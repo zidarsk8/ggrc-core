@@ -1,10 +1,14 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: brad@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
+
 import json
-from ggrc.app import app
-from ggrc.login import login_required
 from flask import render_template, request, flash
 from ggrc.views import base_context
 
-@app.context_processor
+
 def gdrive_context():
   ctx = base_context()
   def instance_json():
@@ -12,21 +16,19 @@ def gdrive_context():
   ctx["instance_json"] = instance_json
   return ctx
 
-@app.route("/gdrive_sandbox")
-@login_required
+
 def sandbox():
   """A demo page for GDrive integration models
   """
   return render_template("sandbox/gdrive.haml")
 
-@app.route("/gcal_sandbox")
-@login_required
+
 def sandbox_gcal():
   """A demo page for GDrive integration models
   """
   return render_template("sandbox/gcal.haml")
 
-@app.route("/audits/post_import_request_hook", methods=['GET'])
+
 def post_import_requests():
   count = unicode(len(json.loads(request.args.get('ids', '[]'))))
   flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
@@ -37,3 +39,21 @@ def post_import_requests():
     audit_id=request.args.get('audit_id', ''),
     created_updated_request_ids=request.args.get("ids", "[]")
   )
+
+
+def init_extra_views(app):
+  from ggrc.login import login_required
+
+  app.context_processor(gdrive_context)
+
+  app.add_url_rule(
+      "/gdrive_sandbox", "sandbox",
+      view_func=login_required(sandbox))
+  app.add_url_rule(
+      "/gcal_sandbox", "sandbox_gcal",
+      view_func=login_required(sandbox_gcal))
+
+  # Since `/audits/post_import_request_hook` is implemented in core, we just
+  #   override it here, rather than declare it anew
+  app.view_functions['post_import_requests'] =\
+      login_required(post_import_requests)

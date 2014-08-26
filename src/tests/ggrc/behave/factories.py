@@ -155,18 +155,18 @@ def factory_for(model_class):
   If there is a factory defined for this model in globals() that factory
   will be used. Otherwise, one will be created and added to globals().
   """
-  if type(model_class) is str or type(model_class) is unicode:
+  if isinstance(model_class, (str, unicode)):
     if '.' in model_class:
       import sys
       path = model_class.split('.')
       module_name = '.'.join(path[:-1])
       factory_name = path[-1]
       __import__(module_name)
-      model_class = getattr(sys.modules[module_name], factory_name)
+      model_class = getattr(sys.modules[module_name], factory_name, None)
     else:
       factory_name = model_class
       import ggrc.models
-      model_class = getattr(ggrc.models, model_class)
+      model_class = ggrc.models.get_model(model_class)
   else:
     factory_name = model_class.__name__
   factory_name = '{0}Factory'.format(factory_name)
@@ -215,6 +215,8 @@ class StandardFactory(ModelFactory):
 
 class SectionFactory(ModelFactory):
   MODEL = models.Section
+  # Explicit `directive` factory is necessary, since it's a `nullable`
+  # column, but uses @validate to maintain requirement
   directive = FactoryStubMarker(models.Regulation)
 
 class ClauseFactory(ModelFactory):
@@ -279,12 +281,15 @@ class ResponseFactory(ModelFactory):
   status = FuzzyChoice(MODEL.VALID_STATES)
 
 class DocumentationResponseFactory(ResponseFactory):
+  MODEL = models.DocumentationResponse
   response_type = 'documentation'
 
 class InterviewResponseFactory(ResponseFactory):
+  MODEL = models.InterviewResponse
   response_type = 'interview'
 
 class PopulationSampleResponseFactory(ResponseFactory):
+  MODEL = models.PopulationSampleResponse
   response_type = 'population sample'
 
 
@@ -320,26 +325,32 @@ class DirectiveSectionFactory(ModelFactory):
 class ObjectControlFactory(ModelFactory):
   MODEL = models.ObjectControl
   status = FuzzyChoice(MODEL.VALID_STATES)
+  controllable = FactoryStubMarker(models.Market)
 
 class ObjectDocumentFactory(ModelFactory):
   MODEL = models.ObjectDocument
   status = FuzzyChoice(MODEL.VALID_STATES)
+  documentable = FactoryStubMarker(models.Market)
 
 class ObjectObjectiveFactory(ModelFactory):
   MODEL = models.ObjectObjective
   status = FuzzyChoice(MODEL.VALID_STATES)
+  objectiveable = FactoryStubMarker(models.Market)
 
 class ObjectOwnerFactory(ModelFactory):
   MODEL = models.ObjectOwner
   status = FuzzyChoice(MODEL.VALID_STATES)
+  ownable = FactoryStubMarker(models.Market)
 
 class ObjectPersonFactory(ModelFactory):
   MODEL = models.ObjectPerson
   status = FuzzyChoice(MODEL.VALID_STATES)
+  personable = FactoryStubMarker(models.Market)
 
 class ObjectSectionFactory(ModelFactory):
   MODEL = models.ObjectSection
   status = FuzzyChoice(MODEL.VALID_STATES)
+  sectionable = FactoryStubMarker(models.Market)
 
 class ObjectiveControlFactory(ModelFactory):
   MODEL = models.ObjectiveControl
@@ -356,7 +367,34 @@ class ProgramDirectiveFactory(ModelFactory):
 class RelationshipFactory(ModelFactory):
   MODEL = models.Relationship
   status = FuzzyChoice(MODEL.VALID_STATES)
+  source = FactoryStubMarker(models.Market)
+  destination = FactoryStubMarker(models.Process)
 
 class SectionObjectiveFactory(ModelFactory):
   MODEL = models.SectionObjective
   status = FuzzyChoice(MODEL.VALID_STATES)
+
+
+# ggrc_basic_permissions model factories
+class RoleFactory(ModelFactory):
+  MODEL = models.get_model("Role")
+
+class UserRoleFactory(ModelFactory):
+  MODEL = models.get_model("UserRole")
+
+class ContextImplicationFactory(ModelFactory):
+  MODEL = models.get_model("ContextImplication")
+
+
+# ggrc_gdrive_integration model factories
+class ObjectFileFactory(ModelFactory):
+  MODEL = models.get_model("ObjectFile")
+  fileable = FactoryStubMarker(models.DocumentationResponse)
+
+class ObjectFolderFactory(ModelFactory):
+  MODEL = models.get_model("ObjectFolder")
+  folderable = FactoryStubMarker(models.Audit)
+
+class ObjectEventFactory(ModelFactory):
+  MODEL = models.get_model("ObjectEvent")
+  eventable = FactoryStubMarker(models.Meeting)

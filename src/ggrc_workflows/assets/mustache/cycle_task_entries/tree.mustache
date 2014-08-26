@@ -1,0 +1,47 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+
+<li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <div class="pull-right">
+    {{^if_equals parent_instance.status 'Verified'}}
+      <a class="info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="CycleTaskEntry" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+      <i class="grcicon-edit"></i>
+      </a>
+
+      {{#if mappings}}
+      {{#is_allowed_all 'delete' mappings}}
+        <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+          {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+          <i class="grcicon-deleted"></i>
+        </a>
+      {{/is_allowed_all}}
+      {{/if}}
+    {{/if_equals}}
+  </div>
+  {{{instance.description}}}
+  {{#child_options.0}}
+    <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
+    </ul>
+  {{/child_options.0}}
+  {{^if_equals parent_instance.status 'Verified'}}
+  {{#defer 'workflowFolder' instance.workflowFolder}}
+    <div class="oneline">
+      <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
+        data-model="{{instance.type}}" data-id="{{instance.id}}" data-folder-id="{{workflowFolder.id}}">
+        <i class="grcicon-attach-color"></i><span>Attach supporting file</span>
+      </a>
+      {{^if workflowFolder}}
+      <small class="error-inline">
+        <strong>Warning:</strong> Workflow folder is not set. Files will be placed in your Gdrive root folder.
+      </small>
+      {{/if}}
+    </div>
+  {{/defer}}
+  {{/if_equals}}
+  <span class="entry-author">Modified by {{#using person=parent_instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date instance.created_at}}</span>
+</li>

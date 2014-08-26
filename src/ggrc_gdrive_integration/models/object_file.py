@@ -32,9 +32,11 @@ class ObjectFile(Base, db.Model):
         else None
     return setattr(self, self.fileable_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('file_id', 'fileable_id', 'fileable_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('file_id', 'fileable_id', 'fileable_type'),
+        )
 
   _publish_attrs = [
       'file_id',
@@ -70,3 +72,11 @@ class Fileable(object):
   _publish_attrs = [
       'object_files',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Fileable, cls).eager_query()
+    return query.options(
+        orm.subqueryload('object_files'))

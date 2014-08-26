@@ -56,7 +56,7 @@ function dateConverter(d, oldValue, fn, key) {
     ret.subtract(new Date().getTimezoneOffset(), "minute");
   }
 
-  if(oldValue && oldValue.getTime && ret.toDate().getTime() === oldValue.getTime()) {
+  if(oldValue && oldValue.getTime && ret && ret.toDate().getTime() === oldValue.getTime()) {
     return oldValue;  // avoid changing to new Date object if the value is the same.
   }
   return ret ? ret.toDate() : undefined;
@@ -112,6 +112,7 @@ can.Model("can.Model.Cacheable", {
         var deferred = $.Deferred()
           , sourceDeferred = finder.call(this, params)
           , self = this
+          , tracker_stop = GGRC.Tracker.start("modelize", self.shortName)
           ;
 
         deferred.then(success, error);
@@ -163,7 +164,7 @@ can.Model("can.Model.Cacheable", {
           deferred.reject.apply(deferred, arguments);
         });
 
-        return deferred;
+        return deferred.done(tracker_stop);
       };
     }
 
@@ -238,7 +239,7 @@ can.Model("can.Model.Cacheable", {
     var id_key = this.id;
     this.bind("created", function(ev, new_obj) {
       var cache = can.getObject("cache", new_obj.constructor, true);
-      if(new_obj[id_key]) {
+      if(new_obj[id_key] || new_obj[id_key] === 0) {
         cache[new_obj[id_key]] = new_obj;
         if(cache[undefined] === new_obj)
           delete cache[undefined];
@@ -288,21 +289,6 @@ can.Model("can.Model.Cacheable", {
       else
         return (new can.Deferred()).reject();
     };
-
-    var that = this;
-    this.risk_tree_options = can.extend(true, {}, this.risk_tree_options); //for subclasses
-    var risk_child_options = that.risk_tree_options.child_options[0];
-    this.risk_tree_options.show_view = GGRC.mustache_path + "/base_objects/tree.mustache";
-    if(risk_child_options) {
-      risk_child_options.find_params.destination_type = that.shortName;
-      risk_child_options.find_params.relationship_type_id = "risk_is_a_threat_to_" + this.root_object;
-    }
-    $(function() {
-      if(risk_child_options)
-        risk_child_options.model = CMS.Models.Risk;
-      if(that.risk_tree_options.child_options && that.risk_tree_options.child_options.length > 1)
-        that.risk_tree_options.child_options[1].model = that;
-    });
   }
 
   , resolve_deferred_bindings : function(obj) {
@@ -373,8 +359,8 @@ can.Model("can.Model.Cacheable", {
   , newInstance : function(args) {
     var cache = can.getObject("cache", this, true);
     if(args && args[this.id] && cache[args[this.id]]) {
-      //cache[args.id].attr(args, false); //CanJS has bugs in recursive merging 
-                                          // (merging -- adding properties from an object without removing existing ones 
+      //cache[args.id].attr(args, false); //CanJS has bugs in recursive merging
+                                          // (merging -- adding properties from an object without removing existing ones
                                           //  -- doesn't work in nested objects).  So we're just going to not merge properties.
       return cache[args[this.id]];
     } else {
@@ -486,25 +472,6 @@ can.Model("can.Model.Cacheable", {
   }
   , tree_view_options : {}
   , list_view_options : {}
-  , risk_tree_options : {
-    single_object : true
-    , child_options : [{
-      model : null
-      , show_view : GGRC.mustache_path + "/risks/tree.mustache"
-      , draw_children : false
-      , find_params : {
-        source_type : "Risk"
-      }
-      , find_function : "findRelatedSource"
-      , create_link : true
-      , related_side : "destination"
-      , parent_find_param : "destination_id"
-    }, {
-      model : null
-      , start_expanded : false
-      , draw_children : true
-    }]
-  }
   , getRootModelName: function() {
     return this.root_model || this.shortName;
   }
@@ -587,31 +554,65 @@ can.Model("can.Model.Cacheable", {
           params.__page = 1;
         }
         if (!params.__page_size) {
-          params.__page_size = 100;
+          params.__page_size = 50;
         }
         return findPageFunc(collection_url, params);
       };
     }
 
   , get_mapper: function(name) {
-      mappers = GGRC.Mappings[this.shortName];
-      mapper = mappers[name];
-      return mapper;
+      var mappers, mapper;
+      mappers = GGRC.Mappings.get_mappings_for(this.shortName);
+      if (mappers) {
+        mapper = mappers[name];
+        return mapper;
+      }
     }
 
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
-    , id_key = this.constructor.id;
-    if (this[id_key])
+      , id_key = this.constructor.id
+      , that = this
+      ;
+
+    if (this[id_key] || this[id_key] === 0)
       cache[this[id_key]] = this;
     this.attr("class", this.constructor);
     this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
-  }
-  , computed_errors : can.compute(function() { return this.errors(); })
 
+    // Listen for `stub_destroyed` change events and nullify or remove the
+    // corresponding property or list item.
+    this.bind("change", function(ev, path, how, newVal, oldVal) {
+      var m, n;
+      m = path.match(/(.*?)\.stub_destroyed$/);
+      if (m) {
+        n = m[1].match(/^([^.]+)\.(\d+)$/);
+        if (n) {
+          that.attr(n[1]).splice(parseInt(n[2], 10), 1);
+        }
+        else {
+          n = m[1].match(/^([^.]+)$/);
+          if (n)
+            that.removeAttr(n[1]);
+        }
+      }
+    });
+  }
+  , computed_errors : can.compute(function() {
+      var errors = this.errors();
+      if(this.attr("_suppress_errors")) {
+        return null;
+      } else {
+        return errors;
+      }
+    })
+  , computed_unsuppressed_errors : can.compute(function() {
+    return this.errors();
+  })
   , get_list_counter: function(name) {
       var binding = this.get_binding(name);
+      if(!binding) return new $.Deferred().reject();
       return binding.refresh_count();
     }
 
@@ -629,7 +630,7 @@ can.Model("can.Model.Cacheable", {
   // This retrieves the potential orphan stats for a given instance
   // Example: "This may also delete 3 Sections, 2 Controls, and 4 object mappings."
   , get_orphaned_count : function(){
-    
+
     if (!this.get_binding('orphaned_objects')) {
       return new $.Deferred().reject();
     }
@@ -748,18 +749,24 @@ can.Model("can.Model.Cacheable", {
     if(!this._pending_refresh) {
       this._pending_refresh = {
         dfd : new $.Deferred()
-        , fn : $.debounce(1000, function() {
+        , fn : $.throttle(1000, true, function() {
           var dfd = that._pending_refresh.dfd;
-          delete that._pending_refresh;
           $.ajax({
             url : href
             , params : params
             , type : "get"
             , dataType : "json"
           })
+          .then(function(resources) {
+            delete that._pending_refresh;
+            return resources;
+          })
           .then($.proxy(that.constructor, "model"))
           .done(function(d) {
-            d.updated();
+            // FIXME: Remove this if it hasn't introduced regressions.  We want
+            //   to avoid triggering `updated` when there haven't been actual
+            //   changes.
+            //d.updated();
             dfd.resolve(d);
           })
           .fail(function() {
@@ -863,12 +870,15 @@ can.Model("can.Model.Cacheable", {
 
     xhr = this._super.apply(this, arguments).then(function(result) {
       if(isNew) {
-        this.after_create && this.after_create();
+        that.after_create && that.after_create();
       } else {
-        this.after_update && this.after_update();
+        that.after_update && that.after_update();
       }
-      this.after_save && this.after_save();
+      that.after_save && that.after_save();
       return result;
+    }, function(xhr, status, message) {
+      that.save_error && that.save_error(xhr.responseText);
+      return new $.Deferred().reject(xhr, status, message);
     });
 
     xhr.always(function() {
@@ -881,6 +891,16 @@ can.Model("can.Model.Cacheable", {
     GGRC.delay_leaving_page_until(dfd);
 
     return $.when(xhr, dfd).then(function(xhr_result) { return xhr_result; });
+  },
+  refresh_all: function() {
+    var props = Array.prototype.slice.call(arguments, 0);
+
+    return RefreshQueue.refresh_all(this, props);
+  },
+  refresh_all_force: function() {
+    var props = Array.prototype.slice.call(arguments, 0);
+
+    return RefreshQueue.refresh_all(this, props, true);
   }
 });
 
@@ -895,28 +915,71 @@ can.Observe.prototype.attr = function(key, val) {
     return _old_attr.apply(this, arguments);
   }
 }
-can.Observe.prototype.stub = function() {
-  var type;
 
-  if (this.constructor.shortName)
+can.Observe.prototype.stub = function() {
+  if (!(this instanceof can.Model || this instanceof can.Stub))
+    console.debug(".stub() called on non-stub, non-instance object", this);
+
+  var type, id, stub;
+
+  if (this instanceof can.Stub)
+    return this;
+
+  if (this instanceof can.Model)
     type = this.constructor.shortName;
   else
     type = this.type;
 
-  if (!this.id)
+  if (this.constructor.id)
+    id = this[this.constructor.id];
+  else
+    id = this.id;
+
+  if (!id && id !== 0)
     return null;
 
-  var obj = {
-    id : this.id,
-    href : this.selfLink || this.href,
-    type : type
-  };
-  if(this.constructor.id && this.constructor.id !== "id") {
-    obj[this.constructor.id] = this[this.constructor.id];
-  }
-
-  return new can.Observe(obj);
+  return can.Stub.get_or_create({
+    id: id,
+    href: this.selfLink || this.href,
+    type: type
+  });
 };
+
+can.Observe("can.Stub", {
+  get_or_create: function(obj) {
+    var id = obj.id
+      , type = obj.type
+      ;
+
+    CMS.Models.stub_cache = CMS.Models.stub_cache || {};
+    CMS.Models.stub_cache[type] = CMS.Models.stub_cache[type] || {};
+    if (!CMS.Models.stub_cache[type][id]) {
+      stub = new can.Stub(obj);
+      CMS.Models.stub_cache[type][id] = stub;
+    }
+    return CMS.Models.stub_cache[type][id];
+  }
+}, {
+  init: function() {
+    var that = this;
+    this._super.apply(this, arguments);
+    this._instance().bind("destroyed", function(ev) {
+      // Trigger propagating `change` event to convey `stub-destroyed` message
+      can.trigger(that, "change", ["stub_destroyed", "stub_destroyed", that, null]);
+      delete CMS.Models.stub_cache[that.type][that.id];
+    });
+  },
+
+  _model: function() {
+    return CMS.Models[this.type] || GGRC.Models[this.type];
+  },
+
+  _instance: function() {
+    if (!this.__instance)
+      this.__instance = this._model().model(this);
+    return this.__instance;
+  }
+});
 
 can.Observe.List.prototype.stubs = function() {
   return new can.Observe.List(can.map(this, function(obj) {
@@ -925,21 +988,20 @@ can.Observe.List.prototype.stubs = function() {
 }
 
 can.Observe.prototype.reify = function() {
-  var type = this.constructor.shortName || this.type;
-  var model;
-  if (this.selfLink) {
+  var type, model;
+
+  if (this instanceof can.Model)
     return this;
-  } else if (model = (CMS.Models[type] || GGRC.Models[type])) {
-    if (model.cache
-        && model.cache[this[model.id]]) {
-        //&& CMS.Models[this.type].cache[this.id].selfLink) {
-      return model.cache[this[model.id]];
-    } else {
-      return null;
-    }
-  } else {
+  if (!(this instanceof can.Stub))
     console.debug("`reify()` called on non-stub, non-instance object", this);
-  }
+
+  type = this.type;
+  model = CMS.Models[type] || GGRC.Models[type];
+
+  if (!model)
+    console.debug("`reify()` called with unrecognized type", this);
+
+  return model.model(this);
 };
 
 can.Observe.List.prototype.reify = function() {

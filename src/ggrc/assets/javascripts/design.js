@@ -9,13 +9,6 @@
  * Extra scripts for beta designs
  * ========================================================= */
 
-/*
- *= require dashboard
- *= require jquery.cookie
- *= require bootstrap-datepicker
- *= require apps/pbc
- */
-
 jQuery(function ($) {
 
   //render out templates function
@@ -82,7 +75,6 @@ jQuery(function ($) {
 /* no worky 
   $(document).on("click", ".sluggroup", function(event){
     //alert("here");
-   // $('.riskWidget').each(function(i){
     var $this = $(this);
     $('.sluggroup').removeClass('selected');
     $this.addClass('selected');
@@ -424,26 +416,6 @@ $('body').on('click', '#showCompanyDirectory', function(e) {
   });
 });
 
-function toggleRisk() {
-  //$('.riskWidget').fadeToggle("fast", "linear");
-  var interval = 200;
-  $('.riskWidget').each(function(i){
-    var el = $(this);
-    if(el.hasClass('active')){
-      $('#grcbutton-risk').addClass('halfopacity').removeClass('active');
-      $.cookie('toggle_risk', null);
-      el.delay(i*interval).slideUp(interval);
-      el.removeClass('active');
-    }else{
-      $('#grcbutton-risk').removeClass('halfopacity').addClass('active');
-      $.cookie('toggle_risk', '1', { expires: 1, path: '/' });
-      el.delay(i*interval).slideDown(interval);
-      el.addClass('active');
-    }
-  });
-
-}
-
 function toggleGovernance() {
    var interval = 200;
   $('.govWidget').each(function(i){
@@ -463,60 +435,11 @@ function toggleGovernance() {
 
 }
 
-
-/* Hack to show a prototype of stacked modal slideout/in */
-/* Specific to two modals currently and ignores bootstrap modal functionality (ie I think they use a toggle)
-
-$(document).on("click", "#openSecondModal", function(event) {
-    
-
-          firstmodal = $(this).closest('.modal');
-          secondmodal = $('#basicnewpersonModal');
-
-          secondmodal.css({"margin-left": "+=1050px"});
-          secondmodal.modal('show').fadeIn('slow');
-             
-          firstmodal.animate({ left: parseInt(firstmodal.css('left'),1200) == -300 ? firstmodal.outerWidth() : -300 });
-          firstmodal.addClass('halfopacity');
-          secondmodal.animate({ left: parseInt(firstmodal.css('left'),1200) == -300 ? firstmodal.outerWidth() : -300 });
-
-
-  });
-
-
-$(document).on("click", "#closeSecondModal", function(event) {
-
-
-          secondmodal = $(this).closest('.modal');
-          firstmodal = $('#showSecondModal');
-
-              secondmodal.modal('hide').fadeOut('slow');
-
-              secondmodal.css({"margin-left": "-=1050px"});
-                 
-              firstmodal.animate({ left: parseInt(firstmodal.css('left'),1200) == 750 ? firstmodal.outerWidth() : 750 });
-              firstmodal.removeClass('halfopacity');
-              //secondmodal.animate({ left: parseInt(firstmodal.css('left'),1200) == 600 ? firstmodal.outerWidth() : 600 });
-
-});
-
-//THE ABOVE SHOULD BE IMPLEMENTED VIA BRAD'S SOLUTION
- */
-
 jQuery(function($) {
   if ($.cookie('toggle_governance') == '1')
     toggleGovernance();
   else
     $('.govWidget').hide();
-  if ($.cookie('toggle_risk') == '1')
-    toggleRisk();
-  else
-    $('.riskWidget').hide();
-
-  $('body').on('click', '#grcbutton-risk', function(e) {
-    toggleRisk();
-    e.preventDefault();
-  });
 
   $('body').on('click', '#grcbutton-governance', function(e) {
     toggleGovernance();

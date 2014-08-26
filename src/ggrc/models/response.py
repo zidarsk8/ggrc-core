@@ -5,18 +5,25 @@
 
 from ggrc import db
 from .mixins import (
-    deferred, Noted, Described, Hyperlinked, WithContact, Slugged,
+    deferred, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
     )
 from .relationship import Relatable
 from .object_document import Documentable
 from .object_person import Personable
 from .object_control import Controllable
 
-class Response(Noted, Described, Hyperlinked, WithContact, Slugged, db.Model):
+class Response(
+    Noted, Described, Hyperlinked, WithContact, Titled, Slugged, db.Model):
   __tablename__ = 'responses'
   __mapper_args__ = {
       'polymorphic_on': 'response_type',
       }
+  _title_uniqueness = False
+  _slug_uniqueness = False
+
+  # Override `Titled.title` to provide default=""
+  title = deferred(
+      db.Column(db.String, nullable=False, default=""), 'Response')
 
   VALID_STATES = (u'Assigned', u'Submitted', u'Accepted', u'Rejected')
   VALID_TYPES = (u'documentation', u'interview', u'population sample')
@@ -27,12 +34,47 @@ class Response(Noted, Described, Hyperlinked, WithContact, Slugged, db.Model):
   status = deferred(db.Column(db.String, nullable=False),
     'Response')
 
+  population_worksheet_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=True),
+      'Response')
+  population_count = deferred(db.Column(db.Integer, nullable=True),
+    'Response')
+  sample_worksheet_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=True),
+      'Response')
+  sample_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
+  sample_evidence_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=True),
+      'Response')
+
+  population_worksheet = db.relationship(
+    "Document",
+    foreign_keys="PopulationSampleResponse.population_worksheet_id"
+    )
+  sample_worksheet = db.relationship(
+    "Document",
+    foreign_keys="PopulationSampleResponse.sample_worksheet_id"
+    )
+  sample_evidence = db.relationship(
+    "Document",
+    foreign_keys="PopulationSampleResponse.sample_evidence_id"
+    )
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('population_worksheet_document', 'population_worksheet_id'),
+        db.Index('sample_evidence_document', 'sample_evidence_id'),
+        db.Index('sample_worksheet_document', 'sample_worksheet_id'),
+        )
+
   _publish_attrs = [
       'request',
       'status',
       'response_type',
       ]
   _sanitize_html = [
+      'description',
       ]
 
   def _display_name(self):
@@ -102,32 +144,6 @@ class PopulationSampleResponse(
       'polymorphic_identity': 'population sample'
       }
   _table_plural = 'population_sample_responses'
-
-  population_worksheet_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False),
-      'Response')
-  population_count = deferred(db.Column(db.Integer, nullable=True),
-    'Response')
-  sample_worksheet_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False),
-      'Response')
-  sample_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
-  sample_evidence_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False),
-      'Response')
-
-  population_worksheet = db.relationship(
-    "Document",
-    foreign_keys="PopulationSampleResponse.population_worksheet_id"
-    )
-  sample_worksheet = db.relationship(
-    "Document",
-    foreign_keys="PopulationSampleResponse.sample_worksheet_id"
-    )
-  sample_evidence = db.relationship(
-    "Document",
-    foreign_keys="PopulationSampleResponse.sample_evidence_id"
-    )
 
   _publish_attrs = [
       'population_worksheet',

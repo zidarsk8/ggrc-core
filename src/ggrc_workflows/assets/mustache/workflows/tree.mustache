@@ -1,0 +1,80 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+
+  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
+    <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+      <div class="openclose">
+        <a class="openclose-placeholder" href="javascript://"> </a>
+        <div class="row-fluid">
+          <div class="span12">
+
+            <ul class="tree-action-list">
+              {{#infer_roles instance}}
+                <li>
+                  <div class="item-data">
+                    <div class="tree-title-area">
+                      <span class="role">
+                        {{.}}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              {{/infer_roles}}
+              <li>
+                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+              </li>
+              {{#instance}}
+                {{#is_private}}
+                  <li>
+                    <div class="counter">
+                      <i class="grcicon-private"></i>
+                    </div>
+                  </li>
+                {{/is_private}}
+              {{/instance}}
+              <li>
+                {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
+              </li>
+            </ul>
+
+            <div class="item-data">
+              <div class="tree-title-area">
+                <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{#if expanded}}
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        {{> '/static/mustache/workflows/tier2_content.mustache'}}
+      </div>
+
+      {{#if_helpers '\
+        #if' draw_children '\
+        and ^if_equals' instance.workflow_state 'Verified'}}
+        {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
+            {{#child_options}}
+              <div class="inner-tree">
+                <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})
+                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
+                </h6>
+                <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
+              </div>
+            {{/child_options}}
+        {{/prune_context}}
+      {{/if}}
+
+    </div>
+    {{/if}}
+  </li>

@@ -7,5 +7,8 @@ from .object_event import ObjectEvent
 ggrc.models.all_models.ObjectFolder = ObjectFolder
 ggrc.models.all_models.ObjectFile = ObjectFile
 ggrc.models.all_models.ObjectEvent = ObjectEvent
+ggrc.models.all_models.ObjectFolder._inflector
+ggrc.models.all_models.ObjectFile._inflector
+ggrc.models.all_models.ObjectEvent._inflector
 ggrc.models.all_models.all_models += [ObjectFolder, ObjectFile, ObjectEvent]
 ggrc.models.all_models.__all__ += [ObjectFolder.__name__, ObjectFile.__name__, ObjectEvent.__name__]

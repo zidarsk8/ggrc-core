@@ -1,0 +1,18 @@
+{{#is_allowed 'create' 'TaskGroupObject' context=parent_instance.context}}
+<li class="tree-footer non-stick">
+  <a
+    href="javascript://"
+    class="inline-footer-link"
+    data-toggle="multitype-object-modal-selector"
+    data-modal-class="modal-wide"
+    data-modal-reset="reset"
+    data-placement="left"
+    data-join-mapping="objects"
+    data-join-object-id="{{parent_instance.id}}"
+    data-join-object-type="TaskGroup"
+    data-exclude-option-types=""
+    >
+    + Add Object
+  </a>
+</li>
+{{/is_allowed}}

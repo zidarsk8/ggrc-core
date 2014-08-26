@@ -12,7 +12,7 @@ from sqlalchemy.orm import relationship, validates
 from sqlalchemy.orm.session import Session
 from uuid import uuid1
 from .inflector import ModelInflectorDescriptor
-from .reflection import PublishOnly
+from .reflection import AttributeInfo, PublishOnly
 from .computed_property import computed_property
 
 """Mixins to add common attributes and relationships. Note, all model classes
@@ -56,7 +56,7 @@ class Identifiable(object):
   def eager_query(cls):
     mapper_class = cls._sa_class_manager.mapper.base_mapper.class_
     return db.session.query(cls).options(
-        db.undefer_group(mapper_class.__name__+'_complete'),
+        db.Load(mapper_class).undefer_group(mapper_class.__name__+'_complete'),
         )
 
   @classmethod
@@ -65,9 +65,48 @@ class Identifiable(object):
     options = []
     for include_link in include_links:
       inclusion_class = getattr(cls, include_link).property.mapper.class_
-      options.append(orm.joinedload(include_link))
-      options.append(orm.undefer_group(inclusion_class.__name__ + '_complete'))
+      options.append(
+          orm.subqueryload(include_link)\
+              .undefer_group(inclusion_class.__name__ + '_complete'))
     return query.options(*options)
+
+  @declared_attr
+  def __table_args__(cls):
+    extra_table_args = AttributeInfo.gather_attrs(cls, '_extra_table_args')
+    table_args = []
+    table_dict = {}
+    for table_arg in extra_table_args:
+      if callable(table_arg):
+        table_arg = table_arg()
+      if isinstance(table_arg, (list, tuple, set)):
+        if isinstance(table_arg[-1], (dict,)):
+          table_dict.update(table_arg[-1])
+          table_args.extend(table_arg[:-1])
+        else:
+          table_args.extend(table_arg)
+      elif isinstance(table_arg, (dict,)):
+        table_dict.update(table_arg)
+      else:
+        table_args.append(table_arg)
+    if len(table_dict) > 0:
+      table_args.append(table_dict)
+    return tuple(table_args,)
+
+  # FIXME: This is not the right place, but there is no better common base
+  #   class
+  def copy_into(self, _other, columns, **kwargs):
+    target = _other or type(self)()
+
+    columns = set(columns).union(kwargs.keys())
+    for name in columns:
+      if name in kwargs:
+        value = kwargs[name]
+      else:
+        value = getattr(self, name)
+      setattr(target, name, value)
+
+    return target
+
 
 def created_at_args():
   """Sqlite doesn't have a server, per se, so the server_* args are useless."""
@@ -121,6 +160,28 @@ class ChangeTracked(object):
       'updated_at',
       ]
   _update_attrs = []
+
+
+class Titled(object):
+
+  @declared_attr
+  def title(cls):
+    return deferred(db.Column(db.String, nullable=False), cls.__name__)
+
+  @staticmethod
+  def _extra_table_args(cls):
+    if getattr(cls, '_title_uniqueness', True):
+      return (
+          db.UniqueConstraint(
+            'title', name='uq_t_{}'.format(cls.__tablename__)),
+          )
+    return ()
+
+  # REST properties
+  _publish_attrs = ['title']
+  _fulltext_attrs = ['title']
+  _sanitize_html = ['title']
+
 
 class Described(object):
   @declared_attr
@@ -223,7 +284,7 @@ class Stateful(object):
     if value is None:
       value = self.default_status()
     if value not in self.valid_statuses():
-      message = "Invalid state '{}'".format(value)
+      message = u"Invalid state '{}'".format(value)
       raise ValueError(message)
     return value
 
@@ -236,6 +297,12 @@ class ContextRBAC(object):
   @declared_attr
   def context(cls):
     return db.relationship('Context', uselist=False)
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('fk_{}_contexts'.format(cls.__tablename__), 'context_id'),
+        )
 
   _publish_attrs = ['context']
 
@@ -281,18 +348,23 @@ class Slugged(Base):
   "slugged" and have additional fields related to their publishing in the
   system.
   """
+
   @declared_attr
   def slug(cls):
     return deferred(db.Column(db.String, nullable=False), cls.__name__)
 
-  @declared_attr
-  def title(cls):
-    return deferred(db.Column(db.String, nullable=False), cls.__name__)
+  @staticmethod
+  def _extra_table_args(cls):
+    if getattr(cls, '_slug_uniqueness', True):
+      return (
+          db.UniqueConstraint('slug', name='uq_{}'.format(cls.__tablename__)),
+          )
+    return ()
 
   # REST properties
-  _publish_attrs = ['slug', 'title']
-  _fulltext_attrs = ['slug', 'title']
-  _sanitize_html = ['slug', 'title']
+  _publish_attrs = ['slug']
+  _fulltext_attrs = ['slug']
+  _sanitize_html = ['slug']
 
   @classmethod
   def generate_slug_for(cls, obj):
@@ -348,11 +420,17 @@ class WithContact(object):
         uselist=False,
         foreign_keys='{}.contact_id'.format(cls.__name__))
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('fk_{}_contact'.format(cls.__tablename__), 'contact_id'),
+        )
+
   _publish_attrs = ['contact']
 
 
 class BusinessObject(
-    Stateful, Noted, Described, Hyperlinked, WithContact, Slugged):
+    Stateful, Noted, Described, Hyperlinked, WithContact, Titled, Slugged):
   VALID_STATES = [
       'Draft',
       'Final',

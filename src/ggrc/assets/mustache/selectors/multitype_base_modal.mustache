@@ -8,7 +8,7 @@
 {{!<div id='{ id }' class='modal modal-selector fade hide' tabindex='-1'>}}
     <div class="modal-header">
       <div class="pull-right">
-        <a class="btn btn-danger btn-mini" href="#" data-dismiss="modal">
+        <a class="btn btn-danger btn-mini" href="javascript://" data-dismiss="modal">
           <i class="grcicon-x-white"></i>
         </a>
       </div>
@@ -50,15 +50,42 @@
           &nbsp;
           {{#selected_option_type}}
           <div class="pull-right">
-            <a class="btn btn-add" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="{{related_model_singular}}" data-object-plural="{{related_table_plural}}" {{#if_equals related_model_singular "Objective"}}data-object-params='{ "description": "{{json_escape object_params.section.description}}" }'{{/if_equals}}>
+            {{#is_allowed 'create' related_model_singular context='any'}}
+            {{#if_equals related_model_singular "Objective"}}
+            <a class="btn btn-add"
+               href="javascript://"
+               data-mapping="true"
+               data-toggle="modal-ajax-form"
+               data-modal-class="modal-wide"
+               data-object-singular="{{related_model_singular}}"
+               data-object-plural="{{related_table_plural}}"
+               data-object-params='{ "description": "{{json_escape object_params.section.description}}" }'>
               <i class="grcicon-add"></i>
               {{#if_equals new_object_title 'Person'}}
-                Add 
+                Add
               {{else}}
-                Create 
+                Create
               {{/#if_equals}}
               {{ new_object_title }}
             </a>
+            {{else}}
+            <a class="btn btn-add"
+               href="javascript://"
+               data-mapping="true"
+               data-toggle="modal-ajax-form"
+               data-modal-class="modal-wide"
+               data-object-singular="{{related_model_singular}}"
+               data-object-plural="{{related_table_plural}}">
+              <i class="grcicon-add"></i>
+              {{#if_equals new_object_title 'Person'}}
+                Add
+              {{else}}
+                Create
+              {{/#if_equals}}
+              {{ new_object_title }}
+            </a>
+            {{/if_equals}}
+            {{/is_allowed}}
           </div>
           {{/selected_option_type}}
         </div>
@@ -76,10 +103,10 @@
             <div class="row-fluid">
               <div class="span12">
                 <div class="modal-search">
-                  <a class="btn btn-mini search-reset" href="#">
+                  <a class="btn btn-mini search-reset" href="javascript://">
                     <i class="grcicon-x-grey"></i>
                   </a>
-                  <input id="search" class="input-block-level" placeholder="Search..." value="{{option_search_term}}" type="text">
+                  <input id="search" class="input-block-level" placeholder="Search..." value="{{option_search_term}}" type="text" autofocus>
                 </div>
               </div>
             </div>
@@ -109,7 +136,7 @@
             {{#is_page_instance}}
               <span class="error">Can't map an object to itself<span>
             {{/is_page_instance}}
-            <a class="btn btn-primary preventdoubleclick 
+            <a class="btn btn-primary preventdoubleclick
               {{#if_helpers '\
                 ^if' selected_option '\
                 or #if' is_page_instance}} disabled {{/if_helpers}}map-button" href="javascript://">

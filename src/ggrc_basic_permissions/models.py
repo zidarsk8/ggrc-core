@@ -29,7 +29,7 @@ class Role(Base, Described, db.Model):
 
   name = db.Column(db.String(128), nullable=False)
   permissions_json = db.Column(db.Text(), nullable=False)
-  scope = db.Column(db.String(64), nullable=False)
+  scope = db.Column(db.String(64), nullable=True)
 
   @simple_property
   def permissions(self):
@@ -55,11 +55,42 @@ class Role(Base, Described, db.Model):
 
 from ggrc.models.person import Person
 Person._publish_attrs.extend(['user_roles'])
-Person._include_links.extend(['user_roles'])
+# FIXME: Cannot use `include_links`, because Memcache expiry doesn't handle
+#   sub-resources correctly
+#Person._include_links.extend(['user_roles'])
+
+
+# Override `Person.eager_query` to ensure `user_roles` is loaded efficiently
+_orig_Person_eager_query = Person.eager_query
+def _Person_eager_query(cls):
+  from sqlalchemy import orm
+
+  return _orig_Person_eager_query().options(
+      orm.subqueryload('user_roles'),
+      #orm.subqueryload('user_roles').undefer_group('UserRole_complete'),
+      #orm.subqueryload('user_roles').joinedload('context'),
+      #orm.subqueryload('user_roles').joinedload('role'),
+      )
+Person.eager_query = classmethod(_Person_eager_query)
+
+
+from ggrc.models.context import Context
+Context._publish_attrs.extend(['user_roles'])
+_orig_Context_eager_query = Context.eager_query
+def _Context_eager_query(cls):
+  from sqlalchemy import orm
+
+  return _orig_Context_eager_query().options(
+      orm.subqueryload('user_roles')
+      )
+Context.eager_query = classmethod(_Context_eager_query)
 
 
 class UserRole(Base, db.Model):
   __tablename__ = 'user_roles'
+
+  # Override default from `ContextRBAC` to provide backref
+  context = db.relationship('Context', backref='user_roles')
 
   role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'), nullable=False)
   role = db.relationship(
@@ -67,6 +98,12 @@ class UserRole(Base, db.Model):
   person_id = db.Column(db.Integer(), db.ForeignKey('people.id'), nullable=False)
   person = db.relationship(
       'Person', backref=backref('user_roles', cascade='all, delete-orphan'))
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('ix_user_roles_person', 'person_id'),
+        )
 
   _publish_attrs = ['role', 'person']
 
@@ -88,7 +125,8 @@ class UserRole(Base, db.Model):
     query = super(UserRole, cls).eager_query()
     return query.options(
         orm.subqueryload('role'),
-        orm.subqueryload('person'))
+        orm.subqueryload('person'),
+        orm.subqueryload('context'))
 
   def _display_name(self):
     if self.context and self.context.related_object:
@@ -146,3 +184,16 @@ class ContextImplication(Base, db.Model):
         source_context=source_context_display_name,
         context=context_display_name,
         )
+
+
+import ggrc.models.all_models
+
+ggrc.models.all_models.Role = Role
+ggrc.models.all_models.UserRole = UserRole
+ggrc.models.all_models.ContextImplication = ContextImplication
+ggrc.models.all_models.Role._inflector
+ggrc.models.all_models.UserRole._inflector
+ggrc.models.all_models.ContextImplication._inflector
+ggrc.models.all_models.all_models.extend([Role, UserRole, ContextImplication])
+ggrc.models.all_models.__all__.extend(
+    ["Role", "UserRole", "ContextImplication"])

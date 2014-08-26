@@ -5,10 +5,11 @@
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import deferred, Base, Described, Slugged
+from .mixins import deferred, Base, Described, Titled, Slugged
 
-class Request(Slugged, Described, Base, db.Model):
+class Request(Titled, Slugged, Described, Base, db.Model):
   __tablename__ = 'requests'
+  _title_uniqueness = False
 
   VALID_TYPES = (u'documentation', u'interview', u'population sample')
   VALID_STATES = (u'Draft', u'Requested', u'Responded', u'Amended Request',
@@ -57,6 +58,7 @@ class Request(Slugged, Described, Base, db.Model):
     'gdrive_upload_path',
     'test',
     'notes',
+    'description',
   ]
 
   def _display_name(self):

@@ -1,7 +1,38 @@
+{{!  multiple instances case }}
 {{^is_dashboard}}
   {{#with_page_object_as 'page_instance'}}
     {{^if_equals parent_instance page_instance}}
+      {{#if multiple_mapping_case}}
+      {{#with_mappable_instances_as 'processed_list' list}}
+      {{#with_direct_mappings_as 'mappings' page_instance processed_list}}
+      {{#with_mapping_instances_as 'mapped_instances' mappings}}
+      {{#with_subtracted_list_as 'unmapped_instances' processed_list mapped_instances}}
+        {{#if_equals unmapped_instances.length 0}}
+          {{#with_allowed_as 'deletable_mappings' 'delete' mappings}}
+            {{#if deletable_mappings.length}}
+              <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap">
+                {{#deletable_mappings}}<span class="result" {{data 'result'}}></span>{{/deletable_mappings}}
+                <i class="grcicon-checked"></i>
+                Make All Relevant
+              </a>
+            {{/if}}
+          {{/with_allowed_as}}
+        {{else}}
+          {{#if unmapped_instances.length}}
+            {{! we permission checked for create up in with_mappable_instances_as}}
+            <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#with processed_list}}{{data 'instance'}}{{/with}} {{#with mappings}}{{data 'existing_mappings'}}{{/with}}>
+              <i class="grcicon-check"></i>
+              Make All Relevant
+            </a>
+          {{/if}}
+        {{/if_equals}}
+      {{/with_subtracted_list_as}}
+      {{/with_mapping_instances_as}}
+      {{/with_direct_mapping_as}}
+      {{/with_mappable_instances_as}}
+      {{else}}
       {{#with_direct_mappings_as 'mappings' page_instance instance}}
+        {{^if_equals page_instance instance}}
         {{#if mappings.length}}
           {{#is_allowed_all 'delete' mappings}}
             <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap">
@@ -18,7 +49,9 @@
           </a>
           {{/is_allowed_to_map}}
         {{/if}}
+        {{/if_equals}}
       {{/with_direct_mapping_as}}
+      {{/if}}
     {{/if_equals}}
   {{/with_page_object_as}}
 {{/is_dashboard}}

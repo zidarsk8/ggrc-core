@@ -5,14 +5,19 @@
 
 from ggrc import db
 from .mixins import (
-    deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact, Slugged,
+    deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact,
+    Titled, Slugged,
     )
 from .object_person import Personable
+from .context import HasOwnContext
+
 
 class Audit(
-    Personable,
-    Timeboxed, Noted, Described, Hyperlinked, WithContact, Slugged, db.Model):
+    Personable, HasOwnContext,
+    Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
+    db.Model):
   __tablename__ = 'audits'
+  _slug_uniqueness = False
 
   VALID_STATES = (
       u'Planned', u'In Progress', u'Manager Review',
@@ -45,10 +50,11 @@ class Audit(
 
   _sanitize_html = [
     'gdrive_evidence_folder',
+    'description',
     ]
 
   _include_links = [
-    'requests',
+    #'requests',
     ]
 
   @classmethod
@@ -59,4 +65,4 @@ class Audit(
     return query.options(
       orm.joinedload('program'),
       orm.subqueryload('requests'),
-      orm.subqueryload_all('object_people.person'))
+      orm.subqueryload('object_people').joinedload('person'))

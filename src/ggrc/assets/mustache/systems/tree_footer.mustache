@@ -43,12 +43,16 @@
         </a>
         &nbsp;
         &nbsp;
+        {{#if allow_creating}}
+        {{#is_allowed 'create' model.shortName context=null}}
         <a href="{{parent_instance.viewLink}}/import_systems?return_to={{param_current_location}}" class="section-import">
           <i class="grcicon-imp-exp"></i>
           Import Systems
         </a>
         &nbsp;
         &nbsp;
+        {{/is_allowed}}
+        {{/if}}
         {{#if list.length}}
         <a href="{{parent_instance.viewLink}}/export_systems?ids={{instance_ids list}}" class="section-import">
           <i class="grcicon-export"></i>

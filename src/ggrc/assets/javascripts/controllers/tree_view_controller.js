@@ -18,6 +18,49 @@ function _firstElementChild(el) {
   }
 }
 
+
+function _display_tree_subpath(el, path) {
+  var rest = path.split("/")
+    , type = rest.shift()
+    , id = rest.shift()
+    , selector = "[data-object-type=" + type + "][data-object-id=" + id + "]"
+    , $node
+    , $next_node
+    , node_controller;
+    ;
+
+  rest = rest.join("/");
+
+  if (type || id) {
+    $node = el.find(selector);
+    //  Try to scroll the element into view by scrolling the *next* element in,
+    //  then possibly backing up to scro
+    //  Find nearest next element,
+    $next_node = $node.closest(':has(+)').next();
+
+    if ($next_node[0] && $next_node[0].scrollIntoView) {
+      $next_node[0].scrollIntoView();
+    }
+
+    if ($node[0] && $node[0].scrollIntoView) {
+      $node[0].scrollIntoView();
+    }
+
+    node_controller = $node.control();
+    if (node_controller && node_controller.display_path) {
+      return node_controller.display_path(rest);
+    }
+    else {
+      //  TODO: `resolve` or `reject` if path isn't found?
+      return new $.Deferred().resolve();
+    }
+  }
+  else {
+    return new $.Deferred().resolve();
+  }
+}
+
+
 can.Observe("can.Observe.TreeOptions", {
   defaults : {
     instance : undefined
@@ -33,7 +76,213 @@ can.Observe("can.Observe.TreeOptions", {
   // }
 });
 
-can.Control("CMS.Controllers.TreeView", {
+can.Control("CMS.Controllers.TreeLoader", {
+  defaults : {}
+}, {
+  init_spinner: function() {
+    var spinner
+      , $spinner
+      , $spinner_li
+      , $footer = this.element.children('.tree-footer').first()
+      ;
+
+    if (this.element) {
+      // Only show the spinner if this is the last subtree
+      // FIXME: This spinner will disappear when this list is completely
+      //   loaded, even if other lists are still pending.
+      if (this.element.next().length > 0)
+        return;
+
+      spinner = new Spinner({
+          "radius": 4
+        , "length": 4
+        , "width": 2
+        }).spin();
+      $spinner = $(spinner.el);
+      $spinner_li = $('<li class="tree-footer tree-item tree-spinner" />');
+      $spinner_li.append($spinner);
+      $spinner.css({
+          display: 'inline-block'
+        , paddingLeft: '20px'
+        , left: '10px'
+        , top: '-4px'
+      });
+      // Admin dashboard
+      if ($footer.length == 0 && this.element.children('.tree-structure').length > 0) {
+        this.element.children('.tree-structure').append($spinner_li);
+      }
+      // My Work
+      else if($footer.length == 0){
+        this.element.append($spinner_li);
+      }
+      else {
+        $footer.before($spinner_li);
+      }
+    }
+  }
+  , prepare: function() {
+    var that = this;
+
+    if (this._prepare_deferred)
+      return this._prepare_deferred;
+
+    this._prepare_deferred = new $.Deferred();
+    this._prepare_deferred.resolve();
+
+    this._attached_deferred.then(function() {
+      if (that.element) {
+        that.element.trigger("updateCount", 0)
+        that.init_count();
+      }
+    });
+
+    return this._prepare_deferred;
+  }
+  , display: function() {
+      var that = this
+        , tracker_stop = GGRC.Tracker.start(
+            "TreeView", "display", this.options.model.shortName)
+        ;
+
+      if (this._display_deferred) {
+        return this._display_deferred;
+      }
+
+      this._display_deferred = $.when(this._attached_deferred, this.prepare());
+
+      this._display_deferred = this._display_deferred.then(this._ifNotRemoved(function() {
+        return $.when(that.fetch_list(), that.init_view())
+          .then(that._ifNotRemoved(that.proxy("draw_list")));
+      })).done(tracker_stop);
+
+      return this._display_deferred;
+    }
+  , draw_list : function(list) {
+    if (this._draw_list_deferred)
+      return this._draw_list_deferred;
+    this._draw_list_deferred = new $.Deferred();
+    if (this.element && !this.element.closest('body').length)
+      return;
+
+    var that = this
+      , refresh_queue = new RefreshQueue();
+
+    if(list) {
+      list = list.length == null ? new can.Observe.List([list]) : list;
+    } else {
+      list = this.options.list;
+    }
+
+    if(!this.element)
+      return;  //controller has been destroyed
+
+    if(!this.options.original_list) {
+      this.options.attr("original_list", list);
+    }
+    this.options.attr("list", []);
+    this.on();
+
+    var temp_list = [];
+    can.each(list, function(v, i) {
+      var item = that.prepare_child_options(v);
+      temp_list.push(item);
+      if(!item.instance.selfLink) {
+        refresh_queue.enqueue(v.instance);
+      }
+    });
+
+    temp_list = can.map(temp_list, function(o) { if (o.instance.selfLink) return o; })
+    this._draw_list_deferred = this.enqueue_items(temp_list);
+    return this._draw_list_deferred;
+  }
+  , _loading_started: function() {
+      if (!this._loading_deferred) {
+        this._loading_deferred = new $.Deferred();
+        this.init_spinner();
+        this.element.trigger("loading");
+      }
+    }
+
+  , _loading_finished: function() {
+      var loading_deferred;
+      if (this._loading_deferred) {
+        this.element.trigger("loaded");
+        this.element.find(".tree-spinner").remove();
+        loading_deferred = this._loading_deferred;
+        this._loading_deferred = null;
+        loading_deferred.resolve();
+      }
+    }
+
+  , enqueue_items: function(items) {
+      var that = this
+        , processChunk;
+
+      if (!items || items.length == 0) {
+        return new $.Deferred().resolve();
+      }
+
+      if (!this._pending_items) {
+        this._pending_items = [];
+        this._loading_started();
+      }
+
+      this._pending_items.push.apply(this._pending_items, items);
+      this._pending_items_ms = Date.now();
+
+      processChunk = function() {
+        if (!that._pending_items) {
+          return;
+        }
+        var chunk = that._pending_items.splice(0, 5),
+            to_refresh = can.map(chunk, function(item) {
+              item = item.instance || item;
+              return item.selfLink ? undefined : item;
+            })
+            ;
+
+        new RefreshQueue().enqueue(to_refresh).trigger().then(function() {
+
+          that.insert_items(chunk);
+          if (that._pending_items && that._pending_items.length > 0) {
+            setTimeout(that._ifNotRemoved(processChunk), 100);
+          }
+          else {
+            that._pending_items = null;
+            setTimeout(that._ifNotRemoved(function() {
+              if (!that._pending_items) {
+                that._loading_finished();
+              }
+            }), 200);
+          }
+        });
+      };
+
+      setTimeout(this._ifNotRemoved(processChunk), 100);
+
+      return this._loading_deferred;
+    }
+
+  , insert_items: function(items) {
+      var that = this
+        , prepped_items = []
+        ;
+
+      can.each(items, function(item) {
+        var prepped = that.prepare_child_options(item);
+        if (prepped.instance.selfLink) {
+          prepped_items.push(prepped);
+        }
+      });
+
+      if (prepped_items.length > 0) {
+        this.options.list.push.apply(this.options.list, prepped_items);
+        this.add_child_lists(prepped_items);
+      }
+    }
+});
+
+CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   //static properties
   defaults : {
     model : null
@@ -44,6 +293,9 @@ can.Control("CMS.Controllers.TreeView", {
     , list : null
     , single_object : false
     , find_params : {}
+    , sortable : false
+    , sort_property : null
+    , sort_function : null
     , start_expanded : false //true
     , draw_children : true
     , find_function : null
@@ -51,7 +303,7 @@ can.Control("CMS.Controllers.TreeView", {
     , allow_reading : true
     , allow_mapping : true
     , allow_creating : true
-    , child_options : [] //this is how we can make nested configs. if you want to use an existing 
+    , child_options : [] //this is how we can make nested configs. if you want to use an existing
     //example child option :
     // { property : "controls", model : CMS.Models.Control, }
     // { parent_find_param : "system_id" ... }
@@ -74,7 +326,7 @@ can.Control("CMS.Controllers.TreeView", {
         can.each(this.options.model[opts.options_property || this.constructor.defaults.options_property], function(v, k) {
           that.options.hasOwnProperty(k) || that.options.attr(k, v);
         });
-      }      
+      }
       can.each(this.constructor.defaults, function(v, k) {
         that.options.hasOwnProperty(k) || that.options.attr(k, v);
       });
@@ -125,27 +377,6 @@ can.Control("CMS.Controllers.TreeView", {
       this._attached_deferred.resolve();
     }
 
-  , prepare: function() {
-      var that = this;
-
-      if (this._prepare_deferred)
-        return this._prepare_deferred;
-
-      this._prepare_deferred = new $.Deferred();
-      this._prepare_deferred.resolve();
-
-      this._attached_deferred.then(function() {
-        if (that.element) {
-          that.element.trigger("updateCount", 0)
-          if (that.options.allow_reading) {
-            that.init_count();
-          }
-        }
-      });
-
-      return this._prepare_deferred;
-    }
-
   , init_view : function() {
       var that = this
         , dfds = []
@@ -153,73 +384,41 @@ can.Control("CMS.Controllers.TreeView", {
 
       if(this.options.header_view) {
         dfds.push(
-          can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
-            if (that.element) {
+          can.view(this.options.header_view, $.when(this.options)).then(
+            this._ifNotRemoved(function(frag) {
               that.element.prepend(frag);
-            }
-          }));
+            })
+          ));
       }
 
       // Init the spinner if items need to be loaded:
-      if(this._count && this._count())
-        this._loading_started();
+      dfds.push(this.init_count().then(function(count) {
+        if (count())
+          that._loading_started();
+        else
+          that.element.trigger("loaded");
+      }));
 
       if(this.options.footer_view) {
         dfds.push(
-          can.view(this.options.footer_view, this.options, function(frag) {
-            if (that.element) {
+          can.view(this.options.footer_view, this.options,
+            this._ifNotRemoved(function(frag) {
               that.element.append(frag);
-            }
-          }));
+            })
+          ));
       }
 
       return $.when.apply($.when, dfds);
-    }
-
-  , init_spinner: function() {
-      var spinner
-        , $spinner
-        , $spinner_li
-        , $footer = this.element.children('.tree-footer').first()
-        ;
-
-      if (this.element) {
-        // Only show the spinner if this is the last subtree
-        // FIXME: This spinner will disappear when this list is completely
-        //   loaded, even if other lists are still pending.
-        if (this.element.next().length > 0)
-          return;
-
-        spinner = new Spinner({
-            "radius": 4
-          , "length": 4
-          , "width": 2
-          }).spin();
-        $spinner = $(spinner.el);
-        $spinner_li = $('<li class="tree-footer tree-item tree-spinner" />');
-        $spinner_li.append($spinner);
-        $spinner.css({
-            display: 'inline-block'
-          , paddingLeft: '20px'
-          , left: '10px'
-          , top: '-4px'
-        });
-
-        if ($footer.length == 0) {
-          this.element.append($spinner_li);
-        }
-        else {
-          $footer.before($spinner_li);
-        }
-      }
     }
 
   , init_count : function() {
       var self = this
         ;
 
-      if (!this.get_count_deferred
-          && this.options.parent_instance && this.options.mapping) {
+      if (this.get_count_deferred)
+        return this.get_count_deferred;
+
+      if (this.options.parent_instance && this.options.mapping) {
         this.get_count_deferred =
           this.options.parent_instance.get_list_counter(this.options.mapping);
       } else if (this.options.list_loader) {
@@ -232,14 +431,18 @@ can.Control("CMS.Controllers.TreeView", {
             });
       }
       if (this.get_count_deferred) {
-        this.get_count_deferred.then(function(count) {
-          self._count = count;
+        this.get_count_deferred.then(this._ifNotRemoved(function(count) {
           self.element && self.element.trigger("updateCount", count());
-          count.bind("change", function() {
-            self.element && self.element.trigger("updateCount", count());
-          });
-        });
+          count.bind("change", self._ifNotRemoved(function() {
+            self.element.trigger("updateCount", count());
+          }));
+        }));
+      } else {
+        // FIXME: Does this ever happen?
+        this.get_count_deferred = new $.Deferred();
+        this.get_count_deferred.resolve(function() { return 0; });
       }
+      return this.get_count_deferred;
     }
 
   , fetch_list : function() {
@@ -281,55 +484,11 @@ can.Control("CMS.Controllers.TreeView", {
     }
   }
 
-  , display: function() {
-      var that = this;
-
-      if (this._display_deferred) {
-        return this._display_deferred;
-      }
-
-      this._display_deferred = $.when(this._attached_deferred, this.prepare());
-
-      this._display_deferred.then(function() {
-        return $.when(that.fetch_list(), that.init_view())
-          .then(that.proxy("draw_list"));
-      });
-
-      return this._display_deferred;
-    }
-
   , display_path: function(path) {
-      var that = this
-        , rest = path.split("/")
-        , step = rest.shift()
-        , type_id = step.split("-")
-        , type = type_id[0]
-        , id = type_id.length > 0 && type_id[1]
-        , $node
-        , node_controller
-        ;
-
-      return this.display().then(function() {
-        if (id) {
-          //  FIXME: Make this trigger only direct children, *not* nodes of
-          //    sub-trees.
-          $node = that.element
-            .find("[data-object-type=" + type + "][data-object-id=" + id + "]");
-          node_controller = $node.control();
-          if (node_controller && node_controller.trigger_expand) {
-            return node_controller.trigger_expand().then(function() {
-              node_controller.display_path(rest.join("/"));
-            });
-          }
-          else {
-            //  TODO: `resolve` or `reject` if path isn't found?
-            return new $.Deferred().resolve();
-          }
-        }
-        else {
-          return new $.Deferred().resolve();
-        }
-      });
+      var that = this;
+      return this.display().then(this._ifNotRemoved(function() {
+        return _display_tree_subpath(that.element, path);
+      }));
     }
 
   , prepare_child_options: function(v) {
@@ -369,159 +528,50 @@ can.Control("CMS.Controllers.TreeView", {
     return v;
   }
 
-  , draw_list : function(list) {
-    if (this._draw_list_deferred)
-      return this._draw_list_deferred;
-    this._draw_list_deferred = new $.Deferred();
-    if (this.element && !this.element.closest('body').length)
-      return;
-
-    var that = this
-      , refresh_queue = new RefreshQueue();
-
-    if(list) {
-      list = list.length == null ? new can.Observe.List([list]) : list;
-    } else {
-      list = this.options.list;
-    }
-
-    if(!this.element)
-      return;  //controller has been destroyed
-
-    if(!this.options.original_list) {
-      this.options.attr("original_list", list);
-    }
-    this.options.attr("list", []);
-    this.on();
-
-    var temp_list = [];
-    can.each(list, function(v, i) {
-      var item = that.prepare_child_options(v);
-      temp_list.push(item);
-      if(!item.instance.selfLink) {
-        refresh_queue.enqueue(v.instance);
-      }
-    });
-
-    temp_list = can.map(temp_list, function(o) { if (o.instance.selfLink) return o; })
-    this._draw_list_deferred = this.enqueue_items(temp_list);
-    return this._draw_list_deferred;
-  }
-
   , "{original_list} add" : function(list, ev, newVals, index) {
     var that = this
       , real_add = []
       ;
+
     can.each(newVals, function(newVal) {
       var _newVal = newVal.instance ? newVal.instance : newVal;
-      if(!that.oldList || !~can.inArray(_newVal, that.oldList)) {
+      if (that.oldList && ~can.inArray(_newVal, that.oldList)) {
+        that.oldList.splice(can.inArray(_newVal, that.oldList), 1);
+      }
+      else {
         that.element && real_add.push(newVal);
-        //that.element.trigger("newChild", newVal);
       }
     });
-    delete that.oldList;
     this.enqueue_items(real_add);
   }
 
-  , _loading_started: function() {
-      if (!this._loading_deferred) {
-        this._loading_deferred = new $.Deferred();
-        this.init_spinner();
-        this.element.trigger("loading");
-      }
-    }
-
-  , _loading_finished: function() {
-      var loading_deferred;
-      if (this._loading_deferred) {
-        this.element.trigger("loaded");
-        this.element.find(".tree-spinner").remove();
-        loading_deferred = this._loading_deferred;
-        this._loading_deferred = null;
-        loading_deferred.resolve();
-      }
-    }
-
-  , enqueue_items: function(items) {
-      var that = this;
-
-      if (!items || items.length == 0) {
-        return new $.Deferred().resolve();
-      }
-
-      if (!this._pending_items) {
-        this._pending_items = [];
-        this._loading_started();
-      }
-
-      this._pending_items.push.apply(this._pending_items, items);
-      this._pending_items_ms = Date.now();
-
-      setTimeout(function() {
-        if (!that._pending_items) {
-          return;
-        }
-        var chunk = that._pending_items.splice(0, 5);
-        that.insert_items(chunk);
-        if (that._pending_items.length > 0) {
-          setTimeout(arguments.callee, 100);
-        }
-        else {
-          that._pending_items = null;
-          setTimeout(function() {
-            if (!that._pending_items) {
-              that._loading_finished();
-            }
-          }, 200);
-        }
-      }, 100);
-
-      return this._loading_deferred;
-    }
-
-  , insert_items: function(items) {
-      var that = this
-        , prepped_items = []
-        ;
-
-      can.each(items, function(item) {
-        var prepped = that.prepare_child_options(item);
-        if (prepped.instance.selfLink) {
-          prepped_items.push(prepped);
-        }
-      });
-
-      if (prepped_items.length > 0) {
-        this.options.list.push.apply(this.options.list, prepped_items);
-        this.add_child_lists(prepped_items);
-      }
-    }
-
   , "{original_list} remove" : function(list, ev, oldVals, index) {
-    var that = this;
+    var that = this
+      , remove_marker = {} // Empty object used as unique marker
+      ;
 
     //  FIXME: This assumes we're replacing the entire list, and corrects for
     //    instances being removed and immediately re-added.  This should be
     //    changed to support exact mirroring of the order of
     //    `this.options.list`.
-    //assume we are doing a replace
-    this.oldList = can.map(oldVals, function(v) { return v.instance ? v.instance : v; });
-    GGRC.queue_event(function() {
-      if(that.oldList) {
-        can.each(oldVals, function(v) {
-          that.element && that.element.trigger("removeChild", v);
+    if (!this.oldList)
+      this.oldList = [];
+    this.oldList.push.apply(
+        this.oldList,
+        can.map(oldVals, function(v) { return v.instance ? v.instance : v; }));
+
+    // `remove_marker` is to ensure that removals are not attempted until 20ms
+    //   after the *last* removal (e.g. for a series of removals)
+    this._remove_marker = remove_marker;
+    setTimeout(this._ifNotRemoved(function() {
+      if (that._remove_marker === remove_marker) {
+        can.each(that.oldList, function(v) {
+          that.element.trigger("removeChild", v);
         });
         delete that.oldList;
-      } else {
-        list = can.map(list, function(l) { return l.instance || l});
-        can.each(oldVals, function(v) {
-          var _v = v.instance || v;
-          if(!~can.inArray(_v, list)) {
-            that.element && that.element.trigger("removeChild", v);
-          }
-        });
+        delete that._remove_marker;
       }
-    });
+    }), 20);
   }
 
   , ".tree-structure subtree_loaded" : function(el, ev) {
@@ -563,19 +613,22 @@ can.Control("CMS.Controllers.TreeView", {
     if (list_window.length > 0)
       queue_window(list_window);
     final_dfd = $.when.apply($, all_draw_items_dfds);
-    final_dfd.done(function() {
+    final_dfd.done(this._ifNotRemoved(function() {
       //  Trigger update for sticky headers and footers
       that.element.trigger("updateSticky");
-    });
+    }));
     return final_dfd;
   }
 
   , draw_items : function(options_list) {
-      var $footer = this.element.children('.tree-footer').first()
+      var that = this
+        , $footer = this.element.children('.tree-footer').first()
         , $items = $()
+        , $existing = this.element.children('li.cms_controllers_tree_view_node')
         , draw_items_dfds = []
+        , sort_prop = this.options.sort_property
+        , sort_function = this.options.sort_function
         ;
-
       options_list = can.makeArray(options_list);
       can.map(options_list, function(options) {
         var $li = $("<li />").cms_controllers_tree_view_node(options);
@@ -583,14 +636,74 @@ can.Control("CMS.Controllers.TreeView", {
         $items.push($li[0]);
       });
 
-      if($footer.length) {
-        $items.insertBefore($footer);
+      if (sort_prop || sort_function) {
+         $items.each(function(i, item) {
+            var j, $item = $(item);
+            for(j = $existing.length - 1; j >= 0; j--) {
+              var old_item = $existing.eq(j).control().options.instance,
+                  new_item = $item.control().options.instance;
+              if (sort_function){
+                compare = sort_function(old_item, new_item);
+              }
+              else {
+                compare = GGRC.Math.string_less_than(
+                  old_item[sort_prop],
+                  new_item[sort_prop]
+                );
+              }
+              if (compare) {
+                $item.insertAfter($existing.eq(j));
+                $existing.splice(j + 1, 0, item);
+                return;
+              }
+            }
+            if($existing.length) {
+              $item.insertBefore($existing.eq(0));
+            } else if($footer.length) {
+              $item.insertBefore($footer);
+            } else {
+              $item.appendTo(this.element);
+            }
+            $existing.splice(0, 0, item);
+         });
+        if (this.options.sortable) {
+          $(this.element).sortable({element: 'li.tree-item', handle: '.drag'})
+        }
       } else {
-        $items.appendTo(this.element);
+        if($footer.length) {
+          $items.insertBefore($footer);
+        } else {
+          $items.appendTo(this.element);
+        }
       }
       return $.when.apply($, draw_items_dfds);
     }
 
+  , " sortupdate" : function(el, ev, ui) {
+    var that = this,
+      $item = $(ui.item),
+      $before = $item.prev("li.cms_controllers_tree_view_node"),
+      $after = $item.next("li.cms_controllers_tree_view_node"),
+      before_index = $before.length
+                     ? $before.control().options.instance[this.options.sort_property]
+                     : "0",
+      after_index = $after.length
+                    ? $after.control().options.instance[this.options.sort_property]
+                    : Number.MAX_SAFE_INTEGER.toString(10);
+
+    ev.stopPropagation();
+
+    if(!this.options.sort_property) {
+      return;
+    }
+
+    $item.control().options.instance.refresh().then(function(inst) {
+      inst.attr(
+        that.options.sort_property,
+        GGRC.Math.string_half(GGRC.Math.string_add(before_index, after_index))
+      ).save();
+    });
+  }
 
   , " removeChild" : function(el, ev, data) {
     var that = this
@@ -618,6 +731,7 @@ can.Control("CMS.Controllers.TreeView", {
       , "[data-object-type=" + instance.constructor.table_singular + "]"
       ].join("")
     ).remove();
+    that.element.trigger("updateSticky");
     ev.stopPropagation();
   }
 
@@ -639,8 +753,22 @@ can.Control("CMS.Controllers.TreeView", {
     var model = el.closest("[data-model]").data("model");
     model.attr(data[model.constructor.root_object] || data);
     ev.stopPropagation();
-  }
-
+  },
+  reload_list: function() {
+    this._draw_list_deferred = false;
+    this.find_all_deferred = false;
+    this.get_count_deferred = false;
+    this.options.list.replace([]);
+    this.element.children('.cms_controllers_tree_view_node').remove();
+    this.fetch_list().then(this.proxy("draw_list"));
+    this.init_count();
+  },
+  "button[custom-event] click" : function(el, ev) {
+    var event_name = el.attr("custom-event");
+    if(this.options.events && typeof this.options.events[event_name] === "function") {
+      this.options.events[event_name].apply(this, arguments);
+    }
+  },
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
@@ -667,7 +795,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
       //   can.each(this.options.model[opts.options_property || this.constructor.defaults.options_property], function(v, k) {
       //     that.options.hasOwnProperty(k) || that.options.attr(k, v);
       //   });
-      // }      
+      // }
       can.each(this.constructor.defaults, function(v, k) {
         that.options.hasOwnProperty(k) || that.options.attr(k, v);
       });
@@ -688,22 +816,22 @@ can.Control("CMS.Controllers.TreeViewNode", {
         || GGRC.mustache_path + "/base_objects/tree.mustache";
     }
     this._draw_node_deferred = new $.Deferred();
-    setTimeout(this.proxy("draw_node"), 20);
+    setTimeout(this._ifNotRemoved(this.proxy("draw_node")), 20);
   }
 
   , draw_node: function() {
     this.add_child_lists_to_child();
     //setTimeout(function() {
       var that = this;
-      can.view(that.options.show_view, that.options, function(frag) {
+      can.view(that.options.show_view, that.options, this._ifNotRemoved(function(frag) {
         that.replace_element(frag);
         that._draw_node_deferred.resolve();
-      });
+      }));
     //}, 20);
   }
   , should_draw_children : function(){
     var draw_children = this.options.draw_children;
-    if(can.isFunction(draw_children)) 
+    if(can.isFunction(draw_children))
       return draw_children.apply(this.options);
     return draw_children;
   }
@@ -799,7 +927,15 @@ can.Control("CMS.Controllers.TreeViewNode", {
     this.on();
   }
 
+  , display: function() {
+      return this.trigger_expand();
+    }
+
   , display_path: function(path) {
+      var that = this;
+      return this.display().then(this._ifNotRemoved(function() {
+        return _display_tree_subpath(that.element, path);
+      }));
     }
 
   , display_subtrees: function() {
@@ -838,13 +974,13 @@ can.Control("CMS.Controllers.TreeViewNode", {
       this.options.attr("expanded", true);
 
       this._expand_deferred = new $.Deferred();
-      setTimeout(function() {
-        that.display_subtrees().then(function() {
+      setTimeout(this._ifNotRemoved(function() {
+        that.display_subtrees().then(that._ifNotRemoved(function() {
           that.element.trigger("subtree_loaded");
           that.element.trigger("loaded");
           that._expand_deferred.resolve();
-        });
-      }, 500);
+        }));
+      }), 500);
       return this._expand_deferred;
     }
 

@@ -1,0 +1,109 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
+from ggrc import db, settings
+from .mixins import deferred, Base, Stateful
+from functools import wraps
+from flask import request
+from flask.wrappers import Response
+from ggrc.models.types import CompressedType
+
+class BackgroundTask(Base, Stateful, db.Model):
+  __tablename__ = 'background_tasks'
+
+  VALID_STATES = [
+    "Pending",
+    "Running",
+    "Success",
+    "Failure"
+  ]
+  name = deferred(db.Column(db.String), 'BackgroundTask')
+  parameters = deferred(db.Column(CompressedType), 'BackgroundTask')
+  result = deferred(db.Column(CompressedType), 'BackgroundTask')
+
+  _publish_attrs = [
+      'name',
+      'result'
+  ]
+
+  def start(self):
+    self.status = "Running"
+    db.session.add(self)
+    db.session.commit()
+
+  def finish(self, status, result):
+    # Ensure to not commit any not-yet-committed changes
+    db.session.rollback()
+
+    if isinstance(result, Response):
+      self.result = {'content': result.response[0],
+                     'status_code': result.status_code,
+                     'headers': result.headers.items()}
+    else:
+      self.result = {'content': result,
+                     'status_code': 200,
+                     'headers': [('Content-Type', 'text/html')]}
+    self.status = status
+    db.session.add(self)
+    db.session.commit()
+
+  def make_response(self, default=None):
+    if self.result == None:
+      return default
+    from ggrc.app import app
+    return app.make_response((self.result['content'], self.result['status_code'],
+                              self.result['headers']))
+
+def create_task(user, name, queued_task, parameters={}):
+  from time import time
+  task = BackgroundTask(name=name + str(int(time()))) # task name must be unique
+  task.parameters = parameters
+  task.modified_by = user
+  from ggrc.app import db
+  db.session.add(task)
+  db.session.commit()
+
+  # schedule a task queue
+  if getattr(settings, 'APP_ENGINE', False):
+    from google.appengine.api import taskqueue
+    from flask import url_for
+    cookie_header = [h for h in request.headers if h[0] == 'Cookie']
+    taskqueue = taskqueue.add(queue_name="ggrc",
+                              url=url_for(queued_task.__name__), name=task.name,
+                              params={'task_id': task.id},
+                              headers=cookie_header)
+  else:
+    queued_task(task)
+
+  return task
+
+def make_task_response(id):
+  task = BackgroundTask.query.get(id)
+  return task.make_response()
+
+def queued_task(func):
+  from ggrc.app import app
+
+  @wraps(func)
+  def decorated_view(*args, **kwargs):
+    if len(args) > 0 and isinstance(args[0], BackgroundTask):
+      task = args[0]
+    else:
+      task = BackgroundTask.query.get(request.form.get("task_id"))
+    task.start()
+    try:
+      result = func(task)
+    except:
+      import traceback
+      app.logger.error("Task failed", exc_info=True)
+      task.finish("Failure", app.make_response((
+        traceback.format_exc(), 200, [('Content-Type', 'text/html')])))
+
+      # Return 200 so that the task is not retried
+      return app.make_response((
+        'failure', 200, [('Content-Type', 'text/html')]))
+    task.finish("Success", result)
+    return result
+  return decorated_view

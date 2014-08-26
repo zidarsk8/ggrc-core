@@ -5,29 +5,6 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-/*
- *= require application
- *= require jquery
- *= require jquery-migrate
- *= require fastfix
- *= require jquery-ui
- *= require bootstrap
- *= require related_selector
- *= require single_selector
- *= require spin.min
- *= require tmpl
- *= require can.jquery-all
- *= require mustache_helper
- *= require_tree ./models
- *= require_tree ./controllers
- *= require_tree ./apps
- *= require sections/notes_controller.js
- *= require_self
- *= require jquery.remotipart-patched
- *= require d3.v2
- *= require related
- *= require related_graph
- */
 
 // Initialize delegated event handlers
 jQuery(function($) {
@@ -52,24 +29,6 @@ jQuery(function($) {
     return 0;
   };
 
-  // Display spinners included in initial page load
-  $('.spinner').each(function() {
-    var spinner = new Spinner({ }).spin();
-    $(this).html(spinner.el);
-    // Scroll up so spinner doesn't get pushed out of visibility
-    $(this).scrollTop(0);
-    $(spinner.el).css({ width: '100px', height: '100px', left: '50px', top: '50px', zIndex : calculate_spinner_z_index});
-  });
-
-  // Before submitting, remove any disabled form elements
-  $('body').on('submit', 'form[data-remote]', function(e, xhr, req) {
-    $(this)
-      .find('.disabled input, .disabled select, .disabled textarea')
-      .each(function(i, el) {
-        $(el).attr('name', '');
-      });
-  });
-
   // On-demand creation of datepicker() objects
   $('body').on('focus', '[data-toggle="datepicker"]', function(e) {
     var $this = $(this);
@@ -77,20 +36,6 @@ jQuery(function($) {
     if (!$this.data('datepicker'))
       $(this).datepicker({changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy'});
   });
-
-  /* FIXME: This was removed because it's inconsistent with the new slug
-       object-name-prefix paradigm.  (E.g. controls having slug of CONTROL-X).
-  // Setup directive-select inputs to prefill slug field
-  $('body').on('change', 'select[name$="[directive_id]"]', function(e) {
-    var $this = $(this)
-      , $form = $(this).closest('form')
-      , $option = $(this).find('option[value="' + $(this).val() + '"]')
-      , $slugfield = $form.find('input[name$="[slug]"]').first()
-      , slugsteps = $slugfield.val().split(/-/);
-
-    $slugfield.val([$option.text()].concat(slugsteps.slice(1)).join("-"));
-  });
-  */
 
   // Turn the arrow when tree node content is shown
   $('body').on('click', '[data-toggle="collapse"]', function(e) {
@@ -108,62 +53,6 @@ jQuery(function($) {
     }, 100);
   });
 
-  // When clicking a slot-link, don't toggle collapse
-  // FIXME: We should avoid hacks like this
-  $('body').on('click', '.slot > a', function(e) {
-    e.stopPropagation();
-  });
-
-  // expandAll and shrinkAll buttons
-  $('body').on('click', 'a.expandAll', function(e) {
-    var $tabs = $(this).closest('.tabbable');
-    if($tabs.length) {
-      $tabs.find('.tab-pane.active .openclose').openclose("open");
-      //$tabs.find('.tab-pane.active .tree-structure .oneline').oneline("view");
-    } else {
-      var $section = $(this).closest("section");
-      $section.find('.openclose').openclose("open");
-      //$section.find('.tree-structure .oneline').oneline("view");
-    }
-    e.preventDefault();
-  });
-  $('body').on('click', 'a.shrinkAll', function(e) {
-    var $tabs = $(this).closest('.tabbable');
-    if($tabs.length) {
-      $tabs.find('.tab-pane.active .openclose.active').openclose('close');
-      //$tabs.find('.tab-pane.active .tree-structure .oneline').oneline("hide");
-    } else {
-      var $section = $(this).closest("section");
-      $section.find('.openclose.active').openclose("close");
-      //$section.find('.tree-structure .oneline').oneline("hide");
-    }
-    e.preventDefault();
-  });
-
-  // Tabs via AJAX on 'Quick Find'
-  $('body').on('show', '.tabbable ul.nav-tabs > li > a', function(e, href) {
-
-
-      // $(pane).load(href, function(data, status, xhr) {
-      //   $tab.data('tab-loaded', true);
-      //   var $data = $(data);
-      //   $(e.target).find(".item-count").html($data.find("li").length);
-      //   $(this).html($data).trigger("loaded", xhr, data);
-      // });
-
-  });
-
-  // // Clear the .widgetsearch box when tab is changed
-  // $('body').on('show', '.tabbable ul.nav-tabs > li > a', function(e) {
-  //   if (e.relatedTarget) {
-  //     $input = $(this).closest('.widget').find('.widgetsearch');
-  //     if ($input.val()) {
-  //       $input.val("");
-  //       $(e.relatedTarget).trigger('show', 'reset');
-  //     }
-  //   }
-  // });
-
   //After the modal template has loaded from the server, but before the
   //  data has loaded to populate into the body, show a spinner
   $("body").on("loaded", ".modal.modal-slim, .modal.modal-wide", function(e) {
@@ -179,60 +68,9 @@ jQuery(function($) {
       ).one("loaded", function() {
         $(this).find(".source").each(spin);
       });
-    }
+    };
 
     $(e.target).find(".modal-body .source").each(spin);
-  });
-
-  function with_params(href, params) {
-    if (href.charAt(href.length - 1) === '?')
-      return href + params;
-    else if (href.indexOf('?') > 0)
-      return href + '&' + params;
-    else
-      return href + '?' + params;
-  }
-
-  // Handle search on related_selectors
-  $('body').on('focus', '.modal .widgetsearch', function(e) {
-    $(this).bind('keypress', function(e) {
-      if (e.which == 13) {
-        // If this input is within a form, don't submit the form
-        e.preventDefault();
-
-        var $this = $(this)
-          , $list = $this.closest('.modal').find('ul.source[data-list-data-href]')
-          , href = with_params($list.data('list-data-href'), $.param({ s: $this.val() }));
-        $.get(href, function(data) {
-          $list.tmpl_setitems(data);
-          $list.closest('.modal').trigger('sync-lists');
-        });
-      }
-    });
-  });
-
-  // Initialize Quick Search handlers
-  $('body').on('keypress', '.modal nav > .widgetsearch', function (e) {
-    if (e.which == 13) {
-      // If this input is within a form, don't submit the form
-      e.preventDefault();
-
-      var $this = $(this)
-        , $list = $this.closest('.modal').find('.modal-body ul[data-list-href]')
-        , href = with_params($list.data('list-href'), $.param({ s: $this.val() }));
-      $.get(href, function(data) {
-        $list.tmpl_setitems(data);
-      });
-    }
-  });
-  $('body').on('keypress', 'nav > .widgetsearch-tocontent', function (e) {
-    if (e.which == 13) {
-      var $this = $(this)
-        , $box = $this.closest('.widget').find('.content')
-        , $child = $($box.children()[0])
-        , href = with_params($child.data('href'), $.param({ s: $this.val() }));
-      $box.load(href, function() { clear_selection($this[0], true); });
-    }
   });
 
   $('body').on('click', '[data-toggle="list-remove"]', function(e) {
@@ -254,67 +92,37 @@ jQuery(function($) {
     }
   });
 
-  $('body').on('click', '[data-toggle="dropdown-select-list"] > li > a', function(e) {
-    var $this = $(this)
-      , value = $(this).data('value')
-      ;
-    $this.closest('ul').siblings('input').val(value);
-    $this.closest('ul').siblings('a').text(value[0].toUpperCase() + value.substr(1));
-    $this.trigger('change');
-    e.preventDefault();
-  });
-
-  $('body').on('click', '[data-toggle="collapse-additional"]', function(e) {
-    if (!e.isDefaultPrevented()) {
-      $(this).siblings('.additional').slideToggle();
-    }
-  });
-});
-
-jQuery(function($) {
-  // Onload trigger tab with 'active' class or default to first tab
-  $('.tabbable > ul').each(function(i, el) {
-    var $tab = $(this).find('> li.active');
-    if (!$tab.length)
-      $tab = $(this).find('> li:first-child');
-    $tab
-      .removeClass('active')
-      .find('> a')
-      .tab('show');
-    $($tab.find('> a').attr("href")).one("loaded", function() {
-      if($tab.not(".quick-search-results .tabbable > ul > li").length) { //don't load the quickfind
-        $tab.siblings().find("> a").each(function(i, a) {
-          GGRC.queue_event(function() {
-            $(a).trigger("show"); //load all the others for counts after this one is showing
-          });
-        });
-      }
-    })
-  });
-  //$('.tabbable > ul > li:first-child > a').tab('show');
 });
 
 // This is only used by import to redirect on successful import
 // - this cannot use other response headers because it is proxied through
 //   an iframe to achieve AJAX file upload (using remoteipart)
 jQuery(function($) {
-  function disableButton(){
+
+  var submit_import = 'form.import div.import-interface input[type=submit]',
+      file_select_elem = 'form.import div.import-interface input[type=file]';
+
+  function onSubmitClick(ev){
+    if ($(this).hasClass('disabled') || $(file_select_elem).val() === "") {
+      ev && ev.preventDefault();
+    }
     $(this).addClass("disabled");
   }
   function checkStatus(result, type, $btn){
-    Task.findOne({id: result.id}, function(task){
-      task = task.task;
+    BackgroundTask.findOne({id: result.id}, function(task){
+      task = task.background_task;
       var msg = ($btn && $btn.val() == "Upload and Review") ? $btn.val() : type;
       if(task.status == "Pending" || task.status == "Running"){
 
         $('body').trigger(
-          'ajax:flash', 
+          'ajax:flash',
             { "progress" : msg + " " +  task.status.toLowerCase() + "..."}
         );
         // Task has not finished yet, check again in a while:
-        setTimeout(function(){checkStatus(result, type, $btn)}, 3000);
+        setTimeout(function(){checkStatus(result, type, $btn);}, 3000);
       }
       else if(task.status == "Success"){
+        var $container = $("#results-container");
         $btn && $btn.removeClass("disabled");
         // Check if redirect:
         try{
@@ -326,34 +134,40 @@ jQuery(function($) {
         } catch(e){}
         // Check if file download (export):
         if("headers" in task.result){
-          var headers = task.result.headers
+          var headers = task.result.headers;
           for(var i = 0; i < headers.length; i++){
             if(headers[i][0] == "Content-Type" && headers[i][1] == "text/csv"){
-              window.location.assign("/task/"+task.id);
+              window.location.assign("/background_task/"+task.id);
             }
           }
         }
-        $("#results-container").html(task.result.content);
-        $('form.import .btn').unbind().unbind().click(disableButton);
+        $container.html(task.result.content);
+        $container.find('input[type=submit]').click(onSubmitClick);
         if(msg === "Upload and Review"){
-          // Don't display "Upload and Review successful." message
+          // Don't display "Upload and Review successful." message;
+          // But kill progress message.
+          $('body').trigger('ajax:flash', {});
           return;
         }
         $('body').trigger(
-          'ajax:flash', 
+          'ajax:flash',
             { "success" : msg + " successful."}
         );
       }
       else if(task.status == "Failure"){
         $btn && $btn.removeClass("disabled");
         $('body').trigger(
-          'ajax:flash', 
+          'ajax:flash',
             { "error" : msg + " failed."}
         );
       }
     });
-  };
-  $('form.import .btn').unbind().click(disableButton);
+  }
+  $(submit_import).click(onSubmitClick);
+  // handler to initialize import upload button as disabled
+  $(submit_import).ready(function(){
+    $(submit_import).addClass("disabled");
+  });
   $('body').on('ajax:success', 'form.import', function(e, data, status, xhr) {
     var $btn = $('form.import .btn.disabled').first();
     if (xhr.getResponseHeader('Content-Type') == 'application/json') {
@@ -365,7 +179,7 @@ jQuery(function($) {
       // Check if task has completed:
       setTimeout(function(){
         checkStatus(result, "Import", $btn);
-      }, 500)
+      }, 500);
     }
     else{
       $btn && $btn.removeClass('disabled');
@@ -385,6 +199,25 @@ jQuery(function($) {
       }
     });
   });
+
+  // change button to disabled when no file selected, and vice versa
+  $(file_select_elem).change(function(ev) {
+    if (this.value === "") {
+      $(submit_import).each(onSubmitClick);
+    } else {
+      $(submit_import).removeClass('disabled');
+    }
+  });
+
+  jQuery(function($) {
+    $('body').on('ajax:success', 'form[data-remote][data-update-target]', function(e, data, status, xhr) {
+      if (xhr.getResponseHeader('Content-Type') == 'text/html') {
+        var $container = $($(this).data('update-target'));
+        $container.html(data);
+        $container.find('input[type=submit]').click(onSubmitClick);
+      }
+    });
+  });
 });
 
 jQuery(function($) {
@@ -396,209 +229,11 @@ jQuery(function($) {
 });
 
 jQuery(function($) {
-  $('body').on('change', 'form.import input#upload', function(e) {
-    var $this = $(this)
-      , value = $this.val()
-      ;
-
-    if ($this.data('last-value') != value) {
-      $this.closest('form').find('#results-container').empty();
-      $this.data('last-value', value);
-    }
-  });
-});
-
-jQuery(function($) {
-  $('body').on('ajax:success', 'form[data-remote][data-update-target]', function(e, data, status, xhr) {
-    if (xhr.getResponseHeader('Content-Type') == 'text/html') {
-      $($(this).data('update-target')).html(data);
-    }
-  });
-});
-
-
-jQuery(function($) {
   $('body').on('ajax:success', '#helpedit form', function(e, data, status, xhr) {
     var $modal = $(this).closest('.modal');
     $modal.find('.modal-header h1').html(data.help.title);
     $modal.find('.modal-body .help-content').html(data.help.content);
     $modal.find('.modal-body #helpedit').collapse('hide');
-  });
-});
-
-jQuery(function($) {
-  $('body').on('change', 'select[name="category[scope_id]"]', function(e) {
-    var $this = $(this)
-      , scope_id = $this.val()
-      , $cats = $this.closest('form').find('select[name="category[parent_id]"]')
-      ;
-    $cats.empty();
-    $.get('/categories', { scope_id: scope_id, root: 1 }, function(data) {
-      $cats.append("<option value=''>&lt;New root object&gt;</option>");
-      $.map(data, function(cat, i) {
-        $cats.append('<option value="' + cat.category.id + '">' + cat.category.name + '</option>');
-      });
-    });
-  });
-});
-
-// Filters on PBC List
-jQuery(function($) {
-  $('body').on('change', '[data-toggle="filter-requests"]', function(e) {
-    var $this = $(this)
-      , filter_target = '.pbc-requests > li'
-      , filter_func = function() { return true; }
-      , target_container = '.pbc-control-assessments > li'
-      ;
-
-    $('[data-toggle="filter-requests"]').each(function(i, elem) {
-      var $elem = $(elem)
-        , filter_attr = $elem.data('filter-attribute')
-        , filter_value = $elem.val()
-        , old_filter_func = filter_func
-        ;
-
-      if ($elem.val() == 'any' || $elem.val() == '')
-        return;
-
-      if (filter_attr == 'type-name' || filter_attr == 'status') {
-        filter_func = function($el) {
-          return (
-            ($el.data('filter-' + filter_attr) == filter_value) &&
-            old_filter_func($el));
-        }
-      } else if (filter_attr == 'date-requested') {
-        filter_func = function($el) {
-          return (
-            ($el.data('filter-' + filter_attr) &&
-             // We use "+ ' UTC'" to avoid strange timezone conversions
-             // due to differing date formats
-             (Date.parse($el.data('filter-' + filter_attr) + ' UTC') >= Date.parse($elem.val() + ' UTC'))) &&
-            old_filter_func($el));
-        }
-      } else if (filter_attr == 'person') {
-        filter_func = function($el) {
-          return (
-            (new RegExp('(^|,)' + $elem.val() + '(,|$)').test($el.data('filter-' + filter_attr))) &&
-            old_filter_func($el));
-        }
-      }
-    });
-
-    // For each container element, hide it if it contains no unfiltered elements
-    $(target_container).each(function(i, container) {
-      var $container = $(container)
-        , has_visible_item = false
-        ;
-
-      $container.find(filter_target).each(function(i, elem) {
-        var $elem = $(elem)
-          ;
-
-        if (!filter_func($elem)) {
-          $elem.slideUp('fast');
-        } else {
-          has_visible_item = true;
-          $elem.slideDown('fast');
-        }
-      });
-
-      if (!has_visible_item) {
-        $container.slideUp('fast');
-      } else {
-        $container.slideDown('fast');
-      }
-    });
-  });
-});
-
-jQuery(function($) {
-  $("body").on("change", ".pbc-requests .main-item", function(ev) {
-    if($(ev.target).parents().is(".status")) {
-      var status = $(ev.target).val();
-      $.ajax({
-        url : "/requests/" + $(ev.currentTarget).data("filter-id") + ".json"
-        , type : "put"
-        , dataType : "json"
-        , data : {
-          request : {
-            status : status
-          }
-        }
-      })
-      .then(function() {
-        $(ev.currentTarget).attr("data-filter-status", status).data("filter-status", status);
-      });
-    }
-  });
-
-  if($.fn.pbc_autocomplete_people) {
-    $(".pbc-request-assignee").pbc_autocomplete_people({
-      select : function(event, ui) {
-        $(event.target).trigger("personSelected", ui.item);
-        can.Control.prototype.bindXHRToButton(
-        $.ajax({
-          type : "put"
-          , url : "/requests/" + $(event.target).closest("[data-filter-id]").data("filter-id") + ".json"
-          , data : { request : { company_responsible : ui.item.email }}
-        }).done(function() {
-            $(event.target).parent().removeClass("field-failure");
-            $(event.target).blur().data("pbcAutocomplete_people")._value(ui.item.email);
-            var oldvalues = $(event.target).closest("[data-filter-person]").data("filter-person").split(",");
-            $(event.target).closest("[data-filter-person]").attr("data-filter-person", ui.item.email).data("filter-person", ui.item.email);
-
-            can.each(oldvalues, function(oldvalue) {
-              if(!$("[data-filter-person*='" + oldvalue + "']").length) {
-                $("select[data-filter-attribute=person] option").each(function() {
-                  if($(this).val() === oldvalue) {
-                    var $sel = $(this).closest("select");
-                    $sel.find("option:first").prop("selected", true);
-                    $(this).remove();
-                    $sel.change();
-                  }
-                })
-              }
-            });
-            if(!~can.inArray(ui.item.email, $("select[data-filter-attribute=person] option").map(function() { return $(this).val()}))) {
-              $("<option>").text(ui.item.email).appendTo("select[data-filter-attribute=person]");
-            } 
-        }).fail(function() {
-          $(event.target).parent().addClass("field-failure");
-        })
-        , $(event.target)
-        );
-        return false;
-      }
-    });
-  }
-});
-
-jQuery(function($) {
-  
-  $('body').on('click', '.pbc-filters button[type="reset"]', function(e){
-    var $this = $(this)
-    , filter_reset_target = '[data-object-type="request"]'
-    ;
-
-    $(filter_reset_target).each(function(i, elem) {
-      var $elem = $(elem)
-        ;
-      $elem.show();
-    });
-  });
-  
-  $('body').on('click', 'button[data-toggle="filter-reset"]', function(e) {
-    var $this = $(this)
-      , filter_reset_target = '[data-toggle="filter-requests"]'
-      ;
-
-    $(filter_reset_target).each(function(i, elem) {
-      var $elem = $(elem)
-        ;
-
-      $elem.val('any');
-      $elem.change();
-    });
   });
 });
 
@@ -624,102 +259,21 @@ jQuery(function($) {
   });
 });
 
-// Sorting on PBC List
-jQuery(function($) {
-  var sort_elements, compare_values
-    , extract_control_code, sort_by_control_code
-    , extract_request_date, sort_by_request_date
-    , trigger_sort
-    ;
-
-  // Compare arrays specially
-  compare_values = function(a, b) {
-    var i;
-    if ($.isArray(a) && $.isArray(b)) {
-      for (i=0; i<a.length; i++) {
-        result = compare_values(a[i], b[i]);
-        if (result != 0)
-          return result;
-      }
-      return (a.length == b.length ? 0 : (a.length < b.length ? -1 : 1));
-    } else {
-      return (a == b ? 0 : (a < b) ? -1 : 1)
-    }
-  }
-
-  // Not a pretty sort function
-  sort_elements = function($els, key_func, reversed) {
-    comparison_func = function(a, b) {
-      return compare_values(key_func(a), key_func(b));
-    }
-    var els = $els.toArray().sort(comparison_func);
-    if (reversed)
-      els = els.reverse();
-    return $(els);
-  }
-
-  extract_control_code = function(li) {
-    var code_string = $(li).data('sort-control-code');
-    if (!code_string)
-      return [];
-    else
-      // Split around numbers so CTL5 < CTL10
-      return $.map(
-        code_string.split(/(\d+)/),
-        function(x) { return isNaN(parseInt(x)) ? x : parseInt(x) })
-  }
-
-  sort_by_control_code = function(reversed) {
-    var $ul = $('ul.pbc-control-assessments');
-    $ul.html(sort_elements($ul.find('> li'), extract_control_code, reversed));
-  }
-
-  extract_request_date = function(li) {
-    var date_string = $(li).data('filter-date-requested') || '0';
-    // We use "+ ' UTC'" to avoid strange timezone conversions
-    // due to differing date formats
-    return Date.parse(date_string + ' UTC');
-  }
-
-  sort_by_request_date = function(reversed) {
-    $('ul.pbc-control-assessments > li').each(function(i) {
-      var $ul = $(this).find('ul.pbc-requests:last');
-      $ul.html(sort_elements($ul.find('> li'), extract_request_date, reversed));
-    });
-  }
-
-  trigger_sort = function() {
-    var sort_type, reversed;
-    sort_type = $('#sortTypeSelect').val();
-    reversed = $('#sortDirectionReverse').hasClass('active');
-
-    if (sort_type == 'Control Code')
-      sort_by_control_code(reversed);
-    else if (sort_type == 'Request Date')
-      sort_by_request_date(reversed);
-  };
-
-  $('body').on('click', '#sortDirectionForward, #sortDirectionReverse', function(e) {
-    $('#sortDirectionForward, #sortDirectionReverse').removeClass('active');
-    $(this).addClass('active');
-    trigger_sort();
-  });
-
-  $('body').on('change', '#sortTypeSelect', function(e) {
-    trigger_sort();
-  });
-
-  $("body").on("list-add-item", '[id^=ajax-modal-controls-list_select]', function(e, data) {
-    $(this).find("[data-id=" + data.id + "]").click();
-  });
-
-
-
-});
-
-//make buttons non-clickable when saving
 jQuery(function($) {
   can.extend(can.Control.prototype, {
+    // Returns a function which will be halted unless `this.element` exists
+    //   - useful for callbacks which depend on the controller's presence in
+    //     the DOM
+    _ifNotRemoved: function(fn) {
+      var that = this;
+      return function() {
+        if (!that.element)
+          return;
+        return fn.apply(this, arguments);
+      };
+    },
+
+    //make buttons non-clickable when saving
     bindXHRToButton : function(xhr, el, newtext, disable) {
       // binding of an ajax to a click is something we do manually
       var $el = $(el)
@@ -741,21 +295,48 @@ jQuery(function($) {
 });
 
 jQuery(function($) {
-  $('body').on('change', '.modal select[name="system[is_biz_process]"]', function(e) {
-    var $this = $(this)
-      , $modal = $this.closest('.modal')
-      , $header_elem = $modal.find('.modal-header h2')
-      ;
 
-    if ($this.val() == '0') {
-      $header_elem.text($header_elem.text().replace(/process/i, 'system'));
-    } else {
-      $header_elem.text($header_elem.text().replace(/system/i, 'process'));
-    }
+  function checkActive(notification_configs) {
+    var inputs = $('.notify-wrap').find('input'),
+        active_notifications;
+
+    active_notifications = $.map(notification_configs, function(a){
+      if(a.enable_flag) {
+        return a.notif_type;
+      }
+    });
+    $.map(inputs, function(input) {
+      // Handle the default case, in case notification objects are not set:
+      if(notification_configs.length === 0) {
+        input.checked = input.value === 'Email_Digest';
+      } else {
+        input.checked = active_notifications.indexOf(input.value) > -1;
+      }
+    });
+  }
+
+  CMS.Models.NotificationConfig.findActive().then(checkActive);
+
+  // Don't close the dropdown if clicked on checkbox
+  $('body').on('click', '.notify-wrap', function(ev){
+    ev.stopPropagation();
   });
-});
 
-jQuery(function($) {
+  $('body').on('click', 'input[name=notifications]', function(ev, el){
+    var li = $(ev.target).closest('.notify-wrap'),
+        inputs = li.find('input'),
+        active = [];
+
+    inputs.prop('disabled', true);
+    active = $.map(inputs, function(input){
+      if(input.checked){
+        return input.value;
+      }
+    });
+    CMS.Models.NotificationConfig.setActive(active).always(function(response){
+      inputs.prop('disabled', false);
+    });
+  });
 
   $('body').on('click', '.clear-display-settings', function(e) {
     CMS.Models.DisplayPrefs.findAll().done(function(data) {
@@ -764,7 +345,7 @@ jQuery(function($) {
         d.unbind("change"); //forget about listening to changes.  we're going to refresh the page
         destroys.push(d.resetPagePrefs());
       });
-      $.when.apply($, destroys).done($.proxy(GGRC, 'navigate'));
+      $.when.apply($, destroys).done(function() { GGRC.navigate(); });
     });
   })
   .on('click', '.set-display-settings-default', function(e) {
@@ -777,8 +358,8 @@ jQuery(function($) {
       });
       $.when.apply($, destroys).done(function() {
         $('body').trigger(
-          'ajax:flash', 
-          { "success" : "Saved page layout as default for " + (page_token === "dashboard" ? "dahsboard" : page_token) }
+          'ajax:flash',
+          { "success" : "Saved page layout as default for " + (page_token === "dashboard" ? "dashboard" : page_token) }
         );
       });
     });
@@ -816,7 +397,7 @@ function resize_areas() {
   ,   footerMargin
   ,   internavHeight
   ;
-  
+
   $window = $(window);
   $lhs = $(".lhs");
   $lhsHolder = $(".lhs-holder");
@@ -845,7 +426,7 @@ function resize_areas() {
   $header.css("width",headerWidth);
   $objectArea
     .css("margin-left",internavWidth)
-    .css("height",internavHeight -30)
+    .css("height",internavHeight)
     .css("width",objectWidth)
     ;
 
@@ -892,32 +473,32 @@ jQuery(function($) {
         duration: duration
       , easing: "easeInOutExpo"
       , step: function(now, fx) {
-          $(this).css('clip', 'rect(0px, '+ (width - now + (out ? start : end)) +'px, ' + height + 'px, 0px)')
+          $(this).css('clip', 'rect(0px, '+ (width - now + (out ? start : end)) +'px, ' + height + 'px, 0px)');
         }
       , complete: function() {
           if (!out) {
             $this.filter(':not(.section-sticky)').fadeIn();
-            $(this).hide(); 
+            $(this).hide();
           }
           $(this).css({
               marginRight: '0px'
             , clip: 'auto'
-          })
+          });
         }
     });
 
     // Queue the reverse on mouseout
     out && $this.closest('li').one("mouseleave", function() {
       expander($this, "in");
-    })
-  };
+    });
+  }
 
   // Footer expander animations (verify that an expander exists)
   $('body').on('mouseenter', '.section-add:has(+ .section-expander), .section-expander:visible:animated', function(e) {
     var $this = $(this);
     expander($this.hasClass('section-add') ? $this : $this.prev('.section-add'), "out");
   });
-  
+
   $('body').on('click', '.show-long', function(e) {
     var $this = $(this)
       , $descField = $this.closest('.span12').find('.tree-description')
@@ -927,21 +508,21 @@ jQuery(function($) {
   });
 
   // activate widget from object nav
-  
+
   $('body').on('mouseenter', 'ul.internav li a', function(e) {
     var $this = $(this)
-    ,   $widgetID = $this.attr("href") 
+    ,   $widgetID = $this.attr("href")
     ,   $targetWidget = $($widgetID)
     ;
 
     if( ! $targetWidget.hasClass("widget-active") ) {
       $targetWidget.addClass("widget-active");
     }
-  });  
+  });
 
   $('body').on('mouseleave', 'ul.internav li a', function(e) {
     var $this = $(this)
-    ,   $widgetID = $this.attr("href") 
+    ,   $widgetID = $this.attr("href")
     ,   $targetWidget = $($widgetID)
     ,   control
     ;
@@ -952,17 +533,7 @@ jQuery(function($) {
     ) {
       $targetWidget.removeClass("widget-active");
     }
-  });  
-
-  /*$('body').on('click', 'ul.internav li a', function(e) {
-    var $this = $(this)
-    ,   $widgetID = $this.attr("href") 
-    ,   $targetWidget = $($widgetID)
-    ;
-    
-    $targetWidget.addClass("widget-active");
-    $('.cms_controllers_inner_nav').control('inner_nav').set_active_widget($widgetID);
-  });*/
+  });
 
   $('body').on('mouseenter', '.widget', function(e) {
     var $this = $(this)
@@ -975,7 +546,7 @@ jQuery(function($) {
         inner_nav.show_active_widget('#' + $this.attr('id'));
       }
     }
-  });  
+  });
 
   $('body').on('deactivate', '.widget', function(e) {
     var $this = $(this)
@@ -985,7 +556,7 @@ jQuery(function($) {
       $this.removeClass("widget-active");
     }
   });
-  
+
   // show/hide audit lead and firm
   $('body').on('mouseover', '.ui-autocomplete li a', function(e) {
     var $this = $(this);
@@ -997,10 +568,8 @@ jQuery(function($) {
     $this.removeClass("active");
     $this.closest('li').removeClass("active");
   });
-  
-});
 
+});
 
 jQuery(resize_areas);
 jQuery(window).on("resize", resize_areas);
-

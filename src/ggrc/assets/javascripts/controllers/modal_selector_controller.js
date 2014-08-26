@@ -497,33 +497,6 @@
         join_object: CMS.Models.Section.findInCacheById(data.join_object_id)
       }
 
-      , risk_controls : {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: data.related_title_singular,
-        modal_title: "Select " + data.related_title_plural,
-
-        related_model_singular: "Risk",
-        related_table_plural: "risks",
-        related_table_singular: "risk",
-        related_title_singular: "Risk",
-        related_title_plural: "Risks",
-
-        option_model: CMS.Models.Control,
-        join_model: CMS.Models.RiskControl,
-
-        option_attr: 'control',
-        join_attr: 'risk',
-        option_id_field: 'control_id',
-        option_type_field: 'control_type',
-        join_id_field: 'risk_id',
-        join_type_field: null,
-
-        join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
-      }
-
       , section_controls : {
         option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
@@ -550,7 +523,6 @@
 
         join_object_id: data.join_object_id,
         join_object_type: data.join_object_type
-        //join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
       }
 
       , program_controls : {
@@ -579,7 +551,6 @@
 
         join_object_id: data.join_object_id,
         join_object_type: data.join_object_type
-        //join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
       }
     };
 
@@ -705,6 +676,7 @@
     });
   });
 
+  //************************************************************************************************
 
   can.Control("GGRC.Controllers.MultitypeModalSelector", {
       defaults: {
@@ -886,7 +858,7 @@
         });
         context.options = options_results;
         context.selected_object = this.options.selected_object;
-        can.view(this.options.option_items_view, context, function(frag) {
+        can.view(this.options.option_items_view, new can.Map(context), function(frag) {
           if (self.element) {
             if (prepend)
               self.element.find('.option_column ul.new-tree').prepend(frag);
@@ -959,10 +931,13 @@
         self.option_list.replace([]);
         self.element.find('.option_column ul.new-tree').empty();
 
-        var join_model = GGRC.JoinDescriptor.join_model_name_for(
+        var join_model = GGRC.Mappings.join_model_name_for(
               this.options.object_model, current_option_model_name);
         var permission_parms = { __permission_type: 'read' };
-        if (current_option_model_name == 'Program') {
+        // FIXME: Workflow context should override Program context
+        // FIXME: Extension isolation violation
+        // This is weird. Don't understand exactly how this should work.
+        if (join_model != 'TaskGroupObject' && current_option_model_name == 'Program') {
           permission_parms = {
             __permission_type: 'create'
             , __permission_model: join_model
@@ -1048,7 +1023,7 @@
           return;
         }
         if (!join_instance) {
-          that.element.trigger("ajax:flash", {
+          $(document.body).trigger("ajax:flash", {
             error: "Select an object to map" });
         } else {
           join_instance.save()
@@ -1063,7 +1038,7 @@
               //that.element.trigger("ajax:flash", { error : xhr.responseText });
               if (that.element) {
                 var message = "That object is already mapped";
-                that.element.trigger("ajax:flash", { error: message });
+                $(document.body).trigger("ajax:flash", { error: message });
               }
             });
         }
@@ -1074,7 +1049,10 @@
           var context_id = null
             , context_object
             ;
-          if (this.context.selected_option.constructor.shortName == "Program") {
+          // FIXME: Extension isolation violation
+          if (this.context.selected_object instanceof CMS.Models.TaskGroup) {
+            context_object = this.context.selected_object;
+          } else if (this.context.selected_option.constructor.shortName == "Program") {
             context_object = this.context.selected_option;
           } else {
             context_object = this.context.selected_object;
@@ -1094,13 +1072,16 @@
           this.element.remove();
       }
 
-    , ".btn-add modal:success" : function(el, ev, data) {
+    , " modal:success" : function(el, ev, data, options) {
         var self = this;
         // Scroll so the top element (the one just added) is in view
         this.element.find(".option_column ul.new-tree").parent().scrollTop(0);
         this.search_reset().then(function() {
           // Move the just-created object to the top
           self.move_option_to_top_and_select(data);
+          if(options && options.map_and_save && self.element){
+            self.on_map(self.element.find('.map-button'));
+          }
         });
       }
 
@@ -1110,7 +1091,7 @@
         if(!this.element){
           return;
         }
-      
+
         var self = this
           , index = this.option_list.indexOf(option)
           , option_column = this.element.find('.option_column ul.new-tree').first()
@@ -1252,10 +1233,6 @@
     }
   }
 
-  function get_join_descriptors_for_model(model_name) {
-    return GGRC.JoinDescriptor.by_object_model[model_name];
-  }
-
   function get_multitype_option_set(object_model_name, option_model_name, data) {
     var join_descriptors = null
       , option_descriptors = {}
@@ -1267,14 +1244,14 @@
 
     if (!option_model_name) {
       join_descriptors =
-        GGRC.JoinDescriptor.by_object_model[object_model_name];
+        GGRC.Mappings.get_canonical_mappings_for(object_model_name);
     } else {
-      join_descriptors =
-        GGRC.JoinDescriptor.by_object_option_models[object_model_name][option_model_name];
+      join_descriptors = {};
+      join_descriptors[option_model_name] = GGRC.Mappings.get_canonical_mapping(object_model_name, option_model_name);
     }
 
-    can.each(join_descriptors, function(descriptor) {
-      var option_model_name = descriptor.options.option_model_name
+    can.each(join_descriptors, function(descriptor, far_model_name) {
+      var option_model_name = descriptor.option_model_name || far_model_name
         , extra_options = modal_descriptor_view_options[option_model_name]
         ;
 
@@ -1286,7 +1263,8 @@
           || ~can.inArray(option_model_name, exclude_option_types)
           //  For some recently-added join settings, there is no join model, so
           //  short-circuit
-          || !descriptor.options.join_model_name)
+          || !descriptor.model_name
+          || !(descriptor instanceof GGRC.ListLoaders.ProxyListLoader))
         return;
 
       if (!option_set.default_option_descriptor)
@@ -1301,8 +1279,8 @@
 
       option_descriptors[option_model_name] =
         ModalOptionDescriptor.from_join_model(
-            descriptor.options.join_model_name
-          , descriptor.options.join_option_attr
+            descriptor.model_name
+          , descriptor.option_attr
           , option_model_name
           , extra_options);
     });
@@ -1343,5 +1321,735 @@
       });
     });
   });
+
+  
+
+
+
+  //*****************************************************************************************
+  //MultitypeMultiSelectModalSelector extends MultitypeModalSelector
+  //Description: Generic Multitype-MultiSelect-Modal-Selector
+  //Should be used for any Object type
+  //*********************************************************************************************
+  GGRC.Controllers.MultitypeModalSelector("GGRC.Controllers.MultitypeMultiSelectModalSelector", {
+    defaults: {
+          option_type_menu: null
+        , option_descriptors: null
+        , base_modal_view: "/static/mustache/selectors/multitype_multiselect_base_modal.mustache"
+        , option_items_view: "/static/mustache/selectors/multitype_multiselect_option_items.mustache"
+        , option_column_view: "/static/mustache/selectors/multitype_multiselect_option_column.mustache"
+        , option_type: null
+        , option_model: null
+        , object_model: null
+        , join_model: null
+      }
+  },{
+    init_context: function() {
+      if (!this.context) {
+        // Calculate the total number of options
+        var option_type_count = 0;
+        if (this.options.option_type_menu) {
+          can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; })
+        }
+
+        this.context = new can.Observe($.extend({
+          objects: this.object_list,
+          options: this.option_list,
+          joins: this.options.join_list,
+          actives: this.active_list,
+          option_type_count: this.options.option_type_menu ? option_type_count : null,
+          selected_object: null,
+          selected_option_type: null,
+          selected_options: [],
+          is_page_instance: false,
+          item_selected: false,
+          items_selected: 0
+          }, this.options));
+      }
+      return this.context;
+    }
+
+    , init_view: function() {
+        var self = this
+          , deferred = $.Deferred()
+          ;
+
+        can.view(
+          this.options.base_modal_view,
+          this.context,
+          function(frag) {
+            self.element.html(frag);
+            self.options.$header = self.element.find('.modal-header');
+            deferred.resolve();
+            self.element.trigger('loaded');
+            self.element.find(".results-wrap").cms_controllers_infinite_scroll();
+            setTimeout(function() {
+              self.element.find('#search').focus();
+            }, 200);
+          });
+
+        // Start listening for events
+        this.on();
+
+        return deferred;
+    }
+
+    , ".results-wrap scrollNext": "show_next_page"
+
+    , move_option_to_top_and_select: function(option) {
+
+        // If element is null, the modal was closed and we don't need to do anything
+        if(!this.element){
+          return;
+        }
+
+        var self = this;
+        var index = this.option_list.indexOf(option);
+        var option_column = this.element.find('.option_column ul.new-tree').first();
+        var option_row = option_column.find('li[data-id=' + option.id + ']');
+
+        if (index > -1) {
+          this.option_list.splice(index, 1);
+          this.option_list.unshift(option);
+        }
+        else {
+          this.option_list.unshift(option);
+        }
+        option_row.remove();
+
+        // Explicitly insert the option -- with paging, the object may not yet
+        //   be in the list.
+        this.insert_options([option], true).then(function() {
+          var option_column = self.element.find('.option_column ul.new-tree').first()
+            , option_row = option_column.find('li[data-id=' + option.id + ']')
+            , check_box = option_row.find('input.object-check-single')
+            ;
+          //Select the item and update the map button  
+          check_box.attr('checked','checked');
+          self.update_selected_items(check_box);
+        });
+    }
+
+    , " modal:success" : function(el, ev, data, options) {
+        var self = this;
+        // Scroll so the top element (the one just added) is in view
+        this.element.find(".option_column ul.new-tree").parent().scrollTop(0);
+        this.search_reset().then(function() {
+          // Move the just-created object to the top
+          self.move_option_to_top_and_select(data);
+          if(options && options.map_and_save && self.element){
+            self.on_map(self.element.find('.map-button'));
+          }
+        });
+    }
+    //Over write the parent class method to select the row. 
+    //The row is selected by selecting the check box
+    , ".option_column li.tree-item click": function(el, ev){}
+
+    , update_selected_items: function(el, ev){
+        var $check = $(this.element).find('.object-check-single'),
+          selected = $.grep($check, function(e){ return (e.checked == true && e.disabled == false );});
+        //Update Map button, #of items selected
+        this.context.attr('item_selected', (selected.length >= 1));
+        this.context.attr('items_selected', (selected.length));
+
+        //FIXME (good to have)
+        //If all the items are selected, top select all should be checked
+    }
+
+    , ".option_column input.object-check-single click": function(el, ev){
+        ev.stopPropagation();
+        this.update_selected_items(el, ev);
+    }
+
+    , "input[type=checkbox].object-check-all click": function(el, ev) {
+      var $el = $(el)
+        , $check = $(this.element).find('.object-check-single:not(:disabled)');
+ 
+      $check.prop('checked', $el.prop('checked'));
+      this.update_selected_items(el, ev);
+    }
+
+    , ".openclose:not(.active) click" : function(el, ev) {
+        //  Modifying the `result` object is bad, but here it can only affect
+        //  throwaway mapping results.
+        var expandable = el.data("expandable");
+        if (expandable)
+          expandable.attr("expanded", true);
+    }
+
+    , reset_selection_count: function(){
+        this.context.attr('item_selected', false);
+        this.context.attr('items_selected', 0);
+    } 
+
+    , "#search keyup": function(el, ev) {
+        var self = this
+          , $el = $(el)
+          , term = $el.val()
+          ;
+        if (term !== this.options.option_search_term) {
+          this.options.option_search_term = term;
+          //Object selected count and Add selected button should reset.
+          //User need to make their selection again
+          this.reset_selection_count();
+          setTimeout(function() {
+            if (self.options.option_search_term === term) {
+              self.refresh_option_list();
+              self.constructor.last_option_search_term = term;
+            }
+          }, 200);
+        }
+      }
+
+    , on_map: $.debounce(500, true, function(el, ev) {
+        var that = this, ajd; 
+
+        if(el.hasClass('disabled')){
+          return;
+        }
+        var join_instance = this.create_join();
+        var its = join_instance.length;
+        var pass = 0;
+        var obj_arr = [];
+
+        if (!(its > 0)) {
+          $(document.body).trigger("ajax:flash", {
+            error: "Select an object to map" });
+        } 
+        else {
+          for(var i = 0; i < its; i++){
+            //We have multiple join_instances
+            ajd = join_instance[i].save().done(function(obj) {
+              // FIXME: Extension isolation violation
+              if(that.options.mapTaskGroup) {
+                //Modify the object to map to task group
+                var id = obj.object.id, 
+                    shortName = obj.object.type,
+                    new_obj = {};
+                    new_obj.id = id;
+                    new_obj.constructor.shortName = shortName;
+
+                obj_arr.push(new_obj);
+              }
+              else {
+                $(document.body).trigger('ajax:flash', 
+                 { success: that.context.selected_options[0].constructor.shortName + " mapped successfully."});
+              }
+              pass += 1;
+              if(pass == its){
+                  if(obj_arr.length >= 1){ 
+                    var obj = {};
+                    obj.multi_map = true;
+                    obj.arr = obj_arr;
+                    
+                    ////trigger the to add selected objects to task group;
+                    that.element.trigger("modal:success", [obj, {map_and_save: true}])
+                  }
+                  $(that.element).modal_form('hide');
+                }
+            })
+            .fail(function(xhr) {
+                // Currently, the only error we encounter here is uniqueness
+                // constraint violations.  Let's use a nicer message!
+                //that.element.trigger("ajax:flash", { error : xhr.responseText });
+                //We should never get here, The mapped objects are already checked and disabled
+                if (that.element) {
+                  var message = "That object is already mapped";
+                  pass += 1;
+                  $(document.body).trigger("ajax:flash", { error: message });
+                  if(pass == its){
+                    $(that.element).modal_form('hide');
+                  }
+                }
+              });
+            this.bindXHRToButton(ajd, el, "Saving, please wait...");
+          }        
+        } //End else
+
+    })//end on_map
+
+
+    , create_join: function() {
+      var $check = $(this.element).find('.object-check-single:checked'),
+        selected = $check.filter(function() { return !this.disabled; }),
+        len = selected.length;
+      
+      for (var i = 0; i < len; i++){
+        var option =  $(selected[i]).closest('li').data('option');
+        this.context.selected_options.push(option);
+      }
+
+      var l = this.context.selected_options.length,
+        joins=[];
+      
+      if(l > 0){
+        for(var i = 0; i < l; i++){
+          if (this.context.selected_options[i]) {
+            var context_id = null
+              , context_object;
+  
+            // FIXME: Extension isolation violation
+            if (this.context.selected_object instanceof CMS.Models.TaskGroup) {
+              context_object = this.context.selected_object;
+            } else if (this.context.selected_options[i].constructor.shortName == "Program") {
+              context_object = this.context.selected_options[i];
+            } else {
+              context_object = this.context.selected_object;
+            }
+            if (context_object.context && context_object.context.id) {
+              context_id = context_object.context.id;
+            }
+            join = this.context.option_descriptor.get_new_join(
+                this.context.selected_object, this.context.selected_options[i], context_id);
+            joins.push(join);
+          }
+        }
+        return joins;
+      }
+    }
+
+  }); 
+  
+  multiselect_descriptor_view_option = {
+    "Person": {
+        column_view : GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache", 
+        items_view  : GGRC.mustache_path + "/wf_people/people_items.mustache"
+    }
+  }
+
+
+  function get_object_multitype_option_set(object_model_name, option_model_name, data, column_view, item_view) {
+    var join_descriptors = null
+      , option_descriptors = {}
+      , option_set = {
+            object_model: object_model_name
+        }
+      , exclude_option_types = data.exclude_option_types ? data.exclude_option_types.split(",") : []
+      ;
+
+    if (!option_model_name) {
+      join_descriptors =
+        GGRC.Mappings.get_canonical_mappings_for(object_model_name);
+    } else {
+      join_descriptors = {};
+      join_descriptors[option_model_name] = GGRC.Mappings.get_canonical_mapping(object_model_name, option_model_name);
+    }
+
+    can.each(join_descriptors, function(descriptor, far_model_name) {
+      //  If the resource type doesn't exist, short-circuit
+      if (!CMS.Models[far_model_name]) {
+        return;
+      }
+
+      var option_model_name = descriptor.option_model_name || far_model_name
+        , extra_options = multiselect_descriptor_view_option[option_model_name];
+
+      //  If we have duplicate options, we want to use the first, so return
+      //    early.
+      //  Also return now if the descriptor is explicitly excluded from the 
+      //    set of descriptors for this modal.
+      if (option_descriptors[option_model_name]
+          || ~can.inArray(option_model_name, exclude_option_types)
+          //  For some recently-added join settings, there is no join model, so
+          //  short-circuit
+          || !descriptor.model_name
+          || !(descriptor instanceof GGRC.ListLoaders.ProxyListLoader))
+        return;
+
+      if (!option_set.default_option_descriptor)
+        option_set.default_option_descriptor = option_model_name;
+
+      if (!extra_options){
+        extra_options = {
+            column_view : column_view
+          , items_view  : item_view
+        }
+      }
+
+      option_descriptors[option_model_name] =
+        ModalOptionDescriptor.from_join_model(
+            descriptor.model_name
+          , descriptor.option_attr
+          , option_model_name
+          , extra_options);
+    });
+
+	option_set.mapTaskGroup = data.mapTaskGroup;
+    option_set.option_descriptors = option_descriptors;
+    return option_set;
+  }
+
+
+
+  ////Set up handler for all multiselect -modal-selector
+  $(function() {
+    $('body').on('click', '[data-toggle="multitype-multiselect-modal-selector"]', function(e) {
+      var $this = $(this)
+        , options
+        , data_set = can.extend({}, $this.data())
+        ;
+
+      can.each($this.data(), function(v, k) {
+        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+        if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+          delete data_set[k];
+      });
+
+
+      //set up the options for new multitype Object  modal
+      var column_view = GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache", 
+      item_view =  GGRC.mustache_path + "/selectors/multitype_multiselect_option_items.mustache" ;
+
+      options = get_object_multitype_option_set(
+        data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
+      
+      options.selected_object = CMS.Models.get_instance(
+          data_set.join_object_type, data_set.join_object_id);
+
+      options.binding = options.selected_object.get_binding(
+          data_set.join_mapping)
+
+      //the below line is not needed, verify and clean up
+      //options.object_params = $this.data("object-params");
+
+      e.preventDefault();
+
+      // Trigger the controller
+      GGRC.Controllers.MultitypeMultiSelectModalSelector.launch($this, options)
+      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+        $this.trigger("modal:" + ev.type, data);
+      });
+    });
+  });
+
+
+
+
+  //********************************************************************************************************
+  //**********************************************************************************************************
+  //MultitypeObjectModalSelector
+  //and related handlers
+
+
+  GGRC.Controllers.MultitypeMultiSelectModalSelector("GGRC.Controllers.MultitypeObjectModalSelector", {
+    defaults: {
+          option_type_menu: null
+        , option_descriptors: null
+        , base_modal_view: "/static/mustache/selectors/object_selector_base_modal.mustache"
+        , option_items_view: "/static/mustache/selectors/object_selector_option_items.mustache"
+        , option_column_view: "/static/mustache/selectors/object_selector_option_column.mustache"
+        , option_type: null
+        , option_model: null
+        , object_model: null
+        , join_model: null
+      }
+  }, {
+    init_menu: function() {
+        var menu, menu2
+          , lookup = {
+              governance: 0
+            , business: 1
+            //, entities: 2
+            };
+
+        if (!this.options.option_type_menu) {
+          menu = [
+              { category: "Governance"
+              , items: []
+              }
+            , { category: "Assets/Business"
+              , items: []
+              }
+            //, { category: "People/Groups"
+            //  , items: []
+            //  }
+            ];
+          can.each(this.options.option_descriptors, function(descriptor) {
+            if (descriptor.model.category == "workflow" || 
+                descriptor.model.category == "undefined" ||
+                descriptor.model.category == "entities"){
+              return;
+            }
+            else{
+              menu[lookup[descriptor.model.category] || 0].items.push({
+                  model_name: descriptor.model.shortName
+                , model_display: descriptor.model.title_plural
+              })
+            }
+          })
+
+          this.options.option_type_menu = menu;
+        }
+        //hard code some of the submenu
+        //this.options.option_type_menu_2 = this.options.option_type_menu;
+        this.options.option_type_menu_2 = can.map([
+              "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
+              "Person", "System", "Process", "DataAsset", "Product", "Project", "Facility" , "Market"
+              ],
+              function(key) {
+                return CMS.Models[key];
+              }
+            ); 
+    }
+
+  , init_context: function() {
+      if (!this.context) {
+        // Calculate the total number of options
+        var option_type_count = 0;
+        if (this.options.option_type_menu) {
+          can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; })
+        }
+
+        this.context = new can.Observe($.extend({
+          objects: this.object_list,
+          options: this.option_list,
+          joins: this.options.join_list,
+          actives: this.active_list,
+          option_type_count: this.options.option_type_menu ? option_type_count : null,
+          selected_object: null,
+          selected_option_type: null,
+          selected_options: [],
+          is_page_instance: false,
+          item_selected: false,
+          items_selected: 0,
+          filter_list: []
+          }, this.options));
+        }
+        return this.context;
+      }
+
+    , ".addFilterRule click": function() {
+      this.context.filter_list.push({
+          value: "",
+          model_name: this.options.option_type_menu_2[0].model_singular
+        });
+    }
+
+    , ".remove_filter click": function(el) {
+      var index = el.data('index');
+      this.context.filter_list.splice(index, 1);
+    }
+
+    //Over write this for search button to update the list
+    , on_select_option_type: function(el, ev) {
+    }
+
+    , "select.option-type-selector change": "on_select_option_type"
+
+    
+    //Over write search text to noop, search button updates the list
+    , "#search keyup": function(el, ev) {
+    }
+
+
+    , "select.filter-type-selector change": function(el,ev){
+      var classes = $(el).attr('class');
+      //search for str starting with select-filter, find the id, update the data to search-filter+id
+
+    }
+    
+    //Search button click
+    , ".objectReview click": "triggerSearch"
+
+    , "#search keyup": function(el, ev) {
+        if (ev.which == 13) {
+          this.triggerSearch();
+        }
+      }
+
+    /* Advanced search and object multi-select is not triggered after a new object addition. There is
+     * no create button on this modal. So we donot have to re-set search. Modal success is triggered after
+     * editing an object.
+    */
+    , " modal:success" : function(el, ev, data, options) {
+      //no op
+    }
+
+    , triggerSearch: function(){
+      // Remove Search Criteria text
+      $('.results-wrap span.info').hide();
+      //Get the selected object value
+
+      var selected = $("select.option-type-selector").val(),
+        self = this,
+        loader,
+        term = $("#search").val() || "",
+        re = new RegExp("^.*" + term + ".*","gi"),
+      //Get the filter_list length, for each select get the value for type, 
+      //for each search, find the search text
+        f_len = this.context.filter_list.length,
+        filters = [],
+        cancel_filter;
+      
+      this.set_option_descriptor(selected);
+
+      this.context.filter_list.each(function(filter_obj) {
+        if(cancel_filter || !filter_obj.search_filter) {
+          cancel_filter = true;
+          return;
+        }
+        filters.push(
+          // Must type filter here because the canonical mapping
+          //  may be polymorphic.
+          new GGRC.ListLoaders.TypeFilteredListLoader(
+            GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected),
+            [selected]
+          ).attach(filter_obj.search_filter)
+        );
+      });
+      if(cancel_filter) {
+        //missing search term.
+        return;
+      }
+
+      if (filters.length > 0) {
+        //Object selected count and Add selected button should reset.
+        //User need to make their selection again
+        this.reset_selection_count();
+
+        
+        //if(filters.length === 1 && !term) {
+        //  //don't bother making an intersecting filter when there's only one source
+        //  loader = filters[0];
+        //} else {
+        //  // make an intersecting loader, that only shows the results that 
+        //  //  show up in all sources.
+        //  if(term) {
+        //    filters.push(new GGRC.ListLoaders.SearchListLoader(term, [selected]).attach(GGRC.current_user));
+        //  }
+        //  loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
+        //}
+        
+        if (filters.length === 1){
+          loader = filters[0];
+        }
+        else {
+          loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
+        }
+
+        //Title search
+        custom_filter = new GGRC.ListLoaders.CustomFilteredListLoader(loader, function(result) {
+          if(term){
+            if(result.instance.title.match(re)) { return true; }  
+            else { return false; }    
+          }          
+          return true;
+        }).attach(CMS.Models.get_instance(GGRC.current_user));
+
+        this.last_loader = custom_filter;
+        self.option_list.replace([]);
+        self.element.find('.option_column ul.new-tree').empty();
+        custom_filter.refresh_stubs().then(function(options) {
+          var active_fn = function() {
+            return self.element &&
+                   self.last_loader === custom_filter;
+          };
+
+          var draw_fn = function(options) {
+            self.insert_options(options);
+          };
+
+          self.option_list.push.apply(self.option_list, options);
+          self._start_pager(can.map(options, function(op) {
+              return op.instance;
+            }), 20, active_fn, draw_fn);
+        });
+      } else {
+        //Object selected count and Add selected button should reset.
+        //User need to make their selection again
+        this.reset_selection_count();
+
+        // With no mappings specified, just do a general search
+        //  on the type selected.
+        this.last_loader = null;
+        this.options.option_search_term = term;
+        this.refresh_option_list();
+        this.constructor.last_option_search_term = term;
+      }
+    }
+
+    , set_option_descriptor: function(option_type) {
+      var self = this
+        , descriptor = this.options.option_descriptors[option_type]
+        ;
+
+      this.constructor.last_selected_options_type = option_type;
+
+      can.Model.startBatch();
+
+      this.context.attr('selected_option_type', option_type);
+      this.context.attr('option_column_view', descriptor.column_view);
+      this.context.attr('option_detail_view', descriptor.detail_view);
+      this.context.attr('option_descriptor', descriptor);
+      this.context.selected_options = [];
+      this.context.attr('selected_result', can.compute(function() {
+        return self.get_result_for_option(self.context.attr('selected_options'));
+      }));
+      this.context.attr('related_table_plural', descriptor.related_table_plural);
+      this.context.attr('related_table_singular', descriptor.related_table_singular);
+      this.context.attr('related_model_singular', descriptor.related_model_singular);
+      this.context.attr('new_object_title', descriptor.new_object_title);
+      this.options.option_items_view = descriptor.items_view;
+      this.options.option_model = descriptor.model;
+      if (!this.options.option_search_term)
+        this.options.option_search_term = '';
+
+      can.Model.stopBatch();
+      //Refresh_option_list is done from the search button
+      //this.refresh_option_list();
+    },
+
+    autocomplete_select : function(el, ev, ui) {
+      setTimeout(function(){
+        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
+        el.trigger('change');
+      }, 0);
+      this.context.attr(el.attr("name"), ui.item);
+    }
+  });
+  
+
+  $(function() {
+    $('body').on('click', '[data-toggle="multitype-object-modal-selector"]', function(e) {
+      var $this = $(this)
+        , options
+        , data_set = can.extend({}, $this.data())
+        ;
+
+      can.each($this.data(), function(v, k) {
+        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+        if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+          delete data_set[k];
+      });
+
+
+      //set up the options for new multitype Object  modal
+      var column_view = GGRC.mustache_path + "/selectors/object_selector_option_column.mustache", 
+      item_view =  GGRC.mustache_path + "/selectors/object_selector_option_items.mustache" ;
+      options = get_object_multitype_option_set(
+        data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
+      
+      options.selected_object = CMS.Models.get_instance(
+          data_set.join_object_type, data_set.join_object_id);
+
+      options.binding = options.selected_object.get_binding(
+          data_set.join_mapping)
+
+      //The below line is not needed, verify and clean up
+      //options.object_params = $this.data("object-params");
+
+      e.preventDefault();
+
+      // Trigger the controller
+      GGRC.Controllers.MultitypeObjectModalSelector.launch($this, options)
+      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+        $this.trigger("modal:" + ev.type, data);
+      });
+    });
+  });
+
+  
+
 
 })(window.can, window.can.$);

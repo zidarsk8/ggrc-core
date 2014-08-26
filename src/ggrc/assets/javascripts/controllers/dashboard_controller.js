@@ -9,9 +9,7 @@
 
 can.Control("CMS.Controllers.Dashboard", {
     defaults: {
-        model_descriptors: null
-      , menu_tree_spec: null
-      , widget_descriptors: null
+      widget_descriptors: null
       //, widget_listeners: null
       //, widget_containers: null
       //
@@ -23,13 +21,9 @@ can.Control("CMS.Controllers.Dashboard", {
       this.init_page_help();
       this.init_page_header();
       this.init_widget_descriptors();
-      if (!this.options.menu_tree)
-        this.init_menu_tree();
       if (!this.inner_nav_controller)
         this.init_inner_nav();
       this.update_inner_nav();
-      if (!this.add_widget_controller)
-        this.init_add_widget();
 
       // Before initializing widgets, hide the container to not show
       // loading state of multiple widgets before reducing to one.
@@ -71,7 +65,8 @@ can.Control("CMS.Controllers.Dashboard", {
   , init_widget_area: function() {
       this.widget_area_controller = new CMS.Controllers.SortableWidgets(
           this.element.find('.widget-area'), {
-              dashboard_controller: this
+              dashboard_controller: this,
+              sort: GGRC.WidgetList.get_default_widget_sort()
           });
       if (!this.inner_nav_controller) {
         //  If there is no inner-nav, then ensure widgets are shown
@@ -94,42 +89,10 @@ can.Control("CMS.Controllers.Dashboard", {
       }
     }
 
-  , init_add_widget: function() {
-      this.add_widget_controller = new CMS.Controllers.AddWidget(
-          this.element.find('.add-nav-item'), {
-              dashboard_controller : this
-            //, widget_descriptors : this.options.widget_descriptors
-            , menu_tree : this.options.menu_tree
-          });
-      }
-
   , init_widget_descriptors: function() {
       var that = this;
 
       this.options.widget_descriptors = this.options.widget_descriptors || {};
-
-      can.each(this.options.model_descriptors, function(descriptor, key) {
-        that.options.widget_descriptors[key] =
-          that.make_list_view_descriptor_from_model_descriptor(descriptor);
-      });
-    }
-
-  , init_menu_tree: function() {
-      var that = this
-        , menu_tree = { categories: [] };
-
-      can.each(this.options.menu_tree_spec, function(category) {
-        var objects = can.map(category.objects, function(widget_name) {
-          return that.options.widget_descriptors[widget_name];
-        });
-
-        menu_tree.categories.push({
-            title: category.title
-          , objects: objects
-        });
-      });
-
-      this.options.menu_tree = menu_tree;
     }
 
   , init_default_widgets: function() {
@@ -327,37 +290,6 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
 
       this.options.widget_descriptors = this.options.widget_descriptors || {};
     }
-
-  , init_menu_tree: function() {
-      var that = this
-        , widget_descriptors = this.options.widget_descriptors
-        , model_name = this.options.instance.constructor.shortName
-        , categories_index = {}
-        , menu_tree = { categories : [] }
-        ;
-
-      can.each(GGRC.RELATIONSHIP_TYPES[model_name], function(value, key) {
-        var related_model = CMS.Models[key]
-          , descriptor = widget_descriptors[related_model.table_singular]
-          , category = null
-          ;
-
-        if (descriptor) {
-          category = descriptor.object_category;
-
-          if (!categories_index[category]) {
-            categories_index[category] = {
-                title : can.map(category.split(" "), can.capitalize).join(" ")
-              , objects : []
-              };
-            menu_tree.categories.push(categories_index[category]);
-          }
-          categories_index[category].objects.push(descriptor);
-        }
-      });
-
-      this.options.menu_tree = menu_tree;
-    }
 });
 
 
@@ -367,6 +299,7 @@ can.Control("CMS.Controllers.InnerNav", {
     , widget_list : null
     , spinners : {}
     , contexts : null
+    , instance : null
   }
 }, {
     init: function(options) {
@@ -376,36 +309,22 @@ can.Control("CMS.Controllers.InnerNav", {
       if (!this.options.widget_list)
         this.options.widget_list = new can.Observe.List([]);
 
-      this.sortable();
+      this.options.instance = GGRC.page_instance();
 
-      can.route.ready();
+      this.sortable();
 
       if (!(this.options.contexts instanceof can.Observe))
         this.options.contexts = new can.Observe(this.options.contexts);
 
       // FIXME: Initialize from `*_widget` hash when hash has no `#!`
-      can.route(":path", {});
-
-      can.route.bind("change", function(ev, attr, how, newVal, oldVal) {
-        if (attr === "path") {
-          if (newVal) {
-            that.display_path(newVal);
-          }
-          else {
-            that.display_path('info_widget');
-          }
-        }
+      can.bind.call(window, 'hashchange', function() {
+        that.route(window.location.hash);
       });
 
       can.view(this.options.internav_view, this.options, function(frag) {
         function fn() {
           that.element.append(frag);
-          if (window.location.hash.substr(0,2) === "#!") {
-            can.route.attr('path', window.location.hash.substr(2));
-          }
-          else {
-            can.route.attr('path', window.location.hash.substr(1));
-          }
+          that.route(window.location.hash);
           delete that.delayed_display;
         }
         that.delayed_display = {
@@ -415,6 +334,22 @@ can.Control("CMS.Controllers.InnerNav", {
       });
 
       this.on();
+    }
+
+  , route: function(path) {
+      if (path.substr(0, 2) === "#!") {
+        path = path.substr(2);
+      } else if (path.substr(0, 1) === "#") {
+        path = path.substr(1);
+      }
+
+      window.location.hash = path;
+
+      if (path.length > 0) {
+        this.display_path(path);
+      } else {
+        this.display_path('info_widget');
+      }
     }
 
   , display_path: function(path) {
@@ -486,6 +421,8 @@ can.Control("CMS.Controllers.InnerNav", {
       $('[href=' + (selector || that.options.contexts.attr('active_widget').selector) + ']')
         .closest('li').addClass('active')
         .siblings().removeClass('active');
+      // Trigger a scroll event to update sticky headers
+      widget.trigger('scroll');
     }
   }
 
@@ -541,8 +478,6 @@ can.Control("CMS.Controllers.InnerNav", {
         , existing_index
         ;
 
-      index = (index == null) ? this.options.widget_list.length : index;
-
       if(this.delayed_display) {
         clearTimeout(this.delayed_display.timeout);
         this.delayed_display.timeout = setTimeout(this.delayed_display.fn, 50);
@@ -575,14 +510,19 @@ can.Control("CMS.Controllers.InnerNav", {
       , spinner : this.options.spinners["#" + $widget.attr("id")]
       });
 
+      index = (index == null) ? this.options.widget_list.length : index;
+
       if(existing_index !== index) {
         if(existing_index > -1) {
-          this.options.widget_list.splice(existing_index, 1);
-        }
-        if(index >= this.options.widget_list.length) {
-          this.options.widget_list.push(widget);
+          if (index >= this.options.widget_list.length) {
+            this.options.widget_list.splice(existing_index, 1);
+            this.options.widget_list.push(widget);
+          } else {
+            this.options.widget_list.splice(existing_index, 1, this.options.widget_list[index]);
+            this.options.widget_list.splice(index, 1, widget);
+          }
         } else {
-          this.options.widget_list.splice(index, 0, widget);
+          this.options.widget_list.push(widget);
         }
       }
       return widget;

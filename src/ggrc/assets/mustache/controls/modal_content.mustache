@@ -9,13 +9,14 @@
 {{#instance}}
 <form action="javascript://">
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
       <label>
         Title
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label>
       <input tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
+      {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
     </div>
   </div>
   <div class="row-fluid">
@@ -124,8 +125,8 @@
         </label>
         <select class="input-block-level" name="key_control" null-if-empty="null-if-empty" tabindex="12">
           <option value="" {{#if_equals key_control ""}}selected{{/if_equals}}>---</option>
-          <option value="0" {{#if_equals key_control "0"}}selected{{/if_equals}}>Key</option>
-          <option value="1" {{#if_equals key_control "1"}}selected{{/if_equals}}>Non-Key</option>
+          <option value="0" {{#if_equals key_control "0"}}selected{{/if_equals}}>Non-Key</option>
+          <option value="1" {{#if_equals key_control "1"}}selected{{/if_equals}}>Key</option>
         </select>
       </div>
       <div class="span3">

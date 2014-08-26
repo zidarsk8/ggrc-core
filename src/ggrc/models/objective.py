@@ -40,9 +40,9 @@ class Objective(
       ]
 
   _include_links = [
-      'section_objectives',
-      'objective_controls',
-      'objective_objects',
+      #'section_objectives',
+      #'objective_controls',
+      #'objective_objects',
       ]
 
   @classmethod
@@ -51,6 +51,6 @@ class Objective(
 
     query = super(Objective, cls).eager_query()
     return cls.eager_inclusions(query, Objective._include_links).options(
-        orm.subqueryload('section_objectives'),
+        orm.subqueryload('section_objectives').joinedload('section'),
         orm.subqueryload('objective_controls'),
         orm.subqueryload('objective_objects'))

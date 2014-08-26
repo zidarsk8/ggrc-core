@@ -1,0 +1,86 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+
+<li class="tree-item governance t-assigned" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}} data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+    <div class="openclose">
+      <a class="openclose-placeholder" href="javascript://"> </a>
+      <div class="row-fluid">
+        <div class="span12">
+          <ul class="tree-action-list">
+            <li>
+              {{{renderLive '/static/mustache/tasks/states.mustache' status=instance.status}}}
+            </li>
+            <li>
+              {{#with_mapping_count instance 'cycle_task_group_object_tasks'}}
+              <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
+                <i class="grcicon-task-black"></i>
+                <strong class="error">{{count}}</strong>
+              </span>
+              {{/with_mapping_count}}
+            </li>
+          </ul>
+          <span class="tier-trigger"></span>
+          <div class="item-data">
+            <div class="tree-title-area">
+              <i class="grcicon-{{instance.object.reify.class.table_singular}}-color"></i>
+              {{instance.title}}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{#if expanded}}
+  <div class="tier-2-info item-content">
+    <div class="tier-2-info-content">
+      {{#using object=instance.object}}
+
+      <div class="row-fluid">
+        <div class="span6">
+          {{#if object.viewLink}}
+            {{#is_allowed "view_object_page" object}}
+              <a href="{{object.viewLink}}" class="info-action">
+                View {{object.class.title_singular}}
+                <i class="grcicon-goto"></i>
+              </a>
+            {{/is_allowed}}
+          {{else}}
+            Object deleted or inaccessible
+          {{/if}}
+        </div>
+      </div>
+
+      <div class="show-description">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="tree-description">
+              <h5>{{firstnonempty object.title instance.title}}</h5>
+              {{{firstnonempty object.description instance.description}}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{/using}}
+    </div>
+
+    {{#if draw_children}}
+      {{#child_options}}
+        <div class="inner-tree">
+          <h6>Tasks ({{list.length}})</h6>
+          <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+        </div>
+      {{/child_options}}
+    {{/if}}
+
+  </div>
+  {{/if}}
+</li>

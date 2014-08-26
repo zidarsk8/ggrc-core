@@ -22,6 +22,7 @@ can.Control("GGRC.Controllers.Modals", {
     , model : null    // model class to use when finding or creating new
     , instance : null // model instance to use instead of finding/creating (e.g. for update)
     , new_object_form : false
+    , mapping : false
     , find_params : {}
   }
 
@@ -39,11 +40,12 @@ can.Control("GGRC.Controllers.Modals", {
       , modal_confirm : "Confirm"
       , modal_description : "description"
       , modal_title : "Confirm"
-      , content_view : GGRC.mustache_path + "/modals/confirm.mustache" 
+      , content_view : GGRC.mustache_path + "/modals/confirm.mustache"
     }, options))
     .on('click', 'a.btn[data-toggle=confirm]', function(e) {
+      var params = $(e.target).closest('.modal').find('form').serializeArray();
       $target.modal('hide').remove();
-      success && success();
+      success && success(params, $(e.target).data('option'));
     })
     .on('click.modal-form.close', '[data-dismiss="modal"]', function() {
       $target.modal('hide').remove();
@@ -61,6 +63,7 @@ can.Control("GGRC.Controllers.Modals", {
     } else {
       this.after_preload()
     }
+    //this.options.attr("mapping", !!this.options.mapping);
   }
 
   , after_preload : function(content) {
@@ -74,9 +77,9 @@ can.Control("GGRC.Controllers.Modals", {
     this.on();
     this.fetch_all()
       .then(this.proxy("apply_object_params"))
-      .then(function() { 
+      .then(function() {
         // If the modal is closed early, the element no longer exists
-        that.element && that.element.trigger('preload') 
+        that.element && that.element.trigger('preload')
       })
       .then(this.proxy("autocomplete"));
   }
@@ -93,18 +96,34 @@ can.Control("GGRC.Controllers.Modals", {
   , "input[data-lookup] focus" : function(el, ev) {
     this.autocomplete(el);
   }
+  , "input[data-lookup] keyup" : function(el, ev) {
+    // Set the transient field for validation
+    var name = el.attr('name').split('.'),
+        instance = this.options.instance,
+        value = el.val();
+
+    name.pop(); //set the owner to null, not the email
+    instance._transient || instance.attr("_transient", new can.Observe({}));
+    can.reduce(name.slice(0, -1), function(current, next) {
+      current = current + "." + next;
+      instance.attr(current) || instance.attr(current, new can.Observe({}));
+      return current;
+    }, "_transient");
+    instance.attr(["_transient"].concat(name).join("."), value);
+  }
 
   , autocomplete : function(el) {
     $.cms_autocomplete.call(this, el);
   }
 
   , autocomplete_select : function(el, event, ui) {
-    var original_event;
-    if(ui.item) {
+    var original_event,
+        that = this;
+
+    $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
       var path = el.attr("name").split(".")
         , instance = this.options.instance
         , index = 0
-        , that = this
         , prop = path.pop();
 
       if (/^\d+$/.test(path[path.length - 1])) {
@@ -120,41 +139,17 @@ can.Control("GGRC.Controllers.Modals", {
         this.options.instance.attr(path, ui.item.stub());
         // Make sure person name/email gets written to the input field
         setTimeout(function(){
-          if(el.val() === ""){
-            // Setting el.val is needed for Auditor field to work
-            var obj = that.options.instance.attr(path);
-            if(obj && obj.type === "Person" && obj.type in CMS.Models && obj.id in CMS.Models[obj.type].cache){
-              el.val(CMS.Models[obj.type].cache[obj.id].name || CMS.Models[obj.type].cache[obj.id].email);
-            }
-            instance._transient || instance.attr("_transient", new can.Observe({}));
-            can.reduce(path.split("."), function(current, next) {
-              current = current + "." + next;
-              instance.attr(current) || instance.attr(current, new can.Observe({}));
-              return current;
-            }, "_transient");
-            instance.attr("_transient." + path, ui.item[prop]);
-          }
-        }, 150);
+          el.val(ui.item.title || ui.item.name || ui.item.email);
+          instance._transient || instance.attr("_transient", new can.Observe({}));
+          can.reduce(path.split("."), function(current, next) {
+            current = current + "." + next;
+            instance.attr(current) || instance.attr(current, new can.Observe({}));
+            return current;
+          }, "_transient");
+          instance.attr("_transient." + path, ui.item[prop]);
+          el.blur();
+        }, 50);
       }
-    } else {
-      original_event = event;
-
-      $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(ev, new_obj) {
-        el.data("ui-autocomplete").options.select(event, {item : new_obj});
-      }).one("hidden", function() {
-        setTimeout(function() {
-          $(this).off(".autocomplete");
-        }, 100);
-      });
-      while(original_event = original_event.originalEvent) {
-        if(original_event.type === "keydown") {
-          //This selection event was generated from a keydown, so click the add new link.
-          el.data("ui-autocomplete").menu.active.find("a").click();
-          break;
-        }
-      }
-      return false;
-    }
   }
 
   , immediate_find_or_create : function(el, ev, data) {
@@ -207,7 +202,7 @@ can.Control("GGRC.Controllers.Modals", {
       dfd = this.options.instance.refresh();
     } else if (this.options.model) {
       dfd = this.options.new_object_form
-          ? $.when(this.options.attr("instance", new this.options.model(params)))
+          ? $.when(this.options.attr("instance", new this.options.model(params).attr("_suppress_errors", true)))
           : this.options.model.findAll(params).then(function(data) {
             var h;
             if(data.length) {
@@ -228,8 +223,17 @@ can.Control("GGRC.Controllers.Modals", {
       that.on();
       dfd = new $.Deferred().resolve(this.options.instance);
     }
-    
+
     return dfd.done(function() {
+
+      // If the modal is closed early, the element no longer exists
+      if (that.element) {
+        // This is to trigger `focus_first_element` in modal_ajax handling
+        that.element.trigger("loaded");
+      }
+
+
+      that.options.instance._transient || that.options.instance.attr("_transient", new can.Observe({}));
       that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
     });
   }
@@ -263,11 +267,15 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "input, textarea, select change" : function(el, ev) {
-      this.set_value_from_element(el);
+      this.options.instance.removeAttr("_suppress_errors");
+      // Set the value if it isn't a search field
+      if(!el.hasClass("search-icon")){
+        this.set_value_from_element(el);
+      }
   }
 
   , "input:not([data-lookup]), textarea keyup" : function(el, ev) {
-      if (el.prop('value').length == 0 || 
+      if (el.prop('value').length == 0 ||
         (typeof el.attr('value') !== 'undefined' && el.attr('value').length == 0)) {
         this.set_value_from_element(el);
       }
@@ -287,6 +295,11 @@ can.Control("GGRC.Controllers.Modals", {
         , value = $el.val()
         , that = this;
         ;
+
+      // If no model is specified, short circuit setting values
+      // Used to support ad-hoc form elements in confirmation dialogs
+      if (!this.options.model)
+        return;
 
       if (name)
         this.set_value({ name: name, value: value });
@@ -331,7 +344,7 @@ can.Control("GGRC.Controllers.Modals", {
 
     if($elem.is("[data-binding]") && $elem.is("[type=checkbox]")){
       can.map($elem, function(el){
-        if(el.value != value.id) 
+        if(el.value != value.id)
           return;
         if($(el).is(":checked")){
           instance.mark_for_addition($elem.data("binding"), value);
@@ -359,14 +372,6 @@ can.Control("GGRC.Controllers.Modals", {
       } else {
 
         if($elem.is("[data-lookup]")) {
-          name.pop(); //set the owner to null, not the email
-          instance._transient || instance.attr("_transient", new can.Observe({}));
-          can.reduce(name.slice(0, -1), function(current, next) {
-            current = current + "." + next;
-            instance.attr(current) || instance.attr(current, new can.Observe({}));
-            return current;
-          }, "_transient");
-          instance.attr(["_transient"].concat(name).join("."), value);
           if(!value) {
             value = null;
           } else {
@@ -417,44 +422,13 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "{$footer} a.btn[data-toggle='modal-submit'] click" : function(el, ev) {
-    var that = this;
-
+    var ajd;
     // Normal saving process
     if (el.is(':not(.disabled)')) {
-      var instance = this.options.instance
-      , ajd;
-
-      this.serialize_form();
-
-      // Special case to handle context outside the form itself
-      // - this avoids duplicated change events, and the API requires
-      //   `context` to be present even if `null`, unlike other attributes
-      if (!instance.context)
-        instance.attr('context', { id: null });
-
-      this.disable_hide = true;
-      ajd = instance.save().done(function(obj) {
-        function finish() {
-          delete that.disable_hide;
-          that.element.trigger("modal:success", obj).modal_form("hide");
-        };
-
-        // If this was an Objective created directly from a Section, create a join
-        var params = that.options.object_params;
-        if (obj instanceof CMS.Models.Objective && params && params.section) {
-          new CMS.Models.SectionObjective({
-            objective: obj
-            , section: CMS.Models.Section.findInCacheById(params.section.id)
-            , context: { id: null }
-          }).save().done(finish);
-        } else {
-          finish();
-        }
-      }).fail(function(xhr, status) {
-        el.trigger("ajax:flash", { error : xhr.responseText });
-        delete that.disable_hide;
-      });
-      this.bindXHRToButton(ajd, el, "Saving, please wait...");
+      ajd = this.save_instance(el, ev);
+      if(ajd) {
+        this.bindXHRToButton(ajd, el, "Saving, please wait...");
+      }
     }
     // Queue a save if clicked after verifying the email address
     else if (this._email_check) {
@@ -469,6 +443,56 @@ can.Control("GGRC.Controllers.Modals", {
         }
       });
     }
+  }
+
+  , "save_instance" : function(el, ev) {
+    var that = this
+    , instance = this.options.instance
+    , ajd;
+
+
+      if(instance.errors()) {
+        instance.removeAttr("_suppress_errors");
+        return;
+      }
+
+      this.serialize_form();
+
+      // Special case to handle context outside the form itself
+      // - this avoids duplicated change events, and the API requires
+      //   `context` to be present even if `null`, unlike other attributes
+      if (!instance.context)
+        instance.attr('context', { id: null });
+
+      this.disable_hide = true;
+      ajd = instance.save().done(function(obj) {
+        function finish() {
+          delete that.disable_hide;
+          that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
+        }
+
+        // If this was an Objective created directly from a Section, create a join
+        var params = that.options.object_params;
+        if (obj instanceof CMS.Models.Objective && params && params.section) {
+          new CMS.Models.SectionObjective({
+            objective: obj
+            , section: CMS.Models.Section.findInCacheById(params.section.id)
+            , context: { id: null }
+          }).save().done(function(){
+            $(document.body).trigger("ajax:flash",
+                { success : "Objective mapped successfully." });
+            finish();
+          });
+        } else {
+          finish();
+        }
+      }).fail(function(xhr, status) {
+        if(!instance.errors()) {
+          $(document.body).trigger("ajax:flash", { error : xhr.responseText });
+        }
+        delete that.disable_hide;
+      });
+      return ajd;
   }
   , " ajax:flash" : function(el, ev, mesg) {
     var that = this;

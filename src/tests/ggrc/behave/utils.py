@@ -17,6 +17,29 @@ import datetime
 from .factories import factory_for, FactoryStubMarker
 import requests
 
+
+def get_model(resource):
+  import ggrc.models
+  if isinstance(resource, Example):
+    resource = resource.resource_type
+  if isinstance(resource, (str, unicode)):
+    if '.' in resource:
+      # FIXME: Imports here shouldn't be needed, but extension module models
+      #   aren't currently initialized (with ._inflector) before tests begin
+      resource_module_path = '.'.join(resource.split(".")[:-1])
+      resource_module = __import__(resource_module_path)
+      resource = resource.split('.')[-1]
+      resource = getattr(resource_module, resource)
+    else:
+      resource = ggrc.models.get_model(resource)
+  return resource
+
+
+def get_inflection(resource, inflection):
+  model = get_model(resource)
+  return unicode(getattr(model._inflector, inflection))
+
+
 class Example(object):
   """An example resource for use in a behave scenario, by name."""
   def __init__(self, resource_type, value, response=None):
@@ -25,10 +48,12 @@ class Example(object):
     self.response = response
 
   def get(self, attr):
-    return self.value.get(get_resource_table_singular(self.resource_type)).get(attr)
+    resource_root = get_inflection(self.resource_type, 'table_singular')
+    return self.value.get(resource_root).get(attr)
 
   def set_embedded_val(self, attr, value):
-    self.value.get(get_resource_table_singular(self.resource_type))[attr] = value
+    resource_root = get_inflection(self.resource_type, 'table_singular')
+    self.value.get(resource_root)[attr] = value
 
   def set(self, attr, value):
     self.value[attr] = value
@@ -47,9 +72,7 @@ def handle_example_resource(context, resource_type):
 def handle_named_example_resource(
     step_context, resource_type, example_name, **kwargs):
   if type(resource_type) is str and '.' in resource_type:
-    import sys
-    __import__(resource_type)
-    resource_type = sys.modules[resource_type]
+    resource_type = get_model(resource_type)
   resource_factory = factory_for(resource_type)
   example = Example(resource_type, resource_factory(**kwargs))
   setattr(step_context, example_name, example)
@@ -57,6 +80,7 @@ def handle_named_example_resource(
 def handle_get_resource_and_name_it(context, url, name):
   response = get_resource(context, url)
   assert response.status_code == 200
+  setattr(context, '_response', response)
   setattr(context, name, response.json())
 
 def get_resource(context, url, headers=None):
@@ -124,10 +148,9 @@ def handle_post_named_example(context, name, expected_status=201):
   if expected_status == 200 or expected_status == 201:
     example = Example(example.resource_type, response.json())
     setattr(context, name, example)
+  return response
 
-def post_to_endpoint(context, endpoint, data, url=None):
-  if url is None:
-    url = get_service_endpoint_url(context, endpoint)
+def post_to_endpoint(context, url, data):
   headers = {
       'Content-Type': 'application/json',
       'X-Requested-By': 'Reciprocity Behave Tests',
@@ -202,31 +225,20 @@ def post_example(context, resource_type, example, url=None, rbac_context=None):
   if rbac_context is not None:
     example["context"] = rbac_context
 
-  data = as_json(
-      {get_resource_table_singular(resource_type): example})
-  return post_to_endpoint(context, resource_type, data, url)
+  resource_root = get_inflection(resource_type, 'table_singular')
+  data = as_json({ resource_root: example })
+  if url is None:
+    url = get_service_endpoint_url_for_type(context, resource_type)
+  return post_to_endpoint(context, url, data)
 
-def resource_type_string(resource_type):
-  if type(resource_type) in [str,unicode]:
-    if '.' in resource_type:
-      return resource_type.split('.')[-1]
-    return resource_type
-  else:
-    return resource_type.__name__
-
-def get_resource_table_singular(resource_type):
-  # This should match the implementation at
-  #   ggrc.models.inflector:ModelInflector.underscore_from_camelcase
-  import re
-  resource_type = resource_type_string(resource_type)
-  s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', resource_type)
-  return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+def get_service_endpoint_url_for_type(context, resource_type):
+  endpoint_name = get_inflection(resource_type, 'model_singular')
+  return get_service_endpoint_url(context, endpoint_name)
 
 def get_service_endpoint_url(context, endpoint_name):
   """Return the URL for the `endpoint_name`. This assumes that there is a
   `service_description` in the `context` to ues to lookup the endpoint url.
   """
-  endpoint_name = resource_type_string(endpoint_name)
   return context.service_description.get(u'service_description')\
       .get(u'endpoints').get(unicode(endpoint_name)).get(u'href')
 
@@ -242,9 +254,8 @@ def check_for_resource_in_collection(
   resource = getattr(context, resource_name)
   collection = getattr(context, collection_name)
   root = collection.keys()[0]
-  from ggrc import models
-  model_class = getattr(models, resource.resource_type)
-  entry_list = collection[root][model_class._inflector.table_plural]
+  table_plural = get_inflection(resource.resource_type, 'table_plural')
+  entry_list = collection[root][table_plural]
   result_pairs = set(
       [(o.get(u'id'), o.get(u'selfLink') or o.get(u'href'))
         for o in entry_list])
@@ -257,5 +268,3 @@ def check_for_resource_in_collection(
     assert check_pair not in result_pairs, \
         'Expected not to find {0} in results {1}'.format(
             check_pair, result_pairs)
-
-

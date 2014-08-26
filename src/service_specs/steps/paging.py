@@ -33,7 +33,4 @@ def check_for_page_link(context, link_name, expected=True):
 @when('retrieving query result page "{link_name}"')
 def get_named_page_link(context, link_name):
   link = check_for_page_link(context, link_name)
-  #if link.startswith('/'):
-    #link = context.base_url+link
-  print link
   handle_get_resource_and_name_it(context, link, 'queryresultcollection')

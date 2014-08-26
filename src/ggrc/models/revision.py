@@ -18,6 +18,12 @@ class Revision(Base, db.Model):
   action = db.Column(db.Enum(u'created', u'modified', u'deleted'), nullable = False)
   content = db.Column(JsonType, nullable=False)
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('revisions_modified_by', 'modified_by_id'),
+        )
+
   _publish_attrs = [
       'resource_id',
       'resource_type',

@@ -39,7 +39,11 @@
       <label>
         Status
       </label>
-      <select class="input-block-level" name="status" {{#new_object_form}}disabled="true"{{/new_object_form}} tabindex="4">
+      <select class="input-block-level" name="status"
+      {{#if_helpers '\
+        #if_auditor' instance '\
+        or #if' new_object_form '\
+        ' _0_include_admin=false }}disabled="true"{{/if_helpers}} tabindex="4">
         {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
         <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
         {{/iterate}}
@@ -51,7 +55,7 @@
       <input tabindex="5" class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
     </div>
   </div>
-  
+
   <div class="row-fluid">
     {{#using objective=instance.objective}}
     <div class="span6">
@@ -102,7 +106,7 @@
         <a class="show-hidden-fields" href="javascript://">
           <span class="out">
             <i class="grcicon-show-arrow"></i>
-            Show 
+            Show
           </span>
           <span class="in">
             <i class="grcicon-hide-arrow"></i>

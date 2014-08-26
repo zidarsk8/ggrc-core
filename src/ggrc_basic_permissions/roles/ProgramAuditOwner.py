@@ -19,7 +19,8 @@ permissions = {
         "ObjectSection",
         "Relationship",
         "Document",
-        "Meeting"
+        "Meeting",
+        "Context",
     ],
     "create": [
         "Request",

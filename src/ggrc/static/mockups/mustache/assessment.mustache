@@ -1,4 +1,4 @@
-<assessment-app>
+<workflow>
 <div class="area program">
     <div class="header-content">
       <div class="row-fluid">
@@ -13,10 +13,10 @@
         </div>
       </div>
     </div>
-    
+
     <section class="content">
       <div class="clearfix">
-        
+
         <div class="inner-nav">
           <div class="object-nav">
             <ul class="nav internav program cms_controllers_inner_nav ui-sortable">
@@ -41,8 +41,8 @@
             </ul>
           </div>
         </div>
-        
-          
+
+
         <div class="object-area" style="margin-left: 200px;">
           <div id="show_columns" class="column-set">
             <div id="middle_column" class="widget-area ui-sortable">
@@ -62,7 +62,7 @@
                     </div>
                     <div class="span3">
                       <div class="widget-action pull-right widget-action-help">
-                        <a data-placement="top" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
+                        <a data-placement="top" data-toggle="modal-ajax-helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
                           <i class="grcicon-help-black"></i>
                         </a>
                       </div>
@@ -77,7 +77,7 @@
                       </div>
                       <div class="span6">&nbsp;</div>
                     </div>
-                    
+
                     <div class="row-fluid">
                       <div class="span6">
                         <div class="rtf-block">
@@ -86,7 +86,7 @@
                       </div>
                       <div class="span6">
                         <div class="row-fluid">
-                          <div>   
+                          <div>
                             <p>
                               <strong>Status:</strong><br>
                               {{assessment.status}}
@@ -95,7 +95,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="row-fluid">
                       <div class="span12">
                         <div class="rtf-block">
@@ -104,7 +104,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="row-fluid">
                       <div class="span12">
                         <p>
@@ -122,11 +122,11 @@
                         </p>
                         <p>
                           <strong>gGRC Folder:</strong>
-                          <a href="#">/{{assessment.program_title}}/{{assessment.title}}/</a>
+                          <a href="javascript://">/{{assessment.program_title}}/{{assessment.title}}/</a>
                         </p>
                       </div>
                     </div>
-                    
+
                     <div class="row-fluid">
                       <div class="span12">
                         <div class="info-utility-link">
@@ -137,7 +137,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="row-fluid">
                       <div class="span12">
                         <div class="workflow-wrap">
@@ -160,8 +160,8 @@
                               <strong>* Reviews</strong> (<span class="count">{{workflow.reviews.length}}</span>)
                               <ul>
                                 {{#each workflow.reviews}}
-                                <li>{{title}} (<a href="#">{{reviewer}}</a>)</li>
-                                {{/each}} 
+                                <li>{{title}} (<a href="javascript://">{{reviewer}}</a>)</li>
+                                {{/each}}
                              </ul>
                             </li>
                             <li>
@@ -186,9 +186,9 @@
                             </a>
                             {{/workflow}}
                           </div>
-                          
+
                         </div>
-                        
+
                       </div>
                     </div>
                     {{^if assessment.started}}
@@ -226,7 +226,7 @@
                     </div>
                     <div class="span3">
                       <div class="widget-action pull-right widget-action-help">
-                        <a data-placement="top" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
+                        <a data-placement="top" data-toggle="modal-ajax-helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
                           <i class="grcicon-help-black"></i>
                         </a>
                       </div>
@@ -235,7 +235,7 @@
                 </header>
                 <section class="content">
                   <div class="object-step" id="filters">
-                    {{#if filter}} 
+                    {{#if filter}}
                     <div class="choose-object-wrap">
                       <div class="choose-object-content">
                         <div class="row-fluid">
@@ -275,7 +275,7 @@
                             </div>
                             {{/each}}
                             <div class="add-rule indent-row">
-                              <a href="#" id="addFilterRule">+ Add Rule</a>
+                              <a href="javascript://" id="addFilterRule">+ Add Rule</a>
                             </div>
                           </div>
                         </div>
@@ -283,7 +283,7 @@
                         <div class="row-fluid">
                           <div class="span3">
                             <div class="deny-buttons">
-                              <a class="btn reset_filter" href="#">Reset</a>
+                              <a class="btn reset_filter" href="javascript://">Reset</a>
                             </div>
                           </div>
                           <div class="span3">
@@ -292,7 +292,7 @@
                           <div class="span6">
                             <div class="confirm-buttons">
                               <span><strong>{{Objects.length}} controls found</strong></span>
-                              <a class="btn btn-primary" href="#" id="objectReview">Review</a>
+                              <a class="btn btn-primary" href="javascript://" id="objectReview">Review</a>
                             </div>
                           </div>
                         </div>
@@ -308,7 +308,7 @@
                             <div class="span9">
                               <div class="item-data">
                                 <div class="tree-title-area">
-                                  <span><strong>{{objects.length}} controls found</strong></span> &nbsp; <a href="#" id="filterTrigger"><strong>Show Filter</strong></a>
+                                  <span><strong>{{objects.length}} controls found</strong></span> &nbsp; <a href="javascript://" id="filterTrigger"><strong>Show Filter</strong></a>
                                 </div>
                               </div>
                             </div>
@@ -444,7 +444,7 @@
 	                                  </div>
 	                                </a>
 	                              </div>
-	                              
+
 	                              <div class="tier-2-info item-content">
 	                                <div class="tier-2-info-content">
 	                                  <div class="show-description">
@@ -460,42 +460,42 @@
 	                                  <div class="row-fluid">
 	                                    <div class="span11">
 	                                      <div class="inner-row">
-	                                      
-	                                        <strong>Entries (<span id="entriesCount">{{entries.length}}</span>)</strong>
+
+	                                        <strong>Comments (<span id="entriesCount">{{entries.length}}</span>)</strong>
 	                                        <ul class="entry-list">
 	                                          {{#each entries}}
 	                                          <li>
 	                                            {{content}}
 	                                            <ul class="attachment-list">
 	                                              <li>
-	                                                <a href="#">
-	                                                  <i class="grcicon-attach"></i> 
+	                                                <a href="javascript://">
+	                                                  <i class="grcicon-attach"></i>
 	                                                  <span>supportingwalkthroughevidence.pdf</span>
 	                                                </a>
 	                                              </li>
 	                                              <li>
-	                                                <a href="#">
-	                                                  <i class="grcicon-attach"></i> 
+	                                                <a href="javascript://">
+	                                                  <i class="grcicon-attach"></i>
 	                                                  <span>screenshot.pdf</span>
 	                                                </a>
 	                                              </li>
 	                                            </ul>
-	                                            <span class="entry-author">By <a href="#">Cassius Clay</a> on 2014-01-27 7:45am UTC</span>
+	                                            <span class="entry-author">By <a href="javascript://">Cassius Clay</a> on 2014-01-27 7:45am UTC</span>
 	                                          </li>
 	                                          {{/each}}
 	                                        </ul>
 	                                        {{^if_equals task_state 'rq-accepted'}}
 	                                        <div class="add-entry" style="display:none;">
                                               <textarea class="span10" placeholder="Entry"></textarea>
-                                              <a href="#" class="entry-attachment">
+                                              <a href="javascript://" class="entry-attachment">
                                                 <i class="grcicon-attach-color"></i> Attach supporting file
                                               </a>
                                               <br>
-                                              <a href="#" class="btn btn-small btn-primary addEntry" data-objects='tasks' data-index="{{@index}}">
-                                                <strong>Add Entry</strong>
+                                              <a href="javascript://" class="btn btn-small btn-primary addEntry" data-objects='tasks' data-index="{{@index}}">
+                                                <strong>Add comment</strong>
                                               </a>
                                           </div>
-	                                        <a href="#" class="add-entry-btn"><strong class="show_review">Add Entry</strong></a>
+	                                        <a href="javascript://" class="add-entry-btn"><strong class="show_review">Add Entry</strong></a>
 	                                        {{/if}}
 	                                      </div>
 	                                    </div>
@@ -508,7 +508,7 @@
 	                            <li class="tree-item tree-item-add tree-footer">
 	                              <div class="row-fluid">
 	                                <div class="span12">
-	                                  <a href="#" class="section-create">
+	                                  <a href="javascript://" class="section-create">
 	                                    Create Task
 	                                  </a>
 	                                </div>
@@ -517,7 +517,7 @@
 	                            {{/if}}
 	                          </ul>
 	                        </div>
-	                        
+
 	                        <div class="assessment-review">
 	                          <p>
 	                            <strong>Reviews</strong>
@@ -530,7 +530,7 @@
 	                                {{review_title}} Notes ({{notes.length}})
 	                                <div class="pull-right review-note-action">
 	                                  {{#if_equals 'rq-amended-request' review_state}}
-	                                  <a href="#" class="startObjectNow btn" data-status="rq-responded" data-type="reviews" data-id="{{@index}}">Complete {{review_title}}</a>
+	                                  <a href="javascript://" class="startObjectNow btn" data-status="rq-responded" data-type="reviews" data-id="{{@index}}">Complete {{review_title}}</a>
 	                                  {{else}}
 	                                  <span class="task-done"><em>{{review_title}} Completed</em></span>
 	                                  {{/if_equals}}
@@ -547,13 +547,13 @@
 	                                            {{content}}
 	                                            <ul class="attachment-list">
 	                                              <li>
-	                                                <a href="#">
-	                                                  <i class="grcicon-attach"></i> 
+	                                                <a href="javascript://">
+	                                                  <i class="grcicon-attach"></i>
 	                                                  <span>screenshot.pdf</span>
 	                                                </a>
 	                                              </li>
 	                                            </ul>
-	                                            <span class="entry-author">By <a href="#">Ronnie Cederman</a> on 2014-01-27 7:45am UTC</span>
+	                                            <span class="entry-author">By <a href="javascript://">Ronnie Cederman</a> on 2014-01-27 7:45am UTC</span>
 	                                          </div>
 	                                        </div>
 	                                      </div>
@@ -567,15 +567,15 @@
 	                                    <div class="span12">
 	                                      <div class="add-entry" style="display:none;">
 			                                      <textarea class="span10" placeholder="Note"></textarea>
-			                                      <a href="#" class="entry-attachment">
+			                                      <a href="javascript://" class="entry-attachment">
 			                                        <i class="grcicon-attach-color"></i> Attach supporting file
 			                                      </a>
 			                                      <br>
-			                                      <a href="#" class="btn btn-small btn-primary addEntry" data-objects='reviews' data-index="{{@index}}">
+			                                      <a href="javascript://" class="btn btn-small btn-primary addEntry" data-objects='reviews' data-index="{{@index}}">
 			                                        <strong>Add Note</strong>
 			                                      </a>
 			                                  </div>
-	                                      <a href="#" class="add-entry-btn"><strong class="show_review">Add Note</strong></a>
+	                                      <a href="javascript://" class="add-entry-btn"><strong class="show_review">Add Note</strong></a>
 	                                    </div>
 	                                  </div>
 	                                </li>
@@ -589,7 +589,7 @@
 	                          </label>
 	                          {{/each}}
 	                        </div>
-	                        
+
 	                      </div>
 	                    </li>
 	                    {{/each}}
@@ -630,12 +630,12 @@
                               Add object under assessment
                             </a>
                             <span class="section-expander">
-                              <a href="#" id="addSingleObjectTrigger">
+                              <a href="javascript://" id="addSingleObjectTrigger">
                                 Add single object
                               </a>
                               &nbsp;
                               &nbsp;
-                              <a href="#" class="section-import" id="filterTriggerFooter">
+                              <a href="javascript://" class="section-import" id="filterTriggerFooter">
                                 Add multiple objects by filtering
                               </a>
                             </span>
@@ -658,8 +658,8 @@
                                 </div>
                               </div>
                               <div class="span2">
-                                <a href="#" class="btn btn-primary btn-footer" id="addSingleControlNow">Add</a>
-                                <a href="#" id="cancelSingleControl"><i class="grcicon-x-grey"></i></a>
+                                <a href="javascript://" class="btn btn-primary btn-footer" id="addSingleControlNow">Add</a>
+                                <a href="javascript://" id="cancelSingleControl"><i class="grcicon-x-grey"></i></a>
                               </div>
                             </div>
                           </div>
@@ -667,7 +667,7 @@
                         <div class="span2">
                           {{#if objects.length}}
                           <div class="object-add">
-                            <a href="#" class="btn btn-primary btn-small" id="addSelected">Add selected</a>
+                            <a href="javascript://" class="btn btn-primary btn-small" id="addSelected">Add selected</a>
                           </div>
                           {{/if}}
                         </div>
@@ -682,10 +682,10 @@
       </div>
     </section>
   </div>
-  
+
   <div id="editAssessmentStandAlone" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="newAssessmentStandAloneLabel" aria-hidden="true">
     <div class="modal-header">
-      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+      <a class="btn btn-mini btn-danger pull-right" href="javascript://" data-dismiss="modal">
         <i class="grcicon-x-white"></i>
       </a>
       <h2>
@@ -714,7 +714,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="row-fluid">
           <div class="span6">
             <label>
@@ -728,7 +728,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="row-fluid">
           <div class="span3">
             <label>
@@ -746,14 +746,14 @@
             <input tabindex="5" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="{{assessment.end_date}}">
           </div>
         </div>
-        
+
         <div class="row-fluid">
           <div class="span12">
             <div class="expand-link">
               <a class="show-hidden-fields" href="javascript://">
                 <span class="out">
                   <i class="grcicon-show"></i>
-                  Show 
+                  Show
                 </span>
                 <span class="in">
                   <i class="grcicon-hide"></i>
@@ -767,7 +767,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="hidden-fields-area" style="display:none">
           <div class="row-fluid">
             <div class="span6">
@@ -790,14 +790,14 @@
             </div>
           </div>
         </div>
-        
+
       </form>
     </div>
     <div class="modal-footer">
       <div class="row-fluid">
         <div class="span3">
           <div class="deny-buttons">
-            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
+            <a tabindex="22" class="btn" data-dismiss="modal" href="javascript://">Cancel</a>
           </div>
         </div>
         <div class="span6">
@@ -813,7 +813,7 @@
   </div>
   <div id="assessmentStart" class="modal hide fade ui-draggable" tabindex="-1" role="dialog" aria-labelledby="assessmentStartLabel" aria-hidden="true">
     <div class="modal-header">
-      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+      <a class="btn btn-mini btn-danger pull-right" href="javascript://" data-dismiss="modal">
         <i class="grcicon-x-white"></i>
       </a>
       <h2>
@@ -822,17 +822,17 @@
     </div>
     <div class="modal-body">
       <p>
-        Assessment tasks and review will be applied to <strong>{{assessment.objects.length}} selected objects</strong>, each of them will have {{assessment.workflow.tasks.length}} tasks 
+        Assessment tasks and review will be applied to <strong>{{assessment.objects.length}} selected objects</strong>, each of them will have {{assessment.workflow.tasks.length}} tasks
         and {{assessment.workflow.reviews.length}} review cycles attached.
       </p>
       <p>
-        All objects and their tasks will be assigned to <a href="#">{{assessment.lead_email}}</a> as Assessment Lead.
+        All objects and their tasks will be assigned to <a href="javascript://">{{assessment.lead_email}}</a> as Assessment Lead.
       </p>
-      <a id="startAssessment" class="btn btn-primary btn-large" href="#">Proceed</a>
-      <a class="btn btn-large" data-dismiss="modal" href="#">Cancel</a>
+      <a id="startAssessment" class="btn btn-primary btn-large" href="javascript://">Proceed</a>
+      <a class="btn btn-large" data-dismiss="modal" href="javascript://">Cancel</a>
     </div>
   </div>
-  
-  
-  
-</assessment-app>
+
+
+
+</workflow>

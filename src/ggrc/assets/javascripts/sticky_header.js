@@ -20,7 +20,7 @@ can.Control("StickyHeader", {
                       +", .advanced-filters"
         // A selector for all sticky-able footers
         // FIXME: This should not have to specifically ignore .tree-spinner
-      , footer_selector: ".tree-footer:not(.tree-spinner)"
+      , footer_selector: ".tree-footer:not(.tree-spinner):not(.non-stick)"
         // A selector for counting the depth
         // Generally this should be header_selector with the final element in each selector removed
       , depth_selector: ".tree-open > .item-open"
@@ -78,7 +78,7 @@ can.Control("StickyHeader", {
       var el = items.eq(i)
         , margin = el.data('sticky').margin
         ;
-      
+
       // Always remove the sticky header so that it's width will get updated
       this.remove(el);
 
@@ -140,6 +140,7 @@ can.Control("StickyHeader", {
     var type = data.type
       , parent = el.parent()
       , offset = data.offset
+      , paddingTop = parseInt(parent.css('padding-top'))
       , pos = parent.position().top
       , height = el.outerHeight()
         // If the header is taller than the margin, it'll disappear early instead of scrolling away smoothly
@@ -154,7 +155,7 @@ can.Control("StickyHeader", {
     }
 
     // If the content is in the viewport...
-    if (type === 'header' && pos < offset && margin > offset) {
+    if (type === 'header' && (pos + paddingTop) < offset && margin > offset) {
       // Return zero or the amount that the header should start scrolling away if applicable
       margin -= offset;
       return data.margin = margin <= global_margin ? -Math.max(0, global_margin - margin) : 0;
@@ -191,7 +192,7 @@ can.Control("StickyHeader", {
 
         // Only add offsets for the closest nested parent of the given depth
         // as well as offsets for the first adjacent sibling of different selectors
-        if (sibling_data.margin !== false && ((!depths[depth] && depth < data.depth) 
+        if (sibling_data.margin !== false && ((!depths[depth] && depth < data.depth)
           || (depth <= data.depth && !$this.is(selector) && !depths[depth_selector]))) {
             increments.push($this.outerHeight() + ' ' + sibling_data.margin);
             increments.push($this[0]);
@@ -236,8 +237,8 @@ can.Control("StickyHeader", {
           position: 'fixed'
         , left: source.offset().left + 'px'
         , width: (source[0].getBoundingClientRect().width
-            - parseFloat(source.css('paddingLeft')) 
-            - parseFloat(source.css('paddingRight'))) 
+            - parseFloat(source.css('paddingLeft'))
+            - parseFloat(source.css('paddingRight')))
             + 'px'
         , marginTop: '0px'
         , marginBottom: '0px'

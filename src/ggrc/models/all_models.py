@@ -42,7 +42,9 @@ from .relationship import Relationship, RelationshipType
 from .request import Request
 from .response import Response, DocumentationResponse, InterviewResponse, PopulationSampleResponse
 from .meeting import Meeting
-from .task import Task
+from .background_task import BackgroundTask
+from .notification import NotificationConfig, Notification, NotificationObject, NotificationRecipient
+from .notification import CalendarEntry
 
 #TODO: This isn't currently used
 #from .relationship_type import RelationshipType
@@ -107,7 +109,31 @@ all_models = [
     Process,
   Revision,
   Event,
-  Task,
+  BackgroundTask,
+  NotificationConfig,
+  Notification,
+  NotificationRecipient,
+  NotificationObject,
+  CalendarEntry,
   ]
 
 __all__ = [model.__name__ for model in all_models]
+
+
+def register_model(model):
+  import ggrc.models.all_models
+  setattr(ggrc.models.all_models, model.__name__, model)
+  model._inflector
+  all_models.append(model)
+  __all__.append(model.__name__)
+
+
+def unregister_model(model):
+  import ggrc.models.all_models
+  import ggrc.models.inflector
+  delattr(ggrc.models.all_models, model.__name__)
+  ggrc.models.inflector.unregister_inflector(model._inflector)
+  if model in all_models:
+    all_models.remove(model)
+  if model.__name__ in __all__:
+    __all__.remove(model.__name__)

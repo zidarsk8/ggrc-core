@@ -7,8 +7,12 @@
 
 {{#if allow_mapping_or_creating}}
 {{#if_instance_of parent_instance 'Directive|Program'}}
-{{#if allow_creating}}
-{{#is_allowed 'create' model.shortName context=null}}
+{{#if_helpers '\
+  #if' allow_mapping '\
+  and #is_allowed_to_map' parent_instance model.shortName '\
+  or #if' allow_creating '\
+  and #is_allowed' 'create' model.shortName _3_context=null '\
+  or #if' list.length}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">
@@ -16,6 +20,8 @@
         + {{model.title_singular}}
       </a>
       <span class="section-expander">
+        {{#if allow_mapping}}
+        {{#is_allowed_to_map parent_instance model.shortName}}
         <a
           href="javascript://"
           rel="tooltip"
@@ -30,12 +36,18 @@
         </a>
         &nbsp;
         &nbsp;
+        {{#if allow_creating}}
+        {{#is_allowed 'create' model.shortName context=null}}
         <a href="{{parent_instance.viewLink}}/import_controls?return_to={{param_current_location}}" class="section-import">
           <i class="grcicon-imp-exp"></i>
           Import Controls
         </a>
         &nbsp;
         &nbsp;
+        {{/is_allowed}}
+        {{/if}}
+        {{/is_allowed_to_map}}
+        {{/if}}
         {{#if list.length}}
         <a href="{{parent_instance.viewLink}}/export_controls?ids={{instance_ids list}}" class="section-import">
           <i class="grcicon-export"></i>
@@ -46,8 +58,7 @@
     </div>
   </div>
 </li>
-{{/is_allowed}}
-{{/if}}
+{{/if_helpers}}
 
 {{else}}
 

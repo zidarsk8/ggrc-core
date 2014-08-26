@@ -8,7 +8,7 @@
 {{! dashboard object listing}}
 <ul class="tree-structure new-tree">
   {{#list}}
-    <li class="tree-item {{object_type}}" data-model="true" {{data 'model'}}>
+    <li class="tree-item role" data-model="true" {{data 'model'}}>
       <div class="simple-link">
         <div class="row-fluid">
           <div class="span12">
@@ -47,6 +47,7 @@
       </div>
     </li>
   {{/list}}
+  {{#if false}}
   <li class="tree-item tree-item-add">
     <div class="row-fluid">
       <div class="span12">
@@ -56,4 +57,5 @@
       </div>
     </div>
   </li>
+  {{/if}}
 </ul>

@@ -55,10 +55,27 @@ def drop_db(use_migrations=False, quiet=False):
   else:
     drop_db_with_drop_all()
 
-def init_app(app):
+
+def init_models(app):
   from .all_models import all_models
   [model._inflector for model in all_models]
 
+
+def init_all_models(app):
+  """Register all gGRC models services with the Flask application ``app``."""
+
+  from ggrc.extensions import get_extension_modules
+
+  # Usually importing the module is enough, but just in case, also invoke
+  # ``init_models``
+  init_models(app)
+  for extension_module in get_extension_modules():
+    ext_init_models = getattr(extension_module, 'init_models', None)
+    if ext_init_models:
+      ext_init_models(app)
+
+
+def init_session_monitor_cache():
   from sqlalchemy.orm.session import Session
   from sqlalchemy import event
   from .cache import Cache
@@ -84,10 +101,14 @@ def init_app(app):
   event.listen(Session, 'after_commit', clear_cache)
   event.listen(Session, 'after_rollback', clear_cache)
 
+
+def init_sanitization_hooks():
   # Register event listener on all String and Text attributes to sanitize them.
   import bleach
+  from HTMLParser import HTMLParser
   import sqlalchemy as sa
   from ggrc.models.reflection import SanitizeHtmlInfo
+  from .all_models import all_models
 
   # Set up custom tags/attributes for bleach
   bleach_tags = [
@@ -102,10 +123,27 @@ def init_app(app):
       'href', 'src', 'width', 'height', 'alt', 'cite', 'datetime',
       'title', 'class', 'name', 'xml:lang', 'abbr'
       ]
+
   for tag in bleach_tags:
     bleach_attrs[tag] = attrs
+
   def cleaner(target, value, oldvalue, initiator):
-    ret = bleach.clean(value, bleach_tags, bleach_attrs)
+    # Some cases like Request don't use the title value
+    #  and it's nullable, so check for that
+    if value is None:
+      return value
+
+    parser = HTMLParser()
+    value = unicode(value)
+    lastvalue = value
+    value = parser.unescape(value)
+    while value != lastvalue:
+      lastvalue = value
+      value = parser.unescape(value)
+
+    ret = parser.unescape(
+      bleach.clean(value, bleach_tags, bleach_attrs, strip=True)
+      )
     return ret
 
   for model in all_models:
@@ -113,5 +151,11 @@ def init_app(app):
     for attr_name in attr_info._sanitize_html:
       attr = getattr(model, attr_name)
       sa.event.listen(attr, 'set', cleaner, retval=True)
+
+
+def init_app(app):
+  init_all_models(app)
+  init_session_monitor_cache()
+  init_sanitization_hooks()
 
 from .inflector import get_model

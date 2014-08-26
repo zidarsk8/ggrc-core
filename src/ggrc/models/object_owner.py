@@ -31,9 +31,11 @@ class ObjectOwner(Mapping, db.Model):
         value.__class__.__name__ if value is not None else None
     return setattr(self, self.ownable_attr, value)
 
-  __table_args__ = (
-      db.UniqueConstraint('person_id', 'ownable_id', 'ownable_type'),
-      )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('person_id', 'ownable_id', 'ownable_type'),
+        )
 
   _publish_attrs = [
       'person',
@@ -77,7 +79,7 @@ class Ownable(object):
       ]
 
   _include_links = [
-      'object_owners',
+      #'object_owners',
       ]
 
   @classmethod

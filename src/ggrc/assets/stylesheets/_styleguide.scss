@@ -118,7 +118,7 @@
 // high fidelity mockup styles
 
 #newlyCreatedTask,
-#addAssessment, 
+#addAssessment,
 #addObjectUnderAssessment,
 #newlyCreatedObject,
 #newlyCreatedFile {
@@ -164,309 +164,27 @@
   display: none;
 }
 
-.mockup-tree { 
-  .tree-item {
-    .tree-title-area {
-      [class^="grcicon-"] {
-        display: inline-block;
-      }
-    }
-  }
-  .tree-item-add {
-    .add-single-object {
-      select,
-      input {
-        margin-bottom: 5px;
-        margin-top: 4px;
-      }
-      a {
-        i {
-          margin-top: 10px;
-        }
-      }
-    }
-  }
-  .object-check {
-    padding-right: 20px;
-    text-align: right;
-    &.all-check {
-      label {
-        line-height: 32px;
-        margin-bottom: 0;
-        input {
-          margin-top: -1px;
-        }
-      }
-    }
-  }
-  .object-add {
-    padding-right: 20px;
-    text-align: right;
-    .btn-small {
-      padding-top: 3px;
-      padding-bottom: 3px;
-    }
-  }
-  .task-done {
-    font-size: 13px;
-    color: $green;
-  }
-  .accepted {
-    color: $green;
-  }
-}
-
-ul.new-tree {
-  &.mockup-tree {
-    li.tree-item {
-      font-size: 13px;
-      line-height: 30px;
-      &.selected {
-        background: $lightGray;
-      }
-      &.object-filter {
-        background: #b7b7b7;
-        span {
-          color: $black;
-        }
-      }
-    }
-    .inner-tree {
-      select {
-        height: 23px;
-      }
-    }
-    .short-field {
-      min-height: 23px;
-      margin-bottom: 0;
-      margin-top: 4px;
-    }
-    .control-wrap {
-      padding-right: 20px;
-      .request-control {
-        text-align: right;
-      }
-    }
-    .assessment-review {
-      padding: 10px 20px 0 20px;
-      input[type="checkbox"] {
-        margin-top: 0;
-      }
-      .review-icon {
-        margin-top: 10px;
-        margin-left: -4px;
-      }
-    }
-    .tree-info-list {
-      i {
-        margin-top: 0;
-      }
-    }
-  }
-  
-}
-
-.choose-object-wrap {
-  background: $lightGray;
-  padding: 8px 0;
-  .choose-object-content {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-  label {
-    line-height: 28px;
-    margin-bottom: 0;
-    margin-right: 6px;
-    display: inline-block;
-  }
-  select,
-  input {
-    margin-bottom: 0;
-  }
-  .objective-selector {
-    display: inline-block;
-  }
-  .first-row {
-    margin-bottom: 10px;
-  }
-  .indent-row {
-    padding-left: 53px;
-    margin-bottom: 10px;
-    select {
-      margin-right: 4px;
-    }
-  }
-  button {
-    border: none;
-    background: none;
-    padding: 0;
-    i {
-      margin-top: 1px;
-    }
-    &:focus,
-    &:active {
-      outline: 0;
-    }
-  }
-  .choose-object-footer {
-    border-top: 1px solid $footerBorder;
-    padding: 6px 20px 0 20px;
-    .confirm-buttons {
-      text-align: right;
-    }
-  }
-  .add-rule {
-    margin-top: 6px;
-  }
-}
-.inner-row {
-  padding-left: 20px;
-  padding-top: 6px;
-}
-.entry-list {
-  @include reset-list();
-  li {
-    border-bottom: 1px solid $footerBorder;
-    padding-bottom: 6px;
-    margin-bottom: 6px;
-    .entry-author {
-      color: $gray;
-      font-size: 11px;
-      font-style: italic;
-      display: block;
-    }
-    &.add-entry {
-      border-bottom: none;
-      margin-top: 12px;
-      textarea {
-        margin-bottom: 4px;
-      }
-      .entry-attachment {
-        display: inline-block;
-        margin-bottom: 10px;
-        [class^="grcicon-"] {
-          margin-top: 1px;
-        }
-      }
-    }
-  }
-}
-.attachment-list {
-  @include reset-list();
-  padding: 4px 0 0 0;
-  li {
-    margin-left: -4px;
-    color: $gray;
-    border-bottom: none;
-    padding-bottom: 4px;
-    a {
-      color: $gray;
-      span {
-        text-decoration: underline;
-      }
-      &:hover {
-        text-decoration: none;
-        span {
-          text-decoration: none;
-        }
-      }
-      i {
-        @include opacity(0.5);
-      }
-    }
-    [class^="grcicon-"] {
-      margin-top: 3px;
-    }
-  }
-}
-
-.review-wrap {
-  .review-note {
-    padding-top: 10px;
-    p {
-      line-height: 16px;
-      color: $black;
-    }
-  }
-  .inner-tree {
-    padding-bottom: 20px;
-    padding-top: 0;
-    h6 {
-      margin-left: 0;
-      margin-right: 0;
-      line-height: 30px;
-      .review-note-action {
-        padding-right: 20px;
-        text-transform: none;
-        .btn {
-          padding-top: 3px;
-          padding-bottom: 3px;
-          line-height: 16px;
-          font-size: 13px;
-          margin-top: -1px;
-        }
-        span {
-          font-size: 11px;
-          font-weight: normal;
-        }
-      }
-    }
-    ul.new-tree {
-      li.tree-item {
-        margin-left: 0;
-        margin-right: 0;
-        .item-data {
-          color: $black;
-          .entry-author {
-            color: $gray;
-            font-size: 11px;
-            font-style: italic;
-            display: block;
-          }
-        }
-      }
-    }
-  }
-  .tree-description {
-    padding-bottom: 16px;
-  }
-}
-.inner-tree {
-  h6 {
-    .help-trigger {
-      margin-right: 19px;
-      i {
-        @include opacity(0.3);
-        @include transition(opacity 0.2s ease-in-out);
-        margin-top: 3px;
-      }
-      &:hover {
-        i {
-          @include opacity(0.7);
-        }
-      }
-    }
-  }
-}
-.lhs-nav {
-  ul.sub-level,
-  ul.sub-actions {
-    li {
-      a {
-        .lhs-main-title {
-          &.span8 {
-            span.lhs-item {
-              width: 100% !important;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-.tree-footer {
-  .add-entry {
-    padding-top: 16px;
-    padding-bottom: 16px;
-  }
+// Mockups Workflow V1.1
+#TaskGroupItem,
+#TaskHolder,
+#TaskUpdated,
+#taskList,
+#objectList,
+#lockTrigger,
+#taskGroupTitle,
+#progressWidgetTrigger,
+#editEntry,
+#verifyTask,
+#verifyTask2,
+#verifyTask3,
+#verifyTaskSpecial,
+#endWorkflowTrigger,
+.finished-number,
+#one-time,
+#weekly,
+#monthly,
+#quarterly,
+#annually,
+#continuos {
+  display: none;
 }

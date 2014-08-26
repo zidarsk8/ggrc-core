@@ -8,8 +8,6 @@
 
 // widgets styles
 .widget {
-  @include border-radius();
-  @include box-shadow(0 0 5px lighten($gray,10%));
   .header {
     .widget-action {
       i {
@@ -29,11 +27,10 @@
       }
     }
   }
-  width:96%;
-  margin:0 2% 4% 2%;
-  overflow-y:hidden;
-  border:1px solid #aaa;
-  @include transition(box-shadow 0.2s,border-color 0.2s);
+  margin:0 0 0 8px;
+  &.workflow-info-widget {
+    overflow-y: visible;
+  }
   &.widget-tabs {
     &.widget-tabs-horizontal {
       .content {
@@ -80,7 +77,7 @@
           &.text-risk,
           &.text-attribute {
             a {
-              color:$risk;  
+              color:$risk;
             }
           }
           &.text-business,
@@ -91,7 +88,7 @@
           &.text-product,
           &.text-orggroup {
             a {
-              color:$business;  
+              color:$business;
             }
           }
           &.text-governance,
@@ -104,7 +101,7 @@
           &.text-regulation,
           &.text-standard {
             a {
-              color:$governance;  
+              color:$governance;
             }
           }
         }
@@ -170,15 +167,11 @@
     }
   }
   .header {
-    background-color: $defaultWidget;
-    border-bottom:1px solid darken($lightGray, 10%);
-    @include transition(background-color 0.2s);
+    background-color: $white;
+    border-bottom:1px solid #eee;
     color:$text;
     height: 30px;
     padding-left: 16px;
-    &:hover {
-      cursor: move;
-    }
     .widget-action {
       height: 30px;
       width: 30px;
@@ -188,9 +181,9 @@
       }
     }
     h2 {
-      font-weight:normal;
+      font-weight:bold;
       line-height: 28px;
-      color: $white;
+      color: #444;
       margin-bottom:0;
       @include oneline();
       span {
@@ -230,37 +223,58 @@
   }
   &.governance {
     .header {
-      background-color:$governance;
+      h2 {
+      color:$governance;
+      }
     }
   }
   &.programs {
     .header {
-      background-color:$programs;
+      h2 {
+      color:$programs;
+      }
     }
   }
   &.risk {
     .header {
-      background-color:$risk;
+      h2 {
+      color:$risk;
+      }
     }
   }
   &.business {
     .header {
-      background-color:$business;
+      h2 {
+      color:$business;
+      }
     }
   }
   &.controls {
     .header {
-      background-color:$controls;
+      h2 {
+      color:$controls;
+      }
     }
   }
   &.objectives {
     .header {
-      background-color:$objectives;
+      h2 {
+      color:$objectives;
+      }
     }
   }
   &.entities {
     .header {
-      background-color:$entities;
+      h2 {
+      color:$entities;
+      }
+    }
+  }
+  &.workflow {
+    .header {
+      h2 {
+      color:$programs;
+      }
     }
   }
   .filter {
@@ -280,7 +294,7 @@
       padding-left:12px;
       .btn {
         padding-right:6px;
-        padding-left:6px;      
+        padding-left:6px;
       }
     }
     .form-inline {
@@ -411,7 +425,30 @@
     }
   }
   .info {
+    &.tier-info {
+      padding:16px 0 0 0;
+      h3 {
+        .btn-mini {
+          font-weight:normal;
+          margin-left:10px;
+          padding-left:10px;
+          padding-right:10px;
+        }
+      }
+      h6 {
+        text-align:left;
+        margin-left:0;
+        margin-right:0;
+        padding-left:0;
+        padding-right:0;
+        border:none;
+        background:none;
+      }
+    }
     padding:5px 16px 0 16px;
+    h6 {
+      font-weight:normal;
+    }
     &.person-info {
       padding: 5px 0 0 0;
       > div {
@@ -424,7 +461,7 @@
     }
     h3 {
       font-weight:normal;
-      padding-bottom:6px;
+      padding-bottom:12px;
       i {
         cursor: pointer;
         @include opacity(0.2);
@@ -441,6 +478,12 @@
       text-transform:uppercase;
       @include opacity(0.4);
       @include transition(opacity 0.2s);
+      &.non-transparent {
+        @include opacity(1);
+        &:hover {
+          text-decoration:underline;
+        }
+      }
       &:hover {
         @include opacity(1);
         text-decoration:none;
@@ -470,6 +513,9 @@
     .url {
       display: inline-block;
       @include oneline();
+    }
+    .error {
+      font-weight:normal;
     }
   }
   .risk-content {
@@ -930,12 +976,15 @@
   &.person-preview {
     overflow: visible;
     height: auto;
+    width: 600px;
   }
 }
 
 // Mockups Assessment Page V1.0
 .info-utility-link {
   margin: 10px 0 15px 0;
+  padding-top:6px;
+  border-top:1px solid #eee;
   i {
     margin-top: 1px;
   }

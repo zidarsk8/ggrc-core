@@ -128,7 +128,7 @@
           }
         }
         .dropdown-menu {
-          z-index: 1005;
+          z-index: 9999;
         }
       }
       .dropdown-menu {
@@ -164,9 +164,10 @@
         .dropdown-menu {
           @include reset-list();
           @include border-radius(0);
-          min-width:100px;
+          min-width: 210px;
           float: none;
           background: $black;
+          padding: 5px 0;
           li {
             float:none;
             clear: both;
@@ -185,6 +186,18 @@
               font-size: 11px;
               i {
                 margin: 7px 6px 0 0;
+              }
+            }
+            &.layout-wrap {
+              @include clearfix();
+              padding: 5px 0; 
+              a {
+                float: left;
+                clear: none;
+                padding-right: 0;
+                i {
+                  margin-right: 0;
+                }
               }
             }
           }
@@ -302,11 +315,12 @@
     }
   }
   .object-header-notification {
-    text-transform: uppercase;
     font-size: 14px;
     line-height: 18px;
     font-weight: bold;
-    margin: 18px 20px 0 103px;
+    font-style: italic;
+    margin: 18px 20px 0 0;
+    text-align: right;
     i {
       margin-top: 1px;
       &.grcicon-attribute-color {
@@ -315,8 +329,10 @@
       }
     }
     &.object-approved {
-      margin: 18px 20px 0 223px;
       color: $green;
+    }
+    &.object-error {
+      color: $red;
     }
   }
   .btn-group {
@@ -477,4 +493,36 @@
       }
     }
   }
+}
+
+.notify-wrap {
+  border-top: 1px dotted $menuLink;
+  border-bottom: 1px dotted $menuLink;
+  padding: 5px 0;
+  margin-top: 5px;
+  span {
+    display:block;
+    color:$menuLink;
+    line-height:30px;
+    padding: 0 10px;
+    i {
+      margin: 7px 6px 0 0;
+      @include opacity(0.6);
+    }
+  }
+  .inner-list {
+    padding-left: 36px;
+    label {
+      color:$menuLink;
+      font-size: 12px;
+      input {
+        margin: -2px 0 0 0;
+      }
+    }
+  }
+}
+
+.logout-wrap {
+  border-top: 1px dotted $menuLink;
+  padding-top: 5px;
 }

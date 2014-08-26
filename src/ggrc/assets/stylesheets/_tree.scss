@@ -19,12 +19,44 @@ ul.new-tree {
       }
     }
     &.active {
+      position: relative;
+      z-index: 1000;
       font-weight:bold;
+      @include box-shadow(0 3px 3px -1px #bbb);
       .row-fluid {
         background:$white;
       }
+      .tier-trigger {
+        background: image-url('grcicons/open.png') no-repeat 20px center;
+        @include background-size(17px 12px);
+      }
     }
-    
+    .tier-trigger {
+      float: left;
+      background: image-url('grcicons/not-open.png') no-repeat 20px center;
+      @include background-size(17px 12px);
+      width: 17px;
+      height: 30px;
+      padding-left: 20px;
+    }
+  }
+  .task-item {
+    .item-data {
+      padding-left: 0;
+    }
+  }
+  .task-group-title {
+    h3 {
+      [class^="grcicon-"] {
+        margin-top: 4px;
+      }
+    }
+  }
+  .task-edit-icon {
+    i {
+      margin-top: 0px;
+      margin-left: 3px;
+    }
   }
   &.request-list,
   &.responses-list {
@@ -72,6 +104,13 @@ ul.new-tree {
     }
   }
   &.responses-list {
+    .objective-selector {
+      .read-only {
+        &.oneline {
+          width: 84%;
+        }
+      }
+    }
     .response-control {
       text-align: right;
       padding-right: 5px;
@@ -119,14 +158,15 @@ ul.new-tree {
       overflow: visible;
       .type {
         float: left;
-        width: 23%;
         .grcicon-carot {
           margin-left: -6px;
         }
       }
       .tree-title-area {
-        float: left;
-        width: 73%;
+        width: auto;
+        &.oneline {
+          width: 85%;
+        }
       }
     }
     .accepted {
@@ -183,7 +223,7 @@ ul.new-tree {
       margin-top: 0;
     }
   }
-  
+
   &.event-tree {
     [class^="grcicon-"] {
       margin-top: 1px;
@@ -206,14 +246,19 @@ ul.new-tree {
         width: auto;
         ul {
           @include reset-list();
+          line-height: 18px;
+          padding-top: 7px;
+          padding-bottom: 5px;
           li {
-            display: inline-block;
-            margin-right: 5px;
+            display: inline;
+            margin-right: 8px;
             line-height: 18px;
-            padding-right: 8px;
+            padding-right: 5px;
             border-right: 1px solid #111;
             &:last-child {
               margin-right: 0;
+              border-right: none;
+              padding-right: 0;
             }
             &.governance,
             &.control,
@@ -384,7 +429,7 @@ ul.new-tree {
       }
     }
   }
-  
+
   a.simple-link {
     .row-fluid {
       &:hover {
@@ -395,18 +440,30 @@ ul.new-tree {
       }
     }
   }
-  
+
   li.tree-item {
     border-bottom:1px solid #ccc;
     line-height:31px;
     min-height:31px;
     background:#fafafa;
+    &.object-filter {
+      background: #b7b7b7;
+      span {
+        color: $black;
+      }
+    }
     .black-font {
       color: $black;
     }
     .watermark-icon {
       display: none;
       margin-right: 20px;
+    }
+    .objective-selector {
+      .short-field {
+        margin-top: 4px;
+        min-height: 23px;
+      }
     }
     .watermark-trigger {
       &.active {
@@ -416,6 +473,50 @@ ul.new-tree {
           }
         }
       }
+    }
+    &.cycle-control-wrap {
+      background: $lightGray !important;
+      padding-right: 20px !important;
+      padding-left: 20px !important;
+      .request-control {
+        text-align: right;
+      }
+    }
+    &.progress-color {
+      > .item-main {
+        &:hover {
+          .row-fluid {
+            background:darken($rqStarted,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
+          }
+        }
+        .row-fluid {
+          background: $rqStarted;
+          border-bottom: 1px solid #f0f076;
+          .tree-title-area {
+            color: $darkText;
+          }
+        }
+      }
+    }
+    &.overdue-color {
+      > .item-main {
+        &:hover {
+          .row-fluid {
+            background:darken($rqWarning,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
+          }
+        }
+        .row-fluid {
+          background: $rqWarning;
+          border-bottom: 1px solid #f1977a;
+          .tree-title-area {
+            color: #c73535;
+          }
+        }
+      }
+    }
+    .task-done {
+      font-size: 13px;
+      color: $green;
     }
     &.tree-item-open {
       @include box-shadow(inset 0 0 8px #bbb);
@@ -490,6 +591,14 @@ ul.new-tree {
         color:$programs;
       }
     }
+    &.disabled {
+      .item-data {
+        color:$darkGray;
+        i {
+          @include opacity(0.4);
+        }
+      }
+    }
     .small {
       font-size:$f-small;
       display: inline-block;
@@ -528,19 +637,56 @@ ul.new-tree {
           clear: both;
           overflow: visible;
         }
+        .tree-title-area {
+          width: 100%;
+        }
         .info-action {
           &.relevant-action {
             padding-right: 0;
           }
         }
+        .objective-selector {
+          input {
+            margin-bottom: 0;
+          }
+        }
+        .inline-black {
+          line-height: 30px;
+          color: $black;
+          margin-bottom: 0;
+          margin-right: 4px;
+        }
+        &.left-space {
+          margin-right: 30px;
+        }
       }
     }
+    .wrap100 { float:left; min-width:100px; }
+    .wrap150 { float:left; min-width:150px; }
+    .wrap200 { float:left; min-width:200px; }
+    .wrap250 { float:left; min-width:250px; }
+    .wrap300 { float:left; min-width:300px; }
   }
   &.colored-list {
     > li.tree-item {
       padding: 1px 1px 0px 1px;
       background: $white;
       border-bottom: none !important;
+      > .item-main {
+        &:hover {
+          .row-fluid {
+            @include background-size(30px 6px !important);
+            background:darken($rqDraft,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
+          }
+        }
+        .row-fluid {
+          background: $rqDraft;
+          border-bottom: 1px solid #d8d8d8;
+          .tree-title-area {
+            color: $text;
+          }
+        }
+      }
       &:last-child {
         padding-bottom: 1px;
         border-bottom: 1px solid #ccc !important;
@@ -548,11 +694,11 @@ ul.new-tree {
       &.tree-item-add {
         padding: 0 0 0 20px;
       }
-      .tree-title-area {
+/*      .tree-title-area {
         [class^="grcicon-"] {
           display: inline-block;
         }
-      }
+      }  */
       .new-tree {
         li.tree-item {
           &.tree-item-add {
@@ -560,7 +706,8 @@ ul.new-tree {
           }
         }
       }
-      &.rq-draft {
+      &.rq-draft,
+      &.t-assigned {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -576,7 +723,7 @@ ul.new-tree {
           }
         }
       }
-      &.rq-requested {
+      &.rq-requested,&.t-inprogress,&.t-declined {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -610,7 +757,6 @@ ul.new-tree {
           }
         }
       }
-      &.rq-amended-request,
       &.rq-amended {
         > .item-main {
           &:hover {
@@ -627,7 +773,8 @@ ul.new-tree {
           }
         }
       }
-      &.rq-updated {
+      &.rq-updated,
+      &.t-finished {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -643,7 +790,9 @@ ul.new-tree {
           }
         }
       }
-      &.rq-accepted {
+      &.rq-accepted,
+      &.t-verified,
+      &.t-completed {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -707,7 +856,9 @@ ul.new-tree {
           }
         }
       }
-      &.rq-rejected {
+      &.rq-amended-request,
+      &.rq-rejected,
+      &.t-overdue {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -752,7 +903,13 @@ ul.new-tree {
       &.rq-assigned,
       &.rq-submitted,
       &.rq-rejected,
-      &.rq-accepted {
+      &.t-assigned,
+      &.t-inprogress,
+      &.t-declined,
+      &.t-verified,
+      &.t-finished,
+      &.t-finished,
+      &.t-overdue, {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -777,6 +934,9 @@ ul.new-tree {
     border-bottom:none;
     a {
       font-weight:bold;
+    }
+    &.inner-tree-footer {
+      padding-left: 0;
     }
   }
   [class^="grcicon-"] {
@@ -810,9 +970,6 @@ ul.new-tree {
     }
   }
   a.show-long {
-    position:absolute;
-    top: 16px;
-    right: 0;
     color:$disabled;
     float:left;
     display:block;
@@ -945,12 +1102,15 @@ ul.new-tree {
   &.bottom-space {
     padding-bottom: 12px;
   }
+  h5 {
+    font-size: 15px;
+    padding-bottom: 10px;
+  }
 }
 
 .tier-2-info {
   display:none;
   &.content-open {
-    @include box-shadow(inset 0 4px 3px -3px #bbb);
     background:#fff;
     padding-bottom:20px;
   }
@@ -969,7 +1129,7 @@ ul.new-tree {
   .tree-info {
     line-height: 18px;
   }
-  
+
   .edit-auditor a {
     font-size:11px;
     font-weight:bold;
@@ -1107,6 +1267,10 @@ ul.new-tree {
   }
 }
 
+.ordered-item-data {
+  padding-left: 5px;
+}
+
 .info-action {
   font-size:11px;
   text-transform:uppercase;
@@ -1121,6 +1285,7 @@ ul.new-tree {
     text-decoration:none;
   }
   &.unmap {
+    margin-left:7px;
     @include opacity(0.25);
     &:hover {
       color:$error;
@@ -1157,7 +1322,7 @@ ul.new-tree {
      text-decoration:none;
      i {
        @include opacity(0.6);
-     } 
+     }
     }
   }
 }
@@ -1234,6 +1399,7 @@ ul.new-tree {
     z-index: 9999;
     margin: 0;
     padding: 0;
+    font-weight: normal;
     @include border-radius($default-border-radius);
     min-width: 160px;
     float: none;
@@ -1254,5 +1420,63 @@ ul.new-tree {
         }
       }
     }
+  }
+}
+
+.tree-spinner {
+  position: relative;
+  z-index: 100 !important;
+}
+
+.multitype-tree {
+  .tree-item {
+    .tree-title-area {
+      [class^="grcicon-"] {
+        display: inline-block;
+      }
+    }
+  }
+  .tree-item-add {
+    .add-single-object {
+      padding-top: 4px;
+      select,
+      input {
+        margin-bottom: 5px;
+        margin-top: 0;
+      }
+      .btn {
+        &.btn-footer {
+          margin-top: -4px;
+        }
+      }
+    }
+  }
+  .object-check {
+    padding-right: 20px;
+    text-align: right;
+    &.all-check {
+      label {
+        line-height: 32px;
+        margin-bottom: 0;
+        input {
+          margin-top: -1px;
+        }
+      }
+    }
+  }
+  .object-add {
+    padding-right: 20px;
+    text-align: right;
+    .btn-small {
+      padding-top: 3px;
+      padding-bottom: 3px;
+    }
+  }
+  .task-done {
+    font-size: 13px;
+    color: $green;
+  }
+  .accepted {
+    color: $green;
   }
 }

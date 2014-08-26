@@ -5,31 +5,6 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-/*
- *= require jquery
- *= require rails
- *= require jquery-ui
- *= require bootstrap
- *= require bootstrap/sticky-popover
- *= require bootstrap/modal-form
- *= require bootstrap/modal-ajax
- *= require bootstrap/scrollspy
- *= require bootstrap/affix
- *= require wysihtml5_parser_rules/advanced
- *= require wysihtml5-0.3.0_rc2
- *= require bootstrap-wysihtml5-0.0.2
- *= require_self
- */
-
-/* Unused?
-jQuery(document).ready(function($) {
-  $('.collapsible .head').click(function(e) {
-      $(this).toggleClass('toggle');
-      $(this).next().toggle();
-      e.preventDefault();
-  }).next().hide();
-});*/
-
 var GGRC = window.GGRC || {};
 GGRC.mustache_path = '/static/mustache';
 
@@ -58,22 +33,70 @@ $(window).on('hashchange', function() {
 
 jQuery.migrateMute = true; //turn off console warnings for jQuery-migrate
 
+
+GGRC.extensions = GGRC.extensions || [];
+
+GGRC.extensions.push({
+    name: "core"
+
+  , object_type_decision_tree: function() {
+      return {
+        "program" : CMS.Models.Program
+      , "audit" : CMS.Models.Audit
+      /*, "directive" : {
+        _discriminator: function(data) {
+          var model_i, model;
+          models =  [CMS.Models.Regulation, CMS.Models.Policy, CMS.Models.Contract];
+          for (model_i in models) {
+            model = models[model_i];
+            if (model.meta_kinds.indexOf(data.kind) >= 0) {
+              return model;
+            }
+          }
+          throw new ModelError("Invalid Directive#kind value '" + data.kind + "'", data);
+        }
+      }*/
+      , "contract" : CMS.Models.Contract
+      , "policy" : CMS.Models.Policy
+      , "standard" : CMS.Models.Standard
+      , "regulation" : CMS.Models.Regulation
+      , "org_group" : CMS.Models.OrgGroup
+      , "project" : CMS.Models.Project
+      , "facility" : CMS.Models.Facility
+      , "product" : CMS.Models.Product
+      , "data_asset" : CMS.Models.DataAsset
+      , "market" : CMS.Models.Market
+      , "system_or_process" : {
+        _discriminator: function(data) {
+          if (data.is_biz_process)
+            return CMS.Models.Process;
+          else
+            return CMS.Models.System;
+        }
+      }
+      , "system" : CMS.Models.System
+      , "process" : CMS.Models.Process
+      , "control" : CMS.Models.Control
+      , "objective" : CMS.Models.Objective
+      , "section" : CMS.Models.Section
+      , "clause" : CMS.Models.Clause
+      , "section_objective" : CMS.Models.SectionObjective
+      , "person" : CMS.Models.Person
+      , "role" : CMS.Models.Role
+      , "threat" : CMS.Models.Threat
+      , "vulnerability" : CMS.Models.Vulnerability
+      , "template" : CMS.Models.Template
+      }
+    }
+});
+
+
 function ModelError(message, data) {
   this.name = "ModelError";
   this.message = message || "Invalid Model encountered";
   this.data = data;
 }
 ModelError.prototype = Error.prototype;
-
-window.onerror = function(message, url, linenumber) {
-  $(document.body).trigger("ajax:flash", {"error" : message});
-  $.ajax({
-    type : "post"
-    , url : "/api/log_events"
-    , dataType : "text"
-    , data : {log_event : {severity : "error", description : message + " (at " + url + ":" + linenumber + ")"}}
-  });
-};
 
   window.cms_singularize = function(type) {
     type = type.trim();
@@ -185,57 +208,28 @@ var confirmleaving = function confirmleaving() {
   }
   , name : "GGRC/window"
 });
+
 jQuery.extend(GGRC, {
-  infer_object_type : function(data) {
-    var decision_tree = {
-      "program" : CMS.Models.Program
-      , "audit" : CMS.Models.Audit
-      /*, "directive" : {
-        _discriminator: function(data) {
-          var model_i, model;
-          models =  [CMS.Models.Regulation, CMS.Models.Policy, CMS.Models.Contract];
-          for (model_i in models) {
-            model = models[model_i];
-            if (model.meta_kinds.indexOf(data.kind) >= 0) {
-              return model;
-            }
+    get_object_type_decision_tree: function() {
+      var tree = {}
+        , extensions = GGRC.extensions || []
+        ;
+
+      can.each(extensions, function(extension) {
+        if (extension.object_type_decision_tree) {
+          if (can.isFunction(extension.object_type_decision_tree)) {
+            $.extend(tree, extension.object_type_decision_tree());
+          } else {
+            $.extend(tree, extension.object_type_decision_tree);
           }
-          throw new ModelError("Invalid Directive#kind value '" + data.kind + "'", data);
         }
-      }*/
-      , "contract" : CMS.Models.Contract
-      , "policy" : CMS.Models.Policy
-      , "standard" : CMS.Models.Standard
-      , "regulation" : CMS.Models.Regulation
-      , "org_group" : CMS.Models.OrgGroup
-      , "project" : CMS.Models.Project
-      , "facility" : CMS.Models.Facility
-      , "product" : CMS.Models.Product
-      , "data_asset" : CMS.Models.DataAsset
-      , "market" : CMS.Models.Market
-      , "system_or_process" : {
-        _discriminator: function(data) {
-          if (data.is_biz_process)
-            return CMS.Models.Process;
-          else
-            return CMS.Models.System;
-        }
-      }
-      , "system" : CMS.Models.System
-      , "process" : CMS.Models.Process
-      , "control" : CMS.Models.Control
-      , "objective" : CMS.Models.Objective
-      , "risky_attribute" : CMS.Models.RiskyAttribute
-      , "risk" : CMS.Models.Risk
-      , "section" : CMS.Models.Section
-      , "clause" : CMS.Models.Clause
-      , "section_objective" : CMS.Models.SectionObjective
-      , "person" : CMS.Models.Person
-      , "role" : CMS.Models.Role
-      , "threat" : CMS.Models.Threat
-      , "vulnerability" : CMS.Models.Vulnerability
-      , "template" : CMS.Models.Template
-    };
+      });
+
+      return tree;
+    }
+
+  , infer_object_type : function(data) {
+    var decision_tree = GGRC.get_object_type_decision_tree();
 
     function resolve_by_key(subtree, data) {
       var kind = data[subtree._key];
@@ -318,6 +312,156 @@ jQuery.extend(GGRC, {
 
   , delay_leaving_page_until : $.proxy(notifier, "queue")
 });
+
+/*
+  The GGRC Math library provides basic arithmetic across arbitrary precision numbers represented
+  as strings.  We wrote this initially to handle easy re-sorting of items in tree views, since
+  we could easily get hundreds of re-sorts by halving the distance from zero to MAX_SAFE_INT
+  until we got down to 10^-250 which would overflow the string on the data side with zeroes.
+*/
+GGRC.Math =  GGRC.Math || {};
+$.extend(GGRC.Math, {
+  /*
+    @param a an addend represented as a decimal notation string
+    @param b an addend represented as a decimal notation string
+
+    @return the sum of the numbers represented in a and b, as a decimal notation string.
+  */
+  string_add: function(a, b) {
+    var _a, _b, i, _c = 0,
+        ret = [],
+        adi = a.indexOf("."),
+        bdi = b.indexOf(".");
+
+    if (adi < 0) {
+      a = a + ".";
+      adi = a.length - 1;
+    }
+    if (bdi < 0) {
+      b = b + ".";
+      bdi = b.length - 1;
+    }
+    while (adi < bdi) {
+      a = "0" + a;
+      adi++;
+    }
+    while (bdi < adi) {
+      b = "0" + b;
+      bdi++;
+    }
+
+    for (i = Math.max(a.length, b.length) - 1; i >= 0; i--) {
+      _a = a[i] || 0;
+      _b = b[i] || 0;
+      if (_a === "." || _b === ".") {
+        if (_a !== "." || _b !== ".")
+          throw "Decimal alignment error";
+        ret.unshift(".");
+      } else {
+        ret.unshift((+_a) + (+_b) + _c);
+        _c = Math.floor(ret[0] / 10);
+        ret[0] = (ret[0] % 10).toString(10);
+      }
+    }
+    if (_c > 0) {
+      ret.unshift(_c.toString(10));
+    }
+    if (ret[ret.length - 1] === ".") {
+      ret.pop();
+    }
+    return ret.join("");
+  },
+
+  /*
+    @param a a decimal notation string
+
+    @return one half of the number represented in a, as a decimal notation string.
+  */
+  string_half: function(a) {
+    var i, _a, _c = 0, ret = [];
+
+    if (!~a.indexOf(".")) {
+      a = a + ".";
+    }
+    for (i = 0; i < a.length; i++) {
+      _a = a[i];
+      if (_a === ".") {
+        ret.push(".");
+      } else {
+        _a = Math.floor((+_a + _c) / 2);
+        if (+a[i] % 2) {
+          _c = 10;
+        } else {
+          _c = 0;
+        }
+        ret.push(_a.toString(10));
+      }
+    }
+    if (_c > 0) {
+      ret.push("5");
+    }
+    if (ret[ret.length - 1] === ".") {
+      ret.pop();
+    }
+    while (ret[0] === "0" && ret.length > 1) {
+      ret.shift();
+    }
+    return ret.join("");
+  },
+
+  /*
+    @param a a number represented as a decimal notation string
+    @param b a number represented as a decimal notation string
+
+    @return the maximum of the numbers represented in a and b, as a decimal notation string.
+  */
+  string_max: function(a, b) {
+    return this.string_less_than(a, b) ? b : a;
+  },
+
+  /*
+    @param a a number represented as a decimal notation string
+    @param b a number represented as a decimal notation string
+
+    @return true if the number represented in a is less than that in b, false otherwise
+  */
+  string_less_than: function(a, b) {
+    var i,
+        _a = ("" + a).replace(/^0*/, ""),
+        _b = ("" + b).replace(/^0*/, ""),
+        adi = _a.indexOf("."),
+        bdi = _b.indexOf(".");
+
+    if (adi < 0) {
+      _a = _a + ".";
+      adi = _a.length - 1;
+    }
+    if (bdi < 0) {
+      _b = _b + ".";
+      bdi = _b.length - 1;
+    }
+    if (adi < bdi) {
+      return true;
+    }
+    if (bdi < adi) {
+      return false;
+    }
+    for (i = 0; i < _a.length - 1; i++) {
+      if (_a[i] === ".") {
+        // continue
+      } else {
+        if ((+_a[i] || 0) < (+_b[i] || 0)) {
+          return true;
+        } else if ((+_a[i] || 0) > (+_b[i] || 0)) {
+          return false;
+        }
+      }
+    }
+    return _b.length >= _a.length ? false : true;
+  }
+
+});
+
 })(GGRC);
 
 
@@ -387,7 +531,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
 
   // Here we break the deferred pattern a bit by piping back to original AJAX deferreds when we
   // set up a failure handler on a later transformation of that deferred.  Why?  The reason is that
-  //  we have a default failure handler that should only be called if no other one is registered, 
+  //  we have a default failure handler that should only be called if no other one is registered,
   //  unless it's also explicitly asked for.  If it's registered in a transformed one, though (after
   //  then() or pipe()), then the original one won't normally be notified of failure.
   can.ajax = $.ajax = function(options) {
@@ -437,6 +581,43 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
     }
   });
 })(jQuery);
+
+// dismiss non-expandable success flash messages
+$(document).ready(function() {
+  // monitor target, where flash messages are added
+  var target = $('section.content div.flash')[0];
+  var observer = new MutationObserver(function( mutations ) {
+    mutations.forEach(function( mutation ) {
+      // check for new nodes
+      if( mutation.addedNodes !== null ) {
+        // remove the success message from non-expandable
+        // flash success messages after five seconds
+        setTimeout(function() {
+          $('.flash .alert-success').not(':has(ul.flash-expandable)').remove();
+        }, 5000);
+      }
+    });
+  });
+
+  var config = {
+      attributes: true
+    , childList: true
+    , characterData: true
+  };
+
+  if (target) {
+    observer.observe(target, config);
+  }
+});
+
+
+//remove flash messages generated by python
+$(document).ready(function() {
+  setTimeout(function() {
+    $('.flash .alert-success').not(':has(ul.flash-expandable)').remove();
+  }, 5000);
+});
+
 
 jQuery(document).ready(function($) {
   // TODO: Not AJAX friendly
@@ -557,16 +738,20 @@ jQuery(document).ready(function($) {
     // force the 'enter' event.
     if (!$(e.currentTarget).data('sticky_popover')) {
       $(e.currentTarget)
-        .sticky_popover($.extend({}, defaults, { 
-          trigger: 'sticky-hover' 
+        .sticky_popover($.extend({}, defaults, {
+          trigger: 'sticky-hover'
           , placement : function() {
             var $el = this.$element
-              , space = $(document).width() - ($el.offset().left + $el.width());
+              , spaceLeft = $(document).width() - ($el.offset().left + $el.width())
+              , spaceRight = $el.offset().left
+              , popover_size = 620;
             // Display on right if there is enough space
-            if($el.closest(".widget-area:first-child").length && space > 420)
+            if($el.closest(".widget-area:first-child").length && spaceLeft > popover_size)
               return "right";
-            else
+            else if(spaceRight > popover_size){
               return "left";
+            }
+            return "top";
           }
         }))
         .triggerHandler(e);
@@ -581,23 +766,6 @@ jQuery(document).ready(function($) {
         .sticky_popover($.extend({}, defaults, { trigger: 'click' }))
         .triggerHandler(e);
     }
-  });
-
-  // Remove widgets
-  $('body').on('click', '.widget .header .remove', function(e) {
-    e.preventDefault();
-    var $this = $(this),
-        $widget = $this.closest(".widget");
-    $widget.fadeOut();  
-  });
-
-  // Contract/Expand widget
-  $('body').on('click', '.widget .header .showhide', function(e) {
-
-    if($(this).is(".widget-showhide"))
-      e.preventDefault();
-
-      showhide(".widget", ".content, .filter").call(this);
   });
 
   function showhide(upsel, downsel) {
@@ -627,7 +795,7 @@ jQuery(document).ready(function($) {
   $.fn.showhide = showhide(".widget", ".content, .filter");
   $.fn.modal_showhide = showhide(".modal", ".hidden-fields-area");
   $('body').on('click', ".expand-link a", $.fn.modal_showhide);
-  
+
   $.fn.widget_showhide = showhide(".info", ".hidden-fields-area");
   $('body').on('click', ".info-expand a", $.fn.widget_showhide);
 
@@ -661,7 +829,7 @@ jQuery(document).ready(function($) {
           $title.find('.description-inline').removeClass('out');
           if ($title.is('.description-only')) {
             $title.removeClass('out');
-          }      
+          }
           $view.text('view');
         }
       }
@@ -671,65 +839,6 @@ jQuery(document).ready(function($) {
   }
 
   $.fn.oneline = oneline;
-
-  /* Deprecated quick search functionality
-   *
-  // Open quick find
-  $('body').on('focus', '.quick-search-holder input', function() {
-    var $this = $(this)
-      , $quick_search = $this.closest('.quick-search')
-      ;
-
-    $quick_search.find('.quick-search-results').fadeIn();
-    $quick_search.find('.quick-search-holder').addClass('open');
-  });
-
-  $('.quick-search').on('close', function() {
-    var $this = $(this)
-      ;
-
-    $this.find('.quick-search-results').hide();
-    $this.find('.quick-search-holder').removeClass('open');
-    $this.find('.quick-search-holder input').blur();
-  });
-
-  // Remove quick find
-  $('body').on('click', '.quick-search-results .remove', function(e) {
-    e.preventDefault();
-
-    $(this).closest('.quick-search').trigger('close');
-  });
-
-  // Close quick find popover when clicked outside the box
-  $('body').on('click', function(e) {
-    var $quick_search = $('.quick-search');
-
-    // Bail early if it's not open
-    if (!$quick_search.find('.quick-search-holder').hasClass('open'))
-      return;
-
-    // Don't close if clicking inside a modal
-    if ($(e.target).closest('.modal').length > 0)
-      return;
-
-    // Don't close if clicking on modal backdrop
-    if ($(e.target).closest('.modal-backdrop').length > 0)
-      return;
-
-    // Don't close if click is within the quick search area
-    if ($quick_search.find(e.target).length > 0)
-      return;
-
-    $quick_search.trigger('close');
-  });
-
-  // Close quick find popover when user presses Escape key
-  $('body').on('keyup', function(e) {
-    if (e.keyCode == 27) {
-      $('.quick-search').trigger('close');
-    }
-  });
-  */
 
   // Close other popovers when one is shown
   $('body').on('show.popover', function(e) {
@@ -750,11 +859,11 @@ jQuery(document).ready(function($) {
 
 jQuery(function($) {
   // tree
-  
+
   $('body').on('click', 'ul.tree .item-title', function(e) {
     var $this = $(this),
         $content = $this.closest('li').find('.item-content');
-    
+
     if($this.hasClass("active")) {
       $content.slideUp('fast');
       $this.removeClass("active");
@@ -762,12 +871,12 @@ jQuery(function($) {
       $content.slideDown('fast');
       $this.addClass("active");
     }
-    
+
   });
 
 
   // tree-structure
-  
+
   $('body').on('click', 'ul.tree-structure .item-main .grcobject, ul.tree-structure .item-main .openclose', function(e) {
     openclose.call(this);
     e.stopPropagation();
@@ -824,11 +933,11 @@ jQuery(function($) {
     });
 
     return this;
-    
+
   }
-  
+
   $.fn.openclose = openclose;
-  
+
 });
 
 $(window).load(function(){
@@ -840,12 +949,12 @@ $(window).load(function(){
       $('.header-content').next('.content').removeClass('affixed');
     }
   });
-  
+
   // pbc filters show-hide
   $('body').on('click', '.advanced-filter-trigger', function() {
     var $this = $(this),
         $filters = $this.closest('.inner-tree').find('.pbc-filters');
-    
+
     if($this.hasClass("active")) {
       $filters.slideUp('fast');
       $this.removeClass("active");
@@ -855,16 +964,16 @@ $(window).load(function(){
       $this.addClass("active");
       $this.html('<i class="grcicon-search"></i> Hide Filters');
     }
-    
+
     return false;
-    
+
   });
-  
+
   // Google Circle CTA Button
   $('body').on('mouseenter', '.square-trigger', function() {
     var $this = $(this),
         $popover = $this.closest('.circle-holder').find('.square-popover');
-    
+
     $popover.slideDown('fast');
     $this.addClass("active");
     return false;
@@ -872,32 +981,38 @@ $(window).load(function(){
   $('body').on('mouseleave', '.square-popover', function() {
     var $this = $(this),
         $trigger = $this.closest('.circle-holder').find('.square-trigger');
-    
+
     $this.slideUp('fast');
     $trigger.removeClass('active');
     $this.removeClass("active");
     return false;
   });
-  
+
   // References popup preview
   $('body').on('mouseenter', '.new-tree .tree-info a.reference', function() {
     if($(this).width() > $('.new-tree .tree-info').width()) {
       $(this).addClass('shrink-it');
-    } 
+    }
   });
-  
+
   // Popover trigger for person tooltip in styleguide
   // The popover disappears if the show/hide isn't controlled manually
   var last_popover;
   $('body').on('mouseenter', '.person-tooltip-trigger', function(ev) {
-    var target = $(ev.currentTarget);
+    var target = $(ev.currentTarget),
+        content = target.closest('.person-holder').find('.custom-popover-content').html();
+
+    if (!content) {
+      // Don't show tooltip if there is no content
+      return;
+    }
     if (!target.data('popover')) {
       target.popover({
           html: true
         , delay: { show: 400, hide: 200 }
         , trigger: 'manual'
         , content: function() {
-            return $(this).closest('.person-holder').find('.custom-popover-content').html();
+            return content;
           }
       });
       target.data('popover').tip().addClass('person-tooltip').css("z-index", 2000);
@@ -953,21 +1068,21 @@ $(window).load(function(){
       last_popover.leave(ev);
     }
   });
-  
+
   // Tab indexing form fields in modal
   $('body').on('focus', '.modal', function() {
     $('.wysiwyg-area').each(function() {
       var $this = $(this),
           $textarea = $this.find('textarea.wysihtml5').attr('tabindex'),
           $descriptionField = $this.find('iframe.wysihtml5-sandbox');
-      
+
       function addingTabindex() {
         $descriptionField.attr('tabindex', $textarea);
       }
       setTimeout(addingTabindex,100)
     });
   });
-  
+
   // Prevent link popup in code mode
   $('body').on('click', 'a[data-wysihtml5-command=popupCreateLink]', function(e){
     var $this = $(this);
@@ -982,27 +1097,27 @@ $(window).load(function(){
   $('body').on('click', '.watermark-trigger', function() {
     var $this = $(this),
         $showWatermark = $this.closest('.tree-item').find('.watermark-icon');
-    
+
     $showWatermark.fadeIn('fast');
     $this.addClass("active");
     $this.html('<span class="utility-link"><i class="grcicon-watermark"></i> Watermarked</span>');
-    
+
     return false;
-    
+
   });
-  
+
 });
 
 jQuery(function($){
   $.fn.cms_wysihtml5 = function() {
-    
-    this.wysihtml5({ 
-        link: true, 
-        image: false, 
-        html: true, 
-        'font-styles': false, 
-        parserRules: wysihtml5ParserRules })
-    
+
+    this.wysihtml5({
+        link: true,
+        image: false,
+        html: true,
+        'font-styles': false,
+        parserRules: wysihtml5ParserRules });
+
     this.each(function() {
       var $that = $(this)
       , editor = $that.data("wysihtml5").editor
@@ -1025,7 +1140,7 @@ jQuery(function($){
         $that.css({"display" : "block", "height" : $that.height() + 20}); //10px offset between reported height and styled height.
         $textarea.css('width', $textarea.width()+20);
         editor.composer.style();// re-copy new size of textarea to composer
-        editor.fire('change_view', editor.currentView.name)
+        editor.fire('change_view', editor.currentView.name);
       });
       var $sandbox = $wysiarea.find(".wysihtml5-sandbox");
 
@@ -1034,21 +1149,21 @@ jQuery(function($){
         var e = new $.Event(ev.type === "mouseup" ? "mouseup" : "mousemove"); //jQUI resize listens on this.
         e.pageX = $sandbox.offset().left + ev.pageX;
         e.pageY = $sandbox.offset().top + ev.pageY;
-        $sandbox.trigger(e); 
+        $sandbox.trigger(e);
       });
 
       $that.data("cms_events_bound", true);
-    })
+    });
 
     return this;
-  }
+  };
 
   $(document.body).on("shown", ".bootstrap-wysihtml5-insert-link-modal", function(e) {
     $(this).draggable({ handle : ".modal-header"})
     .find(".modal-header [data-dismiss='modal']").css("opacity", 1);
   });
 
-  $(document.body).on("change", ".rotate_control_assessment", function(ev) { 
+  $(document.body).on("change", ".rotate_control_assessment", function(ev) {
     ev.currentTarget.click(function() {
       ev.currentTarget.toggle();
     });
@@ -1056,108 +1171,299 @@ jQuery(function($){
 });
 
 jQuery(function($){
-  $.cms_autocomplete = function(el){
-    var ctl = this;
-    // Add autocomplete to the owner field
-    var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
-      var $that = $(this)
-        , name = $that.attr("name") || ""
-        , prop = name.substr(name.lastIndexOf(".") + 1)
-        , searchtypes = can.map($that.data("lookup").split(","), function(t) { return CMS.Models[t].model_singular; });
-
-      // Return if this field temporarily isn't storing data
-      if (!name) return false;
-
-      return $that.autocomplete({
+  var MAX_RESULTS = 20;
+  $.widget(
+    "ggrc.autocomplete",
+    $.ui.autocomplete,
+    {
+      options: {
         // Ensure that the input.change event still occurs
-        change : function(event, ui) {
+        change: function(event, ui) {
           if(!$(event.target).parents(document.body).length)
             console.warn("autocomplete menu change event is coming from detached nodes");
           $(event.target).trigger("change");
-        }
+        },
 
-        , minLength: 0
+        minLength: 0,
 
-        // Search for the people based on the term
-        , source : function(request, response) {
-          var query = request.term || ''
-            , that = this;
+        source: function(request, response) {
+          // Search for the people based on the term
+          var query = request.term || '',
+              queue = new RefreshQueue(),
+              that = this,
+              is_next_page = request.start != null,
+              dfd;
 
           if (query.indexOf('@') > -1)
             query = '"' + query + '"';
 
-          ctl.bindXHRToButton(GGRC.Models.Search
-          .search_for_types(
+          this.last_request = request;
+          if(is_next_page) {
+            dfd = $.when(this.last_stubs);
+          } else {
+            request.start = 0;
+            dfd = this.options.source_for_refreshable_objects.call(this, request);
+          }
+
+          this.options.controller.bindXHRToButton(
+            // Retrieve full people data
+
+          dfd.then(function(objects) {
+            that.last_stubs = objects;
+            can.each(objects.slice(request.start, request.start + MAX_RESULTS), function(object) {
+              queue.enqueue(object);
+            });
+            queue.trigger().then(function(objs) {
+              objs = that.options.apply_filter.call(that, objs, request);
+              if(objs.length || is_next_page) {
+                // Envelope the object to not break model instance due to
+                // shallow copy done by jQuery in `response()`
+                objs = can.map(objs, function(obj) { return { item: obj }; });
+                response(objs);
+              } else {
+                // show the no-results option iff no results come through here,
+                //  and not merely showing paging.
+                that._suggest( [] );
+                that._trigger( "open" );
+              }
+            });
+          }), $(this.element), null, false);
+        },
+
+        apply_filter: function(objects) {
+          return objects;
+        },
+
+        source_for_refreshable_objects: function(request) {
+          var that = this;
+          return GGRC.Models.Search
+            .search_for_types(
               request.term || '',
-              searchtypes,
+              this.options.searchtypes,
               {
               // FIXME: Remove or figure out when this is necessary.
               //{
               //  __permission_type: 'create'
               //  , __permission_model: 'Object' + $that.data("lookup")
               })
-          .then(function(search_result) {
-            var objects = []
-              , queue = new RefreshQueue()
+            .then(function(search_result) {
+              var objects = [];
+
+              can.each(that.options.searchtypes, function(searchtype) {
+                objects.push.apply(
+                  objects, search_result.getResultsForType(searchtype));
+              });
+              return objects;
+            });
+        },
+
+        select: function(ev, ui) {
+          var original_event,
+              that = this,
+              ctl = $(this).data($(this).data("autocomplete-widget-name")).options.controller
               ;
 
-            can.each(searchtypes, function(searchtype) {
-              objects.push.apply(
-                objects, search_result.getResultsForType(searchtype));
+          if(ui.item) {
+            return ctl.autocomplete_select($(this), ev, ui);
+          } else {
+            original_event = event;
+            $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
+              ctl.autocomplete_select($(that), original_event, { item : new_obj });
+              $(that).trigger("modal:success", new_obj);
+            }).one("hidden", function() {
+              setTimeout(function() {
+                $(this).off(".autocomplete");
+              }, 100);
             });
-            // Retrieve full people data
-            can.each(objects, function(object) {
-              queue.enqueue(object);
-            });
-            queue.trigger().then(function(objs) {
-              if(objs.length) {
-                response(objs);
-              } else {
-                that._suggest( [] );
-                that._trigger( "open" );
+            while(original_event = original_event.originalEvent) {
+              if(original_event.type === "keydown") {
+                //This selection event was generated from a keydown, so click the add new link.
+                var widget_name = el.data("autocompleteWidgetName");
+                el.data(widget_name).menu.active.find("a").click();
+                break;
               }
-            });
-          }), $that, null, false);
-        }
-        , select : ctl.proxy("autocomplete_select", $that)
-        , close : function() {
+            }
+            return false;
+          }
+        },
+
+        close: function() {
+          delete this.scroll_op_in_progress;
           //$that.val($that.attr("value"));
         }
-      }).focus(function(){     
-        //Use the below line instead of triggering keydown
-        $(this).data("uiAutocomplete").search($(this).val());
-    }).data('ui-autocomplete');
-    });
-    acs.each(function(i, ac) {
-      ac._renderMenu = function(ul, items) {
-        var model_class = ac.element.data("lookup")
-          , template = ac.element.data("template")
-          , model
+      },
+
+      _create: function() {
+        var that = this
+        , $that = $(this.element)
+        , base_search = $that.data("lookup")
+        , searchtypes;
+
+        this._super.apply(this, arguments);
+
+        $that.data("autocomplete-widget-name", this.widgetFullName);
+
+        $that.focus(function() {
+          $(this).data(that.widgetFullName).search($(this).val());
+        });
+
+        if (base_search) {
+          base_search = base_search.trim();
+          if (base_search.indexOf("__mappable") === 0 || base_search.indexOf("__all") === 0) {
+            searchtypes = GGRC.Mappings.get_canonical_mappings_for(
+              this.options.parent_instance.constructor.shortName
+              );
+            if (base_search.indexOf("__mappable") === 0) {
+              searchtypes = can.map(searchtypes, function(mapping) {
+                return mapping instanceof GGRC.ListLoaders.ProxyListLoader ? mapping : undefined;
+              });
+            }
+            if (base_search.indexOf("_except:")) {
+              can.each(base_search.substr(base_search.indexOf("_except:") + 8).split(","), function(remove) {
+                delete searchtypes[remove];
+              });
+            }
+            searchtypes = Object.keys(searchtypes);
+          } else {
+            searchtypes = base_search.split(",");
+          }
+
+          this.options.searchtypes = can.map(searchtypes, function(t) {
+            return CMS.Models[t].model_singular;
+          });
+        }
+      },
+
+      _setup_menu_context : function(items) {
+          var model_class = this.element.data("lookup")
+
+            , model = CMS.Models[model_class || this.element.data("model")]
+                      || GGRC.Models[model_class || this.element.data("model")]
+            ;
+
+          return {
+            model_class: model_class,
+            model : model,
+            // Reverse the enveloping we did 25 lines up
+            items: can.map(items, function(item) { return item.item; }),
+          };
+      },
+
+      _renderMenu: function(ul, items) {
+        var template = this.element.data("template"),
+          context = new can.Observe(this._setup_menu_context(items)),
+          model = context.model,
+          that = this,
+          $ul = $(ul)
           ;
 
         if (!template) {
-          model = CMS.Models[model_class] || GGRC.Models[model_class];
-          template =
-              '/' + model.table_plural + '/autocomplete_result.mustache';
+          if(model && GGRC.Templates[model.table_plural + "/autocomplete_result"]) {
+            template = '/' + model.table_plural + '/autocomplete_result.mustache';
+          } else {
+            template = '/base_objects/autocomplete_result.mustache';
+          }
         }
+
+        $ul.unbind("scrollNext")
+        .bind("scrollNext", function(ev, data) {
+          if(that.scroll_op_in_progress) {
+            return;
+          }
+          that.scroll_op_in_progress = true;
+          that.last_request = that.last_request || {};
+          that.last_request.start = that.last_request.start || 0;
+          that.last_request.start += MAX_RESULTS;
+          context.attr("items_loading", true);
+          that.source(that.last_request, function(items) {
+            context.items.push.apply(context.items, can.map(items, function(item) { return item.item; }));
+            context.removeAttr("items_loading");
+            setTimeout(function() {
+              delete that.scroll_op_in_progress;
+            }, 10);
+          });
+        });
 
         can.view.render(
           GGRC.mustache_path + template,
-          {model_class: model_class, items: items},
+          context,
           function(frag) {
-            $(ul).html(frag);
+            $ul.html(frag);
+            $ul.cms_controllers_lhn_tooltips().cms_controllers_infinite_scroll();
             can.view.hookup(ul);
           });
-      };
-    });
-  }
+      }
+  });
+  $.widget.bridge("ggrc_autocomplete", $.ggrc.autocomplete);
+
+  $.widget("ggrc.mapping_autocomplete", $.ggrc.autocomplete, {
+    options: {
+      source_for_refreshable_objects: function(request) {
+        var $el = $(this.element),
+          mapping = this.options.controller.options;
+
+        if (mapping.scope) {
+          mapping = mapping.scope.source_mapping;
+        } else {
+          mapping = inst.source_mapping;
+        }
+
+        return $.when(can.map(mapping, function(binding) {
+          return binding.instance;
+        }));
+      },
+      apply_filter: function(objects, request) {
+        return can.map(objects, function(object) {
+          if (!request.term || object.title && ~object.title.indexOf(request.term))
+            return object;
+          else
+            return undefined;
+        });
+      }
+    },
+      _setup_menu_context : function(items) {
+        return $.extend(this._super(items), {
+          mapping : this.options.mapping == null ? this.element.data("mapping") : this.options.mapping
+        });
+      }
+  });
+  $.widget.bridge("ggrc_mapping_autocomplete", $.ggrc.mapping_autocomplete);
+
+  $.cms_autocomplete = function(el) {
+    var ctl = this;
+    // Add autocomplete to the owner field
+    ($(el) || this.element.find('input[data-lookup]'))
+    .filter("[name][name!='']")
+    .ggrc_autocomplete({ controller: ctl });
+  };
+
+});
+
+jQuery(function($) {
+  // Trigger compilation of any remaining preloaded Mustache templates for
+  // faster can.view() response time.
+
+  setTimeout(function() {
+
+    GGRC.queue_event(
+      can.map(GGRC.Templates, function(template, id) {
+        var key = can.view.toId(GGRC.mustache_path + "/" + id + ".mustache");
+        if(!can.view.cachedRenderers[key]) {
+          return function() {
+            can.view.mustache(key, template);
+          };
+        }
+      })
+    );
+  }, 2000);
+
 });
 
 (function($) {
 
   window.getPageToken = function getPageToken() {
-      return $(document.body).data("page-subtype") 
-            || $(document.body).data("page-type") 
+      return $(document.body).data("page-subtype")
+            || $(document.body).data("page-type")
             || window.location.pathname.substring(1, (window.location.pathname + "/").indexOf("/", 1));
     }
 // hello

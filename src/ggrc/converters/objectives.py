@@ -26,7 +26,7 @@ class ObjectiveRowConverter(BaseRowConverter):
 
   def reify(self):
     self.handle('slug', SlugColumnHandler)
-    self.handle_raw_attr('title', is_required=True)
+    self.handle_title('title', is_required=True)
     self.handle_text_or_html('description')
     self.handle_raw_attr('url')
     self.handle_raw_attr('reference_url')
@@ -65,7 +65,7 @@ class ObjectiveRowConverter(BaseRowConverter):
                 "objective": self.obj,
         }
         if parent_type == Program:
-          db_options["context_id"] = parent_id  # id of program
+          db_options["context_id"] = parent_obj.context_id
         db_session.add(ObjectObjective(**db_options))
 
 

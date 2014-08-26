@@ -11,20 +11,23 @@ from ggrc.extensions import get_extension_modules
 from ggrc.app import app
 from ggrc.rbac import permissions
 from ggrc.login import get_current_user
-from ggrc.utils import as_json
-from ggrc.builder.json import publish
+from ggrc.services.common import as_json, inclusion_filter, filter_resource
+from ggrc.builder.json import publish, publish_representation
 from ggrc.views.converters import *  # necessary for import endpoints
 from werkzeug.exceptions import Forbidden
 from . import filters
-from .registry import object_view, tooltip_view
-from ggrc.models.task import Task, queued_task, create_task, make_task_response
+from .registry import object_view
+from ggrc.models.background_task import (
+    BackgroundTask, queued_task, create_task, make_task_response
+    )
+from . import notification
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
 
 # Needs to be secured as we are removing @login_required
-@app.route("/tasks/reindex", methods=["POST"])
+@app.route("/_background_tasks/reindex", methods=["POST"])
 @queued_task
 def reindex(task):
   """
@@ -75,8 +78,12 @@ def get_config_json():
   return json.dumps(public_config)
 
 def get_current_user_json():
+  from ggrc.models.person import Person
   current_user = get_current_user()
-  return as_json(current_user.log_json())
+  person = Person.eager_query().filter_by(id=current_user.id).one()
+  return as_json(
+      filter_resource(
+        publish_representation(publish(person, (), inclusion_filter))))
 
 @app.context_processor
 def base_context():
@@ -151,7 +158,7 @@ def styleguide():
   """
   return render_template("styleguide/styleguide.haml")
 
-@app.route("/task/<id_task>", methods=['GET'])
+@app.route("/background_task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
   return make_task_response(id_task)
 
@@ -160,7 +167,7 @@ def contributed_object_views():
   from .common import RedirectedPolymorphView
 
   return [
-      object_view(models.Task),
+      object_view(models.BackgroundTask),
       object_view(models.Program),
       object_view(models.Directive, RedirectedPolymorphView),
       object_view(models.Contract),
@@ -197,44 +204,6 @@ def all_object_views():
   return views
 
 
-def contributed_tooltip_views():
-  from ggrc import models
-  return [
-      tooltip_view(models.Audit),
-      tooltip_view(models.Program),
-      tooltip_view(models.Contract),
-      tooltip_view(models.Policy),
-      tooltip_view(models.Regulation),
-      tooltip_view(models.Standard),
-      tooltip_view(models.Control),
-      tooltip_view(models.Objective),
-      tooltip_view(models.System),
-      tooltip_view(models.Process),
-      tooltip_view(models.Product),
-      tooltip_view(models.Request),
-      tooltip_view(models.OrgGroup),
-      tooltip_view(models.Facility),
-      tooltip_view(models.Market),
-      tooltip_view(models.Project),
-      tooltip_view(models.DataAsset),
-      tooltip_view(models.Person),
-      tooltip_view(models.Event),
-      ]
-
-
-def all_tooltip_views():
-  views = contributed_tooltip_views()
-
-  for extension_module in get_extension_modules():
-    contributions = getattr(extension_module, "contributed_tooltip_views", None)
-    if contributions:
-      if callable(contributions):
-        contributions = contributions()
-      views.extend(contributions)
-
-  return views
-
-
 def init_extra_views(app):
   pass
 
@@ -244,14 +213,6 @@ def init_all_views(app):
   from ggrc import settings
 
   for entry in all_object_views():
-    entry.service_class.add_to(
-      app,
-      '/{0}'.format(entry.url),
-      entry.model_class,
-      decorators=(login_required,)
-      )
-
-  for entry in all_tooltip_views():
     entry.service_class.add_to(
       app,
       '/{0}'.format(entry.url),
@@ -273,21 +234,21 @@ def mockup():
   """The mockup program guide page
   """
   return render_template("mockups/v1.0/program.html")
-  
+
 @app.route("/mockups/v1.0/assessment.html")
 @login_required
 def assessments():
   """The assessments guide page
   """
   return render_template("mockups/v1.0/assessment.html")
-  
+
 @app.route("/mockups/v1.0/assessment-start.html")
 @login_required
 def assessments_start():
   """The assessment start guide page
   """
   return render_template("mockups/v1.0/assessment-start.html")
-  
+
 @app.route("/mockups/v1.0/object.html")
 @login_required
 def assessments_object():
@@ -300,21 +261,35 @@ def assessments_object():
 def assessments_object_final():
   """The assessment object final guide page
   """
-  return render_template("mockups/v1.0/object-final.html")  
+  return render_template("mockups/v1.0/object-final.html")
 
 @app.route("/mockups/v1.0/my-work.html")
 @login_required
 def assessments_my_work():
   """The assessment my work guide page
   """
-  return render_template("mockups/v1.0/my-work.html")    
-  
+  return render_template("mockups/v1.0/my-work.html")
+
 @app.route("/mockups/assessments_grid")
 @login_required
 def assessments_grid():
   """The assessments grid guide page
   """
   return render_template("mockups/assessments-grid.html")
+
+@app.route("/mockups/v1.1/index.html")
+@login_required
+def workflow_assessment():
+  """The workflow assessment guide page
+  """
+  return render_template("mockups/v1.1/index.html")
+
+@app.route("/mockups/v1.1/workflow.html")
+@login_required
+def workflow_info():
+  """The workflow info guide page
+  """
+  return render_template("mockups/v1.1/workflow.html")
 
 @app.route("/permissions")
 @login_required

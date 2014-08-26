@@ -9,13 +9,14 @@
 {{#instance}}
 <form action="javascript://">
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
       <label>
         Title
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label>
       <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" tabindex="1" autofocus>
+      {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
     </div>
   </div>
   <div class="row-fluid">

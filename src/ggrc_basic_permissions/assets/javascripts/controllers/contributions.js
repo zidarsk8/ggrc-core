@@ -36,11 +36,11 @@
       options.$target = $target;
       $target.modal_form({}, $trigger);
       this.newInstance($target[0], $.extend({ $trigger: $trigger}, options));
-      
+
       return $target;
     },
 
-  }, { 
+  }, {
     init: function(){
       this.init_context();
       this.init_view();
@@ -85,7 +85,7 @@
       var self = this
         , instance = this.options.instance
         ;
-      
+
       function finish(){
         CMS.Models[self.options.scope].cache[self.options.scope_id].refresh();
         self.element.trigger("modal:success").modal_form("hide");
@@ -184,7 +184,7 @@
 
     ".object_column li click": "select_object",
     ".option_column li click": "select_option",
-    ".option_column li input[type='radio'] change": "change_option",
+    ".confirm-buttons a.btn-primary click": "change_option",
 
     init_bindings: function() {
       this.join_list.bind("change", this.proxy("update_active_list"));
@@ -273,6 +273,9 @@
       if (self.options.scope) {
         params.scope = self.options.scope;
       }
+      else if (instance && instance.constructor.shortName === "Workflow" && instance.context) {
+        params.scope = "Workflow";
+      }
       else if (instance && instance.constructor.shortName === "Program" && instance.context) {
         params.scope = "Private Program";
       }
@@ -290,6 +293,9 @@
           options = can.makeArray(options).sort(function(a,b){return a.id-b.id;});
           if (params.scope == "Private Program") {
             description = "A person with the No Access role will not be able to see this Private Program.";
+          }
+          else if (params.scope == "Workflow") {
+            description = "A person with the No Access role will not be able to update or contribute to this Workflow.";
           }
           else {
             description = "This role allows a user access to the MyWork dashboard and applications Help files.";
@@ -345,7 +351,6 @@
       if(!role_found){
         $option_list.find('li[data-id=0] input[type=radio]').prop('checked', true);
       }
-      
     },
 
     /*" hide": function(el, ev) {
@@ -369,61 +374,40 @@
       this.context.attr('selected_option', el.data('option'));
     },
 
-    change_option: function(el, ev) {
+    change_option: function(el_, ev) {
       var self = this
+        , el = $(".people-selector").find("input[type=radio]:checked")
         , li = el.closest('li')
-        , original_option = li.data('option');
+        , clicked_option = li.data('option')
+        , join
         ;
-      
+
+      // Look for and remove the existing join.
       $.map(li.parent().children(), function(el){
         var el = $(el)
         , option = el.closest('li').data('option')
         , join = self.find_join(option.id)
         ;
 
-        if (option.id == original_option.id) {
-          // First, check if join instance already exists
-          if (join) {
-            // Ensure '_removed' attribute is false
-            join.attr('_removed', false);
-          } else if(option.id !== 0) {
-            // Otherwise, create it
-            join = self.get_new_join(
-                option.id, option.scope, option.constructor.shortName);
-            join.save().then(function() {
-                self.join_list.push(join);
-                self.refresh_object_list();
-                self.element.trigger("relationshipcreated", join);
+        if(join) {
+          join.refresh().done(function() {
+            join.destroy().then(function() {
+              self.element.trigger("relationshipdestroyed", join);
             });
-          }
-        } else {
-          // Check if instance is still selected
-          if (join) {
-            // Ensure '_removed' attribute is false
-            if (join.isNew()) {
-              // It was created, then removed, so remove from list
-              join_index = this.join_list.indexOf(join);
-              if (join_index >= 0) {
-                this.join_list.splice(join_index, 1);
-              }
-            } else {
-              // FIXME: The data should be updated in bulk, and only when "Save"
-              //   is clicked.  Right now, it updates continuously.
-              //join.attr('_removed', true);
-              join.refresh().done(function() {
-                join.destroy().then(function() {
-                  join_index = self.join_list.indexOf(join);
-                  if (join_index >= 0) {
-                    self.join_list.splice(join_index, 1);
-                  }
-                  self.refresh_object_list();
-                  self.element.trigger("relationshipdestroyed", join);
-                });
-              });
-            }
-          }
+          });
         }
       });
+
+      // Create the new join (skipping "No Access" role, with id == 0)
+      if (clicked_option.id > 0) {
+        join = self.get_new_join(
+            clicked_option.id, clicked_option.scope, clicked_option.constructor.shortName);
+        join.save().then(function() {
+            self.join_list.push(join);
+            self.refresh_option_list();
+            self.element.trigger("relationshipcreated", join);
+        });
+      }
     },
 
     // HELPERS
@@ -616,7 +600,7 @@
 
       e.preventDefault();
       e.stopPropagation();
-      
+
       options.instance = CMS.Models[scope].cache[instance_id];
       options.userRole_id = data_set.params.userRole_id;
       options.scope_id = data_set.params.scope_id;

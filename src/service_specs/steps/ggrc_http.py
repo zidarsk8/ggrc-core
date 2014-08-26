@@ -13,7 +13,8 @@ from time import sleep, time
 
 from tests.ggrc.behave.utils import (
     Example, handle_example_resource, handle_named_example_resource,
-    put_resource, get_resource_table_singular, get_service_endpoint_url,
+    get_inflection, put_resource,
+    get_service_endpoint_url, get_service_endpoint_url_for_type,
     get_resource, handle_get_resource_and_name_it,
     handle_post_fails_with_status_and_content,
     handle_post_named_example, post_example,
@@ -23,7 +24,7 @@ from tests.ggrc.behave.utils import (
 
 def get_json_response(context):
   if not hasattr(context, 'json'):
-    context.json = context.response.json()
+    context.json = context._response.json()
   return context.json
 
 def add_create_permissions(context, rbac_context_id, resource_types):
@@ -64,10 +65,28 @@ def get_collection_for(context, typename):
 def get_collection_for_with_stubs_only(context, typename):
   do_get_collection_for(context, typename, stubs_only=True)
 
+@when('GET of "{typename}" collection using id__in for "{resource_name}"')
+def get_collection_for_using_id__in(context, typename, resource_name):
+  resource = getattr(context, resource_name)
+  table_singular = get_inflection(typename, 'table_singular')
+  id = resource.value[table_singular]['id']
+  handle_get_resource_and_name_it(
+      context,
+      get_service_endpoint_url_for_type(context, typename) + '?id__in={}'.format(id),
+      "collectionresource")
+
+  # Update the individual resource if one is returned
+  table_plural = get_inflection(typename, 'table_plural')
+  collection_name = table_plural + '_collection'
+  if len(context.collectionresource[collection_name][table_plural]) > 0:
+    resource = context.collectionresource[collection_name][table_plural][0]
+    setattr(context, resource_name, Example(
+      typename, { table_singular: resource }))
+
 def do_get_collection_for(context, typename, stubs_only=False):
   handle_get_resource_and_name_it(
       context,
-      get_service_endpoint_url(context, typename) + '?__stubs_only',
+      get_service_endpoint_url_for_type(context, typename) + '?__stubs_only',
       'collectionresource',
       )
 
@@ -80,7 +99,7 @@ def check_resource_in_collection(context, resource_name):
 @given('"{name}" is POSTed to its collection')
 def post_named_example_to_collection_endpoint(
     context, name, expected_status=201):
-  handle_post_named_example( context, name, expected_status)
+  context._response = handle_post_named_example(context, name, expected_status)
 
 @given('"{name}" is in context "{context_id}"')
 def set_context_id_for(context, name, context_id):
@@ -95,7 +114,7 @@ def simple_post_of_named(context, name, url):
   assert response.status_code == 200, \
       'Expected status code {0}, received {1}'.format(
           200, response.status_code)
-  context.response = response
+  context._response = response
 
 @given('wait')
 @then('wait')
@@ -108,14 +127,15 @@ def do_wait(context):
 @given('HTTP POST to endpoint "{endpoint}"')
 def post_to_named_endpoint(context, endpoint):
   text = handle_template_text(context, context.text)
-  context.response = post_to_endpoint(context, endpoint, text)
+  endpoint_url = get_service_endpoint_url(context, endpoint)
+  context._response = post_to_endpoint(context, endpoint_url, text)
 
 @when('the example "{resource_type}" is POSTed to its collection')
 def post_example_resource_to_its_collection(context, resource_type):
   post_example_resource(context, resource_type)
 
 def post_example_resource(context, resource_type, url=None):
-  context.response = post_example(
+  context._response = post_example(
       context, resource_type, context.example_resource, url)
 
 @when('GET of "{url}" as "{name}"')
@@ -128,24 +148,33 @@ def get_example_resource(context, name, expected_status=200):
 
 @then('a "{status_code}" status code is received')
 def validate_status_code(context, status_code):
-  assert context.response.status_code == int(status_code), \
+  assert context._response.status_code == int(status_code), \
       'Expected status code {0}, received {1}'.format(
-          status_code, context.response.status_code)
+          status_code, context._response.status_code)
 
 @then('a 201 status code is received')
 def validate_status_201(context):
-  assert context.response.status_code == 201, \
+  assert context._response.status_code == 201, \
       'Expected status code 201, received {0}'.format(
-          context.response.status_code)
+          context._response.status_code)
+
+@then('the response has a header "{header}"')
+def validate_header_presence(context, header):
+  assert header in context._response.headers
+
+@then('the response header "{header}" is "{value}"')
+def validate_header_value(context, header, value):
+  assert header in context._response.headers
+  assert context._response.headers[header] == value
 
 @then('the response has a Location header')
 def validate_location_header(context):
-  assert 'Location' in context.response.headers
+  assert 'Location' in context._response.headers
 
 @then('we receive a valid "{resource_type}" in the entity body')
 def validate_resource_in_response(context, resource_type):
-  assert 'application/json' == context.response.headers['Content-Type']
-  assert get_resource_table_singular(resource_type) in get_json_response(context)
+  assert 'application/json' == context._response.headers['Content-Type']
+  assert get_inflection(resource_type, 'table_singular') in get_json_response(context)
   #FIXME more more more
 
 def dates_within_tolerance(original, response):
@@ -157,12 +186,16 @@ def dates_within_tolerance(original, response):
 
 @then('the received "{resource_type}" matches the one we posted')
 def check_resource_equality_for_response(context, resource_type):
-  root = unicode(get_resource_table_singular(resource_type))
+  root = get_inflection(resource_type, 'table_singular')
   resp_json = get_json_response(context)[root]
   orig_json = context.example_resource
   for k in orig_json:
     original = context.example_resource[k]
     response = resp_json[unicode(k)]
+    # Remove `context_id` from comparison, since it isn't posted
+    if isinstance(response, dict) and 'context_id' in response:
+      response = dict(response)
+      del response['context_id']
     if isinstance(original, datetime.datetime):
       response = parse_date(response)
       assert dates_within_tolerance(original, response), \
@@ -199,11 +232,11 @@ def define_current_user(context, user_json):
   context.current_user_json = json.dumps(context.current_user_data)
 
 def get_related_resource_types(resource_type, resource_types):
-  model = getattr(ggrc.models, resource_type)
+  model = ggrc.models.get_model(resource_type)
   for attr in ggrc.db.inspect(model).attrs:
     if isinstance(attr, RelationshipProperty):
       columns = tuple(attr.local_columns)[0]
-      if not (attr.uselist or columns.primary_key or columns.nullable):
+      if not (attr.uselist or columns.primary_key):# or columns.nullable):
         # If the resource has subclasses, then it is abstract, so use one of
         #   its subclasses
         related_resource_types = [

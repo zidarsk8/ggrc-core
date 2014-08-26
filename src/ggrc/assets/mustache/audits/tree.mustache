@@ -13,7 +13,7 @@
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
         <div class="span12">
-          
+
           <ul class="tree-action-list">
             {{#infer_roles instance}}
               <li>
@@ -28,7 +28,7 @@
             {{/infer_roles}}
             {{#with_page_object_as 'page_object'}}
               {{#if_instance_of page_object 'Person'}}
-              
+
                 {{^instance.contact}}
                   <li>
                     <div class="counter">
@@ -36,7 +36,7 @@
                     </div>
                   </li>
                 {{/instance.contact}}
-                
+
                 {{#mapping_count instance 'related_owned_objects'}}
                   <li>
                     <div class="counter">
@@ -63,7 +63,7 @@
               {{/if_instance_of}}
             {{/with_page_object_as}}
           </ul>
-          
+
           <div class="item-data">
             <div class="tree-title-area">
               <i class="grcicon-{{instance.class.table_singular}}-color"></i>
@@ -71,16 +71,16 @@
               <span class="small gray">{{instance.status}}</span>
             </div>
           </div>
-          
+
         </div>
       </div>
     </div>
   </div>
-  
+
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-    
+
       <!--
       <div class="row-fluid">
 
@@ -109,20 +109,20 @@
 
       </div>
       -->
-      
+
       {{#instance.description}}
         <div class="show-description">
           <div class="row-fluid">
             <div class="span12">
-              <div class="tree-description short">
+              <div class="tree-description">
                 {{{instance.description}}}
               </div>
-              {{{show_long}}}
+
             </div>
           </div>
         </div>
       {{/instance.description}}
-      
+
       <div class="row-fluid">
         <div class="span5">
           <div class="tree-info">
@@ -227,12 +227,12 @@
               {{/iterate}}
             </select>
           {{/if_helpers}}
-          
+
         </div>
       </div>
-      
+
       {{{render_hooks 'Audit.tree_view_info'}}}
-      
+
       <ul class="info-audit">
         {{#using program=instance.program}}
         {{#with_mapping 'authorizations' instance}}
@@ -250,11 +250,8 @@
         {{/if_helpers}}
         {{/with_mapping}}
         {{/using}}
-        
-        {{#if_helpers '\
-          #if' allow_mapping_or_creating '\
-          and #is_allowed' 'update' instance '\
-        ' _1_context=instance.context.id}}
+
+        {{#is_allowed 'update' instance context='for'}}
           <li>
           <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
               <i class="grcicon-edit"></i>
@@ -263,26 +260,26 @@
           </li>
           <!--
           <li>
-            <a href="#"><i class="grcicon-edit"></i> {{model.title_singular}} Log</a>
+            <a href="javascript://"><i class="grcicon-edit"></i> {{model.title_singular}} Log</a>
           </li>
           -->
-        {{/if_helpers}}
+        {{/is_allowed}}
         {{#if_helpers '\
           #is_page_instance' instance.program '\
           or #is_profile'}}
 	        {{#is_allowed 'read' 'Request' context=instance.context.id}}
-	          
+
 	          <li>
 	          <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}"><i class="grcicon-export"></i> Export PBC List</a>
 	          </li>
 	        {{/is_allowed}}
-	
+
 	        {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
 	          <li>
 	          {{! FIXME: Better way to get the Audit link }}
 	          <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}"><i class="grcicon-imp-exp"></i> Import PBC List</a>
 	          </li>
-	          
+
 	          <!--
 	          <li>
 	          <a href="/audits/{{instance.id}}/import_pbc_template"><i class="grcicon-export"></i> Download PBC Import Template</a>
@@ -296,6 +293,22 @@
     {{#if draw_children}}
       {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
         {{#is_profile}}
+          {{#with_mapping 'authorizations' instance}}
+          {{#if_auditor instance}}
+            <div class="inner-tree">
+              <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{#if_null child_options.0.original_list}}...{{else}}{{child_options.0.original_list.length}}{{/if_null}})</h6>
+              {{#child_options.0}}
+                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
+              {{/child_options.0}}
+            </div>
+
+            <div class="inner-tree">
+              <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
+              {{#child_options.2}}
+                <ul class="tree-structure new-tree responses-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
+              {{/child_options.2}}
+            </div>
+          {{else}}
           <div class="inner-tree">
             <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{#if_null child_options.1.original_list}}...{{else}}{{child_options.1.original_list.length}}{{/if_null}})</h6>
             {{#child_options.1}}
@@ -306,9 +319,11 @@
           <div class="inner-tree">
             <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
             {{#child_options.2}}
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
+              <ul class="tree-structure new-tree responses-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.2}}
           </div>
+          {{/if_auditor}}
+          {{/with_mapping}}
         {{else}}
           {{#with_page_object_as 'page_object'}}
           {{#if_instance_of page_object 'Audit|Program|Person'}}
@@ -316,7 +331,7 @@
               <h6>
                 PBC Requests ({{#if_null child_options.0.original_list}}...{{else}}{{child_options.0.original_list.length}}{{/if_null}})
                 {{#child_options.0.header_view}}
-                <a href="#" class="advanced-filter-trigger"><i class="grcicon-search"></i> Show Filters</a>
+                <a href="javascript://" class="advanced-filter-trigger"><i class="grcicon-search"></i> Show Filters</a>
                 {{/child_options.0.header_view}}
               </h6>
               {{#child_options.0}}
@@ -345,5 +360,5 @@
 
   </div>
   {{/if}}
-  
+
 </li>

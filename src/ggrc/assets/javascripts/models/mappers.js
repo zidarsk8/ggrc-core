@@ -38,7 +38,7 @@
    *    `binding.instance`, then, is the instance on which the original,
    *    unfiltered list is specified.
    *  For CrossListLoader, the mappings are (`result`, `binding`), where
-   *    `binding` is the "remote binding" which 
+   *    `binding` is the "remote binding" which
    */
   can.Construct("GGRC.ListLoaders.MappingResult", {
   }, {
@@ -250,10 +250,15 @@
     , refresh_list: function() {
         var loader = new GGRC.ListLoaders.ReifyingListLoader(this)
           , binding = loader.attach(this.instance)
+          , self = this
           ;
 
         binding.name = this.name + "_instances";
-        return binding.refresh_instances(this);
+        //  FIXME: `refresh_instances` should not need to be called twice, but
+        //  it fixes pre-mature resolution of mapping deferreds in some cases
+        return binding.refresh_instances(this).then(function(){
+          return self.refresh_instances();
+        });
       }
 
     , refresh_instance: function() {
@@ -487,14 +492,20 @@
     , init_listeners: function(binding) {
         var self = this;
 
-        binding.source_binding = binding.instance.get_binding(this.source);
+        if (typeof this.source === "string") {
+          binding.source_binding = binding.instance.get_binding(this.source);
+        } else {
+          binding.source_binding = this.source;
+        }
 
         binding.source_binding.list.bind("add", function(ev, results) {
-          var matching_results = can.map(can.makeArray(results), function(result) {
-            if (self.filter_fn(result))
-              return self.make_result(result.instance, [result], binding);
-          });
-          self.insert_results(binding, matching_results);
+          if (binding._refresh_stubs_deferred) {
+            var matching_results = can.map(can.makeArray(results), function(result) {
+              if (self.filter_fn(result))
+                return self.make_result(result.instance, [result], binding);
+            });
+            self.insert_results(binding, matching_results);
+          }
         });
 
         binding.source_binding.list.bind("remove", function(ev, results) {
@@ -811,6 +822,94 @@
   });
 
 
+  GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.IntersectingListLoader", {
+  }, {
+      init: function(sources) {
+        this._super();
+
+        this.sources = sources || [];
+      }
+
+    , init_listeners: function(binding) {
+        var self = this;
+
+        if (!binding.source_bindings)
+          binding.source_bindings = [];
+
+        can.each(this.sources, function(source) {
+          var source_binding = null;
+          /// Here is a deviation from the norm, since we want to
+          ///  allow source bindings from possibly several disparate
+          ///  instances.  Pass them in as already created objects
+          ///  and we won't try to find them on the binding instance.
+          if(typeof source === "string") {
+            source_binding = binding.instance.get_binding(source);
+          } else {
+            source_binding = source;
+          }
+          if (source) {
+            binding.source_bindings.push(source_binding);
+          }
+        });
+        self.init_source_listeners(binding, binding.source_bindings);
+      }
+
+    , insert_from_source_binding: function(binding, results, index) {
+        var self = this
+          , new_results
+          , lists = can.map(
+            binding.source_bindings,
+            function(source) {
+              return [can.map(
+                source.list,
+                function(result) {
+                  return result.instance;
+                })];
+              })
+          ;
+
+        new_results = can.map(results, function(result) {
+          // only the results that have membership in all lists will be added.
+          if (can.reduce(lists, function(found, list) {
+            return found && !!~can.inArray(result.instance, list);
+          }, true)) {
+            return self.make_result(result.instance, [result], binding);
+          }
+        });
+        self.insert_results(binding, new_results);
+      }
+
+    , init_source_listeners: function(binding, source_bindings) {
+        var self = this;
+
+        can.each(source_bindings, function(source_binding) {
+
+          self.insert_from_source_binding(binding, source_binding.list);
+
+          source_binding.list.bind("add", function(ev, results) {
+            self.insert_from_source_binding(binding, results);
+          });
+
+          source_binding.list.bind("remove", function(ev, results) {
+            can.each(results, function(result) {
+              self.remove_instance(binding, result.instance, result);
+            });
+          });
+        });
+      }
+
+    , _refresh_stubs: function(binding) {
+        var deferreds = [];
+
+        can.each(binding.source_bindings, function(source_binding) {
+          deferreds.push(source_binding.refresh_stubs());
+        });
+
+        return $.when.apply($, deferreds);
+      }
+  });
+
+
   /*  ProxyListLoader
    *  - handles relationships across join tables
    *
@@ -841,7 +940,8 @@
           ;
 
         binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
-          self._refresh_stubs(binding);
+          if (binding._refresh_stubs_deferred)
+            self._refresh_stubs(binding);
         });
 
         if (object_join_value) {
@@ -879,7 +979,8 @@
                     || (mapping[this.object_attr].reify().constructor == object_model &&
                         mapping[this.object_attr].id == binding.instance.id))
                 && (!option_model
-                    || mapping[this.option_attr].reify() instanceof option_model));
+                    || (mapping[this.option_attr]
+                        && mapping[this.option_attr].reify() instanceof option_model)));
       }
 
     , filter_and_insert_instances_from_mappings: function(binding, mappings) {
@@ -990,17 +1091,25 @@
    */
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.DirectListLoader", {
   }, {
-      init: function(model_name, object_attr) {
+      init: function(model_name, object_attr, object_join_attr) {
         this._super();
 
         this.model_name = model_name;
         this.object_attr = object_attr;
+        this.object_join_attr = object_join_attr;
       }
 
     , init_listeners: function(binding) {
         var self = this
           , model = CMS.Models[this.model_name]
           ;
+
+        binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
+          if (binding._refresh_stubs_deferred) {
+            binding.list.splice(0, binding.list.length);
+            self._refresh_stubs(binding);
+          }
+        });
 
         model.bind("created", function(ev, mapping) {
           if (mapping instanceof model)
@@ -1090,17 +1199,25 @@
       }
 
     , _refresh_stubs: function(binding) {
-        var model = CMS.Models[this.model_name]
-          , object_join_attr = this.object_join_attr || model.table_plural
-          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify();
+        var that = this
+          , refresh_queue = new RefreshQueue()
           ;
 
-        this.insert_instances_from_mappings(binding, mappings);
+        refresh_queue.enqueue(binding.instance);
+
+        return refresh_queue.trigger().then(function() {
+          var model = CMS.Models[that.model_name]
+            , object_join_attr = that.object_join_attr
+            , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
+            ;
+
+          that.insert_instances_from_mappings(binding, mappings);
+        });
       }
   });
 
   /*  IndirectListLoader
-   *  - handles indirect relationships 
+   *  - handles indirect relationships
    *  (zero-to-many, no local join but has a direct mapping in another object)
    *
    *  - listens to:
@@ -1220,7 +1337,7 @@
           , object_attr = this.object_attr + (this.object_attr !== 'context' && model.attributes[this.object_attr].indexOf('stubs') > -1 ?  '.id' : '_id')
           , self = this
           ;
-        params[object_attr] = this.object_attr === 'context' ? binding.instance.context && binding.instance.context.id : binding.instance.id; 
+        params[object_attr] = this.object_attr === 'context' ? binding.instance.context && binding.instance.context.id : binding.instance.id;
         if (mappings || !params[object_attr]) {
           this.insert_instances_from_mappings(binding, mappings);
           return new $.Deferred().resolve(mappings);
@@ -1239,7 +1356,7 @@
   });
 
   /*  SearchListLoader
-   *  - handles search relationships 
+   *  - handles search relationships
    *
    *  - listens to:
    *      - model.created
@@ -1250,12 +1367,10 @@
 
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.SearchListLoader", {
   }, {
-      init: function(term, types, params) {
+      init: function(query_function) {
         this._super();
 
-        this.term = term || '';
-        this.types = types;
-        this.params = params || {};
+        this.query_function = query_function;
       }
 
     , init_listeners: function(binding) {
@@ -1265,30 +1380,7 @@
 
         model.bind("created", function(ev, mapping) {
           if (mapping instanceof model) {
-            var model_type = mapping.constructor.model_singular || mapping.constructor.shortName
-              , types = $.grep(that.types, function(type) { return type === model_type; })
-              ;
-
-            // Ensure that this model exists in the list of types
-            if (types.length) {
-              GGRC.Models.Search.search_for_types(
-                  that.term
-                , types
-                , that.get_params(binding)
-              ).pipe(function(mappings) {
-                // Check for the new mapping existing in the search
-                var entries = $.map(mappings.entries, function(entry) {
-                  if (entry.type === model_type && entry.id === mapping.id) {
-                    return entry;
-                  }
-                });
-
-                // If we found one, insert the mapping
-                entries.length && that.filter_and_insert_instances_from_mappings(binding, [mapping]);
-                
-                return mappings.entries;
-              });
-            }
+            that._refresh_stubs(binding);
           }
         });
 
@@ -1302,16 +1394,6 @@
           if (mapping instanceof model)
             that.remove_instance_from_mapping(binding, mapping);
         });
-      }
-
-    , get_params: function(binding) {
-        var params = can.extend({}, this.params);
-        for (var prop in params) {
-          if (params[prop] && binding.instance[params[prop]]) {
-            params[prop] = binding.instance[params[prop]];
-          }
-        }
-        return params;
       }
 
     , is_valid_mapping: function(binding, mapping) {
@@ -1378,30 +1460,31 @@
       }
 
     , _refresh_stubs: function(binding) {
-        var object_join_attr = ('search_' + (this.object_join_attr || binding.instance.constructor.table_plural))
-          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
-          , self = this
-          ;
+        var object_join_attr = ('search_' + (this.object_join_attr || binding.instance.constructor.table_plural)),
+            mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify(),
+            self = this,
+            result;
 
         if (mappings) {
           this.insert_instances_from_mappings(binding, mappings);
           return new $.Deferred().resolve(mappings);
         }
         else {
-          return GGRC.Models.Search.search_for_types(this.term, this.types, this.get_params(binding)).pipe(function(mappings) {
-            can.each(mappings.entries, function(entry, i) {
+          result = this.query_function(binding);
+          return result.pipe(function(mappings) {
+            can.each(mappings, function(entry, i) {
               var _class = (can.getObject("CMS.Models." + entry.type) || can.getObject("GGRC.Models." + entry.type));
-              mappings.entries[i] = new _class({ id: entry.id });
+              mappings[i] = new _class({ id: entry.id });
             });
 
-            //binding.instance.attr(object_join_attr, mappings.entries);
-            self.insert_instances_from_mappings(binding, mappings.entries.reify());
-            return mappings.entries;
+            //binding.instance.attr(object_join_attr, mappings);
+            self.insert_instances_from_mappings(binding, mappings.reify());
+            return mappings;
           });
         }
       }
 
-    , refresh_list: function() {
+    , refresh_list: function(binding) {
         return this._refresh_stubs(binding);
       }
   });
@@ -1411,12 +1494,10 @@
       init: function(source) {
         this._super();
 
-        if (source instanceof GGRC.ListLoaders.BaseListLoader)
-          this.source = source;
-        else if (source instanceof GGRC.ListLoaders.ListBinding)
+        if (source instanceof GGRC.ListLoaders.ListBinding)
           this.source_binding = source;
         else
-          throw new Error("Invalid source:", source);
+          this.source = source;
       }
 
     , insert_from_source_binding: function(binding, results, index) {
@@ -1460,6 +1541,54 @@
       }
   });
 
+
+  GGRC.MapperHelpers = {};
+
+  GGRC.MapperHelpers.Proxy = function Proxy(
+      option_model_name, join_option_attr, join_model_name, join_object_attr,
+      instance_join_attr) {
+    return new GGRC.ListLoaders.ProxyListLoader(
+        join_model_name, join_object_attr, join_option_attr,
+        instance_join_attr, option_model_name);
+  }
+
+  GGRC.MapperHelpers.Direct = function Direct(
+      option_model_name, instance_join_attr, remote_join_attr) {
+    return new GGRC.ListLoaders.DirectListLoader(
+      option_model_name, instance_join_attr, remote_join_attr);
+  }
+
+  GGRC.MapperHelpers.Indirect = function Indirect(
+      instance_model_name, option_join_attr) {
+    return new GGRC.ListLoaders.IndirectListLoader(
+      instance_model_name, option_join_attr);
+  }
+
+  GGRC.MapperHelpers.Search = function Search(query_function) {
+    return new GGRC.ListLoaders.SearchListLoader(query_function);
+  }
+
+  GGRC.MapperHelpers.Multi = function Multi(sources) {
+    return new GGRC.ListLoaders.MultiListLoader(sources);
+  }
+
+  GGRC.MapperHelpers.TypeFilter = function TypeFilter(source, model_name) {
+    return new GGRC.ListLoaders.TypeFilteredListLoader(source, [model_name]);
+  }
+
+  GGRC.MapperHelpers.CustomFilter = function CustomFilter(source, filter_fn) {
+    return new GGRC.ListLoaders.CustomFilteredListLoader(source, filter_fn);
+  }
+
+  GGRC.MapperHelpers.Reify = function Reify(source) {
+    return new GGRC.ListLoaders.ReifyingListLoader(source);
+  }
+
+  GGRC.MapperHelpers.Cross = function Cross(local_mapping, remote_mapping) {
+    return new GGRC.ListLoaders.CrossListLoader(local_mapping, remote_mapping);
+  }
+
+
   GGRC.all_local_results = function(instance) {
     // Returns directly-linked objects
     var loaders
@@ -1471,7 +1600,7 @@
     if (instance._all_local_results_binding)
       return instance._all_local_results_binding.refresh_stubs();
 
-    loaders = GGRC.Mappings[instance.constructor.shortName];
+    loaders = GGRC.Mappings.get_mappings_for(instance.constructor.shortName);
     can.each(loaders, function(loader, name) {
       if (loader instanceof GGRC.ListLoaders.DirectListLoader
           || loader instanceof GGRC.ListLoaders.ProxyListLoader) {

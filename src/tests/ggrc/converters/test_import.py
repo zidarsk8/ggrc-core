@@ -219,53 +219,7 @@ class TestImport(TestCase):
         'parent_id': pol1.id,
         'dry_run': False,
     }
-    handle_csv_import(
-        ControlsConverter,
-        csv_filename,
-        **options
-    )
-    actual_titles = set()
-    actual_slugs = set()
-    actual_start_dates = set()
-    actual_end_dates = set()
-    controls = [x.control for x in pol1.directive_controls]
-    for control in controls:
-      actual_titles.add(control.title)
-      actual_slugs.add(control.slug)
-      actual_start_dates.add(control.start_date)
-      actual_end_dates.add(control.end_date)
-    self.assertEqual(
-        expected_titles,
-        actual_titles,
-        "Control titles not imported correctly"
-    )
-    self.assertEqual(
-        expected_slugs,
-        actual_slugs,
-        "Control slugs not imported correctly"
-    )
-    systems = System.query.all()
-    for system in systems:
-      self.assertEqual(
-          system.controls,
-          pol1.controls,
-          "System {0} not connected to controls on import".format(
-              system.slug
-          ),
-      )
-    self.mock_log.assert_called_once_with(db.session)
-    # check that imported items appear in index
-    results = MysqlRecordProperty.query.filter(
-        MysqlRecordProperty.type == 'Control',
-        MysqlRecordProperty.content.match('Minimal Control')
-    ).all()
-    index_results = set([x.content for x in results])
-    for title in expected_titles:
-      self.assertIn(
-          title,
-          index_results,
-          "{0} not indexed".format(title)
-      )
+    self.assertRaises(ImportException, handle_csv_import, ControlsConverter, csv_filename, **options)
 
   def test_dates_with_dashes(self):
     csv_filename = join(CSV_DIR, "minimal_import_dates_dashes.csv")

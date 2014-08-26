@@ -33,9 +33,12 @@ class ObjectPerson(Timeboxed, Mapping, db.Model):
         else None
     return setattr(self, self.personable_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('person_id', 'personable_id', 'personable_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('person_id', 'personable_id', 'personable_type'),
+        db.Index('ix_person_id', 'person_id'),
+        )
 
   _publish_attrs = [
       'role',
@@ -53,7 +56,7 @@ class ObjectPerson(Timeboxed, Mapping, db.Model):
 
     query = super(ObjectPerson, cls).eager_query()
     return query.options(
-        orm.subqueryload_all('person'))
+        orm.subqueryload('person'))
 
   def _display_name(self):
     return self.personable.display_name + '<->' + self.person.display_name
@@ -84,7 +87,7 @@ class Personable(object):
       ]
 
   _include_links = [
-      'object_people',
+      #'object_people',
       ]
 
   @classmethod

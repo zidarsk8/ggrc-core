@@ -6,13 +6,13 @@
 }}
 
 
-  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span12">
-            
+
             <ul class="tree-action-list">
               {{#infer_roles instance}}
                 <li>
@@ -26,61 +26,62 @@
                 </li>
               {{/infer_roles}}
               <li>
+                {{#with_page_object_as 'page_instance'}}
+                {{#if_helpers '\
+                  ^if_instance_of' page_instance 'Directive' '\
+                  or ^if_instance_of' instance 'Section'}}
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+                {{/if_helpers}}
+                {{/with_page_object_as}}
               </li>
+              <li>
               {{#with_mapping_count instance 'related_objects'}}
                 {{#prune_context}}
-                  <li>
-                    <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
                       <i class="grcicon-object-black"></i>
                         {{#if count}}
                           <span>{{count}}</span>
                         {{else}}
                           <strong class="error">0</strong>
                         {{/if}}
-                    </div>
-                  </li>
+                    </span>
                 {{/prune_context}}
               {{/with_mapping_count}}
-              
-              {{#pack list=instance.objectives}}
-                {{#prune_context}}
-                  <li>
-                    <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
+
+              {{#with_mapping_count instance 'objectives'}}
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
                       <i class="grcicon-objective-black"></i>
-                        {{#if list.length}} 
-                          <span>{{list.length}}</span>
+                        {{#if count}}
+                          <span>{{count}}</span>
                         {{else}}
                           <strong class="error">0</strong>
                         {{/if}}
-                    </div>
-                  </li>
-                {{/prune_context}}
-              {{/pack}}
-              
-              {{#pack list=instance.controls}}
-                {{#prune_context}}
-                  <li>
-                    <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
+                    </span>
+              {{/with_mapping_count}}
+
+              {{#with_mapping_count instance 'controls'}}
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
                       <i class="grcicon-control-black"></i>
-                      {{#if list.length}} 
-                        <span>{{list.length}}</span>
+                      {{#if count}}
+                        <span>{{count}}</span>
                       {{else}}
                         <strong class="error">0</strong>
                       {{/if}}
-                    </div>
-                  </li>
-                {{/prune_context}}
-              {{/pack}}
+                    </span>
+              {{/with_mapping_count}}
+              </li>
+              <li>
+                {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
+              </li>
             </ul>
-            
+
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
                 {{instance.title}}
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -89,110 +90,18 @@
     {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
-
-        <div class="row-fluid">
-
-          <div class="span12">
-            {{#if_helpers '\
-              if_instance_of' instance "Section" '\
-              and if_instance_of' parent_instance "Directive"}}
-            {{#is_allowed 'update' instance}}
-              <a href="javascript://" class="info-action pull-right" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-object-singular-override="{{#if_equals instance.directive.type 'Contract'}}Clause{{/if_equals}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{instance.class.model_singular}}" data-object-id="{{instance.id}}">
-                <i class="grcicon-edit"></i>
-                Edit {{instance.class.model_singular}}
-              </a>
-            {{/is_allowed}}
-            {{else}}
-            {{#if allow_mapping}}
-            {{#if mappings}}
-            {{#is_allowed_all 'delete' mappings}}
-            {{^is_dashboard}}
-              <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
-                {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-                <i class="grcicon-remove"></i>
-                Unmap
-              </a>
-            {{/is_dashboard}}
-            {{/is_allowed_all}}
-            {{/if}}
-            {{/if}}
-            {{/if_helpers}}
-          </div>
-
-        </div>
-
-        {{#instance.description}}
-          <div class="show-description">
-            <div class="row-fluid">
-              <div class="span12">
-                <div class="tree-description short">
-                  {{{instance.description}}}
-                </div>
-                {{{show_long}}}
-              </div>
-            </div>
-          </div>
-        {{/instance.description}}
-
-        {{#if_instance_of parent_instance "Section"}}
-        {{#using directive=instance.directive}}
-          <div class="row-fluid">
-            <div class="span12">
-              Part of
-              <a href="{{directive.viewLink}}">
-                <i class="grcicon-{{directive.class.table_singular}}-color"></i>
-                {{directive.title}}
-              </a>
-            </div>
-          </div>
-        {{/using}}
-        {{/if_instance_of}}
-
-        {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
-
-        {{{renderLive '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-        {{#instance.url}}
-        <div class="row-fluid">
-          <div class="span6">
-            <div class="tree-info">
-              <strong>URL:</strong>
-              <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-content="{{renderLive '/static/mustache/pbc/iframe_tooltip.mustache' url=instance.url}}" href="{{schemed_url instance.url}}" target="_blank">
-                {{instance.url}}
-              </a>
-            </div>
-          </div>
-        </div>
-        {{/instance.url}}
-        <div class="row-fluid">
-          <div class="span6">&nbsp;</div>
-          <div class="span6">
-            <strong>Reference URL</strong>
-            <div class="oneline">
-              {{#if instance.reference_url}}
-              <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" href="{{schemed_url instance.reference_url}}" target="_blank">
-                {{instance.reference_url}}
-                {{{scriptwrap "render" '/static/mustache/pbc/iframe_tooltip.mustache' attr_class="popover-data-content" url=reference_url}}}
-              </a>
-              {{/if}}
-            </div>
-          </div>
-        </div>
-
-        <span class="tier-2-code">
-          Code: {{instance.slug}}
-        </span>
-
-        {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
-
+        {{> /static/mustache/sections/tier2_content.mustache}}
       </div>
 
 
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
-            <h6>Objectives, Controls, and Business Objects ({{child_count}})<!-- {{^children_drawn}}<span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; left: 15px; top: -4px' }}> - Loading... </span>{{/children_drawn}}--></h6>
             {{#child_options}}
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <h6>Objectives, Controls, and Business Objects ({{child_count}})
+                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
+              </h6>
+              <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}
           </div>
         {{/prune_context}}
@@ -201,4 +110,3 @@
     </div>
     {{/if}}
   </li>
-

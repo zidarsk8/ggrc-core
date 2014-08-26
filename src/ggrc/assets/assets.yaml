@@ -4,27 +4,27 @@
 # Maintained By: dan@reciprocitylabs.com
 
 dashboard-js-files:
+  - tracker.js
   - jquery.js
   - rails.js
   - jquery-ui.js
   - jquery.ba-throttle-debounce.js
-  - sha1.js
-  - bootstrap-transition.js
   - bootstrap-alert.js
-  - bootstrap-button.js
-  - bootstrap-carousel.js
   - bootstrap-collapse.js
   - bootstrap-dropdown.js
   - bootstrap-modal.js
   - bootstrap-tab.js
   - bootstrap-tooltip.js
   - bootstrap-popover.js
-  - bootstrap-typeahead.js
   - bootstrap/sticky-popover.js
   - bootstrap/modal-form.js
-  - can.jquery-all.js
+  - can.jquery.js
+  - can.construct.super.js
+  - can.map.validations.js
+  - can.control.plugin.js
+  - can.construct.proxy.js
+  - can.map.attributes.js
   - bootstrap/modal-ajax.js
-  - bootstrap/affix.js
   - wysihtml5_parser_rules/advanced.js
   - wysihtml5-0.4.0pre.js
   - bootstrap-wysihtml5-0.0.2.js
@@ -33,10 +33,7 @@ dashboard-js-files:
   - permission.js
   - application.js
   - jquerypp.custom.js
-  - related_selector.js
-  - single_selector.js
   - spin.min.js
-  - tmpl.js
   - client_record_replay.js
   - mustache_helper.js
   - sticky_header.js
@@ -46,67 +43,61 @@ dashboard-js-files:
   - models/cacheable.js
   - models/local_storage.js
   - models/display_prefs.js
-  - pbc/document.js
-  - pbc/person.js
+  - models/local_list_cache.js
+  - models/document.js
+  - models/person.js
   - models/simple_models.js
+  - models/business_object_models.js
+  - models/directive_models.js
   - models/recently_viewed_object.js
   - models/search.js
-  - controllers/add_widgets.js
+  - models/audit_models.js
+  - models/notification_config.js
   - controllers/filterable_controller.js
   - controllers/dashboard_widgets_controller.js
   - controllers/info_widget_controller.js
-  - controllers/list_view_controller.js
   - controllers/modals_controller.js
   - controllers/delete_modal_controller.js
   - controllers/help_controller.js
   - controllers/quick_search_controller.js
   - controllers/recently_viewed_controller.js
-  - controllers/resize_widgets_controller.js
   - controllers/sortable_widgets_controller.js
   - controllers/tree_view_controller.js
+  - controllers/list_view_controller.js
   - controllers/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
-  - controls/control.js
-  - controls/controls_controller.js
+  - controllers/mapping_count_controller.js
+  - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
-  - apps/controls.js
-  - sections/section.js
-  - pbc/system.js
+  - models/section.js
+  - models/system.js
   - models/join_models.js
   - controllers/modal_selector_controller.js
-  - directives/routes_controller.js
-  - mapping/mapping_controller.js
-  - sections/sections_controller.js
-  - apps/mapping.js
-  - pbc/meeting.js
-  - pbc/response.js
-  - pbc/responses_controller.js
-  - pbc/modals_controller.js
+  - controllers/advanced_search_controller.js
   - pbc/workflow_controller.js
-  - apps/pbc.js
-  - products/routes_controller.js
-  - apps/products.js
-  - controls/category.js
+  - models/category.js
+  - models/refresh_queue.js
   - apps/quick_search.js
-  - apps/systems.js
-  - apps/programs.js
   - apps/business_objects.js
   - apps/dashboard.js
-  - sections/notes_controller.js
   - roles/roles_modal_controller.js
   - dashboard.js
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   #- d3.v2.js
-  - related_graph.js
+  #- related_graph.js
 
 dashboard-js-template-files:
   - add_widget_menu.mustache
+  - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
   - base_objects/confirm_unmap.mustache
   - base_objects/contacts.mustache
+  - base_objects/general_info.mustache
   - base_objects/extended_info.mustache
+  - base_objects/urls.mustache
+  - base_objects/notes.mustache
   - base_objects/info.mustache
   - base_objects/map_related_modal_content.mustache
   - base_objects/mappings_detail.mustache
@@ -116,6 +107,7 @@ dashboard-js-template-files:
   - base_objects/search_result.mustache
   - base_objects/tree.mustache
   - base_objects/tree_footer_no_access.mustache
+  - base_objects/states.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
@@ -138,6 +130,7 @@ dashboard-js-template-files:
   - dashboard/object_list.mustache
   - dashboard/object_widget.mustache
   - dashboard/recently_viewed_list.mustache
+  - dashboard/mapping_count.mustache
   - directives/autocomplete_result.mustache
   - directives/tree.mustache
   - events/object_list.mustache
@@ -159,6 +152,7 @@ dashboard-js-template-files:
   - objectives/modal_content.mustache
   - objectives/tree.mustache
   - org_groups/modal_content.mustache
+  - pbc/iframe_tooltip.mustache
   - people/active_column.mustache
   - people/filters.mustache
   - people/info.mustache
@@ -185,8 +179,6 @@ dashboard-js-template-files:
   - programs/tree.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
-  - risks/modal_content.mustache
-  - risky_attributes/modal_content.mustache
   - roles/modal_content.mustache
   - roles/object_list.mustache
   - sections/info.mustache
@@ -210,7 +202,6 @@ dashboard-js-template-files:
   - controls/tree_footer.mustache
   - directives/tree_footer.mustache
   - objectives/tree_footer.mustache
-  - risks/tree_footer.mustache
   - sections/tree_footer.mustache
   - people/tree_footer.mustache
   - documents/tree_footer.mustache
@@ -234,7 +225,21 @@ dashboard-js-template-files:
   - documents/autocomplete_result.mustache
   - documents/pbc_tree.mustache
   - requests/filters.mustache
+  - requests/amend_modal_content.mustache
   - org_groups/autocomplete_result.mustache
+  - base_objects/edit_object_link.mustache
+  - base_objects/tier2_content.mustache
+  - controls/tier2_content.mustache
+  - directives/tier2_content.mustache
+  - documents/tier2_content.mustache
+  - objectives/tier2_content.mustache
+  - people/tier2_content.mustache
+  - programs/tier2_content.mustache
+  - sections/tier2_content.mustache
+  - search/advanced_search_base_modal.mustache
+  - search/advanced_search_option_column.mustache
+  - search/advanced_search_option_items.mustache
+  - search/advanced_search_people_items.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`
@@ -243,7 +248,6 @@ dashboard-css-files:
   - jquery-ui.css
 
 dashboard-js-spec-files:
-  - controllers/resize_widgets_spec.js
   - models/local_storage_spec.js
   - models/recently_viewed_object_spec.js
   - models/display_prefs_spec.js

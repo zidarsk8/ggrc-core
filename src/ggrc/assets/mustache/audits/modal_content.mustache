@@ -1,6 +1,7 @@
 {{!div class="modal-body"}}
 {{#instance}}
 <form action="javascript://">
+  {{#if new_object_form}}
   {{#if object_params.program}}
     <div class="row-fluid hidden">
       <div class="span6">
@@ -30,14 +31,27 @@
       </div>
     </div>
   {{/if}}
-  
+  {{else}}
+    <div class="row-fluid hidden">
+      <div class="span6">
+        <div class="spacing-bottom">
+          <label>
+            Program
+          </label>
+          <select class="input-block-level" name="program.id">
+            <option value="{{program.id}}">{{program.title}}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  {{/if}}
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
       <label>
         Title
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
-      </label> 
+      </label>
       {{#if new_object_form}}
         {{#using program_reified=instance.program}}
         <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{default_audit_title title program_reified}}" tabindex="2">
@@ -45,6 +59,7 @@
       {{else}}
         <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" tabindex="2">
       {{/if}}
+      {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
     </div>
     <div class="span3">
       <label>
@@ -74,7 +89,7 @@
     <div class="span12">
       <label class="spacing">
         <input type="checkbox" name="auto_generate" value="checked" tabindex="4">
-        Auto-Generate PBC List based on Objectives <span class="small"><a href="#">({{#using program=instance.program}}{{#with_mapping 'objectives' program}}{{objectives.length}}{{/with_mapping}}{{/using}} Objectives Found)</a></span>
+        Auto-Generate PBC List based on Objectives <span class="small"><a href="javascript://">({{#using program=instance.program}}{{#with_mapping 'objectives' program}}{{objectives.length}}{{/with_mapping}}{{/using}} Objectives Found)</a></span>
       </label>
     </div>
   </div>
@@ -82,13 +97,13 @@
   <div class="row-fluid">
     <div class="span3">
       <label>
-        Planned Start Date 
+        Planned Start Date
       </label>
       <input tabindex="5" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
     </div>
     <div class="span3">
       <label>
-        Planned End Date 
+        Planned End Date
       </label>
       <input tabindex="6" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
     </div>
@@ -112,7 +127,7 @@
         <a class="show-hidden-fields" href="javascript://">
           <span class="out">
             <i class="grcicon-show-arrow"></i>
-            Show 
+            Show
           </span>
           <span class="in">
             <i class="grcicon-hide-arrow"></i>
@@ -176,7 +191,7 @@
     </div>
   </div>
   <input type="hidden" name="slug" value="{{slug}}">
-  <input type="hidden" name="modified_by_id" value="{{#with_current_user_as 'current_user'}}{{current_user.id}}{{/with_current_user_as}}">
+  {{#with_current_user_as 'current_user'}}<input type="hidden" name="modified_by_id" value="{{current_user.id}}">{{/with_current_user_as}}
 </form>
 {{/instance}}
 {{!/div}}

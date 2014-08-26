@@ -9,7 +9,7 @@
   <div class="row-fluid">
     <div class="span3">
       <div class="deny-buttons">
-        <a class="btn" data-dismiss="modal-reset" href="#">Cancel</a>
+        <a class="btn" data-dismiss="modal-reset" href="javascript://">Cancel</a>
       </div>
     </div>
     <div class="span6">
@@ -17,7 +17,7 @@
     </div>
     <div class="span3">
       <div class="confirm-buttons">
-        <a class="btn btn-primary preventdoubleclick {{#instance.computed_errors}}disabled{{/instance.computed_errors}}" data-toggle="modal-submit" href="javascript://">Save</a>
+        <a class="btn btn-primary preventdoubleclick {{#instance.computed_unsuppressed_errors}}disabled{{/instance.computed_unsuppressed_errors}}" data-toggle="modal-submit" href="javascript://">Save</a>
       </div>
     </div>
   </div>

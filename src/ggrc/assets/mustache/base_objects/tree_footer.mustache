@@ -35,6 +35,7 @@
       </span>
       {{/if}}
       {{else}}
+      {{#if_instance_of parent_instance "Section"}}
       <a
         class="section-add section-sticky"
         href="javascript://"
@@ -46,10 +47,26 @@
         data-join-object-type="{{parent_instance.class.shortName}}"
         data-exclude-option-types="{{exclude_option_types}}"
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
-        {{#if_instance_of parent_instance "Section"}}data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{json_escape parent_instance.description}}" } }'{{else}}data-object-params=''{{/if_instance_of}}
+        data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{json_escape parent_instance.description}}" } }'
         >
         Map Object
       </a>
+      {{else}}
+      <a
+        class="section-add section-sticky"
+        href="javascript://"
+        rel="tooltip"
+        data-placement="left"
+        data-toggle="multitype-modal-selector"
+        data-join-mapping="{{mapping}}"
+        data-join-object-id="{{parent_instance.id}}"
+        data-join-object-type="{{parent_instance.class.shortName}}"
+        data-exclude-option-types="{{exclude_option_types}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
+        >
+        Map Object
+      </a>
+      {{/if_instance_of}}
       {{#if_instance_of parent_instance "SectionBase"}}
       <span class="section-expander">
         &nbsp;

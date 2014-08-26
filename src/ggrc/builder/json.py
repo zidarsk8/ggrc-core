@@ -70,6 +70,7 @@ def publish_stub(obj, inclusions=(), inclusion_filter=None):
     if self_url:
       ret['href'] = self_url
     ret['type'] = obj.__class__.__name__
+    ret['context_id'] = obj.context_id
     if hasattr(publisher, '_stub_attrs') and publisher._stub_attrs:
       ret.update(publisher.publish_stubs(obj, inclusions, inclusion_filter))
     return ret
@@ -260,12 +261,235 @@ class UpdateAttrHandler(object):
   def simple_property(cls, obj, json_obj, attr_name, class_attr):
     return json_obj.get(attr_name)
 
+
+"""
+Builder strategy:
+  * For each non-present attribute, return an "AttributeBuilder" instance
+    which describes the objects needed to complete the representation.
+  * Maintain a set of requested (type, condition, stub_only?) tuples
+  * stub_only? tuples can be requested en-masse via UNION queries
+  * non-stub_only? tuples can override stub_only? tuples with identical
+    conditions
+  * When all available object representations have been built:
+
+Query types:
+  (type, id) -> explicit link
+  (type, { keyX: valX, ... }) -> an actual query
+    note, keyX row/object values must be included in response to distinguish
+    results from aggregated queries on the same type
+  (type, [id, { keyX: valX, ... }, id2, { keyY: valY }, ...]) ->
+    an already-aggregated list of conditions
+
+Query combination:
+  (type, id) -> aggregate into "id IN (...)"
+  (type, {}) -> aggregate into "...OR keyX = valX OR keyY = valY"
+
+Query construction:
+  pass
+
+Result storing:
+  { type: { id: <result>, (keyX, ...): { (valX, ...): [<result>, ...] } } }
+
+Result dispatch:
+  singles = { (type, id): [<Builder>, ...] }
+"""
+
+import sqlalchemy
+import ggrc.models
+
+def build_type_query(type, result_spec):
+  model = ggrc.models.get_model(type)
+  mapper = model._sa_class_manager.mapper
+  columns = []
+  columns_indexes = {}
+  if len(list(mapper.self_and_descendants)) == 1:
+    type_column = sqlalchemy.literal(mapper.class_.__name__)
+  else:
+    # Handle polymorphic types with CASE
+    type_column = sqlalchemy.case(
+        value=mapper.polymorphic_on,
+        whens={
+          val: mapper.class_.__name__
+            for val, mapper in mapper.polymorphic_map.items()
+          })
+  columns.append(type_column)
+  columns_indexes['type'] = 0
+  columns.append(model.id)
+  columns_indexes['id'] = 1
+  columns.append(mapper.c.context_id)
+  columns_indexes['context_id'] = 2
+  columns.append(mapper.c.updated_at)
+  columns_indexes['updated_at'] = 3
+
+  conditions = {}
+  for keys, vals in result_spec.items():
+    for key in keys:
+      if key not in columns_indexes:
+        columns_indexes[key] = len(columns)
+        columns.append(mapper.c[key])
+    conditions.setdefault(keys, []).extend(vals.keys())
+
+  where_clauses = []
+  for keys, vals in conditions.items():
+    if len(keys) == 1:
+      # If the key is singular, use `IN (...)`
+      where_clauses.append(
+          columns[columns_indexes[keys[0]]].in_([v[0] for v in vals]))
+    else:
+      # If multiple keys, build `OR` of multiple `AND` clauses
+      clauses = []
+      cols = [columns[columns_indexes[k]] for k in keys]
+      for val in vals:
+        # Now build OR clause with (key, val) pairs
+        clause = []
+        for i, v in enumerate(val):
+          clause.append(cols[i] == val[i])
+        clauses.append(sqlalchemy.and_(*clause))
+      where_clauses.append(sqlalchemy.or_(*clauses))
+  where_clause = sqlalchemy.or_(*where_clauses)
+
+  query = db.session.query(*columns).filter(where_clause)
+
+  return columns_indexes, query
+
+
+def build_stub_union_query(queries):
+  results = {}
+  for (type, conditions) in queries:
+    if isinstance(conditions, (int, long, str, unicode)):
+      # Assume `id` query
+      keys, vals = ('id',), (conditions,)
+      results.setdefault(type, {}).setdefault(keys, {}).setdefault(vals, [])
+    elif isinstance(conditions, dict):
+      keys, vals = zip(*sorted(conditions.items()))
+      results.setdefault(type, {}).setdefault(keys, {}).setdefault(vals, [])
+    else:
+      # FIXME: Handle aggregated conditions recursively
+      pass
+
+  column_count = 0
+  type_column_indexes = {}
+  type_queries = {}
+  for (type, result_spec) in results.items():
+    columns_indexes, query = build_type_query(type, result_spec)
+    type_column_indexes[type] = columns_indexes
+    type_queries[type] = query
+    if len(columns_indexes) > column_count:
+      column_count = len(columns_indexes)
+
+  for (type, query) in type_queries.items():
+    for _ in range(column_count - len(type_column_indexes[type])):
+      query = query.add_column(sqlalchemy.literal(None))
+    type_queries[type] = query
+
+  queries_for_union = type_queries.values()
+  if len(queries_for_union) == 0:
+    query = None
+  elif len(queries_for_union) == 1:
+    query = queries_for_union[0]
+  else:
+    query = db.session.query(
+        sqlalchemy.sql.expression.union(
+          *[q for q in type_queries.values()]).alias('union_query'))
+  return results, type_column_indexes, query
+
+
+def _render_stub_from_match(match, type_columns):
+  type = match[type_columns['type']]
+  id = match[type_columns['id']]
+  return {
+      'type': type,
+      'id': id,
+      'context_id': match[type_columns['context_id']],
+      'href': url_for(type, id=id),
+      }
+
+
+class LazyStubRepresentation(object):
+  def __init__(self, type, conditions):
+    self.type = type
+    if isinstance(conditions, (int, long)):
+      conditions = { 'id': conditions }
+    self.conditions = conditions
+    self.condition_key, self.condition_val = zip(*sorted(conditions.items()))
+
+  def get_matches(self, results):
+    return results\
+        .get(self.type, {})\
+        .get(self.condition_key, {})\
+        .get(self.condition_val, [])
+
+  def render(self, results, type_columns):
+    matches = self.get_matches(results)
+    assert len(matches) <= 1, (results, self.type, self.condition_key, self.condition_val)
+    if len(matches) == 1:
+      return _render_stub_from_match(matches[0], type_columns[self.type])
+    else:
+      return None
+
+
+def walk_representation(obj):
+  if isinstance(obj, dict):
+    for k, v in obj.items():
+      if isinstance(v, dict):
+        for x in walk_representation(v):
+          yield x
+      elif isinstance(v, (list, tuple)):
+        for x in walk_representation(v):
+          yield x
+      else:
+        yield v, k, obj
+  elif isinstance(obj, (list, tuple)):
+    for i, v in enumerate(obj):
+      if isinstance(v, dict):
+        for x in walk_representation(v):
+          yield x
+      elif isinstance(v, (list, tuple)):
+        for x in walk_representation(v):
+          yield x
+      else:
+        yield v, i, obj
+
+
+def gather_queries(resource):
+  queries = []
+  for val, key, obj in walk_representation(resource):
+    if isinstance(val, LazyStubRepresentation):
+      queries.append((val.type, val.conditions))
+  return queries
+
+
+def reify_representation(resource, results, type_columns):
+  for val, key, obj in walk_representation(resource):
+    if isinstance(val, LazyStubRepresentation):
+      obj[key] = val.render(results, type_columns)
+  return resource
+
+
+def publish_representation(resource):
+  queries = gather_queries(resource)
+
+  if len(queries) == 0:
+    return resource
+  else:
+    results, type_columns, query = build_stub_union_query(queries)
+    rows = query.all()
+    for row in rows:
+      type = row[0]
+      for columns, matches in results[type].items():
+        vals = tuple(row[type_columns[type][c]] for c in columns)
+        if vals in matches:
+          matches[vals].append(row)
+
+    return reify_representation(resource, results, type_columns)
+
+
 class Builder(AttributeInfo):
   """JSON Dictionary builder for ggrc.models.* objects and their mixins."""
 
-  def generate_link_object_for_foreign_key(self, id, type):
+  def generate_link_object_for_foreign_key(self, id, type, context_id=None):
     """Generate a link object for this object reference."""
-    return {'id': id, 'type': type, 'href': url_for(type, id=id)}
+    return {'id': id, 'type': type, 'href': url_for(type, id=id), 'context_id': context_id}
 
   def generate_link_object_for(
       self, obj, inclusions, include, inclusion_filter):
@@ -276,7 +500,8 @@ class Builder(AttributeInfo):
     """
     if include and ((not inclusion_filter) or inclusion_filter(obj)):
       return publish(obj, inclusions, inclusion_filter)
-    result = {'id': obj.id, 'type': type(obj).__name__, 'href': url_for(obj)}
+    result = {
+      'id': obj.id, 'type': type(obj).__name__, 'href': url_for(obj), 'context_id': obj.context_id}
     for path in inclusions:
       if type(path) is not str and type(path) is not unicode:
         attr_name, remaining_path = path[0], path[1:]
@@ -330,9 +555,10 @@ class Builder(AttributeInfo):
       if isinstance(class_attr.remote_attr, property):
         target_name = class_attr.value_attr + '_id'
         target_type = class_attr.value_attr + '_type'
-        return [self.generate_link_object_for_foreign_key(
-            getattr(o, target_name), getattr(o, target_type))
-              for o in join_objects]
+        return [
+            LazyStubRepresentation(
+              getattr(o, target_type), getattr(o, target_name))
+            for o in join_objects]
       else:
         target_mapper = class_attr.remote_attr.property.mapper
         # Handle inheritance -- we must check the object itself for the type
@@ -345,8 +571,10 @@ class Builder(AttributeInfo):
         else:
           target_name = list(class_attr.remote_attr.property.local_columns)[0].key
           target_type = class_attr.remote_attr.property.mapper.class_.__name__
-          return [self.generate_link_object_for_foreign_key(
-              getattr(o, target_name), target_type) for o in join_objects]
+          return [
+              LazyStubRepresentation(
+                target_type, getattr(o, target_name))
+              for o in join_objects]
 
   def publish_relationship(
       self, obj, attr_name, class_attr, inclusions, include, inclusion_filter):
@@ -368,8 +596,7 @@ class Builder(AttributeInfo):
       target_name = list(class_attr.property.local_columns)[0].key
       attr_value = getattr(obj, target_name)
       if attr_value is not None:
-        return self.generate_link_object_for_foreign_key(
-            attr_value, target_type)
+        return LazyStubRepresentation(target_type, attr_value)
       else:
         return None
 
@@ -385,9 +612,10 @@ class Builder(AttributeInfo):
           obj, attr_name, class_attr, inclusions, include, inclusion_filter)
     elif class_attr.__class__.__name__ == 'property':
       if not inclusions or include:
-        return self.generate_link_object_for_foreign_key(
-            getattr(obj, '{0}_id'.format(attr_name)),
-            getattr(obj, '{0}_type'.format(attr_name)))
+        if (getattr(obj, '{0}_id'.format(attr_name))):
+          return LazyStubRepresentation(
+              getattr(obj, '{0}_type'.format(attr_name)),
+              getattr(obj, '{0}_id'.format(attr_name)))
       else:
         return self.publish_link(
             obj, attr_name, inclusions, include, inclusion_filter)

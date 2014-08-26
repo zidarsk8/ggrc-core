@@ -7,7 +7,8 @@ import ggrc.builder
 from blinker import Namespace
 from flask import redirect, request, render_template, current_app
 from ggrc.rbac import permissions
-from ggrc.services.common import ModelView, as_json, inclusion_filter
+from ggrc.services.common import \
+    ModelView, as_json, inclusion_filter, filter_resource
 from ggrc.utils import view_url_for, benchmark
 from werkzeug.exceptions import Forbidden
 
@@ -49,7 +50,9 @@ class BaseObjectView(ModelView):
       'instance_json':
         lambda: as_json({
             self.model._inflector.table_singular:
-              ggrc.builder.json.publish(obj, (), inclusion_filter)
+              filter_resource(
+                ggrc.builder.json.publish_representation(
+                  ggrc.builder.json.publish(obj, (), inclusion_filter)))
           })
       }
 

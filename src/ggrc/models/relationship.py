@@ -52,9 +52,12 @@ class Relationship(Mapping, db.Model):
         else None
     return setattr(self, self.destination_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('source_id', 'source_type', 'destination_id', 'destination_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint(
+          'source_id', 'source_type', 'destination_id', 'destination_type'),
+        )
 
   _publish_attrs = [
       'source',
@@ -110,8 +113,8 @@ class Relatable(object):
       ]
 
   _include_links = [
-      'related_sources',
-      'related_destinations'
+      #'related_sources',
+      #'related_destinations'
       ]
 
   @classmethod

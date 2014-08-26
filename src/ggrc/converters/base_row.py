@@ -135,8 +135,8 @@ class BaseRowConverter(object):
   def after_save(self, db_session, **options):
     from ggrc.login import get_current_user_id
     current_user_id = get_current_user_id()
-    # assign owner if it's ownable
-    if hasattr(self.obj, 'owners') and current_user_id:
+    # assign owner if it's ownable ONLY IF IT DOESN'T ALREADY HAVE AN OWNER
+    if hasattr(self.obj, 'owners') and current_user_id and not self.obj.owners:
       current_user = Person.query.get(current_user_id)
       if current_user and current_user not in self.obj.owners:
         # then create an ObjectOwner connector, add to session
@@ -173,6 +173,9 @@ class BaseRowConverter(object):
 
   def handle_raw_attr(self, key, **options):
     return self.handle(key, ColumnHandler, **options)
+
+  def handle_title(self, key, **options):
+    return self.handle(key, TitleHandler, **options)
 
   def handle_date(self, key, **options):
     self.handle(key, DateColumnHandler, **options)
@@ -267,6 +270,7 @@ class ColumnHandler(object):
 
   def export(self):
     return getattr(self.importer.obj, self.key, '')
+
 
 class RequestTypeColumnHandler(ColumnHandler):
 
@@ -368,7 +372,10 @@ class ContactEmailHandler(ColumnHandler):
     return attr
 
   def validate(self, data):
-    pass
+    if self.options.get('prevent_duplicates') and data not in ("", None):
+      has_import_collision = any(data == x.obj.email for x in self.base_importer.objects)
+      if has_import_collision:
+        self.add_error("This email is already used for another person within this import.")
 
 
 class AssigneeHandler(ContactEmailHandler):
@@ -477,6 +484,41 @@ class BooleanColumnHandler(ColumnHandler):
         return "No"
       else:
         return str(self.value) # unknown value - shouldn't happen
+
+class TitleHandler(ColumnHandler):
+
+  def validate(self, data):
+    super(TitleHandler, self).validate(data)
+    # check for collisions in db
+    object_class = self.importer.model_class
+    # check for objects in the same table with the same slug (regardless of parent scope (self.importer.obj))
+    global_db_collisions = object_class.query.filter_by(title=data).all()
+    # add error for collision if it doesn't match one of the slugs
+    if global_db_collisions:
+      current_slug = self.importer.obj.slug
+      if not any(current_slug == x.slug for x in global_db_collisions):
+        self.add_error("An object with this title already exists.")
+        return
+
+    # ... and then within the same import
+    has_import_collision = data in [x.obj.title for x in self.base_importer.objects]
+    if has_import_collision:
+      self.add_error("Another item in this import already has this title.")
+
+
+class SectionTitleHandler(TitleHandler):
+  def validate(self, data):
+    # check for collisions within the directive
+    directive = self.importer.obj.directive
+    scoped_db_collisions = self.importer.model_class.query.filter_by(directive=directive, title=data).all()
+    if scoped_db_collisions:
+      self.add_error("Another item within this {type} already has this title.".format(type=self.importer.obj.directive.kind))
+
+    # ... and then within the same import
+    has_import_collision = data in [x.obj.title for x in self.base_importer.objects]
+    if has_import_collision:
+      self.add_error("Another item in this import already has this title.")
+
 
 class DateColumnHandler(ColumnHandler):
 

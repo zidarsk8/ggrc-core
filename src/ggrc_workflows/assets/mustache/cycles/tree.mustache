@@ -1,0 +1,51 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+<li class="tree-item governance t-assigned" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}} data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+    <div class="openclose">
+      <a class="openclose-placeholder" href="javascript://"> </a>
+      <div class="row-fluid">
+        <div class="span8">
+          <div class="item-data">
+            <div class="tree-title-area">
+              {{instance.title}}
+            </div>
+          </div>
+        </div>
+        <div class="span2">
+          <i class="grcicon-history-color" class="tooltip" title="Due date"></i>
+          {{localize_date instance.end_date}}
+        </div>
+        <div class="span2">
+          <div class="request-control">
+            <cycle-end-cycle cycle="instance">
+              {{#if cycle.is_current}}
+                <button class="btn end-cycle pull-right">End Cycle</button>
+              {{/if}}
+            </cycle-end-cycle>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{#if expanded}}
+  <div class="tier-2-info item-content">
+
+    {{#if draw_children}}
+      {{#child_options}}
+        <div class="inner-tree">
+          <h6>Task Groups ({{list.length}})</h6>
+          <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+        </div>
+      {{/child_options}}
+    {{/if}}
+
+  </div>
+  {{/if}}
+</li>

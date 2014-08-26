@@ -16,9 +16,6 @@
           {{/roles}}
         </select>
         <button class="btn btn-primary" type="submit">Search</button>
-        {{#state.loading}}
-          <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; right: -10px;' }}></span>
-        {{/state.loading}}
       </div>
       <div class="span1">
         <button class="btn" type="reset">Reset</button>

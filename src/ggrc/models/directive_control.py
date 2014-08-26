@@ -9,9 +9,13 @@ from .mixins import Mapping
 class DirectiveControl(Mapping, db.Model):
   __tablename__ = 'directive_controls'
 
-  __table_args__ = (
-    db.UniqueConstraint('directive_id', 'control_id'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('directive_id', 'control_id'),
+        db.Index('ix_control_id', 'control_id'),
+        db.Index('ix_directive_id', 'directive_id'),
+        )
 
   directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'), nullable = False)
   control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable = False)

@@ -461,6 +461,14 @@
         padding-right: 2px;
       }
     }
+    &.workflow-filter {
+      input {
+        margin-bottom: 0;
+      }
+      .btn-add {
+        margin-right: 20px;
+      }
+    }
   }
   .modal-search {
     position:relative;
@@ -472,6 +480,9 @@
       padding:0;
       right:4px;
       top:4px;
+    }
+    i {
+      margin-top:6px;
     }
   }
   .modal-header {
@@ -533,6 +544,10 @@
           display: inline-block;
         }
       }
+    }
+    .scroll-block {
+      max-height: 240px;
+      overflow-y: auto;
     }
     .large {
       font-size: 16px;
@@ -1013,8 +1028,9 @@ p.modal-value {
     }
     &.add-new {
       a {
-        background: $dropPlaceholder;
-        color: $text;
+        color: $link;
+        font-size:11px;
+        background:$white;
       }
     }
   }
@@ -1070,4 +1086,58 @@ p.modal-value {
       margin-right: 4px; 
     }
   }
+}
+
+// Mockups Workflow V1.1
+.gdrive-select {
+  margin-left: 10px;
+}
+
+.results-wrap {
+  height: 240px;
+  background: lighten($lightGray,3%);
+  overflow-y: auto;
+  .info {
+    display: block;
+    text-align: center;
+    padding-top: 95px;
+    color: $gray;
+    font-size: $f-medium;
+    font-weight: bold;
+  }
+}
+
+.hidden-fields-area {
+  small {
+    font-size: $f-small;
+    &.label-small {
+      display: block;
+      padding-left: 16px;
+    }
+  }
+}
+
+.frequency-wrap {
+  label.smaller {
+    margin-top:16px;
+    font-size:14px;
+    span.start-text {
+      width:90px;
+      display:inline-block;
+      line-height:30px;
+      &.extrasmall {
+        width:70px;
+      }
+    }
+    input.date {
+      margin-bottom:0px;
+    }
+    select {
+      margin-bottom:0px;
+    }
+  }
+}
+
+label.second-in-column {
+  margin-top:20px;
 }

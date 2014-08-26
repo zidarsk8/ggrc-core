@@ -46,6 +46,10 @@ h4 {
   }
 }
 
+h6 {
+  font-weight:normal;
+}
+
 h1, h2, h3, h4, h5, h6 {
   &.programs {
     color:$programs;
@@ -67,6 +71,9 @@ h1, h2, h3, h4, h5, h6 {
   }
   &.entities {
     color:$entities;
+  }
+  &.workflow {
+    color:$programs;
   }
 }
 
@@ -156,9 +163,29 @@ u {
   overflow: visible;
 }
 
+.cancel-text {
+  color: $black;
+  &:hover {
+    color: $black;
+  }
+}
+
 .gray {
   color: $gray;
 }
+
+.green {
+  color: $green;
+}
+
+.blue {
+  color: $blue;
+}
+
+.yellow {
+  color: $yellow;
+}
+
 .divider {
   width: 100%;
   height: 1px;
@@ -192,6 +219,9 @@ u {
     background-position: right center;
     padding-right: 28px;
   }
+  &.pull-left {
+    margin-left: 4px;
+  }
 }
 
 .tooltip {
@@ -215,7 +245,7 @@ u {
 
 .progress {
   &.progress-higher {
-    margin-top:2px;  
+    margin-top:2px;
     margin-bottom:0;
     height:23px;
     .bar {
@@ -405,6 +435,12 @@ input.date {
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
   background-position: -268px -364px;
+  &.short-field {
+    height: 16px !important;
+    line-height: 16px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
 }
 
 //Making input 100% width of his parent element
@@ -449,16 +485,28 @@ select.input-block-level {
 
 // autocomplete scrolling
 .ui-widget.ui-autocomplete {
-  font-size: $baseFontSize;
+  font-size: 12px;
   max-height: 7 * $baseFontSize * 1.5;
   overflow-y: auto;
   overflow-x: hidden;
   li a {
-    color:$business;
+    color:$link;
+    border:0;
+    span.small {
+      color:#777;
+      font-size:11px;    
+    }
     .url-link {
       color:#777;
       font-size:11px;
-    } 
+    }
+    &:hover {
+      background:$link;
+      color:$white;
+      span.small {
+        color:#eee;
+      }
+    }
   }
 }
 
@@ -580,10 +628,10 @@ strong.text-governance {
 span,
 strong {
   &.text-risk {
-    color:$risk;    
+    color:$risk;
   }
   &.text-business {
-    color:$business;    
+    color:$business;
   }
 
 }
@@ -606,7 +654,7 @@ strong {
   left:0;
   width:50%;
   margin-left:25%;
-  z-index:1000;
+  z-index:9000;
   .notice {
     p {
       color:$green;
@@ -819,4 +867,118 @@ select.multiple-selector {
 
 .rtf-block {
   word-wrap: break-word;
+}
+
+.top-align-label {
+  input {
+    margin-bottom: 0;
+  }
+}
+
+.drag {
+  &:hover {
+    cursor: move;
+  }
+  i {
+    @include opacity(0.5);
+  }
+}
+
+.field-wrap {
+  @include clearfix;
+  input {
+    width: 40%;
+    float: left;
+    margin-right: 4px;
+    &.date {
+      width: 18%;
+      margin-right: 0;
+    }
+  }
+  .required {
+    float: left;
+    width: 8px;
+    font-weight: bold;
+    color: $red;
+    margin: 6px 8px 0 3px;
+  }
+  a {
+    float: left;
+    width: 15%;
+    &.drag {
+      float: left;
+      width: 23px;
+    }
+  }
+  &.task-wrap {
+    span.empty {
+      float: left;
+      width: 23px;
+      height: 23px;
+    }
+    input {
+      width: 37%;
+      &.date {
+        width: 18%;
+      }
+    }
+  }
+}
+
+// media
+.media {
+  margin-bottom: 20px;
+  .pull-left {
+    margin-right: 10px;
+    line-height: 14px;
+    [class^="grcicon-"] {
+      margin-top: 1px;
+    }
+  }
+  .media-body {
+    overflow: hidden;
+    zoom: 1;
+    a {
+      &.object-title {
+        color: $darkText;
+      }
+    }
+  }
+}
+
+a {
+  &.object-title {
+    color: $text;
+  }
+}
+
+.top-separator {
+  border-top:1px dotted #ccc;
+  padding-top:20px;
+}
+
+// Welcome page
+
+.welcome {
+  h1 {
+    text-align:center;
+    padding-top:1em;
+    padding-bottom:0.5em;
+    font-size:44px;
+    font-weight:normal;
+    line-height:1.5em;
+  }
+  .btn-large {
+    padding-left:60px;
+    padding-right:60px;
+    margin-bottom:10px;
+  }
+}
+
+.upp {
+  text-transform:uppercase;
+}
+
+.cap {
+  text-transform:capitalize;
 }

@@ -6,14 +6,11 @@
  */
 
 .lhs-holder {
-  background: $treeListBgnd;
-  //overflow-x:hidden;
+  background: #eee;
 }
 
 .lhs {
   position:relative;
-  //width:220px;
-  //margin-right: 8px;
   .lhs-bg {
     margin-top:5px;
     display:none;
@@ -41,12 +38,6 @@
   .lhs-search {
     padding:10px;
     > input {
-         -webkit-border-top-left-radius: 10px;
-             -moz-border-radius-topleft: 10px;
-                 border-top-left-radius: 10px;
-      -webkit-border-bottom-left-radius: 10px;
-          -moz-border-radius-bottomleft: 10px;
-              border-bottom-left-radius: 10px;
       margin-bottom: 0;
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
@@ -54,19 +45,6 @@
       background-position:-268px -195px;
       padding-left: 23px;
       font-size:12px;
-      width: 105px;
-    }
-    .checkbox.btn {
-      position: absolute;
-      right: 10px;
-      margin-left: 0;
-      padding-left: 4px;
-         -webkit-border-top-right-radius: 10px;
-             -moz-border-radius-topright: 10px;
-                 border-top-right-radius: 10px;
-      -webkit-border-bottom-right-radius: 10px;
-          -moz-border-radius-bottomright: 10px;
-              border-bottom-right-radius: 10px;
     }
   }
 }
@@ -75,7 +53,7 @@
   &.emphasized { // special case for programs
    ul {
      margin-bottom:0;
-   } 
+   }
   }
   .accordion-group { // override bootstrap
     border:none;
@@ -108,17 +86,34 @@
       }
       a {
         display:block;
-        padding-left:10px;
-        &.active,
+        padding-left:26px;
+        background: image-url('grcicons/not-open.png') no-repeat 10px center;
+        @include background-size(17px 12px);
         &:hover {
           text-decoration:none;
-          background:#fff image-url('grcicons/open.png') no-repeat right center;
+          background:#fff image-url('grcicons/not-open.png') no-repeat 10px center;
+          @include background-size(17px 12px);
+        }
+        &.active {
+          background:#fff image-url('grcicons/open.png') no-repeat 10px center;
           @include background-size(17px 12px);
         }
       }
       &.programs {
         a {
           color:$programs;
+        }
+      }
+      &.finished {
+        a {
+          background-color: $rqAccepted;
+        }
+        .finished-number {
+          margin-right: 10px;
+          &.error {
+            font-weight: normal;
+            color: #ce3e3e;
+          }
         }
       }
     }
@@ -171,34 +166,32 @@
         }
       }
     }
+    li {
+      &.workflow {
+        a {
+          color: $programs;
+        }
+      }
+    }
   }
   ul.sub-level,
   ul.sub-actions {
     background:#fff;
-    border-bottom:1px solid #ccc;
-    border-top:1px solid #ddd;
     display: none;
     overflow: auto;
     max-height: 160px;
 
-    &.in {
-      border-bottom:1px solid #ccc;
-      border-top:1px solid #ddd;
-    }
-
     li {
       font-size:12px;
-      border-bottom:1px solid #ddd;
       &.no-access {
         padding-left:34px;
-        background:#eee;
       }
       a {
         [class*="span"] {
           min-height:24px;
         }
         padding-left:34px;
-        background:#eee;
+        background:$white;
         span.lhs-item {
           display:block;
           width: auto !important;
@@ -234,24 +227,35 @@
         }
       }
       &.add-new {
+        border-bottom:1px solid #ccc;
         a {
-          background:#ddd;
-          color:#666;
+          background:#fff;
+          color:$link;
         }
       }
-
+      &.filters > a {
+        display: inline;
+        background-color:white;
+        &.active {
+          font-weight: bold;
+        }
+      }
     }
   }
   h2 {
-    font-size:15px;
-    font-weight:normal;
+    font-size:11px;
+    font-weight:bold;
     padding-left:10px;
+    text-transform:uppercase;
   }
   &.recent {
     ul.top-level {
       a {
         font-size:12px;
         color:#333;
+
+        padding-left: 10px;
+        background: none;
         &:hover {
          background:#fff;
          text-decoration:underline;
@@ -286,40 +290,38 @@
   height:100%;
   z-index:100;
   width:6px;
-  background-color:#ddd;
-  border-left:1px solid #aaa;
-  border-right:1px solid #aaa;
+  background-color:#fff;
+  border-left:1px solid #ddd;
+  border-right:1px solid #ddd;
   background-image: image-url("bgnds/drag-v.png");
   @include background-size(2px 30px);
   background-repeat:no-repeat;
   background-position:2px 50%;
-  @include opacity(0.6);
   cursor:ew-resize;
   &:hover {
-    @include opacity(1);
     background-color:#fff;
   };
   &.bar-closed {
     left:40px;
     cursor:e-resize;
   }
+  &.objnav {
+    z-index: 1;  // Show object nav bar-v below title
+  }
 }
-
 
 // INNER NAV
 
 .inner-nav {
-  background:#fff;
   .object-nav {
     .add-nav-item {
       position:relative;
       display:block;
-      border-bottom:1px solid #ddd;
       background:#fff;
       a.dropdown-toggle {
         padding-left:20px;
         display:block;
-        line-height:30px;
+        line-height:24px;
         font-size:12px;
         font-weight:bold;
       }
@@ -342,35 +344,63 @@
     }
   }
   ul.internav {
-    border-top:1px solid #ddd;
     @include reset-list();
+    margin-top:10px;
     overflow-y:auto;
     li {
       background:$white;
       position:relative;
       .drag {
         position:absolute;
-        @include opacity(0.5);
         top:0;
         left:0;
         width:16px;
-        height:30px;
+        height:24px;
+        line-height:24px;
         cursor:move;
+        &:hover {
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -316px;
+        }
+      }
+      &.inner-nav-button {
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
+        .message {
+          color: $green;
+        }
+      }
+      &.finished {
+        background: $rqAccepted;
+      }
+      &.started {
+        background: $rqStarted;
+      }
+      &.overdue {
+        background: $red;
+        a {
+          color: $white;
+          i {
+            @include opacity(1);
+          }
+        }
       }
     }
     a {
       padding-left:20px;
       display:block;
-      line-height:30px;
+      line-height:24px;
       font-size:13px;
-      border-bottom:1px solid #ddd;
       color:#777;
       &:hover {
         background-color:#444;
         background-image: image-url("grcicons/icons.png");
         background-repeat: no-repeat;
         @include background-size(368px 416px);
-        background-position: -270px -313px;
+        background-position: -270px -316px;
         color:#fff;
         text-decoration:none;
       }
@@ -379,11 +409,19 @@
       }
     }
     i {
-      margin-top:6px;
+      margin-top:3px;
       margin-right:6px;
       @include opacity(0.3);
     }
-    li.active,
+    li.active {
+      a {
+        color:#000;
+        font-weight:bold;
+        i {
+          @include opacity(1);
+        }
+      }
+    }
     li:hover {
       a {
         background-color:#444;
@@ -392,105 +430,144 @@
           @include opacity(1);
         }
       }
+      &.overdue {
+        a {
+          background-color: $red;
+          color: $white;
+        }
+      }
     }
     &.business {
-      li.active,
       li:hover {
         a {
           color:#fff;
           background-color:$business;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
         }
       }
     }
     &.governance {
-      li.active,
       li:hover {
         a {
-          color:#fff;
           background-color:$governance;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.risk {
-      li.active,
       li:hover {
         a {
-          color:#fff;
           background-color:$risk;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.program {
-      li.active,
       li:hover {
         a {
           color:#fff;
           background-color:$programs;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.objectives {
-      li.active,
       li:hover {
         a {
-          color:#fff;
           background-color:$objectives;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.controls {
-      li.active,
       li:hover {
         a {
           color:#fff;
           background-color:$controls;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.entities {
-      li.active,
       li:hover {
         a {
           color:#fff;
           background-color:$entities;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
-
+    &.workflow {
+      li:hover {
+        a {
+          color:#fff;
+          background-color:$programs;
+        }
+      }
+    }
+  }
+  ul.innernav-arrow {
+    a {
+      &.w-arrow {
+        padding-left: 48px;
+      }
+    }
+    .arrow {
+      background: image-url('grcicons/not-open.png') no-repeat 0 0;
+      @include background-size(17px 12px);
+      width: 17px;
+      height: 12px;
+      position: absolute;
+      top: 8px;
+      left: 24px;
+      padding: 0;
+      cursor: pointer;
+      &.active {
+        background: image-url('grcicons/open.png') no-repeat 0 0;
+        @include background-size(17px 12px);
+      }
+    }
+    li {
+      ul.sub-level {
+        @include reset-list();
+        li {
+          a {
+            border-bottom: 1px dotted #ddd;
+            font-size: 11px;
+            padding-left: 22px;
+            &:hover {
+              background-color: $rqAccepted;
+              background-image: none;
+              background-position: 0 0;
+              color: #777;
+            }
+            i {
+              @include opacity(1);
+            }
+          }
+          &:hover {
+            a {
+              background-color: $rqAccepted;
+              color:#777;
+            }
+          }
+          &:last-child {
+            a {
+              border-bottom: 1px solid #ddd;
+            }
+          }
+        }
+      }
+      &:hover,
+      &.active {
+        ul.sub-level {
+          li {
+            a {
+              background-color:#fff;
+              color:#777;
+              background-image: none;
+              background-position: 0 0;
+              &:hover {
+                background-color: $rqAccepted;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -538,10 +615,12 @@
     }
   }
   .extended-info-contact {
+    @include oneline();
     p {
       font-size:12px;
       span {
         line-height:16px;
+        display: block;
       }
     }
   }
@@ -612,4 +691,35 @@
 // fix for redundant lhn scroll
 .accordion {
   margin-bottom:0;
+}
+
+
+.accordion-group-inner {
+  .sub-level {
+    display: none;
+  }
+}
+
+// advanced search
+
+.advanced-search {
+  a {
+    margin-top:-8px;
+  	text-align:center;
+  	font-size:12px;
+  	text-decoration:underline;
+  	display:block;
+  	line-height:16px;
+  }
+}
+
+//
+
+label {
+  &.my-work-label {
+    font-size:12px;
+    font-weight:bold;
+    float:right;
+    margin-top:4px;
+  }
 }

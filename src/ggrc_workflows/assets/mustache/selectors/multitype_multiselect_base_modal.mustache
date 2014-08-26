@@ -1,0 +1,139 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: Sasmita
+    Maintained By: Sasmita
+}}
+
+    <div class="modal-header">
+      <div class="pull-right">
+        <a class="btn btn-danger btn-mini" href="javascript://" data-dismiss="modal">
+          <i class="grcicon-x-white"></i>
+        </a>
+      </div>
+      <h2>
+        {{#if_equals option_type_count 1}}
+          {{#option_type_menu}}{{#items}}
+              Add {{model_display}} to {{selected_object.class.title_singular}}
+          {{/#items}}{{/option_type_menu}}
+        {{else}}
+          Map Object {{! modal_title }}
+        {{/if_equals}}
+      </h2>
+    </div>
+
+    <!-- search text and create button   -->
+    <div class="modal-filter">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="modal-search objective-selector">
+            <a class="btn btn-mini search-reset" href="javascript://">
+              <i class="grcicon-x-grey"></i>
+            </a>
+            <input
+              id="search"
+              class="input-block-level search-icon"
+              placeholder="Search..."
+              value="{{option_search_term}}"
+              type="text"
+              autofocus>
+          </div>
+        </div>
+
+        <div class="span6">
+          &nbsp;
+          <div class="pull-right">
+            <a class="btn btn-add"
+               href="javascript://"
+               data-mapping="true"
+               data-toggle="modal-ajax-form"
+               data-modal-class="modal-wide"
+               data-object-singular="{{related_model_singular}}"
+               data-object-plural="{{related_table_plural}}">
+              <i class="grcicon-add"></i>
+              {{#if_equals new_object_title 'Person'}}
+                Add
+              {{else}}
+                Create
+              {{/#if_equals}}
+              {{ new_object_title }}
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- Add the list view and items below -->
+    <div class="results">
+      <div class="bar-h"></div>
+      <!-- Header line of the list -->
+      <ul class="new-tree multitype-tree">
+        <li class="tree-item object-filter">
+        <div class="item-main">
+        <div class="row-fluid">
+
+          <div class="span9">
+            <div class="item-data">
+              <div class="tree-title-area">
+                <span>
+                  <strong>
+                    {{ options.length }} Objects found
+                  </strong>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="span3">
+            <div class="object-check all-check">
+              <label>
+                Select all
+                <input type="checkbox" value="1" class="object-check-all" id='objectAll'>
+              </label>
+            </div>
+          </div>
+
+        </div>
+        </div>
+        </li>
+      </ul>
+
+      <div class="results-wrap">
+        <div class="option_column" {{data 'options'}}>
+          {{#if option_column_view}}
+            {{{ renderLive option_column_view }}}
+          {{/if}}
+        </div>
+      </div>
+    </div>
+
+    <!-- footer add/cancel buttons-->
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="deny-buttons">
+            <a class="btn" data-dismiss="modal" href="javascript://">
+              Cancel
+            </a>
+          </div>
+        </div>
+        <div class="span6">
+          <div class="confirm-buttons">
+            {{#is_page_instance}}
+              <span class="error">Can't map an object to itself<span>
+            {{/is_page_instance}}
+            <span>
+              <strong> {{items_selected}} objects selected </strong>
+            </span>
+            <a class="btn btn-primary preventdoubleclick
+              {{#if_helpers '\
+                ^if' item_selected '\
+                or #if' is_page_instance}} disabled {{/if_helpers}}map-button" href="javascript://">
+                    Add Selected
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>

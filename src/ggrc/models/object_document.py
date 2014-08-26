@@ -33,9 +33,12 @@ class ObjectDocument(Timeboxed, Mapping, db.Model):
         else None
     return setattr(self, self.documentable_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('document_id', 'documentable_id', 'documentable_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('document_id', 'documentable_id', 'documentable_type'),
+        db.Index('ix_document_id', 'document_id'),
+        )
 
   _publish_attrs = [
       'role',
@@ -84,7 +87,7 @@ class Documentable(object):
       ]
 
   _include_links = [
-      'object_documents',
+      #'object_documents',
       ]
 
   @classmethod

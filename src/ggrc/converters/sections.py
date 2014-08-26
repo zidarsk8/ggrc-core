@@ -16,7 +16,7 @@ class SectionRowConverter(BaseRowConverter):
     self.obj = self.setup_object_by_slug(self.attrs)
     if self.obj.directive \
         and self.obj.directive is not self.importer.options.get('directive'):
-          self.importer.errors.append('Section code is already used.')
+          self.importer.errors.append('Section code is already used elsewhere.')
     else:
       self.obj.directive = self.importer.options.get('directive')
       if self.obj.id is not None:
@@ -31,7 +31,7 @@ class SectionRowConverter(BaseRowConverter):
     self.handle_raw_attr('reference_url')
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('controls', LinkControlsHandler)
-    self.handle_raw_attr('title', is_required=True)
+    self.handle_title('title', is_required=True)
 
   def save_object(self, db_session, **options):
     directive_id = options.get('directive_id')
@@ -39,16 +39,37 @@ class SectionRowConverter(BaseRowConverter):
       self.obj.directive_id = int(directive_id)
       db_session.add(self.obj)
 
+  def handle_title(self, key, **options):
+    return self.handle(key, SectionTitleHandler, **options)
 
 class ClauseRowConverter(SectionRowConverter):
   model_class = Clause
 
+  def setup_object(self):
+    # Unlike Section, does not need to check for whether it
+    # exists elsewhere
+    self.obj = self.setup_object_by_slug(self.attrs)
+    self.obj.directive = self.importer.options.get('directive')
+    if self.obj.id is not None:
+      self.add_warning('slug', "Clause already exists and will be updated")
+
   def save_object(self, db_session, **options):
     directive_id = options.get('directive_id')
-    if directive_id:
+    if not directive_id:
+      return
+    # Make sure directive/clause aren't already connected before creating
+    clause_id = getattr(self.obj, 'id', None)
+    matching_relationship_count = DirectiveSection.query\
+      .filter(DirectiveSection.directive_id==directive_id)\
+      .filter(DirectiveSection.section_id==clause_id)\
+      .count()
+    if matching_relationship_count == 0:
       db_session.add(self.obj)
       ds = DirectiveSection(directive_id=directive_id, section=self.obj)
       db_session.add(ds)
+
+  def handle_title(self, key, **options):
+    return self.handle(key, TitleHandler, **options)
 
 
 class SectionsConverter(BaseConverter):
@@ -111,7 +132,6 @@ class SectionsConverter(BaseConverter):
     yield []
     yield []
     yield self.object_map.keys()
-
 
 class ClausesConverter(SectionsConverter):
   row_converter = ClauseRowConverter

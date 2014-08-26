@@ -4,10 +4,11 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import deferred, Slugged
+from .mixins import deferred, Titled, Slugged
 
-class Help(Slugged, db.Model):
+class Help(Titled, Slugged, db.Model):
   __tablename__ = 'helps'
+  _title_uniqueness = False
 
   content = deferred(db.Column(db.Text), 'Help')
 
