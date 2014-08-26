@@ -19,10 +19,18 @@
           </span>
           <div class="item-data">
             <div class="tree-title-area">
-              <i class="grcicon-{{instance.class.table_singular}}-color"></i>                 
-              {{instance.title}}
+              <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+              {{#if instance.name}}
+                {{instance.name}}
+              {{else}}
+                {{instance.title}}
+              {{/if}}
               <span class="url-link">
+              {{#if instance.email}}
+                {{instance.email}}
+              {{else}}  
                 {{instance.link}}
+              {{/if}}
               </span>
             </div>
           </div>

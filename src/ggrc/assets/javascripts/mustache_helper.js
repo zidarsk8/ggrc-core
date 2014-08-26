@@ -498,12 +498,16 @@ Mustache.registerHelper("defer", function(prop, deferred, options) {
 
   deferred = resolve_computed(deferred);
   typeof deferred === "function" && (deferred = deferred());
-
-  return defer_render(tag_name, function(items) {
+  function finish(items) {
     var ctx = {};
     ctx[prop] = items;
     return options.fn(options.contexts.add(ctx));
-  }, deferred);
+  }
+  function progress() {
+    return options.inverse(options.contexts);
+  }
+
+  return defer_render(tag_name, { done: finish, progress: progress }, deferred);
 });
 
 Mustache.registerHelper("allow_help_edit", function() {

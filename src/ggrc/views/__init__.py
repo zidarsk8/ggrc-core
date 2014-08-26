@@ -234,21 +234,21 @@ def mockup():
   """The mockup program guide page
   """
   return render_template("mockups/v1.0/program.html")
-  
+
 @app.route("/mockups/v1.0/assessment.html")
 @login_required
 def assessments():
   """The assessments guide page
   """
   return render_template("mockups/v1.0/assessment.html")
-  
+
 @app.route("/mockups/v1.0/assessment-start.html")
 @login_required
 def assessments_start():
   """The assessment start guide page
   """
   return render_template("mockups/v1.0/assessment-start.html")
-  
+
 @app.route("/mockups/v1.0/object.html")
 @login_required
 def assessments_object():
@@ -261,7 +261,7 @@ def assessments_object():
 def assessments_object_final():
   """The assessment object final guide page
   """
-  return render_template("mockups/v1.0/object-final.html")  
+  return render_template("mockups/v1.0/object-final.html")
 
 @app.route("/mockups/v1.0/my-work.html")
 @login_required
@@ -269,7 +269,7 @@ def assessments_my_work():
   """The assessment my work guide page
   """
   return render_template("mockups/v1.0/my-work.html")
-  
+
 @app.route("/mockups/assessments_grid")
 @login_required
 def assessments_grid():
@@ -283,7 +283,7 @@ def workflow_assessment():
   """The workflow assessment guide page
   """
   return render_template("mockups/v1.1/index.html")
-  
+
 @app.route("/mockups/v1.1/workflow.html")
 @login_required
 def workflow_info():

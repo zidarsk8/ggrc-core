@@ -221,6 +221,8 @@ can.Model.Cacheable("CMS.Models.Role", {
 
 });
 
+can.Model.Cacheable("CMS.Models.MultitypeSearch", {}, {});
+
 BackgroundTask = can.Model.extend({
   root_object : "background_task"
   , root_collection : "background_tasks"

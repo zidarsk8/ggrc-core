@@ -172,17 +172,6 @@
           color: $programs;
         }
       }
-      &.wf-inprogress{
-        a {
-
-          background: $rqStarted !important;
-        }
-      }
-      &.wf-verified{
-        a {
-          background: $rqAccepted !important;
-        }
-      }
     }
   }
   ul.sub-level,
@@ -244,7 +233,13 @@
           color:$link;
         }
       }
-
+      &.filters > a {
+        display: inline;
+        background-color:white;
+        &.active {
+          font-weight: bold;
+        }
+      }
     }
   }
   h2 {

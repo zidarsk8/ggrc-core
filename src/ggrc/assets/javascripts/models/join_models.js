@@ -408,4 +408,8 @@ can.Model.Join("CMS.Models.ObjectDocument", {
   }
 }, {});
 
+can.Model.Join("CMS.Models.MultitypeSearchJoin", {
+  join_keys: {}
+}, {});
+
 })(this.can, this.can.$);

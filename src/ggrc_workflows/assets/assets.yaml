@@ -41,6 +41,7 @@ dashboard-js-template-files:
   - task_group_tasks/task_group_subtree_footer.mustache
   - task_group_tasks/task_group_subtree.mustache
   - workflows/confirm_start.mustache
+  - workflows/confirm_start_buttons.mustache
   - workflows/modal_content.mustache
   - workflows/info.mustache
   - workflows/contacts.mustache
@@ -56,6 +57,7 @@ dashboard-js-template-files:
   - selectors/multitype_multiselect_option_column.mustache
   - selectors/multitype_multiselect_option_items.mustache
   - wf_people/tree_footer.mustache
+  - wf_people/people_items.mustache
   - task_groups/tier2_content.mustache
   - tasks/tier2_content.mustache
   - workflows/tier2_content.mustache

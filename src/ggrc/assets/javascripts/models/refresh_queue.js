@@ -161,6 +161,7 @@ can.Construct("RefreshQueue", {
             next_props = props.slice(1),
             next = instance[prop],
             refresh_queue = new RefreshQueue(),
+            dfds = [],
             deferred;
 
         if (next) {
@@ -176,7 +177,14 @@ can.Construct("RefreshQueue", {
           deferred.then(function(refreshed_items) {
             if (next_props.length) {
               can.each(refreshed_items, function(item) {
-                _refresh_all(item, next_props, dfd);
+                var d = new $.Deferred();
+                _refresh_all(item, next_props, d);
+                dfds.push(d);
+              });
+              // Resolve the original deferred only when all list deferreds
+              //   have been resolved
+              $.when.apply($, dfds).then(function() {
+                dfd.resolve();
               });
               return;
             }

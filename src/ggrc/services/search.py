@@ -30,14 +30,21 @@ def search():
     types = None
 
   contact_id = request.args.get('contact_id')
+  extra_params = request.args.get('extra_params', None)
+
+  if extra_params:
+    # Parse t1:a=b,c=d;t2:e=f into dict {t1:{a:b,c:d},t2:{e:f}}
+    extra_params = {k: {kk: vv for kk, vv in
+                    map(lambda x: x.split('='), v.split(','))} for k, v in
+                    map(lambda x: x.split(':'), extra_params.split(';'))}
 
   if should_just_count:
-    return do_counts(terms, types, contact_id)
+    return do_counts(terms, types, contact_id, extra_params)
   if should_group_by_type:
-    return group_by_type_search(terms, types, contact_id)
-  return basic_search(terms, types, permission_type, permission_model, contact_id)
+    return group_by_type_search(terms, types, contact_id, extra_params)
+  return basic_search(terms, types, permission_type, permission_model, contact_id, extra_params)
 
-def do_counts(terms, types=None, contact_id=None):
+def do_counts(terms, types=None, contact_id=None, extra_params=None):
   from ggrc.rbac import permissions
 
   # FIXME: ? This would make the query more efficient, but will also prune
@@ -47,7 +54,8 @@ def do_counts(terms, types=None, contact_id=None):
 
   indexer = get_indexer()
   with benchmark("Counts"):
-    results = indexer.counts(terms, types=types, contact_id=contact_id)
+    results = indexer.counts(terms, types=types, contact_id=contact_id,
+                             extra_params=extra_params)
 
   return current_app.make_response((
     json.dumps({ 'results': {
@@ -61,12 +69,12 @@ def do_counts(terms, types=None, contact_id=None):
 
 def do_search(
     terms, list_for_type, types=None, permission_type='read',
-    permission_model=None, contact_id=None):
+    permission_model=None, contact_id=None, extra_params=None):
   indexer = get_indexer()
   with benchmark("Search"):
     results = indexer.search(
         terms, types=types, permission_type=permission_type,
-        permission_model=permission_model, contact_id=contact_id)
+        permission_model=permission_model, contact_id=contact_id, extra_params=extra_params)
   seen_results = {}
 
   for result in results:
@@ -94,15 +102,18 @@ def make_search_result(entries):
     ))
 
 def basic_search(
-    terms, types=None, permission_type='read', permission_model=None, contact_id=None):
+    terms, types=None, permission_type='read', permission_model=None,
+    contact_id=None, extra_params=None):
   entries = []
   list_for_type = lambda t: entries
-  do_search(terms, list_for_type, types, permission_type, permission_model, contact_id)
+  do_search(terms, list_for_type, types, permission_type, permission_model,
+            contact_id, extra_params)
   return make_search_result(entries)
 
-def group_by_type_search(terms, types=None, contact_id=None):
+def group_by_type_search(terms, types=None, contact_id=None, extra_params=None):
   entries = {}
   list_for_type = \
       lambda t: entries[t] if t in entries else entries.setdefault(t, [])
-  do_search(terms, list_for_type, types, contact_id=contact_id)
+  do_search(terms, list_for_type, types, contact_id=contact_id,
+            extra_params=extra_params)
   return make_search_result(entries)
