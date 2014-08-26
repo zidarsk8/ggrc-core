@@ -225,8 +225,13 @@ can.Control("GGRC.Controllers.Modals", {
     }
 
     return dfd.done(function() {
-      //  This is to trigger `focus_first_element` in modal_ajax handling
-      that.element.trigger("loaded");
+
+      // If the modal is closed early, the element no longer exists
+      if (that.element) {
+        // This is to trigger `focus_first_element` in modal_ajax handling
+        that.element.trigger("loaded");
+      }
+
 
       that.options.instance._transient || that.options.instance.attr("_transient", new can.Observe({}));
       that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
