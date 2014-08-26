@@ -65,7 +65,7 @@ class ObjectiveRowConverter(BaseRowConverter):
                 "objective": self.obj,
         }
         if parent_type == Program:
-          db_options["context_id"] = parent_id  # id of program
+          db_options["context_id"] = parent_obj.context_id
         db_session.add(ObjectObjective(**db_options))
 
 
