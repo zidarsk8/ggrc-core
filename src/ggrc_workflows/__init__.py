@@ -9,13 +9,14 @@ from flask import Blueprint
 from sqlalchemy import inspect
 
 from ggrc import settings, db
+from ggrc.app import app
 from ggrc.login import get_current_user
-#from ggrc.rbac import permissions
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
 from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
-import ggrc_workflows.models as models
 
+import ggrc_workflows.models as models
+from ggrc_workflows.models.mixins import RelativeTimeboxed
 
 # Initialize signal handler for status changes
 from blinker import Namespace
@@ -184,13 +185,22 @@ from ggrc.services.common import Resource
 
 @Resource.model_posted.connect_via(models.Cycle)
 def handle_cycle_post(sender, obj=None, src=None, service=None):
-  current_user = get_current_user()
+  if src.get('autogenerate', False):
+    # When called via a REST POST, use current user.
+    current_user = get_current_user()
+    build_cycle(obj, current_user=current_user)
 
-  if not src.get('autogenerate'):
-    return
 
+def build_cycle(obj, current_user=None):
   # Determine the relevant Workflow
   workflow = obj.workflow
+
+  # Use WorkflowOwner role when this is called via the cron job.
+  if not current_user:
+    for user_role in workflow.context.user_roles:
+      if user_role.role.name == "WorkflowOwner":
+        current_user = user_role.person
+        break
 
   # Populate the top-level Cycle object
   obj.context = workflow.context
@@ -437,7 +447,12 @@ def handle_cycle_task_group_put(
 
 def update_workflow_state(workflow):
   if workflow.recurrences:
-    return
+    today = date.today()
+    base_date = RelativeTimeboxed._calc_base_date(today, workflow.frequency)
+    workflow.next_cycle_start_date = \
+      RelativeTimeboxed._calc_start_date_of_next_period(
+        base_date, workflow.frequency
+        )
 
   for cycle in workflow.cycles:
     if cycle.is_current:
@@ -568,7 +583,6 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
   if src.get('clone'):
     source_workflow.copy_task_groups(obj)
 
-
 def add_public_workflow_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
       .filter(
@@ -584,6 +598,48 @@ def add_public_workflow_context_implication(context, check_exists=False):
     context_scope='Workflow',
     modified_by=get_current_user(),
     ))
+
+
+def init_extra_views(app):
+  from . import views
+  views.init_extra_views(app)
+
+
+def start_recurring_cycles():
+  today = date.today()
+
+  # Get all workflows that should start a new cycle today
+  # (The next_cycle_start_date is precomputed and stored when a cycle is created)
+  workflows = db.session.query(models.Workflow)\
+    .filter(
+        models.Workflow.next_cycle_start_date == date.today(),
+        models.Workflow.recurrences == True
+        ).all()
+
+  # For each workflow, start and save a new cycle.
+  for workflow in workflows:
+
+    cycle = models.Cycle()
+    cycle.workflow = workflow
+    cycle.context = workflow.context
+    cycle.start_date = date.today()
+
+    # Flag the cycle to be saved
+    db.session.add(cycle)
+
+    # Create the cycle (including all child objects)
+    build_cycle(cycle)
+
+    # Update the workflow next_cycle_start_date to push it ahead based on the frequency.
+    base_date = RelativeTimeboxed._calc_base_date(today, workflow.frequency)
+    workflow.next_cycle_start_date = \
+      RelativeTimeboxed._calc_start_date_of_next_period(
+        base_date, workflow.frequency
+        )
+    db.session.add(workflow)
+
+  db.session.commit()
+  db.session.flush()
 
 
 from ggrc_basic_permissions.contributed_roles import (
@@ -639,9 +695,9 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
         },
       }
 
-
 ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
 ROLE_DECLARATIONS = WorkflowRoleDeclarations()
 ROLE_IMPLICATIONS = WorkflowRoleImplications()
+
 
 from ggrc_workflows.notification import notify_email_digest, notify_email_deferred

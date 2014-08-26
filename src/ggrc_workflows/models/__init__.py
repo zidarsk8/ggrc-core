@@ -6,6 +6,7 @@
 
 from ggrc.models.all_models import register_model
 
+from .mixins import RelativeTimeboxed
 from .task_group_task import TaskGroupTask
 from .task_group import TaskGroup
 from .task_group_object import TaskGroupObject

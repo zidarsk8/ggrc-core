@@ -10,7 +10,6 @@ from ggrc.models.mixins import (
     deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful
     )
 from ggrc.models.reflection import PublishOnly
-from ggrc.models.object_owner import Ownable
 from ggrc.models.context import HasOwnContext
 from sqlalchemy.orm import validates
 from ggrc.models.computed_property import computed_property
