@@ -1606,7 +1606,7 @@
   multiselect_descriptor_view_option = {
     "Person": {
         column_view : GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache", 
-        items_view  : GGRC.mustache_path + "/search/advanced_search_people_items.mustache"
+        items_view  : GGRC.mustache_path + "/wf_people/people_items.mustache"
     }
   }
 
