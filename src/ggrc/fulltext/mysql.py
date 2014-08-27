@@ -114,6 +114,12 @@ class MysqlIndexer(SqlIndexer):
             })
     return type_column
 
+  def _types_to_type_models(self, types):
+    if types is not None:
+      return [
+          model for model in all_models.all_models if model.__name__ in types]
+    return all_models.all_models
+
   # filters by "myview" for a given person
   def _add_owner_query(self, query, types=None, contact_id=None):
     '''
@@ -133,11 +139,7 @@ class MysqlIndexer(SqlIndexer):
     if not contact_id:
       return query
 
-    if types is not None:
-      type_models = [
-          model for model in all_models.all_models if model.__name__ in types]
-    else:
-      type_models = all_models.all_models
+    type_models = self._types_to_type_models(types)
 
     model_names = [model.__name__ for model in type_models]
 
@@ -245,37 +247,35 @@ class MysqlIndexer(SqlIndexer):
 
     return query
 
-  def _add_extra_params_query(self, query, extra_params):
+  def _add_extra_params_query(self, query, types, extra_params):
     if not extra_params:
       return query
 
-    union_queries = []
-    for model, params in extra_params.iteritems():
-      for key, value in params.iteritems():
-        item_query = db.session.query(
-            self.record_type.key.label('key'),
-            self.record_type.type.label('type'))
-        item_query = item_query.filter(and_(
-            MysqlRecordProperty.property == key,
-            MysqlRecordProperty.content == value)
-        )
-        union_queries.append(item_query)
+    type_models = self._types_to_type_models(types)
 
-        # Make sure we only filter out the current model
-        item_query = db.session.query(
-            self.record_type.key.label('key'),
-            self.record_type.type.label('type'))
-        item_query = item_query.filter(and_(
-            MysqlRecordProperty.type != model
-        ))
-        union_queries.append(item_query)
+    param_union_queries = []
+    for model in type_models:
+      if not extra_params or model.__name__ not in extra_params:
+        continue
+      param_query = db.session.query(
+          model.id.label('id'),
+          literal(model.__name__).label('type'),
+          literal('context_id').label('context_id')
+      ).filter_by(**extra_params.get(model.__name__))
+      param_union_queries.append(param_query)
 
-    union_query = alias(union(*union_queries))
+    # Extra filters were not defined for selected types
+    if len(param_union_queries) == 0:
+      return query
+
+    # Construct and JOIN to the UNIONed result set
+    param_union_queries = alias(union(*param_union_queries))
     query = query.join(
-        union_query,
+        param_union_queries,
+        or_(~MysqlRecordProperty.type.in_(p for p in extra_params),
         and_(
-            union_query.c.key == MysqlRecordProperty.key,
-            union_query.c.type == MysqlRecordProperty.type),
+            param_union_queries.c.id == MysqlRecordProperty.key,
+            param_union_queries.c.type == MysqlRecordProperty.type),)
     )
     return query
 
@@ -287,7 +287,7 @@ class MysqlIndexer(SqlIndexer):
         self._get_type_query(types, permission_type, permission_model))
     query = query.filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
-    query = self._add_extra_params_query(query, extra_params)
+    query = self._add_extra_params_query(query, types, extra_params)
     # Sort by title:
     # FIXME: This only orders by `title` if title was the matching property
     query = query.order_by(case(
@@ -301,7 +301,7 @@ class MysqlIndexer(SqlIndexer):
     query = query.filter(self._get_type_query(types))
     query = query.filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
-    query = self._add_extra_params_query(query, extra_params)
+    query = self._add_extra_params_query(query, types, extra_params)
     query = query.group_by(self.record_type.type)
     # FIXME: Is this needed for correct group_by/count-distinct behavior?
     #query = query.order_by(self.record_type.type, self.record_type.key)
