@@ -1,31 +1,10 @@
 <div class="action-bar">
   <ul class="change-links">
-    {{#if allow_mapping}}
-      {{#if mappings}}
-        {{#is_allowed_all 'delete' mappings}}
-          {{^is_dashboard}}
-            <li>
-              <a href="javascript://" class="unmap" data-toggle="unmap">
-                {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-                <i class="grcicon-remove"></i>
-                Unmap
-              </a>
-            </li>
-          {{/is_dashboard}}
-        {{/is_allowed_all}}
-      {{/if}}
-    {{/if}}
+    {{> /static/mustache/base_objects/unmap.mustache}}
     {{> /static/mustache/base_objects/edit_object_link.mustache}}
   </ul>
   <ul>
-    {{#if instance.viewLink}}
-      <li>
-        <a href="{{instance.viewLink}}">
-          View {{instance.class.title_singular}}
-          <i class="grcicon-goto"></i>
-        </a>
-      </li>
-    {{/if}}
+    {{> /static/mustache/base_objects/view_link.mustache }}
   </ul>
 </div>
 

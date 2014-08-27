@@ -1,0 +1,15 @@
+{{#if allow_mapping}}
+  {{#if mappings}}
+    {{#is_allowed_all 'delete' mappings}}
+      {{^is_dashboard}}
+        <li>
+          <a href="javascript://" class="unmap" data-toggle="unmap">
+            {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+            <i class="grcicon-remove"></i>
+            Unmap
+          </a>
+        </li>
+      {{/is_dashboard}}
+    {{/is_allowed_all}}
+  {{/if}}
+{{/if}}
