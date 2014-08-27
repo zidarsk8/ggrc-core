@@ -11,7 +11,7 @@ from ggrc.models.mixins import (
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.context import HasOwnContext
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, joinedload_all, undefer_group
 from ggrc.models.computed_property import computed_property
 from .task_group_object import TaskGroupObject
 from .cycle_task_group_object import CycleTaskGroupObject
@@ -107,7 +107,7 @@ class WorkflowState(object):
 
   _publish_attrs = [PublishOnly('workflow_state')]
   _update_attrs = []
-  _stub_attrs = ['workflow_state']
+  _stub_attrs = []
 
   @classmethod
   def get_state(cls, objs):
@@ -141,17 +141,19 @@ class WorkflowState(object):
 
   @computed_property
   def workflow_state(self):
+    return WorkflowState.get_state(self.cycle_task_group_objects)
 
-    cycle_objects = db.session.query(CycleTaskGroupObject)\
-      .join(TaskGroupObject)\
-      .filter(
-        TaskGroupObject.object_id == self.id,
-        TaskGroupObject.object_type == self.type,
-        TaskGroupObject.id == CycleTaskGroupObject.task_group_object_id
-      )\
-      .all()
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
 
-    return WorkflowState.get_state(cycle_objects)
+    query = super(WorkflowState, cls).eager_query()
+    return query.options(
+        orm.subqueryload('cycle_task_group_objects')\
+            .undefer_group('CycleTaskGroupObject_complete'),
+        orm.subqueryload_all('cycle_task_group_objects.cycle'),
+        )
+
 
 # TODO: This makes the Workflow module dependant on Gdrive. It is not pretty.
 from ggrc_gdrive_integration.models.object_folder import Folderable
