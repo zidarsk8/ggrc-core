@@ -1,41 +1,31 @@
+<div class="action-bar">
+  <ul class="change-links">
+    {{> /static/mustache/base_objects/unmap.mustache}}
+    {{> /static/mustache/base_objects/edit_object_link.mustache}}
+  </ul>
+  <ul>
+    {{#if instance.viewLink}}
+      {{#is_allowed "view_object_page" instance}}
+        <li>
+          <a href="{{instance.viewLink}}">
+            View {{instance.class.title_singular}}
+            <i class="grcicon-goto"></i>
+          </a>
+        </li>
+      {{/is_allowed}}
+    {{/if}}
+  </ul>
+</div>
+
+
 <div class="small-info">
-        <div class="row-fluid">
 
-          <div class="span6">
-          {{#if instance.viewLink}}
-            {{#is_allowed "view_object_page" instance}}
-              <a href="{{instance.viewLink}}" class="info-action">
-                View {{instance.class.title_singular}}
-                <i class="grcicon-goto"></i>
-              </a>
-            {{/is_allowed}}
-          {{/if}}
-          </div>
+  {{{renderLive '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
 
-          <div class="span6">
-          {{#if mappings}}
-          {{#is_allowed_all 'delete' mappings}}
-          {{^is_dashboard}}
-            <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
-              {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-              <i class="grcicon-remove"></i>
-              {{unmap_or_delete instance mappings}}
-            </a>
-          {{/is_dashboard}}
-          {{/is_allowed_all}}
-          {{/if}}
-          {{> /static/mustache/base_objects/edit_object_link.mustache}}
-          </div>
+  {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
-        </div>
+  {{{renderLive '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
 
-
-        {{{renderLive '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
-
-        {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
-
-        {{{renderLive '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-
-        {{{renderLive '/static/mustache/base_objects/urls.mustache' instance=instance }}}
+  {{{renderLive '/static/mustache/base_objects/urls.mustache' instance=instance }}}
 
 </div>

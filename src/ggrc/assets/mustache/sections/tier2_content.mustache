@@ -1,46 +1,52 @@
-<div class="small-info">
-        <div class="row-fluid">
-
-          <div class="span6">
-          {{#if instance.viewLink}}
-            {{#is_allowed "view_object_page" instance}}
-              <a href="{{instance.viewLink}}" class="info-action">
-                View {{instance.class.title_singular}}
-                <i class="grcicon-goto"></i>
-              </a>
-            {{/is_allowed}}
-          {{/if}}
-          </div>
-
-          <div class="span6">
-            {{#if_helpers '\
-              if_instance_of' instance "Section" '\
-              and if_instance_of' parent_instance "Directive"}}
-            {{#is_allowed 'update' instance}}
-              <a href="javascript://" class="info-action pull-right" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-object-singular-override="{{#if_equals instance.directive.type 'Contract'}}Clause{{/if_equals}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{instance.class.model_singular}}" data-object-id="{{instance.id}}">
-                <i class="grcicon-edit"></i>
-                Edit {{instance.class.model_singular}}
-              </a>
-            {{/is_allowed}}
-            {{else}}
-            {{#if allow_mapping}}
-            {{#if mappings}}
-            {{#is_allowed_all 'delete' mappings}}
+<div class="action-bar">
+  <ul class="change-links">
+    {{#if_helpers '\
+      if_instance_of' instance "Section" '\
+      and if_instance_of' parent_instance "Directive"}}
+      {{#is_allowed 'update' instance}}
+        <li>
+          <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-object-singular-override="{{#if_equals instance.directive.type 'Contract'}}Clause{{/if_equals}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{instance.class.model_singular}}" data-object-id="{{instance.id}}">
+            <i class="grcicon-edit"></i>
+            Edit {{instance.class.model_singular}}
+          </a>
+        </li>
+      {{/is_allowed}}
+    {{else}}
+      {{#if allow_mapping}}
+        {{#if mappings}}
+          {{#is_allowed_all 'delete' mappings}}
             {{^is_dashboard}}
-              <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
-                {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-                <i class="grcicon-remove"></i>
-                Unmap
-              </a>
+              <li>
+                <a href="javascript://" class="unmap" data-toggle="unmap">
+                  {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+                  <i class="grcicon-remove"></i>
+                  Unmap
+                </a>
+              </li>
             {{/is_dashboard}}
-            {{/is_allowed_all}}
-            {{/if}}
-            {{/if}}
-            {{> /static/mustache/base_objects/edit_object_link.mustache}}
-            {{/if_helpers}}
-          </div>
+          {{/is_allowed_all}}
+        {{/if}}
+      {{/if}}
+      {{> /static/mustache/base_objects/edit_object_link.mustache}}
+    {{/if_helpers}}  
+  </ul>
+  <ul>
+    {{#if instance.viewLink}}
+      {{#is_allowed "view_object_page" instance}}
+        <li>
+          <a href="{{instance.viewLink}}">
+            View {{instance.class.title_singular}}
+            <i class="grcicon-goto"></i>
+          </a>
+        </li>
+      {{/is_allowed}}
+    {{/if}}
+  </ul>
+</div>
 
-        </div>
+
+
+<div class="small-info">
 
         {{{renderLive '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
 

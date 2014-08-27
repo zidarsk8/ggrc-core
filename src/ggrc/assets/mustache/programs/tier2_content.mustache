@@ -1,36 +1,23 @@
-<div class="small-info">
-  <div class="row-fluid">
-
-    <div class="span6">
-    {{#if instance.viewLink}}
-    {{#is_allowed 'view_object_page' 'Program' context=instance.context}}
-      <a href="{{instance.viewLink}}" class="info-action">
-        View {{instance.class.title_singular}}
-        <i class="grcicon-goto"></i>
-      </a>
-    {{/is_allowed}}
-    {{/if}}
-    </div>
-
-    <div class="span6">
-    {{#if allow_mapping}}
-    {{#if mappings}}
-    {{#is_allowed_all 'delete' mappings}}
-    {{^is_dashboard}}
-      <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
-        {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-        <i class="grcicon-remove"></i>
-        Unmap
-      </a>
-    {{/is_dashboard}}
-    {{/is_allowed_all}}
-    {{/if}}
-    {{/if}}
+<div class="action-bar">
+  <ul class="change-links">
+    {{> /static/mustache/base_objects/unmap.mustache}}
     {{> /static/mustache/base_objects/edit_object_link.mustache}}
-    </div>
+  </ul>
+  <ul>
+    {{#if instance.viewLink}}
+      {{#is_allowed 'view_object_page' 'Program' context=instance.context}}
+        <li>
+          <a href="{{instance.viewLink}}">
+            View {{instance.class.title_singular}}
+            <i class="grcicon-goto"></i>
+          </a>
+        </li>
+      {{/is_allowed}}
+    {{/if}}
+  </ul>
+</div>
 
-  </div>
-
+<div class="small-info">
 
   {{{renderLive '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
 
