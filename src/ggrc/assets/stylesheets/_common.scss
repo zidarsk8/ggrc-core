@@ -867,6 +867,8 @@ select.multiple-selector {
 
 .rtf-block {
   word-wrap: break-word;
+  margin-bottom:10px;
+  line-height:18px;
 }
 
 .top-align-label {
@@ -981,4 +983,8 @@ a {
 
 .cap {
   text-transform:capitalize;
+}
+
+.tiny-data {
+  font-size:12px;
 }

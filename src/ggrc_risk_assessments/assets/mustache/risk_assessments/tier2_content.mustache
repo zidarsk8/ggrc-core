@@ -1,26 +1,23 @@
+<div class="action-bar">
+  <ul class="change-links">
+    {{#is_allowed 'update'}}
+      <li>
+        <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
+          <i class="grcicon-edit"></i>
+          <span>Edit risk assessment</span>
+        </a>
+      </li>
+    {{/is_allowed}}
+  </ul>
+</div>
 
-<div class="new-tier">
-
-  <div class="row-fluid">
-    <div class="span9">
-      <h3>{{{instance.title}}}</h3>
-      {{{firstnonempty instance.description '<span class="no-data">No description</span>'}}}
-    </div>
-    <div class="span3">
-      {{#is_allowed 'update'}}
-        <div class="span12">
-          <a href="javascript://" class="pull-right info-action" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
-            <i class="grcicon-edit"></i>
-            <span>Edit risk assessment</span>
-          </a>
-        </div>
-      {{/is_allowed}}
-    </div>
-  </div>
+<div class="small-info">
+  
+  {{{renderLive '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
 
   <div class="row-fluid">
     <div class="span6">
-      <h4>Supporting files</h4>
+      <h6>Supporting files</h6>
       {{#child_options}}
         <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
         </ul>
@@ -28,30 +25,37 @@
       {{#is_allowed 'update'}}
       <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
         data-model="{{instance.type}}" data-id="{{instance.id}}">
-        <i class="grcicon-attach-color"></i><span>Attach supporting file
-        </span>
+        <i class="grcicon-attach-color"></i>
+        <span>Attach supporting file</span>
       </a>
       {{/is_allowed}}
     </div>
     <div class="span3">
-      <h4>Risk Manager</h4>
-      {{#using person=instance.ra_manager}}
-        {{{render '/static/mustache/people/popover.mustache'}}}
-      {{/using}}
+      <h6>Risk Manager</h6>
+      <p>
+        {{#using person=instance.ra_manager}}
+          {{{render '/static/mustache/people/popover.mustache'}}}
+        {{/using}}
+      </p>
     </div>
     <div class="span3">
-      <h4>Risk Counsel</h4>
-      {{#using person=instance.ra_counsel}}
-        {{{render '/static/mustache/people/popover.mustache'}}}
-      {{/using}}
+      <h6>Risk Counsel</h6>
+      <p>
+        {{#using person=instance.ra_counsel}}
+          {{{render '/static/mustache/people/popover.mustache'}}}
+        {{/using}}
+      </p>
+    </div>
+  </div>
+  <br>
+  <div class="row-fluid">
+    <div class="span12">
+      <h6>Additional notes</h6>
+      <div class="tree-description">
+        {{{firstnonempty instance.notes '<span class="no-data">No additional notes</span>'}}}
+      </div>
     </div>
   </div>
 
-  <div class="row-fluid">
-    <div class="span12">
-      <h4>Additional notes</h4>
-      {{{firstnonempty instance.notes '<span class="no-data">No additional notes</span>'}}}
-    </div>
-  </div>
 
 </div>

@@ -20,9 +20,9 @@ ul.new-tree {
     }
     &.active {
       position: relative;
+      border-bottom:1px solid #eee;
       z-index: 1000;
       font-weight:bold;
-      @include box-shadow(0 3px 3px -1px #bbb);
       .row-fluid {
         background:$white;
       }
@@ -43,19 +43,6 @@ ul.new-tree {
   .task-item {
     .item-data {
       padding-left: 0;
-    }
-  }
-  .task-group-title {
-    h3 {
-      [class^="grcicon-"] {
-        margin-top: 4px;
-      }
-    }
-  }
-  .task-edit-icon {
-    i {
-      margin-top: 0px;
-      margin-left: 3px;
     }
   }
   &.request-list,
@@ -661,11 +648,13 @@ ul.new-tree {
         }
       }
     }
+    /*
     .wrap100 { float:left; min-width:100px; }
     .wrap150 { float:left; min-width:150px; }
     .wrap200 { float:left; min-width:200px; }
     .wrap250 { float:left; min-width:250px; }
     .wrap300 { float:left; min-width:300px; }
+    */
   }
   &.colored-list {
     > li.tree-item {
@@ -1284,14 +1273,6 @@ ul.new-tree {
     @include opacity(1);
     text-decoration:none;
   }
-  &.unmap {
-    margin-left:7px;
-    @include opacity(0.25);
-    &:hover {
-      color:$error;
-      @include opacity(1);
-    }
-  }
   &.relevant-action {
     padding-right: 20px;
     color: $subTitle;
@@ -1299,6 +1280,11 @@ ul.new-tree {
     &:hover {
       color: $subTitle;
       @include opacity(1);
+    }
+    &.all-relevant {
+      i {
+        margin-top:4px;
+      }
     }
   }
 }
@@ -1478,5 +1464,11 @@ ul.new-tree {
   }
   .accepted {
     color: $green;
+  }
+}
+
+.unmap {
+  &:hover {
+    color:$error;
   }
 }

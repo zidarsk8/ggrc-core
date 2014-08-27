@@ -15,7 +15,7 @@
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
 
-        <div class="item-data {{#is_dashboard}}span3{{else}}span8{{/is_dashboard}}" style="padding-left:0px;">
+        <div class="item-data {{#is_dashboard}}span3{{else}}span7{{/is_dashboard}}" style="padding-left:0px;">
           <div class="tree-title-area">
             <span class="tier-trigger"></span>{{instance.title}}
           </div>
@@ -26,10 +26,12 @@
           {{#using instance=instance.cycle_task_group_object}}
             {{#using object=instance.object}}
         
-              <div class="item-data span3">
+              <div class="item-data span2">
                 <div class="oneline">
                   <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
-                  {{firstnonempty object.title instance.title}}
+                  <span class="tiny-data">
+                    {{firstnonempty object.title instance.title}}
+                  </span>
                 </div>
               </div>
 
@@ -42,7 +44,9 @@
 
               <div class="item-data span2">
                 <div class="oneline">
-                  {{workflow.title}}
+                  <span class="tiny-data" rel="tooltip" title="Workflow title">
+                    {{workflow.title}}
+                  </span>
                 </div> 
               </div>
           
@@ -51,7 +55,7 @@
 
         {{/is_dashboard}}
 
-        <div class="span4">
+        <div class="span5">
           <ul class="tree-action-list">
             <li>
               <div class="date">
@@ -204,7 +208,7 @@
             {{#child_options}}
             <br>
             <div class="row-fluid">
-              <div class="span11">
+              <div class="span12">
                 <h6>Comments ({{list.length}})</h6>
                 <ul class="entry-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
               </div>
