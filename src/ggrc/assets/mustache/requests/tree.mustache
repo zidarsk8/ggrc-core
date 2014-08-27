@@ -39,7 +39,7 @@
               </div>
             </div>
             <div class="tree-title-area">
-              <span>{{strip_html_tags instance.description}}</span>
+              &nbsp; <span>{{strip_html_tags instance.description}}</span>
             </div>
           </div>
         </div>
@@ -131,89 +131,84 @@
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-      <div class="row-fluid">
-        <div class="span12">
-          <div class="show-description">
-            <div class="row-fluid">
-              <div class="span9">
-                <div class="media">
-                  <div class="pull-left">
-                    <strong>request:</strong>
-                  </div>
-                  <div class="media-body">
-                    <div class="tree-description">
-                      {{{firstnonempty instance.description '<i>State your request here...</i>'}}}
-                    </div>
+      
+      <div class="action-bar">
+        <ul class="change-links">
+          {{#if_can_edit_request instance}}
+            <li>
+              <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
+                <i class="grcicon-edit"></i>
+                Edit PBC {{model.title_singular}}
+              </a>
+            </li>
+          {{/if_can_edit_request}}
+          
+        </ul>
+      </div>
+      
+      <div class="small-info">
 
-                  </div>
-                </div>
-              </div>
-              <div class="span3" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
-                <i class="grcicon-person-green pull-left"></i>
-                {{#using assignee=instance.assignee}}
-                {{#if_helpers "\
-                  #if_can_edit_request" instance "\
-                  and ^if_auditor" instance _1_include_admin=false "\
-                  or #is_allowed" "__GGRC_ADMIN__" instance }}
-                    <div class="objective-selector">
-                      <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
-                    </div>
-                {{else}}
-                  <div class="item-data">
-                    <span class="tree-title-area read-only oneline">
-                      {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
-                    </span>
-                  </div>
-                {{/if_helpers}}
+        <div class="row-fluid">
+          <div class="span6">
+            <h6>Request</h6>
+            <div class="tree-description">
+              {{{firstnonempty instance.description '<i>State your request here...</i>'}}}
+            </div>
+            <br>
+          </div>
+          <div class="span3">
+            <h6>Requested on</h6>
+            {{#if instance.requested_on}}
+              <p>
+                {{#using requested_on=instance.requested_on}}
+                  {{localize_date requested_on}}
                 {{/using}}
+              </p>
+            {{/if}}
+          </div>
+          <div class="span3" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+            <h6>Assignee</h6>
+            {{#using assignee=instance.assignee}}
+              {{#if_helpers "\
+                #if_can_edit_request" instance "\
+                and ^if_auditor" instance _1_include_admin=false "\
+                or #is_allowed" "__GGRC_ADMIN__" instance }}
+                <div class="objective-selector">
+                  <input type="text" name="assignee.name" data-lookup="Person" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
+                </div>
+              {{else}}            
+                <p class="read-only oneline">
+                  {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
+                </p>
+              {{/if_helpers}}
+            {{/using}}
+          </div>
+        </div>
+
+        {{#using objective=instance.objective}}
+          {{#if objective}}
+            <div class="row-fluid">
+              <div class="span12">
+                <h6>Objective</h6>
+                <p class="oneline">
+                  <i class="grcicon-objective-color nomargin"></i>
+                  {{#is_allowed "view_object_page" objective}}
+                    <a class="object-title" href="{{objective.viewLink}}" target="_blank">{{objective.title}}</a>
+                  {{else}}
+                    <span class="object-title" target="_blank">{{objective.title}}</span>
+                  {{/is_allowed}}
+                </p>
               </div>
             </div>
-            {{#using objective=instance.objective}}
-              {{#if objective}}
-                <div class="row-fluid">
-                  <div class="span12">
-                    <div class="media">
-                      <div class="pull-left">
-                        <i class="grcicon-objective-color"></i>
-                        <strong>objective:</strong>
-                      </div>
-                      <div class="media-body">
-                        <div class="tree-description">
-                        {{#is_allowed "view_object_page" objective}}
-                          <a class="object-title" href="{{objective.viewLink}}" target="_blank">{{objective.title}}</a>
-                        {{else}}
-                          <span class="object-title" target="_blank">{{objective.title}}</span>
-                        {{/is_allowed}}
-                          <br>
-                          {{objective.description}}
-                        </div>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              {{/if}}
-            {{/using}}
-
-          </div>
-
-          {{#if instance.requested_on}}
-            {{#using requested_on=instance.requested_on}}
-            <strong>requested on: </strong>{{localize_date requested_on}}
-            {{/using}}
           {{/if}}
+        {{/using}}
 
-          {{{render_hooks 'Request.tree_view_info'}}}
+        {{{render_hooks 'Request.tree_view_info'}}}
 
-          {{#if_can_edit_request instance}}
-            <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
-              <i class="grcicon-edit"></i>
-              Edit PBC {{model.title_singular}}
-            </a>
-          {{/if_can_edit_request}}
-        </div>
       </div>
+
     </div>
+
     {{^if_equals instance.status "Draft"}}
     {{#if draw_children}}
       {{#each child_options}}
