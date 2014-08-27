@@ -352,6 +352,7 @@ can.Control("CMS.Controllers.LHN", {
       window.resize_areas();
       $(window).trigger('resize');
       $obj_bar.css("left", (this.objnav_size + this.lhn_width()) + "px");
+      this.resize_lhn(this.size);
       CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
         prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
       })
