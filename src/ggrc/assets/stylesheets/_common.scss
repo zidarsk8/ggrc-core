@@ -988,3 +988,28 @@ a {
 .tiny-data {
   font-size:12px;
 }
+
+.inline-warning {
+  background:lighten($lightRed,10%);
+  border:1px solid $lightRed;
+  color:$red;
+  @include border-radius();
+  padding:6px;
+  font-size:12px;
+  line-height:16px;
+  h6 {
+    color:#111;
+    font-weight:bold;
+    font-size:12px;
+  }
+  .info.info-expand {
+    line-height:16px;
+    padding:0;
+    background:transparent;
+  }
+  a {
+    color:$red;
+    text-decoration:underline;
+  }
+  
+}

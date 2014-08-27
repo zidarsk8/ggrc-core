@@ -30,9 +30,11 @@
     {{else}}
 
       {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
-      The GDrive folder for this {{instance.class.title_singular}} could not be accessed.
+      <section class="inline-warning">
+        <h6>The gDrive folder for this {{instance.class.title_singular}} could not be accessed.</h6>
+        {{{render '/static/mustache/gdrive/gapi_errors.mustache' type="folder" instance=instance}}}
+      </section>
 
-      {{{render '/static/mustache/gdrive/gapi_errors.mustache' type="folder" instance=instance}}}
 
     {{/with_mapping}}
 
