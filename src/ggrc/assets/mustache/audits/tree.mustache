@@ -81,213 +81,189 @@
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
 
-      <!--
-      <div class="row-fluid">
-
-        <div class="span6">
-        {{#if instance.viewLink}}
-          <a href="{{instance.viewLink}}" class="info-action">
-            View {{instance.class.title_singular}}
-            <i class="grcicon-goto"></i>
-          </a>
-        {{/if}}
-        </div>
-
-        <div class="span6">
-        {{#if mappings}}
-        {{#is_allowed_all 'delete' mappings}}
-        {{^is_dashboard}}
-          <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
-            {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
-            <i class="grcicon-remove"></i>
-            Unmap
-          </a>
-        {{/is_dashboard}}
-        {{/is_allowed_all}}
-        {{/if}}
-        </div>
-
+      <div class="action-bar">
+        <ul class="change-links">
+          {{#is_allowed 'update' instance context='for'}}
+            <li>
+              <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
+                <i class="grcicon-edit"></i>
+                Edit {{model.title_singular}}
+              </a>
+            </li>
+          {{/is_allowed}}
+        </ul>
+        <ul>
+          {{#using program=instance.program}}
+            {{#with_mapping 'authorizations' instance}}
+              {{#if_helpers '\
+                  #is_allowed' 'view_object_page' '__GGRC_ALL__' '\
+                  and ^if_auditor' instance '\
+                  and ^is_page_instance' instance.program '\
+                 ' _0_context='' _1_include_admin=false}}
+                  <li>
+                    <a href="{{program.viewLink}}#audit_widget">
+                      View {{instance.class.title_singular}}
+                      <i class="grcicon-goto"></i>
+                    </a>
+                  </li>
+              {{/if_helpers}}
+            {{/with_mapping}}
+          {{/using}}
+          {{#if_helpers '\
+            #is_page_instance' instance.program '\
+            or #is_profile'}}
+  	        {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
+  	          <li>
+  	          {{! FIXME: Better way to get the Audit link }}
+  	            <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}">
+  	              <i class="grcicon-imp-exp"></i>
+  	              Import PBC List
+  	            </a>
+  	          </li>
+  	        {{/is_allowed}}
+  	        {{#is_allowed 'read' 'Request' context=instance.context.id}}
+  	          <li>
+  	            <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}">
+  	              <i class="grcicon-export"></i>
+  	              Export PBC List
+  	            </a>
+  	          </li>
+  	        {{/is_allowed}}
+          {{/if_helpers}}
+        </ul>
       </div>
-      -->
 
-      {{#instance.description}}
-        <div class="show-description">
+      <div class="small-info">
+
+        <div class="row-fluid">
+          <div class="span8">
+            <h6>Title</h6>
+            <h3>{{instance.title}}</h3>
+          </div>
+          <div class="span4" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
+            <h6>Status</h6>
+            {{#if_helpers '\
+              ^if' allow_mapping_or_creating '\
+              or ^is_allowed' 'update' instance '\
+              or #if' responses.length '\
+            ' _1_context=instance.context.id}}
+              {{instance.status}}
+            {{else}}
+              <select class="input-block-level" name="status">
+                {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
+                <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+                {{/iterate}}
+              </select>
+            {{/if_helpers}}
+          </div>
+        </div>
+        
+        {{#instance.description}}
           <div class="row-fluid">
             <div class="span12">
+              <h6>Description</h6>
               <div class="tree-description">
                 {{{instance.description}}}
               </div>
-
             </div>
           </div>
-        </div>
-      {{/instance.description}}
-
-      <div class="row-fluid">
-        <div class="span5">
-          <div class="tree-info">
-            <ul class="tree-info-list">
-              <li>
-                <strong>Planned Start date: </strong>
-                  {{#if instance.start_date}}
-                    {{localize_date instance.start_date}}
-                  {{else}}
-                    Not set
-                  {{/if}}
-              </li>
-              <li>
-                <strong>Planned End date: </strong>
-                  {{#if instance.end_date}}
-                    {{localize_date instance.end_date}}
-                  {{else}}
-                    Not set
-                  {{/if}}
-              </li>
-              <li>
-                <strong>Planned Report period: </strong>
-                {{#if instance.report_start_date}}
-                  {{#if instance.report_end_date}}
-                    {{localize_date instance.report_start_date}} - {{localize_date instance.report_end_date}}
-                  {{else}}
-                    Starts {{localize_date instance.report_start_date}}
-                  {{/if}}
+          <br>
+        {{/instance.description}}
+        
+        <div class="row-fluid">
+          <div class="span4">
+            <h6>Planned Start Date</h6>
+            <p>
+              {{#if instance.start_date}}
+                {{localize_date instance.start_date}}
+              {{else}}
+                Not set
+              {{/if}}
+            </p>
+          </div>
+          <div class="span4">
+            <h6>Planned End Date</h6>
+            <p>
+              {{#if instance.end_date}}
+                {{localize_date instance.end_date}}
+              {{else}}
+                Not set
+              {{/if}}
+            </p>
+          </div>
+          <div class="span4">
+            <h6>Planned Report Period</h6>
+            <p>
+              {{#if instance.report_start_date}}
+                {{#if instance.report_end_date}}
+                  {{localize_date instance.report_start_date}} - {{localize_date instance.report_end_date}}
                 {{else}}
-                  {{#if instance.report_end_date}}
-                    Ends {{localize_date instance.report_end_date}}
-                  {{else}}
-                    Not set
-                  {{/if}}
+                  Starts {{localize_date instance.report_start_date}}
                 {{/if}}
-              </li>
-            </ul>
+              {{else}}
+                {{#if instance.report_end_date}}
+                  Ends {{localize_date instance.report_end_date}}
+                {{else}}
+                  Not set
+                {{/if}}
+              {{/if}}
+            </p>
           </div>
         </div>
-        <div class="span4">
-          <div class="tree-info">
-            <ul class="tree-info-list">
-              <li>
-                {{#instance.url}}
-                  <strong>URL:</strong>
-                  <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-content="{{renderLive '/static/mustache/pbc/iframe_tooltip.mustache' url=instance.url}}" href="{{schemed_url instance.url}}" target="_blank">
-                    {{instance.url}}
-                  </a>
-                {{/instance.url}}
-              </li>
-              <li>
-                <strong>Audit Lead: </strong>
-                {{#if instance.contact}}
-                  {{#using contact=instance.contact}}
-                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                  {{/using}}
-                {{else}}
-                  None
-                {{/if}}
-              </li>
-              <li>
-                <strong>Audit Firm: </strong>
-                {{#using firm=instance.audit_firm}}
-                  {{{firstnonempty firm.title 'None'}}}
+
+        <div class="row-fluid">
+          <div class="span4">
+            <h6>Audit Lead</h6>
+            <p>
+              {{#if instance.contact}}
+                {{#using contact=instance.contact}}
+                  {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
                 {{/using}}
-              </li>
-              <li>
-                <strong>Auditor: </strong>
-                  {{! `with_auditors` requires `authorizations` mapping, so preload it }}
-                  {{#with_mapping 'authorizations' instance}}
-                  {{#with_auditors instance decoy=authorizations}}
-                    {{#using auditor=auditors.0.person}}
-                      {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
-                    {{/using}}
-                  {{else}}
-                    No auditor assigned
-                  {{/with_auditors}}
-                  {{/with_mapping}}
-              </li>
-            </ul>
+              {{else}}
+                Not defined
+              {{/if}}
+            </p>
+          </div>
+          <div class="span4">
+            <h6>Audit Firm</h6>
+            <p>
+              {{#using firm=instance.audit_firm}}
+                {{{firstnonempty firm.title 'None'}}}
+              {{/using}}
+            </p>
+          </div>
+          <div class="span4">
+            <h6>Auditor</h6>
+            <p>
+              {{! `with_auditors` requires `authorizations` mapping, so preload it }}
+              {{#with_mapping 'authorizations' instance}}
+              {{#with_auditors instance decoy=authorizations}}
+                {{#using auditor=auditors.0.person}}
+                  {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
+                {{/using}}
+              {{else}}
+                No auditor assigned
+              {{/with_auditors}}
+              {{/with_mapping}}
+            </p>
           </div>
         </div>
-        <div class="span3" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
-          {{#if_helpers '\
-            ^if' allow_mapping_or_creating '\
-            or ^is_allowed' 'update' instance '\
-            or #if' responses.length '\
-          ' _1_context=instance.context.id}}
-            <div class="tree-info">
-              <ul class="tree-info-list">
-                <li>
-                  <strong>Status: </strong>
-                  <br>
-                  {{instance.status}}
-                </li>
-              </ul>
+        
+        {{#instance.url}}
+          <div class="row-fluid">
+            <div class="span12">
+              <h6>URL</h6>
+              <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-content="{{renderLive '/static/mustache/pbc/iframe_tooltip.mustache' url=instance.url}}" href="{{schemed_url instance.url}}" target="_blank">
+                {{instance.url}}
+              </a>
             </div>
-          {{else}}
-            <select class="input-medium top-space pull-right" name="status">
-              {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
-              <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-              {{/iterate}}
-            </select>
-          {{/if_helpers}}
+          </div>
+        {{/instance.url}}
 
-        </div>
       </div>
 
       {{{render_hooks 'Audit.tree_view_info'}}}
 
-      <ul class="info-audit">
-        {{#using program=instance.program}}
-        {{#with_mapping 'authorizations' instance}}
-        {{#if_helpers '\
-            #is_allowed' 'view_object_page' '__GGRC_ALL__' '\
-            and ^if_auditor' instance '\
-            and ^is_page_instance' instance.program '\
-           ' _0_context='' _1_include_admin=false}}
-            <li>
-              <a href="{{program.viewLink}}#audit_widget" class="info-action">
-                View {{instance.class.title_singular}}
-                <i class="grcicon-goto"></i>
-              </a>
-            </li>
-        {{/if_helpers}}
-        {{/with_mapping}}
-        {{/using}}
-
-        {{#is_allowed 'update' instance context='for'}}
-          <li>
-          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
-              <i class="grcicon-edit"></i>
-              Edit {{model.title_singular}}
-            </a>
-          </li>
-          <!--
-          <li>
-            <a href="javascript://"><i class="grcicon-edit"></i> {{model.title_singular}} Log</a>
-          </li>
-          -->
-        {{/is_allowed}}
-        {{#if_helpers '\
-          #is_page_instance' instance.program '\
-          or #is_profile'}}
-	        {{#is_allowed 'read' 'Request' context=instance.context.id}}
-
-	          <li>
-	          <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}"><i class="grcicon-export"></i> Export PBC List</a>
-	          </li>
-	        {{/is_allowed}}
-
-	        {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
-	          <li>
-	          {{! FIXME: Better way to get the Audit link }}
-	          <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}"><i class="grcicon-imp-exp"></i> Import PBC List</a>
-	          </li>
-
-	          <!--
-	          <li>
-	          <a href="/audits/{{instance.id}}/import_pbc_template"><i class="grcicon-export"></i> Download PBC Import Template</a>
-	          </li>
-	          -->
-	        {{/is_allowed}}
-        {{/if_helpers}}
-      </ul>
     </div>
 
     {{#if draw_children}}
