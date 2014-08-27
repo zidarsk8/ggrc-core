@@ -4,13 +4,13 @@
     <h6>gDrive Evidence Folder</h6>
     
     {{#with_mapping 'folders' instance}}
-      
+      <p>
       {{#if folders.0.instance.selfLink}}
-
+        
         <a href="{{folders.0.instance.alternateLink}}" target="_blank">
           /{{#using program=instance.program}}{{#with_mapping 'folders' program}}{{folders.0.instance.title}}{{/with_mapping}}{{/using}}/{{folders.0.instance.title}}
         </a>
-
+        
       {{else}}
 
         No evidence folder for this {{instance.class.title_singular}}.
@@ -26,7 +26,7 @@
         {{/using}}
 
       {{/if}}
-
+      </p>
     {{else}}
 
       {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
