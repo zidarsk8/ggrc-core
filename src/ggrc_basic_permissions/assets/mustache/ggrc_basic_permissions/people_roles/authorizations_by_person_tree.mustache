@@ -161,7 +161,9 @@
                             {{role.permission_summary}}
                             {{#if_equals role.permission_summary 'Auditor'}}:
                               {{#with_mapping 'audit_via_context' user_role}}
-                                {{audit_via_context.0.instance.title}}
+                                <span class="role">
+                                  {{audit_via_context.0.instance.title}}
+                                </span>
                               {{/with_mapping}}
                             {{/if_equals}}
                         {{/if_helpers}}
@@ -171,6 +173,7 @@
                 </div>
               </div>            
             </div>          
+          
           </div>
         </div>
       
