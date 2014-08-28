@@ -1130,6 +1130,11 @@ class ReadOnlyResource(Resource):
 
 
 def filter_resource(resource, depth=0, user_permissions=None):
+  """
+  Returns:
+     The subset of resources which are readable based on user_permissions
+  """
+  
   if user_permissions is None:
     user_permissions = permissions.permissions_for(get_current_user())
 
@@ -1162,9 +1167,14 @@ def filter_resource(resource, depth=0, user_permissions=None):
           # Explicitly allow `context` objects to pass through
           pass
         else:
+          # Apply filtering to sub-resources
           if type(value) is dict and 'type' in value:
             resource[key] = filter_resource(
-                value, depth=depth+1, user_permissions=user_permissions)
+              value, depth=depth+1, user_permissions=user_permissions)
+          elif type(value) in (list,tuple):
+            resource[key] = filter_resource(
+              value, depth=depth+1, user_permissions=user_permissions)
+            
       return resource
   else:
     assert False, "Non-object passed to filter_resource"
