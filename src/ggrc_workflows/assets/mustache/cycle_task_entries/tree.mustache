@@ -43,5 +43,5 @@
     </div>
   {{/defer}}
   {{/if_equals}}
-  <span class="entry-author">Modified by {{#using person=parent_instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date instance.created_at}}</span>
+  <span class="entry-author">Modified by {{#using person=instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date instance.created_at}}</span>
 </li>
