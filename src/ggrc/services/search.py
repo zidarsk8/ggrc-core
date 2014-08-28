@@ -31,20 +31,24 @@ def search():
 
   contact_id = request.args.get('contact_id')
   extra_params = request.args.get('extra_params', None)
+  extra_columns = request.args.get('extra_columns', None)
 
   if extra_params:
     # Parse t1:a=b,c=d;t2:e=f into dict {t1:{a:b,c:d},t2:{e:f}}
     extra_params = {k: {kk: vv for kk, vv in
                     map(lambda x: x.split('='), v.split(','))} for k, v in
                     map(lambda x: x.split(':'), extra_params.split(';'))}
+  if extra_columns:
+    # Parse a=b,c=d into dict {a:b,c:d}
+    extra_columns = {k: v for k, v in map(lambda x: x.split('='), extra_columns.split(','))}
 
   if should_just_count:
-    return do_counts(terms, types, contact_id, extra_params)
+    return do_counts(terms, types, contact_id, extra_params, extra_columns)
   if should_group_by_type:
     return group_by_type_search(terms, types, contact_id, extra_params)
   return basic_search(terms, types, permission_type, permission_model, contact_id, extra_params)
 
-def do_counts(terms, types=None, contact_id=None, extra_params=None):
+def do_counts(terms, types=None, contact_id=None, extra_params=None, extra_columns=None):
   from ggrc.rbac import permissions
 
   # FIXME: ? This would make the query more efficient, but will also prune
@@ -55,8 +59,9 @@ def do_counts(terms, types=None, contact_id=None, extra_params=None):
   indexer = get_indexer()
   with benchmark("Counts"):
     results = indexer.counts(terms, types=types, contact_id=contact_id,
-                             extra_params=extra_params)
+                             extra_params=extra_params, extra_columns=extra_columns)
 
+  results = [(r[2] if r[2] != "" else r[0], r[1]) for r in results]
   return current_app.make_response((
     json.dumps({ 'results': {
         'selfLink': request.url,

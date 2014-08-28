@@ -115,10 +115,9 @@ class MysqlIndexer(SqlIndexer):
     return type_column
 
   def _types_to_type_models(self, types):
-    if types is not None:
-      return [
-          model for model in all_models.all_models if model.__name__ in types]
-    return all_models.all_models
+    if types is None:
+      return all_models.all_models
+    return [m for m in all_models.all_models if m.__name__ in types]
 
   # filters by "myview" for a given person
   def _add_owner_query(self, query, types=None, contact_id=None):
@@ -295,14 +294,28 @@ class MysqlIndexer(SqlIndexer):
       else_=literal("ZZZZZ")))
     return query
 
-  def counts(self, terms, group_by_type=True, types=None, contact_id=None, extra_params=None):
+  def counts(self, terms, group_by_type=True, types=None, contact_id=None, extra_params=None, extra_columns=None):
     query = db.session.query(
-        self.record_type.type, func.count(distinct(self.record_type.key)))
+        self.record_type.type, func.count(distinct(self.record_type.key)), literal(""))
     query = query.filter(self._get_type_query(types))
     query = query.filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
     query = self._add_extra_params_query(query, types, extra_params)
     query = query.group_by(self.record_type.type)
+
+    if extra_columns:
+      for k, v in extra_columns.iteritems():
+        params = {v: extra_params.get(k)} if k in extra_params else None
+        q = db.session.query(
+            self.record_type.type, func.count(distinct(self.record_type.key)), literal(k))
+        q = q.filter(self._get_type_query([v]))
+        q = q.filter(self._get_filter_query(terms))
+        q = self._add_owner_query(q, [v], contact_id)
+        q = self._add_extra_params_query(q, [v], params)
+        q = q.group_by(self.record_type.type)
+        query = query.union(q)
+      return query.all()
+
     # FIXME: Is this needed for correct group_by/count-distinct behavior?
     #query = query.order_by(self.record_type.type, self.record_type.key)
     return query.all()
