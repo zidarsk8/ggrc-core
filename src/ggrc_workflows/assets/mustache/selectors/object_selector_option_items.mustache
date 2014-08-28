@@ -55,7 +55,7 @@
     {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
-        {{#pack instance=this}}
+        {{!#pack instance=this}}
           {{#find_template 'tier2_content' instance}}
             {{{renderLive template}}}
           {{else}}
@@ -70,7 +70,7 @@
               </div>
             </div>
           {{/find_template}}
-        {{/pack}}
+        {{!/pack}}
       </div>
     </div>
     {{/if}}
