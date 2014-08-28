@@ -266,12 +266,14 @@ u {
   font-weight: bold;
   @include box-shadow(none);
   .request-control & {
-    padding: 3px 6px;
-    line-height: 15px;
+    padding: 2px 3px;
+    line-height: 13px;
+    font-size:11px;
   }
   .response-control & {
-    padding: 3px 6px;
-    line-height: 15px;
+    padding: 2px 3px;
+    line-height: 13px;
+    font-size:11px;
   }
   i {
     margin-top: 1px;
