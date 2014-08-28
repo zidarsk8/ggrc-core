@@ -96,5 +96,5 @@ class CycleTaskGroupable(object):
 
     query = super(CycleTaskGroupable, cls).eager_query()
     return query.options(
-        #orm.subqueryload('cycle_task_group_objects'),
+        orm.subqueryload('cycle_task_group_objects'),
         )
