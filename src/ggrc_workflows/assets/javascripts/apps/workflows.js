@@ -154,7 +154,7 @@
             "cycle_task_group_objects"),
           cycle_task_group_objects_for_page_object: CustomFilter(
             "cycle_task_group_objects", function(object) {
-              return object.instance.task_group_object.reify().object.reify() === GGRC.page_instance();
+              return object.instance.object.reify() === GGRC.page_instance();
             }),
           cycle_task_group_object_tasks_for_page_object: Cross(
             "cycle_task_group_objects_for_page_object", "cycle_task_group_object_tasks"
