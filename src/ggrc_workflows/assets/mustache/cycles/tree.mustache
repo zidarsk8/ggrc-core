@@ -22,13 +22,17 @@
           {{localize_date instance.end_date}}
         </div>
         <div class="span2">
-          <div class="request-control">
-            <cycle-end-cycle cycle="instance">
-              {{#if cycle.is_current}}
-                <button class="btn end-cycle pull-right">End Cycle</button>
-              {{/if}}
-            </cycle-end-cycle>
-          </div>
+          <ul class="tree-action-list">
+            <li>
+              <div class="request-control">
+                <cycle-end-cycle cycle="instance">
+                  {{#if cycle.is_current}}
+                    <button class="btn end-cycle">End Cycle</button>
+                  {{/if}}
+                </cycle-end-cycle>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </div>

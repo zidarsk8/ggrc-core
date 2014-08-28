@@ -25,8 +25,8 @@
           Owner
           <i class="grcicon-help-black" rel="tooltip" title="Workflow ownership is managed in the People widget."></i>
         </label>
-        <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="hidden" value="" />
-        <input tabindex="3" class="input-block-level" readonly="true" disabled="true" placeholder="Enter email address" type="text" value="{{workflow_owner instance modal_title}}" />
+        <input type="hidden" name="owners.0.email" data-lookup="Person" value="" />
+        <input class="input-block-level" readonly="true" disabled="true" type="text" value="{{workflow_owner instance modal_title}}" />
       {{/with_current_user_as}}
       {{/using}}
       {{/with_mapping}}
@@ -40,7 +40,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3">{{{instance.description}}}</textarea>
+        <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="2">{{{instance.description}}}</textarea>
       </div>
     </div>
     <div class="span4">
@@ -48,7 +48,7 @@
         Frequency
         <i class="grcicon-help-black" rel="tooltip" title="Choose frequency"></i>
       </label>
-      <select tabindex="5" class="input-block-level" id="frequency" name="frequency">
+      <select tabindex="3" class="input-block-level" id="frequency" name="frequency">
         {{#iterate "one_time" "One time" "weekly" "Weekly" "monthly" "Monthly" "quarterly" "Quarterly" "annually" "Annually" step=2}}
         <option value="{{iterator_0}}" {{#if_equals instance.frequency iterator_0}}selected="true"{{/if_equals}}>{{iterator_1}}</option>
         {{/iterate}}
@@ -57,7 +57,7 @@
         Email preferences
         <i class="grcicon-help-black" rel="tooltip" title="This setting will override user email preferences"></i>
       </label>      
-      <input type="checkbox" name="notify_on_change" {{#if instance.notify_on_change}}checked="checked"{{/if}}>
+      <input type="checkbox" name="notify_on_change" {{#if instance.notify_on_change}}checked="checked"{{/if}} tabindex="4">
       Force real-time email updates
     </div>
   </div>
@@ -71,7 +71,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="This email will be sent to all workflow members once workflow starts"></i>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="wf_modal_notify_message" class="span12 double wysihtml5" name="notify_custom_message" placeholder="Enter custom message here" tabindex="3">{{{instance.notify_custom_message}}}</textarea>
+        <textarea id="wf_modal_notify_message" class="span12 double wysihtml5" name="notify_custom_message" placeholder="Enter custom message here" tabindex="5">{{{instance.notify_custom_message}}}</textarea>
       </div> 
     </div>
   </div>
