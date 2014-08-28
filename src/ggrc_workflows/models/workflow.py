@@ -72,7 +72,6 @@ class Workflow(
 
   _fulltext_attrs = [
       'notify_custom_message',
-      'status',
       ]
 
   _publish_attrs = [
