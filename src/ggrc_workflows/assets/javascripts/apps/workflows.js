@@ -555,5 +555,9 @@
     draft_on_update_mixin.add_to(CMS.Models[model_name]);
   });
 
+  // Add Workflows to the orphaned_objects mapping.
+  can.each(_workflow_object_types, function(model_name) {
+    GGRC.Mappings.get_mappings_for(model_name).orphaned_objects.sources.push('workflows');
+  });
 
 })(this.can.$, this.CMS, this.GGRC);
