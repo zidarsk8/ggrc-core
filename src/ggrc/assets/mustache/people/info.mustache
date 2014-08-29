@@ -8,12 +8,18 @@
 <section class="info">
   {{#instance}}  
     {{#is_dashboard}}
-      <div>
-        <a href="/people/{{instance.id}}" class="info-action">
-          View Profile Page
-          <i class="grcicon-goto"></i>
-        </a>
+    
+      <div class="action-bar">
+        <ul>
+          <li>
+            <a href="/people/{{instance.id}}">
+              View Profile Page
+              <i class="grcicon-goto"></i>
+            </a>
+          </li>
+        </ul>
       </div>
+    
     {{/is_dashboard}}
 
     {{#name}}
