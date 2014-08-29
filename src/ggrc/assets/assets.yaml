@@ -250,9 +250,11 @@ dashboard-css-files:
   - jquery-ui.css
 
 dashboard-js-spec-files:
+  - spec_setup.js
   - models/local_storage_spec.js
   - models/recently_viewed_object_spec.js
   - models/display_prefs_spec.js
+  - models/mappers_spec.js
 
 dashboard-js-spec-helpers:
   - jasmine-fixture.js

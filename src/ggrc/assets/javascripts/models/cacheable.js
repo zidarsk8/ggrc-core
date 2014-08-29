@@ -436,12 +436,18 @@ can.Model("can.Model.Cacheable", {
 
   , stubs : function(params) {
       return new can.List(can.map(this.models(params), function(instance) {
-        return instance.stub();
+        if (!instance)
+          return instance;
+        else
+          return instance.stub();
       }));
     }
 
   , stub : function(params) {
-      return this.model(params).stub();
+      if (!params)
+        return params;
+      else
+        return this.model(params).stub();
     }
 
   , model : function(params) {

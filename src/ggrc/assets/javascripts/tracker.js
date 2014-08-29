@@ -9,7 +9,9 @@ GGRC = window.GGRC || {};
 
 GGRC.Tracker = GGRC.Tracker || {};
 
-GGRC.Tracker.timing("dashboard", "load_scripts", Date.now() - st, "dashboard.js script tag to exec start");
+if(typeof st === "number") {
+  GGRC.Tracker.timing("dashboard", "load_scripts", Date.now() - st, "dashboard.js script tag to exec start");
+}
 window.st = Date.now();
 
 GGRC.Tracker.init = function() {
