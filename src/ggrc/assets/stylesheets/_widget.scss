@@ -1055,7 +1055,7 @@
 
 .action-bar {
   @include clearfix();
-  border-bottom:1px solid #eee;
+  padding-top:5px;
   margin-bottom:10px;
   ul {
     @include reset-list();
@@ -1070,6 +1070,30 @@
         font-size:11px;
         text-transform:uppercase;
         font-weight:normal;
+        background:#fafafa;
+        line-height:24px;
+        color:darken($link,20%);
+        display:block;
+        padding:0 6px;
+        @include border-radius(4px);
+        @include transition(background 0.2s ease, color 0.2s ease);
+        i {
+          @include opacity(0.6);
+          @include transition(opacity 0.2s ease);
+        }
+        &:hover {
+         text-decoration:none;
+         color:$link;
+         background:#eee;
+         i {
+           @include opacity(1);
+         }
+        }
+        &.unmap {
+          &:hover {
+            color:$error;
+          }
+        }
       }
     }
     &.change-links {
@@ -1079,4 +1103,11 @@
       }
     }
   }
+}
+
+.object-approved {
+  color:$green;
+  font-size:12px;
+  font-weight:bold;
+  text-transform:uppercase;
 }

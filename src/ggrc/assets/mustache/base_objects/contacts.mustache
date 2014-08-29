@@ -2,7 +2,7 @@
 <div class="row-fluid">
   <div class="span6">
     <h6>Owner</h6>
-    <p>
+    <p class="oneline">
     {{#if is_program}}
       {{#with_mapping 'authorizations' instance}}
         {{#each authorizations}}
@@ -35,7 +35,7 @@
   {{#using person=contact}}
     <div class="span6">
       <h6>Contact</h6>
-      <p>
+      <p class="oneline">
       {{#if person}}
         {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
       {{else}}

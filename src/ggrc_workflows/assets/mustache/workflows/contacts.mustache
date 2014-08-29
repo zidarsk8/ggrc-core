@@ -1,8 +1,8 @@
 {{#instance}}
 <div class="row-fluid">
-  <div {{^if stacked}}class="span12"{{/if}}>
+  <div class="span12">
     <h6>Owner</h6>
-    <p>
+    <p class="oneline">
     {{#with_mapping 'authorizations' instance}}
       {{#each authorizations}}
         <span>
