@@ -46,8 +46,13 @@ function dateConverter(d, oldValue, fn, key) {
   if(typeof d === "string" && ~d.indexOf("/")) {
     conversion = "MM/DD/YYYY";
   }
-  d = d || "";
-  ret = moment(d.toString(), conversion);
+  d = d ? d.toString() : null;
+  ret = moment(d, conversion);
+  if(!ret.unix()) {
+    // invalid date computed. Result of unix() is NaN.
+    return undefined;
+  }
+  
   if (typeof d === "string" && ret
       //  Don't correct timezone for dates
       && !/^\d+-\d+-\d+$/.test(d) && !/^\d+\/\d+\/\d+$/.test(d)
