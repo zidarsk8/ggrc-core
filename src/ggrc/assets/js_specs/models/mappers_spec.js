@@ -534,22 +534,100 @@ describe("mappers", function() {
         cfll._refresh_stubs(binding);
         expect(cfll.filter_fn).toHaveBeenCalledWith(mock_result);
       });
-      /*
-      _refresh_stubs: function(binding) {
-        var self = this
-          ;
 
-        return binding.source_binding.refresh_instances()
-          .then(function(results) {
-            var matching_results = can.map(can.makeArray(results), function(result) {
-              result.instance.reify();
-              if (self.filter_fn(result))
-                return self.make_result(result.instance, [result], binding);
-            });
-            self.insert_results(binding, matching_results);
-          });
-      }
-      */
+    });
+
+    describe("listeners", function() {
+      var cfll, binding, source_binding, new_result;
+      beforeEach(function() {
+        new_result = new LL.MappingResult({id : 1}, []);
+        source_binding = new LL.ListBinding();
+        binding = new LL.ListBinding();
+        cfll = new LL.CustomFilteredListLoader(source_binding, jasmine.createSpy("filter_fn"));
+        binding._refresh_instances_deferred = $.when();
+      });
+
+      describe("source_binding.list add", function() {
+        it("calls custom filter func on the list loader", function() {
+          cfll.init_listeners(binding);
+          source_binding.list.push(new_result);
+          expect(cfll.filter_fn).toHaveBeenCalledWith(new_result);
+        });
+
+        it("does not call the filter func when the binding has not yet been refreshed.", function() {
+          delete binding._refresh_instances_deferred;
+          cfll.init_listeners(binding);
+          source_binding.list.push(new_result);
+          expect(cfll.filter_fn).not.toHaveBeenCalled();
+        });
+
+        it("adds the new item when the filter func returns true", function() {
+          var filter_result = new LL.MappingResult({id : 2}, [new_result]);
+          cfll.filter_fn.andReturn(true);
+          cfll.init_listeners(binding);
+          spyOn(cfll, "make_result").andReturn(filter_result);
+          spyOn(cfll, "insert_results");
+          source_binding.list.push(new_result);
+          expect(cfll.insert_results).toHaveBeenCalledWith(binding, [filter_result]);
+        });
+
+        it("does not add the new item when the filter func returns false", function() {
+          var filter_result = new LL.MappingResult({id : 2}, [new_result]);
+          cfll.filter_fn.andReturn(false);
+          cfll.init_listeners(binding);
+          spyOn(cfll, "make_result").andReturn(filter_result);
+          spyOn(cfll, "insert_results");
+          source_binding.list.push(new_result);
+          expect(cfll.insert_results).not.toHaveBeenCalledWith(binding, [filter_result]);
+          expect(cfll.insert_results).toHaveBeenCalledWith(binding, []);
+        });
+
+        it("adds the new item when the filter func returns a deferred resolving to true", function() {
+          var filter_result = new LL.MappingResult({id : 2}, [new_result]);
+          cfll.filter_fn.andReturn($.when(true));
+          cfll.init_listeners(binding);
+          spyOn(cfll, "make_result").andReturn(filter_result);
+          spyOn(cfll, "insert_results");
+          source_binding.list.push(new_result);
+          expect(cfll.insert_results).toHaveBeenCalledWith(binding, [filter_result]);
+        });
+
+        it("does not add the new item when the filter func returns a deferred resolving to false", function() {
+          var filter_result = new LL.MappingResult({id : 2}, [new_result]);
+          cfll.filter_fn.andReturn($.when(false));
+          cfll.init_listeners(binding);
+          spyOn(cfll, "make_result").andReturn(filter_result);
+          spyOn(cfll, "insert_results");
+          source_binding.list.push(new_result);
+          expect(cfll.insert_results).not.toHaveBeenCalledWith(binding, [filter_result]);
+          expect(cfll.insert_results).toHaveBeenCalledWith(binding, []);
+        });
+
+        it("does not add the new item when the filter func returns a deferred that rejects", function() {
+          var filter_result = new LL.MappingResult({id : 2}, [new_result]);
+          cfll.filter_fn.andReturn(new $.Deferred().reject());
+          cfll.init_listeners(binding);
+          spyOn(cfll, "make_result").andReturn(filter_result);
+          spyOn(cfll, "insert_results");
+          source_binding.list.push(new_result);
+          expect(cfll.insert_results).not.toHaveBeenCalledWith(binding, [filter_result]);
+          expect(cfll.insert_results).toHaveBeenCalledWith(binding, []);
+        });
+
+      });
+
+      describe("source_binding.list remove", function() {
+        it("calls remove_instance on the list loader for each item", function() {
+          var new_result = new LL.MappingResult({id : 1}, []);
+          spyOn(RefreshQueue.prototype, "trigger").andReturn($.when()); //Avoid AJAX
+          spyOn(cfll, "remove_instance");
+          binding.list.push(new_result);
+          source_binding.list.push(new_result);
+          cfll.init_listeners(binding);
+          source_binding.list.shift();
+          expect(cfll.remove_instance).toHaveBeenCalledWith(binding, new_result.instance, new_result);
+        });
+      });
     });
 
   });
