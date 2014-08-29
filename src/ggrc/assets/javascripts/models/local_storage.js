@@ -156,7 +156,7 @@
           , key = [this._shortName, id].join(":")
           , item = this.model({ id : id });
 
-          if(item) {
+          if(window.localStorage.getItem(key)) {
             window.localStorage.removeItem(key);
 
             // remove from list

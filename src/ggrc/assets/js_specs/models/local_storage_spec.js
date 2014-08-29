@@ -10,8 +10,11 @@
 describe("can.Model.LocalStorage", function() {
   
   //run-once setup
-  runs(function() {
-    can.Model.LocalStorage("SpecModel");
+  describe("setup", function() {
+    it("dummy spec", function() {});
+    runs(function() {
+      can.Model.LocalStorage("SpecModel");
+    });
   });
 
   var model1 = { "id" : 1, "foo" : "bar" };
@@ -94,7 +97,9 @@ describe("can.Model.LocalStorage", function() {
         expect(xhr.status).toBe(404);
         failure = true;
       });
-      expect(failure).toBe(true);      
+      waitsFor(function() {
+        return failure;
+      }, 5000, "Failure callback never fired");
     });
   });
 
@@ -156,7 +161,9 @@ describe("can.Model.LocalStorage", function() {
         expect(xhr.status).toBe(404);
         failure = true;
       });
-      expect(failure).toBe(true);      
+      waitsFor(function() {
+        return failure;
+      }, 5000, "failure callback to fire");
     });
   });
 
@@ -182,7 +189,9 @@ describe("can.Model.LocalStorage", function() {
         expect(xhr.status).toBe(404);
         failure = true;
       });
-      expect(failure).toBe(true);      
+      waitsFor(function() {
+        return failure;
+      }, 5000, "failure callback to fire");
     });
 
   });

@@ -65,7 +65,8 @@ describe("GDrive Workflows Controller", function() {
       expect(saved_object.permission_type).toBe("group");
     });
 
-    it("does not create permissions for users who already have an equivalent permission", function() {
+    //This spec is no longer correct, as all of the extant permissions are now divined in resolve_permissions --BM 4/5/2014
+    xit("does not create permissions for users who already have an equivalent permission", function() {
       var person = "foo@example.com";
       
       spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions")
@@ -189,6 +190,7 @@ describe("GDrive Workflows Controller", function() {
         });
         request.audit.reify().attr("requests", [request]);
         spyOn(can.Model.Cacheable.prototype, "get_mapping").andReturn([]);
+        spyOn(can.Model.Cacheable.prototype, "get_binding").andReturn({ refresh_instances : function() { return $.when(); }});
         spyOn(ctl, "link_request_to_new_folder_or_audit_folder");
         spyOn(ctl.request_create_queue, "push");
 
@@ -234,7 +236,7 @@ describe("GDrive Workflows Controller", function() {
   describe("UserRole created event", function() {
 
     it("calls update_permissions only for program with matching context", function() {
-      spyOn(ctl, "update_permissions");
+      spyOn(ctl, "update_permissions").andReturn(new $.Deferred().resolve({}));
 
       var p1 = new CMS.Models.Program({id : 1, context : { id : 1 }});
       var p2 = new CMS.Models.Program({id : 2, context : { id : 2 }});
