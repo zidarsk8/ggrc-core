@@ -30,8 +30,8 @@ def search():
     types = None
 
   contact_id = request.args.get('contact_id')
-  extra_params = request.args.get('extra_params', None)
-  extra_columns = request.args.get('extra_columns', None)
+  extra_params = request.args.get('extra_params', {})
+  extra_columns = request.args.get('extra_columns', {})
 
   if extra_params:
     # Parse t1:a=b,c=d;t2:e=f into dict {t1:{a:b,c:d},t2:{e:f}}
@@ -48,7 +48,7 @@ def search():
     return group_by_type_search(terms, types, contact_id, extra_params)
   return basic_search(terms, types, permission_type, permission_model, contact_id, extra_params)
 
-def do_counts(terms, types=None, contact_id=None, extra_params=None, extra_columns=None):
+def do_counts(terms, types=None, contact_id=None, extra_params={}, extra_columns={}):
   from ggrc.rbac import permissions
 
   # FIXME: ? This would make the query more efficient, but will also prune
@@ -115,7 +115,7 @@ def basic_search(
             contact_id, extra_params)
   return make_search_result(entries)
 
-def group_by_type_search(terms, types=None, contact_id=None, extra_params=None):
+def group_by_type_search(terms, types=None, contact_id=None, extra_params={}):
   entries = {}
   list_for_type = \
       lambda t: entries[t] if t in entries else entries.setdefault(t, [])

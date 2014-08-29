@@ -52,10 +52,7 @@ class MysqlIndexer(SqlIndexer):
   record_type = MysqlRecordProperty
 
   def _get_type_query(
-      self, types=None, permission_type='read', permission_model=None):
-    model_names = [model.__name__ for model in all_models.all_models]
-    if types is not None:
-      model_names = [m for m in model_names if m in types]
+      self, model_names, permission_type='read', permission_model=None):
 
     type_queries = []
     for model_name in model_names:
@@ -246,78 +243,90 @@ class MysqlIndexer(SqlIndexer):
 
     return query
 
-  def _add_extra_params_query(self, query, types, extra_params):
-    if not extra_params:
+  def _add_extra_params_query(self, query, type, extra_param):
+    if not extra_param:
       return query
 
-    type_models = self._types_to_type_models(types)
+    models = [m for m in all_models.all_models if m.__name__ == type]
 
-    param_union_queries = []
-    for model in type_models:
-      if not extra_params or model.__name__ not in extra_params:
-        continue
-      param_query = db.session.query(
-          model.id.label('id'),
-          literal(model.__name__).label('type'),
-          literal('context_id').label('context_id')
-      ).filter_by(**extra_params.get(model.__name__))
-      param_union_queries.append(param_query)
-
-    # Extra filters were not defined for selected types
-    if len(param_union_queries) == 0:
+    if len(models) == 0:
       return query
+    model = models[0]
 
-    # Construct and JOIN to the UNIONed result set
-    param_union_queries = alias(union(*param_union_queries))
-    query = query.join(
-        param_union_queries,
-        or_(~MysqlRecordProperty.type.in_(p for p in extra_params),
-        and_(
-            param_union_queries.c.id == MysqlRecordProperty.key,
-            param_union_queries.c.type == MysqlRecordProperty.type),)
-    )
-    return query
+    return query.filter(self.record_type.key.in_(
+        db.session.query(
+            model.id.label('id')
+        ).filter_by(**extra_param)
+    ))
+
+  def _get_grouped_types(self, types, extra_params):
+    model_names = [model.__name__ for model in all_models.all_models]
+    if types is not None:
+      model_names = [m for m in model_names if m in types]
+
+    if extra_params is not None:
+      model_names = [m for m in model_names if m not in extra_params]
+    return model_names
 
   def search(
-      self, terms, types=None, permission_type='read', permission_model=None, contact_id=None, extra_params=None):
+      self, terms, types=None, permission_type='read', permission_model=None, contact_id=None, extra_params={}):
+    model_names = self._get_grouped_types(types, extra_params)
     query = db.session.query(
         self.record_type.key, self.record_type.type)
     query = query.filter(
-        self._get_type_query(types, permission_type, permission_model))
+        self._get_type_query(model_names, permission_type, permission_model))
     query = query.filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
-    query = self._add_extra_params_query(query, types, extra_params)
+
+    model_names = [model.__name__ for model in all_models.all_models]
+    if types is not None:
+      model_names = [m for m in model_names if m in types]
+
+    unions = []
+    # Add extra_params and extra_colums:
+    for k, v in extra_params.iteritems():
+      if k not in model_names:
+        continue
+      q = db.session.query(
+          self.record_type.key, self.record_type.type)
+      q = q.filter(
+          self._get_type_query([k], permission_type, permission_model))
+      q = q.filter(self._get_filter_query(terms))
+      q = self._add_owner_query(q, [k], contact_id)
+      q = self._add_extra_params_query(q, k, v)
+      unions.append(q)
     # Sort by title:
     # FIXME: This only orders by `title` if title was the matching property
-    query = query.order_by(case(
-      [(self.record_type.property == "title", self.record_type.content)],
-      else_=literal("ZZZZZ")))
+    query = query.union(*unions)
+    #query = query.order_by(case(
+    #  [(self.record_type.property == "title", self.record_type.content)],
+    #  else_=literal("ZZZZZ")))
     return query
 
-  def counts(self, terms, group_by_type=True, types=None, contact_id=None, extra_params=None, extra_columns=None):
+  def counts(self, terms, group_by_type=True, types=None, contact_id=None, extra_params={}, extra_columns={}):
+    model_names = self._get_grouped_types(types, extra_params)
     query = db.session.query(
         self.record_type.type, func.count(distinct(self.record_type.key)), literal(""))
-    query = query.filter(self._get_type_query(types))
+    query = query.filter(self._get_type_query(model_names))
     query = query.filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
-    query = self._add_extra_params_query(query, types, extra_params)
     query = query.group_by(self.record_type.type)
-
-    if extra_columns:
-      for k, v in extra_columns.iteritems():
-        params = {v: extra_params.get(k)} if k in extra_params else None
-        q = db.session.query(
-            self.record_type.type, func.count(distinct(self.record_type.key)), literal(k))
-        q = q.filter(self._get_type_query([v]))
-        q = q.filter(self._get_filter_query(terms))
-        q = self._add_owner_query(q, [v], contact_id)
-        q = self._add_extra_params_query(q, [v], params)
-        q = q.group_by(self.record_type.type)
-        query = query.union(q)
+    all_extra_columns = dict(extra_columns.items() +
+        [(p, p) for p in extra_params if p not in extra_columns]
+    )
+    if not all_extra_columns:
       return query.all()
 
-    # FIXME: Is this needed for correct group_by/count-distinct behavior?
-    #query = query.order_by(self.record_type.type, self.record_type.key)
+    # Add extra_params and extra_colums:
+    for k, v in all_extra_columns.iteritems():
+      q = db.session.query(
+          self.record_type.type, func.count(distinct(self.record_type.key)), literal(k))
+      q = q.filter(self._get_type_query([v]))
+      q = q.filter(self._get_filter_query(terms))
+      q = self._add_owner_query(q, [v], contact_id)
+      q = self._add_extra_params_query(q, v, extra_params.get(k, None))
+      q = q.group_by(self.record_type.type)
+      query = query.union(q)
     return query.all()
 
 Indexer = MysqlIndexer
