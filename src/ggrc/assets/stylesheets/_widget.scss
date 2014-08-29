@@ -1089,6 +1089,11 @@
            @include opacity(1);
          }
         }
+        &.unmap {
+          &:hover {
+            color:$error;
+          }
+        }
       }
     }
     &.change-links {
