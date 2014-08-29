@@ -1,19 +1,20 @@
-    <p class="pull-right" style="margin-right:20px" class="business">
-      {{#if_equals instance.status 'Final'}}
-        <span class="setup-link">Approved</span>
+<p class="pull-right" style="margin-right:20px" class="business">
+  {{#if_equals instance.status 'Final'}}
+    <i class="grcicon-review-color"></i>
+    <span class="object-approved">Reviewed and approved</span>
+  {{else}}
+  {{#person_owned instance.owner.id}}
+    {{#with_mapping_count instance 'current_approval_cycles'}}
+      {{#if_equals count 0}}
+      <a href="javascript://" class="info-edit non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
+        <i class="grcicon-review"></i>
+        <span class="error"><strong>Submit For Review</strong></span>
+      </a>
       {{else}}
-      {{#person_owned instance.owner.id}}
-        {{#with_mapping_count instance 'current_approval_cycles'}}
-          {{#if_equals count 0}}
-          <a href="javascript://" class="info-edit non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
-            <i class="grcicon-review-color"></i>
-            <span class="text-business">Submit For Review</span>
-          </a>
-          {{else}}
-          <i class="grcicon-review"></i>
-          <span class="setup-link">Under review</span>
-          {{/if}}
-        {{/with_mapping}}
-      {{/person_owned}}
+      <i class="grcicon-review"></i>
+      <span class="setup-link">Review in progress</span>
       {{/if}}
-    </p>
+    {{/with_mapping}}
+  {{/person_owned}}
+  {{/if}}
+</p>
