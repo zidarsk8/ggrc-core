@@ -2,10 +2,13 @@
     Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: brad@reciprocitylabs.com
-    Maintained By: brad@reciprocitylabs.com
+    Maintained By: predrag@reciprocitylabs.com
+    
+    Template: extended info applicable to program object
+    
 }}
+
 {{#instance}}
-{{!div class="extended"}}
   <div class="row-fluid">
     <div class="span12">
       <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
@@ -19,21 +22,13 @@
   </div>
   <div class="row-fluid">
     <div class="span12">
-      <div class="rtf">
-        <p>
-          {{{firstnonempty description '<i>No description</i>'}}}
-        </p>
+      <h6>Description</h6>
+      <div class="rtf">      
+        {{{firstnonempty description '<em>No description</em>'}}}
       </div>
-      {{^if_null url}}
-        <a class="url oneline" href="{{schemed_url url}}" target="_blank">
-          {{url}}
-        </a>
-      {{/if_null}}
-      {{#if_null url}}
-        <span class="no-url">No URL</span>
-      {{/if_null}}
     </div>
   </div>
+
   <div class="extended-info-contact">
     {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance is_program=true}}}
   </div>
@@ -106,5 +101,4 @@
       </div>
     </div>
   </div>
-{{!/div}}
 {{/instance}}
