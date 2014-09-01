@@ -272,7 +272,8 @@ class MysqlIndexer(SqlIndexer):
       self, terms, types=None, permission_type='read', permission_model=None, contact_id=None, extra_params={}):
     model_names = self._get_grouped_types(types, extra_params)
     query = db.session.query(
-        self.record_type.key, self.record_type.type)
+        self.record_type.key, self.record_type.type,
+        self.record_type.property, self.record_type.content)
     query = query.filter(
         self._get_type_query(model_names, permission_type, permission_model))
     query = query.filter(self._get_filter_query(terms))
@@ -288,7 +289,8 @@ class MysqlIndexer(SqlIndexer):
       if k not in model_names:
         continue
       q = db.session.query(
-          self.record_type.key, self.record_type.type)
+          self.record_type.key, self.record_type.type,
+          self.record_type.property, self.record_type.content)
       q = q.filter(
           self._get_type_query([k], permission_type, permission_model))
       q = q.filter(self._get_filter_query(terms))
@@ -298,9 +300,9 @@ class MysqlIndexer(SqlIndexer):
     # Sort by title:
     # FIXME: This only orders by `title` if title was the matching property
     query = query.union(*unions)
-    #query = query.order_by(case(
-    #  [(self.record_type.property == "title", self.record_type.content)],
-    #  else_=literal("ZZZZZ")))
+    query = query.order_by(case(
+      [(self.record_type.property == "title", self.record_type.content)],
+      else_=literal("ZZZZZ")))
     return query
 
   def counts(self, terms, group_by_type=True, types=None, contact_id=None, extra_params={}, extra_columns={}):
