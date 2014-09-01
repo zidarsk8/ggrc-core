@@ -1100,6 +1100,15 @@
       }
     }
   }
+  ul.dropdown-menu {
+    li {
+      display:block;
+      margin:0;
+      a {
+        @include border-radius(0);
+      }
+    }
+  }
 }
 
 .object-approved {
