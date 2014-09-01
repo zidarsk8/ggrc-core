@@ -197,6 +197,9 @@
           width: auto !important;
           margin-right: 60px;
           @include oneline();
+          &.lhs-item-long {
+            margin-right: 10px;
+          }
         }
         &.active {
           background:#fff;
