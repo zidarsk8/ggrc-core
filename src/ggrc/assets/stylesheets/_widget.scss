@@ -500,9 +500,6 @@
       @include transition(opacity 0.2s);
       &.non-transparent {
         @include opacity(1);
-        &:hover {
-          text-decoration:underline;
-        }
       }
       &:hover {
         @include opacity(1);
