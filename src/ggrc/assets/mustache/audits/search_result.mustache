@@ -2,18 +2,16 @@
 <li class="{{class.category}}" data-model="true" {{data 'model'}}>
   {{#using program=program}}
   <a href="{{#is_allowed 'view_object_page' 'Program' context=program.context}}{{program.viewLink}}{{else}}/dashboard{{/is_allowed}}#audit_widget/audit/{{id}}" class="show-extended">
-    <div>
       <div>
-        <span class="lhs-item">
+        <span class="lhs-item lhs-item-medium">
           {{title}}
         </span>
       </div>
+      {{#is_private}}
       <div class="lhs-private">
-        {{#is_private}}
-          <i class="grcicon-private" rel="tooltip" title="Private"></i>
-        {{/is_private}}
+        <i class="grcicon-private" rel="tooltip" title="Private"></i>    
       </div>
-    </div>
+      {{/is_private}}
   </a>
   {{/using}}
 </li>

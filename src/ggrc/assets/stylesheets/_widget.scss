@@ -491,24 +491,6 @@
         }
       }
     }
-    a.info-edit {
-      font-size:11px;
-      font-weight:bold;
-      color:#111;
-      text-transform:uppercase;
-      @include opacity(0.4);
-      @include transition(opacity 0.2s);
-      &.non-transparent {
-        @include opacity(1);
-        &:hover {
-          text-decoration:underline;
-        }
-      }
-      &:hover {
-        @include opacity(1);
-        text-decoration:none;
-      }
-    }
     .rtf-block {
       margin-bottom:10px;
       p {
@@ -1100,6 +1082,15 @@
       float:right;
       li {
         margin:0 0 0 20px;
+      }
+    }
+  }
+  ul.dropdown-menu {
+    li {
+      display:block;
+      margin:0;
+      a {
+        @include border-radius(0);
       }
     }
   }

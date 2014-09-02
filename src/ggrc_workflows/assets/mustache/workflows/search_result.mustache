@@ -6,41 +6,43 @@
 }}
 
 
-<li class="filters" data-for="{{model.model_singular}}">
-  <a href="javascript://"
-     {{#if_equals filter_params.Workflow.status 'Active'}}class='active'{{/if_equals}}
+  <li class="filters" data-for="{{model.model_singular}}">
+    <a href="javascript://"
+       {{#if_equals filter_params.Workflow.status 'Active'}}class='active'{{/if_equals}}
      data-key="status" data-value="Active">Active</a> ({{counts.Workflow_Active}})
-  <a href="javascript://"
-     {{#if_equals filter_params.Workflow.status 'Draft'}}class='active'{{/if_equals}}
+    <a href="javascript://"
+       {{#if_equals filter_params.Workflow.status 'Draft'}}class='active'{{/if_equals}}
      data-key="status" data-value="Draft">Draft</a> ({{counts.Workflow_Draft}})
-  <a href="javascript://"
-     {{#if_equals filter_params.Workflow.status 'Inactive'}}class='active'{{/if_equals}}
+    <a href="javascript://"
+       {{#if_equals filter_params.Workflow.status 'Inactive'}}class='active'{{/if_equals}}
      data-key="status" data-value="Inactive">Inactive</a> ({{counts.Workflow_Inactive}})
-</li>
-{{#list}}
-<li class="{{class.category}}" data-model="true" {{data 'model'}}>
-  <a href="{{viewLink}}" class="show-extended">
-    <div>
-      <div class="lhs-main-title">
-        <span class="lhs-item">
-          {{firstnonempty title name email}}
-        </span>
-      </div>
-    </div>
-  </a>
-</li>
-{{/list}}
-{{^list}}
-<li class="spinner">
-</li>
-{{/list}}
-{{^is_allowed 'read' model.shortName context='any'}}
-<li class="no-access">
-  You do not have access to read this information.
-</li>
-{{/is_allowed}}
-{{#list.is_loading}}
-<li class="spinner">
-  <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-</li>
-{{/list.is_loading}}
+  </li>
+
+  {{#list}}
+    <li class="{{class.category}}" data-model="true" {{data 'model'}}>
+      <a href="{{viewLink}}" class="show-extended">
+        <div class="lhs-main-title">
+          <span class="lhs-item lhs-item-long">
+            {{firstnonempty title name email}}
+          </span>
+        </div>
+      </a>
+    </li>
+  {{/list}}
+
+  {{^list}}
+    <li class="spinner">
+    </li>
+  {{/list}}
+
+  {{^is_allowed 'read' model.shortName context='any'}}
+    <li class="no-access">
+      You do not have access to read this information.
+    </li>
+  {{/is_allowed}}
+
+  {{#list.is_loading}}
+    <li class="spinner">
+      <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+    </li>
+  {{/list.is_loading}}

@@ -236,7 +236,9 @@ dashboard-js-template-files:
   - documents/tier2_content.mustache
   - objectives/tier2_content.mustache
   - people/tier2_content.mustache
+  - people/search_result.mustache
   - programs/tier2_content.mustache
+  - programs/search_result.mustache
   - sections/tier2_content.mustache
   - search/advanced_search_base_modal.mustache
   - search/advanced_search_option_column.mustache

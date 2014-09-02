@@ -197,6 +197,13 @@
           width: auto !important;
           margin-right: 60px;
           @include oneline();
+          &.lhs-item-long {
+            margin-right: 10px;
+          }
+          &.lhs-item-medium {
+            margin-right: 36px;
+          }
+
         }
         &.active {
           background:#fff;
@@ -605,6 +612,9 @@
       }
       text-decoration:none;
     }
+  }
+  p {
+    font-size:12px;
   }
   .rtf {
     font-size:12px;
