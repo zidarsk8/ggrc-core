@@ -49,13 +49,42 @@
   </div>
   <div class="row-fluid">
     <div class="span8">
+      {{#using task_group_task=instance.task_group_task}}
+      {{#if_helpers '\
+      #if_equals' task_group_task.task_type 'text' '\
+      or #if_null' task_group_task.task_type}}
       <label>
         Task Details
         <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
       </label>
-      <div class="wysiwyg-area">
-        <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="2">{{instance.description}}</textarea>
+      <div>
+        {{{task_group_task.description}}}
       </div>
+      {{/if_helpers}}
+      {{#if_equals task_group_task.task_type 'menu'}}
+      <label>
+        Response Options
+        <i class="grcicon-help-black" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
+      </label>
+      <select name="selected_response_options">
+        {{#each task_group_task.response_options}}
+          <option value="{{.}}" {{#if_equals instance.selected_response_options.0 this}}selected="selected"{{/if_equals}}>{{.}}</option>
+        {{/each}}
+      </select>
+      {{/if_equals}}
+      {{#if_equals task_group_task.task_type 'checkbox'}}
+      <label>
+        Response Options
+        <i class="grcicon-help-black" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
+      </label>
+        {{#each task_group_task.response_options}}
+          <div class="span4">
+          <input type="checkbox" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}selected="selected"{{/if_equals}}> {{.}}
+        </div>
+        {{/each}}
+      {{/if_equals}}
+      {{/using}}
+    </div>
     </div>
 
     <div class="span4" id="frequency-div">

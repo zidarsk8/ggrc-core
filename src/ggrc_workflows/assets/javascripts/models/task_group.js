@@ -182,7 +182,11 @@
           return workflow.context.reify().refresh();
         });
       }
-    }
+    },
+
+    response_options: can.compute(function() {
+      return $.map(this.attr("description").split(","), $.proxy("".trim.call, "".trim));
+    })
   });
 
 
