@@ -6,98 +6,104 @@
 }}
 
 <section class="info">
-  {{#instance}}
-  <div class="row-fluid">
-    <div class="span12">
-      <h6>Title</h6>
-      <h3>{{title}}</h3>
-      {{#if type}}
-      <p>
-        {{type.title}}
-      </p>
-      {{/if}}
-    </div>
-  </div>
 
-  {{#using directive=instance.directive}}
+  {{#instance}}
+
+    {{#is_allowed 'update' instance context='for'}}  
+      <div class="action-bar">
+        <ul class="change-links">
+          {{{render_hooks 'Section.info_widget_actions'}}}
+          <li>
+            <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="page">
+              <i class="grcicon-edit"></i>
+              <span>Edit {{instance.class.title_singular}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    {{/is_allowed}}
+
+
     <div class="row-fluid">
       <div class="span12">
-        <h6>Part of</h6>
+        <h6>Title</h6>
+        <h3>{{title}}</h3>
+        {{#if type}}
         <p>
-          <a href="{{directive.viewLink}}">
-            <i class="grcicon-{{directive.class.table_singular}}-color"></i>
-            {{directive.title}}
+          {{type.title}}
+        </p>
+        {{/if}}
+      </div>
+    </div>
+
+    {{#using directive=instance.directive}}
+      <div class="row-fluid">
+        <div class="span12">
+          <h6>Part of</h6>
+          <p>
+            <a href="{{directive.viewLink}}">
+              <i class="grcicon-{{directive.class.table_singular}}-color"></i>
+              {{directive.title}}
+            </a>
+          </p>
+        </div>
+      </div>
+    {{/using}}
+
+    <div class="row-fluid">
+      <div class="span12">
+        <h6>Description</h6>
+        <div class="rtf-block">
+          {{{firstnonempty description '<h4 class="no-data">No description</h4>'}}}
+        </div>
+      </div>
+    </div>
+
+    {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+  
+    <div class="row-fluid">
+      <div class="span6">
+        <h6>{{model.title_singular}} URL</h6>
+        <p>
+          <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" href="{{schemed_url url}}" target="_blank">
+            {{url}}
+            {{{scriptwrap "render" '/static/mustache/pbc/iframe_tooltip.mustache' attr_class="popover-data-content" url=url}}}
+          </a>
+        </p>
+      </div>
+      <div class="span6">
+        <h6>Reference URL</h6>
+        <p>
+          <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" href="{{schemed_url reference_url}}" target="_blank">
+            {{reference_url}}
+            {{{scriptwrap "render" '/static/mustache/pbc/iframe_tooltip.mustache' attr_class="popover-data-content" url=reference_url}}}
           </a>
         </p>
       </div>
     </div>
-  {{/using}}
-
-  <div class="row-fluid">
-    <div class="span12">
-      <h6>Description</h6>
-      <div class="rtf-block">
-        {{{firstnonempty description '<h4 class="no-data">No description</h4>'}}}
+    <div class="row-fluid">
+      <div class="span6">
+        <h6>Notes</h6>
+        {{{firstnonempty notes '<h4 class="no-data">No notes available</h4>'}}}
+      </div>
+      <div class="span6">
+        <h6>Code</h6>
+        <p>
+          {{slug}}  
+        </p>
       </div>
     </div>
-  </div>
-
-  {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-  
-  <div class="row-fluid">
-    <div class="span6">
-      <h6>{{model.title_singular}} URL</h6>
+    <br>
+    <div class="info-widget-footer">
       <p>
-        <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" href="{{schemed_url url}}" target="_blank">
-          {{url}}
-          {{{scriptwrap "render" '/static/mustache/pbc/iframe_tooltip.mustache' attr_class="popover-data-content" url=url}}}
-        </a>
+        <small>
+          <em>
+            Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
+            <br>
+            Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+          </em>
+        </small>
       </p>
     </div>
-    <div class="span6">
-      <h6>Reference URL</h6>
-      <p>
-        <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" href="{{schemed_url reference_url}}" target="_blank">
-          {{reference_url}}
-          {{{scriptwrap "render" '/static/mustache/pbc/iframe_tooltip.mustache' attr_class="popover-data-content" url=reference_url}}}
-        </a>
-      </p>
-    </div>
-  </div>
-  <div class="row-fluid">
-    <div class="span6">
-      <h6>Notes</h6>
-      {{{firstnonempty notes '<h4 class="no-data">No notes available</h4>'}}}
-    </div>
-    <div class="span6">
-      <h6>Code</h6>
-      <p>
-        {{slug}}  
-      </p>
-    </div>
-  </div>
-  <br>
-  <div class="info-widget-footer">
-    {{#is_allowed 'update' instance context='for'}}
-    <p class="pull-right">
-      <a href="javascript://" class="info-edit" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="page">
-        <i class="grcicon-edit"></i>
-        <span>Edit {{model.model_title}}</span>
-      </a>
-    </p>
-
-
-    {{{render_hooks 'Section.info_widget_actions'}}}
-    {{/is_allowed}}
-    <p>
-      <small>
-        <em>
-          Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
-          <br>
-          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
-        </em>
-      </small>
-    </p>
-  </div>
   {{/instance}}
 </section>

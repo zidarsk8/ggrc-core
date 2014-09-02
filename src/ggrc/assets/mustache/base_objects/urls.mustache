@@ -5,7 +5,7 @@
         {{#if is_program}}
           Program
         {{else}}
-          {{model.title_singular}}
+          {{firstnonempty instance.class.title_singular}}
         {{/if}}
          URL
       </h6>
