@@ -28,7 +28,14 @@
       end_date: "date",
       //workflow_task_groups: "CMS.Models.WorkflowTaskGroup.stubs"
       modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub"
+      context: "CMS.Models.Context.stub",
+      default_lhn_filters: {
+        Workflow: {status: 'Active'},
+        Workflow_All: {},
+        Workflow_Active: {status: 'Active'},
+        Workflow_Inactive: {status: 'Inactive'},
+        Workflow_Draft: {status: 'Draft'}
+      }
     },
 
     tree_view_options: {

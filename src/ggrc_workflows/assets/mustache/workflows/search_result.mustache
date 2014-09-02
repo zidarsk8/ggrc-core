@@ -7,15 +7,15 @@
 
 
   <li class="filters" data-for="{{model.model_singular}}">
-    <a href="javascript://" {{#if_equals filter_params.Workflow.status 'Active'}}class='active'{{/if_equals}} data-key="status" data-value="Active">
-      Active
-    </a>
-    <a href="javascript://" {{#if_equals filter_params.Workflow.status 'Draft'}}class='active'{{/if_equals}} data-key="status" data-value="Draft">
-      Draft
-    </a>
-    <a href="javascript://" {{#if_equals filter_params.Workflow.status 'Inactive'}}class='active'{{/if_equals}} data-key="status" data-value="Inactive">
-      Inactive
-    </a>
+    <a href="javascript://"
+       {{#if_equals filter_params.Workflow.status 'Active'}}class='active'{{/if_equals}}
+     data-key="status" data-value="Active">Active</a> ({{counts.Workflow_Active}})
+    <a href="javascript://"
+       {{#if_equals filter_params.Workflow.status 'Draft'}}class='active'{{/if_equals}}
+     data-key="status" data-value="Draft">Draft</a> ({{counts.Workflow_Draft}})
+    <a href="javascript://"
+       {{#if_equals filter_params.Workflow.status 'Inactive'}}class='active'{{/if_equals}}
+     data-key="status" data-value="Inactive">Inactive</a> ({{counts.Workflow_Inactive}})
   </li>
 
   {{#list}}

@@ -38,9 +38,14 @@ def search():
     extra_params = {k: {kk: vv for kk, vv in
                     map(lambda x: x.split('='), v.split(','))} for k, v in
                     map(lambda x: x.split(':'), extra_params.split(';'))}
+  else:
+    extra_params = {}
+
   if extra_columns:
     # Parse a=b,c=d into dict {a:b,c:d}
     extra_columns = {k: v for k, v in map(lambda x: x.split('='), extra_columns.split(','))}
+  else:
+    extra_columns = {}
 
   if should_just_count:
     return do_counts(terms, types, contact_id, extra_params, extra_columns)

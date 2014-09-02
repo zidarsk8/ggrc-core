@@ -47,6 +47,7 @@ dashboard-js-template-files:
   - workflows/contacts.mustache
   - workflows/tree.mustache
   - workflows/search_result.mustache
+  - workflows/lhn_search.mustache
   - workflows/extended_info.mustache
   - wf_objects/tree_footer.mustache
   - wf_objects/autocomplete_result.mustache
