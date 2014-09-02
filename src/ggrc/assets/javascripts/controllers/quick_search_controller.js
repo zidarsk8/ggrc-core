@@ -584,6 +584,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         var lhn_prefs = prefs.getLHNState()
           , initial_term
           , initial_params = {}
+          , saved_filters = prefs.getLHNState().filter_params
           ;
 
         self.element.html(frag);
@@ -598,11 +599,12 @@ can.Control("CMS.Controllers.LHN_Search", {
         if (self.options.observer.my_work) {
           initial_params = { "contact_id": GGRC.current_user.id };
         }
-        self.options.filter_params.attr('Workflow', {status: 'Active'});
-        self.options.filter_params.attr('Workflow_All', {});
-        self.options.filter_params.attr('Workflow_Active', {status: 'Active'});
-        self.options.filter_params.attr('Workflow_Inactive', {status: 'Inactive'});
-        self.options.filter_params.attr('Workflow_Draft', {status: 'Draft'});
+        $.map(CMS.Models, function(model, name) {
+          if (model.attributes && model.attributes.default_lhn_filters) {
+            self.options.filter_params.attr(model.attributes.default_lhn_filters)
+          }
+        });
+        self.options.filter_params.attr(saved_filters);
         self.options.loaded_lists = [];
         self.run_search(initial_term, initial_params);
 
@@ -1058,6 +1060,8 @@ can.Control("CMS.Controllers.LHN_Search", {
 
         // Construct extra_params based on filters:
         delete this.current_params.extra_params;
+        this.options.display_prefs.setLHNState("filter_params",
+          this.options.filter_params);
         this.options.filter_params.each(function(obj, type) {
           var properties_list = [];
           obj.each(function(v, k){
