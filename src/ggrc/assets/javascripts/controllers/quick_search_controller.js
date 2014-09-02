@@ -544,6 +544,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       , list_selector: 'ul.top-level > li'
       , model_attr_selector: null
       , model_attr: 'data-model-name'
+      , model_extra_attr: 'data-model-extra'
       , count_selector: '.item-count'
       , list_content_selector: 'ul.sub-level'
       , actions_content_selector: 'ul.sub-actions'
@@ -551,6 +552,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       , limit : 50
       , observer : null
       , filter_params: new can.Observe()
+      , counts : new can.Observe()
     }
 }, {
     display: function() {
@@ -597,6 +599,10 @@ can.Control("CMS.Controllers.LHN_Search", {
           initial_params = { "contact_id": GGRC.current_user.id };
         }
         self.options.filter_params.attr('Workflow', {status: 'Active'});
+        self.options.filter_params.attr('Workflow_All', {});
+        self.options.filter_params.attr('Workflow_Active', {status: 'Active'});
+        self.options.filter_params.attr('Workflow_Inactive', {status: 'Inactive'});
+        self.options.filter_params.attr('Workflow_Draft', {status: 'Draft'});
         self.options.loaded_lists = [];
         self.run_search(initial_term, initial_params);
 
@@ -810,6 +816,7 @@ can.Control("CMS.Controllers.LHN_Search", {
             model: CMS.Models[model_name]
           , filter_params: self.options.filter_params
           , list: self.options.visible_lists[model_name]
+          , counts: self.options.counts
           , count: can.compute(function() {
               return self.options.results_lists[model_name].attr('length');
             })
@@ -835,19 +842,38 @@ can.Control("CMS.Controllers.LHN_Search", {
       });
     }
 
-  , get_list_model: function($list) {
+  , get_list_model: function($list, count) {
       $list = $($list);
       if (this.options.model_attr_selector)
         $list = $list.find(this.options.model_attr_selector).first();
+      if (count && $list.attr('data-count')) {
+        return $list.attr('data-count');
+      }
       return $list.attr(this.options.model_attr);
+    }
+  , get_extra_list_model: function($list) {
+      $list = $($list);
+      if (this.options.model_attr_selector)
+        $list = $list.find(this.options.model_attr_selector).first();
+      if(!$list.attr(this.options.model_extra_attr)) {
+        return null;
+      }
+      var model = $list.attr(this.options.model_attr),
+          extra = $list.attr(this.options.model_extra_attr).split(',');
+
+      extra = $.map(extra, function(e){
+        return e + "=" + model;
+      }).join(',');
+      return extra;
     }
 
   , display_counts: function(search_result) {
       var self = this;
+      self.options.counts.attr(search_result.counts);
       can.each(this.get_lists(), function($list) {
         var model_name, count;
         $list = $($list);
-        model_name = self.get_list_model($list);
+        model_name = self.get_list_model($list, true);
         if (model_name) {
           count = search_result.getCountFor(model_name);
 
@@ -923,12 +949,13 @@ can.Control("CMS.Controllers.LHN_Search", {
   , refresh_counts: function() {
       var self = this
         , search_id = this.search_id
-        , models;
+        , models
+        , extra_models;
       models = can.map(this.get_lists(), this.proxy("get_list_model"));
-
+      extra_models = can.map(this.get_lists(), this.proxy("get_extra_list_model"));
       // Retrieve and display counts
       return GGRC.Models.Search.counts_for_types(
-          this.current_term, models, this.current_params
+          this.current_term, models, this.current_params, extra_models
         ).then(function() {
           if (self.search_id === search_id) {
             return self.display_counts.apply(self, arguments);

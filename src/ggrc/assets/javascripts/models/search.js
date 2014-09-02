@@ -21,9 +21,13 @@ can.Model("GGRC.Models.Search", {
   , counts : function(str, params) {
     return this.findOne($.extend({q : str, counts_only : true}, params));
   }
-  , counts_for_types : function(str, types, params) {
+  , counts_for_types : function(str, types, params, extra_columns) {
     return this.findOne(
-      $.extend({q: str, types: types.join(","), counts_only: true }, params));
+      $.extend({q: str,
+        types: types.join(","),
+        counts_only: true,
+        extra_columns: extra_columns && extra_columns.join(',')
+      }, params));
   }
   , load_via_model_endpoints: function(types) {
     var dfds;
