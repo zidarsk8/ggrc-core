@@ -170,7 +170,23 @@ def get_cycle_contacts(cycle):
     ret_tuple=(workflow_owner, contacts)
   return ret_tuple
 
-def prepare_notification_for_task(task, sender, recipient, subject, notif_pri):
+def get_cycle_tasks(cycle):
+  tasks_found={}
+  ret_tasks=[]
+  for group in cycle.cycle_task_groups:
+     for object in group.cycle_task_group_objects:
+       for task in object.cycle_task_group_object_tasks:
+         if tasks_found.has_key(task.id):
+           continue
+         else:
+           ret_tasks.append(task)
+           tasks_found[task.id]=task
+  return ret_tasks
+
+def get_task_object(task):
+   return task.cycle_task_group_object
+
+def prepare_notification_for_task(task, sender, recipient, subject, email_content, notif_pri):
   workflow=get_task_workflow(task)
   if workflow is None:
     current_app.logger.warn("Trigger: Unable to find workflow for task " + task.title)
@@ -178,36 +194,62 @@ def prepare_notification_for_task(task, sender, recipient, subject, notif_pri):
   recipients=[recipient]
   empty_line="""
   """
-  content=empty_line + subject + " for workflow '" + workflow.title + "' " + empty_line + \
-    "  " + request.url_root + workflow._inflector.table_plural + \
-    "/" + str(workflow.id) + "#task_widget"
+  email_digest_content=empty_line + subject + " for workflow '" + workflow.title + "' " + empty_line + \
+      "  " + request.url_root + workflow._inflector.table_plural + \
+      "/" + str(workflow.id) + "#task_widget"
+
+  email_digest_contents={}
+  email_contents={}
+  email_digest_contents[recipient.id]=email_digest_content
+  email_contents[recipient.id]=email_content
   override_flag=notify_on_change(workflow)
-  prepare_notification(task, 'Email_Deferred', notif_pri, subject, content, sender, \
+  prepare_notification(task, 'Email_Deferred', notif_pri, subject, email_contents, sender, \
    recipients, override=override_flag)
-  prepare_notification(task, 'Email_Digest_Deferred', notif_pri, subject, content, sender, \
+  prepare_notification(task, 'Email_Digest_Deferred', notif_pri, subject, email_digest_contents, sender, \
    recipients, override=override_flag)
 
-def prepare_notification_for_taskgroup(task_group, sender, recipient, subject, notif_pri):
-  workflow=get_taskgroup_workflow(task_group)
+def prepare_notification_for_tasks_now(task, sender, recipient, subject, email_content, notif_pri):
+  workflow=get_task_workflow(task)
   if workflow is None:
-    current_app.logger.warn("Trigger: Unable to find workflow for task group " + task_group.title)
+    current_app.logger.warn("Trigger: Unable to find workflow for task " + task.title)
     return
   recipients=[recipient]
   empty_line="""
   """
-  content=empty_line + subject + " for workflow '" + workflow.title + "' " + empty_line + \
-    "  " + request.url_root + workflow._inflector.table_plural + \
-    "/" + str(workflow.id) + "#task_group_widget"
+  email_digest_content=empty_line + subject + " for workflow '" + workflow.title + "' " + empty_line + \
+      "  " + request.url_root + workflow._inflector.table_plural + \
+      "/" + str(workflow.id) + "#task_widget"
+
+  email_digest_contents={}
+  email_contents={}
+  email_digest_contents[recipient.id]=email_digest_content
+  email_contents[recipient.id]=email_content
   override_flag=notify_on_change(workflow)
-  prepare_notification(task_group, 'Email_Deferred', notif_pri, subject, content, sender, recipients, override=override_flag)
-  prepare_notification(task_group, 'Email_Digest_Deferred', notif_pri, subject, content, sender, recipients, override=override_flag)
+  prepare_notification(task, 'Email_Now', notif_pri, subject, email_contents, sender, \
+   recipients, override=override_flag)
+  prepare_notification(task, 'Email_Digest_Deferred', notif_pri, subject, email_digest_contents, sender, \
+   recipients, override=override_flag)
 
 def handle_tasks_overdue():
+  frequency_mapping =  {
+    "weekly" : 1, 
+    "monthly" : 3, 
+    "quarterly": 7, 
+    "annually": 15
+   }
   tasks=db.session.query(models.CycleTaskGroupObjectTask).\
-    filter(models.CycleTaskGroupObjectTask.end_date < date.today()).\
+    filter(models.CycleTaskGroupObjectTask.end_date == date.today() + timedelta(frequency_mapping["weekly"])).\
+    filter(models.CycleTaskGroupObjectTask.end_date == date.today() + timedelta(frequency_mapping["monthly"])).\
+    filter(models.CycleTaskGroupObjectTask.end_date == date.today() + timedelta(frequency_mapping["quarterly"])).\
+    filter(models.CycleTaskGroupObjectTask.end_date == date.today() + timedelta(frequency_mapping["annually"])).\
     filter(models.CycleTaskGroupObjectTask.status != 'Finished').\
     filter(models.CycleTaskGroupObjectTask.status != 'Verified').\
     all()
+
+  if not len(tasks):
+    return
+
+  tasks_for_contact={}
   for task in tasks:
     cycle=get_cycle(task)
     if cycle is None:
@@ -219,8 +261,34 @@ def handle_tasks_overdue():
       continue
     workflow_owner=contact[0]
     assignee=contact[1]
-    subject="Task " + "'" + task.title + "' is past overdue "  + str(task.end_date)
-    prepare_notification_for_task(task, workflow_owner, assignee, subject, PRI_TASK_OVERDUE)
+    if not frequency_mapping.has_key(cycle.workflow.frequency):  
+      continue
+    num_days=frequency_mapping[cycle.workflow.frequency]
+    if cycle.end_date != date.today() + num_days:
+      continue
+    if not tasks_for_contact.has_key(assignee.id):
+      tasks_for_contact[assignee.id]=[]
+    tasks_for_contact[assignee.id].append((assignee, task))
+
+  subject="One or more tasks assigned to you are due in "  + str(num_days)
+  email_contents={}
+  for id, items in tasks_for_contact.items():
+    email_content=""
+    for item in items:
+      (assignee, task)=item
+      email_content="Hi " + assignee.name + ",<br>"  + "<p>Your tasks: <ul>"
+      break
+    for item in items:
+      (assignee, task)=item
+      task_object=get_task_object(task)
+      email_content=email_content+"<li>" + task.title + ", for " + task_object.title + "</li>"
+      email_content=email_content + \
+        "</ul></p><p>" + "Are due in " + str(num_days) + " .</p>" + \
+        "<p>Click here to view your <a href=" + '"'  + \
+        request.url_root + "dashboard#task_widget"  + '"' + \
+        "<b>task(s)</b></a></p>" + \
+        "Thanks,<br>gGRC Team"
+      prepare_notification_for_tasks_now(task, workflow_owner, assignee, subject, email_content, PRI_TASK_OVERDUE)
 
 def handle_tasks_due(num_days):
   tasks=db.session.query(models.CycleTaskGroupObjectTask).\
@@ -228,6 +296,11 @@ def handle_tasks_due(num_days):
     filter(models.CycleTaskGroupObjectTask.status != 'Finished').\
     filter(models.CycleTaskGroupObjectTask.status != 'Verified').\
     all()
+
+  if not len(tasks):
+    return
+
+  tasks_for_contact={}
   for task in tasks:
     cycle=get_cycle(task)
     if cycle is None:
@@ -239,8 +312,49 @@ def handle_tasks_due(num_days):
       continue
     workflow_owner=contact[0]
     assignee=contact[1]
-    subject="Task " + "'" + task.title + "' is due in " + str(num_days) + " days"
-    prepare_notification_for_task(task, workflow_owner, assignee, subject, PRI_TASK_DUE)
+    if not tasks_for_contact.has_key(assignee.id):
+      tasks_for_contact[assignee.id]=[]
+    tasks_for_contact[assignee.id].append((assignee, task))
+
+  if num_days > 0:
+    num_days_text="in " + str(num_days)
+  else:
+    num_days_text="today"
+  subject="One or more tasks assigned to you are due " + num_days_text + "!"
+
+  for id, items in tasks_for_contact.items():
+    email_content=""
+    for item in items:
+      (assignee, task)=item
+      email_content="Hi " + assignee.name + ",<br>"  + "<p>Your tasks: <ul>"
+      break
+    for item in items:
+      (assignee, task)=item
+      task_object=get_task_object(task)
+      email_content=email_content+"<li>" + task.title + ", for " + task_object.title + "</li>"
+      email_content=email_content + \
+        "</ul></p><p>" + "Are due " + num_days_text + " .</p>" + \
+        "<p>Click here to view your <a href=" + '"'  + \
+        request.url_root + "dashboard#task_widget"  + '"' + \
+        "<b>task(s)</b></a></p>" + \
+        "Thanks,<br>gGRC Team"
+      prepare_notification_for_tasks_now(task, workflow_owner, assignee, subject, email_content, PRI_TASK_DUE)
+
+def handle_tasks_completed_for_cycle():
+  workflow_cycles=db.session.query(models.Cycle).\
+    filter(models.Cycle.is_current==True).\
+    all()
+  unfinished_tasks_in_cycle={}
+  for cycle in workflow_cycles:
+    for task_group in cycle.cycle_task_groups:
+       for task_group_object in task_group.cycle_task_group_objects:
+         for task in task_group_object.cycle_task_group_object_tasks:
+           if task.status not in ['Finished', 'Verified']:
+             unfinished_tasks_in_cycle[cycle.id]=True
+  for cycle in workflow_cycles:
+     if not unfinished_tasks_in_cycle.has_key(cycle.id):
+       subject="All tasks for workflow "  + cycle.title  + " are completed"
+       prepare_notification_for_completed_cycle(cycle, subject, PRI_CYCLE)
 
 @Resource.model_posted.connect_via(NotificationConfig)
 def handle_notification_config_post(sender, obj=None, src=None, service=None):
@@ -269,42 +383,15 @@ def handle_notification_config_changes(sender, obj=None, src=None, service=None)
         enable_flag={assignee.id: obj.enable_flag}
         prepare_calendar_for_cycle(cycle, enable_flag)
 
-@Resource.model_put.connect_via(models.Cycle)
-def handle_end_cycle(sender, obj=None, src=None, service=None):
-  if obj is None:
-    current_app.logger.warn("Trigger: Unable to get cycle object")
-    return
-  if not hasattr(obj, 'is_current'):
-    current_app.logger.warn("is_current attribute is not set in object")
-    return
-  if not obj.is_current:
-    notify_custom_message=False
-    subject="Workflow Cycle " + "'" + obj.title + "' ended"
-    prepare_notification_for_cycle(obj, subject, PRI_CYCLE, notify_custom_message)
-
 @workflow_cycle_start.connect_via(models.Cycle)
 def handle_start_cycle(sender, obj=None, new_status=None, old_status=None):
   if obj is None:
     current_app.logger.warn("Trigger: Unable to get cycle object")
     return
   notify_custom_message=True
-  subject="Workflow Cycle " + "'" + obj.title + "' started"
+  subject="Workflow " + obj.title + " is activated"
   prepare_notification_for_cycle(obj, subject, PRI_CYCLE, notify_custom_message)
   prepare_calendar_for_cycle(obj)
-
-@status_change.connect_via(models.CycleTaskGroup)
-def handle_taskgroup_status_change(sender, obj=None, new_status=None, old_status=None):
-  if obj is None:
-    current_app.logger.warn("Trigger: Unable to get task group object")
-    return
-  contact=get_task_group_contacts(obj)
-  if contact is None:
-    current_app.logger.warn("Trigger: Unable to get task group contact information")
-    return
-  workflow_owner=contact[0]
-  assignee=contact[1]
-  subject="Task Group " + "'" + obj.title + "' status changed to "  + new_status
-  prepare_notification_for_taskgroup(obj, workflow_owner, assignee, subject, PRI_TASKGROUP)
 
 @Resource.model_deleted.connect_via(models.CycleTaskGroup)
 def handle_taskgroup_deleted(sender, obj=None, service=None):
@@ -333,13 +420,44 @@ def handle_task_put(sender, obj=None, src=None, service=None):
     return
   workflow_owner=contact[0]
   assignee=contact[1]
-  subject="Task " + "'" + obj.title + "' status changed to " + obj.status
   notif_pri=PRI_TASK_CHANGES
-  if obj.status in ['InProgress']:
+  if obj.status in ['Assigned']:
     notif_pri=PRI_TASK_ASSIGNMENT
   user=get_current_user()
-  if obj.status in ['InProgress', 'Finished', 'Assigned', 'Declined', 'Verified']: 
-    prepare_notification_for_task(obj, user, assignee, subject, notif_pri)
+  if obj.status in ['InProgress', 'Finished', 'Verified']: 
+    subject="Email subject is not generated for " + obj.title  + " , status: " + obj.status
+    content="Email content is not generated for " + obj.title  + " , status: " + obj.status
+  if obj.status in ['Assigned', 'Declined']: 
+    cycle=get_cycle(obj)
+    task_object=get_task_object(obj)
+    if cycle is None or object is None: 
+      current_app.logger.error("Unable to find cycle or object for task: " + task.title)
+      return
+    if obj.status in ['Assigned']:
+      subject="Task " +  obj.title + " is assigned to you"
+      content="Hi " + assignee.name + ",<br>" + \
+        "<p>" + user.name  + " assigned task: " + obj.title + " for " + task_object.title + \
+        ", under workflow: " + \
+        "<a href=" + '"' +  request.url_root + cycle.workflow._inflector.table_plural + \
+        "/" + str(cycle.workflow.id) + "#current_widget" + '"' + \
+        "<b>" + cycle.title + "</b></a></p>" + \
+        "<p>Click here to view your <a href=" + '"'  + \
+        request.url_root + "dashboard#task_widget"  + '"' + \
+        "<b>task</b></a></p>" + \
+        "Thanks,<br>gGRC Team"
+    else:
+      subject=user.name + " declined " +  obj.title 
+      content="Hi " + assignee.name + ",<br>" + \
+        "<p>" + user.name  + " declined task: " + obj.title + " for " + task_object.title + \
+        ", under workflow: " + \
+        "<a href=" + '"' +  request.url_root + cycle.workflow._inflector.table_plural + \
+        "/" + str(cycle.workflow.id) + "#current_widget" + '"' + \
+        "<b>" + cycle.title + "</b></a></p>" + \
+        "<p>Click here to view your <a href=" + '"'  + \
+        request.url_root + "dashboard#task_widget"  + '"' + \
+        "<b>task</b></a></p>" + \
+        "Thanks,<br>gGRC Team"
+    prepare_notification_for_task(obj, user, assignee, subject, content, notif_pri)
     taskgroup=get_taskgroup(obj)
     if taskgroup is not None:
       prepare_calendar_for_taskgroup(taskgroup)
@@ -395,11 +513,48 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
       to_email[person.id]=True
       recipients.append(person)
   if len(recipients):
-    prepare_notification(workflow, 'Email_Now', notif_pri, subject, content, \
-      workflow_owner, recipients, notify_custom_message=notify_custom_message, override=override_flag)
-    prepare_notification(workflow, 'Email_Digest', notif_pri, subject, content, \
-        workflow_owner, recipients, override=override_flag)
+    #prepare_notification(workflow, 'Email_Now', notif_pri, subject, content, \
+      #workflow_owner, recipients, notify_custom_message=notify_custom_message, override=override_flag)
+    #prepare_notification(workflow, 'Email_Digest', notif_pri, subject, content, \
+        #workflow_owner, recipients, override=override_flag)
     prepare_calendar_for_workflow_member(cycle, workflow, member, action)
+
+def prepare_notification_for_completed_cycle(cycle, subject, notif_pri, notify_custom_message=False):
+  workflow=get_cycle_workflow(cycle)
+  if workflow is None:
+    current_app.logger.warn("Trigger: Unable to find workflow for cycle")
+    return
+  workflow_owner=get_workflow_owner(workflow)
+  if workflow_owner is None:
+    current_app.logger.warn("Trigger: Unable to find workflow owner for cycle")
+    return
+  override_flag=notify_on_change(workflow)
+  empty_line="""
+  """
+  email_contents={}
+  email_digest_contents={}
+  email_digest_content=empty_line + subject + empty_line +  \
+    "  " + request.url_root + workflow._inflector.table_plural + \
+    "/" + str(workflow.id) + "#current_widget"
+  members=[workflow_owner]
+  for member in members:
+    email_content = "Hi " + member.name + ",<br>" + \
+      "<p>All tasks for " + cycle.title + " scheduled for this cycle" + \
+      "[" + cycle.start_date.strftime("%m/%d/%y") + "] - " + \
+      "[" + cycle.end_date.strftime("%m/%d/%y") + "]" + \
+      "are completed </p>" + \
+      "<p>Click here to view your <a href=" + '"'  + \
+      request.url_root + workflow._inflector.table_plural + \
+      "/" + str(workflow.id) + "#current_widget"  + '"' + \
+      "<b>workflow</b></a></p>" + \
+      "Thanks,<br>gGRC Team"
+    email_digest_contents[member.id]=email_digest_content
+    email_contents[member.id]=email_content 
+
+  prepare_notification(cycle, 'Email_Now', notif_pri, subject, email_contents, \
+    workflow_owner, members, override=override_flag)
+  prepare_notification(cycle, 'Email_Digest', notif_pri, subject, email_digest_contents, \
+    workflow_owner, members, override=override_flag)
 
 def prepare_notification_for_cycle(cycle, subject, notif_pri, notify_custom_message=False):
   workflow=get_cycle_workflow(cycle)
@@ -413,66 +568,68 @@ def prepare_notification_for_cycle(cycle, subject, notif_pri, notify_custom_mess
   override_flag=notify_on_change(workflow)
   empty_line="""
   """
-  content=empty_line + subject + empty_line +  \
+  email_contents={}
+  email_digest_contents={}
+  email_digest_content=empty_line + subject + empty_line +  \
     "  " + request.url_root + workflow._inflector.table_plural + \
     "/" + str(workflow.id) + "#current_widget"
-  email_content=content
-  if notify_custom_message is True and workflow.notify_custom_message is not None:
-    email_content=workflow.notify_custom_message + "<br>" + content
-  prepare_notification(cycle, 'Email_Now', notif_pri, subject, email_content, \
-    workflow_owner, workflow.people, override=override_flag)
-  prepare_notification(cycle, 'Email_Digest', notif_pri, subject, content, \
-    workflow_owner, workflow.people, override=override_flag)
+  members=[workflow_owner]
+  for people in workflow.people:
+    members.append(people)
+  for member in members:
+    email_content = "Hi " + member.name + ",<br>" + \
+      "<p>Workflow <a href=" + '"' +  request.url_root + workflow._inflector.table_plural + \
+      "/" + str(workflow.id) + "#current_widget" + '"' + \
+      "<b>" + cycle.title + "</b></a> is now active <br></p>" 
+    if notify_custom_message is True and workflow.notify_custom_message is not None:
+     email_content="<p>" + email_content + workflow.notify_custom_message + "</p>"
+    email_digest_contents[member.id]=email_digest_content
+    email_contents[member.id]=email_content + \
+      "<p>First cycle starts on " + cycle.start_date.strftime("%m/%d/%y") + \
+      " and is due on " + cycle.end_date.strftime("%m/%d/%y") + \
+      "</p>"
 
-def prepare_notification_for_workflow(workflow, subject, notif_pri):
-  workflow_owner=get_workflow_owner(workflow)
-  if workflow_owner is None:
-    current_app.logger.warn("Trigger: Unable to find workflow owner for cycle")
-    return
-  override_flag=notify_on_change(workflow)
-  empty_line="""
-  """
-  content=empty_line + subject + empty_line +  \
-    "  " + request.url_root + workflow._inflector.table_plural + \
-    "/" + str(workflow.id) + "#info_widget"
-  prepare_notification(workflow, 'Email_Now', notif_pri, subject, content, \
-    workflow_owner, workflow.people, override=override_flag)
-  prepare_notification(workflow, 'Email_Digest', notif_pri, subject, content, \
-    workflow_owner, workflow.people, override=override_flag)
+  task_for_contact={}
+  tasks=get_cycle_tasks(cycle)
+  for task in tasks:
+    if task.contact:
+      if not task_for_contact.has_key(task.contact.id):
+        task_for_contact[task.contact.id]=[]
+      task_for_contact[task.contact.id].append(task)
+  for member in members:
+    if task_for_contact.has_key(member.id):
+      email_content=email_contents[member.id]
+      if len(tasks):
+        email_content=email_content + \
+          "<p>You are assigned the following tasks: </p><ul>"
+        tasks=task_for_contact[member.id]
+        for task in tasks:
+          task_object=get_task_object(task)
+          if task_object:
+            email_content=email_content + "<li>" + \
+              task.title + ", " + "for " + task_object.title +  ", " + \
+              "due on " +  task.end_date.strftime("%m/%d/%y") +  "</li>"
+        email_contents[member.id]=email_content+"</ul>"
 
-def handle_workflow_cycle_overdue():
-  workflow_cycles=db.session.query(models.Cycle).\
-    filter(models.Cycle.is_current==True).\
-    filter(models.Cycle.status != 'Finished').\
-    filter(models.Cycle.status != 'Verified').\
-    filter(models.Cycle.end_date < date.today()).\
-    all()
-  for cycle in workflow_cycles:
-    subject="Workflow " + "'" + cycle.title + "' is past overdue " + str(cycle.end_date) 
-    prepare_notification_for_cycle(cycle, subject, PRI_CYCLE)
-
-def handle_workflow_cycle_due(num_days):
-  workflow_cycles=db.session.query(models.Cycle).\
-    filter(models.Cycle.is_current==True).\
-    filter(models.Cycle.status != 'Finished').\
-    filter(models.Cycle.status != 'Verified').\
-    filter(models.Cycle.end_date == (date.today() + timedelta(num_days))).\
-    all()
-  for cycle in workflow_cycles:
-    subject="Workflow " + "'" + cycle.title + "' is due in " + str(num_days) + " days"
-    prepare_notification_for_cycle(cycle, subject, PRI_CYCLE)
-
-def handle_workflow_cycle_starting(num_days):
-  workflows=db.session.query(models.Workflow)
-  for workflow in workflows:
-    next_start_date = workflow.next_cycle_start_date
-    #next_start_date=calc_start_date(
-    #  workflow.frequency, 
-    #  workflow.start_date)
-    starting_date=date.today() + timedelta(num_days)
-    if next_start_date == starting_date:
-      subject="Workflow " + "'" + workflow.title + "' will start in " + str(num_days) + " days"
-      prepare_notification_for_workflow(workflow, subject, PRI_WORKFLOW)
+  end_email_content= \
+    "<p>" + \
+    "Workflow members are:  <ul>" + \
+    "<li>" + workflow_owner.name +  " Workflow Owner </<li>" 
+  for people in workflow.people:
+    end_email_content=end_email_content + \
+      "<li>" + people.name + " Workflow Member </li>"
+  end_email_content=end_email_content + "</ul> </p>" + \
+    "<p>Click here to view your <a href=" + '"'  + \
+    request.url_root + "dashboard#task_widget"  + '"' + \
+    "<b>tasks</b></a></p>" + \
+    "Thanks,<br>gGRC Team"
+  for member in members:
+    email_contents[member.id]=email_contents[member.id]+end_email_content
+ 
+  prepare_notification(cycle, 'Email_Now', notif_pri, subject, email_contents, \
+    workflow_owner, members, override=override_flag)
+  prepare_notification(cycle, 'Email_Digest', notif_pri, subject, email_digest_contents, \
+    workflow_owner, members, override=override_flag)
 
 def prepare_notification(src, notif_type, notif_pri, subject, content, owner, recipients, \
   override=False, notify_custom_message=None):
@@ -668,10 +825,12 @@ def notify_email_digest():
   """ Preprocessing of tasks, cycles prior to generating email digest
   """
   handle_tasks_overdue()
-  handle_workflow_cycle_overdue()
-  handle_workflow_cycle_due(WORKFLOW_CYCLE_DUE)
-  for num_days in WORKFLOW_CYCLE_STARTING:
-    handle_workflow_cycle_starting(num_days)
+  handle_tasks_due(0)
+  handle_tasks_completed_for_cycle()
+  #handle_workflow_cycle_overdue()
+  #handle_workflow_cycle_due(WORKFLOW_CYCLE_DUE)
+  #for num_days in WORKFLOW_CYCLE_STARTING:
+    #handle_workflow_cycle_starting(num_days)
   db.session.commit()
 
   email_digest_notification=EmailDigestNotification()

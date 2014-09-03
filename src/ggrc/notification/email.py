@@ -68,7 +68,7 @@ class EmailNotification(NotificationBase):
     ignored_notifs={}
     #ToDo(Mouli): The valid states mapping must be set outside the generic email notification module
     ignored_states={
-      'CycleTaskGroupObjectTask': ['Finished'],
+      'CycleTaskGroupObjectTask': ['Finished', 'InProgress', 'Verified'],
       'CycleTaskGroup': ['InProgress', 'Verified'],
     }
     for notif in notifs:
@@ -85,7 +85,7 @@ class EmailNotification(NotificationBase):
     #ToDo(Mouli): The valid states mapping must be set outside the generic email notification module
     valid_states={
       'CycleTaskGroupObjectTask': ['Assigned', 'InProgress', 'Finished', 'Verified', 'Declined'],
-      'CycleTaskGroup': ['InProgress', 'Finished', 'Verified'],
+      #'CycleTaskGroup': ['InProgress', 'Finished', 'Verified'],
     }
     valid_transition_task={
      'Assigned': 'InProgress',
@@ -93,13 +93,13 @@ class EmailNotification(NotificationBase):
      'Finished': 'Declined',
      'Finished': 'Verified',
     }
-    valid_transition_taskgroup={
-     'InProgress': 'Finished',
-     'Finished': 'Verified',
-    }
+    #valid_transition_taskgroup={
+     #'InProgress': 'Finished',
+     #'Finished': 'Verified',
+    #}
     valid_transition={
       'CycleTaskGroupObjectTask': valid_transition_task,
-      'CycleTaskGroup': valid_transition_taskgroup,
+      #'CycleTaskGroup': valid_transition_taskgroup,
     }
     undo_transition_task={
      'InProgress': 'Assigned',
@@ -107,13 +107,13 @@ class EmailNotification(NotificationBase):
      'Declined':'Finished',
      'Verified': 'Finished',
     }
-    undo_transition_taskgroup={
-     'Finished': 'InProgress',
-     'Verified': 'Finished',
-    }
+    #undo_transition_taskgroup={
+     #'Finished': 'InProgress',
+     #'Verified': 'Finished',
+    #}
     undo_transition={
       'CycleTaskGroupObjectTask': undo_transition_task,
-      'CycleTaskGroup': undo_transition_taskgroup,
+      #'CycleTaskGroup': undo_transition_taskgroup,
     }
     for key, target_notifs in notifs_by_target.items():
       type=key[0]
@@ -174,7 +174,6 @@ class EmailNotification(NotificationBase):
       notif_pri=self.notif_pri,
       notif_date=now,
       created_at=now,
-      content=content,
       subject=subject,
       sender_id=sender.id
      )
@@ -203,6 +202,7 @@ class EmailNotification(NotificationBase):
         status='InProgress',
         notif_type=self.notif_type,
         recipient_id=recipient.id,
+        content=content[recipient.id],
         notification=notification
       )
       db.session.add(notification_recipient)
@@ -222,8 +222,8 @@ class EmailNotification(NotificationBase):
   def notify_one(self, notification, notify_custom_message=None):
     sender=Person.query.filter(Person.id==notification.sender_id).first()
     assignees={}
-    assignees_with_custom_message={}
     notif_error={}
+    email_content={}
     for notify_recipient in notification.recipients:
       if notify_recipient.notif_type != self.notif_type:
         continue
@@ -233,52 +233,26 @@ class EmailNotification(NotificationBase):
       recipient=Person.query.filter(Person.id==recipient_id).first()
       if recipient is None:
         continue
-      if notify_custom_message is not None and notify_custom_message.has_key(recipient.id):
-        if not assignees_with_custom_message.has_key(recipient.id):
-          assignees_with_custom_message[recipient.id]=recipient.name + " <" + recipient.email + ">"
-      else:
-        if not assignees.has_key(recipient.id):
-          assignees[recipient.id]=recipient.name + " <" + recipient.email + ">"
+      if not assignees.has_key(recipient.id):
+        assignees[recipient.id]=recipient.name + " <" + recipient.email + ">"
+        email_content[recipient_id]=notify_recipient.content
 
     if len(assignees) > 0:
-      to_list=""
-      cnt=0
-      for id, assignee in assignees.items():
-        to_list=to_list + assignee
-        if cnt < len(assignees)-1:
-          to_list=to_list + ","
-        cnt=cnt+1
       sender_info=sender.name + "<" + sender.email + ">" 
       email_headers={"On-Behalf-Of":sender_info}
-      message=mail.EmailMessage(
-        sender="gGRC Administrator on behalf of " + sender.name +  "<" + self.appengine_email + ">",
-        to=to_list,
-        subject=notification.subject,
-        headers=email_headers,
-        html=notification.content,
-        body=notification.content)
-      try:
-        message.send()
-      except: 
-        notif_error[id]="Unable to send email to " + to_list
-        current_app.logger.error("Unable to send email to " + to_list) 
-
-    empty_line="""
-    """
-    for id, assignee in assignees_with_custom_message.items():
-      message=mail.EmailMessage(
-        sender="gGRC Administrator on behalf of " + sender.name +  "<" + self.appengine_email + ">",
-        to=assignee,
-        subject=notification.subject,
-        headers=email_headers,
-        html=notify_custom_message[id] + empty_line +  notification.content,
-        body=notify_custom_message[id] + empty_line +  notification.content)
-
-      try:
-        message.send()
-      except: 
-        notif_error[id]="Unable to send email to " + assignee
-        current_app.logger.error("Unable to send email to " + assignee) 
+      for recipient_id, recipient_email in assignees.items():
+        message=mail.EmailMessage(
+          sender="gGRC Administrator on behalf of " + sender.name +  "<" + self.appengine_email + ">",
+          to=recipient_email,
+          subject=notification.subject,
+          headers=email_headers,
+          html=email_content[recipient_id],
+          body=email_content[recipient_id])
+        try:
+          message.send()
+        except: 
+          notif_error[id]="Unable to send email to " + assignee
+          current_app.logger.error("Unable to send email to " + assignee) 
 
     for notify_recipient in notification.recipients:
       if notify_recipient.notif_type != self.notif_type:
@@ -347,7 +321,7 @@ class EmailDigestNotification(EmailNotification):
             content[key]={}
           if not content[key].has_key(notification.notif_pri):
             content[key][notif_pri]=""
-          content[key][notif_pri]=content[key][notif_pri] + empty_line + notification.content
+          content[key][notif_pri]=content[key][notif_pri] + empty_line + notify_recipient.content
 
       for (recipient_id, sender_id), items in content.items():
         recipient=to[recipient_id] 

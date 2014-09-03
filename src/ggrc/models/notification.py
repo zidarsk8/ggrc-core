@@ -79,6 +79,7 @@ class NotificationRecipient(Base, Stateful, db.Model):
   notification_id = db.Column(db.Integer, db.ForeignKey('notifications.id'), nullable=False)
   recipient_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
   error_text = db.Column(db.Text)
+  content = db.Column(db.Text)
 
 class CalendarEntry(Base, db.Model):
   __tablename__='calendar_entries'
