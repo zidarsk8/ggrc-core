@@ -18,16 +18,24 @@ GGRC.Controllers.Modals("GGRC.Controllers.Delete", {
 
   , "{$footer} a.btn[data-toggle=delete] click" : function(el, ev) {
     var that = this;
+    
+    // Disable the cancel button.
+    var cancel_button = $("a.btn[data-dismiss=modal]");
+    cancel_button.attr('disabled','disabled');
+    
     this.bindXHRToButton(this.options.instance.destroy().done(function(instance) {
       // If this modal is spawned from an edit modal, make sure that one does
       // not refresh the instance post-delete.
       var parent_controller = $(that.options.$trigger).closest('.modal').control();
-      if (parent_controller)
+      if (parent_controller) {
         parent_controller.options.skip_refresh = true;
+      }
 
       $(document.body).trigger("ajax:flash", { success : instance.display_name() +  ' deleted successfully'});
-      if (that.element)
+      if (that.element) {
         that.element.trigger("modal:success", that.options.instance);
+      }
+      
     }), el);
   }
 
