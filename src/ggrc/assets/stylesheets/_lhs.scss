@@ -421,6 +421,11 @@
         .message {
           color: $green;
         }
+        .tiny-help-text {
+          padding-top:4px;
+          font-size:10px;
+          line-height:13px;
+        }
       }
       &.finished {
         background: $rqAccepted;
