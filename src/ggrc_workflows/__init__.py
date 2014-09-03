@@ -453,6 +453,7 @@ def update_workflow_state(workflow):
       RelativeTimeboxed._calc_start_date_of_next_period(
         base_date, workflow.frequency
         )
+    return
 
   for cycle in workflow.cycles:
     if cycle.is_current:
