@@ -2,12 +2,8 @@
   <div class="row-fluid">
     <div class="span6">
       <h6>
-        {{#if is_program}}
-          Program
-        {{else}}
-          {{firstnonempty instance.class.title_singular}}
-        {{/if}}
-         URL
+        {{firstnonempty constructor.title_singular}}
+        URL
       </h6>
       <p>
         <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" href="{{schemed_url url}}" target="_blank">
