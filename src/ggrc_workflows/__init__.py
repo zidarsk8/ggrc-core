@@ -410,6 +410,17 @@ def handle_task_group_task_post(sender, obj=None, src=None, service=None):
   ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
 
 
+@Resource.model_put.connect_via(models.TaskGroup)
+def handle_task_group_put(sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.contact.history.has_changes():
+    ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
+
+
+@Resource.model_posted.connect_via(models.TaskGroup)
+def handle_task_group_post(sender, obj=None, src=None, service=None):
+  ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
+
+
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
     sender, obj=None, src=None, service=None):

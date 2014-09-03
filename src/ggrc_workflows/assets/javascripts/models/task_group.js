@@ -39,6 +39,7 @@
     },
 
     init: function() {
+      var that = this;
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("title");
       this.validate(["_transient.contact", "contact"], function(newVal, prop) {
@@ -50,6 +51,18 @@
         // is resolved.
         if(!contact_has_email_address) {
           return "No valid contact selected for assignee";
+        }
+      });
+
+      // Refresh workflow people:
+      this.bind("created", function(ev, instance) {
+        if (instance instanceof that) {
+          instance.refresh_all_force('workflow', 'context')
+        }
+      });
+      this.bind("updated", function(ev, instance) {
+        if (instance instanceof that) {
+          instance.refresh_all_force('workflow', 'context')
         }
       });
     }
