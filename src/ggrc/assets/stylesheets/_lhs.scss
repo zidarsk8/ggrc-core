@@ -169,7 +169,22 @@
     li {
       &.workflow {
         a {
-          color: $programs;
+          color:$programs;
+        }
+        &.Active {
+          a {
+            color: $green;
+          }        
+        }
+        &.Draft {
+          a {
+            color: darken(#f60,10%);
+          }        
+        }
+        &.Inactive {
+          a {
+            color: #666;
+          }        
         }
       }
     }
@@ -184,13 +199,13 @@
     li {
       font-size:12px;
       &.no-access {
-        padding-left:34px;
+        padding-left:28px;
       }
       a {
         [class*="span"] {
           min-height:24px;
         }
-        padding-left:34px;
+        padding-left:28px;
         background:$white;
         span.lhs-item {
           display:block;
@@ -240,11 +255,38 @@
           color:$link;
         }
       }
-      &.filters > a {
-        display: inline;
-        background-color:white;
-        &.active {
-          font-weight: bold;
+      &.filters {
+        margin-left:28px;
+        a.wf-trigger {
+          display: inline-block;
+          background-color:#eee;
+          color:#666;
+          margin:0 4px 0 0;
+          font-size:11px;
+          text-transform:lowercase;
+          padding:0 4px;
+          line-height:16px;
+          @include border-radius(4px);
+          @include transition(background 0.2s ease, color 0.2s ease);
+          &.active {
+            &.wf-active {
+            background:$green;
+            color:$white;
+            }
+            &.wf-draft {
+            background:darken(#f60,10%);
+            color:$white;
+            }
+            &.wf-inactive {
+            background:#666;
+            color:$white;
+            }
+          }
+          &:hover {
+            text-decoration:none;
+            background:#ddd;
+            color:$link;
+          }
         }
       }
     }
@@ -615,6 +657,18 @@
   }
   p {
     font-size:12px;
+    &.Draft {
+      color:darken(#f60,10%);
+      font-weight:bold;
+    }
+    &.Active {
+      color:$green;
+      font-weight:bold;
+    }
+    &.Inactive {
+      color:#666;
+      font-weight:bold;
+    }
   }
   .rtf {
     font-size:12px;

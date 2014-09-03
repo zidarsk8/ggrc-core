@@ -27,6 +27,17 @@
     </div>
   </div>
 
+  <div class="row-fluid">
+    <div class="span12">
+      <h6>Status</h6>    
+      <p class="{{#if_equals status 'Active'}}Active{{/if_equals}}{{#if_equals status 'Inactive'}}Inactive{{/if_equals}}{{#if_equals status 'Draft'}}Draft{{/if_equals}}">
+        {{status}}
+      </p>
+      </div>
+    </div>
+  </div>
+
+
   <div class="links">
     <div class="row-fluid">
       <div class="span12">
