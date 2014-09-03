@@ -439,12 +439,13 @@ class ModelView(View):
       terms = request.args['__search']
       types = self._get_matching_types(self.model)
       indexer = get_indexer()
-      search_query = indexer._get_type_query(types, 'read', None)
+      models = indexer._get_grouped_types(types)
+      search_query = indexer._get_type_query(models, 'read', None)
       search_query = and_(search_query, indexer._get_filter_query(terms))
       search_query = db.session.query(indexer.record_type.key).filter(search_query)
       if '__mywork' in request.args:
         search_query = indexer._add_owner_query(
-            search_query, types, get_current_user_id())
+            search_query, models, get_current_user_id())
       search_subquery = search_query.subquery()
       query = query.filter(self.model.id.in_(search_subquery))
     order_properties = []
@@ -1134,7 +1135,7 @@ def filter_resource(resource, depth=0, user_permissions=None):
   Returns:
      The subset of resources which are readable based on user_permissions
   """
-  
+
   if user_permissions is None:
     user_permissions = permissions.permissions_for(get_current_user())
 
@@ -1174,7 +1175,7 @@ def filter_resource(resource, depth=0, user_permissions=None):
           elif type(value) in (list,tuple):
             resource[key] = filter_resource(
               value, depth=depth+1, user_permissions=user_permissions)
-            
+
       return resource
   else:
     assert False, "Non-object passed to filter_resource"
