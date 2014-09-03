@@ -259,7 +259,7 @@ class MysqlIndexer(SqlIndexer):
         ).filter_by(**extra_param)
     ))
 
-  def _get_grouped_types(self, types, extra_params):
+  def _get_grouped_types(self, types, extra_params=None):
     model_names = [model.__name__ for model in all_models.all_models]
     if types is not None:
       model_names = [m for m in model_names if m in types]
