@@ -311,7 +311,7 @@
       //    with Mappers/ListLoaders
       //, direct_directives: ForeignKey("Directive", "directive", "controls")
       , joined_directives: Proxy(
-          "Directive", "directive", "DirectiveControl", "control", "directive_controls")
+          null, "directive", "DirectiveControl", "control", "directive_controls")
       , directives: Multi(["joined_directives"]) // "direct_directives"
       , contracts: TypeFilter("directives", "Contract")
       , policies: TypeFilter("directives", "Policy")
