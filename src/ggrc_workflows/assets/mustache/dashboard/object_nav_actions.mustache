@@ -14,6 +14,9 @@
           Activate Workflow
         </button>
       </workflow-activate>
+      {{^instance.task_groups.length}}
+        <p class="tiny-help-text">You need to setup task group(s) before activating workflow</p>
+      {{/task_groups}}
     </li>
   {{/if}}
 {{/is_allowed}}

@@ -1022,3 +1022,18 @@ a {
 .smallmargin {
   margin-top:2px !important;
 }
+
+p {
+  &.Draft {
+    color:darken(#f60,10%);
+    font-weight:bold;
+  }
+  &.Active {
+    color:$green;
+    font-weight:bold;
+  }
+  &.Inactive {
+    color:#666;
+    font-weight:bold;
+  }
+}

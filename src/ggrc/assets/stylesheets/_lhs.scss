@@ -174,17 +174,17 @@
         &.Active {
           a {
             color: $green;
-          }        
+          }
         }
         &.Draft {
           a {
             color: darken(#f60,10%);
-          }        
+          }
         }
         &.Inactive {
           a {
             color: #666;
-          }        
+          }
         }
       }
     }
@@ -256,7 +256,12 @@
         }
       }
       &.filters {
-        margin-left:28px;
+        padding-left:28px;
+        background:$white;
+        height: 24px;
+        margin-top: -24px;
+        position: absolute;
+        width:100%;
         a.wf-trigger {
           display: inline-block;
           background-color:#eee;
@@ -290,6 +295,9 @@
         }
       }
     }
+  }
+  ul.with-filters {
+    margin-top: 24px;
   }
   h2 {
     font-size:11px;
@@ -420,6 +428,11 @@
         padding: 10px;
         .message {
           color: $green;
+        }
+        .tiny-help-text {
+          padding-top:4px;
+          font-size:10px;
+          line-height:13px;
         }
       }
       &.finished {
