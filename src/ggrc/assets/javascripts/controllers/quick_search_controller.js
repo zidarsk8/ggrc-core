@@ -358,7 +358,7 @@ can.Control("CMS.Controllers.LHN", {
       })
     }
 
-  , min_lhn_size : 180
+  , min_lhn_size : 226
   , min_objnav_size : 44
   , mousedown : false
   , dragged : false

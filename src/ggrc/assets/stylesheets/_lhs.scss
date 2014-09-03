@@ -256,10 +256,12 @@
         }
       }
       &.filters {
-        margin-left:28px;
+        padding-left:28px;
+        background:$white;
         height: 24px;
         margin-top: -24px;
         position: absolute;
+        width:100%;
         a.wf-trigger {
           display: inline-block;
           background-color:#eee;
