@@ -211,6 +211,18 @@
             "Workflow", "workflow", "WorkflowPerson", "person", "workflow_people"),
 
         },
+        OrgGroup: {
+          // Make sure OrgGroups don't have workflows
+          //   in orphaned objects:
+          orphaned_objects: Multi([
+            "related_objects",
+            "people",
+            "controls",
+            "objectives",
+            "sections",
+            "clauses",
+          ])
+        },
         Person: {
           assigned_tasks: Search(function(binding) {
             return CMS.Models.CycleTaskGroupObjectTask.findAll({
