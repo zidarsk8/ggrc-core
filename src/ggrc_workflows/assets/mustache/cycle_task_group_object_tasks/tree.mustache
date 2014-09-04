@@ -152,11 +152,37 @@
 
         <div class="row-fluid">
           <div class="span12">
+          {{#if_helpers '\
+            #if_equals' instance.task_type 'text' '\
+            or #if_equals' instance.task_type "" '\
+            or #if_null' instance.task_type}}
             <h6>Task details</h6>
             <div class="tree-description">
               {{{firstnonempty instance.description 'No additional details'}}}
             </div>
-            <br>
+          {{/if_helpers}}
+          {{#if_equals instance.task_type 'menu'}}
+            <h6>Response Options</h6>
+            {{! here we need to start a quick form or other componenet}}
+            <ggrc-quick-update instance="instance">
+              <select name="selected_response_options.0">
+                {{#each instance.response_options}}
+                  <option value="{{.}}" {{#if_equals instance.selected_response_options.0 this}}selected="selected"{{/if_equals}}>{{.}}</option>
+                {{/each}}
+              </select>
+            </ggrc-quick-update>
+          {{/if_equals}}
+          {{#if_equals instance.task_type 'checkbox'}}
+            <h6>Response Options</h6>
+            <ggrc-quick-update instance="instance">
+              {{#each instance.response_options}}
+              <div class="span4">
+                <input type="checkbox" multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}selected="selected"{{/in_array}}> {{.}}
+              </div>
+              {{/each}}
+            </ggrc-quick-update>
+          {{/if_equals}}
+          <br>
           </div>
         </div>
 

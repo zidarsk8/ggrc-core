@@ -83,6 +83,13 @@
       contact: "CMS.Models.Person.stub",
       modified_by: "CMS.Models.Person.stub",
       task_group: "CMS.Models.TaskGroup.stub",
+      response_options: "JSONType"
+    },
+
+    serialize: {
+      JSONType: function(val) {
+        return JSON.stringify(val);
+      }
     },
 
     init: function() {
@@ -184,8 +191,12 @@
       }
     },
 
-    response_options: can.compute(function() {
-      return $.map(this.attr("description").split(","), $.proxy("".trim.call, "".trim));
+    response_options_csv: can.compute(function(val) {
+      if(val != null) {
+        this.attr("response_options", $.map(val.split(","), $.proxy("".trim.call, "".trim)));
+      } else {
+        return (this.attr("response_options") || []).join(", ");
+      }
     })
   });
 

@@ -5,6 +5,7 @@
 
 
 from ggrc import db
+from ggrc.models.types import JsonType
 from ggrc.models.mixins import (
     Base, Titled, Described, Timeboxed, Stateful, WithContact
     )
@@ -27,6 +28,13 @@ class CycleTaskGroupObjectTask(
     "TaskGroupTask",
     foreign_keys="CycleTaskGroupObjectTask.task_group_task_id"
     )
+  task_type = db.Column(
+      db.String(length=250), nullable=False)
+  response_options = db.Column(
+      JsonType, nullable=True)
+  selected_response_options = db.Column(
+      JsonType, nullable=True)
+
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
 
@@ -36,4 +44,7 @@ class CycleTaskGroupObjectTask(
       'task_group_task',
       'cycle_task_entries',
       'sort_index',
+      'task_type',
+      'response_options',
+      'selected_response_options'
       ]
