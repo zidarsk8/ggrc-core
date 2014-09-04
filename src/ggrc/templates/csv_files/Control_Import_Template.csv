@@ -18,7 +18,7 @@ Description is an optional text field.  If you have the description available, w
 Can be ""Reactive"", ""Preventative"", ""Detective"", or ""Administrative"".
 ","*Optional.  
 
-Can be ""Manual"", ""Manual w Segregation of Duties"", ""Automated"", ""IT - Automated ITGC"", ""Fin - IT-Supported Manual"", ""Fin - Application"", or ""Fin - Manual""","*Optional.
+Can be ""Manual"", ""Manual - Segregation of Duties"", ""Automated"", ""IT - Automated ITGC"", ""Fin - IT-Supported Manual"", ""Fin - Application"", or ""Fin - Manual""","*Optional.
 
 Date fields should always follow standard formats such as year/month/date in the form of xxxx/xx/xx ","*Optional.
 
