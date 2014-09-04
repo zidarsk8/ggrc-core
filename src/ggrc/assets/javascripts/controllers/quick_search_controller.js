@@ -871,7 +871,14 @@ can.Control("CMS.Controllers.LHN_Search", {
 
   , display_counts: function(search_result) {
       var self = this;
+
+      // Remove all current counts
+      self.options.counts.each(function(val, key) {
+          self.options.counts.removeAttr(key);
+      });
+      // Set the new counts
       self.options.counts.attr(search_result.counts);
+
       can.each(this.get_lists(), function($list) {
         var model_name, count;
         $list = $($list);
