@@ -2432,4 +2432,17 @@ Mustache.registerHelper("find_template", function(base_name, instance, options) 
   }
 });
 
+// Append string to source if the string isn't already present,
+//   remove the string from source if it is present.
+Mustache.registerHelper("toggle_string", function(source, str){
+  source = Mustache.resolve(source);
+  str = Mustache.resolve(str);
+  var re = new RegExp('.*' + str);
+  if (re.test(source)) {
+    return source.replace(str, '');
+  }
+
+  return source + str;
+});
+
 })(this, jQuery, can);
