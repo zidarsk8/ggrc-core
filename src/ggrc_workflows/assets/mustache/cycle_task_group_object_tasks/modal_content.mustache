@@ -6,6 +6,22 @@
 }}
 
 <form action="javascript://">
+  {{#using cycle=instance.cycle}}
+    {{#using workflow=cycle.workflow}}
+      {{#if_equals workflow.status 'Active'}}
+        <div class="row-fluid">
+          <div class="span12">
+              <div class="alert">
+                <button type="button" class="close" data-dismiss="alert">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>Note:</strong> Any changes made here will affect only this workflow cycle. To change future occurrences, edit task group(s) in "Setup" tab.
+              </div>
+          </div>
+        </div>    
+      {{/if_equals}}
+    {{/using}}
+  {{/using}}
   <div class="row-fluid">
     <div class="span8">
       <label>

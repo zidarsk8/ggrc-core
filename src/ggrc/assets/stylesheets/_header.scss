@@ -526,3 +526,15 @@
   border-top: 1px dotted $menuLink;
   padding-top: 5px;
 }
+
+small {
+  &.count {
+    background:$error;
+    @include border-radius(4px);
+    text-shadow:none;
+    color:$white;
+    &.count-zero {
+      background:#777;
+    }
+  }
+}
