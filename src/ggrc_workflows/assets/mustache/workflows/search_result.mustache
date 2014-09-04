@@ -9,15 +9,15 @@
   <li class="filters" data-for="{{model.model_singular}}">
     <a href="javascript://" class="wf-trigger wf-active {{#if_equals filter_params.Workflow.status 'Active'}}active{{/if_equals}}" data-key="status" data-value="Active">
       Active
-      ({{counts.Workflow_Active}})
-    </a> 
+      ({{firstnonempty counts.Workflow_Active 0}})
+    </a>
     <a href="javascript://" class="wf-trigger wf-draft {{#if_equals filter_params.Workflow.status 'Draft'}}active{{/if_equals}}" data-key="status" data-value="Draft">
       Draft
-      ({{counts.Workflow_Draft}})
-    </a> 
+      ({{firstnonempty counts.Workflow_Draft 0}})
+    </a>
     <a href="javascript://" class="wf-trigger wf-inactive {{#if_equals filter_params.Workflow.status 'Inactive'}}active{{/if_equals}}" data-key="status" data-value="Inactive">
       Inactive
-      ({{counts.Workflow_Inactive}})
+      ({{firstnonempty counts.Workflow_Inactive 0}})
     </a>
   </li>
 
@@ -26,7 +26,7 @@
       <a href="{{viewLink}}" class="show-extended">
         <div class="lhs-main-title">
           <span class="lhs-item lhs-item-long">
-            {{title}} 
+            {{title}}
           </span>
         </div>
       </a>
