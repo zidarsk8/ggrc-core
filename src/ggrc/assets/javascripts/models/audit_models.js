@@ -314,6 +314,28 @@ can.Model.Cacheable("CMS.Models.Request", {
       });
     }
   }
+  , after_save: function() {
+    var that = this;
+    new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
+      return new RefreshQueue().enqueue(audits[0].program).trigger();
+    }).then(function(programs) {
+      return $.when(
+        programs[0],
+        programs[0].get_binding("authorized_people").refresh_instances(),
+        CMS.Models.Role.findAll({ name : "ProgramReader" }));
+    }).then(function(program, people_bindings, reader_roles) {
+      if(!~can.inArray(
+        that.assignee.reify(),
+        can.map(people_bindings, function(pb) { return pb.instance; })
+      )) {
+        new CMS.Models.UserRole({
+          person: that.assignee,
+          role: reader_roles[0].stub(),
+          context: program.context
+        }).save();
+      }
+    });
+  }
   , form_preload : function(new_object_form) {
     var audit, that = this;
     if(new_object_form) {
