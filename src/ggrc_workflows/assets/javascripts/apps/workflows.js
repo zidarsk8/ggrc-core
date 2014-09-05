@@ -479,6 +479,7 @@
         parent_instance: object,
         model: "Cycle",
         mapping: "current_cycles",
+        header_view: GGRC.mustache_path + "/cycles/head.mustache",
       }
     };
     new_widget_descriptors.history = history_widget_descriptor;
