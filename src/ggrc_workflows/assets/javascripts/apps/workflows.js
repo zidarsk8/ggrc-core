@@ -233,8 +233,7 @@
           }),
           assigned_tasks_with_history: Search(function(binding) {
             return CMS.Models.CycleTaskGroupObjectTask.findAll({
-              contact_id: binding.instance.id,
-              status__in: 'Assigned,InProgress,Finished,Declined',
+              contact_id: binding.instance.id
             });
           })
         }
