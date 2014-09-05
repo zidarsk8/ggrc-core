@@ -10,7 +10,6 @@
    Images are saved at 32pixels, scaled to 16pixels for .widgetbtn, and further scaled for .btn-nano and similar ...
  */
 
-
 [class^="grcicon-"],
 [class^="icon-"],
 .showhide {
@@ -27,6 +26,10 @@
     margin-top:2px;
     @include opacity(0.5);
   }
+}
+
+a.remove_filter i[class^="grcicon-"] {
+  vertical-align: text-bottom !important;
 }
 
 // Top level tree items don't need icons
