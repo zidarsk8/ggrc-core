@@ -2,14 +2,14 @@
 """email_content_enhancement
 
 Revision ID: 19abed0bcf16
-Revises: e09d8acc49b
+Revises: 5509cd84a758
 Create Date: 2014-08-25 18:31:38.211566
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '19abed0bcf16'
-down_revision = 'e09d8acc49b'
+down_revision = '5509cd84a758'
 
 from alembic import op
 import sqlalchemy as sa
