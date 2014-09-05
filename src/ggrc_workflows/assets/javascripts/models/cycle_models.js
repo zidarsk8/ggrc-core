@@ -274,7 +274,12 @@
 
     serialize: {
       JSONType: function(val) {
-        return JSON.stringify(val);
+        return JSON.stringify(can.List.prototype.serialize.call(val));
+      }
+    },
+    convert: {
+      JSONType: function(source) {
+        return new can.List(source.serialize ? source.serialize() : source).attr("serialize", null);
       }
     },
 
