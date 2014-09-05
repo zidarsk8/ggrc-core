@@ -379,15 +379,15 @@ def handle_notification_config_changes(sender, obj=None, src=None, service=None)
         enable_flag={assignee.id: obj.enable_flag}
         prepare_calendar_for_cycle(cycle, enable_flag)
 
-@workflow_cycle_start.connect_via(models.Cycle)
-def handle_cycle_start(sender, obj=None, new_status=None, old_status=None):
-  if obj is None:
-    current_app.logger.warn("Trigger: Unable to get cycle object")
-    return
+def handle_new_workflow_cycle_start():
+  cycles=db.session.query(models.Cycle).\
+    filter(models.Cycle.is_current==True).\
+    filter(models.Cycle.start_date == datetime.utcnow().date()).all()
   notify_custom_message=True
-  subject="New cycle of workflow  " + obj.title + " begins today"
-  prepare_notification_for_cycle(obj, subject, " begins today", PRI_CYCLE, notify_custom_message)
-  #ToDo(Mouli): Update calendar entry
+  for cycle in cycles:
+    subject="New cycle of workflow  " + cycle.title + " begins today"
+    prepare_notification_for_cycle(cycle, subject, " begins today", PRI_CYCLE, notify_custom_message)
+    #ToDo(Mouli): Update calendar entry
 
 @Resource.model_deleted.connect_via(models.CycleTaskGroup)
 def handle_taskgroup_deleted(sender, obj=None, service=None):
@@ -825,6 +825,7 @@ class WorkflowCalendarService(CalendarService):
 def notify_email_digest():
   """ Preprocessing of tasks, cycles prior to generating email digest
   """
+  handle_new_workflow_cycle_start()
   handle_tasks_overdue()
   handle_tasks_due(0)
   handle_tasks_completed_for_cycle()
