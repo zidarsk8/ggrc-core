@@ -19,7 +19,7 @@
       </div>
     </div>
   </div>
-  
+
   {{#using workflow=instance.workflow}}
     {{#if_equals workflow.status 'Active'}}
       <div class="row-fluid">
@@ -28,13 +28,13 @@
               <button type="button" class="close" data-dismiss="alert">
                 <span aria-hidden="true">&times;</span>
               </button>
-              <strong>Note:</strong> This workflow is active. Changes you make here will not affect active cycles.
+              <strong>Note:</strong> This workflow is active. Changes you make here will not affect active cycles. They will only affect future recurrences.
             </div>
         </div>
-      </div>    
+      </div>
     {{/if_equals}}
   {{/using}}
-  
+
   {{#if_equals instance.description ""}}
   {{else}}
     <div class="row-fluid">
