@@ -7,7 +7,7 @@
 
 <section class="info">
 
-  {{#is_allowed 'update' instance context='for'}}  
+  {{#is_allowed 'update' instance context='for'}}
     <div class="action-bar">
       <ul class="change-links">
         <li>
@@ -97,13 +97,13 @@
         {{{instance.frequency}}}
       </p>
     </div>
-    
+
   </div>
 
   <div class="row-fluid">
     <div class="span12">
       <h6>
-        gGRC Folder</strong>
+        Workflow Folder <i class="grcicon-help-black" rel="tooltip" data-original-title="If selected, all workflow attachments go here."></i>
       </h6>
       <p class="oneline">
         {{#with_mapping 'folders' instance}}
