@@ -84,8 +84,47 @@
   can.Component.extend({
     tag: "workflow-activate",
     template: "<content/>",
+    init: function() {
+      this.scope._can_activate_def();
+    },
+    scope: {
+      waiting: true,
+      can_activate: false,
+      _can_activate_def: function() {
+        var self = this,
+            workflow = GGRC.page_instance();
+        self.attr('waiting', true);
+        $.when(
+          workflow.refresh_all('task_groups', 'task_group_objects'),
+          workflow.refresh_all('task_groups', 'task_group_tasks')
+        ).then(function() {
+          var task_groups = workflow.task_groups.reify(),
+              can_activate = task_groups.length > 0;
+          task_groups.each(function(task_group) {
+            if (!task_group.task_group_objects.length ||
+                !task_group.task_group_tasks.length) {
+              can_activate = false;
+            }
+          });
+          self.attr('can_activate', can_activate);
+          self.attr('waiting', false);
+        })
+      },
+      _handle_refresh: function(model) {
+        var models = ['TaskGroup', 'TaskGroupTask', 'TaskGroupObject']
+        if (models.indexOf(model.shortName) > -1) {
+          this._can_activate_def();
+        }
+      },
+    },
     events: {
-      click: function() {
+      "{can.Model.Cacheable} created": function(model) {
+        this.scope._handle_refresh(model);
+      },
+      "{can.Model.Cacheable} destroyed": function(model) {
+        this.scope._handle_refresh(model);
+      },
+      "button click": function() {
         var workflow = GGRC.page_instance();
         if (workflow.frequency !== 'one_time') {
           workflow.refresh().then(function() {

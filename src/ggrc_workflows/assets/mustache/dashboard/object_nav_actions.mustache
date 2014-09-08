@@ -7,16 +7,28 @@
 
 
 {{#is_allowed 'update' instance context='for'}}
-  {{#if_equals instance.status "Draft"}}
-    <li class="inner-nav-button">
-      <workflow-activate workflow="instance">
-        <button type="submit" href="#workflowActivate" class="btn" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
-          Activate Workflow
-        </button>
-      </workflow-activate>
-      {{^instance.task_groups.length}}
-        <p class="tiny-help-text">You need to setup task group(s) before activating workflow</p>
-      {{/task_groups}}
-    </li>
-  {{/if}}
+  <li class="inner-nav-button">
+    <workflow-activate workflow="instance" deferredData="can_activate">
+      {{#if_equals instance.status "Draft"}}
+        {{#if waiting}}
+          <span {{attach_spinner '{ "radius": 5, "length": 5, "width": 3 }' 'display:inline-block; margin: 15px;' }}></span>
+        {{else}}
+          <button type="submit" href="#workflowActivate" class="btn" {{^can_activate}}disabled="disabled"{{/can_activate}}>
+            Activate Workflow
+          </button>
+          {{^can_activate}}
+            <p class="tiny-help-text">You need to setup task group(s) before activating workflow</p>
+          {{/can_activate}}
+        {{/waiting}}
+      {{else}}
+        {{#if waiting}}
+          <span {{attach_spinner '{ "radius": 5, "length": 5, "width": 3 }' 'display:inline-block; margin: 15px;' }}></span>
+        {{else}}
+          {{^can_activate}}
+            <p class="alert tiny-help-text" style="margin-bottom:0px;"><strong>Note:</strong> At least one of the task groups is missing either a task or an object.</p>
+          {{/can_activate}}
+        {{/if}}
+      {{/if_equals}}
+    </workflow-activate>
+  </li>
 {{/is_allowed}}

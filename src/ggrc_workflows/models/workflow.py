@@ -84,6 +84,7 @@ class Workflow(
       'cycles',
       'object_approval',
       'recurrences',
+      PublishOnly('next_cycle_start_date'),
       ]
 
   def copy(self, _other=None, **kwargs):
