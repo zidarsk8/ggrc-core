@@ -124,7 +124,7 @@
       "{can.Model.Cacheable} destroyed": function(model) {
         this.scope._handle_refresh(model);
       },
-      click: function() {
+      "button click": function() {
         var workflow = GGRC.page_instance();
         if (workflow.frequency !== 'one_time') {
           workflow.refresh().then(function() {
