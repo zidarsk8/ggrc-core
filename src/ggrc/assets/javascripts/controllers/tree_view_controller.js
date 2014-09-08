@@ -274,7 +274,7 @@ can.Control("CMS.Controllers.TreeLoader", {
         var prepped = that.prepare_child_options(item),
             is_shown = true;
 
-        this.filters.each(function(value, prop) {
+        item.filters && item.filters.each(function(value, prop) {
           if (prepped.instance.attr(prop) !== value) {
             is_shown = false;
           }
