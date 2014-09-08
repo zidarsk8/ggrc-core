@@ -51,9 +51,9 @@
     <div class="span12">
       {{#each filter_list}}
       <div class="indent-row">
-        <button type="submit" data-index="{{@index}}" class="remove_filter">
+        <a href="javascript://" data-index="{{@index}}" class="remove_filter">
           <i class="grcicon-deleted"></i>
-        </button>
+        </a>
         <label>
           <strong>{{#if @index}}AND&nbsp;{{/if}}Relevant to:</strong>
         </label>
