@@ -1532,15 +1532,6 @@
       this.update_selected_items(el, ev);
     }
 
-    /*
-    , ".openclose:not(.active) click" : function(el, ev) {
-        //  Modifying the `result` object is bad, but here it can only affect
-        //  throwaway mapping results.
-        var expandable = el.data("expandable");
-        if (expandable)
-          expandable.attr("expanded", true);
-    }
-    */
     , reset_selection_count: function(){
         this.context.attr('item_selected', false);
         this.context.attr('items_selected', 0);
