@@ -22,16 +22,29 @@ from ggrc_workflows import status_change, workflow_cycle_start
 from datetime import datetime
 from werkzeug.exceptions import Forbidden
 from ggrc.login import get_current_user
+from sqlalchemy import inspect
 
-PRI_TASK_OVERDUE=1
-PRI_TASK_DUE=2
-PRI_TASK_ASSIGNMENT=3
-PRI_TASK_CHANGES=4
-PRI_TASKGROUP=5
-PRI_CYCLE=6
-PRI_WORKFLOW_MEMBER_CHANGES=7
-PRI_OTHERS=8
+PRI_CYCLE=1
+PRI_TASK_OVERDUE=2
+PRI_TASK_DUE=3
+PRI_TASK_ASSIGNED=4
+PRI_TASK_DECLINED=5
+PRI_COMPLETED_TASKS=6
+PRI_TASKGROUP=7
+PRI_WORKFLOW_MEMBER_CHANGES=8
+PRI_OTHERS=9
 
+PRI_MAPPING={
+  PRI_CYCLE: 'New Workflow cycles',
+  PRI_TASK_OVERDUE: 'Overdue Tasks',
+  PRI_TASK_DUE: 'Tasks Due today',
+  PRI_TASK_ASSIGNED: 'Tasks Assigned to you',
+  PRI_TASK_DECLINED: 'Your tasks that are declined',
+  PRI_COMPLETED_TASKS: 'Workflow cycles with all completed tasks',
+}
+
+# ToDo(Mouli): Use pyHaml HTML templates as well sanitize input instead of embedding HTML
+#
 def notify_on_change(workflow):
   if workflow.notify_on_change is None:
     return False
@@ -49,39 +62,39 @@ def get_workflow_owner(workflow):
 def get_task_workflow_owner(task):
   workflow=get_task_workflow(task) 
   if workflow is None:
-    current_app.logger.warn("Trigger: workflow is not found for task " + task.title)
+    current_app.logger.warn("Notification Trigger: workflow is not found for task " + task.title)
     return None
   return get_workflow_owner(workflow)
 
 def get_taskgroup_workflow_owner(task_group):
   workflow=get_taskgroup_workflow(task_group) 
   if workflow is None:
-    current_app.logger.warn("Trigger: workflow is not found for task group " + task_group.title)
+    current_app.logger.warn("Notification Trigger: workflow is not found for task group " + task_group.title)
     return None
   return get_workflow_owner(workflow)
 
 def get_cycle_workflow_owner(cycle):
   workflow=get_cycle_workflow(cycle) 
   if workflow is None:
-    current_app.logger.warn("Trigger: workflow is not found for cycle" + cycle.title)
+    current_app.logger.warn("Notification Trigger: workflow is not found for cycle" + cycle.title)
     return None
   return get_workflow_owner(workflow)
 
 def get_task_workflow(task):
   cycle=get_cycle(task)
   if cycle is None:
-    current_app.logger.warn("Trigger: cycle is not found for task " + task.title)
+    current_app.logger.warn("Notification Trigger: cycle is not found for task " + task.title)
     return None
   return get_cycle_workflow(cycle)
 
 def get_taskgroup_workflow(task_group):
   cycle=get_taskgroup_cycle(task_group) 
   if cycle is None:
-    current_app.logger.warn("Trigger: cycle is not found for task group " + task_group.title)
+    current_app.logger.warn("Notification Trigger: cycle is not found for task group " + task_group.title)
     return None
   workflow=get_cycle_workflow(cycle)
   if workflow is None:
-    current_app.logger.warn("Trigger: workflow cycle is not found for task group " + task_group.title)
+    current_app.logger.warn("Notification Trigger: workflow cycle is not found for task group " + task_group.title)
     return None
   return workflow
 
@@ -92,19 +105,19 @@ def get_task_assignee(task):
   if task_group is not None and task_group.contact is not None:
     return task_group.contact
   if task_group is None:
-    current_app.logger.warn("Trigger: task group for cycle is not found for task " + task.title)
+    current_app.logger.warn("Notification Trigger: task group for cycle is not found for task " + task.title)
     return None
   cycle=get_taskgroup_cycle(task_group)
   if cycle is not None and cycle is not None:
     return cycle.contact
   if cycle is None:
-    current_app.logger.warn("Trigger: cycle is not found for task " + task.title)
+    current_app.logger.warn("Notification Trigger: cycle is not found for task " + task.title)
     return None
    
 def get_cycle(task):
   task_group=get_taskgroup(task) 
   if task_group is None:
-    current_app.logger.warn("Trigger: cycle task group is not found for task " + task.title)
+    current_app.logger.warn("Notification Trigger: cycle task group is not found for task " + task.title)
     return None
   return get_taskgroup_cycle(task_group)
 
@@ -127,7 +140,7 @@ def get_task_contacts(task):
     return None
   assignee=get_task_assignee(task)
   if assignee is None:
-    current_app.logger.warn("Trigger: Unable to find assignee for task " + task.title)
+    current_app.logger.warn("Notification Trigger: Unable to find assignee for task " + task.title)
     return None
   ret_tuple=(workflow_owner, assignee)
   return ret_tuple
@@ -135,7 +148,7 @@ def get_task_contacts(task):
 def get_task_group_contacts(task_group):
   workflow_owner=get_taskgroup_workflow_owner(task_group)
   if workflow_owner is None:
-    current_app.logger.warn("Trigger: Unable to find workflow owner for task group " + task_group.title)
+    current_app.logger.warn("Notification Trigger: Unable to find workflow owner for task group " + task_group.title)
     return None
   ret_tuple=(workflow_owner, workflow_owner)
   return ret_tuple
@@ -143,16 +156,16 @@ def get_task_group_contacts(task_group):
 def get_cycle_contacts(cycle):
   workflow_owner=get_cycle_workflow_owner(cycle)
   if workflow_owner is None:
-    current_app.logger.warn("Trigger: Unable to find workflow owner for cycle" + cycle.title)
+    current_app.logger.warn("Notification Trigger: Unable to find workflow owner for cycle" + cycle.title)
     return None
   if cycle.contact is None:
-    current_app.logger.warn("Trigger: Unable to find contacts for cycle " + \
+    current_app.logger.warn("Notification Trigger: Unable to find contacts for cycle " + \
       cycle.title + " , using workflow owner as contact")
     ret_tuple=(workflow_owner, workflow_owner)
   else:
     contacts=cycle.contact
     if contacts is None:
-      current_app.logger.warn("Trigger: Unable to find contact information for cycle" + cycle.title)
+      current_app.logger.warn("Notification Trigger: Unable to find contact information for cycle" + cycle.title)
       return None
     ret_tuple=(workflow_owner, contacts)
   return ret_tuple
@@ -188,40 +201,39 @@ def get_task_object(task):
 def prepare_notification_for_task(task, sender, recipient, subject, email_content, notif_pri):
   workflow=get_task_workflow(task)
   if workflow is None:
-    current_app.logger.warn("Trigger: Unable to find workflow for task " + task.title)
+    current_app.logger.warn("Notification Trigger: Unable to find workflow for task " + task.title)
     return
   recipients=[recipient]
-  empty_line="""
-  """
-  email_digest_content=empty_line + subject + " for workflow '" + workflow.title + "' " + empty_line + \
-      "  " + request.url_root + workflow._inflector.table_plural + \
-      "/" + str(workflow.id) + "#task_widget"
-
   email_digest_contents={}
   email_contents={}
-  email_digest_contents[recipient.id]=email_digest_content
+  email_digest_contents[recipient.id]="<a href=" + '"'  + \
+    request.url_root + "dashboard#task_widget"  + '"' + ">" + \
+    task.title + "</a>"
   email_contents[recipient.id]=email_content
   override_flag=notify_on_change(workflow)
-  prepare_notification(task, 'Email_Deferred', notif_pri, subject, email_contents, sender, \
-   recipients, override=override_flag)
-  prepare_notification(task, 'Email_Digest_Deferred', notif_pri, subject, email_digest_contents, sender, \
-   recipients, override=False)
+  if notif_pri != PRI_TASK_ASSIGNED:
+    prepare_notification(task, 'Email_Deferred', notif_pri, subject, email_contents, sender, \
+     recipients, override=override_flag)
+    prepare_notification(task, 'Email_Digest_Deferred', notif_pri, subject, email_digest_contents, sender, \
+     recipients, override=False)
+  else:
+    prepare_notification(task, 'Email_Now', notif_pri, subject, email_contents, sender, \
+     recipients, override=override_flag)
+    prepare_notification(task, 'Email_Digest', notif_pri, subject, email_digest_contents, sender, \
+     recipients, override=False)
 
 def prepare_notification_for_tasks_now(task, sender, recipient, subject, email_content, notif_pri):
   workflow=get_task_workflow(task)
   if workflow is None:
-    current_app.logger.warn("Trigger: Unable to find workflow for task " + task.title)
+    current_app.logger.warn("Notification Trigger: Unable to find workflow for task " + task.title)
     return
   recipients=[recipient]
-  empty_line="""
-  """
-  email_digest_content=empty_line + subject + " for workflow '" + workflow.title + "' " + empty_line + \
-      "  " + request.url_root + workflow._inflector.table_plural + \
-      "/" + str(workflow.id) + "#task_widget"
-
+  empty_line="\n"
   email_digest_contents={}
   email_contents={}
-  email_digest_contents[recipient.id]=email_digest_content
+  email_digest_contents[recipient.id]="<a href=" + '"'  + \
+    request.url_root + "dashboard#task_widget"  + '"' + ">" + \
+    task.title + "</a>"
   email_contents[recipient.id]=email_content
   override_flag=notify_on_change(workflow)
   prepare_notification(task, 'Email_Now', notif_pri, subject, email_contents, sender, \
@@ -281,7 +293,7 @@ def handle_tasks_overdue():
       email_content=email_content + \
         "</ul></p><p>" + "Are due in " + str(num_days) + " .</p>" + \
         "<p>Click here to view your <a href=" + '"'  + \
-        request.url_root + "dashboard#task_widget"  + '"' + \
+        request.url_root + "dashboard#task_widget"  + '"' + ">" + \
         "<b>task(s)</b></a></p>" + \
         "Thanks,<br>gGRC Team"
       prepare_notification_for_tasks_now(task, workflow_owner, assignee, subject, email_content, PRI_TASK_OVERDUE)
@@ -331,7 +343,7 @@ def handle_tasks_due(num_days):
       email_content=email_content + \
         "</ul></p><p>" + "Are due " + num_days_text + " .</p>" + \
         "<p>Click here to view your <a href=" + '"'  + \
-        request.url_root + "dashboard#task_widget"  + '"' + \
+        request.url_root + "dashboard#task_widget"  + '"' + ">" + \
         "<b>task(s)</b></a></p>" + \
         "Thanks,<br>gGRC Team"
       prepare_notification_for_tasks_now(task, workflow_owner, assignee, subject, email_content, PRI_TASK_DUE)
@@ -350,7 +362,7 @@ def handle_tasks_completed_for_cycle():
   for cycle in workflow_cycles:
      if not unfinished_tasks_in_cycle.has_key(cycle.id):
        subject="All tasks for workflow "  + cycle.title  + " are completed"
-       prepare_notification_for_completed_cycle(cycle, subject, PRI_CYCLE)
+       prepare_notification_for_completed_cycle(cycle, subject, PRI_COMPLETED_TASKS)
 
 @Resource.model_posted.connect_via(NotificationConfig)
 def handle_notification_config_post(sender, obj=None, src=None, service=None):
@@ -408,57 +420,63 @@ def handle_taskgroup_deleted(sender, obj=None, service=None):
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_task_put(sender, obj=None, src=None, service=None):
   if not (src.get('status') and getattr(obj, 'status')):
-    current_app.logger.warn("Trigger: Status attribute is not modified for task")
+    current_app.logger.warn("Notification Trigger: Status attribute is not modified for task")
     return
   contact=get_task_contacts(obj)
   if contact is None:
-    current_app.logger.warn("Trigger: Unable to get task contact information")
+    current_app.logger.warn("Notification Trigger: Unable to get task contact information")
     return
   workflow_owner=contact[0]
   assignee=contact[1]
-  notif_pri=PRI_TASK_CHANGES
-  if obj.status in ['Assigned']:
-    notif_pri=PRI_TASK_ASSIGNMENT
+  if inspect(obj).attrs.contact.history.has_changes():
+   notif_pri=PRI_TASK_ASSIGNED
+  elif inspect(obj).attrs.status.history.has_changes():
+    if obj.status not in ['Declined']:
+      notif_pri=PRI_OTHERS
+    else:
+      notif_pri=PRI_TASK_DECLINED
+  else:
+    return
   user=get_current_user()
-  if obj.status in ['InProgress', 'Finished', 'Verified']: 
+  cycle=get_cycle(obj)
+  task_object=get_task_object(obj)
+  if cycle is None or object is None: 
+    current_app.logger.error("Unable to find cycle or object for task: " + task.title)
+    return
+  if notif_pri == PRI_TASK_ASSIGNED:
+    subject="Task " +  obj.title + " is assigned to you"
+    content="Hi " + assignee.name + ",<br>" + \
+      "<p>" + user.name  + " assigned task: " + obj.title + " for " + task_object.title + \
+      ", under workflow: " + \
+      "<a href=" + '"' +  request.url_root + cycle.workflow._inflector.table_plural + \
+      "/" + str(cycle.workflow.id) + "#current_widget" + '"' + \
+      "<b>" + cycle.title + "</b></a></p>" + \
+      "<p>Click here to view your <a href=" + '"'  + \
+      request.url_root + "dashboard#task_widget"  + '"' + ">" + \
+      "<b>task</b></a></p>" + \
+      "Thanks,<br>gGRC Team"
+  elif notif_pri == PRI_TASK_DECLINED:
+    subject=user.name + " declined " +  obj.title 
+    content="Hi " + assignee.name + ",<br>" + \
+      "<p>" + user.name  + " declined task: " + obj.title + " for " + task_object.title + \
+      ", under workflow: " + \
+      "<a href=" + '"' +  request.url_root + cycle.workflow._inflector.table_plural + \
+      "/" + str(cycle.workflow.id) + "#current_widget" + '"' + \
+      "<b>" + cycle.title + "</b></a></p>" + \
+      "<p>Click here to view your <a href=" + '"'  + \
+      request.url_root + "dashboard#task_widget"  + '"' + ">" + \
+      "<b>task</b></a></p>" + \
+      "Thanks,<br>gGRC Team"
+  else:
     subject="Email subject is not generated for " + obj.title  + " , status: " + obj.status
     content="Email content is not generated for " + obj.title  + " , status: " + obj.status
-  if obj.status in ['Assigned', 'Declined']: 
-    cycle=get_cycle(obj)
-    task_object=get_task_object(obj)
-    if cycle is None or object is None: 
-      current_app.logger.error("Unable to find cycle or object for task: " + task.title)
-      return
-    if obj.status in ['Assigned']:
-      subject="Task " +  obj.title + " is assigned to you"
-      content="Hi " + assignee.name + ",<br>" + \
-        "<p>" + user.name  + " assigned task: " + obj.title + " for " + task_object.title + \
-        ", under workflow: " + \
-        "<a href=" + '"' +  request.url_root + cycle.workflow._inflector.table_plural + \
-        "/" + str(cycle.workflow.id) + "#current_widget" + '"' + \
-        "<b>" + cycle.title + "</b></a></p>" + \
-        "<p>Click here to view your <a href=" + '"'  + \
-        request.url_root + "dashboard#task_widget"  + '"' + \
-        "<b>task</b></a></p>" + \
-        "Thanks,<br>gGRC Team"
-    else:
-      subject=user.name + " declined " +  obj.title 
-      content="Hi " + assignee.name + ",<br>" + \
-        "<p>" + user.name  + " declined task: " + obj.title + " for " + task_object.title + \
-        ", under workflow: " + \
-        "<a href=" + '"' +  request.url_root + cycle.workflow._inflector.table_plural + \
-        "/" + str(cycle.workflow.id) + "#current_widget" + '"' + \
-        "<b>" + cycle.title + "</b></a></p>" + \
-        "<p>Click here to view your <a href=" + '"'  + \
-        request.url_root + "dashboard#task_widget"  + '"' + \
-        "<b>task</b></a></p>" + \
-        "Thanks,<br>gGRC Team"
-    prepare_notification_for_task(obj, user, assignee, subject, content, notif_pri)
-    taskgroup=get_taskgroup(obj)
-    if taskgroup is not None:
-      prepare_calendar_for_taskgroup(taskgroup)
-    else:
-      current_app.logger.warn("Trigger: Unable to get task group for task " + obj.title)
+
+  prepare_notification_for_task(obj, user, assignee, subject, content, notif_pri)
+  taskgroup=get_taskgroup(obj)
+  if taskgroup is not None:
+    prepare_calendar_for_taskgroup(taskgroup)
+  else:
+    current_app.logger.warn("Notification Trigger: Unable to get task group for task " + obj.title)
 
 @Resource.model_posted.connect_via(models.WorkflowPerson)
 def handle_workflow_person_post(sender, obj=None, src=None, service=None):
@@ -485,15 +503,14 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
     else:
       continue
   if not found_cycle:
-    current_app.logger.warn("Trigger: No Cycle has been started for workflow " + workflow.title)
+    current_app.logger.warn("Notification Trigger: No Cycle has been started for workflow " + workflow.title)
     return
   workflow_owner=get_workflow_owner(workflow)
   if workflow_owner is None:
-    current_app.logger.warn("Trigger: Unable to find workflow owner")
+    current_app.logger.warn("Notification Trigger: Unable to find workflow owner")
     return
   override_flag=notify_on_change(workflow)
-  empty_line="""
-  """
+  empty_line="\n"
   content=empty_line + subject + empty_line +  \
     "  " + request.url_root + workflow._inflector.table_plural + \
     "/" + str(workflow.id) + "#person_widget"
@@ -514,20 +531,16 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
 def prepare_notification_for_completed_cycle(cycle, subject, notif_pri, notify_custom_message=False):
   workflow=get_cycle_workflow(cycle)
   if workflow is None:
-    current_app.logger.warn("Trigger: Unable to find workflow for cycle")
+    current_app.logger.warn("Notification Trigger: Unable to find workflow for cycle")
     return
   workflow_owner=get_workflow_owner(workflow)
   if workflow_owner is None:
-    current_app.logger.warn("Trigger: Unable to find workflow owner for cycle")
+    current_app.logger.warn("Notification Trigger: Unable to find workflow owner for cycle")
     return
   override_flag=notify_on_change(workflow)
-  empty_line="""
-  """
+  empty_line="\n"
   email_contents={}
   email_digest_contents={}
-  email_digest_content=empty_line + subject + empty_line +  \
-    "  " + request.url_root + workflow._inflector.table_plural + \
-    "/" + str(workflow.id) + "#current_widget"
   members=[workflow_owner]
   for member in members:
     email_content = "Hi " + member.name + ",<br>" + \
@@ -540,10 +553,13 @@ def prepare_notification_for_completed_cycle(cycle, subject, notif_pri, notify_c
       " are completed </p>" + \
       "<p>Click here to view your <a href=" + '"'  + \
       request.url_root + workflow._inflector.table_plural + \
-      "/" + str(workflow.id) + "#current_widget"  + '"' + \
+      "/" + str(workflow.id) + "#current_widget"  + '"' + ">" + \
       "<b>workflow</b></a></p>" + \
       "Thanks,<br>gGRC Team"
-    email_digest_contents[member.id]=email_digest_content
+    email_digest_contents[member.id]= "<a href=" + '"' +  request.url_root + \
+      cycle.workflow._inflector.table_plural + \
+      "/" + str(cycle.workflow.id) + "#current_widget" + '"' + ">" + \
+      cycle.title + "</a>"
     email_contents[member.id]=email_content 
 
   prepare_notification(cycle, 'Email_Now', notif_pri, subject, email_contents, \
@@ -554,20 +570,16 @@ def prepare_notification_for_completed_cycle(cycle, subject, notif_pri, notify_c
 def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, notify_custom_message=False):
   workflow=get_cycle_workflow(cycle)
   if workflow is None:
-    current_app.logger.warn("Trigger: Unable to find workflow for cycle")
+    current_app.logger.warn("Notification Trigger: Unable to find workflow for cycle")
     return
   workflow_owner=get_workflow_owner(workflow)
   if workflow_owner is None:
-    current_app.logger.warn("Trigger: Unable to find workflow owner for cycle")
+    current_app.logger.warn("Notification Trigger: Unable to find workflow owner for cycle")
     return
   override_flag=notify_on_change(workflow)
-  empty_line="""
-  """
+  empty_line="\n"
   email_contents={}
   email_digest_contents={}
-  email_digest_content=empty_line + subject + empty_line +  \
-    "  " + request.url_root + workflow._inflector.table_plural + \
-    "/" + str(workflow.id) + "#current_widget"
   #members=[workflow_owner]
   members=[]
   for people in workflow.people:
@@ -575,11 +587,14 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
   for member in members:
     email_content = "Hi " + member.name + ",<br>" + \
       "<p>New Workflow <a href=" + '"' +  request.url_root + workflow._inflector.table_plural + \
-      "/" + str(workflow.id) + "#current_widget" + '"' + \
+      "/" + str(workflow.id) + "#current_widget" + '"' + ">" + \
       "<b>" + cycle.title + "</b></a>" + begins_in_days + "<br></p>" 
     if notify_custom_message is True and workflow.notify_custom_message is not None:
      email_content="<p>" + email_content + workflow.notify_custom_message + "</p>"
-    email_digest_contents[member.id]=email_digest_content
+    email_digest_contents[member.id]= "<a href=" + '"' +  request.url_root + \
+      cycle.workflow._inflector.table_plural + \
+      "/" + str(cycle.workflow.id) + "#current_widget" + '"' + ">" + \
+      cycle.title + "</a>"
     email_contents[member.id]=email_content 
     if cycle.start_date and cycle.end_date:
       email_contents[member.id]=email_contents[member.id] + \
@@ -621,7 +636,7 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
         "<li>" + people.name + " Workflow Owner </li>"
   end_email_content=end_email_content + "</ul> </p>" + \
     "<p>Click here to view your <a href=" + '"'  + \
-    request.url_root + "dashboard#task_widget"  + '"' + \
+    request.url_root + "dashboard#task_widget"  + '"' + ">" + \
     "<b>tasks</b></a></p>" + \
     "Thanks,<br>gGRC Team"
   for member in members:
@@ -831,7 +846,7 @@ def notify_email_digest():
   handle_tasks_completed_for_cycle()
   db.session.commit()
 
-  email_digest_notification=EmailDigestNotification()
+  email_digest_notification=EmailDigestNotification(priority_mapping=PRI_MAPPING)
   email_digest_notification.notify()
   db.session.commit()
 
