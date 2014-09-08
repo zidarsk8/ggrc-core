@@ -10,7 +10,7 @@ Then copy the Code from your Regulation Info widget on your Regulation page in g
 Can be ""Reactive"", ""Preventative"", ""Detective"", or ""Administrative"".
 ","*Optional.  
 
-Can be ""Manual"", ""Manual w Segregation of Duties"", ""Automated"", ""IT - Automated ITGC"", ""Fin - IT-Supported Manual"", ""Fin - Application"", or ""Fin - Manual""",*Not yet implemented.  Ignore for now.,"*Optional.
+Can be ""Manual"", ""Manual - Segregation of Duties"", ""Automated"", ""IT - Automated ITGC"", ""Fin - IT-Supported Manual"", ""Fin - Application"", or ""Fin - Manual""",*Not yet implemented.  Ignore for now.,"*Optional.
 
 Date fields should always follow standard formats such as year/month/date in the form of xxxx/xx/xx ",,*Optional.  Enter a valid URL,"*Optional.  
 
