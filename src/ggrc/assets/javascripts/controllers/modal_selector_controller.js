@@ -1344,7 +1344,56 @@
         , join_model: null
       }
   },{
-    init_context: function() {
+    init: function(){
+      GGRC.Controllers.MultitypeModalSelector.prototype.init.apply(this, arguments);
+      this.refresh_option_list();
+    }
+
+    , init_menu: function() {
+        var menu 
+          , lookup = {
+              governance: 0
+            , business: 1
+            };
+
+        if (!this.options.option_type_menu) {
+          menu = [
+              { category: "Governance"
+              , items: []
+              }
+            , { category: "Assets/Business"
+              , items: []
+              }
+            ];
+          can.each(this.options.option_descriptors, function(descriptor) {
+            if (descriptor.model.category == "workflow" || 
+                descriptor.model.category == "undefined" ||
+                descriptor.model.category == "entities"){
+              return;
+            }
+            else{
+              menu[lookup[descriptor.model.category] || 0].items.push({
+                  model_name: descriptor.model.shortName
+                , model_display: descriptor.model.title_plural
+              })
+            }
+          })
+
+          this.options.option_type_menu = menu;
+        }
+        //hard code some of the submenu
+        //this.options.option_type_menu_2 = this.options.option_type_menu;
+        this.options.option_type_menu_2 = can.map([
+              "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
+              "Person", "System", "Process", "DataAsset", "Product", "Project", "Facility" , "Market"
+              ],
+              function(key) {
+                return CMS.Models[key];
+              }
+            ); 
+    }
+    
+    , init_context: function() {
       if (!this.context) {
         // Calculate the total number of options
         var option_type_count = 0;
@@ -1363,10 +1412,23 @@
           selected_options: [],
           is_page_instance: false,
           item_selected: false,
-          items_selected: 0
+          items_selected: 0,
+          filter_list: []
           }, this.options));
       }
       return this.context;
+    }
+
+    , ".addFilterRule click": function() {
+      this.context.filter_list.push({
+          value: "",
+          model_name: this.options.option_type_menu_2[0].model_singular
+        });
+    }
+
+    , ".remove_filter click": function(el) {
+      var index = el.data('index');
+      this.context.filter_list.splice(index, 1);
     }
 
     , init_view: function() {
@@ -1470,37 +1532,190 @@
       this.update_selected_items(el, ev);
     }
 
-    , ".openclose:not(.active) click" : function(el, ev) {
-        //  Modifying the `result` object is bad, but here it can only affect
-        //  throwaway mapping results.
-        var expandable = el.data("expandable");
-        if (expandable)
-          expandable.attr("expanded", true);
-    }
-
     , reset_selection_count: function(){
         this.context.attr('item_selected', false);
         this.context.attr('items_selected', 0);
     } 
 
     , "#search keyup": function(el, ev) {
-        var self = this
-          , $el = $(el)
-          , term = $el.val()
-          ;
-        if (term !== this.options.option_search_term) {
-          this.options.option_search_term = term;
-          //Object selected count and Add selected button should reset.
-          //User need to make their selection again
-          this.reset_selection_count();
-          setTimeout(function() {
-            if (self.options.option_search_term === term) {
-              self.refresh_option_list();
-              self.constructor.last_option_search_term = term;
-            }
-          }, 200);
+        if (ev.which == 13) {
+          this.context.attr("option_search_term", el.val());
+          this.triggerSearch();
         }
       }
+
+    , refresh_option_list: function() {
+        var self = this
+          , current_option_model = this.options.option_model
+          , current_option_model_name = current_option_model.shortName
+          , current_search_term = this.options.option_search_term
+          , active_fn
+          , draw_fn
+          , ctx = this.context
+          ;
+
+        active_fn = function() {
+          return self.element &&
+                 self.options.option_model === current_option_model &&
+                 self.options.option_search_term === current_search_term;
+        };
+
+        draw_fn = function(options) {
+          self.insert_options(options);
+        };
+
+        self.option_list.replace([]);
+        self.element.find('.option_column ul.new-tree').empty();
+
+        var join_model = GGRC.Mappings.join_model_name_for(
+              this.options.object_model, current_option_model_name);
+        var permission_parms = { __permission_type: 'read' };
+        if (current_option_model_name == 'Program') {
+          permission_parms = {
+            __permission_type: 'create'
+            , __permission_model: join_model
+          };
+        }
+
+        if (ctx.owner){
+          permission_parms.contact_id = ctx.owner.id;
+        }
+
+        return GGRC.Models.Search
+          .search_for_types(
+              current_search_term || '',
+              [current_option_model_name],
+              permission_parms)
+          .then(function(search_result) {
+            var options = [];
+
+            if (active_fn()) {
+              options = search_result.getResultsForType(current_option_model_name);
+
+              self.option_list.push.apply(self.option_list, options);
+              self._start_pager(options, 20, active_fn, draw_fn);
+            }
+          });
+    }
+
+    //Search button click
+    , ".objectReview click": "triggerSearch"
+
+    , triggerSearch: function(){
+      var ctx = this.context;
+      var self = this,
+        selected = this.options.option_model.shortName,
+        loader,
+        term = ctx.option_search_term || "",
+        filters = [],
+        cancel_filter;
+
+      this.set_option_descriptor(selected);
+
+      ctx.filter_list.each(function(filter_obj) {
+        if(cancel_filter || !filter_obj.search_filter) {
+          cancel_filter = true;
+          return;
+        }
+        //push into filter array
+        filters.push (
+          // Must type filter here because the canonical mapping may be polymorphic.
+          new GGRC.ListLoaders.TypeFilteredListLoader(
+            GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected),
+            [selected]
+          ).attach(filter_obj.search_filter)
+        );
+        
+      });
+      if (cancel_filter) {
+        //missing search term.
+        return;
+      }
+
+      if (filters.length > 0) {
+        if(ctx.owner || term){
+          filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
+              return GGRC.Models.Search.search_for_types(
+                term,
+                [selected],
+                { contact_id: binding.instance && binding.instance.id }
+                ).then(function(mappings) {
+                  return mappings.entries;
+                });
+            }).attach(ctx.owner || {}));
+        }
+        //Object selected count and Add selected button should reset. User need to make their selection again
+        this.reset_selection_count();
+
+        if (filters.length === 1) {
+          loader = filters[0];
+        }
+        else {
+          loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
+        }
+
+        this.last_loader = loader;
+        self.option_list.replace([]);
+        self.element.find('.option_column ul.new-tree').empty();
+
+        loader.refresh_stubs().then(function(options) {
+          var active_fn = function() {
+            return self.element && self.last_loader === loader;
+          };
+
+          var draw_fn = function(options) {
+            self.insert_options(options);
+          };
+          self.option_list.push.apply(self.option_list, options);
+          self._start_pager(can.map(options, function(op) {
+              return op.instance;
+            }), 20, active_fn, draw_fn);
+        });        
+
+      } //end filters.length > 0
+      else{
+        //Object selected count and Add selected button should reset.
+        //User need to make their selection again
+        this.reset_selection_count();
+
+        // With no mappings specified, just do a general search on the type selected.
+        this.last_loader = null;
+        this.options.option_search_term = term;
+        this.refresh_option_list();
+        this.constructor.last_option_search_term = term;
+      }
+    }
+
+    , set_option_descriptor: function(option_type) {
+      var self = this
+        , descriptor = this.options.option_descriptors[option_type]
+        ;
+
+      this.constructor.last_selected_options_type = option_type;
+
+      can.Model.startBatch();
+
+      this.context.attr('selected_option_type', option_type);
+      this.context.attr('option_column_view', descriptor.column_view);
+      this.context.attr('option_detail_view', descriptor.detail_view);
+      this.context.attr('option_descriptor', descriptor);
+      this.context.selected_options = [];
+      this.context.attr('selected_result', can.compute(function() {
+        return self.get_result_for_option(self.context.attr('selected_options'));
+      }));
+      this.context.attr('related_table_plural', descriptor.related_table_plural);
+      this.context.attr('related_table_singular', descriptor.related_table_singular);
+      this.context.attr('related_model_singular', descriptor.related_model_singular);
+      this.context.attr('new_object_title', descriptor.new_object_title);
+      this.options.option_items_view = descriptor.items_view;
+      this.options.option_model = descriptor.model;
+      if (!this.options.option_search_term)
+        this.options.option_search_term = '';
+
+      can.Model.stopBatch();
+      //Refresh_option_list is done from the search button
+      //this.refresh_option_list();
+    }
 
     , on_map: $.debounce(500, true, function(el, ev) {
         var that = this, ajd; 
@@ -1607,6 +1822,14 @@
         }
         return joins;
       }
+    }
+
+    , autocomplete_select : function(el, ev, ui) {
+      setTimeout(function(){
+        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
+        el.trigger('change');
+      }, 0);
+      this.context.attr(el.attr("name"), ui.item);
     }
 
   }); 
@@ -1745,90 +1968,9 @@
         , join_model: null
       }
   }, {
-    init_menu: function() {
-        var menu, menu2
-          , lookup = {
-              governance: 0
-            , business: 1
-            //, entities: 2
-            };
-
-        if (!this.options.option_type_menu) {
-          menu = [
-              { category: "Governance"
-              , items: []
-              }
-            , { category: "Assets/Business"
-              , items: []
-              }
-            //, { category: "People/Groups"
-            //  , items: []
-            //  }
-            ];
-          can.each(this.options.option_descriptors, function(descriptor) {
-            if (descriptor.model.category == "workflow" || 
-                descriptor.model.category == "undefined" ||
-                descriptor.model.category == "entities"){
-              return;
-            }
-            else{
-              menu[lookup[descriptor.model.category] || 0].items.push({
-                  model_name: descriptor.model.shortName
-                , model_display: descriptor.model.title_plural
-              })
-            }
-          })
-
-          this.options.option_type_menu = menu;
-        }
-        //hard code some of the submenu
-        //this.options.option_type_menu_2 = this.options.option_type_menu;
-        this.options.option_type_menu_2 = can.map([
-              "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
-              "Person", "System", "Process", "DataAsset", "Product", "Project", "Facility" , "Market"
-              ],
-              function(key) {
-                return CMS.Models[key];
-              }
-            ); 
-    }
-
-  , init_context: function() {
-      if (!this.context) {
-        // Calculate the total number of options
-        var option_type_count = 0;
-        if (this.options.option_type_menu) {
-          can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; })
-        }
-
-        this.context = new can.Observe($.extend({
-          objects: this.object_list,
-          options: this.option_list,
-          joins: this.options.join_list,
-          actives: this.active_list,
-          option_type_count: this.options.option_type_menu ? option_type_count : null,
-          selected_object: null,
-          selected_option_type: null,
-          selected_options: [],
-          is_page_instance: false,
-          item_selected: false,
-          items_selected: 0,
-          filter_list: []
-          }, this.options));
-        }
-        return this.context;
-      }
-
-    , ".addFilterRule click": function() {
-      this.context.filter_list.push({
-          value: "",
-          model_name: this.options.option_type_menu_2[0].model_singular
-        });
-    }
-
-    , ".remove_filter click": function(el) {
-      var index = el.data('index');
-      this.context.filter_list.splice(index, 1);
+    init: function(){
+      GGRC.Controllers.MultitypeModalSelector.prototype.init.apply(this, arguments);
+      //this.refresh_option_list();
     }
 
     //Over write this for search button to update the list
@@ -1836,11 +1978,6 @@
     }
 
     , "select.option-type-selector change": "on_select_option_type"
-
-    
-    //Over write search text to noop, search button updates the list
-    , "#search keyup": function(el, ev) {
-    }
 
 
     , "select.filter-type-selector change": function(el,ev){
@@ -1850,7 +1987,7 @@
     }
     
     //Search button click
-    , ".objectReview click": "triggerSearch"
+    //, ".objectReview click": "triggerSearch"
 
     , "#search keyup": function(el, ev) {
         if (ev.which == 13) {
@@ -1865,7 +2002,7 @@
     , " modal:success" : function(el, ev, data, options) {
       //no op
     }
-
+    
     , triggerSearch: function(){
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();
@@ -1876,9 +2013,6 @@
         loader,
         term = $("#search").val() || "",
         re = new RegExp("^.*" + term + ".*","gi"),
-      //Get the filter_list length, for each select get the value for type, 
-      //for each search, find the search text
-        f_len = this.context.filter_list.length,
         filters = [],
         cancel_filter;
       
@@ -1907,19 +2041,6 @@
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
         this.reset_selection_count();
-
-        
-        //if(filters.length === 1 && !term) {
-        //  //don't bother making an intersecting filter when there's only one source
-        //  loader = filters[0];
-        //} else {
-        //  // make an intersecting loader, that only shows the results that 
-        //  //  show up in all sources.
-        //  if(term) {
-        //    filters.push(new GGRC.ListLoaders.SearchListLoader(term, [selected]).attach(GGRC.current_user));
-        //  }
-        //  loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
-        //}
         
         if (filters.length === 1){
           loader = filters[0];
@@ -1955,7 +2076,8 @@
               return op.instance;
             }), 20, active_fn, draw_fn);
         });
-      } else {
+      } 
+      else {
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
         this.reset_selection_count();
@@ -1968,45 +2090,7 @@
         this.constructor.last_option_search_term = term;
       }
     }
-
-    , set_option_descriptor: function(option_type) {
-      var self = this
-        , descriptor = this.options.option_descriptors[option_type]
-        ;
-
-      this.constructor.last_selected_options_type = option_type;
-
-      can.Model.startBatch();
-
-      this.context.attr('selected_option_type', option_type);
-      this.context.attr('option_column_view', descriptor.column_view);
-      this.context.attr('option_detail_view', descriptor.detail_view);
-      this.context.attr('option_descriptor', descriptor);
-      this.context.selected_options = [];
-      this.context.attr('selected_result', can.compute(function() {
-        return self.get_result_for_option(self.context.attr('selected_options'));
-      }));
-      this.context.attr('related_table_plural', descriptor.related_table_plural);
-      this.context.attr('related_table_singular', descriptor.related_table_singular);
-      this.context.attr('related_model_singular', descriptor.related_model_singular);
-      this.context.attr('new_object_title', descriptor.new_object_title);
-      this.options.option_items_view = descriptor.items_view;
-      this.options.option_model = descriptor.model;
-      if (!this.options.option_search_term)
-        this.options.option_search_term = '';
-
-      can.Model.stopBatch();
-      //Refresh_option_list is done from the search button
-      //this.refresh_option_list();
-    },
-
-    autocomplete_select : function(el, ev, ui) {
-      setTimeout(function(){
-        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
-        el.trigger('change');
-      }, 0);
-      this.context.attr(el.attr("name"), ui.item);
-    }
+   
   });
   
 
