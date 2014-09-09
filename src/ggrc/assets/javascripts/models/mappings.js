@@ -843,7 +843,7 @@
     , Request : {
         _canonical : {
             "responses" : ["DocumentataionResponse", "InterviewResponse", "PopulationSampleResponse"]
-          , "audit" : "Audit"
+          , "_audit" : "Audit"
         }
       , responses: Direct("Response", "request", "responses")
       , _audit: Direct("Audit", "requests", "audit")
