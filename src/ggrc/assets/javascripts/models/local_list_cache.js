@@ -29,7 +29,7 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
   , init : function() {
     var that = this
     , _update = this.update;
-    
+
     this.update = function(id, params) {
       return that.destroy({ id : id }).then(function() {
         return that.create(params);
@@ -57,6 +57,7 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
       , type : this.type
       , search_text : this.search_text
       , my_work : this.my_work
+      , extra_params: this.extra_params
       , objects : can.map(this.objects || [], function(d) {
         if(that.type && d.constructor.shortName !== that.type)
           return;
