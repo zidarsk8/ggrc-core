@@ -6,26 +6,28 @@
 }}
 
 
-<div class="advanced-filters search-filters">
+<li class="advanced-filters" {{ (el) -> el.ggrc_controllers_tree_filter() }}>
   <form class="form-search" onsubmit="return false" autocomplete="off">
     <div class="row-fluid">
-      <div class="span9">
+      <div class="span4">
         Status:
-        <select data-filter="status">
-          <option value="all">All</option>
+        <select name="status" class="short-field" style="width:100px">
+          <option value="">Any</option>
           <option value="Verified">Verified</option>
           <option value="Finished">Finished</option>
           <option value="InProgress">In Progress</option>
           <option value="Assigned">Assigned</option>
         </select>
+      </div>
+      <div class="span4">
         Overdue:
-        <select data-filter="overdue">
-          <option value="all">All</option>
+        <select name="overdue" class="short-field" style="width:100px">
+          <option value="">Any</option>
           <option value="overdue">Overdue</option>
-          <option value="">Not Overdue</option>
+          <option value="[empty]">Not Overdue</option>
         </select>
       </div>
-      <div class="span3">
+      <div class="span4">
         <button class="btn" custom-event="show-history"
           mapping="{{toggle_string mapping '_with_history'}}"
           style="float:right;"
@@ -40,4 +42,4 @@
       </div>
     </div>
   </form>
-</div>
+</li>

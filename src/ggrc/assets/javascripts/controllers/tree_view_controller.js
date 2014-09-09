@@ -77,9 +77,7 @@ can.Observe("can.Observe.TreeOptions", {
 });
 
 can.Control("CMS.Controllers.TreeLoader", {
-  defaults : {
-    filters: {}
-  }
+  defaults : {}
 }, {
   init_spinner: function() {
     var spinner
@@ -271,16 +269,8 @@ can.Control("CMS.Controllers.TreeLoader", {
         ;
 
       can.each(items, function(item) {
-        var prepped = that.prepare_child_options(item),
-            is_shown = true;
-
-        item.filters && item.filters.each(function(value, prop) {
-          if (prepped.instance.attr(prop) !== value) {
-            is_shown = false;
-          }
-        })
-
-        if (prepped.instance.selfLink && is_shown) {
+        var prepped = that.prepare_child_options(item);
+        if (prepped.instance.selfLink) {
           prepped_items.push(prepped);
         }
       });
@@ -779,15 +769,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options.events[event_name].apply(this, arguments);
     }
   },
-  "[data-filter] change" : function(el, ev) {
-    var filter = el.data('filter');
-    if (el.val() === "all") {
-      this.options.filters.removeAttr(filter);
-    } else {
-      this.options.filters.attr(filter, el.val());
-    }
-    this.reload_list();
-  }
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
