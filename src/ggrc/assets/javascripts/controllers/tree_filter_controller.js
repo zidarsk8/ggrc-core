@@ -1,7 +1,7 @@
 can.Control("GGRC.Controllers.TreeFilter", {
-  
+
 }, {
-  
+
   init : function() {
     var parent_control;
     this._super && this._super.apply(this, arguments);
@@ -47,12 +47,14 @@ can.Control("GGRC.Controllers.TreeFilter", {
         var val = states[key]
         , test = that.resolve_object(model, key.replace(/__/g, '.'));
         
-        if(val && val.isAfter) {
+       if(val && val.isAfter) {
           if(!test || moment(test).isBefore(val)) {
             return false;
           } else {
             return st;
           }
+        } else if (val === "[empty]" && test === "") {
+          return st;
         } else if(val && (!test || !~test.toUpperCase().indexOf(val.toUpperCase()))) {
           return false;
         } else {
@@ -85,6 +87,9 @@ can.Control("GGRC.Controllers.TreeFilter", {
       // If the name is blank, use email
       if (prop === 'name' && obj.attr && (!obj.attr(prop) || !obj.attr(prop).trim()) && obj.attr('email') && obj.attr('email').trim()) {
         prop = 'email';
+      }
+      if (obj.instance) {
+        obj = obj.instance;
       }
       obj = obj.attr ? obj.attr(prop) : obj.prop;
       obj = obj && obj.reify ? obj.reify() : obj;

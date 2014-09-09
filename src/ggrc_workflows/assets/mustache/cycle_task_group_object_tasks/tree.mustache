@@ -10,7 +10,7 @@
   data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}"
   {{#instance}}{{data 'model'}}{{/instance}}
   >
-  <div class="item-main">
+  <div class="item-main" {{data 'model'}}>
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
@@ -25,7 +25,7 @@
 
           {{#using instance=instance.cycle_task_group_object}}
             {{#using object=instance.object}}
-        
+
               <div class="item-data span2">
                 <div class="oneline">
                   <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
@@ -47,9 +47,9 @@
                   <span class="tiny-data" rel="tooltip" title="Workflow title">
                     {{workflow.title}}
                   </span>
-                </div> 
+                </div>
               </div>
-          
+
             {{/using}}
           {{/using}}
 
@@ -111,25 +111,25 @@
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
 
-      {{#is_allowed 'update' instance context='for'}}      
+      {{#is_allowed 'update' instance context='for'}}
       <div class="action-bar">
         <ul class="change-links">
           <li>
             <a href="javascript://" data-object-singular-override="Task for current Workflow Cycle" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
               <i class="grcicon-edit"></i>
               Edit Task
-            </a>            
+            </a>
           </li>
         </ul>
       </div>
       {{/is_allowed}}
-      
+
       <section class="small-info info tier-info">
         <div class="row-fluid">
           <div class="span9">
             <h6>Task</h6>
             <h3>
-              {{instance.title}}            
+              {{instance.title}}
             </h3>
           </div>
           <div class="span3">
@@ -143,7 +143,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="row-fluid">
           <div class="span12">
             <h6>Task details</h6>
@@ -191,11 +191,11 @@
             {{/using}}
           {{/using}}
         {{/is_dashboard}}
-        
+
         {{#is_dashboard}}
           {{#using cycle=instance.cycle}}
           {{#using workflow=cycle.workflow}}
-            
+
             <div class="row-fluid">
               <div class="span12">
                 <h6>Part of the workflow</h6>
@@ -208,11 +208,11 @@
                 <br>
               </div>
             </div>
-            
+
           {{/using}}
           {{/using}}
         {{/is_dashboard}}
-        
+
 
 
       {{#if draw_children}}

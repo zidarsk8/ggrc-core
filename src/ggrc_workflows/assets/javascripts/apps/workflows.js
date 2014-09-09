@@ -230,6 +230,11 @@
               'cycle.is_current': true,
               status__in: 'Assigned,InProgress,Finished,Declined',
             });
+          }),
+          assigned_tasks_with_history: Search(function(binding) {
+            return CMS.Models.CycleTaskGroupObjectTask.findAll({
+              contact_id: binding.instance.id
+            });
           })
         }
       };
@@ -512,11 +517,18 @@
           parent_instance: GGRC.page_instance(),
           model: CMS.Models.CycleTaskGroupObjectTask,
           show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
+          header_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/filters.mustache",
           mapping: "assigned_tasks",
           draw_children: true,
           sort_property: null,
           sort_function: _task_sort_function,
           draw_children: true,
+          events: {
+            "show-history" : function(el, ev) {
+              this.options.attr("mapping", el.attr("mapping"));
+              this.reload_list();
+            }
+          },
           child_options: [
             {
               model: CMS.Models.CycleTaskEntry,
