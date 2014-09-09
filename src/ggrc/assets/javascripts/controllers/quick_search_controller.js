@@ -904,6 +904,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         , dfds = []
         , search_text = this.current_term
         , my_work = self.current_params && self.current_params.contact_id
+        , extra_params = self.current_params && self.current_params.extra_params
         ;
 
       can.each(lists, function(list) {
@@ -939,6 +940,7 @@ can.Control("CMS.Controllers.LHN_Search", {
             , objects : d
             , search_text : search_text
             , my_work : my_work
+            , extra_params: extra_params
             , type : model_name
             , keys : ["title", "contact", "private", "viewLink"]
           }).save();
@@ -1007,7 +1009,8 @@ can.Control("CMS.Controllers.LHN_Search", {
             var a = a[0];
             if (a
                 && a.search_text == self.current_term
-                && a.my_work == (self.current_params && self.current_params.contact_id)) {
+                && a.my_work == (self.current_params && self.current_params.contact_id)
+                && a.extra_params == (self.current_params && self.current_params.extra_params)) {
               types[a.name] = a.objects;
             }
           });
