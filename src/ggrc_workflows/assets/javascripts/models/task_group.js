@@ -89,6 +89,54 @@
       var that = this;
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("title");
+      this.validate([
+        "start_date",
+        "end_date",
+        "relative_end_month",
+        "relative_end_day",
+        "relative_start_month",
+        "relative_start_day"
+      ], function(newVal, prop){
+        var that =
+         this,
+         workflow = GGRC.page_instance(),
+         dates_are_valid = false;
+        
+        // Handle cases of a workflow with start and end dates
+        switch(workflow.frequency) {
+          case "weekly":
+            dates_are_valid = 
+              0 < that.relative_start_day && 6 > that.relative_start_day
+              && 0 < that.relative_end_day && 6 > that.relative_end_day;
+            break;
+          case "monthly":
+            dates_are_valid = 
+              0 < that.relative_start_day && 0 < that.relative_end_day;
+            break;
+          case "quarterly":
+            dates_are_valid = 
+              0 < that.relative_start_month && 4 > that.relative_start_month 
+              && 0 < that.relative_start_day
+              && 0 < that.relative_end_month && 4 > that.relative_end_month
+              && 0 < that.relative_end_day;
+            break;
+          case "annually":
+            dates_are_valid = 
+              0 < that.relative_start_day 
+              && 0 < that.relative_start_month
+              && 0 < that.relative_end_day
+              && 0 < that.relative_end_month;
+            break;
+          default: // one-time workflows
+            dates_are_valid =
+                 that.start_date && 0 < that.start_date.length
+              && that.end_date && 0 < that.end_date.length;
+        }
+        
+        if(!dates_are_valid) {
+          return "Start and/or end date is invalid";
+        }
+      });
 
       this.bind("created", function(ev, instance) {
         if (instance instanceof that) {
