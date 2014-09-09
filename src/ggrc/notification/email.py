@@ -322,7 +322,7 @@ class EmailDigestNotification(EmailNotification):
         sorted_items=collections.OrderedDict(sorted(items.items()))
         body=""
         for key, value in sorted_items.items():
-          body=''.join(body, value, "</ul></p>")
+          body=''.join([body, value, "</ul></p>"])
         content_for_recipients[recipient_id] = \
           "Hello {}<br>{}<p>Thanks,<br> gGRC Team</p>".format(recipient.name, body)
       
