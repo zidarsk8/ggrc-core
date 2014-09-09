@@ -70,7 +70,7 @@ class Workflow(
   next_cycle_start_date = deferred(
       db.Column(db.Date, nullable=True), 'Workflow')
 
-  _fulltext_attrs = [
+  _sanitize_html = [
       'notify_custom_message',
       ]
 
