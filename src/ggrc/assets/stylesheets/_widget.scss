@@ -1117,3 +1117,21 @@
     }
   }
 }
+
+.zero-state {
+  background:#eee;
+  border-bottom:1px solid #ddd;
+  padding-bottom:40px;
+  h2 {
+    line-height:36px;
+    font-size:24px;
+    padding:40px 40px 0 40px;
+    font-weight:normal;
+    text-align:center;
+    color:#bbb;
+  }
+  h3 {
+    font-weight:normal;
+    text-align:center;
+  }
+}
