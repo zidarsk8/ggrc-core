@@ -165,6 +165,12 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
         , menu_tree_spec: GGRC.admin_menu_spec
         , default_widgets : ["people", "roles", "events"]
       });
+
+      // Ensure each extension has had a chance to initialize admin widgets
+      can.each(GGRC.extensions, function(extension) {
+        if (extension.init_admin_widgets)
+          extension.init_admin_widgets();
+      });
     } else {
       $area.cms_controllers_dashboard({
         widget_descriptors: GGRC.widget_descriptors,

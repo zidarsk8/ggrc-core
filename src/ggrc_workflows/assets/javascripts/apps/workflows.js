@@ -297,6 +297,9 @@
     }
     WorkflowExtension.init_global();
   };
+  WorkflowExtension.init_admin_widgets = function init_admin_widgets() {
+    WorkflowExtension.init_global();
+  };
 
   WorkflowExtension.init_widgets_for_other_pages =
       function init_widgets_for_other_pages() {
