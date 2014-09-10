@@ -12,7 +12,7 @@
    </li>
  {{/items}}
  {{#if items_loading}}
-  <li class="spinner ui-menu-item">
+  <li class="spinner ui-menu-item" data-ui-autocomplete-item="">
     <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
   </li>
 {{/if}}
