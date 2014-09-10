@@ -95,11 +95,6 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
                       + ' "' + that.original_object.title + '"',
               contact: that.contact,
               context: wf.context
-            }).save(),
-            new CMS.Models.WorkflowPerson({
-              workflow: wf,
-              person: that.contact,
-              context: wf.context
             }).save()
           );
       }).then(function(wf, tg) {
