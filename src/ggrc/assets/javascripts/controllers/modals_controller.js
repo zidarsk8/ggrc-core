@@ -77,6 +77,7 @@ can.Control("GGRC.Controllers.Modals", {
     this.on();
     this.fetch_all()
       .then(this.proxy("apply_object_params"))
+      .then(this.proxy("serialize_form"))
       .then(function() {
         // If the modal is closed early, the element no longer exists
         that.element && that.element.trigger('preload')
@@ -263,7 +264,6 @@ can.Control("GGRC.Controllers.Modals", {
     this.element.find('.wysihtml5').each(function() {
       $(this).cms_wysihtml5();
     });
-    this.serialize_form();
   }
 
   , "input, textarea, select change" : function(el, ev) {
