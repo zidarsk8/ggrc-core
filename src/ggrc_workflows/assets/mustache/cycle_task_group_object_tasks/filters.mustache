@@ -5,7 +5,7 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-<li class="inline-filtering">
+<li class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }}>
   <form class="form-search" onsubmit="return false" autocomplete="off">
     <div class="row-fluid">
       <div class="span12">
@@ -27,7 +27,17 @@
           </li>
           <li>
             <label>
-              <input class="checkbox" type="checkbox">
+              <input class="checkbox" type="checkbox" value="overdue" name="overdue">
+              Show overdue only
+            </label>
+          </li>
+          <li>
+            <label>
+              <input class="checkbox" type="checkbox"
+                custom-event="show-history"
+                data-toggle="filter-reset"
+                name="h"
+                mapping="{{toggle_string mapping '_with_history'}}">
               Show History
             </label>
           </li>
@@ -36,37 +46,3 @@
     </div>
   </form>
 </li>
-
-<!--
-
-<li class="advanced-filters" {{ (el) -> el.ggrc_controllers_tree_filter() }}>
-  <form class="form-search" onsubmit="return false" autocomplete="off">
-    <div class="row-fluid">
-      <div class="span4">
-        Status:
-      </div>
-      <div class="span4">
-        Overdue:
-        <select name="overdue" class="short-field" style="width:100px">
-          <option value="">Any</option>
-          <option value="overdue">Overdue</option>
-          <option value="[empty]">Not Overdue</option>
-        </select>
-      </div>
-      <div class="span4">
-        <button class="btn" custom-event="show-history"
-          mapping="{{toggle_string mapping '_with_history'}}"
-          style="float:right;"
-          >
-          <i class="grcicon-history-color" style="margin-top:0px;"></i>
-          {{#if_match mapping '.*_with_history'}}
-            Hide History
-          {{else}}
-            Show History
-          {{/if_equals}}
-        </button>
-      </div>
-    </div>
-  </form>
-</li>
--->
