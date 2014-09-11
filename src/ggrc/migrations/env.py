@@ -4,6 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from __future__ import with_statement
+import re
 from alembic import context
 from logging.config import fileConfig
 
@@ -51,14 +52,7 @@ def include_symbol(tablename, schema=None):
         return False
 
     # Exclude `*_alembic_version` tables
-    # FIXME: Generate this from included extensions
-    alembic_exclusions = [
-        'ggrc_alembic_version',
-        'ggrc_basic_permissions_alembic_version',
-        'ggrc_gdrive_integration_alembic_version',
-        ]
-
-    if tablename in alembic_exclusions:
+    if re.match(r'.*_alembic_version$', tablename):
         return False
 
     # If the tablename didn't match any exclusion cases, return True
