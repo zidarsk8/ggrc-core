@@ -34,7 +34,7 @@ class ObjectOwner(Mapping, db.Model):
   @staticmethod
   def _extra_table_args(cls):
     return (
-        db.UniqueConstraint('person_id', 'ownable_id', 'ownable_type'),
+        #db.UniqueConstraint('person_id', 'ownable_id', 'ownable_type'),
         )
 
   _publish_attrs = [
