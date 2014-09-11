@@ -1103,6 +1103,12 @@
   }
 }
 
+.modal {
+  .action-bar {
+    padding-top:0;
+  }
+}
+
 .object-approved {
   color:$green;
   font-size:12px;
