@@ -1161,3 +1161,34 @@ p.modal-value {
 label.second-in-column {
   margin-top:20px;
 }
+
+.modal {
+  .modal-body {
+    .relevance-filters {
+      margin-top:20px;
+      h6 {
+        margin-bottom:6px;
+      }
+      .objective-selector {
+        display:inline-block;
+      }
+      .add-rule {
+        font-size:13px;
+        margin-left:6px;
+      }
+      label {
+        font-size:12px;
+        font-weight:bold;
+      }
+    }
+    .filter-actions {
+      margin-top:10px;
+      border-top:1px solid #eee;
+      padding-top:10px;
+    }
+    .single-line-filter {
+      margin-bottom:6px;
+    }
+  }
+}
+
