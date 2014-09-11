@@ -13,6 +13,12 @@ class Option(Described, Base, db.Model):
   title = deferred(db.Column(db.String), 'Option')
   required = deferred(db.Column(db.Boolean), 'Option')
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('ix_options_role', 'role'),
+        )
+
   _publish_attrs = [
       'role',
       'title',

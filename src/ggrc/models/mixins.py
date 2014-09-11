@@ -149,6 +149,13 @@ class ChangeTracked(object):
         foreign_keys='{0}.modified_by_id'.format(cls.__name__),
         uselist=False,
         )
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        #db.Index('ix_{}_updated_at'.format(cls.__tablename__), 'updated_at'),
+        )
+
   #TODO Add a transaction id, this will be handy for generating etags
   #and for tracking the changes made to several resources together.
   #transaction_id = db.Column(db.Integer)

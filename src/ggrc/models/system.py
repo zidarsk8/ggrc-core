@@ -70,6 +70,13 @@ class SystemOrProcess(
     return query.options(
         orm.joinedload('network_zone'))
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index(
+          'ix_{}_is_biz_process'.format(cls.__tablename__), 'is_biz_process'),
+        )
+
 
 class System(
     Documentable, Personable, Objectiveable, Controllable, Sectionable,

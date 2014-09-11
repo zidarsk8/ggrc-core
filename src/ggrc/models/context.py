@@ -40,6 +40,14 @@ class Context(Base, db.Model):
         else None
     return setattr(self, self.related_object_attr, value)
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index(
+          'ix_context_related_object',
+          'related_object_type', 'related_object_id'),
+        )
+
   _publish_attrs = ['name', 'related_object','description',]
   _sanitize_html = ['name','description',]
   _include_links = []

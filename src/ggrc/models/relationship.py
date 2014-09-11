@@ -57,6 +57,12 @@ class Relationship(Mapping, db.Model):
     return (
         db.UniqueConstraint(
           'source_id', 'source_type', 'destination_id', 'destination_type'),
+        db.Index(
+          'ix_relationships_source',
+          'source_type', 'source_id'),
+        db.Index(
+          'ix_relationships_destination',
+          'destination_type', 'destination_id'),
         )
 
   _publish_attrs = [
