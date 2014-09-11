@@ -9,6 +9,7 @@ from ggrc.models.object_document import Documentable
 
 class RiskAssessment(Documentable, Timeboxed, Noted, Described, Titled, Base, db.Model):
   __tablename__ = 'risk_assessments'
+  _title_uniqueness = False
 
   ra_manager_id = deferred(
     db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
@@ -21,7 +22,7 @@ class RiskAssessment(Documentable, Timeboxed, Noted, Described, Titled, Base, db
     'Person', uselist=False, foreign_keys='RiskAssessment.ra_counsel_id')
 
   program_id = deferred(
-    db.Column(db.Integer, db.ForeignKey('programs.id')), 'RiskAssessment')
+    db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False), 'RiskAssessment')
   program = db.relationship(
     'Program',
     backref='risk_assessments',
