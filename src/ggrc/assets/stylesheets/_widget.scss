@@ -519,7 +519,7 @@
     .error {
       font-weight:normal;
     }
-    i {
+    i[rel=tooltip] {
       @include opacity(0.2);
       cursor: pointer;
       &:hover {
