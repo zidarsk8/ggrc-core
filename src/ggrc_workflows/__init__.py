@@ -537,6 +537,7 @@ def handle_workflow_person_post(sender, obj=None, src=None, service=None):
 
 @Resource.model_posted.connect_via(models.Workflow)
 def handle_workflow_post(sender, obj=None, src=None, service=None):
+  source_workflow = None
 
   if src.get('clone'):
     source_workflow_id = src.get('clone')
@@ -572,11 +573,17 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
   # the WorkflowOwner role in the workflow's context.
   workflow_owner_role = _find_role('WorkflowOwner')
   user_role = UserRole(
-      person=get_current_user(),
+      person=user,
       role=workflow_owner_role,
       context=context,
       modified_by=get_current_user(),
       )
+  db.session.add(models.WorkflowPerson(
+    person=user,
+    workflow=obj,
+    context=context,
+    modified_by=get_current_user(),
+    ))
   # pass along a temporary attribute for logging the events.
   user_role._display_related_title = obj.title
   db.session.add(user_role)
@@ -596,7 +603,29 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
     add_public_workflow_context_implication(context)
 
   if src.get('clone'):
-    source_workflow.copy_task_groups(obj)
+    source_workflow.copy_task_groups(
+      obj,
+      clone_people=src.get('clone_people', False),
+      clone_tasks=src.get('clone_tasks', False)
+      )
+
+    if src.get('clone_people'):
+      workflow_member_role = _find_role('WorkflowMember')
+      for authorization in source_workflow.context.user_roles:
+        #Current user has already been added as workflow owner
+        if authorization.person != user:
+          db.session.add(UserRole(
+            person=authorization.person,
+            role=workflow_member_role,
+            context=context,
+            modified_by=user))
+      for person in source_workflow.people:
+        if person != user:
+          db.session.add(models.WorkflowPerson(
+            person=person,
+            workflow=obj,
+            context=context))
+
 
 def add_public_workflow_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
