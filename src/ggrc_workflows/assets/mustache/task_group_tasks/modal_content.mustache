@@ -212,4 +212,5 @@
     <input type="hidden" name="context" model="Context" value="{{firstnonempty object_params.context instance.context.id}}" />
     <input type="hidden" name="sort_index" value="{{firstnonempty object_params.sort_index instance.sort_index}}" />
   </div>
+  {{{render_hooks 'TaskGroupTask.modal_tier1'}}}
 </form>
