@@ -34,7 +34,8 @@
   {{/list}}
 
   {{^list}}
-    <li class="spinner">
+    <li class="spinny">
+      <div class="inline-spinny" {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' }}></div>
     </li>
   {{/list}}
 
@@ -45,7 +46,7 @@
   {{/is_allowed}}
 
   {{#list.is_loading}}
-    <li class="spinner">
-      <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block;' }}></span>
+    <li class="spinny">
+      <div class="inline-spinny" {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' }}></div>
     </li>
   {{/list.is_loading}}
