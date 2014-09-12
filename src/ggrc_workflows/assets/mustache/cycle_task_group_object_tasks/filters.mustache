@@ -5,40 +5,43 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-
-<li class="advanced-filters" {{ (el) -> el.ggrc_controllers_tree_filter() }}>
+<li class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }}>
   <form class="form-search" onsubmit="return false" autocomplete="off">
     <div class="row-fluid">
-      <div class="span4">
-        Status:
-        <select name="status" class="short-field" style="width:100px">
-          <option value="">Any</option>
-          <option value="Verified">Verified</option>
-          <option value="Finished">Finished</option>
-          <option value="InProgress">In Progress</option>
-          <option value="Assigned">Assigned</option>
-        </select>
-      </div>
-      <div class="span4">
-        Overdue:
-        <select name="overdue" class="short-field" style="width:100px">
-          <option value="">Any</option>
-          <option value="overdue">Overdue</option>
-          <option value="[empty]">Not Overdue</option>
-        </select>
-      </div>
-      <div class="span4">
-        <button class="btn" custom-event="show-history"
-          mapping="{{toggle_string mapping '_with_history'}}"
-          style="float:right;"
-          >
-          <i class="grcicon-history-color" style="margin-top:0px;"></i>
-          {{#if_match mapping '.*_with_history'}}
-            Hide History
-          {{else}}
-            Show History
-          {{/if_equals}}
-        </button>
+      <div class="span12">
+        <h6>
+          Filter Tasks
+        </h6>
+        <ul class="quick-filters">
+          <li>
+            <label>
+              By Status
+            </label>
+            <select name="status">
+              <option value="">Any</option>
+              <option value="Verified">Verified</option>
+              <option value="Finished">Finished</option>
+              <option value="InProgress">In Progress</option>
+              <option value="Assigned">Assigned</option>
+            </select>
+          </li>
+          <li>
+            <label>
+              <input class="checkbox" type="checkbox" value="overdue" name="overdue">
+              Show overdue only
+            </label>
+          </li>
+          <li>
+            <label>
+              <input class="checkbox" type="checkbox"
+                custom-event="show-history"
+                data-toggle="filter-reset"
+                name="h"
+                mapping="{{toggle_string mapping '_with_history'}}">
+              Show History
+            </label>
+          </li>
+        </ul>
       </div>
     </div>
   </form>
