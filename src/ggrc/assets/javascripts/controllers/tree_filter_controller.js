@@ -16,6 +16,8 @@ can.Control("GGRC.Controllers.TreeFilter", {
     var name = el.attr("name").replace(/\./g, '__');
     if(el.is(".hasDatepicker")) {
       this.options.states.attr(name, moment(el.val(), "MM/DD/YYYY"));
+    } else if (el.is(":checkbox") && !el.is(":checked")) {
+      this.options.states.removeAttr(name);
     } else {
       this.options.states.attr(name, el.val());
     }
@@ -46,7 +48,7 @@ can.Control("GGRC.Controllers.TreeFilter", {
       if(can.reduce(Object.keys(states._data), function(st, key) {
         var val = states[key]
         , test = that.resolve_object(model, key.replace(/__/g, '.'));
-        
+
        if(val && val.isAfter) {
           if(!test || moment(test).isBefore(val)) {
             return false;
@@ -68,9 +70,10 @@ can.Control("GGRC.Controllers.TreeFilter", {
     });
   }
 
-  , 'button[data-toggle="filter-reset"] click' : function(el, ev) {
-    var that = this
-    , filter_reset_target = 'input, select';
+  , '[data-toggle="filter-reset"] click' : function(el, ev) {
+    var that = this,
+        filter_reset_target = 'input, select',
+        checked;
 
     this.element.find(filter_reset_target).each(function(i, elem) {
       var $elem = $(elem)
@@ -78,6 +81,16 @@ can.Control("GGRC.Controllers.TreeFilter", {
 
       that.options.states.removeAttr($elem.attr("name").replace(/\./g, '__'));
     });
+
+    if (el.is(':checkbox')) {
+      checked = el.prop('checked');
+      // Manually reset the form
+      el.closest('form')[0].reset();
+      if (el.is(":checkbox")) {
+        // But not the checkbox
+        el.prop('checked', checked);
+      }
+    }
     can.trigger(this.options.states, "change", "*");
   }
 
