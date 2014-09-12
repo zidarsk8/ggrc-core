@@ -35,7 +35,7 @@ class ObjectFile(Base, db.Model):
   @staticmethod
   def _extra_table_args(cls):
     return (
-        db.UniqueConstraint('file_id', 'fileable_id', 'fileable_type'),
+        #db.UniqueConstraint('file_id', 'fileable_id', 'fileable_type'),
         )
 
   _publish_attrs = [

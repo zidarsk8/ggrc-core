@@ -19,6 +19,7 @@ class TaskGroupTask(
     WithContact, Titled, Described, RelativeTimeboxed, Base,
     db.Model):
   __tablename__ = 'task_group_tasks'
+  _title_uniqueness = False
 
   task_group_id = db.Column(
       db.Integer, db.ForeignKey('task_groups.id'), nullable=False)
