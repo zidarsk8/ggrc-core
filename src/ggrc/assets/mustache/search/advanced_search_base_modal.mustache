@@ -20,109 +20,20 @@
 <div class="modal-body choose-object-wrap">
   <div class="row-fluid">
     <div class="span2">
-      <h6>Object type</h6>
-      {{#if option_type_menu}}
-        {{^if_equals option_type_count 1}}
-          <select class="input-block-level option-type-selector">
-            {{#option_type_menu}}
-              <optgroup label="{{category}}">
-                {{#items}}
-                <option
-                  value="{{model_name}}"
-                  label="{{model_display}}"
-                  {{#if_equals model_name selected_option_type}}selected="selected"
-                  {{/if_equals}}>
-                </option>
-                {{/items}}
-              </optgroup>
-            {{/option_type_menu}}
-          </select>
-        {{/if_equals}}
-      {{/if}}
+      {{> "/static/mustache/base_objects/filters/filter_by_type.mustache"}}
     </div>
     <div class="span6">
-      <h6>Matching terms</h6>
-      <div class="modal-search objective-selector">
-        <input
-          id="search"
-          class="input-block-level"
-          placeholder="Enter text to search..."
-          can-value="option_search_term"
-          type="text"
-          autofocus
-        >
-      </div>    
+      {{> "/static/mustache/base_objects/filters/filter_by_text.mustache"}}
     </div>
     <div class="span4">
-      <h6>Filter by person</h6>
-      <div class="modal-search objective-selector">
-        <input
-          id="search-by-owner"
-          class="search-by-owner input-block-level"
-          placeholder="Find owner or contact"
-          type="text"
-          name="owner"
-          value="{{firstnonempty owner.name owner.email owner.title}}"
-          data-lookup="Person"
-          data-template="/people/autocomplete_result.mustache"
-          null-if-empty="null-if-empty"
-          {{ autocomplete_select }}
-        >
-      </div>
+      {{> "/static/mustache/base_objects/filters/filter_by_person.mustache"}}
     </div>
   </div>
-  <div class="relevance-filters">
-    <div class="row-fluid">
-      <div class="span12">
-        <h6>Filter by mapping relevance</h6>
-        {{#each filter_list}}
-        <div class="single-line-filter">
-          <button type="submit" data-index="{{@index}}" class="remove_filter">
-            <i class="grcicon-deleted"></i>
-          </button>
-          <label>
-            {{#if @index}}AND {{/if}}Relevant to:
-          </label>
-          <select class="input-small filter-type-selector select-filter{{@index}}" can-value="model_name">
-            {{#option_type_menu_2}}
-            <option
-              value="{{model_singular}}"
-              label="{{title_singular}}">
-            </option>
-            {{/option_type_menu_2}}
-          </select>
-          {{#model_name}}
-          <div class="modal-search objective-selector">
-            <input
-              id="search-filter{{@index}}"
-              class="input-large search-icon search-filter{{@index}}"
-              placeholder="Enter text to search for {{model_name}}"
-              type="text"
-              name="filter_list.{{@index}}.search_filter"
-              value="{{firstnonempty search_filter.name search_filter.email search_filter.title}}"
-              data-lookup="{{this}}"
-              data-template="/{{#if_equals model_name 'Person'}}people{{else}}base_objects{{/if_equals}}/autocomplete_result.mustache"
-              {{ autocomplete_select }}
-              >
-          </div>
-          {{/model_name}}
-        </div>
-        {{/each}}
-        <div class="add-rule">
-          <a href="javascript://" id="addFilterRule" class="addFilterRule">+ Add New Rule</a>
-        </div>
-      </div>
-    </div>
-  </div>  
-  <div class="filter-actions">
-    <div class="row-fluid">
-      <div class="span12">
-        <a class="btn pull-right objectReview" href="javascript://" id="objectReview">
-          Search
-        </a>
-      </div>
-    </div>
-  </div>
+  
+  {{> "/static/mustache/base_objects/filters/filter_by_relevance.mustache"}}
+
+  {{> "/static/mustache/base_objects/filters/filter_actions.mustache"}}
+
 </div>
 
 <div class="results">
