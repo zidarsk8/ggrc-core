@@ -30,7 +30,7 @@ class TaskGroup(
       'TaskGroupTask', backref='task_group', cascade='all, delete-orphan')
 
   cycle_task_groups = db.relationship(
-      'CycleTaskGroup', backref='task_group', cascade='all, delete-orphan')
+      'CycleTaskGroup', backref='task_group')
 
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
