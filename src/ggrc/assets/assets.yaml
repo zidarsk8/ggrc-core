@@ -110,6 +110,11 @@ dashboard-js-template-files:
   - base_objects/tree.mustache
   - base_objects/tree_footer_no_access.mustache
   - base_objects/states.mustache
+  - base_objects/filters/filter_actions.mustache
+  - base_objects/filters/filter_by_person.mustache
+  - base_objects/filters/filter_by_relevance.mustache
+  - base_objects/filters/filter_by_text.mustache
+  - base_objects/filters/filter_by_type.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
@@ -244,6 +249,8 @@ dashboard-js-template-files:
   - search/advanced_search_option_column.mustache
   - search/advanced_search_option_items.mustache
   - search/advanced_search_people_items.mustache
+
+
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`
