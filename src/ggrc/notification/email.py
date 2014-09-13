@@ -293,6 +293,8 @@ class EmailDigestNotification(EmailNotification):
         for notify_recipient in notification.recipients:
           if notify_recipient.notif_type != self.notif_type:
             continue
+          if notify_recipient.content is None:
+            continue
           recipient_id=notify_recipient.recipient_id
           if recipient_id is None:
             continue
