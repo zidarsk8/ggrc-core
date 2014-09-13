@@ -20,7 +20,7 @@ class CycleTaskGroup(
   cycle_id = db.Column(
       db.Integer, db.ForeignKey('cycles.id'), nullable=False)
   task_group_id = db.Column(
-      db.Integer, db.ForeignKey('task_groups.id'), nullable=False)
+      db.Integer, db.ForeignKey('task_groups.id'), nullable=True)
   cycle_task_group_objects = db.relationship(
       'CycleTaskGroupObject',
       backref='cycle_task_group',

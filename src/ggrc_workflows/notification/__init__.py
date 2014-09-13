@@ -222,23 +222,12 @@ def prepare_notification_for_task(task, sender, recipient, subject, email_conten
     prepare_notification(task, 'Email_Digest', notif_pri, subject, email_digest_contents, sender, \
      recipients, override=False)
 
-def prepare_notification_for_tasks_now(task, sender, recipient, subject, email_content, notif_pri):
-  workflow=get_task_workflow(task)
-  if workflow is None:
-    current_app.logger.warn("Notification Trigger: Unable to find workflow for task " + task.title)
-    return
+def prepare_notification_for_tasks_now(sender, recipient, subject, email_content, notif_pri):
   recipients=[recipient]
   empty_line="\n"
-  email_digest_contents={}
   email_contents={}
-  email_digest_contents[recipient.id]="<a href=" + '"'  + \
-    request.url_root + "dashboard#task_widget"  + '"' + ">" + \
-    task.title + "</a>"
   email_contents[recipient.id]=email_content
-  override_flag=notify_on_change(workflow)
-  prepare_notification(task, 'Email_Now', notif_pri, subject, email_contents, sender, \
-   recipients, override=override_flag)
-  prepare_notification(task, 'Email_Digest_Deferred', notif_pri, subject, email_digest_contents, sender, \
+  prepare_notification(recipient, 'Email_Now', notif_pri, subject, email_contents, sender, \
    recipients, override=False)
 
 def handle_tasks_overdue():
@@ -290,13 +279,19 @@ def handle_tasks_overdue():
       (assignee, task, subject)=item
       task_object=get_task_object(task)
       email_content=email_content+"<li>" + task.title + ", for " + task_object.title + "</li>"
-      email_content=email_content + \
-        "</ul></p><p>" + "Are due in " + str(num_days) + " .</p>" + \
-        "<p>Click here to view your <a href=" + '"'  + \
+      email_digest_contents={}
+      email_digest_contents[assignee.id]="<a href=" + '"'  + \
         request.url_root + "dashboard#task_widget"  + '"' + ">" + \
-        "<b>task(s)</b></a></p>" + \
-        "Thanks,<br>gGRC Team"
-      prepare_notification_for_tasks_now(task, workflow_owner, assignee, subject, email_content, PRI_TASK_OVERDUE)
+        task.title + "</a>"
+      prepare_notification(assignee, 'Email_Digest', PRI_TASK_OVERDUE, subject, email_digest_contents, \
+        assignee, [assignee], override=False)
+    email_content=email_content + \
+     "</ul></p><p>" + "Are due in " + str(num_days) + " .</p>" + \
+     "<p>Click here to view your <a href=" + '"'  + \
+     request.url_root + "dashboard#task_widget"  + '"' + ">" + \
+     "<b>task(s)</b></a></p>" + \
+     "Thanks,<br>gGRC Team"
+    prepare_notification_for_tasks_now(assignee, assignee, subject, email_content, PRI_TASK_OVERDUE)
 
 def handle_tasks_due(num_days):
   tasks=db.session.query(models.CycleTaskGroupObjectTask).\
@@ -340,13 +335,19 @@ def handle_tasks_due(num_days):
       (assignee, task)=item
       task_object=get_task_object(task)
       email_content=email_content+"<li>" + task.title + ", for " + task_object.title + "</li>"
-      email_content=email_content + \
-        "</ul></p><p>" + "Are due " + num_days_text + " .</p>" + \
-        "<p>Click here to view your <a href=" + '"'  + \
+      email_digest_contents={}
+      email_digest_contents[assignee.id]="<a href=" + '"'  + \
         request.url_root + "dashboard#task_widget"  + '"' + ">" + \
-        "<b>task(s)</b></a></p>" + \
-        "Thanks,<br>gGRC Team"
-      prepare_notification_for_tasks_now(task, workflow_owner, assignee, subject, email_content, PRI_TASK_DUE)
+        task.title + "</a>"
+      prepare_notification(assignee, 'Email_Digest', PRI_TASK_DUE, subject, email_digest_contents, \
+        assignee, [assignee], override=False)
+    email_content=email_content + \
+      "</ul></p><p>" + "Are due " + num_days_text + " .</p>" + \
+      "<p>Click here to view your <a href=" + '"'  + \
+      request.url_root + "dashboard#task_widget"  + '"' + ">" + \
+      "<b>task(s)</b></a></p>" + \
+      "Thanks,<br>gGRC Team"
+    prepare_notification_for_tasks_now(assignee, assignee, subject, email_content, PRI_TASK_DUE)
 
 def handle_tasks_completed_for_cycle():
   workflow_cycles=db.session.query(models.Cycle).\

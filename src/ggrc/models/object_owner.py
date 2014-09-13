@@ -35,6 +35,7 @@ class ObjectOwner(Mapping, db.Model):
   def _extra_table_args(cls):
     return (
         #db.UniqueConstraint('person_id', 'ownable_id', 'ownable_type'),
+        db.Index('ix_object_owners_ownable', 'ownable_type', 'ownable_id'),
         )
 
   _publish_attrs = [

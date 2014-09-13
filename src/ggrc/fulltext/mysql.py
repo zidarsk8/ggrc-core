@@ -36,6 +36,11 @@ class MysqlRecordProperty(db.Model):
         # the DDL below or a similar Alembic migration should be used to create
         # the index.
         db.Index('{}_text_idx'.format(cls.__tablename__), 'content'),
+        # These are real indexes
+        db.Index('ix_{}_key'.format(cls.__tablename__), 'key'),
+        db.Index('ix_{}_type'.format(cls.__tablename__), 'type'),
+        db.Index('ix_{}_tags'.format(cls.__tablename__), 'tags'),
+        db.Index('ix_{}_context_id'.format(cls.__tablename__), 'context_id'),
         # Only MyISAM supports fulltext indexes until newer MySQL/MariaDB
         {'mysql_engine': 'myisam'},
         )

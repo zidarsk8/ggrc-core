@@ -117,6 +117,12 @@ class Directive(Timeboxed, BusinessObject, db.Model):
         orm.subqueryload('directive_sections'),
         orm.subqueryload('sections'))
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('ix_{}_meta_kind'.format(cls.__tablename__), 'meta_kind'),
+        )
+
 
 # FIXME: For subclasses, restrict kind
 class Policy(

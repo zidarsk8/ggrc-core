@@ -5,6 +5,8 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
+{{{renderLive '/static/mustache/base_objects/tree_footer_zero.mustache'}}}
+
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
 <li class="tree-footer tree-item tree-item-add">
@@ -41,7 +43,7 @@
         href="javascript://"
         rel="tooltip"
         data-placement="left"
-        data-toggle="multitype-modal-selector"
+        data-toggle="multitype-object-modal-selector"
         data-join-mapping="{{mapping}}"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.class.shortName}}"
@@ -57,7 +59,7 @@
         href="javascript://"
         rel="tooltip"
         data-placement="left"
-        data-toggle="multitype-modal-selector"
+        data-toggle="multitype-object-modal-selector"
         data-join-mapping="{{mapping}}"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.class.shortName}}"
@@ -71,16 +73,16 @@
       <span class="section-expander">
         &nbsp;
         &nbsp;
-        <a 
-          href="javascript://" 
+        <a
+          href="javascript://"
           rel="tooltip"
           data-placement="left"
-          data-toggle="modal-ajax-form" 
-          data-modal-reset="reset" 
-          data-dirty="#category_objectives, #combo" 
-          data-route="category_objectives" 
-          data-modal-class="modal-wide" 
-          data-object-singular="Objective" 
+          data-toggle="modal-ajax-form"
+          data-modal-reset="reset"
+          data-dirty="#category_objectives, #combo"
+          data-route="category_objectives"
+          data-modal-class="modal-wide"
+          data-object-singular="Objective"
           data-object-plural="objectives"
           data-original-title="Create new {{firstnonempty title_singular model.title_singular 'Objective'}} from this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
           data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}" }, "description": "{{json_escape parent_instance.description}}" }'>

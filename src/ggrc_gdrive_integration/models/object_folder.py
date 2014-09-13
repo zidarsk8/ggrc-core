@@ -36,6 +36,7 @@ class ObjectFolder(Base, db.Model):
   def _extra_table_args(cls):
     return (
         #db.UniqueConstraint('folder_id', 'folderable_id', 'folderable_type'),
+        db.Index('ix_folderable_id_type', 'folderable_id', 'folderable_type'),
         )
 
   _publish_attrs = [
