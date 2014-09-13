@@ -23,6 +23,7 @@ from datetime import date
 class Workflow(
     HasOwnContext, Timeboxed, Described, Titled, Slugged, Stateful, Base, db.Model):
   __tablename__ = 'workflows'
+  _title_uniqueness = False
 
   VALID_STATES = [u"Draft", u"Active", u"Inactive"]
 

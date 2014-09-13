@@ -35,7 +35,7 @@ class ObjectEvent(Base, db.Model):
   @staticmethod
   def _extra_table_args(cls):
     return (
-        db.UniqueConstraint('event_id', 'eventable_id', 'eventable_type'),
+        #db.UniqueConstraint('event_id', 'eventable_id', 'eventable_type'),
         )
 
   _publish_attrs = [

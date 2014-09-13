@@ -15,6 +15,7 @@ from .mixins import Base, Stateful
 
 class NotificationConfig(Base, db.Model):
   __tablename__ = 'notification_configs'
+  name = db.Column(db.String, nullable=True)
   enable_flag = db.Column(db.Boolean)
   notif_type = db.Column(db.String)
   person_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
@@ -37,6 +38,7 @@ class NotificationConfig(Base, db.Model):
 
 class Notification(Base, db.Model):
   __tablename__ = 'notifications'
+  name = db.Column(db.String, nullable=True)
   notif_date = db.Column(db.DateTime)
   notif_pri = db.Column(db.Integer)
   content = db.Column(db.Text)
@@ -60,6 +62,7 @@ class NotificationObject(Base, Stateful, db.Model):
     "Verified",
   ]
 
+  name = db.Column(db.String, nullable=True)
   notification_id = db.Column(db.Integer, db.ForeignKey('notifications.id'), nullable=False)
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
@@ -75,6 +78,7 @@ class NotificationRecipient(Base, Stateful, db.Model):
     "Failed",
   ]
 
+  name = db.Column(db.String, nullable=True)
   notif_type = db.Column(db.String)
   notification_id = db.Column(db.Integer, db.ForeignKey('notifications.id'), nullable=False)
   recipient_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
@@ -83,6 +87,6 @@ class NotificationRecipient(Base, Stateful, db.Model):
 
 class CalendarEntry(Base, db.Model):
   __tablename__='calendar_entries'
-  name=db.Column(db.String, nullable=False)
-  calendar_id = db.Column(db.String, nullable=False)
-  owner_id=db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
+  name=db.Column(db.String, nullable=True)
+  calendar_id = db.Column(db.String, nullable=True)
+  owner_id=db.Column(db.Integer, db.ForeignKey('people.id'), nullable=True)

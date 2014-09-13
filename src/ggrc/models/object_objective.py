@@ -38,6 +38,9 @@ class ObjectObjective(Timeboxed, Mapping, db.Model):
     return (
         db.UniqueConstraint('objective_id', 'objectiveable_id', 'objectiveable_type'),
         db.Index('ix_objective_id', 'objective_id'),
+        db.Index(
+          'ix_object_objectives_objectiveable',
+          'objectiveable_type', 'objectiveable_id'),
         )
 
   _publish_attrs = [

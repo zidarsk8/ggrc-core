@@ -15,6 +15,7 @@ from ggrc.models.reflection import PublishOnly
 class TaskGroup(
     WithContact, Timeboxed, Described, Titled, Slugged, db.Model):
   __tablename__ = 'task_groups'
+  _title_uniqueness = False
 
   workflow_id = db.Column(
       db.Integer, db.ForeignKey('workflows.id'), nullable=False)
