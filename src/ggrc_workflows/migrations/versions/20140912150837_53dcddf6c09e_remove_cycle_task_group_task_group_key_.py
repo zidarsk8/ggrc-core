@@ -2,14 +2,14 @@
 """Remove cycle_task_group task_group key constraint
 
 Revision ID: 53dcddf6c09e
-Revises: 23f5b46fc4a3
+Revises: 541f6ed93688
 Create Date: 2014-09-12 15:08:37.646701
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '53dcddf6c09e'
-down_revision = '23f5b46fc4a3'
+down_revision = '541f6ed93688'
 
 from alembic import op
 
