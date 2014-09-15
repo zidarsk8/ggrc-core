@@ -112,7 +112,7 @@ class EmailNotification(NotificationBase):
           "EmailDeferredNotification: Error occured in handling state " + 
           "transitions"
           )
-        for notif in target_notifs:
+        for (notif, notif_object) in target_notifs:
           skipped_notifs[notif.id]=notif
         continue
 
