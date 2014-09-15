@@ -68,16 +68,11 @@
       li.spinny {
         padding:0;
         margin:0;
-        .inline-spinny {
-          width:32px;
-          height:32px;
-          margin-left:20px;
-          .spinner {
-            width: 30px;
-            height: 30px;
-            left: 30px;
-            top: 14px;
-          }
+        > .spinner {
+          width: 30px;
+          height: 30px;
+          left: 40px;
+          top: 14px;
         }
       }
     }
