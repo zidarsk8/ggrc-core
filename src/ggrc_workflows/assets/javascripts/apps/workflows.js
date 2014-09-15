@@ -268,6 +268,11 @@
        "task_groups": "TaskGroup"
       };
 
+      mappings[type].orphaned_objects = Multi([
+        GGRC.Mappings.get_mappings_for(type).orphaned_objects,
+        mappings[type].workflows
+      ]);
+
       //CMS.Models[type].attributes.workflow_objects =
       //  "CMS.Models.WorkflowObject.stubs";
       CMS.Models[type].attributes.task_group_objects =
@@ -583,11 +588,6 @@
   });
   can.each(_workflow_object_types, function(model_name) {
     draft_on_update_mixin.add_to(CMS.Models[model_name]);
-  });
-
-  // Add Workflows to the orphaned_objects mapping.
-  can.each(_workflow_object_types, function(model_name) {
-    GGRC.Mappings.get_mappings_for(model_name).orphaned_objects.sources.push('workflows');
   });
 
 })(this.can.$, this.CMS, this.GGRC);
