@@ -261,7 +261,7 @@ def handle_tasks_overdue():
     if not frequency_mapping.has_key(cycle.workflow.frequency):  
       continue
     num_days=frequency_mapping[cycle.workflow.frequency]
-    if task.end_date != datetime.utcnow().date() + num_days:
+    if task.end_date != (datetime.utcnow().date() + timedelta(num_days)):
       continue
     subject="One or more tasks assigned to you are due in "  + str(num_days)
     if not tasks_for_contact.has_key(assignee.id):
