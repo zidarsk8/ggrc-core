@@ -9,17 +9,14 @@
       </div>
       {{#is_private}}
       <div class="lhs-private">
-        <i class="grcicon-private" rel="tooltip" title="Private"></i>    
+        <i class="grcicon-private" rel="tooltip" title="Private"></i>
       </div>
       {{/is_private}}
   </a>
   {{/using}}
 </li>
 {{/list}}
-{{^list}}
-<li class="spinner">
-</li>
-{{/list}}
+
 {{#if_helpers '\
    ^is_allowed' 'read' model.shortName _0_context='any' '\
    and ^is_allowed' 'create' model.shortName _1_context='any' '\
@@ -28,8 +25,8 @@
   You do not have access to read this information.
 </li>
 {{/if_helpers}}
+
 {{#list.is_loading}}
-<li class="spinner">
-  <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-</li>
+  <li class="spinny"  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' }}>
+  </li>
 {{/list.is_loading}}
