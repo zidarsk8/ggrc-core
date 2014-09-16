@@ -68,7 +68,7 @@ class EmailNotification(NotificationBase):
     ignored_notifs={}
     #ToDo(Mouli): The valid states mapping must be set outside the generic email notification module
     ignored_states={
-      'CycleTaskGroupObjectTask': ['Finished', 'InProgress', 'Verified'],
+      'CycleTaskGroupObjectTask': ['Assigned', 'Finished', 'InProgress', 'Verified'],
       'CycleTaskGroup': ['InProgress', 'Verified'],
     }
     for notif in notifs:
@@ -112,7 +112,7 @@ class EmailNotification(NotificationBase):
           "EmailDeferredNotification: Error occured in handling state " + 
           "transitions"
           )
-        for notif in target_notifs:
+        for (notif, notif_object) in target_notifs:
           skipped_notifs[notif.id]=notif
         continue
 
