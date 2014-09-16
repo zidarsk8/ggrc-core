@@ -122,18 +122,28 @@ class RelativeTimeboxed(Timeboxed):
     new_date = cls._nearest_work_day(new_date, direction=-1)
     return new_date
 
-  def calc_start_date(self, base_date):
-    if self.task_group.workflow.frequency == "one_time":
+  def calc_start_date(self, frequency, base_date):
+    if frequency == "one_time":
       return self.start_date
     else:
       return self._calc_start_date(
-          base_date, self.task_group.workflow.frequency,
+          base_date, frequency,
           self.relative_start_month, self.relative_start_day)
 
-  def calc_end_date(self, base_date):
-    if self.task_group.workflow.frequency == "one_time":
+  def calc_end_date(self, frequency, base_date):
+    if frequency == "one_time":
       return self.end_date
-    else:
-      return self._calc_end_date(
-          base_date, self.task_group.workflow.frequency,
-          self.relative_end_month, self.relative_end_day)
+
+    start_date = self._calc_start_date(
+        base_date, frequency,
+        self.relative_end_month, self.relative_end_day)
+
+    end_date = self._calc_end_date(
+        base_date, frequency,
+        self.relative_end_month,
+        self.relative_end_day)
+
+    if start_date < end_date:
+      return end_date
+
+    return self._calc_start_date_of_next_period(end_date, frequency)
