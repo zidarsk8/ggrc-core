@@ -1,5 +1,5 @@
 {{#if allow_creating}}
-{{#is_allowed' '__GGRC_ADMIN__' model.shortName context=parent_instance.context.id}}
+{{#is_allowed '__GGRC_ADMIN__' model.shortName context=parent_instance.context.id}}
   <li class="tree-item tree-item-add tree-footer">
     <div class="row-fluid">
       <div class="span12">
@@ -12,9 +12,9 @@
     </div>
   </li>
 {{else}}
+  {{^if_auditor parent_instance}}
   {{#if_helpers '\
     #is_allowed' 'create' model.shortName _0_context=parent_instance.context.id '\
-    and ^if_auditor' parent_instance '\
     and ^if_equals' parent_instance.status 'Accepted'}}
   {{#if_can_edit_request parent_instance}}
   <li class="tree-item tree-item-add tree-footer">
@@ -30,5 +30,6 @@
   </li>
   {{/if_can_edit_request}}
   {{/if_helpers}}
+  {{/if_auditor}}
 {{/is_allowed}}}
 {{/if}}
