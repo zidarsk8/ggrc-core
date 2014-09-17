@@ -7,6 +7,7 @@
 import datetime, calendar
 from ggrc.models.mixins import Timeboxed
 from ggrc import settings, db
+from dateutil.relativedelta import relativedelta
 
 
 class RelativeTimeboxed(Timeboxed):
@@ -89,24 +90,15 @@ class RelativeTimeboxed(Timeboxed):
   @classmethod
   def _calc_start_date_of_next_period(cls, base_date, frequency):
     if frequency == "one_time":
-      ret = base_date
-    elif frequency == "annually":
-      ret = datetime.date(year=base_date.year+1, month=base_date.month, day=base_date.day)
-    elif frequency == "monthly":
-      if base_date.month < 12:
-        new_date = datetime.date(year=base_date.year, month=base_date.month+1, day=base_date.day)
-      else:
-        new_date = datetime.date(year=base_date.year+1, month=1, day=base_date.day)
-      ret = new_date
-    elif frequency == "quarterly":
-      if base_date.month < 10:
-        new_date = datetime.date(year=base_date.year, month=base_date.month+3, day=base_date.day)
-      else:
-        new_date = datetime.date(year=base_date.year+1, month=1, day=base_date.day)
-      ret = new_date
-    elif frequency == "weekly":
-      ret = base_date + datetime.timedelta(days=7)
-    return ret
+      return base_date
+
+    freq_to_delta = {
+        'annually': dict(years=1),
+        'monthly': dict(months=1),
+        'quarterly': dict(months=3),
+        'weekly': dict(weeks=1)
+    }
+    return base_date + relativedelta(**freq_to_delta.get(frequency, dict()))
 
   @classmethod
   def _calc_start_date(
@@ -122,18 +114,28 @@ class RelativeTimeboxed(Timeboxed):
     new_date = cls._nearest_work_day(new_date, direction=-1)
     return new_date
 
-  def calc_start_date(self, base_date):
-    if self.task_group.workflow.frequency == "one_time":
+  def calc_start_date(self, frequency, base_date):
+    if frequency == "one_time":
       return self.start_date
     else:
       return self._calc_start_date(
-          base_date, self.task_group.workflow.frequency,
+          base_date, frequency,
           self.relative_start_month, self.relative_start_day)
 
-  def calc_end_date(self, base_date):
-    if self.task_group.workflow.frequency == "one_time":
+  def calc_end_date(self, frequency, base_date):
+    if frequency == "one_time":
       return self.end_date
-    else:
-      return self._calc_end_date(
-          base_date, self.task_group.workflow.frequency,
-          self.relative_end_month, self.relative_end_day)
+
+    start_date = self._calc_start_date(
+        base_date, frequency,
+        self.relative_end_month, self.relative_end_day)
+
+    end_date = self._calc_end_date(
+        base_date, frequency,
+        self.relative_end_month,
+        self.relative_end_day)
+
+    if start_date < end_date:
+      return end_date
+
+    return self._calc_start_date_of_next_period(end_date, frequency)

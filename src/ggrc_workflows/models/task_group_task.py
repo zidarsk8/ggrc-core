@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from ggrc.models.mixins import (
     deferred, Base, Titled, Slugged, Described, Timeboxed, WithContact
     )
+from ggrc.login import get_current_user
 from ggrc.models.reflection import PublishOnly
 from ggrc_workflows.models.mixins import RelativeTimeboxed
 
@@ -66,7 +67,16 @@ class TaskGroupTask(
         'relative_start_month', 'relative_start_day',
         'relative_end_month', 'relative_end_day',
         'start_date', 'end_date',
-        'contact',
+        'contact', 'modified_by'
         ]
-    target = self.copy_into(_other, columns, **kwargs)
+
+    contact = None
+    if(kwargs.get('clone_people', False)):
+      contact = self.contact
+    else:
+      contact = get_current_user()
+
+    kwargs['modified_by'] = get_current_user()
+
+    target = self.copy_into(_other, columns, contact=contact, **kwargs)
     return target

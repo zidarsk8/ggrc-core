@@ -11,10 +11,9 @@ from ggrc.models.mixins import (
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.context import HasOwnContext
-from sqlalchemy.orm import validates, joinedload_all, undefer_group
+from ggrc.login import get_current_user
+from sqlalchemy.orm import validates
 from ggrc.models.computed_property import computed_property
-from .task_group_object import TaskGroupObject
-from .cycle_task_group_object import CycleTaskGroupObject
 from .cycle import Cycle
 from collections import OrderedDict
 from datetime import date
@@ -96,10 +95,18 @@ class Workflow(
     target = self.copy_into(_other, columns, **kwargs)
     return target
 
-  def copy_task_groups(self, target):
+  def copy_task_groups(self, target, **kwargs):
     for task_group in self.task_groups:
-      target.task_groups.append(
-          task_group.copy(workflow=target, context=target.context))
+      obj = task_group.copy(
+        workflow=target,
+        context=target.context,
+        clone_people=kwargs.get("clone_people", False),
+        modified_by=get_current_user(),
+        )
+      target.task_groups.append(obj)
+
+      if(kwargs.get("clone_tasks", False)):
+        task_group.copy_tasks(obj, clone_people=kwargs.get("clone_people", False))
 
     return target
 

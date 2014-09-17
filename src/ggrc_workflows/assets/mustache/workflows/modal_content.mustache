@@ -48,7 +48,7 @@
         Frequency
         <i class="grcicon-help-black" rel="tooltip" title="Choose frequency"></i>
       </label>
-      <select tabindex="3" class="input-block-level" id="frequency" name="frequency">
+      <select tabindex="3" class="input-block-level" id="frequency" name="frequency" {{^if new_object_form}}disabled="disabled"{{/if new_object_form}}>
         {{#iterate "one_time" "One time" "weekly" "Weekly" "monthly" "Monthly" "quarterly" "Quarterly" "annually" "Annually" step=2}}
         <option value="{{iterator_0}}" {{#if_equals instance.frequency iterator_0}}selected="true"{{/if_equals}}>{{iterator_1}}</option>
         {{/iterate}}
