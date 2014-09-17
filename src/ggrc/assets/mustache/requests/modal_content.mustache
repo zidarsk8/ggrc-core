@@ -83,7 +83,7 @@
           {{#using audit=instance.audit}}
           {{#using assignee=audit.contact}}
             {{firstnonempty assignee.email '&nbsp;'}}
-            <input type="hidden" name="assignee.email" value="{{assignee.email}}">
+            <input type="hidden" model="Person" name="assignee" value="{{assignee.id}}">
           {{/using}}
           {{/using}}
         {{else}}
