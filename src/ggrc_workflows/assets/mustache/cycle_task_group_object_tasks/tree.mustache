@@ -194,9 +194,11 @@
           {{/using}}
         {{/is_dashboard}}
 
-        {{#is_dashboard}}
-          {{#using cycle=instance.cycle}}
-          {{#using workflow=cycle.workflow}}
+        {{#using cycle=instance.cycle}}
+        {{#using workflow=cycle.workflow}}
+        {{#if_helpers '\
+          #is_dashboard' '\
+          or ^is_page_instance' workflow}}
 
             <div class="row-fluid">
               <div class="span12">
@@ -210,10 +212,9 @@
                 <br>
               </div>
             </div>
-
-          {{/using}}
-          {{/using}}
-        {{/is_dashboard}}
+        {{/if_helpers}}
+        {{/using}}
+        {{/using}}
 
 
 
