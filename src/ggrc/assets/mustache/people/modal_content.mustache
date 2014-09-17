@@ -21,6 +21,14 @@
 
       <br>
     </div>
+    <div class="span3">
+      <label for="person_is_enabled">Enabled <span class="required">*</span></label>
+      <input type="checkbox" tabindex="3" id="person_is_enabled" name="is_enabled" value="{{is_enabled}}" {{#if instance.is_enabled}}checked="checked"{{/if}} >
+      <span class="help-inline">
+      </span>
+
+      <br>
+    </div>
     <!--div class="span3">
       <label for="person-language">Language</label>
       <select class="input-small" id="person-language" name="language_id" tabindex="3">
