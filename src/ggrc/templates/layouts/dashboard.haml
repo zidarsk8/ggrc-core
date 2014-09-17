@@ -110,6 +110,10 @@
           .span3
             -block subheader_extras
 
+      .top-inner-nav
+        .object-nav
+          %ul.nav{ 'class': "internav ={ model_display_class }" }
+
       %section.content
         .flash
           -with messages = get_flashed_messages(with_categories=True)
@@ -132,8 +136,8 @@
                   %p=message
         -block main
           .clearfix
-            .objnav.bar-v
-            .inner-nav
+            //.objnav.bar-v
+            //.inner-nav
               .object-nav
                 %ul.nav{ 'class': "internav ={ model_display_class }" }
             .object-area
