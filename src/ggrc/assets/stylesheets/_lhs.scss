@@ -368,8 +368,173 @@
   }
 }
 
-// INNER NAV
+// TOP INNER NAV
+.top-inner-nav {
+  ul.internav {
+    @include reset-list();
+    @include clearfix();
+    li {
+      background:$white;
+      position:relative;
+      float: left;
+      border-right: 1px solid $white;
+      .drag {
+        position:absolute;
+        top:0;
+        left:0;
+        width:16px;
+        height:24px;
+        line-height:24px;
+        cursor:move;
+        &:hover {
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -314px;
+        }
+      }
+      &.inner-nav-button {
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
+        .message {
+          color: $green;
+        }
+        .tiny-help-text {
+          padding-top:4px;
+          font-size:10px;
+          line-height:13px;
+        }
+      }
+      &.finished {
+        background: $rqAccepted;
+      }
+      &.started {
+        background: $rqStarted;
+      }
+      &.overdue {
+        background: $red;
+        a {
+          color: $white;
+          i {
+            @include opacity(1);
+          }
+        }
+      }
+    }
+    a {
+      padding: 0 6px 0 14px;
+      display: block;
+      line-height: 29px;
+      font-size: 13px;
+      color: $tabTitle;
+      background-color: darken($tabBgnd,3%);
+      &:hover {
+        background-color:#444;
+        background-image: image-url("grcicons/icons.png");
+        background-repeat: no-repeat;
+        @include background-size(368px 416px);
+        background-position: -270px -314px;
+        color:#fff;
+        text-decoration:none;
+      }
+    }
+    i {
+      margin-top:6px;
+      margin-right:3px;
+      @include opacity(0.3);
+    }
+    li.active {
+      a {
+        color:#000;
+        font-weight:bold;
+        background-color: $white;
+        i {
+          @include opacity(1);
+        }
+      }
+    }
+    li:hover {
+      a {
+        background-color:#444;
+        color:#fff;
+        i {
+          @include opacity(1);
+        }
+      }
+      &.overdue {
+        a {
+          background-color: $red;
+          color: $white;
+        }
+      }
+    }
+    &.business {
+      li:hover {
+        a {
+          color:#fff;
+          background-color:$business;
+        }
+      }
+    }
+    &.governance {
+      li:hover {
+        a {
+          background-color:$governance;
+        }
+      }
+    }
+    &.risk {
+      li:hover {
+        a {
+          background-color:$risk;
+        }
+      }
+    }
+    &.program {
+      li:hover {
+        a {
+          color:#fff;
+          background-color:$programs;
+        }
+      }
+    }
+    &.objectives {
+      li:hover {
+        a {
+          background-color:$objectives;
+        }
+      }
+    }
+    &.controls {
+      li:hover {
+        a {
+          color:#fff;
+          background-color:$controls;
+        }
+      }
+    }
+    &.entities {
+      li:hover {
+        a {
+          color:#fff;
+          background-color:$entities;
+        }
+      }
+    }
+    &.workflow {
+      li:hover {
+        a {
+          color:#fff;
+          background-color:$programs;
+        }
+      }
+    }
+  }
+}
 
+// INNER NAV
+/* Inner nav dont exist anymore. It is moved up to top-inner-nav
 .inner-nav {
   .object-nav {
     .add-nav-item {
@@ -633,6 +798,7 @@
     }
   }
 }
+*/
 
 .extended-info {
   position:absolute;
