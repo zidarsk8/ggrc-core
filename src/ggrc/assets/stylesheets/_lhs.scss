@@ -358,16 +358,16 @@
   height:100%;
   z-index:100;
   width:6px;
-  background-color:#fff;
-  border-left:1px solid #ddd;
-  border-right:1px solid #ddd;
+  background-color:$white;
+  border-left:1px solid $tabBorder;
+  border-right:1px solid $tabBorder;
   background-image: image-url("bgnds/drag-v.png");
   @include background-size(2px 30px);
   background-repeat:no-repeat;
   background-position:2px 50%;
   cursor:ew-resize;
   &:hover {
-    background-color:#fff;
+    background-color:$white;
   };
   &.bar-closed {
     left:40px;
@@ -383,37 +383,24 @@
   ul.internav {
     @include reset-list();
     @include clearfix();
+    margin-left: 11px;
     li {
-      background:$white;
-      position:relative;
+      position: relative;
       float: left;
-      border-right: 1px solid $white;
-      .drag {
-        position:absolute;
-        top:0;
-        left:0;
-        width:16px;
-        height:24px;
-        line-height:24px;
-        cursor:move;
-        &:hover {
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -314px;
-        }
-      }
+      margin-bottom: -1px;
       &.inner-nav-button {
         text-align: center;
-        border-bottom: 1px solid #ddd;
-        padding: 10px;
+        padding: 1px 10px 0 10px;
+        float: right;
         .message {
           color: $green;
         }
         .tiny-help-text {
-          padding-top:4px;
-          font-size:10px;
-          line-height:13px;
+          padding-top: 4px;
+          font-size: 10px;
+          line-height: 13px;
+          display: inline-block;
+          margin: 0;
         }
       }
       &.finished {
@@ -433,41 +420,38 @@
       }
     }
     a {
-      padding: 0 6px 0 14px;
+      padding: 0 9px;
       display: block;
       line-height: 29px;
       font-size: 13px;
       color: $tabTitle;
-      background-color: darken($tabBgnd,3%);
+      border: 1px solid transparent;
       &:hover {
-        background-color:#444;
-        background-image: image-url("grcicons/icons.png");
-        background-repeat: no-repeat;
-        @include background-size(368px 416px);
-        background-position: -270px -314px;
-        color:#fff;
-        text-decoration:none;
+        background: $tabHoverBgnd;
+        color: $white;
+        text-decoration: none;
       }
     }
     i {
-      margin-top:6px;
-      margin-right:3px;
-      @include opacity(0.3);
+      margin-top: 6px;
+      margin-right: 3px;
+      @include opacity(0.55);
     }
     li.active {
       a {
-        color:#000;
-        font-weight:bold;
+        color: $subTitle;
         background-color: $white;
+        border: 1px solid $tabBorder;
+        border-bottom-color: transparent;
         i {
-          @include opacity(1);
+          @include opacity(8);
         }
       }
     }
     li:hover {
       a {
-        background-color:#444;
-        color:#fff;
+        background-color: $tabHoverBgnd;
+        color: $white;
         i {
           @include opacity(1);
         }
@@ -482,7 +466,7 @@
     &.business {
       li:hover {
         a {
-          color:#fff;
+          color: $white;
           background-color:$business;
         }
       }
@@ -504,7 +488,7 @@
     &.program {
       li:hover {
         a {
-          color:#fff;
+          color: $white;
           background-color:$programs;
         }
       }
@@ -519,7 +503,7 @@
     &.controls {
       li:hover {
         a {
-          color:#fff;
+          color: $white;
           background-color:$controls;
         }
       }
@@ -527,7 +511,7 @@
     &.entities {
       li:hover {
         a {
-          color:#fff;
+          color: $white;
           background-color:$entities;
         }
       }
@@ -535,7 +519,7 @@
     &.workflow {
       li:hover {
         a {
-          color:#fff;
+          color: $white;
           background-color:$programs;
         }
       }

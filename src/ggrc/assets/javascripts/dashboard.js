@@ -405,6 +405,7 @@ function resize_areas() {
   $header = $(".header-content");
   $innerNav = $(".inner-nav");
   $objectArea = $(".object-area");
+  $topNav = $(".top-inner-nav");
   $area = $(".area");
   $bar = $(".bar-v");
 
@@ -412,7 +413,7 @@ function resize_areas() {
   winWidth = $window.width();
   lhsHeight = winHeight - 70;
   footerMargin = lhsHeight;
-  internavHeight = lhsHeight - 50;
+  internavHeight = lhsHeight - 100;
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
@@ -424,6 +425,7 @@ function resize_areas() {
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);
+  $topNav.css("width",objectWidth);
   $objectArea
     .css("margin-left",internavWidth)
     .css("height",internavHeight)
