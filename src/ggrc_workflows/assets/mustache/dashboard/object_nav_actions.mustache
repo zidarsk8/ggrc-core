@@ -13,12 +13,12 @@
         {{#if waiting}}
           <span {{attach_spinner '{ "radius": 5, "length": 5, "width": 3 }' 'display:inline-block; margin: 15px;' }}></span>
         {{else}}
-          <button type="submit" href="#workflowActivate" class="btn" {{^can_activate}}disabled="disabled"{{/can_activate}}>
-            Activate Workflow
-          </button>
           {{^can_activate}}
             <p class="tiny-help-text">You need to setup task group(s) before activating workflow</p>
           {{/can_activate}}
+          <button type="submit" href="#workflowActivate" class="btn" {{^can_activate}}disabled="disabled"{{/can_activate}}>
+            Activate Workflow
+          </button>
         {{/waiting}}
       {{else}}
         {{#if waiting}}
