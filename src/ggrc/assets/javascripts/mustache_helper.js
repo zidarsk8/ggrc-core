@@ -1805,7 +1805,7 @@ Mustache.registerHelper("to_class", function(prop, delimiter, options) {
       failed
     {{/if_helpers}}
 
-  FIXME: Only synchronous helpers (those which call options.fn() or options.inverse() 
+  FIXME: Only synchronous helpers (those which call options.fn() or options.inverse()
     without yielding the thread through defer_render or otherwise) can currently be used
     with if_helpers.  if_helpers should support all helpers by changing the walk through
     conjunctions and disjunctions to one using a can.reduce(Array, function(Deferred, item) {}, $.when())
@@ -2444,6 +2444,11 @@ Mustache.registerHelper("toggle_string", function(source, str){
   }
 
   return source + str;
+});
+
+Mustache.registerHelper("grdive_msg_to_id", function(message){
+  var msg = Mustache.resolve(message).split(' ');
+  return msg[msg.length-1];
 });
 
 })(this, jQuery, can);

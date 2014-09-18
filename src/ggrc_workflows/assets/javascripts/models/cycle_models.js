@@ -129,6 +129,8 @@
           return null;
         }
         return folders[0].instance;
+      }, function(result) {
+        return result;
       });
     }
   });
