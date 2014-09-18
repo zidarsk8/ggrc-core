@@ -495,6 +495,7 @@ Mustache.registerHelper("defer", function(prop, deferred, options) {
   }
 
   tag_name = (options.hash || {}).tag_name || "span";
+  allow_fail = (options.hash || {}).allow_fail || false;
 
   deferred = resolve_computed(deferred);
   typeof deferred === "function" && (deferred = deferred());
@@ -507,7 +508,7 @@ Mustache.registerHelper("defer", function(prop, deferred, options) {
     return options.inverse(options.contexts);
   }
 
-  return defer_render(tag_name, { done: finish, progress: progress }, deferred);
+  return defer_render(tag_name, { done: finish, fail: allow_fail ? finish : null, progress: progress }, deferred);
 });
 
 Mustache.registerHelper("allow_help_edit", function() {
