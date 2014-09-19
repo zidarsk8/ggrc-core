@@ -207,7 +207,7 @@ CMS.Controllers.TreeLoader("GGRC.Controllers.ListView", {
     }
   , reset_sticky_clone : function(){
       this.element.find('.sticky-clone').remove();
-      this.element.find('.advanced-filters').removeClass('sticky sticky-header').removeAttr('style');
+      this.element.find('.sticky-filter').removeClass('sticky sticky-header').removeAttr('style');
       this.element.find('.tree-footer').removeClass('sticky sticky-footer').removeAttr('style').hide();
       this.element.find('.tree-footer').show();
     }

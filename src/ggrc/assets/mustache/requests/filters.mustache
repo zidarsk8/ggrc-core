@@ -4,45 +4,48 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
-<li class="advanced-filters pbc-filters extra-header" style="display: none;" {{ (el) -> el.ggrc_controllers_tree_filter() }}>
-  <form>
-    <div class="row-fluid">
-      <div class="span4">
-        <ul class="filter-date-range">
-          <li>
-            <span class="requested-text">requested on or after:</span>
-            <input class="input-small date" name="requested_on" data-toggle="datepicker" data-after="filter_start_date" placeholder="/ /" type="text" value="">
-          </li>
-        </ul>
-      </div>
-      <div class="span2">
-        <i class="grcicon-person-green pull-left"></i>
-        <div class="objective-selector">
-          <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
+<li class="sticky-filter inner-filter-sticky">
+  <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
+    <form>
+      <div class="row-fluid">
+        <div class="span12">
+          <h6>
+            Filter Requests
+          </h6>
+          <ul class="quick-filters">
+            <li>
+              <label>
+                By Date
+              </label>
+              <input class="input-date date" name="requested_on" data-toggle="datepicker" data-after="filter_start_date" placeholder="/ /" type="text" value="">
+            </li>
+            <li>
+              <label>
+                By Type
+              </label>
+              <select name="request_type">
+                {{#iterate "" "Documentation" "Interview" "Population Sample"}}
+                <option value="{{iterator.toLowerCase}}" {{#iterator.toLowerCase}}{{#trim}}{{#if_equals this states.request_type}}selected="true"{{/trim}}{{/iterator.toLowerCase}}{{/if_equals}}>{{firstnonempty iterator "Any"}}</option>
+                {{/iterate}}
+              </select>
+            </li>
+            <li>
+              <label>
+                By Status
+              </label>
+              <select name="status">
+                <option value="" selected="true">Any</option>
+                <option>Draft</option>
+                <option>Requested</option>
+                <option>Responded</option>
+                <option>Amended Request</option>
+                <option>Updated Response</option>
+                <option>Accepted</option>
+              </select>
+            </li>
+          </ul>
         </div>
       </div>
-      <div class="span2">
-        <span class="pull-left request-type">type:</span>
-        <select name="request_type" class="span6 short-field">
-          {{#iterate "" "Documentation" "Interview" "Population Sample"}}
-          <option value="{{iterator.toLowerCase}}" {{#iterator.toLowerCase}}{{#trim}}{{#if_equals this states.request_type}}selected="true"{{/trim}}{{/iterator.toLowerCase}}{{/if_equals}}>{{firstnonempty iterator "Any"}}</option>
-          {{/iterate}}
-        </select>
-      </div>
-      <div class="span2">
-        <select name="status" class="span10 short-field">
-          <option value="" selected="true">Any</option>
-          <option>Draft</option>
-          <option>Requested</option>
-          <option>Responded</option>
-          <option>Amended Request</option>
-          <option>Updated Response</option>
-          <option>Accepted</option>
-        </select>
-      </div>
-      <div class="span2">
-        <button type="reset" data-toggle="filter-reset" class="btn">Reset</button>
-      </div>
-    </div>
-  </form>
+    </form>
+  </div>
 </li>

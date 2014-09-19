@@ -299,17 +299,5 @@
     .request-readonly {
       margin-right: 0;
     }
-    .advanced-filters {
-      &.pbc-filters {
-        .filter-date-range {
-          li {
-            &.pull-right {
-              clear: both;
-              float: none;
-            }
-          }
-        }
-      }
-    }
   }
 }
