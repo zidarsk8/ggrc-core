@@ -185,5 +185,48 @@ Mustache.registerHelper("if_workflow_assignee_privileges", function(instance, op
 
 });
 
+Mustache.registerHelper("if_task_group_assignee_privileges", function(instance, options) {
+
+  var workflow_dfd,
+      current_user = GGRC.current_user,
+      admin = Permission.is_allowed("__GGRC_ADMIN__");
+
+  if(!options) {
+    options = instance;
+    instance = options.context;
+  }
+  instance = Mustache.resolve(instance);
+
+  //short-circuit if admin.
+  if(admin) {
+    return options.fn(options.contexts);
+  }
+
+  workflow_dfd = instance.workflow.reify().refresh().then(function(workflow){
+    return $.when(
+      workflow.get_binding("authorizations").refresh_instances(),
+      workflow.get_binding("owner_authorizations").refresh_instances()
+    );
+  });
+
+  return Mustache.defer_render("span", function(authorizations, owner_auths) {
+    var owner_auth_ids = can.map(owner_auths, function(auth) {
+        return auth.instance.person && auth.instance.person.id;
+      }),
+      all_auth_ids = can.map(authorizations, function(auth) {
+        return auth.instance.person && auth.instance.person.id;
+      }),
+      task_group_contact_id = instance.contact && instance.contact.id;
+
+    if(~can.inArray(current_user.id, owner_auth_ids)
+      || ~can.inArray(current_user.id, all_auth_ids)
+      && (current_user.id === task_group_contact_id)) {
+      return options.fn(options.contexts);
+    } else {
+      return options.inverse(options.contexts);
+    }
+  }, workflow_dfd);
+
+});
 
 })(this.can, this.can.$, this.Mustache);

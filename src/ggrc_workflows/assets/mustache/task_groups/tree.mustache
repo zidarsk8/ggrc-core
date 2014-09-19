@@ -21,17 +21,17 @@
               <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
                 <i class="grcicon-person-green pull-left"></i>
                 {{#using assignee=instance.contact}}
-                {{#if true}}
+                {{#is_allowed 'update' 'TaskGroup' context=instance.context}}
                     <div class="objective-selector">
                       <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
                     </div>
                 {{else}}
                   <div class="item-data">
-                    <span class="tree-title-area read-only oneline">
+                    <span class="tree-title-area oneline">
                       {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
                     </span>
                   </div>
-                {{/if}}
+                {{/is_allowed}}
                 {{/using}}
               </div>
               <div class="span1">
