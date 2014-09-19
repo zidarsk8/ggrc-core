@@ -495,6 +495,7 @@ Mustache.registerHelper("defer", function(prop, deferred, options) {
   }
 
   tag_name = (options.hash || {}).tag_name || "span";
+  allow_fail = (options.hash || {}).allow_fail || false;
 
   deferred = resolve_computed(deferred);
   typeof deferred === "function" && (deferred = deferred());
@@ -507,7 +508,7 @@ Mustache.registerHelper("defer", function(prop, deferred, options) {
     return options.inverse(options.contexts);
   }
 
-  return defer_render(tag_name, { done: finish, progress: progress }, deferred);
+  return defer_render(tag_name, { done: finish, fail: allow_fail ? finish : null, progress: progress }, deferred);
 });
 
 Mustache.registerHelper("allow_help_edit", function() {
@@ -1804,7 +1805,7 @@ Mustache.registerHelper("to_class", function(prop, delimiter, options) {
       failed
     {{/if_helpers}}
 
-  FIXME: Only synchronous helpers (those which call options.fn() or options.inverse() 
+  FIXME: Only synchronous helpers (those which call options.fn() or options.inverse()
     without yielding the thread through defer_render or otherwise) can currently be used
     with if_helpers.  if_helpers should support all helpers by changing the walk through
     conjunctions and disjunctions to one using a can.reduce(Array, function(Deferred, item) {}, $.when())
@@ -2443,6 +2444,11 @@ Mustache.registerHelper("toggle_string", function(source, str){
   }
 
   return source + str;
+});
+
+Mustache.registerHelper("grdive_msg_to_id", function(message){
+  var msg = Mustache.resolve(message).split(' ');
+  return msg[msg.length-1];
 });
 
 })(this, jQuery, can);

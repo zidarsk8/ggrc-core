@@ -29,18 +29,26 @@
     </ul>
   {{/child_options.0}}
   {{^if_equals parent_instance.status 'Verified'}}
-  {{#defer 'workflowFolder' instance.workflowFolder}}
-    <div class="oneline">
-      <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
-        data-model="{{instance.type}}" data-id="{{instance.id}}" data-folder-id="{{workflowFolder.id}}">
-        <i class="grcicon-attach-color"></i><span>Attach supporting file</span>
-      </a>
-      {{^if workflowFolder}}
+  {{#defer 'workflowFolder' instance.workflowFolder allow_fail=true}}
+    {{#if workflowFolder.errors}}
       <small class="error-inline">
-        <strong>Warning:</strong> Workflow folder is not set. Files will be placed in your Gdrive root folder.
+        <strong>Warning:</strong> You need permission to upload files to workflow folder. <a href="https://drive.google.com/folderview?id={{grdive_msg_to_id workflowFolder.message}}&usp=sharing#">Request access</a>.
       </small>
-      {{/if}}
-    </div>
+    {{else}}
+      <div class="oneline">
+        <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
+          data-model="{{instance.type}}" data-id="{{instance.id}}" data-folder-id="{{workflowFolder.id}}">
+          <i class="grcicon-attach-color"></i><span>Attach supporting file</span>
+        </a>
+        {{^if workflowFolder}}
+        <small class="error-inline">
+          <strong>Warning:</strong> Workflow folder is not set. Files will be placed in your Gdrive root folder.
+        </small>
+        {{/if}}
+      </div>
+    {{/need_permission}}
+  {{else}}
+    <div {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }' 'display:inline-block; top: -5px; margin-left: 5px;' }}></div>
   {{/defer}}
   {{/if_equals}}
   <span class="entry-author">Modified by {{#using person=instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date instance.created_at}}</span>

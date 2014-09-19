@@ -185,6 +185,8 @@ can.Construct("RefreshQueue", {
               //   have been resolved
               $.when.apply($, dfds).then(function(items) {
                 dfd.resolve(items);
+              }, function() {
+                dfd.reject.apply(this, arguments);
               });
               return;
             }
@@ -195,6 +197,8 @@ can.Construct("RefreshQueue", {
             }
             // Last refreshed property was a single instance, return it as such
             dfd.resolve(refreshed_items[0]);
+          }, function() {
+            dfd.reject.apply(this, arguments);
           });
         } else {
           console.warn("refresh_all failed at", prop);
