@@ -436,7 +436,7 @@ Mustache.registerHelper("render_hooks", function() {
   }).join("\n");
 });
 
-function defer_render(tag_prefix, funcs, deferred) {
+var defer_render = Mustache.defer_render = function defer_render(tag_prefix, funcs, deferred) {
   var hook
     , tag_name = tag_prefix.split(" ")[0]
     ;

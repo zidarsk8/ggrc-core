@@ -96,6 +96,8 @@
 
           task_groups: Direct(
             "TaskGroup", "workflow", "task_groups"),
+          tasks: Cross(
+            "task_groups", "task_group_tasks"),
           cycles: Direct(
             "Cycle", "workflow", "cycles"),
           folders:
