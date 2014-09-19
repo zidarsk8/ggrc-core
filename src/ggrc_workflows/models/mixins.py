@@ -122,13 +122,9 @@ class RelativeTimeboxed(Timeboxed):
           base_date, frequency,
           self.relative_start_month, self.relative_start_day)
 
-  def calc_end_date(self, frequency, base_date):
+  def calc_end_date(self, frequency, base_date, start_date):
     if frequency == "one_time":
       return self.end_date
-
-    start_date = self._calc_start_date(
-        base_date, frequency,
-        self.relative_end_month, self.relative_end_day)
 
     end_date = self._calc_end_date(
         base_date, frequency,

@@ -249,7 +249,7 @@ def build_cycle(obj, current_user=None):
 
       for task_group_task in task_group.task_group_tasks:
         start_date = task_group_task.calc_start_date(frequency, base_date)
-        end_date = task_group_task.calc_end_date(frequency, base_date)
+        end_date = task_group_task.calc_end_date(frequency, base_date, start_date)
         cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
           context=obj.context,
           cycle=obj,
