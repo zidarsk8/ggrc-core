@@ -4,21 +4,32 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
-<div class="advanced-filters search-filters">
+<div class="inline-filtering sticky-filter search-filters">
   <form class="form-search" onsubmit="return false" autocomplete="off">
     <div class="row-fluid">
-      <div class="span11">
-        <input name="search" type="text" value="" class="input-xlarge search-query" value="{{search_query}}" placeholder="Filter by name, email or company">
-        <select name="user_role">
-          <option value="" selected>All Roles</option>
-          {{#roles}}
-            <option value="{{id}}">{{name}}</option>
-          {{/roles}}
-        </select>
-        <button class="btn btn-primary" type="submit">Search</button>
-      </div>
-      <div class="span1">
-        <button class="btn" type="reset">Reset</button>
+      <div class="span12">
+        <h6>
+          Filter People
+        </h6>
+        <ul class="quick-filters">
+          <li>
+            <label>
+              By Name
+            </label>
+            <input name="search" type="text" value="" class="input-medium" value="{{search_query}}" placeholder="By name, email or company">
+          </li>
+          <li>
+            <label>
+              By Roles
+            </label>
+            <select name="user_role">
+              <option value="" selected>All Roles</option>
+              {{#roles}}
+                <option value="{{id}}">{{name}}</option>
+              {{/roles}}
+            </select>
+          </li>
+        </ul>
       </div>
     </div>
   </form>

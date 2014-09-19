@@ -189,6 +189,9 @@ ul.new-tree {
         float: none;
         width: 40%;
       }
+      &.input-date {
+        width: 80px;
+      }
     }
     .request-control {
       float: left;
@@ -426,6 +429,11 @@ ul.new-tree {
         }
       }
     }
+  }
+
+  li.inner-filter-sticky {
+    margin-left: 20px;
+    margin-right: 20px;
   }
 
   li.tree-item {
@@ -1360,6 +1368,17 @@ ul.new-tree {
         margin-top: 4px;
         @include opacity(0.3);
       }
+    }
+  }
+  .inline-filtering {
+    h6 {
+      @include border-radius(0);
+      border: none;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      line-height:30px;
+      color:#000;
     }
   }
 }
