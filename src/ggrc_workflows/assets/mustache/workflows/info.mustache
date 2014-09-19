@@ -17,44 +17,35 @@
           </a>
         </li>
         <li>
-          <div class="dropdown">
-            <a class="dropdown-toggle" href="#" data-toggle="dropdown" role="button">
-              More<i class="grcicon-carot"></i>
+          <workflow-clone workflow="instance">
+            <a href="javascript://">
+              Clone Workflow
             </a>
-            <ul class="dropdown-menu pull-right" aria-labelledby="drop1" role="menu">
-              <li>
-                <workflow-clone workflow="instance">
-                  <a href="javascript://">
-                    Clone Workflow
-                  </a>
-                </workflow-clone>
-              </li>
-              {{!
-              <li>
-                <a href="javascript://" class="info-edit calendar-auth">
-                  Authenticate Calendar Service
-                </a>
-              </li>
-              }}
-              {{#if instance.recurrences}}
-              <li>
-                <workflow-start-cycle workflow="instance">
-                  <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
-                    Manually Start a Cycle
-                  </a>
-                </workflow-start-cycle>
-              </li>
-              <li>
-                <workflow-deactivate workflow="instance">
-                  <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
-                    Archive workflow
-                  </a>
-                </workflow-deactivate>
-              </li>
-              {{/if}}
-            </ul>
-          </div>
+          </workflow-clone>
         </li>
+        {{!
+        <li>
+          <a href="javascript://" class="info-edit calendar-auth">
+            Authenticate Calendar Service
+          </a>
+        </li>
+        }}
+        {{#if instance.recurrences}}
+        <li>
+          <workflow-start-cycle workflow="instance">
+            <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+              Manually Start a Cycle
+            </a>
+          </workflow-start-cycle>
+        </li>
+        <li>
+          <workflow-deactivate workflow="instance">
+            <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+              Archive workflow
+            </a>
+          </workflow-deactivate>
+        </li>
+        {{/if}}
       </ul>
     </div>
   {{/is_allowed}}
