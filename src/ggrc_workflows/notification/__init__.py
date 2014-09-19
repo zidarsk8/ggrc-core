@@ -517,7 +517,7 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
     "/" + str(workflow.id) + "#person_widget"
   to_email={}
   # custom message is set in email for new member added to workflow (not for email digest)
-  if action in ['Add']:
+  if action in ['Add'] and workflow.notify_custom_message is not None:
     notify_custom_message={member.id: workflow.notify_custom_message + '<br>'}
   else:
     notify_custom_message=None

@@ -1570,7 +1570,10 @@
         var join_model = GGRC.Mappings.join_model_name_for(
               this.options.object_model, current_option_model_name);
         var permission_parms = { __permission_type: 'read' };
-        if (current_option_model_name == 'Program') {
+        // FIXME: Workflow context should override Program context
+        // FIXME: Extension isolation violation
+        // This is weird. Don't understand exactly how this should work.
+        if (join_model != 'TaskGroupObject' && current_option_model_name == 'Program') {
           permission_parms = {
             __permission_type: 'create'
             , __permission_model: join_model
