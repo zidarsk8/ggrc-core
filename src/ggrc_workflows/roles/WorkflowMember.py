@@ -27,6 +27,8 @@ permissions = {
         "ObjectDocument",
         "ObjectFolder",
         "ObjectFile",
+        "TaskGroupObject",
+        "TaskGroupTask",
     ],
     "update": [
         "WorkflowPerson",
@@ -36,6 +38,8 @@ permissions = {
         "ObjectDocument",
         "ObjectFolder",
         "ObjectFile",
+        "TaskGroupObject",
+        "TaskGroupTask",
     ],
     "delete": [
         "WorkflowPerson",
@@ -44,6 +48,8 @@ permissions = {
         "ObjectDocument",
         "ObjectFolder",
         "ObjectFile",
+        "TaskGroupObject",
+        "TaskGroupTask",
     ],
     "view_object_page": [
         "Workflow",
