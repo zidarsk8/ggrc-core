@@ -38,7 +38,11 @@
         Assignee
         <i class="grcicon-help-black" rel="tooltip" title="This is the default assignee for this task."></i>
       </label>
+      {{#if_workflow_assignee_privileges instance}}
       <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
+      {{else}}
+        <div>{{firstexist contact.email ''}}</div>
+      {{/if_workflow_assignee_privileges}}
       {{/using}}
       <br>
     </div>
