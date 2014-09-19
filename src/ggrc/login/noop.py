@@ -10,7 +10,7 @@ Login as example user for development mode.
 
 import flask_login
 import json
-from flask import url_for, redirect, request, session, g
+from flask import url_for, redirect, request, session, g, flash
 
 default_user_name = 'Example User'
 default_user_email = 'user@example.com'
@@ -41,9 +41,13 @@ def before_request(*args, **kwargs):
 def login():
   from ggrc.login.common import get_next_url
   user = get_user()
-  flask_login.login_user(user)
-  return redirect(get_next_url(request, default_url=url_for('dashboard')))
-
+  if user.is_enabled:
+    flask_login.login_user(user)
+    return redirect(get_next_url(request, default_url=url_for('dashboard')))
+  else:
+    flash(u'That user account is disabled.', 'alert-error')
+    return redirect('/')
+  
 def logout():
   from ggrc.login.common import get_next_url
   if 'permissions' in session:
