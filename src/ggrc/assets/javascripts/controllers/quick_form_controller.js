@@ -62,11 +62,14 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
       $(el).closest('.open').removeClass('open');
     }, 100);
   }
-  , "button,a.undo click" : function(el, ev){
-    ev.stopPropagation();
-    if(!el.data('name') || !el.data('value') || $(el).hasClass('disabled')){
-      return;
-    }
+
+  , "button[data-name][data-value]:not(.disabled), a.undoable[data-toggle*=modal] click": function(el, ev) {
+
+    var that = this
+      , name = el.data('name')
+      , old_value = {};
+
+
     if(el.data('openclose')){
       var action = el.data('openclose'),
           main = el.closest('.item-main'),
@@ -84,21 +87,52 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
         openclose.trigger('click');
       }
     }
+
+    old_value[el.data("name")] = this.options.instance.attr(el.data("name"));
+    if(el.data("also-undo")) {
+      can.each(el.data("also-undo").split(","), function(attrname) {
+        attrname = attrname.trim();
+        old_value[attrname] = that.options.instance.attr(attrname);
+      });
+    }
+
+    // Check if the undo button was clicked:
+    this.options.instance.attr('_undo') || that.options.instance.attr('_undo', []);
+
+    if(el.is("[data-toggle*=modal")) {
+      setTimeout(function() {
+        $(".modal:visible").one("modal:success", function() {
+          that.options.instance.attr('_undo').unshift(old_value);
+        });
+      }, 100);
+    } else {
+      ev.stopPropagation();
+
+      that.options.instance.attr('_undo').unshift(old_value);
+
+      that.options.instance.attr('_disabled', 'disabled');
+      that.options.instance.refresh().then(function(instance){
+        that.set_value({ name: el.data('name'), value: el.data('value') });
+        return instance.save();
+      }).then(function(){
+        that.options.instance.attr('_disabled', '');
+      });
+    }
+  }
+
+
+  , "a.undo click" : function(el, ev){
+    ev.stopPropagation();
     var that = this
       , name = el.data('name')
       , old_value = this.options.instance.attr(name) || "";
 
-    // Check if the undo button was clicked:
-    this.options.instance.attr('_undo') || that.options.instance.attr('_undo', []);
-    if(!el.data('undo')){
-      that.options.instance.attr('_undo').unshift(old_value);
-    }
-    else{
-      that.options.instance.attr('_undo').shift();
-    }
+    new_value = that.options.instance.attr('_undo').shift();
     that.options.instance.attr('_disabled', 'disabled');
     that.options.instance.refresh().then(function(instance){
-      that.set_value({ name: el.data('name'), value: el.data('value') });
+      can.each(new_value, function(value, name) {
+        that.set_value({ name: name, value: value });
+      });
       return instance.save();
     }).then(function(){
       that.options.instance.attr('_disabled', '');
