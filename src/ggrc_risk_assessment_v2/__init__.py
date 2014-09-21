@@ -64,6 +64,7 @@ def contributed_services():
   return [
       service('risks', models.Risk),
       service('risk_objects', models.RiskObject),
+      service('threat_actors', models.ThreatActor),
       ]
 
 
@@ -72,6 +73,7 @@ def contributed_object_views():
 
   return [
       object_view(models.Risk),
+      object_view(models.ThreatActor),
       ]
 
 # Initialize non-RESTful views

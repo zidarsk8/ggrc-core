@@ -8,6 +8,8 @@ from ggrc.models.all_models import register_model
 
 from .risk import Risk
 from .risk_object import RiskObject
+from .threat_actor import ThreatActor
 
 register_model(Risk)
 register_model(RiskObject)
+register_model(ThreatActor)
