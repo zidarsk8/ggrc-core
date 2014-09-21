@@ -16,7 +16,8 @@
       "Objective", "Control", "Section", "Clause",
       "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project"
-    ], related_object_descriptors = {};
+    ], related_object_descriptors = {},
+    threat_actor_descriptor, risk_descriptor;
 
   // Register `risk_assessment_v2` extension with GGRC
   GGRC.extensions.push(RiskAssessmentV2Extension);
@@ -71,10 +72,28 @@
           related_programs: TypeFilter("related_objects", "Program"),
         },
         Risk: {
-          _mixins: ['related']
+          _mixins: ['related'],
+          _canonical: {
+           "related_objects_as_source": ['ThreatActor']
+          },
+          related_objects_as_source: Proxy(
+           null, "destination", "Relationship", "source", "related_destinations"),
+          related_objects_as_destination: Proxy(
+           null, "source", "Relationship", "destination", "related_sources"),
+          related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
+          related_threat_actors: TypeFilter("related_objects", "ThreatActor"),
         },
         ThreatActor: {
-          _mixins: ['related']
+          _mixins: ['related'],
+          _canonical: {
+           "related_objects_as_source": ['Risk']
+          },
+          related_objects_as_source: Proxy(
+           null, "destination", "Relationship", "source", "related_destinations"),
+          related_objects_as_destination: Proxy(
+           null, "source", "Relationship", "destination", "related_sources"),
+          related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
+          related_risks: TypeFilter("related_objects", "Risk"),
         }
     };
 
@@ -84,7 +103,8 @@
       mappings[type].risks = new GGRC.ListLoaders.ProxyListLoader(
         "RiskObject", "object", "risk", "risk_objects", null);
 
-      mappings[type].related_threat_actors = TypeFilter("related_objects", "ThreatActor")
+      //mappings[type].related_risks = TypeFilter("related_objects", "Risk")
+      //mappings[type].related_threat_actors = TypeFilter("related_objects", "ThreatActor")
     });
     new GGRC.Mappings("ggrc_risk_assessment_v2", mappings);
 };
@@ -113,6 +133,38 @@
         }
       }
     });
+    threat_actor_descriptor = {
+      content_controller: CMS.Controllers.TreeView,
+      content_controller_selector: "ul",
+      widget_initial_content: '<ul class="tree-structure new-tree multitype-tree"></ul>',
+      widget_id: CMS.Models.ThreatActor.table_plural,
+      widget_name: CMS.Models.ThreatActor.title_plural,
+      widget_icon: CMS.Models.ThreatActor.table_singular,
+      content_controller_options: {
+        child_options: [],
+        draw_children: false,
+        parent_instance: page_instance,
+        model: CMS.Models.ThreatActor,
+        mapping: "related_" + CMS.Models.ThreatActor.table_plural,
+        footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+      }
+    };
+    risk_descriptor = {
+      content_controller: CMS.Controllers.TreeView,
+      content_controller_selector: "ul",
+      widget_initial_content: '<ul class="tree-structure new-tree multitype-tree"></ul>',
+      widget_id: CMS.Models.ThreatActor.table_plural,
+      widget_name: CMS.Models.Risk.title_plural,
+      widget_icon: CMS.Models.Risk.table_singular,
+      content_controller_options: {
+        child_options: [],
+        draw_children: false,
+        parent_instance: page_instance,
+        model: CMS.Models.Risk,
+        mapping: "related_" + CMS.Models.Risk.table_plural,
+        footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+      }
+    };
 
     if (page_instance instanceof CMS.Models.Risk) {
       RiskAssessmentV2Extension.init_widgets_for_risk_page();
@@ -124,12 +176,22 @@
 
   RiskAssessmentV2Extension.init_widgets_for_risk_page =
       function init_widgets_for_risk_page() {
-    new GGRC.WidgetList("ggrc_risk_assessment_v2", { Risk: related_object_descriptors });
+    var risk_descriptors = $.extend(
+      {},
+      related_object_descriptors,
+      {ThreatActor: threat_actor_descriptor}
+    );
+    new GGRC.WidgetList("ggrc_risk_assessment_v2", { Risk: risk_descriptors });
   };
 
   RiskAssessmentV2Extension.init_widgets_for_threat_actor_page =
       function init_widgets_for_threat_actor_page() {
-    new GGRC.WidgetList("ggrc_risk_assessment_v2", { ThreatActor: related_object_descriptors });
+    var threat_actor_descriptors = $.extend(
+      {},
+      related_object_descriptors,
+      {Risk: risk_descriptor}
+    );
+    new GGRC.WidgetList("ggrc_risk_assessment_v2", { ThreatActor: threat_actor_descriptors });
   };
 
 
