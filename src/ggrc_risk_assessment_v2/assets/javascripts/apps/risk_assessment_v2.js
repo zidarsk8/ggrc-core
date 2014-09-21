@@ -147,7 +147,7 @@
       related_object_descriptors[model_name] = {
         content_controller: CMS.Controllers.TreeView,
         content_controller_selector: "ul",
-        widget_initial_content: '<ul class="tree-structure new-tree multitype-tree"></ul>',
+        widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
         widget_id: model.table_plural,
         widget_name: model.model_plural,
         widget_icon: model.table_singular,
@@ -163,7 +163,7 @@
     threat_actor_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree multitype-tree"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
       widget_id: CMS.Models.ThreatActor.table_plural,
       widget_name: CMS.Models.ThreatActor.title_plural,
       widget_icon: CMS.Models.ThreatActor.table_singular,
@@ -179,7 +179,7 @@
     risk_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree multitype-tree"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
       widget_id: CMS.Models.ThreatActor.table_plural,
       widget_name: CMS.Models.Risk.title_plural,
       widget_icon: CMS.Models.Risk.table_singular,
