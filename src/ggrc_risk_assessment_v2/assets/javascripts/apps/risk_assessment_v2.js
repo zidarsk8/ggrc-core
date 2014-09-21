@@ -49,7 +49,8 @@
 
       related: {
         _canonical: {
-          "related_objects_as_source": _risk_object_types
+          "related_objects_as_source": _risk_object_types,
+          related_objectives: "Objective"
         },
         related_objects_as_source: Proxy(
           null, "destination", "Relationship", "source", "related_destinations"),
@@ -72,6 +73,8 @@
         related_contracts: TypeFilter("related_objects", "Contract"),
         related_policies: TypeFilter("related_objects", "Policy"),
         related_standards: TypeFilter("related_objects", "Standard"),
+        related_objectives: Proxy(
+          "Objective", "objective", "ObjectObjective", "objectiveable", "object_objectives")
       },
       Risk: {
         _mixins: ['related'],
@@ -104,18 +107,31 @@
     };
 
     can.each(_risk_object_types, function (type) {
-      mappings[type] = {
-        _canonical: {
-          "related_objects_as_source": ['Risk', 'ThreatActor']
-        },
-        related_objects_as_source: Proxy(
-          null, "destination", "Relationship", "source", "related_destinations"),
-        related_objects_as_destination: Proxy(
-          null, "source", "Relationship", "destination", "related_sources"),
-        related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
-        related_risks: TypeFilter("related_objects", "Risk"),
-        related_threat_actors: TypeFilter("related_objects", "ThreatActor"),
-      };
+      if (type === 'Objective') {
+        mappings[type] = {
+          _canonical : {
+            "related_objects" : ['Risk', 'ThreatActor']
+          },
+          related_objects: Proxy(
+              null, "objectiveable", "ObjectObjective", "objective", "objective_objects"),
+          related_risks: TypeFilter("related_objects", "Risk"),
+          related_threat_actors: TypeFilter("related_objects", "ThreatActor"),
+        };
+      } else {
+        mappings[type] = {
+          _canonical: {
+            "related_objects_as_source": ['Risk', 'ThreatActor']
+          },
+          related_objects_as_source: Proxy(
+            null, "destination", "Relationship", "source", "related_destinations"),
+          related_objects_as_destination: Proxy(
+            null, "source", "Relationship", "destination", "related_sources"),
+          related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
+          related_risks: TypeFilter("related_objects", "Risk"),
+          related_threat_actors: TypeFilter("related_objects", "ThreatActor"),
+        };
+      }
+
     });
     new GGRC.Mappings("ggrc_risk_assessment_v2", mappings);
   };
