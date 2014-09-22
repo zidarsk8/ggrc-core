@@ -15,7 +15,8 @@
       "Regulation", "Standard", "Policy", "Contract",
       "Objective", "Control", "Section", "Clause",
       "System", "Process",
-      "DataAsset", "Facility", "Market", "Product", "Project"
+      "DataAsset", "Facility", "Market", "Product", "Project",
+      "MultitypeSearch"
     ],
     related_object_descriptors = {},
     threat_actor_descriptor, risk_descriptor;
@@ -48,15 +49,17 @@
     var mappings = {
 
       related: {
-        _canonical: {
-          "related_objects_as_source": _risk_object_types,
-          related_objectives: "Objective"
-        },
         related_objects_as_source: Proxy(
           null, "destination", "Relationship", "source", "related_destinations"),
         related_objects_as_destination: Proxy(
           null, "source", "Relationship", "destination", "related_sources"),
         related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
+      },
+      related_objects: {
+        _canonical: {
+          "related_objects_as_source": _risk_object_types,
+          related_objectives: "Objective"
+        },
         related_programs: TypeFilter("related_objects", "Program"),
         related_data_assets: TypeFilter("related_objects", "DataAsset"),
         related_facilities: TypeFilter("related_objects", "Facility"),
@@ -76,32 +79,24 @@
         related_objectives: Proxy(
           "Objective", "objective", "ObjectObjective", "objectiveable", "object_objectives")
       },
-      Risk: {
-        _mixins: ['related'],
+      related_risk: {
         _canonical: {
-          // TODO: Figure out why Program needs to be here as well
+          "related_objects_as_source": ['Risk', 'Program']
+        },
+        related_risks: TypeFilter("related_objects", "Risk"),
+      },
+      related_threat_actor: {
+        _canonical: {
           "related_objects_as_source": ['ThreatActor', 'Program']
         },
-        related_objects_as_source: Proxy(
-          null, "destination", "Relationship", "source", "related_destinations"),
-        related_objects_as_destination: Proxy(
-          null, "source", "Relationship", "destination", "related_sources"),
-        related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
         related_threat_actors: TypeFilter("related_objects", "ThreatActor"),
+      },
+      Risk: {
+        _mixins: ['related', 'related_objects', 'related_threat_actor'],
         orphaned_objects: Multi([]),
       },
       ThreatActor: {
-        _mixins: ['related'],
-        _canonical: {
-          // TODO: Figure out why Program needs to be here as well
-          "related_objects_as_source": ['Risk', 'Program']
-        },
-        related_objects_as_source: Proxy(
-          null, "destination", "Relationship", "source", "related_destinations"),
-        related_objects_as_destination: Proxy(
-          null, "source", "Relationship", "destination", "related_sources"),
-        related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
-        related_risks: TypeFilter("related_objects", "Risk"),
+        _mixins: ['related', 'related_objects', 'related_risk'],
         orphaned_objects: Multi([])
       }
     };
@@ -119,16 +114,7 @@
         };
       } else {
         mappings[type] = {
-          _canonical: {
-            "related_objects_as_source": ['Risk', 'ThreatActor']
-          },
-          related_objects_as_source: Proxy(
-            null, "destination", "Relationship", "source", "related_destinations"),
-          related_objects_as_destination: Proxy(
-            null, "source", "Relationship", "destination", "related_sources"),
-          related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
-          related_risks: TypeFilter("related_objects", "Risk"),
-          related_threat_actors: TypeFilter("related_objects", "ThreatActor"),
+          _mixins: ['related', 'related_risk', 'related_threat_actor'],
         };
       }
 
@@ -143,6 +129,11 @@
 
     // Init widget descriptors:
     can.each(_risk_object_types, function (model_name) {
+
+      if (model_name === 'MultitypeSearch') {
+        return;
+      }
+
       var model = CMS.Models[model_name];
       related_object_descriptors[model_name] = {
         content_controller: CMS.Controllers.TreeView,
@@ -180,7 +171,7 @@
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
       widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
-      widget_id: CMS.Models.ThreatActor.table_plural,
+      widget_id: CMS.Models.Risk.table_plural,
       widget_name: CMS.Models.Risk.title_plural,
       widget_icon: CMS.Models.Risk.table_singular,
       content_controller_options: {
@@ -229,24 +220,11 @@
   RiskAssessmentV2Extension.init_widgets_for_other_pages =
     function init_widgets_for_other_pages() {
       var descriptor = {},
-        page_instance = GGRC.page_instance();
-
+          page_instance = GGRC.page_instance();
       if (page_instance && ~can.inArray(page_instance.constructor.shortName, _risk_object_types)) {
         descriptor[page_instance.constructor.shortName] = {
           risk: risk_descriptor,
-          threat_actor: {
-            widget_id: 'threat_actor',
-            widget_name: "Threat Actors",
-            content_controller: GGRC.Controllers.TreeView,
-            content_controller_options: {
-              mapping: "related_threat_actors",
-              parent_instance: page_instance,
-              model: CMS.Models.ThreatActor,
-              draw_children: false,
-              child_options: [],
-              footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-            }
-          }
+          threat_actor: threat_actor_descriptor,
         };
       }
       new GGRC.WidgetList("ggrc_risk_assessment_v2", descriptor);
