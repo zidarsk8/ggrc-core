@@ -71,6 +71,7 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
       ret = $.when(
         new CMS.Models.Workflow({
           frequency: "one_time",
+          status: "Active",
           title: "Object review for "
                   + this.original_object.constructor.title_singular
                   + ' "' + this.original_object.title + '"',
