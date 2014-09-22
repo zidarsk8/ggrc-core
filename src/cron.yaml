@@ -11,10 +11,10 @@ cron:
   schedule: every day 01:00
   timezone: US/Pacific
 
-- description: gGRC deferred email 
-  url: /notify_email_deferred
-  schedule: every 10 mins
-  timezone: US/Pacific
+#- description: gGRC deferred email 
+#  url: /notify_email_deferred
+#  schedule: every 10 mins
+#  timezone: US/Pacific
 
 - description: gGRC workflow - start cycles for workflows with a new period starting today
   url: /start_recurring_cycles
