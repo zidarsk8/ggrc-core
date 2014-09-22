@@ -43,7 +43,8 @@
       Reify = GGRC.MapperHelpers.Reify,
       Search = GGRC.MapperHelpers.Search,
       TypeFilter = GGRC.MapperHelpers.TypeFilter,
-      Multi = GGRC.MapperHelpers.Multi;
+      Multi = GGRC.MapperHelpers.Multi,
+      Indirect = GGRC.MapperHelpers.Indirect;
 
     // Add mappings for risk objects
     var mappings = {
@@ -81,13 +82,13 @@
       },
       related_risk: {
         _canonical: {
-          "related_objects_as_source": ['Risk', 'Program']
+          "related_objects_as_source": ['Risk'].concat(_risk_object_types)
         },
         related_risks: TypeFilter("related_objects", "Risk"),
       },
       related_threat_actor: {
         _canonical: {
-          "related_objects_as_source": ['ThreatActor', 'Program']
+          "related_objects_as_source": ['ThreatActor'].concat(_risk_object_types)
         },
         related_threat_actors: TypeFilter("related_objects", "ThreatActor"),
       },
@@ -98,26 +99,20 @@
       ThreatActor: {
         _mixins: ['related', 'related_objects', 'related_risk'],
         orphaned_objects: Multi([])
-      }
+      },
+      Person: {
+        owned_risks: Indirect("Risk", "contact"),
+        owned_threat_actors: Indirect("ThreatActor", "contact"),
+      },
     };
 
     can.each(_risk_object_types, function (type) {
-      if (type === 'Objective') {
-        mappings[type] = {
-          _canonical : {
-            "related_objects" : ['Risk', 'ThreatActor']
-          },
-          related_objects: Proxy(
-              null, "objectiveable", "ObjectObjective", "objective", "objective_objects"),
-          related_risks: TypeFilter("related_objects", "Risk"),
-          related_threat_actors: TypeFilter("related_objects", "ThreatActor"),
-        };
-      } else {
-        mappings[type] = {
-          _mixins: ['related', 'related_risk', 'related_threat_actor'],
-        };
-      }
-
+      mappings[type] = {
+        _canonical: {
+          "related_objects_as_source": ['Risk', 'ThreatActor']
+        },
+        _mixins: ['related', 'related_risk', 'related_threat_actor'],
+      };
     });
     new GGRC.Mappings("ggrc_risk_assessment_v2", mappings);
   };
@@ -125,7 +120,11 @@
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for risk page
   RiskAssessmentV2Extension.init_widgets = function init_widgets() {
-    var page_instance = GGRC.page_instance();
+    var page_instance = GGRC.page_instance(),
+        is_my_work = function is_my_work() {
+          return page_instance.type === "Person";
+        },
+        related_or_owned = is_my_work() ? 'owned_' : 'related_';
 
     // Init widget descriptors:
     can.each(_risk_object_types, function (model_name) {
@@ -163,8 +162,8 @@
         draw_children: false,
         parent_instance: page_instance,
         model: CMS.Models.ThreatActor,
-        mapping: "related_" + CMS.Models.ThreatActor.table_plural,
-        footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+        mapping: related_or_owned + CMS.Models.ThreatActor.table_plural,
+        footer_view: is_my_work() ? null : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       }
     };
     risk_descriptor = {
@@ -179,8 +178,8 @@
         draw_children: false,
         parent_instance: page_instance,
         model: CMS.Models.Risk,
-        mapping: "related_" + CMS.Models.Risk.table_plural,
-        footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+        mapping: related_or_owned + CMS.Models.Risk.table_plural,
+        footer_view: is_my_work() ? null : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       }
     };
 
@@ -188,6 +187,8 @@
       RiskAssessmentV2Extension.init_widgets_for_risk_page();
     } else if (page_instance instanceof CMS.Models.ThreatActor) {
       RiskAssessmentV2Extension.init_widgets_for_threat_actor_page();
+    } else if (page_instance instanceof CMS.Models.Person) {
+      RiskAssessmentV2Extension.init_widgets_for_person_page();
     } else {
       RiskAssessmentV2Extension.init_widgets_for_other_pages();
     }
@@ -214,6 +215,20 @@
       );
       new GGRC.WidgetList("ggrc_risk_assessment_v2", {
         ThreatActor: threat_actor_descriptors
+      });
+  };
+
+  RiskAssessmentV2Extension.init_widgets_for_person_page =
+    function init_widgets_for_person_page() {
+      var people_widgets = $.extend({}, {
+          ThreatActor: threat_actor_descriptor
+        }, {
+          Risk: risk_descriptor
+        }
+      );
+
+      new GGRC.WidgetList("ggrc_risk_assessment_v2", {
+        Person: people_widgets,
       });
   };
 
