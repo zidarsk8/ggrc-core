@@ -448,7 +448,7 @@
       }
     }
     li:hover {
-      a {
+      > a {
         background-color: $tabHoverBgnd;
         color: $white;
         i {
@@ -464,7 +464,7 @@
     }
     &.business {
       li:hover {
-        a {
+        > a {
           color: $white;
           background-color:$business;
         }
@@ -472,21 +472,21 @@
     }
     &.governance {
       li:hover {
-        a {
+        > a {
           background-color:$governance;
         }
       }
     }
     &.risk {
       li:hover {
-        a {
+        > a {
           background-color:$risk;
         }
       }
     }
     &.program {
       li:hover {
-        a {
+        > a {
           color: $white;
           background-color:$programs;
         }
@@ -494,14 +494,14 @@
     }
     &.objectives {
       li:hover {
-        a {
+        > a {
           background-color:$objectives;
         }
       }
     }
     &.controls {
       li:hover {
-        a {
+        > a {
           color: $white;
           background-color:$controls;
         }
@@ -509,7 +509,7 @@
     }
     &.entities {
       li:hover {
-        a {
+        > a {
           color: $white;
           background-color:$entities;
         }
@@ -517,7 +517,7 @@
     }
     &.workflow {
       li:hover {
-        a {
+        > a {
           color: $white;
           background-color:$programs;
         }
