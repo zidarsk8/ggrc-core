@@ -194,6 +194,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
 def build_cycle(obj, current_user=None):
   # Determine the relevant Workflow
   workflow = obj.workflow
+  frequency = workflow.frequency
 
   # Use WorkflowOwner role when this is called via the cron job.
   if not current_user:
@@ -247,6 +248,8 @@ def build_cycle(obj, current_user=None):
           cycle_task_group_object)
 
       for task_group_task in task_group.task_group_tasks:
+        start_date = task_group_task.calc_start_date(frequency, base_date)
+        end_date = task_group_task.calc_end_date(frequency, base_date)
         cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
           context=obj.context,
           cycle=obj,
@@ -255,8 +258,8 @@ def build_cycle(obj, current_user=None):
           title=task_group_task.title,
           description=task_group_task.description,
           sort_index=task_group_task.sort_index,
-          start_date=task_group_task.calc_start_date(base_date),
-          end_date=task_group_task.calc_end_date(base_date),
+          start_date=start_date,
+          end_date=end_date,
           contact=task_group_task.contact,
           status="Assigned",
           modified_by=current_user,
@@ -534,6 +537,7 @@ def handle_workflow_person_post(sender, obj=None, src=None, service=None):
 
 @Resource.model_posted.connect_via(models.Workflow)
 def handle_workflow_post(sender, obj=None, src=None, service=None):
+  source_workflow = None
 
   if src.get('clone'):
     source_workflow_id = src.get('clone')
@@ -569,11 +573,17 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
   # the WorkflowOwner role in the workflow's context.
   workflow_owner_role = _find_role('WorkflowOwner')
   user_role = UserRole(
-      person=get_current_user(),
+      person=user,
       role=workflow_owner_role,
       context=context,
       modified_by=get_current_user(),
       )
+  db.session.add(models.WorkflowPerson(
+    person=user,
+    workflow=obj,
+    context=context,
+    modified_by=get_current_user(),
+    ))
   # pass along a temporary attribute for logging the events.
   user_role._display_related_title = obj.title
   db.session.add(user_role)
@@ -593,7 +603,29 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
     add_public_workflow_context_implication(context)
 
   if src.get('clone'):
-    source_workflow.copy_task_groups(obj)
+    source_workflow.copy_task_groups(
+      obj,
+      clone_people=src.get('clone_people', False),
+      clone_tasks=src.get('clone_tasks', False)
+      )
+
+    if src.get('clone_people'):
+      workflow_member_role = _find_role('WorkflowMember')
+      for authorization in source_workflow.context.user_roles:
+        #Current user has already been added as workflow owner
+        if authorization.person != user:
+          db.session.add(UserRole(
+            person=authorization.person,
+            role=workflow_member_role,
+            context=context,
+            modified_by=user))
+      for person in source_workflow.people:
+        if person != user:
+          db.session.add(models.WorkflowPerson(
+            person=person,
+            workflow=obj,
+            context=context))
+
 
 def add_public_workflow_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\

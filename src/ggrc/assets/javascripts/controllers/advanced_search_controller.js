@@ -275,7 +275,7 @@
 
       if (filters.length > 0) {
         // For All Objects, make sure to load only those objects in the list of all_models
-        // Multilist loader might load objects list g-drive folder and context
+        // Multilist loader might load objects like g-drive folder and context
         // The Search list loader will filter those objects
         if(selected === "AllObjects") {
             filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
@@ -299,31 +299,7 @@
                 });
             }).attach(ctx.owner || {}));
         }
-        /*
-        if(ctx.owner || term){ 
-          if(selected === "AllObjects") {
-            filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
-              return GGRC.Models.Search.search_for_types(
-                term,
-                self.options.all_models,
-                { contact_id: binding.instance && binding.instance.id }
-                ).then(function(mappings) {
-                  return mappings.entries;
-                });
-            }).attach(ctx.owner || {}));
-          }
-          else {
-            filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
-              return GGRC.Models.Search.search_for_types(
-                term,
-                [selected],
-                { contact_id: binding.instance && binding.instance.id }
-                ).then(function(mappings) {
-                  return mappings.entries;
-                });
-            }).attach(ctx.owner || {}));
-          }
-        }*/
+        
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
         this.reset_selection_count();

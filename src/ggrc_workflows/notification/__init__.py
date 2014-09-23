@@ -36,7 +36,7 @@ PRI_OTHERS=9
 
 PRI_MAPPING={
   PRI_CYCLE: 'New Workflow cycles',
-  PRI_TASK_OVERDUE: 'Overdue Tasks',
+  PRI_TASK_OVERDUE: 'Tasks Due Reminder',
   PRI_TASK_DUE: 'Tasks Due today',
   PRI_TASK_ASSIGNED: 'Tasks Assigned to you',
   PRI_TASK_DECLINED: 'Your tasks that are declined',
@@ -261,9 +261,9 @@ def handle_tasks_overdue():
     if not frequency_mapping.has_key(cycle.workflow.frequency):  
       continue
     num_days=frequency_mapping[cycle.workflow.frequency]
-    if task.end_date != datetime.utcnow().date() + num_days:
+    if task.end_date != (datetime.utcnow().date() + timedelta(num_days)):
       continue
-    subject="One or more tasks assigned to you are due in "  + str(num_days)
+    subject="One or more tasks assigned to you are due in "  + str(num_days) + " days"
     if not tasks_for_contact.has_key(assignee.id):
       tasks_for_contact[assignee.id]=[]
     tasks_for_contact[assignee.id].append((assignee, task, subject))
@@ -286,7 +286,7 @@ def handle_tasks_overdue():
       prepare_notification(assignee, 'Email_Digest', PRI_TASK_OVERDUE, subject, email_digest_contents, \
         assignee, [assignee], override=False)
     email_content=email_content + \
-     "</ul></p><p>" + "Are due in " + str(num_days) + " .</p>" + \
+     "</ul></p><p>" + "Are due in " + str(num_days) + " days.</p>" + \
      "<p>Click here to view your <a href=" + '"'  + \
      request.url_root + "dashboard#task_widget"  + '"' + ">" + \
      "<b>task(s)</b></a></p>" + \
@@ -320,7 +320,7 @@ def handle_tasks_due(num_days):
     tasks_for_contact[assignee.id].append((assignee, task))
 
   if num_days > 0:
-    num_days_text="in " + str(num_days)
+    num_days_text="in " + str(num_days) + " days"
   else:
     num_days_text="today"
   subject="One or more tasks assigned to you are due " + num_days_text + "!"

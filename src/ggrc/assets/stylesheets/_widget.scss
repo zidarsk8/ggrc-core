@@ -628,112 +628,6 @@
   }
 }
 
-.advanced-filters {
-  form {
-    margin-bottom: 0;
-  }
-  background: $widgetHeader;
-  border-bottom: 1px solid $widgetBorder;
-  padding: 10px 20px;
-  .row-fluid {
-    [class*="span"] {
-      min-height: 24px;
-    }
-  }
-  .filter-date-range {
-    @include reset-list();
-    li {
-      display: inline-block;
-      span {
-        color: $darkGray;
-      }
-      .input-small {
-        width: 84px;
-      }
-    }
-  }
-  input {
-    line-height: 14px;
-    height: 14px;
-    font-size: 13px;
-    margin-bottom: 0;
-  }
-  select {
-    line-height: 24px;
-    height: 24px;
-    margin-bottom: 0;
-  }
-  &.search-filters select {
-    width: auto;
-  }
-  .objective-selector {
-    @include clearfix();
-    [class^="grcicon-"] {
-      float: right;
-      margin: 4px 4px 0 0;
-    }
-    input {
-      float: right;
-      line-height: 14px;
-      height: 14px;
-      min-height: 24px;
-      margin-bottom: 0;
-    }
-  }
-  &.pbc-filters {
-    border-left: 1px solid $widgetBorder;
-    border-right: 1px solid $widgetBorder;
-    border-top: 1px solid $darkGray;
-    border-bottom: 1px solid $darkGray;
-    background: darken($widgetHeader, 15%);
-    margin: 0 20px;
-    padding: 0;
-    display: none;
-    span {
-      line-height: 30px;
-    }
-    .request-type {
-      margin-right: 4px;
-    }
-    .input-mini {
-      &.date {
-        width: 30px;
-        padding-top: 5px;
-        padding-bottom: 3px;
-      }
-    }
-    i {
-      margin-top: 7px;
-    }
-    .short-field {
-      min-height: 23px;
-      margin-top: 4px;
-    }
-    select {
-      line-height: 14px;
-      padding: 2px 4px 0 4px;
-    }
-    .filter-date-range {
-      @include clearfix();
-      padding-left: 5px;
-      li {
-        line-height: 30px;
-      }
-      span {
-        font-size: 12px;
-        color: $black;
-      }
-    }
-    .btn {
-      margin-top: 4px;
-      padding: 3px 6px;
-      line-height: 15px;
-      margin-right: 5px;
-      float: right;
-    }
-  }
-}
-
 .widget-filters {
   @include background-image(linear-gradient(top, #eee, $white));
   @include border-radius(4px 0 4px 4px);
@@ -1125,8 +1019,8 @@
 }
 
 .zero-state {
-  background:#eee;
-  border-bottom:1px solid #ddd;
+  background: $lightGray;
+  border-bottom: 1px solid $infoMessageBorder;
   padding-bottom:40px;
   h2 {
     line-height:36px;
@@ -1134,11 +1028,22 @@
     padding:40px 40px 0 40px;
     font-weight:normal;
     text-align:center;
-    color:#bbb;
+    color: $infoMessageText;
   }
   h3 {
     font-weight:normal;
     text-align:center;
+  }
+}
+.inner-tree {
+  .zero-state {
+    margin: 0 20px;
+    padding-bottom: 15px;
+    border-left: 1px solid $warmGray;
+    border-right: 1px solid $warmGray;
+    h2 {
+      padding: 15px 40px 0 40px;
+    }
   }
 }
 
@@ -1151,23 +1056,43 @@
   border-bottom:1px solid #ccc;
   padding:0 20px;
   input {
-    margin:-3px 3px 0 0;
+    margin: -1px 3px 0 0;
+    line-height: 14px;
+    height: 14px;
+    padding: 2px 4px;
+    font-size: 12px;
+    &.input-medium {
+      width: 170px;
+    }
+    &.input-date {
+      width: 80px;
+      padding: 2px 4px 2px 26px;
+      &.date {
+        background-position: -268px -367px;
+      }
+    }
   }
   label {
     font-size:11px;
     text-transform:uppercase;
+    display: inline-block;
   }
   select {
     line-height:20px;
     font-size:12px;
     height:20px;
     width:120px;
+    display: inline-block;
+    margin-bottom: 0;
   }
   h6 {
     display:inline-block;
     line-height:30px;
     color:#000;
     font-weight:bold;
+  }
+  form {
+    margin: 0;
   }
   ul.quick-filters {
     @include reset-list();

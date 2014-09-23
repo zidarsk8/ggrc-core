@@ -403,12 +403,15 @@ can.Control("CMS.Controllers.InnerNav", {
     }
 
   , set_active_widget : function(widget) {
+    var active_widget = widget;
+
     if (typeof widget === 'string') {
-      this.options.contexts.attr("active_widget", this.widget_by_selector(widget));
+      active_widget = this.widget_by_selector(widget);
     }
-    else {
-      this.options.contexts.attr("active_widget", widget);
-    }
+
+    active_widget.attr('force_show', true);
+    this.update_add_more_link();
+    this.options.contexts.attr("active_widget", active_widget);
     this.show_active_widget();
   }
 
@@ -529,15 +532,31 @@ can.Control("CMS.Controllers.InnerNav", {
   }
 
   , update_widget_count : function($el, count) {
-      var widget_id = $el.closest('.widget').attr('id')
-        , widget = this.widget_by_selector("#" + widget_id)
-        ;
+      var widget_id = $el.closest('.widget').attr('id'),
+          widget = this.widget_by_selector("#" + widget_id);
 
       if (widget) {
         widget.attr({
             count: count
           , has_count: true
         });
+      }
+      this.update_add_more_link();
+    },
+
+    update_add_more_link: function() {
+      var has_hidden_widgets = false,
+          $hidden_widgets = $('.hidden-widgets-list');
+      // Update has hidden widget attr
+      $.map(this.options.widget_list, function(widget){
+        if (widget.has_count && widget.count === 0 && !widget.force_show) {
+          has_hidden_widgets = true;
+        }
+      })
+      if (has_hidden_widgets) {
+        $hidden_widgets.show();
+      } else {
+        $hidden_widgets.hide();
       }
     }
 });

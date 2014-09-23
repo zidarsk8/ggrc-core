@@ -63,7 +63,6 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       , model_name = get_attr($tab, that.options.tab_model_attr)
       , model = can.getObject("CMS.Models." + model_name) || can.getObject("GGRC.Models." + model_name)
       , view_data = null
-      , spinner
       , xhrs = {};
 
       if(!template && typeof console !== "undefined") {
@@ -115,21 +114,11 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       }
 
       if(that.options.spin) {
-        spinner = new Spinner({ }).spin();
-        $pane.html(spinner.el);
         // Scroll up so spinner doesn't get pushed out of visibility
         $pane.scrollTop(0);
-        $(spinner.el).css({ width: '100px', height: '100px', left: '50px', top: '50px', zIndex : calculate_spinner_z_index });
       }
 
       if (view_data) {
-        $pane.html(
-          $(new Spinner().spin().el)
-          .css({
-            width: '100px', height: '100px',
-            left: '38%', top: '50%',
-            zIndex : calculate_spinner_z_index
-          }));
         can.view(template, view_data, function(frag, xhr) {
           $tab.data('tab-loaded', true);
           $pane.html(frag);
@@ -548,7 +537,6 @@ can.Control("CMS.Controllers.LHN_Search", {
       , count_selector: '.item-count'
       , list_content_selector: 'ul.sub-level'
       , actions_content_selector: 'ul.sub-actions'
-      , spinner_selector: '.spinner'
       , limit : 50
       , observer : null
       , filter_params: new can.Observe()
@@ -637,22 +625,6 @@ can.Control("CMS.Controllers.LHN_Search", {
         // Refresh the counts whenever the lists change
         self.refresh_counts();
       });
-    }
-
-  , make_spinner: function() {
-      var spinner = new Spinner({
-          radius: 4
-        , length: 7
-        , width: 2
-        }).spin();
-      $(spinner.el).css({
-        width: '30px',
-        height: '30px',
-        left: '30px',
-        top: '15px',
-        //zIndex : calculate_spinner_z_index
-      });
-      return spinner.el;
     }
 
   , "{list_selector} > a click": "toggle_list_visibility"
@@ -804,6 +776,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         model_name = self.get_list_model($list);
         self.options.results_lists[model_name] = new can.Observe.List();
         self.options.visible_lists[model_name] = new can.Observe.List();
+        self.options.visible_lists[model_name].attr('is_loading', true);
       });
     }
 
@@ -926,11 +899,10 @@ can.Control("CMS.Controllers.LHN_Search", {
 
         function finish_display(_) {
           can.Map.startBatch();
+          self.options.visible_lists[model_name].attr('is_loading', false);
           self.options.visible_lists[model_name].replace(initial_visible_list);
           can.Map.stopBatch();
-          // Stop spinner when request is complete
           setTimeout(function() {
-            $list.find(self.options.spinner_selector).html("");
             $list.trigger("list_displayed", model_name);
           }, 1);
         }
@@ -992,12 +964,6 @@ can.Control("CMS.Controllers.LHN_Search", {
           self.options.loaded_lists.push(model_name);
         });
 
-        // Start the spinners before the request
-        can.each(lists, function(list) {
-          var $list = $(list);
-          $list.find('.spinner').html(self.make_spinner());
-        });
-
         $.when.apply(
           $
           , models.map(function(model_name) {
@@ -1057,6 +1023,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         });
         can.each(this.options.visible_lists, function(list) {
           list.replace([]);
+          list.attr('is_loading', true);
         });
         this.options.loaded_lists = [];
 

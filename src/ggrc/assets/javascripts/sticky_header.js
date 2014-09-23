@@ -16,8 +16,8 @@ can.Control("StickyHeader", {
       , header_selector: ".header"
                       +", .tree-open > .item-open > .item-main"
                       +", .tree-open > .item-open > .item-content > .inner-tree > h6"
-                      +", .tree-open > .item-open > .item-content > .inner-tree > .tree-structure > .advanced-filters"
-                      +", .advanced-filters"
+                      +", .tree-open > .item-open > .item-content > .inner-tree > .tree-structure > .sticky-filter"
+                      +", .sticky-filter"
         // A selector for all sticky-able footers
         // FIXME: This should not have to specifically ignore .tree-spinner
       , footer_selector: ".tree-footer:not(.tree-spinner):not(.non-stick)"
