@@ -679,20 +679,23 @@ Mustache.registerHelper("option_select", function(object, attr_name, role, optio
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
 
-Mustache.registerHelper("category_select", function(object, attr_name, category_type) {
+Mustache.registerHelper("category_select", function(object, attr_name, category_type, options) {
   var selected_options = object[attr_name] || [] //object.attr(attr_name) || []
     , selected_ids = can.map(selected_options, function(selected_option) {
         return selected_option.id;
       })
     , options_dfd = CMS.Models[category_type].findAll()
+    , tab_index = options.hash && options.hash.tabindex
     , tag_prefix = 'select class="span12" multiple="multiple"'
     ;
 
+  tab_index = typeof tab_index !== 'undefined' ? ' tabindex="' + tab_index + '"' : ''
   function get_select_html(options) {
     return [
         '<select class="span12" multiple="multiple"'
       ,   ' model="' + category_type + '"'
       ,   ' name="' + attr_name + '"'
+      ,   tab_index
       , '>'
       , can.map(options, function(option) {
           return [
@@ -1804,7 +1807,7 @@ Mustache.registerHelper("to_class", function(prop, delimiter, options) {
       failed
     {{/if_helpers}}
 
-  FIXME: Only synchronous helpers (those which call options.fn() or options.inverse() 
+  FIXME: Only synchronous helpers (those which call options.fn() or options.inverse()
     without yielding the thread through defer_render or otherwise) can currently be used
     with if_helpers.  if_helpers should support all helpers by changing the walk through
     conjunctions and disjunctions to one using a can.reduce(Array, function(Deferred, item) {}, $.when())
