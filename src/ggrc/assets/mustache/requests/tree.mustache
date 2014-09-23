@@ -219,7 +219,7 @@
       {{#each child_options}}
           <div class="inner-tree">
             <h6>PBC {{#prune_context}}{{firstnonempty title_plural model.title_plural}} ({{#if_null original_list}}...{{else}}{{original_list.length}}{{/if_null}}{{/prune_context}})</h6>
-            <ul class="tree-structure new-tree responses-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
+            <ul class="tree-structure new-tree responses-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
             </ul>
           </div>
       {{/each}}
