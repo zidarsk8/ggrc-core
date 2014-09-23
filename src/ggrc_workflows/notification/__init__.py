@@ -211,16 +211,16 @@ def prepare_notification_for_task(task, sender, recipient, subject, email_conten
     task.title + "</a>"
   email_contents[recipient.id]=email_content
   override_flag=notify_on_change(workflow)
-  if notif_pri != PRI_TASK_ASSIGNED:
-    prepare_notification(task, 'Email_Deferred', notif_pri, subject, email_contents, sender, \
-     recipients, override=override_flag)
-    prepare_notification(task, 'Email_Digest_Deferred', notif_pri, subject, email_digest_contents, sender, \
-     recipients, override=False)
-  else:
-    prepare_notification(task, 'Email_Now', notif_pri, subject, email_contents, sender, \
-     recipients, override=override_flag)
-    prepare_notification(task, 'Email_Digest', notif_pri, subject, email_digest_contents, sender, \
-     recipients, override=False)
+  #if notif_pri != PRI_TASK_ASSIGNED:
+    #prepare_notification(task, 'Email_Deferred', notif_pri, subject, email_contents, sender, \
+     #recipients, override=override_flag)
+    #prepare_notification(task, 'Email_Digest_Deferred', notif_pri, subject, email_digest_contents, sender, \
+     #recipients, override=False)
+  #else:
+  prepare_notification(task, 'Email_Now', notif_pri, subject, email_contents, sender, \
+    recipients, override=override_flag)
+  prepare_notification(task, 'Email_Digest', notif_pri, subject, email_digest_contents, sender, \
+    recipients, override=False)
 
 def prepare_notification_for_tasks_now(sender, recipient, subject, email_content, notif_pri):
   recipients=[recipient]
@@ -469,9 +469,9 @@ def handle_task_put(sender, obj=None, src=None, service=None):
       "<b>task</b></a></p>" + \
       "Thanks,<br>gGRC Team"
   else:
-    subject="Email subject is not generated for " + obj.title  + " , status: " + obj.status
-    content="Email content is not generated for " + obj.title  + " , status: " + obj.status
-
+    #subject="Email subject is not generated for " + obj.title  + " , status: " + obj.status
+    #content="Email content is not generated for " + obj.title  + " , status: " + obj.status
+    return
   prepare_notification_for_task(obj, user, assignee, subject, content, notif_pri)
   taskgroup=get_taskgroup(obj)
   if taskgroup is not None:
@@ -506,21 +506,21 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
   if not found_cycle:
     current_app.logger.warn("Notification Trigger: No Cycle has been started for workflow " + workflow.title)
     return
-  workflow_owner=get_workflow_owner(workflow)
-  if workflow_owner is None:
-    current_app.logger.warn("Notification Trigger: Unable to find workflow owner")
-    return
-  override_flag=notify_on_change(workflow)
-  empty_line="\n"
-  content=empty_line + subject + empty_line +  \
-    "  " + request.url_root + workflow._inflector.table_plural + \
-    "/" + str(workflow.id) + "#person_widget"
+  #workflow_owner=get_workflow_owner(workflow)
+  #if workflow_owner is None:
+    #current_app.logger.warn("Notification Trigger: Unable to find workflow owner")
+    #return
+  #override_flag=notify_on_change(workflow)
+  #empty_line="\n"
+  #content=empty_line + subject + empty_line +  \
+    #"  " + request.url_root + workflow._inflector.table_plural + \
+    #"/" + str(workflow.id) + "#person_widget"
   to_email={}
   # custom message is set in email for new member added to workflow (not for email digest)
-  if action in ['Add'] and workflow.notify_custom_message is not None:
-    notify_custom_message={member.id: workflow.notify_custom_message + '<br>'}
-  else:
-    notify_custom_message=None
+  #if action in ['Add'] and and workflow.notify_custom_message is not None:
+    #notify_custom_message={member.id: workflow.notify_custom_message + '<br>'}
+  #else:
+    #notify_custom_message=None
   recipients=[]
   for person in workflow.people:
     if not to_email.has_key(person.id):
