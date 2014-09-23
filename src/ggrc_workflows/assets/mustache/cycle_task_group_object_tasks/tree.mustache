@@ -134,6 +134,7 @@
           </div>
           <div class="span3">
             <h6>Assignee</h6>
+            {{#if_workflow_assignee_privileges instance}}
             <div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
               {{#using contact=instance.contact}}
                 <div class="objective-selector">
@@ -141,6 +142,11 @@
                 </div>
               {{/using}}
             </div>
+            {{else}}
+              {{#using contact=instance.contact}}
+              <div>{{firstnonempty contact.name contact.email ''}}</div>
+              {{/using}}
+            {{/if_workflow_assignee_privileges}}
           </div>
         </div>
 
@@ -194,9 +200,11 @@
           {{/using}}
         {{/is_dashboard}}
 
-        {{#is_dashboard}}
-          {{#using cycle=instance.cycle}}
-          {{#using workflow=cycle.workflow}}
+        {{#using cycle=instance.cycle}}
+        {{#using workflow=cycle.workflow}}
+        {{#if_helpers '\
+          #is_dashboard' '\
+          or ^is_page_instance' workflow}}
 
             <div class="row-fluid">
               <div class="span12">
@@ -210,10 +218,9 @@
                 <br>
               </div>
             </div>
-
-          {{/using}}
-          {{/using}}
-        {{/is_dashboard}}
+        {{/if_helpers}}
+        {{/using}}
+        {{/using}}
 
 
 

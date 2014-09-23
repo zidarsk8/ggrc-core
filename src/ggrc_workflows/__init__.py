@@ -13,6 +13,7 @@ from ggrc.app import app
 from ggrc.login import get_current_user
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
+from ggrc.rbac.permissions import is_allowed_update
 from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
 
 import ggrc_workflows.models as models
@@ -249,7 +250,7 @@ def build_cycle(obj, current_user=None):
 
       for task_group_task in task_group.task_group_tasks:
         start_date = task_group_task.calc_start_date(frequency, base_date)
-        end_date = task_group_task.calc_end_date(frequency, base_date)
+        end_date = task_group_task.calc_end_date(frequency, base_date, start_date)
         cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
           context=obj.context,
           cycle=obj,
@@ -302,15 +303,16 @@ def update_cycle_object_child_state(obj):
     for child in children:
       if status == 'Declined' or \
          status_order.index(status) > status_order.index(child.status):
-        old_status = child.status
-        child.status = status
-        db.session.add(child)
-        status_change.send(
-            child.__class__,
-            obj=child,
-            new_status=child.status,
-            old_status=old_status
-        )
+        if is_allowed_update(type(child), child.context):
+          old_status = child.status
+          child.status = status
+          db.session.add(child)
+          status_change.send(
+              child.__class__,
+              obj=child,
+              new_status=child.status,
+              old_status=old_status
+          )
         update_cycle_object_child_state(child)
 
 
@@ -326,15 +328,16 @@ def update_cycle_object_parent_state(obj):
   # If any child is `InProgress`, then parent should be `InProgress`
   if obj.status == 'InProgress' or obj.status == 'Declined':
     if parent.status != 'InProgress':
-      old_status = parent.status
-      parent.status = 'InProgress'
-      db.session.add(parent)
-      status_change.send(
-          parent.__class__,
-          obj=parent,
-          new_status=parent.status,
-          old_status=old_status
-          )
+      if is_allowed_update(type(parent), parent.context):
+        old_status = parent.status
+        parent.status = 'InProgress'
+        db.session.add(parent)
+        status_change.send(
+            parent.__class__,
+            obj=parent,
+            new_status=parent.status,
+            old_status=old_status
+            )
       update_cycle_object_parent_state(parent)
   # If all children are `Finished` or `Verified`, then parent should be same
   elif obj.status == 'Finished' or obj.status == 'Verified':
@@ -349,24 +352,26 @@ def update_cycle_object_parent_state(obj):
           if child.status != 'Finished':
             children_finished = False
       if children_verified:
-        old_status=parent.status
-        parent.status = 'Verified'
-        status_change.send(
-            parent.__class__,
-            obj=parent,
-            new_status=parent.status,
-            old_status=old_status
-            )
+        if is_allowed_update(type(parent), parent.context):
+          old_status=parent.status
+          parent.status = 'Verified'
+          status_change.send(
+              parent.__class__,
+              obj=parent,
+              new_status=parent.status,
+              old_status=old_status
+              )
         update_cycle_object_parent_state(parent)
       elif children_finished:
-        old_status=parent.status
-        parent.status = 'Finished'
-        status_change.send(
-            parent.__class__,
-            obj=parent,
-            new_status=parent.status,
-            old_status=old_status
-            )
+        if is_allowed_update(type(parent), parent.context):
+          old_status=parent.status
+          parent.status = 'Finished'
+          status_change.send(
+              parent.__class__,
+              obj=parent,
+              new_status=parent.status,
+              old_status=old_status
+              )
         update_cycle_object_parent_state(parent)
 
 

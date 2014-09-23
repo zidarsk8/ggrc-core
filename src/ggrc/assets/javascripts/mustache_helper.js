@@ -436,7 +436,7 @@ Mustache.registerHelper("render_hooks", function() {
   }).join("\n");
 });
 
-function defer_render(tag_prefix, funcs, deferred) {
+var defer_render = Mustache.defer_render = function defer_render(tag_prefix, funcs, deferred) {
   var hook
     , tag_name = tag_prefix.split(" ")[0]
     ;
@@ -495,6 +495,7 @@ Mustache.registerHelper("defer", function(prop, deferred, options) {
   }
 
   tag_name = (options.hash || {}).tag_name || "span";
+  allow_fail = (options.hash || {}).allow_fail || false;
 
   deferred = resolve_computed(deferred);
   typeof deferred === "function" && (deferred = deferred());
@@ -507,7 +508,7 @@ Mustache.registerHelper("defer", function(prop, deferred, options) {
     return options.inverse(options.contexts);
   }
 
-  return defer_render(tag_name, { done: finish, progress: progress }, deferred);
+  return defer_render(tag_name, { done: finish, fail: allow_fail ? finish : null, progress: progress }, deferred);
 });
 
 Mustache.registerHelper("allow_help_edit", function() {
@@ -2446,6 +2447,11 @@ Mustache.registerHelper("toggle_string", function(source, str){
   }
 
   return source + str;
+});
+
+Mustache.registerHelper("grdive_msg_to_id", function(message){
+  var msg = Mustache.resolve(message).split(' ');
+  return msg[msg.length-1];
 });
 
 })(this, jQuery, can);

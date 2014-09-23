@@ -84,7 +84,7 @@ class EmailNotification(NotificationBase):
     skipped_notifs={}
     #ToDo(Mouli): The valid states mapping must be set outside the generic email notification module
     valid_states={
-      'CycleTaskGroupObjectTask': ['Assigned', 'InProgress', 'Finished', 'Verified', 'Declined'],
+      'CycleTaskGroupObjectTask': ['Assigned', 'InProgress', 'Finished', 'Declined', 'Verified'],
     }
     valid_transition_task={
      'Assigned': 'InProgress',
@@ -366,12 +366,12 @@ class EmailDeferredNotification(EmailNotification):
     notifs_by_target={}
     for notification in deferred_notifs: 
       for notify_recipient in notification.recipients:
-        user_id=notify_recipient.id
+        user_id=notify_recipient.recipient_id
         break
       for notif_object in notification.notification_object:
         object_id=notif_object.object_id
         object_type=notif_object.object_type
-        if not notifs_by_target.has_key(object_id):
+        if not notifs_by_target.has_key((object_type, object_id, user_id)):
           notifs_by_target[(object_type, object_id, user_id)]=[]
         notifs_by_target[(object_type, object_id, user_id)].append((notification, notif_object))
     skipped_notifs=self.get_skipped_notifications(notifs_by_target)
@@ -408,12 +408,12 @@ class EmailDigestDeferredNotification(EmailDigestNotification):
     for notification in deferred_notifs: 
       # ToDO(Mouli): The design supports only 1 recipient for notification object for handling deferred notification 
       for notify_recipient in notification.recipients:
-        user_id=notify_recipient.id
+        user_id=notify_recipient.recipient_id
         break
       for notif_object in notification.notification_object:
         object_id=notif_object.object_id
         object_type=notif_object.object_type
-        if not notifs_by_target.has_key(object_id):
+        if not notifs_by_target.has_key((object_type, object_id, user_id)):
           notifs_by_target[(object_type, object_id, user_id)]=[]
         notifs_by_target[(object_type, object_id, user_id)].append((notification, notif_object))
     skipped_notifs=self.get_skipped_notifications(notifs_by_target)
