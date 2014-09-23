@@ -80,11 +80,10 @@ can.Control("CMS.Controllers.TreeLoader", {
   defaults : {}
 }, {
   init_spinner: function() {
-    var spinner
-      , $spinner
-      , $spinner_li
-      , $footer = this.element.children('.tree-footer').first()
-      ;
+    var spinner,
+        $spinner,
+        $spinner_li,
+        $footer;
 
     if (this.element) {
       // Only show the spinner if this is the last subtree
@@ -93,6 +92,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       if (this.element.next().length > 0)
         return;
 
+      $footer = this.element.children('.tree-footer').first()
       spinner = new Spinner({
           "radius": 4
         , "length": 4
@@ -393,6 +393,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       // Init the spinner if items need to be loaded:
       dfds.push(this.init_count().then(function(count) {
+        if (!that.element) {
+          return;
+        }
         if (count())
           that._loading_started();
         else
