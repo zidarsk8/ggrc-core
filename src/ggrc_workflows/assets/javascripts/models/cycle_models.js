@@ -73,11 +73,28 @@
     }
   }, {
     init: function() {
+      var that = this;
       this._super.apply(this, arguments);
       this.bind("status", function(ev, newVal) {
         if (newVal === 'Verified') {
-          this.attr("is_current", false);
-          this.save();
+          new RefreshQueue().enqueue(this.workflow.reify()).trigger().then(function(wfs) {
+            return wfs[0].get_binding("owners").refresh_instances();
+          }).then(function(wf_owner_bindings) {
+            var current_user = CMS.Models.get_instance(GGRC.current_user);
+            if(~can.inArray(
+              current_user,
+              can.map(wf_owner_bindings, function(wf_owner_binding) {
+                return wf_owner_binding.instance;
+              })
+            )) {
+              that.refresh().then(function() {
+                if(that.attr("is_current")) {
+                  that.attr("is_current", false);
+                  that.save();
+                }
+              });
+            }
+          });
         }
       });
     },
