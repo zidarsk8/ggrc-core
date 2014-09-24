@@ -592,9 +592,41 @@ $(document).ready(function(){
       $('#continuos').show();
     }
   });
+
+  // Hide fields in modals
+  $(".modal .hide").each(function() {
+    var $this = $(this),
+        $hideable = $(this).closest('[class*="span"].hideable'),
+        $innerHide = $this.closest('[class*="span"]').find('.hideable'),
+        $resetForm = $this.closest('.modal-body').find('.reset-form');
+
+    $this.click(function() {
+      $this.closest('.inner-hide').addClass('inner-hideable');
+      $hideable.hide();
+      $resetForm.fadeIn(500);
+
+      for(var i=0; i < $this.closest('.hide-wrap.hideable').find('.inner-hideable').length; i++) {
+        if(i == 1) {
+          $this.closest('.inner-hide').parent('.hideable').hide();
+        }
+      };
+      return false
+
+    });
+
+    $resetForm.click(function() {
+      $this.closest('.inner-hide').removeClass('inner-hideable');
+      $hideable.show();
+      $('.inner-hide').parent('.hideable').show();
+      $resetForm.fadeOut(500);
+      return false
+    });
+  });
+
 });
 
 // Grid View Example
+/*
 var dataView;
 var grid;
 var data = [];
@@ -815,3 +847,4 @@ $(function () {
   $("#gridContainer").resizable();
 
 })
+*/
