@@ -370,7 +370,7 @@ can.Control("CMS.Controllers.LHN", {
 
     $bar.css("left", a)
 
-    $search.width(resize - 136);
+    $search.width(resize - 49);
     window.resize_areas();
     $(window).trigger('resize');
     $obj_bar.css("left", (this.objnav_size + this.lhn_width()) + "px");
