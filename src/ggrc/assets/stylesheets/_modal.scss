@@ -468,6 +468,9 @@
   }
   .reset-form {
     display: none;
+    p {
+      margin: 0;
+    }
   }
   .row-fluid {
     [class*="span"] {

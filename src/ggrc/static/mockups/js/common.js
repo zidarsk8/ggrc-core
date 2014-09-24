@@ -603,13 +603,14 @@ $(document).ready(function(){
     $this.click(function() {
       $this.closest('.inner-hide').addClass('inner-hideable');
       $hideable.hide();
-      $resetForm.show();
+      $resetForm.fadeIn(500);
 
       for(var i=0; i < $this.closest('.hide-wrap.hideable').find('.inner-hideable').length; i++) {
         if(i == 1) {
           $this.closest('.inner-hide').parent('.hideable').hide();
         }
-      }
+      };
+      return false
 
     });
 
@@ -617,7 +618,8 @@ $(document).ready(function(){
       $this.closest('.inner-hide').removeClass('inner-hideable');
       $hideable.show();
       $('.inner-hide').parent('.hideable').show();
-      $resetForm.hide();
+      $resetForm.fadeOut(500);
+      return false
     });
   });
 
