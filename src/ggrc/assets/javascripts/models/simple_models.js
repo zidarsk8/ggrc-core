@@ -190,8 +190,9 @@ can.Model.Cacheable("CMS.Models.Role", {
   , destroy : "DELETE /api/roles/{id}"
   , create : "POST /api/roles"
   , scopes : [
-        "Private Program"
-      , "System"
+        "Private Program",
+        "Workflow",
+        "System"
     ]
   , defaults : {
       permissions: {
