@@ -359,8 +359,10 @@ can.Control("CMS.Controllers.LHN", {
     , $obj_bar = $(".objnav.bar-v")
     , $search = $('.widgetsearch')
     ;
-    if(resize < this.min_lhn_size/2 && !$lhs.hasClass("lhs-closed")) this.toggle_lhs();
-    if(resize < this.min_lhn_size) return;
+    //if(resize < this.min_lhn_size/2 && !$lhs.hasClass("lhs-closed")) this.toggle_lhs(); THIS IS RE-CODED BELOW THIS LINE. Instead of min_lhn_size I've added size of 40px
+    if(resize < 40 && !$lhs.hasClass("lhs-closed")) this.toggle_lhs();
+    //if(resize < this.min_lhn_size) return; THIS IS RE-CODED BELOW THIS LINE. Instead of min_lhn_size I've added size of 40px
+    if(resize < 40) return;
     if($lhs.hasClass("lhs-closed")) this.toggle_lhs();
     $lhsHolder.width(resize);
 
