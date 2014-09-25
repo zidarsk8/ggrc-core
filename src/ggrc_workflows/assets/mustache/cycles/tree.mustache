@@ -18,8 +18,10 @@
           </div>
         </div>
         <div class="span2">
-          <i class="grcicon-history-color" class="tooltip" title="Due date"></i>
-          {{localize_date instance.end_date}}
+          {{#instance.end_date}}
+            <i class="grcicon-history-color" class="tooltip" title="Due date"></i>
+            {{localize_date instance.end_date}}
+          {{/instance.end_date}}
         </div>
         <div class="span2">
           <ul class="tree-action-list">
