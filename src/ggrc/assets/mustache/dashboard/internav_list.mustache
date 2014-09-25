@@ -5,17 +5,48 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
+
 {{#each widget_list}}
   <li>
-    <a href="{{ selector }}">
+    {{#if_helpers '\
+      #if' has_count '\
+      and #if' count '\
+      or ^if' has_count '\
+      or #if' force_show}}
+
+    <a href="{{ selector }}" rel="tooltip" data-placement="bottom" title="{{ internav_display }}">
       <div class="oneline">
         <i class="{{ internav_icon }}"></i>
-        {{ internav_display }}
-        {{#has_count}}({{count}}{{#spinner}}...{{/spinner}}){{/has_count}}
+        {{#if show_title}}
+          {{internav_display}}
+          {{#has_count}}({{count}}{{#spinner}}...{{/spinner}}){{/has_count}}
+        {{else}}
+          {{#has_count}}{{count}}{{#spinner}}...{{/spinner}}{{/has_count}}
+        {{/if}}
       </div>
     </a>
-    <div class="drag"></div>
+    {{/if_helpers}}
   </li>
 {{/each}}
-
+<li class="hidden-widgets-list">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-show" rel="tooltip" data-placement="top" title="Add widget"></i></a>
+  <div class="dropdown-menu" role="menu">
+    {{#each widget_list}}
+      <div>
+        {{^if_helpers '\
+          #if' has_count '\
+          and #if' count '\
+          or ^if' has_count '\
+          or #if' force_show}}
+        <a href="{{ selector }}">
+          <div class="oneline">
+            <i class="{{ internav_icon }}"></i>
+            {{internav_display}}
+          </div>
+        </a>
+        {{/if_helpers}}
+      </div>
+    {{/each}}
+  </div>
+</li>
 {{{render_hooks 'ObjectNav.Actions'}}}

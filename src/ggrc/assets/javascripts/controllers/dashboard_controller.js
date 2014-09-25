@@ -403,12 +403,15 @@ can.Control("CMS.Controllers.InnerNav", {
     }
 
   , set_active_widget : function(widget) {
+    var active_widget = widget;
+
     if (typeof widget === 'string') {
-      this.options.contexts.attr("active_widget", this.widget_by_selector(widget));
+      active_widget = this.widget_by_selector(widget);
     }
-    else {
-      this.options.contexts.attr("active_widget", widget);
-    }
+
+    active_widget.attr('force_show', true);
+    this.update_add_more_link();
+    this.options.contexts.attr("active_widget", active_widget);
     this.show_active_widget();
   }
 
@@ -529,9 +532,8 @@ can.Control("CMS.Controllers.InnerNav", {
   }
 
   , update_widget_count : function($el, count) {
-      var widget_id = $el.closest('.widget').attr('id')
-        , widget = this.widget_by_selector("#" + widget_id)
-        ;
+      var widget_id = $el.closest('.widget').attr('id'),
+          widget = this.widget_by_selector("#" + widget_id);
 
       if (widget) {
         widget.attr({
@@ -539,6 +541,43 @@ can.Control("CMS.Controllers.InnerNav", {
           , has_count: true
         });
       }
+      this.update_add_more_link();
+    },
+
+    update_add_more_link: function() {
+      var has_hidden_widgets = false,
+          $hidden_widgets = $('.hidden-widgets-list');
+      // Update has hidden widget attr
+      $.map(this.options.widget_list, function(widget){
+        if (widget.has_count && widget.count === 0 && !widget.force_show) {
+          has_hidden_widgets = true;
+        }
+      })
+      if (has_hidden_widgets) {
+        $hidden_widgets.show();
+      } else {
+        $hidden_widgets.hide();
+      }
+      this.show_hide_titles();
+    },
+    "{window} resize" : function(el, ev) {
+      this.show_hide_titles();
+    },
+    show_hide_titles: function() {
+      var $el = this.element,
+          $last = $el.children().not(':hidden,.inner-nav-button').last(),
+          widgets = this.options.widget_list,
+          last_pos = $last.position() || {},
+
+          are_shown = widgets.length && widgets[0].attr('show_title'),
+          num_visible = $el.children(':visible').length,
+
+          threshold = are_shown ? 180 : 180 + 70*num_visible,
+          do_show = $el.width() - last_pos.left > threshold;
+
+      widgets.forEach(function(widget) {
+        widget.attr('show_title', do_show);
+      });
     }
 });
 
