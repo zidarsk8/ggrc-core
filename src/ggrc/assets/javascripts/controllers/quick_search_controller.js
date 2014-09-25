@@ -859,6 +859,9 @@ can.Control("CMS.Controllers.LHN_Search", {
         if (model_name) {
           count = search_result.getCountFor(model_name);
 
+          // Remove filter suffix (ie Workflow_All) from model_name before
+          //  checking permissions
+          model_name = model_name.split('_')[0];
           if (Permission.is_allowed('read', model_name, null) && !isNaN(parseInt(count))) {
             $list
               .find(self.options.count_selector)

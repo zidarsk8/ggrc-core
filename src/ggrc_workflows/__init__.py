@@ -702,19 +702,23 @@ from ggrc_workflows.roles import (
 class WorkflowRoleContributions(RoleContributions):
   contributions = {
       'ProgramCreator': {
+        'read': ['Workflow'],
         'create': ['Workflow'],
         },
       'ObjectEditor': {
+        'read': ['Workflow'],
         'create': ['Workflow'],
         },
       'Reader': {
-        'read': []
+        'read': ['Workflow'],
         },
       'ProgramEditor': {
-        'create': ['Workflow']
+        'read': ['Workflow'],
+        'create': ['Workflow'],
         },
       'ProgramOwner': {
-        'create': ['Workflow']
+        'read': ['Workflow'],
+        'create': ['Workflow'],
         },
       }
 
