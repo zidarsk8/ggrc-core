@@ -463,6 +463,10 @@
         i {
           @include opacity(1);
         }
+        &:hover {
+          background: $tabHoverBgnd;
+          color: $white;
+        }
       }
     }
     li:hover {
