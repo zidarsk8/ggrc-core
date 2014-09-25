@@ -558,6 +558,26 @@ can.Control("CMS.Controllers.InnerNav", {
       } else {
         $hidden_widgets.hide();
       }
+      this.show_hide_titles();
+    },
+    "{window} resize" : function(el, ev) {
+      this.show_hide_titles();
+    },
+    show_hide_titles: function() {
+      var $el = this.element,
+          $last = $el.children().not(':hidden,.inner-nav-button').last(),
+          widgets = this.options.widget_list,
+          last_pos = $last.position() || {},
+
+          are_shown = widgets.length && widgets[0].attr('show_title'),
+          num_visible = $el.children(':visible').length,
+
+          threshold = are_shown ? 180 : 180 + 70*num_visible,
+          do_show = $el.width() - last_pos.left > threshold;
+
+      widgets.forEach(function(widget) {
+        widget.attr('show_title', do_show);
+      });
     }
 });
 
