@@ -79,7 +79,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   }
   , init : function() {
     var that = this;
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
     this._super.apply(this, arguments);
   }
 }, {
@@ -155,7 +155,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   }
 
   , init : function() {
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
     this._super.apply(this, arguments);
   }
 }, {

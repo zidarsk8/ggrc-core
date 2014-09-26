@@ -35,9 +35,9 @@
     }
     , init : function() {
         this._super && this._super.apply(this, arguments);
-        this.validatePresenceOf("title");
-        this.validatePresenceOf("start_date");
-        this.validatePresenceOf("end_date");
+        this.validateNonBlank("title");
+        this.validateNonBlank("start_date");
+        this.validateNonBlank("end_date");
       }
   }, {});
 
