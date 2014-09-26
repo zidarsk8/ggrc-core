@@ -79,7 +79,7 @@ can.Model.Cacheable("CMS.Models.Control", {
   }
 
   , init : function() {
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
     this._super.apply(this, arguments);
   }
 }

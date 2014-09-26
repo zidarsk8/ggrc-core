@@ -51,7 +51,7 @@ can.Model.Cacheable("CMS.Models.Document", {
 
   }
   , init : function() {
-    this.validatePresenceOf("link");
+    this.validateNonBlank("link");
     this._super.apply(this, arguments);
   }
 
