@@ -14,6 +14,14 @@
         </h6>
         <ul class="quick-filters">
           <li>
+            <input type="text" name="cycle.workflow.title" data-lookup="Workflow" class="span10 short-field search-icon" placeholder="Filter by Workflow" value="">
+          </li>
+          {{#is_dashboard}}
+          <li>
+            <input type="text" name="cycle_task_group_object.title" data-lookup="Program,Audit,Regulation,Policy,Standard,Contract,Clause,Section,Objective,Control,System,Process,DataAsset,Product,Project,Facility,Market" class="span10 short-field search-icon" placeholder="Filter by Object" data-template="/directives/autocomplete_result.mustache" value="">
+          </li>
+          {{/is_dashboard}}
+          <li>
             <label>
               By Status
             </label>
