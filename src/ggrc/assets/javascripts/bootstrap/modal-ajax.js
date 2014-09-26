@@ -261,10 +261,9 @@
         } else if (form_target == 'redirect') {
           if (typeof xhr !== 'undefined' && "getResponseHeader" in xhr) {
             GGRC.navigate(xhr.getResponseHeader('location'));
-          }
-          else if(data.type === "Audit"){
-            GGRC.navigate(data.program.reify().viewLink + "#audit_widget");          }
-          else {
+          } else if(data._redirect) {
+            GGRC.navigate(data._redirect);
+          } else {
             GGRC.navigate(data.selfLink.replace('/api', ''));
           }
         } else if (form_target == 'refresh_page_instance'){

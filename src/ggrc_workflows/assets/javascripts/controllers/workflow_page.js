@@ -66,6 +66,11 @@
     "{CMS.Models.TaskGroup} created": function(model, ev, instance) {
       if (instance instanceof CMS.Models.TaskGroup) {
         setTimeout(function() {
+          // If the TaskGroup was created as part of a Workflow, we don't want to
+          //  do a redirect here
+          if (instance._no_redirect) {
+            return;
+          }
           window.location.hash =
             'task_group_widget/task_group/' + instance.id;
         }, 250);
@@ -181,7 +186,7 @@
       return workflow.save().then(function(workflow) {
         GGRC.navigate(workflow.viewLink);
       });
-      
+
     }
   });
 

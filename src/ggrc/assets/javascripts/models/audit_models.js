@@ -84,13 +84,13 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
 }, {
   save : function() {
-    
+
     var that = this;
     // Make sure the context is always set to the parent program
     if(this.context == null || this.context.id == null){
       this.attr('context', this.program.reify().context);
     }
-    
+
     return this._super.apply(this, arguments).then(function(instance) {
       return that._save_auditor(instance);
     });
@@ -102,7 +102,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
       ;
 
     Permission.refresh(); //Creating an audit creates new contexts.  Make sure they're reflected client-side
-    
+
     if(typeof instance.auditor === 'undefined'){
       return instance;
     }
@@ -113,7 +113,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
         return new $.Deferred().reject();
       }
       auditor_role = roles[0];
-      
+
       return CMS.Models.UserRole.findAll({
         context_id__in: instance.context.id,
         role_id__in: auditor_role.id
@@ -140,6 +140,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
         person : instance.auditor
       }).save());
     }).then(function(){
+      instance.attr('_redirect',
+        instance.program.reify().viewLink + "#audit_widget/audit/" + instance.id);
       return instance;
     });
   }, findAuditors : function(return_list){
@@ -179,7 +181,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
       return loader.refresh_instances().then(function() {
         $.map(loader.list, function(binding) {
           // FIXME: This works for now, but is sad.
-          
+
           dfds.push(new $.Deferred(function(dfd) {
 
             if (!binding.instance.selfLink) {
