@@ -24,7 +24,11 @@ GGRC.Controllers.Modals("GGRC.Controllers.ApprovalWorkflow", {
       original_object : this.options.instance
     }));
   },
-
+  "input[null-if-empty] change" : function(el, ev) {
+    if(el.val() === "") {
+      this.options.instance.attr(el.attr("name").split(".").slice(0, -1).join("."), null);
+    }
+  }
 });
 
 GGRC.register_modal_hook("approvalform", function($target, $trigger, option) {

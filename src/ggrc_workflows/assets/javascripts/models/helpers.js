@@ -56,7 +56,7 @@ can.Observe("CMS.ModelHelpers.CycleTask", {
   })
 });
 
-
+var approval_workflow_errors_compute;
 can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
   defaults : {
     original_object: null,
@@ -153,16 +153,17 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
       }).save();
     });
   },
-  computed_errors: can.compute(function() {
+  computed_errors: (approval_workflow_errors_compute = can.compute(function() {
     var errors = null;
-    if(!this.attr("assignee")) {
-      errors = { assignee: "Must be defined" };
+    if(!this.attr("contact")) {
+      errors = { contact: "Must be defined" };
     }
     if(!this.attr("end_date")) {
       errors = $.extend(errors, { end_date : "Must be defined" });
     }
     return errors;
-  })
+  })),
+  computed_unsuppressed_errors: approval_workflow_errors_compute
 });
 
 })(this.can, this.can.$, this.CMS);
