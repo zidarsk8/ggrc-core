@@ -388,6 +388,7 @@
       position: relative;
       float: left;
       margin-bottom: -1px;
+      @include background-size(368px 416px);
       &.inner-nav-button {
         text-align: center;
         padding: 1px 10px 0 10px;
@@ -427,19 +428,40 @@
       }
     }
     a {
-      padding: 0 9px;
+      padding: 0 14px 0 10px;
       display: block;
       line-height: 29px;
       font-size: 13px;
       color: $tabTitle;
       border: 1px solid transparent;
       @include transition(background 0.2s ease, color 0.2s ease);
+      position: relative;
+      .closed {
+        display: none;
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 10px;
+        height: 10px;
+        line-height: 10px;
+        background-image: image-url("grcicons/icons.png");
+        background-position: -347px -179px;
+        background-repeat: no-repeat;
+        @include background-size(368px 416px);
+        cursor: pointer;
+      }
       &:hover {
         background: $tabHoverBgnd;
         color: $white;
         text-decoration: none;
         i {
           @include opacity(1);
+        }
+        .closed {
+          display: block;
+          position: absolute;
+          top: 2px;
+          right: 2px;
         }
       }
     }
