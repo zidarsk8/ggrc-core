@@ -303,7 +303,7 @@ def update_cycle_object_child_state(obj):
     for child in children:
       if status == 'Declined' or \
          status_order.index(status) > status_order.index(child.status):
-        if is_allowed_update(type(child), child.context):
+        if is_allowed_update(child.__class__.__name__, child.context.id):
           old_status = child.status
           child.status = status
           db.session.add(child)
@@ -328,7 +328,7 @@ def update_cycle_object_parent_state(obj):
   # If any child is `InProgress`, then parent should be `InProgress`
   if obj.status == 'InProgress' or obj.status == 'Declined':
     if parent.status != 'InProgress':
-      if is_allowed_update(type(parent), parent.context):
+      if is_allowed_update(parent.__class__.__name__, parent.context.id):
         old_status = parent.status
         parent.status = 'InProgress'
         db.session.add(parent)
@@ -352,7 +352,7 @@ def update_cycle_object_parent_state(obj):
           if child.status != 'Finished':
             children_finished = False
       if children_verified:
-        if is_allowed_update(type(parent), parent.context):
+        if is_allowed_update(parent.__class__.__name__, parent.context.id):
           old_status=parent.status
           parent.status = 'Verified'
           status_change.send(
@@ -363,7 +363,7 @@ def update_cycle_object_parent_state(obj):
               )
         update_cycle_object_parent_state(parent)
       elif children_finished:
-        if is_allowed_update(type(parent), parent.context):
+        if is_allowed_update(parent.__class__.__name__, parent.context.id):
           old_status=parent.status
           parent.status = 'Finished'
           status_change.send(
