@@ -971,7 +971,11 @@ label {
   &.my-work-label {
     font-size:12px;
     font-weight:bold;
-    float:right;
     margin-top:4px;
   }
+}
+
+// My work radio button
+input[type="radio"].my-work {
+  margin-top: -4px;
 }
