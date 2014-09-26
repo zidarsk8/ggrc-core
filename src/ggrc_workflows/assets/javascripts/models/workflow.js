@@ -49,10 +49,19 @@
   }, {
     save : function() {
       var that = this,
-          task_group_title = this.task_group_title.trim(),
+          task_group_title = this.task_group_title,
           redirect_link;
 
       return this._super.apply(this, arguments).then(function(instance) {
+        // Check if gdrive folder was added
+        if (instance.workflow_folder) {
+          return $.when(
+            instance,
+            GGRC.Controllers.GDriveWorkflow.attach_files(instance.workflow_folder, 'folders', instance)
+          );
+        }
+        return instance;
+      }).then(function(instance) {
         redirect_link = instance.viewLink + "#task_group_widget"
         if (!task_group_title) {
           instance.attr('_redirect', redirect_link);
