@@ -226,9 +226,10 @@ can.Control("CMS.Controllers.LHN", {
     }
 
   , "input.my-work click": function(el, ev) {
-      var target = $(ev.target);
+      var target = $(ev.target),
+          checked;
       if (target.is('input.my-work')) {
-        var checked = target.prop("checked");
+        checked = target.val() === 'my_work';
         this.obs.attr("my_work", checked);
         //target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
         this.options.display_prefs.setLHNState("my_work", checked);
@@ -267,11 +268,10 @@ can.Control("CMS.Controllers.LHN", {
 
         // Delay LHN initializations until after LHN is rendered
         lhn_search_dfd.then(function() {
-          var target = self.element.find('#lhs input.my-work')
-            , checked = self.obs.attr('my_work')
-            ;
-
-          target.prop('checked', checked);
+          var checked = self.obs.attr('my_work'),
+              value = checked ? "my_work" : "all",
+              target = self.element.find('#lhs input.my-work[value='+value+']');
+          target.prop('checked', true);
           target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
           if(!$lhs.hasClass("lhs-closed")) {
             $(".recent").ggrc_controllers_recently_viewed();
