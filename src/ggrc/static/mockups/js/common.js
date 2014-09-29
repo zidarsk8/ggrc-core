@@ -594,7 +594,7 @@ $(document).ready(function(){
   });
 
   // Hide fields in modals
-  $(".modal .hide").each(function() {
+  $(".modal .field-hide").each(function() {
     var $this = $(this),
         $hideable = $(this).closest('[class*="span"].hideable'),
         $innerHide = $this.closest('[class*="span"]').find('.hideable'),
