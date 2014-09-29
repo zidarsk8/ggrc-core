@@ -4,8 +4,8 @@ $(document).ready(function(){
 
   $('.lhs-holder').css('height', $(window).height() - 71 );
   $('.inner-nav').css('height', $(window).height() - 126 );
-  $('.object-area').css('height', $(window).height() - 156 );
-  $('.object-area').css('width', $(window).width() - 448 );
+  $('.object-area').css('height', $(window).height() - 172 );
+  $('.object-area').css('width', $(window).width() - 248 );
 
   $('input[name=notify-digest]').parent().on('click', function(ev){
     ev.stopPropagation();
@@ -621,6 +621,26 @@ $(document).ready(function(){
       $resetForm.fadeOut(500);
       return false
     });
+  });
+
+  // Custom Attribute select
+  $('.attr-custom').change(function() {
+    if (this.value == '3') {
+      $('.if-dropdown').fadeIn(500);
+      $('.if-checkbox').fadeOut(500);
+    } else if (this.value == "4") {
+      $('.if-dropdown').fadeOut(500);
+      $('.if-checkbox').fadeOut(500);
+    } else {
+      $('.if-dropdown').fadeOut(500);
+      $('.if-checkbox').fadeIn(500);
+    }
+  });
+  
+  // Add Custom Attribute
+  $('body').on('click', '#addAttribute', function() {
+    $("#NewAttribute").show();
+    $("#customAttribute").modal('hide');
   });
 
 });
