@@ -1236,6 +1236,29 @@ jQuery(function($){
 
         source_for_refreshable_objects: function(request) {
           var that = this;
+
+          if (this.options.searchlist) {
+            return this.options.searchlist.then(function() {
+              var filtered_list = [];
+              return $.map(arguments, function(item) {
+                var search_attr = item.title || "",
+                    term = request.term.toLowerCase();
+
+                // Filter out duplicates:
+                if (filtered_list.indexOf(item._cid) > -1) {
+                  return;
+                }
+                filtered_list.push(item._cid);
+
+                // Perform search based on term:
+                if (search_attr.toLowerCase().indexOf(term) === -1) {
+                  return;
+                }
+                return item;
+              });
+            });
+          }
+
           return GGRC.Models.Search
             .search_for_types(
               request.term || '',
@@ -1294,10 +1317,11 @@ jQuery(function($){
       },
 
       _create: function() {
-        var that = this
-        , $that = $(this.element)
-        , base_search = $that.data("lookup")
-        , searchtypes;
+        var that = this,
+            $that = $(this.element),
+            base_search = $that.data("lookup"),
+            from_list = $that.data("from-list"),
+            searchtypes;
 
         this._super.apply(this, arguments);
 
@@ -1307,7 +1331,12 @@ jQuery(function($){
           $(this).data(that.widgetFullName).search($(this).val());
         });
 
-        if (base_search) {
+        if (from_list) {
+          this.options.searchlist = $.when.apply(this, $.map(from_list.list, function(item) {
+            var props = base_search.trim().split('.');
+            return item.instance.refresh_all.apply(item.instance, props);
+          }));
+        } else if (base_search) {
           base_search = base_search.trim();
           if (base_search.indexOf("__mappable") === 0 || base_search.indexOf("__all") === 0) {
             searchtypes = GGRC.Mappings.get_canonical_mappings_for(
