@@ -122,7 +122,7 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
           : "/base_objects/tree_footer.mustache")
     });
     this.tree_view_options.child_options[1].model = this;
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
   } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {
     init : function() {
@@ -174,7 +174,7 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
     this._super && this._super.apply(this, arguments);
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);
     this.tree_view_options.child_options[1].model = this;
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
   } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {
     init : function() {

@@ -70,7 +70,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     this._super && this._super.apply(this, arguments);
     this.validatePresenceOf("program");
     this.validatePresenceOf("contact");
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
     this.validate(["_transient.audit_firm", "audit_firm"], function(newVal, prop) {
       var audit_firm = this.attr("audit_firm");
       var audit_firm_text = this.attr("_transient.audit_firm");
@@ -265,8 +265,8 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , init : function() {
     this._super.apply(this, arguments);
-    this.validatePresenceOf("description");
-    this.validatePresenceOf("due_on");
+    this.validateNonBlank("description");
+    this.validateNonBlank("due_on");
     this.validatePresenceOf("assignee");
     if(this === CMS.Models.Request) {
       this.bind("created", function(ev, instance) {
@@ -589,9 +589,9 @@ can.Model.Cacheable("CMS.Models.Meeting", {
   , defaults : {}
   , init : function() {
     this._super && this._super.apply(this, arguments);
-    this.validatePresenceOf("title");
-    this.validatePresenceOf("start_at");
-    this.validatePresenceOf("end_at");
+    this.validateNonBlank("title");
+    this.validateNonBlank("start_at");
+    this.validateNonBlank("end_at");
   }
 }, {
   init : function () {

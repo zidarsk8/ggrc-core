@@ -62,7 +62,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , defaults : {
   }
   , init : function() {
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
     //this.validateInclusionOf("kind", this.meta_kinds);
     this._super.apply(this, arguments);
   }

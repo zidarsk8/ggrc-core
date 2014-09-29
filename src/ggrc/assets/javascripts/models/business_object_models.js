@@ -84,7 +84,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     });
     this.tree_view_options.child_options[1].model = this;
 
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
   }
 }, {});
 
@@ -150,7 +150,7 @@ can.Model.Cacheable("CMS.Models.Project", {
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
 
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
   }
 }, {});
 
@@ -231,7 +231,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
     });
     this.tree_view_options.child_options[1].model = this;
 
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
   }
 }, {});
 
@@ -317,7 +317,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     });
     this.tree_view_options.child_options[1].model = this;
 
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
   }
 }, {
 });
@@ -399,7 +399,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     });
     this.tree_view_options.child_options[1].model = this;
 
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
   }
 }, {});
 
@@ -465,7 +465,7 @@ can.Model.Cacheable("CMS.Models.Market", {
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
 
-    this.validatePresenceOf("title");
+    this.validateNonBlank("title");
   }
 }, {});
 
