@@ -455,17 +455,7 @@
       }
     }
   }
-  .hide {
-    display: inline-block;
-    float: right;
-    color: $warmGray;
-    font-size: 12px;
-    text-decoration: underline;
-    margin-top: 3px;
-    &:hover {
-      text-decoration: none;
-    }
-  }
+
   .reset-form {
     display: none;
     p {
