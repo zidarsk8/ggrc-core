@@ -34,7 +34,11 @@ can.Control("GGRC.Controllers.TreeFilter", {
 
   , autocomplete_select : function(el, event, ui) {
     setTimeout(function(){
-      el.val(ui.item.name ? ui.item.name : ui.item.email, ui.item);
+      if (ui.item.title) {
+        el.val(ui.item.title, ui.item);
+      } else {
+        el.val(ui.item.name ? ui.item.name : ui.item.email, ui.item);
+      }
       el.trigger('change');
     }, 0);
   }
