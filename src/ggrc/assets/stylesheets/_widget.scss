@@ -1132,3 +1132,19 @@
     }
   }
 }
+
+// Report
+.save-template {
+  float: right;
+  padding: 10px 20px;
+  label {
+    display: inline-block;
+    &.disabled {
+      color: $gray;
+    }
+  }
+  .input-medium {
+    margin-bottom: 0;
+    margin-right: 10px;
+  }
+}

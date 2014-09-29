@@ -6,6 +6,7 @@ $(document).ready(function(){
   $('.inner-nav').css('height', $(window).height() - 126 );
   $('.object-area').css('height', $(window).height() - 172 );
   $('.object-area').css('width', $(window).width() - 248 );
+  $('.object-area.wide').css('width', $(window).width() - 48 );
 
   $('input[name=notify-digest]').parent().on('click', function(ev){
     ev.stopPropagation();
@@ -641,6 +642,28 @@ $(document).ready(function(){
   $('body').on('click', '#addAttribute', function() {
     $("#NewAttribute").show();
     $("#customAttribute").modal('hide');
+  });
+
+  // Reporting
+  $("body").on("click", "#addFilterRule", function() {
+    var $this = $(this),
+        $newRule = $this.closest(".relevance-filters").find("#newObjectSet");
+
+    $newRule.show();
+  });
+  
+  $("body").on("click", "#removeFilter", function() {
+    var $this = $(this),
+        $newRule = $this.closest("#newObjectSet");
+
+    $newRule.hide();
+  });
+  $(".save-template input[type=checkbox]").each(function() {
+    var $this = $(this),
+        $label = $(this).closest("label");
+    if($(this).prop('disabled')) {
+      $label.addClass("disabled");
+    }
   });
 
 });
