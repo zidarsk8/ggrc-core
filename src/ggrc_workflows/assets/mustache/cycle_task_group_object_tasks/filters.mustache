@@ -15,11 +15,11 @@
         <ul class="quick-filters">
           {{#is_dashboard}}
           <li>
-            <input type="text" name="cycle_task_group_object.title" {{data 'from-list'}} data-lookup="cycle_task_group_object.object" class="span10 short-field search-icon" placeholder="Filter by Object" data-template="/directives/autocomplete_result.mustache" value="">
+            <input type="text" name="cycle_task_group_object.title" {{data 'from-list'}} data-lookup="cycle_task_group_object.object" class="span10 short-field search-icon" placeholder="Filter by Object" data-template="/directives/autocomplete_result.mustache" value="" {{^list}}disabled="disabled"{{/list}}>
           </li>
           {{/is_dashboard}}
           <li>
-            <input type="text" name="cycle.workflow.title" {{data 'from-list'}} data-lookup="cycle.workflow" class="span10 short-field search-icon" placeholder="Filter by Workflow" value="">
+            <input type="text" name="cycle.workflow.title" {{data 'from-list'}} data-lookup="cycle.workflow" class="span10 short-field search-icon" placeholder="Filter by Workflow" value="" {{^list}}disabled="disabled"{{/list}}>
           </li>
           <li>
             <label>
