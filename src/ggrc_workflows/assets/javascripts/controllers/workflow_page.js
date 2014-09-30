@@ -106,10 +106,7 @@
           var task_groups = workflow.task_groups.reify(),
               can_activate = task_groups.length > 0;
           task_groups.each(function(task_group) {
-            if (task_group.task_group_objects.length &&
-                !task_group.task_group_tasks.length ||
-                !task_group.task_group_objects.length &&
-                task_group.task_group_tasks.length) {
+            if (!task_group.task_group_tasks.length) {
               can_activate = false;
             }
           });
