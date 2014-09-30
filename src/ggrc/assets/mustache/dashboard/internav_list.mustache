@@ -23,7 +23,9 @@
         {{else}}
           {{#has_count}}{{count}}{{#spinner}}...{{/spinner}}{{/has_count}}
         {{/if}}
-        <span class="closed"></span>
+        {{^count}}{{#has_count}}
+          <span class="closed"></span>
+        {{/has_count}}{{/count}}
       </div>
     </a>
     {{/if_helpers}}

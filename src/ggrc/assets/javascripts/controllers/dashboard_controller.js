@@ -578,6 +578,19 @@ can.Control("CMS.Controllers.InnerNav", {
       widgets.forEach(function(widget) {
         widget.attr('show_title', do_show);
       });
+    },
+    '.closed click' : function(el, ev) {
+      var $link = el.closest('a'),
+          widget = this.widget_by_selector($link.attr('href')),
+          active_widget = this.options.contexts.attr("active_widget"),
+          widgets = this.options.widget_list;
+
+      widget.attr('force_show', false);
+      this.update_add_more_link();
+      if (widget.selector === active_widget.selector) {
+        this.options.contexts.attr("active_widget", widgets[0]);
+      }
+      this.show_active_widget();
     }
 });
 
