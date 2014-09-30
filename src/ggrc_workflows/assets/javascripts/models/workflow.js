@@ -47,7 +47,40 @@
       this.validateNonBlank("title");
     },
   }, {
+    save : function() {
+      var that = this,
+          task_group_title = this.task_group_title,
+          redirect_link;
 
+      return this._super.apply(this, arguments).then(function(instance) {
+        // Check if gdrive folder was added
+        if (instance.workflow_folder) {
+          return $.when(
+            instance,
+            GGRC.Controllers.GDriveWorkflow.attach_files(instance.workflow_folder, 'folders', instance)
+          );
+        }
+        return instance;
+      }).then(function(instance) {
+        redirect_link = instance.viewLink + "#task_group_widget"
+        if (!task_group_title) {
+          instance.attr('_redirect', redirect_link);
+          return instance;
+        }
+        var tg = new CMS.Models.TaskGroup({
+          title: task_group_title,
+          workflow: instance,
+          assignee: instance.contact,
+          context: instance.context,
+        });
+        return tg.save().then(function(tg) {
+          // Prevent the redirect form workflow_page.js
+          tg.attr('_no_redirect', true);
+          instance.attr('_redirect', redirect_link + "/task_group/" + tg.id);
+          return that;
+        });
+      });
+    },
     // Check if task groups are slated to start
     //   in the current week/month/quarter/year
     is_mid_frequency: function() {

@@ -170,7 +170,60 @@ var permissions_by_type = {
 };
 
 can.Control("GGRC.Controllers.GDriveWorkflow", {
-
+  attach_files: function(files, type, object){
+    return new RefreshQueue().enqueue(files).trigger().then(function(files){
+      can.each(files, function(file) {
+        //Since we can re-use existing file references from the picker, check for that case.
+        CMS.Models.Document.findAll({link : file.alternateLink }).done(function(d) {
+          if(d.length) {
+            //file found, just link to object
+            report_progress(
+              "Linking Drive file \"" + d[0].title + "\"",
+              $.when([new CMS.Models.ObjectDocument({
+                  context : object.context || {id : null}
+                  , documentable : object
+                  , document : d[0]
+                }).save(),
+              ])
+            )
+          } else {
+            if(type === 'folders'){
+              report_progress("Linking folder " + file.title,
+                new CMS.Models.ObjectFolder({
+                  folderable : object
+                  , folder : file
+                  , context : object.context || {id: null}
+                }).save()
+              );
+              return;
+            }
+            //file not found, make Document object.
+            report_progress(
+              "Linking new Drive file \"" + file.title + "\""
+              , new CMS.Models.Document({
+                context : object.context || {id : null}
+                , title : file.title
+                , link : file.alternateLink
+              }).save().then(function(doc) {
+                return $.when([
+                  new CMS.Models.ObjectDocument({
+                    context : object.context || {id : null}
+                    , documentable : object
+                    , document : doc
+                  }).save(),
+                  new CMS.Models.ObjectFile({
+                    context : object.context || {id : null}
+                    , file : file
+                    , fileable : doc
+                  }).save()
+                ]);
+              })
+            );
+          }
+        });
+      });
+    });
+  }
 }, {
   request_create_queue : []
   , user_permission_ids : {}
@@ -750,7 +803,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           var picker = new google.picker.PickerBuilder()
             .setOAuthToken(gapi.auth.getToken().access_token)
             .setDeveloperKey(GGRC.config.GAPI_KEY)
-            .setCallback(pickerCallback)
+            .setCallback(pickerCallback);
 
           if(el.data('type') === 'folders'){
             var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
@@ -768,7 +821,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
               .addView(docsView)
               .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
           }
-          picker.build().setVisible(true);
+          picker = picker.build();
+          picker.setVisible(true);
+          picker.A.style.zIndex = 2001; // our modals start with 1050
         });
       }
 
@@ -793,60 +848,16 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     });
   }
   , ".entry-attachment picked": function(el, ev, data) {
-    var object = CMS.Models[el.data("model")].findInCacheById(el.data("id")),
+    var object,
         files = data.files || [];
-    return new RefreshQueue().enqueue(files).trigger().then(function(files){
-      can.each(files, function(file) {
-        //Since we can re-use existing file references from the picker, check for that case.
-        CMS.Models.Document.findAll({link : file.alternateLink }).done(function(d) {
-          if(d.length) {
-            //file found, just link to object
-            report_progress(
-              "Linking Drive file \"" + d[0].title + "\"",
-              $.when([new CMS.Models.ObjectDocument({
-                  context : object.context || {id : null}
-                  , documentable : object
-                  , document : d[0]
-                }).save(),
-              ])
-            )
-          } else {
-            if(el.data('type') === 'folders'){
-              report_progress("Linking folder " + file.title,
-                new CMS.Models.ObjectFolder({
-                  folderable : object
-                  , folder : file
-                  , context : object.context || {id: null}
-                }).save()
-              );
-              return;
-            }
-            //file not found, make Document object.
-            report_progress(
-              "Linking new Drive file \"" + file.title + "\""
-              , new CMS.Models.Document({
-                context : object.context || {id : null}
-                , title : file.title
-                , link : file.alternateLink
-              }).save().then(function(doc) {
-                return $.when([
-                  new CMS.Models.ObjectDocument({
-                    context : object.context || {id : null}
-                    , documentable : object
-                    , document : doc
-                  }).save(),
-                  new CMS.Models.ObjectFile({
-                    context : object.context || {id : null}
-                    , file : file
-                    , fileable : doc
-                  }).save()
-                ]);
-              })
-            );
-          }
-        });
-      });
-    });
+
+    if(el.data('instance')) {
+      object = el.data('instance');
+      object.instance.attr('workflow_folder', data.files);
+      return;
+    }
+    object = CMS.Models[el.data("model")].findInCacheById(el.data("id"));
+    return GGRC.Controllers.GDriveWorkflow.attach_files(files, el.data('type'), object);
   }
   , "a[data-toggle=evidence-gdrive-picker] click" : function(el, ev) {
     var response = CMS.Models.Response.findInCacheById(el.data("response-id"))
