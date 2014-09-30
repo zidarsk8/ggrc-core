@@ -37,7 +37,7 @@ class TaskGroupTask(
   task_type = db.Column(
       db.String(length=250), default=default_task_type, nullable=False)
   response_options = db.Column(
-      JsonType, nullable=True)
+      JsonType(), nullable=False, default='[]')
 
   VALID_TASK_TYPES = ['text', 'menu', 'checkbox']
 

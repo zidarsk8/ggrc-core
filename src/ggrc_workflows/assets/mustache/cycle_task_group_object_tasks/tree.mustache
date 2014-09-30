@@ -177,7 +177,7 @@
             <ggrc-quick-update instance="instance">
               {{#each instance.response_options}}
               <div class="span4">
-                <input type="checkbox" multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}selected="selected"{{/in_array}}> {{.}}
+                <input type="checkbox" multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}checked="checked"{{/in_array}}> {{.}}
               </div>
               {{/each}}
             </ggrc-quick-update>

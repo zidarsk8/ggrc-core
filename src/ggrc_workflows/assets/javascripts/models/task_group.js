@@ -83,13 +83,7 @@
       contact: "CMS.Models.Person.stub",
       modified_by: "CMS.Models.Person.stub",
       task_group: "CMS.Models.TaskGroup.stub",
-      response_options: "JSONType"
-    },
-
-    serialize: {
-      JSONType: function(val) {
-        return JSON.stringify(val);
-      }
+      response_options: "can.List.newInstance"
     },
 
     init: function() {

@@ -323,7 +323,10 @@ can.Component.extend({
     init: function() {
       this.scope.attr("controller", this);
       this.scope.attr("model", this.scope.model || this.scope.instance.constructor);
-      this.scope.instance.refresh();
+      if(!this.scope.instance._transient) {
+        //only refresh if there's not currently an edit modal spawned.
+        this.scope.instance.refresh();
+      }
     },
     //currently we don't support proxy object updates in mappings, so for now a change
     //  to a connected object (assuming we are operating on a proxy object) will trigger
@@ -359,12 +362,16 @@ can.Component.extend({
     //  generally for these.
     "input:not([data-mapping]), select change" : function(el) {
       if(el.is("[type=checkbox][multiple]")) {
-        this.scope.instance.attr(
-          el.attr("name"),
+        if(!this.scope.instance[el.attr("name")]) {
+          this.scope.instance.attr(el.attr("name"), new can.List());
+        }
+        this.scope.instance
+        .attr(el.attr("name"))
+        .replace(
           can.map(
-            this.scope.find("input[name='" + el.attr("name") + "']"),
+            this.element.find("input[name='" + el.attr("name") + "']:checked"),
             function(el) {
-              return el.val();
+              return $(el).val();
             }
           )
         );
