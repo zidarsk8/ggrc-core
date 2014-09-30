@@ -149,7 +149,6 @@
                         <h6>Pivot Object</h6>
                         <select class="input-block-level option-type-selector">
                           <optgroup label="Governance">
-                            <option></option>
                             <option value="Program">Programs</option>
                             <option value="Regulation">Regulations</option>
                             <option value="Standard">Standards</option>
@@ -186,9 +185,9 @@
                     <div class="relevance-filters">
                       <div class="row-fluid">
                         <div class="span12">
-                          <h6>Relevant Object set</h6>
+                          <h6>Relevant object set</h6>
                           <div class="single-line-filter">
-                            <select class="input-small">
+                            <select class="input-small relevant-set-choose">
                               <option value="Program" label="Program">Program</option>
                               <option value="Regulation">Regulation</option>
                               <option value="Policy">Policy</option>
@@ -208,14 +207,140 @@
                               <option value="Market">Market</option>
                             </select>
                           </div>
+
+                          <div class="relevant-set first">
+                            <ul>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Title
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Description
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Owner
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Contact
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Notes
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Control URL
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Reference URL
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Code
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Effective date
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Stop date
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  State
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Kind/Nature
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Fraud related
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Significance
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Type/Means
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Frequency
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Categories
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Assertions
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Principal assessor
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Secondary assessor
+                                </label>
+                              </li>
+                            </ul>
+                          </div>
+
                           <br>
                           <div id="newObjectSet">
-                            <h6>And relevant to</h6>
+                            <h6>2nd Relevant object set</h6>
                             <div class="single-line-filter">
                               <button type="submit" data-index="1" class="remove_filter" id="removeFilter">
                                 <i class="grcicon-deleted"></i>
                               </button>
-                              <select class="input-small">
+                              <select class="input-small second-relevant-set-choose">
                                 <option value="Program" label="Program">Program</option>
                                 <option value="Regulation">Regulation</option>
                                 <option value="Policy">Policy</option>
@@ -235,6 +360,84 @@
                                 <option value="Market">Market</option>
                               </select>
                             </div>
+
+                            <div class="relevant-set second">
+                            <ul>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Title
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Description
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Owner
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Contact
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Notes
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  System URL
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Reference URL
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Code
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Effective date
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Stop date
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  State
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Network zone
+                                </label>
+                              </li>
+                            </ul>
+                          </div>
+
                           </div>
                           <div class="add-rule">
                             <a href="javascript://" id="addFilterRule" class="addFilterRule"><i class="grcicon-show"></i> Add another set</a>
@@ -244,13 +447,137 @@
                     </div>
                   </div>
 
-                  <div class="save-template">
-                    <label class="small">
-                      <input type="checkbox" name="" id="" checked="checked" disabled="disabled">
-                      Save report as
-                    </label>
-                    <input type="text" class="input-medium" placeholder="" disabled="disabled">
-                    <button type="submit" class="btn btn-primary" disabled="disabled">Generate report</button>
+                  <div class="save-template-wrap">
+                    <div class="save-template">
+                      <label class="small">
+                        <input type="checkbox" name="" id="" checked="checked" disabled="disabled">
+                        Save report as
+                      </label>
+                      <input type="text" class="input-medium" placeholder="" disabled="disabled">
+                      <button type="submit" class="btn btn-primary" disabled="disabled">Generate report</button>
+                    </div>
+                  </div>
+
+                  <div class="empty-message-state" id="emptyMessageState">
+                    <p>Pivot object is not selected</p>
+                  </div>
+                  <div class="selected-object" id="selectedObject">
+                    <i class="grcicon-program-black"></i> PROG1
+                    <span class="pull-right">Date: 09/26/14</span>
+                  </div>
+
+                  <div class="generated-report" id="generatedReport">
+                    <table class="table table-bordered">
+                      <thead>
+                        <!--<col style="width: 14.2857%;">-->
+                        <tr>
+                          <th>Control Title</th>
+                          <th>Control Owner</th>
+                          <th>Control Code</th>
+                          <th>Control State</th>
+                          <th>System Title</th>
+                          <th>System Code</th>
+                          <th>System State</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>CTRL 1</td>
+                          <td>John Doe</td>
+                          <td>CT000</td>
+                          <td>Draft</td>
+                          <td>SYS1.1</td>
+                          <td>S001</td>
+                          <td>Final</td>
+                        </tr>
+                        <tr>
+                          <td>CTRL 1</td>
+                          <td>John Doe</td>
+                          <td>CT000</td>
+                          <td>Draft</td>
+                          <td>SYS1.2</td>
+                          <td>S002</td>
+                          <td>Maintenance</td>
+                        </tr>
+                        <tr>
+                          <td>CTRL 1</td>
+                          <td>John Doe</td>
+                          <td>CT000</td>
+                          <td>Effective</td>
+                          <td>SYS1.3</td>
+                          <td>S003</td>
+                          <td>Final</td>
+                        </tr>
+                        <tr>
+                          <td>CTRL 2</td>
+                          <td>Lisa Mona</td>
+                          <td>CT002</td>
+                          <td>Effective</td>
+                          <td>SYS2.1</td>
+                          <td>S004</td>
+                          <td>Final</td>
+                        </tr>
+                        <tr>
+                          <td>CTRL 3</td>
+                          <td>Karim Abdul</td>
+                          <td>CT045</td>
+                          <td>Ineffective</td>
+                          <td>SYS3.1</td>
+                          <td>SX</td>
+                          <td>Final</td>
+                        </tr>
+                        <tr>
+                          <td>CTRL 3</td>
+                          <td>Karim Abdul</td>
+                          <td>CT045</td>
+                          <td>Ineffective</td>
+                          <td>SYS3.2</td>
+                          <td>SXa</td>
+                          <td>Draft</td>
+                        </tr>
+                        <tr>
+                          <td>CTRL 4</td>
+                          <td>Manny Manning</td>
+                          <td>CT-AK-47a</td>
+                          <td>Effective</td>
+                          <td>SYS4.1</td>
+                          <td>SX11</td>
+                          <td>Draft</td>
+                        </tr>
+                        <tr>
+                          <td>CTRL 4</td>
+                          <td>Manny Manning</td>
+                          <td>CT-AK-47a</td>
+                          <td>Effective</td>
+                          <td>SYS4.2</td>
+                          <td>SX12</td>
+                          <td>Final</td>
+                        </tr>
+                        <tr>
+                          <td>CTRL 4</td>
+                          <td>Manny Manning</td>
+                          <td>CT-AK-47a</td>
+                          <td>Effective</td>
+                          <td>SYS4.3</td>
+                          <td>SX13</td>
+                          <td>Final</td>
+                        </tr>
+                        <tr>
+                          <td>CTRL 5</td>
+                          <td>Carl Grove</td>
+                          <td>CT-PR</td>
+                          <td>Effective</td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <a href="#" class="btn btn-primary pull-right"><i class="grcicon-export-white"></i> Export to CSV</a>
+                  </div>
+
+                  <div class="zero-state" id="zeroState">
+                    <h2>No results for the current search</h2>
                   </div>
                 </section>
               </section>

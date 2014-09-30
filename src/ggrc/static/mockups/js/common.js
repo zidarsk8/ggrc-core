@@ -666,6 +666,51 @@ $(document).ready(function(){
     }
   });
 
+  // Custom reporting
+  $('.relevant-set-choose').change(function() {
+    if (this.value == 'Control') {
+      $('.relevant-set.first').slideDown(500);
+    } else {
+      $('.relevant-set.first').slideUp(500);
+    }
+  });
+
+  $('.second-relevant-set-choose').change(function() {
+    if (this.value == 'System') {
+      $('.relevant-set.second').slideDown(500);
+    } else {
+      $('.relevant-set.second').slideUp(500);
+    }
+  });
+
+  $('.option-type-selector').change(function() {
+    if (this.value == 'Program') {
+      $("#emptyMessageState").fadeOut(500);
+      $("#selectedObject").delay(500).fadeIn(500);
+    } else {
+      $("#selectedObject").fadeOut(500);
+      $("#emptyMessageState").delay(500).fadeIn(500);
+    }
+  });
+
+  $('.relevant-set input[type=checkbox]').change(function() {
+    if($(this).prop('checked')) {
+      $("#zeroState").fadeOut(500);
+      $("#generatedReport").delay(500).fadeIn(500);
+      $(".save-template label").removeClass("disabled");
+      $(".save-template input[type=checkbox]").removeAttr("disabled");
+      $(".save-template input[type=text]").removeAttr("disabled");
+      $(".save-template button").removeAttr("disabled");
+    } else {
+      $("#generatedReport").fadeOut(500);
+      $("#zeroState").delay(500).fadeIn(500);
+      $(".save-template label").addClass("disabled");
+      $(".save-template input[type=checkbox]").attr("disabled", true);
+      $(".save-template input[type=text]").attr("disabled", true);
+      $(".save-template button").attr("disabled", true);
+    }
+  });
+
 });
 
 // Grid View Example
