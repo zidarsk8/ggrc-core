@@ -23,7 +23,7 @@
 {{/if}}
 {{#if model}}
 {{#is_allowed "create" model.shortName context=null}}
-<li class="ui-menu-item add-new" data-ui-autocomplete-item="">
+<li class="ui-menu-item add-new oneline" data-ui-autocomplete-item="">
   <a data-object-plural="{{model.table_plural}}" data-modal-class="modal-wide" href="javascript://" data-object-singular="{{model.model_singular}}" data-toggle="modal-ajax-form" data-modal-reset="reset" data-mapping="{{mapping}}">
     + Create New
   </a>
