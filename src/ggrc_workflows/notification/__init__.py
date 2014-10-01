@@ -60,21 +60,21 @@ def get_workflow_owner(workflow):
     return user_role.person
 
 def get_task_workflow_owner(task):
-  workflow=get_task_workflow(task) 
+  workflow=get_task_workflow(task)
   if workflow is None:
     current_app.logger.warn("Notification Trigger: workflow is not found for task " + task.title)
     return None
   return get_workflow_owner(workflow)
 
 def get_taskgroup_workflow_owner(task_group):
-  workflow=get_taskgroup_workflow(task_group) 
+  workflow=get_taskgroup_workflow(task_group)
   if workflow is None:
     current_app.logger.warn("Notification Trigger: workflow is not found for task group " + task_group.title)
     return None
   return get_workflow_owner(workflow)
 
 def get_cycle_workflow_owner(cycle):
-  workflow=get_cycle_workflow(cycle) 
+  workflow=get_cycle_workflow(cycle)
   if workflow is None:
     current_app.logger.warn("Notification Trigger: workflow is not found for cycle" + cycle.title)
     return None
@@ -88,7 +88,7 @@ def get_task_workflow(task):
   return get_cycle_workflow(cycle)
 
 def get_taskgroup_workflow(task_group):
-  cycle=get_taskgroup_cycle(task_group) 
+  cycle=get_taskgroup_cycle(task_group)
   if cycle is None:
     current_app.logger.warn("Notification Trigger: cycle is not found for task group " + task_group.title)
     return None
@@ -113,9 +113,9 @@ def get_task_assignee(task):
   if cycle is None:
     current_app.logger.warn("Notification Trigger: cycle is not found for task " + task.title)
     return None
-   
+
 def get_cycle(task):
-  task_group=get_taskgroup(task) 
+  task_group=get_taskgroup(task)
   if task_group is None:
     current_app.logger.warn("Notification Trigger: cycle task group is not found for task " + task.title)
     return None
@@ -232,9 +232,9 @@ def prepare_notification_for_tasks_now(sender, recipient, subject, email_content
 
 def handle_tasks_overdue():
   frequency_mapping =  {
-    "weekly" : 1, 
-    "monthly" : 3, 
-    "quarterly": 7, 
+    "weekly" : 1,
+    "monthly" : 3,
+    "quarterly": 7,
     "annually": 15
    }
   tasks=db.session.query(models.CycleTaskGroupObjectTask).\
@@ -258,7 +258,7 @@ def handle_tasks_overdue():
       continue
     workflow_owner=contact[0]
     assignee=contact[1]
-    if not frequency_mapping.has_key(cycle.workflow.frequency):  
+    if not frequency_mapping.has_key(cycle.workflow.frequency):
       continue
     num_days=frequency_mapping[cycle.workflow.frequency]
     if task.end_date != (datetime.utcnow().date() + timedelta(num_days)):
@@ -457,7 +457,7 @@ def handle_task_put(sender, obj=None, src=None, service=None):
       "<b>task</b></a></p>" + \
       "Thanks,<br>gGRC Team"
   elif notif_pri == PRI_TASK_DECLINED:
-    subject=user.name + " declined " +  obj.title 
+    subject=user.name + " declined " +  obj.title
     content="Hi " + assignee.name + ",<br>" + \
       "<p>" + user.name  + " declined task: " + obj.title + task_object + \
       ", under workflow: " + \
@@ -545,11 +545,11 @@ def prepare_notification_for_completed_cycle(cycle, subject, notif_pri, notify_c
   members=[workflow_owner]
   for member in members:
     email_content = "Hi " + member.name + ",<br>" + \
-      "<p>All tasks for " + cycle.title + " scheduled for this cycle" 
+      "<p>All tasks for " + cycle.title + " scheduled for this cycle"
     if cycle.start_date and cycle.end_date:
       email_content = email_content + \
         "[" + cycle.start_date.strftime("%m/%d/%y") + "] - " + \
-        "[" + cycle.end_date.strftime("%m/%d/%y") + "]" 
+        "[" + cycle.end_date.strftime("%m/%d/%y") + "]"
     email_content = email_content + \
       " are completed </p>" + \
       "<p>Click here to view your <a href=" + '"'  + \
@@ -561,7 +561,7 @@ def prepare_notification_for_completed_cycle(cycle, subject, notif_pri, notify_c
       cycle.workflow._inflector.table_plural + \
       "/" + str(cycle.workflow.id) + "#current_widget" + '"' + ">" + \
       cycle.title + "</a>"
-    email_contents[member.id]=email_content 
+    email_contents[member.id]=email_content
 
   prepare_notification(cycle, 'Email_Now', notif_pri, subject, email_contents, \
     workflow_owner, members, override=override_flag)
@@ -589,14 +589,14 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
     email_content = "Hi " + member.name + ",<br>" + \
       "<p>New Workflow <a href=" + '"' +  request.url_root + workflow._inflector.table_plural + \
       "/" + str(workflow.id) + "#current_widget" + '"' + ">" + \
-      "<b>" + cycle.title + "</b></a>" + begins_in_days + "<br></p>" 
+      "<b>" + cycle.title + "</b></a>" + begins_in_days + "<br></p>"
     if notify_custom_message is True and workflow.notify_custom_message is not None:
      email_content="<p>" + email_content + workflow.notify_custom_message + "</p>"
     email_digest_contents[member.id]= "<a href=" + '"' +  request.url_root + \
       cycle.workflow._inflector.table_plural + \
       "/" + str(cycle.workflow.id) + "#current_widget" + '"' + ">" + \
       cycle.title + "</a>"
-    email_contents[member.id]=email_content 
+    email_contents[member.id]=email_content
     if cycle.start_date and cycle.end_date:
       email_contents[member.id]=email_contents[member.id] + \
         "<p>First cycle starts on " + cycle.start_date.strftime("%m/%d/%y") + \
@@ -641,7 +641,7 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
     "Thanks,<br>gGRC Team"
   for member in members:
     email_contents[member.id]=email_contents[member.id]+end_email_content
- 
+
   prepare_notification(cycle, 'Email_Now', notif_pri, subject, email_contents, \
     workflow_owner, members, override=override_flag)
   prepare_notification(cycle, 'Email_Digest', notif_pri, subject, email_digest_contents, \
@@ -692,7 +692,7 @@ class WorkflowCalendarService(CalendarService):
     workflow=get_cycle_workflow(cycle)
     if workflow is None:
       current_app.logger.warn("Workflow not found for cycle " + cycle.title)
-      return 
+      return
     workflow_owner=get_workflow_owner(workflow)
     if workflow_owner is None:
       current_app.logger.warn("Workflow owner not found for workflow " + workflow.title)
@@ -702,7 +702,7 @@ class WorkflowCalendarService(CalendarService):
     if calendar is None and user.id != workflow_owner.id:
       current_app.logger.warn("Workflow owner and super user roles can create Calendar")
       return
-    if calendar is None: 
+    if calendar is None:
       calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
       if calendar is None:
         current_app.logger.error("Unable to create calendar entry for workflow " + workflow.title)
@@ -750,11 +750,11 @@ class WorkflowCalendarService(CalendarService):
     workflow=get_taskgroup_workflow(task_group)
     if workflow is None:
       current_app.logger.warn("Workflow not found for task group " + task_group.title)
-      return 
+      return
     cycle=get_taskgroup_cycle(task_group)
     if cycle is None:
       current_app.logger.warn("cycle not found for task group " + task_group.title)
-      return 
+      return
     workflow_owner=get_workflow_owner(workflow)
     if workflow_owner is None:
       current_app.logger.warn("Workflow owner not found for workflow " + workflow.title)
@@ -810,7 +810,7 @@ class WorkflowCalendarService(CalendarService):
         'writer')
       if calendar_acls is None:
         current_app.logger.error("Unable to create ACLs for workflow "  + workflow.title)
-        return 
+        return
         #raise Forbidden()
     calendar_notification = notif.prepare([task_group], workflow_owner, assignees, subject, content)
     if calendar_notification is not None:
@@ -820,7 +820,7 @@ class WorkflowCalendarService(CalendarService):
     workflow=get_taskgroup_workflow(task_group)
     if workflow is None:
       current_app.logger.warn("Workflow not found for task group " + task_group.title)
-      return 
+      return
     workflow_owner=get_workflow_owner(workflow)
     if workflow_owner is None:
       current_app.logger.warn("Workflow owner not found for workflow " + workflow.title)
@@ -851,13 +851,13 @@ def notify_email_digest():
   db.session.commit()
 
 def notify_email_deferred():
-  """ Processing of deferred emails in particular handling Task/Undo 
+  """ Processing of deferred emails in particular handling Task/Undo
   """
   email_deferred=EmailDeferredNotification()
   email_deferred.notify()
   db.session.commit()
 
-  """ Processing of deferred email digest in particular handling Task/Undo 
+  """ Processing of deferred email digest in particular handling Task/Undo
       Marking notification type to be EmailDigest
   """
   email_digest_deferred=EmailDigestDeferredNotification()
