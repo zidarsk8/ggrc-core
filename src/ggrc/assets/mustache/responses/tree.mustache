@@ -188,15 +188,6 @@
       </div>
       {{/child_options.1}}
       {{/if_equals}}
-      {{#child_options.0}}
-      <div class="inner-tree">
-        <h6>Mapped Objects ({{child_options.0.list.length}})
-                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
-        </h6>
-        <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
-        </ul>
-      </div>
-      {{/child_options.0}}
       {{#if_equals instance.response_type 'interview'}}
       {{#child_options.2}}
       <div class="inner-tree">
@@ -268,6 +259,15 @@
         </ul>
       </div>
       {{/if_equals}}
+      {{#child_options.0}}
+      <div class="inner-tree">
+        <h6>Mapped Objects ({{child_options.0.list.length}})
+                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
+        </h6>
+        <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
+        </ul>
+      </div>
+      {{/child_options.0}}
 
     </div>
     {{/if}}
