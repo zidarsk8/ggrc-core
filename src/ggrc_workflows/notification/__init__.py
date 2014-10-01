@@ -128,10 +128,7 @@ def get_cycle_workflow(cycle):
   return cycle.workflow
 
 def get_taskgroup(task):
-  task_group_object=task.cycle_task_group_object
-  if task_group_object == None:
-    return None
-  return task_group_object.cycle_task_group
+  return task.cycle_task_group
 
 def get_task_contacts(task):
   workflow_owner=get_task_workflow_owner(task)
@@ -195,8 +192,11 @@ def get_workflow_tasks(workflow):
          tasks_found[task.id]=task
   return ret_tasks
 
-def get_task_object(task):
-   return task.cycle_task_group_object
+def get_task_object_string(task):
+  task_object = task.cycle_task_group_object
+  if not task_object:
+    return ""
+  return " for " + task_object.title
 
 def prepare_notification_for_task(task, sender, recipient, subject, email_content, notif_pri):
   workflow=get_task_workflow(task)
@@ -277,8 +277,8 @@ def handle_tasks_overdue():
       break
     for item in items:
       (assignee, task, subject)=item
-      task_object=get_task_object(task)
-      email_content=email_content+"<li>" + task.title + ", for " + task_object.title + "</li>"
+      task_object=get_task_object_string(task)
+      email_content=email_content+"<li>" + task.title + task_object + "</li>"
       email_digest_contents={}
       email_digest_contents[assignee.id]="<a href=" + '"'  + \
         request.url_root + "dashboard#task_widget"  + '"' + ">" + \
@@ -333,8 +333,8 @@ def handle_tasks_due(num_days):
       break
     for item in items:
       (assignee, task)=item
-      task_object=get_task_object(task)
-      email_content=email_content+"<li>" + task.title + ", for " + task_object.title + "</li>"
+      task_object=get_task_object_string(task)
+      email_content=email_content+"<li>" + task.title + task_object + "</li>"
       email_digest_contents={}
       email_digest_contents[assignee.id]="<a href=" + '"'  + \
         request.url_root + "dashboard#task_widget"  + '"' + ">" + \
@@ -440,14 +440,14 @@ def handle_task_put(sender, obj=None, src=None, service=None):
     return
   user=get_current_user()
   cycle=get_cycle(obj)
-  task_object=get_task_object(obj)
-  if cycle is None or object is None: 
+  task_object=get_task_object_string(obj)
+  if cycle is None or object is None:
     current_app.logger.error("Unable to find cycle or object for task: " + task.title)
     return
   if notif_pri == PRI_TASK_ASSIGNED:
     subject="Task " +  obj.title + " is assigned to you"
     content="Hi " + assignee.name + ",<br>" + \
-      "<p>" + user.name  + " assigned task: " + obj.title + " for " + task_object.title + \
+      "<p>" + user.name  + " assigned task: " + obj.title + task_object + \
       ", under workflow: " + \
       "<a href=" + '"' +  request.url_root + cycle.workflow._inflector.table_plural + \
       "/" + str(cycle.workflow.id) + "#current_widget" + '"' + \
@@ -459,7 +459,7 @@ def handle_task_put(sender, obj=None, src=None, service=None):
   elif notif_pri == PRI_TASK_DECLINED:
     subject=user.name + " declined " +  obj.title 
     content="Hi " + assignee.name + ",<br>" + \
-      "<p>" + user.name  + " declined task: " + obj.title + " for " + task_object.title + \
+      "<p>" + user.name  + " declined task: " + obj.title + task_object + \
       ", under workflow: " + \
       "<a href=" + '"' +  request.url_root + cycle.workflow._inflector.table_plural + \
       "/" + str(cycle.workflow.id) + "#current_widget" + '"' + \
@@ -618,11 +618,10 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
           "<p>You are assigned the following tasks: </p><ul>"
         tasks=task_for_contact[member.id]
         for task in tasks:
-          task_object=get_task_object(task)
-          if task_object:
-            email_content=email_content + "<li>" + \
-              task.title + ", " + "for " + task_object.title +  ", " + \
-              "due on " +  task.end_date.strftime("%m/%d/%y") +  "</li>"
+          task_object=get_task_object_string(task)
+          email_content=email_content + "<li>" + \
+            task.title + task_object +  ", " + \
+            "due on " +  task.end_date.strftime("%m/%d/%y") +  "</li>"
         email_contents[member.id]=email_content+"</ul>"
 
   end_email_content= \
