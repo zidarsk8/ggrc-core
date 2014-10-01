@@ -358,6 +358,9 @@ can.Control("CMS.Controllers.LHN", {
     , $bar = $("#lhn>.bar-v")
     , $obj_bar = $(".objnav.bar-v")
     , $search = $('.widgetsearch')
+    , $lhs_label_right = $(".lhs-search .my-work-right")
+    , $lhs_label = $(".lhs-search .my-work-label")
+    , lhn_second_row = 201
     ;
     //if(resize < this.min_lhn_size/2 && !$lhs.hasClass("lhs-closed")) this.toggle_lhs(); THIS IS RE-CODED BELOW THIS LINE. Instead of min_lhn_size I've added size of 40px
     if(resize < 40 && !$lhs.hasClass("lhs-closed")) this.toggle_lhs();
@@ -365,6 +368,15 @@ can.Control("CMS.Controllers.LHN", {
     if(resize < 40) return;
     if($lhs.hasClass("lhs-closed")) this.toggle_lhs();
     $lhsHolder.width(resize);
+
+    // LHN search radio buttons oneline fix
+    if(resize < lhn_second_row) {
+      $lhs_label_right.removeClass("pull-right");
+      $lhs_label.addClass("oneline");
+    } else {
+      $lhs_label_right.addClass("pull-right");
+      $lhs_label.removeClass("oneline");
+    }
 
     var a = (resize) + "px";
     var b = (resize+8) + "px"
