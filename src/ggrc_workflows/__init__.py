@@ -192,6 +192,29 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
     build_cycle(obj, current_user=current_user)
 
 
+def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
+                       frequency, base_date):
+  start_date = task_group_task.calc_start_date(frequency, base_date)
+  end_date = task_group_task.calc_end_date(frequency, base_date, start_date)
+  cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
+      context=cycle.context,
+      cycle=cycle,
+      cycle_task_group=cycle_task_group,
+      task_group_task=task_group_task,
+      title=task_group_task.title,
+      description=task_group_task.description,
+      sort_index=task_group_task.sort_index,
+      start_date=start_date,
+      end_date=end_date,
+      contact=task_group_task.contact,
+      status="Assigned",
+      modified_by=current_user,
+      task_type=task_group_task.task_type,
+      response_options=task_group_task.response_options,
+  )
+  return cycle_task_group_object_task
+
+
 def build_cycle(obj, current_user=None):
   # Determine the relevant Workflow
   workflow = obj.workflow
@@ -232,6 +255,15 @@ def build_cycle(obj, current_user=None):
         sort_index=task_group.sort_index,
         )
 
+    if len(task_group.task_group_objects) == 0:
+      for task_group_task in task_group.task_group_tasks:
+        cycle_task_group_object_task = _create_cycle_task(
+            task_group_task, obj, cycle_task_group, current_user,
+            frequency, base_date
+        )
+        cycle_task_group.cycle_task_group_tasks.append(
+            cycle_task_group_object_task)
+
     for task_group_object in task_group.task_group_objects:
       object = task_group_object.object
 
@@ -249,24 +281,10 @@ def build_cycle(obj, current_user=None):
           cycle_task_group_object)
 
       for task_group_task in task_group.task_group_tasks:
-        start_date = task_group_task.calc_start_date(frequency, base_date)
-        end_date = task_group_task.calc_end_date(frequency, base_date, start_date)
-        cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
-          context=obj.context,
-          cycle=obj,
-          #cycle_task_group_object=cycle_task_group_object,
-          task_group_task=task_group_task,
-          title=task_group_task.title,
-          description=task_group_task.description,
-          sort_index=task_group_task.sort_index,
-          start_date=start_date,
-          end_date=end_date,
-          contact=task_group_task.contact,
-          status="Assigned",
-          modified_by=current_user,
-          task_type=task_group_task.task_type,
-          response_options=task_group_task.response_options,
-          )
+        cycle_task_group_object_task = _create_cycle_task(
+            task_group_task, obj, cycle_task_group, current_user,
+            frequency, base_date
+        )
         cycle_task_group_object.cycle_task_group_object_tasks.append(
             cycle_task_group_object_task)
 
@@ -281,16 +299,14 @@ def build_cycle(obj, current_user=None):
 
 # 'InProgress' states propagate via these links
 _cycle_object_parent_attr = {
-    models.CycleTaskGroupObjectTask: 'cycle_task_group_object',
-    models.CycleTaskGroupObject: 'cycle_task_group',
-    models.CycleTaskGroup: 'cycle'
+    models.CycleTaskGroupObjectTask: ['cycle_task_group_object', 'cycle_task_group'],
+    models.CycleTaskGroup: ['cycle']
     }
 
 # 'Finished' and 'Verified' states are determined via these links
 _cycle_object_children_attr = {
-    models.CycleTaskGroupObject: 'cycle_task_group_object_tasks',
-    models.CycleTaskGroup: 'cycle_task_group_objects',
-    models.Cycle: 'cycle_task_groups'
+    models.CycleTaskGroup: ['cycle_task_group_objects', 'cycle_task_group_tasks'],
+    models.Cycle: ['cycle_task_groups']
     }
 
 
@@ -299,64 +315,43 @@ def update_cycle_object_child_state(obj):
   status_order = (None, 'Assigned', 'InProgress',
                   'Declined', 'Finished', 'Verified')
   status = obj.status
-  children_attr = _cycle_object_children_attr.get(type(obj), None)
-  if children_attr:
-    children = getattr(obj, children_attr, None)
-    for child in children:
-      if status == 'Declined' or \
-         status_order.index(status) > status_order.index(child.status):
-        if is_allowed_update(type(child), child.context):
-          old_status = child.status
-          child.status = status
-          db.session.add(child)
-          status_change.send(
-              child.__class__,
-              obj=child,
-              new_status=child.status,
-              old_status=old_status
-          )
-        update_cycle_object_child_state(child)
+  children_attrs = _cycle_object_children_attr.get(type(obj), [])
+  for children_attr in children_attrs:
+    if children_attr:
+      children = getattr(obj, children_attr, None)
+      for child in children:
+        if status == 'Declined' or \
+           status_order.index(status) > status_order.index(child.status):
+          if is_allowed_update(type(child), child.context):
+            old_status = child.status
+            child.status = status
+            db.session.add(child)
+            status_change.send(
+                child.__class__,
+                obj=child,
+                new_status=child.status,
+                old_status=old_status
+            )
+          update_cycle_object_child_state(child)
 
 
 def update_cycle_object_parent_state(obj):
-  parent_attr = _cycle_object_parent_attr.get(type(obj), None)
-  if not parent_attr:
-    return
+  parent_attrs = _cycle_object_parent_attr.get(type(obj), [])
+  for parent_attr in parent_attrs:
+    if not parent_attr:
+      continue
 
-  parent = getattr(obj, parent_attr, None)
-  if not parent:
-    return
+    parent = getattr(obj, parent_attr, None)
+    if not parent:
+      continue
 
-  # If any child is `InProgress`, then parent should be `InProgress`
-  if obj.status == 'InProgress' or obj.status == 'Declined':
-    if parent.status != 'InProgress':
-      if is_allowed_update(type(parent), parent.context):
-        old_status = parent.status
-        parent.status = 'InProgress'
-        db.session.add(parent)
-        status_change.send(
-            parent.__class__,
-            obj=parent,
-            new_status=parent.status,
-            old_status=old_status
-            )
-      update_cycle_object_parent_state(parent)
-  # If all children are `Finished` or `Verified`, then parent should be same
-  elif obj.status == 'Finished' or obj.status == 'Verified':
-    children_attr = _cycle_object_children_attr.get(type(parent), None)
-    if children_attr:
-      children = getattr(parent, children_attr, None)
-      children_finished = True
-      children_verified = True
-      for child in children:
-        if child.status != 'Verified':
-          children_verified = False
-          if child.status != 'Finished':
-            children_finished = False
-      if children_verified:
+    # If any child is `InProgress`, then parent should be `InProgress`
+    if obj.status == 'InProgress' or obj.status == 'Declined':
+      if parent.status != 'InProgress':
         if is_allowed_update(type(parent), parent.context):
-          old_status=parent.status
-          parent.status = 'Verified'
+          old_status = parent.status
+          parent.status = 'InProgress'
+          db.session.add(parent)
           status_change.send(
               parent.__class__,
               obj=parent,
@@ -364,17 +359,41 @@ def update_cycle_object_parent_state(obj):
               old_status=old_status
               )
         update_cycle_object_parent_state(parent)
-      elif children_finished:
-        if is_allowed_update(type(parent), parent.context):
-          old_status=parent.status
-          parent.status = 'Finished'
-          status_change.send(
-              parent.__class__,
-              obj=parent,
-              new_status=parent.status,
-              old_status=old_status
-              )
-        update_cycle_object_parent_state(parent)
+    # If all children are `Finished` or `Verified`, then parent should be same
+    elif obj.status == 'Finished' or obj.status == 'Verified':
+      children_attrs = _cycle_object_children_attr.get(type(parent), [])
+      for children_attr in children_attrs:
+        if children_attr:
+          children = getattr(parent, children_attr, None)
+          children_finished = True
+          children_verified = True
+          for child in children:
+            if child.status != 'Verified':
+              children_verified = False
+              if child.status != 'Finished':
+                children_finished = False
+          if children_verified:
+            if is_allowed_update(type(parent), parent.context):
+              old_status=parent.status
+              parent.status = 'Verified'
+              status_change.send(
+                  parent.__class__,
+                  obj=parent,
+                  new_status=parent.status,
+                  old_status=old_status
+                  )
+            update_cycle_object_parent_state(parent)
+          elif children_finished:
+            if is_allowed_update(type(parent), parent.context):
+              old_status=parent.status
+              parent.status = 'Finished'
+              status_change.send(
+                  parent.__class__,
+                  obj=parent,
+                  new_status=parent.status,
+                  old_status=old_status
+                  )
+            update_cycle_object_parent_state(parent)
 
 
 def ensure_assignee_is_workflow_member(workflow, assignee):

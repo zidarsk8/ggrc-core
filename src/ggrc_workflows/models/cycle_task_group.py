@@ -26,6 +26,11 @@ class CycleTaskGroup(
       backref='cycle_task_group',
       cascade='all, delete-orphan'
       )
+  cycle_task_group_tasks = db.relationship(
+      'CycleTaskGroupObjectTask',
+      backref='cycle_task_group',
+      cascade='all, delete-orphan'
+      )
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
   next_due_date = db.Column(db.Date)
@@ -34,6 +39,7 @@ class CycleTaskGroup(
       'cycle',
       'task_group',
       'cycle_task_group_objects',
+      'cycle_task_group_tasks',
       'sort_index',
       'next_due_date',
       ]
