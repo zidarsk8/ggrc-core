@@ -90,7 +90,8 @@ class TaskGroupTask(
         'relative_start_month', 'relative_start_day',
         'relative_end_month', 'relative_end_day',
         'start_date', 'end_date',
-        'contact', 'modified_by'
+        'contact', 'modified_by',
+        'task_type', 'response_options',
         ]
 
     contact = None
