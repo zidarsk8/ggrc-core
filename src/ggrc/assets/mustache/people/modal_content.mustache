@@ -18,20 +18,15 @@
       <input tabindex="2" class="span12" id="person_email" name="email" placeholder="email@company.com" size="30" type="text" value="{{email}}">
       <span class="help-inline">
       </span>
-
       <br>
     </div>
-    <!--div class="span3">
-      <label for="person-language">Language</label>
-      <select class="input-small" id="person-language" name="language_id" tabindex="3">
-      </select>
+    <div class="span3">
+      <label for="person_is_enabled">Enabled <span class="required">*</span></label>
+      <input type="checkbox" tabindex="3" id="person_is_enabled" name="is_enabled" value="{{is_enabled}}" {{#if instance.is_enabled}}checked="checked"{{/if}} >
       <span class="help-inline">
       </span>
+      <br>
     </div>
-    <div class="span2 disabled fltrt">
-      <label>Status</label>
-      <input tabindex="4" class="span12" disabled="disabled" placeholder="Deprecated" type="text">
-    </div-->
   </div>
   <div class="row-fluid">
     <div class="span12">

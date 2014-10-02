@@ -21,35 +21,50 @@
 </div>
 <div class="selector-list people-selector">
   <ul class="new-tree tree-structure">
-    {{#options}}
-    <li class="tree-item" {{ data 'option' }} data-id="{{ id }}">
-      <div class="item-main">
-        <div class="openclose">
-          <a class="openclose-placeholder" href="javascript://"> </a>
-          <div class="row-fluid">
-            <div class="span11">
-              <div class="item-data">
-                <div class="tree-title-area">
-                  {{name}}
+    {{#if selected_object.is_enabled}}
+      {{#options}}
+      <li class="tree-item" {{ data 'option' }} data-id="{{ id }}">
+        <div class="item-main">
+          <div class="openclose">
+            <a class="openclose-placeholder" href="javascript://"> </a>
+            <div class="row-fluid">
+              <div class="span11">
+                <div class="item-data">
+                  <div class="tree-title-area">
+                    {{name}}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="span1">
-              <input type="radio" name="map" rel="tooltip" title="map">
+              <div class="span1">
+                <input type="radio" name="map" rel="tooltip" title="map">
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="tier-2-info item-content">
-        <div class="tier-2-info-content">
-          <p>{{{description}}}</p>
+        <div class="tier-2-info item-content">
+          <div class="tier-2-info-content">
+            <p>{{{description}}}</p>
 
-          {{{render_hooks 'Role.option_detail'}}}
+            {{{render_hooks 'Role.option_detail'}}}
 
-          {{#scope}}<p><strong>Role Scope:</strong> {{scope}}</p>{{/scope}}
+            {{#scope}}<p><strong>Role Scope:</strong> {{scope}}</p>{{/scope}}
+          </div>
         </div>
-      </div>
-    </li>
-    {{/options}}
+      </li>
+      {{/options}}
+    {{else}}
+      <li class="tree-item">
+        <div class="item-main">
+          <div class="row-fluid">
+            <div class="span11">
+              <div class="item-data">
+                <p>This user is disabled and cannot be granted authorizations.
+                  They currently have "No Access".</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    {{/if}}
   </ul>
 </div>
