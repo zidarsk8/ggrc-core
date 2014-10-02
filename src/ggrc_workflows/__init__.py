@@ -305,6 +305,7 @@ _cycle_object_parent_attr = {
 
 # 'Finished' and 'Verified' states are determined via these links
 _cycle_object_children_attr = {
+    models.CycleTaskGroupObject: ['cycle_task_group_object_tasks'],
     models.CycleTaskGroup: ['cycle_task_group_objects', 'cycle_task_group_tasks'],
     models.Cycle: ['cycle_task_groups']
     }
