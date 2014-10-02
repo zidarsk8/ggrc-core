@@ -2,14 +2,14 @@
 """Cycle tasks without objects
 
 Revision ID: 1865596d21dc
-Revises: 4c6ce142b434
+Revises: 4dd3191323da
 Create Date: 2014-09-30 14:07:16.347636
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '1865596d21dc'
-down_revision = '4c6ce142b434'
+down_revision = '4dd3191323da'
 
 from alembic import op
 import sqlalchemy as sa
