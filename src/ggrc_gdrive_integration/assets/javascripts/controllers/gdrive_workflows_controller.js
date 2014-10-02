@@ -182,64 +182,12 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   */
 
   , create_audit_folder : partial_proxy(create_folder, CMS.Models.Audit, function(inst) { return inst.title; }, "program")
-  , "{CMS.Models.Audit} created" : function(model, ev, instance) {
-    if(instance instanceof CMS.Models.Audit) {
-      var that = this;
-      this._audit_create_in_progress = true;
-      instance.delay_resolving_save_until(
-         instance.program.reify().refresh()
-        .then(this.proxy("create_folder_if_nonexistent"))
-        .then($.proxy(instance.program.reify(), "refresh"))
-        .then(function() {
-          return that.create_audit_folder(model, ev, instance);
-         })
-        .always(function(){
-          delete that._audit_create_in_progress;
-        })
-      );
-    }
-  }
-
-  // if we had to wait for an Audit to get its own folder link on creation, we can now do the delayed creation
-  //  of folder links for the audit's requests, which were created first in the PBC workflow
-  , "{CMS.Models.ObjectFolder} created" : function(model, ev, instance) {
-    var i, that = this, folderable, create_deferreds = [];
-    if(instance instanceof CMS.Models.ObjectFolder && (folderable = instance.folderable.reify()) instanceof CMS.Models.Audit) {
-      instance.delay_resolving_save_until(
-        folderable.refresh().then(function() {
-          return folderable.get_binding("folders").refresh_instances().then(function() {
-            for(i = that.request_create_queue.length; i--;) {
-              if(that.request_create_queue[i].audit.reify() === instance.folderable.reify()) {
-                if(that.request_create_queue[i].objective) {
-                  create_deferreds.push(that.create_request_folder(CMS.Models.Request, ev, that.request_create_queue[i]));
-                } else {
-                  var dfd = new CMS.Models.ObjectFolder({
-                    folder_id : instance.folder_id
-                    , folderable : that.request_create_queue[i]
-                    , context : that.request_create_queue[i].context || { id : null }
-                  }).save();
-                  create_deferreds.push(dfd);
-                  report_progress(
-                    'Linking new Request to Audit folder'
-                    , dfd
-                  );
-                }
-                that.request_create_queue.splice(i, 1);
-              }
-            }
-            return $.when.apply($, create_deferreds);
-          });
-        })
-      );
-    }
-  }
 
   // When creating requests as part of audit workflow, wait for audit to have a folder link before
   // trying to create subfolders for request.  If the audit and its folder link are already created
   //  we can do the request folder immediately.
   , create_request_folder : partial_proxy(
     create_folder, CMS.Models.Request, function(inst) { return inst.objective.reify().title; }, "audit")
-  , "{CMS.Models.Request} created" : "link_request_to_new_folder_or_audit_folder"
 
   , link_request_to_new_folder_or_audit_folder : function(model, ev, instance) {
     if(instance instanceof CMS.Models.Request) {
@@ -621,12 +569,6 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     );
   }
 
-  , "{CMS.Models.Program} updated" : function(model, ev, instance) {
-    if(instance instanceof CMS.Models.Program) {
-      instance.delay_resolving_save_until(this.update_permissions(model, ev, instance));
-    }
-  }
-  , "{CMS.Models.Audit} updated" : "update_audit_owner_permission"
   , update_audit_owner_permission : function(model, ev, instance){
 
     if(!(instance instanceof CMS.Models.Audit)) {
@@ -635,7 +577,6 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
     var dfd = instance.delay_resolving_save_until(this.update_permissions(model, ev, instance));
   }
-  , "{CMS.Models.Request} updated" : "update_request_folder"
 
   , update_request_folder : function(model, ev, instance) {
     var that = this;
@@ -858,7 +799,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       el.trigger(
         "ajax:flash"
         , {
-          warning : 'Can\'t upload: No GDrive folder found for PBC Request '
+          warning : 'Can\'t upload: No GDrive folder found for Audit '
                   + request.objective ? ('"' + request.objective.reify().title + '"') : " with no title"
         });
       return;
@@ -987,35 +928,6 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     });
   }
 
-  // FIXME I can't figure out from the UserRole what context it applies to.  Assuming that we are on
-  //  the program page and adding ProgramReader/ProgramEditor/ProgramOwner.
-  , "{CMS.Models.UserRole} created" : function(model, ev, instance) {
-    var cache, that = this;
-    if(instance instanceof CMS.Models.UserRole
-       && instance.context // Only proceed if not the common context
-       && /^Program|^Auditor/.test(instance.role.reify().name)
-    ) {
-      cache = /^Program/.test(instance.role.reify().name) ? CMS.Models.Program.cache : CMS.Models.Audit.cache;
-
-      if (!cache)
-        return;
-
-      can.each(Object.keys(cache), function(key) {
-        var dfd = new $.Deferred();
-        if(cache[key].context && cache[key].context.id === instance.context.id) {
-          //delay this because the user role isn't updated in the object yet.
-          instance.delay_resolving_save_until(dfd);
-          setTimeout(function() {
-            that.update_permissions(
-              cache[key].constructor
-              , ev
-              , cache[key]
-            ).always($.proxy(dfd, "resolve"));
-          }, 10);
-        }
-      });
-    }
-  }
   , "a.show-meeting click" : function(el, ev){
     var instance = el.closest("[data-model], :data(model)").data("model")
       , cev = el.closest("[data-model], :data(cev)").data("cev")
