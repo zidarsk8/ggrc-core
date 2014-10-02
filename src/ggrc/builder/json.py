@@ -124,7 +124,8 @@ class UpdateAttrHandler(object):
       value = method(obj, json_obj, attr_name, class_attr)
     if isinstance(value, (set, list)) \
       and (
-        not hasattr(class_attr.property, 'columns') \
+        not hasattr(class_attr, 'property') \
+        or not hasattr(class_attr.property, 'columns') \
         or not isinstance(
         class_attr.property.columns[0].type,
         JsonType
