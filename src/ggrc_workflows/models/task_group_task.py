@@ -44,7 +44,7 @@ class TaskGroupTask(
   @validates('task_type')
   def validate_task_type(self, key, value):
     if value is None:
-      value = self.default_frequency()
+      value = self.default_task_type()
     if value not in self.VALID_TASK_TYPES:
       message = u"Invalid type '{}'".format(value)
       raise ValueError(message)
