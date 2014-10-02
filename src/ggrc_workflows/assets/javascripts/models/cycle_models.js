@@ -268,6 +268,19 @@
       contact: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
       cycle: "CMS.Models.Cycle.stub",
+      response_options: "can.List.newInstance",
+      selected_response_options: "can.List.newInstance"
+    },
+
+    serialize: {
+      // JSONType: function(val) {
+      //   return JSON.stringify(can.List.prototype.serialize.call(val));
+      // }
+    },
+    convert: {
+      // JSONType: function(source) {
+      //   return new can.List(source.serialize ? source.serialize() : source).attr("serialize", null);
+      // }
     },
 
     tree_view_options: {
@@ -308,7 +321,23 @@
       return this.refresh_all('cycle_task_group_object', 'task_group_object', 'object').then(function(object){
         return object;
       });
-    }
+    },
+    response_options_csv: can.compute(function(val) {
+      if(val != null) {
+        this.attr("response_options", $.map(val.split(","), $.proxy("".trim.call, "".trim)));
+      } else {
+        return (this.attr("response_options") || []).join(", ");
+      }
+    }),
+
+    selected_response_options_csv: can.compute(function(val) {
+      if(val != null) {
+        this.attr("selected_response_options", $.map(val.split(","), $.proxy("".trim.call, "".trim)));
+      } else {
+        return (this.attr("selected_response_options") || []).join(", ");
+      }
+    })
+
   });
 
 })(window.can);

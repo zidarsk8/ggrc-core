@@ -1172,9 +1172,9 @@ def filter_resource(resource, depth=0, user_permissions=None):
           if type(value) is dict and 'type' in value:
             resource[key] = filter_resource(
               value, depth=depth+1, user_permissions=user_permissions)
-          elif type(value) in (list,tuple):
-            resource[key] = filter_resource(
-              value, depth=depth+1, user_permissions=user_permissions)
+          # elif type(value) in (list,tuple):
+          #   resource[key] = filter_resource(
+          #     value, depth=depth+1, user_permissions=user_permissions)
 
       return resource
   else:

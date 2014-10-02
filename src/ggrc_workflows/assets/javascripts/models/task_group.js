@@ -83,6 +83,7 @@
       contact: "CMS.Models.Person.stub",
       modified_by: "CMS.Models.Person.stub",
       task_group: "CMS.Models.TaskGroup.stub",
+      response_options: "can.List.newInstance"
     },
 
     init: function() {
@@ -182,7 +183,15 @@
           return workflow.context.reify().refresh();
         });
       }
-    }
+    },
+
+    response_options_csv: can.compute(function(val) {
+      if(val != null) {
+        this.attr("response_options", $.map(val.split(","), $.proxy("".trim.call, "".trim)));
+      } else {
+        return (this.attr("response_options") || []).join(", ");
+      }
+    })
   });
 
 

@@ -264,6 +264,8 @@ def build_cycle(obj, current_user=None):
           contact=task_group_task.contact,
           status="Assigned",
           modified_by=current_user,
+          task_type=task_group_task.task_type,
+          response_options=task_group_task.response_options,
           )
         cycle_task_group_object.cycle_task_group_object_tasks.append(
             cycle_task_group_object_task)

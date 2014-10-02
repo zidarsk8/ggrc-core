@@ -50,12 +50,33 @@
   <div class="row-fluid">
     <div class="span8">
       <label>
+        Task Type
+      </label>
+      <select name="task_type">
+        {{#iterate 'text' 'Task Details' 'menu' 'One Response Option' 'checkbox' 'Mutiple Response Options' step=2}}
+          <option value="{{iterator_0}}" {{#if_equals instance.task_type iterator_0}}selected="selected"{{/if_equals}}>{{iterator_1}}</option>
+        {{/iterate}}
+      </select>
+      <br>
+      <label>
+      {{#if_helpers '\
+      #if_equals' instance.task_type 'text' '\
+      or #if_equals' instance.task_type '' '\
+      or #if_null' instance.task_type}}
+      <label>
         Task Details
         <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="2">{{instance.description}}</textarea>
+        <textarea id="tgt_response_options" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="2">{{instance.description}}</textarea>
       </div>
+      {{else}}
+      <label>
+        Selection Response Options (Comma Separated)
+        <i class="grcicon-help-black" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
+      </label>
+        <textarea id="tgt_response_options" class="span12 double" name="response_options_csv" placeholder="Enter Description" tabindex="2">{{instance.response_options_csv}}</textarea>
+      {{/if_equals}}
     </div>
 
     <div class="span4" id="frequency-div">
