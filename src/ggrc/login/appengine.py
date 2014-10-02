@@ -19,7 +19,7 @@ E.g., ``login: required`` must be specified *at least* for the '/login' route.
 from google.appengine.api import users
 from ggrc.login.common import find_or_create_user_by_email, get_next_url
 import flask_login
-from flask import url_for, redirect, request, session
+from flask import url_for, redirect, request, session, flash
 
 
 def get_user():
@@ -31,12 +31,12 @@ def get_user():
 
 def login():
   user = get_user()
-  flask_login.login_user(user)
-  return redirect(
-    get_next_url(request, default_url=url_for('dashboard')))
-  #return redirect(
-  #  users.create_login_url(
-  #    get_next_url(request, default_url=url_for('dashboard'))))
+  if user.is_enabled:
+    flask_login.login_user(user)
+    return redirect(get_next_url(request, default_url=url_for('dashboard')))
+  else:
+    flash(u'That user account is disabled.', 'alert-error')
+    return redirect('/')
 
 def logout():
   flask_login.logout_user()
