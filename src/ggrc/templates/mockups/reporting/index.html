@@ -109,26 +109,25 @@
           <li>
             <a href="#system">
               <div class="oneline">
+                <i class="grcicon-pie-chart-color"></i>
                 ISO systems
               </div>
             </a>
-            <div class="drag"></div>
           </li>
           <li>
             <a href="#tasks">
               <div class="oneline">
+                <i class="grcicon-pie-chart-color"></i>
                 Overdue tasks
               </div>
             </a>
-            <div class="drag"></div>
           </li>
-          <li class="active">
-            <a href="#newReport">
+          <li class="hidden-widgets-list">
+            <a class="dropdown-toggle" href="#newReport">
               <div class="oneline">
-                + New report
+                <i class="grcicon-show" rel="tooltip" data-placement="top" data-original-title="Add new report"></i>
               </div>
             </a>
-            <div class="drag"></div>
           </li>
         </ul>
       </div>
@@ -146,7 +145,10 @@
                   <div class="choose-object-wrap parent">
                     <div class="row-fluid">
                       <div class="span2">
-                        <h6>Pivot Object</h6>
+                        <h6>
+                          Pivot Object type
+                          <span class="required">*</span>
+                        </h6>
                         <select class="input-block-level option-type-selector">
                           <optgroup label="Governance">
                             <option value="Program">Program</option>
@@ -174,45 +176,47 @@
                           </optgroup>
                         </select>
                       </div>
-                      <div class="span5">
-                        <h6>Object name</h6>
+                      <div class="span4">
+                        <h6>
+                          Find pivot object
+                          <span class="required">*</span>
+                        </h6>
                         <div class="modal-search objective-selector">
-                          <input id="search" class="input-block-level" placeholder="Type to find person..." can-value="option_search_term" type="text" autofocus="">
+                          <input id="search" class="input-block-level" placeholder="Type to search for program..." type="text">
                         </div>
                       </div>
-                    </div>
-                    <br>
-                    <div class="relevance-filters">
-                      <div class="row-fluid">
-                        <div class="span12">
-                          <h6>Relevant object set</h6>
-                          <div class="single-line-filter">
-                            <select class="input-small relevant-set-choose">
-                              <option value="Program">Programs</option>
-                              <option value="Regulation">Regulations</option>
-                              <option value="Policy">Policies</option>
-                              <option value="Standard">Standards</option>
-                              <option value="Contract">Contracts</option>
-                              <option value="Clause">Clauses</option>
-                              <option value="Section">Sections</option>
-                              <option value="Objective">Objectives</option>
-                              <option value="Control">Controls</option>
-                              <option value="Person">Persons</option>
-                              <option value="System">Systems</option>
-                              <option value="Process">Processes</option>
-                              <option value="DataAsset">Data Assets</option>
-                              <option value="Product">Products</option>
-                              <option value="Project">Projects</option>
-                              <option value="Facility">Facilities</option>
-                              <option value="Market">Markets</option>
-                            </select>
-                          </div>
-
-                          <div class="relevant-set first">
-                            <ul>
+                      <div class="span3">
+                        <h6>
+                          Primary object set
+                          <span class="required">*</span>
+                        </h6>
+                        <div class="single-line-filter">
+                          <select class="input-xlarge relevant-set-choose">
+                            <option value="Program">Programs</option>
+                            <option value="Regulation">Regulations</option>
+                            <option value="Policy">Policies</option>
+                            <option value="Standard">Standards</option>
+                            <option value="Contract">Contracts</option>
+                            <option value="Clause">Clauses</option>
+                            <option value="Section">Sections</option>
+                            <option value="Objective">Objectives</option>
+                            <option value="Control" selected="selected">Controls</option>
+                            <option value="Person">Persons</option>
+                            <option value="System">Systems</option>
+                            <option value="Process">Processes</option>
+                            <option value="DataAsset">Data Assets</option>
+                            <option value="Product">Products</option>
+                            <option value="Project">Projects</option>
+                            <option value="Facility">Facilities</option>
+                            <option value="Market">Markets</option>
+                          </select>
+                          <a href="#" class="attribute-trigger" data-attrwrap=".attr-wrap"><i class="grcicon-setup-color"></i></a>
+                          <div class="attr-wrap">
+                            <h3>Select control attributes to show in report</h3>
+                            <ul class="attr-list">
                               <li>
                                 <label>
-                                  <input type="checkbox" name="" id="">
+                                  <input type="checkbox" name="" id="" checked="checked">
                                   Title
                                 </label>
                               </li>
@@ -224,7 +228,7 @@
                               </li>
                               <li>
                                 <label>
-                                  <input type="checkbox" name="" id="">
+                                  <input type="checkbox" name="" id="" checked="checked">
                                   Owner
                                 </label>
                               </li>
@@ -254,7 +258,7 @@
                               </li>
                               <li>
                                 <label>
-                                  <input type="checkbox" name="" id="">
+                                  <input type="checkbox" name="" id="" checked="checked">
                                   Code
                                 </label>
                               </li>
@@ -272,7 +276,7 @@
                               </li>
                               <li>
                                 <label>
-                                  <input type="checkbox" name="" id="">
+                                  <input type="checkbox" name="" id="" checked="checked">
                                   State
                                 </label>
                               </li>
@@ -332,115 +336,82 @@
                               </li>
                             </ul>
                           </div>
+                        </div>
+                      </div>
+                      <div class="span3">
+                        <h6>
+                          Secondary object set
+                        </h6>
+                        <div class="single-line-filter">
+                          <select class="input-xlarge relevant-set-choose">
+                            <option value="">- Choose -</option>
+                            <option value="Program">Programs</option>
+                            <option value="Regulation">Regulations</option>
+                            <option value="Policy">Policies</option>
+                            <option value="Standard">Standards</option>
+                            <option value="Contract">Contracts</option>
+                            <option value="Clause">Clauses</option>
+                            <option value="Section">Sections</option>
+                            <option value="Objective">Objectives</option>
+                            <option value="Control">Controls</option>
+                            <option value="Person">Persons</option>
+                            <option value="System">Systems</option>
+                            <option value="Process">Processes</option>
+                            <option value="DataAsset">Data Assets</option>
+                            <option value="Product">Products</option>
+                            <option value="Project">Projects</option>
+                            <option value="Facility">Facilities</option>
+                            <option value="Market">Markets</option>
+                          </select>
+                          <a href="#" class="attribute-trigger"><i class="grcicon-setup-color"></i></a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-                          <br>
-                          <div id="newObjectSet">
-                            <h6>2nd Relevant object set</h6>
-                            <div class="single-line-filter">
-                              <button type="submit" data-index="1" class="remove_filter" id="removeFilter">
-                                <i class="grcicon-deleted"></i>
-                              </button>
-                              <select class="input-small second-relevant-set-choose">
-                                <option value="Program">Programs</option>
-                                <option value="Regulation">Regulations</option>
-                                <option value="Policy">Policies</option>
-                                <option value="Standard">Standards</option>
-                                <option value="Contract">Contracts</option>
-                                <option value="Clause">Clauses</option>
-                                <option value="Section">Sections</option>
-                                <option value="Objective">Objectives</option>
-                                <option value="Control">Controls</option>
-                                <option value="Person">Persons</option>
-                                <option value="System">Systems</option>
-                                <option value="Process">Processes</option>
-                                <option value="DataAsset">Data Assets</option>
-                                <option value="Product">Products</option>
-                                <option value="Project">Projects</option>
-                                <option value="Facility">Facilities</option>
-                                <option value="Market">Markets</option>
-                              </select>
-                            </div>
-
-                            <div class="relevant-set second">
-                            <ul>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  Title
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  Description
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  Owner
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  Contact
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  Notes
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  System URL
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  Reference URL
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  Code
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  Effective date
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  Stop date
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  State
-                                </label>
-                              </li>
-                              <li>
-                                <label>
-                                  <input type="checkbox" name="" id="">
-                                  Network zone
-                                </label>
-                              </li>
-                            </ul>
+                  <div id="newFilter" class="filter-wrap">
+                    <div class="row-fluid">
+                      <div class="span4">
+                        <h6>
+                          Keyword filter
+                        </h6>
+                        <input type="text" class="input-block-level" placeholder="Enter keywords" id="">
+                      </div>
+                      <div class="span2">
+                        <h6>
+                          Owner/Contact
+                        </h6>
+                        <input type="text" class="input-block-level" placeholder="Type to find person" id="">
+                      </div>
+                      <div class="span3">
+                        <h6>
+                          Modified date (From - To)
+                        </h6>
+                        <div class="row-fluid">
+                          <div class="span5">
+                            <input class="input-block-level date hasDatepicker" name="custom_report_start_date" data-toggle="datepicker" data-before="custom_report_end_date" placeholder="MM/DD/YYYY" type="text" value="" id="">
                           </div>
-
+                          <div class="span1 date-range-text">
+                            <div class="centered">to</div>
                           </div>
-                          <div class="add-rule">
-                            <a href="javascript://" id="addFilterRule" class="addFilterRule"><i class="grcicon-show"></i> Add another set</a>
+                          <div class="span5">
+                            <input class="input-block-level date hasDatepicker" name="custom_report_end_date" data-toggle="datepicker" data-after="custom_report_start_date" placeholder="MM/DD/YYYY" type="text" value="" id="">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="span3">
+                        <h6>
+                          Created date (From - To)
+                        </h6>
+                        <div class="row-fluid">
+                          <div class="span5">
+                            <input class="input-block-level date hasDatepicker" name="custom_report_start_date_2" data-toggle="datepicker" data-before="custom_report_end_date_2" placeholder="MM/DD/YYYY" type="text" value="" id="">
+                          </div>
+                          <div class="span1 date-range-text">
+                            <div class="centered">to</div>
+                          </div>
+                          <div class="span5">
+                            <input class="input-block-level date hasDatepicker" name="custom_report_end_date_2" data-toggle="datepicker" data-after="custom_report_start_date_2" placeholder="MM/DD/YYYY" type="text" value="" id="">
                           </div>
                         </div>
                       </div>
@@ -448,13 +419,17 @@
                   </div>
 
                   <div class="save-template-wrap">
+                    <div class="add-filter">
+                      <a href="javascript://" id="addFilterRule">show more filters...</a>
+                    </div>
                     <div class="save-template">
                       <label class="small">
-                        <input type="checkbox" name="" id="" checked="checked" disabled="disabled">
+                        <input type="checkbox" name="" id="" checked="checked" disabled="disabled" placeholder="enter report name">
                         Save report as
                       </label>
                       <input type="text" class="input-medium" placeholder="" disabled="disabled">
                       <button type="submit" class="btn btn-primary" disabled="disabled">Generate report</button>
+                      <a href="#" class="btn btn-primary pull-right" disabled="disabled"><i class="grcicon-export-white"></i> Export to CSV</a>
                     </div>
                   </div>
 
@@ -469,7 +444,6 @@
                   <div class="generated-report" id="generatedReport">
                     <table class="table table-bordered">
                       <thead>
-                        <!--<col style="width: 14.2857%;">-->
                         <tr>
                           <th>Control Title</th>
                           <th>Control Owner</th>
@@ -573,12 +547,24 @@
                         </tr>
                       </tbody>
                     </table>
-                    <a href="#" class="btn btn-primary pull-right"><i class="grcicon-export-white"></i> Export to CSV</a>
                   </div>
 
                   <div class="zero-state" id="zeroState">
                     <h2>No results for the current search</h2>
                   </div>
+
+                  <div class="save-template-wrap">
+                    <div class="save-template">
+                      <label class="small">
+                        <input type="checkbox" name="" id="" checked="checked" disabled="disabled" placeholder="enter report name">
+                        Save report as
+                      </label>
+                      <input type="text" class="input-medium" placeholder="" disabled="disabled">
+                      <button type="submit" class="btn btn-primary" disabled="disabled">Generate report</button>
+                      <a href="#" class="btn btn-primary pull-right" disabled="disabled"><i class="grcicon-export-white"></i> Export to CSV</a>
+                    </div>
+                  </div>
+
                 </section>
               </section>
               
@@ -2733,6 +2719,7 @@
   <script type="text/javascript" src="/static/mockups/js/transition.js"></script>
   <script type="text/javascript" src="/static/mockups/js/tooltip.js"></script>
   <script type="text/javascript" src="/static/mockups/js/modal.js"></script>
+  <script type="text/javascript" src="/static/mockups/js/popover.js"></script>
   <script type="text/javascript" src="/static/mockups/js/bootstrap-collapse.js"></script>
   <!--
   <script type="text/javascript" src="/static/mockups/js/can.jquery.js"></script>

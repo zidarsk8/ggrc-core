@@ -670,6 +670,16 @@ i.short {
   margin-top:5px !important;
 }
 
+.grcicon-setup-color {
+  background-position: -342px -224px;
+}
+.attribute-trigger {
+  &.active {
+    .grcicon-setup-color {
+      background-position: -342px -248px;
+    }
+  }
+}
 
 // WYSIWYG Icons
 
@@ -726,6 +736,7 @@ i.short {
   .grcicon-task_group-color { background-position:-318px -56px; }
   .grcicon-history-color { background-position: -318px -104px; }
   .grcicon-cycle-color { background-position: -342px -32px; }
+  .grcicon-pie-chart-color {background-position:-198px -344px;}
 
   li {
     a:hover {
@@ -770,6 +781,7 @@ i.short {
       .grcicon-task_group-color { background-position:-318px -32px; }
       .grcicon-history-color { background-position: -318px -128px; }
       .grcicon-cycle-color { background-position: -342px -56px; }
+      .grcicon-pie-chart-color {background-position:-342px -200px;}
     }
   }
 

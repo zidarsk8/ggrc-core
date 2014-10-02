@@ -1148,6 +1148,10 @@
 // Report
 .save-template-wrap {
   @include clearfix();
+  .add-filter {
+    float: left;
+    padding: 10px 20px;
+  }
 }
 .save-template {
   float: right;
@@ -1161,24 +1165,70 @@
   .input-medium {
     margin-bottom: 0;
     margin-right: 10px;
+    margin-left: 4px;
+  }
+  button {
+    margin-right: 10px;
   }
 }
 
-.relevant-set {
+.attr-wrap {
   display: none;
-  ul {
-    @include reset-list();
-    @include clearfix();
-    margin: 10px 0 0 20px;
-    li {
-      float: left;
-      margin-right: 20px;
-      margin-bottom: 10px;
-      input {
-        margin-top: -3px;
-      }
+}
+
+ul.attr-list {
+  @include reset-list();
+  @include clearfix();
+  margin-top: 20px;
+  li {
+    float: left;
+    width: 33.3333%;
+    input {
+      margin-top: -3px;
     }
   }
+}
+
+.popover {
+  @include border-radius($default-border-radius);
+  width: 600px;
+  border: 1px solid $infoMessageText;
+  .popover-content {
+    @include border-radius($default-border-radius);
+  }
+}
+
+.attribute-trigger {
+  float: right;
+  line-height: 26px;
+  height: 26px;
+  width: 12%;
+  text-align: center;
+  border: 1px solid $infoMessageText;
+  @include border-radius($default-border-radius);
+  i {
+    margin-top: 5px;
+  }
+  &.active {
+    background: $darkBlue;
+  }
+}
+
+.single-line-filter {
+  select {
+    &.input-xlarge {
+      width: 85%;
+    }
+  }
+}
+
+.filter-wrap {
+  padding: 20px;
+  border-bottom: 1px solid $lightGray;
+}
+
+.date-range-text {
+  line-height: 28px;
 }
 
 .selected-object {

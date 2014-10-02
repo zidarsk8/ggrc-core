@@ -142,7 +142,7 @@ $(document).ready(function(){
       $this.addClass("active");
     }
 
-    return false;
+    return false
 
   });
 
@@ -644,20 +644,21 @@ $(document).ready(function(){
     $("#customAttribute").modal('hide');
   });
 
-  // Reporting
+  // Custom Reporting
   $("body").on("click", "#addFilterRule", function() {
     var $this = $(this),
-        $newRule = $this.closest(".relevance-filters").find("#newObjectSet");
+        $newFilter = $this.closest(".widget").find("#newFilter");
 
-    $newRule.show();
+    if($this.hasClass("active")) {
+      $newFilter.slideUp(500);
+      $this.removeClass("active").text("show more filters...");
+    } else {
+      $newFilter.slideDown(500);
+      $this.addClass("active").text("hide more filters...");
+    }
+    return false
   });
   
-  $("body").on("click", "#removeFilter", function() {
-    var $this = $(this),
-        $newRule = $this.closest("#newObjectSet");
-
-    $newRule.hide();
-  });
   $(".save-template input[type=checkbox]").each(function() {
     var $this = $(this),
         $label = $(this).closest("label");
@@ -666,7 +667,30 @@ $(document).ready(function(){
     }
   });
 
-  // Custom reporting
+  $("body").on("click", ".attribute-trigger", function() {
+    if($(this).hasClass("active")) {
+      $(this).removeClass("active");
+    } else {
+      $(this).addClass("active");
+    }
+  });
+
+  $(".attribute-trigger").popover({
+    container: "body",
+    html: true,
+    content: function(){
+      return $($(this).data("attrwrap")).html();
+    },
+    placement: "bottom",
+    trigger: "click",
+    template: '<div class="popover" role="tooltip"><div class="popover-content"></div></div>'
+  });
+
+  $('.attribute-trigger').on('shown.bs.popover', function () {
+    $('.popover').css('left',parseInt($('.popover').css('left')) - 282 + 'px')
+  })
+
+  /* TO-DO: Will modify this script for new way of showing attributes
   $('.relevant-set-choose').change(function() {
     if (this.value == 'Control') {
       $('.relevant-set.first').slideDown(500);
@@ -674,15 +698,9 @@ $(document).ready(function(){
       $('.relevant-set.first').slideUp(500);
     }
   });
+  */
 
-  $('.second-relevant-set-choose').change(function() {
-    if (this.value == 'System') {
-      $('.relevant-set.second').slideDown(500);
-    } else {
-      $('.relevant-set.second').slideUp(500);
-    }
-  });
-
+  /* TO-DO: Will modify this script for new way of syncing pivot object selected
   $('.option-type-selector').change(function() {
     if (this.value == 'Program') {
       $("#emptyMessageState").fadeOut(500);
@@ -692,7 +710,9 @@ $(document).ready(function(){
       $("#emptyMessageState").delay(500).fadeIn(500);
     }
   });
+  */
 
+  /* TO-DO: Will modify this script for new way of showing table. On "Generate report" button click table will be show.
   $('.relevant-set input[type=checkbox]').change(function() {
     if($(this).prop('checked')) {
       $("#zeroState").fadeOut(500);
@@ -701,6 +721,7 @@ $(document).ready(function(){
       $(".save-template input[type=checkbox]").removeAttr("disabled");
       $(".save-template input[type=text]").removeAttr("disabled");
       $(".save-template button").removeAttr("disabled");
+      $(".save-template a.btn").removeAttr("disabled");
     } else {
       $("#generatedReport").fadeOut(500);
       $("#zeroState").delay(500).fadeIn(500);
@@ -708,8 +729,10 @@ $(document).ready(function(){
       $(".save-template input[type=checkbox]").attr("disabled", true);
       $(".save-template input[type=text]").attr("disabled", true);
       $(".save-template button").attr("disabled", true);
+      $(".save-template a.btn").attr("disabled", true);
     }
   });
+  */
 
 });
 
