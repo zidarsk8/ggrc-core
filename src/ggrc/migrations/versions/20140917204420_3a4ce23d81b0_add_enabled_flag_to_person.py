@@ -2,14 +2,14 @@
 """add enabled flag to person
 
 Revision ID: 3a4ce23d81b0
-Revises: 19abed0bcf16
+Revises: 53bb0f4f6ec8
 Create Date: 2014-09-17 20:44:20.246783
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '3a4ce23d81b0'
-down_revision = '19abed0bcf16'
+down_revision = '53bb0f4f6ec8'
 
 from alembic import op
 import sqlalchemy as sa
