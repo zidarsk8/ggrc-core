@@ -39,7 +39,8 @@
       _mixins : ["folderable"]
     },
     Request : {
-      _mixins : ["folderable"]
+      folders : new GGRC.ListLoaders.CrossListLoader("_audit", "folders"),
+      _audit : new GGRC.ListLoaders.DirectListLoader("Audit", "requests", "audit")
     },
     DocumentationResponse : {
       _mixins : ["fileable"]
@@ -89,35 +90,14 @@
   $('head').append("<scr" + "ipt type='text/javascript' src='https://apis.google.com/js/client.js?onload=resolvegapi" + r + "'></script>");
 
 
-  $.extend(true, CMS.Models.Program.attributes, {
-    "object_folders" : "CMS.Models.ObjectFolder.stubs"
-    , "folders" : "CMS.Models.GDriveFolder.stubs"
-  });
-  GGRC.register_hook("Program.extended_info", GGRC.mustache_path + "/programs/gdrive_info.mustache");
-
   $.extend(true, CMS.Models.Audit.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
-  CMS.Models.Audit.tree_view_options.show_view = GGRC.mustache_path + "/audits/gdrive_tree.mustache";
 
   GGRC.register_hook("Audit.tree_view_info", GGRC.mustache_path + "/audits/gdrive_info.mustache");
 
 
-  $.extend(true, CMS.Models.Request.attributes, {
-    "object_folders" : "CMS.Models.ObjectFolder.stubs"
-    , "folders" : "CMS.Models.GDriveFolder.stubs"
-  });
-  GGRC.register_hook("Request.tree_view_info", GGRC.mustache_path + "/requests/gdrive_info.mustache");
-
-  $.extend(true, CMS.Models.DocumentationResponse.attributes, {
-    "object_files" : "CMS.Models.ObjectFile.stubs"
-    , "files" : "CMS.Models.GDriveFile.stubs"
-  });
-  $.extend(true, CMS.Models.PopulationSampleResponse.attributes, {
-    "object_files" : "CMS.Models.ObjectFile.stubs"
-    , "files" : "CMS.Models.GDriveFile.stubs"
-  });
   $.extend(true, CMS.Models.Document.attributes, {
     "object_files" : "CMS.Models.ObjectFile.stubs"
     , "files" : "CMS.Models.GDriveFile.stubs"
