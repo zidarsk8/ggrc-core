@@ -723,24 +723,6 @@ $(document).ready(function(){
       $("#zeroState").delay(500).fadeIn(500);
     }
   });
-
-  $("body").on("click", "#newReportAdd", function() {
-    var $this = $(this),
-        $reportTab = $this.closest(".internav").find("#newReport");
-
-    $reportTab.show().addClass("active");
-  });
-
-  $('#custom_report_name').keyup(function() {
-    $("#newReport a .oneline .title").text("Controls Review");
-    $("#newReport .closed").show();
-  });
-
-  $("body").on("click", ".report-trigger", function() {
-    $("#zeroState").fadeOut(500);
-    $("#generatedReport").delay(500).fadeIn(500);
-  });
-
 });
 
 // Make sure the windows are resized properly
