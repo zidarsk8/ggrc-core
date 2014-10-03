@@ -442,6 +442,26 @@
           @include opacity(1);
         }
       }
+      .closed {
+        display: none;
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 10px;
+        height: 10px;
+        line-height: 10px;
+        //background-image: url('/static/images/grcicons/icons.png');
+        background-image: image-url("grcicons/icons.png");
+        background-position: -347px -179px;
+        background-repeat: no-repeat;
+        @include background-size(368px 416px);
+        cursor: pointer;
+        &.red {
+          top: -4px;
+          right: -4px;
+          background-position: -347px -275px;
+        }
+      }
     }
     i {
       margin-top: 6px;

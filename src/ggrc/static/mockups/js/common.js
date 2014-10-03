@@ -732,7 +732,8 @@ $(document).ready(function(){
   });
 
   $('#custom_report_name').keyup(function() {
-    $("#newReport a .oneline").text("Controls Review");
+    $("#newReport a .oneline .title").text("Controls Review");
+    $("#newReport .closed").show();
   });
 
   $("body").on("click", ".report-trigger", function() {
