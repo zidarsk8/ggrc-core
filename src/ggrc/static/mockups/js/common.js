@@ -637,7 +637,7 @@ $(document).ready(function(){
       $('.if-checkbox').fadeIn(500);
     }
   });
-  
+
   // Add Custom Attribute
   $('body').on('click', '#addAttribute', function() {
     $("#NewAttribute").show();
@@ -658,7 +658,7 @@ $(document).ready(function(){
     }
     return false
   });
-  
+
   $(".save-template input[type=checkbox]").each(function() {
     var $this = $(this),
         $label = $(this).closest("label");
@@ -709,7 +709,7 @@ $(document).ready(function(){
     $(".save-template button").removeAttr("disabled");
     $(".save-template a.btn").removeAttr("disabled");
   });
-  
+
   $('#pivot_search').on('mouseout', function(){
     if(!$.trim(this.value).length){
       $("#selectedObject").fadeOut(500);
