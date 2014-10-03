@@ -1,0 +1,11 @@
+#! /usr/bin/env bash
+
+# WARNING: If you have hooks configured on your local machine, please back them up.
+# WARNING: These instructions will delete them.
+
+# README: Run this on your local repository by typing the following:
+# cd ggrc-core; rm -rf .git/hooks; ln -s ../git_hooks .git/hooks
+
+bn=`git log --oneline | wc -l | tr -d ' '`
+echo "BUILD_NUMBER=\"${bn}\"" > src/ggrc/settings/build_number.py
+echo "Local build number set to ${bn}"

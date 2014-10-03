@@ -24,7 +24,17 @@ exports = []
 COMPANY = "Company, Inc."
 COMPANY_LOGO_TEXT = "Company GRC"
 COPYRIGHT = u"Confidential. Copyright " + u"\u00A9" # \u00A9 is the (c) symbol
-VERSION = "v0.9.0"
+
+BUILD_NUMBER = "x"
+try:
+  import build_number
+  BUILD_NUMBER = build_number.BUILD_NUMBER
+except (ImportError):
+  pass
+  
+MAJOR_VERSION = "0.9"
+MINOR_VERSION = "0"
+VERSION = "v" + MAJOR_VERSION + "." + MINOR_VERSION + "." + BUILD_NUMBER
 
 # Google Analytics variables
 GOOGLE_ANALYTICS_ID = os.environ.get('GGRC_GOOGLE_ANALYTICS_ID', '')
