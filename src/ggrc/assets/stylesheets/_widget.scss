@@ -1234,6 +1234,10 @@ ul.attr-list {
 .selected-object {
   padding: 10px 20px;
   border-top: 1px solid $darkGray;
+  font-weight: bold;
+  span {
+    font-weight: normal;
+  }
 }
 
 .generated-report {

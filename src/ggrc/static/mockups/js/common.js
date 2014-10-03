@@ -700,39 +700,45 @@ $(document).ready(function(){
   });
   */
 
-  /* TO-DO: Will modify this script for new way of syncing pivot object selected
-  $('.option-type-selector').change(function() {
-    if (this.value == 'Program') {
-      $("#emptyMessageState").fadeOut(500);
-      $("#selectedObject").delay(500).fadeIn(500);
-    } else {
+  $('#pivot_search').keyup(function() {
+    $("#emptyMessageState").fadeOut(500);
+    $("#selectedObject").delay(500).fadeIn(500);
+    $(".save-template label").removeClass("disabled");
+    $(".save-template input[type=checkbox]").removeAttr("disabled");
+    $(".save-template input[type=text]").removeAttr("disabled");
+    $(".save-template button").removeAttr("disabled");
+    $(".save-template a.btn").removeAttr("disabled");
+  });
+  
+  $('#pivot_search').on('mouseout', function(){
+    if(!$.trim(this.value).length){
       $("#selectedObject").fadeOut(500);
       $("#emptyMessageState").delay(500).fadeIn(500);
-    }
-  });
-  */
-
-  /* TO-DO: Will modify this script for new way of showing table. On "Generate report" button click table will be show.
-  $('.relevant-set input[type=checkbox]').change(function() {
-    if($(this).prop('checked')) {
-      $("#zeroState").fadeOut(500);
-      $("#generatedReport").delay(500).fadeIn(500);
-      $(".save-template label").removeClass("disabled");
-      $(".save-template input[type=checkbox]").removeAttr("disabled");
-      $(".save-template input[type=text]").removeAttr("disabled");
-      $(".save-template button").removeAttr("disabled");
-      $(".save-template a.btn").removeAttr("disabled");
-    } else {
-      $("#generatedReport").fadeOut(500);
-      $("#zeroState").delay(500).fadeIn(500);
       $(".save-template label").addClass("disabled");
       $(".save-template input[type=checkbox]").attr("disabled", true);
       $(".save-template input[type=text]").attr("disabled", true);
       $(".save-template button").attr("disabled", true);
       $(".save-template a.btn").attr("disabled", true);
+      $("#generatedReport").fadeOut(500);
+      $("#zeroState").delay(500).fadeIn(500);
     }
   });
-  */
+
+  $("body").on("click", "#newReportAdd", function() {
+    var $this = $(this),
+        $reportTab = $this.closest(".internav").find("#newReport");
+
+    $reportTab.show().addClass("active");
+  });
+
+  $('#custom_report_name').keyup(function() {
+    $("#newReport a .oneline").text("Controls Review");
+  });
+
+  $("body").on("click", ".report-trigger", function() {
+    $("#zeroState").fadeOut(500);
+    $("#generatedReport").delay(500).fadeIn(500);
+  });
 
 });
 

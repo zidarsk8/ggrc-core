@@ -122,8 +122,15 @@
               </div>
             </a>
           </li>
+          <li id="newReport">
+            <a href="#tasks">
+              <div class="oneline">
+                New report 1
+              </div>
+            </a>
+          </li>
           <li class="hidden-widgets-list">
-            <a class="dropdown-toggle" href="#newReport">
+            <a class="dropdown-toggle" id="newReportAdd" href="#">
               <div class="oneline">
                 <i class="grcicon-show" rel="tooltip" data-placement="top" data-original-title="Add new report"></i>
               </div>
@@ -140,7 +147,7 @@
             <div id="middle_column" class="widget-area ui-sortable">
 
               <!-- Widget: New Report -->
-              <section class="widget sticky_header widget-active" id="newReport" style="display: block;">
+              <section class="widget sticky_header widget-active" style="display: block;">
                 <section class="content ggrc_controllers_list_view">
                   <div class="choose-object-wrap parent">
                     <div class="row-fluid">
@@ -151,7 +158,7 @@
                         </h6>
                         <select class="input-block-level option-type-selector">
                           <optgroup label="Governance">
-                            <option value="Program">Program</option>
+                            <option value="Program" selected="selected">Program</option>
                             <option value="Regulation">Regulation</option>
                             <option value="Standard">Standard</option>
                             <option value="Policy">Policy</option>
@@ -162,7 +169,7 @@
                             <option value="Clause">Clause</option>
                           </optgroup>
                           <optgroup label="People/Groups">
-                            <option value="People" selected="selected">Person</option>
+                            <option value="People">Person</option>
                             <option value="OrgGroup">Org Group</option>
                           </optgroup>
                           <optgroup label="Assets/Business">
@@ -182,7 +189,7 @@
                           <span class="required">*</span>
                         </h6>
                         <div class="modal-search objective-selector">
-                          <input id="search" class="input-block-level" placeholder="Type to search for program..." type="text">
+                          <input id="pivot_search" class="input-block-level" placeholder="Type to search for program..." type="text">
                         </div>
                       </div>
                       <div class="span3">
@@ -427,8 +434,8 @@
                         <input type="checkbox" name="" id="" checked="checked" disabled="disabled" placeholder="enter report name">
                         Save report as
                       </label>
-                      <input type="text" class="input-medium" placeholder="" disabled="disabled">
-                      <button type="submit" class="btn btn-primary" disabled="disabled">Generate report</button>
+                      <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name" disabled="disabled">
+                      <button type="submit" class="btn btn-primary report-trigger" disabled="disabled">Generate report</button>
                       <a href="#" class="btn btn-primary pull-right" disabled="disabled"><i class="grcicon-export-white"></i> Export to CSV</a>
                     </div>
                   </div>
@@ -437,7 +444,7 @@
                     <p>Pivot object is not selected</p>
                   </div>
                   <div class="selected-object" id="selectedObject">
-                    <i class="grcicon-program-black"></i> PROG1
+                    PROGRAM 1
                     <span class="pull-right">Date: 09/26/14</span>
                   </div>
 
@@ -559,8 +566,8 @@
                         <input type="checkbox" name="" id="" checked="checked" disabled="disabled" placeholder="enter report name">
                         Save report as
                       </label>
-                      <input type="text" class="input-medium" placeholder="" disabled="disabled">
-                      <button type="submit" class="btn btn-primary" disabled="disabled">Generate report</button>
+                      <input type="text" class="input-medium" placeholder="Enter report name" disabled="disabled">
+                      <button type="submit" class="btn btn-primary report-trigger" disabled="disabled">Generate report</button>
                       <a href="#" class="btn btn-primary pull-right" disabled="disabled"><i class="grcicon-export-white"></i> Export to CSV</a>
                     </div>
                   </div>
