@@ -180,6 +180,7 @@
                   options = temp;
                 }
 
+                self.option_list.replace([]);
                 self.option_list.push.apply(self.option_list, options);
                 self._start_pager(options, 20, active_fn, draw_fn);
               }
@@ -197,6 +198,7 @@
             if (active_fn()) {
               options = search_result.getResultsForType(current_option_model_name);
 
+              self.option_list.replace([]);
               self.option_list.push.apply(self.option_list, options);
               self._start_pager(options, 20, active_fn, draw_fn);
             }
