@@ -743,6 +743,50 @@ $(document).ready(function(){
 
 });
 
+// Make sure the windows are resized properly
+jQuery(resize_areas);
+jQuery(window).on("resize", resize_areas);
+
+// The function is borrowed from dashboard.js
+function resize_areas() {
+  var $window, $lhs, $lhsHolder, $area, $header, $footer, $innerNav,
+      $objectArea, $bar, winHeight, winWidth, objectWidth, headerWidth,
+      lhsWidth, footerMargin, internavHeight;
+
+  $window = $(window);
+  $lhs = $(".lhs");
+  $lhsHolder = $(".lhs-holder");
+  $footer = $(".footer");
+  $header = $(".header-content");
+  $innerNav = $(".inner-nav");
+  $objectArea = $(".object-area");
+  $topNav = $(".top-inner-nav");
+  $area = $(".area");
+  $bar = $(".bar-v");
+
+  winHeight = $window.height();
+  winWidth = $window.width();
+  lhsHeight = winHeight - 70;
+  footerMargin = lhsHeight;
+  internavHeight = lhsHeight - 100;
+  lhsWidth = $lhsHolder.width();
+  barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
+  internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
+  objectWidth = winWidth - lhsWidth - internavWidth - barWidth;
+  headerWidth = winWidth - lhsWidth;
+
+  $lhsHolder.css("height",lhsHeight);
+  $bar.css("height",lhsHeight);
+  $footer.css("margin-top",footerMargin);
+  $innerNav.css("height",internavHeight);
+  $header.css("width",headerWidth);
+  $topNav.css("width",objectWidth);
+  $objectArea
+    .css("margin-left",internavWidth)
+    .css("height",internavHeight)
+    .css("width",objectWidth);
+}
+
 // Grid View Example
 /*
 var dataView;
