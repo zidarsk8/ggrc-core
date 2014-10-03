@@ -53,6 +53,12 @@
                 <strong class="error">{{count}}</strong>
               </span>
               {{/with_mapping_count}}
+              {{#with_mapping_count instance 'cycle_task_group_tasks'}}
+                <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
+                  <i class="grcicon-task-black"></i>
+                  <strong class="error">{{count}}</strong>
+                </span>
+              {{/with_mapping_count}}
             </li>
 
             <!--li>
@@ -77,31 +83,29 @@
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-
-      {{#instance.description}}
       <div class="show-description">
         <div class="row-fluid">
           <div class="span12">
-            <div class="tree-description">
-              {{{instance.description}}}
+            <div class="tree-description small-info">
+              <h6>Description</h6>
+              {{#if instance.description}}
+                {{{instance.description}}}
+              {{else}}
+                <i>No description</i>
+              {{/if}}
             </div>
-
           </div>
         </div>
       </div>
-      {{/instance.description}}
-
     </div>
-
     {{#if draw_children}}
       {{#child_options}}
-        <div class="inner-tree">
-          <h6>Objects ({{list.length}})</h6>
+        <div class="inner-tree {{^if list.length}}hide{{/list}}">
+          <h6>{{title}} ({{list.length}})</h6>
           <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
         </div>
       {{/child_options}}
     {{/if}}
-
   </div>
   {{/if}}
 </li>

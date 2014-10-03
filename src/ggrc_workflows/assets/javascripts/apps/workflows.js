@@ -154,6 +154,10 @@
             "CycleTaskGroupObject",
             "cycle_task_group",
             "cycle_task_group_objects"),
+          cycle_task_group_tasks: Direct(
+            "CycleTaskGroupObjectTask",
+            "cycle_task_group",
+            "cycle_task_group_tasks"),
           cycle_task_group_objects_for_page_object: CustomFilter(
             "cycle_task_group_objects", function(object) {
               return object.instance.object.reify() === GGRC.page_instance();
@@ -186,6 +190,10 @@
             "CycleTaskGroupObject",
             "cycle_task_group_object_tasks",
             "cycle_task_group_object"),
+          cycle_task_group: Direct(
+            "CycleTaskGroup",
+            "cycle_task_group_object_tasks",
+            "cycle_task_group"),
           //task_group_object: Direct(
           //  "TaskGroupObject", "cycle", "tasks")
           cycle_task_entries: Direct(

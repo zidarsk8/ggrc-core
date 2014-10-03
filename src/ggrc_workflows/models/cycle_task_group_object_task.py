@@ -20,8 +20,10 @@ class CycleTaskGroupObjectTask(
 
   cycle_id = db.Column(
       db.Integer, db.ForeignKey('cycles.id'), nullable=False)
+  cycle_task_group_id = db.Column(
+      db.Integer, db.ForeignKey('cycle_task_groups.id'), nullable=False)
   cycle_task_group_object_id = db.Column(
-      db.Integer, db.ForeignKey('cycle_task_group_objects.id'), nullable=False)
+      db.Integer, db.ForeignKey('cycle_task_group_objects.id'), nullable=True)
   task_group_task_id = db.Column(
       db.Integer, db.ForeignKey('task_group_tasks.id'), nullable=False)
   task_group_task = db.relationship(
@@ -41,6 +43,7 @@ class CycleTaskGroupObjectTask(
   _publish_attrs = [
       'cycle',
       'cycle_task_group_object',
+      'cycle_task_group',
       'task_group_task',
       'cycle_task_entries',
       'sort_index',
