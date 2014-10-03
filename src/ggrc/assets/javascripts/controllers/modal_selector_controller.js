@@ -1613,6 +1613,7 @@
                   options = temp;
                 }
 
+                self.option_list.replace([]);
                 self.option_list.push.apply(self.option_list, options);
                 self._start_pager(options, 20, active_fn, draw_fn);
               }
@@ -1628,8 +1629,8 @@
             var options = [];
 
             if (active_fn()) {
+              self.option_list.replace([]);
               options = search_result.getResultsForType(current_option_model_name);
-
               self.option_list.push.apply(self.option_list, options);
               self._start_pager(options, 20, active_fn, draw_fn);
             }
