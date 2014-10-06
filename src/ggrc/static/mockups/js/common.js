@@ -700,29 +700,6 @@ $(document).ready(function(){
   });
   */
 
-  $('#pivot_search').keyup(function() {
-    $("#emptyMessageState").fadeOut(500);
-    $("#selectedObject").delay(500).fadeIn(500);
-    $(".save-template label").removeClass("disabled");
-    $(".save-template input[type=checkbox]").removeAttr("disabled");
-    $(".save-template input[type=text]").removeAttr("disabled");
-    $(".save-template button").removeAttr("disabled");
-    $(".save-template a.btn").removeAttr("disabled");
-  });
-
-  $('#pivot_search').on('mouseout', function(){
-    if(!$.trim(this.value).length){
-      $("#selectedObject").fadeOut(500);
-      $("#emptyMessageState").delay(500).fadeIn(500);
-      $(".save-template label").addClass("disabled");
-      $(".save-template input[type=checkbox]").attr("disabled", true);
-      $(".save-template input[type=text]").attr("disabled", true);
-      $(".save-template button").attr("disabled", true);
-      $(".save-template a.btn").attr("disabled", true);
-      $("#generatedReport").fadeOut(500);
-      $("#zeroState").delay(500).fadeIn(500);
-    }
-  });
 });
 
 // Make sure the windows are resized properly

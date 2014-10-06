@@ -13,30 +13,17 @@
   <div class="top-inner-nav">
     <div class="object-nav">
       <ul class="nav internav  cms_controllers_inner_nav ui-sortable">
+        {{#tabs}}
         <li>
           <a href="#system">
             <div class="oneline">
-              <i class="grcicon-pie-chart-color"></i>
-              ISO systems
+              {{^new_report}}<i class="grcicon-pie-chart-color"></i>{{/new_report}}
+              <span class="{{#new_report}} red{{/new_report}}">{{title}}</span>
             </div>
           </a>
         </li>
-        <li>
-          <a href="#tasks">
-            <div class="oneline">
-              <i class="grcicon-pie-chart-color"></i>
-              Overdue tasks
-            </div>
-          </a>
-        </li>
-        <li id="newReport">
-          <a href="#tasks">
-            <div class="oneline">
-              <span class="title">New report 1</span>
-              <span class="closed red"></span>
-            </div>
-          </a>
-        </li>
+        {{/tabs}}
+
         <li class="hidden-widgets-list">
           <a class="dropdown-toggle" id="newReportAdd" href="#">
             <div class="oneline">
@@ -338,13 +325,13 @@
                     <a href="javascript://" id="addFilterRule">show more filters...</a>
                   </div>
                   <div class="save-template">
-                    <label class="small">
-                      <input type="checkbox" name="" id="" checked="checked" disabled="disabled" placeholder="enter report name">
+                    <label class="small {{^if pivot_selected}}disabled{{/if}}">
+                      <input type="checkbox" name="" id="" checked="checked" {{^if pivot_selected}}disabled="disabled"{{/if}} placeholder="enter report name">
                       Save report as
                     </label>
-                    <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name" disabled="disabled">
-                    <button type="submit" class="btn btn-primary report-trigger" disabled="disabled">Generate report</button>
-                    <a href="#" class="btn btn-primary pull-right" disabled="disabled"><i class="grcicon-export-white"></i> Export to CSV</a>
+                    <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name" {{^if pivot_selected}}disabled="disabled"{{/if}}>
+                    <button type="submit" class="btn btn-primary report-trigger" {{^if pivot_selected}}disabled="disabled"{{/if}}>Generate report</button>
+                    <button type="submit" class="btn btn-primary pull-right" {{^if pivot_selected}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
                   </div>
                 </div>
 
@@ -469,14 +456,17 @@
                 </div>
 
                 <div class="save-template-wrap">
+                  <div class="add-filter">
+                    <a href="javascript://" id="addFilterRule">show more filters...</a>
+                  </div>
                   <div class="save-template">
-                    <label class="small">
-                      <input type="checkbox" name="" id="" checked="checked" disabled="disabled" placeholder="enter report name">
+                    <label class="small {{^if pivot_selected}}disabled{{/if}}">
+                      <input type="checkbox" name="" id="" checked="checked" {{^if pivot_selected}}disabled="disabled"{{/if}} placeholder="enter report name">
                       Save report as
                     </label>
-                    <input type="text" class="input-medium" placeholder="Enter report name" disabled="disabled">
-                    <button type="submit" class="btn btn-primary report-trigger" disabled="disabled">Generate report</button>
-                    <a href="#" class="btn btn-primary pull-right" disabled="disabled"><i class="grcicon-export-white"></i> Export to CSV</a>
+                    <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name" {{^if pivot_selected}}disabled="disabled"{{/if}}>
+                    <button type="submit" class="btn btn-primary report-trigger" {{^if pivot_selected}}disabled="disabled"{{/if}}>Generate report</button>
+                    <button type="submit" class="btn btn-primary pull-right" {{^if pivot_selected}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
                   </div>
                 </div>
 
