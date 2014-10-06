@@ -5,15 +5,31 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
+<div class="hideable-holder"> 
 {{#instance}}
 <form action="javascript://">
+  <!-- Reset button --> 
   <div class="row-fluid">
-    <div class="span3">
-      <label for="person_name">Name</label>
+    <div class="span12">
+      <div class="pull-right reset-form">
+        <p>
+          <small><em>Note: Fields are only temporary hidden for this session!</em></small>
+          <a id="formRestore" tabindex="26" class="btn" href="javascript://">Reset form</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span6">
+      <label for="person_name">
+        Name
+        <span class="required">*</span>
+      </label>
       <input tabindex="1" class="span12" id="person_name" name="name" placeholder="John Doe" size="30" type="text" value="{{name}}" autofocus>
       <br>
     </div>
-    <div class="span3">
+    <div class="span6">
       <label for="person_email">Email <span class="required">*</span></label>
       <input tabindex="2" class="span12" id="person_email" name="email" placeholder="email@company.com" size="30" type="text" value="{{email}}">
       <span class="help-inline">
@@ -34,8 +50,11 @@
     </div-->
   </div>
   <div class="row-fluid">
-    <div class="span12">
-      <label for="person_company">Company</label>
+    <div class="span12 hidable">
+      <label for="person_company">
+        Company
+        <a href="javascript://" class="field-hide">hide</a>
+      </label>
       <input tabindex="5" class="span12" id="person_company" name="company" placeholder="Acme, Inc." size="30" type="text" value="{{company}}">
       <span class="help-inline">
       </span>
@@ -45,3 +64,4 @@
   <br>
 </form>
 {{/instance}}
+</div>
