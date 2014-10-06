@@ -367,6 +367,13 @@ u {
     }
   }
 }
+
+.btn-small {
+  padding: 3px 6px;
+  font-size: $f-small;
+  line-height: 16px;
+}
+
 // Disabled state
 .btn.disabled, .btn[disabled] {
   @include opacity(0.25);
