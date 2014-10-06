@@ -90,6 +90,16 @@ u {
   text-decoration: underline;
 }
 
+.about-link {
+  font-size: 12px;
+  text-decoration: underline;
+  color: $gray;
+  &:hover {
+    text-decoration: none;
+    color: $gray;
+  }
+}
+
 // helpers
 .centered {
   text-align: center;
