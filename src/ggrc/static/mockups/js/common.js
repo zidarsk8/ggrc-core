@@ -645,20 +645,6 @@ $(document).ready(function(){
   });
 
   // Custom Reporting
-  $("body").on("click", "#addFilterRule", function() {
-    var $this = $(this),
-        $newFilter = $this.closest(".widget").find("#newFilter");
-
-    if($this.hasClass("active")) {
-      $newFilter.slideUp(500);
-      $this.removeClass("active").text("show more filters...");
-    } else {
-      $newFilter.slideDown(500);
-      $this.addClass("active").text("hide more filters...");
-    }
-    return false
-  });
-
   $(".save-template input[type=checkbox]").each(function() {
     var $this = $(this),
         $label = $(this).closest("label");
@@ -667,38 +653,27 @@ $(document).ready(function(){
     }
   });
 
-  $("body").on("click", ".attribute-trigger", function() {
-    if($(this).hasClass("active")) {
-      $(this).removeClass("active");
-    } else {
-      $(this).addClass("active");
-    }
-  });
-
   $(".attribute-trigger").popover({
     container: "body",
     html: true,
     content: function(){
-      return $($(this).data("attrwrap")).html();
+      return $(this).next('.attr-wrap').html();
     },
     placement: "bottom",
-    trigger: "click",
     template: '<div class="popover" role="tooltip"><div class="popover-content"></div></div>'
   });
 
   $('.attribute-trigger').on('shown.bs.popover', function () {
-    $('.popover').css('left',parseInt($('.popover').css('left')) - 282 + 'px')
-  })
-
-  /* TO-DO: Will modify this script for new way of showing attributes
-  $('.relevant-set-choose').change(function() {
-    if (this.value == 'Control') {
-      $('.relevant-set.first').slideDown(500);
-    } else {
-      $('.relevant-set.first').slideUp(500);
-    }
+    $(this).addClass("active");
   });
-  */
+
+  $('.attribute-trigger.right').on('shown.bs.popover', function () {
+    $('.popover').css('left',parseInt($('.popover').css('left')) - 276 + 'px')
+  });
+
+  $('.attribute-trigger').on('hidden.bs.popover', function () {
+    $(this).removeClass("active");
+  });
 
 });
 
