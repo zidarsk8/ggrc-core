@@ -9,17 +9,7 @@
 <div class="hideable-holder">
 {{#instance}}
 <form action="javascript://">
-  <!-- Reset button --> 
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="pull-right reset-form">
-        <p>
-          <small><em>Note: Fields are only temporary hidden for this session!</em></small>
-          <a id="formRestore" tabindex="26" class="btn" href="javascript://">Reset form</a>
-        </p>
-      </div>
-    </div>
-  </div>
+  {{> /static/mustache/base_objects/form_restore.mustache}}
 
   <div class="row-fluid">
     <div class="span6">

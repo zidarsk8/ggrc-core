@@ -8,18 +8,8 @@
 {{!div class="modal-body"}}
 <div class="hideable-holder"> 
 {{#instance}}
-<form action="javascript://">
-  <!-- Reset button --> 
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="pull-right reset-form">
-        <p>
-          <small><em>Note: Fields are only temporary hidden for this session!</em></small>
-          <a id="formRestore" tabindex="26" class="btn" href="javascript://">Reset form</a>
-        </p>
-      </div>
-    </div>
-  </div>
+<form action="javascript://">  
+  {{> /static/mustache/base_objects/form_restore.mustache}}
 
   <!-- Title Row -->
   <div class="row-fluid">  
@@ -29,7 +19,7 @@
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label>
-      <input tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" tabindex="1" autofocus>
+      <input tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
       {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
     </div>
   </div>
@@ -43,7 +33,7 @@
         <a href="javascript://" class="field-hide">hide</a>
       </label>
       <div class="wysiwyg-area">
-        <textarea tabindex="2" id="system_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="2">{{{description}}}</textarea>
+        <textarea tabindex="2" id="system_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
       </div>
     </div>
     

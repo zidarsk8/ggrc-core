@@ -472,6 +472,12 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "{$content} #formRestore click" : function(el, ev) {
+    //Update UI status array to initial state
+    var ui_arr_length = this.options.ui_array.length;
+    for(var i = 0; i < ui_arr_length; i++) {
+      this.options.ui_array[i] = 0;
+    }
+
     var $resetForm = $(this.element).find('.reset-form');
     this.options.reset_visible = false;
     //$(this.element).find(".hidden").show();

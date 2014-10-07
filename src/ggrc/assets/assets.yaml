@@ -111,6 +111,7 @@ dashboard-js-template-files:
   - base_objects/tree_footer_no_access.mustache
   - base_objects/tree_footer_zero.mustache
   - base_objects/states.mustache
+  - base_objects/form_restore.mustache
   - base_objects/filters/filter_actions.mustache
   - base_objects/filters/filter_by_person.mustache
   - base_objects/filters/filter_by_relevance.mustache
