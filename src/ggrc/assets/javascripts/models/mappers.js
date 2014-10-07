@@ -419,7 +419,6 @@
 
     , remove_instance: function(binding, instance, mappings) {
         var self = this
-          , mappings
           , mapping_index
           , instance_index_to_remove = -1
           , indexes_to_remove = []
@@ -499,7 +498,7 @@
         }
 
         binding.source_binding.list.bind("add", function(ev, results) {
-          if (binding._refresh_stubs_deferred) {
+          if (binding._refresh_stubs_deferred && binding._refresh_stubs_deferred.state() !== "pending") {
             var matching_results = can.map(can.makeArray(results), function(result) {
               if (self.filter_fn(result))
                 return self.make_result(result.instance, [result], binding);
@@ -755,6 +754,27 @@
   */
   GGRC.ListLoaders.StubFilteredListLoader("GGRC.ListLoaders.CustomFilteredListLoader", {
   }, {
+      process_result : function(binding, result, new_result, include) {
+        var self = this;
+        if (include) {
+          if(typeof include.then === "function") {
+            //return nothing yet. push in later if it is needed.
+            include.then(function(real_include) {
+              if(real_include) {
+                self.insert_results(binding, [new_result]);
+              } else {
+                self.remove_instance(binding, result.instance, result);
+              }
+            });
+          } else {
+            self.insert_results(binding, [new_result]);
+          }
+        } else {
+          self.remove_instance(binding, result.instance, result);
+        }
+
+      },
+
       init_listeners: function(binding) {
         var self = this;
 
@@ -765,24 +785,15 @@
         }
 
         binding.source_binding.list.bind("add", function(ev, results) {
-          if (binding._refresh_instances_deferred) {
-            var matching_results = can.map(can.makeArray(results), function(result) {
-              var include = self.filter_fn(result);
-              if (include) {
-                if(typeof include.then === "function") {
-                  //return nothing yet. push in later if it is needed.
-                  include.then(function(real_include) {
-                    if(real_include) {
-                      self.insert_results(binding, [self.make_result(result.instance, [result], binding)]);
-                    }
-                  });
-                } else {
-                  return self.make_result(result.instance, [result], binding);
-                }
-              }
+          binding.refresh_instances().done(function() {
+            can.map(can.makeArray(results), function(result) {
+              var new_result = self.make_result(result.instance, [result], binding);
+              new_result.compute = can.compute(function() {
+                return self.filter_fn(result);
+              }).bind("change", $.proxy(self, "process_result", binding, result, new_result));
+              self.process_result(binding, result, new_result, new_result.compute());
             });
-            self.insert_results(binding, matching_results);
-          }
+          });
         });
 
         binding.source_binding.list.bind("remove", function(ev, results) {
@@ -798,22 +809,13 @@
 
         return binding.source_binding.refresh_instances()
           .then(function(results) {
-            var matching_results = can.map(can.makeArray(results), function(result) {
-              var include = self.filter_fn(result);
-              if (include) {
-                if(typeof include.then === "function") {
-                  //return nothing yet. push in later if it is needed.
-                  include.then(function(real_include) {
-                    if(real_include) {
-                      self.insert_results(binding, [self.make_result(result.instance, [result], binding)]);
-                    }
-                  });
-                } else {
-                  return self.make_result(result.instance, [result], binding);
-                }
-              }
+            can.map(can.makeArray(results), function(result) {
+              var new_result = self.make_result(result.instance, [result], binding);
+              new_result.compute = can.compute(function() {
+                return self.filter_fn(result);
+              }).bind("change", $.proxy(self, "process_result", binding, result, new_result));
+              self.process_result(binding, result, new_result, new_result.compute());
             });
-            self.insert_results(binding, matching_results);
           });
       }
   });
@@ -999,7 +1001,7 @@
           ;
 
         binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
-          if (binding._refresh_stubs_deferred)
+          if (binding._refresh_stubs_deferred && binding._refresh_stubs_deferred.state() !== "pending")
             self._refresh_stubs(binding);
         });
 
@@ -1164,7 +1166,7 @@
           ;
 
         binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
-          if (binding._refresh_stubs_deferred) {
+          if (binding._refresh_stubs_deferred && binding._refresh_stubs_deferred.state() !== "pending") {
             binding.list.splice(0, binding.list.length);
             self._refresh_stubs(binding);
           }
