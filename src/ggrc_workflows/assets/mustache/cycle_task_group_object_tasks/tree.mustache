@@ -30,7 +30,7 @@
                 <div class="oneline">
                   <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
                   <span class="tiny-data">
-                    {{firstnonempty object.title instance.title}}
+                    {{firstnonempty object.title ''}}
                   </span>
                 </div>
               </div>
@@ -191,27 +191,21 @@
         {{#is_dashboard}}
           {{#using instance=instance.cycle_task_group_object}}
             {{#using object=instance.object}}
-
+              {{#if object.viewLink}}
               <div class="row-fluid">
                 <div class="span9">
                   <h6>Task to be performed on object</h6>
                   <p>
                     <i class="grcicon-{{instance.object.reify.class.table_singular}}-color smallmargin"></i>
                     <span class="cap">{{instance.object.reify.class.table_singular}}:</span>
-                    {{#if object.viewLink}}
-                      {{#is_allowed "view_object_page" object}}
-                        <a href="{{object.viewLink}}" rel="tooltip" data-original-title="View {{instance.object.reify.class.table_singular}}">
-                          {{firstnonempty object.title instance.title}}
-                          <i class="grcicon-goto smallmargin"></i>
-                        </a>
-                      {{else}}
+                    {{#is_allowed "view_object_page" object}}
+                      <a href="{{object.viewLink}}" rel="tooltip" data-original-title="View {{instance.object.reify.class.table_singular}}">
                         {{firstnonempty object.title instance.title}}
-                      {{/is_allowed}}
+                        <i class="grcicon-goto smallmargin"></i>
+                      </a>
                     {{else}}
-                      <span class="error">
-                        Warning: Object deleted or inaccessible
-                      </span>
-                    {{/if}}
+                      {{firstnonempty object.title instance.title}}
+                    {{/is_allowed}}
                   </p>
                 </div>
                 <div class="span3">
@@ -223,7 +217,7 @@
                   </p>
                 </div>
               </div>
-
+              {{/if}}
             {{/using}}
           {{/using}}
         {{/is_dashboard}}

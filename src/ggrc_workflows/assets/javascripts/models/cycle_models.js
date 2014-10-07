@@ -168,6 +168,7 @@
       cycle: "CMS.Models.Cycle.stub",
       task_group: "CMS.Models.TaskGroup.stub",
       cycle_task_group_objects: "CMS.Models.CycleTaskGroupObject.stubs",
+      cycle_task_group_tasks: "CMS.Models.CycleTaskGroupObjectTask.stubs",
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub"
     },
@@ -177,12 +178,17 @@
       show_view: _mustache_path + "/tree.mustache",
       //footer_view: _mustache_path + "/tree_footer.mustache",
       draw_children: true,
-      child_options: [
-        {
+      child_options: [{
+          title: 'Objects',
           model: "CycleTaskGroupObject",
           mapping: "cycle_task_group_objects",
           allow_creating: false
-        }
+        }, {
+          title: 'Tasks',
+          model: "CycleTaskGroupObjectTask",
+          mapping: "cycle_task_group_tasks",
+          allow_creating: false
+        },
       ]
     },
 
@@ -194,8 +200,10 @@
         if (instance instanceof that) {
           var dfd = instance.refresh_all_force('cycle', 'workflow');
           dfd.then(function(){
-            instance.refresh_all_force('cycle_task_group_objects',
-              'cycle_task_group_object_tasks');
+            return $.when(
+              instance.refresh_all_force('cycle_task_group_objects'),
+              instance.refresh_all_force('cycle_task_group_tasks')
+            );
           });
         }
       });
@@ -262,6 +270,7 @@
 
     attributes: {
       cycle_task_group_object: "CMS.Models.CycleTaskGroupObject.stub",
+      cycle_task_group: "CMS.Models.CycleTaskGroup.stub",
       task_group_task: "CMS.Models.TaskGroupTask.stub",
       cycle_task_entries: "CMS.Models.CycleTaskEntry.stubs",
       modified_by: "CMS.Models.Person.stub",
@@ -302,10 +311,8 @@
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          instance.refresh_all_force('cycle_task_group_object',
-              'cycle_task_group', 'cycle', 'workflow').then(function() {
-            var object = instance.cycle_task_group_object.reify();
-            object.refresh_all_force('task_group_object', 'object');
+          instance.refresh_all_force('cycle_task_group_object', 'task_group_object', 'object').then(function(object) {
+            return instance.refresh_all_force('cycle_task_group', 'cycle', 'workflow');
           });
         }
       });
