@@ -82,6 +82,7 @@ $(document).ready(function() {
         tabs.push({title: "New Report " + new_tabs, new_report: true});
         $ul.find('li').not('.hidden-widgets-list').last().addClass("active");
       },
+      // Trying to activate or deactivate popover when value in select is changed.
       /*
       ".sec-obj change": function(el, ev) {
         var choose = el.val();
