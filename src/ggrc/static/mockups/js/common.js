@@ -675,6 +675,10 @@ $(document).ready(function(){
     $(this).removeClass("active");
   });
 
+  $('.generated-report .dropdown-menu input').click(function(e) {
+    e.stopPropagation();
+  });
+
 });
 
 // Make sure the windows are resized properly
