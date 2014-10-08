@@ -110,7 +110,7 @@
                             </li>
                             <li>
                               <label>
-                                <input type="checkbox" name="" id="" checked="checked">
+                                <input type="checkbox" name="" id="">
                                 Contact
                               </label>
                             </li>
@@ -122,7 +122,7 @@
                             </li>
                             <li>
                               <label>
-                                <input type="checkbox" name="" id="" checked="checked">
+                                <input type="checkbox" name="" id="">
                                 System URL
                               </label>
                             </li>
@@ -134,7 +134,7 @@
                             </li>
                             <li>
                               <label>
-                                <input type="checkbox" name="" id="" checked="checked">
+                                <input type="checkbox" name="" id="">
                                 Code
                               </label>
                             </li>
@@ -146,19 +146,19 @@
                             </li>
                             <li>
                               <label>
-                                <input type="checkbox" name="" id="" checked="checked">
+                                <input type="checkbox" name="" id="">
                                 Effective date
                               </label>
                             </li>
                             <li>
                               <label>
-                                <input type="checkbox" name="" id="" checked="checked">
+                                <input type="checkbox" name="" id="">
                                 Stop date
                               </label>
                             </li>
                             <li>
                               <label>
-                                <input type="checkbox" name="" id="" checked="checked">
+                                <input type="checkbox" name="" id="">
                                 State
                               </label>
                             </li>
@@ -200,7 +200,7 @@
                           <ul class="attr-list">
                             <li>
                               <label>
-                                <input type="checkbox" name="" id="" checked="checked">
+                                <input type="checkbox" name="" id="ctrl_title" checked="checked">
                                 Title
                               </label>
                             </li>
@@ -538,196 +538,87 @@
                     </label>
                     <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name" {{^if pivot_selected}}disabled="disabled"{{/if}}>
                     <button type="submit" class="btn btn-primary report-trigger" {{^if pivot_selected}}disabled="disabled"{{/if}}>Generate report</button>
-                    <button type="submit" class="btn btn-primary pull-right" {{^if pivot_selected}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
+                    <button id="test" type="submit" class="btn btn-primary pull-right" {{^if pivot_selected}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
                   </div>
-                </div>
-
-                <div class="selected-object">
-                  {{obj_title}}
-                  <span class="pull-right">Date: 09/26/14</span>
                 </div>
 
                 <div class="generated-report">
                   <table class="table table-bordered">
                     <thead>
                       <tr>
-                        <th>Control Title</th>
-                        <th>Control Owner</th>
-                        <th>Control Contact</th>
-                        <th>Control URL</th>
-                        <th>Control Code</th>
-                        <th>Control State</th>
-                        <th>System Title</th>
-                        <th>System Owner</th>
-                        <th>System Contact</th>
-                        <th>System URL</th>
-                        <th>System Code</th>
-                        <th>System Effective date</th>
-                        <th>System Stop date</th>
-                        <th>System State</th>
+                        {{#table_title}}
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_1}}" href="#">{{tbl_title_1}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_2}}" href="#">{{tbl_title_2}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_3}}" href="#">{{tbl_title_3}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_4}}" href="#">{{tbl_title_4}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_5}}" href="#">{{tbl_title_5}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_6}}" href="#">{{tbl_title_6}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_7}}" href="#">{{tbl_title_7}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_8}}" href="#">{{tbl_title_8}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_9}}" href="#">{{tbl_title_9}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_10}}" href="#">{{tbl_title_10}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_11}}" href="#">{{tbl_title_11}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_12}}" href="#">{{tbl_title_12}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_13}}" href="#">{{tbl_title_13}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_14}}" href="#">{{tbl_title_14}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_15}}" href="#">{{tbl_title_15}}</a>
+                          </th>
+                          <th>
+                            <a rel="tooltip" data-placement="top" data-original-title="Sort by {{tbl_title_16}}" href="#">{{tbl_title_16}}</a>
+                          </th>
+                        {{/table_title}}
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>CTRL 1</td>
-                        <td>John Doe</td>
-                        <td>Julius Robert Oppenheimer</td>
-                        <td>http://google.com/control/manhattan-project</td>
-                        <td>CT000</td>
-                        <td>Draft</td>
-                        <td>SYS1.1</td>
-                        <td>Jane Doe</td>
-                        <td>Richard Feynman</td>
-                        <td>http://google.com/system/manhattan-project</td>
-                        <td>S001</td>
-                        <td>01/24/2014</td>
-                        <td>12/24/2015</td>
-                        <td>Final</td>
-                      </tr>
-                      <tr>
-                        <td>CTRL 1</td>
-                        <td>John Doe</td>
-                        <td>Julius Robert Oppenheimer</td>
-                        <td>http://google.com/control/manhattan-project</td>
-                        <td>CT000</td>
-                        <td>Draft</td>
-                        <td>SYS1.2</td>
-                        <td>Jane Doe</td>
-                        <td>Richard Feynman</td>
-                        <td>http://google.com/system/manhattan-project</td>
-                        <td>S002</td>
-                        <td>01/24/2014</td>
-                        <td>12/24/2015</td>
-                        <td>Maintenance</td>
-                      </tr>
-                      <tr>
-                        <td>CTRL 1</td>
-                        <td>John Doe</td>
-                        <td>Julius Robert Oppenheimer</td>
-                        <td>http://google.com/control/manhattan-project</td>
-                        <td>CT000</td>
-                        <td>Effective</td>
-                        <td>SYS1.3</td>
-                        <td>Jane Doe</td>
-                        <td>Richard Feynman</td>
-                        <td>http://google.com/system/manhattan-project</td>
-                        <td>S003</td>
-                        <td>01/24/2014</td>
-                        <td>12/24/2015</td>
-                        <td>Final</td>
-                      </tr>
-                      <tr>
-                        <td>CTRL 2</td>
-                        <td>Lisa Mona</td>
-                        <td>Julius Robert Oppenheimer</td>
-                        <td>http://google.com/control/manhattan-project</td>
-                        <td>CT002</td>
-                        <td>Effective</td>
-                        <td>SYS2.1</td>
-                        <td>Jane Doe</td>
-                        <td>Richard Feynman</td>
-                        <td>http://google.com/system/manhattan-project</td>
-                        <td>S004</td>
-                        <td>01/24/2014</td>
-                        <td>12/24/2015</td>
-                        <td>Final</td>
-                      </tr>
-                      <tr>
-                        <td>CTRL 3</td>
-                        <td>Karim Abdul</td>
-                        <td>Julius Robert Oppenheimer</td>
-                        <td>http://google.com/control/manhattan-project</td>
-                        <td>CT045</td>
-                        <td>Ineffective</td>
-                        <td>SYS3.1</td>
-                        <td>Jane Doe</td>
-                        <td>Richard Feynman</td>
-                        <td>http://google.com/system/manhattan-project</td>
-                        <td>SX</td>
-                        <td>01/24/2014</td>
-                        <td>12/24/2015</td>
-                        <td>Final</td>
-                      </tr>
-                      <tr>
-                        <td>CTRL 3</td>
-                        <td>Karim Abdul</td>
-                        <td>Julius Robert Oppenheimer</td>
-                        <td>http://google.com/control/manhattan-project</td>
-                        <td>CT045</td>
-                        <td>Ineffective</td>
-                        <td>SYS3.2</td>
-                        <td>Jane Doe</td>
-                        <td>Richard Feynman</td>
-                        <td>http://google.com/system/manhattan-project</td>
-                        <td>SXa</td>
-                        <td>01/24/2014</td>
-                        <td>12/24/2015</td>
-                        <td>Draft</td>
-                      </tr>
-                      <tr>
-                        <td>CTRL 4</td>
-                        <td>Manny Manning</td>
-                        <td>Julius Robert Oppenheimer</td>
-                        <td>http://google.com/control/manhattan-project</td>
-                        <td>CT-AK-47a</td>
-                        <td>Effective</td>
-                        <td>SYS4.1</td>
-                        <td>Jane Doe</td>
-                        <td>Richard Feynman</td>
-                        <td>http://google.com/system/manhattan-project</td>
-                        <td>SX11</td>
-                        <td>01/24/2014</td>
-                        <td>12/24/2015</td>
-                        <td>Draft</td>
-                      </tr>
-                      <tr>
-                        <td>CTRL 4</td>
-                        <td>Manny Manning</td>
-                        <td>Julius Robert Oppenheimer</td>
-                        <td>http://google.com/control/manhattan-project</td>
-                        <td>CT-AK-47a</td>
-                        <td>Effective</td>
-                        <td>SYS4.2</td>
-                        <td>Jane Doe</td>
-                        <td>Richard Feynman</td>
-                        <td>http://google.com/system/manhattan-project</td>
-                        <td>SX12</td>
-                        <td>01/24/2014</td>
-                        <td>12/24/2015</td>
-                        <td>Final</td>
-                      </tr>
-                      <tr>
-                        <td>CTRL 4</td>
-                        <td>Manny Manning</td>
-                        <td>Julius Robert Oppenheimer</td>
-                        <td>http://google.com/control/manhattan-project</td>
-                        <td>CT-AK-47a</td>
-                        <td>Effective</td>
-                        <td>SYS4.3</td>
-                        <td>Jane Doe</td>
-                        <td>Richard Feynman</td>
-                        <td>http://google.com/system/manhattan-project</td>
-                        <td>SX13</td>
-                        <td>01/24/2014</td>
-                        <td>12/24/2015</td>
-                        <td>Final</td>
-                      </tr>
-                      <tr>
-                        <td>CTRL 5</td>
-                        <td>Carl Grove</td>
-                        <td>Julius Robert Oppenheimer</td>
-                        <td>http://google.com/control/manhattan-project</td>
-                        <td>CT-PR</td>
-                        <td>Effective</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                      </tr>
+                      {{#table_data}}
+                        <tr>
+                          <td>{{tbl_data_1}}</td>
+                          <td>{{tbl_data_2}}</td>
+                          <td>{{tbl_data_3}}</td>
+                          <td>{{tbl_data_4}}</td>
+                          <td>{{tbl_data_5}}</td>
+                          <td>{{tbl_data_6}}</td>
+                          <td>{{tbl_data_7}}</td>
+                          <td>{{tbl_data_8}}</td>
+                          <td>{{tbl_data_9}}</td>
+                          <td>{{tbl_data_10}}</td>
+                          <td>{{tbl_data_11}}</td>
+                          <td>{{tbl_data_12}}</td>
+                          <td>{{tbl_data_13}}</td>
+                          <td>{{tbl_data_14}}</td>
+                          <td>{{tbl_data_15}}</td>
+                          <td>{{tbl_data_16}}</td>
+                        </tr>
+                      {{/table_data}}
                     </tbody>
                   </table>
                 </div>
