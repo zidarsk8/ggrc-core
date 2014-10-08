@@ -1227,7 +1227,7 @@ ul.attr-list {
   table {
     @include border-radius(0);
     th, td {
-      min-width: 30% !important;
+      min-width: 70px;
     }
     .dropdown-menu {
       min-width: 240px;
