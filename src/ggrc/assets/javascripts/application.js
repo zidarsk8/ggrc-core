@@ -1092,6 +1092,10 @@ $(window).load(function(){
 jQuery(function($){
   $.fn.cms_wysihtml5 = function() {
 
+    if ($(this).data('_wysihtml5_initialized'))
+      return;
+
+    $(this).data('_wysihtml5_initialized', true);
     this.wysihtml5({
         link: true,
         image: false,
