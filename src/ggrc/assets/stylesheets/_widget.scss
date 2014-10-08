@@ -1236,7 +1236,7 @@ ul.attr-list {
         right: 0;
         left: auto;
       }
-      input {
+      .dropdown-input {
         float: left;
         margin: 0 5px 0 0;
         width: 185px;
@@ -1244,6 +1244,14 @@ ul.attr-list {
       button {
         float: left;
         width: 40px;
+      }
+      .range {
+        float: left;
+        margin-right: 5px;
+        width: 195px;
+        input {
+          margin: 0;
+        }
       }
     }
     tr {
