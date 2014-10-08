@@ -277,19 +277,6 @@
       contact: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
       cycle: "CMS.Models.Cycle.stub",
-      response_options: "can.List.newInstance",
-      selected_response_options: "can.List.newInstance"
-    },
-
-    serialize: {
-      // JSONType: function(val) {
-      //   return JSON.stringify(can.List.prototype.serialize.call(val));
-      // }
-    },
-    convert: {
-      // JSONType: function(source) {
-      //   return new can.List(source.serialize ? source.serialize() : source).attr("serialize", null);
-      // }
     },
 
     tree_view_options: {
