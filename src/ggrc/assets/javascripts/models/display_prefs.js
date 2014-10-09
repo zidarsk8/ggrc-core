@@ -126,22 +126,6 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
     return widget_id ? size.attr(widget_id) : size;
   }
-
-  , setObjNavSize : function(page_id, widget_id, size) {
-    this.makeObject(page_id === null ? page_id : path, OBJ_SIZE).attr(widget_id, size);
-    this.autoupdate && this.save();
-    return this;
-  }
-
-  , getObjNavSize : function(page_id, widget_id) {
-    var size = this.getObject(page_id === null ? page_id : path, OBJ_SIZE);
-    if(!size) {
-      size = this.makeObject(page_id === null ? page_id : path, OBJ_SIZE).attr(this.makeObject(OBJ_SIZE, page_id).serialize());
-    }
-
-    return widget_id ? size.attr(widget_id) : size;
-  }
-
   , setGlobal : function(widget_id, attrs) {
     var global = this.getObject(null, GLOBAL) && this.getObject(null, GLOBAL).attr(widget_id);
     if (!global) {
