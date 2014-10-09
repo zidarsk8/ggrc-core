@@ -442,6 +442,10 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-riskyattribute-color, .grcicon-risky_attribute-color { background-position:-102px -320px; }
 .grcicon-dashboard-big { background-position:-246px -224px; }
 
+.grcicon-vendor-black { background-position: -30px -392px; }
+.grcicon-vendor-white { background-position: -54px -392px; }
+.grcicon-vendor-color { background-position: -78px -392px; }
+
 .grcicon-show { background-position:-222px -320px }
 .grcicon-hide { background-position:-246px -320px }
 .grcicon-show-arrow { background-position:-126px -56px }
@@ -513,6 +517,7 @@ i.short {
   .grcicon-task_group-color { background-position:-318px -56px; }
   .grcicon-history-color { background-position: -318px -104px; }
   .grcicon-cycle-color { background-position: -342px -32px; }
+  .grcicon-vendor-color { background-position: -30px -392px; }
 
   li {
     a:hover {
@@ -555,6 +560,7 @@ i.short {
       .grcicon-task_group-color { background-position:-318px -32px; }
       .grcicon-history-color { background-position: -318px -128px; }
       .grcicon-cycle-color { background-position: -342px -56px; }
+      .grcicon-vendor-color { background-position: -54px -392px; }
     }
   }
 
@@ -637,5 +643,6 @@ i.short {
     .grcicon-workflow-color { background-position:-6px -344px; }
     .grcicon-cycle_task_group_object_task-color,.grcicon-task-color { background-position:-294px -392px; }
     .grcicon-task_group-color { background-position:-318px -56px; }
+    .grcicon-vendor-color { background-position: -30px -392px; }
   }
 }
