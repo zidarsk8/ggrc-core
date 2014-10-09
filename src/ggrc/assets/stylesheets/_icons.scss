@@ -446,6 +446,11 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-vendor-white { background-position: -54px -392px; }
 .grcicon-vendor-color { background-position: -78px -392px; }
 
+.grcicon-assessment-plan-black, .grcicon-access-list-black, .grcicon-issue-black { background-position: -54px -344px; }
+.grcicon-assessment-plan-white, .grcicon-access-list-white, .grcicon-issue-white { background-position: -78px -344px; }
+.grcicon-assessment-plan-color, .grcicon-issue-color { background-position: -78px -368px; }
+.grcicon-access-list-color { background-position: -54px -368px; }
+
 .grcicon-show { background-position:-222px -320px }
 .grcicon-hide { background-position:-246px -320px }
 .grcicon-show-arrow { background-position:-126px -56px }
@@ -518,6 +523,7 @@ i.short {
   .grcicon-history-color { background-position: -318px -104px; }
   .grcicon-cycle-color { background-position: -342px -32px; }
   .grcicon-vendor-color { background-position: -30px -392px; }
+  .grcicon-assessment-plan-color, .grcicon-access-list-color, .grcicon-issue-color { background-position: -54px -344px; }
 
   li {
     a:hover {
@@ -561,6 +567,7 @@ i.short {
       .grcicon-history-color { background-position: -318px -128px; }
       .grcicon-cycle-color { background-position: -342px -56px; }
       .grcicon-vendor-color { background-position: -54px -392px; }
+      .grcicon-assessment-plan-color, .grcicon-access-list-color, .grcicon-issue-color { background-position: -78px -344px; }
     }
   }
 
@@ -644,6 +651,6 @@ i.short {
     .grcicon-cycle_task_group_object_task-color,.grcicon-task-color { background-position:-294px -392px; }
     .grcicon-task_group-color { background-position:-318px -56px; }
     .grcicon-vendor-color { background-position: -30px -392px; }
-    
+    .grcicon-assessment-plan-color, .grcicon-access-list-color, .grcicon-issue-color { background-position: -54px -344px; }
   }
 }
