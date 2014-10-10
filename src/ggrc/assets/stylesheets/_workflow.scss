@@ -387,6 +387,9 @@ ul.new-tree {
   &.inline-data-content-small {
     font-size:11px;
   }
+  &.oneline {
+    display: block;
+  }
 }
 
 .inline-footer-link {
