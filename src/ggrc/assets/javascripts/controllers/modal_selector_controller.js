@@ -1616,6 +1616,7 @@
                 self.option_list.replace([]);
                 self.option_list.push.apply(self.option_list, options);
                 self._start_pager(options, 20, active_fn, draw_fn);
+                $('.modalSearchButton').removeAttr('disabled');
               }
             });
         }
@@ -1633,14 +1634,17 @@
               options = search_result.getResultsForType(current_option_model_name);
               self.option_list.push.apply(self.option_list, options);
               self._start_pager(options, 20, active_fn, draw_fn);
+              $('.modalSearchButton').removeAttr('disabled');
             }
           });
     }
 
     //Search button click
-    , ".objectReview click": "triggerSearch"
+    , ".modalSearchButton:not([disabled]) click": "triggerModalSearch"
 
-    , triggerSearch: function(){
+    , triggerModalSearch: function(){
+      $('.modalSearchButton').attr('disabled','disabled');
+
       var ctx = this.context;
       var self = this,
         selected = this.options.option_model.shortName,
@@ -1706,6 +1710,7 @@
             self.insert_options(options);
           };
           self.option_list.push.apply(self.option_list, options);
+          $('.modalSearchButton').removeAttr('disabled');
           self._start_pager(can.map(options, function(op) {
               return op.instance;
             }), 20, active_fn, draw_fn);

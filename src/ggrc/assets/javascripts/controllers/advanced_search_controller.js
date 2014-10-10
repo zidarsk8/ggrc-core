@@ -183,6 +183,7 @@
                 self.option_list.replace([]);
                 self.option_list.push.apply(self.option_list, options);
                 self._start_pager(options, 20, active_fn, draw_fn);
+                $('.advancedSearchButton').removeAttr('disabled');
               }
             });
         }
@@ -201,12 +202,13 @@
               self.option_list.replace([]);
               self.option_list.push.apply(self.option_list, options);
               self._start_pager(options, 20, active_fn, draw_fn);
+              $('.advancedSearchButton').removeAttr('disabled');
             }
           });
     }
 
     //Search button click
-    , ".objectReview click": "triggerSearch"
+    , ".advancedSearchButton:not([disabled]) click": "triggerSearch"
 
     , "#search keyup": function(el, ev) {
         if (ev.which == 13) {
@@ -222,20 +224,19 @@
     }
 
     , triggerSearch: function(){
-
+      $('.advancedSearchButton').attr('disabled','disabled');
+      
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();
       var ctx = this.context;
 
       //Get the selected object value
-
       var selected = $("select.option-type-selector").val(),
         self = this,
         loader,
         term = ctx.option_search_term || "",
         filters = [],
         cancel_filter;
-
 
       this.set_option_descriptor(selected);
 
@@ -308,8 +309,7 @@
 
         if (filters.length === 1) {
           loader = filters[0];
-        }
-        else {
+        } else {
           loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
         }
 
@@ -325,6 +325,7 @@
             self.insert_options(options);
           };
           self.option_list.push.apply(self.option_list, options);
+          $('.advancedSearchButton').removeAttr('disabled');
           self._start_pager(can.map(options, function(op) {
               return op.instance;
             }), 20, active_fn, draw_fn);
