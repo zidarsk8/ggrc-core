@@ -233,22 +233,50 @@
             </p>
           </div>
           <div class="span4">
-            <h6>Auditor</h6>
-            <p>
-              {{! `with_auditors` requires `authorizations` mapping, so preload it }}
-              {{#with_mapping 'authorizations' instance}}
-              {{#with_auditors instance decoy=authorizations}}
-                {{#using auditor=auditors.0.person}}
+            {{! `with_auditors` requires `authorizations` mapping, so preload it }}
+            {{#with_mapping 'auditor_authorizations' instance}}
+              {{#if auditor_authorizations.length}}
+                <h6>{{#if_equals auditor_authorizations.length 1}}Auditor{{else}}Auditors{{/if_equals}}</h6>
+                {{#each auditor_authorizations}}
+                <p>
+                {{#using auditor=instance.person}}
                   {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
                 {{/using}}
+                {{#is_allowed 'delete' this}}
+                  <a href="javascript://" class="unmap" data-toggle="unmap">
+                    <span class="result" {{data 'result'}}></span>
+                    <i class="grcicon-deleted"></i>
+                  </a>
+                {{/is_allowed}}
+                </p>
+                {{/each}}
               {{else}}
-                No auditor assigned
-              {{/with_auditors}}
-              {{/with_mapping}}
-            </p>
+                <h6>Auditors</h6>
+                <p>No auditor assigned</p>
+              {{/if}}
+            {{/with_mapping}}
+            {{#is_allowed 'create' 'UserRole'}}
+            {{#toggle show_new_object_form}}
+              {{#with_page_object_as 'page_instance'}}
+              <ggrc-quick-add parent_instance="instance" join_model="UserRole">
+                {{#prune_context}}
+                <div class="objective-selector field-wrap">
+                  <input tabindex="3" type="text" name="instance" data-lookup="Person" null-if-empty="true" class="search-icon" placeholder="Add Auditor" {{autocomplete_select}} value="{{instance.email}}">
+                  <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+         
+                  <a href="javascript://" class="btn btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>+Add</a>
+                </div>
+                <input type="hidden" name="role_name" value="Auditor" />
+                {{/prune_context}}
+              </ggrc-quick-add>
+              {{/with_page_object_as}}
+            {{else}}
+                <a href="javascript://" class="btn" {{toggle_button}}>+ Add Auditor</a>
+            {{/toggle}}
+            {{/is_allowed}}
           </div>
         </div>
-        
+
         {{#instance.url}}
           <div class="row-fluid">
             <div class="span12">

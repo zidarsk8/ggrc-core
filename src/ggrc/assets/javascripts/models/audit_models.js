@@ -95,6 +95,9 @@ can.Model.Cacheable("CMS.Models.Audit", {
       return that._save_auditor(instance);
     });
   }
+  , findAuditorUserRoles: function() {
+
+  } 
   , _save_auditor : function(instance){
 
     var no_change = false
