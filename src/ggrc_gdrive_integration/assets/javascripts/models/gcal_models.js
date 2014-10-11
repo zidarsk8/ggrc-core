@@ -96,7 +96,7 @@
       , that = this;
 
       if(params && params.response) {
-        params.q = "PBC Response #" + params.response.id;
+        params.q = "Response #" + params.response.id;
       }
       return dfd.then(function() {
         return GGRC.gapi_request_with_auth({
