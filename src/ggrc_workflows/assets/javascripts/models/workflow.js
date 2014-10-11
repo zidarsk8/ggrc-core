@@ -37,7 +37,9 @@
         Workflow_Draft: {status: 'Draft'}
       }
     },
-
+    obj_nav_options: {
+      show_all_tabs: true,
+    },
     tree_view_options: {
       show_view: GGRC.mustache_path + "/workflows/tree.mustache"
     },
