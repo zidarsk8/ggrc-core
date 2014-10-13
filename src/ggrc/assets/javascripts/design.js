@@ -450,4 +450,3 @@ jQuery(function($) {
 $(document).load(function(){
   $("#program_start_date").hide();
 });
-
