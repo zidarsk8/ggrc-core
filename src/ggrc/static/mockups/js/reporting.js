@@ -102,6 +102,14 @@ $(document).ready(function() {
         }
       },
       */
+      "#addFilterRule click": function(el, ev) {
+        var newRule = this.element.find("#newObjectSet");
+        newRule.slideDown('fast');
+      },
+      "#removeFilter click": function(el, ev) {
+        var newRule = this.element.find("#newObjectSet");
+        newRule.slideUp('fast');
+      }
     }
   });
 

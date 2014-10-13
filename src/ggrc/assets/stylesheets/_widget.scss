@@ -1204,6 +1204,16 @@ ul.attr-list {
     box-sizing: border-box;
     height: 28px;
   }
+  .input-medium {
+    width: 75%;
+    float: left;
+  }
+  .remove_filter {
+    float: left;
+    width: 10%;
+    text-align: left;
+    margin-top: 5px;
+  }
 }
 
 .date-range-text {

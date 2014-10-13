@@ -46,46 +46,40 @@
             <section class="widget sticky_header widget-active" style="display: block;">
               <section class="content ggrc_controllers_list_view">
                 <div class="choose-object-wrap parent">
+                  
                   <div class="row-fluid">
                     <div class="span4">
                       <h6>
-                        Pivot Object type
-                        <span class="required">*</span>
-                      </h6>
-                      <select class="input-block-level option-type-selector">
-                        <optgroup label="Governance">
-                          <option value="Program" selected="selected">Program</option>
-                          <option value="Regulation">Regulation</option>
-                          <option value="Standard">Standard</option>
-                          <option value="Policy">Policy</option>
-                          <option value="Contract">Contract</option>
-                          <option value="Objective">Objective</option>
-                          <option value="Control">Control</option>
-                          <option value="Section">Section</option>
-                          <option value="Clause">Clause</option>
-                        </optgroup>
-                        <optgroup label="People/Groups">
-                          <option value="People">Person</option>
-                          <option value="OrgGroup">Org Group</option>
-                        </optgroup>
-                        <optgroup label="Assets/Business">
-                          <option value="System">System</option>
-                          <option value="Process">Process</option>
-                          <option value="DataAsset">Data Asset</option>
-                          <option value="Facility">Facility</option>
-                          <option value="Market">Market</option>
-                          <option value="Product">Product</option>
-                          <option value="Project">Project</option>
-                        </optgroup>
-                      </select>
-                    </div>
-                    <div class="span4">
-                      <h6>
-                        Pivot object
+                        Anchor object type
                         <span class="required">*</span>
                       </h6>
                       <div class="single-line-filter">
-                        <input id="pivot_search" class="input-xlarge" placeholder="Type to search for program..." type="text">
+                        <select class="input-xlarge option-type-selector">
+                          <optgroup label="Governance">
+                            <option value="Program" selected="selected">Program</option>
+                            <option value="Regulation">Regulation</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Policy">Policy</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Objective">Objective</option>
+                            <option value="Control">Control</option>
+                            <option value="Section">Section</option>
+                            <option value="Clause">Clause</option>
+                          </optgroup>
+                          <optgroup label="People/Groups">
+                            <option value="People">Person</option>
+                            <option value="OrgGroup">Org Group</option>
+                          </optgroup>
+                          <optgroup label="Assets/Business">
+                            <option value="System">System</option>
+                            <option value="Process">Process</option>
+                            <option value="DataAsset">Data Asset</option>
+                            <option value="Facility">Facility</option>
+                            <option value="Market">Market</option>
+                            <option value="Product">Product</option>
+                            <option value="Project">Project</option>
+                          </optgroup>
+                        </select>
                         <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
                         <div class="attr-wrap">
                           <h3>Select program attributes to show in report</h3>
@@ -164,6 +158,289 @@
                             </li>
                           </ul>
                         </div>
+                      </div>
+                    </div>
+                    <div class="span4">
+                      <h6>
+                        Anchor object
+                        <span class="required">*</span>
+                      </h6>
+                      <input id="pivot_search" class="input-block-level" placeholder="Type to search for program..." type="text">
+                    </div>
+                    <div class="span4">
+                      <h6>Filter by person</h6>
+                      <div class="modal-search objective-selector">
+                        <input id="search-by-owner" class="search-by-owner input-block-level ui-autocomplete-input" placeholder="Find owner or contact" type="text" name="owner" value="">
+                      </div>
+                    </div>
+                  </div>
+                  <br>
+                  <div class="relevance-filters">
+                    <div class="row-fluid">
+                      <div class="span4">
+                        <h6>Relevant object set</h6>
+                        <div class="single-line-filter">
+                          <button type="submit" data-index="0" class="remove_filter">
+                            <i class="grcicon-deleted"></i>
+                          </button>
+                          <select class="input-medium relevant-set-choose">
+                            <option value="Program" label="Program">Program</option>
+                            <option value="Regulation">Regulation</option>
+                            <option value="Policy">Policy</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Clause">Clause</option>
+                            <option value="Section">Section</option>
+                            <option value="Objective">Objective</option>
+                            <option value="Control">Control</option>
+                            <option value="Person">Person</option>
+                            <option value="System">System</option>
+                            <option value="Process">Process</option>
+                            <option value="DataAsset">Data Asset</option>
+                            <option value="Product">Product</option>
+                            <option value="Project">Project</option>
+                            <option value="Facility">Facility</option>
+                            <option value="Market">Market</option>
+                          </select>
+                          <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
+                          <div class="attr-wrap">
+                            <h3>Select system attributes to show in report</h3>
+                            <ul class="attr-list">
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="" checked="checked">
+                                  Title
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Description
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="" checked="checked">
+                                  Owner
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="" checked="checked">
+                                  Contact
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Notes
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="" checked="checked">
+                                  System URL
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Reference URL
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="" checked="checked">
+                                  Code
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="">
+                                  Network Zone
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="" checked="checked">
+                                  Effective date
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="" checked="checked">
+                                  Stop date
+                                </label>
+                              </li>
+                              <li>
+                                <label>
+                                  <input type="checkbox" name="" id="" checked="checked">
+                                  State
+                                </label>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="span4">
+                        <h6>Search</h6>
+                        <input id="" class="input-block-level search-icon search-filter0 ui-autocomplete-input" placeholder="Type to search for object" type="text" name="" value="">
+                      </div>
+                    </div>
+                    <br>
+                    <div id="newObjectSet">
+                      <div class="row-fluid">
+                        <div class="span4">
+                          <h6>2nd Relevant object set</h6>
+                          <div class="single-line-filter">
+                            <button type="submit" data-index="1" class="remove_filter" id="removeFilter">
+                              <i class="grcicon-deleted"></i>
+                            </button>
+                            <select class="input-medium second-relevant-set-choose">
+                              <option value="Program" label="Program">Program</option>
+                              <option value="Regulation">Regulation</option>
+                              <option value="Policy">Policy</option>
+                              <option value="Standard">Standard</option>
+                              <option value="Contract">Contract</option>
+                              <option value="Clause">Clause</option>
+                              <option value="Section">Section</option>
+                              <option value="Objective">Objective</option>
+                              <option value="Control">Control</option>
+                              <option value="Person">Person</option>
+                              <option value="System">System</option>
+                              <option value="Process">Process</option>
+                              <option value="DataAsset">Data Asset</option>
+                              <option value="Product">Product</option>
+                              <option value="Project">Project</option>
+                              <option value="Facility">Facility</option>
+                              <option value="Market">Market</option>
+                            </select>
+                            <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
+                            <div class="attr-wrap">
+                              <h3>Select system attributes to show in report</h3>
+                              <ul class="attr-list">
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    Title
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Description
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    Owner
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    Contact
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Notes
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    System URL
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Reference URL
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    Code
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    Effective date
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    Stop date
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    State
+                                  </label>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="span4">
+                          <h6>Search</h6>
+                          <input id="" class="input-block-level search-icon search-filter1 ui-autocomplete-input" placeholder="Type to search for object" type="text" name="" value="">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="add-rule">
+                      <a href="#" id="addFilterRule" class="addFilterRule">+ Add New Rule</a>
+                    </div>
+                  </div>
+
+                  <!--
+                  <div class="row-fluid">
+                    <div class="span4">
+                      <h6>
+                        Pivot Object type
+                        <span class="required">*</span>
+                      </h6>
+                      <select class="input-block-level option-type-selector">
+                        <optgroup label="Governance">
+                          <option value="Program" selected="selected">Program</option>
+                          <option value="Regulation">Regulation</option>
+                          <option value="Standard">Standard</option>
+                          <option value="Policy">Policy</option>
+                          <option value="Contract">Contract</option>
+                          <option value="Objective">Objective</option>
+                          <option value="Control">Control</option>
+                          <option value="Section">Section</option>
+                          <option value="Clause">Clause</option>
+                        </optgroup>
+                        <optgroup label="People/Groups">
+                          <option value="People">Person</option>
+                          <option value="OrgGroup">Org Group</option>
+                        </optgroup>
+                        <optgroup label="Assets/Business">
+                          <option value="System">System</option>
+                          <option value="Process">Process</option>
+                          <option value="DataAsset">Data Asset</option>
+                          <option value="Facility">Facility</option>
+                          <option value="Market">Market</option>
+                          <option value="Product">Product</option>
+                          <option value="Project">Project</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                    <div class="span4">
+                      <h6>
+                        Pivot object
+                        <span class="required">*</span>
+                      </h6>
+                      <div class="single-line-filter">
+                        <input id="pivot_search" class="input-xlarge" placeholder="Type to search for program..." type="text">
                       </div>
                     </div>
                   </div>
@@ -527,6 +804,7 @@
                       </div>
                     </div>
                   </div>
+                  -->
 
                 </div>
 
