@@ -22,10 +22,16 @@
 	        Upload Evidence
 	      </a>
 	      {{else}}
-	      The Audit Lead must create a Request folder before Evidence can be uploaded.
+	        The Audit Lead must map a folder to Audit before Evidence can be uploaded.
 	      {{/if}}
       {{else}}
-        The Audit Lead must create a Request folder before Evidence can be uploaded.
+        {{#if error.errors}}
+          <small>
+            You need permission to access evidence folder. <a href="https://drive.google.com/folderview?id={{grdive_msg_to_id error.message}}&usp=sharing#">Request access.</a>
+          </small>
+        {{else}}
+          The Audit Lead must map a folder to Audit before Evidence can be uploaded.
+        {{/if}}
       {{/with_mapping}}
       {{/using}}
     </div>

@@ -103,13 +103,10 @@
           folders:
             new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder"),
           previous_cycles: CustomFilter("cycles", function(result) {
-              return !result.instance.is_current;
-            }),
-          current_cycles: CustomFilter("cycles", function(result) {
-              return result.instance.is_current;
+              return !result.instance.attr("is_current");
             }),
           current_cycle: CustomFilter("cycles", function(result) {
-              return result.instance.is_current;
+              return result.instance.attr("is_current");
             }),
           current_task_groups: Cross("current_cycle", "reify_cycle_task_groups"),
           current_task_group_objects: Cross("current_task_groups", "cycle_task_group_objects_for_page_object"),
@@ -154,9 +151,13 @@
             "CycleTaskGroupObject",
             "cycle_task_group",
             "cycle_task_group_objects"),
+          cycle_task_group_tasks: Direct(
+            "CycleTaskGroupObjectTask",
+            "cycle_task_group",
+            "cycle_task_group_tasks"),
           cycle_task_group_objects_for_page_object: CustomFilter(
             "cycle_task_group_objects", function(object) {
-              return object.instance.object.reify() === GGRC.page_instance();
+              return object.instance.attr("object").reify() === GGRC.page_instance();
             }),
           cycle_task_group_object_tasks_for_page_object: Cross(
             "cycle_task_group_objects_for_page_object", "cycle_task_group_object_tasks"
@@ -186,6 +187,10 @@
             "CycleTaskGroupObject",
             "cycle_task_group_object_tasks",
             "cycle_task_group_object"),
+          cycle_task_group: Direct(
+            "CycleTaskGroup",
+            "cycle_task_group_object_tasks",
+            "cycle_task_group"),
           //task_group_object: Direct(
           //  "TaskGroupObject", "cycle", "tasks")
           cycle_task_entries: Direct(
@@ -262,9 +267,9 @@
       mappings[type].workflows = Cross("task_groups", "workflow");
       mappings[type].approval_workflows = CustomFilter(
         "workflows", function(binding) {
-          return binding.instance.object_approval;
+          return binding.instance.attr("object_approval");
         });
-      mappings[type].current_approval_cycles = Cross("approval_workflows", "current_cycles");
+      mappings[type].current_approval_cycles = Cross("approval_workflows", "current_cycle");
       mappings[type]._canonical = {
        "workflows": "Workflow",
        "task_groups": "TaskGroup"
@@ -494,7 +499,7 @@
         draw_children: true,
         parent_instance: object,
         model: "Cycle",
-        mapping: "current_cycles",
+        mapping: "current_cycle",
         header_view: GGRC.mustache_path + "/cycles/tree_header.mustache",
       }
     };

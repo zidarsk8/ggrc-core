@@ -11,6 +11,7 @@ from datetime import datetime
 from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models.reflection import AttributeInfo
+from ggrc.models.types import JsonType
 from ggrc.utils import url_for, view_url_for
 from sqlalchemy.ext.associationproxy import AssociationProxy
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -108,6 +109,7 @@ class UpdateAttrHandler(object):
     """Perform the update to ``obj`` required to make the attribute attr
     equivalent in ``obj`` and ``json_obj``.
     """
+    class_attr = getattr(obj.__class__, attr)
     if (hasattr(attr, '__call__')):
       # The attribute has been decorated with a callable, grab the name and
       # invoke the callable to get the value
@@ -118,10 +120,16 @@ class UpdateAttrHandler(object):
       # key off of the type of the attribute and invoke the method of the
       # same name.
       attr_name = attr
-      class_attr = getattr(obj.__class__, attr_name)
       method = getattr(cls, class_attr.__class__.__name__)
       value = method(obj, json_obj, attr_name, class_attr)
-    if isinstance(value, (set, list)):
+    if isinstance(value, (set, list)) \
+      and (
+        not hasattr(class_attr, 'property') \
+        or not hasattr(class_attr.property, 'columns') \
+        or not isinstance(
+        class_attr.property.columns[0].type,
+        JsonType
+        )):
       # SQLAlchemy instrumentation botches up if we replace entire collections
       # It works if we update them with changes
       new_set = set(value)

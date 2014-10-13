@@ -63,94 +63,96 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
   }
 }, {
   save : function() {
-    var ret,
-        that = this
-        aws = this.original_object.get_mapping("approval_workflows");
-
-    if(aws.length < 1) {
-      ret = $.when(
-        new CMS.Models.Workflow({
-          frequency: "one_time",
-          status: "Active",
-          title: "Object review for "
-                  + this.original_object.constructor.title_singular
-                  + ' "' + this.original_object.title + '"',
-          object_approval: true,
-          notify_on_change: true,
-          notify_custom_message: "Hello " + this.contact.reify().name + ",\n\n"
-            + GGRC.current_user.name + " (" + GGRC.current_user.email
-            + ") asked you to review newly created "
-            + this.original_object.constructor.model_singular + ' "' + this.original_object.title
-            + '" before ' + moment(this.end_date).format("MM/DD/YYYY") + ". "
-            + "Click <a href='" + window.location.href.replace("#.*$", "#")
-            + "workflows_widget'>here</a> to perform a review.\n\nThanks,\ngGRC Team",
-          context: that.original_object.context
-        }).save()
-      ).then(function(wf) {
-          return $.when(
-            wf,
-            new CMS.Models.TaskGroup({
-              workflow : wf,
-              title: "Object review for "
-                      + that.original_object.constructor.title_singular
-                      + ' "' + that.original_object.title + '"',
-              contact: that.contact,
-              context: wf.context
-            }).save()
-          );
-      }).then(function(wf, tg) {
-          return $.when(
-            wf,
-            new CMS.Models.TaskGroupTask({
-              task_group: tg,
-              start_date: moment().format('MM/DD/YYYY'),
-              end_date: that.end_date,
-              object_approval: true,
-              sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
-              contact: that.contact,
-              context: wf.context,
-              title: "Object review for "
-                      + that.original_object.constructor.title_singular
-                      + ' "' + that.original_object.title + '"',
-            }).save(),
-            new CMS.Models.TaskGroupObject({
-              task_group: tg,
-              object: that.original_object,
-              context: wf.context
-            }).save()
-          );
-      });
-    } else {
-      ret = $.when(
-        aws[0].instance.refresh(),
-        $.when.apply(
-          $,
-          can.map(aws[0].instance.task_groups.reify(), function(tg) {
-            return tg.refresh();
+    var that = this,
+        aws_dfd = this.original_object.get_binding("approval_workflows").refresh_list();
+    
+    return aws_dfd.then(function(aws){
+      var ret;
+      if(aws.length < 1) {
+        ret = $.when(
+          new CMS.Models.Workflow({
+            frequency: "one_time",
+            status: "Active",
+            title: "Object review for "
+                    + that.original_object.constructor.title_singular
+                    + ' "' + that.original_object.title + '"',
+            object_approval: true,
+            notify_on_change: true,
+            notify_custom_message: "Hello " + that.contact.reify().name + ",\n\n"
+              + GGRC.current_user.name + " (" + GGRC.current_user.email
+              + ") asked you to review newly created "
+              + that.original_object.constructor.model_singular + ' "' + that.original_object.title
+              + '" before ' + moment(that.end_date).format("MM/DD/YYYY") + ". "
+              + "Click <a href='" + window.location.href.replace("#.*$", "#")
+              + "workflows_widget'>here</a> to perform a review.\n\nThanks,\ngGRC Team",
+            context: that.original_object.context
+          }).save()
+        ).then(function(wf) {
+            return $.when(
+              wf,
+              new CMS.Models.TaskGroup({
+                workflow : wf,
+                title: "Object review for "
+                        + that.original_object.constructor.title_singular
+                        + ' "' + that.original_object.title + '"',
+                contact: that.contact,
+                context: wf.context
+              }).save()
+            );
+        }).then(function(wf, tg) {
+            return $.when(
+              wf,
+              new CMS.Models.TaskGroupTask({
+                task_group: tg,
+                start_date: moment().format('MM/DD/YYYY'),
+                end_date: that.end_date,
+                object_approval: true,
+                sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
+                contact: that.contact,
+                context: wf.context,
+                title: "Object review for "
+                        + that.original_object.constructor.title_singular
+                        + ' "' + that.original_object.title + '"',
+              }).save(),
+              new CMS.Models.TaskGroupObject({
+                task_group: tg,
+                object: that.original_object,
+                context: wf.context
+              }).save()
+            );
+        });
+      } else {
+        ret = $.when(
+          aws[0].instance.refresh(),
+          $.when.apply(
+            $,
+            can.map(aws[0].instance.task_groups.reify(), function(tg) {
+              return tg.refresh();
+            })
+          ).then(function() {
+            return $.when.apply($, can.map(can.makeArray(arguments), function(tg) {
+              return tg.attr("contact", that.contact).save().then(function(tg) {
+                return $.when.apply($, can.map(tg.task_group_tasks.reify(), function(tgt) {
+                  return tgt.refresh().then(function(tgt) {
+                    return tgt.attr('contact', that.contact)
+                      .attr('end_date', that.end_date)
+                      .attr('start_date', moment().format('MM/DD/YYYY'))
+                      .save();
+                  });
+                }));
+              });
+            }));
           })
-        ).then(function() {
-          return $.when.apply($, can.map(can.makeArray(arguments), function(tg) {
-            return tg.attr("contact", that.contact).save().then(function(tg) {
-              return $.when.apply($, can.map(tg.task_group_tasks.reify(), function(tgt) {
-                return tgt.refresh().then(function(tgt) {
-                  return tgt.attr('contact', that.contact)
-                    .attr('end_date', that.end_date)
-                    .attr('start_date', moment().format('MM/DD/YYYY'))
-                    .save();
-                });
-              }));
-            });
-          }));
-        })
-      );
-    }
+        );
+      }
 
-    return ret.then(function(wf) {
-      return new CMS.Models.Cycle({
-        workflow: wf,
-        autogenerate: true,
-        context: wf.context
-      }).save();
+      return ret.then(function(wf) {
+        return new CMS.Models.Cycle({
+          workflow: wf,
+          autogenerate: true,
+          context: wf.context
+        }).save();
+      });
     });
   },
   computed_errors: (approval_workflow_errors_compute = can.compute(function() {

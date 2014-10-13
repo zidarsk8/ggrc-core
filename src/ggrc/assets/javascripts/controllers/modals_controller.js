@@ -266,6 +266,10 @@ can.Control("GGRC.Controllers.Modals", {
     content != null && this.options.$content.html(content).removeAttr("style");
     footer != null && this.options.$footer.html(footer);
 
+    this.setup_wysihtml5();
+  }
+
+  , setup_wysihtml5 : function() {
     this.element.find('.wysihtml5').each(function() {
       $(this).cms_wysihtml5();
     });
@@ -426,6 +430,7 @@ can.Control("GGRC.Controllers.Modals", {
       if(name[0] !== "people")
         instance.attr(name[0], value);
     }
+    this.setup_wysihtml5(); //in case the changes in values caused a new wysi box to appear.
   }
 
   , "[data-before], [data-after] change" : function(el, ev) {

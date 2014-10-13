@@ -234,9 +234,11 @@
           padding:10px;
           h3 {
             font-weight:normal;
+            @include oneline();
           }
           h4 {
             font-weight:normal;
+            @include oneline();
           }
         }
       }

@@ -30,7 +30,7 @@
                 <div class="oneline">
                   <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
                   <span class="tiny-data">
-                    {{firstnonempty object.title instance.title}}
+                    {{firstnonempty object.title ''}}
                   </span>
                 </div>
               </div>
@@ -152,38 +152,60 @@
 
         <div class="row-fluid">
           <div class="span12">
+          {{#if_helpers '\
+            #if_equals' instance.task_type 'text' '\
+            or #if_equals' instance.task_type "" '\
+            or #if_null' instance.task_type}}
             <h6>Task details</h6>
             <div class="tree-description">
               {{{firstnonempty instance.description 'No additional details'}}}
             </div>
-            <br>
+          {{/if_helpers}}
+          {{#if_equals instance.task_type 'menu'}}
+            <h6>Response Options</h6>
+            {{! here we need to start a quick form or other componenet}}
+            <ggrc-quick-update instance="instance">
+              <select name="selected_response_options.0">
+                {{#each instance.response_options}}
+                  <option value="{{.}}" {{#if_equals instance.selected_response_options.0 this}}selected="selected"{{/if_equals}}>{{.}}</option>
+                {{/each}}
+              </select>
+            </ggrc-quick-update>
+          {{/if_equals}}
+          {{#if_equals instance.task_type 'checkbox'}}
+            <h6>Response Options</h6>
+            <ggrc-quick-update instance="instance">
+              {{#each instance.response_options}}
+              <div class="row-fluid">
+                <div class="span12">
+                  <input type="checkbox" multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}checked="checked"{{/in_array}}> {{.}}
+                </div>
+              </div>
+              {{/each}}
+            </ggrc-quick-update>
+          {{/if_equals}}
+          <br>
           </div>
         </div>
 
         {{#is_dashboard}}
           {{#using instance=instance.cycle_task_group_object}}
             {{#using object=instance.object}}
-
+              {{#if object.viewLink}}
               <div class="row-fluid">
                 <div class="span9">
                   <h6>Task to be performed on object</h6>
                   <p>
                     <i class="grcicon-{{instance.object.reify.class.table_singular}}-color smallmargin"></i>
                     <span class="cap">{{instance.object.reify.class.table_singular}}:</span>
-                    {{#if object.viewLink}}
-                      {{#is_allowed "view_object_page" object}}
-                        <a href="{{object.viewLink}}" rel="tooltip" data-original-title="View {{instance.object.reify.class.table_singular}}">
-                          {{firstnonempty object.title instance.title}}
-                          <i class="grcicon-goto smallmargin"></i>
-                        </a>
-                      {{else}}
+                    {{#is_allowed "view_object_page" object}}
+                      <a href="{{object.viewLink}}" rel="tooltip" data-original-title="View {{instance.object.reify.class.table_singular}}">
                         {{firstnonempty object.title instance.title}}
-                      {{/is_allowed}}
+                        <i class="grcicon-goto smallmargin"></i>
+                      </a>
                     {{else}}
-                      <span class="error">
-                        Warning: Object deleted or inaccessible
-                      </span>
-                    {{/if}}
+                      {{firstnonempty object.title instance.title}}
+                    {{/is_allowed}}
                   </p>
                 </div>
                 <div class="span3">
@@ -195,7 +217,7 @@
                   </p>
                 </div>
               </div>
-
+              {{/if}}
             {{/using}}
           {{/using}}
         {{/is_dashboard}}

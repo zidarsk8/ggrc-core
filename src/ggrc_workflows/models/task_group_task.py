@@ -8,10 +8,12 @@ import datetime, calendar
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import validates
 from ggrc.models.mixins import (
     deferred, Base, Titled, Slugged, Described, Timeboxed, WithContact
     )
 from ggrc.login import get_current_user
+from ggrc.models.types import JsonType
 from ggrc.models.reflection import PublishOnly
 from ggrc_workflows.models.mixins import RelativeTimeboxed
 
@@ -22,12 +24,31 @@ class TaskGroupTask(
   __tablename__ = 'task_group_tasks'
   _title_uniqueness = False
 
+  @classmethod
+  def default_task_type(cls):
+    return "text"
+
   task_group_id = db.Column(
       db.Integer, db.ForeignKey('task_groups.id'), nullable=False)
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
   object_approval = db.Column(
       db.Boolean, nullable=False, default=False)
+  task_type = db.Column(
+      db.String(length=250), default=default_task_type, nullable=False)
+  response_options = db.Column(
+      JsonType(), nullable=False, default='[]')
+
+  VALID_TASK_TYPES = ['text', 'menu', 'checkbox']
+
+  @validates('task_type')
+  def validate_task_type(self, key, value):
+    if value is None:
+      value = self.default_task_type()
+    if value not in self.VALID_TASK_TYPES:
+      message = u"Invalid type '{}'".format(value)
+      raise ValueError(message)
+    return value
 
   @staticmethod
   def _extra_table_args(cls):
@@ -45,6 +66,8 @@ class TaskGroupTask(
       'relative_end_month',
       'relative_end_day',
       'object_approval',
+      'task_type',
+      'response_options'
       ]
   _sanitize_html = []
 
@@ -67,7 +90,8 @@ class TaskGroupTask(
         'relative_start_month', 'relative_start_day',
         'relative_end_month', 'relative_end_day',
         'start_date', 'end_date',
-        'contact', 'modified_by'
+        'contact', 'modified_by',
+        'task_type', 'response_options',
         ]
 
     contact = None

@@ -353,17 +353,20 @@ can.Control("CMS.Controllers.InnerNav", {
     }
 
   , display_path: function(path) {
-      var step = path.split("/")[0]
-        , rest = path.substr(step.length + 1)
-        ;
+      var step = path.split("/")[0],
+          rest = path.substr(step.length + 1),
+          widget_list = this.options.widget_list;
 
       // Find and make active the widget specified by `step`
       widget = this.find_widget_by_target("#" + step);
+      if (!widget && widget_list.length) {
+        // Target was not found, but we can select the first widget in the list
+        widget = widget_list[0];
+      }
       if (widget) {
         this.set_active_widget(widget);
         return this.display_widget_path(rest);
-      }
-      else {
+      } else {
         return new $.Deferred().resolve();
       }
     }
@@ -578,6 +581,19 @@ can.Control("CMS.Controllers.InnerNav", {
       widgets.forEach(function(widget) {
         widget.attr('show_title', do_show);
       });
+    },
+    '.closed click' : function(el, ev) {
+      var $link = el.closest('a'),
+          widget = this.widget_by_selector($link.attr('href')),
+          active_widget = this.options.contexts.attr("active_widget"),
+          widgets = this.options.widget_list;
+
+      widget.attr('force_show', false);
+      this.update_add_more_link();
+      if (widget.selector === active_widget.selector) {
+        this.options.contexts.attr("active_widget", widgets[0]);
+      }
+      this.show_active_widget();
     }
 });
 

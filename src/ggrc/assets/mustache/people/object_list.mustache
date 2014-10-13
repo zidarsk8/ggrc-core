@@ -22,6 +22,11 @@
                         <div class="tree-title-area">
                           <span class="role" title="{{#roles}}{{permission_summary}} {{/roles}}">
                             {{roles.0.permission_summary}}
+                            {{^if is_enabled}}
+                              <span class="user-disabled">
+                                (Disabled)
+                              </span>
+                            {{/if}}
                           </span>
                         </div>
                       </div>
@@ -32,6 +37,11 @@
                         <div class="tree-title-area">
                           <span class="no-role">
                             No Access
+                            {{^if is_enabled}}
+                              <span class="user-disabled">
+                                (Disabled)
+                              </span>
+                            {{/if}}
                           </span>
                         </div>
                       </div>

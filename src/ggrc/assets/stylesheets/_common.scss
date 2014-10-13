@@ -90,6 +90,16 @@ u {
   text-decoration: underline;
 }
 
+.about-link {
+  font-size: 12px;
+  text-decoration: underline;
+  color: $gray;
+  &:hover {
+    text-decoration: none;
+    color: $gray;
+  }
+}
+
 // helpers
 .centered {
   text-align: center;
@@ -367,6 +377,13 @@ u {
     }
   }
 }
+
+.btn-small {
+  padding: 3px 6px;
+  font-size: $f-small;
+  line-height: 16px;
+}
+
 // Disabled state
 .btn.disabled, .btn[disabled] {
   @include opacity(0.25);
@@ -1043,4 +1060,10 @@ p {
     color:#666;
     font-weight:bold;
   }
+}
+
+.user-disabled {
+  color:#f00 !important;
+  font-weight:bold;
+  font-variant:small-caps;
 }

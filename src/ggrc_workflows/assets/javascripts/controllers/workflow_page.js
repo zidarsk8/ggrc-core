@@ -66,6 +66,11 @@
     "{CMS.Models.TaskGroup} created": function(model, ev, instance) {
       if (instance instanceof CMS.Models.TaskGroup) {
         setTimeout(function() {
+          // If the TaskGroup was created as part of a Workflow, we don't want to
+          //  do a redirect here
+          if (instance._no_redirect) {
+            return;
+          }
           window.location.hash =
             'task_group_widget/task_group/' + instance.id;
         }, 250);
@@ -101,8 +106,7 @@
           var task_groups = workflow.task_groups.reify(),
               can_activate = task_groups.length > 0;
           task_groups.each(function(task_group) {
-            if (!task_group.task_group_objects.length ||
-                !task_group.task_group_tasks.length) {
+            if (!task_group.task_group_tasks.length) {
               can_activate = false;
             }
           });
@@ -181,7 +185,7 @@
       return workflow.save().then(function(workflow) {
         GGRC.navigate(workflow.viewLink);
       });
-      
+
     }
   });
 

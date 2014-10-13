@@ -12,8 +12,8 @@ from .exceptions import ValidationError
 from .context import HasOwnContext
 import re
 
-
 class Person(HasOwnContext, Base, db.Model):
+  
   __tablename__ = 'people'
   EMAIL_RE_STRING = "\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])\Z"
 
@@ -21,6 +21,7 @@ class Person(HasOwnContext, Base, db.Model):
   name = deferred(db.Column(db.String), 'Person')
   language_id = deferred(db.Column(db.Integer), 'Person')
   company = deferred(db.Column(db.String), 'Person')
+  is_enabled = deferred(db.Column(db.Boolean), 'Person')
 
   object_people = db.relationship(
       'ObjectPerson', backref='person', cascade='all, delete-orphan')
@@ -33,6 +34,12 @@ class Person(HasOwnContext, Base, db.Model):
       uselist=False,
       )
 
+  def __init__(self, **kwargs):
+    # Default is_enabled to True
+    if 'is_enabled' not in kwargs:
+      kwargs['is_enabled'] = True
+    super(Person, self).__init__(**kwargs)
+      
   @staticmethod
   def _extra_table_args(cls):
     return (
@@ -50,6 +57,7 @@ class Person(HasOwnContext, Base, db.Model):
       'email',
       'language',
       'name',
+      'is_enabled',
       PublishOnly('object_people'),
       ]
   _sanitize_html = [
@@ -130,3 +138,4 @@ class Person(HasOwnContext, Base, db.Model):
       sorted_roles = sorted(unique_roles,
           key=lambda x: ROLE_HIERARCHY.get(x, -1))
       return sorted_roles[0]
+

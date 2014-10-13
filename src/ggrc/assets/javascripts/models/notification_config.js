@@ -22,7 +22,7 @@
     active: "POST /api/set_active_notifications",
 
     findActive: function(){
-      if(GGRC.current_user === null){
+      if(GGRC.current_user === null || GGRC.current_user === undefined){
         return $.when([]);
       }
       return this.findAll({person_id: GGRC.current_user.id});
