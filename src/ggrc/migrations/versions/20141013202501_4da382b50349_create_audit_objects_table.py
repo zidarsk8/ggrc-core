@@ -9,10 +9,11 @@ Create Date: 2014-06-13 20:25:01.824560
 
 # revision identifiers, used by Alembic.
 revision = '4da382b50349'
-down_revision = '51f6b61fd82a'
+down_revision = '3a4ce23d81b0'
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.sql import table, column
 
 
 def upgrade():
@@ -30,6 +31,20 @@ def upgrade():
       sa.ForeignKeyConstraint(['audit_id'], ['audits.id'], ),
       sa.PrimaryKeyConstraint(u'id'),
       sa.UniqueConstraint(u'audit_id', u'auditable_id', u"auditable_type")
+      )
+
+    op.add_column(
+      u'audits',
+      sa.Column(u'object_type', sa.String(length=250), nullable=False)
+      )
+
+    audits_table = table('audits',
+      column('id', sa.Integer),
+      column('object_type', sa.String)
+      )
+
+    op.execute(audits_table.update()\
+      .values(object_type=u'Objective')\
       )
 
 def downgrade():
