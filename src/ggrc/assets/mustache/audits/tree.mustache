@@ -255,7 +255,7 @@
                 <p>No auditor assigned</p>
               {{/if}}
             {{/with_mapping}}
-            {{#is_allowed 'create' 'UserRole'}}
+            {{#is_allowed 'create' 'UserRole' context=instance.context.id}}
             {{#toggle show_new_object_form}}
               {{#with_page_object_as 'page_instance'}}
               <ggrc-quick-add parent_instance="instance" join_model="UserRole">
