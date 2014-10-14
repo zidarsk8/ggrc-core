@@ -1199,21 +1199,19 @@ ul.attr-list {
 }
 
 .single-line-filter {
+  margin-bottom: 20px;
+  .relevance-filters & {
+    margin-bottom: 6px;
+  }
   .input-xlarge {
     width: 85%;
     box-sizing: border-box;
     height: 28px;
   }
-  .input-medium {
-    width: 75%;
-    float: left;
-  }
-  .remove_filter {
-    float: left;
-    width: 10%;
-    text-align: left;
-    margin-top: 5px;
-  }
+}
+
+.relevance-filters {
+  margin-bottom: 20px;
 }
 
 .date-range-text {

@@ -23,6 +23,8 @@ $(document).ready(function() {
         {tbl_data_1: "Program 1", tbl_data_2: "Predrag", tbl_data_3: "CTRL 4", tbl_data_4: "Manny Manning", tbl_data_5: "Julius Robert Oppenheimer", tbl_data_6: "http://google.com/control/manhattan-project", tbl_data_7: "CT-AK-47a", tbl_data_8: "Effective", tbl_data_9: "SYS4.2", tbl_data_10: "Jane Doe", tbl_data_11: "Richard Feynman", tbl_data_12: "http://google.com/system/manhattan-project", tbl_data_13: "SX12", tbl_data_14: "01/24/2014", tbl_data_15: "12/24/2015", tbl_data_16: "Final"},
         {tbl_data_1: "Program 1", tbl_data_2: "Predrag", tbl_data_3: "CTRL 4", tbl_data_4: "Manny Manning", tbl_data_5: "Julius Robert Oppenheimer", tbl_data_6: "http://google.com/control/manhattan-project", tbl_data_7: "CT-AK-47a", tbl_data_8: "Effective", tbl_data_9: "SYS4.3", tbl_data_10: "Jane Doe", tbl_data_11: "Richard Feynman", tbl_data_12: "http://google.com/system/manhattan-project", tbl_data_13: "SX13", tbl_data_14: "01/24/2014", tbl_data_15: "12/24/2015", tbl_data_16: "Final"},
         {tbl_data_1: "Program 1", tbl_data_2: "Predrag", tbl_data_3: "CTRL 5", tbl_data_4: "Carl Grove", tbl_data_5: "Julius Robert Oppenheimer", tbl_data_6: "http://google.com/control/manhattan-project", tbl_data_7: "CT-PR", tbl_data_8: "Effective", tbl_data_9: "", tbl_data_10: "", tbl_data_11: "", tbl_data_12: "", tbl_data_13: "", tbl_data_14: "", tbl_data_15: "", tbl_data_15: ""}
+      ],
+      filterRules: [
       ]
       /*
       attr_select: function() {
@@ -103,12 +105,24 @@ $(document).ready(function() {
       },
       */
       "#addFilterRule click": function(el, ev) {
-        var newRule = this.element.find("#newObjectSet");
-        newRule.slideDown('fast');
+        var newRule = this.scope.filterRules,
+            new_rules = 0;
+        newRule.forEach(function(rule) {
+          if (rule.new_rule) {
+            new_rules++;
+          }
+        });
+        if (new_rules === 0) {
+          newRule.push({label: "Relevant to:", new_rule: true});
+        } else {
+          newRule.push({label: "AND Relevant to:", new_rule: true});
+        }
       },
-      "#removeFilter click": function(el, ev) {
-        var newRule = this.element.find("#newObjectSet");
-        newRule.slideUp('fast');
+      ".remove_filter click": function(el) {
+        var $item = el.closest(".single-line-filter"),
+            index = $item.index(),
+            rule = this.scope.filterRules;
+        rule.splice(index - 1, 1);
       }
     }
   });
