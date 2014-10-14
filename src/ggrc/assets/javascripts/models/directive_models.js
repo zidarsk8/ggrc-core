@@ -89,7 +89,6 @@ CMS.Models.Directive("CMS.Models.Standard", {
   , findOne : "GET /api/standards/{id}"
   , create : "POST /api/standards"
   , update : "PUT /api/standards/{id}"
-  , destroy : "DELETE /api/standards/{id}"
   , defaults : {
     kind : "Standard"
   }
@@ -135,7 +134,6 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , findOne : "GET /api/regulations/{id}"
   , create : "POST /api/regulations"
   , update : "PUT /api/regulations/{id}"
-  , destroy : "DELETE /api/regulations/{id}"
   , defaults : {
     kind : "Regulation"
   }
@@ -181,7 +179,6 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , findOne : "GET /api/policies/{id}"
   , create : "POST /api/policies"
   , update : "PUT /api/policies/{id}"
-  , destroy : "DELETE /api/policies/{id}"
   , defaults : {
       kind : null
     }
@@ -227,7 +224,6 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , findOne : "GET /api/contracts/{id}"
   , create : "POST /api/contracts"
   , update : "PUT /api/contracts/{id}"
-  , destroy : "DELETE /api/contracts/{id}"
   , defaults : {
     kind : "Contract"
   }

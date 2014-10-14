@@ -4,20 +4,23 @@
 # Maintained By: anze@reciprocitylabs.com
 
 from ggrc import db, settings
+from ggrc.login import get_current_user
 from .mixins import deferred, Base, Stateful
 from functools import wraps
 from flask import request
 from flask.wrappers import Response
 from ggrc.models.types import CompressedType
+from time import time
+
 
 class BackgroundTask(Base, Stateful, db.Model):
   __tablename__ = 'background_tasks'
 
   VALID_STATES = [
-    "Pending",
-    "Running",
-    "Success",
-    "Failure"
+      "Pending",
+      "Running",
+      "Success",
+      "Failure"
   ]
   name = deferred(db.Column(db.String), 'BackgroundTask')
   parameters = deferred(db.Column(CompressedType), 'BackgroundTask')
@@ -50,38 +53,42 @@ class BackgroundTask(Base, Stateful, db.Model):
     db.session.commit()
 
   def make_response(self, default=None):
-    if self.result == None:
+    if self.result is None:
       return default
     from ggrc.app import app
-    return app.make_response((self.result['content'], self.result['status_code'],
+    return app.make_response((self.result['content'],
+                              self.result['status_code'],
                               self.result['headers']))
 
-def create_task(user, name, queued_task, parameters={}):
-  from time import time
-  task = BackgroundTask(name=name + str(int(time()))) # task name must be unique
+
+def create_task(name, url, queued_task=None, parameters={}):
+
+  # task name must be unique
+  task = BackgroundTask(name=name + str(int(time())))
   task.parameters = parameters
-  task.modified_by = user
-  from ggrc.app import db
+  task.modified_by = get_current_user()
   db.session.add(task)
   db.session.commit()
 
   # schedule a task queue
   if getattr(settings, 'APP_ENGINE', False):
     from google.appengine.api import taskqueue
-    from flask import url_for
-    cookie_header = [h for h in request.headers if h[0] == 'Cookie']
-    taskqueue = taskqueue.add(queue_name="ggrc",
-                              url=url_for(queued_task.__name__), name=task.name,
-                              params={'task_id': task.id},
-                              headers=cookie_header)
-  else:
+    taskqueue = taskqueue.add(
+        queue_name="ggrc",
+        url=url,
+        name=task.name,
+        params={'task_id': task.id},
+        method=request.method,
+        headers=request.headers)
+  elif queued_task:
     queued_task(task)
-
   return task
+
 
 def make_task_response(id):
   task = BackgroundTask.query.get(id)
   return task.make_response()
+
 
 def queued_task(func):
   from ggrc.app import app
@@ -99,11 +106,11 @@ def queued_task(func):
       import traceback
       app.logger.error("Task failed", exc_info=True)
       task.finish("Failure", app.make_response((
-        traceback.format_exc(), 200, [('Content-Type', 'text/html')])))
+          traceback.format_exc(), 200, [('Content-Type', 'text/html')])))
 
       # Return 200 so that the task is not retried
       return app.make_response((
-        'failure', 200, [('Content-Type', 'text/html')]))
+          'failure', 200, [('Content-Type', 'text/html')]))
     task.finish("Success", result)
     return result
   return decorated_view
