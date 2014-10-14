@@ -550,10 +550,15 @@ can.Control("CMS.Controllers.InnerNav", {
     update_add_more_link: function() {
       var has_hidden_widgets = false,
           $hidden_widgets = $('.hidden-widgets-list'),
-          model = this.options.instance.constructor,
-          show_all_tabs = model.obj_nav_options.show_all_tabs;
-      // Update has hidden widget attr
+          instance = this.options.instance || {},
+          model = instance.constructor,
+          show_all_tabs = false;
 
+      if (model.obj_nav_options) {
+        show_all_tabs = model.obj_nav_options.show_all_tabs;
+      }
+
+      // Update has hidden widget attr
       $.map(this.options.widget_list, function(widget){
         if (widget.has_count && widget.count === 0 &&
             !widget.force_show && !show_all_tabs) {
