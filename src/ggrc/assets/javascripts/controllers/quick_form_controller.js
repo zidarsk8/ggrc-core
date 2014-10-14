@@ -169,6 +169,7 @@ can.Component.extend({
     source_mapping: null,
     join_model: '@',
     model: null,
+    delay: '@',
     attributes: {}
   },
   events: {
@@ -187,7 +188,7 @@ can.Component.extend({
     "a[data-toggle=submit]:not(.disabled) click": function(el){
       var that = this,
         join_model_class, join_object;
-      
+
       if (this.scope.join_model && this.scope.join_model !== "@") {
         join_model_class = CMS.Models[this.scope.join_model] || CMS.ModelHelpers[this.scope.join_model];
         join_object = {};
