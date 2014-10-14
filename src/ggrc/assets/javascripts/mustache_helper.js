@@ -2466,10 +2466,6 @@ Mustache.registerHelper("grdive_msg_to_id", function(message){
   @helper_type section -- use outside of element tags.
 
   @param compute some computed value to flip between true and false
-
-  NB: This should probably be promoted to ggrc core, as it is generally
-  useful, but defer doing so until it is actually being *used* outside
-  of this extension. --BM
 */
 Mustache.registerHelper("toggle", function(compute, options) {
   function toggle(trigger) {
