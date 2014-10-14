@@ -1226,6 +1226,9 @@ jQuery(function($){
             return this.options.searchlist.then(function() {
               var filtered_list = [];
               return $.map(arguments, function(item) {
+                if (!item) {
+                  return;
+                }
                 var search_attr = item.title || "",
                     term = request.term.toLowerCase();
 
