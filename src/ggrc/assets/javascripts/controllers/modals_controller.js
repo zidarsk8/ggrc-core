@@ -454,7 +454,8 @@ can.Control("GGRC.Controllers.Modals", {
     var $el = $(el),
       $hidable = $el.closest('[class*="span"].hidable'),
       $innerHide = $el.closest('[class*="span"]').find('.hidable'),
-      $resetForm = $el.closest('.modal-body').find('.reset-form');
+      $showButton = $(this.element).find('#formRestore'),
+      $hideButton = $(this.element).find('#formHide');
 
       $el.closest('.inner-hide').addClass('inner-hidable');
       //$hidable.hide();
@@ -465,15 +466,30 @@ can.Control("GGRC.Controllers.Modals", {
       var tab_value = $ui_unit.attr('tabindex');
       this.options.ui_array[tab_value-1] = 1;
 
-      $resetForm.fadeIn(500);
-
       for(var i=0; i < $el.closest('.hide-wrap.hidable').find('.inner-hidable').length; i++) {
         if(i == 1) {
-          //$el.closest('.inner-hide').parent('.hidable').hide();
           $el.closest('.inner-hide').parent('.hidable').addClass("hidden");
         }
       };
+
+      $hideButton.fadeOut(500);
+      $showButton.delay(499).fadeIn(500);
+
       return false;
+  }
+
+  , "{$content} #formHide click" : function(el, ev) {
+    var ui_arr_length = this.options.ui_array.length;
+    for(var i = 0; i < ui_arr_length; i++) {
+      this.options.ui_array[i] = 0;
+    }
+    var $showButton = $(this.element).find('#formRestore');
+    this.options.reset_visible = false;
+    $(this.element).find(".hidable").addClass("hidden");   
+    $(this.element).find('.inner-hide').addClass('inner-hidable');
+    el.fadeOut(500);
+    $showButton.delay(499).fadeIn(500);
+    return false
   }
 
   , "{$content} #formRestore click" : function(el, ev) {
@@ -483,14 +499,15 @@ can.Control("GGRC.Controllers.Modals", {
       this.options.ui_array[i] = 0;
     }
 
-    var $resetForm = $(this.element).find('.reset-form');
+    var $hideButton = $(this.element).find('#formHide');
     this.options.reset_visible = false;
     //$(this.element).find(".hidden").show();
     //$(this.element).find('.inner-hide').parent('.hidable').show();
     //$(this.element).find('.inner-hide').show();
     $(this.element).find(".hidden").removeClass("hidden");   
-    $(this.element).find('.inner-hide').removeClass('inner-hidable');    
-    $resetForm.fadeOut(500);
+    $(this.element).find('.inner-hide').removeClass('inner-hidable');
+    el.fadeOut(500);
+    $hideButton.delay(499).fadeIn(500);
     return false
   }
 
