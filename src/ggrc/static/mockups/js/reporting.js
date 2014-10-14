@@ -3,7 +3,7 @@ $(document).ready(function() {
   can.Component.extend({
     tag: "reporting",
     scope: {
-      pivot_selected: false,
+      report_gen: false,
       //attr_selected: false,
       tabs: [
         {title: "ISO Systems"},
@@ -76,11 +76,8 @@ $(document).ready(function() {
       ".report-trigger click": function(el, ev) {
         this.element.find(".zero-state").fadeOut(500);
         this.element.find(".generated-report").delay(500).fadeIn(500);
-      },
-      "#pivot_search keyup": function(el, ev) {
-        var search = el.val();
-        
-        this.scope.attr('pivot_selected', search.trim() !== "");
+
+        this.scope.attr('report_gen', true);
       },
       "#newReportAdd click": function(el, ev) {
         var tabs = this.scope.tabs,

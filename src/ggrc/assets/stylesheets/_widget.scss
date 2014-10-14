@@ -1212,6 +1212,11 @@ ul.attr-list {
 
 .relevance-filters {
   margin-bottom: 20px;
+  .add-rule {
+    a {
+      font-size: 13px;
+    }
+  }
 }
 
 .date-range-text {

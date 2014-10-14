@@ -678,6 +678,9 @@ $(document).ready(function(){
   $('.generated-report .dropdown-menu input').click(function(e) {
     e.stopPropagation();
   });
+  $('.generated-report .dropdown-menu select').click(function(e) {
+    e.stopPropagation();
+  });
 
 });
 

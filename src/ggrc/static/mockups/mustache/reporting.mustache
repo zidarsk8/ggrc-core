@@ -55,28 +55,28 @@
                       <div class="single-line-filter">
                         <select class="input-xlarge option-type-selector">
                           <optgroup label="Governance">
-                            <option value="Program" selected="selected">Program</option>
-                            <option value="Regulation">Regulation</option>
-                            <option value="Standard">Standard</option>
-                            <option value="Policy">Policy</option>
-                            <option value="Contract">Contract</option>
-                            <option value="Objective">Objective</option>
-                            <option value="Control">Control</option>
-                            <option value="Section">Section</option>
-                            <option value="Clause">Clause</option>
+                            <option value="Program" selected="selected">Programs</option>
+                            <option value="Regulation">Regulations</option>
+                            <option value="Standard">Standards</option>
+                            <option value="Policy">Policies</option>
+                            <option value="Contract">Contracts</option>
+                            <option value="Objective">Objectives</option>
+                            <option value="Control">Controls</option>
+                            <option value="Section">Sections</option>
+                            <option value="Clause">Clauses</option>
                           </optgroup>
                           <optgroup label="People/Groups">
-                            <option value="People">Person</option>
-                            <option value="OrgGroup">Org Group</option>
+                            <option value="People">People</option>
+                            <option value="OrgGroup">Org Groups</option>
                           </optgroup>
                           <optgroup label="Assets/Business">
-                            <option value="System">System</option>
-                            <option value="Process">Process</option>
-                            <option value="DataAsset">Data Asset</option>
-                            <option value="Facility">Facility</option>
-                            <option value="Market">Market</option>
-                            <option value="Product">Product</option>
-                            <option value="Project">Project</option>
+                            <option value="System">Systems</option>
+                            <option value="Process">Processes</option>
+                            <option value="DataAsset">Data Assets</option>
+                            <option value="Facility">Facilities</option>
+                            <option value="Market">Markets</option>
+                            <option value="Product">Products</option>
+                            <option value="Project">Projects</option>
                           </optgroup>
                         </select>
                         <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
@@ -227,7 +227,7 @@
                           <option value="Section">Sections</option>
                           <option value="Objective">Objectives</option>
                           <option value="Control" selected="selected">Controls</option>
-                          <option value="Person">Persons</option>
+                          <option value="Person">People</option>
                           <option value="System">Systems</option>
                           <option value="Process">Processes</option>
                           <option value="DataAsset">Data Assets</option>
@@ -380,7 +380,7 @@
                           <option value="Section">Sections</option>
                           <option value="Objective">Objectives</option>
                           <option value="Control">Controls</option>
-                          <option value="Person">Persons</option>
+                          <option value="Person">People</option>
                           <option value="System">Systems</option>
                           <option value="Process">Processes</option>
                           <option value="DataAsset">Data Assets</option>
@@ -485,7 +485,7 @@
                           <option value="Section">Sections</option>
                           <option value="Objective">Objectives</option>
                           <option value="Control">Controls</option>
-                          <option value="Person">Persons</option>
+                          <option value="Person">People</option>
                           <option value="System">Systems</option>
                           <option value="Process">Processes</option>
                           <option value="DataAsset">Data Assets</option>
@@ -584,7 +584,7 @@
                           <option value="Section">Sections</option>
                           <option value="Objective">Objectives</option>
                           <option value="Control">Controls</option>
-                          <option value="Person">Persons</option>
+                          <option value="Person">People</option>
                           <option value="System">Systems</option>
                           <option value="Process">Processes</option>
                           <option value="DataAsset">Data Assets</option>
@@ -673,13 +673,13 @@
 
                 <div class="save-template-wrap">
                   <div class="save-template">
-                    <label class="small {{^if pivot_selected}}disabled{{/if}}">
-                      <input type="checkbox" name="" id="" checked="checked" {{^if pivot_selected}}disabled="disabled"{{/if}} placeholder="enter report name">
+                    <label class="small">
+                      <input type="checkbox" name="" id="" checked="checked" placeholder="enter report name">
                       Save report as
                     </label>
-                    <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name" {{^if pivot_selected}}disabled="disabled"{{/if}}>
-                    <button type="submit" class="btn btn-primary report-trigger" {{^if pivot_selected}}disabled="disabled"{{/if}}>Generate report</button>
-                    <button id="test" type="submit" class="btn btn-primary pull-right" {{^if pivot_selected}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
+                    <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
+                    <button type="submit" class="btn btn-primary report-trigger">Generate report</button>
+                    <button id="test" type="submit" class="btn btn-primary pull-right" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
                   </div>
                 </div>
 
@@ -750,7 +750,17 @@
                             <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_8}}" href="#">{{tbl_title_8}}</a>
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                              <select class="dropdown-input">
+                                <option>Draft</option>
+                                <option>Final</option>
+                                <option>Effective</option>
+                                <option>Ineffective</option>
+                                <option>Launched</option>
+                                <option>Not Launched</option>
+                                <option>In Scope</option>
+                                <option>Not in Scope</option>
+                                <option>Deprecated</option>
+                              </select>
                               <button type="submit" class="btn btn-primary">Go</button>
                             </div>
                           </th>
@@ -876,13 +886,13 @@
 
                 <div class="save-template-wrap">
                   <div class="save-template">
-                    <label class="small {{^if pivot_selected}}disabled{{/if}}">
-                      <input type="checkbox" name="" id="" checked="checked" {{^if pivot_selected}}disabled="disabled"{{/if}} placeholder="enter report name">
+                    <label class="small">
+                      <input type="checkbox" name="" id="" checked="checked" placeholder="enter report name">
                       Save report as
                     </label>
-                    <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name" {{^if pivot_selected}}disabled="disabled"{{/if}}>
-                    <button type="submit" class="btn btn-primary report-trigger" {{^if pivot_selected}}disabled="disabled"{{/if}}>Generate report</button>
-                    <button type="submit" class="btn btn-primary pull-right" {{^if pivot_selected}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
+                    <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
+                    <button type="submit" class="btn btn-primary report-trigger">Generate report</button>
+                    <button type="submit" class="btn btn-primary pull-right" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
                   </div>
                 </div>
 
