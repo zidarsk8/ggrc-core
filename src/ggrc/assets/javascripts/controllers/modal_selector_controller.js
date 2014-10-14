@@ -1551,7 +1551,7 @@
     , "#search keyup": function(el, ev) {
         if (ev.which == 13) {
           this.context.attr("option_search_term", el.val());
-          this.triggerSearch();
+          this.triggerModalSearch();
         }
       }
 
@@ -2063,7 +2063,7 @@
       //no op
     }
     
-    , triggerSearch: function(){
+    , triggerModalSearch: function(){
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();
       var ctx = this.context;
