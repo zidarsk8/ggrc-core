@@ -170,6 +170,17 @@ u {
   }
 }
 
+.checkbox-inline {
+  input[type="checkbox"] {
+    margin-top: -1px;
+  }
+}
+.radio-inline {
+  input[type="radio"] {
+    margin-top: -1px;
+  }
+}
+
 .gray {
   color: $gray;
 }
