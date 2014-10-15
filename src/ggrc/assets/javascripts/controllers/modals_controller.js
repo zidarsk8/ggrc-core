@@ -267,13 +267,7 @@ can.Control("GGRC.Controllers.Modals", {
     footer != null && this.options.$footer.html(footer);
 
     this.setup_wysihtml5();
-  }
-
-  , setup_wysihtml5 : function() {
-    this.element.find('.wysihtml5').each(function() {
-      $(this).cms_wysihtml5();
-    });
-
+    
     //Update UI status array 
     var $form = $(this.element).find('form');
     var storable_ui = $form.find('[tabindex]').length;
@@ -281,6 +275,12 @@ can.Control("GGRC.Controllers.Modals", {
       //When we start, all the ui elements are visible
       this.options.ui_array.push(0);
     }
+  }
+
+  , setup_wysihtml5 : function() {
+    this.element.find('.wysihtml5').each(function() {
+      $(this).cms_wysihtml5();
+    });
   }
 
   , "input, textarea, select change" : function(el, ev) {
@@ -484,12 +484,23 @@ can.Control("GGRC.Controllers.Modals", {
       this.options.ui_array[i] = 0;
     }
     var $showButton = $(this.element).find('#formRestore');
-    this.options.reset_visible = false;
-    $(this.element).find(".hidable").addClass("hidden");   
+    this.options.reset_visible = true;
+    
+    var $hidables = $(this.element).find(".hidable"); 
+    $hidables.addClass("hidden");   
     $(this.element).find('.inner-hide').addClass('inner-hidable');
+
+    //Set up the hidden elements index to 1
+    var hidden_elements = $hidables.find('[tabindex]');
+    for(var i = 0; i < hidden_elements.length; i++) {
+      var tab_value = $(hidden_elements[i]).attr('tabindex');
+      //The UI array index start from 0, and tab-index is from 1
+      this.options.ui_array[tab_value-1] = 1;
+    }
+
     el.fadeOut(500);
     $showButton.delay(499).fadeIn(500);
-    return false
+    return false;
   }
 
   , "{$content} #formRestore click" : function(el, ev) {
@@ -530,8 +541,11 @@ can.Control("GGRC.Controllers.Modals", {
       }
       
       if($selected){
-        $resetForm = $selected.closest('.modal-body').find('.reset-form');
-        $resetForm.fadeIn(500);
+        var $hideButton = $selected.closest('.modal-body').find('#formHide'),
+          $showButton = $selected.closest('.modal-body').find('#formRestore');
+
+        $hideButton.fadeOut(500);
+        $showButton.delay(499).fadeIn(500);
       }
       return false;
     }
