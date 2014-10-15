@@ -161,7 +161,6 @@
           source_mapping_source="parent_instance"
           mapping="authorized_people"
           deferred="true"
-          {{#unless new_object_form}}instance="instance.context"{{/unless}}
           >
           {{#if list.length}}
             <label>{{#if_equals list.length 1}}Auditor{{else}}Auditors{{/if_equals}}</label>
