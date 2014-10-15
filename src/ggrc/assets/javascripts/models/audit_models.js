@@ -32,7 +32,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
     , audit_objects : "CMS.Models.AuditObject.stubs"
   }
   , defaults : {
-    status : "Draft"
+    status : "Draft",
+    object_type: "Control"
   }
   , tree_view_options : {
     draw_children : true
@@ -95,7 +96,10 @@ can.Model.Cacheable("CMS.Models.Audit", {
     return this._super.apply(this, arguments).then(function(instance) {
       return that._save_auditor(instance);
     });
-  }
+  },
+  object_model: can.compute(function() {
+    return CMS.Models[this.attr("object_type")];
+  })
   , _save_auditor : function(instance){
 
     var no_change = false
@@ -319,6 +323,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , after_save: function() {
     var that = this;
+    
     new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
       return new RefreshQueue().enqueue(audits[0].program).trigger();
     }).then(function(programs) {
@@ -338,6 +343,27 @@ can.Model.Cacheable("CMS.Models.Request", {
         }).save();
       }
     });
+  },
+  before_save: function(notifier) {
+    var that = this,
+        obj = this.audit_object_object ? this.audit_object_object.reify() : this.audit_object_object,
+        matching_objs;
+    if(obj && (matching_objs = can.map(this.get_mapping("audit_objects_via_audit"), function(mapping) {
+      if(mapping.instance === obj)
+        return mapping;
+    })).length < 1) {
+      notifier.queue(
+        new CMS.Models.AuditObject({
+          audit: this.audit,
+          auditable: this.audit_object_object,
+          context: this.audit.reify().context
+        }).save().then(function(ao) {
+          that.attr("audit_object", ao.stub());
+        })
+      );
+    } else {
+      that.attr("audit_object", matching_objs && matching_objs.length && matching_objs[0].mappings[0].instance.stub() || null);
+    }
   }
   , form_preload : function(new_object_form) {
     var audit, that = this;
@@ -349,21 +375,6 @@ can.Model.Cacheable("CMS.Models.Request", {
           that.attr('assignee', audit.contact);
         });
       }
-    }
-  },
-  after_save : function() {
-    var obj = this.objective.reify();
-    if(obj && can.map(this.get_mapping("objectives_via_audit"), function(mapping) {
-      if(mapping.instance === obj)
-        return mapping;
-    }).length < 1) {
-      this.notifier.queue(
-        new CMS.Models.AuditObject({
-          audit: this.audit,
-          auditable: this.objective,
-          context: this.audit.reify().context
-        }).save()
-      );
     }
   },
   // Compute for determining the connected object via audit_objects
