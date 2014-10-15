@@ -387,10 +387,8 @@ can.Control("CMS.Controllers.LHN", {
       $(window).trigger('resize');
     }
   }
-  , "{window} mousedown" : function(el, ev) {
+  , ".bar-v mousedown" : function(el, ev) {
     var $target = $(ev.target);
-    if(!$target.hasClass('bar-v'))
-      return;
     this.mousedown = true;
     this.dragged = false;
   }
@@ -401,8 +399,8 @@ can.Control("CMS.Controllers.LHN", {
 
     ev.preventDefault();
     this.dragged = true;
-      this.size = ev.pageX;
-      this.resize_lhn(this.size, el);
+    this.size = ev.pageX;
+    this.resize_lhn(this.size);
   }
   , "{window} mouseup" : function(el, ev){
     var self = this;
@@ -420,9 +418,8 @@ can.Control("CMS.Controllers.LHN", {
     });
   }
   , "{window} resize" : function(el, ev) {
-    var $lhs = this.element.find("#lhs");
-    if ($lhs) {
-      this.resize_lhn($lhs.width(), true);
+    if (this.size) {
+      this.resize_lhn(this.size, true);
     }
   }
   , "#lhs click": function(el, ev) {

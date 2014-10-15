@@ -5,7 +5,7 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-<div class="hideable-holder"> 
+<div class="hideable-holder">
 {{#instance}}
 <form action="javascript://">
   {{> /static/mustache/base_objects/form_restore.mustache}}
@@ -27,7 +27,7 @@
       <br>
     </div>
     <div class="span4">
-      <label for="person_is_enabled">Enabled <span class="required">*</span></label>
+      <label for="person_is_enabled">Enabled</label>
       <input type="checkbox" tabindex="3" id="person_is_enabled" name="is_enabled" value="{{is_enabled}}" {{#if instance.is_enabled}}checked="checked"{{/if}} >
       <span class="help-inline">
       </span>

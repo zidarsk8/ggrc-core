@@ -112,11 +112,13 @@ dashboard-js-template-files:
   - base_objects/tree_footer_zero.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
-  - base_objects/filters/filter_actions.mustache
+  - base_objects/filters/advanced_search_filter_actions.mustache
+  - base_objects/filters/modal_filter_actions.mustache
   - base_objects/filters/filter_by_person.mustache
   - base_objects/filters/filter_by_relevance.mustache
   - base_objects/filters/filter_by_text.mustache
   - base_objects/filters/filter_by_type.mustache
+  - base_objects/notes_and_code.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache

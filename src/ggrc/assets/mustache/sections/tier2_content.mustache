@@ -106,6 +106,17 @@
             </p>
           </div>
         </div>
+        
+        <div class="row-fluid">
+          <div class="span12">
+            <h6>
+              Notes
+            </h6>
+            <div class="rtf-block">
+              {{{firstnonempty notes '<h4 class="no-data">No note</h4>'}}}
+            </div>
+          </div>
+        </div>
 
         {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 </div>

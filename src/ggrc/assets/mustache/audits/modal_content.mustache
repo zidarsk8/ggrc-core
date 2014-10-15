@@ -181,14 +181,6 @@
         </div>
       </div>
     </div>
-    <div class="row-fluid">
-      <div class="span12">
-        <label>
-          Evidence Folder Path
-        </label>
-        <span class="large">/{{object_params.program_title}}/{{title}}</span>
-      </div>
-    </div>
   </div>
   <input type="hidden" name="slug" value="{{slug}}">
   {{#with_current_user_as 'current_user'}}<input type="hidden" name="modified_by_id" value="{{current_user.id}}">{{/with_current_user_as}}
