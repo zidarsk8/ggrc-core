@@ -48,4 +48,9 @@ def upgrade():
       )
 
 def downgrade():
+    op.drop_column(
+      u'audits',
+      u'object_type'
+      )
+
     op.drop_table(u'audit_objects')
