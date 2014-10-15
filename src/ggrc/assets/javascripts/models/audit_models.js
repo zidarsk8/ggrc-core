@@ -94,6 +94,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     }
 
     return this._super.apply(this, arguments).then(function(instance) {
+<<<<<<< HEAD
       return that._save_auditor(instance);
     });
   },
@@ -145,6 +146,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
         person : instance.auditor
       }).save());
     }).then(function(){
+=======
+>>>>>>> Fixed mustache helpers around auditor (support multiple auditors), and prevent auditors from creating UserRoles during request/audit edit
       instance.attr('_redirect',
         instance.program.reify().viewLink + "#audit_widget/audit/" + instance.id);
       return instance;
@@ -332,9 +335,10 @@ can.Model.Cacheable("CMS.Models.Request", {
         programs[0].get_binding("authorized_people").refresh_instances(),
         CMS.Models.Role.findAll({ name : "ProgramReader" }));
     }).then(function(program, people_bindings, reader_roles) {
-      if(!~can.inArray(
-        that.assignee.reify(),
-        can.map(people_bindings, function(pb) { return pb.instance; })
+      if(Permission.is_allowed("create", "UserRole", program.context)
+        && !~can.inArray(
+          that.assignee.reify(),
+          can.map(people_bindings, function(pb) { return pb.instance; })
       )) {
         new CMS.Models.UserRole({
           person: that.assignee,
