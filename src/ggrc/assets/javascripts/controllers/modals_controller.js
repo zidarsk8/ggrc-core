@@ -751,7 +751,7 @@ can.Control("GGRC.Controllers.Modals", {
 
 /*
   Below this line we're defining a can.Component, which is in this file
-  because is works in tandem with the modals form controller.
+  because it works in tandem with the modals form controller.
 
   The purpose of this component is to allow for pending adds/removes of connected
   objects while the modal is visible.  On save, the actual pending actions will 
