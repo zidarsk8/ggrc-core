@@ -655,6 +655,12 @@ ul.new-tree {
           margin-right: 30px;
         }
       }
+      &.tasks-action {
+        li {
+          float: none;
+          display: inline-block;
+        }
+      }
     }
     /*
     .wrap100 { float:left; min-width:100px; }

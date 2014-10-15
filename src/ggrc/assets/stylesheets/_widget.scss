@@ -1067,7 +1067,7 @@
       width: 80px;
       padding: 2px 4px 2px 26px;
       &.date {
-        background-position: -268px -367px;
+        background-position: -342px -367px;
       }
     }
   }
@@ -1099,6 +1099,14 @@
     li {
       display:inline-block;
       margin-right:20px;
+    }
+  }
+  &.task-filtering {
+    input {
+      &[class*="span"] {
+        padding: 4px;
+        min-height: 20px;
+      }
     }
   }
 }

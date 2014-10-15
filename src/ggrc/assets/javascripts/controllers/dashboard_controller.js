@@ -353,17 +353,20 @@ can.Control("CMS.Controllers.InnerNav", {
     }
 
   , display_path: function(path) {
-      var step = path.split("/")[0]
-        , rest = path.substr(step.length + 1)
-        ;
+      var step = path.split("/")[0],
+          rest = path.substr(step.length + 1),
+          widget_list = this.options.widget_list;
 
       // Find and make active the widget specified by `step`
       widget = this.find_widget_by_target("#" + step);
+      if (!widget && widget_list.length) {
+        // Target was not found, but we can select the first widget in the list
+        widget = widget_list[0];
+      }
       if (widget) {
         this.set_active_widget(widget);
         return this.display_widget_path(rest);
-      }
-      else {
+      } else {
         return new $.Deferred().resolve();
       }
     }
@@ -546,13 +549,22 @@ can.Control("CMS.Controllers.InnerNav", {
 
     update_add_more_link: function() {
       var has_hidden_widgets = false,
-          $hidden_widgets = $('.hidden-widgets-list');
+          $hidden_widgets = $('.hidden-widgets-list'),
+          instance = this.options.instance || {},
+          model = instance.constructor,
+          show_all_tabs = false;
+
+      if (model.obj_nav_options) {
+        show_all_tabs = model.obj_nav_options.show_all_tabs;
+      }
+
       // Update has hidden widget attr
       $.map(this.options.widget_list, function(widget){
-        if (widget.has_count && widget.count === 0 && !widget.force_show) {
+        if (widget.has_count && widget.count === 0 &&
+            !widget.force_show && !show_all_tabs) {
           has_hidden_widgets = true;
         }
-      })
+      });
       if (has_hidden_widgets) {
         $hidden_widgets.show();
       } else {
@@ -578,6 +590,19 @@ can.Control("CMS.Controllers.InnerNav", {
       widgets.forEach(function(widget) {
         widget.attr('show_title', do_show);
       });
+    },
+    '.closed click' : function(el, ev) {
+      var $link = el.closest('a'),
+          widget = this.widget_by_selector($link.attr('href')),
+          active_widget = this.options.contexts.attr("active_widget"),
+          widgets = this.options.widget_list;
+
+      widget.attr('force_show', false);
+      this.update_add_more_link();
+      if (widget.selector === active_widget.selector) {
+        this.options.contexts.attr("active_widget", widgets[0]);
+      }
+      this.show_active_widget();
     }
 });
 

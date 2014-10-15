@@ -234,9 +234,11 @@
           padding:10px;
           h3 {
             font-weight:normal;
+            @include oneline();
           }
           h4 {
             font-weight:normal;
+            @include oneline();
           }
         }
       }
@@ -455,7 +457,7 @@
       }
     }
   }
-  .hide {
+  .field-hide {
     display: inline-block;
     float: right;
     color: $warmGray;
@@ -467,7 +469,7 @@
     }
   }
   .reset-form {
-    display: none;
+    margin-bottom: 10px;
     p {
       margin: 0;
     }
@@ -483,6 +485,10 @@
       }
     }
   }
+  .hidden{
+    display: none;
+  }
+
   .if-dropdown {
     display: none;
   }
@@ -641,6 +647,13 @@
       font-weight: normal;
       color:#111;
       font-size: 16px;
+      &.inline-check {
+        line-height: 26px;
+        margin-bottom: 0;
+        input {
+          margin-top: 2px;
+        }
+      }
       .required {
         color: $red;
         font-weight: bold;

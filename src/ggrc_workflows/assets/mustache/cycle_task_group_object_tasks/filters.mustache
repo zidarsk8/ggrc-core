@@ -5,7 +5,7 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-<li class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }}>
+<li class="inline-filtering task-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }}>
   <form class="form-search" onsubmit="return false" autocomplete="off">
     <div class="row-fluid">
       <div class="span12">
@@ -13,6 +13,14 @@
           Filter Tasks
         </h6>
         <ul class="quick-filters">
+          {{#is_dashboard}}
+          <li>
+            <input type="text" name="cycle_task_group_object.title" {{data 'from-list'}} data-lookup="cycle_task_group_object.object" class="span10" placeholder="Filter by Object" data-template="/directives/autocomplete_result.mustache" value="" {{^list}}disabled="disabled"{{/list}}>
+          </li>
+          {{/is_dashboard}}
+          <li>
+            <input type="text" name="cycle.workflow.title" {{data 'from-list'}} data-lookup="cycle.workflow" class="span10" placeholder="Filter by Workflow" value="" {{^list}}disabled="disabled"{{/list}}>
+          </li>
           <li>
             <label>
               By Status

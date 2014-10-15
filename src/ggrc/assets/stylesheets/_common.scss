@@ -90,6 +90,16 @@ u {
   text-decoration: underline;
 }
 
+.about-link {
+  font-size: 12px;
+  text-decoration: underline;
+  color: $gray;
+  &:hover {
+    text-decoration: none;
+    color: $gray;
+  }
+}
+
 // helpers
 .centered {
   text-align: center;
@@ -378,6 +388,13 @@ u {
     }
   }
 }
+
+.btn-small {
+  padding: 3px 6px;
+  font-size: $f-small;
+  line-height: 16px;
+}
+
 // Disabled state
 .btn.disabled, .btn[disabled] {
   @include opacity(0.25);
@@ -447,7 +464,7 @@ input.date {
   @include background-size(368px 416px);
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
-  background-position: -268px -364px;
+  background-position: -340px -364px;
   &.short-field {
     height: 16px !important;
     line-height: 16px !important;
@@ -1058,4 +1075,9 @@ p {
 
 .required {
   color: $red;
+}
+.user-disabled {
+  color:#f00 !important;
+  font-weight:bold;
+  font-size: $f-small;
 }

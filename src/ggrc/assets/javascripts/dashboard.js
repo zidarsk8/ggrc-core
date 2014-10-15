@@ -571,6 +571,23 @@ jQuery(function($) {
     $this.closest('li').removeClass("active");
   });
 
+  // Show/hide inner filters
+  $('body').on('click', '.advanced-filter-trigger', function() {
+    var $this = $(this),
+        $filter = $this.closest('.inner-tree').find('.inner-filter-sticky');
+
+    if($this.hasClass("active")) {
+      $filter.slideUp('fast');
+      $this.removeClass("active");
+      $this.html('<i class="grcicon-search"></i> Show Filters');
+    } else {
+      $filter.slideDown('fast');
+      $this.addClass("active");
+      $this.html('<i class="grcicon-search"></i> Hide Filters');
+    }
+    return false
+  });
+
 });
 
 jQuery(resize_areas);

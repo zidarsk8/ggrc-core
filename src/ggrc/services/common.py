@@ -694,9 +694,9 @@ class Resource(ModelView):
         request.headers['If-Unmodified-Since'] != \
           self.http_timestamp(self.modified_at(obj)):
       return current_app.make_response((
-          'The resource has been changed. The conflict must be resolved and '
-          'the request resubmitted with an up to date Etag for If-Match '
-          'header.',
+          'The resource could not be updated due to a conflict with the '
+          'current state on the server. Please resolve the conflict by '
+          'refreshing the resource.',
           409,
           [('Content-Type', 'text/plain')]
           ))
@@ -1172,9 +1172,9 @@ def filter_resource(resource, depth=0, user_permissions=None):
           if type(value) is dict and 'type' in value:
             resource[key] = filter_resource(
               value, depth=depth+1, user_permissions=user_permissions)
-          elif type(value) in (list,tuple):
-            resource[key] = filter_resource(
-              value, depth=depth+1, user_permissions=user_permissions)
+          # elif type(value) in (list,tuple):
+          #   resource[key] = filter_resource(
+          #     value, depth=depth+1, user_permissions=user_permissions)
 
       return resource
   else:

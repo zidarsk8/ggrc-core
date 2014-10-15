@@ -48,6 +48,11 @@
                       <span class="email">{{email}}</span>
                     {{/name}}
                   {{/if_match}}
+                  {{^if is_enabled}}
+                    <span class="user-disabled">
+                      (Disabled)
+                    </span>
+                  {{/if}}
                 </div>
               </div>
               
