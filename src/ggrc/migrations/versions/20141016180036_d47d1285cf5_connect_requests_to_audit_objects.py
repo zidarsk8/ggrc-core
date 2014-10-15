@@ -173,6 +173,7 @@ def downgrade():
   audit_objects_table = table('audit_objects',
     column('id', sa.Integer),
     column('auditable_id', sa.Integer),
+    column('auditable_type', sa.String)
     )
 
   requests_table = table('requests',
@@ -186,7 +187,12 @@ def downgrade():
   op.execute(requests_table.update()\
     .values(
       objective_id=select([audit_objects_table.c.auditable_id])
-        .where(requests_table.c.audit_object_id == audit_objects_table.c.id)
+        .where(
+          and_(
+            requests_table.c.audit_object_id == audit_objects_table.c.id,
+            audit_objects_table.c.auditable_type == 'Objective'
+            )
+          )
         .correlate(requests_table).as_scalar()
     ))
 
