@@ -1232,6 +1232,10 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
             this.proxy("on_fade_out_timeout"),
             this.options.fade_out_delay);
     }
+  , destroy: function() {
+    this._super();
+    this.on_mouseleave();
+  }
 });
 
 })(this.can, this.can.$);
