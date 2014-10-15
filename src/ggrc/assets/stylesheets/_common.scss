@@ -180,6 +180,17 @@ u {
   }
 }
 
+.checkbox-inline {
+  input[type="checkbox"] {
+    margin-top: -1px;
+  }
+}
+.radio-inline {
+  input[type="radio"] {
+    margin-top: -1px;
+  }
+}
+
 .gray {
   color: $gray;
 }
@@ -1062,6 +1073,9 @@ p {
   }
 }
 
+.required {
+  color: $red;
+}
 .user-disabled {
   color:#f00 !important;
   font-weight:bold;
