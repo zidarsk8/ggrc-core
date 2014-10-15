@@ -1029,7 +1029,7 @@
       }
 
     , is_valid_mapping: function(binding, mapping) {
-        var model = CMS.Models[this.model_name]
+        var model = CMS.Models[this.model_name] || can.Model.Cacheable
           , object_model = binding.instance.constructor
           , option_model = CMS.Models[this.option_model_name]
           ;
@@ -1189,7 +1189,7 @@
       }
 
     , is_valid_mapping: function(binding, mapping) {
-        var model = CMS.Models[this.model_name]
+        var model = CMS.Models[this.model_name] || can.Model.Cacheable
           , object_model = binding.instance.constructor
           ;
 
@@ -1318,7 +1318,7 @@
       }
 
     , is_valid_mapping: function(binding, mapping) {
-        var model = CMS.Models[this.model_name]
+        var model = CMS.Models[this.model_name] || can.Model.Cacheable
           , object_model = binding.instance.constructor
           ;
 

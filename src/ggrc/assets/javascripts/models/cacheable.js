@@ -865,44 +865,49 @@ can.Model("can.Model.Cacheable", {
   }
 
   , save : function() {
-    var that = this
-      , isNew = this.isNew()
-      , xhr
-      , dfd = new $.Deferred()
-      ;
+    var that = this,
+        _super = this._super,
+        isNew = this.isNew(),
+        xhr,
+        dfd = new $.Deferred(),
+        pre_save_notifier = new PersistentNotifier({ name : this.constructor.model_singular + " (pre-save)" })
+        ;
 
-    this.before_save && this.before_save();
+    this.before_save && this.before_save(pre_save_notifier);
     if(isNew) {
       this.attr("provisional_id", "provisional_" + Math.floor(Math.random() * 10000000));
       can.getObject("provisional_cache", can.Model.Cacheable, true)[this.provisional_id] = this;
-      this.before_create && this.before_create();
+      this.before_create && this.before_create(pre_save_notifier);
     } else {
-      this.before_update && this.before_update();
+      this.before_update && this.before_update(pre_save_notifier);
     }
 
-    xhr = this._super.apply(this, arguments).then(function(result) {
-      if(isNew) {
-        that.after_create && that.after_create();
-      } else {
-        that.after_update && that.after_update();
-      }
-      that.after_save && that.after_save();
-      return result;
-    }, function(xhr, status, message) {
-      that.save_error && that.save_error(xhr.responseText);
-      return new $.Deferred().reject(xhr, status, message);
-    });
+    pre_save_notifier.on_empty(function() {
 
-    xhr.always(function() {
-      that.notifier.on_empty(function() {
-        dfd.resolve();
+      xhr = _super.apply(that, arguments).then(function(result) {
+        if(isNew) {
+          that.after_create && that.after_create();
+        } else {
+          that.after_update && that.after_update();
+        }
+        that.after_save && that.after_save();
+        return result;
+      }, function(xhr, status, message) {
+        that.save_error && that.save_error(xhr.responseText);
+        return new $.Deferred().reject(xhr, status, message);
       });
+
+      xhr.always(function() {
+        that.notifier.on_empty(function() {
+          dfd.resolve();
+        });
+      });
+
+      GGRC.delay_leaving_page_until(xhr);
+      GGRC.delay_leaving_page_until(dfd);
+
     });
-
-    GGRC.delay_leaving_page_until(xhr);
-    GGRC.delay_leaving_page_until(dfd);
-
-    return $.when(xhr, dfd).then(function(xhr_result) { return xhr_result; });
+    return dfd.then(function() { return xhr; });
   },
   refresh_all: function() {
     var props = Array.prototype.slice.call(arguments, 0);
