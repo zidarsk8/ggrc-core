@@ -180,6 +180,17 @@ u {
   }
 }
 
+.checkbox-inline {
+  input[type="checkbox"] {
+    margin-top: -1px;
+  }
+}
+.radio-inline {
+  input[type="radio"] {
+    margin-top: -1px;
+  }
+}
+
 .gray {
   color: $gray;
 }
@@ -453,7 +464,7 @@ input.date {
   @include background-size(368px 416px);
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
-  background-position: -268px -364px;
+  background-position: -340px -364px;
   &.short-field {
     height: 16px !important;
     line-height: 16px !important;
@@ -1062,8 +1073,11 @@ p {
   }
 }
 
+.required {
+  color: $red;
+}
 .user-disabled {
   color:#f00 !important;
   font-weight:bold;
-  font-variant:small-caps;
+  font-size: $f-small;
 }

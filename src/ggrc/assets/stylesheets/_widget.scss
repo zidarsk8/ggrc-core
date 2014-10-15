@@ -1067,7 +1067,7 @@
       width: 80px;
       padding: 2px 4px 2px 26px;
       &.date {
-        background-position: -268px -367px;
+        background-position: -342px -367px;
       }
     }
   }
@@ -1137,6 +1137,200 @@
     }
     a {
       font-weight: bold;
+    }
+  }
+}
+
+// Report
+.save-template-wrap {
+  @include clearfix();
+}
+.save-template {
+  float: right;
+  padding: 10px 20px;
+  label {
+    display: inline-block;
+    &.disabled {
+      color: $gray;
+    }
+  }
+  .input-medium {
+    margin-bottom: 0;
+    margin-right: 10px;
+    margin-left: 4px;
+  }
+  button {
+    margin-right: 10px;
+  }
+}
+
+.attr-wrap {
+  display: none;
+}
+
+ul.attr-list {
+  @include reset-list();
+  @include clearfix();
+  margin-top: 20px;
+  li {
+    float: left;
+    width: 33.3333%;
+    input {
+      margin-top: -3px;
+    }
+  }
+}
+
+.popover {
+  @include border-radius($default-border-radius);
+  width: 600px;
+  border: 1px solid $infoMessageText;
+  .popover-content {
+    @include border-radius($default-border-radius);
+  }
+}
+
+.attribute-trigger {
+  float: right;
+  line-height: 26px;
+  height: 26px;
+  width: 12%;
+  text-align: center;
+  border: 1px solid $infoMessageText;
+  @include border-radius($default-border-radius);
+  i {
+    margin-top: 5px;
+  }
+  &.active {
+    background: $darkBlue;
+  }
+}
+
+.single-line-filter {
+  margin-bottom: 20px;
+  .relevance-filters & {
+    margin-bottom: 6px;
+  }
+  .input-xlarge {
+    width: 85%;
+    box-sizing: border-box;
+    height: 28px;
+  }
+}
+
+.relevance-filters {
+  margin-bottom: 20px;
+  .add-rule {
+    a {
+      font-size: 13px;
+    }
+  }
+}
+
+.date-range-text {
+  line-height: 28px;
+}
+
+.selected-object {
+  display: none;
+  padding: 10px 20px;
+  border-top: 1px solid $darkGray;
+  font-weight: bold;
+  span {
+    font-weight: normal;
+  }
+}
+
+.generated-report {
+  display: none;
+  margin: 0 20px;
+  overflow-x: auto;
+  table {
+    @include border-radius(0);
+    th, td {
+      min-width: 70px;
+    }
+    .dropdown-menu {
+      min-width: 240px;
+      padding: 15px;
+      &.right {
+        right: 0;
+        left: auto;
+      }
+      .dropdown-input {
+        float: left;
+        margin: 0 5px 0 0;
+        width: 185px;
+      }
+      button {
+        float: left;
+        width: 40px;
+      }
+      .range {
+        float: left;
+        margin-right: 5px;
+        width: 195px;
+        input {
+          margin: 0;
+        }
+      }
+    }
+    tr {
+      &:nth-child(odd) {
+        background: lighten($lightGray,3%);
+      }
+      th {
+        background: darken($lightGray,7%);
+        vertical-align: top;
+        position: relative;
+        padding: 8px 12px 8px 8px;
+        .table-filter {
+          position: absolute;
+          top: 30%;
+          right: -4px;
+        }
+      }
+    }
+    &.table-bordered {
+      border: 1px solid $darkGray;
+      border-left: none;
+      td,
+      th {
+        border-top: 1px solid $darkGray;
+        border-left: 1px solid $darkGray;
+      }
+      thead {
+        &:first-child {
+          tr {
+            &:first-child {
+              th {
+                &:first-child {
+                  @include border-radius(0);
+                }
+                &:last-child {
+                  @include border-radius(0);
+                }
+              }
+            }
+          }
+        }
+      }
+      tbody {
+        &:last-child {
+          tr {
+            &:last-child {
+              td {
+                &:first-child {
+                  @include border-radius(0);
+                }
+                &:last-child {
+                  @include border-radius(0);
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -300,28 +300,28 @@
           {{#with_mapping 'authorizations' instance}}
           {{#if_auditor instance}}
             <div class="inner-tree">
-              <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{#if_null child_options.0.original_list}}...{{else}}{{child_options.0.original_list.length}}{{/if_null}})</h6>
+              <h6>{{#is_dashboard}}My {{/is_dashboard}}Requests ({{#if_null child_options.0.original_list}}...{{else}}{{child_options.0.original_list.length}}{{/if_null}})</h6>
               {{#child_options.0}}
                 <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.0}}
             </div>
 
             <div class="inner-tree">
-              <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
+              <h6>{{#is_dashboard}}My {{/is_dashboard}}Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
               {{#child_options.2}}
                 <ul class="tree-structure new-tree responses-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.2}}
             </div>
           {{else}}
           <div class="inner-tree">
-            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{#if_null child_options.1.original_list}}...{{else}}{{child_options.1.original_list.length}}{{/if_null}})</h6>
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}Requests ({{#if_null child_options.1.original_list}}...{{else}}{{child_options.1.original_list.length}}{{/if_null}})</h6>
             {{#child_options.1}}
               <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.1}}
           </div>
 
           <div class="inner-tree">
-            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
             {{#child_options.2}}
               <ul class="tree-structure new-tree responses-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.2}}
@@ -333,7 +333,7 @@
           {{#if_instance_of page_object 'Audit|Program|Person'}}
             <div class="inner-tree">
               <h6>
-                PBC Requests ({{#if_null child_options.0.original_list}}...{{else}}{{child_options.0.original_list.length}}{{/if_null}})
+                Requests ({{#if_null child_options.0.original_list}}...{{else}}{{child_options.0.original_list.length}}{{/if_null}})
                 {{#child_options.0.header_view}}
                 <a href="javascript://" class="advanced-filter-trigger active"><i class="grcicon-search"></i> Hide Filters</a>
                 {{/child_options.0.header_view}}
@@ -344,14 +344,14 @@
             </div>
           {{else}}
             <div class="inner-tree">
-              <h6>PBC Requests which contain object ({{#if_null child_options.3.original_list}}...{{else}}{{child_options.3.original_list.length}}{{/if_null}})</h6>
+              <h6>Requests which contain object ({{#if_null child_options.3.original_list}}...{{else}}{{child_options.3.original_list.length}}{{/if_null}})</h6>
               {{#child_options.3}}
                 <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.3}}
             </div>
 
             <div class="inner-tree">
-              <h6>PBC Responses which contain object ({{#if_null child_options.4.original_list}}...{{else}}{{child_options.4.original_list.length}}{{/if_null}})</h6>
+              <h6>Responses which contain object ({{#if_null child_options.4.original_list}}...{{else}}{{child_options.4.original_list.length}}{{/if_null}})</h6>
               {{#child_options.4}}
                 <ul class="tree-structure responses-list new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.4}}

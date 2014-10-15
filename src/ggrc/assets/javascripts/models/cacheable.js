@@ -52,7 +52,7 @@ function dateConverter(d, oldValue, fn, key) {
     // invalid date computed. Result of unix() is NaN.
     return undefined;
   }
-  
+
   if (typeof d === "string" && ret
       //  Don't correct timezone for dates
       && !/^\d+-\d+-\d+$/.test(d) && !/^\d+\/\d+\/\d+$/.test(d)
@@ -485,6 +485,7 @@ can.Model("can.Model.Cacheable", {
     , "packaged_datetime" : makeDateSerializer("datetime", "dateTime")
   }
   , tree_view_options : {}
+  , obj_nav_options: {}
   , list_view_options : {}
   , getRootModelName: function() {
     return this.root_model || this.shortName;
