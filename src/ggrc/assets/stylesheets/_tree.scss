@@ -45,6 +45,11 @@ ul.new-tree {
       padding-left: 0;
     }
   }
+  &.simple-list {
+    li {
+      padding-left: 20px;
+    }
+  }
   &.request-list,
   &.responses-list {
     .short-field {

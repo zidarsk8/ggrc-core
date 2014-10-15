@@ -312,6 +312,13 @@ def reporting():
   """
   return render_template("mockups/reporting/index.html")
 
+@app.route("/mockups/dashboard-ui/index.html")
+@login_required
+def dashboard_ui():
+  """Dashboard UI UX mockup
+  """
+  return render_template("mockups/dashboard-ui/index.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():

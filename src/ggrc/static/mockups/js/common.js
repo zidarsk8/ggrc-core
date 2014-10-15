@@ -704,6 +704,7 @@ function resize_areas() {
   $topNav = $(".top-inner-nav");
   $area = $(".area");
   $bar = $(".bar-v");
+  $lhsSearch = $(".lhs-search");
 
   winHeight = $window.height();
   winWidth = $window.width();
@@ -711,6 +712,7 @@ function resize_areas() {
   footerMargin = lhsHeight;
   internavHeight = lhsHeight - 100;
   lhsWidth = $lhsHolder.width();
+  lhsSearchWidth = $lhsSearch.width() - 29;
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
   objectWidth = winWidth - lhsWidth - internavWidth - barWidth;
@@ -722,6 +724,7 @@ function resize_areas() {
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);
   $topNav.css("width",objectWidth);
+  $(".widgetsearch").css("width", lhsSearchWidth);
   $objectArea
     .css("margin-left",internavWidth)
     .css("height",internavHeight)
