@@ -1134,6 +1134,11 @@
         min-height: 20px;
       }
     }
+    .quick-filters {
+      li:last-child {
+        margin-right: 0;
+      }
+    }
   }
 }
 
