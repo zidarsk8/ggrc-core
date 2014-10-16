@@ -85,6 +85,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
   , create : "POST /api/sections"
   , update : "PUT /api/sections/{id}"
   , destroy : "DELETE /api/sections/{id}"
+  , is_custom_attributable: true
 
   , attributes : {
       context : "CMS.Models.Context.stub"
@@ -155,7 +156,7 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
   , create: "POST /api/clauses"
   , update: "PUT /api/clauses/{id}"
   , destroy: "DELETE /api/clauses/{id}"
-
+  , is_custom_attributable: true
   , attributes: {
       context : "CMS.Models.Context.stub"
     , contact: "CMS.Models.Person.stub"

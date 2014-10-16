@@ -16,6 +16,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
   , mixins : ["contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , program: "CMS.Models.Program.stub"

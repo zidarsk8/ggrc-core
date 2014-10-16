@@ -386,8 +386,10 @@ class ModelView(View):
     columns.append(mapper.primary_key[0].label('id'))
     #columns.append(model.id.label('id'))
     columns.append(self._get_type_select_column(model).label('type'))
-    columns.append(mapper.c.context_id.label('context_id'))
-    columns.append(mapper.c.updated_at.label('updated_at'))
+    if hasattr(mapper.c, 'context_id'):
+      columns.append(mapper.c.context_id.label('context_id'))
+    if hasattr(mapper.c, 'updated_at'):
+      columns.append(mapper.c.updated_at.label('updated_at'))
     #columns.append(self._get_polymorphic_column(model))
     return columns
 

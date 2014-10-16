@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: david@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
@@ -14,6 +14,8 @@ from .context import Context
 from .control import Control, ControlCategory, ControlAssertion
 from .control_control import ControlControl
 from .control_section import ControlSection
+from .custom_attribute_definition import CustomAttributeDefinition
+from .custom_attribute_value import CustomAttributeValue
 from .data_asset import DataAsset
 from .directive import Directive, Regulation, Policy, Contract, Standard
 from .directive_control import DirectiveControl
@@ -64,6 +66,8 @@ all_models = [
   Control,
   ControlControl,
   ControlSection,
+  CustomAttributeDefinition,
+  CustomAttributeValue,
   DataAsset,
   Directive,
     Contract,

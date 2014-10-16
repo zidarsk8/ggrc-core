@@ -294,6 +294,14 @@ can.Model("can.Model.Cacheable", {
       else
         return (new can.Deferred()).reject();
     };
+    
+    // Register this type as a custom attributable type if it is one.
+    if(this.is_custom_attributable) {
+      if(!GGRC.custom_attributable_types) {
+        GGRC.custom_attributable_types = [];
+      }
+      GGRC.custom_attributable_types.push(this);//{'full_name': this.fullName});
+    }
   }
 
   , resolve_deferred_bindings : function(obj) {

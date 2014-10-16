@@ -27,6 +27,8 @@ def contributed_services():
     service('controls', models.Control),
     service('control_controls', models.ControlControl),
     service('control_sections', models.ControlSection),
+    service('custom_attribute_definitions', models.CustomAttributeDefinition),
+    service('custom_attribute_values', models.CustomAttributeValue),
     service('data_assets', models.DataAsset),
     service('directives', models.Directive, ReadOnlyResource),
       service('contracts', models.Contract),

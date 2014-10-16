@@ -11,7 +11,6 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , title_plural : "Systems/Processes"
     , category : "business"
     , findAll : "GET /api/systems_or_processes"
-
     , model : function(params) {
         if (this.shortName !== 'SystemOrProcess')
           return this._super(params);
@@ -28,7 +27,6 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
             return CMS.Models.System.model(params);
         }
       }
-
     , mixins : ["ownable", "contactable", "unique_title"]
     , tree_view_options : {
       show_view : "/static/mustache/base_objects/tree.mustache"
@@ -86,8 +84,8 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
   , create : "POST /api/systems"
   , update : "PUT /api/systems/{id}"
   , destroy : "DELETE /api/systems/{id}"
-
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -146,6 +144,7 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , update : "PUT /api/processes/{id}"
   , destroy : "DELETE /api/processes/{id}"
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"

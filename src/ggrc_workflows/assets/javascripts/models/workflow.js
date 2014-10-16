@@ -18,6 +18,7 @@
     create: "POST /api/workflows",
     update: "PUT /api/workflows/{id}",
     destroy: "DELETE /api/workflows/{id}",
+    is_custom_attributable: true,
 
     attributes: {
       people: "CMS.Models.Person.stubs",

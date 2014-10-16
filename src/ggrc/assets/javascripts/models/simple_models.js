@@ -36,6 +36,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
   , mixins : ["contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -117,6 +118,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , links_to : {
       "Section" : "SectionObjective"
   }
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"

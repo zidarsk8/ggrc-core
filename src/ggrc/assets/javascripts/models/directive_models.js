@@ -97,6 +97,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -143,6 +144,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -189,6 +191,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -235,6 +238,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
