@@ -24,7 +24,7 @@
       </label>
       {{#with_mapping 'responses' instance}}
       <select name="request_type" class="input-block-level" tabindex="2" {{#if responses.length}}disabled="true" readonly="true"{{/if}}>
-        {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+        {{#iterate 'Documentation' 'Interview'}}
         <option value="{{iterator.toLowerCase}}" {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
         {{/iterate}}
       </select>
