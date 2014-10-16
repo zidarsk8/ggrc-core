@@ -79,6 +79,15 @@
 
 }
 
+.inner-content {
+  .span4 & {
+    margin-left: 20px;
+  }
+  .span8 & {
+    margin-right: 20px;
+  }
+}
+
 .footer {
   margin-top:500px;
   overflow:hidden;

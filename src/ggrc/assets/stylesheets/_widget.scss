@@ -8,8 +8,21 @@
 
 // widgets styles
 .widget {
+  margin-bottom: 40px;
+  border: 1px solid $darkGray;
   .header {
+    background: $lightGray;
+    border-bottom:1px solid $darkGray;
+    color: $text;
+    height: 30px;
+    padding-left: 20px;
     .widget-action {
+      height: 30px;
+      width: 30px;
+      &.widget-action-help {
+        @include box-shadow(none);
+        background: transparent;
+      }
       i {
         @include opacity(0.5);
         @include transition(opacity 0.3s ease);
@@ -26,8 +39,47 @@
         }
       }
     }
+    h2 {
+      font-weight:bold;
+      line-height: 28px;
+      color: #444;
+      margin-bottom:0;
+      @include oneline();
+      span {
+        font-size: $f-small;
+        font-weight:normal;
+      }
+      span.subtitle {
+        font-size: $f-regular;
+        font-style: italic;
+      }
+      i {
+        margin-top: 7px;
+        margin-right: 7px;
+      }
+      span.explanation {
+        color:$white;
+        @include opacity(0.7);
+        font-style:italic;
+        margin-left:10px;
+      }
+    }
+    .btn-mini {
+      margin-left:6px;
+      padding-left:2px;
+      padding-right:2px;
+      i {
+        @include opacity(0.4);
+      }
+      &:hover {
+        border-color:$white;
+        i {
+          @include opacity(1);
+        }
+      }
+    }
+    @include row-fluid-fix();
   }
-  padding-bottom: 40px;
   &.workflow-info-widget {
     overflow-y: visible;
   }
@@ -165,61 +217,6 @@
         @include opacity(0.1);
       }
     }
-  }
-  .header {
-    background-color: $white;
-    border-bottom:1px solid #eee;
-    color:$text;
-    height: 30px;
-    padding-left: 22px;
-    .widget-action {
-      height: 30px;
-      width: 30px;
-      &.widget-action-help {
-        @include box-shadow(none);
-        background: transparent;
-      }
-    }
-    h2 {
-      font-weight:bold;
-      line-height: 28px;
-      color: #444;
-      margin-bottom:0;
-      @include oneline();
-      span {
-        font-size: $f-small;
-        font-weight:normal;
-      }
-      span.subtitle {
-        font-size: $f-regular;
-        font-style: italic;
-      }
-      i {
-        margin-top: 7px;
-        margin-right: 7px;
-      }
-      span.explanation {
-        color:$white;
-        @include opacity(0.7);
-        font-style:italic;
-        margin-left:10px;
-      }
-    }
-    .btn-mini {
-      margin-left:6px;
-      padding-left:2px;
-      padding-right:2px;
-      i {
-        @include opacity(0.4);
-      }
-      &:hover {
-        border-color:$white;
-        i {
-          @include opacity(1);
-        }
-      }
-    }
-    @include row-fluid-fix();
   }
   &.governance {
     .header {
