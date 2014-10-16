@@ -29,7 +29,7 @@ def upgrade():
     sa.Column('mandatory', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
   )
-  op.create_index('ix_custom_attributes_title', 'custom_attribute_declarations', ['title'], unique=False)
+  op.create_index('ix_custom_attributes_title', 'custom_attribute_definitions', ['title'], unique=False)
 
   op.create_table(
     'custom_attribute_values',
@@ -42,7 +42,7 @@ def upgrade():
     sa.Column('attributable_id', sa.Integer(), nullable=True),
     sa.Column('attributable_type', sa.String(length=250), nullable=True),
     sa.Column('attribute_value', sa.Text(), nullable=False),
-    sa.ForeignKeyConstraint(['custom_attribute_id'], ['custom_attribute_declarations.id'], ),
+    sa.ForeignKeyConstraint(['custom_attribute_id'], ['custom_attribute_definitions.id'], ),
     sa.PrimaryKeyConstraint('id')
   )
   op.create_index('ix_custom_attributes_attributable', 'custom_attribute_values', ['attributable_id', 'attributable_type'], unique=False)
