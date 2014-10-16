@@ -748,4 +748,182 @@ can.Control("GGRC.Controllers.Modals", {
   }
 });
 
+
+/*
+  Below this line we're defining a can.Component, which is in this file
+  because it works in tandem with the modals form controller.
+
+  The purpose of this component is to allow for pending adds/removes of connected
+  objects while the modal is visible.  On save, the actual pending actions will 
+  be resolved and we won't worry about the transient state we use anymore.
+*/
+can.Component.extend({
+  tag: "ggrc-modal-connector",
+  // <content> in a component template will be replaced with whatever is contained
+  //  within the component tag.  Since the views for the original uses of these components
+  //  were already created with content, we just used <content> instead of making
+  //  new view template files.
+  template: "<content/>",
+  scope: {
+    parent_instance: null,
+    instance: null,
+    instance_attr: '@',
+    source_mapping: '@',
+    source_mapping_source: '@',
+    mapping: '@',
+    // the following are just for the case when we have no object to start with,
+    changes: []
+  },
+  events: {
+    init: function() {
+      this.scope.attr("controller", this);
+
+      if (!this.scope.instance) {
+        this.scope.attr("deferred", true);
+      } else if (this.scope.instance.reify) {
+        this.scope.attr("instance", this.scope.instance.reify());
+      }
+
+      if (!this.scope.source_mapping) {
+        this.scope.attr("source_mapping", this.scope.mapping);
+      }
+      if (!this.scope.source_mapping_source) {
+        this.scope.source_mapping_source = 'instance';
+      }
+
+      if (this.scope[this.scope.source_mapping_source]) {
+        this.scope.attr(
+          "list",
+          can.map(
+            this.scope[this.scope.source_mapping_source].get_mapping(this.scope.source_mapping),
+            function(binding) {
+              return binding.instance;
+            })
+        );
+        //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
+      } else {
+        if(!this.scope.parent_instance._transient[this.scope.instance_attr + "_" + this.scope.mapping]) {
+          this.scope.attr("list", []);
+          this.scope.parent_instance.attr(
+            "_transient." + this.scope.instance_attr + "_" + this.scope.mapping,
+            this.scope.list
+            );
+        } else {
+          this.scope.attr("list", this.scope.parent_instance._transient[this.scope.instance_attr + "_" + this.scope.mapping]);
+        }
+      }
+      this.options.parent_instance = this.scope.parent_instance;
+      this.options.instance = this.scope.instance;
+      this.on();
+    },
+
+    "deferred_update": function() {
+      var that = this,
+          changes = this.scope.changes;
+
+      if(changes.length > 0) {
+        this.scope.attr("instance", this.scope.attr("parent_instance").attr(this.scope.instance_attr).reify());
+        can.each(
+          changes,
+          function(item) {
+            if(item.how === "add") {
+              that.scope.instance.mark_for_addition(that.scope.mapping, item.what, item.extra);
+            } else {
+              that.scope.instance.mark_for_deletion(that.scope.mapping, item.what);
+            }
+          }
+        );
+        return that.scope.instance.constructor.resolve_deferred_bindings(that.scope.instance);
+      }
+    },
+    "{parent_instance} updated": "deferred_update",
+    "{parent_instance} created": "deferred_update",
+    // this works like autocomplete_select on all modal forms and
+    //  descendant class objects.
+    autocomplete_select : function(el, event, ui) {
+      var that = this,
+          extra_attrs = can.reduce(
+                          this.element
+                          .find("input:not([data-mapping], [data-lookup])")
+                          .get(),
+                          function(attrs, el) {
+                            attrs[$(el).attr("name")] = $(el).val();
+                            return attrs;
+                          }, {});
+      if (that.scope.deferred) {
+        that.scope.changes.push({ what: ui.item, how: "add", extra: extra_attrs });
+      } else {
+        that.scope.instance.mark_for_addition(that.scope.mapping, ui.item, extra_attrs);
+      }
+      that.scope.list.push(ui.item);
+      that.scope.attr("show_new_object_form", false);
+    },
+    "[data-toggle=unmap] click" : function(el, ev) {
+      var i, that = this;
+      ev.stopPropagation();
+      can.map(
+        el.find('.result'),
+        function(result_el) {
+          var obj = $(result_el).data("result");
+          if (that.scope.deferred) {
+            that.scope.changes.push({ what: obj, how: "remove" });
+          } else {
+            that.scope.instance.mark_for_deletion(that.scope.mapping, obj);
+          }
+          for(i = that.scope.list.length; i >= 0; i--) {
+            if(that.scope.list[i] === obj) {
+              that.scope.list.splice(i, 1);
+            }
+          }
+        });
+    },
+    "input[null-if-empty] change" : function(el) {
+      if (!el.val()) {
+        this.scope.attributes.attr(el.attr("name"), null);
+      }
+    },
+    "input[data-lookup], input[data-mapping] keyup" : function(el, ev) {
+      ev.stopPropagation();
+    },
+    ".ui-autocomplete-input modal:success" : function(el, ev, data, options) {
+      var that = this,
+          extra_attrs = can.reduce(
+                          this.element
+                          .find("input:not([data-mapping], [data-lookup])")
+                          .get(),
+                          function(attrs, el) {
+                            attrs[$(el).attr("name")] = $(el).val();
+                            return attrs;
+                          }, {});
+      
+      can.each(data.arr || [data], function(obj) {
+        if (that.scope.deferred) {
+          that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
+        } else {
+          that.scope.instance.mark_for_addition(that.scope.mapping, obj, extra_attrs);
+        }
+        that.scope.list.push(obj);
+      });
+    }
+  },
+  helpers: {
+    // Mapping-based autocomplete selectors use this helper to
+    //  attach the mapping autocomplete ui widget.  These elements should
+    //  be decorated with data-mapping attributes.
+    mapping_autocomplete : function(options) {
+      return function(el) {
+        var $el = $(el);
+        $el.ggrc_mapping_autocomplete({
+          controller : options.contexts.attr("controller"),
+          model : $el.data("model"),
+          mapping : false
+        });
+      };
+    }
+  },
+});
+
+
+
+
 })(window.can, window.can.$);
