@@ -785,6 +785,12 @@
       , context: Direct("Context", "related_object", "context")
       , authorizations: Cross("context", "user_roles")
 
+      , auditor_authorizations: CustomFilter("authorizations", function(result) {
+        return new RefreshQueue().enqueue(result.instance.role.reify()).trigger().then(function(roles) {
+          return roles[0].name === "Auditor";
+        });
+      })
+      , auditors: Cross("auditor_authorizations", "person")
       , related_owned_objects: CustomFilter("related_objects", function(result) {
           var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();
           return !person

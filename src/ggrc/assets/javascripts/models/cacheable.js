@@ -336,6 +336,9 @@ can.Model("can.Model.Cacheable", {
             if(binding.loader.option_attr) {
               inst.attr(binding.loader.option_attr, pj.what.stub());
             }
+            if(pj.extra) {
+              inst.attr(pj.extra);
+            }
             dfds.push(inst.save());
           } else if(pj.how === "remove") {
             can.map(binding.list, function(bound_obj) {
@@ -847,7 +850,7 @@ can.Model("can.Model.Cacheable", {
   /**
    Set up a deferred join object creation when this object is updated.
   */
-  , mark_for_addition : function(join_attr, obj) {
+  , mark_for_addition : function(join_attr, obj, extra_attrs) {
     obj = obj.reify ? obj.reify() : obj;
     if(!this._pending_joins) {
       this._pending_joins = [];
@@ -857,7 +860,7 @@ can.Model("can.Model.Cacheable", {
         this._pending_joins.splice(i, 1);
       }
     }
-    this._pending_joins.push({how : "add", what : obj, through : join_attr });
+    this._pending_joins.push({how : "add", what : obj, through : join_attr, extra: extra_attrs });
   }
 
   , delay_resolving_save_until : function(dfd) {

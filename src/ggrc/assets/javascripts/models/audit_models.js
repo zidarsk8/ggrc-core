@@ -85,6 +85,9 @@ can.Model.Cacheable("CMS.Models.Audit", {
     CMS.Models.Role.findAll({name__in: "Auditor"});
   }
 }, {
+  object_model: can.compute(function() {
+    return CMS.Models[this.attr("object_type")];
+  }),
   save : function() {
 
     var that = this;
@@ -94,57 +97,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
     }
 
     return this._super.apply(this, arguments).then(function(instance) {
-      return that._save_auditor(instance);
-    });
-  },
-  object_model: can.compute(function() {
-    return CMS.Models[this.attr("object_type")];
-  })
-  , _save_auditor : function(instance){
-
-    var no_change = false
-      , auditor_role
-      ;
-
-    Permission.refresh(); //Creating an audit creates new contexts.  Make sure they're reflected client-side
-
-    if(typeof instance.auditor === 'undefined'){
-      return instance;
-    }
-    // Find the Auditor user role
-    return CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
-      if(roles.length === 0) {
-        console.warn("No Auditor role");
-        return new $.Deferred().reject();
-      }
-      auditor_role = roles[0];
-
-      return CMS.Models.UserRole.findAll({
-        context_id__in: instance.context.id,
-        role_id__in: auditor_role.id
-      });
-    }).then(function(auditor_roles){
-      return $.when.apply($,
-        can.map(auditor_roles, function(role){
-          if(typeof instance.auditor !== "undefined" &&
-              instance.auditor != null &&
-              role.person.id === instance.auditor.id) {
-            // Auditor hasn't changed
-            no_change = true;
-            return $.when();
-          }
-          return role.refresh().then(function(role){role.destroy();});
-      }));
-    }).then(function(){
-      if(!instance.auditor || no_change){
-        return $.when();
-      }
-      return $.when(new CMS.Models.UserRole({
-        context : instance.context,
-        role : auditor_role,
-        person : instance.auditor
-      }).save());
-    }).then(function(){
       instance.attr('_redirect',
         instance.program.reify().viewLink + "#audit_widget/audit/" + instance.id);
       return instance;
@@ -332,9 +284,10 @@ can.Model.Cacheable("CMS.Models.Request", {
         programs[0].get_binding("authorized_people").refresh_instances(),
         CMS.Models.Role.findAll({ name : "ProgramReader" }));
     }).then(function(program, people_bindings, reader_roles) {
-      if(!~can.inArray(
-        that.assignee.reify(),
-        can.map(people_bindings, function(pb) { return pb.instance; })
+      if(Permission.is_allowed("create", "UserRole", program.context)
+        && !~can.inArray(
+          that.assignee.reify(),
+          can.map(people_bindings, function(pb) { return pb.instance; })
       )) {
         new CMS.Models.UserRole({
           person: that.assignee,

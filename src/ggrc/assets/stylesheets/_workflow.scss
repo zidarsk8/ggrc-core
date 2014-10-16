@@ -181,6 +181,10 @@ ul.new-tree {
   .add-rule {
     margin-top: 6px;
   }
+  &.parent {
+    padding: 0 20px 20px 20px;
+    border-bottom: 1px solid $lightGray;
+  }
 }
 
 .inner-row {
