@@ -8,6 +8,7 @@
 # TODO: Implement with Authentication
 #from .account import Account
 from .audit import Audit
+from .audit_object import AuditObject
 from .categorization import Categorization
 from .category import CategoryBase
 from .context import Context
@@ -56,6 +57,7 @@ from .revision import Revision
 from .event import Event
 all_models = [
   Audit,
+  AuditObject,
   Categorization,
   CategoryBase,
     ControlCategory,

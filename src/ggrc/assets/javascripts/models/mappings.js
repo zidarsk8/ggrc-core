@@ -777,6 +777,8 @@
         }
       , requests: Direct("Request", "audit", "requests")
       , _program: Direct("Program", "audits", "program")
+      , objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects")
+      , objectives: TypeFilter("objects", "Objective")
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
@@ -853,6 +855,11 @@
         }
       , responses: Direct("Response", "request", "responses")
       , _audit: Direct("Audit", "requests", "audit")
+      , _audit_object: Direct("AuditObject", "auditable", "audit_object")
+      , audit_object_object : Cross("_audit_object", "_auditable")
+      , audit_objects_via_audit : Cross("_audit", "objects")
+      , objectives_via_audit : Cross("_audit", "objectives")
+      , _objective: TypeFilter("audit_object_object", "Objective")
       , documentation_responses : TypeFilter("responses", "DocumentationResponse")
       , interview_responses : TypeFilter("responses", "InterviewResponse")
       , population_sample_responses : TypeFilter("responses", "PopulationSampleResponse")
@@ -905,6 +912,9 @@
             "Workflow", "workflow", "MultitypeSearchJoin"),
         sections: Proxy(
             "Section", "section", "MultitypeSearchJoin"),
-      }
+    }
+    , AuditObject : {
+      _auditable : Direct(null, null, "auditable")
+    }
   });
 })(GGRC, can);

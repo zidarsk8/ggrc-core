@@ -29,9 +29,11 @@ can.Model.Cacheable("CMS.Models.Audit", {
     , people : "CMS.Models.Person.stubs"
     , contact : "CMS.Models.Person.stub"
     , audit_firm : "CMS.Models.OrgGroup.stub"
+    , audit_objects : "CMS.Models.AuditObject.stubs"
   }
   , defaults : {
-    status : "Draft"
+    status : "Draft",
+    object_type: "Control"
   }
   , tree_view_options : {
     draw_children : true
@@ -83,6 +85,9 @@ can.Model.Cacheable("CMS.Models.Audit", {
     CMS.Models.Role.findAll({name__in: "Auditor"});
   }
 }, {
+  object_model: can.compute(function() {
+    return CMS.Models[this.attr("object_type")];
+  }),
   save : function() {
 
     var that = this;
@@ -197,7 +202,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     , responses : "CMS.Models.Response.stubs"
     , assignee : "CMS.Models.Person.stub"
     , requestor : "CMS.Models.Person.stub"
-    , objective : "CMS.Models.Objective.stub"
+    , audit_object : "CMS.Models.AuditObject.stub"
     , requested_on : "date"
     , due_on : "date"
   }
@@ -270,6 +275,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , after_save: function() {
     var that = this;
+    
     new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
       return new RefreshQueue().enqueue(audits[0].program).trigger();
     }).then(function(programs) {
@@ -290,6 +296,27 @@ can.Model.Cacheable("CMS.Models.Request", {
         }).save();
       }
     });
+  },
+  before_save: function(notifier) {
+    var that = this,
+        obj = this.audit_object_object ? this.audit_object_object.reify() : this.audit_object_object,
+        matching_objs;
+    if(obj && (matching_objs = can.map(this.get_mapping("audit_objects_via_audit"), function(mapping) {
+      if(mapping.instance === obj)
+        return mapping;
+    })).length < 1) {
+      notifier.queue(
+        new CMS.Models.AuditObject({
+          audit: this.audit,
+          auditable: this.audit_object_object,
+          context: this.audit.reify().context
+        }).save().then(function(ao) {
+          that.attr("audit_object", ao.stub());
+        })
+      );
+    } else {
+      that.attr("audit_object", matching_objs && matching_objs.length && matching_objs[0].mappings[0].instance.stub() || null);
+    }
   }
   , form_preload : function(new_object_form) {
     var audit, that = this;
@@ -303,6 +330,7 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
     }
   }
+
 });
 
 
