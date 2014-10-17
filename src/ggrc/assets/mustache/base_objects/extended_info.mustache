@@ -41,6 +41,11 @@
           <a class="url" href="mailto:{{email}}" target="_blank">
             {{email}}
           </a>
+          {{^if is_enabled}}
+            <span class="user-disabled">
+              (Disabled)
+            </span>
+          {{/if}}
         </p>
       </div>
     </div>
