@@ -644,6 +644,45 @@ $(document).ready(function(){
     $("#customAttribute").modal('hide');
   });
 
+  // Custom attribute disable edit link
+  $(".disabled-link").on("click", function(ev) {
+    ev.preventDefault();
+  });
+
+  $("#attribute-cat-trigger").on("click", function() {
+    var $this = $(this);
+        $activeList = $this.closest("li"),
+        $list = $this.closest(".internav").find("li"),
+        $activeWidget = $this.closest("body").find("#attribute_cat"),
+        $widget = $this.closest("body").find(".widget");
+
+    $widget.hide();
+    $activeWidget.show();
+    $list.removeClass("active");
+    $activeList.addClass("active");
+  });
+
+  $("#object-attribute-trigger").on("click", function() {
+    var $this = $(this);
+        $activeList = $this.closest("li"),
+        $list = $this.closest(".internav").find("li"),
+        $activeWidget = $this.closest("body").find("#object_attribute_widget"),
+        $widget = $this.closest("body").find(".widget");
+
+    $widget.hide();
+    $activeWidget.show();
+    $list.removeClass("active");
+    $activeList.addClass("active");
+  });
+
+  $("#addCategory").on("click", function() {
+    var $this = $(this),
+        $newCategory = $("#newCategory");
+
+    $this.modal('hide');
+    $newCategory.show();
+  });
+
   // Custom Reporting
   $(".save-template input[type=checkbox]").each(function() {
     var $this = $(this),

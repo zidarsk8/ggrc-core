@@ -172,7 +172,6 @@
                   <a class="export-link" href="/admin/export/help">
                     <i class="grcicon-help-black"></i>
                     <span>Export Help</span>
-
                   </a>
                 </li>
               </ul>
@@ -213,60 +212,22 @@
             <div class="drag"></div>
           </li>
           <li class="active">
-            <a href="#object_attribute_widget">
+            <a href="#object_attribute_widget" id="object-attribute-trigger">
               <div class="oneline">
                 <i class="grcicon-object-color"></i>
-                Object Attributes (2)
+                Object Attributes
               </div>
             </a>
             <div class="drag"></div>
           </li>
-          <li class="hidden-widgets-list">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="grcicon-show" rel="tooltip" data-placement="top" data-original-title="Add widget"></i>
+          <li>
+            <a href="#attribute_cat" id="attribute-cat-trigger">
+              <div class="oneline">
+                <i class="grcicon-object-color"></i>
+                Attribute categories (2)
+              </div>
             </a>
-            <div class="dropdown-menu" role="menu">
-              <div>
-                <a href="#program_widget">
-                  <div class="oneline">
-                    <i class="grcicon-program-color"></i>
-                    Programs
-                  </div>
-                </a>
-              </div>
-              <div>
-                <a href="#regulation_widget">
-                  <div class="oneline">
-                    <i class="grcicon-regulation-color"></i>
-                    Regulations
-                  </div>
-                </a>
-              </div>
-              <div>
-                <a href="#contract_widget">
-                  <div class="oneline">
-                    <i class="grcicon-contract-color"></i>
-                    Contracts
-                  </div>
-                </a>
-              </div>
-              <div>
-                <a href="#policy_widget">
-                  <div class="oneline">
-                    <i class="grcicon-policy-color"></i>
-                    Policies
-                  </div>
-                </a>
-              </div>
-              <div>
-                <a href="#standard_widget">
-                  <div class="oneline">
-                    <i class="grcicon-standard-color"></i>
-                    Standards
-                  </div>
-                </a>
-              </div>
-            </div>
+            <div class="drag"></div>
           </li>
         </ul>
       </div>
@@ -278,15 +239,118 @@
           <div id="show_columns" class="column-set">
             <div id="middle_column" class="widget-area ui-sortable">
 
+              <!-- Widget: Attribute Categories -->
+              <section class="widget sticky_header" id="attribute_cat" style="display: none;">
+                <header class="header">
+                  <div class="row-fluid">
+                    <div class="span9">
+                      <h2>
+                        <i class="grcicon-object-black"></i>
+                        Attributes categories
+                        <span class="object_count">(2)</span>
+                        <span class="explanation"></span>
+                      </h2>
+                    </div>
+                    <div class="span3">
+                      <div class="widget-action pull-right widget-action-help">
+                        <a data-placement="left" data-toggle="modal-ajax-helpform" data-help-slug="people_list" href="javascript://" rel="tooltip" data-original-title="Help">
+                          <i class="grcicon-help-black"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </header>
+                <section class="content ggrc_controllers_list_view">
+                  <ul class="tree-structure new-tree colored-list">
+                    <li class="tree-item" data-model="true">
+                      <div class="item-main">
+                        <div class="openclose">
+                          <div class="row-fluid">
+                            <div class="span12">
+                              <ul class="tree-action-list">
+                                <li>
+                                  <button class="btn btn-small btn-primary">Edit</button>
+                                </li>
+                                <li>
+                                  <button class="btn btn-small btn-danger">Delete</button>
+                                </li>
+                              </ul>
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  Default
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="tree-item" data-model="true">
+                      <div class="item-main">
+                        <div class="openclose">
+                          <div class="row-fluid">
+                            <div class="span12">
+                              <ul class="tree-action-list">
+                                <li>
+                                  <button class="btn btn-small btn-primary">Edit</button>
+                                </li>
+                                <li>
+                                  <button class="btn btn-small btn-danger">Delete</button>
+                                </li>
+                              </ul>
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  Advanced
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="tree-item" data-model="true" id="newCategory">
+                      <div class="item-main">
+                        <div class="openclose">
+                          <div class="row-fluid">
+                            <div class="span12">
+                              <ul class="tree-action-list">
+                                <li>
+                                  <button class="btn btn-small btn-primary">Edit</button>
+                                </li>
+                                <li>
+                                  <button class="btn btn-small btn-danger">Delete</button>
+                                </li>
+                              </ul>
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  Custom
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="tree-item tree-item-add tree-item-footer">
+                      <div class="row-fluid">
+                        <div class="span12">
+                          <a href="#customCategory" data-toggle="modal">+ Attribute Category</a>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </section>
+              </section>
+
               <!-- Widget: Object Attribute -->
-              <section class="widget sticky_header widget-active" id="object_attribute_widget" style="display: block;">
+              <section class="widget sticky_header" id="object_attribute_widget" style="display: block;">
                 <header class="header">
                   <div class="row-fluid">
                     <div class="span9">
                       <h2>
                         <i class="grcicon-object-black"></i>
                         Object Attributes
-                        <span class="object_count">(2)</span>
+                        <span class="object_count"></span>
                         <span class="explanation"></span>
                       </h2>
                     </div>
@@ -528,14 +592,16 @@
                         <div class="tier-2-info-content">
                           <div class="table-wrap">
                             <table class="table">
-                              <col style="width: 50%;" />
-                              <col style="width: 25%;" />
+                              <col style="width: 35%;" />
+                              <col style="width: 20%;" />
+                              <col style="width: 20%;" />
                               <col style="width: 15%;" />
                               <col style="width: 10%;" />
                               <thead>
                                 <tr>
                                   <th>Attribute name</th>
                                   <th>Attribute type</th>
+                                  <th>Attribute category</th>
                                   <th>Mandatory</th>
                                   <th>Edit</th>
                                 </tr>
@@ -544,61 +610,247 @@
                                 <tr>
                                   <td>Title</td>
                                   <td>Text</td>
-                                  <td colspan="2">Yes</td>
+                                  <td>Primary</td>
+                                  <td>Yes</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr>
                                   <td>Description</td>
                                   <td>Rich text</td>
-                                  <td colspan="2">No</td>
+                                  <td>Primary</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr>
                                   <td>Owner</td>
                                   <td>Text</td>
-                                  <td colspan="2">No</td>
+                                  <td>Primary</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr>
                                   <td>Contact</td>
                                   <td>Text</td>
-                                  <td colspan="2">No</td>
+                                  <td>Primary</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr>
                                   <td>Notes</td>
                                   <td>Rich text</td>
-                                  <td colspan="2">No</td>
+                                  <td>Primary</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr>
                                   <td>System URL</td>
                                   <td>Text</td>
-                                  <td colspan="2">No</td>
+                                  <td>Primary</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr>
                                   <td>Code</td>
                                   <td>Text</td>
-                                  <td colspan="2">No</td>
+                                  <td>Advanced</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr>
                                   <td>Network Zone</td>
                                   <td>Dropdown</td>
-                                  <td colspan="2">No</td>
+                                  <td>Advanced</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr>
                                   <td>Effective Date</td>
                                   <td>Date</td>
-                                  <td colspan="2">No</td>
+                                  <td>Advanced</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr>
                                   <td>Stop Date</td>
                                   <td>Date</td>
-                                  <td colspan="2">No</td>
+                                  <td>Advanced</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr>
                                   <td>State</td>
                                   <td>Dropdown</td>
-                                  <td colspan="2">No</td>
+                                  <td>Advanced</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#" class="disabled-link" rel="tooltip" data-placement="top" data-original-title="Default attributes cannot be edited">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Custom 1</td>
+                                  <td>Dropdown</td>
+                                  <td>Advanced</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Custom 2</td>
+                                  <td>Text</td>
+                                  <td>Advanced</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Custom 3</td>
+                                  <td>Checkbox</td>
+                                  <td>Advanced</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Custom 4</td>
+                                  <td>File upload</td>
+                                  <td>Advanced</td>
+                                  <td>No</td>
+                                  <td class="action-bar">
+                                    <ul>
+                                      <li>
+                                        <a href="#">
+                                          <i class="grcicon-edit"></i>
+                                          Edit
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </td>
                                 </tr>
                                 <tr id="NewAttribute">
                                   <td>Risk Factor</td>
                                   <td>Dropdown</td>
+                                  <td>Advanced</td>
                                   <td>No</td>
                                   <td class="action-bar">
                                     <ul>
@@ -614,7 +866,7 @@
                               </tbody>
                               <tfoot class="add-item">
                                 <tr>
-                                  <td colspan="4">
+                                  <td colspan="5">
                                     <a class="btn-add" href="#customAttribute" data-toggle="modal">
                                       Add Attribute
                                     </a>
@@ -2722,18 +2974,26 @@
               <option value="3">Dropdown</option>
               <option value="4">Checkbox</option>
               <option value="5">File upload</option>
-              <option value="6">Date</option>
             </select>
           </div>
         </div>
 
         <div class="row-fluid if-dropdown">
-          <div class="span12">
+          <div class="span8">
             <label>
-              Possible values (separated by comma ",")
+              Dropdown values (separated by comma ",")
               <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
             </label>
             <input class="input-block-level" placeholder="Values" name="values" type="text" value="" tabindex="3">
+          </div>
+          <div class="span4">
+            <label>
+              Dropdown Preview
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <select class="input-block-level" tabindex="4">
+              <option value=""></option>
+            </select>
           </div>
         </div>
 
@@ -2812,18 +3072,28 @@
               <option value="3" selected>Dropdown</option>
               <option value="4">Checkbox</option>
               <option value="5">File upload</option>
-              <option value="6">Date</option>
             </select>
           </div>
         </div>
 
         <div class="row-fluid if-dropdown" style="display:block;">
-          <div class="span12">
+          <div class="span8">
             <label>
-              Possible values (separated by comma ",")
+              Dropdown values (separated by comma ",")
               <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
             </label>
             <input class="input-block-level" placeholder="Values" name="values" type="text" value="Low, Medium, High" tabindex="3">
+          </div>
+          <div class="span4">
+            <label>
+              Dropdown Preview
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <select class="input-block-level" tabindex="4">
+              <option value="1">Low</option>
+              <option value="2">Medium</option>
+              <option value="3">High</option>
+            </select>
           </div>
         </div>
 
@@ -2864,6 +3134,53 @@
         <div class="span3">
           <div class="confirm-buttons">
             <a tabindex="24" data-dismiss="modal" class="btn btn-primary" href="javascript://">Save</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="customCategory" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="customCategoryLabel" aria-hidden="true">
+    <div class="modal-header">
+      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+        <i class="grcicon-x-white"></i>
+      </a>
+      <h2>
+        <span>Add Attribute Category</span>
+      </h2>
+    </div>
+    <div class="modal-body">
+      <form action="#">
+        <div class="row-fluid">
+          <div class="span8">
+            <label>
+              Attribute name
+              <span class="required">*</span>
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <input class="input-block-level" placeholder="Attribute Category" name="attribute_title" type="text" value="Custom" tabindex="1" autofocus>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span1">
+          <div class="deny-buttons">
+            <a class="btn" data-dismiss="modal" href="#">Cancel</a>
+          </div>
+        </div>
+        <div class="span2">
+          <div class="deny-buttons">
+            <a class="btn btn-danger" data-dismiss="modal" href="#">Delete</a>
+          </div>
+        </div>
+        <div class="span6">
+          &nbsp;
+        </div>
+        <div class="span3">
+          <div class="confirm-buttons">
+            <a tabindex="24" data-dismiss="modal" id="addCategory" class="btn btn-primary" href="javascript://">Save</a>
           </div>
         </div>
       </div>
