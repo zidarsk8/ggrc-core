@@ -108,14 +108,14 @@
               {{#if_match instance.status "Respon"}}
                 {{#if_auditor instance}}
                 <button data-name="status" data-value="Accepted" class="btn btn-add {{instance._disabled}}">Accept</button>
-                <a href="javascript://" 
-                   data-toggle="modal-ajax-form" 
-                   data-object-singular="Request" 
-                   data-object-params='{"modal_title":"Amend Request"}' 
-                   data-object-plural="requests" 
-                   data-object-id="{{instance.id}}" 
-                   class="btn btn-warning {{instance._disabled}} undoable" 
-                   data-modal-class="modal-wide" 
+                <a href="javascript://"
+                   data-toggle="modal-ajax-form"
+                   data-object-singular="Request"
+                   data-object-params='{"modal_title":"Amend Request"}'
+                   data-object-plural="requests"
+                   data-object-id="{{instance.id}}"
+                   class="btn btn-warning {{instance._disabled}} undoable"
+                   data-modal-class="modal-wide"
                    data-template="/static/mustache/requests/amend_modal_content.mustache"
                    data-name="status"
                    data-value="{{instance.status}}"
@@ -142,7 +142,7 @@
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-      
+
       <div class="action-bar">
         <ul class="change-links">
           {{#if_can_edit_request instance}}
@@ -153,10 +153,10 @@
               </a>
             </li>
           {{/if_can_edit_request}}
-          
+
         </ul>
       </div>
-      
+
       <div class="small-info">
 
         <div class="row-fluid">
@@ -187,7 +187,7 @@
                 <div class="objective-selector">
                   <input type="text" name="assignee.name" data-lookup="Person" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
                 </div>
-              {{else}}            
+              {{else}}
                 <p class="read-only oneline">
                   {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
                 </p>
