@@ -832,7 +832,7 @@
                   if(!('related_sources' in response)) continue;
                   relationships = new can.Observe.List().concat(response.related_sources.reify(), response.related_destinations.reify());
                   for (j = 0; relationship = relationships[j]; j++) {
-                    if (relationship.source && relationship.source.reify() === page_instance
+                    if (relationship.source && relationship.source.reify && relationship.source.reify() === page_instance
                         || relationship.destination && relationship.destination.reify() === page_instance) {
                       return true;
                     }
