@@ -391,6 +391,9 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-orggroup, .grcicon-org_group { background-position:-78px -248px;}
 .grcicon-orggroup-black, .grcicon-org_group-black { background-position:-78px -224px; }
 .grcicon-orggroup-color, .grcicon-org_group-color { background-position:-246px -296px; }
+.grcicon-vendor, .grcicon-vendor { background-position:-78px -248px;}
+.grcicon-vendor-black, .grcicon-vendor-black { background-position:-78px -224px; }
+.grcicon-vendor-color, .grcicon-vendor-color { background-position:-246px -296px; }
 .grcicon-dataasset, .grcicon-data_asset { background-position:-174px -248px; }
 .grcicon-dataasset-black, .grcicon-data_asset-black { background-position:-174px -224px; }
 .grcicon-dataasset-color, .grcicon-data_asset-color { background-position:-54px -320px; }
@@ -518,6 +521,7 @@ i.short {
   .grcicon-facility-color { background-position:-222px -104px; }
   .grcicon-market-color { background-position:-246px -104px; }
   .grcicon-org_group-color { background-position:-78px -224px; }
+  .grcicon-vendor-color { background-position:-78px -224px; }
   .grcicon-process-color { background-position:-102px -224px; }
   .grcicon-product-color { background-position:-270px -104px; }
   .grcicon-project-color { background-position:-54px -224px; }
@@ -565,6 +569,7 @@ i.short {
       .grcicon-facility-color { background-position:-222px -128px; }
       .grcicon-market-color { background-position:-246px -128px; }
       .grcicon-org_group-color { background-position:-78px -248px; }
+      .grcicon-vendor-color { background-position:-78px -248px; }
       .grcicon-process-color { background-position:-102px -248px }
       .grcicon-product-color { background-position:-270px -128px; }
       .grcicon-project-color { background-position:-54px -248px; }
@@ -621,6 +626,7 @@ i.short {
           .grcicon-product-color { background-position:-174px -296px; }
           .grcicon-project-color { background-position:-222px -296px; }
           .grcicon-org_group-color { background-position:-246px -296px; }
+          .grcicon-vendor-color { background-position:-246px -296px; }
           .grcicon-data_asset-color { background-position:-54px -320px; }
           .grcicon-object-color { background-position:-6px -392px; }
           .grcicon-workflow-color { background-position:-294px -296px; }
@@ -752,6 +758,7 @@ i.short {
     .grcicon-facility-color { background-position:-222px -104px; }
     .grcicon-market-color { background-position:-246px -104px; }
     .grcicon-org_group-color { background-position:-78px -224px; }
+    .grcicon-vendor-color { background-position:-78px -224px; }
     .grcicon-process-color { background-position:-102px -224px; }
     .grcicon-product-color { background-position:-270px -104px; }
     .grcicon-project-color { background-position:-54px -224px; }

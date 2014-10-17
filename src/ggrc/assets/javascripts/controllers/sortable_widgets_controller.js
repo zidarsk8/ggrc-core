@@ -28,6 +28,7 @@
    , "facility_widget"
    , "market_widget"
    , "org_group_widget"
+   , "vendor_widget"
    , "person_widget"
    , "document_widget"
    ];

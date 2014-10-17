@@ -188,6 +188,7 @@ def contributed_object_views():
       object_view(models.Project),
       object_view(models.DataAsset),
       object_view(models.Person),
+      object_view(models.Vendor),
       ]
 
 
