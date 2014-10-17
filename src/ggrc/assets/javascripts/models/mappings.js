@@ -777,12 +777,20 @@
         }
       , requests: Direct("Request", "audit", "requests")
       , _program: Direct("Program", "audits", "program")
+      , objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects")
+      , objectives: TypeFilter("objects", "Objective")
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
       , context: Direct("Context", "related_object", "context")
       , authorizations: Cross("context", "user_roles")
 
+      , auditor_authorizations: CustomFilter("authorizations", function(result) {
+        return new RefreshQueue().enqueue(result.instance.role.reify()).trigger().then(function(roles) {
+          return roles[0].name === "Auditor";
+        });
+      })
+      , auditors: Cross("auditor_authorizations", "person")
       , related_owned_objects: CustomFilter("related_objects", function(result) {
           var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();
           return !person
@@ -847,6 +855,11 @@
         }
       , responses: Direct("Response", "request", "responses")
       , _audit: Direct("Audit", "requests", "audit")
+      , _audit_object: Direct("AuditObject", "auditable", "audit_object")
+      , audit_object_object : Cross("_audit_object", "_auditable")
+      , audit_objects_via_audit : Cross("_audit", "objects")
+      , objectives_via_audit : Cross("_audit", "objectives")
+      , _objective: TypeFilter("audit_object_object", "Objective")
       , documentation_responses : TypeFilter("responses", "DocumentationResponse")
       , interview_responses : TypeFilter("responses", "InterviewResponse")
       , population_sample_responses : TypeFilter("responses", "PopulationSampleResponse")
@@ -899,6 +912,9 @@
             "Workflow", "workflow", "MultitypeSearchJoin"),
         sections: Proxy(
             "Section", "section", "MultitypeSearchJoin"),
-      }
+    }
+    , AuditObject : {
+      _auditable : Direct(null, null, "auditable")
+    }
   });
 })(GGRC, can);
