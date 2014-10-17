@@ -48,7 +48,7 @@
             {{#using audit=instance.audit}}
             {{#with_mapping "audit_object_object" instance}}
               {{#if audit_object_object.0.instance}}
-                <div class="tree-title-area" rel="tooltip" data-placement="top" data-original-title="{{objective.title}}">
+                <div class="tree-title-area" rel="tooltip" data-placement="top" data-original-title="{{audit_object_object.0.instance.title}}">
                   <i class="grcicon-{{audit.object_model.table_singular}}-color"></i>
                   {{#is_allowed "view_object_page" audit_object_object.0.instance}}
                     <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
