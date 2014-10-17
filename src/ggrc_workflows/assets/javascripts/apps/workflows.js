@@ -230,6 +230,18 @@
             "clauses",
           ])
         },
+        Vendor: {
+          // Make sure Vendors don't have workflows
+          //   in orphaned objects:
+          orphaned_objects: Multi([
+            "related_objects",
+            "people",
+            "controls",
+            "objectives",
+            "sections",
+            "clauses",
+          ])
+        },
         Person: {
           assigned_tasks: Search(function(binding) {
             return CMS.Models.CycleTaskGroupObjectTask.findAll({

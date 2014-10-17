@@ -32,6 +32,7 @@ from .objective import Objective
 from .objective_control import ObjectiveControl
 from .option import Option
 from .org_group import OrgGroup
+from .vendor import Vendor
 from .person import Person
 from .product import Product
 from .program import Program
@@ -87,6 +88,7 @@ all_models = [
   ObjectSection,
   Option,
   OrgGroup,
+  Vendor,
   Person,
   Product,
   Program,
