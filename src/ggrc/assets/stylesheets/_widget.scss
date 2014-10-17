@@ -9,12 +9,11 @@
 // widgets styles
 .widget {
   margin-bottom: 40px;
-  border: 1px solid $darkGray;
   .header {
     background: $lightGray;
     border-bottom:1px solid $darkGray;
     color: $text;
-    height: 30px;
+    height: 40px;
     padding-left: 20px;
     .widget-action {
       height: 30px;
@@ -40,10 +39,11 @@
       }
     }
     h2 {
-      font-weight:bold;
-      line-height: 28px;
+      line-height: 40px;
       color: #444;
       margin-bottom:0;
+      font-weight: normal;
+      font-size: $f-widgetTitle;
       @include oneline();
       span {
         font-size: $f-small;
@@ -1329,5 +1329,34 @@ ul.attr-list {
         }
       }
     }
+  }
+}
+
+// Get started list
+.quick-list {
+  @include reset-list();
+  li {
+    margin: 10px 10px 0 10px;
+  }
+  a {
+    display: block;
+    background: $treeListBgnd;
+    border: 1px solid $darkGray;
+    line-height: 30px;
+    height: 30px;
+    padding: 0 10px;
+    color: $text;
+    @include transition(background, 0.2s, ease-in-out);
+    i {
+      margin-top: 7px;
+    }
+    &:hover {
+      text-decoration: none;
+      background: darken($treeListBgnd,6%);
+    }
+  }
+  .divider {
+    background: $darkGray;
+    margin: 14px 0;
   }
 }
