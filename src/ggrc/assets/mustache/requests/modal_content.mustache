@@ -10,7 +10,7 @@
   <div class="row-fluid">
     <div class="span6">
       <label>
-        PBC Request
+        Request
         <span class="required">*</span>
       </label>
       <div class="wysiwyg-area">
@@ -57,20 +57,24 @@
   </div>
 
   <div class="row-fluid">
-    {{#using objective=instance.objective}}
+    {{#using audit=instance.audit}}
+    {{#using audit_object=instance.audit_object}}
+    {{#using audit_object_object=audit_object.auditable}}
     <div class="span6">
     {{#if_auditor instance include_admin=false}}
       &nbsp;
     {{else}}
       <label>
-        Objective
+        {{audit.object_model.title_singular}}
       </label>
-      <i class="grcicon-objective-color pull-left icon-field"></i>
+      <i class="grcicon-{{audit.object_model.table_singular}}-color pull-left icon-field"></i>
       <div class="objective-selector">
-        <input tabindex="6" type="text" name="objective.title" data-lookup="Objective" class="span10 search-icon" value="{{firstnonempty objective.title ''}}" placeholder="Enter text to search for Objective">
+        <input tabindex="6" type="text" name="audit_object_object.title" data-lookup="{{audit.object_type}}" class="span10 search-icon" value="{{firstnonempty audit_object_object.title ''}}" placeholder="Enter text to search for {{audit.object_type}}">
       </div>
     {{/if_auditor}}
     </div>
+    {{/using}}
+    {{/using}}
     {{/using}}
     <div class="span6">
       <label>

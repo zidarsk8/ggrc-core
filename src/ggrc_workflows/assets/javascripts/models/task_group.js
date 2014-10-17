@@ -83,7 +83,6 @@
       contact: "CMS.Models.Person.stub",
       modified_by: "CMS.Models.Person.stub",
       task_group: "CMS.Models.TaskGroup.stub",
-      response_options: "can.List.newInstance"
     },
 
     init: function() {

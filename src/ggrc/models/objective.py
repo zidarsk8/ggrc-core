@@ -10,10 +10,11 @@ from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
 from .object_objective import Objectiveable
+from .audit_object import Auditable
 from .reflection import PublishOnly
 
 class Objective(
-    Objectiveable, Documentable, Personable, Ownable, BusinessObject,
+    Auditable, Objectiveable, Documentable, Personable, Ownable, BusinessObject,
     db.Model):
   __tablename__ = 'objectives'
 
@@ -27,8 +28,6 @@ class Objective(
       'objective_controls', 'control', 'ObjectiveControl')
   objective_objects = db.relationship(
       'ObjectObjective', backref='objective', cascade='all, delete-orphan')
-  requests = db.relationship(
-     'Request', backref='objective')
 
   _publish_attrs = [
       PublishOnly('section_objectives'),

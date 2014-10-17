@@ -26,7 +26,7 @@ class Request(Titled, Slugged, Described, Base, db.Model):
   requested_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False)
-  objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'),
+  audit_object_id = db.Column(db.Integer, db.ForeignKey('audit_objects.id'),
     nullable=True)
   gdrive_upload_path = deferred(db.Column(db.String, nullable=True),
     'Request')
@@ -49,7 +49,7 @@ class Request(Titled, Slugged, Described, Base, db.Model):
     'due_on',
     'status',
     'audit',
-    'objective',
+    'audit_object',
     'responses',
     'test',
     'notes',
@@ -79,5 +79,5 @@ class Request(Titled, Slugged, Described, Base, db.Model):
     query = super(Request, cls).eager_query()
     return query.options(
       orm.joinedload('audit'),
-      orm.joinedload('objective'),
+      orm.joinedload('audit_object'),
       orm.subqueryload('responses'))

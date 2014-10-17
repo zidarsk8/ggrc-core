@@ -8,47 +8,6 @@
 ;(function(can, $, Mustache) {
 
 /*
-  toggle mustache helper
-
-  An extended "if" that sets up a "toggle_button" trigger, which can
-  be applied to any button rendered within the section bounded by the
-  toggle call.  toggle_buttons set the value of the toggle value to its
-  boolean opposite.  Note that external forces can also set this value
-  and thereby flip the toggle -- this helper is friendly to those cases.
-
-  @helper_type section -- use outside of element tags.
-
-  @param compute some computed value to flip between true and false
-
-  NB: This should probably be promoted to ggrc core, as it is generally
-  useful, but defer doing so until it is actually being *used* outside
-  of this extension. --BM
-*/
-Mustache.registerHelper("toggle", function(compute, options) {
-  function toggle(trigger) {
-    if (typeof trigger === "function") {
-      trigger = Mustache.resolve(trigger);
-    }
-    if (typeof trigger !== "string") {
-      trigger = "click";
-    }
-    return function(el) {
-      $(el).bind(trigger, function() {
-        compute(compute() ? false : true);
-      });
-    };
-  }
-
-  if (compute()) {
-    return options.fn(
-      options.contexts, { helpers: { toggle_button: toggle }});
-  } else {
-    return options.inverse(
-      options.contexts, { helpers: { toggle_button: toggle }});
-  }
-});
-
-/*
   sort_index_at_end mustache helper
 
   Given a list of items with a sort_index property, or a list of

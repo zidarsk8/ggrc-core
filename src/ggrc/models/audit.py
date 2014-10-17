@@ -10,6 +10,7 @@ from .mixins import (
     )
 from .object_person import Personable
 from .context import HasOwnContext
+from .reflection import PublishOnly
 
 
 class Audit(
@@ -37,6 +38,9 @@ class Audit(
       'Audit')
   requests = db.relationship(
       'Request', backref='audit', cascade='all, delete-orphan')
+  audit_objects = db.relationship(
+      'AuditObject', backref='audit', cascade='all, delete-orphan')
+  object_type = db.Column(db.String(length=250), nullable=False, default='Control')
 
   _publish_attrs = [
     'report_start_date',
@@ -46,6 +50,8 @@ class Audit(
     'gdrive_evidence_folder',
     'program',
     'requests',
+    'object_type',
+    PublishOnly('audit_objects')
     ]
 
   _sanitize_html = [

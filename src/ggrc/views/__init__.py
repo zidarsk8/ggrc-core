@@ -306,6 +306,13 @@ def custom_attributes():
   """
   return render_template("mockups/custom-attributes/index.html")
 
+@app.route("/mockups/reporting/index.html")
+@login_required
+def reporting():
+  """Reporting mockup
+  """
+  return render_template("mockups/reporting/index.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():

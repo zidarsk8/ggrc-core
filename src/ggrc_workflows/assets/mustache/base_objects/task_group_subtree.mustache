@@ -2,11 +2,15 @@
     <div class="item-main objective-selector field-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}}>
       <div class="row-fluid">
         <div class="span11">
-          <div class="oneline">
-            <i class="grcicon-{{instance.class.table_singular}}-color"></i>        
-            <span class="inline-data-content">
-              {{instance.title}}
-            </span>
+          <div class="row-fluid">
+            <div class="span1">
+              <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+            </div>
+            <div class="span11">
+              <span class="inline-data-content oneline" rel="tooltip" title="{{instance.title}}">
+                {{instance.title}}
+              </span>
+            </div>
           </div>
         </div>
         <div class="span1">

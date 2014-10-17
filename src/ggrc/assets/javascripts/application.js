@@ -1093,6 +1093,10 @@ $(window).load(function(){
 jQuery(function($){
   $.fn.cms_wysihtml5 = function() {
 
+    if ($(this).data('_wysihtml5_initialized'))
+      return;
+
+    $(this).data('_wysihtml5_initialized', true);
     this.wysihtml5({
         link: true,
         image: false,
@@ -1223,6 +1227,9 @@ jQuery(function($){
             return this.options.searchlist.then(function() {
               var filtered_list = [];
               return $.map(arguments, function(item) {
+                if (!item) {
+                  return;
+                }
                 var search_attr = item.title || "",
                     term = request.term.toLowerCase();
 

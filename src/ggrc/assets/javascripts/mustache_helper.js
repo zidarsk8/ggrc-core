@@ -2117,7 +2117,14 @@ Mustache.registerHelper("if_auditor", function(instance, options){
   audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
   auditors = audit.findAuditors(true); // immediate-mode findAuditors
 
-  if((include_admin && admin) || (auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id)) {
+  if((include_admin && admin)
+     || can.map(
+          auditors,
+          function(auditor) {
+            if(auditor.person.id === GGRC.current_user.id) {
+              return auditor;
+            }
+        }).length > 0) {
     return options.fn(options.contexts);
   } else {
     return options.inverse(options.contexts);
@@ -2150,11 +2157,17 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
         , create = Permission.is_allowed("creating", instance)
         , assignee = instance.assignee.id === GGRC.current_user.id
         , audit_lead = audit.contact.id === GGRC.current_user.id
-        , auditor = auditors && auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id
+        , auditor = can.map(
+                      auditors || [],
+                      function(auditor) {
+                        if(auditor.person.id === GGRC.current_user.id) {
+                          return auditor;
+                        }
+                    }).length > 0
         , auditor_states = ["Draft", "Responded", "Amended Response"] // States in which an auditor can edit a request
         , assignee_states = ["Requested", "Amended Request"]
-        , can_auditor_edit = auditor && ~can.inArray(instance.status, auditor_states)
-        , can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.status, assignee_states)
+        , can_auditor_edit = auditor && ~can.inArray(instance.attr("status"), auditor_states)
+        , can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.attr("status"), assignee_states)
         ;
       //    instead of
       //    ^if' allow_mapping_or_creating '\
@@ -2453,5 +2466,43 @@ Mustache.registerHelper("grdive_msg_to_id", function(message){
   var msg = Mustache.resolve(message).split(' ');
   return msg[msg.length-1];
 });
+
+/*
+  toggle mustache helper
+
+  An extended "if" that sets up a "toggle_button" trigger, which can
+  be applied to any button rendered within the section bounded by the
+  toggle call.  toggle_buttons set the value of the toggle value to its
+  boolean opposite.  Note that external forces can also set this value
+  and thereby flip the toggle -- this helper is friendly to those cases.
+
+  @helper_type section -- use outside of element tags.
+
+  @param compute some computed value to flip between true and false
+*/
+Mustache.registerHelper("toggle", function(compute, options) {
+  function toggle(trigger) {
+    if (typeof trigger === "function") {
+      trigger = Mustache.resolve(trigger);
+    }
+    if (typeof trigger !== "string") {
+      trigger = "click";
+    }
+    return function(el) {
+      $(el).bind(trigger, function() {
+        compute(compute() ? false : true);
+      });
+    };
+  }
+
+  if (compute()) {
+    return options.fn(
+      options.contexts, { helpers: { toggle_button: toggle }});
+  } else {
+    return options.inverse(
+      options.contexts, { helpers: { toggle_button: toggle }});
+  }
+});
+
 
 })(this, jQuery, can);

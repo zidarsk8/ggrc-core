@@ -291,10 +291,8 @@ can.Control("CMS.Controllers.LHN", {
             initial_scroll();
           }
         });
-        self.size = prefs[0].getLHNavSize(null, "lhs") || self.min_lhn_size;
-        self.objnav_size = prefs[0].getObjNavSize(null, "object-area") || 200;
+        self.size = prefs[0].getLHNavSize(null, "lhs");
         self.resize_lhn(self.size);
-        self.resize_objnav(self.lhn_width() + self.objnav_size);
         // Collapse the LHN if they did it on a previous page
         self.collapsed = prefs[0].getCollapsed(null, "lhs");
         self.collapsed && self.toggle_lhs();
@@ -322,7 +320,7 @@ can.Control("CMS.Controllers.LHN", {
         , $lhsHolder = $(".lhs-holder")
         , $area = $(".area")
         , $bar = $("#lhn > .bar-v")
-        , $obj_bar = $(".objnav.bar-v")
+        , $search = $('.widgetsearch')
         ;
       if($lhs.hasClass("lhs-closed")) {
         $lhs.removeClass("lhs-closed");
@@ -338,35 +336,34 @@ can.Control("CMS.Controllers.LHN", {
         $bar.css("left", "40px");
       }
 
+      $search.width($lhs.width() - 49);
       window.resize_areas();
-      $(window).trigger('resize');
-      $obj_bar.css("left", (this.objnav_size + this.lhn_width()) + "px");
-      this.resize_lhn(this.size);
       CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
         prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
-      })
+      });
     }
 
-  , min_lhn_size : 226
-  , min_objnav_size : 44
   , mousedown : false
   , dragged : false
-  , resize_lhn : function(resize){
-    var $lhs = $("#lhs")
-    , $lhsHolder = $(".lhs-holder")
-    , $area = $(".area")
-    , $bar = $("#lhn>.bar-v")
-    , $obj_bar = $(".objnav.bar-v")
-    , $search = $('.widgetsearch')
-    , $lhs_label_right = $(".lhs-search .my-work-right")
-    , $lhs_label = $(".lhs-search .my-work-label")
-    , lhn_second_row = 201
-    ;
-    //if(resize < this.min_lhn_size/2 && !$lhs.hasClass("lhs-closed")) this.toggle_lhs(); THIS IS RE-CODED BELOW THIS LINE. Instead of min_lhn_size I've added size of 40px
-    if(resize < 40 && !$lhs.hasClass("lhs-closed")) this.toggle_lhs();
-    //if(resize < this.min_lhn_size) return; THIS IS RE-CODED BELOW THIS LINE. Instead of min_lhn_size I've added size of 40px
-    if(resize < 40) return;
-    if($lhs.hasClass("lhs-closed")) this.toggle_lhs();
+  , resize_lhn : function(resize, no_trigger){
+    var $lhs = $("#lhs"),
+        $lhsHolder = $(".lhs-holder"),
+        $area = $(".area"),
+        $bar = $("#lhn>.bar-v"),
+        $search = $('.widgetsearch'),
+        $lhs_label_right = $(".lhs-search .my-work-right"),
+        $lhs_label = $(".lhs-search .my-work-label"),
+        lhn_second_row = 201,
+        max_width = window.innerWidth - 30;
+
+    if(resize < 40 && !$lhs.hasClass("lhs-closed")) {
+      this.toggle_lhs(no_trigger);
+    }
+    if(resize < 40) {
+      return;
+    }
+    resize = Math.min(resize, max_width);
+    if($lhs.hasClass("lhs-closed")) this.toggle_lhs(no_trigger);
     $lhsHolder.width(resize);
 
     // LHN search radio buttons oneline fix
@@ -386,28 +383,12 @@ can.Control("CMS.Controllers.LHN", {
 
     $search.width(resize - 49);
     window.resize_areas();
-    $(window).trigger('resize');
-    $obj_bar.css("left", (this.objnav_size + this.lhn_width()) + "px");
+    if (!no_trigger) {
+      $(window).trigger('resize');
+    }
   }
-  , resize_objnav : function(resize){
-
-    var $object_area = $(".object-area")
-      , $object_nav = $(".inner-nav")
-      , $object_bar = $('.objnav.bar-v')
-      , collapsed = false
-      , size = resize - this.lhn_width();
-      ;
-    if(size < this.min_objnav_size) return;
-    $object_nav.width(size);
-    $object_bar.css('left', resize);
-    window.resize_areas();
-    $(window).trigger('resize');
-  }
-  , "{window} mousedown" : function(el, ev) {
+  , ".bar-v mousedown" : function(el, ev) {
     var $target = $(ev.target);
-    if(!$target.hasClass('bar-v'))
-      return;
-    this.objnav = $target.hasClass('objnav');
     this.mousedown = true;
     this.dragged = false;
   }
@@ -418,32 +399,29 @@ can.Control("CMS.Controllers.LHN", {
 
     ev.preventDefault();
     this.dragged = true;
-    if(!this.objnav){
-      this.size = ev.pageX;
-      this.resize_lhn(this.size, el);
-    }
-    else{
-      this.objnav_size = ev.pageX - this.lhn_width();
-      this.resize_objnav(ev.pageX);
-    }
+    this.size = ev.pageX;
+    this.resize_lhn(this.size);
   }
   , "{window} mouseup" : function(el, ev){
     var self = this;
     if(!this.mousedown) return;
 
     this.mousedown = false;
-    if(!this.dragged && !this.objnav){
+    if(!this.dragged){
       this.toggle_lhs();
       return;
     }
-    self.size = Math.max(self.size, this.min_lhn_size);
-    self.objnav_size = Math.max(self.objnav_size, self.min_objnav_size);
+    self.size = self.size;
+
     CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
-        prefs[0].setObjNavSize(null, "object-area", self.objnav_size);
         prefs[0].setLHNavSize(null, "lhs", self.size);
     });
   }
-
+  , "{window} resize" : function(el, ev) {
+    if (this.size) {
+      this.resize_lhn(this.size, true);
+    }
+  }
   , "#lhs click": function(el, ev) {
       this.resize_search();
     }
@@ -1254,6 +1232,10 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
             this.proxy("on_fade_out_timeout"),
             this.options.fade_out_delay);
     }
+  , destroy: function() {
+    this._super();
+    this.on_mouseleave();
+  }
 });
 
 })(this.can, this.can.$);
