@@ -195,23 +195,24 @@
             {{/using}}
           </div>
         </div>
-
-        {{#using objective=instance.objective}}
-          {{#if objective}}
-            <div class="row-fluid">
-              <div class="span12">
-                <h6>Objective</h6>
-                <p class="oneline">
-                  <i class="grcicon-objective-color nomargin"></i>
-                  {{#is_allowed "view_object_page" objective}}
-                    <a class="object-title" href="{{objective.viewLink}}" target="_blank">{{objective.title}}</a>
-                  {{else}}
-                    <span class="object-title" target="_blank">{{objective.title}}</span>
-                  {{/is_allowed}}
-                </p>
+        {{#using audit=instance.audit}}
+          {{#with_mapping "audit_object_object" instance}}
+            {{#if audit_object_object.0.instance}}
+              <div class="row-fluid">
+                <div class="span12">
+                  <h6>{{audit.object_model.table_singular}}</h6>
+                  <p class="oneline">
+                    <i class="grcicon-{{audit.object_model.table_singular}}-color nomargin"></i>
+                    {{#is_allowed "view_object_page" audit_object_object.0.instance}}
+                      <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
+                    {{else}}
+                      <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
+                    {{/is_allowed}}
+                  </p>
+                </div>
               </div>
-            </div>
-          {{/if}}
+            {{/if}}
+          {{/using}}
         {{/using}}
 
         {{{render_hooks 'Request.tree_view_info'}}}
