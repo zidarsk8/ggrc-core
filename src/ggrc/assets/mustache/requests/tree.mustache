@@ -132,6 +132,31 @@
               {{/instance._undo.0}}
               {{/with_mapping}}
               {{/using}}
+              &nbsp;&nbsp;
+              {{! taken from responses/tree_footer}}
+              {{#if allow_creating}}
+              {{#is_allowed '__GGRC_ADMIN__' model.shortName context=instance.context.id}}
+                      {{#using audit=parent_instance.audit}}
+                      <a href="javascript://" class="section-create btn btn-primary" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.response_model_class}}" data-object-plural="responses" data-object-params='{ "{{instance.class.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.class.model_singular}}" }, "context": { "id" : {{firstexist audit.context.id "null"}}, "href" : "{{audit.context.href}}", "type" : "{{audit.context.type}}" } }'>
+                        Create Response
+                      </a>
+                      {{/using}}
+              {{else}}
+                {{^if_auditor instance}}
+                {{#if_helpers '\
+                  #is_allowed' 'create' model.shortName _0_context=instance.context.id '\
+                  and ^if_equals' instance.status 'Accepted'}}
+                {{#if_can_edit_request instance}}
+                      {{#using audit=instance.audit}}
+                      <a href="javascript://" class="section-create btn btn-primary" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.response_model_class}}" data-object-plural="responses" data-object-params='{ "{{instance.class.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.class.model_singular}}" }, "context": { "id" : {{firstexist audit.context.id "null"}}, "href" : "{{audit.context.href}}", "type" : "{{audit.context.type}}" } }'>
+                        Create Response
+                      </a>
+                      {{/using}}
+                {{/if_can_edit_request}}
+                {{/if_helpers}}
+                {{/if_auditor}}
+              {{/is_allowed}}}
+              {{/if}}
             </div>
           </div>
         </div>
