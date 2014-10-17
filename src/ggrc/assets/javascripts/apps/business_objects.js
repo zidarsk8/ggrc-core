@@ -270,24 +270,25 @@ $(function() {
   });
 
   var base_widgets_by_type = {
-    "Program": ["Regulation", "Contract", "Policy", "Standard", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
-    "Regulation" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
-    "Policy" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
-    "Standard" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
-    "Contract" : ["Program", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
-    "Clause" : ["Contract", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
-    "Section" : ["Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
-    "Objective" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
-    "Control" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
-    "Person" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Audit"],
-    "OrgGroup" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
-    "System" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
-    "Process" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
-    "DataAsset" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
-    "Product" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
-    "Project" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
-    "Facility" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
-    "Market" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"]
+    "Program": ["Regulation", "Contract", "Policy", "Standard", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Regulation" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
+    "Policy" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
+    "Standard" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
+    "Contract" : ["Program", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
+    "Clause" : ["Contract", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
+    "Section" : ["Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
+    "Objective" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
+    "Control" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Person" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Audit"],
+    "OrgGroup" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Vendor" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "System" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Process" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "DataAsset" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Product" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Project" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Facility" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Market" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"]
   };
 
   function sort_sections(sections) {
@@ -435,6 +436,9 @@ $(function() {
                 }
             , OrgGroup: {
                   mapping: "related_org_groups"
+                }
+            , Vendor: {
+                  mapping: "related_vendors"
                 }
             , Process: {
                   mapping: "related_processes"
@@ -593,6 +597,9 @@ $(function() {
         , OrgGroup: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
+        , Vendor: {
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+          }
         , Process: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
@@ -685,6 +692,9 @@ $(function() {
               }
             , OrgGroup: {
                 mapping: "extended_related_org_groups_via_search"
+              }
+            , Vendor: {
+                mapping: "extended_related_vendors_via_search"
               }
             , Process: {
                 mapping: "extended_related_processes_via_search"
