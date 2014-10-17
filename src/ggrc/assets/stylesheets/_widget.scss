@@ -976,6 +976,20 @@
             color:$error;
           }
         }
+        &.disabled-link {
+          color: $gray;
+          i {
+            @include opacity(0.3);
+          }
+          &:hover {
+            color: $gray;
+            background: $treeListBgnd;
+            cursor: default;
+            i {
+              @include opacity(0.3);
+            }
+          }
+        }
       }
     }
     &.change-links {
