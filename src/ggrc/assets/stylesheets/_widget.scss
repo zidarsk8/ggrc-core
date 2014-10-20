@@ -1093,7 +1093,10 @@
   background:#ddd;
   border-top:1px solid #ccc;
   border-bottom:1px solid #ccc;
-  padding:0 20px;
+  padding: 0;
+  .filter-title {
+    padding-left: 20px;
+  }
   input {
     margin: -1px 3px 0 0;
     line-height: 14px;
@@ -1123,6 +1126,9 @@
     width:120px;
     display: inline-block;
     margin-bottom: 0;
+    &.input-small {
+      width: 90px;
+    }
   }
   h6 {
     display:inline-block;
@@ -1143,14 +1149,16 @@
   }
   &.task-filtering {
     input {
-      &[class*="span"] {
+      &[class*="span"],
+      &.input-block-level {
         padding: 4px;
         min-height: 20px;
       }
-    }
-    .quick-filters {
-      li:last-child {
-        margin-right: 0;
+      &.input-block-level {
+        margin-top: 5px;
+      }
+      &[type="checkbox"] {
+        margin-top: -2px;
       }
     }
   }
