@@ -166,6 +166,7 @@ dashboard-js-template-files:
   - objectives/modal_content.mustache
   - objectives/tree.mustache
   - org_groups/modal_content.mustache
+  - vendors/modal_content.mustache
   - pbc/iframe_tooltip.mustache
   - people/active_column.mustache
   - people/filters.mustache
@@ -241,6 +242,7 @@ dashboard-js-template-files:
   - requests/filters.mustache
   - requests/amend_modal_content.mustache
   - org_groups/autocomplete_result.mustache
+  - vendors/autocomplete_result.mustache
   - base_objects/edit_object_link.mustache
   - base_objects/tier2_content.mustache
   - controls/tier2_content.mustache

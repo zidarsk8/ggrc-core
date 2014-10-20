@@ -52,6 +52,7 @@ def all_cache_entries():
     resource('objective_controls', 'ObjectiveControl'),
     resource('options', 'Option'),
     resource('org_groups', 'OrgGroup'),
+    resource('vendors', 'Vendor'),
     resource('people', 'Person'),
     resource('products', 'Product'),
     resource('projects', 'Project'),
