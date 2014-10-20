@@ -373,7 +373,7 @@ def update_cycle_object_parent_state(obj):
               children_verified = False
               if child.status != 'Finished':
                 children_finished = False
-          if children_verified:
+          if children_verified and len(children) > 0:
             if is_allowed_update(parent.__class__.__name__, parent.context.id):
               old_status=parent.status
               parent.status = 'Verified'
@@ -384,7 +384,7 @@ def update_cycle_object_parent_state(obj):
                   old_status=old_status
                   )
             update_cycle_object_parent_state(parent)
-          elif children_finished:
+          elif children_finished and len(children) > 0:
             if is_allowed_update(parent.__class__.__name__, parent.context.id):
               old_status=parent.status
               parent.status = 'Finished'
