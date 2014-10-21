@@ -44,19 +44,7 @@ can.Model.Cacheable("CMS.Models.CustomAttributeDefinition", {
   init : function() {
     var that = this;
     this._super.apply(this, arguments);
-
-    // this.bind("change", function(ev, attr, how, newVal, oldVal) {
-    //   // Emit the "orphaned" event when the directive attribute is removed
-    //   if (attr === "directive" && how === "remove" && oldVal && newVal === undefined) {
-    //     // It is necessary to temporarily add the attribute back for orphaned
-    //     // processing to work properly.
-    //     that.directive = oldVal;
-    //     can.trigger(that.constructor, 'orphaned', that);
-    //     delete that.directive;
-    //   }
-    // });
   }
-
 });
 
 })(this, can.$);
@@ -90,19 +78,7 @@ can.Model.Cacheable("CMS.Models.CustomAttributeValue", {
   init : function() {
     var that = this;
     this._super.apply(this, arguments);
-
-    // this.bind("change", function(ev, attr, how, newVal, oldVal) {
-    //   // Emit the "orphaned" event when the directive attribute is removed
-    //   if (attr === "directive" && how === "remove" && oldVal && newVal === undefined) {
-    //     // It is necessary to temporarily add the attribute back for orphaned
-    //     // processing to work properly.
-    //     that.directive = oldVal;
-    //     can.trigger(that.constructor, 'orphaned', that);
-    //     delete that.directive;
-    //   }
-    // });
   }
-
 });
 
 })(this, can.$);
