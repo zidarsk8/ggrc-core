@@ -43,7 +43,7 @@
       {{#if_helpers '\
         #if_auditor' instance '\
         or #if' new_object_form '\
-        ' _0_include_admin=false }}disabled="true"{{/if_helpers}} tabindex="4">
+        ' _0_include_admin=false }}disabled="true"{{/if_helpers}}>
         {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
         <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
         {{/iterate}}
@@ -52,7 +52,7 @@
         Due On
         <span class="required">*</span>
       </label>
-      <input tabindex="5" class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
+      <input tabindex="4" class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
     </div>
   </div>
 
@@ -69,7 +69,7 @@
       </label>
       <i class="grcicon-{{audit.object_model.table_singular}}-color pull-left icon-field"></i>
       <div class="objective-selector">
-        <input tabindex="6" type="text" name="audit_object_object.title" data-lookup="{{audit.object_type}}" class="span10 search-icon" value="{{firstnonempty audit_object_object.title ''}}" placeholder="Enter text to search for {{audit.object_type}}">
+        <input tabindex="5" type="text" name="audit_object_object.title" data-lookup="{{audit.object_type}}" class="span10 search-icon" value="{{firstnonempty audit_object_object.title ''}}" placeholder="Enter text to search for {{audit.object_type}}">
       </div>
     {{/if_auditor}}
     </div>
@@ -98,7 +98,7 @@
       {{else}}
         {{#using assignee=instance.assignee}}
         <div class="objective-selector">
-          <input tabindex="7" type="text" name="assignee.email" class="span10 search-icon" data-lookup="Person" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.email ''}}">
+          <input tabindex="6" type="text" name="assignee.email" class="span10 search-icon" data-lookup="Person" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.email ''}}">
         </div>
         {{/using}}
       {{/if_auditor}}
@@ -131,7 +131,7 @@
           Test
         </label>
         <div class="wysiwyg-area">
-          <textarea tabindex="8" id="test_description" class="span12 double wysihtml5" name="test" placeholder="Enter Test">{{{test}}}</textarea>
+          <textarea tabindex="7" id="test_description" class="span12 double wysihtml5" name="test" placeholder="Enter Test">{{{test}}}</textarea>
         </div>
       </div>
       <div class="span6">
@@ -139,7 +139,7 @@
           Notes
         </label>
         <div class="wysiwyg-area">
-          <textarea tabindex="9" id="notes_description" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
+          <textarea tabindex="8" id="notes_description" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
         </div>
       </div>
     </div>
@@ -149,7 +149,7 @@
           Code
           <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         </label>
-        <input tabindex="8" class="input-block-level" name="slug" placeholder="REQUEST-XXX" type="text" value="{{slug}}">
+        <input tabindex="9" class="input-block-level" name="slug" placeholder="REQUEST-XXX" type="text" value="{{slug}}">
       </div>
     </div>
 
