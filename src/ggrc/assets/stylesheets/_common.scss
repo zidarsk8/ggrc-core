@@ -941,6 +941,11 @@ select.multiple-selector {
       float: left;
       width: 23px;
     }
+    &.remove-field {
+      i {
+        margin-top: 5px;
+      }
+    }
   }
   &.task-wrap {
     span.empty {
