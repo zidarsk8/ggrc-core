@@ -397,7 +397,8 @@ can.Model.Cacheable("CMS.Models.Response", {
       , model : can.Model.Cacheable
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-      , allow_mapping : true
+      , allow_mapping : false
+      , allow_creating: false
       , exclude_option_types : function() {
         var types = {
           "DocumentationResponse" : "Document"
@@ -410,18 +411,24 @@ can.Model.Cacheable("CMS.Models.Response", {
       model : "Document"
       , mapping : "documents"
       , show_view : GGRC.mustache_path + "/documents/pbc_tree.mustache"
+      , allow_mapping: false
+      , allow_creating: false
     }, {
       //3: Meeting participants
       model : "Person"
       , mapping : "people"
       , show_view : GGRC.mustache_path + "/people/tree.mustache"
       , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
+      , allow_mapping: false
+      , allow_creating: false
     }, {
       //2: Meetings
       model : "Meeting"
       , mapping : "meetings"
       , show_view : GGRC.mustache_path + "/meetings/tree.mustache"
       , footer_view : GGRC.mustache_path + "/meetings/tree_footer.mustache"
+      , allow_mapping: false
+      , allow_creating: false
     }]
   }
 }, {
