@@ -283,7 +283,7 @@ can.Control("GGRC.Controllers.Modals", {
     });
   }
 
-  , "input, textarea, select change" : function(el, ev) {
+  , "input:not(isolate-form input), textarea:not(isolate-form textarea), select:not(isolate-form select) change" : function(el, ev) {
       this.options.instance.removeAttr("_suppress_errors");
       // Set the value if it isn't a search field
       if(!el.hasClass("search-icon")){
@@ -291,7 +291,7 @@ can.Control("GGRC.Controllers.Modals", {
       }
   }
 
-  , "input:not([data-lookup]), textarea keyup" : function(el, ev) {
+  , "input:not([data-lookup], isolate-form *), textarea keyup" : function(el, ev) {
       if (el.prop('value').length == 0 ||
         (typeof el.attr('value') !== 'undefined' && el.attr('value').length == 0)) {
         this.set_value_from_element(el);
@@ -300,7 +300,7 @@ can.Control("GGRC.Controllers.Modals", {
 
   , serialize_form : function() {
       var $form = this.options.$content.find("form")
-        , $elements = $form.find(":input")
+        , $elements = $form.find(":input:not(isolate-form *)")
         ;
 
       can.each($elements.toArray(), this.proxy("set_value_from_element"));
@@ -340,7 +340,7 @@ can.Control("GGRC.Controllers.Modals", {
     }
     var name = item.name.split(".")
       , $elem, value, model, $other;
-    $elem = this.options.$content.find("[name='" + item.name + "']");
+    $elem = this.options.$content.find("[name='" + item.name + "']:not(isolate-form *)");
     model = $elem.attr("model");
 
     if (model) {
@@ -401,7 +401,7 @@ can.Control("GGRC.Controllers.Modals", {
             value = null;
           } else {
             value = this.options.model.convert.date(value);
-            $other = this.options.$content.find("[name='" + name.join(".") + ".time']");
+            $other = this.options.$content.find("[name='" + name.join(".") + ".time']:not(isolate-form *)");
             if($other.length) {
               value = moment(value).add(parseInt($other.val(), 10)).toDate();
             }
@@ -763,7 +763,7 @@ can.Component.extend({
   //  within the component tag.  Since the views for the original uses of these components
   //  were already created with content, we just used <content> instead of making
   //  new view template files.
-  template: "<content/>",
+  template: "<isolate-form><content/></isolate-form>",
   scope: {
     parent_instance: null,
     instance: null,
@@ -771,6 +771,7 @@ can.Component.extend({
     source_mapping: '@',
     source_mapping_source: '@',
     mapping: '@',
+    attributes: {},
     // the following are just for the case when we have no object to start with,
     changes: []
   },
@@ -882,8 +883,56 @@ can.Component.extend({
         this.scope.attributes.attr(el.attr("name"), null);
       }
     },
-    "input[data-lookup], input[data-mapping] keyup" : function(el, ev) {
+    "input keyup" : function(el, ev) {
       ev.stopPropagation();
+    },
+    "input, textarea, select change" : function(el, ev) {
+        this.scope.attributes.attr(el.attr("name"), el.val());
+    },
+
+    "input:not([data-lookup], [data-mapping]), textarea keyup" : function(el, ev) {
+      if (el.prop('value').length == 0 ||
+        (typeof el.attr('value') !== 'undefined' && el.attr('value').length == 0)) {
+        this.scope.attributes.attr(el.attr("name"), el.val());
+      }
+    },
+    "a[data-toggle=submit]:not(.disabled) click": function(el, ev) {
+      var obj,
+          that = this,
+          binding = this.scope.instance.get_binding(this.scope.mapping),
+          extra_attrs = can.reduce(
+                          this.element
+                          .find("input:not([data-mapping], [data-lookup])")
+                          .get(),
+                          function(attrs, el) {
+                            if ($(el).attr("model")) {
+                              attrs[$(el).attr("name")] = CMS.Models[$(el).attr("model")].findInCacheById($(el).val());
+                            } else {
+                              attrs[$(el).attr("name")] = $(el).val();
+                            }
+                            return attrs;
+                          }, {});
+
+      ev.stopPropagation();
+
+      if(binding.loader instanceof GGRC.ListLoaders.DirectListLoader) {
+        extra_attrs[binding.loader.object_attr] = this.scope.instance;
+        obj = new CMS.Models[binding.loader.model_name](extra_attrs);
+      } else {
+        obj = GGRC.Mappings.make_join_object(
+          this.scope.instance.constructor.shortName,
+          binding.loader.model_name,
+          extra_attrs
+        );
+      }
+      
+      if (that.scope.deferred) {
+        that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
+      } else {
+        that.scope.instance.mark_for_addition(that.scope.mapping, obj, extra_attrs);
+      }
+      that.scope.list.push(obj);
+      that.scope.attr("attributes", {});
     },
     ".ui-autocomplete-input modal:success" : function(el, ev, data, options) {
       var that = this,
@@ -892,7 +941,11 @@ can.Component.extend({
                           .find("input:not([data-mapping], [data-lookup])")
                           .get(),
                           function(attrs, el) {
-                            attrs[$(el).attr("name")] = $(el).val();
+                            if ($(el).attr("model")) {
+                              attrs[$(el).attr("name")] = CMS.Models[$(el).attr("model")].findInCacheById($(el).val());
+                            } else {
+                              attrs[$(el).attr("name")] = $(el).val();
+                            }
                             return attrs;
                           }, {});
       
@@ -903,6 +956,7 @@ can.Component.extend({
           that.scope.instance.mark_for_addition(that.scope.mapping, obj, extra_attrs);
         }
         that.scope.list.push(obj);
+        that.scope.attr("attributes", {});
       });
     }
   },

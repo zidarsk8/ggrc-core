@@ -337,7 +337,10 @@ can.Model.Cacheable("CMS.Models.Response", {
     var found = false;
     if (this.shortName !== 'Response')
       return this._super(params);
-    if (!params)
+    if (!params 
+        || (params instanceof CMS.Models.Response 
+            && params.constructor !== CMS.Models.Response
+       ))
       return params;
     params = this.object_from_resource(params);
     if (!params.selfLink) {
