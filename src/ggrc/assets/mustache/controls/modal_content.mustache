@@ -169,6 +169,7 @@
         <input tabindex="14" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
       </div>
     </div>
+
     <div class="row-fluid">
       <div class="span4 hidable">
         <label>
@@ -176,7 +177,9 @@
           <i class="grcicon-help-black" rel="tooltip" title="How often should this Control be re-evaluated?"></i>
           <a href="javascript://" class="field-hide">hide</a>
         </label>
-        {{{option_select this "verify_frequency" "verify_frequency" tabindex=15}}}
+        <div tabindex=15>
+          {{{option_select this "verify_frequency" "verify_frequency" tabindex=15}}}
+        </div>
       </div>
       <div class="span4 hidable">
         <label>
@@ -184,7 +187,9 @@
           <i class="grcicon-help-black" rel="tooltip" title="Select control assertions."></i>
           <a href="javascript://" class="field-hide">hide</a>
         </label>
-        {{{category_select this "assertions" "ControlAssertion" tabindex=16}}}
+          <div tabindex=16>
+            {{{category_select this "assertions" "ControlAssertion" tabindex=16}}}
+          </div>
       </div>
       <div class="span4 hidable">
         <label>
@@ -192,10 +197,11 @@
           <i class="grcicon-help-black" rel="tooltip" title="Select control categories."></i>
           <a href="javascript://" class="field-hide">hide</a>
         </label>
-        {{{category_select this "categories" "ControlCategory" tabindex=17}}}
+          <div tabindex=17>
+            {{{category_select this "categories" "ControlCategory" tabindex=17}}}
+          </div>
       </div>
     </div>
-    
     <div class="row-fluid">
       <div class="span4 hidable">
         <label>
@@ -237,7 +243,6 @@
         </select>
       </div>
     </div>
-    
   </div>
 </form>
 {{/instance}}
