@@ -76,14 +76,13 @@
   &.dashboard-area {
     margin-left:0;
   }
-
 }
 
 .inner-content {
-  .span4 & {
+  .side-wrap & {
     margin-left: 20px;
   }
-  .span8 & {
+  .content-wrap & {
     margin-right: 20px;
   }
 }
