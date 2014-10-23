@@ -72,28 +72,62 @@
                       <ul class="quick-list">
                         <li>
                           <a href="#">
-                            <i class="grcicon-program-color"></i>
-                            Create a Program
-                          </a>
-                        </li>
-                        <li>
-                          <a href="#">
                             <i class="grcicon-workflow-color"></i>
-                            Create a Workflow
+                            Start new workflow
                           </a>
                         </li>
                         <li>
                           <a href="#">
                             <i class="grcicon-audit-color"></i>
-                            Create An Audit
+                            Start new audit
+                          </a>
+                        </li>
+                        <li>
+                          <a href="#">
+                            <i class="grcicon-program-color"></i>
+                            Start new program
                           </a>
                         </li>
                         <li>
                           <div class="divider"></div>
-                          <a href="#">
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             <i class="grcicon-policy-color"></i>
-                            Create An Object
+                            Create new object
                           </a>
+                          <div class="dropdown-menu" role="menu">
+                            <div>
+                              <a href="#contract_widget">
+                                <div class="oneline">
+                                  <i class="grcicon-contract-color"></i>
+                                  Contracts
+                                </div>
+                              </a>
+                            </div>
+                            <div>
+                              <a href="#project_widget">
+                                <div class="oneline">
+                                  <i class="grcicon-project-color"></i>
+                                  Projects
+                                </div>
+                              </a>
+                            </div>
+                            <div>
+                              <a href="#vendor_widget">
+                                <div class="oneline">
+                                  <i class="grcicon-vendor-color"></i>
+                                  Vendors
+                                </div>
+                              </a>
+                            </div>
+                            <div>
+                              <a href="#risk_assessments_widget">
+                                <div class="oneline">
+                                  <i class="grcicon-risk_assessment-color"></i>
+                                  Risk Assessments
+                                </div>
+                              </a>
+                            </div>
+                          </div>
                         </li>
                       </ul><!-- tree-structure end -->
                     </section><!-- Widget content end -->
@@ -203,15 +237,17 @@
                         <li class="tree-item">
                           <div class="item-main">
                             <div class="row-fluid">
-                              <div class="span5">
+                              <div class="span8">
                                 <div class="item-data">
                                   <div class="tree-title-area">
                                     <div class="row-fluid">
-                                      <div class="span7">
-                                        <span class="label custom-label label-white">Active</span>
-                                        Workflow 1
+                                      <div class="span9">
+                                        <div class="oneline">
+                                          <span class="label custom-label label-active">Active</span>
+                                          Master clause library review
+                                        </div>
                                       </div>
-                                      <div class="span5">
+                                      <div class="span3">
                                         <span class="date-wrap">
                                           <i class="grcicon-history-color"></i>
                                           09/25/2014
@@ -221,11 +257,11 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="span7">
+                              <div class="span4">
                                 <div class="tree-progress">
                                   <div class="progress custom-progress">
-                                    <div class="bar bar-success" style="width: 70%;">In progress</div>
-                                    <div class="bar bar-danger" style="width: 30%;">Pending</div>
+                                    <div class="bar bar-success" style="width: 70%;" rel="tooltip" data-original-title="In progress"></div>
+                                    <div class="bar bar-danger" style="width: 30%;" rel="tooltip" data-original-title="Pending"></div>
                                   </div>
                                 </div>
                               </div>
@@ -235,15 +271,17 @@
                         <li class="tree-item">
                           <div class="item-main">
                             <div class="row-fluid">
-                              <div class="span5">
+                              <div class="span8">
                                 <div class="item-data">
                                   <div class="tree-title-area">
                                     <div class="row-fluid">
-                                      <div class="span7">
-                                        <span class="label custom-label label-default">Draft</span>
-                                        Workflow 2
+                                      <div class="span9">
+                                        <div class="oneline">
+                                          <span class="label custom-label label-default">Draft</span>
+                                          Annual vendor compliance test
+                                        </div>
                                       </div>
-                                      <div class="span5">
+                                      <div class="span3">
                                         <span class="date-wrap">
                                           <i class="grcicon-history-color"></i>
                                           09/25/2014
@@ -253,13 +291,13 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="span7">
+                              <div class="span4">
                                 <div class="tree-progress">
                                   <div class="progress custom-progress">
-                                    <div class="bar bar-success" style="width: 25%;">In progress</div>
-                                    <div class="bar bar-danger" style="width: 25%;">Pending</div>
-                                    <div class="bar bar-warning" style="width: 25%;">Overdue</div>
-                                    <div class="bar bar-base" style="width: 25%;">Not started</div>
+                                    <div class="bar bar-success" style="width: 25%;" rel="tooltip" data-original-title="In progress"></div>
+                                    <div class="bar bar-danger" style="width: 25%;" rel="tooltip" data-original-title="Pending"></div>
+                                    <div class="bar bar-warning" style="width: 25%;" rel="tooltip" data-original-title="Overdue"></div>
+                                    <div class="bar bar-base" style="width: 25%;" rel="tooltip" data-original-title="Not started"></div>
                                   </div>
                                 </div>
                               </div>
@@ -269,15 +307,17 @@
                         <li class="tree-item">
                           <div class="item-main">
                             <div class="row-fluid">
-                              <div class="span5">
+                              <div class="span8">
                                 <div class="item-data">
                                   <div class="tree-title-area">
                                     <div class="row-fluid">
-                                      <div class="span7">
-                                        <span class="label custom-label label-white">Active</span>
-                                        Workflow 3
+                                      <div class="span9">
+                                        <div class="oneline">
+                                          <span class="label custom-label label-active">Active</span>
+                                          Google Fiber assessment for West Virginia with a very very long title
+                                        </div>
                                       </div>
-                                      <div class="span5">
+                                      <div class="span3">
                                         <span class="date-wrap">
                                           <i class="grcicon-history-color"></i>
                                           09/25/2014
@@ -287,12 +327,12 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="span7">
+                              <div class="span4">
                                 <div class="tree-progress">
                                   <div class="progress">
-                                    <div class="bar bar-success" style="width: 60%;">In progress</div>
-                                    <div class="bar bar-danger" style="width: 20%;">Pending</div>
-                                    <div class="bar bar-warning" style="width: 20%;">Overdue</div>
+                                    <div class="bar bar-success" style="width: 60%;" rel="tooltip" data-original-title="In progress"></div>
+                                    <div class="bar bar-danger" style="width: 20%;" rel="tooltip" data-original-title="Pending"></div>
+                                    <div class="bar bar-warning" style="width: 20%;" rel="tooltip" data-original-title="Overdue"></div>
                                   </div>
                                 </div>
                               </div>
@@ -302,15 +342,17 @@
                         <li class="tree-item">
                           <div class="item-main">
                             <div class="row-fluid">
-                              <div class="span5">
+                              <div class="span8">
                                 <div class="item-data">
                                   <div class="tree-title-area">
                                     <div class="row-fluid">
-                                      <div class="span7">
-                                        <span class="label custom-label label-white">Active</span>
-                                        Workflow 4
+                                      <div class="span9">
+                                        <div class="oneline">
+                                          <span class="label custom-label label-active">Active</span>
+                                          Food quality and variety assessment
+                                        </div>
                                       </div>
-                                      <div class="span5">
+                                      <div class="span3">
                                         <span class="date-wrap">
                                           <i class="grcicon-history-color"></i>
                                           09/25/2014
@@ -320,11 +362,11 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="span7">
+                              <div class="span4">
                                 <div class="tree-progress">
                                   <div class="progress custom-progress">
-                                    <div class="bar bar-success" style="width: 90%;">In progress</div>
-                                    <div class="bar bar-base" style="width: 10%;" rel="tooltip" data-original-title="Not started">Not started</div>
+                                    <div class="bar bar-success" style="width: 90%;" rel="tooltip" data-original-title="In progress"></div>
+                                    <div class="bar bar-base" style="width: 10%;" rel="tooltip" data-original-title="Not started"></div>
                                   </div>
                                 </div>
                               </div>

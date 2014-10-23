@@ -261,10 +261,13 @@ u {
   font-weight: normal;
   text-shadow: none;
   margin-right: 4px;
-  border: 1px solid $gray;
 }
-.label-white {
-  background: $white;
+.label-active {
+  background: $green;
+  color: $white;
+}
+.label-default {
+  background: $lightGray;
   color: $black;
 }
 

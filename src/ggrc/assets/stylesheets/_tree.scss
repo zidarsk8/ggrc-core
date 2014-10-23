@@ -49,6 +49,10 @@ ul.new-tree {
     li {
       padding-left: 20px;
     }
+    a {
+      display: block;
+      @include oneline();
+    }
   }
   &.request-list,
   &.responses-list {
