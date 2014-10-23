@@ -915,15 +915,11 @@ can.Component.extend({
 
       ev.stopPropagation();
 
+      extra_attrs[binding.loader.object_attr] = this.scope.instance;
       if(binding.loader instanceof GGRC.ListLoaders.DirectListLoader) {
-        extra_attrs[binding.loader.object_attr] = this.scope.instance;
         obj = new CMS.Models[binding.loader.model_name](extra_attrs);
       } else {
-        obj = GGRC.Mappings.make_join_object(
-          this.scope.instance.constructor.shortName,
-          binding.loader.model_name,
-          extra_attrs
-        );
+        obj = new CMS.Models[binding.loader.option_model_name](extra_attrs);
       }
       
       if (that.scope.deferred) {

@@ -330,16 +330,21 @@ can.Model("can.Model.Cacheable", {
               : new model({
                   context : obj.context
                 });
-            if(binding.loader.object_attr) {
-              inst.attr(binding.loader.object_attr, obj.stub());
-            }
-            if(binding.loader.option_attr) {
-              inst.attr(binding.loader.option_attr, pj.what.stub());
-            }
-            if(pj.extra) {
-              inst.attr(pj.extra);
-            }
-            dfds.push(inst.save());
+            dfds.push(
+              $.when(pj.what !== inst && pj.what.isNew() ? pj.what.save() : null)
+               .then(function() {
+                if(binding.loader.object_attr) {
+                  inst.attr(binding.loader.object_attr, obj.stub());
+                }
+                if(binding.loader.option_attr) {
+                  inst.attr(binding.loader.option_attr, pj.what.stub());
+                }
+                if(pj.extra) {
+                  inst.attr(pj.extra);
+                }
+                return inst.save();
+              })
+            );
           } else if(pj.how === "remove") {
             can.map(binding.list, function(bound_obj) {
               if(bound_obj.instance === pj.what || bound_obj.instance[binding.loader.option_attr] === pj.what) {
