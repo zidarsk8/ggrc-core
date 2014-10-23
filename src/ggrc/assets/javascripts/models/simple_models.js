@@ -34,7 +34,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , findOne : "/api/programs/{id}"
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
-  //, destroy : "DELETE /api/programs/{id}"
+  , destroy : "DELETE /api/programs/{id}"
   , mixins : ["contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"

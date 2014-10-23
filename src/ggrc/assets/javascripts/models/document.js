@@ -16,6 +16,7 @@ can.Model.Cacheable("CMS.Models.Document", {
     , findAll : "GET /api/documents"
     , create : "POST /api/documents"
     , update : "PUT /api/documents/{id}"
+    , destroy : "DELETE /api/documents/{id}"
     , search : function(request, response) {
         return $.ajax({
             type : "get"
@@ -25,10 +26,10 @@ can.Model.Cacheable("CMS.Models.Document", {
             , success : function(data) {
                 response($.map( data, function( item ) {
                   return can.extend({}, item.document, {
-                    label: item.document.title
-                          ? item.document.title
-                          + (item.document.link_url
-                            ? " (" + item.document.link_url + ")"
+                    label: item.document.title 
+                          ? item.document.title 
+                          + (item.document.link_url 
+                            ? " (" + item.document.link_url + ")" 
                             : "")
                           : item.document.link_url
                     , value: item.document.id

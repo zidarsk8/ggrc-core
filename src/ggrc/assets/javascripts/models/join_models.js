@@ -114,6 +114,7 @@ can.Model.Join("CMS.Models.Relationship", {
   }
   , findAll: "GET /api/relationships"
   , create: "POST /api/relationships"
+  , destroy: "DELETE /api/relationships/{id}"
 }, {
   reinit: function() {
     var that = this;
@@ -152,6 +153,7 @@ can.Model.Join("CMS.Models.ObjectSection", {
   }
   , findAll: "GET /api/object_sections"
   , create: "POST /api/object_sections"
+  , destroy: "DELETE /api/object_sections/{id}"
 }, {
 });
 
@@ -170,6 +172,7 @@ can.Model.Join("CMS.Models.ObjectControl", {
   }
   , findAll: "GET /api/object_controls"
   , create: "POST /api/object_controls"
+  , destroy: "DELETE /api/object_controls/{id}"
 }, {
 });
 
@@ -188,6 +191,7 @@ can.Model.Join("CMS.Models.ObjectObjective", {
   }
   , findAll: "GET /api/object_objectives"
   , create: "POST /api/object_objectives"
+  , destroy: "DELETE /api/object_objectives/{id}"
 }, {
 });
 
@@ -206,6 +210,7 @@ can.Model.Join("CMS.Models.ProgramDirective", {
   }
   , findAll: "GET /api/program_directives"
   , create: "POST /api/program_directives"
+  , destroy : "DELETE /api/program_directives/{id}"
 }, {
 });
 
@@ -224,6 +229,7 @@ can.Model.Join("CMS.Models.ObjectiveControl", {
     }
   , findAll: "GET /api/objective_controls"
   , create: "POST /api/objective_controls"
+  , destroy : "DELETE /api/objective_controls/{id}"
 }, {
 });
 
@@ -233,6 +239,7 @@ can.Model.Join("CMS.Models.UserRole", {
   , findAll : "GET /api/user_roles"
   , update : "PUT /api/user_roles/{id}"
   , create : "POST /api/user_roles"
+  , destroy : "DELETE /api/user_roles/{id}"
   , attributes : {
       context : "CMS.Models.Context.stub"
     , modified_by : "CMS.Models.Person.stub"
@@ -277,6 +284,7 @@ can.Model.Join("CMS.Models.ControlSection", {
   , root_object : "control_section"
   , findAll : "GET /api/control_sections"
   , create : "POST /api/control_sections"
+  , destroy : "DELETE /api/control_sections/{id}"
   , join_keys : {
       section : CMS.Models.SectionBase
     , control : CMS.Models.Control
@@ -295,6 +303,7 @@ can.Model.Join("CMS.Models.SectionObjective", {
   , root_object : "section_objective"
   , findAll : "GET /api/section_objectives"
   , create : "POST /api/section_objectives"
+  , destroy : "DELETE /api/section_objectives/{id}"
   , join_keys : {
       section : CMS.Models.SectionBase
     , objective : CMS.Models.Objective
@@ -313,6 +322,7 @@ can.Model.Join("CMS.Models.DirectiveControl", {
   , root_object : "directive_control"
   , findAll : "GET /api/directive_controls"
   , create : "POST /api/directive_controls"
+  , destroy : "DELETE /api/directive_controls/{id}"
   , join_keys : {
       directive : CMS.Models.Directive
     , control : CMS.Models.Control
@@ -331,6 +341,7 @@ can.Model.Join("CMS.Models.DirectiveSection", {
   , root_object : "directive_section"
   , findAll : "GET /api/directive_sections"
   , create : "POST /api/directive_sections"
+  , destroy : "DELETE /api/directive_sections/{id}"
   , join_keys : {
       directive : CMS.Models.Directive
     , section : CMS.Models.SectionBase
@@ -359,6 +370,7 @@ can.Model.Join("CMS.Models.ProgramControl", {
   }
   , findAll : "GET /api/program_controls"
   , create : "POST /api/program_controls"
+  , destroy : "DELETE /api/program_controls/{id}"
 }, {
 
 });
@@ -378,6 +390,7 @@ can.Model.Join("CMS.Models.ControlControl", {
   }
   , findAll : "GET /api/control_controls"
   , create : "POST /api/control_controls"
+  , destroy : "DELETE /api/control_controls/{id}"
 }, {
 
 });
@@ -388,6 +401,7 @@ can.Model.Join("CMS.Models.ObjectPerson", {
   , findAll: "GET /api/object_people"
   , create : "POST /api/object_people"
   , update : "PUT /api/object_people/{id}"
+  , destroy : "DELETE /api/object_people/{id}"
   , join_keys : {
     personable : can.Model.Cacheable
     , person : CMS.Models.Person
@@ -406,6 +420,7 @@ can.Model.Join("CMS.Models.ObjectDocument", {
   , root_collection : "object_documents"
   , findAll: "GET /api/object_documents"
   , create: "POST /api/object_documents"
+  , destroy : "DELETE /api/object_documents/{id}"
   , join_keys : {
     documentable : can.Model.Cacheable
     , document : CMS.Models.Document

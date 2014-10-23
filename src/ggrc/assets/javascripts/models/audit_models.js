@@ -13,6 +13,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , category : "programs"
   , findOne : "GET /api/audits/{id}"
   , update : "PUT /api/audits/{id}"
+  , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
   , mixins : ["contactable", "unique_title"]
   , attributes : {
@@ -244,6 +245,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   , root_collection : "requests"
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
+  , destroy : "DELETE /api/requests/{id}"
   , mixins : ["unique_title", "requestorable"]
   , attributes : {
       context : "CMS.Models.Context.stub"
@@ -409,6 +411,7 @@ can.Model.Cacheable("CMS.Models.Response", {
 
   , findAll : "GET /api/responses"
   , findOne : "GET /api/responses/{id}"
+  , destroy : "DELETE /api/responses/{id}"
   , model : function(params) {
     var found = false;
     if (this.shortName !== 'Response')
@@ -538,6 +541,7 @@ CMS.Models.Response("CMS.Models.DocumentationResponse", {
   , update : "PUT /api/documentation_responses/{id}"
   , findAll : "GET /api/documentation_responses"
   , findOne : "GET /api/documentation_responses/{id}"
+  , destroy : "DELETE /api/documentation_responses/{id}"
   , attributes : {}
   , init : function() {
     this._super && this._super.apply(this, arguments);
@@ -558,6 +562,7 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
   , update : "PUT /api/interview_responses/{id}"
   , findAll : "GET /api/interview_responses"
   , findOne : "GET /api/interview_responses/{id}"
+  , destroy : "DELETE /api/interview_responses/{id}"
   , attributes : {}
   , init : function() {
     this._super && this._super.apply(this, arguments);
@@ -596,6 +601,7 @@ CMS.Models.Response("CMS.Models.PopulationSampleResponse", {
   , update : "PUT /api/population_sample_responses/{id}"
   , findAll : "GET /api/population_sample_responses"
   , findOne : "GET /api/population_sample_responses/{id}"
+  , destroy : "DELETE /api/population_sample_responses/{id}"
   , attributes : {}
   , init : function() {
     this._super && this._super.apply(this, arguments);
@@ -615,6 +621,7 @@ can.Model.Cacheable("CMS.Models.Meeting", {
   , findAll : "GET /api/meetings"
   , create : "POST /api/meetings"
   , update : "PUT /api/meetings/{id}"
+  , destroy : "DELETE /api/meetings/{id}"
   , attributes : {
       context : "CMS.Models.Context.stub"
     , response : "CMS.Models.Response.stub"

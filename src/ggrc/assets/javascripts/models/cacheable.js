@@ -112,29 +112,25 @@ can.Model("can.Model.Cacheable", {
   , title_singular : ""
   , title_plural : ""
   , findOne : "GET {href}"
-  , destroy: function(id, instance) {
-    var dfd = new $.Deferred();
-    if (!instance.selfLink) {
-      dfd.reject();
-    }
-    $.ajax({
-      url: instance.selfLink,
-      type: 'DELETE',
-    }).then(function(result) {
-      if ("background_task" in result) {
-        return CMS.Models.BackgroundTask.findOne({id: result.background_task.id});
-      } else {
-        dfd.resolve(instance);
-      }
-    }).then(function(task) {
-      if (!task) {
-        return;
-      }
-      return task.poll();
-    }).then(function() {
-      dfd.resolve(instance);
-    });
-    return dfd;
+  , makeDestroy: function(destroy) {
+    return function(id, instance) {
+      return destroy(id).then(function(result) {
+        if ("background_task" in result) {
+          return CMS.Models.BackgroundTask.findOne(
+            {id: result.background_task.id}
+          ).then(function(task) {
+            if (!task) {
+              return;
+            }
+            return task.poll();
+          }).then(function() {
+            return instance;
+          });
+        } else {
+          return instance;
+        }
+      });
+    };
   }
   , makeFindAll: function(finder) {
       return function(params, success, error) {

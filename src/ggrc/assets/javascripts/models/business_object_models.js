@@ -15,6 +15,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , findOne : "GET /api/org_groups/{id}"
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
+  , destroy : "DELETE /api/org_groups/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
@@ -96,6 +97,7 @@ can.Model.Cacheable("CMS.Models.Project", {
   , findOne : "GET /api/projects/{id}"
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
+  , destroy : "DELETE /api/projects/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
@@ -162,6 +164,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , findOne : "GET /api/facilities/{id}"
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
+  , destroy : "DELETE /api/facilities/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
@@ -243,6 +246,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   , findOne : "GET /api/products/{id}"
   , create : "POST /api/products"
   , update : "PUT /api/products/{id}"
+  , destroy : "DELETE /api/products/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
@@ -330,6 +334,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , findOne : "GET /api/data_assets/{id}"
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
+  , destroy : "DELETE /api/data_assets/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
@@ -411,6 +416,7 @@ can.Model.Cacheable("CMS.Models.Market", {
   , findOne : "GET /api/markets/{id}"
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
+  , destroy : "DELETE /api/markets/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
