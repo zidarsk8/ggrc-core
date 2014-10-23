@@ -107,12 +107,22 @@
     };
 
     can.each(_risk_object_types, function (type) {
-      mappings[type] = {
-        _canonical: {
-          "related_objects_as_source": ['Risk', 'ThreatActor']
-        },
-        _mixins: ['related', 'related_risk', 'related_threat_actor'],
-      };
+      if (type === "Control") {
+        mappings[type] = {
+          _canonical: {
+            "related_objects": ['Risk', 'ThreatActor']
+          },
+          related_risks: TypeFilter("related_objects", "Risk"),
+          related_threat_actors: TypeFilter("related_objects", "ThreatActor"),
+        };
+      } else {
+        mappings[type] = {
+          _canonical: {
+            "related_objects_as_source": ['Risk', 'ThreatActor']
+          },
+          _mixins: ['related', 'related_risk', 'related_threat_actor'],
+        };
+      }
     });
     new GGRC.Mappings("ggrc_risk_assessment_v2", mappings);
   };
