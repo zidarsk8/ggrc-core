@@ -165,7 +165,7 @@
             <h6>Response Options</h6>
             {{! here we need to start a quick form or other componenet}}
             <ggrc-quick-update instance="instance">
-              <select name="selected_response_options.0">
+              <select name="selected_response_options.0" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}}>
                 {{#each instance.response_options}}
                   <option value="{{.}}" {{#if_equals instance.selected_response_options.0 this}}selected="selected"{{/if_equals}}>{{.}}</option>
                 {{/each}}
@@ -178,7 +178,7 @@
               {{#each instance.response_options}}
               <div class="row-fluid">
                 <div class="span12">
-                  <input type="checkbox" multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}checked="checked"{{/in_array}}> {{.}}
+                  <input type="checkbox" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}} multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}checked="checked"{{/in_array}}> {{.}}
                 </div>
               </div>
               {{/each}}
