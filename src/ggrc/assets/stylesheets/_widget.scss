@@ -181,11 +181,11 @@
       }
     }
     h2 {
-      font-weight:bold;
       line-height: 28px;
       color: #444;
       margin-bottom:0;
       @include oneline();
+      font-family: $fontTitle;
       span {
         font-size: $f-small;
         font-weight:normal;
