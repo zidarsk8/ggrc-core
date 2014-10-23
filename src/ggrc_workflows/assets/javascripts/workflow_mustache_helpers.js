@@ -188,4 +188,17 @@ Mustache.registerHelper("if_task_group_assignee_privileges", function(instance, 
 
 });
 
+Mustache.registerHelper("if_can_edit_response", function(instance, status, options) {
+  instance = Mustache.resolve(instance);
+  status = Mustache.resolve(status);
+  var cycle = instance.cycle.reify(),
+      can_edit;
+  can_edit = cycle.is_current && ["Finished", "Verified"].indexOf(status) === -1;
+  if (can_edit) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
+});
+
 })(this.can, this.can.$, this.Mustache);
