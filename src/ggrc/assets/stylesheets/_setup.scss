@@ -178,8 +178,25 @@
   }
 }
 
-// mixins
+// Web fonts
 
+$font_path: "/static/fonts/";
+$font_name: "raleway-light-webfont";
+
+@font-face {
+  font-family: 'RalewayLight';
+  src: url('#{$font_path}#{$font_name}.eot');
+  src: url('#{$font_path}#{$font_name}.eot?#iefix') format('embedded-opentype'),
+       url('#{$font_path}#{$font_name}.woff') format('woff'),
+       url('#{$font_path}#{$font_name}.ttf') format('truetype'),
+       url('#{$font_path}#{$font_name}.svg#ralewaylight') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+$fontTitle: 'RalewayLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+// mixins
   @mixin reset-list() {
     margin:0;
     padding:0;
