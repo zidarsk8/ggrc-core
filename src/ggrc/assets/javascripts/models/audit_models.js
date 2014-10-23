@@ -416,7 +416,10 @@ can.Model.Cacheable("CMS.Models.Response", {
     var found = false;
     if (this.shortName !== 'Response')
       return this._super(params);
-    if (!params)
+    if (!params 
+        || (params instanceof CMS.Models.Response 
+            && params.constructor !== CMS.Models.Response
+       ))
       return params;
     params = this.object_from_resource(params);
     if (!params.selfLink) {
@@ -473,7 +476,8 @@ can.Model.Cacheable("CMS.Models.Response", {
       , model : can.Model.Cacheable
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-      , allow_mapping : true
+      , allow_mapping : false
+      , allow_creating: false
       , exclude_option_types : function() {
         var types = {
           "DocumentationResponse" : "Document"
@@ -486,18 +490,24 @@ can.Model.Cacheable("CMS.Models.Response", {
       model : "Document"
       , mapping : "documents"
       , show_view : GGRC.mustache_path + "/documents/pbc_tree.mustache"
+      , allow_mapping: false
+      , allow_creating: false
     }, {
       //3: Meeting participants
       model : "Person"
       , mapping : "people"
       , show_view : GGRC.mustache_path + "/people/tree.mustache"
       , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
+      , allow_mapping: false
+      , allow_creating: false
     }, {
       //2: Meetings
       model : "Meeting"
       , mapping : "meetings"
       , show_view : GGRC.mustache_path + "/meetings/tree.mustache"
       , footer_view : GGRC.mustache_path + "/meetings/tree_footer.mustache"
+      , allow_mapping: false
+      , allow_creating: false
     }]
   }
 }, {
