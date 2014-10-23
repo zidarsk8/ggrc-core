@@ -53,19 +53,21 @@
     <div class="span6 hide-wrap hidable">      
       <div class="row-fluid inner-hide">
         <div class="span12 hidable">
-          {{#with_mapping "authorizations" instance}}
-          {{#using owner=instance.owners.0 model_singular=model.model_singular}}
-          {{#with_current_user_as 'current_user'}}
-            <label>
-              Owner
-              <i class="grcicon-help-black" rel="tooltip" title="Program ownership is managed in the People widget."></i>
-              <a href="javascript://" class="field-hide">hide</a>
-            </label>
-            <input tabindex="4" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="hidden" value="" />
-            <input tabindex="5" class="input-block-level" readonly="true" disabled="true" placeholder="Enter email address" type="text" value="{{private_program_owner instance modal_title}}" />
-          {{/with_current_user_as}}
-          {{/using}}
-          {{/with_mapping}}
+          <label>
+            Owner
+            <i class="grcicon-help-black" rel="tooltip" title="Program ownership is managed in the People widget."></i>
+            <a href="javascript://" class="field-hide">hide</a>
+          </label>
+          <div tabindex="5">
+            {{#with_mapping "authorizations" instance}}
+            {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+            {{#with_current_user_as 'current_user'}}
+              <input class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="hidden" value="" />
+              <input class="input-block-level" readonly="true" disabled="true" placeholder="Enter email address" type="text" value="{{private_program_owner instance modal_title}}" />
+            {{/with_current_user_as}}
+            {{/using}}
+            {{/with_mapping}}
+          </div>
         </div>
       </div>
       <div class="row-fluid inner-hide">
