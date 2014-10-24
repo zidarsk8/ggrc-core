@@ -11,6 +11,11 @@
 <form action="javascript://">
   {{> /static/mustache/base_objects/form_restore.mustache}}
 
+  <!-- Custom attribute Uiindex is used to store the initial tabbable order of the component that is subject to hide. Uiindex value must be unique.
+  Uiindex attribute value must be equal to tabindex attribute value for show/hide to work properly. 
+  All hiding component must have both uiindex and tabindex attributes.    
+  -->
+
   <div class="row-fluid">
     <div class="span6">
       <label>
@@ -18,7 +23,7 @@
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Enter Title"></i>
       </label>
-      <input tabindex="1" id="section-title" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
+      <input tabindex="1" uiindex="1" id="section-title" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
     </div>
     <div class="span6">
       &nbsp;
@@ -31,10 +36,10 @@
       <label>
         Text of Clause
         <i class="grcicon-help-black" rel="tooltip" title="Enter text of clause"></i>
-        <a href="javascript://" class="field-hide">hide</a>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
-        <textarea tabindex="2" id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of clause">{{{description}}}</textarea>
+        <textarea tabindex="2" uiindex="2" id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of clause">{{{description}}}</textarea>
       </div>
     </div>
     <div class="span6 hide-wrap hidable">      
@@ -44,9 +49,9 @@
           <label>
             Owner
             <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
-            <a href="javascript://" class="field-hide">hide</a>
+            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
-          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+          <input tabindex="3" uiindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
           {{/using}}
         </div>
       </div>
@@ -56,9 +61,9 @@
           <label>
             Contact
             <i class="grcicon-help-black" rel="tooltip" title="Point of contact for this object"></i>
-            <a href="javascript://" class="field-hide">hide</a>
+            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
-          <input tabindex="4" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
+          <input tabindex="4" uiindex="4" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
           {{/using}}
         </div>
       </div>
@@ -70,19 +75,19 @@
       <label>
         Notes
         <i class="grcicon-help-black" rel="tooltip" title="Append simple text or html notes here."></i>
-        <a href="javascript://" class="field-hide">hide</a>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
-        <textarea tabindex="5" id="notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
+        <textarea tabindex="5" uiindex="5" id="notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
       </div>
     </div>
     <div class="span6 hidable">
       <label>
         Reference URL
         <i class="grcicon-help-black" rel="tooltip" title="Web links to other references."></i>
-        <a href="javascript://" class="field-hide">hide</a>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="6" id="reference_url" class="input-block-level" placeholder="https://www.example.com/" name="reference_url" type="text" value="{{reference_url}}">
+      <input tabindex="6" uiindex="6" id="reference_url" class="input-block-level" placeholder="https://www.example.com/" name="reference_url" type="text" value="{{reference_url}}">
     </div>
   </div>
   
@@ -92,9 +97,9 @@
         <label>
           Code
           <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
-          <a href="javascript://" class="field-hide">hide</a>
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <input tabindex="7" id="section-code" class="input-block-level" name="slug" placeholder="CLAUSE-XXX" type="text" value="{{slug}}">
+        <input tabindex="7" uiindex="7" id="section-code" class="input-block-level" name="slug" placeholder="CLAUSE-XXX" type="text" value="{{slug}}">
       </div>
     </div>
   </div>
