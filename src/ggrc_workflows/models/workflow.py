@@ -30,7 +30,7 @@ class Workflow(
 
   @classmethod
   def default_frequency(cls):
-    return 'one_time'
+    return 'one time' #'one_time'
 
   @validates('frequency')
   def validate_frequency(self, key, value):
@@ -39,7 +39,10 @@ class Workflow(
     if value not in self.VALID_FREQUENCIES:
       message = u"Invalid state '{}'".format(value)
       raise ValueError(message)
-    return value
+    elif value == 'one_time':
+      return 'one time'
+    else:
+      return value
 
   notify_on_change = deferred(
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
