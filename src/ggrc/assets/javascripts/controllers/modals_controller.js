@@ -278,6 +278,9 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , setup_wysihtml5 : function() {
+    if (!this.element) {
+      return;
+    }
     this.element.find('.wysihtml5').each(function() {
       $(this).cms_wysihtml5();
     });
