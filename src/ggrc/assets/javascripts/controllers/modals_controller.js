@@ -204,7 +204,7 @@ can.Control("GGRC.Controllers.Modals", {
     }
     else if (this.options.instance) {
       dfd = this.options.instance.refresh();
-    } 
+    }
     else if (this.options.model) {
       dfd = this.options.new_object_form
           ? $.when(this.options.attr("instance", new this.options.model(params).attr("_suppress_errors", true)))
@@ -223,7 +223,7 @@ can.Control("GGRC.Controllers.Modals", {
             if(that.element !== null)
               that.on(); //listen to instance.
           });
-    } 
+    }
     else {
       this.options.attr("instance", new can.Observe(params));
       that.on();
@@ -267,8 +267,8 @@ can.Control("GGRC.Controllers.Modals", {
     footer != null && this.options.$footer.html(footer);
 
     this.setup_wysihtml5();
-    
-    //Update UI status array 
+
+    //Update UI status array
     var $form = $(this.element).find('form');
     var storable_ui = $form.find('[tabindex]').length;
     for(var i = 0; i < storable_ui; i++) {
@@ -488,9 +488,9 @@ can.Control("GGRC.Controllers.Modals", {
     }
     var $showButton = $(this.element).find('#formRestore');
     this.options.reset_visible = true;
-    
-    var $hidables = $(this.element).find(".hidable"); 
-    $hidables.addClass("hidden");   
+
+    var $hidables = $(this.element).find(".hidable");
+    $hidables.addClass("hidden");
     $(this.element).find('.inner-hide').addClass('inner-hidable');
 
     //Set up the hidden elements index to 1
@@ -518,7 +518,7 @@ can.Control("GGRC.Controllers.Modals", {
     //$(this.element).find(".hidden").show();
     //$(this.element).find('.inner-hide').parent('.hidable').show();
     //$(this.element).find('.inner-hide').show();
-    $(this.element).find(".hidden").removeClass("hidden");   
+    $(this.element).find(".hidden").removeClass("hidden");
     $(this.element).find('.inner-hide').removeClass('inner-hidable');
     el.fadeOut(500);
     $hideButton.delay(499).fadeIn(500);
@@ -528,11 +528,11 @@ can.Control("GGRC.Controllers.Modals", {
   , save_ui_status : function(){}
 
   , restore_ui_status : function(){
-    //walk through the ui_array, for the one values, 
+    //walk through the ui_array, for the one values,
     //select the element with tab index and hide it
-    
+
     if(this.options.reset_visible){//some elements are hidden
-      var $selected, str, tabindex, 
+      var $selected, str, tabindex,
         $form = $(this.element).find('form');
       for (var i = 0; i < this.options.ui_array.length; i++){
         if(this.options.ui_array[i] == 1){
@@ -542,7 +542,7 @@ can.Control("GGRC.Controllers.Modals", {
           $selected.closest('.hidable').addClass('hidden');
         }
       }
-      
+
       if($selected){
         var $hideButton = $selected.closest('.modal-body').find('#formHide'),
           $showButton = $selected.closest('.modal-body').find('#formRestore');
@@ -558,10 +558,10 @@ can.Control("GGRC.Controllers.Modals", {
   //make buttons non-clickable when saving
   , bindXHRToBackdrop : function(xhr, el, newtext, disable) {
       // binding of an ajax to a click is something we do manually
-      
+
       var $el = $(el)
       , oldtext = $el.text();
-      var alt; 
+      var alt;
 
       var myel = "<div ";
       //if(newtext) {
@@ -588,9 +588,9 @@ can.Control("GGRC.Controllers.Modals", {
           var save_close_btn = $(this.element).find("a.btn[data-toggle=modal-submit]");
           var save_addmore_btn = $(this.element).find("a.btn[data-toggle=modal-submit-addmore]");
 
-          //$(save_close_btn).attr("disabled", true); 
+          //$(save_close_btn).attr("disabled", true);
           $(save_close_btn).addClass("disabled pending-ajax");
-          //$(save_addmore_btn).attr("disabled", true); 
+          //$(save_addmore_btn).attr("disabled", true);
           $(save_addmore_btn).addClass("disabled pending-ajax");
 
           var modal_backdrop = this.element.data("modal_form").$backdrop;
@@ -602,7 +602,7 @@ can.Control("GGRC.Controllers.Modals", {
           this.bindXHRToButton(ajd, el, "Saving, please wait...");
         }
       }
-      
+
     }
     // Queue a save if clicked after verifying the email address
     else if (this._email_check) {
@@ -620,7 +620,7 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , new_instance: function(data){
-    var that = this,    
+    var that = this,
       params = this.find_params();
 
     $.when(this.options.attr("instance", new this.options.model(params).attr("_suppress_errors", true)))
@@ -757,7 +757,7 @@ can.Control("GGRC.Controllers.Modals", {
   because it works in tandem with the modals form controller.
 
   The purpose of this component is to allow for pending adds/removes of connected
-  objects while the modal is visible.  On save, the actual pending actions will 
+  objects while the modal is visible.  On save, the actual pending actions will
   be resolved and we won't worry about the transient state we use anymore.
 */
 can.Component.extend({
@@ -924,7 +924,7 @@ can.Component.extend({
       } else {
         obj = new CMS.Models[binding.loader.option_model_name](extra_attrs);
       }
-      
+
       if (that.scope.deferred) {
         that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
       } else {
@@ -947,7 +947,7 @@ can.Component.extend({
                             }
                             return attrs;
                           }, {});
-      
+
       can.each(data.arr || [data], function(obj) {
         if (that.scope.deferred) {
           that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
