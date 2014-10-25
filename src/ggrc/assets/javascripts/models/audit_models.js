@@ -397,7 +397,7 @@ can.Model.Cacheable("CMS.Models.Response", {
       , model : can.Model.Cacheable
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-      , allow_mapping : false
+      , allow_mapping : true
       , allow_creating: false
       , exclude_option_types : function() {
         var types = {

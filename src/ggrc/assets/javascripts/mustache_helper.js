@@ -426,6 +426,13 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   return can.view.render(template, options.contexts);
 });
 
+// Renders one or more "hooks", which are templates registered under a
+//  particular key using GGRC.register_hook(), using the current context.
+//  Hook keys can be composed with dot separators by passing in multiple
+//  positional parameters.
+//
+// Example: {{{render_hooks 'Audit' 'test_info'}}}  renders all hooks registerd
+//  with GGRC.register_hook("Audit.test_info", <template path>)
 Mustache.registerHelper("render_hooks", function() {
   var args = can.makeArray(arguments),
       options = args.splice(args.length - 1, 1)[0],
@@ -434,6 +441,19 @@ Mustache.registerHelper("render_hooks", function() {
   return can.map(can.getObject(hook, GGRC.hooks) || [], function(hook_tmpl) {
     return can.Mustache.getHelper("renderLive", options.contexts).fn(hook_tmpl, options.contexts, options);
   }).join("\n");
+});
+
+//Checks whether any hooks are registered for a particular key
+Mustache.registerHelper("if_hooks", function() {
+  var args = can.makeArray(arguments),
+      options = args.splice(args.length - 1, 1)[0],
+      hook = can.map(args, Mustache.resolve).join(".");
+
+  if((can.getObject(hook, GGRC.hooks) || []).length > 0) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
 });
 
 var defer_render = Mustache.defer_render = function defer_render(tag_prefix, funcs, deferred) {
@@ -1264,8 +1284,8 @@ function resolve_computed(maybe_computed, always_resolve) {
 }
 
 Mustache.registerHelper("attach_spinner", function(spin_opts, styles) {
-  spin_opts = resolve_computed(spin_opts);
-  styles = resolve_computed(styles);
+  spin_opts = Mustache.resolve(spin_opts);
+  styles = Mustache.resolve(styles);
   spin_opts = typeof spin_opts === "string" ? JSON.parse(spin_opts) : {};
   styles = typeof styles === "string" ? styles : "";
   return function(el) {

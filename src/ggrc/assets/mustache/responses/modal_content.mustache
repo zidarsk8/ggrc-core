@@ -64,14 +64,18 @@
           <a href="javascript://" class="field-hide">hide</a>
         </label>
         {{#each list}}
-        <div class="span12">
-          <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-content="{{render '/static/mustache/pbc/iframe_tooltip.mustache' url=link}}" href="{{schemed_url link}}" target="_blank">
-            {{firstnonempty title link}}
-          </a>
-          <a href="javascript://" class="unmap" data-toggle="unmap">
-            <span class="result" {{data 'result'}}></span>
-            <i class="grcicon-deleted"></i>
-          </a>
+        <div class="row-fluid">
+          <div class="span11 oneline">
+            <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-content="{{render '/static/mustache/pbc/iframe_tooltip.mustache' url=link}}" href="{{schemed_url link}}" target="_blank">
+              {{firstnonempty title link}}
+            </a>
+          </div>
+          <div class="span1">
+            <a href="javascript://" class="unmap" data-toggle="unmap">
+              <span class="result" {{data 'result'}}></span>
+              <i class="grcicon-deleted"></i>
+            </a>
+          </div>
         </div>
         {{/each}}
         {{^list.length}}
@@ -79,6 +83,7 @@
             <em>No meetings</em>
           </div>
         {{/list.length}}
+        {{^if_hooks 'DocumentationResponse.modal_connector'}}
         {{#prune_context}}
           <br>
           <div class="span12 objective-selector">
@@ -97,6 +102,8 @@
             </div>
           </div>
         {{/prune_context}}
+        {{/if_hooks}}
+        {{{render_hooks 'DocumentationResponse.modal_connector'}}}
       </ggrc-modal-connector>
     </div>
     {{/if_instance_of}}

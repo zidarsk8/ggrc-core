@@ -43,13 +43,22 @@
       _audit : new GGRC.ListLoaders.DirectListLoader("Audit", "requests", "audit")
     },
     DocumentationResponse : {
-      _mixins : ["fileable"]
+      _mixins : ["fileable"],
+      //FIXME when responses get their own folders, remove these list loaders and add the "folderable" mixin --BM 10/24/2014
+      folders: new GGRC.ListLoaders.CrossListLoader("_request", "folders"),
+      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request")
     },
     InterviewResponse : {
-      _mixins : ["fileable"]
+      _mixins : ["fileable"],
+      //FIXME when responses get their own folders, remove these list loaders and add the "folderable" mixin --BM 10/24/2014
+      folders: new GGRC.ListLoaders.CrossListLoader("_request", "folders"),
+      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request")
     },
     PopulationSampleResponse : {
-      _mixins : ["fileable"]
+      _mixins : ["fileable"],
+      //FIXME when responses get their own folders, remove these list loaders and add the "folderable" mixin --BM 10/24/2014
+      folders: new GGRC.ListLoaders.CrossListLoader("_request", "folders"),
+      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request")
     },
     Document : {
       _mixins : ["fileable"]
@@ -104,7 +113,7 @@
   });
 
   //CMS.Models.Response.tree_view_options.child_options[1].show_view = GGRC.mustache_path + "/responses/gdrive_evidence_tree.mustache";
-  CMS.Models.Response.tree_view_options.child_options[1].footer_view = GGRC.mustache_path + "/responses/gdrive_upload_evidence.mustache";
+  GGRC.register_hook('DocumentationResponse.modal_connector', GGRC.mustache_path + "/responses/gdrive_upload_evidence.mustache");
   //We are no longer mapping GDrive files directly to responses.  It makes it difficult to figure out which GDrive file is which
   // document when we go to present. however, this functionality is still supported. 
 

@@ -930,6 +930,20 @@ can.Component.extend({
       that.scope.list.push(obj);
       that.scope.attr("attributes", {});
     },
+    "a[data-object-source] modal:success": function(el, ev, data) {
+      var that = this;
+      ev.stopPropagation();
+
+      can.each(data.arr || [data], function(obj) {
+      
+        if (that.scope.deferred) {
+          that.scope.changes.push({ what: obj, how: "add" });
+        } else {
+          that.scope.instance.mark_for_addition(that.scope.mapping, obj);
+        }
+        that.scope.list.push(obj);
+      });
+    },
     ".ui-autocomplete-input modal:success" : function(el, ev, data, options) {
       var that = this,
           extra_attrs = can.reduce(
