@@ -17,7 +17,7 @@
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Title goes here"></i>
       </label>
-      <input class="input-block-level required" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" uiindex="1" autofocus>
+      <input class="input-block-level required" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
       <br>
     </div>
     <div class="span4 hidable">
@@ -30,7 +30,7 @@
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <input type="hidden" name="owners.0.email" data-lookup="Person" value="" />
-        <input class="input-block-level" readonly="true" disabled="true" type="text" value="{{workflow_owner instance modal_title}}"  tabindex="2"  uiindex="2"/>
+        <input class="input-block-level" readonly="true" disabled="true" type="text" value="{{workflow_owner instance modal_title}}"  tabindex="2" />
       {{/with_current_user_as}}
       {{/using}}
       {{/with_mapping}}
@@ -45,7 +45,7 @@
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3" uiindex="3">{{{instance.description}}}</textarea>
+        <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3">{{{instance.description}}}</textarea>
       </div>
     </div>
 
@@ -57,7 +57,7 @@
             <i class="grcicon-help-black" rel="tooltip" title="Choose frequency"></i>
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
-          <select tabindex="4"  uiindex="4" class="input-block-level" id="frequency" name="frequency" {{^if new_object_form}}disabled="disabled"{{/if new_object_form}}>
+          <select tabindex="4" class="input-block-level" id="frequency" name="frequency" {{^if new_object_form}}disabled="disabled"{{/if new_object_form}}>
             {{#iterate "one_time" "One time" "weekly" "Weekly" "monthly" "Monthly" "quarterly" "Quarterly" "annually" "Annually" step=2}}
             <option value="{{iterator_0}}" {{#if_equals instance.frequency iterator_0}}selected="true"{{/if_equals}}>{{iterator_1}}</option>
             {{/iterate}}
@@ -71,7 +71,7 @@
             <i class="grcicon-help-black" rel="tooltip" title="This setting will override user email preferences"></i>
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>      
-          <input type="checkbox" name="notify_on_change" {{#if instance.notify_on_change}}checked="checked"{{/if}} tabindex="5"  uiindex="5">
+          <input type="checkbox" name="notify_on_change" {{#if instance.notify_on_change}}checked="checked"{{/if}} tabindex="5">
           Force real-time email updates
         </div>
       </div>
@@ -84,7 +84,7 @@
         Workflow Folder <i class="grcicon-help-black" rel="tooltip" data-original-title="If selected, all workflow attachments go here."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <p tabindex="6" uiindex="6">
+      <p tabindex="6">
         {{#if instance.workflow_folder}}
           <a href="{{instance.workflow_folder.0.url}}" target="_blank">
             {{instance.workflow_folder.0.name}}
@@ -108,7 +108,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="The name of the first task group"></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input class="input-block-level" placeholder="Enter Title" name="task_group_title" type="text" tabindex="7"  uiindex="7" autofocus>
+      <input class="input-block-level" placeholder="Enter Title" name="task_group_title" type="text" tabindex="7" autofocus>
       <br>
     </div>
   </div>
@@ -122,7 +122,7 @@
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="wf_modal_notify_message" class="span12 double wysihtml5" name="notify_custom_message" placeholder="Enter custom message here" tabindex="8"  uiindex="8">{{{instance.notify_custom_message}}}</textarea>
+        <textarea id="wf_modal_notify_message" class="span12 double wysihtml5" name="notify_custom_message" placeholder="Enter custom message here" tabindex="8">{{{instance.notify_custom_message}}}</textarea>
       </div>
     </div>
   </div>

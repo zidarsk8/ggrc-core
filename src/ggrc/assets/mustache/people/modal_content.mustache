@@ -10,23 +10,18 @@
 <form action="javascript://">
   {{> /static/mustache/base_objects/form_restore.mustache}}
 
-  <!-- Custom attribute Uiindex is used to store the initial tabbable order of the component that is subject to hide. Uiindex value must be unique.
-  Uiindex attribute value must be equal to tabindex attribute value for show/hide to work properly. 
-  All hiding component must have both uiindex and tabindex attributes.    
-  -->
-
   <div class="row-fluid">
     <div class="span4">
       <label for="person_name">
         Name
         <span class="required">*</span>
       </label>
-      <input tabindex="1" uiindex="1" class="span12" id="person_name" name="name" placeholder="John Doe" size="30" type="text" value="{{name}}" autofocus>
+      <input tabindex="1" class="span12" id="person_name" name="name" placeholder="John Doe" size="30" type="text" value="{{name}}" autofocus>
       <br>
     </div>
     <div class="span4">
       <label for="person_email">Email <span class="required">*</span></label>
-      <input tabindex="2" uiindex="2" class="span12" id="person_email" name="email" placeholder="email@company.com" size="30" type="text" value="{{email}}">
+      <input tabindex="2" class="span12" id="person_email" name="email" placeholder="email@company.com" size="30" type="text" value="{{email}}">
       <span class="help-inline">
       </span>
       <br>
@@ -37,7 +32,7 @@
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <label for="person_is_enabled" class="inline-check">
-        <input type="checkbox" tabindex="3" uiindex="3" id="person_is_enabled" name="is_enabled" value="{{is_enabled}}" {{#if instance.is_enabled}}checked="checked"{{/if}} >
+        <input type="checkbox" tabindex="3" id="person_is_enabled" name="is_enabled" value="{{is_enabled}}" {{#if instance.is_enabled}}checked="checked"{{/if}} >
         enabled user
       </label>
       <span class="help-inline">
@@ -51,7 +46,7 @@
         Company
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="4" uiindex="4" class="span12" id="person_company" name="company" placeholder="Acme, Inc." size="30" type="text" value="{{company}}">
+      <input tabindex="4" class="span12" id="person_company" name="company" placeholder="Acme, Inc." size="30" type="text" value="{{company}}">
       <span class="help-inline">
       </span>
       <br>
