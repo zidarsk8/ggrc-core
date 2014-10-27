@@ -95,18 +95,18 @@
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
 
-  GGRC.register_hook("Audit.tree_view_info", GGRC.mustache_path + "/audits/gdrive_info.mustache");
+  GGRC.register_hook("Audit.tree_view_info", GGRC.mustache_path + "/gdrive/gdrive_folder.mustache");
 
 
   $.extend(true, CMS.Models.Document.attributes, {
-    "object_files" : "CMS.Models.ObjectFile.stubs"
-    , "files" : "CMS.Models.GDriveFile.stubs"
+    "object_files": "CMS.Models.ObjectFile.stubs",
+    "files": "CMS.Models.GDriveFile.stubs"
   });
 
   //CMS.Models.Response.tree_view_options.child_options[1].show_view = GGRC.mustache_path + "/responses/gdrive_evidence_tree.mustache";
   CMS.Models.Response.tree_view_options.child_options[1].footer_view = GGRC.mustache_path + "/responses/gdrive_upload_evidence.mustache";
   //We are no longer mapping GDrive files directly to responses.  It makes it difficult to figure out which GDrive file is which
-  // document when we go to present. however, this functionality is still supported. 
+  // document when we go to present. however, this functionality is still supported.
 
 
   // GGRC.JoinDescriptor.from_arguments_list([
