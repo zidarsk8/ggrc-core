@@ -85,7 +85,11 @@
         Frequency
       </h6>
       <p class="upp">
-        {{{instance.frequency}}}
+        {{#if_equals instance.frequency 'one_time'}}
+          One time
+        {{else}}
+          {{instance.frequency}}
+        {{/if_equals}}
       </p>
     </div>
 
