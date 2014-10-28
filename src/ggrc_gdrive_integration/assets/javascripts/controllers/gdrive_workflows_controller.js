@@ -999,7 +999,7 @@ can.Component.extend({
                 }
 
                 return $.when(
-                  CMS.Models.ObjectFile.findAll({ file_id : file.id, fileable : d[0].stub() }),
+                  CMS.Models.ObjectFile.findAll({ file_id : file.id, fileable_id : d[0].id }),
                   object_doc
                 ).then(function(ofs) {
                   if(ofs.length < 1) {
