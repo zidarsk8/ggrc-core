@@ -5,8 +5,9 @@
   #is_allowed' "create" 'ObjectDocument' _0_context=instance.context.id '\
     and ^if_equals' instance.status 'Accepted' '\
   or #is_allowed' '__GGRC_ADMIN__' 'Audit' _2_context=null}}
-  <div class="span12">
-    <ggrc-gdrive-picker-launcher instance="instance" deferred="true"></ggrc-gdrive-picker-launcher>
-  </div>
+<div>
+<br>
+<ggrc-gdrive-picker-launcher instance="instance" deferred="true"></ggrc-gdrive-picker-launcher>
+<div>
 {{/if_helpers}}
 {{/with_current_user_as}}
