@@ -158,7 +158,6 @@
       <ggrc-modal-connector
         instance="instance"
         source_mapping="business_objects"
-        mapping="business_objects"
         deferred="true"
         >
         <label>
@@ -182,7 +181,7 @@
         {{/each}}
         {{^list.length}}
           <div class="span12">
-            <em>No meetings</em>
+            <em>No mapped</em>
           </div>
         {{/list.length}}
         {{#prune_context}}
@@ -191,6 +190,7 @@
             <div style="clear:both">
                <a class="section-add section-sticky"
                  href="javascript://" rel="tooltip"
+                 {{#instance}}{{data 'join-object'}}{{/instance}}
                  data-placement="left"
                  data-toggle="multitype-object-modal-selector"
                  data-deferred="true"
@@ -200,8 +200,8 @@
                  data-join-object-type="{{instance.class.model_singular}}"
                  {{#if_instance_of instance 'DocumentationResponse'}}data-exclude-option-types="Document"{{/if_instance_of}}
                  data-original-title="Map Object to this {{instance.class.title_singular}}">
-        Map Object
-      </a>
+                Map Object
+              </a>
             </div>
           </div>
         {{/prune_context}}

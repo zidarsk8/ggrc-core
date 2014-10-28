@@ -925,102 +925,108 @@ can.Component.extend({
     link_text: null,
     trigger_upload : function(scope, el, ev) {
       var that = this,
-          parent_folder = (this.instance.get_mapping("folders")[0] || {}).instance;
+          parent_folder_dfd = this.instance.get_binding("folders").refresh_instances();
 
-      if(!parent_folder || !parent_folder.selfLink) {
-        //no ObjectFolder or cannot access folder from GAPI
-        el.trigger(
-          "ajax:flash"
-          , {
-            warning : 'Can\'t upload: No GDrive folder found'
-          });
-        return;
-      }
-      //NB: resources returned from uploadFiles() do not match the properties expected from getting
-      // files from GAPI -- "name" <=> "title", "url" <=> "alternateLink".  Of greater annoyance is
-      // the "url" field from the picker differs from the "alternateLink" field value from GAPI: the
-      // URL has a query parameter difference, "usp=drive_web" vs "usp=drivesdk".  For consistency,
-      // when getting file references back from Picker, always put them in a RefreshQueue before
-      // using their properties. --BM 11/19/2013
-      parent_folder.uploadFiles().then(function(files) {
-        that.attr("pending", true);
-        return new RefreshQueue().enqueue(files).trigger().then(function(fs) {
-          return $.when.apply($, can.map(fs, function(f) {
-            if(!~can.inArray(parent_folder.id, can.map(f.parents, function(p) { return p.id; }))) {
-              return f.copyToParent(parent_folder);
-            } else {
-              return f;
-            }
-          }));
-        });
-      }).done(function() {
-        var files = can.map(
-                      can.makeArray(arguments),
-                      function(file) {
-                        return CMS.Models.GDriveFile.model(file);
-                      }),
-            doc_dfds = [];
-        can.each(files, function(file) {
-          //Since we can re-use existing file references from the picker, check for that case.
-          var dfd = CMS.Models.Document.findAll({link : file.alternateLink }).then(function(d) {
-            var doc_dfd, object_doc, object_file;
-            
-            if(d.length < 1) {
-              d.push(
-                new CMS.Models.Document({
-                  context : that.instance.context || {id : null}
-                  , title : file.title
-                  , link : file.alternateLink
-                })
-              );
-            }
-            if(that.deferred || !d[0].isNew()) {
-              doc_dfd = $.when(d[0]);
-            } else {
-              doc_dfd = d[0].save();
-            }
+      can.Control.prototype.bindXHRToButton(parent_folder_dfd, el);
+      parent_folder_dfd.done(function(bindings) {
+        var parent_folder;
+        if(bindings.length < 1 || !bindings[0].instance.selfLink) {
+          //no ObjectFolder or cannot access folder from GAPI
+          el.trigger(
+            "ajax:flash"
+            , {
+              warning : 'Can\'t upload: No GDrive folder found'
+            });
+          return;
+        }
 
-            doc_dfd = doc_dfd.then(function(doc) {
-              if(that.deferred) {
-                that.instance.mark_for_addition("documents", doc, {
-                  context : that.instance.context || {id : null}
-                });
+        parent_folder = bindings[0].instance;
+        //NB: resources returned from uploadFiles() do not match the properties expected from getting
+        // files from GAPI -- "name" <=> "title", "url" <=> "alternateLink".  Of greater annoyance is
+        // the "url" field from the picker differs from the "alternateLink" field value from GAPI: the
+        // URL has a query parameter difference, "usp=drive_web" vs "usp=drivesdk".  For consistency,
+        // when getting file references back from Picker, always put them in a RefreshQueue before
+        // using their properties. --BM 11/19/2013
+        parent_folder.uploadFiles().then(function(files) {
+          that.attr("pending", true);
+          return new RefreshQueue().enqueue(files).trigger().then(function(fs) {
+            return $.when.apply($, can.map(fs, function(f) {
+              if(!~can.inArray(parent_folder.id, can.map(f.parents, function(p) { return p.id; }))) {
+                return f.copyToParent(parent_folder);
               } else {
-                object_doc = new CMS.Models.ObjectDocument({
+                return f;
+              }
+            }));
+          });
+        }).done(function() {
+          var files = can.map(
+                        can.makeArray(arguments),
+                        function(file) {
+                          return CMS.Models.GDriveFile.model(file);
+                        }),
+              doc_dfds = [];
+          can.each(files, function(file) {
+            //Since we can re-use existing file references from the picker, check for that case.
+            var dfd = CMS.Models.Document.findAll({link : file.alternateLink }).then(function(d) {
+              var doc_dfd, object_doc, object_file;
+              
+              if(d.length < 1) {
+                d.push(
+                  new CMS.Models.Document({
                     context : that.instance.context || {id : null}
-                    , documentable : that.instance
-                    , document : doc
-                  }).save();
+                    , title : file.title
+                    , link : file.alternateLink
+                  })
+                );
+              }
+              if(that.deferred || !d[0].isNew()) {
+                doc_dfd = $.when(d[0]);
+              } else {
+                doc_dfd = d[0].save();
               }
 
-              return $.when(
-                CMS.Models.ObjectFile.findAll({ file_id : file.id, fileable : d[0].stub() }),
-                object_doc
-              ).then(function(ofs) {
-                if(ofs.length < 1) {
-                  if(that.deferred) {
-                    doc.mark_for_addition("files", file, {
+              doc_dfd = doc_dfd.then(function(doc) {
+                if(that.deferred) {
+                  that.instance.mark_for_addition("documents", doc, {
+                    context : that.instance.context || {id : null}
+                  });
+                } else {
+                  object_doc = new CMS.Models.ObjectDocument({
                       context : that.instance.context || {id : null}
-                    });
-                  } else {
-                    return new CMS.Models.ObjectFile({
-                      context : that.instance.context || {id : null}
-                      , file : file
-                      , fileable : doc
+                      , documentable : that.instance
+                      , document : doc
                     }).save();
-                  }
-              }})
-              .then(function() {
-                return doc;
+                }
+
+                return $.when(
+                  CMS.Models.ObjectFile.findAll({ file_id : file.id, fileable : d[0].stub() }),
+                  object_doc
+                ).then(function(ofs) {
+                  if(ofs.length < 1) {
+                    if(that.deferred) {
+                      doc.mark_for_addition("files", file, {
+                        context : that.instance.context || {id : null}
+                      });
+                    } else {
+                      return new CMS.Models.ObjectFile({
+                        context : that.instance.context || {id : null}
+                        , file : file
+                        , fileable : doc
+                      }).save();
+                    }
+                }})
+                .then(function() {
+                  return doc;
+                });
               });
+              return doc_dfd;
             });
-            return doc_dfd;
+            doc_dfds.push(dfd);
           });
-          doc_dfds.push(dfd);
-        });
-        $.when.apply($, doc_dfds).then(function() {
-          el.trigger("modal:success", { arr: can.makeArray(arguments) });
-          that.attr('pending', false);
+          $.when.apply($, doc_dfds).then(function() {
+            el.trigger("modal:success", { arr: can.makeArray(arguments) });
+            that.attr('pending', false);
+          });
         });
       });
     }

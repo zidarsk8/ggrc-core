@@ -718,6 +718,7 @@ can.Control("GGRC.Controllers.Modals", {
         ev.preventDefault();
         return false;
       }
+      delete this.options.instance._pending_joins;
       if (this.options.instance instanceof can.Model
           // Ensure that this modal was hidden and not a child modal
           && ev.target === this.element[0]
@@ -777,6 +778,7 @@ can.Component.extend({
   },
   events: {
     init: function() {
+      var key;
       this.scope.attr("controller", this);
 
       if (!this.scope.instance) {
@@ -803,14 +805,15 @@ can.Component.extend({
         );
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
-        if(!this.scope.parent_instance._transient[this.scope.instance_attr + "_" + this.scope.mapping]) {
+        key = this.scope.instance_attr + "_" + (this.scope.mapping || this.scope.source_mapping);
+        if(!this.scope.parent_instance._transient[key]) {
           this.scope.attr("list", []);
           this.scope.parent_instance.attr(
-            "_transient." + this.scope.instance_attr + "_" + this.scope.mapping,
+            "_transient." + key,
             this.scope.list
             );
         } else {
-          this.scope.attr("list", this.scope.parent_instance._transient[this.scope.instance_attr + "_" + this.scope.mapping]);
+          this.scope.attr("list", this.scope.parent_instance._transient[key]);
         }
       }
       this.options.parent_instance = this.scope.parent_instance;
@@ -827,10 +830,12 @@ can.Component.extend({
         can.each(
           changes,
           function(item) {
+            var mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, item.what.constructor.shortName);
+
             if(item.how === "add") {
-              that.scope.instance.mark_for_addition(that.scope.mapping, item.what, item.extra);
+              that.scope.instance.mark_for_addition(mapping, item.what, item.extra);
             } else {
-              that.scope.instance.mark_for_deletion(that.scope.mapping, item.what);
+              that.scope.instance.mark_for_deletion(mapping, item.what);
             }
           }
         );
@@ -842,7 +847,8 @@ can.Component.extend({
     // this works like autocomplete_select on all modal forms and
     //  descendant class objects.
     autocomplete_select : function(el, event, ui) {
-      var that = this,
+      var mapping,
+          that = this,
           extra_attrs = can.reduce(
                           this.element
                           .find("input:not([data-mapping], [data-lookup])")
@@ -854,7 +860,8 @@ can.Component.extend({
       if (that.scope.deferred) {
         that.scope.changes.push({ what: ui.item, how: "add", extra: extra_attrs });
       } else {
-        that.scope.instance.mark_for_addition(that.scope.mapping, ui.item, extra_attrs);
+        mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, ui.item.constructor.shortName);
+        that.scope.instance.mark_for_addition(mapping, ui.item, extra_attrs);
       }
       that.scope.list.push(ui.item);
       that.scope.attr("show_new_object_form", false);
@@ -865,11 +872,13 @@ can.Component.extend({
       can.map(
         el.find('.result'),
         function(result_el) {
-          var obj = $(result_el).data("result");
+          var mapping,
+              obj = $(result_el).data("result");
           if (that.scope.deferred) {
             that.scope.changes.push({ what: obj, how: "remove" });
           } else {
-            that.scope.instance.mark_for_deletion(that.scope.mapping, obj);
+            mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);
+            that.scope.instance.mark_for_deletion(mapping, obj);
           }
           for(i = that.scope.list.length; i >= 0; i--) {
             if(that.scope.list[i] === obj) {
@@ -897,7 +906,7 @@ can.Component.extend({
       }
     },
     "a[data-toggle=submit]:not(.disabled) click": function(el, ev) {
-      var obj,
+      var obj, mapping,
           that = this,
           binding = this.scope.instance.get_binding(this.scope.mapping),
           extra_attrs = can.reduce(
@@ -925,13 +934,15 @@ can.Component.extend({
       if (that.scope.deferred) {
         that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
       } else {
-        that.scope.instance.mark_for_addition(that.scope.mapping, obj, extra_attrs);
+        mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);
+        that.scope.instance.mark_for_addition(mapping, obj, extra_attrs);
       }
       that.scope.list.push(obj);
       that.scope.attr("attributes", {});
     },
     "a[data-object-source] modal:success": function(el, ev, data) {
-      var that = this;
+      var mapping,
+          that = this;
       ev.stopPropagation();
 
       can.each(data.arr || [data], function(obj) {
@@ -939,7 +950,8 @@ can.Component.extend({
         if (that.scope.deferred) {
           that.scope.changes.push({ what: obj, how: "add" });
         } else {
-          that.scope.instance.mark_for_addition(that.scope.mapping, obj);
+          mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);
+          that.scope.instance.mark_for_addition(mapping, obj);
         }
         that.scope.list.push(obj);
       });
@@ -960,10 +972,12 @@ can.Component.extend({
                           }, {});
       
       can.each(data.arr || [data], function(obj) {
+        var mapping;
         if (that.scope.deferred) {
           that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
         } else {
-          that.scope.instance.mark_for_addition(that.scope.mapping, obj, extra_attrs);
+          mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);
+          that.scope.instance.mark_for_addition(mapping, obj, extra_attrs);
         }
         that.scope.list.push(obj);
         that.scope.attr("attributes", {});

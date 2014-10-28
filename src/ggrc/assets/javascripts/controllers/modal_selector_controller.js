@@ -2226,7 +2226,7 @@
       options = get_object_multitype_option_set(
         data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
       
-      options.selected_object = CMS.Models.get_instance(
+      options.selected_object = data_set.join_object || CMS.Models.get_instance(
           data_set.join_object_type, data_set.join_object_id);
 
       options.binding = options.selected_object.get_binding(

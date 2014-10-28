@@ -2524,5 +2524,29 @@ Mustache.registerHelper("toggle", function(compute, options) {
   }
 });
 
+can.each({
+  "has_pending_addition": "add",
+  "has_pending_removal": "remove"
+}, function(how, fname) {
+  Mustache.registerHelper(fname, function(object, option_instance, options) {
+    if(!options) {
+      options = option_instance;
+      option_instance = object;
+      object = options.context;
+    }
+    option_instance = Mustache.resolve(option_instance);
+    object = Mustache.resolve(object);
+
+    if(object._pending_joins && can.map(
+      object._pending_joins,
+      function(pj) {
+        return pj.how === how && pj.what === option_instance ? option_instance : undefined;
+      }).length > 0) {
+      return options.fn(options.contexts);
+    } else {
+      return options.inverse(options.contexts);
+    }
+  });
+});
 
 })(this, jQuery, can);
