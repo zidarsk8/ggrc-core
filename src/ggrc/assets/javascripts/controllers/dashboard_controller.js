@@ -598,11 +598,8 @@ can.Control("CMS.Controllers.InnerNav", {
           widgets = this.options.widget_list;
 
       widget.attr('force_show', false);
-      this.update_add_more_link();
-      if (widget.selector === active_widget.selector) {
-        this.options.contexts.attr("active_widget", widgets[0]);
-      }
-      this.show_active_widget();
+      this.route(widgets[0].selector); // Switch to the first widget
+      return false; // Prevent the url change back to the widget we are hiding
     }
 });
 
