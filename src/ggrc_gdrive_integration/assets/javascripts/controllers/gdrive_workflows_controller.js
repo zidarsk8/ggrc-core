@@ -806,7 +806,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       return;
     }
     object = CMS.Models[el.data("model")].findInCacheById(el.data("id"));
-    object.attr('_folder_change_pendign', true);
+    object.attr('_folder_change_pending', true);
     if (el.data('replace')) {
       $.when.apply(this, $.map(object.object_folders, function(object_folder) {
         // Remove existing object folders before mapping a new one:
@@ -817,12 +817,12 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
             el.data('type'), object);
         });
       })).then(function() {
-        object.attr('_folder_change_pendign', false);
+        object.attr('_folder_change_pending', false);
       });
     }
     return GGRC.Controllers.GDriveWorkflow.attach_files(files,
       el.data('type'), object).then(function() {
-      object.attr('_folder_change_pendign', false);
+      object.attr('_folder_change_pending', false);
     });
   }
   , "a[data-toggle=evidence-gdrive-picker] click" : function(el, ev) {
