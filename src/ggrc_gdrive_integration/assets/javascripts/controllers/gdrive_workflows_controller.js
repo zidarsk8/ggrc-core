@@ -731,6 +731,14 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     })
     );
   }
+  , "a[data-toggle=gdrive-remover] click" : function(el, ev) {
+    object = CMS.Models[el.data("model")].findInCacheById(el.data("id"));
+    object.object_folders.forEach(function(object_folder){
+      object_folder.reify().refresh().then(function(instance){
+        instance.destroy();
+      });
+    });
+  }
   , "a[data-toggle=gdrive-picker] click" : function(el, ev) {
 
     var dfd = GGRC.Controllers.GAPI.authorize(["https://www.googleapis.com/auth/drive"]),
@@ -798,7 +806,24 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       return;
     }
     object = CMS.Models[el.data("model")].findInCacheById(el.data("id"));
-    return GGRC.Controllers.GDriveWorkflow.attach_files(files, el.data('type'), object);
+    object.attr('_folder_change_pendign', true);
+    if (el.data('replace')) {
+      $.when.apply(this, $.map(object.object_folders, function(object_folder) {
+        // Remove existing object folders before mapping a new one:
+        return object_folder.reify().refresh().then(function(instance) {
+          return instance.destroy();
+        }).then(function() {
+          return GGRC.Controllers.GDriveWorkflow.attach_files(files,
+            el.data('type'), object);
+        });
+      })).then(function() {
+        object.attr('_folder_change_pendign', false);
+      });
+    }
+    return GGRC.Controllers.GDriveWorkflow.attach_files(files,
+      el.data('type'), object).then(function() {
+      object.attr('_folder_change_pendign', false);
+    });
   }
   , "a[data-toggle=evidence-gdrive-picker] click" : function(el, ev) {
     var response = CMS.Models.Response.findInCacheById(el.data("response-id"))
