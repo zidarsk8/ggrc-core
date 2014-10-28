@@ -260,7 +260,7 @@
     , Control: {
         _mixins: ["personable"] //controllable
       , _canonical : {
-        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Process", "Product", "Project", "System"],
+        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System"],
         "programs" : "Program",
         "objectives" : "Objective",
         "implemented_controls" : "Control",
@@ -273,13 +273,14 @@
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
       , related_org_groups:  TypeFilter("related_objects", "OrgGroup")
+      , related_vendors:     TypeFilter("related_objects", "Vendor")
       , related_processes:   TypeFilter("related_objects", "Process")
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
       , related_business_objects: Multi([
           "related_data_assets", "related_facilities", "related_markets",
-          "related_org_groups", "related_processes", "related_products",
+          "related_org_groups", "related_vendors", "related_processes", "related_products",
           "related_projects", "related_systems"
           ])
       , related_and_able_objects: Multi([
@@ -333,7 +334,7 @@
     , Objective: {
         _mixins: ["personable"] //objectiveable
       , _canonical : {
-          "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Process", "Product", "Project", "System",
+          "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System",
                                "Regulation", "Contract", "Policy", "Standard", "Program"]
         , "objectives" : "Objective"
         , "controls" : "Control"
@@ -348,6 +349,7 @@
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
       , related_org_groups:  TypeFilter("related_objects", "OrgGroup")
+      , related_vendors:     TypeFilter("related_objects", "Vendor")
       , related_processes:   TypeFilter("related_objects", "Process")
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
@@ -384,7 +386,7 @@
     , section_base: {
         _mixins: ["personable"] //sectionable
       , _canonical : {
-        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Process", "Product", "Project", "System"],
+        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System"],
         "objectives" : "Objective",
         "controls" : "Control"
       }
@@ -396,6 +398,7 @@
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
       , related_org_groups:  TypeFilter("related_objects", "OrgGroup")
+      , related_vendors:     TypeFilter("related_objects", "Vendor")
       , related_processes:   TypeFilter("related_objects", "Process")
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
@@ -476,7 +479,7 @@
     , related_object: {
        _canonical : {
         "related_objects_as_source" : [
-          "DataAsset", "Facility", "Market", "OrgGroup", "Process", "Product",
+          "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
           "Program", "DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"
           ]
@@ -490,6 +493,7 @@
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
       , related_org_groups:  TypeFilter("related_objects", "OrgGroup")
+      , related_vendors:     TypeFilter("related_objects", "Vendor")
       , related_processes:   TypeFilter("related_objects", "Process")
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
@@ -635,6 +639,9 @@
     , OrgGroup: {
         _mixins: ["business_object"]
       }
+    , Vendor: {
+        _mixins: ["business_object"]
+      }
     , Product: {
         _mixins: ["business_object"]
       }
@@ -653,7 +660,7 @@
           "related_objects" : [
             "Program", "Regulation", "Contract", "Policy",  "Standard",
             "Objective", "Control", "Section", "Clause", "DataAsset", "Facility", "Market",
-            "OrgGroup", "Process", "Product", "Project", "System"
+            "OrgGroup", "Vendor", "Process", "Product", "Project", "System"
             ],
           "authorizations" : "UserRole"
         }
@@ -671,6 +678,7 @@
       , owned_facilities: Indirect("Facility", "contact")
       , owned_markets: Indirect("Market", "contact")
       , owned_org_groups: Indirect("OrgGroup", "contact")
+      , owned_vendors: Indirect("Vendor", "contact")
       , owned_processes: Indirect("Process", "contact")
       , owned_products: Indirect("Product", "contact")
       , owned_projects: Indirect("Project", "contact")
@@ -691,6 +699,7 @@
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
       , related_org_groups:  TypeFilter("related_objects", "OrgGroup")
+      , related_vendors:     TypeFilter("related_objects", "Vendor")
       , related_processes:   TypeFilter("related_objects", "Process")
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
@@ -711,6 +720,7 @@
       , extended_related_facilities:  Multi(["related_facilities", "owned_facilities"])
       , extended_related_markets:     Multi(["related_markets", "owned_markets"])
       , extended_related_org_groups:  Multi(["related_org_groups", "owned_org_groups"])
+      , extended_related_vendors:     Multi(["related_vendors", "owned_vendors"])
       , extended_related_processes:   Multi(["related_processes", "owned_processes"])
       , extended_related_products:    Multi(["related_products", "owned_products"])
       , extended_related_projects:    Multi(["related_projects", "owned_projects"])
@@ -721,7 +731,7 @@
             "Program",  "Regulation", "Contract", "Policy", "Standard",
             "Section", "Clause", "Objective", "Control",
             "System", "Process", "DataAsset", "Product", "Project", "Facility",
-            "Market", "OrgGroup", "Audit"//, "Request", "Response"
+            "Market", "OrgGroup", "Vendor", "Audit"//, "Request", "Response"
             ];
 
           return GGRC.Models.Search.search_for_types(
@@ -744,6 +754,7 @@
       , extended_related_facilities_via_search:  TypeFilter("related_objects_via_search", "Facility")
       , extended_related_markets_via_search:     TypeFilter("related_objects_via_search", "Market")
       , extended_related_org_groups_via_search:  TypeFilter("related_objects_via_search", "OrgGroup")
+      , extended_related_vendors_via_search:     TypeFilter("related_objects_via_search", "Vendor")
       , extended_related_processes_via_search:   TypeFilter("related_objects_via_search", "Process")
       , extended_related_products_via_search:    TypeFilter("related_objects_via_search", "Product")
       , extended_related_projects_via_search:    TypeFilter("related_objects_via_search", "Project")
@@ -777,6 +788,8 @@
         }
       , requests: Direct("Request", "audit", "requests")
       , _program: Direct("Program", "audits", "program")
+      , objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects")
+      , objectives: TypeFilter("objects", "Objective")
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
@@ -819,7 +832,7 @@
                   if(!('related_sources' in response)) continue;
                   relationships = new can.Observe.List().concat(response.related_sources.reify(), response.related_destinations.reify());
                   for (j = 0; relationship = relationships[j]; j++) {
-                    if (relationship.source && relationship.source.reify() === page_instance
+                    if (relationship.source && relationship.source.reify && relationship.source.reify() === page_instance
                         || relationship.destination && relationship.destination.reify() === page_instance) {
                       return true;
                     }
@@ -853,6 +866,11 @@
         }
       , responses: Direct("Response", "request", "responses")
       , _audit: Direct("Audit", "requests", "audit")
+      , _audit_object: Direct("AuditObject", "auditable", "audit_object")
+      , audit_object_object : Cross("_audit_object", "_auditable")
+      , audit_objects_via_audit : Cross("_audit", "objects")
+      , objectives_via_audit : Cross("_audit", "objectives")
+      , _objective: TypeFilter("audit_object_object", "Objective")
       , documentation_responses : TypeFilter("responses", "DocumentationResponse")
       , interview_responses : TypeFilter("responses", "InterviewResponse")
       , population_sample_responses : TypeFilter("responses", "PopulationSampleResponse")
@@ -905,6 +923,9 @@
             "Workflow", "workflow", "MultitypeSearchJoin"),
         sections: Proxy(
             "Section", "section", "MultitypeSearchJoin"),
-      }
+    }
+    , AuditObject : {
+      _auditable : Direct(null, null, "auditable")
+    }
   });
 })(GGRC, can);

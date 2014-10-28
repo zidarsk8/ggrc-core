@@ -8,8 +8,20 @@
 
 // widgets styles
 .widget {
+  margin-bottom: 40px;
   .header {
+    //background: $lightGray;
+    border-bottom:1px solid $darkGray;
+    color: $text;
+    height: 40px;
+    padding-left: 20px;
     .widget-action {
+      height: 30px;
+      margin-right: 18px;
+      &.widget-action-help {
+        @include box-shadow(none);
+        background: transparent;
+      }
       i {
         @include opacity(0.5);
         @include transition(opacity 0.3s ease);
@@ -18,7 +30,7 @@
         display: block;
         width: 20px;
         height: 16px;
-        padding: 7px 5px;
+        padding: 12px 0;
         &:hover {
           i {
             @include opacity(1);
@@ -26,8 +38,96 @@
         }
       }
     }
+    h2 {
+      line-height: 40px;
+      color: #444;
+      margin-bottom:0;
+      font-weight: normal;
+      font-size: $f-widgetTitle;
+      @include oneline();
+      span {
+        font-size: $f-small;
+        font-weight:normal;
+      }
+      span.subtitle {
+        font-size: $f-regular;
+        font-style: italic;
+      }
+      i {
+        margin-top: 12px;
+        margin-right: 7px;
+      }
+      span.explanation {
+        color:$white;
+        @include opacity(0.7);
+        font-style:italic;
+        margin-left:10px;
+      }
+    }
+    .btn-mini {
+      margin-left:6px;
+      padding-left:2px;
+      padding-right:2px;
+      i {
+        @include opacity(0.4);
+      }
+      &:hover {
+        border-color:$white;
+        i {
+          @include opacity(1);
+        }
+      }
+    }
+    @include row-fluid-fix();
+    &.widget-nav {
+      height: 30px;
+      background: none;
+      ul {
+        @include reset-list();
+        @include clearfix();
+        li {
+          float: left;
+          margin-bottom: -1px;
+        }
+        a {
+          padding: 0 10px 0 10px;
+          display: block;
+          line-height: 29px;
+          font-size: 13px;
+          color: $tabTitle;
+          border: 1px solid transparent;
+          @include transition(background 0.2s ease, color 0.2s ease);
+          &:hover {
+            background: $tabHoverBgnd;
+            color: $white;
+            text-decoration: none;
+            i {
+              @include opacity(1);
+            }
+          }
+        }
+        i {
+          margin-top: 6px;
+          @include opacity(0.55);
+        }
+        li.active {
+          a {
+            color: $subTitle;
+            background-color: $white;
+            border: 1px solid $darkGray;
+            border-bottom-color: transparent;
+            i {
+              @include opacity(1);
+            }
+            &:hover {
+              background: $tabHoverBgnd;
+              color: $white;
+            }
+          }
+        }
+      }
+    }
   }
-  padding-bottom: 40px;
   &.workflow-info-widget {
     overflow-y: visible;
   }
@@ -181,11 +281,11 @@
       }
     }
     h2 {
-      font-weight:bold;
       line-height: 28px;
       color: #444;
       margin-bottom:0;
       @include oneline();
+      font-family: $fontTitle;
       span {
         font-size: $f-small;
         font-weight:normal;
@@ -949,31 +1049,26 @@
         margin: 4px 0 0 0;
       }
       a {
-        font-size:11px;
-        text-transform:uppercase;
-        font-weight:normal;
-        background:#fafafa;
-        line-height:24px;
-        color:darken($link,20%);
-        display:block;
-        padding:0 6px;
-        @include border-radius(4px);
-        @include transition(background 0.2s ease, color 0.2s ease);
-        i {
-          @include opacity(0.6);
-          @include transition(opacity 0.2s ease);
-        }
-        &:hover {
-         text-decoration:none;
-         color:$link;
-         background:#eee;
-         i {
-           @include opacity(1);
-         }
-        }
+        @extend %action-link;
+        font-size: 11px;
+        line-height: 24px;
         &.unmap {
           &:hover {
             color:$error;
+          }
+        }
+        &.disabled-link {
+          color: $gray;
+          i {
+            @include opacity(0.3);
+          }
+          &:hover {
+            color: $gray;
+            background: $treeListBgnd;
+            cursor: default;
+            i {
+              @include opacity(0.3);
+            }
           }
         }
       }
@@ -1074,7 +1169,10 @@
   background:#ddd;
   border-top:1px solid #ccc;
   border-bottom:1px solid #ccc;
-  padding:0 20px;
+  padding: 0;
+  .filter-title {
+    padding-left: 20px;
+  }
   input {
     margin: -1px 3px 0 0;
     line-height: 14px;
@@ -1104,6 +1202,9 @@
     width:120px;
     display: inline-block;
     margin-bottom: 0;
+    &.input-small {
+      width: 90px;
+    }
   }
   h6 {
     display:inline-block;
@@ -1124,9 +1225,16 @@
   }
   &.task-filtering {
     input {
-      &[class*="span"] {
+      &[class*="span"],
+      &.input-block-level {
         padding: 4px;
         min-height: 20px;
+      }
+      &.input-block-level {
+        margin-top: 5px;
+      }
+      &[type="checkbox"] {
+        margin-top: -2px;
       }
     }
   }
@@ -1353,5 +1461,32 @@ ul.attr-list {
         }
       }
     }
+  }
+}
+
+// Get started list
+.quick-list {
+  @include reset-list();
+  li {
+    margin: 10px 10px 0 10px;
+  }
+  [class^="grcicon-"] {
+    margin: 6px 0 0 0;
+  }
+  a {
+    @extend %action-link;
+    font-size: 13px;
+    line-height: 30px;
+  }
+  .divider {
+    background: $darkGray;
+    margin: 14px 0;
+  }
+}
+
+.progress-wrap {
+  .title {
+    text-align: right;
+    display: inline-block;
   }
 }

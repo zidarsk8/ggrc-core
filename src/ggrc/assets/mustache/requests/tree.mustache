@@ -45,32 +45,32 @@
         </div>
         <div class="span4">
           <div class="item-data">
-            {{#using objective=instance.objective}}
-              {{#if objective}}
-                <div class="tree-title-area" rel="tooltip" data-placement="top" data-original-title="{{objective.title}}">
-                  <i class="grcicon-objective-color"></i>
-                  {{#is_allowed "view_object_page" objective}}
-                    <a class="object-title" href="{{objective.viewLink}}" target="_blank">{{objective.title}}</a>
+            {{#using audit=instance.audit}}
+            {{#with_mapping "audit_object_object" instance}}
+              {{#if audit_object_object.0.instance}}
+                <div class="tree-title-area" rel="tooltip" data-placement="top" data-original-title="{{audit_object_object.0.instance.title}}">
+                  <i class="grcicon-{{audit.object_model.table_singular}}-color"></i>
+                  {{#is_allowed "view_object_page" audit_object_object.0.instance}}
+                    <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
                   {{else}}
-                    <span class="object-title" target="_blank">{{objective.title}}</span>
+                    <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
                   {{/is_allowed}}
                 </div>
               {{else}}
-                {{#using audit=instance.audit}}
                 {{#with_mapping "authorizations" audit}}
                 {{#if_helpers "\
                   ^if_equals" instance.status "Accepted" "\
                   and ^if_auditor" instance _1_include_admin=false}}
                   <div class="tree-title-area">
                     <a class="utility-link controls danger" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
-                      <i class="grcicon-objective-danger"></i>
-                      Map Objective
+                      <i class="grcicon-{{audit.object_model.table_singular}}-danger"></i>
+                      Map {{audit.object_model.title_singular}}
                     </a>
                   </div>
                 {{/if_helpers}}
                 {{/with_mapping}}
-                {{/using}}
               {{/if}}
+            {{/with_mapping}}
             {{/using}}
           </div>
         </div>
@@ -135,14 +135,14 @@
               {{#if_match instance.status "Respon"}}
                 {{#if_auditor instance}}
                 <button data-name="status" data-value="Accepted" class="btn btn-add {{instance._disabled}}">Accept</button>
-                <a href="javascript://" 
-                   data-toggle="modal-ajax-form" 
-                   data-object-singular="Request" 
-                   data-object-params='{"modal_title":"Amend Request"}' 
-                   data-object-plural="requests" 
-                   data-object-id="{{instance.id}}" 
-                   class="btn btn-warning {{instance._disabled}} undoable" 
-                   data-modal-class="modal-wide" 
+                <a href="javascript://"
+                   data-toggle="modal-ajax-form"
+                   data-object-singular="Request"
+                   data-object-params='{"modal_title":"Amend Request"}'
+                   data-object-plural="requests"
+                   data-object-id="{{instance.id}}"
+                   class="btn btn-warning {{instance._disabled}} undoable"
+                   data-modal-class="modal-wide"
                    data-template="/static/mustache/requests/amend_modal_content.mustache"
                    data-name="status"
                    data-value="{{instance.status}}"
@@ -169,7 +169,7 @@
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-      
+
       <div class="action-bar">
         <ul class="change-links">
           {{#if_can_edit_request instance}}
@@ -180,10 +180,10 @@
               </a>
             </li>
           {{/if_can_edit_request}}
-          
+
         </ul>
       </div>
-      
+
       <div class="small-info">
 
         <div class="row-fluid">
@@ -214,7 +214,7 @@
                 <div class="objective-selector">
                   <input type="text" name="assignee.name" data-lookup="Person" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
                 </div>
-              {{else}}            
+              {{else}}
                 <p class="read-only oneline">
                   {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
                 </p>
@@ -222,23 +222,24 @@
             {{/using}}
           </div>
         </div>
-
-        {{#using objective=instance.objective}}
-          {{#if objective}}
-            <div class="row-fluid">
-              <div class="span12">
-                <h6>Objective</h6>
-                <p class="oneline">
-                  <i class="grcicon-objective-color nomargin"></i>
-                  {{#is_allowed "view_object_page" objective}}
-                    <a class="object-title" href="{{objective.viewLink}}" target="_blank">{{objective.title}}</a>
-                  {{else}}
-                    <span class="object-title" target="_blank">{{objective.title}}</span>
-                  {{/is_allowed}}
-                </p>
+        {{#using audit=instance.audit}}
+          {{#with_mapping "audit_object_object" instance}}
+            {{#if audit_object_object.0.instance}}
+              <div class="row-fluid">
+                <div class="span12">
+                  <h6>{{audit.object_model.table_singular}}</h6>
+                  <p class="oneline">
+                    <i class="grcicon-{{audit.object_model.table_singular}}-color nomargin"></i>
+                    {{#is_allowed "view_object_page" audit_object_object.0.instance}}
+                      <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
+                    {{else}}
+                      <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
+                    {{/is_allowed}}
+                  </p>
+                </div>
               </div>
-            </div>
-          {{/if}}
+            {{/if}}
+          {{/using}}
         {{/using}}
 
         {{{render_hooks 'Request.tree_view_info'}}}

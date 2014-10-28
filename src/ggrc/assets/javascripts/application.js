@@ -61,6 +61,7 @@ GGRC.extensions.push({
       , "standard" : CMS.Models.Standard
       , "regulation" : CMS.Models.Regulation
       , "org_group" : CMS.Models.OrgGroup
+      , "vendor" : CMS.Models.Vendor
       , "project" : CMS.Models.Project
       , "facility" : CMS.Models.Facility
       , "product" : CMS.Models.Product

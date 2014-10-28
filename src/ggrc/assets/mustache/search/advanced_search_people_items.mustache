@@ -27,6 +27,11 @@
                 <span class="url-link">
                   {{#if instance.email}}{{instance.email}}{{/if}}
                 </span>
+                {{^if instance.is_enabled}}
+                  <span class="user-disabled">
+                    (Disabled)
+                  </span>
+                {{/if}}
               </div>
             </div>
           </div>

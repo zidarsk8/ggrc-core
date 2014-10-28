@@ -19,6 +19,7 @@
     $f-medium:85%;
     $f-small:75%;
     $f-subTitle:120%;
+    $f-widgetTitle: 130%;
     $f-headline:170%;
 
   // widget
@@ -117,6 +118,8 @@
   $tabBorder: #ddd;
   $tabHoverBgnd: #444;
   $darkBlue: #0055cc;
+  $warningBorder: #fbeed5;
+  $warningBgnd: #fcf8e3;
   
   // pbc requests color states
   $rqDraft: #f7f7f7;
@@ -131,8 +134,69 @@
   $rqAssigned: #ffffbe;
   $rqSubmitted: #cbeaff;
 
-// mixins
+  // progress bar colors
+  $bar-base: #fff;
+  $bar-success: #d1fcb5;
+  $bar-danger: #ffffbe;
+  $bar-warning: #ffcebe;
 
+  // progress bar placeholder colors
+  %bar-base {
+    background: $bar-base;
+  }
+  %bar-success {
+    background: $bar-success;
+  }
+  %bar-danger {
+    background: $bar-danger;
+  }
+  %bar-warning {
+    background: $bar-warning;
+  }
+
+// action-bar link behave
+%action-link {
+  text-transform:uppercase;
+  font-weight:normal;
+  background:#fafafa;
+  color:darken($link,20%);
+  display:block;
+  padding:0 6px;
+  @include border-radius(4px);
+  @include transition(background 0.2s ease, color 0.2s ease);
+  i {
+    @include opacity(0.6);
+    @include transition(opacity 0.2s ease);
+  }
+  &:hover {
+    text-decoration:none;
+    color:$link;
+    background:#eee;
+    i {
+      @include opacity(1);
+    }
+  }
+}
+
+// Web fonts
+
+$font_path: "/static/fonts/";
+$font_name: "raleway-light-webfont";
+
+@font-face {
+  font-family: 'RalewayLight';
+  src: url('#{$font_path}#{$font_name}.eot');
+  src: url('#{$font_path}#{$font_name}.eot?#iefix') format('embedded-opentype'),
+       url('#{$font_path}#{$font_name}.woff') format('woff'),
+       url('#{$font_path}#{$font_name}.ttf') format('truetype'),
+       url('#{$font_path}#{$font_name}.svg#ralewaylight') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+$fontTitle: 'RalewayLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+// mixins
   @mixin reset-list() {
     margin:0;
     padding:0;

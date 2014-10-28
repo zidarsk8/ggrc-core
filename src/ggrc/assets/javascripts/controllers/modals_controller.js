@@ -204,7 +204,7 @@ can.Control("GGRC.Controllers.Modals", {
     }
     else if (this.options.instance) {
       dfd = this.options.instance.refresh();
-    } 
+    }
     else if (this.options.model) {
       dfd = this.options.new_object_form
           ? $.when(this.options.attr("instance", new this.options.model(params).attr("_suppress_errors", true)))
@@ -223,7 +223,7 @@ can.Control("GGRC.Controllers.Modals", {
             if(that.element !== null)
               that.on(); //listen to instance.
           });
-    } 
+    }
     else {
       this.options.attr("instance", new can.Observe(params));
       that.on();
@@ -267,10 +267,17 @@ can.Control("GGRC.Controllers.Modals", {
     footer != null && this.options.$footer.html(footer);
 
     this.setup_wysihtml5();
-    
-    //Update UI status array 
+
+    //Update UI status array
     var $form = $(this.element).find('form');
-    var storable_ui = $form.find('[tabindex]').length;
+    var tab_list = $form.find('[tabindex]');
+    var hidable_tabs = 0;
+    for (var i = 0; i < tab_list.length; i++) {
+      if ($(tab_list[i]).attr('tabindex') > 0)
+        hidable_tabs++;
+    }
+    //ui_array index is used as the tab_order, Add extra space for skipped numbers
+    var storable_ui = hidable_tabs + 10;
     for(var i = 0; i < storable_ui; i++) {
       //When we start, all the ui elements are visible
       this.options.ui_array.push(0);
@@ -278,6 +285,9 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , setup_wysihtml5 : function() {
+    if (!this.element) {
+      return;
+    }
     this.element.find('.wysihtml5').each(function() {
       $(this).cms_wysihtml5();
     });
@@ -462,9 +472,16 @@ can.Control("GGRC.Controllers.Modals", {
       $hidable.addClass("hidden");
       this.options.reset_visible = true;
       //update ui array
-      var $ui_unit = $hidable.find('[tabindex]');
-      var tab_value = $ui_unit.attr('tabindex');
-      this.options.ui_array[tab_value-1] = 1;
+      var ui_unit = $hidable.find('[tabindex]');
+      var i, tab_value;
+      for (i = 0; i < ui_unit.length; i++) {
+        tab_value = $(ui_unit[i]).attr('tabindex');
+        if(tab_value > 0) {
+          this.options.ui_array[tab_value-1] = 1;
+          $(ui_unit[i]).attr('tabindex', '-1');
+          $(ui_unit[i]).attr('uiindex', tab_value);
+        }
+      }
 
       for(var i=0; i < $el.closest('.hide-wrap.hidable').find('.inner-hidable').length; i++) {
         if(i == 1) {
@@ -485,17 +502,21 @@ can.Control("GGRC.Controllers.Modals", {
     }
     var $showButton = $(this.element).find('#formRestore');
     this.options.reset_visible = true;
-    
-    var $hidables = $(this.element).find(".hidable"); 
-    $hidables.addClass("hidden");   
+
+    var $hidables = $(this.element).find(".hidable");
+    $hidables.addClass("hidden");
     $(this.element).find('.inner-hide').addClass('inner-hidable');
 
     //Set up the hidden elements index to 1
     var hidden_elements = $hidables.find('[tabindex]');
     for(var i = 0; i < hidden_elements.length; i++) {
       var tab_value = $(hidden_elements[i]).attr('tabindex');
-      //The UI array index start from 0, and tab-index is from 1
-      this.options.ui_array[tab_value-1] = 1;
+      //The UI array index start from 0, and tab-index/io-index is from 1
+      if(tab_value > 0){
+        this.options.ui_array[tab_value-1] = 1;
+        $(hidden_elements[i]).attr('tabindex', '-1');
+        $(hidden_elements[i]).attr('uiindex', tab_value);
+      }
     }
 
     el.fadeOut(500);
@@ -510,12 +531,23 @@ can.Control("GGRC.Controllers.Modals", {
       this.options.ui_array[i] = 0;
     }
 
+    //Set up the correct tab index for tabbing
+    //Get all the ui elements with 'uiindex' set to original tabindex
+    //Restore the original tab index
+    var $form = $(this.element).find('form');
+    var uiElements = $form.find('[uiindex]');
+    for (var i = 0; i < uiElements.length; i++) {
+      var $el = $(uiElements[i]);
+      var tab_val = $el.attr('uiindex');
+      $el.attr('tabindex', tab_val);
+    }
+
     var $hideButton = $(this.element).find('#formHide');
     this.options.reset_visible = false;
     //$(this.element).find(".hidden").show();
     //$(this.element).find('.inner-hide').parent('.hidable').show();
     //$(this.element).find('.inner-hide').show();
-    $(this.element).find(".hidden").removeClass("hidden");   
+    $(this.element).find(".hidden").removeClass("hidden");
     $(this.element).find('.inner-hide').removeClass('inner-hidable');
     el.fadeOut(500);
     $hideButton.delay(499).fadeIn(500);
@@ -525,11 +557,11 @@ can.Control("GGRC.Controllers.Modals", {
   , save_ui_status : function(){}
 
   , restore_ui_status : function(){
-    //walk through the ui_array, for the one values, 
+    //walk through the ui_array, for the one values,
     //select the element with tab index and hide it
-    
+
     if(this.options.reset_visible){//some elements are hidden
-      var $selected, str, tabindex, 
+      var $selected, str, tabindex,
         $form = $(this.element).find('form');
       for (var i = 0; i < this.options.ui_array.length; i++){
         if(this.options.ui_array[i] == 1){
@@ -537,9 +569,11 @@ can.Control("GGRC.Controllers.Modals", {
           str = '[tabindex=' + tabindex + ']';
           $selected = $form.find(str);
           $selected.closest('.hidable').addClass('hidden');
+          $selected.attr('uiindex', tabindex);
+          $selected.attr('tabindex', '-1');
         }
       }
-      
+
       if($selected){
         var $hideButton = $selected.closest('.modal-body').find('#formHide'),
           $showButton = $selected.closest('.modal-body').find('#formRestore');
@@ -555,10 +589,10 @@ can.Control("GGRC.Controllers.Modals", {
   //make buttons non-clickable when saving
   , bindXHRToBackdrop : function(xhr, el, newtext, disable) {
       // binding of an ajax to a click is something we do manually
-      
+
       var $el = $(el)
       , oldtext = $el.text();
-      var alt; 
+      var alt;
 
       var myel = "<div ";
       //if(newtext) {
@@ -585,9 +619,9 @@ can.Control("GGRC.Controllers.Modals", {
           var save_close_btn = $(this.element).find("a.btn[data-toggle=modal-submit]");
           var save_addmore_btn = $(this.element).find("a.btn[data-toggle=modal-submit-addmore]");
 
-          //$(save_close_btn).attr("disabled", true); 
+          //$(save_close_btn).attr("disabled", true);
           $(save_close_btn).addClass("disabled pending-ajax");
-          //$(save_addmore_btn).attr("disabled", true); 
+          //$(save_addmore_btn).attr("disabled", true);
           $(save_addmore_btn).addClass("disabled pending-ajax");
 
           var modal_backdrop = this.element.data("modal_form").$backdrop;
@@ -599,7 +633,7 @@ can.Control("GGRC.Controllers.Modals", {
           this.bindXHRToButton(ajd, el, "Saving, please wait...");
         }
       }
-      
+
     }
     // Queue a save if clicked after verifying the email address
     else if (this._email_check) {
@@ -617,7 +651,7 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , new_instance: function(data){
-    var that = this,    
+    var that = this,
       params = this.find_params();
 
     $.when(this.options.attr("instance", new this.options.model(params).attr("_suppress_errors", true)))
@@ -755,7 +789,7 @@ can.Control("GGRC.Controllers.Modals", {
   because it works in tandem with the modals form controller.
 
   The purpose of this component is to allow for pending adds/removes of connected
-  objects while the modal is visible.  On save, the actual pending actions will 
+  objects while the modal is visible.  On save, the actual pending actions will
   be resolved and we won't worry about the transient state we use anymore.
 */
 can.Component.extend({
@@ -930,7 +964,7 @@ can.Component.extend({
       } else {
         obj = new CMS.Models[binding.loader.option_model_name](extra_attrs);
       }
-      
+
       if (that.scope.deferred) {
         that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
       } else {
@@ -970,7 +1004,7 @@ can.Component.extend({
                             }
                             return attrs;
                           }, {});
-      
+
       can.each(data.arr || [data], function(obj) {
         var mapping;
         if (that.scope.deferred) {

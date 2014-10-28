@@ -105,6 +105,10 @@ u {
   text-align: center;
 }
 
+.right {
+  text-align: right;
+}
+
 .no-results {
   margin-top:20px;
   h3, p {
@@ -250,34 +254,43 @@ u {
   z-index: 2000 !important;
 }
 
-// progress bar
-.bar {
-  float:left;
-  &.bar-success {
-    @include gradient-vertical(lighten($addBtn, 15%), $addBtn);
-  }
-  &.bar-danger {
-    @include gradient-vertical(lighten($orange, 15%), $orange);
-  }
-  &.bar-warning {
-    @include gradient-vertical(lighten($red, 15%), $red);
-  }
+.custom-label {
+  width: 50px;
+  display: inline-block;
+  text-align: center;
+  font-weight: normal;
+  text-shadow: none;
+  margin-right: 4px;
+  border: 1px solid $gray;
+}
+.label-white {
+  background: $white;
+  color: $black;
 }
 
+// progress bar
 .progress {
-  &.progress-higher {
-    margin-top:2px;
-    margin-bottom:0;
-    height:23px;
-    .bar {
-      height:23px;
-      line-height:23px;
-    }
+  background: transparent;
+  border: 1px solid $warmGray;
+  height: 19px;
+  @include box-shadow(none);
+  @include border-radius(0);
+  margin: 5px 0 0 0;
+  .bar {
+    height: 19px;
+    line-height: 19px;
+    color: $black;
+    text-shadow: none;
+    font-weight: normal;
+    font-size: 11px;
+    @include box-shadow(none);
+    float:left;
   }
-  .empty-progress {
-    text-align:center;
-    color:$gray;
-    font-weight:normal;
+
+  @each $bar_color in success, danger, warning, base {
+    .bar-#{$bar_color} {
+      @extend %bar-#{$bar_color};
+    }
   }
 }
 
@@ -940,6 +953,11 @@ select.multiple-selector {
     &.drag {
       float: left;
       width: 23px;
+    }
+    &.remove-field {
+      i {
+        margin-top: 5px;
+      }
     }
   }
   &.task-wrap {

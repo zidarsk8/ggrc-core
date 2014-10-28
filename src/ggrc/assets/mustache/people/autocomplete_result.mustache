@@ -2,6 +2,11 @@
 <li {{data 'ui-autocomplete-item'}} class="ui-menu-item">
   <a href="javascript://" class='show-extended' {{data 'model'}}>
     {{name}} <span class="small">{{email}}</span>
+  {{^if is_enabled}}
+    <span class="user-disabled">
+      (Disabled)
+    </span>
+  {{/if}}
   </a>
 </li>
 {{/each}}

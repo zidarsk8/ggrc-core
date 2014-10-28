@@ -10,6 +10,7 @@ permissions = {
         "InterviewResponse",
         "PopulationSampleResponse",
         "Audit",
+        "AuditObject",
         "Meeting",
         "ObjectControl",
         "ObjectDocument",
@@ -36,7 +37,8 @@ permissions = {
         "Relationship",
         "Document",
         "Meeting",
-        "Response"
+        "Response",
+        "AuditObject"
     ],
     "view_object_page": [
         "__GGRC_ALL__"
@@ -47,6 +49,7 @@ permissions = {
         "InterviewResponse",
         "PopulationSampleResponse",
         "Audit",
+        "AuditObject",
         "Meeting",
         "ObjectControl",
         "ObjectDocument",
@@ -65,6 +68,7 @@ permissions = {
         "ObjectSection",
         "Relationship",
         "Document",
-        "Meeting"
+        "Meeting",
+        "AuditObject"
     ]
 }

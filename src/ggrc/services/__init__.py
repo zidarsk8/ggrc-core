@@ -19,6 +19,7 @@ def contributed_services():
   return [
     service('background_tasks', models.BackgroundTask),
     service('audits', models.Audit),
+    service('audit_objects', models.AuditObject),
     service('categorizations', models.Categorization),
     service('category_bases', models.CategoryBase),
       service('control_categories', models.ControlCategory),
@@ -51,6 +52,7 @@ def contributed_services():
     service('objective_controls', models.ObjectiveControl),
     service('options', models.Option),
     service('org_groups', models.OrgGroup),
+    service('vendors', models.Vendor),
     service('people', models.Person),
     service('products', models.Product),
     service('projects', models.Project),

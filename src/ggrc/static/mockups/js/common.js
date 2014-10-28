@@ -644,6 +644,45 @@ $(document).ready(function(){
     $("#customAttribute").modal('hide');
   });
 
+  // Custom attribute disable edit link
+  $(".disabled-link").on("click", function(ev) {
+    ev.preventDefault();
+  });
+
+  $("#attribute-cat-trigger").on("click", function() {
+    var $this = $(this);
+        $activeList = $this.closest("li"),
+        $list = $this.closest(".internav").find("li"),
+        $activeWidget = $this.closest("body").find("#attribute_cat"),
+        $widget = $this.closest("body").find(".widget");
+
+    $widget.hide();
+    $activeWidget.show();
+    $list.removeClass("active");
+    $activeList.addClass("active");
+  });
+
+  $("#object-attribute-trigger").on("click", function() {
+    var $this = $(this);
+        $activeList = $this.closest("li"),
+        $list = $this.closest(".internav").find("li"),
+        $activeWidget = $this.closest("body").find("#object_attribute_widget"),
+        $widget = $this.closest("body").find(".widget");
+
+    $widget.hide();
+    $activeWidget.show();
+    $list.removeClass("active");
+    $activeList.addClass("active");
+  });
+
+  $("#addCategory").on("click", function() {
+    var $this = $(this),
+        $newCategory = $("#newCategory");
+
+    $this.modal('hide');
+    $newCategory.show();
+  });
+
   // Custom Reporting
   $(".save-template input[type=checkbox]").each(function() {
     var $this = $(this),
@@ -704,6 +743,7 @@ function resize_areas() {
   $topNav = $(".top-inner-nav");
   $area = $(".area");
   $bar = $(".bar-v");
+  $lhsSearch = $(".lhs-search");
 
   winHeight = $window.height();
   winWidth = $window.width();
@@ -711,6 +751,7 @@ function resize_areas() {
   footerMargin = lhsHeight;
   internavHeight = lhsHeight - 100;
   lhsWidth = $lhsHolder.width();
+  lhsSearchWidth = $lhsSearch.width() - 29;
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
   objectWidth = winWidth - lhsWidth - internavWidth - barWidth;
@@ -722,6 +763,7 @@ function resize_areas() {
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);
   $topNav.css("width",objectWidth);
+  $(".widgetsearch").css("width", lhsSearchWidth);
   $objectArea
     .css("margin-left",internavWidth)
     .css("height",internavHeight)

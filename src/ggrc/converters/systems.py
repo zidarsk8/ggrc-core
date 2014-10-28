@@ -45,6 +45,8 @@ class SystemRowConverter(BaseRowConverter):
     self.handle_option('network_zone')
     self.handle('org_groups', LinkRelationshipsHandler, model_class=OrgGroup,
                  direction='from', model_human_name='Org Group')
+    self.handle('vendors', LinkRelationshipsHandler, model_class=Vendor,
+                 direction='from', model_human_name='Vendor')
     self.handle_date('start_date')
     self.handle_date('created_at', no_import=True)
     self.handle_date('updated_at', no_import=True)
@@ -104,6 +106,7 @@ class SystemsConverter(BaseConverter):
     ('Map:System', 'sub_systems'),
     ('Map:Process', 'sub_processes'),
     ('Map:Org Group', 'org_groups'),
+    ('Map:Vendor', 'vendors'),
     ('Effective Date', 'start_date'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at'),

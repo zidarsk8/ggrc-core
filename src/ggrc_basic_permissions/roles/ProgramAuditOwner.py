@@ -11,6 +11,7 @@ permissions = {
         "PopulationSampleResponse",
         "UserRole",
         "Audit",
+        "AuditObject",
         "Meeting",
         "ObjectControl",
         "ObjectDocument",
@@ -29,6 +30,7 @@ permissions = {
         "PopulationSampleResponse",
         "UserRole",
         "Audit",
+        "AuditObject",
         "Meeting",
         "ObjectControl",
         "ObjectDocument",
@@ -50,6 +52,7 @@ permissions = {
         "PopulationSampleResponse",
         "UserRole",
         "Audit",
+        "AuditObject",
         "Meeting",
         "ObjectControl",
         "ObjectDocument",
@@ -70,5 +73,7 @@ permissions = {
         "Relationship",
         "Document",
         "Meeting"
+        "AuditObject",
+        "Audit"
     ]
 }

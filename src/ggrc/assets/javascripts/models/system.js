@@ -55,6 +55,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , "Product" : {}
       , "Facility" : {}
       , "OrgGroup" : {}
+      , "Vendor" : {}
       , "Project" : {}
       , "DataAsset" : {}
       , "Program" : {}

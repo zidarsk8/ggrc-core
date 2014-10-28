@@ -72,6 +72,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , "Product" : {}
     , "Facility" : {}
     , "OrgGroup" : {}
+    , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
     , "Market" : {}
@@ -139,6 +140,7 @@ can.Model.Cacheable("CMS.Models.Project", {
     , "Product" : {}
     , "Facility" : {}
     , "OrgGroup" : {}
+    , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
     , "Market" : {}
@@ -219,6 +221,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , "Product" : {}
     , "Facility" : {}
     , "OrgGroup" : {}
+    , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
     , "Market" : {}
@@ -304,6 +307,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     , "Product" : {}
     , "Facility" : {}
     , "OrgGroup" : {}
+    , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
     , "Product" : {}
@@ -387,6 +391,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , "Product" : {}
     , "Facility" : {}
     , "OrgGroup" : {}
+    , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
     , "Market" : {}
@@ -454,6 +459,7 @@ can.Model.Cacheable("CMS.Models.Market", {
     , "Product" : {}
     , "Facility" : {}
     , "OrgGroup" : {}
+    , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
     , "Market" : {}
@@ -464,6 +470,88 @@ can.Model.Cacheable("CMS.Models.Market", {
     $(function(){
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
+
+    this.validateNonBlank("title");
+  }
+}, {});
+
+can.Model.Cacheable("CMS.Models.Vendor", {
+  root_object : "vendor"
+  , root_collection : "vendors"
+  , category : "entities"
+  , findAll : "GET /api/vendors"
+  , findOne : "GET /api/vendors/{id}"
+  , create : "POST /api/vendors"
+  , update : "PUT /api/vendors/{id}"
+  , destroy : "DELETE /api/vendors/{id}"
+  , mixins : ["ownable", "contactable", "unique_title"]
+  , attributes : {
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
+    , owners : "CMS.Models.Person.stubs"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.get_stubs"
+  }
+  , tree_view_options : {
+    show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+    , child_options : [{
+      model : null
+      , find_params : {
+        "destination_type" : "Process"
+        , "source_type" : "Vendor"
+        , relationship_type_id : "vendor_has_process"
+      }
+      , parent_find_param : "source_id"
+      , draw_children : true
+      , find_function : "findRelated"
+      , related_side : "source"
+      , create_link : true
+    }, {
+      model : null
+      , find_params : {
+        "destination_type" : "Vendor"
+        , "source_type" : "Vendor"
+        , relationship_type_id: "vendor_relies_upon_vendor"
+      }
+      , parent_find_param : "destination_id"
+      , draw_children : true
+      , start_expanded : false
+      , find_function : "findRelatedSource"
+      , related_side : "destination"
+      , single_object : false
+      , create_link : true
+    }]}
+  , links_to : {
+    "System" : {}
+    , "Process" : {}
+    , "Program" : {}
+    , "Product" : {}
+    , "Facility" : {}
+    , "OrgGroup" : {}
+    , "Vendor" : {}
+    , "Project" : {}
+    , "DataAsset" : {}
+    , "Market" : {}
+    }
+  , init : function() {
+    var that = this;
+    this._super && this._super.apply(this, arguments);
+    $(function(){
+      that.tree_view_options.child_options[0].model = CMS.Models.Process;
+    });
+    this.tree_view_options.child_options[1].model = this;
 
     this.validateNonBlank("title");
   }

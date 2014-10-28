@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: andy@reciprocitylabs.com
     Maintained By: andy@reciprocitylabs.com
@@ -22,7 +22,13 @@
         <div class="span8">
           <div class="profile-info">
             <ul>
-              <li><h4>{{firstnonempty name email}}</h4></li>
+              <li><h4>{{firstnonempty name email}}
+              {{^if is_enabled}}
+                <span class="user-disabled">
+                  (Disabled)
+                </span>
+              {{/if}}
+              </h4></li>
               <li><strong>Email:</strong> <a href="mailto:{{email}}" target="_blank">{{email}}</a></li>
               {{#company}}<li><strong>Company:</strong> {{company}}</li>{{/company}}
             </ul>

@@ -39,7 +39,7 @@
       _mixins : ["folderable"]
     },
     Request : {
-      folders : new GGRC.ListLoaders.CrossListLoader("_audit", "folders"),
+      folders : new GGRC.ListLoaders.CrossListLoader("_audit_object", "folders"),
       _audit : new GGRC.ListLoaders.DirectListLoader("Audit", "requests", "audit")
     },
     DocumentationResponse : {
