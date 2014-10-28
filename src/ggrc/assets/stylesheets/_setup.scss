@@ -15,7 +15,7 @@
 
   // font-sizes
   
-    $f-regular:90%; // equals 16px
+    $f-regular:90%; // equals 16px ?????
     $f-medium:85%;
     $f-small:75%;
     $f-subTitle:120%;
@@ -57,6 +57,7 @@
     $red: #ce3e3e;
     $lightRed: #ff9d9d;
     $green: #1d8d15;
+    $blue: #069;
     $darkBlue: #369;
     $warmGray: #ccc;
     $midGray: #aaa;
@@ -120,6 +121,8 @@
   $darkBlue: #0055cc;
   $warningBorder: #fbeed5;
   $warningBgnd: #fcf8e3;
+  $contentBgnd: #e5e5e5;
+  $itemBorder: #e3e3e3;
   
   // pbc requests color states
   $rqDraft: #f7f7f7;
@@ -181,10 +184,10 @@
 // Web fonts
 
 $font_path: "/static/fonts/";
-$font_name: "raleway-light-webfont";
+$font_name: "raleway-regular-webfont";
 
 @font-face {
-  font-family: 'RalewayLight';
+  font-family: 'RalewayRegular';
   src: url('#{$font_path}#{$font_name}.eot');
   src: url('#{$font_path}#{$font_name}.eot?#iefix') format('embedded-opentype'),
        url('#{$font_path}#{$font_name}.woff') format('woff'),
@@ -194,7 +197,7 @@ $font_name: "raleway-light-webfont";
   font-style: normal;
 }
 
-$fontTitle: 'RalewayLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
+$fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 // mixins
   @mixin reset-list() {

@@ -446,10 +446,9 @@ ul.new-tree {
   }
 
   li.tree-item {
-    border-bottom:1px solid #ccc;
-    line-height:31px;
-    min-height:31px;
-    background:#fafafa;
+    border-bottom: 1px solid $itemBorder;
+    min-height: 30px;
+    padding: 6px 0;
     &:last-child {
       border-bottom: none;
     }
@@ -681,9 +680,6 @@ ul.new-tree {
     .wrap250 { float:left; min-width:250px; }
     .wrap300 { float:left; min-width:300px; }
     */
-    .tree-progress {
-      margin-right: 20px;
-    }
   }
   &.colored-list {
     > li.tree-item {
@@ -1224,14 +1220,17 @@ ul.new-tree {
 }
 
 .item-data {
-  padding-left: 20px;
-  color:#222;
   overflow: hidden;
   zoom: 1;
   &.no-space {
     padding-left: 0;
   }
   .tree-title-area {
+    font-size: 16px;
+    line-height: 24px;
+    a {
+      color: $blue;
+    }
     @include oneline();
     .event-action {
       font-size:13px;

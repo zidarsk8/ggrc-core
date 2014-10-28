@@ -10,40 +10,14 @@
 .widget {
   margin-bottom: 40px;
   .header {
-    //background: $lightGray;
-    border-bottom:1px solid $darkGray;
-    color: $text;
-    height: 40px;
-    padding-left: 20px;
-    .widget-action {
-      height: 30px;
-      margin-right: 18px;
-      &.widget-action-help {
-        @include box-shadow(none);
-        background: transparent;
-      }
-      i {
-        @include opacity(0.5);
-        @include transition(opacity 0.3s ease);
-      }
-      a {
-        display: block;
-        width: 20px;
-        height: 16px;
-        padding: 12px 0;
-        &:hover {
-          i {
-            @include opacity(1);
-          }
-        }
-      }
-    }
+    height: 30px;
+    background: none;
     h2 {
-      line-height: 40px;
-      color: #444;
-      margin-bottom:0;
+      font-size: 18px;
+      line-height: 27px;
+      color: $black;
+      margin-bottom: 0;
       font-weight: normal;
-      font-size: $f-widgetTitle;
       @include oneline();
       font-family: $fontTitle;
       span {
@@ -81,22 +55,23 @@
     }
     @include row-fluid-fix();
     &.widget-nav {
-      height: 30px;
+      height: 40px;
       background: none;
       ul {
         @include reset-list();
         @include clearfix();
         li {
           float: left;
-          margin-bottom: -1px;
+          font-size: 18px;
+          line-height: 30px;
+          color: $black;
+          font-family: $fontTitle;
         }
         a {
-          padding: 0 10px 0 10px;
+          padding: 5px 15px;
           display: block;
-          line-height: 29px;
-          font-size: 13px;
-          color: $tabTitle;
-          border: 1px solid transparent;
+          line-height: 30px;
+          color: $black;
           @include transition(background 0.2s ease, color 0.2s ease);
           &:hover {
             background: $tabHoverBgnd;
@@ -113,10 +88,10 @@
         }
         li.active {
           a {
-            color: $subTitle;
+            color: $black;
             background-color: $white;
-            border: 1px solid $darkGray;
-            border-bottom-color: transparent;
+            border-left: 1px solid $tabBorder;
+            border-right: 1px solid $tabBorder;
             i {
               @include opacity(1);
             }
@@ -128,6 +103,14 @@
         }
       }
     }
+  }
+  .content {
+    @include box-shadow(0 2px 2px -2px rgba(0,0,0, 0.3));
+    padding-left: 10px;
+    padding-right: 10px;
+    background: $white;
+    border-left: 1px solid $tabBorder;
+    border-right: 1px solid $tabBorder;
   }
   &.workflow-info-widget {
     overflow-y: visible;
@@ -375,10 +358,6 @@
     input[type="text"] {
       @include input-block-level();
     }
-  }
-  .content {
-    border-top: none;
-    background:$white;
   }
   .footer {
     color:$text;
