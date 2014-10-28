@@ -130,7 +130,7 @@ def admin_reindex():
   from ggrc import settings
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
-  tq = create_task(get_current_user(), "reindex", reindex)
+  tq = create_task("reindex", url_for(reindex.__name__), reindex)
   return tq.make_response(app.make_response(("scheduled %s" % tq.name,
                                             200,
                                             [('Content-Type', 'text/html')])))

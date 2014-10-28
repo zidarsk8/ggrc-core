@@ -14,6 +14,7 @@ from ggrc.converters.import_helper import handle_csv_import, handle_converter_cs
 from ggrc.login import get_current_user, login_required
 from ggrc.models.background_task import create_task, queued_task
 from ggrc.rbac import permissions
+from flask import url_for
 
 
 _default_context = object()
@@ -204,7 +205,9 @@ def import_controls_to_program(program_id):
       'return_to': return_to,
   }
   tq = create_task(
-      get_current_user(), "import_control", import_control_program_task,
+      "import_control",
+      url_for(import_control_program_task.__name__),
+      import_control_program_task,
       parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
@@ -243,7 +246,9 @@ def import_objectives(directive_id):
       'return_to': return_to,
   }
   tq = create_task(
-      get_current_user(), "import_objective", import_objective_directive_task,
+      "import_objective",
+      url_for(import_objective_directive_task.__name__),
+      import_objective_directive_task,
       parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
@@ -280,7 +285,9 @@ def import_objectives_to_program(program_id):
       'return_to': return_to,
   }
   tq = create_task(
-      get_current_user(), "import_objective", import_objective_program_task,
+      "import_objective",
+      url_for(import_objective_program_task.__name__),
+      import_objective_program_task,
       parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
@@ -297,7 +304,7 @@ def import_objective_directive_task(task):
   directive = Directive.query.get(directive_id)
   directive_url = view_url_for(directive)
   return_to = task.parameters.get("return_to") or directive_url
-  
+
   try:
     converter = handle_csv_import(ObjectivesConverter, csv_file.splitlines(True), **task.parameters)
     if dry_run:
@@ -358,7 +365,9 @@ def import_controls(directive_id):
       'return_to': return_to,
   }
   tq = create_task(
-      get_current_user(), "import_control", import_control_directive_task,
+      "import_control",
+      url_for(import_control_directive_task.__name__),
+      import_control_directive_task,
       parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
@@ -585,7 +594,9 @@ def import_people(import_type):
                 "csv_file": csv_file.read(),
                 "csv_filename": filename}
   tq = create_task(
-      get_current_user(), "import_" + import_type, import_task[import_type],
+      "import_" + import_type,
+      url_for(import_task[import_type].__name__),
+      import_task[import_type],
       parameters)
   return tq.make_response(import_dump({"id":tq.id, "status":tq.status}))
 
@@ -625,8 +636,8 @@ def import_requests(audit_id):
           count = len(converter.objects)
           urlparts = urlparse(request.args.get("return_to"))
           return_to = urlunparse(
-            (urlparts.scheme, 
-              urlparts.netloc, 
+            (urlparts.scheme,
+              urlparts.netloc,
               u"/audits/post_import_request_hook",
               u'',
               u'return_to=' + urllib.quote_plus(request.args.get("return_to")) \
@@ -773,7 +784,10 @@ def import_systems_processes(object_kind):
     return render_template("directives/import_errors.haml", exception_message=file_msg)
   parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename, "object_kind": object_kind}
   tq = create_task(
-      get_current_user(), "import_system", import_system_task, parameters)
+      "import_system",
+      url_for(import_system_task.__name__),
+      import_system_task,
+      parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
 @app.route("/programs/<program_id>/import_systems", methods=['GET', 'POST'])
@@ -846,7 +860,9 @@ def export(export_type):
   }
 
   tq = create_task(
-      get_current_user(), "export_" + export_type, export_task[export_type])
+      "export_" + export_type,
+      url_for(export_task[export_type].__name__),
+      export_task[export_type])
   return import_dump({"id":tq.id, "status":tq.status})
 
 @app.route("/standards/<directive_id>/export_sections", methods=['GET'])
@@ -1104,4 +1120,3 @@ def import_controls_template(object_type, object_id):
   }
   body = render_template("csv_files/" + template_name, **options)
   return current_app.make_response((body, 200, headers))
-

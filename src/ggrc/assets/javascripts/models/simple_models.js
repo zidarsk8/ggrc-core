@@ -225,7 +225,7 @@ can.Model.Cacheable("CMS.Models.Role", {
 
 can.Model.Cacheable("CMS.Models.MultitypeSearch", {}, {});
 
-BackgroundTask = can.Model.extend({
+can.Model.Cacheable("CMS.Models.BackgroundTask", {
   root_object : "background_task"
   , root_collection : "background_tasks"
   , findAll : "GET /api/background_tasks"
@@ -235,7 +235,27 @@ BackgroundTask = can.Model.extend({
   , create : "POST /api/background_tasks"
   , scopes : []
   , defaults : {}
-}, {});
+}, {
+  poll: function() {
+    var dfd = new $.Deferred(),
+        self = this,
+        wait = 2000,
+        interval;
+
+    function _poll(){
+      self.refresh().then(function(task) {
+        // Poll until we either get a success or a failure:
+        if (['Success', 'Failure'].indexOf(task.status) < 0) {
+          setTimeout(_poll, wait);
+        } else {
+          dfd.resolve(task);
+        }
+      });
+    }
+    _poll();
+    return dfd;
+  }
+});
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model, params = {}, instance = null, href;
