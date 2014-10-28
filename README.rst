@@ -2,7 +2,7 @@
 gGRC-Core
 *********
 
-Google Governance, Risk and Compliance. Migrated from [Google Code](https://code.google.com/p/ggrc-core/).
+Google Governance, Risk and Compliance. Migrated from `Google Code <https://code.google.com/p/ggrc-core>`_.
 
 Requirements
 ============
@@ -20,6 +20,8 @@ environment:
      - Oracle VirtualBox Virtual Machine player
    * - `Vagrant <http://www.vagrantup.com/>`_
      - Handy scriptable VM management
+   * - Ruby and Ruby Dev
+     - sudo aptitude install ruby-dev
    * - `librarian (ruby gem) <http://rubygems.org/gems/librarian>`_
      - Ruby bundle management framework.
    * - `librarian-chef (ruby gem) <http://rubygems.org/gems/librarian-chef>`_
