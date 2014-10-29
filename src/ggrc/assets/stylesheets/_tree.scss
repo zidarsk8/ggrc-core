@@ -448,7 +448,8 @@ ul.new-tree {
   li.tree-item {
     border-bottom: 1px solid $itemBorder;
     min-height: 30px;
-    padding: 6px 0;
+    padding: 6px 0 11px 0;
+    line-height: 24px;
     &:last-child {
       border-bottom: none;
     }
@@ -1227,7 +1228,6 @@ ul.new-tree {
   }
   .tree-title-area {
     font-size: 16px;
-    line-height: 24px;
     a {
       color: $blue;
     }

@@ -273,24 +273,19 @@ u {
 
 // progress bar
 .progress {
-  background: transparent;
-  border: 1px solid $warmGray;
-  height: 19px;
+  background: $lightGray;
+  height: 20px;
   @include box-shadow(none);
-  @include border-radius(0);
-  margin: 5px 0 0 0;
+  @include border-radius($default-border-radius);
+  margin: 4px 0 0 0;
   .bar {
-    height: 19px;
-    line-height: 19px;
-    color: $black;
-    text-shadow: none;
-    font-weight: normal;
-    font-size: 11px;
+    height: 20px;
     @include box-shadow(none);
-    float:left;
+    float: left;
+    margin-right: 1px;
   }
 
-  @each $bar_color in success, danger, warning, base {
+  @each $bar_color in verify, progress, pending, warning {
     .bar-#{$bar_color} {
       @extend %bar-#{$bar_color};
     }
@@ -1101,4 +1096,14 @@ p {
   color:#f00 !important;
   font-weight:bold;
   font-size: $f-small;
+}
+
+.item-util {
+  display: block;
+  font-size: 11px;
+  line-height: 16px;
+  color: $black;
+  .tree-progress & {
+    text-align: center;
+  }
 }

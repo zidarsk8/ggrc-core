@@ -138,20 +138,20 @@
   $rqSubmitted: #cbeaff;
 
   // progress bar colors
-  $bar-base: #fff;
-  $bar-success: #72d572;
-  $bar-danger: #ffe082;
+  $bar-verify: #8bc34a;
+  $bar-progress: #40c4ff;
+  $bar-pending: #ffab40;
   $bar-warning: #f69988;
 
   // progress bar placeholder colors
-  %bar-base {
-    background: $bar-base;
+  %bar-verify {
+    background: $bar-verify;
   }
-  %bar-success {
-    background: $bar-success;
+  %bar-progress {
+    background: $bar-progress;
   }
-  %bar-danger {
-    background: $bar-danger;
+  %bar-pending {
+    background: $bar-pending;
   }
   %bar-warning {
     background: $bar-warning;
