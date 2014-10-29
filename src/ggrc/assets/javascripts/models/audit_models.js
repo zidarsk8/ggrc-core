@@ -97,6 +97,10 @@ can.Model.Cacheable("CMS.Models.Audit", {
     }
 
     return this._super.apply(this, arguments).then(function(instance) {
+      // Since Audits have a non-standard url for viewing, the url has to be set here
+      // so that the browser can be redirected properly after creating.
+      instance.attr('_redirect',
+        instance.program.reify().viewLink + "#audit_widget/audit/" + instance.id);
       return that._save_auditor(instance);
     });
   },
@@ -148,8 +152,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
         person : instance.auditor
       }).save());
     }).then(function(){
-      instance.attr('_redirect',
-        instance.program.reify().viewLink + "#audit_widget/audit/" + instance.id);
       return instance;
     });
   }, findAuditors : function(return_list){
