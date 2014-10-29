@@ -27,7 +27,10 @@
       <br>
     </div>
     <div class="span4 hidable">
-      <label>&nbsp;</label>
+      <label>
+        &nbsp;
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      </label>
       <label for="person_is_enabled" class="inline-check">
         <input type="checkbox" tabindex="3" id="person_is_enabled" name="is_enabled" value="{{is_enabled}}" {{#if instance.is_enabled}}checked="checked"{{/if}} >
         enabled user
@@ -41,7 +44,7 @@
     <div class="span12 hidable">
       <label for="person_company">
         Company
-        <a href="javascript://" class="field-hide">hide</a>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <input tabindex="4" class="span12" id="person_company" name="company" placeholder="Acme, Inc." size="30" type="text" value="{{company}}">
       <span class="help-inline">
