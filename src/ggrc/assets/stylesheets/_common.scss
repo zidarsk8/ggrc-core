@@ -1099,3 +1099,8 @@ p {
   font-weight:bold;
   font-size: $f-small;
 }
+
+.border-l {
+  padding-bottom: 5px;
+  border-bottom: 1px solid $infoMessageBorder;
+}
