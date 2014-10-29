@@ -620,8 +620,10 @@ can.Control("GGRC.Controllers.Modals", {
           var save_addmore_btn = $(this.element).find("a.btn[data-toggle=modal-submit-addmore]");
           var modal_backdrop = this.element.data("modal_form").$backdrop;
 
-          this.bindXHRToButton(ajd, save_close_btn);
-          this.bindXHRToButton(ajd, save_addmore_btn);
+          //this.bindXHRToButton(ajd, save_close_btn);
+          //this.bindXHRToButton(ajd, save_addmore_btn);
+          $(save_addmore_btn).addClass("disabled pending-ajax");
+          $(save_close_btn).addClass("disabled pending-ajax");
 
           this.bindXHRToBackdrop(ajd, modal_backdrop, "Saving, please wait...");
         }
