@@ -1350,45 +1350,94 @@
     }
 
     , init_menu: function() {
-        var menu, all_models = [], 
-            lookup = {
+        var menu,
+          all_models = [],
+          lookup,
+          selected_object =  this.options.selected_object.type;
+
+        if(selected_object === "TaskGroup") { //workflow/TaskGroup don't have People/Groups sub catagory
+          lookup = {
               governance: 0
             , business: 1
-            };
+          };
+          if (!this.options.option_type_menu) {
+            menu = [
+                { category: "Governance"
+                , items: []
+                }
+              , { category: "Assets/Business"
+                , items: []
+                }
+              ];
 
-        if (!this.options.option_type_menu) {
-          menu = [
-              { category: "Governance"
-              , items: []
+            //Add All Objects at the top of the list
+            menu[0].items.push({
+              model_name:"AllObjects",
+              model_display:"All Objects"
+            });
+
+            can.each(this.options.option_descriptors, function(descriptor) {
+              if (descriptor.model.category == "workflow" ||
+                  descriptor.model.category == "undefined" ||
+                  descriptor.model.category == "entities"){
+                return;
               }
-            , { category: "Assets/Business"
-              , items: []
+              else{
+                menu[lookup[descriptor.model.category] || 0].items.push({
+                    model_name: descriptor.model.shortName
+                  , model_display: descriptor.model.title_plural
+                });
+                //Save the model names for All Object search
+                all_models.push(descriptor.model.shortName);
               }
-            ];
+            })
 
-          //Add All Objects at the top of the list
-          menu[0].items.push({
-            model_name:"AllObjects",
-            model_display:"All Objects"
-          }); 
+            this.options.option_type_menu = menu;
+          }
 
-          can.each(this.options.option_descriptors, function(descriptor) {
-            if (descriptor.model.category == "workflow" || 
-                descriptor.model.category == "undefined" ||
-                descriptor.model.category == "entities"){
-              return;
-            }
-            else{
-              menu[lookup[descriptor.model.category] || 0].items.push({
-                  model_name: descriptor.model.shortName
-                , model_display: descriptor.model.title_plural
-              });
-              //Save the model names for All Object search
-              all_models.push(descriptor.model.shortName);
-            }
-          })
+        }
+        else {
+          lookup = {
+              governance: 0
+            , business: 1
+            , entities: 2
+          };
 
-          this.options.option_type_menu = menu;
+          if (!this.options.option_type_menu) {
+            menu = [
+                { category: "Governance"
+                , items: []
+                }
+              , { category: "Assets/Business"
+                , items: []
+                }
+              , { category: "People/Groups"
+                , items: []
+                }
+              ];
+
+            //Add All Objects at the top of the list
+            menu[0].items.push({
+              model_name:"AllObjects",
+              model_display:"All Objects"
+            });
+
+            can.each(this.options.option_descriptors, function(descriptor) {
+              if (descriptor.model.category == "workflow" || descriptor.model.category == "undefined"){
+                return;
+              }
+              else{
+                menu[lookup[descriptor.model.category] || 0].items.push({
+                    model_name: descriptor.model.shortName
+                  , model_display: descriptor.model.title_plural
+                });
+                //Save the model names for All Object search
+                all_models.push(descriptor.model.shortName);
+              }
+            })
+
+            this.options.option_type_menu = menu;
+          }
         }
 
         this.options.all_models = all_models;
@@ -1412,6 +1461,8 @@
           can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; })
         }
 
+        var display_selection = this.options.option_descriptors[this.options.default_option_descriptor].model.title_plural;
+
         this.context = new can.Observe($.extend({
           objects: this.object_list,
           options: this.option_list,
@@ -1424,7 +1475,8 @@
           is_page_instance: false,
           item_selected: false,
           items_selected: 0,
-          filter_list: []
+          filter_list: [],
+          display_selection: display_selection ? display_selection : "Objects"
           }, this.options));
       }
       return this.context;
