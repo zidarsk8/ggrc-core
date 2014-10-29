@@ -13,28 +13,27 @@
     </div>
     
     {{#using contact=instance.contact}}
-    {{#with_current_user_as 'current_user'}}
     <div class="span3">
       <label>
         Assignee
         <span class="required">*</span>
       </label>
-      <i class="grcicon-person-green pull-left icon-field"></i>
       <div class="objective-selector">
-        {{#if new_object_form}}
           {{#using request=instance.request}}
           {{#using request_assignee=request.assignee}}
-            <input tabindex="2" type="text" name="contact.email" class="span10 search-icon" placeholder="Enter text to search for Assignee" data-lookup="Person" value="{{firstnonempty contact.email request_assignee.email ''}}">
-            <input type="hidden" name="contact.id" value="{{firstnonempty contact.id request_assignee.id ''}}">
+            {{#if new_object_form}}
+              <input type="hidden" name="contact.id" value="{{request_assignee.id}}">
+            {{else}}
+              <input type="hidden" name="contact.id" value="{{contact.id}}">
+            {{/if}}
+            <span class="read-only oneline">
+              <i class="grcicon-person-green pull-left icon-field"></i>
+              {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+            </span>
           {{/using}}
           {{/using}}
-        {{else}}
-          <input tabindex="2" type="text" name="contact.email" class="span11" data-lookup="Person" value="{{firstnonempty contact.email parent_instance.assignee.reify.email ''}}">
-          <input type="hidden" name="contact.id" value="{{firstnonempty contact.id ''}}">
-        {{/if}}
       </div>
     </div>
-    {{/with_current_user_as}}
     {{/using}}
   </div>
   
