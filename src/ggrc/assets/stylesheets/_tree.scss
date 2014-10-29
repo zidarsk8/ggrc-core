@@ -45,15 +45,6 @@ ul.new-tree {
       padding-left: 0;
     }
   }
-  &.simple-list {
-    li {
-      padding-left: 20px;
-    }
-    a {
-      display: block;
-      @include oneline();
-    }
-  }
   &.request-list,
   &.responses-list {
     .short-field {
@@ -633,11 +624,10 @@ ul.new-tree {
       @include reset-list();
       @include clearfix();
       float: right;
-      margin-right: 20px;
       li {
         float: left;
-        margin-left: 15px;
-        line-height: 31px;
+        margin-left: 10px;
+        line-height: 24px;
         .item-data {
           padding-left: 0;
           float: none;
@@ -1232,6 +1222,10 @@ ul.new-tree {
       color: $blue;
     }
     @include oneline();
+    &.w-status {
+      float: left;
+      width: 94%;
+    }
     .event-action {
       font-size:13px;
       color:#777;

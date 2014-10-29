@@ -54,7 +54,7 @@
     $gray: #999;
     $darkGray: #7c7c7c;
     $lightGray: #eee;
-    $red: #ce3e3e;
+    $red: #e00032;
     $lightRed: #ff9d9d;
     $green: #1d8d15;
     $blue: #069;
@@ -137,49 +137,15 @@
   $rqAssigned: #ffffbe;
   $rqSubmitted: #cbeaff;
 
+  $lightBlue: #40c4ff;
+  $orange: #ffab40;
+  $btnGreen: #009933;
+
   // progress bar colors
   $bar-verify: #8bc34a;
-  $bar-progress: #40c4ff;
-  $bar-pending: #ffab40;
-  $bar-warning: #f69988;
 
-  // progress bar placeholder colors
-  %bar-verify {
-    background: $bar-verify;
-  }
-  %bar-progress {
-    background: $bar-progress;
-  }
-  %bar-pending {
-    background: $bar-pending;
-  }
-  %bar-warning {
-    background: $bar-warning;
-  }
-
-// action-bar link behave
-%action-link {
-  text-transform:uppercase;
-  font-weight:normal;
-  background:#fafafa;
-  color:darken($link,20%);
-  display:block;
-  padding:0 6px;
-  @include border-radius(4px);
-  @include transition(background 0.2s ease, color 0.2s ease);
-  i {
-    @include opacity(0.6);
-    @include transition(opacity 0.2s ease);
-  }
-  &:hover {
-    text-decoration:none;
-    color:$link;
-    background:#eee;
-    i {
-      @include opacity(1);
-    }
-  }
-}
+  // status label colors
+  $status-draft: #bdbdbd;
 
 // Web fonts
 
@@ -200,6 +166,13 @@ $font_name: "raleway-regular-webfont";
 $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 // mixins
+  @mixin btnBgnd($color) {
+    background: $color;
+    &:hover {
+      background: darken($color, 8%);
+    }
+  }
+
   @mixin reset-list() {
     margin:0;
     padding:0;
@@ -239,6 +212,8 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   @mixin default-border-top() {
     border-top: 1px solid $lightGray;
   }
+
+// Placeholders
 
 // Turn icons to black
 %black-icons {
@@ -333,4 +308,76 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   .grcicon-assessment-plan-color { background-position: -102px -392px; }
   .grcicon-access-list-color { background-position: -78px -344px; }
   .grcicon-issue-color { background-position: -342px -344px; }
+}
+
+// progress bar placeholder colors
+%bar-verify {
+  background: $bar-verify;
+}
+%bar-progress {
+  background: $lightBlue;
+}
+%bar-pending {
+  background: $orange;
+}
+%bar-warning {
+  background: $red;
+}
+
+// status label placeholder colors
+%status-draft {
+  background: $status-draft;
+}
+%status-progress {
+  background: $lightBlue;
+}
+%status-overdue {
+  background: $red;
+}
+
+// flat buttons color
+%btn-primary {
+  @include btnBgnd($blue);
+}
+%btn-success {
+  @include btnBgnd($btnGreen);
+}
+%btn-info {
+  @include btnBgnd($lightBlue);
+}
+%btn-warning {
+  @include btnBgnd($orange);
+}
+%btn-danger {
+  @include btnBgnd($red);
+}
+
+// action-bar link behave
+%action-link {
+  text-transform:uppercase;
+  font-weight:normal;
+  background:#fafafa;
+  color:darken($link,20%);
+  display:block;
+  padding:0 6px;
+  @include border-radius(4px);
+  @include transition(background 0.2s ease, color 0.2s ease);
+  i {
+    @include opacity(0.6);
+    @include transition(opacity 0.2s ease);
+  }
+  &:hover {
+    text-decoration:none;
+    color:$link;
+    background:#eee;
+    i {
+      @include opacity(1);
+    }
+  }
+}
+
+// Item util wide
+%item-util-wide {
+  margin: 0;
+  width: 100%;
 }
