@@ -812,11 +812,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         // Remove existing object folders before mapping a new one:
         return object_folder.reify().refresh().then(function(instance) {
           return instance.destroy();
-        }).then(function() {
-          return GGRC.Controllers.GDriveWorkflow.attach_files(files,
-            el.data('type'), object);
         });
       })).then(function() {
+        return GGRC.Controllers.GDriveWorkflow.attach_files(files,
+          el.data('type'), object);
+      }).then(function() {
         object.attr('_folder_change_pending', false);
       });
     }
