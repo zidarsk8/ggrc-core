@@ -950,8 +950,19 @@ can.Component.extend({
     link_text: null,
     trigger_upload : function(scope, el, ev) {
       var that = this,
-          parent_folder_dfd = this.instance.get_binding("folders").refresh_instances();
+          parent_folder_dfd = this.instance.get_binding("extended_folders").refresh_instances();
 
+      function is_own_folder(mapping, instance) {
+        if(mapping.binding.instance !== instance)
+          return false;
+        if(!mapping.mappings || mapping.mappings.length < 1 || mapping.instance === true)
+          return true;
+        else {
+          return can.reduce(mapping.mappings, function(current, mp) {
+            return current || is_own_folder(mp, instance);
+          }, false);
+        }
+      }
       can.Control.prototype.bindXHRToButton(parent_folder_dfd, el);
       parent_folder_dfd.done(function(bindings) {
         var parent_folder;
@@ -965,7 +976,13 @@ can.Component.extend({
           return;
         }
 
-        parent_folder = bindings[0].instance;
+        parent_folder = can.map(bindings, function(binding) {
+          return can.reduce(binding.mappings, function(current, mp) {
+            return current || is_own_folder(mp, that.instance);
+          }, false) ? binding.instance : undefined;
+        });
+        parent_folder = parent_folder[0] || bindings[0].instance;
+
         //NB: resources returned from uploadFiles() do not match the properties expected from getting
         // files from GAPI -- "name" <=> "title", "url" <=> "alternateLink".  Of greater annoyance is
         // the "url" field from the picker differs from the "alternateLink" field value from GAPI: the

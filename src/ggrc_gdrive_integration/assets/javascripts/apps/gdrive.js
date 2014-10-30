@@ -36,29 +36,28 @@
       _mixins : ["folderable"]
     },
     Audit : {
-      _mixins : ["folderable"]
+      _mixins : ["folderable"],
+      extended_folders: new GGRC.ListLoaders.MultiListLoader(["folders"])
     },
     Request : {
       folders : new GGRC.ListLoaders.CrossListLoader("_audit", "folders"),
-      _audit : new GGRC.ListLoaders.DirectListLoader("Audit", "requests", "audit")
+      _audit : new GGRC.ListLoaders.DirectListLoader("Audit", "requests", "audit"),
+      extended_folders: new GGRC.ListLoaders.MultiListLoader(["folders"])
     },
     DocumentationResponse : {
-      _mixins : ["fileable"],
-      //FIXME when responses get their own folders, remove these list loaders and add the "folderable" mixin --BM 10/24/2014
-      folders: new GGRC.ListLoaders.CrossListLoader("_request", "folders"),
-      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request")
+      _mixins : ["fileable", "folderable"],
+      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request"),
+      folders_via_request: new GGRC.ListLoaders.CrossListLoader("_request", "extended_folders"),
+      extended_folders: new GGRC.ListLoaders.MultiListLoader(["folders", "folders_via_request"])
     },
     InterviewResponse : {
-      _mixins : ["fileable"],
-      //FIXME when responses get their own folders, remove these list loaders and add the "folderable" mixin --BM 10/24/2014
-      folders: new GGRC.ListLoaders.CrossListLoader("_request", "folders"),
-      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request")
+      _mixins : ["fileable", "folderable"],
     },
     PopulationSampleResponse : {
-      _mixins : ["fileable"],
-      //FIXME when responses get their own folders, remove these list loaders and add the "folderable" mixin --BM 10/24/2014
-      folders: new GGRC.ListLoaders.CrossListLoader("_request", "folders"),
-      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request")
+      _mixins : ["fileable", "folderable"],
+      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request"),
+      folders_via_request: new GGRC.ListLoaders.CrossListLoader("_request", "extended_folders"),
+      extended_folders: new GGRC.ListLoaders.MultiListLoader(["folders", "folders_via_request"])
     },
     Document : {
       _mixins : ["fileable"]
