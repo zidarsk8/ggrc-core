@@ -133,11 +133,12 @@ class WorkflowState(object):
       cycle = obj if isinstance(obj, Cycle) else obj.cycle
       if not cycle.is_current:
         continue
-      if obj.end_date and \
-         obj.end_date <= today and \
-         obj.status != "Verified":
-        priority_states["Overdue"] = True
-      elif not obj.status:
+      for task in obj.cycle_task_group_object_tasks:
+        if task.end_date and \
+           task.end_date <= today and \
+           task.status != "Verified":
+          priority_states["Overdue"] = True
+      if not obj.status:
         priority_states["Assigned"] = True
       priority_states[obj.status] = True
 

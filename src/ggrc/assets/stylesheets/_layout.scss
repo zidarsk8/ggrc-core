@@ -76,7 +76,15 @@
   &.dashboard-area {
     margin-left:0;
   }
+}
 
+.inner-content {
+  .side-wrap & {
+    margin-left: 20px;
+  }
+  .content-wrap & {
+    margin-right: 20px;
+  }
 }
 
 .footer {

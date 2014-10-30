@@ -98,6 +98,57 @@ can.Model.Cacheable("CMS.Models.Audit", {
     }
 
     return this._super.apply(this, arguments).then(function(instance) {
+      return that._save_auditor(instance);
+    });
+  },
+  object_model: can.compute(function() {
+    return CMS.Models[this.attr("object_type")];
+  })
+  , _save_auditor : function(instance){
+
+    var no_change = false
+      , auditor_role
+      ;
+
+    Permission.refresh(); //Creating an audit creates new contexts.  Make sure they're reflected client-side
+
+    if(typeof instance.auditor === 'undefined'){
+      return instance;
+    }
+    // Find the Auditor user role
+    return CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
+      if(roles.length === 0) {
+        console.warn("No Auditor role");
+        return new $.Deferred().reject();
+      }
+      auditor_role = roles[0];
+
+      return CMS.Models.UserRole.findAll({
+        context_id__in: instance.context.id,
+        role_id__in: auditor_role.id
+      });
+    }).then(function(auditor_roles){
+      return $.when.apply($,
+        can.map(auditor_roles, function(role){
+          if(typeof instance.auditor !== "undefined" &&
+              instance.auditor != null &&
+              role.person.id === instance.auditor.id) {
+            // Auditor hasn't changed
+            no_change = true;
+            return $.when();
+          }
+          return role.refresh().then(function(role){role.destroy();});
+      }));
+    }).then(function(){
+      if(!instance.auditor || no_change){
+        return $.when();
+      }
+      return $.when(new CMS.Models.UserRole({
+        context : instance.context,
+        role : auditor_role,
+        person : instance.auditor
+      }).save());
+    }).then(function(){
       instance.attr('_redirect',
         instance.program.reify().viewLink + "#audit_widget/audit/" + instance.id);
       return instance;
@@ -366,7 +417,10 @@ can.Model.Cacheable("CMS.Models.Response", {
     var found = false;
     if (this.shortName !== 'Response')
       return this._super(params);
-    if (!params)
+    if (!params 
+        || (params instanceof CMS.Models.Response 
+            && params.constructor !== CMS.Models.Response
+       ))
       return params;
     params = this.object_from_resource(params);
     if (!params.selfLink) {
@@ -423,7 +477,8 @@ can.Model.Cacheable("CMS.Models.Response", {
       , model : can.Model.Cacheable
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-      , allow_mapping : true
+      , allow_mapping : false
+      , allow_creating: false
       , exclude_option_types : function() {
         var types = {
           "DocumentationResponse" : "Document"
@@ -436,18 +491,24 @@ can.Model.Cacheable("CMS.Models.Response", {
       model : "Document"
       , mapping : "documents"
       , show_view : GGRC.mustache_path + "/documents/pbc_tree.mustache"
+      , allow_mapping: false
+      , allow_creating: false
     }, {
       //3: Meeting participants
       model : "Person"
       , mapping : "people"
       , show_view : GGRC.mustache_path + "/people/tree.mustache"
       , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
+      , allow_mapping: false
+      , allow_creating: false
     }, {
       //2: Meetings
       model : "Meeting"
       , mapping : "meetings"
       , show_view : GGRC.mustache_path + "/meetings/tree.mustache"
       , footer_view : GGRC.mustache_path + "/meetings/tree_footer.mustache"
+      , allow_mapping: false
+      , allow_creating: false
     }]
   }
 }, {

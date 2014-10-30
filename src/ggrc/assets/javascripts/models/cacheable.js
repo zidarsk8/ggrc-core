@@ -112,6 +112,26 @@ can.Model("can.Model.Cacheable", {
   , title_singular : ""
   , title_plural : ""
   , findOne : "GET {href}"
+  , makeDestroy: function(destroy) {
+    return function(id, instance) {
+      return destroy(id).then(function(result) {
+        if ("background_task" in result) {
+          return CMS.Models.BackgroundTask.findOne(
+            {id: result.background_task.id}
+          ).then(function(task) {
+            if (!task) {
+              return;
+            }
+            return task.poll();
+          }).then(function() {
+            return instance;
+          });
+        } else {
+          return instance;
+        }
+      });
+    };
+  }
   , makeFindAll: function(finder) {
       return function(params, success, error) {
         var deferred = $.Deferred()
@@ -338,16 +358,21 @@ can.Model("can.Model.Cacheable", {
               : new model({
                   context : obj.context
                 });
-            if(binding.loader.object_attr) {
-              inst.attr(binding.loader.object_attr, obj.stub());
-            }
-            if(binding.loader.option_attr) {
-              inst.attr(binding.loader.option_attr, pj.what.stub());
-            }
-            if(pj.extra) {
-              inst.attr(pj.extra);
-            }
-            dfds.push(inst.save());
+            dfds.push(
+              $.when(pj.what !== inst && pj.what.isNew() ? pj.what.save() : null)
+               .then(function() {
+                if(binding.loader.object_attr) {
+                  inst.attr(binding.loader.object_attr, obj.stub());
+                }
+                if(binding.loader.option_attr) {
+                  inst.attr(binding.loader.option_attr, pj.what.stub());
+                }
+                if(pj.extra) {
+                  inst.attr(pj.extra);
+                }
+                return inst.save();
+              })
+            );
           } else if(pj.how === "remove") {
             can.map(binding.list, function(bound_obj) {
               if(bound_obj.instance === pj.what || bound_obj.instance[binding.loader.option_attr] === pj.what) {

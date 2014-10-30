@@ -15,9 +15,11 @@
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
 
-        <div class="item-data {{#is_dashboard}}span3{{else}}span7{{/is_dashboard}}" style="padding-left:0px;">
+        <div class="{{#is_dashboard}}span2{{else}}span6{{/is_dashboard}}" style="padding-left:0px;">
           <div class="tree-title-area">
-            <span class="tier-trigger"></span>{{instance.title}}
+            <div class="oneline">
+              <span class="tier-trigger"></span>{{instance.title}}
+            </div>
           </div>
         </div>
 
@@ -26,7 +28,7 @@
           {{#using instance=instance.cycle_task_group_object}}
             {{#using object=instance.object}}
 
-              <div class="item-data span2">
+              <div class="span2">
                 <div class="oneline">
                   <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
                   <span class="tiny-data">
@@ -42,7 +44,7 @@
             {{#using workflow=cycle.workflow}}
 
 
-              <div class="item-data span2">
+              <div class="span2">
                 <div class="oneline">
                   <span class="tiny-data" rel="tooltip" title="Workflow title">
                     {{workflow.title}}
@@ -55,7 +57,7 @@
 
         {{/is_dashboard}}
 
-        <div class="span5">
+        <div class="span6">
           <ul class="tree-action-list tasks-action">
             <li>
               <div class="date">
@@ -165,7 +167,7 @@
             <h6>Response Options</h6>
             {{! here we need to start a quick form or other componenet}}
             <ggrc-quick-update instance="instance">
-              <select name="selected_response_options.0">
+              <select name="selected_response_options.0" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}}>
                 {{#each instance.response_options}}
                   <option value="{{.}}" {{#if_equals instance.selected_response_options.0 this}}selected="selected"{{/if_equals}}>{{.}}</option>
                 {{/each}}
@@ -178,7 +180,7 @@
               {{#each instance.response_options}}
               <div class="row-fluid">
                 <div class="span12">
-                  <input type="checkbox" multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}checked="checked"{{/in_array}}> {{.}}
+                  <input type="checkbox" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}} multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}checked="checked"{{/in_array}}> {{.}}
                 </div>
               </div>
               {{/each}}

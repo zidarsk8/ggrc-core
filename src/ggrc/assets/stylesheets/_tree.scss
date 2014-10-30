@@ -45,6 +45,11 @@ ul.new-tree {
       padding-left: 0;
     }
   }
+  &.simple-list {
+    li {
+      padding-left: 20px;
+    }
+  }
   &.request-list,
   &.responses-list {
     .short-field {
@@ -441,6 +446,9 @@ ul.new-tree {
     line-height:31px;
     min-height:31px;
     background:#fafafa;
+    &:last-child {
+      border-bottom: none;
+    }
     &.object-filter {
       background: #b7b7b7;
       span {
@@ -669,6 +677,9 @@ ul.new-tree {
     .wrap250 { float:left; min-width:250px; }
     .wrap300 { float:left; min-width:300px; }
     */
+    .tree-progress {
+      margin-right: 20px;
+    }
   }
   &.colored-list {
     > li.tree-item {
@@ -691,8 +702,11 @@ ul.new-tree {
         }
       }
       &:last-child {
-        padding-bottom: 1px;
-        border-bottom: 1px solid #ccc !important;
+        > .item-main {
+          .row-fluid {
+            border-bottom: none;
+          }
+        }
       }
       &.tree-item-add {
         padding: 0 0 0 20px;
@@ -1090,6 +1104,14 @@ ul.new-tree {
         select {
           margin-bottom: 0;
         }
+      }
+    }
+  }
+  .custom-state {
+    ul.new-tree {
+      li.tree-item {
+        margin-left: 0;
+        margin-right: 0;
       }
     }
   }
