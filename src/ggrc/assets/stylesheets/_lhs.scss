@@ -387,7 +387,6 @@
     li {
       position: relative;
       float: left;
-      margin-bottom: -1px;
       @include background-size(368px 416px);
       &.inner-nav-button {
         text-align: center;
@@ -432,9 +431,8 @@
       display: block;
       line-height: 29px;
       font-size: 13px;
-      color: $tabTitle;
-      border: 1px solid transparent;
-      @include transition(background 0.2s ease, color 0.2s ease);
+      color: $gray;
+      @include transition(color 0.2s ease);
       position: relative;
       .closed {
         display: none;
@@ -451,8 +449,8 @@
         cursor: pointer;
       }
       &:hover {
-        background: $tabHoverBgnd;
-        color: $white;
+        color: $black;
+        background: none;
         text-decoration: none;
         i {
           @include opacity(1);
@@ -487,7 +485,7 @@
     }
     i {
       margin-top: 6px;
-      @include opacity(0.55);
+      @include opacity(0.4);
     }
     li.hidden-widgets-list {
       a.dropdown-toggle {
@@ -498,16 +496,13 @@
     }
     li.active {
       a {
-        color: $subTitle;
-        background-color: $white;
-        border: 1px solid $tabBorder;
-        border-bottom-color: transparent;
+        color: $black;
         i {
           @include opacity(1);
         }
         &:hover {
-          background: $tabHoverBgnd;
-          color: $white;
+          color: $black;
+          background: none;
         }
       }
     }
@@ -580,6 +575,11 @@
         }
       }
     }
+  }
+  .close-nav {
+    float: right;
+    margin-right: 21px;
+    margin-top: 6px;
   }
 }
 

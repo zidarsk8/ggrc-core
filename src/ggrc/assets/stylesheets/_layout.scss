@@ -31,7 +31,7 @@
 
 .lhs-holder {
   position:fixed;
-  top:30px;
+  top:48px;
   left:0;
   width:240px;
   height:500px;
@@ -41,11 +41,12 @@
   margin-left:248px;
 }
 .header-content {
-  height:50px;
-  line-height:50px;
+  height:47px;
+  line-height:47px;
   position:fixed;
-  top: 30px;
+  top: 48px;
   width:100%;
+  border-bottom: 1px solid $headerBorder;
 }
 /* Inner nav dont exist anymore. It is moved up to top-inner-nav
 .inner-nav {
@@ -61,15 +62,17 @@
   width: 100%;
   position: fixed;
   z-index: 1;
-  top: 80px;
-  border-bottom: 1px solid $tabBorder;
+  top: 66px;
+  background: $tabBgnd;
+  @include box-shadow(inset 1px 4px 9px -6px rgba(0,0,0,0.4));
 }
 .object-area {
   position:fixed;
-  top: 130px;
+  top: 96px;
   overflow-y:auto;
   overflow-x:hidden;
   height:445px;
+  padding-top: 20px;
   background: $contentBgnd;
   &.import-area {
     margin-left:0;

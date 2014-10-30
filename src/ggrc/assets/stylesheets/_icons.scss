@@ -260,12 +260,16 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-alarm { background-position: -342px -80px; }
 .grcicon-reset { background-position: -342px -128px; }
 .grcicon-close-tab { background-position: -342px -176px; }
+.grcicon-close-red { background-position: -342px -272px; }
 .grcicon-warning { background-position:-174px -8px }
 
 // Large icons
 .grciconlarge-dashboard { background-position:-8px -8px; }
 .grciconlarge-dashboard-white { background-position:-8px -40px; }
 .grciconlarge-arrow-left { background-position: -40px -8px; }
+
+.grciconlarge-nav-trigger { background-position: -72px -8px; }
+.grciconlarge-nav-trigger-active { background-position: -72px -40px; }
 
 .showhide {
   background-position:-198px -56px;
@@ -511,13 +515,6 @@ i.short {
 .internav {
   // turns icons to black
   @extend %black-icons;
-
-  li {
-    a:hover {
-      // turned icons to white
-      @extend %white-icons;
-    }
-  }
 
   &.innernav-arrow {
     li.accordion-group-inner {

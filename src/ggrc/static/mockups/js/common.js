@@ -721,6 +721,21 @@ $(document).ready(function(){
     e.stopPropagation();
   });
 
+  $(".nav-trigger").on("click", function() {
+    var $this = $(this),
+        $nav = $this.closest("body").find(".top-inner-nav"),
+        $content = $this.closest("body").find(".object-area");
+    if($this.hasClass("active")) {
+      $this.removeClass("active");
+      $nav.animate({top: "66"}, 300, "linear");
+      $content.animate({top: "96"}, 300, "linear");
+    } else {
+      $this.addClass("active");
+      $nav.animate({top: "96"}, 300, "linear");
+      $content.animate({top: "126"}, 300, "linear");
+    }
+  });
+
 });
 
 // Make sure the windows are resized properly
@@ -749,13 +764,13 @@ function resize_areas() {
   winWidth = $window.width();
   lhsHeight = winHeight - 70;
   footerMargin = lhsHeight;
-  internavHeight = lhsHeight - 100;
+  internavHeight = lhsHeight - 86;
   lhsWidth = $lhsHolder.width();
   lhsSearchWidth = $lhsSearch.width() - 29;
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
   objectWidth = winWidth - lhsWidth - internavWidth - barWidth;
-  headerWidth = winWidth - lhsWidth;
+  headerWidth = winWidth - lhsWidth - barWidth - 20;
 
   $lhsHolder.css("height",lhsHeight);
   $bar.css("height",lhsHeight);

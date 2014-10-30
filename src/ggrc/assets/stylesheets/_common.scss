@@ -11,9 +11,11 @@ body {
 
 // typography
 h1 {
-  color:$headerTitle;
-  font-size:$f-headline;
-  line-height:36px;
+  color: $headerTitle;
+  font-size: 24px;
+  line-height: 48px;
+  font-family: $fontTitle;
+  font-weight: normal;
   span {
     color: $disabled;
     font-weight: normal;
@@ -70,7 +72,7 @@ h1, h2, h3, h4, h5, h6 {
     color:$controls;
   }
   &.entities {
-    color:$entities;
+    color:$black;
   }
   &.workflow {
     color:$programs;
