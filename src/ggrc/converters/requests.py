@@ -7,11 +7,14 @@
 from .base import *
 from ggrc import db
 from ggrc.login import get_current_user
-from ggrc.models import Audit, Program, Request
+from ggrc.models.context import Context
+from ggrc.models import Audit, Program, Request, AuditObject
 from .base_row import *
 
 from collections import OrderedDict
 from datetime import datetime
+from ggrc.app import app
+
 
 class RequestRowConverter(BaseRowConverter):
   model_class = Request
@@ -26,6 +29,7 @@ class RequestRowConverter(BaseRowConverter):
 
   def reify(self):
     self.handle('slug', SlugColumnHandler)
+    self.handle('control_id', ControlHandler, is_needed_later=True)
     self.handle('objective_id', ObjectiveHandler, is_needed_later=True)
     self.handle('request_type', RequestTypeColumnHandler, is_required=True)
     self.handle('status', StatusColumnHandler, valid_states=Request.VALID_STATES, default_value='Draft')
@@ -45,7 +49,27 @@ class RequestRowConverter(BaseRowConverter):
       self.obj.requestor = get_current_user()
       self.obj.audit = audit
       self.obj.context = audit.context
-      db_session.add(self.obj)
+
+    if getattr(self.obj,'control_id',''):
+      ao = AuditObject.query.filter_by(audit_id=audit_id, auditable_id=self.obj.control_id, auditable_type='Control').first()
+      if ao:
+        self.obj.audit_object=ao
+      else:
+        context = Context.query.filter_by(related_object_id=audit.id, related_object_type='Audit').first()
+        control = Control.query.filter_by(id=self.obj.control_id).first()
+        self.obj.audit_object=AuditObject(audit=audit, auditable=control, context=context)
+        db_session.add(self.obj.audit_object)
+
+    if getattr(self.obj,'objective_id',''):
+      ao = AuditObject.query.filter_by(audit_id=audit_id, auditable_id=self.obj.objective_id, auditable_type='Objective').first()
+      if ao:
+        self.obj.audit_object=ao
+      else:
+        context = Context.query.filter_by(related_object_id=audit.id, related_object_type='Audit').first()
+        objective = Objective.query.filter_by(id=self.obj.objective_id).first()
+        self.obj.audit_object=AuditObject(audit=audit, auditable=objective, context=context)
+        db_session.add(self.obj.audit_object)
+    db_session.add(self.obj)
 
 class RequestsConverter(BaseConverter):
 
@@ -58,6 +82,7 @@ class RequestsConverter(BaseConverter):
     ('Request Code', 'slug'),
     ('Request Type', 'request_type'),
     ('Request Description', 'description'),
+    ('Control Code', 'control_id'),
     ('Objective Code', 'objective_id'),
     ('Notes', 'notes'),
     ('Test', 'test'),

@@ -14,6 +14,7 @@ from ggrc.models.all_models import (
     System, SystemOrProcess,
 )
 from ggrc.models.exceptions import ValidationError
+from ggrc.app import app
 
 
 def unpack_list(vals):
@@ -779,6 +780,50 @@ class ObjectiveHandler(ColumnHandler):
       objective = Objective.query.get(objective_id)
       if objective:
         return objective.slug
+    return ''
+
+
+class ControlHandler(ColumnHandler):
+
+  def parse_item(self, value):
+    # if this slug exists, return the control_id, otherwise throw error
+    if value:
+      
+      control = Control.query.filter_by(slug=value).first()
+      if not control:
+        self.add_error("Control code '{}' does not exist.".format(value))
+      else:
+        return control.id
+    else:
+      if self.options.get('is_needed_later'):
+        self.add_warning("A Control will need to be mapped later")
+      return None
+
+  def export(self):
+    control_id = None
+    
+    if getattr(self.importer.obj, 'audit_object', ''):
+      if 'Control' == self.importer.obj.audit_object.auditable_type:
+        control_id = getattr(self.importer.obj.audit_object, 'auditable_id', '')
+    
+    if control_id:
+      control = Control.query.filter_by(id=control_id).first()
+      return control.slug
+    else:
+      return control_id
+
+  def display(self):
+    
+    # self.importer.obj[self.key] only returns control id
+    # need to return corresponding objective slug or empty string
+    control_id = getattr(self.importer.obj, 'control_id', '')
+    
+    app.logger.info("DISPLAY: self.importer.object is a {}".format(self.importer.obj.__dict__))
+
+    if control_id:
+      control = Control.query.get(control_id)
+      if control:
+        return control.slug
     return ''
 
 
