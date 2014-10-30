@@ -108,6 +108,14 @@
     padding-right: 10px;
     background: $white;
   }
+  &.bare {
+    .content {
+      @include box-shadow(none);
+      background: transparent;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
   &.workflow-info-widget {
     overflow-y: visible;
   }
@@ -1368,20 +1376,44 @@ ul.attr-list {
 .quick-list {
   @include reset-list();
   li {
-    margin: 10px 10px 0 10px;
+    margin-bottom: 5px;
     position: relative;
+    &.top-space {
+      margin-top: 15px;
+    }
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
   [class^="grcicon-"] {
     margin: 6px 0 0 0;
   }
   a {
-    @extend %action-link;
-    font-size: 13px;
-    line-height: 30px;
+    font-size: 16px;
+    line-height: 35px;
+    height: 35px;
+    display: block;
+    background: $white;
+    color: $blue;
+    @include box-shadow(0 2px 2px -1px rgba(0,0,0, 0.3));
+    @include transition (background 0.2s ease, color 0.2s ease);
+    &:hover {
+      text-decoration: none;
+      background: $blue;
+      color: $white;
+    }
   }
-  .divider {
-    background: $darkGray;
-    margin: 14px 0;
+  .icon-wrap {
+    display: inline-block;
+    line-height: 35px;
+    height: 35px;
+    width: 35px;
+    text-align: center;
+    background: $blue;
+    margin-right: 5px;
+    i {
+      margin-top: 9px;
+    }
   }
   .dropdown-menu {
     width: 100%;
