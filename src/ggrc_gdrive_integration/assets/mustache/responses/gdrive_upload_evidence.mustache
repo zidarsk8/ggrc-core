@@ -10,5 +10,5 @@
 <div>
 {{/if_helpers}}
 {{#is_allowed "create" 'ObjectDocument' context=instance.context.id}}
-  {{> /static/mustache/gdrive/gdrive_folder.mustache}}
+  <ggrc-gdrive-folder-picker deferred="true" instance="instance"/>
 {{/is_allowed}}
