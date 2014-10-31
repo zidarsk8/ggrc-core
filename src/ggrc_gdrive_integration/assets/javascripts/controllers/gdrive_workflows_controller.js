@@ -939,7 +939,7 @@ can.Component.extend({
               CANCEL = google.picker.Action.CANCEL;
 
           if (data[ACTION] == PICKED) {
-            files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
+            files = CMS.Models.GDriveFolder.models(data[DOCUMENTS]);
             el.trigger('picked', {
               files: files
             });
@@ -958,13 +958,13 @@ can.Component.extend({
 
       this.scope.attr('_folder_change_pending', true);
       if (el.data('replace')) {
-        if(that.scope.deferred) {
-          if(that.scope.current_folder) {
-            that.scope.instance.mark_for_deletion("folders", that.scope.current_folder);
+        if(scope.deferred) {
+          if(scope.current_folder) {
+            scope.instance.mark_for_deletion("folders", scope.current_folder);
           }
           dfd = $.when();
         } else {
-          dfd = $.when.apply(this, $.map(that.scope.instance.object_folders, function(object_folder) {
+          dfd = $.when.apply(this, $.map(scope.instance.object_folders, function(object_folder) {
             // Remove existing object folders before mapping a new one:
             return object_folder.reify().refresh().then(function(instance) {
               return instance.destroy();
@@ -975,11 +975,11 @@ can.Component.extend({
         dfd = $.when();
       }
       return dfd.then(function() {
-        if(that.scope.deferred) {
+        if(scope.deferred) {
           return $.when.apply(
             $,
             can.map(files, function(file) {
-              that.scope.instance.mark_for_addition("folders", file);
+              scope.instance.mark_for_addition("folders", file);
               return file.refresh();
             })
           );
@@ -987,12 +987,15 @@ can.Component.extend({
           return GGRC.Controllers.GDriveWorkflow.attach_files(
             files,
             el.data('type'),
-            that.scope.instance
+            scope.instance
             );
         }
       }).then(function() {
-        that.scope.attr('_folder_change_pending', false);
+        scope.attr('_folder_change_pending', false);
         scope.attr("current_folder", files[0]);
+        if(scope.deferred && scope.instance._transient) {
+          scope.instance.attr("_transient.folder", files[0]);
+        }
       });
     }
   }
@@ -1012,7 +1015,13 @@ can.Component.extend({
     link_text: null,
     trigger_upload : function(scope, el, ev) {
       var that = this,
-          parent_folder_dfd = this.instance.get_binding("extended_folders").refresh_instances();
+          parent_folder_dfd;
+
+      if(this.instance.attr("_transient.folder")) {
+        parent_folder_dfd = $.when([{ instance: this.instance.attr("_transient.folder") }]);
+      } else {
+        parent_folder_dfd = this.instance.get_binding("extended_folders").refresh_instances();
+      }
 
       function is_own_folder(mapping, instance) {
         if(mapping.binding.instance !== instance)
