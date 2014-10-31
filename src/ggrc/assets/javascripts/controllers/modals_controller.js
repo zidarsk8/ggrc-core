@@ -559,8 +559,6 @@ can.Control("GGRC.Controllers.Modals", {
   , restore_ui_status : function(){
     //walk through the ui_array, for the one values,
     //select the element with tab index and hide it
-    var $form = $(this.element).find('form');
-    $form[0].reset();
 
     if(this.options.reset_visible){//some elements are hidden
       var $selected, str, tabindex;
@@ -658,6 +656,8 @@ can.Control("GGRC.Controllers.Modals", {
       .done (function() {
         // If the modal is closed early, the element no longer exists
         if (that.element) {
+          var $form = $(that.element).find('form');
+          $form.trigger('reset');
           // This is to trigger `focus_first_element` in modal_ajax handling
           that.element.trigger("loaded");
         }
