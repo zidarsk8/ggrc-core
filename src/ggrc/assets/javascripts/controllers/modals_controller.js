@@ -561,8 +561,8 @@ can.Control("GGRC.Controllers.Modals", {
     //select the element with tab index and hide it
 
     if(this.options.reset_visible){//some elements are hidden
-      var $selected, str, tabindex,
-        $form = $(this.element).find('form');
+      var $selected, str, tabindex;
+
       for (var i = 0; i < this.options.ui_array.length; i++){
         if(this.options.ui_array[i] == 1){
           tabindex = i+1;
@@ -620,8 +620,6 @@ can.Control("GGRC.Controllers.Modals", {
           var save_addmore_btn = $(this.element).find("a.btn[data-toggle=modal-submit-addmore]");
           var modal_backdrop = this.element.data("modal_form").$backdrop;
 
-          //this.bindXHRToButton(ajd, save_close_btn);
-          //this.bindXHRToButton(ajd, save_addmore_btn);
           $(save_addmore_btn).addClass("disabled pending-ajax");
           $(save_close_btn).addClass("disabled pending-ajax");
 
@@ -658,6 +656,8 @@ can.Control("GGRC.Controllers.Modals", {
       .done (function() {
         // If the modal is closed early, the element no longer exists
         if (that.element) {
+          var $form = $(that.element).find('form');
+          $form.trigger('reset');
           // This is to trigger `focus_first_element` in modal_ajax handling
           that.element.trigger("loaded");
         }
