@@ -559,10 +559,12 @@ can.Control("GGRC.Controllers.Modals", {
   , restore_ui_status : function(){
     //walk through the ui_array, for the one values,
     //select the element with tab index and hide it
+    var $form = $(this.element).find('form');
+    $form[0].reset();
 
     if(this.options.reset_visible){//some elements are hidden
-      var $selected, str, tabindex,
-        $form = $(this.element).find('form');
+      var $selected, str, tabindex;
+
       for (var i = 0; i < this.options.ui_array.length; i++){
         if(this.options.ui_array[i] == 1){
           tabindex = i+1;
@@ -620,8 +622,6 @@ can.Control("GGRC.Controllers.Modals", {
           var save_addmore_btn = $(this.element).find("a.btn[data-toggle=modal-submit-addmore]");
           var modal_backdrop = this.element.data("modal_form").$backdrop;
 
-          //this.bindXHRToButton(ajd, save_close_btn);
-          //this.bindXHRToButton(ajd, save_addmore_btn);
           $(save_addmore_btn).addClass("disabled pending-ajax");
           $(save_close_btn).addClass("disabled pending-ajax");
 
