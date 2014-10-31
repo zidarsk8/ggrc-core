@@ -723,14 +723,17 @@ $(document).ready(function(){
 
   $(".nav-trigger").on("click", function() {
     var $this = $(this),
+        $tooltip = $this.find("i"),
         $nav = $this.closest("body").find(".top-inner-nav"),
         $content = $this.closest("body").find(".object-area");
     if($this.hasClass("active")) {
       $this.removeClass("active");
+      $tooltip.attr("data-original-title", "Show menu");
       $nav.animate({top: "66"}, 300, "linear");
       $content.animate({top: "96"}, 300, "linear");
     } else {
       $this.addClass("active");
+      $tooltip.attr("data-original-title", "Hide menu");
       $nav.animate({top: "96"}, 300, "linear");
       $content.animate({top: "126"}, 300, "linear");
     }
