@@ -791,7 +791,9 @@
             self.element.trigger('loaded');
             self.element.find(".selector-list").cms_controllers_infinite_scroll();
             setTimeout(function() {
-              self.element.find('#search').focus();
+              if (self.emlement) {
+                self.element.find('#search').focus();
+              }
             }, 200);
           });
 
@@ -1509,7 +1511,9 @@
             self.element.trigger('loaded');
             self.element.find(".results-wrap").cms_controllers_infinite_scroll();
             setTimeout(function() {
-              self.element.find('#search').focus();
+              if (self.emlement) {
+                self.element.find('#search').focus();
+              }
             }, 200);
           });
 
