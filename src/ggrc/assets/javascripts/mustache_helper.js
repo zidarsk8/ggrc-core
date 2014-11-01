@@ -1748,32 +1748,44 @@ Mustache.registerHelper("person_owned", function(owner_id, options) {
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("default_audit_title", function(title, program, options) {
-  var computed_title = title()
-    , computed_program = resolve_computed(program)
-    , default_title
+Mustache.registerHelper("default_audit_title", function(instance, options) {
+  var program, default_title, current_title
     , index = 1
     ;
+    
+    instance = Mustache.resolve(instance);
+    program = instance.attr("program");
+ 
+  if(!instance._transient) {
+    instance.attr("_transient", { default_title : "" });
+  }
 
-  if(typeof computed_program === 'undefined'){
+  if(program == null){
     // Mark the title to be populated when computed_program is defined,
     // returning an empty string here would disable the save button.
-    return 'undefined';
+    instance.attr("title", "");
+    instance.attr("_transient.default_title", instance.title);
+    return;
   }
-  if(typeof computed_title !== 'undefined' && computed_title !== 'undefined'){
-    return computed_title;
+  if(instance._transient.default_title !== instance.title) {
+    return;
   }
-  program = resolve_computed(program) || {title : "program"};
 
-  default_title = new Date().getFullYear() + ": " + program.title + " - Audit";
+  program = program.reify();
 
-  // Count the current number of audits with default_title
-  $.map(CMS.Models['Audit'].cache, function(audit){
-    if(audit.title && audit.title.indexOf(default_title) === 0){
-      index += 1;
-    }
+  new RefreshQueue().enqueue(program).trigger().then(function() {
+
+    default_title = new Date().getFullYear() + ": " + program.title + " - Audit";
+
+    // Count the current number of audits with default_title
+    $.map(CMS.Models['Audit'].cache, function(audit){
+      if(audit.title && audit.title.indexOf(default_title) === 0){
+        index += 1;
+      }
+    });
+    instance.attr("title", new Date().getFullYear() + ": " + program.title + " - Audit " + index);
+    instance.attr("_transient.default_title", instance.title);
   });
-  return new Date().getFullYear() + ": " + program.title + " - Audit " + index;
 });
 
 Mustache.registerHelper('param_current_location', function() {
