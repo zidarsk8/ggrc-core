@@ -1004,15 +1004,16 @@ can.Component.extend({
 
 can.Component.extend({
   tag: "ggrc-gdrive-picker-launcher",
-  template: '<a href="javascript://" class="btn" '
+  template: '<a href="javascript://" class="{{link_class}}" '
             + 'data-object-source="true" data-toggle="evidence-gdrive-picker" '
-            + 'can-click="trigger_upload">{{firstnonempty link_text "Upload Files to GDrive"}}</a>'
+            + 'can-click="trigger_upload">{{firstexist link_text "Upload Files to GDrive"}}</a>'
             + '{{#pending}}<span {{attach_spinner \'{ "radius": 3, "length": 2.5, "width": 2 }\' '
             + '\'display:inline-block; top: -5px; left: 12px;\' }}></span>{{/pending}}',
   scope: {
     instance: null,
     deferred: "@",
-    link_text: null,
+    link_text: "@",
+    link_class: "@",
     trigger_upload : function(scope, el, ev) {
       var that = this,
           parent_folder_dfd;
@@ -1142,6 +1143,13 @@ can.Component.extend({
           });
         });
       });
+    }
+  },
+  events: {
+    init: function() {
+      if(!this.scope.link_class) {
+        this.scope.attr("link_class", "btn");
+      }
     }
   }
 });
