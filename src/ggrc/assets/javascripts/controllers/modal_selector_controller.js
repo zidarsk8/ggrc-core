@@ -1005,9 +1005,9 @@
     , on_select_option: function(el) {
         var instance = el.data('option')
           , page_instance = GGRC.page_instance();
-        
+
         //Check if selected item is page instance:
-        this.context.attr('is_page_instance', 
+        this.context.attr('is_page_instance',
           page_instance.type === instance.type && page_instance.id === instance.id);
         el.closest('.option_column').find('li.tree-item').removeClass('selected');
         el.addClass('selected');
@@ -1030,7 +1030,7 @@
         } else {
           join_instance.save()
             .done(function() {
-              $(document.body).trigger('ajax:flash', 
+              $(document.body).trigger('ajax:flash',
                   { success: that.context.selected_option.constructor.shortName + " mapped successfully."});
               $(that.element).modal_form('hide');
             })
@@ -1259,7 +1259,7 @@
 
       //  If we have duplicate options, we want to use the first, so return
       //    early.
-      //  Also return now if the descriptor is explicitly excluded from the 
+      //  Also return now if the descriptor is explicitly excluded from the
       //    set of descriptors for this modal.
       if (option_descriptors[option_model_name]
           || ~can.inArray(option_model_name, exclude_option_types)
@@ -1324,7 +1324,7 @@
     });
   });
 
-  
+
 
 
 
@@ -1452,9 +1452,9 @@
               function(key) {
                 return CMS.Models[key];
               }
-            ); 
+            );
     }
-    
+
     , init_context: function() {
       if (!this.context) {
         // Calculate the total number of options
@@ -1553,7 +1553,7 @@
             , option_row = option_column.find('li[data-id=' + option.id + ']')
             , check_box = option_row.find('input.object-check-single')
             ;
-          //Select the item and update the map button  
+          //Select the item and update the map button
           check_box.attr('checked','checked');
           self.update_selected_items(check_box);
         });
@@ -1571,7 +1571,7 @@
           }
         });
     }
-    //Over write the parent class method to select the row. 
+    //Over write the parent class method to select the row.
     //The row is selected by selecting the check box
     , ".option_column li.tree-item click": function(el, ev){}
 
@@ -1594,7 +1594,7 @@
     , "input[type=checkbox].object-check-all click": function(el, ev) {
       var $el = $(el)
         , $check = $(this.element).find('.object-check-single:not(:disabled)');
- 
+
       $check.prop('checked', $el.prop('checked'));
       this.update_selected_items(el, ev);
     }
@@ -1602,7 +1602,7 @@
     , reset_selection_count: function(){
         this.context.attr('item_selected', false);
         this.context.attr('items_selected', 0);
-    } 
+    }
 
     , "#search keyup": function(el, ev) {
         if (ev.which == 13) {
@@ -1661,7 +1661,7 @@
           var models = this.options.all_models;
           return GGRC.Models.Search.search_for_types(current_search_term || '', models, permission_parms)
             .then(function (search_result){
-              var options = [], op1, temp ; 
+              var options = [], op1, temp ;
               if (active_fn()) {
                 for(var i = 0; i < models.length; i++){
                   op1 = search_result.getResultsForType(models[i]);
@@ -1724,7 +1724,7 @@
             [selected]
           ).attach(filter_obj.search_filter)
         );
-        
+
       });
       if (cancel_filter) {
         //missing search term.
@@ -1770,7 +1770,7 @@
           self._start_pager(can.map(options, function(op) {
               return op.instance;
             }), 20, active_fn, draw_fn);
-        });        
+        });
 
       } //end filters.length > 0
       else{
@@ -1866,7 +1866,7 @@
                 var obj_set = {};
                 obj_set.multi_map = true;
                 obj_set.arr = obj_arr;
-                
+
                 ////trigger the to add selected objects to task group;
                 that.element.trigger("modal:success", [obj_set, {map_and_save: true}]);
               }
@@ -1917,17 +1917,17 @@
         $check = $(this.element).find('.object-check-single:checked'),
         selected = $check.filter(function() { return !this.disabled; }),
         len = selected.length;
-      
+
       for (var i = 0; i < len; i++){
         var option =  $(selected[i]).closest('li').data('option');
         this.context.selected_options.push(option);
       }
-      
+
       return this.context.selected_options;
     }
 
     , create_join: function() {
-      //If the object type === allObjects, the option descriptor is not set for mapping, so 
+      //If the object type === allObjects, the option descriptor is not set for mapping, so
       //One has to again set option descriptor and then call a mapping
 
       var that = this,
@@ -1965,7 +1965,7 @@
            join = that.context.option_descriptor.get_new_join(
               that.context.selected_object, option, context_id);
           }
-          
+
           return join;
         });
       return joins;
@@ -1979,11 +1979,11 @@
       this.context.attr(el.attr("name"), ui.item);
     }
 
-  }); 
-  
+  });
+
   multiselect_descriptor_view_option = {
     "Person": {
-        column_view : GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache", 
+        column_view : GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache",
         items_view  : GGRC.mustache_path + "/wf_people/people_items.mustache"
     }
   }
@@ -2017,7 +2017,7 @@
 
       //  If we have duplicate options, we want to use the first, so return
       //    early.
-      //  Also return now if the descriptor is explicitly excluded from the 
+      //  Also return now if the descriptor is explicitly excluded from the
       //    set of descriptors for this modal.
       if (option_descriptors[option_model_name]
           || ~can.inArray(option_model_name, exclude_option_types)
@@ -2073,7 +2073,7 @@
 
       options = get_object_multitype_option_set(
         data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
-      
+
       options.selected_object = CMS.Models.get_instance(
           data_set.join_object_type, data_set.join_object_id);
 
@@ -2137,12 +2137,12 @@
       //no op
       this.options.$trigger.trigger("modal:success", [data, options]);
     }
-    
+
     , triggerModalSearch: function(){
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();
       var ctx = this.context;
-      
+
       //Get the selected object value
       var selected = $("select.option-type-selector").val(),
         self = this,
@@ -2150,7 +2150,7 @@
         term = ctx.option_search_term || "",
         filters = [],
         cancel_filter;
-      
+
       this.set_option_descriptor(selected);
 
       ctx.filter_list.each(function(filter_obj) {
@@ -2218,7 +2218,7 @@
         // Object selected count and Add selected button should reset.
         // User need to make their selection again
         this.reset_selection_count();
-        
+
         if (filters.length === 1){
           loader = filters[0];
         }
@@ -2244,7 +2244,7 @@
               return op.instance;
             }), 20, active_fn, draw_fn);
         });
-      } 
+      }
       else {
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
@@ -2258,9 +2258,9 @@
         this.constructor.last_option_search_term = term;
       }
     }
-   
+
   });
-  
+
 
   $(function() {
     $('body').on('click', '[data-toggle="multitype-object-modal-selector"]', function(e) {
@@ -2281,7 +2281,7 @@
       item_view =  GGRC.mustache_path + "/selectors/object_selector_option_items.mustache" ;
       options = get_object_multitype_option_set(
         data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
-      
+
       options.selected_object = data_set.join_object || CMS.Models.get_instance(
           data_set.join_object_type, data_set.join_object_id);
 
@@ -2303,7 +2303,7 @@
     });
   });
 
-  
+
 
 
 })(window.can, window.can.$);
