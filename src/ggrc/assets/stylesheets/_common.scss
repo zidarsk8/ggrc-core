@@ -1117,5 +1117,12 @@ p {
       right: 0;
       left: auto;
     }
+    &.one-item {
+      width: 160px;
+      .inner-nav-item {
+        float: none;
+        clear: both;
+      }
+    }
   }
 }
