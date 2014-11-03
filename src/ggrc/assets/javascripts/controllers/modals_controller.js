@@ -665,6 +665,8 @@ can.Control("GGRC.Controllers.Modals", {
         that.options.instance._transient || that.options.instance.attr("_transient", new can.Observe({}));
         that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
       })
+      .then(this.proxy("apply_object_params"))
+      .then(this.proxy("serialize_form"))
       .then(that.proxy("autocomplete"));
 
     this.restore_ui_status();
