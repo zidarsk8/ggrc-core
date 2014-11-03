@@ -296,14 +296,17 @@ can.Control("GGRC.Controllers.Modals", {
   , "input:not(isolate-form input), textarea:not(isolate-form textarea), select:not(isolate-form select) change" : function(el, ev) {
       this.options.instance.removeAttr("_suppress_errors");
       // Set the value if it isn't a search field
-      if(!el.hasClass("search-icon")){
+      if(!el.hasClass("search-icon")
+        || el.is("[null-if-empty]")
+           && (!el.val() || el.val().length === 0)
+      ) {
         this.set_value_from_element(el);
       }
   }
 
   , "input:not([data-lookup], isolate-form *), textarea keyup" : function(el, ev) {
-      if (el.prop('value').length == 0 ||
-        (typeof el.attr('value') !== 'undefined' && el.attr('value').length == 0)) {
+      if (el.prop('value').length === 0 ||
+        (typeof el.attr('value') !== 'undefined' && el.attr('value').length === 0)) {
         this.set_value_from_element(el);
       }
   }
@@ -320,7 +323,7 @@ can.Control("GGRC.Controllers.Modals", {
       var $el = $(el)
         , name = $el.attr('name')
         , value = $el.val()
-        , that = this;
+        , that = this
         ;
 
       // If no model is specified, short circuit setting values
