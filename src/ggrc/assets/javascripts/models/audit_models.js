@@ -304,6 +304,12 @@ can.Model.Cacheable("CMS.Models.Request", {
     var that = this,
         obj = this.audit_object_object ? this.audit_object_object.reify() : this.audit_object_object,
         matching_objs;
+    if(that.audit_object
+       && (!that.audit_object_object
+           || that.audit_object.reify().auditable.id !== that.audit_object_object.id
+    )) {
+      return;
+    }
     if(obj && (matching_objs = can.map(this.get_mapping("audit_objects_via_audit"), function(mapping) {
       if(mapping.instance === obj)
         return mapping;

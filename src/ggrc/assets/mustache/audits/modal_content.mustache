@@ -101,9 +101,9 @@
       <label class="spacing">
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <input type="checkbox" name="auto_generate" value="checked" tabindex="5">
-        Auto-Generate PBC List based on Objectives 
+        Auto-Generate Requests based on Controls
         <span class="small">
-          <a href="javascript://">({{#using program=instance.program}}{{#with_mapping 'objectives' program}}{{objectives.length}}{{/with_mapping}}{{/using}} Objectives Found)
+          <a href="javascript://">({{#using program=instance.program}}{{#with_mapping 'controls' program}}{{controls.length}}{{/with_mapping}}{{/using}} Controls Found)
           </a>
         </span>
       </label>
