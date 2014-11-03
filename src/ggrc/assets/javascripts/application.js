@@ -1088,6 +1088,22 @@ $(window).load(function(){
 
   });
 
+  // top nav dropdown position
+  function dropdownPosition() {
+    var $this = $(this),
+        $dropdown = $this.closest(".hidden-widgets-list").find(".dropdown-menu"),
+        offset = $this.offset(),
+        win = $(window),
+        winWidth = win.width();
+
+    if(winWidth - offset.left < 322) {
+      $dropdown.addClass("right-pos");
+    } else {
+      $dropdown.removeClass("right-pos");
+    }
+  }
+  $(".dropdown-toggle").on("click", dropdownPosition);
+
 });
 
 jQuery(function($){
