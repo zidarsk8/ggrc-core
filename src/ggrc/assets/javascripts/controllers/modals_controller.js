@@ -757,7 +757,9 @@ can.Control("GGRC.Controllers.Modals", {
         ev.preventDefault();
         return false;
       }
-      delete this.options.instance._pending_joins;
+      if (this.options.instance) {
+        delete this.options.instance._pending_joins;
+      }
       if (this.options.instance instanceof can.Model
           // Ensure that this modal was hidden and not a child modal
           && ev.target === this.element[0]
@@ -985,7 +987,7 @@ can.Component.extend({
       ev.stopPropagation();
 
       can.each(data.arr || [data], function(obj) {
-      
+
         if (that.scope.deferred) {
           that.scope.changes.push({ what: obj, how: "add" });
         } else {
