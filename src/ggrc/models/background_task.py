@@ -102,7 +102,7 @@ def queued_task(func):
     if len(args) > 0 and isinstance(args[0], BackgroundTask):
       task = args[0]
     else:
-      task = BackgroundTask.query.get(request.form.get("task_id"))
+      task = BackgroundTask.query.get(request.values.get("task_id"))
     task.start()
     try:
       result = func(task)
