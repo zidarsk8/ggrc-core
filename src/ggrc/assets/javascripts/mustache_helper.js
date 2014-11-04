@@ -2187,8 +2187,8 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
         , update = Permission.is_allowed("update", instance)
         , map = Permission.is_allowed("mapping", instance)
         , create = Permission.is_allowed("creating", instance)
-        , assignee = instance.assignee.id === GGRC.current_user.id
-        , audit_lead = audit.contact.id === GGRC.current_user.id
+        , assignee = !!instance.assignee && instance.assignee.id === GGRC.current_user.id
+        , audit_lead = !!audit.contact && audit.contact.id === GGRC.current_user.id
         , auditor = can.map(
                       auditors || [],
                       function(auditor) {
