@@ -36,29 +36,28 @@
       _mixins : ["folderable"]
     },
     Audit : {
-      _mixins : ["folderable"]
+      _mixins : ["folderable"],
+      extended_folders: new GGRC.ListLoaders.MultiListLoader(["folders"])
     },
     Request : {
       folders : new GGRC.ListLoaders.CrossListLoader("_audit", "folders"),
-      _audit : new GGRC.ListLoaders.DirectListLoader("Audit", "requests", "audit")
+      _audit : new GGRC.ListLoaders.DirectListLoader("Audit", "requests", "audit"),
+      extended_folders: new GGRC.ListLoaders.MultiListLoader(["folders"])
     },
     DocumentationResponse : {
-      _mixins : ["fileable"],
-      //FIXME when responses get their own folders, remove these list loaders and add the "folderable" mixin --BM 10/24/2014
-      folders: new GGRC.ListLoaders.CrossListLoader("_request", "folders"),
-      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request")
+      _mixins : ["fileable", "folderable"],
+      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request"),
+      folders_via_request: new GGRC.ListLoaders.CrossListLoader("_request", "extended_folders"),
+      extended_folders: new GGRC.ListLoaders.MultiListLoader(["folders", "folders_via_request"])
     },
     InterviewResponse : {
-      _mixins : ["fileable"],
-      //FIXME when responses get their own folders, remove these list loaders and add the "folderable" mixin --BM 10/24/2014
-      folders: new GGRC.ListLoaders.CrossListLoader("_request", "folders"),
-      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request")
+      _mixins : ["fileable", "folderable"],
     },
     PopulationSampleResponse : {
-      _mixins : ["fileable"],
-      //FIXME when responses get their own folders, remove these list loaders and add the "folderable" mixin --BM 10/24/2014
-      folders: new GGRC.ListLoaders.CrossListLoader("_request", "folders"),
-      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request")
+      _mixins : ["fileable", "folderable"],
+      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request"),
+      folders_via_request: new GGRC.ListLoaders.CrossListLoader("_request", "extended_folders"),
+      extended_folders: new GGRC.ListLoaders.MultiListLoader(["folders", "folders_via_request"])
     },
     Document : {
       _mixins : ["fileable"]
@@ -104,7 +103,8 @@
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
 
-  GGRC.register_hook("Audit.tree_view_info", GGRC.mustache_path + "/gdrive/gdrive_folder.mustache");
+  can.view.mustache("picker-tag-default", "<ggrc-gdrive-folder-picker instance='instance'/>");
+  GGRC.register_hook("Audit.tree_view_info", "picker-tag-default");
 
 
   $.extend(true, CMS.Models.Document.attributes, {
@@ -114,7 +114,9 @@
 
   //CMS.Models.Response.tree_view_options.child_options[1].show_view = GGRC.mustache_path + "/responses/gdrive_evidence_tree.mustache";
   GGRC.register_hook('DocumentationResponse.modal_connector', GGRC.mustache_path + "/responses/gdrive_upload_evidence.mustache");
-  //We are no longer mapping GDrive files directly to responses.  It makes it difficult to figure out which GDrive file is which
+  can.view.mustache("picker-tag-readonly", "<ggrc-gdrive-folder-picker instance='instance' readonly='true'/>");
+  GGRC.register_hook("DocumentationResponse.tree_evidence", "picker-tag-readonly");
+    //We are no longer mapping GDrive files directly to responses.  It makes it difficult to figure out which GDrive file is which
   // document when we go to present. however, this functionality is still supported.
 
 
