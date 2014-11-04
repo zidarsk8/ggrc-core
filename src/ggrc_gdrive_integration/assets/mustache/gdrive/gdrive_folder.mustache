@@ -10,11 +10,11 @@
               <i class="grcicon-attach-color"></i> {{current_folder.title}}
             </a>
             {{^if readonly}}
-            <a href="javascript://" rel="tooltip" data-original-title="{{firstnonempty placeholder 'Choose a new folder'}}" data-toggle="gdrive-picker" data-model="{{instance.class.model_singular}}" data-id="{{instance.id}}" data-type="folders" data-replace="true" class="entry-attachment">
+            <a class="icon-link" href="javascript://" rel="tooltip" data-original-title="{{firstnonempty placeholder 'Choose a new folder'}}" data-toggle="gdrive-picker" data-model="{{instance.class.model_singular}}" data-id="{{instance.id}}" data-type="folders" data-replace="true" class="entry-attachment">
               <i class="grcicon-edit"></i>
             </a>
 
-            <a href="javascript://" rel="tooltip" data-original-title="Detach folder from {{instance.class.title_singular}}" data-toggle="gdrive-remover"
+            <a class="icon-link" href="javascript://" rel="tooltip" data-original-title="Detach folder from {{instance.class.title_singular}}" data-toggle="gdrive-remover"
               data-model="{{instance.class.model_singular}}" data-id="{{instance.id}}">
               <i class="grcicon-deleted"></i>
             </a>
