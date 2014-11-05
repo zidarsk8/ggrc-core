@@ -1110,6 +1110,20 @@ $(window).load(function(){
   }
   $(".dropdown-toggle").on("click", dropdownPosition);
 
+  // Search field active state
+  $('.widgetsearch').filter(function() {
+    return this.value;
+  }).addClass('active');
+  $(".widgetsearch").on("keyup", function() {
+    var $this = $(this);
+
+    if($this.val().trim() !== "") {
+      $this.addClass("active");
+    } else {
+      $this.removeClass("active");
+    }
+  });
+
 });
 
 jQuery(function($){
