@@ -185,6 +185,7 @@
     },
 
     response_options_csv: can.compute(function(val) {
+      val = Mustache.resolve(val);
       if(val != null) {
         this.attr("response_options", $.map(val.split(","), $.proxy("".trim.call, "".trim)));
       } else {
