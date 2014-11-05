@@ -588,6 +588,25 @@ can.Control("GGRC.Controllers.Modals", {
     }
 
   }
+  //make buttons non-clickable when saving, make it disable afterwards
+  ,  bindXHRToButton_disable : function(xhr, el, newtext, disable) {
+      // binding of an ajax to a click is something we do manually
+      var $el = $(el)
+      , oldtext = $el.text();
+
+      if(newtext) {
+        $el[0].innerHTML = newtext;
+      }
+      $el.addClass("disabled pending-ajax");
+      if (disable !== false) {
+        $el.attr("disabled", true);
+      }
+      xhr.always(function() {
+        // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
+        $el.removeAttr("disabled").removeClass("disabled pending-ajax")[0].innerHTML = oldtext;
+        $el.addClass("disabled");
+      });
+    }
 
   //make buttons non-clickable when saving
   , bindXHRToBackdrop : function(xhr, el, newtext, disable) {
@@ -617,21 +636,21 @@ can.Control("GGRC.Controllers.Modals", {
     // Normal saving process
     if (el.is(':not(.disabled)')) {
       ajd = this.save_instance(el, ev);
+      var save_close_btn = $(this.element).find("a.btn[data-toggle=modal-submit]");
+      var save_addmore_btn = $(this.element).find("a.btn[data-toggle=modal-submit-addmore]");
+      var modal_backdrop = this.element.data("modal_form").$backdrop;
       if(this.options.add_more) {
         if(ajd) {
-          var save_close_btn = $(this.element).find("a.btn[data-toggle=modal-submit]");
-          var save_addmore_btn = $(this.element).find("a.btn[data-toggle=modal-submit-addmore]");
-          var modal_backdrop = this.element.data("modal_form").$backdrop;
-
-          $(save_addmore_btn).addClass("disabled pending-ajax");
-          $(save_close_btn).addClass("disabled pending-ajax");
+          this.bindXHRToButton_disable(ajd, save_close_btn);
+          this.bindXHRToButton_disable(ajd, save_addmore_btn);
 
           this.bindXHRToBackdrop(ajd, modal_backdrop, "Saving, please wait...");
         }
       }
       else {
         if(ajd) {
-          this.bindXHRToButton(ajd, el, "Saving, please wait...");
+          this.bindXHRToButton(ajd, save_close_btn, "Saving, please wait...");
+          this.bindXHRToButton(ajd, save_addmore_btn);
         }
       }
 
