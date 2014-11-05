@@ -591,10 +591,10 @@ can.Control("GGRC.Controllers.Modals", {
   //make buttons non-clickable when saving, make it disable afterwards
   ,  bindXHRToButton_disable : function(xhr, el, newtext, disable) {
       // binding of an ajax to a click is something we do manually
-      var $el = $(el)
-      , oldtext = $el.text();
+      var $el = $(el),
+          oldtext = $el.text();
 
-      if(newtext) {
+      if (newtext) {
         $el[0].innerHTML = newtext;
       }
       $el.addClass("disabled pending-ajax");
@@ -632,13 +632,14 @@ can.Control("GGRC.Controllers.Modals", {
     }
 
   , triggerSave : function(el, ev) {
-    var ajd;
+    var ajd,
+        save_close_btn = this.element.find("a.btn[data-toggle=modal-submit]"),
+        save_addmore_btn = this.element.find("a.btn[data-toggle=modal-submit-addmore]"),
+        modal_backdrop = this.element.data("modal_form").$backdrop;
     // Normal saving process
     if (el.is(':not(.disabled)')) {
       ajd = this.save_instance(el, ev);
-      var save_close_btn = $(this.element).find("a.btn[data-toggle=modal-submit]");
-      var save_addmore_btn = $(this.element).find("a.btn[data-toggle=modal-submit-addmore]");
-      var modal_backdrop = this.element.data("modal_form").$backdrop;
+
       if(this.options.add_more) {
         if(ajd) {
           this.bindXHRToButton_disable(ajd, save_close_btn);
