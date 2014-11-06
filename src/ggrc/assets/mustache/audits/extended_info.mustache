@@ -31,7 +31,7 @@
       <p>
         {{#if instance.contact}}
           {{#using contact=instance.contact}}
-          {{{firstnonempty contact.name contact.email}}
+          {{firstnonempty contact.name contact.email}}
           {{/using}}
         {{else}}
           Not assigned
