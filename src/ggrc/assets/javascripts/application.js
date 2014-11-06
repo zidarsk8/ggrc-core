@@ -1114,15 +1114,6 @@ $(window).load(function(){
   $('.widgetsearch').filter(function() {
     return this.value;
   }).addClass('active');
-  $(".widgetsearch").on("keyup", function() {
-    var $this = $(this);
-
-    if($this.val().trim() !== "") {
-      $this.addClass("active");
-    } else {
-      $this.removeClass("active");
-    }
-  });
 
 });
 

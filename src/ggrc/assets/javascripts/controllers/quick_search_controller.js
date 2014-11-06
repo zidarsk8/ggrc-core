@@ -225,6 +225,14 @@ can.Control("CMS.Controllers.LHN", {
       }
     }
 
+  , ".widgetsearch keyup": function(el, ev) {
+      if(el.val().trim() !== "") {
+        el.addClass("active");
+      } else {
+        el.removeClass("active");
+      }
+    }
+
   , "input.my-work click": function(el, ev) {
       var target = $(ev.target),
           checked;
