@@ -1109,12 +1109,6 @@ $(window).load(function(){
     }
   }
   $(".dropdown-toggle").on("click", dropdownPosition);
-
-  // Search field active state
-  $('.widgetsearch').filter(function() {
-    return this.value;
-  }).addClass('active');
-
 });
 
 jQuery(function($){

@@ -298,6 +298,9 @@ can.Control("CMS.Controllers.LHN", {
           } else {
             initial_scroll();
           }
+          self.element.find('.widgetsearch').filter(function() {
+            return this.value;
+          }).addClass('active');
         });
         self.size = prefs[0].getLHNavSize(null, "lhs");
         self.resize_lhn(self.size);
