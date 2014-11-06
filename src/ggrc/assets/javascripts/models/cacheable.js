@@ -845,7 +845,11 @@ can.Model("can.Model.Cacheable", {
           return (v && typeof v.save === "function") ? v.stub().serialize() : (v.serialize ? v.serialize() : v);
         });
       } else if(typeof val !== 'function') {
-        serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
+        if(that[name] && that[name].isComputed) {
+          serial[name] = val && val.serialize ? val.serialize() : val;
+        } else {
+          serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
+        }
       }
     });
     return serial;
