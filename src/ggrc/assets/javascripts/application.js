@@ -1109,7 +1109,6 @@ $(window).load(function(){
     }
   }
   $(".dropdown-toggle").on("click", dropdownPosition);
-
 });
 
 jQuery(function($){
