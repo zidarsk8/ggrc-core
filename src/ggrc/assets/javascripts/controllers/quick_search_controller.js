@@ -298,6 +298,7 @@ can.Control("CMS.Controllers.LHN", {
           } else {
             initial_scroll();
           }
+          // Set active state to search field if the input is not empty:
           self.element.find('.widgetsearch').filter(function() {
             return this.value;
           }).addClass('active');
