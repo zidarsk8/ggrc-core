@@ -354,7 +354,7 @@ can.Control("CMS.Controllers.LHN", {
         $lhs_label_right = $(".lhs-search .my-work-right"),
         $lhs_label = $(".lhs-search .my-work-label"),
         lhn_second_row = 201,
-        max_width = window.innerWidth - 30;
+        max_width = window.outerWidth / 2 - 4;
 
     if(resize < 40 && !$lhs.hasClass("lhs-closed")) {
       this.toggle_lhs(no_trigger);
