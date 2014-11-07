@@ -9,23 +9,7 @@ ul.new-tree {
   @include reset-list();
   .openclose {
     cursor: pointer;
-    .row-fluid {
-      &:hover {
-        background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-        @include background-size(30px 6px);
-        .counter {
-          @include opacity(1);
-        }
-      }
-    }
     &.active {
-      position: relative;
-      border-bottom:1px solid #eee;
-      z-index: 1000;
-      font-weight:bold;
-      .row-fluid {
-        background:$white;
-      }
       .tier-trigger {
         background: image-url('grcicons/open.png') no-repeat 20px center;
         @include background-size(17px 12px);
@@ -437,12 +421,42 @@ ul.new-tree {
   }
 
   li.tree-item {
-    border-bottom: 1px solid $itemBorder;
     min-height: 30px;
-    padding: 6px 0 11px 0;
     line-height: 24px;
+    > .item-wrap {
+      padding: 6px 0 11px 0;
+      margin: 0 10px;
+      border-bottom: 1px solid $itemBorder;
+    }
+    > .item-main {
+      background: $white;
+      > .openclose {
+        &:hover {
+          background: $itemBorder image-url("bgnds/hover.png") no-repeat 50% bottom;
+          @include background-size(30px 6px);
+          .counter {
+            @include opacity(1);
+          }
+        }
+        > .item-wrap {
+          margin: 0 10px;
+          padding-top: 6px;
+          padding-bottom: 11px;
+          border-bottom: 1px solid $itemBorder;
+        }
+      }
+    }
     &:last-child {
-      border-bottom: none;
+      > .item-wrap {
+        border-bottom: none;
+      }
+      > .item-main {
+        > .openclose {
+          > .item-wrap {
+            border-bottom: none;
+          }
+        }
+      }
     }
     &.object-filter {
       background: #b7b7b7;
@@ -515,10 +529,6 @@ ul.new-tree {
     .task-done {
       font-size: 13px;
       color: $green;
-    }
-    &.tree-item-open {
-      @include box-shadow(inset 0 0 8px #bbb);
-      background:#fff;
     }
     .inner-item-count {
       padding-right: 20px;
@@ -1018,45 +1028,30 @@ ul.new-tree {
   }
   // reduce visibility of closed tree-items
   &.tree-open {
-    > li.tree-item {
-      background:#eee;
-      .tree-title-area {
+    li.tree-item {
+      background: $white;
+      > .item-main {
         @include opacity(0.5);
       }
       &.item-open {
-        .tree-title-area {
+        > .item-main {
           @include opacity(1);
+          > .openclose {
+            > .item-wrap {
+              border-bottom: none;
+            }
+          }
         }
+        background: transparent;
         .inner-item-count {
           @include opacity(1);
         }
       }
     }
-    ul.tree-open {
-      > li.tree-item {
-        background:#eee;
-        .tree-title-area {
-          @include opacity(0.5);
-        }
-        &.item-open {
-          .tree-title-area {
-            @include opacity(1);
-          }
-        }
-      }
-      ul.tree-open {
-        > li.tree-item {
-          background:#eee;
-          .tree-title-area {
-            @include opacity(0.5);
-          }
-          &.item-open {
-            .tree-title-area {
-              @include opacity(1);
-            }
-          }
-        }
-      }
+  }
+  &.tree-one {
+    li.tree-item {
+      background: $white;
     }
   }
   // end
@@ -1117,15 +1112,14 @@ ul.new-tree {
 }
 
 .tier-2-info {
-  display:none;
-  &.content-open {
-    background:#fff;
-    padding-bottom:20px;
-  }
+  display: none;
+  margin: 10px 0;
 }
 .tier-2-info-content {
-  padding:0 20px;
-  position:relative;
+  padding: 0 20px;
+  position: relative;
+  background: $white;
+  @include box-shadow(0px 8px 8px -8px rgba(0,0,0, 0.6), 0px -8px 8px -8px rgba(0,0,0, 0.5));
   .tier-2-code {
     color: #777;
     font-style: italic;
