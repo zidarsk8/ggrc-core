@@ -43,7 +43,7 @@
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
       @include background-size(368px 416px);
-      background-position:-268px -195px;
+      background-position: -340px -315px;
       padding-left: 23px;
       font-size:12px;
     }
@@ -1020,4 +1020,13 @@ label {
 // My work radio button
 input[type="radio"].my-work {
   margin-top: -4px;
+}
+
+// Widgetsearch active state
+.widgetsearch {
+  &.active {
+    background-color: #dcedc8;
+    border: 1px solid #8bc34a;
+    background-position: -340px -3px !important;
+  }
 }

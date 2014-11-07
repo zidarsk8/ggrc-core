@@ -603,8 +603,10 @@ can.Control("GGRC.Controllers.Modals", {
       }
       xhr.always(function() {
         // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-        $el.removeAttr("disabled").removeClass("disabled pending-ajax")[0].innerHTML = oldtext;
-        $el.addClass("disabled");
+        if ($el.length) {
+          $el.removeAttr("disabled").removeClass("disabled pending-ajax")[0].innerHTML = oldtext;
+          $el.addClass("disabled");
+        }
       });
     }
 
