@@ -278,7 +278,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , after_save: function() {
     var that = this;
-    
+
     new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
       return new RefreshQueue().enqueue(audits[0].program).trigger();
     }).then(function(programs) {
@@ -363,6 +363,8 @@ can.Model.Cacheable("CMS.Models.Response", {
       this.bind("created", refresh_request);
       this.bind("destroyed", refresh_request);
     }
+
+    this.validateNonBlank("description");
   }
   , create : "POST /api/responses"
   , update : "PUT /api/responses/{id}"
@@ -374,8 +376,8 @@ can.Model.Cacheable("CMS.Models.Response", {
     var found = false;
     if (this.shortName !== 'Response')
       return this._super(params);
-    if (!params 
-        || (params instanceof CMS.Models.Response 
+    if (!params
+        || (params instanceof CMS.Models.Response
             && params.constructor !== CMS.Models.Response
        ))
       return params;
