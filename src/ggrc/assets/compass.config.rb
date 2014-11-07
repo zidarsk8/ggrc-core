@@ -16,6 +16,9 @@
 # ..
 #   compass watch -c assets/compass.config.rb
 
+# cache inside the VM, to not overload the host's filesystem - http://stackoverflow.com/questions/19124367/rails-app-on-percise32-vagrant-box-assets-get-text-file-busy-error-errnoe
+cache_path = "/tmp/.sass-cache"
+
 sass_options = {
   :debug_info => true,
   }
