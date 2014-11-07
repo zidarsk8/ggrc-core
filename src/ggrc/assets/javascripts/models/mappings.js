@@ -546,6 +546,7 @@
       , authorizations_via_audits: Cross("audits", "authorizations")
       , context: Direct("Context", "related_object", "context")
       , contexts_via_audits: Cross("audits", "context")
+      , program_authorized_people: Cross("context", "authorized_people")
       , authorization_contexts: Multi(["context", "contexts_via_audits"])
       , authorizations_via_contexts: Cross("authorization_contexts", "user_roles")
       , authorizations: Cross("authorization_contexts", "user_roles")
