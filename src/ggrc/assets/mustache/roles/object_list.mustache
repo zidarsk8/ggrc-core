@@ -12,7 +12,7 @@
       <div class="simple-link">
         <div class="row-fluid">
           <div class="span12">
-            
+
             <ul class="tree-action-list">
               {{#scope}}
                 <li>
@@ -25,7 +25,7 @@
                   </div>
                 </li>
               {{/scope}}
-              {{^if_match scope 'System|Admin'}}
+              {{^if_match scope 'System|Admin|Workflow'}}
                 <li>
                   <div class="counter">
                     <a data-object-plural="roles" data-object-singular="Role" data-object-id="{{id}}" data-modal-class="modal-wide" data-placement="left" data-toggle="role-modal" href="javascript://" rel="tooltip" title="Edit">
@@ -35,13 +35,13 @@
                 </li>
               {{/if_match}}
             </ul>
-            
+
             <div class="item-data">
               <div class="tree-title-area">
                 {{name}}
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
