@@ -14,8 +14,10 @@ can.Model("GGRC.Models.Search", {
   , search_for_types : function(str, types, params) {
     if ((!str || str.trim().length == 0) && (!params || params.length == 0))
       // Empty search, so actually hit normal endpoints instead of search
+      // This returns a search instance which will search across all given types.
       return this.load_via_model_endpoints(types);
     else
+      // This returns a Search instance, NOT a model instance.
       return this.findOne($.extend({q : str, types : types.join(",") }, params));
   }
   , counts : function(str, params) {
