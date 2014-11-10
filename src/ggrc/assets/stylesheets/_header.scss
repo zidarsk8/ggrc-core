@@ -48,7 +48,6 @@
     text-decoration:none;
   }
   .logo {
-		padding-left: 20px;
     h2 {
       font-family: $fontTitle;
       font-size: 18px;
@@ -247,6 +246,18 @@
           }
         }
       }
+    }
+  }
+  .lhn-trigger {
+    display: inline-block;
+    width: 16px;
+    margin: 16px 20px 0 20px;
+    .icon-bar {
+      display: block;
+      margin-bottom: 3px;
+      height: 3px;
+      background: #757575;
+      width: 100%;
     }
   }
 }

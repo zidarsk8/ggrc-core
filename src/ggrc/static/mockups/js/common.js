@@ -729,13 +729,42 @@ $(document).ready(function(){
     if($this.hasClass("active")) {
       $this.removeClass("active");
       $tooltip.attr("data-original-title", "Show menu");
-      $nav.animate({top: "66"}, 300, "linear");
+        $nav.animate({top: "66"}, 300, "linear");
       $content.animate({top: "96"}, 300, "linear");
     } else {
       $this.addClass("active");
       $tooltip.attr("data-original-title", "Hide menu");
       $nav.animate({top: "96"}, 300, "linear");
       $content.animate({top: "126"}, 300, "linear");
+    }
+  });
+
+  $(".lhn-trigger").on("click", function() {
+    var $this = $(this),
+        $lhn = $this.closest("body").find(".lhs-holder"),
+        $lhn_bar = $this.closest("body").find(".bar-v"),
+        win_width = $window.width(),
+        lhs_width = win_width - 248,
+        $area = $this.closest("body").find(".area"),
+        $header = $this.closest("body").find(".header-content"),
+        $top_nav = $this.closest("body").find(".top-inner-nav"),
+        $object_area = $this.closest("body").find(".object-area");
+    if($this.hasClass("active")) {
+      $this.removeClass("active");
+      $lhn.animate({left: "0"});
+      $lhn_bar.animate({left: "240"}, 300);
+      //$area.animate({marginLeft: "248"}, 300, "linear");
+      $header.animate({width: lhs_width}, 300);
+      $top_nav.animate({width: lhs_width}, 300);
+      $object_area.animate({width: lhs_width}, 300);
+    } else {
+      $this.addClass("active");
+      $lhn.animate({left: "-240"}, 300);
+      $lhn_bar.animate({left: "-8"}, 300);
+      //$area.animate({marginLeft: "0"}, 300, "linear");
+      $header.animate({width: winWidth}, 300);
+      $top_nav.animate({width: winWidth}, 300);
+      $object_area.animate({width: winWidth}, 300);
     }
   });
 
@@ -772,11 +801,17 @@ function resize_areas() {
   lhsSearchWidth = $lhsSearch.width() - 29;
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
-  objectWidth = winWidth - lhsWidth - internavWidth - barWidth;
-  headerWidth = winWidth - lhsWidth - barWidth - 20;
+  //objectWidth = winWidth - lhsWidth - internavWidth - barWidth;
+  objectWidth = winWidth;
+  //headerWidth = winWidth - lhsWidth - barWidth - 20;
+  headerWidth = winWidth - 20;
 
-  $lhsHolder.css("height",lhsHeight);
-  $bar.css("height",lhsHeight);
+  $lhsHolder
+    .css("height",lhsHeight)
+    .css("width", "0");
+  $bar
+    .css("height",lhsHeight)
+    .css("left","-8px");
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);
@@ -786,6 +821,7 @@ function resize_areas() {
     .css("margin-left",internavWidth)
     .css("height",internavHeight)
     .css("width",objectWidth);
+  $area.css("margin-left", "0");
 }
 
 // Grid View Example

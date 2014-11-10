@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
   can.Component.extend({
-    tag: "reporting",
+    tag: "dashboard",
     scope: {
     },
     template: "<content/>",
