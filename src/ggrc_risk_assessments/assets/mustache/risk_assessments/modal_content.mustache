@@ -39,7 +39,7 @@
         Risk Manager
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
-      <input tabindex="3" class="input-block-level" name="ra_manager.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist manager.email ''}}" />
+      <input tabindex="3" class="input-block-level" name="ra_manager.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="text" value="{{firstexist manager.email ''}}" />
       {{/using}}
       <br>
     </div>
@@ -49,7 +49,7 @@
         Risk Counsel
         <i class="grcicon-help-black" rel="tooltip" title="This is the counsel in charge of this {{model_singular}}."></i>
       </label>
-      <input tabindex="3" class="input-block-level" name="ra_counsel.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist counsel.email ''}}" />
+      <input tabindex="3" class="input-block-level" name="ra_counsel.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="text" value="{{firstexist counsel.email ''}}" />
       {{/using}}
       <br>
     </div>
