@@ -22,14 +22,10 @@
     <div class="row-fluid">
       <div class="span6">
         <div class="spacing-bottom">
-          <label {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }' 'display:inline-block; top: -5px; margin-left: 5px;' }}>
+          <label>
             Program
           </label>
-          <select class="input-block-level" name="program.id" tabindex="1" autofocus>
-            {{#all 'Program' '{ "context_id__null" : false, "require_permission": "update" }'}}
-            <option value="{{id}}">{{title}}</option>
-            {{/all}}
-          </select>
+          <input type="text" class="input-block-level" name="program.id" tabindex="1" {{autocomplete_select}} data-lookup="Program" autofocus/>
         </div>
       </div>
     </div>
