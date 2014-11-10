@@ -44,7 +44,7 @@
             <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
-          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-params="Person:is_enabled=1" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
           {{/using}}
         </div>
       </div>
@@ -57,7 +57,7 @@
             <i class="grcicon-help-black" rel="tooltip" title="Point of contact for this object"></i>
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
-          <input tabindex="4" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
+          <input tabindex="4" class="input-block-level" name="contact.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
           {{/using}}
         </div>
       </div>
