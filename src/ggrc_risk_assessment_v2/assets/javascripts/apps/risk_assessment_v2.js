@@ -107,7 +107,7 @@
     };
 
     can.each(_risk_object_types, function (type) {
-      if (type === "Control" || type === "Section" ) {
+      if (["Control", "Section", "Objective"].indexOf(type) > -1) {
         mappings[type] = {
           _canonical: {
             "related_objects": ['Risk', 'ThreatActor']
