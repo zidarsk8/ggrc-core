@@ -81,7 +81,7 @@ function report_progress(str, xhr) {
     var flash = {}
     , container_string = "<div class='audit-status'>"
     , head_string = "<div class='audit-status-head'>"
-    , list_bridge = "[Click to open]</div><ul class='flash-expandable'>"
+    , list_bridge = " [Click to open]</div><ul class='flash-expandable'>"
     , closer = "</ul></div></div>"
     , successes = [container_string + head_string + "Actions completed successfully." + list_bridge]
     , failures = [container_string + head_string + "There were errors." + list_bridge]
