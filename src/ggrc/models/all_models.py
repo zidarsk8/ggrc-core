@@ -42,7 +42,7 @@ from .program_directive import ProgramDirective
 from .project import Project
 from .relationship import Relationship, RelationshipType
 from .request import Request
-from .response import Response, DocumentationResponse, InterviewResponse, PopulationSampleResponse
+from .response import Response, DocumentationResponse, InterviewResponse
 from .meeting import Meeting
 from .background_task import BackgroundTask
 from .notification import NotificationConfig, Notification, NotificationObject, NotificationRecipient
@@ -103,7 +103,6 @@ all_models = [
   Response,
     DocumentationResponse,
     InterviewResponse,
-    PopulationSampleResponse,
   SectionBase,
     Section,
     Clause,

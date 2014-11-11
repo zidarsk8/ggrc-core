@@ -289,10 +289,8 @@
           ])
       , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
       , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
-      , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")
       , related_responses:                      Multi(["related_documentation_responses"
                                                 , "related_interview_responses"
-                                                , "related_population_sample_responses"
                                                 ])
       , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
       , programs: Proxy(
@@ -481,7 +479,7 @@
         "related_objects_as_source" : [
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
-          "Program", "DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"
+          "Program", "DocumentationResponse", "InterviewResponse"
           ]
       }
       , related_objects_as_source: Proxy(
@@ -507,10 +505,8 @@
 
       , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
       , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
-      , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")
       , related_responses:                      Multi(["related_documentation_responses"
                                                 , "related_interview_responses"
-                                                , "related_population_sample_responses"
                                                 ])
       , related_requests_via_related_responses: Cross("related_responses", "_request")
       , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
@@ -814,10 +810,8 @@
       , related_owned_requests: TypeFilter("related_owned_objects", "Request")
       , related_owned_documentation_responses: TypeFilter("related_owned_objects", "DocumentationResponse")
       , related_owned_interview_responses: TypeFilter("related_owned_objects", "InterviewResponse")
-      , related_owned_population_sample_responses: TypeFilter("related_owned_objects", "PopulationSampleResponse")
       , related_owned_responses: Multi(["related_owned_documentation_responses"
                                       , "related_owned_interview_responses"
-                                      , "related_owned_population_sample_responses"
                                       ])
 
       , related_mapped_objects: CustomFilter("related_objects", function(result) {
@@ -853,16 +847,14 @@
       , related_mapped_requests: TypeFilter("related_mapped_objects", "Request")
       , related_mapped_documentation_responses: TypeFilter("related_mapped_objects", "DocumentationResponse")
       , related_mapped_interview_responses: TypeFilter("related_mapped_objects", "InterviewResponse")
-      , related_mapped_population_sample_responses: TypeFilter("related_mapped_objects", "PopulationSampleResponse")
       , related_mapped_responses: Multi(["related_mapped_documentation_responses"
                                       , "related_mapped_interview_responses"
-                                      , "related_mapped_population_sample_responses"
                                       ])
       , extended_related_objects: Cross("requests", "extended_related_objects")
     }
     , Request : {
         _canonical : {
-            "responses" : ["DocumentataionResponse", "InterviewResponse", "PopulationSampleResponse"]
+            "responses" : ["DocumentationResponse", "InterviewResponse"]
           , "_audit" : "Audit"
         }
       , responses: Direct("Response", "request", "responses")
@@ -874,11 +866,10 @@
       , _objective: TypeFilter("audit_object_object", "Objective")
       , documentation_responses : TypeFilter("responses", "DocumentationResponse")
       , interview_responses : TypeFilter("responses", "InterviewResponse")
-      , population_sample_responses : TypeFilter("responses", "PopulationSampleResponse")
       , related_objects_via_responses : Cross("responses", "business_objects")
       , extended_related_objects: Multi(["related_objects_via_responses"])
       , orphaned_objects : Multi(["responses"])
-      //, responses : Multi(["documentation_responses", "interview_responses", "population_sample_responses"])
+      //, responses : Multi(["documentation_responses", "interview_responses"])
     }
 
     , response : {
@@ -900,14 +891,6 @@
       , _mixins : ["response"]
       , meetings: Direct("Meeting", "response", "meetings")
       , business_objects : Multi(["related_objects", "controls", "documents"])
-    }
-    , PopulationSampleResponse : {
-      _canonical : {
-        "population_samples" : "PopulationSample"
-      }
-      , _mixins : ["response"]
-      , business_objects : Multi(["related_objects", "controls", "people", "documents"])
-      , population_samples : Direct("PopulationSample", "response", "population_samples")
     }
     , Meeting : {
       _mixins : ["personable"]

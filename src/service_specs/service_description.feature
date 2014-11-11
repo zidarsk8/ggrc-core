@@ -47,7 +47,6 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
 #      | Response           |
       | DocumentationResponse    |
       | InterviewResponse        |
-      | PopulationSampleResponse |
       | Section            |
       | SectionObjective   |
       | SystemOrProcess    |

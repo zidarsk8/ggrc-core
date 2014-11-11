@@ -387,7 +387,6 @@ $(function() {
               Document : false
             , DocumentationResponse : false
             , InterviewResponse : false
-            , PopulationSampleResponse : false
           }
       }
 

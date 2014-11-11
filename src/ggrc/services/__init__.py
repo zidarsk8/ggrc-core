@@ -64,7 +64,6 @@ def contributed_services():
     service('responses', models.Response),
       service('documentation_responses', models.DocumentationResponse),
       service('interview_responses', models.InterviewResponse),
-      service('population_sample_responses', models.PopulationSampleResponse),
     service('revisions', models.Revision, ReadOnlyResource),
     service('section_bases', models.SectionBase, ReadOnlyResource),
       service('sections', models.Section),

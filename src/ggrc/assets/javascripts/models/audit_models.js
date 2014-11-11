@@ -586,27 +586,6 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
   }
 });
 
-CMS.Models.Response("CMS.Models.PopulationSampleResponse", {
-  root_object : "population_sample_response"
-  , root_collection : "population_sample_responses"
-  , create : "POST /api/population_sample_responses"
-  , update : "PUT /api/population_sample_responses/{id}"
-  , findAll : "GET /api/population_sample_responses"
-  , findOne : "GET /api/population_sample_responses/{id}"
-  , destroy : "DELETE /api/population_sample_responses/{id}"
-  , attributes : {}
-  , init : function() {
-    this._super && this._super.apply(this, arguments);
-    can.extend(this.attributes, CMS.Models.Response.attributes);
-    this.cache = CMS.Models.Response.cache;
-  }
-  , process_args : function(args, names) {
-    var params = this._super(args, names);
-    params[this.root_object].response_type = "population sample";
-    return params;
-  }
-}, {});
-
 can.Model.Cacheable("CMS.Models.Meeting", {
   root_collection : "meetings"
   , root_object : "meeting"

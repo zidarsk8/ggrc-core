@@ -32,7 +32,6 @@ permissions = {
         "ObjectSection",
         "Option",
         "OrgGroup",
-        "PopulationSample",
         "Product",
         "ProgramControl",
         "ProgramDirective",
@@ -88,7 +87,6 @@ permissions = {
         "ObjectSection",
         "Option",
         "OrgGroup",
-        "PopulationSample",
         "Product",
         "ProgramControl",
         "ProgramDirective",
@@ -233,7 +231,7 @@ permissions = {
             },
             "condition": "contains"
         },
-        "PopulationSample",
+        "PopulationSample",  # TODO remove
         {
             "type": "Product",
             "terms": {
@@ -431,7 +429,7 @@ permissions = {
             },
             "condition": "contains"
         },
-        "PopulationSample",
+        "PopulationSample",  # TODO remove
         {
             "type": "Product",
             "terms": {
