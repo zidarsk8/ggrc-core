@@ -431,13 +431,6 @@ ul.new-tree {
     > .item-main {
       background: $white;
       > .openclose {
-        &:hover {
-          background: $itemBorder image-url("bgnds/hover.png") no-repeat 50% bottom;
-          @include background-size(30px 6px);
-          .counter {
-            @include opacity(1);
-          }
-        }
         > .item-wrap {
           margin: 0 10px;
           padding-top: 6px;

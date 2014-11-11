@@ -251,13 +251,17 @@
   .lhn-trigger {
     display: inline-block;
     width: 16px;
-    margin: 16px 20px 0 20px;
+    margin: 16px 20px 0 24px;
+    @include transition-duration(0.3s);
     .icon-bar {
       display: block;
       margin-bottom: 3px;
       height: 3px;
       background: #757575;
       width: 100%;
+    }
+    &.active {
+      @include rotate(90deg);
     }
   }
 }
@@ -280,11 +284,18 @@
       line-height: 36px;
       vertical-align: middle;
     }
+    i {
+      margin-top: 10px;
+      margin-right: 8px;
+    }
   }
   .nav-trigger {
     float: right;
     margin-right: 20px;
     margin-top: 11px;
+    i {
+      margin: 0;
+    }
     &.active {
       .grciconlarge-nav-trigger { background-position: -72px -40px; }
     }

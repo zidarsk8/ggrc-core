@@ -4,11 +4,9 @@
     <div class="row-fluid">
       <div id="page-header" class="span12">
         <h1 class="entities">
-          <div class="grcobject entities" rel="tooltip" data-placement="bottom" title="Person">
-            <i class="grcicon-person"></i>
-          </div>
+          <i class="grciconlarge-dashboard-new" rel="tooltip" data-placement="bottom" title="Person"></i>
           My Dashboard
-          <a class="nav-trigger" href="#"><i class="grciconlarge-nav-trigger" rel="tooltip" data-placement="left" title="Show menu"></i></a>
+          <a class="nav-trigger active" href="#"><i class="grciconlarge-nav-trigger" rel="tooltip" data-placement="left" title="Hide menu"></i></a>
         </h1>
       </div>
     </div>
@@ -619,48 +617,50 @@
                     <section class="content">
                       <ul class="tree-structure new-tree">
                         <li class="filter-wrap">
-                          <form>
-                            <div class="row-fluid">
-                              <div class="span9">
-                                <ul>
-                                  <li>
-                                    <label>
-                                      Status
-                                    </label>
-                                    <select name="status" class="input-small">
-                                      <option value="" selected="true">Any</option>
-                                      <option>Draft</option>
-                                      <option>Requested</option>
-                                      <option>Responded</option>
-                                      <option>Amended Request</option>
-                                      <option>Updated Response</option>
-                                      <option>Accepted</option>
-                                    </select>
-                                  </li>
-                                  <li>
-                                    <input type="text" class="input-medium" placeholder="Filter by Object">
-                                  </li>
-                                  <li>
-                                    <input type="text" class="input-medium" placeholder="Filter by Workflow">
-                                  </li>
-                                  <li>
+                          <div class="filter-border">
+                            <form>
+                              <div class="row-fluid">
+                                <div class="span9">
+                                  <ul>
+                                    <li>
+                                      <label>
+                                        Status
+                                      </label>
+                                      <select name="status" class="input-small">
+                                        <option value="" selected="true">Any</option>
+                                        <option>Draft</option>
+                                        <option>Requested</option>
+                                        <option>Responded</option>
+                                        <option>Amended Request</option>
+                                        <option>Updated Response</option>
+                                        <option>Accepted</option>
+                                      </select>
+                                    </li>
+                                    <li>
+                                      <input type="text" class="input-medium" placeholder="Filter by Object">
+                                    </li>
+                                    <li>
+                                      <input type="text" class="input-medium" placeholder="Filter by Workflow">
+                                    </li>
+                                    <li>
+                                      <label class="checkbox-inline">
+                                        <input class="checkbox" type="checkbox">
+                                        Overdue only
+                                      </label>
+                                    </li>
+                                  </ul>
+                                </div>
+                                <div class="span3">
+                                  <div class="pull-right">
                                     <label class="checkbox-inline">
                                       <input class="checkbox" type="checkbox">
-                                      Overdue only
+                                      Show history
                                     </label>
-                                  </li>
-                                </ul>
-                              </div>
-                              <div class="span3">
-                                <div class="pull-right">
-                                  <label class="checkbox-inline">
-                                    <input class="checkbox" type="checkbox">
-                                    Show history
-                                  </label>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </form>
+                            </form>
+                          </div>
                         </li>
                         <li class="tree-item">
                           <div class="item-main">

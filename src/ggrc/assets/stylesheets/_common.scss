@@ -1068,11 +1068,14 @@ p {
 }
 
 .filter-wrap {
-  border-bottom: 1px solid $itemBorder;
-  padding: 12px 0 4px 0;
   background: $white;
-  form {
+  .filter-border {
+    border-bottom: 1px solid $itemBorder;
+    padding: 12px 0 4px 0;
     margin: 0 10px;
+  }
+  form {
+    margin: 0;
   }
   label {
     font-size: 12px;

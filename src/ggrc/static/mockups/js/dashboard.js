@@ -11,5 +11,5 @@ $(document).ready(function() {
     }
   });
 
-  $(".area").html(can.view("/static/mockups/mustache/dashboard.mustache",{}));
+  $(".dashboard-wrap").html(can.view("/static/mockups/mustache/dashboard.mustache",{}));
 });

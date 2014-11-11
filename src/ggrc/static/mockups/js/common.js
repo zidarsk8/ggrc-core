@@ -721,57 +721,65 @@ $(document).ready(function(){
     e.stopPropagation();
   });
 
-  $(".nav-trigger").on("click", function() {
+  // Top navigation show/hide
+  function topNav() {
     var $this = $(this),
         $tooltip = $this.find("i"),
         $nav = $this.closest("body").find(".top-inner-nav"),
-        $content = $this.closest("body").find(".object-area");
+        $lhn_nav = $this.closest("body").find(".lhs-holder"),
+        $content = $this.closest("body").find(".object-area"),
+        $fake_merge = $content.add($lhn_nav);
     if($this.hasClass("active")) {
       $this.removeClass("active");
       $tooltip.attr("data-original-title", "Show menu");
-        $nav.animate({top: "66"}, 300, "linear");
-      $content.animate({top: "96"}, 300, "linear");
+      $nav.animate({top: "66"}, 300, "linear");
+      $fake_merge.animate({top: "96"}, 300, "linear");
     } else {
       $this.addClass("active");
       $tooltip.attr("data-original-title", "Hide menu");
       $nav.animate({top: "96"}, 300, "linear");
-      $content.animate({top: "126"}, 300, "linear");
+      $fake_merge.animate({top: "126"}, 300, "linear");
     }
-  });
+  }
 
-  $(".lhn-trigger").on("click", function() {
-    var $this = $(this),
+  // LHN show/hide
+  function lhnAnimate() {
+    var win_width = $(window).width(),
+        lhs_width = win_width - 248,
+        header_width = lhs_width - 20,
+        $this = $(this),
         $lhn = $this.closest("body").find(".lhs-holder"),
         $lhn_bar = $this.closest("body").find(".bar-v"),
-        win_width = $window.width(),
-        lhs_width = win_width - 248,
-        $area = $this.closest("body").find(".area"),
-        $header = $this.closest("body").find(".header-content"),
-        $top_nav = $this.closest("body").find(".top-inner-nav"),
         $object_area = $this.closest("body").find(".object-area");
     if($this.hasClass("active")) {
       $this.removeClass("active");
-      $lhn.animate({left: "0"});
-      $lhn_bar.animate({left: "240"}, 300);
-      //$area.animate({marginLeft: "248"}, 300, "linear");
-      $header.animate({width: lhs_width}, 300);
-      $top_nav.animate({width: lhs_width}, 300);
-      $object_area.animate({width: lhs_width}, 300);
+      $lhn.animate({left: "-240"}, 300, "linear");
+      $lhn_bar.animate({left: "-8"}, 300, "linear");
+      $object_area.animate({
+        marginLeft: "0",
+        width: win_width
+      }, 300, "linear");
     } else {
       $this.addClass("active");
-      $lhn.animate({left: "-240"}, 300);
-      $lhn_bar.animate({left: "-8"}, 300);
-      //$area.animate({marginLeft: "0"}, 300, "linear");
-      $header.animate({width: winWidth}, 300);
-      $top_nav.animate({width: winWidth}, 300);
-      $object_area.animate({width: winWidth}, 300);
+      $lhn.animate({left: "0"}, 300, "linear");
+      $lhn_bar.animate({left: "240"}, 300, "linear");
+      $object_area.animate({
+        marginLeft: "248",
+        width: lhs_width
+      }, 300, "linear");
     }
-  });
+  }
+
+  $(".nav-trigger").on("click", topNav);
+
+  $(".lhn-trigger").on("click", lhnAnimate);
 
 });
 
 // Make sure the windows are resized properly
+
 jQuery(resize_areas);
+jQuery(".area").css("margin-left", "0");
 jQuery(window).on("resize", resize_areas);
 
 // The function is borrowed from dashboard.js
@@ -808,7 +816,7 @@ function resize_areas() {
 
   $lhsHolder
     .css("height",lhsHeight)
-    .css("width", "0");
+    .css("left", "-240px");
   $bar
     .css("height",lhsHeight)
     .css("left","-8px");
