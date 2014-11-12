@@ -740,6 +740,11 @@ can.Control("GGRC.Controllers.Modals", {
             finish();
           });
         } else {
+          var type = obj.type ? obj.type : '', 
+              name = obj.title ? obj.title : '',
+              msg;
+          msg = "New " + type + " " + name + " added successfully.";
+          $(document.body).trigger("ajax:flash", { success : msg });
           finish();
         }
       }).fail(function(xhr, status) {
