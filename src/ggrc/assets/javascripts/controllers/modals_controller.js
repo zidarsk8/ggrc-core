@@ -564,7 +564,10 @@ can.Control("GGRC.Controllers.Modals", {
     //select the element with tab index and hide it
 
     if(this.options.reset_visible){//some elements are hidden
-      var $selected, str, tabindex;
+      var $selected,
+          str,
+          tabindex,
+          $form = $(this.element).find('form');;
 
       for (var i = 0; i < this.options.ui_array.length; i++){
         if(this.options.ui_array[i] == 1){
