@@ -248,8 +248,11 @@
       }
     }
   }
+  .lhn-trigger-wrap {
+  }
   .lhn-trigger {
     display: inline-block;
+    height: 16px;
     width: 16px;
     margin: 16px 20px 0 24px;
     @include transition-duration(0.3s);
@@ -259,9 +262,25 @@
       height: 3px;
       background: #757575;
       width: 100%;
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
     &.active {
       @include rotate(90deg);
+      @include border-radius(18px);
+      margin: 6px 10px 0 14px;
+      padding: 10px;
+      background: $white;
+      .icon-bar {
+        background: #f60;
+      }
+    }
+    &:hover {
+      @include border-radius(18px);
+      margin: 6px 10px 0 14px;
+      padding: 10px;
+      background: $white;
     }
   }
 }
