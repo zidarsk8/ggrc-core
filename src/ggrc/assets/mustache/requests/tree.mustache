@@ -82,7 +82,6 @@
               {{/if}}
             </div>
             <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-            {{#using audit=instance.audit}}
               {{! taken from responses/tree_footer}}
               {{#if allow_creating}}
               {{^if_equals instance.status 'Draft'}}
@@ -110,6 +109,7 @@
               {{/is_allowed}}}
               {{/if_equals}}
               {{/if}}
+              {{#using audit=instance.audit}}
               {{#with_mapping "authorizations" audit}}
               {{#if_equals instance.status "Draft"}}
                 {{#if_auditor instance}}
@@ -158,7 +158,7 @@
                 <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
               {{/instance._undo.0}}
               {{/with_mapping}}
-            {{/using}}
+              {{/using}}
             </div>
           </div>
         </div>
