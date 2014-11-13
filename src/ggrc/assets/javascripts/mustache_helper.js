@@ -893,7 +893,9 @@ Mustache.registerHelper("person_roles", function(person, scope, options) {
     user_roles_refresh_queue.enqueue(user_roles);
     user_roles_refresh_queue.trigger().then(function() {
       var roles = can.map(can.makeArray(user_roles), function(user_role) {
-              return user_role.role.reify();
+              if (user_role.role) {
+                return user_role.role.reify();
+              }
             })
         , roles_refresh_queue = new RefreshQueue()
         ;
@@ -1752,10 +1754,10 @@ Mustache.registerHelper("default_audit_title", function(instance, options) {
   var program, default_title, current_title
     , index = 1
     ;
-    
+
     instance = Mustache.resolve(instance);
     program = instance.attr("program");
- 
+
   if(!instance._transient) {
     instance.attr("_transient", { default_title : "" });
   }
