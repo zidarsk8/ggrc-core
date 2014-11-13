@@ -80,7 +80,7 @@ def create_task(name, url, queued_task=None, parameters={}):
     taskqueue.add(
         queue_name="ggrc",
         url=url,
-        name=task.name,
+        name="{}_{}".format(task.name, task.id),
         params={'task_id': task.id},
         method=request.method,
         headers=headers)
