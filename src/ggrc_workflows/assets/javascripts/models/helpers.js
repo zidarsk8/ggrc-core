@@ -110,6 +110,7 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
                 sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
                 contact: that.contact,
                 context: wf.context,
+                task_type: "text",
                 title: "Object review for "
                         + that.original_object.constructor.title_singular
                         + ' "' + that.original_object.title + '"'
@@ -134,10 +135,12 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
               return tg.attr("contact", that.contact).save().then(function(tg) {
                 return $.when.apply($, can.map(tg.task_group_tasks.reify(), function(tgt) {
                   return tgt.refresh().then(function(tgt) {
-                    return tgt.attr('contact', that.contact)
-                      .attr('end_date', that.end_date)
-                      .attr('start_date', moment().format('MM/DD/YYYY'))
-                      .save();
+                    return tgt.attr({
+                      'contact': that.contact,
+                      'end_date': that.end_date,
+                      'start_date': moment().format('MM/DD/YYYY'),
+                      'task_type': tgt.task_type || 'text'
+                      }).save();
                   });
                 }));
               });
