@@ -243,6 +243,7 @@
       ctx.filter_list.each(function(filter_obj) {
         if(cancel_filter || !filter_obj.search_filter) {
           cancel_filter = true;
+          $('.advancedSearchButton').removeAttr('disabled');
           return;
         }
         //All Object
@@ -273,6 +274,7 @@
       });
       if(cancel_filter) {
         //missing search term.
+        $('.advancedSearchButton').removeAttr('disabled');
         return;
       }
 
