@@ -432,6 +432,9 @@ ul.new-tree {
       background: $white;
       > .openclose {
         > .item-wrap {
+          @include scale(1);
+          @include opacity(1);
+          @include transition(all .3s ease-in-out);
           margin: 0 10px;
           padding-top: 6px;
           padding-bottom: 11px;
@@ -1024,14 +1027,23 @@ ul.new-tree {
     li.tree-item {
       background: $white;
       > .item-main {
-        @include opacity(0.5);
+        > .openclose {
+          > .item-wrap {
+            @include opacity(0.5);
+            @include scale(0.95);
+            @include transition(all .3s ease-in-out);
+          }
+        }
       }
       &.item-open {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        @include box-shadow(0px 8px 8px -8px rgba(0,0,0, 0.6), 0px -8px 8px -8px rgba(0,0,0, 0.5));
         > .item-main {
-          @include opacity(1);
           > .openclose {
             > .item-wrap {
-              border-bottom: none;
+              @include scale(1);
+              @include opacity(1);
             }
           }
         }
@@ -1106,13 +1118,11 @@ ul.new-tree {
 
 .tier-2-info {
   display: none;
-  margin: 10px 0;
 }
 .tier-2-info-content {
   padding: 0 20px;
   position: relative;
   background: $white;
-  @include box-shadow(0px 8px 8px -8px rgba(0,0,0, 0.6), 0px -8px 8px -8px rgba(0,0,0, 0.5));
   .tier-2-code {
     color: #777;
     font-style: italic;
