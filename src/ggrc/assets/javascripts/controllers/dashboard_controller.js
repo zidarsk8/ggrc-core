@@ -387,7 +387,7 @@ can.Control("CMS.Controllers.InnerNav", {
   , sortable: function() {
       return this.element.sortable({
           placeholder: 'drop-placeholder'
-        , items : "li"
+        , items : "li:not(.hidden-widgets-list)"
         , disabled: true
       })
     }
