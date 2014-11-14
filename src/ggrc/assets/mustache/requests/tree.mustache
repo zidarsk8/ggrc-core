@@ -212,7 +212,7 @@
                 and ^if_auditor" instance _1_include_admin=false "\
                 or #is_allowed" "__GGRC_ADMIN__" instance }}
                 <div class="objective-selector">
-                  <input type="text" name="assignee.name" data-lookup="Person" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty assignee.name assignee.email ''}}">
+                  <input type="text" name="assignee.name" data-lookup="Person" data-params="Person:is_enabled=1" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty assignee.name assignee.email ''}}">
                 </div>
               {{else}}
                 <p class="read-only oneline">

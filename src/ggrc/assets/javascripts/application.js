@@ -1194,7 +1194,7 @@ jQuery(function($){
         minLength: 0,
 
         source: function(request, response) {
-          // Search for the people based on the term
+          // Search based on the term
           var query = request.term || '',
               queue = new RefreshQueue(),
               that = this,
@@ -1273,12 +1273,8 @@ jQuery(function($){
             .search_for_types(
               request.term || '',
               this.options.searchtypes,
-              {
-              // FIXME: Remove or figure out when this is necessary.
-              //{
-              //  __permission_type: 'create'
-              //  , __permission_model: 'Object' + $that.data("lookup")
-              })
+              this.options.search_params
+            )
             .then(function(search_result) {
               var objects = [];
 
@@ -1331,9 +1327,11 @@ jQuery(function($){
             $that = $(this.element),
             base_search = $that.data("lookup"),
             from_list = $that.data("from-list"),
+            search_params = $that.data("params"),
             searchtypes;
 
         this._super.apply(this, arguments);
+        this.options.search_params = {extra_params: search_params};
 
         $that.data("autocomplete-widget-name", this.widgetFullName);
 
