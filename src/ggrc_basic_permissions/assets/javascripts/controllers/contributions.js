@@ -184,7 +184,7 @@
 
     ".object_column li click": "select_object",
     ".option_column li click": "select_option",
-    ".confirm-buttons a.btn-primary click": "change_option",
+    ".confirm-buttons a.btn-primary:not(.disabled) click": "change_option",
 
     init_bindings: function() {
       this.join_list.bind("change", this.proxy("update_active_list"));

@@ -59,16 +59,16 @@ can.Observe("CMS.ModelHelpers.CycleTask", {
 var approval_workflow_errors_compute;
 can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
   defaults : {
-    original_object: null,
+    original_object: null
   }
 }, {
-  save : function() {
+  save: function() {
     var that = this,
         aws_dfd = this.original_object.get_binding("approval_workflows").refresh_list();
     
     return aws_dfd.then(function(aws){
       var ret;
-      if(aws.length < 1) {
+      if (aws.length < 1) {
         ret = $.when(
           new CMS.Models.Workflow({
             frequency: "one_time",
@@ -78,13 +78,13 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
                     + ' "' + that.original_object.title + '"',
             object_approval: true,
             notify_on_change: true,
-            notify_custom_message: "Hello " + that.contact.reify().name + ",\n\n"
+            notify_custom_message: "Hello " + that.contact.reify().name + ",<br/><br/>"
               + GGRC.current_user.name + " (" + GGRC.current_user.email
               + ") asked you to review newly created "
               + that.original_object.constructor.model_singular + ' "' + that.original_object.title
               + '" before ' + moment(that.end_date).format("MM/DD/YYYY") + ". "
-              + "Click <a href='" + window.location.href.replace("#.*$", "#")
-              + "'>here</a> to perform a review.\n\nThanks,\ngGRC Team",
+              + "Click <a href='" + window.location.href.replace(/#.*$/, "#")
+              + "workflows_widget'>here</a> to perform a review.<br/><br/>Thanks,<br/>gGRC Team",
             context: that.original_object.context
           }).save()
         ).then(function(wf) {
@@ -110,9 +110,10 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
                 sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
                 contact: that.contact,
                 context: wf.context,
+                task_type: "text",
                 title: "Object review for "
                         + that.original_object.constructor.title_singular
-                        + ' "' + that.original_object.title + '"',
+                        + ' "' + that.original_object.title + '"'
               }).save(),
               new CMS.Models.TaskGroupObject({
                 task_group: tg,
@@ -134,10 +135,12 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
               return tg.attr("contact", that.contact).save().then(function(tg) {
                 return $.when.apply($, can.map(tg.task_group_tasks.reify(), function(tgt) {
                   return tgt.refresh().then(function(tgt) {
-                    return tgt.attr('contact', that.contact)
-                      .attr('end_date', that.end_date)
-                      .attr('start_date', moment().format('MM/DD/YYYY'))
-                      .save();
+                    return tgt.attr({
+                      'contact': that.contact,
+                      'end_date': that.end_date,
+                      'start_date': moment().format('MM/DD/YYYY'),
+                      'task_type': tgt.task_type || 'text'
+                      }).save();
                   });
                 }));
               });
