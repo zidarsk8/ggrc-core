@@ -453,12 +453,18 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "{$footer} a.btn[data-toggle='modal-submit-addmore'] click" : function(el, ev){
+    if (el.hasClass('disabled')) {
+      return;
+    }
     this.options.attr("add_more", true);
     this.save_ui_status();
     this.triggerSave(el, ev);
   }
 
   , "{$footer} a.btn[data-toggle='modal-submit'] click" : function(el, ev){
+    if (el.hasClass('disabled')) {
+      return;
+    }
     this.options.attr("add_more", false);
     this.triggerSave(el, ev);
   }
