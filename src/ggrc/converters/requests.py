@@ -50,7 +50,7 @@ class RequestRowConverter(BaseRowConverter):
       self.obj.audit = audit
       self.obj.context = audit.context
 
-    if getattr(self.obj,'control_id',''):
+    if audit and ("Control" == audit.object_type) and getattr(self.obj,'control_id',''):
       ao = AuditObject.query.filter_by(audit_id=audit_id, auditable_id=self.obj.control_id, auditable_type='Control').first()
       if ao:
         self.obj.audit_object=ao
@@ -60,7 +60,7 @@ class RequestRowConverter(BaseRowConverter):
         self.obj.audit_object=AuditObject(audit=audit, auditable=control, context=context)
         db_session.add(self.obj.audit_object)
 
-    if getattr(self.obj,'objective_id',''):
+    if audit and ("Objective" == audit.object_type) and getattr(self.obj,'objective_id',''):
       ao = AuditObject.query.filter_by(audit_id=audit_id, auditable_id=self.obj.objective_id, auditable_type='Objective').first()
       if ao:
         self.obj.audit_object=ao
@@ -121,4 +121,3 @@ class RequestsConverter(BaseConverter):
     yield[]
     yield[]
     yield self.object_map.keys()
-
