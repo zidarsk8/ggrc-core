@@ -891,7 +891,7 @@
     }
     , DocumentationResponse : {
       _mixins : ["response"]
-      , business_objects : Multi(["related_objects", "controls", "people"])
+      , business_objects : Multi(["related_objects", "controls", "people", "sections", "clauses"])
     }
     , InterviewResponse : {
         _canonical : {
@@ -899,14 +899,14 @@
         }
       , _mixins : ["response"]
       , meetings: Direct("Meeting", "response", "meetings")
-      , business_objects : Multi(["related_objects", "controls", "documents"])
+      , business_objects : Multi(["related_objects", "controls", "documents", "sections", "clauses"])
     }
     , PopulationSampleResponse : {
       _canonical : {
         "population_samples" : "PopulationSample"
       }
       , _mixins : ["response"]
-      , business_objects : Multi(["related_objects", "controls", "people", "documents"])
+      , business_objects : Multi(["related_objects", "controls", "people", "documents", "sections", "clauses"])
       , population_samples : Direct("PopulationSample", "response", "population_samples")
     }
     , Meeting : {
