@@ -1672,7 +1672,7 @@
                 self.option_list.replace([]);
                 self.option_list.push.apply(self.option_list, options);
                 self._start_pager(options, 20, active_fn, draw_fn);
-                $('.modalSearchButton').removeAttr('disabled');
+                self.element.find('.modalSearchButton').removeAttr('disabled');
               }
             });
         }
@@ -1690,7 +1690,7 @@
               options = search_result.getResultsForType(current_option_model_name);
               self.option_list.push.apply(self.option_list, options);
               self._start_pager(options, 20, active_fn, draw_fn);
-              $('.modalSearchButton').removeAttr('disabled');
+              self.element.find('.modalSearchButton').removeAttr('disabled');
             }
           });
     }
@@ -1699,7 +1699,7 @@
     , ".modalSearchButton:not([disabled]) click": "triggerModalSearch"
 
     , triggerModalSearch: function() {
-      $('.modalSearchButton').attr('disabled','disabled');
+      this.element.find('.modalSearchButton').attr('disabled','disabled');
 
       //Get the selected object value
       var ctx = this.context,
@@ -1709,8 +1709,8 @@
         term = ctx.option_search_term || "",
         filters = [],
         cancel_filter,
-        item_selected = $("select.option-type-selector").val(),
-        search_text = $('.results-wrap span.info');
+        item_selected = this.element.find("select.option-type-selector").val(),
+        search_text = this.element.find('.results-wrap span.info');
 
       // Remove Search Criteria text
       if(search_text.length)
@@ -1724,7 +1724,7 @@
       ctx.filter_list.each(function(filter_obj) {
         if(cancel_filter || !filter_obj.search_filter) {
           cancel_filter = true;
-          $('.modalSearchButton').removeAttr('disabled');
+          self.element.find('.modalSearchButton').removeAttr('disabled');
           return;
         }
         if(selected === "AllObjects") {//create a multi filter
@@ -1754,7 +1754,7 @@
       });
       if(cancel_filter) {
         //missing search term.
-        $('.modalSearchButton').removeAttr('disabled');
+        this.element.find('.modalSearchButton').removeAttr('disabled');
         //Also show a message that the search term should not be empty
         return;
       }
@@ -1811,7 +1811,7 @@
           };
 
           self.option_list.push.apply(self.option_list, options);
-          $('.modalSearchButton').removeAttr('disabled');
+          self.element.find('.modalSearchButton').removeAttr('disabled');
           self._start_pager(can.map(options, function(op) {
               return op.instance;
             }), 20, active_fn, draw_fn);
