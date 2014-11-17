@@ -981,7 +981,7 @@
   &.person-preview {
     overflow: visible;
     height: auto;
-    width: 600px;
+    width: 325px;
   }
 }
 
@@ -1315,8 +1315,7 @@ ul.attr-list {
 
 .popover {
   @include border-radius($default-border-radius);
-  width: 600px;
-  border: 1px solid $infoMessageText;
+  width: 350px;
   .popover-content {
     @include border-radius($default-border-radius);
   }

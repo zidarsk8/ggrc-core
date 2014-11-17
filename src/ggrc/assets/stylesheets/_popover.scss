@@ -53,9 +53,9 @@
     }
   }
   &.top {
-    margin-top: -5px;
+    margin-top: -18px;
     .arrow {
-      bottom: -10px;
+      bottom: -21px;
       left: 50%;
       margin-left: -11px;
       border-top-color: $popOverBorder;
@@ -137,9 +137,9 @@
         }
       }
     }
-    width: 600px;
+    width: 350px;
+    padding: 0;
     background: $popOverBorder;
-    padding: 1px;
     .popover-title {
       color: $darkGray;
       border-bottom: 1px solid $popOverHeaderBorder;
