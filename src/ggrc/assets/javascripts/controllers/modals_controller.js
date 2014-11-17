@@ -752,7 +752,7 @@ can.Control("GGRC.Controllers.Modals", {
           var type = obj.type ? obj.type : '', 
               name = obj.title ? obj.title : '',
               msg;
-          msg = "New " + type + " " + name + " added successfully.";
+          msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
           $(document.body).trigger("ajax:flash", { success : msg });
           finish();
         }
