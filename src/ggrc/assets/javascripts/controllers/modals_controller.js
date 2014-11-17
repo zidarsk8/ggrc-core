@@ -707,9 +707,10 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "save_instance" : function(el, ev) {
-      var that = this
-      , instance = this.options.instance
-      , ajd;
+      var that = this,
+        instance = this.options.instance,
+        ajd,
+        instance_id = instance.id;
 
 
       if(instance.errors()) {
@@ -752,7 +753,11 @@ can.Control("GGRC.Controllers.Modals", {
           var type = obj.type ? obj.type : '', 
               name = obj.title ? obj.title : '',
               msg;
-          msg = "New " + type + " " + name + " added successfully.";
+          if(instance_id === undefined) { //new element
+            msg = "New " + type + " " + name + " added successfully.";
+          } else {
+            msg = name + " modified successfully.";
+          }
           $(document.body).trigger("ajax:flash", { success : msg });
           finish();
         }
