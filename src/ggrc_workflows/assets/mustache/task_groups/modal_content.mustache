@@ -6,6 +6,8 @@
 }}
 
 <form action="javascript://">
+  {{> /static/mustache/base_objects/form_restore.mustache}}
+
   <div class="row-fluid">
     <div class="span8">
       <label>
@@ -32,10 +34,11 @@
   </div>
 
   <div class="row-fluid">
-    <div class="span8">
+    <div class="span8 hidable">
       <label for="program_description">
         Details
         <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
         <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3">{{instance.description}}</textarea>
