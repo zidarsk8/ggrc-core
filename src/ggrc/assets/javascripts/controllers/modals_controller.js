@@ -754,9 +754,9 @@ can.Control("GGRC.Controllers.Modals", {
               name = obj.title ? obj.title : '',
               msg;
           if(instance_id === undefined) { //new element
-            msg = "New " + type + " " + name + " added successfully.";
+            msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
           } else {
-            msg = name + " modified successfully.";
+            msg = "<span class='user-string'>" + name + "</span>" + " modified successfully.";
           }
           $(document.body).trigger("ajax:flash", { success : msg });
           finish();
