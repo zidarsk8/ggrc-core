@@ -729,9 +729,74 @@ $(document).ready(function(){
     e.stopPropagation();
   });
 
+  // Top navigation show/hide
+  function topNav() {
+    var options = {
+          duration: 800,
+          easing: 'easeOutExpo'
+        },
+        $this = $(this),
+        $tooltip = $this.find("i"),
+        $nav = $this.closest("body").find(".top-inner-nav"),
+        $lhn_nav = $this.closest("body").find(".lhs-holder"),
+        $content = $this.closest("body").find(".object-area"),
+        $fake_merge = $content.add($lhn_nav);
+    if($this.hasClass("active")) {
+      $this.removeClass("active");
+      $tooltip.attr("data-original-title", "Show menu");
+      $nav.animate({top: "66"}, options);
+      $fake_merge.animate({top: "96"}, options);
+    } else {
+      $this.addClass("active");
+      $tooltip.attr("data-original-title", "Hide menu");
+      $nav.animate({top: "96"}, options);
+      $fake_merge.animate({top: "126"}, options);
+    }
+  }
+
+  // LHN show/hide
+  function lhnAnimate() {
+    var options = {
+          duration: 800,
+          easing: 'easeOutExpo'
+        },
+        win_width = $(window).width(),
+        remain_width = win_width - 248,
+        $this = $(this),
+        $lhn = $this.closest("body").find(".lhs-holder"),
+        lhn_width = $lhn.width() - 20,
+        $lhn_bar = $this.closest("body").find(".bar-v"),
+        $object_area = $this.closest("body").find(".object-area"),
+        $lhs_search = $this.closest("body").find(".lhs-search");
+    if($this.hasClass("active")) {
+      $this.removeClass("active");
+      $lhn.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
+      $lhn_bar.removeClass("active").animate({left: "-8"}, options);
+      $object_area.removeClass("active").animate({
+        marginLeft: "0",
+        width: win_width
+      }, options);
+      $lhs_search.removeClass("active").css("width", "220px");
+      $lhs_search.find(".widgetsearch").css("width", "191px");
+    } else {
+      $this.addClass("active");
+      $lhn.addClass("active").animate({left: "0"}, options);
+      $lhn_bar.addClass("active").animate({left: "240"}, options);
+      $object_area.addClass("active").animate({
+        marginLeft: "248",
+        width: remain_width
+      }, options);
+      $lhs_search.addClass("active");
+    }
+  }
+
+  $(".nav-trigger").on("click", topNav);
+  $(".lhn-trigger").on("click", lhnAnimate);
+
 });
 
 // Make sure the windows are resized properly
+
 jQuery(resize_areas);
 jQuery(window).on("resize", resize_areas);
 
@@ -744,38 +809,57 @@ function resize_areas() {
   $window = $(window);
   $lhs = $(".lhs");
   $lhsHolder = $(".lhs-holder");
+  $lhsHolderActive = $(".lhs-holder.active");
   $footer = $(".footer");
   $header = $(".header-content");
   $innerNav = $(".inner-nav");
   $objectArea = $(".object-area");
+  $objectAreaActive = $(".object-area.active");
   $topNav = $(".top-inner-nav");
   $area = $(".area");
   $bar = $(".bar-v");
+  $barActive = $(".bar-v.active");
   $lhsSearch = $(".lhs-search");
+  $lhsSearchActive = $(".lhs-search.active");
 
   winHeight = $window.height();
   winWidth = $window.width();
   lhsHeight = winHeight - 70;
   footerMargin = lhsHeight;
-  internavHeight = lhsHeight - 100;
+  internavHeight = lhsHeight - 86;
   lhsWidth = $lhsHolder.width();
   lhsSearchWidth = $lhsSearch.width() - 29;
+  lhsSearchWidthActive = $lhsSearchActive.width() - 29;
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
-  objectWidth = winWidth - lhsWidth - internavWidth - barWidth;
-  headerWidth = winWidth - lhsWidth;
+  objectWidthActive = winWidth - lhsWidth - barWidth;
+  objectWidth = winWidth;
+  //headerWidth = winWidth - lhsWidth - barWidth - 20;
+  headerWidth = winWidth - 20;
 
-  $lhsHolder.css("height",lhsHeight);
-  $bar.css("height",lhsHeight);
+  $lhsHolder
+    .css("height",lhsHeight)
+    .css("left", "-240px");
+  $lhsHolderActive.css("left", "0");
+  $bar
+    .css("height",lhsHeight)
+    .css("left","-8px");
+  $barActive.css("left", lhsWidth);
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);
   $topNav.css("width",objectWidth);
   $(".widgetsearch").css("width", lhsSearchWidth);
+  $lhsSearchActive.css("width", lhsWidth - 20);
+  $lhsSearchActive.find(".widgetsearch").css("width", lhsWidth - 49);
   $objectArea
-    .css("margin-left",internavWidth)
+    .css("margin-left","0")
     .css("height",internavHeight)
     .css("width",objectWidth);
+  $objectAreaActive
+    .css("margin-left", lhsWidth + 8)
+    .css("width",objectWidthActive);
+  $area.css("margin-left", "0");
 }
 
 // Grid View Example

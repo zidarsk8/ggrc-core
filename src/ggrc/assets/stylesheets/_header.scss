@@ -6,7 +6,7 @@
  */
 
 .header.main {
-  height: 30px;
+  height: 48px;
 }
 
 .header-bar {
@@ -48,75 +48,51 @@
     text-decoration:none;
   }
   .logo {
-    line-height:30px;
-		padding-left:20px;
+    h2 {
+      font-family: $fontTitle;
+      font-size: 18px;
+      line-height: 48px;
+      font-weight: normal;
+      color: $black;
+      margin-right: 0;
+      a {
+        color: $black;
+      }
+    }
   }
   .menu {
     @include clearfix();
     @include reset-list();
     float:right;
+    margin-right: 10px;
     li {
       float:left;
-      color: $white;
-      line-height:30px;
-      font-size:$f-regular;
-      font-weight:bold;
-      text-transform:uppercase;
-      text-shadow: 0 1px 1px $black;
-      &.quick-search {
-        position: relative;
-        .quick-search-holder {
-          border: 1px solid $topBarSearchBorder;
-          background: $topBarSearchBgnd;
-          height: 21px;
-          @include border-radius($default-border-radius);
-          @include box-shadow(inset 0 0 5px rgba(0, 0, 0, 0.5));
-          margin: 3px 10px 0 10px;
-          input {
-            height: 21px;
-            line-height: 21px;
-            color: $topBarSearchText;
-            width: 144px;
-            padding: 0 4px 0 0;
-            border: none;
-            background: none;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
-            @include box-shadow(none);
-            @include placeholder($topBarSearchText);
+      color: $black;
+      line-height: 48px;
+      font-size: 14px;
+      .count {
+        font-size: 12px;
+        font-weight: bold;
+        line-height: 16px;
+        text-align: center;
+        width: 16px;
+        height: 16px;
+        @include border-radius(8px);
+      }
+      a {
+        display: block;
+        color: $black;
+        line-height: 48px;
+        padding: 0 10px;
+        i {
+          margin: 16px 2px 0 0;
+          &.grcicon-carot-white {
+            margin-right: 0;
           }
-          &.open {
-            background: $white;
-            @include border-radius($default-border-radius);
-            @include box-shadow(none);
-            @include border-bottom-radius(0);
-            border: 1px solid $white;
-            position: relative;
-            z-index: 1002;
-            input {
-              color: $darkGray;
-              text-shadow: none;
-              @include placeholder($darkGray);
-            }
-            button {
-              i {
-                background-position:-246px -56px;
-                @include opacity(0.4);
-              }
-            }
-          }
-          button {
-            float: left;
-            background: none;
-            border: none;
-            height: 21px;
-            width: 24px;
-            padding: 0;
-            cursor: text;
-            i {
-              margin: 1px 0 0 0;
-              @include opacity(0.55);
-            }
-          }
+        }
+        &:hover {
+          //background: $black;
+          //color:$white;
         }
       }
       &.add-object {
@@ -180,6 +156,9 @@
                 background: $black;
                 color:$white;
               }
+              i {
+                margin: 7px 2px 0 0;
+              }
             }
             &.show-role {
               padding: 0 10px;
@@ -199,28 +178,6 @@
                   margin-right: 0;
                 }
               }
-            }
-          }
-        }
-      }
-      &.black-link {
-        a {
-          display:block;
-          color:$menuLink;
-          line-height:30px;
-          padding: 0 10px;
-          i {
-            margin: 7px 6px 0 0;
-            @include opacity(0.6);
-            &.grcicon-carot-white {
-              margin-right: 0;
-            }
-          }
-          &:hover {
-            background: $black;
-            color:$white;
-            i {
-              @include opacity(1);
             }
           }
         }
@@ -291,16 +248,48 @@
       }
     }
   }
+  .lhn-trigger-wrap {
+  }
+  .lhn-trigger {
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    margin: 16px 20px 0 24px;
+    @include transition-duration(0.3s);
+    .icon-bar {
+      display: block;
+      margin-bottom: 3px;
+      height: 3px;
+      background: #757575;
+      width: 100%;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    &.active {
+      @include rotate(90deg);
+      @include border-radius(18px);
+      margin: 6px 10px 0 14px;
+      padding: 10px;
+      background: $white;
+      .icon-bar {
+        background: #f60;
+      }
+    }
+    &:hover {
+      @include border-radius(18px);
+      margin: 6px 10px 0 14px;
+      padding: 10px;
+      background: $white;
+    }
+  }
 }
 
 .header-content {
   background: $white;
   z-index:3;
+  padding-left: 20px;
   h1 {
-    line-height: 36px;
-    padding-left:20px;
-    padding:7px 5px 3px 20px;
-    font-family: $fontTitle;
     span.private {
       i {
         margin-top:11px;
@@ -313,6 +302,21 @@
       display: inline-block;
       line-height: 36px;
       vertical-align: middle;
+    }
+    i {
+      margin-top: 10px;
+      margin-right: 8px;
+    }
+  }
+  .nav-trigger {
+    float: right;
+    margin-right: 20px;
+    margin-top: 11px;
+    i {
+      margin: 0;
+    }
+    &.active {
+      .grciconlarge-nav-trigger { background-position: -72px -40px; }
     }
   }
   .object-header-notification {

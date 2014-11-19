@@ -9,23 +9,7 @@ ul.new-tree {
   @include reset-list();
   .openclose {
     cursor: pointer;
-    .row-fluid {
-      &:hover {
-        background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-        @include background-size(30px 6px);
-        .counter {
-          @include opacity(1);
-        }
-      }
-    }
     &.active {
-      position: relative;
-      border-bottom:1px solid #eee;
-      z-index: 1000;
-      font-weight:bold;
-      .row-fluid {
-        background:$white;
-      }
       .tier-trigger {
         background: image-url('grcicons/open.png') no-repeat 20px center;
         @include background-size(17px 12px);
@@ -43,11 +27,6 @@ ul.new-tree {
   .task-item {
     .item-data {
       padding-left: 0;
-    }
-  }
-  &.simple-list {
-    li {
-      padding-left: 20px;
     }
   }
   &.request-list,
@@ -442,12 +421,43 @@ ul.new-tree {
   }
 
   li.tree-item {
-    border-bottom:1px solid #ccc;
-    line-height:31px;
-    min-height:31px;
-    background:#fafafa;
+    min-height: 30px;
+    line-height: 24px;
+    p {
+      line-height: 18px;
+      font-size: 12px;
+      padding: 10px 0;
+    }
+    > .item-wrap {
+      padding: 6px 0 11px 0;
+      margin: 0 10px;
+      border-bottom: 1px solid $itemBorder;
+    }
+    > .item-main {
+      background: $white;
+      > .openclose {
+        > .item-wrap {
+          //@include scale(1);
+          @include opacity(1);
+          @include transition(all .3s ease-in-out);
+          margin: 0 10px;
+          padding-top: 6px;
+          padding-bottom: 11px;
+          border-bottom: 1px solid $itemBorder;
+        }
+      }
+    }
     &:last-child {
-      border-bottom: none;
+      > .item-wrap {
+        border-bottom: none;
+      }
+      > .item-main {
+        > .openclose {
+          > .item-wrap {
+            border-bottom: none;
+          }
+        }
+      }
     }
     &.object-filter {
       background: #b7b7b7;
@@ -520,10 +530,6 @@ ul.new-tree {
     .task-done {
       font-size: 13px;
       color: $green;
-    }
-    &.tree-item-open {
-      @include box-shadow(inset 0 0 8px #bbb);
-      background:#fff;
     }
     .inner-item-count {
       padding-right: 20px;
@@ -629,11 +635,10 @@ ul.new-tree {
       @include reset-list();
       @include clearfix();
       float: right;
-      margin-right: 20px;
       li {
         float: left;
-        margin-left: 15px;
-        line-height: 31px;
+        margin-left: 10px;
+        line-height: 24px;
         .item-data {
           padding-left: 0;
           float: none;
@@ -677,9 +682,6 @@ ul.new-tree {
     .wrap250 { float:left; min-width:250px; }
     .wrap300 { float:left; min-width:300px; }
     */
-    .tree-progress {
-      margin-right: 20px;
-    }
   }
   &.colored-list {
     > li.tree-item {
@@ -1027,45 +1029,39 @@ ul.new-tree {
   }
   // reduce visibility of closed tree-items
   &.tree-open {
-    > li.tree-item {
-      background:#eee;
-      .tree-title-area {
-        @include opacity(0.5);
+    li.tree-item {
+      background: $white;
+      > .item-main {
+        > .openclose {
+          > .item-wrap {
+            @include opacity(0.5);
+            //@include scale(0.95);
+            @include transition(all .3s ease-in-out);
+          }
+        }
       }
       &.item-open {
-        .tree-title-area {
-          @include opacity(1);
+        margin-top: 10px;
+        margin-bottom: 20px;
+        @include box-shadow(0px 6px 6px -6px rgba(0,0,0, 0.3), 0px -6px 6px -6px rgba(0,0,0, 0.2));
+        > .item-main {
+          > .openclose {
+            > .item-wrap {
+              //@include scale(1);
+              @include opacity(1);
+            }
+          }
         }
+        background: transparent;
         .inner-item-count {
           @include opacity(1);
         }
       }
     }
-    ul.tree-open {
-      > li.tree-item {
-        background:#eee;
-        .tree-title-area {
-          @include opacity(0.5);
-        }
-        &.item-open {
-          .tree-title-area {
-            @include opacity(1);
-          }
-        }
-      }
-      ul.tree-open {
-        > li.tree-item {
-          background:#eee;
-          .tree-title-area {
-            @include opacity(0.5);
-          }
-          &.item-open {
-            .tree-title-area {
-              @include opacity(1);
-            }
-          }
-        }
-      }
+  }
+  &.tree-one {
+    li.tree-item {
+      background: $white;
     }
   }
   // end
@@ -1134,15 +1130,12 @@ ul.new-tree {
 }
 
 .tier-2-info {
-  display:none;
-  &.content-open {
-    background:#fff;
-    padding-bottom:20px;
-  }
+  display: none;
 }
 .tier-2-info-content {
-  padding:0 20px;
-  position:relative;
+  padding: 0 10px 0 32px;
+  position: relative;
+  background: $white;
   .tier-2-code {
     color: #777;
     font-style: italic;
@@ -1228,15 +1221,21 @@ ul.new-tree {
 }
 
 .item-data {
-  padding-left: 20px;
-  color:#222;
   overflow: hidden;
   zoom: 1;
   &.no-space {
     padding-left: 0;
   }
   .tree-title-area {
+    font-size: 16px;
+    a {
+      color: $blue;
+    }
     @include oneline();
+    &.w-status {
+      float: left;
+      width: 94%;
+    }
     .event-action {
       font-size:13px;
       color:#777;
