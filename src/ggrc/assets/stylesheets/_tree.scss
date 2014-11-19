@@ -1146,6 +1146,11 @@ ul.new-tree {
 .tier-2-info-content {
   padding:0 20px;
   position:relative;
+  .doc-folder {
+    h6 {
+      margin-top: 10px;
+    }
+  }
   .tier-2-code {
     color: #777;
     font-style: italic;
