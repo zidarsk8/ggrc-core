@@ -423,6 +423,12 @@ ul.new-tree {
   li.tree-item {
     min-height: 30px;
     line-height: 24px;
+    position: relative;
+    @include perspective(1200);
+    @include transform-style(preserve-3d);
+    @include scale(1);
+    @include opacity(1);
+    @include transition(all .3s cubic-bezier(0.000, 0.050, 1.000, 0.550));
     p {
       line-height: 18px;
       font-size: 12px;
@@ -437,9 +443,6 @@ ul.new-tree {
       background: $white;
       > .openclose {
         > .item-wrap {
-          //@include scale(1);
-          @include opacity(1);
-          @include transition(all .3s ease-in-out);
           margin: 0 10px;
           padding-top: 6px;
           padding-bottom: 11px;
@@ -1029,33 +1032,33 @@ ul.new-tree {
   }
   // reduce visibility of closed tree-items
   &.tree-open {
+    @include perspective(1200);
     li.tree-item {
       background: $white;
-      > .item-main {
-        > .openclose {
-          > .item-wrap {
-            @include opacity(0.5);
-            //@include scale(0.95);
-            @include transition(all .3s ease-in-out);
-          }
-        }
-      }
+      @include scale(0.95);
+      @include opacity(0.5);
+      @include transition(all .3s cubic-bezier(0.000, 0.050, 1.000, 0.550));
       &.item-open {
+        @include scale(1);
+        @include opacity(1);
         margin-top: 10px;
         margin-bottom: 20px;
         @include box-shadow(0px 6px 6px -6px rgba(0,0,0, 0.3), 0px -6px 6px -6px rgba(0,0,0, 0.2));
-        > .item-main {
-          > .openclose {
-            > .item-wrap {
-              //@include scale(1);
-              @include opacity(1);
-            }
-          }
-        }
         background: transparent;
         .inner-item-count {
           @include opacity(1);
         }
+      }
+      > .item-main {
+        > .openclose {
+          > .item-wrap {
+            border-color: transparent;
+          }
+        }
+      }
+      .tier-2-info {
+        @include transform(rotateX(0deg));
+        background: $white;
       }
     }
   }
@@ -1131,11 +1134,15 @@ ul.new-tree {
 
 .tier-2-info {
   display: none;
+  @include transform(rotateX(-89deg));
+  @include transform-origin(100%, 0, 0);
+  @include transform-style(preserve-3d);
+  background: $gray;
+  @include transition(all 0.8s cubic-bezier(0.000, 0.050, 1.000, 0.550));
 }
 .tier-2-info-content {
   padding: 0 10px 0 32px;
   position: relative;
-  background: $white;
   .tier-2-code {
     color: #777;
     font-style: italic;
