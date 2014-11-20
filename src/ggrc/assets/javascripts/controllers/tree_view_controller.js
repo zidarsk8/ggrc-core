@@ -574,7 +574,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         delete that.oldList;
         delete that._remove_marker;
       }
-    }), 20);
+    }), 200);
   }
 
   , ".tree-structure subtree_loaded" : function(el, ev) {

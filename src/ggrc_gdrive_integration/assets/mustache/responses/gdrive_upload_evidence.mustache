@@ -1,6 +1,5 @@
 {{! upload evidence to GDrive by clicking this button}}
 
-{{#with_current_user_as "current_user"}}
 {{#if_helpers '\
   #is_allowed' "create" 'ObjectDocument' _0_context=instance.context.id '\
     and ^if_equals' instance.status 'Accepted' '\
@@ -10,4 +9,6 @@
 <ggrc-gdrive-picker-launcher instance="instance" deferred="true"></ggrc-gdrive-picker-launcher>
 <div>
 {{/if_helpers}}
-{{/with_current_user_as}}
+{{#is_allowed "create" 'ObjectDocument' context=instance.context.id}}
+  <ggrc-gdrive-folder-picker deferred="true" instance="instance"/>
+{{/is_allowed}}

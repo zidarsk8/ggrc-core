@@ -285,10 +285,21 @@ Mustache.registerHelper("if_match", function(val1, val2, options) {
 });
 
 Mustache.registerHelper("in_array", function(needle, haystack, options) {
+  var found = false;
   needle = resolve_computed(needle);
   haystack = resolve_computed(haystack);
+  haystack.attr("length");
 
-  return options[~can.inArray(needle, haystack) ? "fn" : "inverse"](options.contexts);
+  can.each(haystack, function(_, index) {
+    if(haystack.attr(index) === needle) {
+      found = true;
+    }
+  });
+  if(found) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
 });
 
 Mustache.registerHelper("if_null", function(val1, options) {
@@ -893,7 +904,9 @@ Mustache.registerHelper("person_roles", function(person, scope, options) {
     user_roles_refresh_queue.enqueue(user_roles);
     user_roles_refresh_queue.trigger().then(function() {
       var roles = can.map(can.makeArray(user_roles), function(user_role) {
-              return user_role.role.reify();
+              if (user_role.role) {
+                return user_role.role.reify();
+              }
             })
         , roles_refresh_queue = new RefreshQueue()
         ;
@@ -1748,32 +1761,44 @@ Mustache.registerHelper("person_owned", function(owner_id, options) {
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("default_audit_title", function(title, program, options) {
-  var computed_title = title()
-    , computed_program = resolve_computed(program)
-    , default_title
+Mustache.registerHelper("default_audit_title", function(instance, options) {
+  var program, default_title, current_title
     , index = 1
     ;
 
-  if(typeof computed_program === 'undefined'){
+    instance = Mustache.resolve(instance);
+    program = instance.attr("program");
+
+  if(!instance._transient) {
+    instance.attr("_transient", { default_title : "" });
+  }
+
+  if(program == null){
     // Mark the title to be populated when computed_program is defined,
     // returning an empty string here would disable the save button.
-    return 'undefined';
+    instance.attr("title", "");
+    instance.attr("_transient.default_title", instance.title);
+    return;
   }
-  if(typeof computed_title !== 'undefined' && computed_title !== 'undefined'){
-    return computed_title;
+  if(instance._transient.default_title !== instance.title) {
+    return;
   }
-  program = resolve_computed(program) || {title : "program"};
 
-  default_title = new Date().getFullYear() + ": " + program.title + " - Audit";
+  program = program.reify();
 
-  // Count the current number of audits with default_title
-  $.map(CMS.Models['Audit'].cache, function(audit){
-    if(audit.title && audit.title.indexOf(default_title) === 0){
-      index += 1;
-    }
+  new RefreshQueue().enqueue(program).trigger().then(function() {
+
+    default_title = new Date().getFullYear() + ": " + program.title + " - Audit";
+
+    // Count the current number of audits with default_title
+    $.map(CMS.Models['Audit'].cache, function(audit){
+      if(audit.title && audit.title.indexOf(default_title) === 0){
+        index += 1;
+      }
+    });
+    instance.attr("title", new Date().getFullYear() + ": " + program.title + " - Audit " + index);
+    instance.attr("_transient.default_title", instance.title);
   });
-  return new Date().getFullYear() + ": " + program.title + " - Audit " + index;
 });
 
 Mustache.registerHelper('param_current_location', function() {
@@ -2175,8 +2200,8 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
         , update = Permission.is_allowed("update", instance)
         , map = Permission.is_allowed("mapping", instance)
         , create = Permission.is_allowed("creating", instance)
-        , assignee = instance.assignee.id === GGRC.current_user.id
-        , audit_lead = audit.contact.id === GGRC.current_user.id
+        , assignee = !!instance.assignee && instance.assignee.id === GGRC.current_user.id
+        , audit_lead = !!audit.contact && audit.contact.id === GGRC.current_user.id
         , auditor = can.map(
                       auditors || [],
                       function(auditor) {

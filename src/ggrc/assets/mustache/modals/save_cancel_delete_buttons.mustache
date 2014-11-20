@@ -19,10 +19,7 @@
         {{/new_object_form}}
       </div>
     </div>
-    <div class="span5">
-      &nbsp;
-    </div>
-    <div class="span4">
+    <div class="span9">
       <div class="confirm-buttons">
         {{#mapping}}
         <input type="checkbox" id="map-and-save" checked="checked">&nbsp;<label style="display:inline" for="map-and-save"> Map and save</label>
@@ -33,12 +30,8 @@
             <a tabindex="25" class="btn btn-primary preventdoubleclick {{#instance.computed_unsuppressed_errors}}disabled{{/instance.computed_unsuppressed_errors}}" data-toggle="modal-submit" href="javascript://">Save & Close</a>
           {{/new_object_form}}
           {{#new_object_form}}
-            {{#if_match model.model_singular 'Request|DocumentationResponse|InterviewResponse'}}
-              <a tabindex="25" class="btn btn-primary preventdoubleclick {{#instance.computed_unsuppressed_errors}}disabled{{/instance.computed_unsuppressed_errors}}" data-toggle="modal-submit" href="javascript://">Save & Close</a>
-            {{else}}
-              <a tabindex="24" class="btn btn-primary preventdoubleclick {{#instance.computed_unsuppressed_errors}}disabled{{/instance.computed_unsuppressed_errors}}" data-toggle="modal-submit-addmore" href="javascript://">Save & Add Another</a>
-              <a tabindex="25" class="btn btn-primary preventdoubleclick {{#instance.computed_unsuppressed_errors}}disabled{{/instance.computed_unsuppressed_errors}}" data-toggle="modal-submit" href="javascript://">Save & Close</a>
-            {{/if_match}}
+            <a tabindex="24" class="btn btn-primary preventdoubleclick {{#instance.computed_unsuppressed_errors}}disabled{{/instance.computed_unsuppressed_errors}}" data-toggle="modal-submit-addmore" href="javascript://">Save & Add Another</a>
+            <a tabindex="25" class="btn btn-primary preventdoubleclick {{#instance.computed_unsuppressed_errors}}disabled{{/instance.computed_unsuppressed_errors}}" data-toggle="modal-submit" href="javascript://">Save & Close</a>
           {{/new_object_form}}
         {{/mapping}}
       </div>

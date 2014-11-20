@@ -277,17 +277,49 @@ can.Model("can.Model.Cacheable", {
 
     var _update = this.update;
     this.update = function(id, params) {
-      var ret = _update
+      var that = this,
+        ret = _update
         .call(this, id, this.process_args(params))
         .then(
           $.proxy(this, "resolve_deferred_bindings")
-          , function(status) {
-            var dfd;
-            if(status === 409) {
-              //handle conflict.
+          , function(xhr) {
+            var dfd, obj, attrs, base_attrs;
+            if(xhr.status === 409) {
+              obj = that.findInCacheById(id);
+              attrs = obj.attr();
+              base_attrs = obj._backupStore;
+              return obj.refresh().then(function(obj) {
+                var conflict = false,
+                    remote_attrs = obj.attr();
+                if (can.Object.same(remote_attrs, attrs)) {
+                  //current state is same as server state -- do nothing.
+                  return obj;
+                } else if(can.Object.same(remote_attrs, base_attrs)) {
+                  //base state matches server state -- no incorrect expectations -- save.
+                  return obj.attr(attrs).save();
+                } else {
+                  //check what properties changed -- we can merge if the same prop wasn't changed on both
+                  can.each(base_attrs, function(val, key) {
+                    if (!can.Object.same(attrs[key], remote_attrs[key])) {
+                      if(can.Object.same(val, remote_attrs[key])) {
+                        obj.attr(key, attrs[key]);
+                      } else if (!can.Object.same(val, attrs[key])) {
+                        conflict = true;
+                      }
+                    }
+                  });
+                  if(conflict) {
+                    $(document.body).trigger("ajax:flash", {
+                      warning: "There was a conflict while saving. Your changes have not yet been saved. please check any fields you were editing and try saving again"
+                    });
+                    return xhr;
+                  } else {
+                    return obj.save();
+                  }
+                }
+              });
             } else {
-              dfd = new $.Deferred();
-              return dfd.reject.apply(dfd, arguments);
+              return xhr;
             }
           }
         );
@@ -307,10 +339,12 @@ can.Model("can.Model.Cacheable", {
 
     var _refresh = this.makeFindOne({ type : "get", url : "{href}" });
     this.refresh = function(params) {
-      var href = params.selfLink || params.href;
+      var that = this,
+          href = params.selfLink || params.href;
 
       if (href)
-        return _refresh.call(this, {href : params.selfLink || params.href});
+        return _refresh.call(this, {href : params.selfLink || params.href})
+               .done(function(d) { d.backup(); });
       else
         return (new can.Deferred()).reject();
     };
@@ -811,10 +845,7 @@ can.Model("can.Model.Cacheable", {
           })
           .then($.proxy(that.constructor, "model"))
           .done(function(d) {
-            // FIXME: Remove this if it hasn't introduced regressions.  We want
-            //   to avoid triggering `updated` when there haven't been actual
-            //   changes.
-            //d.updated();
+            d.backup();
             dfd.resolve(d);
           })
           .fail(function() {
@@ -853,7 +884,11 @@ can.Model("can.Model.Cacheable", {
           return (v && typeof v.save === "function") ? v.stub().serialize() : (v.serialize ? v.serialize() : v);
         });
       } else if(typeof val !== 'function') {
-        serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
+        if(that[name] && that[name].isComputed) {
+          serial[name] = val && val.serialize ? val.serialize() : val;
+        } else {
+          serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
+        }
       }
     });
     return serial;

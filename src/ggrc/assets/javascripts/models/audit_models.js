@@ -98,62 +98,42 @@ can.Model.Cacheable("CMS.Models.Audit", {
     }
 
     return this._super.apply(this, arguments).then(function(instance) {
-      return that._save_auditor(instance);
-    });
-  },
-  object_model: can.compute(function() {
-    return CMS.Models[this.attr("object_type")];
-  })
-  , _save_auditor : function(instance){
-
-    var no_change = false
-      , auditor_role
-      ;
-
-    Permission.refresh(); //Creating an audit creates new contexts.  Make sure they're reflected client-side
-
-    if(typeof instance.auditor === 'undefined'){
-      return instance;
-    }
-    // Find the Auditor user role
-    return CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
-      if(roles.length === 0) {
-        console.warn("No Auditor role");
-        return new $.Deferred().reject();
-      }
-      auditor_role = roles[0];
-
-      return CMS.Models.UserRole.findAll({
-        context_id__in: instance.context.id,
-        role_id__in: auditor_role.id
-      });
-    }).then(function(auditor_roles){
-      return $.when.apply($,
-        can.map(auditor_roles, function(role){
-          if(typeof instance.auditor !== "undefined" &&
-              instance.auditor != null &&
-              role.person.id === instance.auditor.id) {
-            // Auditor hasn't changed
-            no_change = true;
-            return $.when();
-          }
-          return role.refresh().then(function(role){role.destroy();});
-      }));
-    }).then(function(){
-      if(!instance.auditor || no_change){
-        return $.when();
-      }
-      return $.when(new CMS.Models.UserRole({
-        context : instance.context,
-        role : auditor_role,
-        person : instance.auditor
-      }).save());
-    }).then(function(){
+      // Since Audits have a non-standard url for viewing, the url has to be set here
+      // so that the browser can be redirected properly after creating.
       instance.attr('_redirect',
         instance.program.reify().viewLink + "#audit_widget/audit/" + instance.id);
       return instance;
     });
-  }, findAuditors : function(return_list){
+  },
+  after_save: function() {
+    var that = this;
+    
+    new RefreshQueue().enqueue(this.program.reify()).trigger()
+    .then(function(programs) {
+      return $.when(
+        programs[0],
+        programs[0].get_binding("program_authorized_people").refresh_instances(),
+        CMS.Models.Role.findAll({ name : "ProgramReader" })
+      );
+    }).then(function(program, person_bindings, reader_roles) {
+      var authorized_people = can.map(person_bindings, function(pb) {
+        return pb.instance;
+      });
+
+      if(Permission.is_allowed("create", "UserRole", program.context)
+        && !~can.inArray(
+          that.contact.reify(),
+          authorized_people
+      )) {
+        new CMS.Models.UserRole({
+          person: that.contact,
+          role: reader_roles[0].stub(),
+          context: program.context
+        }).save();
+      }
+    });
+  },
+  findAuditors : function(return_list){
     // If return_list is true, use findAuditors in the
     //  classical way, where the exact state of the list
     //  isn't needed immeidately (as in a Mustache helper);
@@ -327,19 +307,23 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , after_save: function() {
     var that = this;
-    
+
     new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
       return new RefreshQueue().enqueue(audits[0].program).trigger();
     }).then(function(programs) {
       return $.when(
         programs[0],
-        programs[0].get_binding("authorized_people").refresh_instances(),
+        programs[0].get_binding("program_authorized_people").refresh_instances(),
         CMS.Models.Role.findAll({ name : "ProgramReader" }));
     }).then(function(program, people_bindings, reader_roles) {
+      var authorized_people = can.map(people_bindings, function(pb) {
+        return pb.instance;
+      });
+
       if(Permission.is_allowed("create", "UserRole", program.context)
         && !~can.inArray(
           that.assignee.reify(),
-          can.map(people_bindings, function(pb) { return pb.instance; })
+          authorized_people
       )) {
         new CMS.Models.UserRole({
           person: that.assignee,
@@ -353,6 +337,12 @@ can.Model.Cacheable("CMS.Models.Request", {
     var that = this,
         obj = this.audit_object_object ? this.audit_object_object.reify() : this.audit_object_object,
         matching_objs;
+    if(that.audit_object
+       && (!that.audit_object_object
+           || that.audit_object.reify().auditable.id !== that.audit_object_object.id
+    )) {
+      return;
+    }
     if(obj && (matching_objs = can.map(this.get_mapping("audit_objects_via_audit"), function(mapping) {
       if(mapping.instance === obj)
         return mapping;
@@ -406,6 +396,8 @@ can.Model.Cacheable("CMS.Models.Response", {
       this.bind("created", refresh_request);
       this.bind("destroyed", refresh_request);
     }
+
+    this.validateNonBlank("description");
   }
   , create : "POST /api/responses"
   , update : "PUT /api/responses/{id}"
@@ -417,8 +409,8 @@ can.Model.Cacheable("CMS.Models.Response", {
     var found = false;
     if (this.shortName !== 'Response')
       return this._super(params);
-    if (!params 
-        || (params instanceof CMS.Models.Response 
+    if (!params
+        || (params instanceof CMS.Models.Response
             && params.constructor !== CMS.Models.Response
        ))
       return params;

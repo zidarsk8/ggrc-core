@@ -110,7 +110,6 @@ jQuery(function($) {
   }
   function checkStatus(result, type, $btn){
     CMS.Models.BackgroundTask.findOne({id: result.id}, function(task){
-      task = task.background_task;
       var msg = ($btn && $btn.val() == "Upload and Review") ? $btn.val() : type;
       if(task.status == "Pending" || task.status == "Running"){
 
@@ -288,7 +287,9 @@ jQuery(function($) {
       }
       xhr.always(function() {
         // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-        $el.removeAttr("disabled").removeClass("disabled pending-ajax")[0].innerHTML = oldtext;
+        if ($el.length) {
+          $el.removeAttr("disabled").removeClass("disabled pending-ajax")[0].innerHTML = oldtext;
+        }
       });
     }
   });

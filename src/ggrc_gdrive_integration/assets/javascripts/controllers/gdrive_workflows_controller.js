@@ -81,7 +81,7 @@ function report_progress(str, xhr) {
     var flash = {}
     , container_string = "<div class='audit-status'>"
     , head_string = "<div class='audit-status-head'>"
-    , list_bridge = "[Click to open]</div><ul class='flash-expandable'>"
+    , list_bridge = " [Click to open]</div><ul class='flash-expandable'>"
     , closer = "</ul></div></div>"
     , successes = [container_string + head_string + "Actions completed successfully." + list_bridge]
     , failures = [container_string + head_string + "There were errors." + list_bridge]
@@ -731,100 +731,6 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     })
     );
   }
-  , "a[data-toggle=gdrive-remover] click" : function(el, ev) {
-    object = CMS.Models[el.data("model")].findInCacheById(el.data("id"));
-    object.object_folders.forEach(function(object_folder){
-      object_folder.reify().refresh().then(function(instance){
-        instance.destroy();
-      });
-    });
-  }
-  , "a[data-toggle=gdrive-picker] click" : function(el, ev) {
-
-    var dfd = GGRC.Controllers.GAPI.authorize(["https://www.googleapis.com/auth/drive"]),
-        folder_id = el.data("folder-id");
-    dfd.then(function(){
-      gapi.load('picker', {'callback': createPicker});
-
-      // Create and render a Picker object for searching images.
-      function createPicker() {
-        window.oauth_dfd.done(function(token, oauth_user) {
-          var picker = new google.picker.PickerBuilder()
-            .setOAuthToken(gapi.auth.getToken().access_token)
-            .setDeveloperKey(GGRC.config.GAPI_KEY)
-            .setCallback(pickerCallback);
-
-          if(el.data('type') === 'folders'){
-            var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-              .setIncludeFolders(true)
-              .setSelectFolderEnabled(true);
-            picker.addView(view);
-          }
-          else{
-            var docsUploadView = new google.picker.DocsUploadView()
-                  .setParent(folder_id),
-                docsView = new google.picker.DocsView()
-                  .setParent(folder_id);
-
-            picker.addView(docsUploadView)
-              .addView(docsView)
-              .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
-          }
-          picker = picker.build();
-          picker.setVisible(true);
-          picker.A.style.zIndex = 2001; // our modals start with 1050
-        });
-      }
-
-      function pickerCallback(data) {
-
-        var files, models,
-            PICKED = google.picker.Action.PICKED,
-            ACTION = google.picker.Response.ACTION,
-            DOCUMENTS = google.picker.Response.DOCUMENTS,
-            CANCEL = google.picker.Action.CANCEL;
-
-        if (data[ACTION] == PICKED) {
-          files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
-          el.trigger('picked', {
-            files: files
-          });
-        }
-        else if (data[ACTION] == CANCEL) {
-          el.trigger('rejected');
-        }
-      }
-    });
-  }
-  , ".entry-attachment picked": function(el, ev, data) {
-    var object,
-        files = data.files || [];
-
-    if(el.data('instance')) {
-      object = el.data('instance');
-      object.instance.attr('workflow_folder', data.files);
-      return;
-    }
-    object = CMS.Models[el.data("model")].findInCacheById(el.data("id"));
-    object.attr('_folder_change_pending', true);
-    if (el.data('replace')) {
-      $.when.apply(this, $.map(object.object_folders, function(object_folder) {
-        // Remove existing object folders before mapping a new one:
-        return object_folder.reify().refresh().then(function(instance) {
-          return instance.destroy();
-        });
-      })).then(function() {
-        return GGRC.Controllers.GDriveWorkflow.attach_files(files,
-          el.data('type'), object);
-      }).then(function() {
-        object.attr('_folder_change_pending', false);
-      });
-    }
-    return GGRC.Controllers.GDriveWorkflow.attach_files(files,
-      el.data('type'), object).then(function() {
-      object.attr('_folder_change_pending', false);
-    });
-  }
 
   , "a.create-folder click" : function(el, ev) {
     var data = el.closest("[data-model], :data(model)").data("model") || GGRC.make_model_instance(GGRC.page_object);
@@ -937,21 +843,201 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   }
 });
 
+// Because we're using a view from GGRC.Templates here, we have to encase
+//  this component definition in a jQuery document.ready callback -- otherwise
+//  GGRC.Templates would not yet exist.
+$(function() {
+can.Component.extend({
+  tag: "ggrc-gdrive-folder-picker",
+  template: can.view(GGRC.mustache_path + "/gdrive/gdrive_folder.mustache"),
+  scope : {
+    deferred: "@",
+    tabindex: "@",
+    placeholder: "@",
+    readonly: "@"
+  },
+  events: {
+    init: function() {
+      var that = this;
+      this.element.removeAttr("tabindex");
+      this.scope.attr("_folder_change_pending", true);
+      this.scope.instance.get_binding("folders").refresh_instances().then(function(folders) {
+        that.scope.removeAttr("_folder_change_pending");
+        that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
+        that.options.folder_list = folders;
+        that.on();
+      }, function(error) {
+        that.scope.removeAttr("_folder_change_pending");
+        that.scope.attr('folder_error', error);
+      });
+    },
+    "{folder_list} change": function() {
+      var pjlength;
+      this.scope.attr("current_folder", this.options.folder_list.length ? this.options.folder_list[0].instance : null);
+      if(this.scope.deferred && this.scope.instance._pending_joins) {
+        pjlength = this.scope.instance._pending_joins.length;
+        can.each(this.scope.instance._pending_joins.slice(0).reverse(), function(pj, i) {
+          if(pj.through === "folders") {
+            this.scope.instance._pending_joins.splice(pjlength - i - 1, 1);
+          }
+        });
+      }
+    },
+    "a[data-toggle=gdrive-remover] click" : function(el, ev) {
+      if(this.scope.deferred) {
+        this.scope.instance.mark_for_deletion("folders", this.scope.current_folder);
+      } else {
+        object = CMS.Models[el.data("model")].findInCacheById(el.data("id"));
+        object.object_folders.forEach(function(object_folder){
+          object_folder.reify().refresh().then(function(instance){
+            instance.destroy();
+          });
+        });
+      }
+      this.scope.attr("current_folder", null);
+    },
+    "a[data-toggle=gdrive-picker] click" : function(el, ev) {
+
+      var dfd = GGRC.Controllers.GAPI.authorize(["https://www.googleapis.com/auth/drive"]),
+          folder_id = el.data("folder-id");
+      dfd.then(function(){
+        gapi.load('picker', {'callback': createPicker});
+
+        // Create and render a Picker object for searching images.
+        function createPicker() {
+          window.oauth_dfd.done(function(token, oauth_user) {
+            var picker = new google.picker.PickerBuilder()
+              .setOAuthToken(gapi.auth.getToken().access_token)
+              .setDeveloperKey(GGRC.config.GAPI_KEY)
+              .setCallback(pickerCallback);
+
+            if(el.data('type') === 'folders'){
+              var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+                .setMimeTypes(["application/vnd.google-apps.folder"])
+                .setSelectFolderEnabled(true);
+              picker.addView(view);
+            }
+            else{
+              var docsUploadView = new google.picker.DocsUploadView()
+                    .setParent(folder_id),
+                  docsView = new google.picker.DocsView()
+                    .setParent(folder_id);
+
+              picker.addView(docsUploadView)
+                .addView(docsView)
+                .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
+            }
+            picker = picker.build();
+            picker.setVisible(true);
+            picker.A.style.zIndex = 2001; // our modals start with 1050
+          });
+        }
+
+        function pickerCallback(data) {
+
+          var files, models,
+              PICKED = google.picker.Action.PICKED,
+              ACTION = google.picker.Response.ACTION,
+              DOCUMENTS = google.picker.Response.DOCUMENTS,
+              CANCEL = google.picker.Action.CANCEL;
+
+          if (data[ACTION] == PICKED) {
+            files = CMS.Models.GDriveFolder.models(data[DOCUMENTS]);
+            el.trigger('picked', {
+              files: files
+            });
+          }
+          else if (data[ACTION] == CANCEL) {
+            el.trigger('rejected');
+          }
+        }
+      });
+    },
+    ".entry-attachment picked": function(el, ev, data) {
+      var dfd,
+          that = this,
+          files = data.files || [],
+          scope = this.scope;
+
+      this.scope.attr('_folder_change_pending', true);
+      if (el.data('replace')) {
+        if(scope.deferred) {
+          if(scope.current_folder) {
+            scope.instance.mark_for_deletion("folders", scope.current_folder);
+          }
+          dfd = $.when();
+        } else {
+          dfd = $.when.apply(this, $.map(scope.instance.object_folders, function(object_folder) {
+            // Remove existing object folders before mapping a new one:
+            return object_folder.reify().refresh().then(function(instance) {
+              return instance.destroy();
+            });
+          }));
+        }
+      } else {
+        dfd = $.when();
+      }
+      return dfd.then(function() {
+        if(scope.deferred) {
+          return $.when.apply(
+            $,
+            can.map(files, function(file) {
+              scope.instance.mark_for_addition("folders", file);
+              return file.refresh();
+            })
+          );
+        } else {
+          return GGRC.Controllers.GDriveWorkflow.attach_files(
+            files,
+            el.data('type'),
+            scope.instance
+            );
+        }
+      }).then(function() {
+        scope.attr('_folder_change_pending', false);
+        scope.attr("current_folder", files[0]);
+        if(scope.deferred && scope.instance._transient) {
+          scope.instance.attr("_transient.folder", files[0]);
+        }
+      });
+    }
+  }
+});
+});
+
 can.Component.extend({
   tag: "ggrc-gdrive-picker-launcher",
-  template: '<a href="javascript://" class="btn" '
+  template: '<a href="javascript://" class="{{link_class}}" '
             + 'data-object-source="true" data-toggle="evidence-gdrive-picker" '
-            + 'can-click="trigger_upload">{{firstnonempty link_text "Upload Files to GDrive"}}</a>'
+            + 'can-click="trigger_upload">{{firstexist link_text "Upload Files to GDrive"}}</a>'
             + '{{#pending}}<span {{attach_spinner \'{ "radius": 3, "length": 2.5, "width": 2 }\' '
             + '\'display:inline-block; top: -5px; left: 12px;\' }}></span>{{/pending}}',
   scope: {
     instance: null,
     deferred: "@",
-    link_text: null,
+    link_text: "@",
+    link_class: "@",
     trigger_upload : function(scope, el, ev) {
       var that = this,
-          parent_folder_dfd = this.instance.get_binding("folders").refresh_instances();
+          parent_folder_dfd;
 
+      if(this.instance.attr("_transient.folder")) {
+        parent_folder_dfd = $.when([{ instance: this.instance.attr("_transient.folder") }]);
+      } else {
+        parent_folder_dfd = this.instance.get_binding("extended_folders").refresh_instances();
+      }
+
+      function is_own_folder(mapping, instance) {
+        if(mapping.binding.instance !== instance)
+          return false;
+        if(!mapping.mappings || mapping.mappings.length < 1 || mapping.instance === true)
+          return true;
+        else {
+          return can.reduce(mapping.mappings, function(current, mp) {
+            return current || is_own_folder(mp, instance);
+          }, false);
+        }
+      }
       can.Control.prototype.bindXHRToButton(parent_folder_dfd, el);
       parent_folder_dfd.done(function(bindings) {
         var parent_folder;
@@ -965,7 +1051,13 @@ can.Component.extend({
           return;
         }
 
-        parent_folder = bindings[0].instance;
+        parent_folder = can.map(bindings, function(binding) {
+          return can.reduce(binding.mappings, function(current, mp) {
+            return current || is_own_folder(mp, that.instance);
+          }, false) ? binding.instance : undefined;
+        });
+        parent_folder = parent_folder[0] || bindings[0].instance;
+
         //NB: resources returned from uploadFiles() do not match the properties expected from getting
         // files from GAPI -- "name" <=> "title", "url" <=> "alternateLink".  Of greater annoyance is
         // the "url" field from the picker differs from the "alternateLink" field value from GAPI: the
@@ -994,7 +1086,7 @@ can.Component.extend({
             //Since we can re-use existing file references from the picker, check for that case.
             var dfd = CMS.Models.Document.findAll({link : file.alternateLink }).then(function(d) {
               var doc_dfd, object_doc, object_file;
-              
+
               if(d.length < 1) {
                 d.push(
                   new CMS.Models.Document({
@@ -1054,6 +1146,13 @@ can.Component.extend({
           });
         });
       });
+    }
+  },
+  events: {
+    init: function() {
+      if(!this.scope.link_class) {
+        this.scope.attr("link_class", "btn");
+      }
     }
   }
 });

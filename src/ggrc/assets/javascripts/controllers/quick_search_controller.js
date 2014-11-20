@@ -225,6 +225,14 @@ can.Control("CMS.Controllers.LHN", {
       }
     }
 
+  , ".widgetsearch keyup": function(el, ev) {
+      if(el.val().trim() !== "") {
+        el.addClass("active");
+      } else {
+        el.removeClass("active");
+      }
+    }
+
   , "input.my-work click": function(el, ev) {
       var target = $(ev.target),
           checked;
@@ -290,6 +298,10 @@ can.Control("CMS.Controllers.LHN", {
           } else {
             initial_scroll();
           }
+          // Set active state to search field if the input is not empty:
+          self.element.find('.widgetsearch').filter(function() {
+            return this.value;
+          }).addClass('active');
         });
         self.size = prefs[0].getLHNavSize(null, "lhs");
         self.resize_lhn(self.size);
@@ -354,7 +366,7 @@ can.Control("CMS.Controllers.LHN", {
         $lhs_label_right = $(".lhs-search .my-work-right"),
         $lhs_label = $(".lhs-search .my-work-label"),
         lhn_second_row = 201,
-        max_width = window.innerWidth - 30;
+        max_width = window.outerWidth / 2 - 4;
 
     if(resize < 40 && !$lhs.hasClass("lhs-closed")) {
       this.toggle_lhs(no_trigger);

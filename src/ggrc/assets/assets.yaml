@@ -24,6 +24,7 @@ dashboard-js-files:
   - can.control.plugin.js
   - can.construct.proxy.js
   - can.map.attributes.js
+  - can.map.backup.js
   - bootstrap/modal-ajax.js
   - wysihtml5_parser_rules/advanced.js
   - wysihtml5-0.4.0pre.js

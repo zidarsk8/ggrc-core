@@ -139,7 +139,8 @@
         Cycle: {
           cycle_task_groups: Direct(
             "CycleTaskGroup", "cycle", "cycle_task_groups"),
-          reify_cycle_task_groups: Reify("cycle_task_groups")
+          reify_cycle_task_groups: Reify("cycle_task_groups"),
+          workflow: Direct("Workflow", "cycles", "workflow")
         },
 
         CycleTaskGroup: {
@@ -207,7 +208,10 @@
           cycle_task_group_object_task: Direct(
             "CycleTaskGroupObjectTask",
             "cycle_task_entries",
-            "cycle_task_group_object_task")
+            "cycle_task_group_object_task"),
+          workflow: Cross("cycle", "workflow"),
+          folders: Cross("workflow", "folders"),
+          extended_folders: Multi(["folders"])
         },
 
         People: {
@@ -462,7 +466,7 @@
             draw_children: true,
             //note that we are using special naming for the tree views here.
             //  also, tasks for a task group aren't directly mapping to the
-            //  tasks themselves but to the join object.  This is impotant
+            //  tasks themselves but to the join object.  This is important
             //  since the join objects themselves have important attributes.
             child_options: [
               {

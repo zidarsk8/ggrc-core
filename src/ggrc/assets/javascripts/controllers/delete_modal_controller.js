@@ -30,7 +30,8 @@ GGRC.Controllers.Modals("GGRC.Controllers.Delete", {
         parent_controller.options.skip_refresh = true;
       }
 
-      $(document.body).trigger("ajax:flash", { success : instance.display_name() +  ' deleted successfully'});
+      msg = "<span class='user-string'>" + instance.display_name() + "</span>" + " deleted successfully";
+      $(document.body).trigger("ajax:flash", { success : msg});
       if (that.element) {
         that.element.trigger("modal:success", that.options.instance);
       }

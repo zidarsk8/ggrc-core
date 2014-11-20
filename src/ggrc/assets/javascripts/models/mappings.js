@@ -546,6 +546,7 @@
       , authorizations_via_audits: Cross("audits", "authorizations")
       , context: Direct("Context", "related_object", "context")
       , contexts_via_audits: Cross("audits", "context")
+      , program_authorized_people: Cross("context", "authorized_people")
       , authorization_contexts: Multi(["context", "contexts_via_audits"])
       , authorizations_via_contexts: Cross("authorization_contexts", "user_roles")
       , authorizations: Cross("authorization_contexts", "user_roles")
@@ -861,7 +862,7 @@
     }
     , Request : {
         _canonical : {
-            "responses" : ["DocumentataionResponse", "InterviewResponse", "PopulationSampleResponse"]
+            "responses" : ["DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"]
           , "_audit" : "Audit"
         }
       , responses: Direct("Response", "request", "responses")
@@ -890,7 +891,7 @@
     }
     , DocumentationResponse : {
       _mixins : ["response"]
-      , business_objects : Multi(["related_objects", "controls", "people"])
+      , business_objects : Multi(["related_objects", "controls", "people", "sections", "clauses"])
     }
     , InterviewResponse : {
         _canonical : {
@@ -898,14 +899,14 @@
         }
       , _mixins : ["response"]
       , meetings: Direct("Meeting", "response", "meetings")
-      , business_objects : Multi(["related_objects", "controls", "documents"])
+      , business_objects : Multi(["related_objects", "controls", "documents", "sections", "clauses"])
     }
     , PopulationSampleResponse : {
       _canonical : {
         "population_samples" : "PopulationSample"
       }
       , _mixins : ["response"]
-      , business_objects : Multi(["related_objects", "controls", "people", "documents"])
+      , business_objects : Multi(["related_objects", "controls", "people", "documents", "sections", "clauses"])
       , population_samples : Direct("PopulationSample", "response", "population_samples")
     }
     , Meeting : {

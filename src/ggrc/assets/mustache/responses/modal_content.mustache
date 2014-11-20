@@ -1,6 +1,8 @@
 {{!div class="modal-body"}}
+<div class="hideable-holder">
 {{#instance}}
 <form action="javascript://">
+  {{> /static/mustache/base_objects/form_restore.mustache}}
   <div class="row-fluid">
     <div class="span9">
       <label>
@@ -39,7 +41,7 @@
   
   <div class="row-fluid">
     {{#if_instance_of instance "DocumentationResponse"}}
-    <div class="span6">
+    <div class="span6 hidable">
       <ggrc-modal-connector
         instance="instance"
         source_mapping="documents"
@@ -48,7 +50,7 @@
         >
         <label class="border-l">
           Documents
-          <a href="javascript://" class="field-hide">hide</a>
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         {{#each list}}
         <div class="oneline">
@@ -62,7 +64,7 @@
         </div>
         {{/each}}
         {{^list.length}}
-          <span class="gray"><em>No meetings</em></span>
+          <span class="gray"><em>No References</em></span>
         {{/list.length}}
         {{^if_hooks 'DocumentationResponse.modal_connector'}}
         {{#prune_context}}
@@ -71,26 +73,27 @@
             <div style="float:left">
               <label for="link" style="line-height:29px">Add Evidence URL: &nbsp;</label>
             </div>
-            <div style="float:left"><input tabindex="3" type="text" name="link" placeholder="Enter Evidence URL here" value="{{attributes.link}}"></div>
+            <div style="float:left"><input type="text" tabindex="3" name="link" placeholder="Enter Evidence URL here" value="{{attributes.link}}"></div>
             <input type="hidden" name="context" model="Context" value="{{instance.context.id}}">
             <div style="clear:both; height:1px">&nbsp;</div>
             <div style="float:left">
               <label for="title" style="line-height:29px">Evidence title (optional): &nbsp;</label>
             </div>
-            <div style="float:left"><input tabindex="3" type="text" name="title" placeholder="Enter title here" value="{{attributes.title}}"></div>            
+            <div style="float:left"><input type="text" tabindex="4" name="title" placeholder="Enter title here" value="{{attributes.title}}"></div>
             <div style="clear:both">
               <a href="javascript://" class="btn btn-success {{^attributes.title}}disabled{{/attributes.title}} no-float" data-toggle="submit">Add</a>
             </div>
           </div>
         {{/prune_context}}
         {{/if_hooks}}
+        <div tabindex="5"></div><!this dummy div is needed for save&add another button for hidden elements for the below dynamically loaded g-drive connector buttons. -->
         {{{render_hooks 'DocumentationResponse.modal_connector'}}}
       </ggrc-modal-connector>
     </div>
     {{/if_instance_of}}
 
     {{#if_instance_of instance "InterviewResponse"}}
-    <div class="span6">
+    <div class="span6 hidable">
       <ggrc-modal-connector
         instance="instance"
         source_mapping="meetings"
@@ -99,7 +102,7 @@
         >
         <label class="border-l">
           Meetings
-          <a href="javascript://" class="field-hide">hide</a>
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         {{#each list}}
         <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-content="{{render '/static/mustache/pbc/iframe_tooltip.mustache' url=title}}" href="{{schemed_url title}}" target="_blank">
@@ -123,14 +126,14 @@
             <input type="hidden" name="context" model="Context" value="{{instance.context.id}}">
             <input type="hidden" name="start_at" value="{{localize_datetime}}">
             <input type="hidden" name="end_at" value="{{localize_datetime}}">
-            <a href="javascript://" class="btn btn-success {{^attributes.title}}disabled{{/attributes.title}} no-float" data-toggle="submit">Add</a>
+            <a href="javascript://" class="btn btn-success {{^attributes.title}}disabled{{/attributes.title}} no-float" data-toggle="submit" tabindex="4">Add</a>
           </div>
         {{/prune_context}}
       </ggrc-modal-connector>
     </div>
     {{/if_instance_of}}
 
-    <div class="span6">
+    <div class="span6 hidable">
       <ggrc-modal-connector
         instance="instance"
         source_mapping="business_objects"
@@ -138,7 +141,7 @@
         >
         <label class="border-l">
           Mapped Objects
-          <a href="javascript://" class="field-hide">hide</a>
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         {{#each list}}
         <div class="oneline">
@@ -169,14 +172,13 @@
                  data-join-object-id="{{instance.id}}"
                  data-join-object-type="{{instance.class.model_singular}}"
                  {{#if_instance_of instance 'DocumentationResponse'}}data-exclude-option-types="Document"{{/if_instance_of}}
-                 data-original-title="Map Object to this {{instance.class.title_singular}}">
+                 data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6">
                 Map Objects
               </a>
             </div>
           </div>
         {{/prune_context}}
       </ggrc-modal-connector>
-
     </div>
   </div>
 
@@ -188,4 +190,5 @@
   {{/new_object_form}}
 </form>
 {{/instance}}
+</div>
 {{!/div}}
