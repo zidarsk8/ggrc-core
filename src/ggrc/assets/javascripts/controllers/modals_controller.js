@@ -498,9 +498,8 @@ can.Control("GGRC.Controllers.Modals", {
         }
       };
 
-      $hideButton.fadeOut(500);
-      $showButton.delay(499).fadeIn(500);
-
+      $hideButton.hide();
+      $showButton.show();
       return false;
   }
 
@@ -528,8 +527,8 @@ can.Control("GGRC.Controllers.Modals", {
       }
     }
 
-    el.fadeOut(500);
-    $showButton.delay(499).fadeIn(500);
+    el.hide();
+    $showButton.show();
     return false;
   }
 
@@ -553,13 +552,10 @@ can.Control("GGRC.Controllers.Modals", {
 
     var $hideButton = $(this.element).find('#formHide');
     this.options.reset_visible = false;
-    //$(this.element).find(".hidden").show();
-    //$(this.element).find('.inner-hide').parent('.hidable').show();
-    //$(this.element).find('.inner-hide').show();
     $(this.element).find(".hidden").removeClass("hidden");
     $(this.element).find('.inner-hide').removeClass('inner-hidable');
-    el.fadeOut(500);
-    $hideButton.delay(499).fadeIn(500);
+    el.hide();
+    $hideButton.show();
     return false
   }
 
@@ -590,8 +586,8 @@ can.Control("GGRC.Controllers.Modals", {
         var $hideButton = $selected.closest('.modal-body').find('#formHide'),
           $showButton = $selected.closest('.modal-body').find('#formRestore');
 
-        $hideButton.fadeOut(500);
-        $showButton.delay(499).fadeIn(500);
+        $hideButton.hide();
+        $showButton.show();
       }
       return false;
     }
