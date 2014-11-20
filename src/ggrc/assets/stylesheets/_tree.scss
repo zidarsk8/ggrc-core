@@ -423,6 +423,9 @@ ul.new-tree {
   li.tree-item {
     min-height: 30px;
     line-height: 24px;
+    position: relative;
+    @include perspective(1200);
+    @include transform-style(preserve-3d);
     p {
       line-height: 18px;
       font-size: 12px;
@@ -1029,13 +1032,13 @@ ul.new-tree {
   }
   // reduce visibility of closed tree-items
   &.tree-open {
+    @include perspective(1200);
     li.tree-item {
       background: $white;
       > .item-main {
         > .openclose {
           > .item-wrap {
             @include opacity(0.5);
-            //@include scale(0.95);
             @include transition(all .3s ease-in-out);
           }
         }
@@ -1057,6 +1060,10 @@ ul.new-tree {
           @include opacity(1);
         }
       }
+    }
+    .tier-2-info {
+      @include transform(rotateX(0deg));
+      background: $white;
     }
   }
   &.tree-one {
@@ -1123,11 +1130,15 @@ ul.new-tree {
 
 .tier-2-info {
   display: none;
+  @include transform(rotateX(-89deg));
+  @include transform-origin(100%, 0, 0);
+  @include transform-style(preserve-3d);
+  background: $gray;
+  @include transition(all 0.8s cubic-bezier(0.000, 0.050, 1.000, 0.550));
 }
 .tier-2-info-content {
   padding: 0 10px 0 32px;
   position: relative;
-  background: $white;
   .tier-2-code {
     color: #777;
     font-style: italic;
