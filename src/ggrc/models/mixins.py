@@ -449,3 +449,24 @@ class BusinessObject(
       'Not in Scope',
       'Deprecated',
       ]
+
+# This class is just a marker interface/mixin to indicate that a model type
+# supports custom attributes.
+class CustomAttributable(object):
+
+    @declared_attr
+    def custom_attributes(cls):
+      return db.relationship(
+          cls.__name__,
+          # NOTE Here's how to get a list of all classes that extend CustomAttributable
+          # [cls.__name__ for cls in vars()['CustomAttributable'].__subclasses__()]
+          # FIXME The backref has to point back where attributable_type and attributable_id match.
+          # This is the query that I want to use to load custom_attribute_values
+          # SELECT * FROM custom_attribute_values WHERE attributable_type = cls.__name__ AND attributable_id=id
+          backref=db.backref('custom_attributable', remote_side='{0}.id'.format(cls.__name__)),
+          )
+
+    # REST properties
+    _publish_attrs = [
+        'custom_attributes'
+    ]

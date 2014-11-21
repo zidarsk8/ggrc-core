@@ -6,7 +6,7 @@
 from ggrc import db
 from .mixins import (
     deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact,
-    Titled, Slugged,
+    Titled, Slugged, CustomAttributable
     )
 from .object_person import Personable
 from .context import HasOwnContext
@@ -14,7 +14,7 @@ from .reflection import PublishOnly
 
 
 class Audit(
-    Personable, HasOwnContext,
+    CustomAttributable, Personable, HasOwnContext,
     Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
     db.Model):
   __tablename__ = 'audits'

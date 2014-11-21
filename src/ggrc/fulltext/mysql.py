@@ -90,7 +90,9 @@ class MysqlIndexer(SqlIndexer):
         or_(*type_queries))
 
   def _get_filter_query(self, terms):
-    whitelist = MysqlRecordProperty.property.in_(['title', 'name', 'email', 'notes', 'description', 'slug'])
+    whitelist = MysqlRecordProperty.property.in_(
+        ['title', 'name', 'email', 'notes', 'description', 'slug', 'attribute_value']
+    )
     if not terms:
       return whitelist
     elif terms:
@@ -283,6 +285,11 @@ class MysqlIndexer(SqlIndexer):
     query = query.filter(
         self._get_type_query(model_names, permission_type, permission_model))
     query = query.filter(self._get_filter_query(terms))
+    # We need to query also for matches based on any custom attribute values that
+    # instances of the given types actually have.
+    for t in types:
+        if isinstance(t, CustomAttributable):
+            query.join(t.custom_attribute_values).filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
 
     model_names = [model.__name__ for model in all_models.all_models]
