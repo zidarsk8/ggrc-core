@@ -838,8 +838,7 @@ function resize_areas() {
   headerWidth = winWidth - 20;
 
   $lhsHolder
-    .css("height",lhsHeight)
-    .css("left", "-240px");
+    .css("height",lhsHeight);
   $lhsHolderActive.css("left", "0");
   $bar
     .css("height",lhsHeight)
