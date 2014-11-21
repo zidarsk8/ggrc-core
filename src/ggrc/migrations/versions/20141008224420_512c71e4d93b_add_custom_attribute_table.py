@@ -24,7 +24,8 @@ def upgrade():
     sa.Column('title', sa.String(length=250), nullable=False),
     sa.Column('helptext', sa.String(length=250), nullable=False),
     sa.Column('placeholder', sa.String(length=250), nullable=False),
-    sa.Column('type_string', sa.String(length=250), nullable=False),
+    sa.Column('definition_type', sa.String(length=250), nullable=False),
+    sa.Column('attribute_type', sa.String(length=250), nullable=False),
     sa.Column('multi_choice_options', sa.Text(), nullable=True),
     sa.Column('mandatory', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')

@@ -11,12 +11,13 @@ from .mixins import (
 class CustomAttributeDefinition(Base, Titled, db.Model):
   __tablename__ = 'custom_attribute_definitions'
 
-  type_string = deferred(db.Column(db.String), 'CustomAttributeDefinition')
+  definition_type = deferred(db.Column(db.String), 'CustomAttributeDefinition')
+  attribute_type = deferred(db.Column(db.String), 'CustomAttributeDefinition')
   multi_choice_options = deferred(db.Column(db.String), 'CustomAttributeDefinition')
   mandatory = deferred(db.Column(db.Boolean), 'CustomAttributeDefinition')
 
   _publish_attrs = [
-      'type_string',
+      'definition_type',
+      'attribute_type',
       'multi_choice_options',
-      'mandatory'
-      ]
+      'mandatory']
