@@ -5,13 +5,13 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-(function(namespace, $, can) {
+(function (namespace, $, can) {
 
 //chrome likes to cache AJAX requests for Mustaches.
 var mustache_urls = {};
-$.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+$.ajaxPrefilter(function ( options, originalOptions, jqXHR ) {
   if ( /\.mustache$/.test(options.url) ) {
-    if(mustache_urls[options.url]) {
+    if (mustache_urls[options.url]) {
       options.url = mustache_urls[options.url];
     } else {
       mustache_urls[options.url] = options.url += "?r=" + Math.random();
@@ -28,13 +28,13 @@ function get_template_path(url) {
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
 
-$.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
+$.ajaxTransport("text", function (options, _originalOptions, _jqXHR) {
   var template_path = get_template_path(options.url),
       template = template_path && GGRC.Templates[template_path];
 
   if (template) {
     return {
-      send: function(headers, completeCallback) {
+      send: function (headers, completeCallback) {
         function done() {
           if (template)
             completeCallback(200, "success", { text: template });
@@ -48,207 +48,207 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
           done();
       },
 
-      abort: function() {
+      abort: function () {
         template = null;
       }
     };
   }
 });
 
-  var quickHash = function(str, seed) {
-    var bitval = seed || 1;
-    str = str || "";
-    for(var i = 0; i < str.length; i++)
-    {
-      bitval *= str.charCodeAt(i);
-      bitval = Math.pow(bitval, 7);
-      bitval %= Math.pow(7, 37);
+var quickHash = function (str, seed) {
+  var bitval = seed || 1;
+  str = str || "";
+  for (var i = 0; i < str.length; i++)
+  {
+    bitval *= str.charCodeAt(i);
+    bitval = Math.pow(bitval, 7);
+    bitval %= Math.pow(7, 37);
+  }
+  return bitval;
+};
+
+
+var getParentNode = function (el, defaultParentNode) {
+  return defaultParentNode && el.parentNode.nodeType === 11 ? defaultParentNode : el.parentNode;
+};
+
+
+function isExtendedFalsy(obj) {
+  return !obj
+    || (typeof obj === "object" && can.isEmptyObject(obj))
+    || (obj.length != null && obj.length === 0)
+    || (obj.serialize && can.isEmptyObject(obj.serialize()));
+}
+
+function preprocessClassString(str) {
+  var ret = []
+  , src = str.split(" ");
+
+  for (var i = 0; i < src.length; i++) {
+    var expr = src[i].trim();
+    if (expr.charAt(0) === "=") {
+      ret.push({ attr : src[i].trim().substr(1) });
+    } else if (expr.indexOf(":") > -1) {
+      var spl = expr.split(":");
+      var arr = [];
+      for (var j = 0; j < spl.length - 1; j ++) {
+        var inverse = spl[j].trim()[0] === "!"
+        , attr_name = spl[j].trim().substr(inverse ? 1 : 0);
+
+        arr.push({attr : attr_name, inverse : inverse});
+      }
+      arr.value = spl[spl.length - 1];
+      ret.push(arr);
+    } else {
+      ret.push(expr);
     }
-    return bitval;
-  };
+  }
+  return ret;
+}
 
-
-  var getParentNode = function (el, defaultParentNode) {
-    return defaultParentNode && el.parentNode.nodeType === 11 ? defaultParentNode : el.parentNode;
-  };
-
-
-    function isExtendedFalsy(obj) {
-      return !obj
-        || (typeof obj === "object" && can.isEmptyObject(obj))
-        || (obj.length != null && obj.length == 0)
-        || (obj.serialize && can.isEmptyObject(obj.serialize()));
-    }
-
-    function preprocessClassString(str) {
-      var ret = []
-      , src = str.split(" ");
-
-      for(var i = 0; i < src.length; i++) {
-        var expr = src[i].trim();
-        if(expr.charAt(0) === "=") {
-          ret.push({ attr : src[i].trim().substr(1) });
-        } else if(expr.indexOf(":") > -1) {
-          var spl = expr.split(":");
-          var arr = [];
-          for(var j = 0; j < spl.length - 1; j ++) {
-            var inverse = spl[j].trim()[0] === "!"
-            , attr_name = spl[j].trim().substr(inverse ? 1 : 0);
-
-            arr.push({attr : attr_name, inverse : inverse});
-          }
-          arr.value = spl[spl.length - 1];
-          ret.push(arr);
-        } else {
-          ret.push(expr);
+function buildClassString(arr, context) {
+  var ret = [];
+  for (var i = 0; i < arr.length; i++) {
+    if (typeof arr[i] === "string") {
+      ret.push(arr[i]);
+    } else if (typeof arr[i] === "object" && arr[i].attr) {
+      ret.push(can.getObject(arr[i].attr, context));
+    } else if (can.isArray(arr[i]) && arr[i].value) {
+      var p = true;
+      for (var j = 0; j < arr[i].length; j ++) {
+        var attr = can.getObject(arr[i][j].attr, context);
+        if (arr[i][j].inverse ? !isExtendedFalsy(attr) : isExtendedFalsy(attr)) {
+          p = false;
+          break;
         }
       }
-      return ret;
-    }
-
-    function buildClassString(arr, context) {
-      var ret = [];
-      for(var i = 0; i < arr.length; i++) {
-        if(typeof arr[i] === "string") {
-          ret.push(arr[i]);
-        } else if(typeof arr[i] === "object" && arr[i].attr) {
-          ret.push(can.getObject(arr[i].attr, context));
-        } else if(can.isArray(arr[i]) && arr[i].value) {
-          var p = true;
-          for(var j = 0; j < arr[i].length; j ++) {
-            var attr = can.getObject(arr[i][j].attr, context);
-            if(arr[i][j].inverse ? !isExtendedFalsy(attr) : isExtendedFalsy(attr)) {
-              p = false;
-              break;
-            }
-          }
-          if(p) {
-            ret.push(arr[i].value);
-          }
-        } else {
-          throw "Unsupported class building expression: " + JSON.stringify(arr[i]);
-        }
+      if (p) {
+        ret.push(arr[i].value);
       }
-
-      return ret.join(" ");
+    } else {
+      throw "Unsupported class building expression: " + JSON.stringify(arr[i]);
     }
+  }
 
-  Mustache.registerHelper("addclass", function(prefix, compute, options) {
-    prefix = resolve_computed(prefix);
-    return function(el) {
-      var curClass = null
-        , wasAttached = false
-        , callback
+  return ret.join(" ");
+}
+
+Mustache.registerHelper("addclass", function (prefix, compute, options) {
+  prefix = resolve_computed(prefix);
+  return function (el) {
+    var curClass = null
+      , wasAttached = false
+      , callback
+      ;
+
+    callback = function (_ev, newVal, _oldVal) {
+      var nowAttached = $(el).closest('body').length > 0
+        , newClass = null
         ;
 
-      callback = function(_ev, newVal, _oldVal) {
-        var nowAttached = $(el).closest('body').length > 0
-          , newClass = null
-          ;
+      //  If we were once attached and now are not, unbind this callback.
+      if (wasAttached && !nowAttached) {
+        compute.unbind('change', callback);
+        return;
+      } else if (nowAttached && !wasAttached) {
+        wasAttached = true;
+      }
 
-        //  If we were once attached and now are not, unbind this callback.
-        if (wasAttached && !nowAttached) {
-          compute.unbind('change', callback);
-          return;
-        } else if (nowAttached && !wasAttached) {
-          wasAttached = true;
-        }
+      if (newVal && newVal.toLowerCase)
+        newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, '-');
 
-        if (newVal && newVal.toLowerCase)
-          newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, '-');
-
-        if (curClass) {
-          $(el).removeClass(curClass);
-          curClass = null;
-        }
-        if (newClass) {
-          $(el).addClass(newClass);
-          curClass = newClass;
-        }
-      };
-
-      compute.bind('change', callback);
-      callback(null, resolve_computed(compute));
+      if (curClass) {
+        $(el).removeClass(curClass);
+        curClass = null;
+      }
+      if (newClass) {
+        $(el).addClass(newClass);
+        curClass = newClass;
+      }
     };
+
+    compute.bind('change', callback);
+    callback(null, resolve_computed(compute));
+  };
+});
+
+/**
+  Add a live bound attribute to an element, avoiding buggy CanJS attribute interpolations.
+  Usage:
+  {{#withattr attrname attrvalue attrname attrvalue...}}<element/>{{/withattr}} to apply to the child element
+  {{{withattr attrname attrvalue attrname attrvalue...}}} to apply to the parent element a la XSLT <xsl:attribute>. Note the triple braces!
+  attrvalue can take mustache tokens, but they should be backslash escaped.
+*/
+Mustache.registerHelper("withattr", function () {
+  var args = can.makeArray(arguments).slice(0, arguments.length - 1)
+  , options = arguments[arguments.length - 1]
+  , attribs = []
+  , that = this.___st4ck ? this[this.length-1] : this
+  , data = can.extend({}, that)
+  , hash = quickHash(args.join("-"), quickHash(that._cid)).toString(36)
+  , attr_count = 0;
+
+  var hook = can.view.hook(function (el, parent, view_id) {
+    var content = options.fn(that);
+
+    if (content) {
+      var frag = can.view.frag(content, parent);
+      var $newel = $(frag.querySelector("*"));
+      var newel = $newel[0];
+
+      el.parentNode ? el.parentNode.replaceChild(newel, el) : $(parent).append($newel);
+      el = newel;
+    } else {
+      //we are inside the element we want to add attrs to.
+      var p = el.parentNode;
+      p.removeChild(el);
+      el = p;
+    }
+
+    function sub_all(el, ev, newVal, oldVal) {
+      var $el = $(el);
+      can.each(attribs, function (attrib) {
+        $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data)).html());
+      });
+    }
+
+    for (var i = 0; i < args.length - 1; i += 2) {
+      var attr_name = args[i];
+      var attr_tmpl = args[i + 1];
+      //set up bindings where appropriate
+      attr_tmpl = attr_tmpl.replace(/\{[^\}]*\}/g, function (match, offset, string) {
+        var token = match.substring(1, match.length - 1);
+        if (typeof data[token] === "function") {
+          data[token].bind && data[token].bind("change." + hash, $.proxy(sub_all, that, el));
+          data[token] = data[token].call(that);
+        }
+
+        that.bind && that.bind(token + "." + hash, $.proxy(sub_all, that, el));
+
+        return "{" + match + "}";
+      });
+      can.view.mustache("withattr_" + hash + "_" + (++attr_count), attr_tmpl);
+      attribs.push({name : attr_name, value : "withattr_" + hash + "_" + attr_count });
+    }
+
+    sub_all(el);
+
   });
 
-  /**
-    Add a live bound attribute to an element, avoiding buggy CanJS attribute interpolations.
-    Usage:
-    {{#withattr attrname attrvalue attrname attrvalue...}}<element/>{{/withattr}} to apply to the child element
-    {{{withattr attrname attrvalue attrname attrvalue...}}} to apply to the parent element a la XSLT <xsl:attribute>. Note the triple braces!
-    attrvalue can take mustache tokens, but they should be backslash escaped.
-  */
-  Mustache.registerHelper("withattr", function() {
-    var args = can.makeArray(arguments).slice(0, arguments.length - 1)
-    , options = arguments[arguments.length - 1]
-    , attribs = []
-    , that = this.___st4ck ? this[this.length-1] : this
-    , data = can.extend({}, that)
-    , hash = quickHash(args.join("-"), quickHash(that._cid)).toString(36)
-    , attr_count = 0;
+  return "<div"
+  + hook
+  + " data-replace='true'/>";
+});
 
-    var hook = can.view.hook(function(el, parent, view_id) {
-      var content = options.fn(that);
-
-      if(content) {
-        var frag = can.view.frag(content, parent);
-        var $newel = $(frag.querySelector("*"));
-        var newel = $newel[0];
-
-        el.parentNode ? el.parentNode.replaceChild(newel, el) : $(parent).append($newel);
-        el = newel;
-      } else {
-        //we are inside the element we want to add attrs to.
-        var p = el.parentNode;
-        p.removeChild(el);
-        el = p;
-      }
-
-      function sub_all(el, ev, newVal, oldVal) {
-        var $el = $(el);
-        can.each(attribs, function(attrib) {
-          $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data)).html());
-        });
-      }
-
-      for(var i = 0; i < args.length - 1; i += 2) {
-        var attr_name = args[i];
-        var attr_tmpl = args[i + 1];
-        //set up bindings where appropriate
-        attr_tmpl = attr_tmpl.replace(/\{[^\}]*\}/g, function(match, offset, string) {
-          var token = match.substring(1, match.length - 1);
-          if(typeof data[token] === "function") {
-            data[token].bind && data[token].bind("change." + hash, $.proxy(sub_all, that, el));
-            data[token] = data[token].call(that);
-          }
-
-          that.bind && that.bind(token + "." + hash, $.proxy(sub_all, that, el));
-
-          return "{" + match + "}";
-        });
-        can.view.mustache("withattr_" + hash + "_" + (++attr_count), attr_tmpl);
-        attribs.push({name : attr_name, value : "withattr_" + hash + "_" + attr_count });
-      }
-
-      sub_all(el);
-
-    });
-
-    return "<div"
-    + hook
-    + " data-replace='true'/>";
-  });
-
-Mustache.registerHelper("if_equals", function(val1, val2, options) {
+Mustache.registerHelper("if_equals", function (val1, val2, options) {
   var that = this, _val1, _val2;
   function exec() {
-    if(_val1 == _val2) return options.fn(options.contexts);
+    if (_val1 == _val2) return options.fn(options.contexts);
     else return options.inverse(options.contexts);
   }
-    if(typeof val1 === "function") {
-      if(val1.isComputed) {
-        val1.bind("change", function(ev, newVal, oldVal) {
+    if (typeof val1 === "function") {
+      if (val1.isComputed) {
+        val1.bind("change", function (ev, newVal, oldVal) {
           _val1 = newVal;
           return exec();
         });
@@ -257,9 +257,9 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
     } else {
       _val1 = val1;
     }
-    if(typeof val2 === "function") {
-      if(val2.isComputed) {
-        val2.bind("change", function(ev, newVal, oldVal) {
+    if (typeof val2 === "function") {
+      if (val2.isComputed) {
+        val2.bind("change", function (ev, newVal, oldVal) {
           _val2 = newVal;
           exec();
         });
@@ -272,45 +272,45 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
   return exec();
 });
 
-Mustache.registerHelper("if_match", function(val1, val2, options) {
+Mustache.registerHelper("if_match", function (val1, val2, options) {
   var that = this
   , _val1 = resolve_computed(val1)
   , _val2 = resolve_computed(val2);
   function exec() {
     var re = new RegExp(_val2);
-    if(re.test(_val1)) return options.fn(options.contexts);
+    if (re.test(_val1)) return options.fn(options.contexts);
     else return options.inverse(options.contexts);
   }
   return exec();
 });
 
-Mustache.registerHelper("in_array", function(needle, haystack, options) {
+Mustache.registerHelper("in_array", function (needle, haystack, options) {
   var found = false;
   needle = resolve_computed(needle);
   haystack = resolve_computed(haystack);
   haystack.attr("length");
 
-  can.each(haystack, function(_, index) {
-    if(haystack.attr(index) === needle) {
+  can.each(haystack, function (_, index) {
+    if (haystack.attr(index) === needle) {
       found = true;
     }
   });
-  if(found) {
+  if (found) {
     return options.fn(options.contexts);
   } else {
     return options.inverse(options.contexts);
   }
 });
 
-Mustache.registerHelper("if_null", function(val1, options) {
+Mustache.registerHelper("if_null", function (val1, options) {
   var that = this, _val1;
   function exec() {
-    if(_val1 == null) return options.fn(that);
+    if (_val1 == null) return options.fn(that);
     else return options.inverse(that);
   }
-    if(typeof val1 === "function") {
-      if(val1.isComputed) {
-        val1.bind("change", function(ev, newVal, oldVal) {
+    if (typeof val1 === "function") {
+      if (val1.isComputed) {
+        val1.bind("change", function (ev, newVal, oldVal) {
           _val1 = newVal;
           return exec();
         });
@@ -322,57 +322,64 @@ Mustache.registerHelper("if_null", function(val1, options) {
   return exec();
 });
 
-can.each(["firstexist", "firstnonempty"], function(fname) {
-  Mustache.registerHelper(fname, function() {
-    var args = can.makeArray(arguments).slice(0, arguments.length - 1);
-    for(var i = 0; i < args.length; i++) {
-      var v = args[i];
-      v = resolve_computed(v);
-      if(v != null && (fname === "firstexist" || !!(v.toString().trim().replace(/&nbsp;|\s|<br *\/?>/g, "")))) return v.toString();
-    }
-    return "";
-  });
+// Resolve and return the first computed value from a list
+Mustache.registerHelper("firstexist", function () {
+  var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)
+  for (var i = 0; i < args.length; i++) {
+    var v = resolve_computed(args[i]);
+    if (v != null) return v.toString();
+  }
+  return "";
 });
 
-Mustache.registerHelper("pack", function() {
+// Return the first value from a list that computes to a non-empty string
+Mustache.registerHelper("firstnonempty", function () {
+  var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)
+  for (var i = 0; i < args.length; i++) {
+    var v = resolve_computed(args[i]);
+    if (v != null && !!v.toString().trim().replace(/&nbsp;|\s|<br *\/?>/g, "")) return v.toString();
+  }
+  return "";
+});
+
+Mustache.registerHelper("pack", function () {
   var options = arguments[arguments.length - 1];
   var objects = can.makeArray(arguments).slice(0, arguments.length - 1);
   var pack = {};
-  can.each(objects, function(obj, i) {
-      if(typeof obj === "function") {
+  can.each(objects, function (obj, i) {
+      if (typeof obj === "function") {
           objects[i] = obj = obj();
       }
 
-    if(obj._data) {
+    if (obj._data) {
       obj = obj._data;
     }
-    for(var k in obj) {
-      if(obj.hasOwnProperty(k)) {
+    for (var k in obj) {
+      if (obj.hasOwnProperty(k)) {
         pack[k] = obj[k];
       }
     }
   });
-  if(options.hash) {
-    for(var k in options.hash) {
-      if(options.hash.hasOwnProperty(k)) {
+  if (options.hash) {
+    for (var k in options.hash) {
+      if (options.hash.hasOwnProperty(k)) {
         pack[k] = options.hash[k];
       }
     }
   }
   pack = new can.Observe(pack);
-  var retval = options.fn(pack);
-  return retval;
+  return options.fn(pack);
 });
 
 
-Mustache.registerHelper("is_beta", function(){
+Mustache.registerHelper("is_beta", function () {
   var options = arguments[arguments.length - 1];
-  if($(document.body).hasClass('BETA')) return options.fn(this);
+  if ($(document.body).hasClass('BETA')) return options.fn(this);
   else return options.inverse(this);
 });
 
-Mustache.registerHelper("if_page_type", function(page_type, options) {
-  var options = arguments[arguments.length - 1];
+Mustache.registerHelper("if_page_type", function (page_type, options) {
+  var options = arguments[arguments.length - 1];  // FIXME duplicate declaration of 'options'
   if (window.location.pathname.split('/')[1] == page_type)
     return options.fn(this);
   else
@@ -381,25 +388,25 @@ Mustache.registerHelper("if_page_type", function(page_type, options) {
 
 // Render a named template with the specified context, serialized and
 // augmented by 'options.hash'
-Mustache.registerHelper("render", function(template, context, options) {
-  if(!options) {
+Mustache.registerHelper("render", function (template, context, options) {
+  if (!options) {
     options = context;
     context = this;
   }
 
-  if(typeof context === "function") {
+  if (typeof context === "function") {
     context = context();
   }
 
-  if(typeof template === "function") {
+  if (typeof template === "function") {
     template = template();
   }
 
   context = $.extend({}, context.serialize ? context.serialize() : context);
 
   if (options.hash) {
-    for(var k in options.hash) {
-      if(options.hash.hasOwnProperty(k)) {
+    for (var k in options.hash) {
+      if (options.hash.hasOwnProperty(k)) {
         context[k] = options.hash[k];
         if (typeof context[k] == "function")
           context[k] = context[k]();
@@ -414,23 +421,23 @@ Mustache.registerHelper("render", function(template, context, options) {
 
 // Like 'render', but doesn't serialize the 'context' object, and doesn't
 // apply options.hash
-Mustache.registerHelper("renderLive", function(template, context, options) {
-  if(!options) {
+Mustache.registerHelper("renderLive", function (template, context, options) {
+  if (!options) {
     options = context;
     context = this;
   } else {
     options.contexts = options.contexts.add(context);
   }
 
-  if(typeof context === "function") {
+  if (typeof context === "function") {
     context = context();
   }
 
-  if(typeof template === "function") {
+  if (typeof template === "function") {
     template = template();
   }
 
-  if(options.hash) {
+  if (options.hash) {
     options.contexts = options.contexts.add(options.hash);
   }
 
@@ -442,25 +449,25 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
 //  Hook keys can be composed with dot separators by passing in multiple
 //  positional parameters.
 //
-// Example: {{{render_hooks 'Audit' 'test_info'}}}  renders all hooks registerd
+// Example: {{{render_hooks 'Audit' 'test_info'}}}  renders all hooks registered
 //  with GGRC.register_hook("Audit.test_info", <template path>)
-Mustache.registerHelper("render_hooks", function() {
+Mustache.registerHelper("render_hooks", function () {
   var args = can.makeArray(arguments),
       options = args.splice(args.length - 1, 1)[0],
       hook = can.map(args, Mustache.resolve).join(".");
 
-  return can.map(can.getObject(hook, GGRC.hooks) || [], function(hook_tmpl) {
+  return can.map(can.getObject(hook, GGRC.hooks) || [], function (hook_tmpl) {
     return can.Mustache.getHelper("renderLive", options.contexts).fn(hook_tmpl, options.contexts, options);
   }).join("\n");
 });
 
-//Checks whether any hooks are registered for a particular key
-Mustache.registerHelper("if_hooks", function() {
+// Checks whether any hooks are registered for a particular key
+Mustache.registerHelper("if_hooks", function () {
   var args = can.makeArray(arguments),
       options = args.splice(args.length - 1, 1)[0],
       hook = can.map(args, Mustache.resolve).join(".");
 
-  if((can.getObject(hook, GGRC.hooks) || []).length > 0) {
+  if ((can.getObject(hook, GGRC.hooks) || []).length > 0) {
     return options.fn(options.contexts);
   } else {
     return options.inverse(options.contexts);
@@ -474,20 +481,20 @@ var defer_render = Mustache.defer_render = function defer_render(tag_prefix, fun
 
   tag_name = tag_name || "span";
 
-  if(typeof funcs === "function") {
+  if (typeof funcs === "function") {
     funcs = { done : funcs };
   }
 
   function hookup(element, parent, view_id) {
     var $element = $(element)
-    , f = function() {
+    , f = function () {
       var g = deferred && deferred.state() === "rejected" ? funcs.fail : funcs.done
         , args = arguments
         , term = element.nextSibling
-        , compute = can.compute(function() { return g.apply(this, args) || ""; }, this)
+        , compute = can.compute(function () { return g.apply(this, args) || ""; }, this)
         ;
 
-      if(element.parentNode) {
+      if (element.parentNode) {
         can.view.live.html(element, compute, parent);
       } else {
         $element.after(compute());
@@ -506,7 +513,7 @@ var defer_render = Mustache.defer_render = function defer_render(tag_prefix, fun
     else
       setTimeout(f, 13);
 
-    if(funcs.progress) {
+    if (funcs.progress) {
       // You would think that we could just do $element.append(funcs.progress()) here
       //  but for some reason we have to hookup our own fragment.
       $element.append(can.view.hookup($("<div>").html(funcs.progress())).html());
@@ -515,9 +522,9 @@ var defer_render = Mustache.defer_render = function defer_render(tag_prefix, fun
 
   hook = can.view.hook(hookup);
   return ["<", tag_prefix, " ", hook, ">", "</", tag_name, ">"].join("");
-}
+};
 
-Mustache.registerHelper("defer", function(prop, deferred, options) {
+Mustache.registerHelper("defer", function (prop, deferred, options) {
   var context = this;
   var tag_name;
   if (!options) {
@@ -529,7 +536,7 @@ Mustache.registerHelper("defer", function(prop, deferred, options) {
   allow_fail = (options.hash || {}).allow_fail || false;
 
   deferred = resolve_computed(deferred);
-  typeof deferred === "function" && (deferred = deferred());
+  if (typeof deferred === "function") deferred = deferred();
   function finish(items) {
     var ctx = {};
     ctx[prop] = items;
@@ -542,7 +549,7 @@ Mustache.registerHelper("defer", function(prop, deferred, options) {
   return defer_render(tag_name, { done: finish, fail: allow_fail ? finish : null, progress: progress }, deferred);
 });
 
-Mustache.registerHelper("allow_help_edit", function() {
+Mustache.registerHelper("allow_help_edit", function () {
   var options = arguments[arguments.length - 1];
   var instance = this && this.instance ? this.instance : options.context.instance;
   if (instance) {
@@ -556,7 +563,7 @@ Mustache.registerHelper("allow_help_edit", function() {
   return options.inverse(this);
 });
 
-Mustache.registerHelper("all", function(type, params, options) {
+Mustache.registerHelper("all", function (type, params, options) {
   var model = CMS.Models[type] || GGRC.Models[type]
   , $dummy_content = $(options.fn({}).trim()).first()
   , tag_name = $dummy_content.prop("tagName")
@@ -564,44 +571,44 @@ Mustache.registerHelper("all", function(type, params, options) {
   , require_permission = ""
   , items_dfd, hook;
 
-  if(!options) {
+  if (!options) {
     options = params;
     params = {};
   } else {
     params = JSON.parse(resolve_computed(params));
   }
-  if("require_permission" in params){
+  if ("require_permission" in params) {
     require_permission = params.require_permission;
     delete params.require_permission;
   }
 
   function hookup(element, parent, view_id) {
-    items_dfd.done(function(items){
+    items_dfd.done(function (items) {
       var val
       , $parent = $(element.parentNode)
       , $el = $(element);
-      items = can.map(items, function(item){
-        if(require_permission === "" || Permission.is_allowed(require_permission, type, item.context.id)){
+      items = can.map(items, function (item) {
+        if (require_permission === "" || Permission.is_allowed(require_permission, type, item.context.id)) {
           return item;
         }
       });
-      can.each(items, function(item) {
+      can.each(items, function (item) {
         $(can.view.frag(options.fn(item), parent)).appendTo(element.parentNode);
       });
-      if($parent.is("select")
+      if ($parent.is("select")
         && $parent.attr("name")
         && context
       ) {
         val = context.attr($parent.attr("name"));
-        if(val) {
+        if (val) {
           $parent.find("option[value=" + val + "]").attr("selected", true);
         } else {
           context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0] || null);
         }
       }
-      $parent.parent().find(":data(spinner)").each(function(i, el) {
+      $parent.parent().find(":data(spinner)").each(function (i, el) {
         var spinner = $(el).data("spinner");
-        spinner && spinner.stop();
+        if (spinner) spinner.stop();
       });
       $el.remove();
       //since we are removing the original live bound element, replace the
@@ -612,20 +619,20 @@ Mustache.registerHelper("all", function(type, params, options) {
     return element.parentNode;
   }
 
-  if($dummy_content.attr("data-view-id")) {
+  if ($dummy_content.attr("data-view-id")) {
     can.view.hookups[$dummy_content.attr("data-view-id")] = hookup;
   } else {
     hook = can.view.hook(hookup);
-    $dummy_content.attr.apply($dummy_content, can.map(hook.split('='), function(s) { return s.replace(/'|"| /, "");}));
+    $dummy_content.attr.apply($dummy_content, can.map(hook.split('='), function (s) { return s.replace(/'|"| /, "");}));
   }
 
   items_dfd = model.findAll(params);
   return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
 });
 
-can.each(["with_page_object_as", "with_current_user_as"], function(fname) {
-  Mustache.registerHelper(fname, function(name, options) {
-    if(!options) {
+can.each(["with_page_object_as", "with_current_user_as"], function (fname) {
+  Mustache.registerHelper(fname, function (name, options) {
+    if (!options) {
       options = name;
       name = fname.replace(/with_(.*)_as/, "$1");
     }
@@ -634,7 +641,7 @@ can.each(["with_page_object_as", "with_current_user_as"], function(fname) {
                           || CMS.Models.Person.model(GGRC.current_user))
                        : GGRC.page_instance()
                        );
-    if(page_object) {
+    if (page_object) {
       var p = {};
       p[name] = page_object;
       options.contexts = options.contexts.add(p);
@@ -645,7 +652,7 @@ can.each(["with_page_object_as", "with_current_user_as"], function(fname) {
   });
 });
 
-Mustache.registerHelper("iterate", function() {
+Mustache.registerHelper("iterate", function () {
   var i = 0, j = 0
   , args = can.makeArray(arguments).slice(0, arguments.length - 1)
   , options = arguments[arguments.length - 1]
@@ -655,9 +662,9 @@ Mustache.registerHelper("iterate", function() {
 
   options.hash && options.hash.listen && Mustache.resolve(options.hash.listen);
 
-  for(; i < args.length; i += step) {
+  for (; i < args.length; i += step) {
     ctx.iterator = typeof args[i] === "string" ? new String(args[i]) : args[i];
-    for(j = 0; j < step; j++) {
+    for (j = 0; j < step; j++) {
       ctx["iterator_" + j] = typeof args[i + j] === "string" ? new String(args[i + j]) : args[i + j];
     }
     ret.push(options.fn(options.contexts.add(ctx)));
@@ -666,20 +673,19 @@ Mustache.registerHelper("iterate", function() {
   return ret.join("");
 });
 
-Mustache.registerHelper("is_private", function(options) {
+Mustache.registerHelper("is_private", function (options) {
   var context = this;
-  if(options.isComputed) {
+  if (options.isComputed) {
     context = resolve_computed(options);
     options = arguments[1];
   }
-  var private = context && context.attr('private');
-  if (private) {
+  if (context && context.attr('private')) {
     return options.fn(context);
   }
   return options.inverse(context);
 });
 
-Mustache.registerHelper("option_select", function(object, attr_name, role, options) {
+Mustache.registerHelper("option_select", function (object, attr_name, role, options) {
   var selected_option = object.attr(attr_name)
     , selected_id = selected_option ? selected_option.id : null
     , options_dfd = CMS.Models.Option.for_role(role)
@@ -695,7 +701,7 @@ Mustache.registerHelper("option_select", function(object, attr_name, role, optio
       , '<option value=""'
       ,   !selected_id ? ' selected=selected' : ''
       , '>---</option>'
-      , can.map(options, function(option) {
+      , can.map(options, function (option) {
           return [
             '<option value="', option.id, '"'
           ,   selected_id == option.id ? ' selected=selected' : ''
@@ -711,9 +717,9 @@ Mustache.registerHelper("option_select", function(object, attr_name, role, optio
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
 
-Mustache.registerHelper("category_select", function(object, attr_name, category_type, options) {
+Mustache.registerHelper("category_select", function (object, attr_name, category_type, options) {
   var selected_options = object[attr_name] || [] //object.attr(attr_name) || []
-    , selected_ids = can.map(selected_options, function(selected_option) {
+    , selected_ids = can.map(selected_options, function (selected_option) {
         return selected_option.id;
       })
     , options_dfd = CMS.Models[category_type].findAll()
@@ -721,7 +727,7 @@ Mustache.registerHelper("category_select", function(object, attr_name, category_
     , tag_prefix = 'select class="span12" multiple="multiple"'
     ;
 
-  tab_index = typeof tab_index !== 'undefined' ? ' tabindex="' + tab_index + '"' : ''
+  tab_index = typeof tab_index !== 'undefined' ? ' tabindex="' + tab_index + '"' : '';
   function get_select_html(options) {
     return [
         '<select class="span12" multiple="multiple"'
@@ -729,7 +735,7 @@ Mustache.registerHelper("category_select", function(object, attr_name, category_
       ,   ' name="' + attr_name + '"'
       ,   tab_index
       , '>'
-      , can.map(options, function(option) {
+      , can.map(options, function (option) {
           return [
             '<option value="', option.id, '"'
           ,   selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''
@@ -745,7 +751,7 @@ Mustache.registerHelper("category_select", function(object, attr_name, category_
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
 
-Mustache.registerHelper("schemed_url", function(url) {
+Mustache.registerHelper("schemed_url", function (url) {
   if (url) {
     url = url.isComputed? url(): url;
     if (url && !url.match(/^[a-zA-Z]+:/)) {
@@ -758,7 +764,7 @@ Mustache.registerHelper("schemed_url", function(url) {
 function when_attached_to_dom(el, cb) {
   // Trigger the "more" toggle if the height is the same as the scrollable area
   el = $(el);
-  !function poll() {
+  return !function poll() {
     if (el.closest(document.documentElement).length) {
       cb();
     }
@@ -768,31 +774,31 @@ function when_attached_to_dom(el, cb) {
   }();
 }
 
-Mustache.registerHelper("open_on_create", function(style) {
-  return function(el) {
-    when_attached_to_dom(el, function() {
+Mustache.registerHelper("open_on_create", function (style) {
+  return function (el) {
+    when_attached_to_dom(el, function () {
       $(el).openclose("open");
     });
   };
 });
 
-Mustache.registerHelper("trigger_created", function() {
-  return function(el) {
-    when_attached_to_dom(el, function() {
+Mustache.registerHelper("trigger_created", function () {
+  return function (el) {
+    when_attached_to_dom(el, function () {
       $(el).trigger("contentAttached");
     });
   };
 });
 
-Mustache.registerHelper("show_long", function() {
+Mustache.registerHelper("show_long", function () {
   return  [
       '<a href="javascript://" class="show-long"'
-    , can.view.hook(function(el, parent, view_id) {
+    , can.view.hook(function (el, parent, view_id) {
         el = $(el);
 
         var content = el.prevAll('.short');
-        if (content.length) {
-          !function hide() {
+        if (content.length)
+          return !function hide() {
             // Trigger the "more" toggle if the height is the same as the scrollable area
             if (el[0].offsetHeight) {
               if (content[0].offsetHeight === content[0].scrollHeight) {
@@ -805,7 +811,7 @@ Mustache.registerHelper("show_long", function() {
                 , toggle;
               if (root.length && !root.hasClass('item-open') && (toggle = root.find('.openclose')) && toggle.length) {
                 // Listen for the toggle instead of timeouts
-                toggle.one('click', function() {
+                toggle.one('click', function () {
                   // Delay to ensure all event handlers have fired
                   setTimeout(hide, 0);
                 });
@@ -816,13 +822,13 @@ Mustache.registerHelper("show_long", function() {
               }
             }
           }();
-        }
+
       })
     , ">...more</a>"
   ].join('');
 });
 
-Mustache.registerHelper("using", function(options) {
+Mustache.registerHelper("using", function (options) {
   var refresh_queue = new RefreshQueue()
     , context
     , frame = new can.Observe()
@@ -854,18 +860,18 @@ Mustache.registerHelper("using", function(options) {
   return defer_render('span', finish, refresh_queue.trigger());
 });
 
-Mustache.registerHelper("with_mapping", function(binding, options) {
+Mustache.registerHelper("with_mapping", function (binding, options) {
   var refresh_queue = new RefreshQueue()
     , context = arguments.length > 2 ? resolve_computed(options) : this
     , frame = new can.Observe()
     , loader
     , stack;
 
-  if(!context) // can't find an object to map to.  Do nothing;
+  if (!context) // can't find an object to map to.  Do nothing;
     return;
 
   loader = context.get_binding(binding);
-  if(!loader)
+  if (!loader)
     return;
   frame.attr(binding, loader.list);
 
@@ -882,7 +888,7 @@ Mustache.registerHelper("with_mapping", function(binding, options) {
 });
 
 
-Mustache.registerHelper("person_roles", function(person, scope, options) {
+Mustache.registerHelper("person_roles", function (person, scope, options) {
   var roles_deferred = new $.Deferred()
     , refresh_queue = new RefreshQueue()
     ;
@@ -897,13 +903,13 @@ Mustache.registerHelper("person_roles", function(person, scope, options) {
   refresh_queue.enqueue(person);
   // Force monitoring of changes to `person.user_roles`
   person.attr("user_roles");
-  refresh_queue.trigger().then(function() {
+  refresh_queue.trigger().then(function () {
     var user_roles = person.user_roles.reify()
       , user_roles_refresh_queue = new RefreshQueue()
       ;
     user_roles_refresh_queue.enqueue(user_roles);
-    user_roles_refresh_queue.trigger().then(function() {
-      var roles = can.map(can.makeArray(user_roles), function(user_role) {
+    user_roles_refresh_queue.trigger().then(function () {
+      var roles = can.map(can.makeArray(user_roles), function (user_role) {
               if (user_role.role) {
                 return user_role.role.reify();
               }
@@ -911,8 +917,8 @@ Mustache.registerHelper("person_roles", function(person, scope, options) {
         , roles_refresh_queue = new RefreshQueue()
         ;
       roles_refresh_queue.enqueue(roles.splice());
-      roles_refresh_queue.trigger().then(function() {
-        roles = can.map(can.makeArray(roles), function(role) {
+      roles_refresh_queue.trigger().then(function () {
+        roles = can.map(can.makeArray(roles), function (role) {
           if (!scope || new RegExp(scope).test(role.scope)) {
             return role;
           }
@@ -941,7 +947,7 @@ Mustache.registerHelper("person_roles", function(person, scope, options) {
   return defer_render('span', finish, roles_deferred);
 });
 
-Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
+Mustache.registerHelper("unmap_or_delete", function (instance, mappings) {
     instance = resolve_computed(instance);
     mappings = resolve_computed(mappings);
   if (mappings.indexOf(instance) > -1) {
@@ -958,20 +964,20 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
 });
 
 Mustache.registerHelper("with_direct_mappings_as",
-    function(var_name, parent_instance, instance, options) {
+    function (var_name, parent_instance, instance, options) {
   // Finds the mapping, if any, between `parent_object` and `instance`, then
   // renders the block with those mappings available in the scope as `var_name`
 
   parent_instance = Mustache.resolve(parent_instance);
   instance = Mustache.resolve(instance);
 
-  if(!instance) {
+  if (!instance) {
       instance = [];
-  } else if(typeof instance.length === "number") {
-      instance = can.map(instance, function(inst) {
+  } else if (typeof instance.length === "number") {
+      instance = can.map(instance, function (inst) {
         return inst.instance ? inst.instance : inst;
       });
-  } else if(instance.instance) {
+  } else if (instance.instance) {
       instance = [instance.instance];
   } else {
       instance = [instance];
@@ -979,9 +985,9 @@ Mustache.registerHelper("with_direct_mappings_as",
 
   var frame = new can.Observe();
   frame.attr(var_name, []);
-  GGRC.all_local_results(parent_instance).then(function(results) {
+  GGRC.all_local_results(parent_instance).then(function (results) {
     var instance_only = options.hash && options.hash.instances_only;
-    can.each(results, function(result) {
+    can.each(results, function (result) {
       if (~can.inArray(result.instance, instance)) {
         frame.attr(var_name).push(instance_only ? result.instance : result);
       }
@@ -991,7 +997,7 @@ Mustache.registerHelper("with_direct_mappings_as",
   return options.fn(options.contexts.add(frame));
 });
 
-Mustache.registerHelper("result_direct_mappings", function(
+Mustache.registerHelper("result_direct_mappings", function (
     bindings, parent_instance, options) {
   bindings = Mustache.resolve(bindings);
   bindings = resolve_computed(bindings);
@@ -1014,11 +1020,11 @@ Mustache.registerHelper("result_direct_mappings", function(
   }
   mappings_type = has_direct_mappings ?
       (has_external_mappings ? "Dir & Ext" : "Dir") : "Ext";
-  options.context.mappings_type = mappings_type
+  options.context.mappings_type = mappings_type;
   return options.fn(options.contexts);
 });
 
-Mustache.registerHelper("if_result_has_extended_mappings", function(
+Mustache.registerHelper("if_result_has_extended_mappings", function (
     bindings, parent_instance, options) {
   //  Render the `true` / `fn` block if the `result` exists (in this list)
   //  due to mappings other than directly to the `parent_instance`.  Otherwise
@@ -1044,7 +1050,7 @@ Mustache.registerHelper("if_result_has_extended_mappings", function(
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("each_with_extras_as", function(name, list, options) {
+Mustache.registerHelper("each_with_extras_as", function (name, list, options) {
   //  Iterate over `list` and render the provided block with additional
   //  variables available in the context, specifically to enable joining with
   //  commas and using "and" in the right place.
@@ -1085,14 +1091,14 @@ Mustache.registerHelper("each_with_extras_as", function(name, list, options) {
   return output.join("");
 });
 
-Mustache.registerHelper("link_to_tree", function() {
+Mustache.registerHelper("link_to_tree", function () {
   var args = [].slice.apply(arguments)
     , options = args.pop()
     , link = []
     ;
 
   args = can.map(args, Mustache.resolve);
-  args = can.map(args, function(stub) { return stub.reify(); });
+  args = can.map(args, function (stub) { return stub.reify(); });
   link.push("#" + args[0].constructor.table_singular + "_widget");
   //  FIXME: Add this back when extended-tree-routing is enabled
   //for (i=0; i<args.length; i++)
@@ -1100,7 +1106,7 @@ Mustache.registerHelper("link_to_tree", function() {
   return link.join("/");
 });
 
-Mustache.registerHelper("date", function(date) {
+Mustache.registerHelper("date", function (date) {
   var m = moment(new Date(date.isComputed ? date() : date))
     , dst = m.isDST()
     ;
@@ -1114,7 +1120,7 @@ Mustache.registerHelper("date", function(date) {
  *  {{#is_allowed ACTION RESOURCE_INSTANCE}} content {{/is_allowed}}
  */
 var allowed_actions = ["create", "read", "update", "delete", "view_object_page", "__GGRC_ADMIN__"];
-Mustache.registerHelper("is_allowed", function() {
+Mustache.registerHelper("is_allowed", function () {
   var args = Array.prototype.slice.call(arguments, 0)
     , actions = []
     , resource
@@ -1127,7 +1133,7 @@ Mustache.registerHelper("is_allowed", function() {
     ;
 
   // Resolve arguments
-  can.each(args, function(arg, i) {
+  can.each(args, function (arg, i) {
     arg = typeof arg === 'function' && arg.isComputed ? arg() : arg;
 
     if (typeof arg === 'string' && can.inArray(arg, allowed_actions) > -1) {
@@ -1144,7 +1150,7 @@ Mustache.registerHelper("is_allowed", function() {
     context_id = options.hash.context;
     if (typeof context_id === 'function' && context_id.isComputed)
       context_id = context_id();
-    if(context_id && typeof context_id === "object" && context_id.id) {
+    if (context_id && typeof context_id === "object" && context_id.id) {
       // Passed in the context object instead of the context ID, so use the ID
       context_id = context_id.id;
     }
@@ -1173,12 +1179,12 @@ Mustache.registerHelper("is_allowed", function() {
   }
 
   // Check permissions
-  can.each(actions, function(action) {
+  can.each(actions, function (action) {
     if (context_id !== undefined) {
       passed = passed && Permission.is_allowed(action, resource_type, context_id);
     }
     if (passed && context_override === 'for' && resource) {
-      passed = passed && Permission.is_allowed_for(action, resource);
+      passed = passed && Permission.is_allowed_for (action, resource);
     }
     else if (passed && context_override === 'any' && resource_type) {
       passed = passed && Permission.is_allowed_any(action, resource_type);
@@ -1191,21 +1197,21 @@ Mustache.registerHelper("is_allowed", function() {
     ;
 });
 
-Mustache.registerHelper("is_allowed_all", function(action, instances, options) {
+Mustache.registerHelper("is_allowed_all", function (action, instances, options) {
   var passed = true;
 
   action = resolve_computed(action);
   instances = resolve_computed(instances);
 
-  can.each(instances, function(instance) {
+  can.each(instances, function (instance) {
     var resource_type
       , context_id
       , base_mappings = []
       ;
 
-    if(instance instanceof GGRC.ListLoaders.MappingResult) {
-      instance.walk_instances(function(inst, mapping) {
-        if(can.reduce(mapping.mappings, function(a, b) { return a || (b.instance === true); }, false)) {
+    if (instance instanceof GGRC.ListLoaders.MappingResult) {
+      instance.walk_instances(function (inst, mapping) {
+        if (can.reduce(mapping.mappings, function (a, b) { return a || (b.instance === true); }, false)) {
           base_mappings.push(inst);
         }
       });
@@ -1213,7 +1219,7 @@ Mustache.registerHelper("is_allowed_all", function(action, instances, options) {
       base_mappings.push(instance);
     }
 
-    can.each(base_mappings, function(instance) {
+    can.each(base_mappings, function (instance) {
       resource_type = instance.constructor.shortName;
       context_id = instance.context ? instance.context.id : null;
       passed = passed && Permission.is_allowed(action, resource_type, context_id);
@@ -1226,7 +1232,7 @@ Mustache.registerHelper("is_allowed_all", function(action, instances, options) {
     return options.inverse(options.contexts || this);
 });
 
-Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
+Mustache.registerHelper("is_allowed_to_map", function (source, target, options) {
   //  For creating mappings, we only care if the user can create instances of
   //  the join model.
   //  - `source` must be a model instance
@@ -1258,7 +1264,7 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
 
   context_id = source.context ? source.context.id : null;
 
-  resource_type = GGRC.Mappings.join_model_name_for(
+  resource_type = GGRC.Mappings.join_model_name_for (
     source.constructor.shortName, target_type);
 
   // The special case for `Cacheable` should no longer be necessary given
@@ -1296,18 +1302,18 @@ function resolve_computed(maybe_computed, always_resolve) {
     && (maybe_computed.isComputed || always_resolve)) ? resolve_computed(maybe_computed(), always_resolve) : maybe_computed;
 }
 
-Mustache.registerHelper("attach_spinner", function(spin_opts, styles) {
+Mustache.registerHelper("attach_spinner", function (spin_opts, styles) {
   spin_opts = Mustache.resolve(spin_opts);
   styles = Mustache.resolve(styles);
   spin_opts = typeof spin_opts === "string" ? JSON.parse(spin_opts) : {};
   styles = typeof styles === "string" ? styles : "";
-  return function(el) {
+  return function (el) {
     var spinner = new Spinner(spin_opts).spin();
     $(el).append($(spinner.el).attr("style", $(spinner.el).attr("style") + ";" + styles)).data("spinner", spinner);
   };
 });
 
-Mustache.registerHelper("determine_context", function(page_object, target) {
+Mustache.registerHelper("determine_context", function (page_object, target) {
   if (page_object.constructor.shortName == "Program") {
     return page_object.context ? page_object.context.id : null;
   } else if (target.constructor.shortName == "Program") {
@@ -1316,7 +1322,7 @@ Mustache.registerHelper("determine_context", function(page_object, target) {
   return page_object.context ? page_object.context.id : null;
 });
 
-Mustache.registerHelper("json_escape", function(obj, options) {
+Mustache.registerHelper("json_escape", function (obj, options) {
   var s = JSON.stringify("" + (resolve_computed(obj) || ""));
   return s.substr(1, s.length - 2);
   /*return (""+(resolve_computed(obj) || ""))
@@ -1343,8 +1349,8 @@ Mustache.registerHelper("json_escape", function(obj, options) {
 can.each({
   "localize_date" : "MM/DD/YYYY"
   , "localize_datetime" : "MM/DD/YYYY hh:mm:ss A"
-}, function(tmpl, fn) {
-  Mustache.registerHelper(fn, function(date, options) {
+}, function (tmpl, fn) {
+  Mustache.registerHelper(fn, function (date, options) {
     if (!options) {
       date = new Date();
     } else {
@@ -1354,7 +1360,7 @@ can.each({
   });
 });
 
-Mustache.registerHelper("instance_ids", function(list, options) {
+Mustache.registerHelper("instance_ids", function (list, options) {
   //  `instance_ids` is used only to extract a comma-separated list of
   //  instance `id` values for use by `Export Controls` link in
   //  `assets/mustache/controls/tree_footer.mustache`
@@ -1362,7 +1368,7 @@ Mustache.registerHelper("instance_ids", function(list, options) {
   list = resolve_computed(Mustache.resolve(list));
   if (list) {
     list.attr("length");
-    ids = can.map(list, function(result) { return result.attr("instance.id"); });
+    ids = can.map(list, function (result) { return result.attr("instance.id"); });
   }
   else {
     ids = [];
@@ -1370,7 +1376,7 @@ Mustache.registerHelper("instance_ids", function(list, options) {
   return ids.join(",");
 });
 
-Mustache.registerHelper("local_time_range", function(value, start, end, options) {
+Mustache.registerHelper("local_time_range", function (value, start, end, options) {
   var tokens = [];
   var sod;
   value = resolve_computed(value) || undefined;
@@ -1380,7 +1386,7 @@ Mustache.registerHelper("local_time_range", function(value, start, end, options)
   end = moment(value).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
 
   function selected(time) {
-    if(time
+    if (time
       && value
       && time.hours() === value.getHours()
       && time.minutes() === value.getMinutes()
@@ -1398,7 +1404,7 @@ Mustache.registerHelper("local_time_range", function(value, start, end, options)
   return new Mustache.safeString(tokens.join(""));
 });
 
-Mustache.registerHelper("mapping_count", function(instance) {
+Mustache.registerHelper("mapping_count", function (instance) {
   var args = can.makeArray(arguments)
     , mappings = args.slice(1, args.length - 1)
     , options = args[args.length-1]
@@ -1417,7 +1423,7 @@ Mustache.registerHelper("mapping_count", function(instance) {
     }
   }
 
-  if(!root) {
+  if (!root) {
     root = new can.Observe();
     get_observe_context(options.contexts).attr("__mapping_count", root);
   }
@@ -1435,10 +1441,10 @@ Mustache.registerHelper("mapping_count", function(instance) {
     root.attr(mapping).attr('loading', true);
     refresh_queue.enqueue(instance);
     dfd = refresh_queue.trigger()
-      .then(function(instances) { return instances[0]; })
-      .done(function(refreshed_instance) {
+      .then(function (instances) { return instances[0]; })
+      .done(function (refreshed_instance) {
         if (refreshed_instance && refreshed_instance.get_binding(mapping)) {
-          refreshed_instance.get_list_loader(mapping).done(function(list) {
+          refreshed_instance.get_list_loader(mapping).done(function (list) {
             root.attr(mapping, list);
           });
         }
@@ -1447,15 +1453,15 @@ Mustache.registerHelper("mapping_count", function(instance) {
     });
   }
 
-  var ret = defer_render('span', { done : update, progress : function() { return options.inverse(options.contexts); } }, dfd);
+  var ret = defer_render('span', { done : update, progress : function () { return options.inverse(options.contexts); } }, dfd);
   return ret;
 });
 
-Mustache.registerHelper("visibility_delay", function(delay, options) {
+Mustache.registerHelper("visibility_delay", function (delay, options) {
   delay = resolve_computed(delay);
 
-  return function(el) {
-    setTimeout(function() {
+  return function (el) {
+    setTimeout(function () {
       if ($(el.parentNode).is(':visible'))
         $(el).append(options.fn(options.contexts));
         can.view.hookup($(el).children());
@@ -1465,7 +1471,7 @@ Mustache.registerHelper("visibility_delay", function(delay, options) {
 });
 
 
-Mustache.registerHelper("with_program_roles_as", function(
+Mustache.registerHelper("with_program_roles_as", function (
       var_name, result, options) {
   var dfd = $.when()
     , frame = new can.Observe()
@@ -1479,14 +1485,14 @@ Mustache.registerHelper("with_program_roles_as", function(
 
   frame.attr("roles", []);
 
-  can.each(mappings, function(mapping) {
+  can.each(mappings, function (mapping) {
     if (mapping instanceof CMS.Models.UserRole) {
       refresh_queue.enqueue(mapping.role);
     }
   });
 
-  dfd = refresh_queue.trigger().then(function(roles) {
-    can.each(mappings, function(mapping) {
+  dfd = refresh_queue.trigger().then(function (roles) {
+    can.each(mappings, function (mapping) {
       if (mapping instanceof CMS.Models.UserRole) {
         frame.attr("roles").push({
           user_role: mapping,
@@ -1515,13 +1521,13 @@ Mustache.registerHelper("with_program_roles_as", function(
 
 // Determines and serializes the roles for a user
 var program_roles;
-Mustache.registerHelper("infer_roles", function(instance, options) {
+Mustache.registerHelper("infer_roles", function (instance, options) {
   instance = resolve_computed(instance);
   var state = options.contexts.attr("__infer_roles")
     , page_instance = GGRC.page_instance()
     , person = page_instance instanceof CMS.Models.Person ? page_instance : null
-    , init_state = function() {
-        !state.roles && state.attr({
+    , init_state = function () {
+        if (!state.roles) state.attr({
             status: 'loading'
           , count: 0
           , roles: new can.Observe.List()
@@ -1529,7 +1535,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
       }
     ;
 
-  if(!state) {
+  if (!state) {
     state = new can.Observe();
     options.context.attr("__infer_roles", state);
   }
@@ -1550,26 +1556,26 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
           ;
 
         refresh_queue.enqueue(requests.reify());
-        refresh_queue.trigger().then(function(requests) {
-          can.each(requests, function(request) {
+        refresh_queue.trigger().then(function (requests) {
+          can.each(requests, function (request) {
             var responses = request.responses || new can.Observe.List()
               , refresh_queue = new RefreshQueue()
               ;
 
             refresh_queue.enqueue(responses.reify());
-            refresh_queue.trigger().then(function(responses) {
-              can.each(responses, function(response) {
+            refresh_queue.trigger().then(function (responses) {
+              can.each(responses, function (response) {
                 if (response.contact && response.contact.id === person.id
                     && !~can.inArray('Response Contact', state.attr('roles'))) {
                   state.attr('roles').push('Response Contact');
                 }
-              })
+              });
             });
 
             if (request.assignee && request.assignee.id === person.id
                 && !~can.inArray('Request Assignee', state.attr('roles'))) {
               state.attr('roles').push('Request Assignee');
-            };
+            }
           });
         });
       }
@@ -1583,7 +1589,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
       }
 
       // Check for people
-      if (instance.people && ~can.inArray(person.id, $.map(instance.people, function(person) { return person.id; }))) {
+      if (instance.people && ~can.inArray(person.id, $.map(instance.people, function (person) { return person.id; }))) {
         state.attr('roles').push('Mapped');
       }
 
@@ -1591,17 +1597,17 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
         $.when(
           instance.reify().get_binding('authorizations').refresh_list(),
           instance.findAuditors()
-        ).then(function(authorizations, auditors) {
-          if(~can.inArray(person.id, $.map(auditors, function(p) { return p.person.id; }))){
+        ).then(function (authorizations, auditors) {
+          if (~can.inArray(person.id, $.map(auditors, function (p) { return p.person.id; }))) {
             state.attr('roles').push('Auditor');
           }
-          authorizations.bind("change", function() {
-            state.attr('roles', can.map(state.attr('roles'), function(role) {
+          authorizations.bind("change", function () {
+            state.attr('roles', can.map(state.attr('roles'), function (role) {
               if (role != 'Auditor')
                 return role;
             }));
-            instance.findAuditors().then(function(auds) {
-              if(~can.inArray(person.id, $.map(auds, function(p) { return p.person.id; }))){
+            instance.findAuditors().then(function (auds) {
+              if (~can.inArray(person.id, $.map(auds, function (p) { return p.person.id; }))) {
                 state.attr('roles').push('Auditor');
               }
             });
@@ -1610,23 +1616,23 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
       }
 
       // Check for ownership
-      if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function(person) { return person.id; }))) {// && !~can.inArray("Auditor", state.attr('roles'))) {
+      if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function (person) { return person.id; }))) {// && !~can.inArray("Auditor", state.attr('roles'))) {
         state.attr('roles').push('Owner');
       }
 
       // Check for authorizations
       if (instance instanceof CMS.Models.Program && instance.context && instance.context.id) {
-        person.get_list_loader("authorizations").done(function(authorizations) {
-          authorizations = can.map(authorizations, function(auth) {
+        person.get_list_loader("authorizations").done(function (authorizations) {
+          authorizations = can.map(authorizations, function (auth) {
             if (auth.instance.context && auth.instance.context.id === instance.context.id) {
               return auth.instance;
             }
           });
           !program_roles && (program_roles = CMS.Models.Role.findAll({ scope__in: "Private Program,Audit" }));
-          program_roles.done(function(roles) {
-            can.each(authorizations, function(auth) {
+          program_roles.done(function (roles) {
+            can.each(authorizations, function (auth) {
               var role = CMS.Models.Role.findInCacheById(auth.role.id);
-              role && state.attr('roles').push(role.name);
+              if (role) state.attr('roles').push(role.name);
             });
           });
         });
@@ -1635,7 +1641,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
     // When we're not on a profile page
     else {
       // Check for ownership
-      if (instance.owners && ~can.inArray(GGRC.current_user.id, $.map(instance.owners, function(person) { return person.id; }))) {
+      if (instance.owners && ~can.inArray(GGRC.current_user.id, $.map(instance.owners, function (person) { return person.id; }))) {
         init_state();
         state.attr('roles').push('Yours');
       }
@@ -1652,7 +1658,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
   else {
     if (state.attr('roles').attr('length')) {
       var result = [];
-      can.each(state.attr('roles'), function(role) {
+      can.each(state.attr('roles'), function (role) {
         result.push(options.fn(role));
       });
       return result.join('');
@@ -1661,19 +1667,19 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
 });
 
 function get_observe_context(scope) {
-  if(!scope) return null;
-  if(scope._context instanceof can.Observe) return scope._context;
+  if (!scope) return null;
+  if (scope._context instanceof can.Observe) return scope._context;
   return get_observe_context(scope._parent);
 }
 
 
 // Uses search to find the counts for a model type
-Mustache.registerHelper("global_count", function(model_type, options) {
+Mustache.registerHelper("global_count", function (model_type, options) {
   model_type = resolve_computed(model_type);
   var state = options.contexts.attr("__global_count")
     ;
 
-  if(!state) {
+  if (!state) {
     state = new can.Observe();
     get_observe_context(options.contexts).attr("__global_count", state);
   }
@@ -1694,16 +1700,16 @@ Mustache.registerHelper("global_count", function(model_type, options) {
     }
 
     var model = CMS.Models[model_type]
-      , update_count = function(ev, instance) {
+      , update_count = function (ev, instance) {
           if (!instance || instance instanceof model) {
-            GGRC._search_cache_deferred.then(function(result) {
+            GGRC._search_cache_deferred.then(function (result) {
               if (!result.counts.hasOwnProperty(model_type)) {
                 return GGRC.Models.Search.counts_for_types(null, [model_type]);
               }
               else {
                 return result;
               }
-            }).then(function(result) {
+            }).then(function (result) {
               state.attr({
                   status: 'loaded'
                 , count: result.counts[model_type]
@@ -1732,14 +1738,14 @@ Mustache.registerHelper("global_count", function(model_type, options) {
   }
 });
 
-Mustache.registerHelper("is_dashboard", function(options) {
+Mustache.registerHelper("is_dashboard", function (options) {
   if (/dashboard/.test(window.location))
     return options.fn(options.contexts);
   else
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("is_profile", function(parent_instance, options) {
+Mustache.registerHelper("is_profile", function (parent_instance, options) {
   var instance;
   if (options)
     instance = resolve_computed(parent_instance);
@@ -1752,7 +1758,7 @@ Mustache.registerHelper("is_profile", function(parent_instance, options) {
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("person_owned", function(owner_id, options) {
+Mustache.registerHelper("person_owned", function (owner_id, options) {
   owner_id = resolve_computed(owner_id);
   var page_instance = GGRC.page_instance();
   if (!(page_instance instanceof CMS.Models.Person) || (owner_id && page_instance.id === owner_id))
@@ -1761,7 +1767,7 @@ Mustache.registerHelper("person_owned", function(owner_id, options) {
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("default_audit_title", function(instance, options) {
+Mustache.registerHelper("default_audit_title", function (instance, options) {
   var program, default_title, current_title
     , index = 1
     ;
@@ -1769,30 +1775,30 @@ Mustache.registerHelper("default_audit_title", function(instance, options) {
     instance = Mustache.resolve(instance);
     program = instance.attr("program");
 
-  if(!instance._transient) {
+  if (!instance._transient) {
     instance.attr("_transient", { default_title : "" });
   }
 
-  if(program == null){
+  if (program == null) {
     // Mark the title to be populated when computed_program is defined,
     // returning an empty string here would disable the save button.
     instance.attr("title", "");
     instance.attr("_transient.default_title", instance.title);
     return;
   }
-  if(instance._transient.default_title !== instance.title) {
+  if (instance._transient.default_title !== instance.title) {
     return;
   }
 
   program = program.reify();
 
-  new RefreshQueue().enqueue(program).trigger().then(function() {
+  new RefreshQueue().enqueue(program).trigger().then(function () {
 
     default_title = new Date().getFullYear() + ": " + program.title + " - Audit";
 
     // Count the current number of audits with default_title
-    $.map(CMS.Models['Audit'].cache, function(audit){
-      if(audit.title && audit.title.indexOf(default_title) === 0){
+    $.map(CMS.Models['Audit'].cache, function (audit) {
+      if (audit.title && audit.title.indexOf(default_title) === 0) {
         index += 1;
       }
     });
@@ -1801,11 +1807,11 @@ Mustache.registerHelper("default_audit_title", function(instance, options) {
   });
 });
 
-Mustache.registerHelper('param_current_location', function() {
+Mustache.registerHelper('param_current_location', function () {
   return GGRC.current_url_compute();
 });
 
-Mustache.registerHelper("sum", function() {
+Mustache.registerHelper("sum", function () {
   var sum = 0;
   for (var i = 0; i < arguments.length - 1; i++) {
     sum += parseInt(resolve_computed(arguments[i]), 10);
@@ -1813,7 +1819,7 @@ Mustache.registerHelper("sum", function() {
   return ''+sum;
 });
 
-Mustache.registerHelper("to_class", function(prop, delimiter, options) {
+Mustache.registerHelper("to_class", function (prop, delimiter, options) {
   prop = resolve_computed(prop);
   delimiter = (arguments.length > 2 && resolve_computed(delimiter)) || '-';
   return prop.toLowerCase().replace(/[\s\t]+/g, delimiter);
@@ -1856,16 +1862,16 @@ Mustache.registerHelper("to_class", function(prop, delimiter, options) {
   FIXME: Only synchronous helpers (those which call options.fn() or options.inverse()
     without yielding the thread through defer_render or otherwise) can currently be used
     with if_helpers.  if_helpers should support all helpers by changing the walk through
-    conjunctions and disjunctions to one using a can.reduce(Array, function(Deferred, item) {}, $.when())
-    pattern instead of can.reduce(Array, function(Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
+    conjunctions and disjunctions to one using a can.reduce(Array, function (Deferred, item) {}, $.when())
+    pattern instead of can.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
 */
-Mustache.registerHelper("if_helpers", function() {
+Mustache.registerHelper("if_helpers", function () {
   var args = arguments
     , options = arguments[arguments.length - 1]
     , helper_result
     , helper_options = can.extend({}, options, {
-        fn: function() { helper_result = 'fn'; }
-      , inverse: function() { helper_result = 'inverse'; }
+        fn: function () { helper_result = 'fn'; }
+      , inverse: function () { helper_result = 'inverse'; }
       })
     ;
 
@@ -1876,11 +1882,11 @@ Mustache.registerHelper("if_helpers", function() {
     , disjunctions = []
     , index = 0
     ;
-  can.each(args, function(arg, i) {
+  can.each(args, function (arg, i) {
     if (i < args.length - 1) {
       if (typeof arg === 'string' && arg.match(/^\n\s*/)) {
-        if(statement) {
-          if(statement.logic === "or") {
+        if (statement) {
+          if (statement.logic === "or") {
             disjunctions.push(statements);
             statements = []
           }
@@ -1920,10 +1926,10 @@ Mustache.registerHelper("if_helpers", function() {
       }
     }
   });
-  if(statement) {
-    if(statement.logic === "or") {
+  if (statement) {
+    if (statement.logic === "or") {
       disjunctions.push(statements);
-      statements = []
+      statements = [];
     }
     statements.push(statement);
   }
@@ -1931,12 +1937,12 @@ Mustache.registerHelper("if_helpers", function() {
 
   if (disjunctions.length) {
     // Evaluate statements
-    var result = can.reduce(disjunctions, function(disjunctive_result, conjunctions) {
-      if(disjunctive_result)
+    var result = can.reduce(disjunctions, function (disjunctive_result, conjunctions) {
+      if (disjunctive_result)
         return true;
 
-      var conjunctive_result = can.reduce(conjunctions, function(current_result, stmt) {
-        if(!current_result)
+      var conjunctive_result = can.reduce(conjunctions, function (current_result, stmt) {
+        if (!current_result)
           return false; //short circuit
 
         helper_result = null;
@@ -1959,21 +1965,21 @@ Mustache.registerHelper("if_helpers", function() {
   }
 });
 
-Mustache.registerHelper("with_model_as", function(var_name, model_name, options) {
+Mustache.registerHelper("with_model_as", function (var_name, model_name, options) {
   var frame = {};
   model_name = resolve_computed(Mustache.resolve(model_name));
   frame[var_name] = CMS.Models[model_name];
   return options.fn(options.contexts.add(frame));
 });
 
-Mustache.registerHelper("private_program_owner", function(instance, modal_title, options) {
+Mustache.registerHelper("private_program_owner", function (instance, modal_title, options) {
   var state = options.contexts.attr('__private_program_owner');
   if (resolve_computed(modal_title).indexOf('New ') === 0) {
     return GGRC.current_user.email;
   }
   else {
     var loader = resolve_computed(instance).get_binding('authorizations');
-    return $.map(loader.list, function(binding) {
+    return $.map(loader.list, function (binding) {
       if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
         return binding.instance.person.reify().attr('email');
       }
@@ -1984,15 +1990,15 @@ Mustache.registerHelper("private_program_owner", function(instance, modal_title,
 
 // Determines whether the value matches one in the $.map'd list
 // {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
-Mustache.registerHelper("if_in_map", function(list, path, value, options) {
+Mustache.registerHelper("if_in_map", function (list, path, value, options) {
   list = resolve_computed(list);
 
   if (!list.attr || list.attr('length')) {
     path = path.split('.');
-    var map = $.map(list, function(obj) {
-      can.each(path, function(prop) {
+    var map = $.map(list, function (obj) {
+      can.each(path, function (prop) {
         obj = (obj && obj[prop]) || null;
-      })
+      });
       return obj;
     });
 
@@ -2002,7 +2008,7 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
   return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("with_auditors", function(instance, options) {
+Mustache.registerHelper("with_auditors", function (instance, options) {
   var auditors, auditors_dfd
     , decoy
     ;
@@ -2013,14 +2019,14 @@ Mustache.registerHelper("with_auditors", function(instance, options) {
     decoy.attr();
   }
 
-  if(!instance)
+  if (!instance)
     return "";
 
-  auditors_dfd = Mustache.resolve(instance).findAuditors().done(function(aud) {
+  auditors_dfd = Mustache.resolve(instance).findAuditors().done(function (aud) {
     auditors = aud;
   });
-  return defer_render("span", function() {
-    if(auditors && auditors.attr("length") > 0){
+  return defer_render("span", function () {
+    if (auditors && auditors.attr("length") > 0) {
       return options.fn(options.contexts.add({"auditors": auditors}));
     }
     else{
@@ -2029,40 +2035,40 @@ Mustache.registerHelper("with_auditors", function(instance, options) {
   }, auditors_dfd);
 });
 
-Mustache.registerHelper("if_instance_of", function(inst, cls, options) {
+Mustache.registerHelper("if_instance_of", function (inst, cls, options) {
   var result;
   cls = resolve_computed(cls);
   inst = resolve_computed(inst);
 
-  if(typeof cls === "string") {
-    cls = cls.split("|").map(function(c) {
+  if (typeof cls === "string") {
+    cls = cls.split("|").map(function (c) {
       return CMS.Models[c];
-    })
-  } else if(typeof cls !== "function") {
+    });
+  } else if (typeof cls !== "function") {
     cls = [cls.constructor];
   } else {
     cls = [cls];
   }
 
-  result = can.reduce(cls, function(res, c) {
+  result = can.reduce(cls, function (res, c) {
     return res || inst instanceof c;
   }, false);
 
   return options[result ? "fn" : "inverse"](options.contexts);
 });
 
-Mustache.registerHelper("prune_context", function(options) {
+Mustache.registerHelper("prune_context", function (options) {
   return options.fn(new can.view.Scope(options.context));
 });
 
 // Turns DocumentationResponse to Response
-Mustache.registerHelper("type_to_readable", function(str, options){
+Mustache.registerHelper("type_to_readable", function (str, options) {
   return resolve_computed(str, true).replace(/([A-Z])/g, ' $1').split(' ').pop();
 });
 
-Mustache.registerHelper("mixed_content_check", function(url, options) {
+Mustache.registerHelper("mixed_content_check", function (url, options) {
   url = Mustache.getHelper("schemed_url", options.contexts).fn(url);
-  if(window.location.protocol === "https:" && !/^https:/.test(url)) {
+  if (window.location.protocol === "https:" && !/^https:/.test(url)) {
     return options.inverse(options.contexts);
   } else {
     return options.fn(options.contexts);
@@ -2085,12 +2091,12 @@ Mustache.registerHelper("mixed_content_check", function(url, options) {
   Hash keys starting with "attr_" will be treated as attributes to place on the script tag itself.
   e.g. {{#scriptwrap attr_class="data-popover-content" attr_aria_
 */
-Mustache.registerHelper("scriptwrap", function(helper) {
+Mustache.registerHelper("scriptwrap", function (helper) {
   var extra_attrs = ""
   , args = can.makeArray(arguments).slice(1, arguments.length)
   , options = args[args.length - 1] || helper
-  , ret = "<script type='text/html'" + can.view.hook(function(el, parent, view_id) {
-    var c = can.compute(function() {
+  , ret = "<script type='text/html'" + can.view.hook(function (el, parent, view_id) {
+    var c = can.compute(function () {
       var $d = $("<div>").html(
         helper === options
         ? options.fn(options.contexts)  //not calling a separate helper case
@@ -2102,9 +2108,9 @@ Mustache.registerHelper("scriptwrap", function(helper) {
     can.view.live.html(el, c, parent);
   });
 
-  if(options.hash) {
-    can.each(Object.keys(options.hash), function(key) {
-      if(/^attr_/.test(key)) {
+  if (options.hash) {
+    can.each(Object.keys(options.hash), function (key) {
+      if (/^attr_/.test(key)) {
         extra_attrs += " " + key.substr(5).replace("_", "-") + "='" + resolve_computed(options.hash[key]) + "'";
         delete options.hash[key];
       }
@@ -2115,7 +2121,7 @@ Mustache.registerHelper("scriptwrap", function(helper) {
   return new Mustache.safeString(ret);
 });
 
-Mustache.registerHelper("ggrc_config_value", function(key, default_, options) {
+Mustache.registerHelper("ggrc_config_value", function (key, default_, options) {
   key = resolve_computed(key);
   if (!options) {
     options = default_;
@@ -2126,12 +2132,12 @@ Mustache.registerHelper("ggrc_config_value", function(key, default_, options) {
   return can.getObject(key, [GGRC.config]) || default_;
 });
 
-Mustache.registerHelper("is_page_instance", function(instance, options){
-  var instance = resolve_computed(instance)
+Mustache.registerHelper("is_page_instance", function (instance, options) {
+  var instance = resolve_computed(instance)  // FIXME duplicate declaration
     , page_instance = GGRC.page_instance()
     ;
 
-  if(instance && instance.type === page_instance.type && instance.id === page_instance.id){
+  if (instance && instance.type === page_instance.type && instance.id === page_instance.id) {
     return options.fn(options.contexts);
   }
   else{
@@ -2139,11 +2145,11 @@ Mustache.registerHelper("is_page_instance", function(instance, options){
   }
 });
 
-Mustache.registerHelper("remove_space", function(str, options){
+Mustache.registerHelper("remove_space", function (str, options) {
   return resolve_computed(str, true).replace(' ', '');
 });
 
-Mustache.registerHelper("if_auditor", function(instance, options){
+Mustache.registerHelper("if_auditor", function (instance, options) {
   var audit, auditors_dfd, auditors
     , admin = Permission.is_allowed("__GGRC_ADMIN__")
     , include_admin = !options.hash || options.hash.include_admin !== false;
@@ -2151,22 +2157,22 @@ Mustache.registerHelper("if_auditor", function(instance, options){
   instance = Mustache.resolve(instance);
   instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
 
-  if(!instance)
+  if (!instance)
     return "";
 
   audit = instance instanceof CMS.Models.Request ? instance.attr("audit") : instance;
 
-  if(!audit)
+  if (!audit)
     return "";  //take no action until audit is available
 
   audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
   auditors = audit.findAuditors(true); // immediate-mode findAuditors
 
-  if((include_admin && admin)
+  if ((include_admin && admin)
      || can.map(
           auditors,
-          function(auditor) {
-            if(auditor.person.id === GGRC.current_user.id) {
+          function (auditor) {
+            if (auditor.person.id === GGRC.current_user.id) {
               return auditor;
             }
         }).length > 0) {
@@ -2176,26 +2182,26 @@ Mustache.registerHelper("if_auditor", function(instance, options){
   }
 });
 
-Mustache.registerHelper("if_can_edit_request", function(instance, options){
+Mustache.registerHelper("if_can_edit_request", function (instance, options) {
 
-    var instance, audit, auditors, accepted
+    var instance, audit, auditors, accepted  // FIXME duplicate declaration
     , admin = Permission.is_allowed("__GGRC_ADMIN__");
 
     instance = resolve_computed(instance);
     instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
 
-    if(!instance)
+    if (!instance)
       return "";
 
     audit = instance.attr("audit");
 
-    if(!audit)
+    if (!audit)
       return "";  //take no action until audit is available
 
     audit = audit.reify();
     auditors_dfd = audit.findAuditors();
 
-    return defer_render("span", function(auditors) {
+    return defer_render("span", function (auditors) {
       var accepted = instance.status === "Accepted"
         , update = Permission.is_allowed("update", instance)
         , map = Permission.is_allowed("mapping", instance)
@@ -2204,8 +2210,8 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
         , audit_lead = !!audit.contact && audit.contact.id === GGRC.current_user.id
         , auditor = can.map(
                       auditors || [],
-                      function(auditor) {
-                        if(auditor.person.id === GGRC.current_user.id) {
+                      function (auditor) {
+                        if (auditor.person.id === GGRC.current_user.id) {
                           return auditor;
                         }
                     }).length > 0
@@ -2218,8 +2224,8 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
       //    ^if' allow_mapping_or_creating '\
       //    or ^is_allowed' 'update' instance '\
       //    ' _1_context=instance.context.id
-      if(admin || can_auditor_edit || can_assignee_edit ||
-          (!accepted && (update || map || create))){
+      if (admin || can_auditor_edit || can_assignee_edit ||
+          (!accepted && (update || map || create))) {
         return options.fn(options.contexts);
       }
       else{
@@ -2228,20 +2234,20 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
     }, auditors_dfd);
 });
 
-Mustache.registerHelper("strip_html_tags", function(str){
+Mustache.registerHelper("strip_html_tags", function (str) {
   return resolve_computed(str).replace(/<(?:.|\n)*?>/gm, '');
 });
 
-Mustache.registerHelper("switch", function(value, options) {
+Mustache.registerHelper("switch", function (value, options) {
   var frame = new can.Observe({});
   value = resolve_computed(value);
   frame.attr(value || "default", true);
   frame.attr("default", true);
   return options.fn(options.contexts.add(frame), {
     helpers : {
-      case : function(val, options) {
+      case : function (val, options) {
         val = resolve_computed(val);
-        if(options.context[val]) {
+        if (options.context[val]) {
           options.context.attr ? options.context.attr("default", false) : (options.context.default = false);
           return options.fn(options.contexts);
         }
@@ -2251,7 +2257,7 @@ Mustache.registerHelper("switch", function(value, options) {
 });
 
 
-Mustache.registerHelper("fadein", function(delay, prop, options) {
+Mustache.registerHelper("fadein", function (delay, prop, options) {
   switch(arguments.length) {
     case 1:
     options = delay;
@@ -2263,15 +2269,15 @@ Mustache.registerHelper("fadein", function(delay, prop, options) {
     break;
   }
   resolve_computed(prop);
-  return function(el) {
+  return function (el) {
     var $el = $(el);
     $el.css("display", "none");
-    if(!prop || resolve_computed(prop)) {
-      setTimeout(function() {
+    if (!prop || resolve_computed(prop)) {
+      setTimeout(function () {
         $el.fadeIn({
           duration : (options.hash && options.hash.duration) || 500
-          , complete : function() {
-            typeof prop === "function" && prop(true);
+          , complete : function () {
+            return typeof prop === "function" && prop(true);
           }
         });
       }, delay);
@@ -2279,7 +2285,7 @@ Mustache.registerHelper("fadein", function(delay, prop, options) {
   };
 });
 
-Mustache.registerHelper("fadeout", function(delay, prop, options) {
+Mustache.registerHelper("fadeout", function (delay, prop, options) {
   switch(arguments.length) {
     case 1:
     options = delay;
@@ -2290,14 +2296,14 @@ Mustache.registerHelper("fadeout", function(delay, prop, options) {
     prop = null;
     break;
   }
-  if(resolve_computed(prop)) {
-    return function(el) {
+  if (resolve_computed(prop)) {
+    return function (el) {
       var $el = $(el);
-      setTimeout(function() {
+      setTimeout(function () {
         $el.fadeOut({
           duration : (options.hash && options.hash.duration) || 500
-          , complete : function() {
-            typeof prop === "function" && prop(null);
+          , complete : function () {
+            return typeof prop === "function" && prop(null);
           }
         });
       }, delay);
@@ -2305,9 +2311,9 @@ Mustache.registerHelper("fadeout", function(delay, prop, options) {
   }
 });
 
-Mustache.registerHelper("with_mapping_count", function(instance, mapping_names, options) {
+Mustache.registerHelper("with_mapping_count", function (instance, mapping_names, options) {
   var args = can.makeArray(arguments)
-    , options = args[args.length-1]
+    , options = args[args.length-1]  // FIXME duplicate declaration
     , mapping_name
     ;
 
@@ -2323,33 +2329,34 @@ Mustache.registerHelper("with_mapping_count", function(instance, mapping_names, 
     }
   }
 
-  var finish = function(count) {
+  var finish = function (count) {
     return options.fn(options.contexts.add({ count: count }));
   };
 
-  var progress = function() {
+  var progress = function () {
     return options.inverse(options.contexts);
   };
 
   return defer_render(
-      "span",
-      { done: finish, progress: progress },
-      instance.get_list_counter(mapping_name))
+    "span",
+    { done: finish, progress: progress },
+    instance.get_list_counter(mapping_name)
+  );
 });
 
-Mustache.registerHelper("is_overdue", function(_date, status, options){
+Mustache.registerHelper("is_overdue", function (_date, status, options) {
   options = arguments.length === 2 ? arguments[1] : options;
   status = arguments.length === 2 ? "" : resolve_computed(status);
   var date = moment(resolve_computed(_date));
-  if(status !== 'Verified' && date && date.isBefore(new Date())){
+  if (status !== 'Verified' && date && date.isBefore(new Date())) {
     return options.fn(options.contexts);
   }
-  else{
+  else {
     return options.inverse(options.contexts);
   }
 });
 
-Mustache.registerHelper("with_mappable_instances_as", function(name, list, options) {
+Mustache.registerHelper("with_mappable_instances_as", function (name, list, options) {
   var ctx = new can.Observe()
     , page_inst = GGRC.page_instance()
     , page_context = page_inst.context ? page_inst.context.id : null
@@ -2359,10 +2366,10 @@ Mustache.registerHelper("with_mappable_instances_as", function(name, list, optio
 
   if (list) {
     list.attr("length"); //setup live.
-    list = can.map(list, function(item, key) {
+    list = can.map(list, function (item, key) {
       var inst = item.instance || item;
-      var jds = GGRC.Mappings.join_model_name_for(page_inst.constructor.shortName, inst.constructor.shortName);
-      if(inst !== page_inst
+      var jds = GGRC.Mappings.join_model_name_for (page_inst.constructor.shortName, inst.constructor.shortName);
+      if (inst !== page_inst
          && jds
          && Permission.is_allowed("create", jds, page_context)
       ) {
@@ -2376,7 +2383,7 @@ Mustache.registerHelper("with_mappable_instances_as", function(name, list, optio
   return options.fn(options.contexts.add(ctx));
 });
 
-Mustache.registerHelper("with_subtracted_list_as", function(name, haystack, needles, options) {
+Mustache.registerHelper("with_subtracted_list_as", function (name, haystack, needles, options) {
   var ctx = new can.Observe();
 
   haystack = Mustache.resolve(haystack);
@@ -2385,7 +2392,7 @@ Mustache.registerHelper("with_subtracted_list_as", function(name, haystack, need
   if (haystack) {
     haystack.attr("length"); //setup live.
     needles.attr("length");
-    haystack = can.map(haystack, function(item, key) {
+    haystack = can.map(haystack, function (item, key) {
       return ~can.inArray(item, needles) ? undefined : item;
     });
   }
@@ -2395,7 +2402,7 @@ Mustache.registerHelper("with_subtracted_list_as", function(name, haystack, need
   return options.fn(options.contexts.add(ctx));
 });
 
-Mustache.registerHelper("with_mapping_instances_as", function(name, mappings, options) {
+Mustache.registerHelper("with_mapping_instances_as", function (name, mappings, options) {
   var ctx = new can.Observe();
 
   mappings = Mustache.resolve(mappings);
@@ -2407,7 +2414,7 @@ Mustache.registerHelper("with_mapping_instances_as", function(name, mappings, op
   if (mappings) {
     //  Setup decoy for live binding
     mappings.attr && mappings.attr("length");
-    mappings = can.map(mappings, function(item, key) {
+    mappings = can.map(mappings, function (item, key) {
       return item.instance;
     });
   }
@@ -2417,7 +2424,7 @@ Mustache.registerHelper("with_mapping_instances_as", function(name, mappings, op
 });
 
 
-Mustache.registerHelper("with_allowed_as", function(name, action, mappings, options) {
+Mustache.registerHelper("with_allowed_as", function (name, action, mappings, options) {
   var ctx = new can.Observe();
 
   mappings = Mustache.resolve(mappings);
@@ -2429,7 +2436,7 @@ Mustache.registerHelper("with_allowed_as", function(name, action, mappings, opti
   if (mappings) {
     //  Setup decoy for live binding
     mappings.attr && mappings.attr("length");
-    mappings = can.map(mappings, function(item, key) {
+    mappings = can.map(mappings, function (item, key) {
       var mp = item.get_mappings()[0]
         , context_id = mp.context ? mp.context.id : null
         ;
@@ -2443,20 +2450,20 @@ Mustache.registerHelper("with_allowed_as", function(name, action, mappings, opti
   return options.fn(options.contexts.add(ctx));
 });
 
-Mustache.registerHelper("log", function(obj){
+Mustache.registerHelper("log", function (obj) {
   console.log(resolve_computed(obj));
 });
 
-Mustache.registerHelper("autocomplete_select", function(options) {
+Mustache.registerHelper("autocomplete_select", function (options) {
   var cls;
-  if(options.hash && options.hash.controller) {
+  if (options.hash && options.hash.controller) {
     cls = Mustache.resolve(cls);
-    if(typeof cls === "string") {
+    if (typeof cls === "string") {
       cls = can.getObject(cls);
     }
   }
-  return function(el) {
-    $(el).bind("inserted", function() {
+  return function (el) {
+    $(el).bind("inserted", function () {
       var $ctl = $(this).parents(":data(controls)");
       $(this).ggrc_autocomplete($.extend({}, options.hash, {
         controller : cls ? $ctl.control(cls) : $ctl.control()
@@ -2465,16 +2472,16 @@ Mustache.registerHelper("autocomplete_select", function(options) {
   };
 });
 
-Mustache.registerHelper("find_template", function(base_name, instance, options) {
+Mustache.registerHelper("find_template", function (base_name, instance, options) {
   var tmpl;
 
   base_name = Mustache.resolve(base_name);
-  if(!options) {
+  if (!options) {
     options = instance;
     instance = options.context;
   }
   instance = Mustache.resolve(instance);
-  if(instance.instance) {
+  if (instance.instance) {
     //binding result case
     instance = instance.instance;
   }
@@ -2487,7 +2494,7 @@ Mustache.registerHelper("find_template", function(base_name, instance, options) 
     tmpl = null;
   }
 
-  if(tmpl) {
+  if (tmpl) {
     return options.fn(options.contexts.add({ template : tmpl }));
   } else {
     return options.inverse(options.contexts);
@@ -2496,7 +2503,7 @@ Mustache.registerHelper("find_template", function(base_name, instance, options) 
 
 // Append string to source if the string isn't already present,
 //   remove the string from source if it is present.
-Mustache.registerHelper("toggle_string", function(source, str){
+Mustache.registerHelper("toggle_string", function (source, str) {
   source = Mustache.resolve(source);
   str = Mustache.resolve(str);
   var re = new RegExp('.*' + str);
@@ -2507,7 +2514,7 @@ Mustache.registerHelper("toggle_string", function(source, str){
   return source + str;
 });
 
-Mustache.registerHelper("grdive_msg_to_id", function(message){
+Mustache.registerHelper("grdive_msg_to_id", function (message) {
   var msg = Mustache.resolve(message).split(' ');
   return msg[msg.length-1];
 });
@@ -2525,7 +2532,7 @@ Mustache.registerHelper("grdive_msg_to_id", function(message){
 
   @param compute some computed value to flip between true and false
 */
-Mustache.registerHelper("toggle", function(compute, options) {
+Mustache.registerHelper("toggle", function (compute, options) {
   function toggle(trigger) {
     if (typeof trigger === "function") {
       trigger = Mustache.resolve(trigger);
@@ -2533,8 +2540,8 @@ Mustache.registerHelper("toggle", function(compute, options) {
     if (typeof trigger !== "string") {
       trigger = "click";
     }
-    return function(el) {
-      $(el).bind(trigger, function() {
+    return function (el) {
+      $(el).bind(trigger, function () {
         compute(compute() ? false : true);
       });
     };
@@ -2552,9 +2559,9 @@ Mustache.registerHelper("toggle", function(compute, options) {
 can.each({
   "has_pending_addition": "add",
   "has_pending_removal": "remove"
-}, function(how, fname) {
-  Mustache.registerHelper(fname, function(object, option_instance, options) {
-    if(!options) {
+}, function (how, fname) {
+  Mustache.registerHelper(fname, function (object, option_instance, options) {
+    if (!options) {
       options = option_instance;
       option_instance = object;
       object = options.context;
@@ -2562,9 +2569,9 @@ can.each({
     option_instance = Mustache.resolve(option_instance);
     object = Mustache.resolve(object);
 
-    if(object._pending_joins && can.map(
+    if (object._pending_joins && can.map(
       object._pending_joins,
-      function(pj) {
+      function (pj) {
         return pj.how === how && pj.what === option_instance ? option_instance : undefined;
       }).length > 0) {
       return options.fn(options.contexts);
