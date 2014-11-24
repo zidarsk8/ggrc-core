@@ -586,11 +586,5 @@ i.short {
   .dropdown-menu {
     // turns icons to black
     @extend %black-icons;
-    a {
-      &:hover {
-        // turned icons to white
-        @extend %white-icons;
-      }
-    }
   }
 }

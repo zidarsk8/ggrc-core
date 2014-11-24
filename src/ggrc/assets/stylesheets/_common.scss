@@ -1113,6 +1113,29 @@ p {
   }
 }
 
-.test-block {
-  @include transition(width 800ms cubic-bezier(0.190, 1.000, 0.220, 1.000));
+.hidden-widgets-list {
+  .dropdown-menu {
+    width: 320px;
+    @include clearfix();
+    .inner-nav-item {
+      float: left;
+      width: 160px;
+    }
+    &.right-pos {
+      right: 0;
+      left: auto;
+    }
+    &.mid-pos {
+      right: auto;
+      left: 300px;
+      top: -146px;
+    }
+    &.one-item {
+      width: 160px;
+      .inner-nav-item {
+        float: none;
+        clear: both;
+      }
+    }
+  }
 }
