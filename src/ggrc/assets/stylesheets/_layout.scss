@@ -31,11 +31,12 @@
 
 .lhs-holder {
   position:fixed;
-  top:126px;
+  top:136px;
   left:-240px;
   width:240px;
   height:500px;
   overflow-y:auto;
+  background: $white;
 }
 .area {
   margin-left:248px;
