@@ -928,5 +928,13 @@
     , AuditObject : {
       _auditable : Direct(null, null, "auditable")
     }
+    // Used by Custom Attributes widget
+    , CustomAttributable : {
+      custom_attribute_definitions: Search(function(binding) {
+        return CMS.Models.CustomAttributeDefinition.findAll({
+          definition_type: binding.instance.root_object
+        });
+      })
+    }
   });
 })(GGRC, can);
