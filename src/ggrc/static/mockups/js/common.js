@@ -760,32 +760,21 @@ $(document).ready(function(){
           duration: 800,
           easing: 'easeOutExpo'
         },
-        win_width = $(window).width(),
-        remain_width = win_width - 248,
         $this = $(this),
         $lhn = $this.closest("body").find(".lhs-holder"),
         lhn_width = $lhn.width() - 20,
         $lhn_bar = $this.closest("body").find(".bar-v"),
-        $object_area = $this.closest("body").find(".object-area"),
         $lhs_search = $this.closest("body").find(".lhs-search");
     if($this.hasClass("active")) {
       $this.removeClass("active");
       $lhn.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
       $lhn_bar.removeClass("active").animate({left: "-8"}, options);
-      $object_area.removeClass("active").animate({
-        marginLeft: "0",
-        width: win_width
-      }, options);
       $lhs_search.removeClass("active").css("width", "220px");
       $lhs_search.find(".widgetsearch").css("width", "191px");
     } else {
       $this.addClass("active");
       $lhn.addClass("active").animate({left: "0"}, options);
       $lhn_bar.addClass("active").animate({left: "240"}, options);
-      $object_area.addClass("active").animate({
-        marginLeft: "248",
-        width: remain_width
-      }, options);
       $lhs_search.addClass("active");
     }
   }

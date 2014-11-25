@@ -373,6 +373,9 @@
   &.objnav {
     z-index: 1;  // Show object nav bar-v below title
   }
+  &.active {
+    @include box-shadow(2px -2px 4px rgba(0,0,0, 0.1));
+  }
 }
 
 // TOP INNER NAV
