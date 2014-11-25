@@ -36,16 +36,18 @@ $.ajaxTransport("text", function (options, _originalOptions, _jqXHR) {
     return {
       send: function (headers, completeCallback) {
         function done() {
-          if (template)
+          if (template) {
             completeCallback(200, "success", { text: template });
+          }
         }
-        if (options.async)
+        if (options.async) {
           //Use requestAnimationFrame where possible because we want
           // these to run as quickly as possible but still release
           // the thread.
           (window.requestAnimationFrame || window.setTimeout)(done, 0);
-        else
+        } else {
           done();
+        }
       },
 
       abort: function () {
@@ -154,8 +156,9 @@ Mustache.registerHelper("addclass", function (prefix, compute, options) {
         wasAttached = true;
       }
 
-      if (newVal && newVal.toLowerCase)
+      if (newVal && newVal.toLowerCase) {
         newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, '-');
+      }
 
       if (curClass) {
         $(el).removeClass(curClass);
@@ -348,7 +351,7 @@ Mustache.registerHelper("pack", function () {
   var pack = {};
   can.each(objects, function (obj, i) {
       if (typeof obj === "function") {
-          objects[i] = obj = obj();
+        objects[i] = obj = obj();
       }
 
     if (obj._data) {
@@ -755,7 +758,7 @@ Mustache.registerHelper("schemed_url", function (url) {
   if (url) {
     url = url.isComputed? url(): url;
     if (url && !url.match(/^[a-zA-Z]+:/)) {
-        return (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
+      return (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
     }
   }
   return url;
@@ -909,11 +912,13 @@ Mustache.registerHelper("person_roles", function (person, scope, options) {
       ;
     user_roles_refresh_queue.enqueue(user_roles);
     user_roles_refresh_queue.trigger().then(function () {
-      var roles = can.map(can.makeArray(user_roles), function (user_role) {
-              if (user_role.role) {
-                return user_role.role.reify();
-              }
-            })
+      var roles = can.map(
+        can.makeArray(user_roles),
+        function (user_role) {
+          if (user_role.role) {
+            return user_role.role.reify();
+          }
+        })
         , roles_refresh_queue = new RefreshQueue()
         ;
       roles_refresh_queue.enqueue(roles.splice());
@@ -1148,17 +1153,18 @@ Mustache.registerHelper("is_allowed", function () {
   });
   if (options.hash && options.hash.hasOwnProperty("context")) {
     context_id = options.hash.context;
-    if (typeof context_id === 'function' && context_id.isComputed)
+    if (typeof context_id === 'function' && context_id.isComputed) {
       context_id = context_id();
+    }
     if (context_id && typeof context_id === "object" && context_id.id) {
       // Passed in the context object instead of the context ID, so use the ID
       context_id = context_id.id;
     }
     //  Using `context=null` in Mustache templates, when `null` is not defined,
     //  causes `context_id` to be `""`.
-    if (context_id === "" || context_id === undefined)
+    if (context_id === "" || context_id === undefined) {
       context_id = null;
-    else if (context_id === 'for' || context_id === 'any') {
+    } else if (context_id === 'for' || context_id === 'any') {
       context_override = context_id;
       context_id = undefined;
     }
@@ -1462,9 +1468,10 @@ Mustache.registerHelper("visibility_delay", function (delay, options) {
 
   return function (el) {
     setTimeout(function () {
-      if ($(el.parentNode).is(':visible'))
+      if ($(el.parentNode).is(':visible')) {
         $(el).append(options.fn(options.contexts));
-        can.view.hookup($(el).children());
+      }
+        can.view.hookup($(el).children());  // FIXME dubious indentation - was this intended to be in the 'if'?
     }, delay);
     return el;
   };
@@ -1481,7 +1488,7 @@ Mustache.registerHelper("with_program_roles_as", function (
     ;
 
   result = resolve_computed(result);
-  mappings = resolve_computed(result.get_mappings_compute())
+  mappings = resolve_computed(result.get_mappings_compute());
 
   frame.attr("roles", []);
 
@@ -1527,11 +1534,13 @@ Mustache.registerHelper("infer_roles", function (instance, options) {
     , page_instance = GGRC.page_instance()
     , person = page_instance instanceof CMS.Models.Person ? page_instance : null
     , init_state = function () {
-        if (!state.roles) state.attr({
+        if (!state.roles) {
+          state.attr({
             status: 'loading'
-          , count: 0
-          , roles: new can.Observe.List()
-        });
+            , count: 0
+            , roles: new can.Observe.List()
+          });
+        }
       }
     ;
 
@@ -1632,7 +1641,9 @@ Mustache.registerHelper("infer_roles", function (instance, options) {
           program_roles.done(function (roles) {
             can.each(authorizations, function (auth) {
               var role = CMS.Models.Role.findInCacheById(auth.role.id);
-              if (role) state.attr('roles').push(role.name);
+              if (role) {
+                state.attr('roles').push(role.name);
+              }
             });
           });
         });
@@ -1888,7 +1899,7 @@ Mustache.registerHelper("if_helpers", function () {
         if (statement) {
           if (statement.logic === "or") {
             disjunctions.push(statements);
-            statements = []
+            statements = [];
           }
           statements.push(statement);
           index = index + 1;
