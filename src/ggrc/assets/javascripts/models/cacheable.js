@@ -681,6 +681,12 @@ can.Model("can.Model.Cacheable", {
       }
     });
   }
+  , custom_attribute_definitions: function custom_attribute_definitions() {
+    var self = this;
+    return CMS.Models.CustomAttributeDefinition.findAll({
+      definition_type: self.class.root_object
+    });
+  }
   , computed_errors : can.compute(function() {
       var errors = this.errors();
       if(this.attr("_suppress_errors")) {

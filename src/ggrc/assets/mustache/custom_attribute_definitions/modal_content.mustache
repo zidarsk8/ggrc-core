@@ -24,11 +24,9 @@
         <i class="grcicon-help-black" rel="tooltip" title="Choose the type of attribute to create."></i>
       </label>
       <select name="attribute_type" tabindex="2">
-        <option {{#if_equals attribute_type "Text"}}selected="selected"{{/attribute_type}} value="Text">Text</option>
-        <option {{#if_equals attribute_type "Rich Text"}}selected="selected"{{/attribute_type}} value="Rich Text">Rich Text</option>
-        <option {{#if_equals attribute_type "Dropdown"}}selected="selected"{{/attribute_type}} value="Dropdown">Dropdown</option>
-        <option {{#if_equals attribute_type "Checkbox"}}selected="selected"{{/attribute_type}} value="Checkbox">Checkbox</option>
-        <option {{#if_equals attribute_type "File upload"}}selected="selected"{{/attribute_type}} value="File upload">File upload</option>
+        {{#iterate 'Text', 'Rich Text', 'Dropdown', 'Checkbox', 'File upload'}}
+        <option {{#if_equals iterator attribute_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
+        {{/iterate}}
       </select>
     </div>
     <div class="span2">
