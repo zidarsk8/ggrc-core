@@ -453,20 +453,29 @@ class BusinessObject(
 # This class is just a marker interface/mixin to indicate that a model type
 # supports custom attributes.
 class CustomAttributable(object):
+    @declared_attr
+    def custom_attribute_values(cls):
+        joinstr = 'and_(foreign(CustomAttributeValue.custom_attributable_id == {type}.id), '\
+                        'foreign(CustomAttributeValue.custom_attributable_type) == "{type}")'
+        joinstr = joinstr.format(type=cls.__name__)
+        return relationship(
+            "CustomAttributeValue",
+            primaryjoin=joinstr,
+            backref='{0}_custom_attributable'.format(cls.__name__),
+            cascade='all, delete-orphan',
+            )
+
+    _publish_attrs = [
+        'custom_attribute_values',
+    ]
+    _include_links = [
+        # 'custom_attribute_values',
+    ]
 
     @declared_attr
-    def custom_attributes(cls):
-      return db.relationship(
-          cls.__name__,
-          # NOTE Here's how to get a list of all classes that extend CustomAttributable
-          # [cls.__name__ for cls in vars()['CustomAttributable'].__subclasses__()]
-          # FIXME The backref has to point back where attributable_type and attributable_id match.
-          # This is the query that I want to use to load custom_attribute_values
-          # SELECT * FROM custom_attribute_values WHERE attributable_type = cls.__name__ AND attributable_id=id
-          backref=db.backref('custom_attributable', remote_side='{0}.id'.format(cls.__name__)),
-          )
-
-    # REST properties
-    _publish_attrs = [
-        'custom_attributes'
-    ]
+    def custom_attribute_definitions(cls):
+        from .custom_attribute_definition import CustomAttributeDefinition
+        # FIXME definitions should be class scoped, not instance scoped.
+        return db.relationship(
+            "CustomAttributeDefinition",
+            primaryjoin=CustomAttributeDefinition.type_string==cls.__name__)

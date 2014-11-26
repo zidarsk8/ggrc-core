@@ -62,6 +62,7 @@ can.Model.Cacheable("CMS.Models.CustomAttributeValue", {
   , mixins : []
   , attributes : {
     definition : "CMS.Models.CustomAttributeDefinition.stub"
+    custom_attributable : "CMS.Models.CustomAttributable.stub"
     , modified_by : "CMS.Models.Person.stub"
   }
   , links_to : {
