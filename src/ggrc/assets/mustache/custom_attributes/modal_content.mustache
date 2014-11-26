@@ -16,6 +16,7 @@
       <div class="hidable span6">
         <label>
           {{title}}
+          {{#mandatory}}<span class="required">*</span>{{/mandatory}}
           {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
