@@ -600,6 +600,36 @@ can.Control("CMS.Controllers.InnerNav", {
       widget.attr('force_show', false);
       this.route(widgets[0].selector); // Switch to the first widget
       return false; // Prevent the url change back to the widget we are hiding
+    },
+
+    // top nav dropdown position
+    ".dropdown-toggle click": function(el, ev) {
+      var $dropdown = el.closest(".hidden-widgets-list").find(".dropdown-menu"),
+        $menu_item = $dropdown.find(".inner-nav-item").find("a"),
+        offset = el.offset(),
+        top_pos = offset.top + 36,
+        left_pos = offset.left,
+        win = $(window),
+        win_height = win.height(),
+        footer_height = $(".footer").outerHeight(),
+        remain_height = win_height - footer_height,
+        win_width = win.width();
+
+      if(win_width - left_pos < 322) {
+        $dropdown.addClass("right-pos");
+      } else {
+        $dropdown.removeClass("right-pos");
+      }
+      if(remain_height - top_pos < dropdown_height) {
+        $dropdown.addClass("mid-pos");
+      } else {
+        $dropdown.removeClass("mid-pos");
+      }
+      if($menu_item.length === 1) {
+        $dropdown.addClass("one-item");
+      } else {
+        $dropdown.removeClass("one-item");
+      }
     }
 });
 
