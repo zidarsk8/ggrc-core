@@ -120,6 +120,9 @@
           this._can_activate_def();
         }
       },
+      _restore_button: function () {
+          this.attr('waiting', false);
+      }
     },
     events: {
       "{can.Model.Cacheable} created": function(model) {
@@ -128,20 +131,30 @@
       "{can.Model.Cacheable} destroyed": function(model) {
         this.scope._handle_refresh(model);
       },
-      "button click": function() {
+      "button click": function($el, event) {
+        var scope = this.scope;
+
+        scope.attr('waiting', true);
+                 
         var workflow = GGRC.page_instance();
         if (workflow.frequency !== 'one_time') {
-          workflow.refresh().then(function() {
-            workflow.attr('recurrences', true);
-            workflow.attr('status', "Active");
-            workflow.save();
-          });
+          workflow.refresh()
+                .fail(scope._restore_button.bind(scope))
+                .then(function() {
+                    workflow.attr('recurrences', true);
+                    workflow.attr('status', "Active");
+                    workflow.save()
+                        .fail(scope._restore_button.bind(scope));
+                });
         } else {
-          _generate_cycle().then(function() {
-            workflow.refresh().then(function() {
-              workflow.attr('status', "Active").save();
-            });
-          });
+           _generate_cycle()
+                .fail(scope._restore_button.bind(scope))
+                .then(function() {
+                    workflow.refresh().then(function() {
+                        workflow.attr('status', "Active").save()
+                            .fail(scope._restore_button.bind(scope));
+                    });
+                });
         }
       }
     }
