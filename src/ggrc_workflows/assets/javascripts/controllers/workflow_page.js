@@ -129,11 +129,8 @@
         this.scope._handle_refresh(model);
       },
       "button click": function($el, event) {
-        if ($el.hasClass("disabled")) {
-            return false;
-        }
-        $el.addClass("disabled");
-         
+        this.scope.attr('waiting', true);
+                 
         var workflow = GGRC.page_instance();
         if (workflow.frequency !== 'one_time') {
           workflow.refresh().then(function() {
