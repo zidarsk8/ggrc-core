@@ -53,9 +53,8 @@ h6 {
   font-weight:normal;
   font-size: 11px;
   color: $darkText;
-  line-height: 22px;
+  line-height: 17px;
   font-weight: bold;
-  margin-bottom: 3px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -267,9 +266,10 @@ u {
   height: 8px;
   @include border-radius($default-border-radius);
   float: left;
-  margin-right: 10px;
-  margin-left: 4px;
   margin: 9px 10px 0 4px;
+  .entry-list & {
+    margin: 5px 10px 0 4px;
+  }
 }
 
 @each $status_label in draft, progress, overdue {
