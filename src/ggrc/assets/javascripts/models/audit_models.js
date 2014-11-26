@@ -107,7 +107,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   },
   after_save: function() {
     var that = this;
-    
+
     new RefreshQueue().enqueue(this.program.reify()).trigger()
     .then(function(programs) {
       return $.when(

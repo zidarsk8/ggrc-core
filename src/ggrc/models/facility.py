@@ -4,7 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import BusinessObject, Timeboxed
+from .mixins import BusinessObject, Timeboxed, CustomAttributable
 from .object_control import Controllable
 from .object_document import Documentable
 from .object_objective import Objectiveable
@@ -14,6 +14,6 @@ from .object_section import Sectionable
 from .relationship import Relatable
 
 class Facility(
-    Documentable, Personable, Objectiveable, Controllable, Sectionable,
-    Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
+    CustomAttributable, Documentable, Personable, Objectiveable, Controllable,
+    Sectionable, Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'facilities'

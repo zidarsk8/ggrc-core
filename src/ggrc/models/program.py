@@ -5,7 +5,7 @@
 
 from ggrc import db
 from .associationproxy import association_proxy
-from .mixins import deferred, BusinessObject, Timeboxed
+from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
 from .object_document import Documentable
 from .object_objective import Objectiveable
 from .object_owner import Ownable
@@ -16,8 +16,8 @@ from .context import HasOwnContext
 
 
 class Program(
-    Documentable, Personable, Objectiveable, Relatable, HasOwnContext,
-    Timeboxed, Ownable, BusinessObject, db.Model):
+    CustomAttributable, Documentable, Personable, Objectiveable, Relatable,
+    HasOwnContext, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'programs'
 
   KINDS = [

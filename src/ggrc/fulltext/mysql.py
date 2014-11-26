@@ -90,7 +90,9 @@ class MysqlIndexer(SqlIndexer):
         or_(*type_queries))
 
   def _get_filter_query(self, terms):
-    whitelist = MysqlRecordProperty.property.in_(['title', 'name', 'email', 'notes', 'description', 'slug'])
+    whitelist = MysqlRecordProperty.property.in_(
+        ['title', 'name', 'email', 'notes', 'description', 'slug', 'attribute_value']
+    )
     if not terms:
       return whitelist
     elif terms:

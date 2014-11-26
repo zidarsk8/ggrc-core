@@ -449,3 +449,33 @@ class BusinessObject(
       'Not in Scope',
       'Deprecated',
       ]
+
+# This class is just a marker interface/mixin to indicate that a model type
+# supports custom attributes.
+class CustomAttributable(object):
+    @declared_attr
+    def custom_attribute_values(cls):
+        joinstr = 'and_(foreign(CustomAttributeValue.attributable_id) == {type}.id, '\
+                        'foreign(CustomAttributeValue.attributable_type) == "{type}")'
+        joinstr = joinstr.format(type=cls.__name__)
+        return relationship(
+            "CustomAttributeValue",
+            primaryjoin=joinstr,
+            backref='{0}_custom_attributable'.format(cls.__name__),
+            cascade='all, delete-orphan',
+            )
+
+    _publish_attrs = [
+        'custom_attribute_values',
+    ]
+    _include_links = [
+        # 'custom_attribute_values',
+    ]
+    #
+    # @declared_attr
+    # def custom_attribute_definitions(cls):
+    #     from .custom_attribute_definition import CustomAttributeDefinition
+    #     # FIXME definitions should be class scoped, not instance scoped.
+    #     joinstr = 'foreign(CustomAttributeDefinition.definition_type) == "{name}"'
+    #     joinstr = joinstr.format(name=cls.__name__)
+    #     return db.relationship("CustomAttributeDefinition",primaryjoin=joinstr)
