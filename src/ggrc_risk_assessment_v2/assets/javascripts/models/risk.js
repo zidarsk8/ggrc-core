@@ -17,7 +17,7 @@
     create: "POST /api/risks",
     update: "PUT /api/risks/{id}",
     destroy: "DELETE /api/risks/{id}",
-    mixins: ["ownable", "contactable"],
+    mixins: ["ownable", "contactable", "unique_title"],
     attributes : {
       context : "CMS.Models.Context.stub",
       contact : "CMS.Models.Person.stub",
