@@ -4,44 +4,49 @@
     Created By: anze@reciprocitylabs.com
     Maintained By: anze@reciprocitylabs.com
 }}
-<div class="hideable-holder bare">
+
+
+{{#instance.class.is_custom_attributable}}
 <custom-attributes instance="instance">
-  {{#with_custom_attribute_definitions}}
-  <div class="row-fluid">
-    {{#each loaded_definitions}}
-    <div class="hidable span6">
-      <label>
-        {{title}}
-        <i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>
-        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      </label>
-      {{#switch attribute_type}}
-      {{#case 'Text'}}
-        <input tabindex="20" class="input-block-level" placeholder="{{placeholder}}" name="title" type="text" value="">
-      {{/case}}
-      {{#case 'Rich Text'}}
-        <div class="wysiwyg-area">
-          <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="description" placeholder="{{placeholder}}">{{{description}}}</textarea>
-        </div>
-      {{/case}}
-      {{#case 'Dropdown'}}
-        <select class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="20">
-          {{#iterate 'Draft', 'Final'}}
-            <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-          {{/iterate}}
-        </select>
-      {{/case}}
-      {{#case 'Checkbox'}}
-        <div class="checkbox-area">
-          <input tabindex="20" name="private" value="private" type="checkbox" {{#if private}}checked="checked"{{/if}}> Private Program
-        </div>
-      {{/case}}
-      {{/switch}}
+  <div class="hideable-holder bare">
+
+    {{#with_custom_attribute_definitions}}
+    <div class="row-fluid">
+      {{#each loaded_definitions}}
+      <div class="hidable span6">
+        <label>
+          {{title}}
+          {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        </label>
+        {{#switch attribute_type}}
+        {{#case 'Text'}}
+          <input tabindex="20" class="input-block-level" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text" value="">
+        {{/case}}
+        {{#case 'Rich Text'}}
+          <div class="wysiwyg-area">
+            <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{{description}}}</textarea>
+          </div>
+        {{/case}}
+        {{#case 'Dropdown'}}
+          <select class="input-block-level" name="custom_attributes.{{id}}" null-if-empty="null-if-empty" tabindex="20">
+            {{#iterate 'Draft', 'Final'}}
+              <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
+          </select>
+        {{/case}}
+        {{#case 'Checkbox'}}
+          <div class="checkbox-area">
+            <input tabindex="20" name="custom_attributes.{{id}}" value="private" type="checkbox" {{#if private}}checked="checked"{{/if}}> Private Program
+          </div>
+        {{/case}}
+        {{/switch}}
+      </div>
+      {{/loaded_definitions}}
     </div>
-    {{/loaded_definitions}}
+    {{else}}
+      Loading Custom Attributes...<span  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' 'display:inline-block; top: -6px; left: 20px;' }}></span>
+    {{/with_custom_attribute_definitions}}
   </div>
-  {{else}}
-    loading attrs
-  {{/with_custom_attribute_definitions}}
 </custom-attributes>
-</div>
+{{/instance.class.is_custom_attributable}}
