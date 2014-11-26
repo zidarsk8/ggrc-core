@@ -84,8 +84,8 @@
             <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
               {{! taken from responses/tree_footer}}
               {{^if_equals instance.status "Accepted"}}
-              {{#if allow_creating}}
               {{^if_equals instance.status 'Draft'}}
+              {{#if allow_creating}}
               &nbsp;&nbsp;
               {{#is_allowed '__GGRC_ADMIN__' model.shortName context=instance.context.id}}
                       {{#using audit=instance.audit}}
