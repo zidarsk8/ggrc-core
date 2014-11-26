@@ -491,6 +491,7 @@ can.Model.Cacheable("CMS.Models.Vendor", {
   , update : "PUT /api/vendors/{id}"
   , destroy : "DELETE /api/vendors/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"

@@ -129,8 +129,9 @@ dashboard-js-template-files:
   - controls/modal_content.mustache
   - controls/object_list.mustache
   - controls/tree.mustache
-  - custom_attributes/object_list.mustache
   - custom_attribute_definitions/modal_content.mustache
+  - custom_attribute_definitions/tree.mustache
+  - custom_attribute_definitions/subtree.mustache
   - dashboard/internav_list.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache

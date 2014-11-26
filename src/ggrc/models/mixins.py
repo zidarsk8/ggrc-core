@@ -455,8 +455,8 @@ class BusinessObject(
 class CustomAttributable(object):
     @declared_attr
     def custom_attribute_values(cls):
-        joinstr = 'and_(foreign(CustomAttributeValue.custom_attributable_id == {type}.id), '\
-                        'foreign(CustomAttributeValue.custom_attributable_type) == "{type}")'
+        joinstr = 'and_(foreign(CustomAttributeValue.attributable_id) == {type}.id, '\
+                        'foreign(CustomAttributeValue.attributable_type) == "{type}")'
         joinstr = joinstr.format(type=cls.__name__)
         return relationship(
             "CustomAttributeValue",
@@ -471,11 +471,11 @@ class CustomAttributable(object):
     _include_links = [
         # 'custom_attribute_values',
     ]
-
-    @declared_attr
-    def custom_attribute_definitions(cls):
-        from .custom_attribute_definition import CustomAttributeDefinition
-        # FIXME definitions should be class scoped, not instance scoped.
-        return db.relationship(
-            "CustomAttributeDefinition",
-            primaryjoin=CustomAttributeDefinition.type_string==cls.__name__)
+    #
+    # @declared_attr
+    # def custom_attribute_definitions(cls):
+    #     from .custom_attribute_definition import CustomAttributeDefinition
+    #     # FIXME definitions should be class scoped, not instance scoped.
+    #     joinstr = 'foreign(CustomAttributeDefinition.definition_type) == "{name}"'
+    #     joinstr = joinstr.format(name=cls.__name__)
+    #     return db.relationship("CustomAttributeDefinition",primaryjoin=joinstr)
