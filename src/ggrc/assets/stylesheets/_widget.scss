@@ -1434,18 +1434,25 @@ ul.attr-list {
     }
   }
   .dropdown-menu {
-    width: 100%;
     a {
-      text-transform: none;
-      color: $tabTitle;
       padding: 0 14px 0 10px;
+      display: block;
       line-height: 29px;
+      font-size: 13px;
+      color: $gray;
+      @include transition(color 0.2s ease);
+      text-transform: none;
       background: $white;
       @include border-radius(0);
-      @include transition (background 0.2s ease, color 0.2s ease);
+      @include box-shadow(none);
+      i {
+        @include opacity(0.4);
+      }
       &:hover {
-        background: $tabHoverBgnd;
-        color: $white;
+        color: $black;
+        i {
+          @include opacity(1);
+        }
       }
     }
   }

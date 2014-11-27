@@ -782,6 +782,42 @@ $(document).ready(function(){
   $(".nav-trigger").on("click", topNav);
   $(".lhn-trigger").on("click", lhnAnimate);
 
+  // top nav dropdown position
+  function dropdownPosition() {
+    var $this = $(this),
+        $dropdown = $this.closest(".hidden-widgets-list").find(".dropdown-menu"),
+        $menu_item = $dropdown.find(".inner-nav-item").find("a"),
+        dropdown_height = $dropdown.outerHeight(),
+        offset = $this.offset(),
+        top_pos = offset.top + 36,
+        left_pos = offset.left,
+        win = $(window),
+        win_height = win.height(),
+        footer_height = $(".footer").outerHeight(),
+        remain_height = win_height - footer_height,
+        win_width = win.width();
+
+    console.log(top_pos);
+
+    if(win_width - left_pos < 322) {
+      $dropdown.addClass("right-pos");
+    } else {
+      $dropdown.removeClass("right-pos");
+    }
+    if(remain_height - top_pos < dropdown_height) {
+      $dropdown.addClass("mid-pos");
+    } else {
+      $dropdown.removeClass("mid-pos");
+    }
+    if($menu_item.length === 1) {
+      $dropdown.addClass("one-item");
+    } else {
+      $dropdown.removeClass("one-item");
+    }
+
+  }
+  $(".dropdown-toggle").on("click", dropdownPosition);
+
 });
 
 // Make sure the windows are resized properly
