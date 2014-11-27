@@ -409,7 +409,6 @@ can.Control("GGRC.Controllers.Modals", {
       if(can.isArray(value)) {
         value = new can.Observe.List(can.map(value, function(v) { return new can.Observe({}).attr(name.slice(1).join("."), v); }));
       } else {
-
         if($elem.is("[data-lookup]")) {
           if(!value) {
             value = null;
@@ -449,8 +448,14 @@ can.Control("GGRC.Controllers.Modals", {
       value = value || [];
       cur.splice.apply(cur, [0, cur.length].concat(value));
     } else {
-      if(name[0] !== "people")
+      if (name[0] === "custom_attributes") {
+        if (!instance.custom_attributes) {
+          instance.attr('custom_attributes', new can.Map());
+        }
+        instance.custom_attributes.attr(name[1], value[name[1]]);
+      } else if(name[0] !== "people") {
         instance.attr(name[0], value);
+      }
     }
     this.setup_wysihtml5(); //in case the changes in values caused a new wysi box to appear.
   }

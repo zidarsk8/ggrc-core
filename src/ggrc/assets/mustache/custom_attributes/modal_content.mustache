@@ -22,23 +22,24 @@
         </label>
         {{#switch attribute_type}}
         {{#case 'Text'}}
-          <input tabindex="20" class="input-block-level" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text" value="">
+          <input tabindex="20" class="input-block-level" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text" value="{{!TODO Get value}}">
         {{/case}}
         {{#case 'Rich Text'}}
           <div class="wysiwyg-area">
-            <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{{description}}}</textarea>
+            <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{!TODO Get value}}</textarea>
           </div>
         {{/case}}
         {{#case 'Dropdown'}}
           <select class="input-block-level" name="custom_attributes.{{id}}" null-if-empty="null-if-empty" tabindex="20">
-            {{#iterate 'Draft', 'Final'}}
-              <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{! TODO: itarate over items in `multi_choice_options`}}
+            {{#iterate ''}}
+              <option {{!#if_equals iterator status}}selected="true"{{!/if_equals}}>{{iterator}}</option>
             {{/iterate}}
           </select>
         {{/case}}
         {{#case 'Checkbox'}}
           <div class="checkbox-area">
-            <input tabindex="20" name="custom_attributes.{{id}}" value="private" type="checkbox" {{#if private}}checked="checked"{{/if}}> Private Program
+            <input tabindex="20" name="custom_attributes.{{id}}" value="true" type="checkbox" {{!TODO: get value}}checked="checked"{{!/if}}> Private Program
           </div>
         {{/case}}
         {{/switch}}

@@ -14,9 +14,6 @@
     },
     content: "<content/>",
     events: {
-      'onload': function(){
-        console.log("onload")
-      }
     },
     helpers: {
       with_custom_attribute_definitions: function(options) {
@@ -26,7 +23,7 @@
 
         function finish(custom_attributes) {
           // TODO: Find a better way of enabling rich text fields
-          setTimeout(function(){
+          setTimeout(function() {
             $($.find('custom-attributes .wysihtml5')).each(function() {
               $(this).cms_wysihtml5();
             });
