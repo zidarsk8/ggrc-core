@@ -6,7 +6,10 @@
 }}
 
 {{!div class="modal-body"}}
+{{#instance}}
 <form action="javascript://">
+  {{> /static/mustache/base_objects/form_restore.mustache}}
+
   <div class="row-fluid">
     <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
       <label>
@@ -66,24 +69,51 @@
           </span>
           Advanced
           <span class="hidden-fields out">
-            Code
+            Code, Effective Date, Stop Date, State
           </span>
         </a>
       </div>
     </div>
   </div>
   <div class="hidden-fields-area" style="display:none">
-    <div class="row-fluid">
-      <div class="span6">
+   <div class="row-fluid">
+      <div class="span4">
         <label>
           Code
           <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         </label>
-        <input tabindex="7" class="input-block-level" name="slug" placeholder="RISK-XXX" type="text" value="{{instance.slug}}">
+        <input tabindex="7" class="input-block-level" name="slug" placeholder="RISK-XXX" type="text" value="{{slug}}">
       </div>
-      <div class="span6">
+      <div class="span4">
+        <label>
+          Effective Date
+          <i class="grcicon-help-black" rel="tooltip" title="Enter the date this object becomes effective."></i>
+        </label>
+        <input tabindex="8" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+      </div>
+      <div class="span4">
+        <label>
+          Stop Date
+          <i class="grcicon-help-black" rel="tooltip" title="Enter the date the object stops being effective."></i>
+        </label>
+        <input tabindex="9" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span4">
+        <label>
+          State
+          <i class="grcicon-help-black" rel="tooltip" title="Indicates the status of this object."></i>
+        </label>
+        <select class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="10">
+          <option value="" {{#if_equals status ""}}selected{{/if_equals}}>---</option>
+          {{#iterate 'Draft', 'Final', 'Effective', 'Ineffective', 'Launched', 'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'}}
+            <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+          {{/iterate}}
+        </select>
       </div>
     </div>
   </div>
 </form>
+{{/instance}}
 {{!/div}}
