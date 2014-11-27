@@ -26,7 +26,7 @@ class Response(
       db.Column(db.String, nullable=False, default=""), 'Response')
 
   VALID_STATES = (u'Assigned', u'Submitted', u'Accepted', u'Rejected')
-  VALID_TYPES = (u'documentation', u'interview')
+  VALID_TYPES = (u'documentation', u'interview', u'population sample')
   request_id = deferred(
       db.Column(db.Integer, db.ForeignKey('requests.id'), nullable=False),
       'Response')
@@ -46,6 +46,19 @@ class Response(
   sample_evidence_id = deferred(
       db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=True),
       'Response')
+
+  population_worksheet = db.relationship(
+    "Document",
+    foreign_keys="PopulationSampleResponse.population_worksheet_id"
+    )
+  sample_worksheet = db.relationship(
+    "Document",
+    foreign_keys="PopulationSampleResponse.sample_worksheet_id"
+    )
+  sample_evidence = db.relationship(
+    "Document",
+    foreign_keys="PopulationSampleResponse.sample_evidence_id"
+    )
 
   @staticmethod
   def _extra_table_args(cls):
@@ -123,3 +136,33 @@ class InterviewResponse(
     query = super(InterviewResponse, cls).eager_query()
     return query.options(
       orm.subqueryload('meetings'))
+
+class PopulationSampleResponse(
+    Relatable, Documentable, Personable, Controllable, Response):
+
+  __mapper_args__ = {
+      'polymorphic_identity': 'population sample'
+      }
+  _table_plural = 'population_sample_responses'
+
+  _publish_attrs = [
+      'population_worksheet',
+      'population_count',
+      'sample_worksheet',
+      'sample_count',
+      'sample_evidence',
+      ]
+  _sanitize_html = [
+      'population_count',
+      'sample_count',
+      ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(PopulationSampleResponse, cls).eager_query()
+    return query.options(
+      orm.joinedload('population_worksheet'),
+      orm.joinedload('sample_worksheet'),
+      orm.joinedload('sample_evidence'))

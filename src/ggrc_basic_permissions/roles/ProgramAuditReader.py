@@ -8,6 +8,7 @@ permissions = {
         "Request",
         "DocumentationResponse",
         "InterviewResponse",
+        "PopulationSampleResponse",
         "Audit",
         "AuditObject",
         "Meeting",

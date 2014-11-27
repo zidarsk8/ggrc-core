@@ -288,6 +288,11 @@ class InterviewResponseFactory(ResponseFactory):
   MODEL = models.InterviewResponse
   response_type = 'interview'
 
+class PopulationSampleResponseFactory(ResponseFactory):
+  MODEL = models.PopulationSampleResponse
+  response_type = 'population sample'
+
+
 # Category Objects
 
 class ControlCategoryFactory(ModelFactory):

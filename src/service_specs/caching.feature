@@ -385,6 +385,11 @@ Feature: Resource caching
       | InterviewResponse         | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | InterviewResponse         | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | InterviewResponse         | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
+      | PopulationSampleResponse  | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
+      | PopulationSampleResponse  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
+      | PopulationSampleResponse  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
+      | PopulationSampleResponse  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
+      | PopulationSampleResponse  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Section                   | directive_sections   | section              | DirectiveSection          | status   | Draft  | Final  |
       | Section                   | control_sections     | section              | ControlSection            | status   | Draft  | Final  |
       | Section                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |

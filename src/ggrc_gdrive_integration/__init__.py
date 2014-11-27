@@ -14,7 +14,7 @@ import ggrc_gdrive_integration.models
 
 from ggrc import db
 from ggrc.models import Program, Audit, Request, Response, \
-  DocumentationResponse, InterviewResponse, Document, \
+  DocumentationResponse, InterviewResponse, PopulationSampleResponse, Document, \
   Meeting
 from .models.object_folder import Folderable
 from .models.object_file import Fileable
@@ -31,6 +31,11 @@ DocumentationResponse.__bases__ = (Fileable,) + DocumentationResponse.__bases__
 DocumentationResponse.late_init_fileable()
 # InterviewResponse.__bases__ = (Fileable,) + InterviewResponse.__bases__
 # InterviewResponse.late_init_fileable()
+PopulationSampleResponse.__bases__ = (Folderable,) + PopulationSampleResponse.__bases__
+PopulationSampleResponse.late_init_folderable()
+PopulationSampleResponse.__bases__ = (Fileable,) + \
+  PopulationSampleResponse.__bases__
+PopulationSampleResponse.late_init_fileable()
 #Program._publish_attrs.append('object_folders')
 Document.__bases__ = (Fileable,) + \
   Document.__bases__

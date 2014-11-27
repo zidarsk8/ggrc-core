@@ -34,6 +34,7 @@ permissions = {
         "ObjectSection",
         "Option",
         "OrgGroup",
+        "PopulationSample",
         "Product",
         "ProgramControl",
         "ProgramDirective",

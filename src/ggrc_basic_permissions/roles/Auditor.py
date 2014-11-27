@@ -31,6 +31,18 @@ permissions = {
             "type": "InterviewResponse",
             "condition": "in"
         },
+        {
+            "terms": {
+                "property_name": "status",
+                "value": [
+                    "Submitted",
+                    "Accepted",
+                    "Rejected"
+                ]
+            },
+            "type": "PopulationSampleResponse",
+            "condition": "in"
+        },
         "Meeting",
         "ObjectControl",
         "ObjectDocument",
@@ -52,7 +64,8 @@ permissions = {
     "update": [
         "Request",
          "DocumentationResponse",
-         "InterviewResponse"
+         "InterviewResponse",
+         "PopulationSampleResponse"
     ],
     "delete": [
         "Request",
