@@ -9,9 +9,6 @@
 
   can.Component.extend({
     tag: "custom-attributes",
-    custom_attributes: {
-      instance: "@"
-    },
     content: "<content/>",
     events: {
     },
@@ -19,9 +16,13 @@
       with_custom_attribute_definitions: function(options) {
         var instance = this.instance,
             self = this,
-            dfd = instance.custom_attribute_definitions();
+            dfd = $.when(
+              instance.custom_attribute_definitions(),
+              // Making sure custom_attribute_values are loaded
+              instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
+            );
 
-        function finish(custom_attributes) {
+        function finish(custom_attributes, values) {
           // TODO: Find a better way of enabling rich text fields
           setTimeout(function() {
             $($.find('custom-attributes .wysihtml5')).each(function() {

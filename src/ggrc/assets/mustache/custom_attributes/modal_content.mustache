@@ -9,7 +9,6 @@
 {{#instance.class.is_custom_attributable}}
 <custom-attributes instance="instance">
   <div class="hideable-holder bare">
-
     {{#with_custom_attribute_definitions}}
     <div class="row-fluid">
       {{#each loaded_definitions}}
@@ -22,11 +21,11 @@
         </label>
         {{#switch attribute_type}}
         {{#case 'Text'}}
-          <input tabindex="20" class="input-block-level" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text" value="{{!TODO Get value}}">
+          <input tabindex="20" class="input-block-level" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text" value="{{custom_attribute_value instance id}}">
         {{/case}}
         {{#case 'Rich Text'}}
           <div class="wysiwyg-area">
-            <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{!TODO Get value}}</textarea>
+            <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{custom_attribute_value instance id}}</textarea>
           </div>
         {{/case}}
         {{#case 'Dropdown'}}
