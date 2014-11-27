@@ -1,0 +1,54 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+
+{{#instance.class.is_custom_attributable}}
+<custom-attributes instance="instance">
+  <div class="hideable-holder bare">
+
+    {{#with_custom_attribute_definitions}}
+    <div class="row-fluid">
+      {{#each loaded_definitions}}
+      <div class="hidable span6">
+        <label>
+          {{title}}
+          {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+          {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        </label>
+        {{#switch attribute_type}}
+        {{#case 'Text'}}
+          <input tabindex="20" class="input-block-level" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text" value="{{!TODO Get value}}">
+        {{/case}}
+        {{#case 'Rich Text'}}
+          <div class="wysiwyg-area">
+            <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{!TODO Get value}}</textarea>
+          </div>
+        {{/case}}
+        {{#case 'Dropdown'}}
+          <select class="input-block-level" name="custom_attributes.{{id}}" null-if-empty="null-if-empty" tabindex="20">
+            {{! TODO: itarate over items in `multi_choice_options`}}
+            {{#iterate ''}}
+              <option {{!#if_equals iterator status}}selected="true"{{!/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
+          </select>
+        {{/case}}
+        {{#case 'Checkbox'}}
+          <div class="checkbox-area">
+            <input tabindex="20" name="custom_attributes.{{id}}" value="true" type="checkbox" {{!TODO: get value}}checked="checked"{{!/if}}> Private Program
+          </div>
+        {{/case}}
+        {{/switch}}
+      </div>
+      {{/loaded_definitions}}
+    </div>
+    {{else}}
+      Loading Custom Attributes...<span  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' 'display:inline-block; top: -6px; left: 20px;' }}></span>
+    {{/with_custom_attribute_definitions}}
+  </div>
+</custom-attributes>
+{{/instance.class.is_custom_attributable}}

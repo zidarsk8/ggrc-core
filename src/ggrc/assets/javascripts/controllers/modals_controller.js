@@ -18,6 +18,7 @@ can.Control("GGRC.Controllers.Modals", {
     preload_view : GGRC.mustache_path + "/dashboard/modal_preload.mustache"
     , content_view : GGRC.mustache_path + "/help/help_modal_content.mustache"
     , header_view : GGRC.mustache_path + "/modals/modal_header.mustache"
+    , custom_attributes_view : GGRC.mustache_path + "/custom_attributes/modal_content.mustache"
     , button_view : null
     , model : null    // model class to use when finding or creating new
     , instance : null // model instance to use instead of finding/creating (e.g. for update)
@@ -191,6 +192,7 @@ can.Control("GGRC.Controllers.Modals", {
       can.view(this.options.content_view, dfd)
       , can.view(this.options.header_view, dfd)
       , can.view(this.options.button_view, dfd)
+      , can.view(this.options.custom_attributes_view, dfd)
     ).done(this.proxy('draw'));
   }
 
@@ -252,7 +254,7 @@ can.Control("GGRC.Controllers.Modals", {
     return this.options.find_params.serialize ? this.options.find_params.serialize() : this.options.find_params
   }
 
-  , draw : function(content, header, footer) {
+  , draw : function(content, header, footer, custom_attributes) {
     // Don't draw if this has been destroyed previously
     if (!this.element) {
       return;
@@ -261,10 +263,17 @@ can.Control("GGRC.Controllers.Modals", {
     can.isArray(content) && (content = content[0]);
     can.isArray(header) && (header = header[0]);
     can.isArray(footer) && (footer = footer[0]);
+    if (can.isArray(custom_attributes)) {
+      custom_attributes = custom_attributes[0];
+    }
 
     header != null && this.options.$header.find("h2").html(header);
     content != null && this.options.$content.html(content).removeAttr("style");
     footer != null && this.options.$footer.html(footer);
+
+    if (custom_attributes != null) {
+      this.options.$content.append(custom_attributes);
+    }
 
     this.setup_wysihtml5();
 
@@ -400,7 +409,6 @@ can.Control("GGRC.Controllers.Modals", {
       if(can.isArray(value)) {
         value = new can.Observe.List(can.map(value, function(v) { return new can.Observe({}).attr(name.slice(1).join("."), v); }));
       } else {
-
         if($elem.is("[data-lookup]")) {
           if(!value) {
             value = null;
@@ -440,8 +448,14 @@ can.Control("GGRC.Controllers.Modals", {
       value = value || [];
       cur.splice.apply(cur, [0, cur.length].concat(value));
     } else {
-      if(name[0] !== "people")
+      if (name[0] === "custom_attributes") {
+        if (!instance.custom_attributes) {
+          instance.attr('custom_attributes', new can.Map());
+        }
+        instance.custom_attributes.attr(name[1], value[name[1]]);
+      } else if(name[0] !== "people") {
         instance.attr(name[0], value);
+      }
     }
     this.setup_wysihtml5(); //in case the changes in values caused a new wysi box to appear.
   }
@@ -746,7 +760,7 @@ can.Control("GGRC.Controllers.Modals", {
             finish();
           });
         } else {
-          var type = obj.type ? obj.type : '', 
+          var type = obj.type ? obj.type : '',
               name = obj.title ? obj.title : '',
               msg;
           if(instance_id === undefined) { //new element

@@ -486,6 +486,13 @@
         }
       }
     }
+    &.bare {
+      .row-fluid {
+        [class*="span"]:nth-child(even) {
+          margin-right: 0;
+        }
+      }
+    }
   }
   .hidden{
     display: none;

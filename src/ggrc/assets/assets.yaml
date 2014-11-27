@@ -83,6 +83,7 @@ dashboard-js-files:
   - apps/quick_search.js
   - apps/business_objects.js
   - apps/dashboard.js
+  - apps/custom_attributes.js
   - roles/roles_modal_controller.js
   - dashboard.js
   - jquery.iframe-transport.js
@@ -129,6 +130,7 @@ dashboard-js-template-files:
   - controls/modal_content.mustache
   - controls/object_list.mustache
   - controls/tree.mustache
+  - custom_attributes/modal_content.mustache
   - custom_attribute_definitions/modal_content.mustache
   - custom_attribute_definitions/tree.mustache
   - custom_attribute_definitions/subtree.mustache

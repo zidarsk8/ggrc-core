@@ -6,18 +6,25 @@
 from ggrc import db
 from .mixins import (
     deferred, Titled, Base
-    )
+)
+
 
 class CustomAttributeDefinition(Base, Titled, db.Model):
   __tablename__ = 'custom_attribute_definitions'
 
   definition_type = deferred(db.Column(db.String), 'CustomAttributeDefinition')
   attribute_type = deferred(db.Column(db.String), 'CustomAttributeDefinition')
-  multi_choice_options = deferred(db.Column(db.String), 'CustomAttributeDefinition')
+  multi_choice_options = deferred(db.Column(db.String),
+                                  'CustomAttributeDefinition')
   mandatory = deferred(db.Column(db.Boolean), 'CustomAttributeDefinition')
+  helptext = deferred(db.Column(db.String), 'CustomAttributeDefinition')
+  placeholder = deferred(db.Column(db.String), 'CustomAttributeDefinition')
 
   _publish_attrs = [
       'definition_type',
       'attribute_type',
       'multi_choice_options',
-      'mandatory']
+      'mandatory',
+      'helptext',
+      'placeholder',
+  ]
