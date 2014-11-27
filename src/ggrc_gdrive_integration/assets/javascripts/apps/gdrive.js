@@ -53,12 +53,6 @@
     InterviewResponse : {
       _mixins : ["fileable", "folderable"],
     },
-    PopulationSampleResponse : {
-      _mixins : ["fileable", "folderable"],
-      _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request"),
-      folders_via_request: new GGRC.ListLoaders.CrossListLoader("_request", "extended_folders"),
-      extended_folders: new GGRC.ListLoaders.MultiListLoader(["folders", "folders_via_request"])
-    },
     Document : {
       _mixins : ["fileable"]
     },
