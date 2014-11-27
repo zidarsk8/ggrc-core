@@ -2574,24 +2574,4 @@ can.each({
   });
 });
 
-// TODO: for some reason having this in custom-attributes component wouldn't work
-//       It seems like having deferred rendering kills component side helpers
-//       A quick solution for this is to have this helper here available globally
-Mustache.registerHelper("custom_attribute_value", function(instance, id, options){
-
-  instance = Mustache.resolve(instance);
-  id = Mustache.resolve(id);
-
-  // In with_custom_attribute_definitions helper we make sure custom_attribute_values
-  // are already reified and refreshed.
-  var i, value, values = instance.custom_attribute_values;
-
-  for (i = 0; i < values.length; i++) {
-    value = values[i];
-    if (value.custom_attribute_id == id) {
-      return value.attribute_value;
-    }
-  }
-});
-
 })(this, jQuery, can);

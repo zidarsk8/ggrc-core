@@ -28,6 +28,28 @@
             $($.find('custom-attributes .wysihtml5')).each(function() {
               $(this).cms_wysihtml5();
             });
+            $($.find("custom-attributes :input:not(isolate-form *)")).each(function(_, el) {
+
+              var $el = $(el), name, val = "", id, i;
+              if (!$el.attr('name')) {
+                return;
+              }
+              name = $el.attr('name').split('.');
+              if (name[0] != 'custom_attributes') {
+                return;
+              }
+              id = name[1];
+
+              for (i = 0; i < values.length; i++) {
+                if (values[i].custom_attribute_id == id) {
+                  val = values[i].attribute_value;
+                }
+              }
+              $el.val(val);
+              // TODO: This bit triggers a validate form on load, causing the title
+              //       cannot be blank error to show up on form load.
+              $el.trigger('change');
+            });
           });
 
           return options.fn(options.contexts.add({

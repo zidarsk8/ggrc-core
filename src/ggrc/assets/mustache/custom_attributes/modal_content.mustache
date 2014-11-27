@@ -21,11 +21,11 @@
         </label>
         {{#switch attribute_type}}
         {{#case 'Text'}}
-          <input tabindex="20" class="input-block-level" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text" value="{{custom_attribute_value instance id}}">
+          <input tabindex="20" class="input-block-level" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text">
         {{/case}}
         {{#case 'Rich Text'}}
           <div class="wysiwyg-area">
-            <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{custom_attribute_value instance id}}</textarea>
+            <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}"></textarea>
           </div>
         {{/case}}
         {{#case 'Dropdown'}}
@@ -38,7 +38,7 @@
         {{/case}}
         {{#case 'Checkbox'}}
           <div class="checkbox-area">
-            <input tabindex="20" name="custom_attributes.{{id}}" value="true" type="checkbox" {{!TODO: get value}}checked="checked"{{!/if}}> Private Program
+            <input tabindex="20" name="custom_attributes.{{id}}" value="true" type="checkbox"> Private Program
           </div>
         {{/case}}
         {{/switch}}
