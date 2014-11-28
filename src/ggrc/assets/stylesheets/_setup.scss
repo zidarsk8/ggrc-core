@@ -57,10 +57,13 @@
     $red: #e00032;
     $lightRed: #ff9d9d;
     $green: #1d8d15;
-    $blue: #069;
+    $lightGreen: #8bc34a;
+    $blue: #0277bd;
     $darkBlue: #369;
     $warmGray: #ccc;
     $midGray: #aaa;
+    $textGray: #757575;
+    $defaultBlue: #2196f3;
   
   // quick search
     $topBarSearchText: #bbbdc1;
@@ -122,8 +125,8 @@
   $darkBlue: #0055cc;
   $warningBorder: #fbeed5;
   $warningBgnd: #fcf8e3;
-  $contentBgnd: #e3e3e3;
-  $itemBorder: #e3e3e3;
+  $contentBgnd: #e0e0e0;
+  $itemBorder: #e0e0e0;
   
   // pbc requests color states
   $rqDraft: #f7f7f7;
@@ -140,10 +143,7 @@
 
   $lightBlue: #40c4ff;
   $orange: #ffab40;
-  $btnGreen: #009933;
-
-  // progress bar colors
-  $bar-verify: #8bc34a;
+  $btnGreen: #43a047;
 
   // status label colors
   $status-draft: #bdbdbd;
@@ -318,7 +318,7 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 // progress bar placeholder colors
 %bar-verify {
-  background: $bar-verify;
+  background: $lightGreen;
 }
 %bar-progress {
   background: $lightBlue;

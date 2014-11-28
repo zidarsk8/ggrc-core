@@ -208,7 +208,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-down { background-position:-102px -56px; }
 .grcicon-reg-map-white { background-position:-6px -80px; }
 .grcicon-carot { background-position:-78px -56px; }
-.grcicon-carot-white { background-position:-78px -80px; }
+//.grcicon-carot-white { background-position:-78px -80px; } removed from icons
 .grcicon-arrowright-black, .grcicon-goto { background-position:-174px -56px; }
 .grcicon-goto-white { background-position:-174px -80px; }
 .grcicon-goto-left { background-position:-78px -104px; }
@@ -264,6 +264,9 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-close-tab { background-position: -342px -176px; }
 .grcicon-close-red { background-position: -342px -272px; }
 .grcicon-warning { background-position:-174px -8px }
+.grcicon-arrow-left { background-position:-126px -56px }
+.grcicon-arrow-right { background-position:-102px -56px }
+.grcicon-arrow-bottom { background-position:-102px -80px }
 
 // Large icons
 .grciconlarge-dashboard { background-position:-8px -8px; }
@@ -280,7 +283,7 @@ a.remove_filter i[class^="grcicon-"] {
   @include opacity(0.5);
   @include transition(opacity 0.4s);
   &.active {
-    background-position:-222px -56px;
+    //background-position:-222px -56px; removed from icons
     @include opacity(1);
   }
   &.lastchild {
@@ -475,8 +478,8 @@ a.remove_filter i[class^="grcicon-"] {
 
 .grcicon-show { background-position:-222px -320px }
 .grcicon-hide { background-position:-246px -320px }
-.grcicon-show-arrow { background-position:-126px -56px }
-.grcicon-hide-arrow { background-position:-102px -56px }
+//.grcicon-show-arrow { background-position:-126px -56px } removed from icons
+//.grcicon-hide-arrow { background-position:-102px -56px } removed from icons
 
 .grcicon-logout-color { background-position:-150px -8px; }
 

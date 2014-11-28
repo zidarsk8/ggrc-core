@@ -963,11 +963,6 @@ ul.new-tree {
   [class^="grcicon-"] {
     margin-top:7px;
   }
-  .btn {
-    [class^="grcicon-"] {
-      margin-top: 1px;
-    }
-  }
   .parent {
     @include opacity(0.6);
   }
@@ -1262,9 +1257,6 @@ ul.new-tree {
   }
   .tree-title-area {
     font-size: 16px;
-    a {
-      color: $blue;
-    }
     @include oneline();
     &.w-status {
       float: left;

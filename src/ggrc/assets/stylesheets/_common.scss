@@ -15,13 +15,24 @@ h1 {
   color: $headerTitle;
   font-size: 24px;
   line-height: 48px;
+  height: 47px;
   font-family: $fontTitle;
   font-weight: normal;
-  span {
-    color: $disabled;
-    font-weight: normal;
-  }
   @include oneline();
+  position: relative;
+  .title-prev {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+  }
+  .title-slide {
+    position: absolute;
+    left: 40px;
+    top: 0;
+    z-index: 9999;
+    background: $white;
+  }
 }
 
 h2 {
@@ -104,6 +115,19 @@ u {
   &:hover {
     text-decoration: none;
     color: $gray;
+  }
+}
+
+p {
+  small {
+    color: $textGray;
+  }
+}
+
+a {
+  color: $blue;
+  &:hover {
+    color: $blue;
   }
 }
 
@@ -199,6 +223,25 @@ u {
 .radio-inline {
   input[type="radio"] {
     margin: -1px 0 0 0;
+  }
+}
+
+.btn {
+  &.dropdown-toggle {
+    [class^="grcicon-"] {
+      margin-top: 1px !important;
+    }
+  }
+}
+
+.wrap-row {
+  margin-bottom: 20px;
+  p {
+    padding-top: 6px;
+    margin-bottom: 3px;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }
 
