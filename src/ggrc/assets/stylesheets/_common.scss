@@ -15,13 +15,24 @@ h1 {
   color: $headerTitle;
   font-size: 24px;
   line-height: 48px;
+  height: 47px;
   font-family: $fontTitle;
   font-weight: normal;
-  span {
-    color: $disabled;
-    font-weight: normal;
-  }
   @include oneline();
+  position: relative;
+  .title-prev {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+  }
+  .title-slide {
+    position: absolute;
+    left: 40px;
+    top: 0;
+    z-index: 9999;
+    background: $white;
+  }
 }
 
 h2 {
