@@ -320,6 +320,13 @@ def dashboard_ui():
   """
   return render_template("mockups/dashboard-ui/index.html")
 
+@app.route("/mockups/dashboard-ui/object.html")
+@login_required
+def object_ui():
+  """Object UI UX mockup
+  """
+  return render_template("mockups/dashboard-ui/object.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():

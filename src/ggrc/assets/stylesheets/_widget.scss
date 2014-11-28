@@ -471,31 +471,32 @@
     }
   }
   .info {
-    &.tier-info {
-      padding:16px 0 0 0;
-      h3 {
-        .btn-mini {
-          font-weight:normal;
-          margin-left:10px;
-          padding-left:10px;
-          padding-right:10px;
+    background: $white;
+    padding: 25px 30px 20px 30px;
+    font-size: 13px;
+    .state-value {
+      text-transform: uppercase;
+      font-weight: bold;
+      &.green {
+        color: $lightGreen;
+      }
+    }
+    .wrap-row {
+      p {
+        padding-top: 0;
+        margin-bottom: 9px;
+        &:last-child {
+          margin-bottom: 0;
         }
       }
     }
-    padding:5px 16px 0 16px;
-    &.person-info {
-      padding: 5px 0 0 0;
-      > div {
-        overflow: hidden;
-      }
-    }
-    p {
-      margin:0;
-      padding-bottom:9px;
+    h6 {
+      padding-bottom: 2px;
     }
     h3 {
-      font-weight:normal;
-      padding-bottom:12px;
+      font-size: 18px;
+      line-height: 23px;
+      font-weight: normal;
       i {
         cursor: pointer;
         @include opacity(0.2);
@@ -537,6 +538,23 @@
       @include opacity(0.4);
       &:hover {
         @include opacity(0.8);
+      }
+    }
+    &.tier-info {
+      padding:16px 0 0 0;
+      h3 {
+        .btn-mini {
+          font-weight:normal;
+          margin-left:10px;
+          padding-left:10px;
+          padding-right:10px;
+        }
+      }
+    }
+    &.person-info {
+      padding: 5px 0 0 0;
+      > div {
+        overflow: hidden;
       }
     }
   }
@@ -615,9 +633,22 @@
     display: inline-block;
     margin: 0 0 0 10px;
   }
+  .custom-attr-wrap {
+    border-top: 1px solid $itemBorder;
+    .hidden-fields-area {
+      margin-top: 15px;
+      border-bottom: 1px solid $itemBorder;
+    }
+  }
   .info-expand {
-    border-top: 1px dotted $footerBorder;
-    padding: 0 0 12px 0;
+    border-bottom: 1px solid $itemBorder;
+    a {
+      display: block;
+      padding: 9px 0 10px 4px;
+      font-size: 13px;
+      font-weight: bold;
+      line-height: 20px;
+    }
     .in, .out.active, .active .out {
       display : none;
     };
@@ -631,12 +662,10 @@
     }
   }
   .info-widget-footer {
-    border-top: 1px solid $footerBorder;
-    padding-top: 10px;
-    .pull-right {
-      i {
-        margin-top: 1px;
-      }
+    padding-top: 3px;
+    padding-left: 10px;
+    a {
+      color: $textGray;
     }
   }
 }
@@ -1400,7 +1429,6 @@ ul.attr-list {
     height: 35px;
     display: block;
     background: $white;
-    color: $blue;
     @include box-shadow(0 2px 2px -1px rgba(0,0,0, 0.3));
     @include transition (background 0.2s ease, color 0.2s ease);
     &:hover {

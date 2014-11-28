@@ -984,12 +984,11 @@
 
 a.show-hidden-fields {
   &.active {
-    border-top:1px solid #ddd;
+    border-top: 1px solid $itemBorder;
   }
   display:block;
   padding-top:10px;
   font-size:16px;
-  color:#4c9deb;
   span.hidden-fields {
     margin-left:10px;
     font-style:italic;
@@ -997,7 +996,8 @@ a.show-hidden-fields {
     color:$gray;
   }
   i {
-    margin-top:1px;
+    margin-top: 2px;
+    @include opacity(0.25);
   }
   &:hover {
     text-decoration:none;

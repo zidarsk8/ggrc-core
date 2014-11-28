@@ -107,6 +107,19 @@ u {
   }
 }
 
+p {
+  small {
+    color: $textGray;
+  }
+}
+
+a {
+  color: $blue;
+  &:hover {
+    color: $blue;
+  }
+}
+
 // helpers
 .centered {
   text-align: center;
@@ -199,6 +212,25 @@ u {
 .radio-inline {
   input[type="radio"] {
     margin: -1px 0 0 0;
+  }
+}
+
+.btn {
+  &.dropdown-toggle {
+    [class^="grcicon-"] {
+      margin-top: 1px !important;
+    }
+  }
+}
+
+.wrap-row {
+  margin-bottom: 20px;
+  p {
+    padding-top: 6px;
+    margin-bottom: 3px;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }
 
