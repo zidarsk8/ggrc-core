@@ -11,14 +11,26 @@ from ggrc.models.object_owner import Ownable
 from ggrc.models.object_control import Controllable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_objective import Objectiveable
-from ggrc.models.mixins import Base, Described, Slugged, Titled, WithContact, deferred
+from ggrc.models.mixins import Base, Described, Slugged, Titled, WithContact, deferred, Stateful, Timeboxed
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 
 
-class Risk(Relatable, Controllable, Objectiveable, Documentable, Described,
-    Ownable, WithContact, Titled, Slugged, Base, db.Model):
+class Risk(Stateful, Relatable, Controllable, Objectiveable, Documentable, Described,
+    Ownable, WithContact, Titled, Timeboxed, Slugged, Base, db.Model):
   __tablename__ = 'risks'
+
+  VALID_STATES = [
+      'Draft',
+      'Final',
+      'Effective',
+      'Ineffective',
+      'Launched',
+      'Not Launched',
+      'In Scope',
+      'Not in Scope',
+      'Deprecated',
+      ]
 
   # Overriding mixin to make mandatory
   @declared_attr
