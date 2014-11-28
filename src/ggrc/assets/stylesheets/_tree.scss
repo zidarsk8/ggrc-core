@@ -428,11 +428,10 @@ ul.new-tree {
     @include transform-style(preserve-3d);
     @include scale(1);
     @include opacity(1);
-    @include transition(all .3s cubic-bezier(0.000, 0.050, 1.000, 0.550));
+    @include transition(all 0.2s cubic-bezier(0.000, 0.050, 1.000, 0.550));
     p {
-      line-height: 18px;
-      font-size: 12px;
-      padding: 10px 0;
+      line-height: 20px;
+      font-size: 13px;
     }
     > .item-wrap {
       padding: 6px 0 11px 0;
@@ -964,6 +963,11 @@ ul.new-tree {
   [class^="grcicon-"] {
     margin-top:7px;
   }
+  .btn {
+    [class^="grcicon-"] {
+      margin-top: 1px;
+    }
+  }
   .parent {
     @include opacity(0.6);
   }
@@ -1061,6 +1065,11 @@ ul.new-tree {
         background: $white;
       }
     }
+    .filter-wrap {
+      .filter-border {
+        border-color: $white;
+      }
+    }
   }
   &.tree-one {
     li.tree-item {
@@ -1068,6 +1077,11 @@ ul.new-tree {
     }
   }
   // end
+}
+
+.w-status {
+  float: left;
+  width: 90%;
 }
 
 .inner-tree {
@@ -1138,11 +1152,24 @@ ul.new-tree {
   @include transform-origin(100%, 0, 0);
   @include transform-style(preserve-3d);
   background: $gray;
-  @include transition(all 0.8s cubic-bezier(0.000, 0.050, 1.000, 0.550));
+  @include transition(all 0.6s cubic-bezier(0.000, 0.050, 1.000, 0.550));
 }
 .tier-2-info-content {
   padding: 0 10px 0 32px;
   position: relative;
+  font-size: 13px;
+  line-height: 20px;
+  @include clearfix();
+  .wrap-row {
+    margin-bottom: 14px;
+    p {
+      padding-top: 6px;
+      margin-bottom: 3px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
   .tier-2-code {
     color: #777;
     font-style: italic;
@@ -1351,6 +1378,65 @@ ul.new-tree {
      i {
        @include opacity(0.6);
      }
+    }
+  }
+}
+
+.tier-content {
+  overflow: hidden;
+  zoom: 1;
+}
+
+.details-wrap {
+  float: right;
+  margin-left: 20px;
+  width: 60px;
+  margin-top: -4px;
+  position: relative;
+  a {
+    display: block;
+  }
+  .dropdown-menu {
+    @include reset-list();
+    @include border-radius(0);
+    min-width: 210px;
+    float: none;
+    padding: 5px 0;
+    margin-top: 6px;
+    text-transform: none;
+    top: 100%;
+    right: 0;
+    left: auto;
+    li {
+      float:none;
+      clear: both;
+      text-transform: none;
+      a {
+        display: block;
+        line-height: 30px;
+        padding: 0 10px;
+        background: none;
+        text-shadow: none;
+        color: $gray;
+        @include transition(background 0.2s ease, color 0.2s ease);
+        i {
+          margin: 7px 4px 0 0;
+          @include opacity(0.4);
+          @include transition(opacity 0.2s ease);
+        }
+        &:hover {
+          background: $headerBgnd;
+          color: $black;
+          i {
+            @include opacity(1);
+          }
+        }
+      }
+      &.border {
+        border-top: 1px solid $headerBgnd;
+        padding-top: 5px;
+        margin-top: 5px;
+      }
     }
   }
 }

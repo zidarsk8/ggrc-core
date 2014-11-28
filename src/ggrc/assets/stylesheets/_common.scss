@@ -51,6 +51,10 @@ h4 {
 
 h6 {
   font-weight:normal;
+  font-size: 11px;
+  color: $darkText;
+  line-height: 17px;
+  font-weight: bold;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -262,9 +266,10 @@ u {
   height: 8px;
   @include border-radius($default-border-radius);
   float: left;
-  margin-right: 10px;
-  margin-left: 4px;
   margin: 9px 10px 0 4px;
+  .entry-list & {
+    margin: 5px 10px 0 4px;
+  }
 }
 
 @each $status_label in draft, progress, overdue {
@@ -308,8 +313,14 @@ u {
     line-height: 18px;
     padding: 4px 14px;
   }
+  [class^="grcicon-"] {
+    @include opacity(0.7);
+  }
   &:active {
     @include box-shadow(inset 0 0 4px rgba(0,0,0,0.4));
+    [class^="grcicon-"] {
+      @include opacity(1);
+    }
   }
   &.btn-footer {
     margin-top: 4px;
@@ -339,7 +350,7 @@ u {
   }
 }
 
-@each $btn_color in primary, success, info, warning, danger {
+@each $btn_color in primary, success, info, warning, danger, gray {
   .btn-#{$btn_color} {
     @extend %btn-#{$btn_color};
   }

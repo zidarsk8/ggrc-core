@@ -171,6 +171,9 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
     background: $color;
     &:hover {
       background: darken($color, 8%);
+      [class^="grcicon-"] {
+        @include opacity(1);
+      }
     }
   }
 
@@ -353,6 +356,9 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 %btn-danger {
   @include btnBgnd($red);
+}
+%btn-gray {
+  @include btnBgnd($lightGray);
 }
 
 // action-bar link behave
