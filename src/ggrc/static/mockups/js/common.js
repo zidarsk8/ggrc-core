@@ -739,18 +739,19 @@ $(document).ready(function(){
         $tooltip = $this.find("i"),
         $nav = $this.closest("body").find(".top-inner-nav"),
         $lhn_nav = $this.closest("body").find(".lhs-holder"),
+        $bar = $this.closest("body").find(".bar-v"),
         $content = $this.closest("body").find(".object-area"),
-        $fake_merge = $content.add($lhn_nav);
+        $fake_merge = $content.add($lhn_nav).add($bar);
     if($this.hasClass("active")) {
       $this.removeClass("active");
       $tooltip.attr("data-original-title", "Show menu");
       $nav.animate({top: "66"}, options);
-      $fake_merge.animate({top: "96"}, options);
+      $fake_merge.animate({top: "106"}, options);
     } else {
       $this.addClass("active");
       $tooltip.attr("data-original-title", "Hide menu");
       $nav.animate({top: "96"}, options);
-      $fake_merge.animate({top: "126"}, options);
+      $fake_merge.animate({top: "136"}, options);
     }
   }
 
@@ -865,9 +866,13 @@ function resize_areas() {
 
   winHeight = $window.height();
   winWidth = $window.width();
-  lhsHeight = winHeight - 70;
+  header_height = $(".header").height();
+  header_content_height = $(".header-content").height();
+  top_nav_height = $(".top-inner-nav").height();
+  footer_height = $(".footer").outerHeight();
+  lhsHeight = winHeight - header_height - header_content_height - top_nav_height - footer_height - 20;
   footerMargin = lhsHeight;
-  internavHeight = lhsHeight - 86;
+  internavHeight = winHeight - 156;
   lhsWidth = $lhsHolder.width();
   lhsSearchWidth = $lhsSearch.width() - 29;
   lhsSearchWidthActive = $lhsSearchActive.width() - 29;
