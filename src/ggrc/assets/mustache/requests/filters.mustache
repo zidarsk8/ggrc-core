@@ -28,7 +28,7 @@
                 By Type
               </label>
               <select name="request_type">
-                {{#iterate "" "Documentation" "Interview" "Population Sample"}}
+                {{#iterate "" "Documentation" "Interview"}}
                 <option value="{{iterator.toLowerCase}}" {{#iterator.toLowerCase}}{{#trim}}{{#if_equals this states.request_type}}selected="true"{{/trim}}{{/iterator.toLowerCase}}{{/if_equals}}>{{firstnonempty iterator "Any"}}</option>
                 {{/iterate}}
               </select>
