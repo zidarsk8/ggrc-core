@@ -49,5 +49,5 @@ def upgrade():
   op.create_index('ix_custom_attributes_attributable', 'custom_attribute_values', ['attributable_id', 'attributable_type'], unique=False)
 
 def downgrade():
-  op.drop_table('custom_attribute_declarations')
+  op.drop_table('custom_attribute_definitions')
   op.drop_table('custom_attribute_values')
