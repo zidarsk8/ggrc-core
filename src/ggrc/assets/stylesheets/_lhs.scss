@@ -11,6 +11,8 @@
 
 .lhs {
   position:relative;
+  padding-left: 10px;
+  padding-right: 4px;
   .lhs-bg {
     margin-top:5px;
     display:none;
@@ -31,20 +33,53 @@
     .lhs-nav {
       display:none;
     }
-    .top-level, .bar-h {
+    .top-level {
       visibility:hidden;
     }
   }
   .lhs-search {
-    padding:10px;
-    > input {
+    padding:10px 20px 10px 10px;
+    @include clearfix();
+    .widgetsearch {
       margin-bottom: 0;
+      font-size: 12px;
+      @include border-radius(0);
+      border: 1px solid $lightGray;
+      float: left;
+      @include box-shadow(none);
+    }
+    .widgetsearch-submit {
+      float: left;
+      background: $lightGray;
+      line-height: 28px;
+      width: 36px;
+      border: none;
+      padding: 0;
+      @include border-radius(0 4px 4px 0);
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
       @include background-size(368px 416px);
-      background-position:-268px -195px;
-      padding-left: 23px;
-      font-size:12px;
+      background-position: -335px -314px;
+    }
+  }
+}
+
+.lhn-type {
+  @include clearfix();
+  min-width: 246px;
+  a {
+    float: left;
+    height: 34px;
+    line-height: 34px;
+    font-family: $fontTitle;
+    font-size: 16px;
+    color: darken($status-draft,10%);
+    text-align: center;
+    width: 50%;
+    background: $lightGray;
+    &.active {
+      color: $deepOrange;
+      background: $white;
     }
   }
 }
@@ -74,6 +109,13 @@
           top: 14px;
         }
       }
+      li {
+        > a {
+          font-size: 12px;
+          text-transform: none;
+          font-weight: normal;
+        }
+      }
     }
     &.sub-actions {
       margin-bottom:14px;
@@ -93,25 +135,30 @@
       }
       small {
         font-size:12px;
+        font-weight: normal;
       }
       a {
-        display:block;
-        padding-left:26px;
-        background: image-url('grcicons/not-open.png') no-repeat 10px center;
-        @include background-size(17px 12px);
+        font-size: 13px;
+        text-transform: uppercase;
+        font-weight: bold;
+        display: block;
+        .grcicon-arrow-right {
+          @include opacity(0.25);
+          margin: 4px 0 0 7px;
+        }
         &:hover {
           text-decoration:none;
-          background:#fff image-url('grcicons/not-open.png') no-repeat 10px center;
-          @include background-size(17px 12px);
         }
         &.active {
-          background:#fff image-url('grcicons/open.png') no-repeat 10px center;
-          @include background-size(17px 12px);
+          .grcicon-arrow-right {
+            @include opacity(1);
+            background-position: -102px -80px;
+          }
         }
       }
       &.programs {
         a {
-          color:$programs;
+          color: $programs;
         }
       }
       &.finished {
@@ -130,7 +177,7 @@
     li {
       &.governance {
         a {
-          color:$governance;
+          color: $governance;
         }
       }
     }
@@ -199,13 +246,16 @@
       }
     }
   }
+  .lhn-items-list,
+  .lhn-items-list-actions {
+    display: none;
+  }
+
   ul.sub-level,
   ul.sub-actions {
     background:#fff;
     display: none;
     overflow: auto;
-    max-height: 160px;
-
     li {
       font-size:12px;
       &.no-access {
@@ -215,7 +265,7 @@
         [class*="span"] {
           min-height:24px;
         }
-        padding-left:28px;
+        padding-left: 18px;
         background:$white;
         span.lhs-item {
           display:block;
@@ -230,15 +280,18 @@
           }
 
         }
+        .grcicon-arrow-right-small {
+          @include opacity(0.25);
+          margin: 4px 0 0 7px;
+        }
         &.active {
-          background:#fff;
+          .grcicon-arrow-right-small {
+            @include opacity(1);
+            background-position: -126px -80px;
+          }
         }
         &:hover {
-          text-decoration:underline;
-          background:#fff;
-          span {
-            text-decoration:underline;
-          }
+          text-decoration: underline;
         }
         .lhs-private {
           margin-right: 17px;
@@ -259,8 +312,8 @@
         }
       }
       &.add-new {
-        border-bottom:1px solid #ccc;
         a {
+          text-transform: none;
           background:#fff;
           color:$link;
         }
@@ -305,15 +358,61 @@
         }
       }
     }
+    &.custom {
+      li {
+        a {
+          padding-left: 28px;
+          &:hover {
+            background: $lightGray;
+            text-decoration: none;
+          }
+        }
+        &.add-new {
+          a {
+            padding-left: 32px;
+          }
+        }
+      }
+    }
   }
+
+  ul.lhn-items-list,
+  ul.lhn-items-list-actions {
+    li {
+      a {
+        padding-left: 48px;
+        &:hover {
+          background: $lightGray;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+
+  ul.lhn-items-list {
+    margin-bottom: 0;
+  }
+
+  ul.lhn-items-list-actions {
+    li {
+      a {
+        font-weight: bold;
+      }
+    }
+  }
+
   ul.with-filters {
     margin-top: 24px;
   }
   h2 {
-    font-size:11px;
-    font-weight:bold;
-    padding-left:10px;
-    text-transform:uppercase;
+    font-size: 13px;
+    font-weight: bold;
+    padding-left: 10px;
+    text-transform: uppercase;
+    color: $darkText;
+    line-height: 20px;
+    margin-bottom: 5px;
+    margin-top: 10px;
   }
   &.recent {
     ul.top-level {
@@ -333,26 +432,13 @@
 }
 
 .bar-h {
-  height:6px;
-  background-color:#fff;
-  border-top:1px solid #aaa;
-  border-bottom:1px solid #aaa;
-  //background-image: image-url("bgnds/drag-h.png");
-  @include background-size(30px 2px);
-  background-repeat:no-repeat;
-  background-position:50% 2px;
-  @include opacity(0.3);
-  /*
-  &:hover {
-    @include opacity(1);
-    cursor:move;
-  };
-  */
+  background-color: $itemBorder;
+  height: 1px;
 }
 
 .bar-v {
   position: fixed;
-  top: 136px;
+  top: 176px;
   left: -8px;
   height:100%;
   z-index:100;
@@ -374,7 +460,7 @@
     z-index: 1;  // Show object nav bar-v below title
   }
   &.active {
-    @include box-shadow(2px -2px 4px rgba(0,0,0, 0.1));
+    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
   }
 }
 

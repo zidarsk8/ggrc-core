@@ -263,10 +263,13 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-reset-black { background-position: -174px -32px; }
 .grcicon-close-tab { background-position: -342px -176px; }
 .grcicon-close-red { background-position: -342px -272px; }
-.grcicon-warning { background-position:-174px -8px }
-.grcicon-arrow-left { background-position:-126px -56px }
-.grcicon-arrow-right { background-position:-102px -56px }
-.grcicon-arrow-bottom { background-position:-102px -80px }
+.grcicon-warning { background-position: -174px -8px; }
+.grcicon-arrow-left { background-position: -126px -56px; }
+.grcicon-arrow-right { background-position: -102px -56px; }
+.grcicon-arrow-bottom { background-position: -102px -80px; }
+
+.grcicon-arrow-right-small { background-position: -78px -80px; }
+.grcicon-arrow-bottom-small { background-position: -126px -80px; }
 
 // Large icons
 .grciconlarge-dashboard { background-position:-8px -8px; }
@@ -475,6 +478,8 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-issue-black { background-position: -342px -296px; }
 .grcicon-issue-white { background-position: -342px -344px; }
 .grcicon-issue-color { background-position: -342px -392px; }
+
+.grcicon-search-gray { background-position: -342px -320px; }
 
 .grcicon-show { background-position:-222px -320px }
 .grcicon-hide { background-position:-246px -320px }

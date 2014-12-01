@@ -313,6 +313,12 @@ a {
   .entry-list & {
     margin: 5px 10px 0 4px;
   }
+  .lhn-items-list & {
+    width: 4px;
+    height: 4px;
+    @include border-radius(2px);
+    margin: 10px 8px 0 1px;
+  }
 }
 
 @each $status_label in draft, progress, overdue {

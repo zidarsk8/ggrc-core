@@ -38,16 +38,6 @@
     $disabled: #777; // WCAG AA
     $warning:#f60; // WCAG AAA
 
-  // compliance
-    $defaultWidget: #444; // WCAG AAA
-    $governance: #075294;  // WCAG AAA
-    $business: #3a8917;  // WCAG AAA
-    $risk: #731a46;  // WCAG AAA
-    $entities: #a8491a; // WCAG AAA
-    $programs: #391d7d; // WCAG AAA
-    $objectives: #2b8ccc;
-    $controls: #243ea4;
-
   // default colors
     $white: #fff;
     $black: #000;
@@ -58,6 +48,7 @@
     $lightRed: #ff9d9d;
     $green: #1d8d15;
     $lightGreen: #8bc34a;
+    $defaultGreen: #4caf50;
     $blue: #0277bd;
     $darkBlue: #369;
     $warmGray: #ccc;
@@ -127,6 +118,16 @@
   $warningBgnd: #fcf8e3;
   $contentBgnd: #e0e0e0;
   $itemBorder: #e0e0e0;
+
+  // compliance
+  $defaultWidget: #444; // WCAG AAA
+  $governance: $defaultBlue;  // WCAG AAA
+  $business: $defaultGreen;  // WCAG AAA
+  $risk: #731a46;  // WCAG AAA
+  $entities: #795548; // WCAG AAA
+  $programs: #512da8; // WCAG AAA
+  $objectives: #2b8ccc;
+  $controls: #243ea4;
   
   // pbc requests color states
   $rqDraft: #f7f7f7;
@@ -143,6 +144,7 @@
 
   $lightBlue: #40c4ff;
   $orange: #ffab40;
+  $deepOrange: #ff7043;
   $btnGreen: #43a047;
 
   // status label colors
