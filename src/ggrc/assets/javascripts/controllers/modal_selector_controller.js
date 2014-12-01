@@ -877,30 +877,55 @@
           , pager
           ;
 
-        pager = function(objects) {//request_limit, render_limit) {
-          var refresh_queue = new RefreshQueue()
-            ;
+        pager = function(objects, size) {//request_limit, render_limit) {
+          var refresh_queue = new RefreshQueue(),
+              dfd = $.Deferred();
 
           self._show_next_page = null;
+          self._show_all = null;
 
-          refresh_queue.enqueue(objects.slice(0, page_size));
-          refresh_queue.trigger().then(function(options) {
+          refresh_queue.enqueue(objects.slice(0, size));
+          page_size = size;
+          $.when(refresh_queue.trigger().then(function(options) {
+            var dfd = $.Deferred();
             if (active_fn()) {
-              draw_fn(options);
+              $.when(draw_fn(options)).done(function(){
+                dfd.resolve();
+              });
 
               //  Enforce minimum wait between render operations
               setTimeout(function() {
                 self._show_next_page = function() {
                   if (objects.length > page_size) {
-                    pager(objects.slice(page_size));
+                    pager(objects.slice(page_size), page_size);
                   }
                 }
               }, 50);
+              // show all
+              setTimeout(function() {
+                self._show_all = function() {
+                  var new_size,
+                      dfd = $.Deferred();
+                  if (objects.length > page_size) {
+                    new_size = objects.length - page_size;
+                    $.when(pager(objects.slice(page_size), new_size)).done(function(){
+                        dfd.resolve();
+                    });
+                  } else {
+                    dfd.resolve();
+                  }
+                  return dfd;
+                }
+              }, 0);
             }
+            return dfd;
+          })).done(function(){
+            dfd.resolve();
           });
+          return dfd;
         }
 
-        pager(objects);
+        pager(objects, page_size);
       }
 
     , show_next_page: function() {
@@ -910,6 +935,18 @@
       }
 
     , ".selector-list scrollNext": "show_next_page"
+
+    , show_all: function() {
+      var dfd = $.Deferred();
+      if (this._show_all){
+        $.when(this._show_all()).done(function(){
+          dfd.resolve();
+        });
+      } else {
+        dfd.resolve();
+      }
+      return dfd;
+    }
 
     , refresh_option_list: function() {
         var self = this
@@ -927,7 +964,11 @@
         };
 
         draw_fn = function(options) {
-          self.insert_options(options);
+          var dfd = $.Deferred();
+          $.when(self.insert_options(options)).done(function() {
+            dfd.resolve();
+          });
+          return dfd;
         };
 
         self.option_list.replace([]);
@@ -1592,11 +1633,30 @@
     }
 
     , "input[type=checkbox].object-check-all click": function(el, ev) {
-      var $el = $(el)
-        , $check = $(this.element).find('.object-check-single:not(:disabled)');
+      if (el.hasClass('disabled')) {
+        return;
+      }
+      if(this.element.find('.object-check-single').length == 0) {
+        el.prop('checked', false);
+        return;
+      }
 
-      $check.prop('checked', $el.prop('checked'));
-      this.update_selected_items(el, ev);
+      var that = this,
+          $check,
+          info = this.element.find('.results-wrap span.info');
+          info.text('Wait loading data----');
+      el.attr('disabled', 'disabled');
+      el.addClass('disabled pending-ajax');
+      info.show();
+      $.when(this.show_all()).done(function(){
+        $check = $(that.element).find('.object-check-single:not(:disabled)');
+
+      $check.prop('checked', el.prop('checked'));
+      that.update_selected_items(el, ev);
+      el.removeAttr('disabled');
+      el.removeClass('disabled pending-ajax');
+      info.hide();
+      });
     }
 
     , reset_selection_count: function(){
@@ -1634,7 +1694,11 @@
         };
 
         draw_fn = function(options) {
-          self.insert_options(options);
+          var dfd = $.Deferred();
+          $.when(self.insert_options(options)).done(function() {
+            dfd.resolve();
+          });
+          return dfd;
         };
 
         self.option_list.replace([]);
@@ -1710,7 +1774,8 @@
         filters = [],
         cancel_filter,
         item_selected = this.element.find("select.option-type-selector").val(),
-        search_text = this.element.find('.results-wrap span.info');
+        search_text = this.element.find('.results-wrap span.info'),
+        all_checkbox = this.element.find('.object-check-all');
 
       // Remove Search Criteria text
       if(search_text.length)
@@ -1763,6 +1828,9 @@
         // For All Objects, make sure to load only those objects in the list of all_models
         // Multilist loader might load objects like g-drive folder and context
         // The Search list loader will filter those objects
+
+        all_checkbox.prop('checked', false);
+
         if(selected === "AllObjects") {
             filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
               return GGRC.Models.Search.search_for_types(
@@ -1807,7 +1875,11 @@
           };
 
           var draw_fn = function(options) {
-            self.insert_options(options);
+            var dfd = $.Deferred();
+            $.when(self.insert_options(options)).done(function() {
+              dfd.resolve();
+            });
+            return dfd;
           };
 
           self.option_list.push.apply(self.option_list, options);
@@ -1818,6 +1890,8 @@
         });
       }
       else {
+        all_checkbox.prop('checked', false);
+
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
         this.reset_selection_count();
