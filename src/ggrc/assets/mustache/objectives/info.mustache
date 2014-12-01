@@ -8,7 +8,7 @@
 <section class="info">
   {{#instance}}
 
-  {{#is_allowed 'update' instance context='for'}}  
+  {{#is_allowed 'update' instance context='for'}}
     <div class="action-bar">
       <ul class="change-links">
         {{{render_hooks 'Objective.info_widget_actions'}}}
@@ -37,6 +37,8 @@
   </div>
 
   <br>
+
+  {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
 
   <div class="info-widget-footer">
     <p>

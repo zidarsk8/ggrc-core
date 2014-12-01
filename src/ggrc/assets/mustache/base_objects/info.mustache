@@ -7,8 +7,8 @@
 
 <section class="info">
   {{#instance}}
-  
-    {{#is_allowed 'update' instance context='for'}}  
+
+    {{#is_allowed 'update' instance context='for'}}
       <div class="action-bar">
         <ul class="change-links">
           {{{render_hooks instance.class.shortName 'info_widget_actions'}}}
@@ -21,21 +21,21 @@
         </ul>
       </div>
     {{/is_allowed}}
-  
+
     {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
     {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
     {{{render '/static/mustache/base_objects/urls.mustache' instance=instance}}}
     {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
- 
+
     <br>
- 
+
     <div class="row-fluid">
       <div class="span12">
         <div class="info-expand">
           <a class="show-hidden-fields info-show-hide" href="javascript://">
             <span class="out">
               <i class="grcicon-show-arrow"></i>
-              Show 
+              Show
             </span>
             <span class="in">
               <i class="grcicon-hide-arrow"></i>
@@ -79,6 +79,9 @@
         </div>
       </div>
     </div>
+
+    {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+
     <div class="info-widget-footer">
       <p>
         <small>

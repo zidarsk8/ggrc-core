@@ -800,6 +800,9 @@ jQuery(document).ready(function($) {
   $.fn.widget_showhide = showhide(".info", ".hidden-fields-area");
   $('body').on('click', ".info-expand a", $.fn.widget_showhide);
 
+  $.fn.widget_showhide_custom = showhide(".info", ".hidden-fields-area-custom");
+  $('body').on('click', ".info-expand-custom a", $.fn.widget_showhide_custom);
+
   // Show/hide tree leaf content
   $('body').on('click', '.tree-structure .oneline, .tree-structure .description, .tree-structure .view-more', oneline);
 
