@@ -24,12 +24,12 @@
 }
 
 @media (max-width: 767px) {
-  
+
   body {
     padding-left: 0;
     padding-right: 0;
   }
-  
+
   .header-bar {
     .menu {
       li.black-link {
@@ -44,7 +44,7 @@
       }
     }
   }
-  
+
   .header-content {
     .actions {
       li {
@@ -132,7 +132,7 @@
       }
     }
   }
-  
+
   .widget {
     .header,
     .filter,
@@ -220,7 +220,7 @@
       @include opacity(0.8);
     }
   }
-  
+
   .widget-filters {
     select {
       margin-bottom: 20px;
@@ -241,7 +241,7 @@
       }
     }
   }
-  
+
   .pbc-ca {
     .ca-fields {
       a {
@@ -256,7 +256,7 @@
       }
     }
   }
-  
+
   .evidence {
     .row-fluid {
       p {
@@ -264,15 +264,15 @@
       }
     }
   }
-  
+
   .request-date {
     text-align:left;
   }
-  
+
   .content {
     background: $white;
   }
-  
+
   .lhs-nav {
     ul.sub-level {
       li {
@@ -308,6 +308,14 @@
   ul.new-tree {
     .request-readonly {
       margin-right: 0;
+    }
+  }
+}
+
+.bare {
+  .row-fluid {
+    [class*="span"] {
+      margin-left: 0;
     }
   }
 }

@@ -14,7 +14,7 @@
     },
     helpers: {
       with_custom_attribute_definitions: function(options) {
-        var instance = this.instance,
+        var instance = this.instance || GGRC.page_instance(),
             self = this,
             dfd = $.when(
               instance.custom_attribute_definitions(),
@@ -23,13 +23,14 @@
             );
 
         function finish(custom_attributes, values) {
-          // TODO: Find a better way of enabling rich text fields
           setTimeout(function() {
+            // TODO: Find a better way of enabling rich text fields
             $($.find('custom-attributes .wysihtml5')).each(function() {
               $(this).cms_wysihtml5();
             });
-            $($.find("custom-attributes :input:not(isolate-form *)")).each(function(_, el) {
 
+            // TODO: Find a better way for inserting attribute values into DOM
+            $($.find("custom-attributes :input:not(isolate-form *)")).each(function(_, el) {
               var $el = $(el), name, val = "", id, i;
               if (!$el.attr('name')) {
                 return;
@@ -49,6 +50,18 @@
               // TODO: This bit triggers a validate form on load, causing the title
               //       cannot be blank error to show up on form load.
               $el.trigger('change');
+            });
+            $($.find("custom-attributes [data-custom-attribute]")).each(function(_, el) {
+              var $el = $(el),
+                  id = $el.data('custom-attribute'),
+                  val = "";
+
+              for (i = 0; i < values.length; i++) {
+                if (values[i].custom_attribute_id == id) {
+                  val = values[i].attribute_value;
+                }
+              }
+              $el.html(val);
             });
           });
 
