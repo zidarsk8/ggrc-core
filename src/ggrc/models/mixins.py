@@ -465,8 +465,39 @@ class CustomAttributable(object):
             cascade='all, delete-orphan',
             )
 
+    def custom_attributes(cls, attributes):
+        if 'custom_attributes' not in attributes:
+          return
+        attributes = attributes['custom_attributes']
+        from .custom_attribute_value import CustomAttributeValue
+        # attributes looks like this:
+        #    {<id of attribute definition> : attribute value, ... }
+
+        # 1) Delete all custom attributes for the CustomAttributable instance
+        db.session.query(CustomAttributeValue)\
+            .filter(CustomAttributeValue.attributable_type==cls.__class__.__name__)\
+            .filter(CustomAttributeValue.attributable_id==cls.id)\
+            .delete()
+        db.session.commit()
+        # 2) Instantiate custom attribute values for each of the definitions
+        #    passed in (keys)
+        for ad_id in attributes.keys():
+            av = CustomAttributeValue()
+            av.custom_attribute_id = ad_id
+            av.attributable_id = cls.id
+            av.attributable_type = cls.__class__.__name__
+            av.attribute_value = attributes[ad_id]
+            # 3) Set the context_id for each custom attribute value to the context id
+            #    of the custom attributable.
+            av.context_id = cls.context_id
+            # 4) Save the new set of custom attribute values.
+            db.session.add(av)
+
     _publish_attrs = [
-        'custom_attribute_values',
+        'custom_attribute_values'
+    ]
+    _update_attrs = [
+        'custom_attributes'
     ]
     _include_links = [
         # 'custom_attribute_values',

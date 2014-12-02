@@ -14,20 +14,19 @@ class RecordBuilder(object):
 
   def as_record(self, obj):
     # Defaults. These work when the record is not a custom attribute
-    properties = dict([(attr, getattr(obj, attr)) \
-        for attr in self._fulltext_attrs])
+    properties = dict([(attr, getattr(obj, attr))
+                       for attr in self._fulltext_attrs])
     record_id = obj.id
     record_type = obj.__class__.__name__
 
     # Override defaults to index custom attribute values as attributes of the
     # parent object (the CustomAttributable).
     if "CustomAttributeValue" == record_type:
-        record_id = obj.attributable_id
-        record_type = obj.attributable_type
-        # The name of the attribute comes from the custom_attribute_definition,
-        # the value comes from the custom_attribute_value
-        properties = {obj.custom_attribute_definition.title: obj.attribute_value}
-
+      record_id = obj.attributable_id
+      record_type = obj.attributable_type
+      # The name of the attribute property needs to be unique for each object,
+      # the value comes from the custom_attribute_value
+      properties = {"attribute_value_" + str(obj.id): obj.attribute_value}
     return Record(
         # This logic saves custom attribute values as attributes of the object
         # that owns the attribute values. When obj is not a CustomAttributeValue

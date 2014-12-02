@@ -119,6 +119,28 @@ def get_related_keys_for_expiration(context, o):
   return keys
 
 
+def set_ids_for_new_custom_attribute_values(objects, obj):
+  """
+  When we are creating custom attribute values for
+  POST requests, obj.id is not yet defined. This is why we update
+  custom attribute values at this point and set the correct attributable_id
+
+  Args:
+    objects: newly created objects (we update only the ones that are CustomAttributeValue
+    obj: parent object to be set as attributable
+
+  Returns:
+    None
+  """
+
+  from ggrc.models.custom_attribute_value import CustomAttributeValue
+  for object in objects:
+    if not isinstance(object, CustomAttributeValue):
+      continue
+    object.attributable_id = obj.id
+    db.session.add(object)
+  db.session.flush()
+
 def update_memcache_before_commit(context, modified_objects, expiry_time):
   """
   Preparing the memccache entries to be updated before DB commit
@@ -747,7 +769,9 @@ class Resource(ModelView):
       db.session.commit()
     with benchmark("Query for object"):
       obj = self.get_object(id)
+    print "UPDATING INDEX"
     update_index(db.session, modified_objects)
+    print "NOT UPDATING INDEX"
     with benchmark("Update memcache after commit for resource collection PUT"):
       update_memcache_after_commit(self.request)
     with benchmark("Serialize collection"):
@@ -989,6 +1013,7 @@ class Resource(ModelView):
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     modified_objects = get_modified_objects(db.session)
+    set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
     log_event(db.session, obj)
     with benchmark("Update memcache before commit for resource collection POST"):
       update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
