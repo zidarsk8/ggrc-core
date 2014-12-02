@@ -769,9 +769,7 @@ class Resource(ModelView):
       db.session.commit()
     with benchmark("Query for object"):
       obj = self.get_object(id)
-    print "UPDATING INDEX"
     update_index(db.session, modified_objects)
-    print "NOT UPDATING INDEX"
     with benchmark("Update memcache after commit for resource collection PUT"):
       update_memcache_after_commit(self.request)
     with benchmark("Serialize collection"):
