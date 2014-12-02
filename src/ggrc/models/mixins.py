@@ -466,18 +466,18 @@ class CustomAttributable(object):
             )
 
     def custom_attributes(cls, attributes):
-        print("#### Setting CUSTOM ATTRIBUTES")
+        if 'custom_attributes' not in attributes:
+          return
         attributes = attributes['custom_attributes']
         from .custom_attribute_value import CustomAttributeValue
         # attributes looks like this:
         #    {<id of attribute definition> : attribute value, ... }
 
-        # TODO
         # 1) Delete all custom attributes for the CustomAttributable instance
         db.session.query(CustomAttributeValue)\
-        .filter(CustomAttributeValue.attributable_type==cls.__class__.__name__)\
-        .filter(CustomAttributeValue.attributable_id==cls.id)\
-        .delete()
+            .filter(CustomAttributeValue.attributable_type==cls.__class__.__name__)\
+            .filter(CustomAttributeValue.attributable_id==cls.id)\
+            .delete()
         db.session.commit()
         # 2) Instantiate custom attribute values for each of the definitions
         #    passed in (keys)
@@ -487,10 +487,10 @@ class CustomAttributable(object):
             av.attributable_id = cls.id
             av.attributable_type = cls.__class__.__name__
             av.attribute_value = attributes[ad_id]
-        # 3) Set the context_id for each custom attribute value to the context id
-        #    of the custom attributable.
+            # 3) Set the context_id for each custom attribute value to the context id
+            #    of the custom attributable.
             av.context_id = cls.context_id
-        # 4) Save the new set of custom attribute values.
+            # 4) Save the new set of custom attribute values.
             db.session.add(av)
 
     _publish_attrs = [

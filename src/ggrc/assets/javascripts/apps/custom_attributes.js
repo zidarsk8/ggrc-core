@@ -19,11 +19,17 @@
       with_custom_attribute_definitions: function(options) {
         var instance = this.instance || GGRC.page_instance(),
             self = this,
-            dfd = $.when(
-              instance.custom_attribute_definitions(),
-              // Making sure custom_attribute_values are loaded
-              instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
-            );
+            dfd;
+
+        if (!(instance && instance.custom_attribute_definitions)) {
+          return;
+        }
+
+        dfd = $.when(
+          instance.custom_attribute_definitions(),
+          // Making sure custom_attribute_values are loaded
+          instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
+        );
 
         function finish(custom_attributes, values) {
           setTimeout(function() {
