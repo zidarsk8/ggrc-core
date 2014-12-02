@@ -49,5 +49,6 @@ def upgrade():
   op.create_index('ix_custom_attributes_attributable', 'custom_attribute_values', ['attributable_id', 'attributable_type'], unique=False)
 
 def downgrade():
+  op.drop_constraint('custom_attribute_values_ibfk_1', 'custom_attribute_values', type_='foreignkey')
   op.drop_table('custom_attribute_definitions')
   op.drop_table('custom_attribute_values')
