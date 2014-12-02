@@ -792,7 +792,7 @@ $(document).ready(function(){
       $lhnType.removeClass("active").animate({left: "-246"}, options).css("width", "246px");
       $lhn_bar.removeClass("active").animate({left: "-8"}, options);
       $lhs_search.removeClass("active").css("width", "196px");
-      $lhs_search.find(".widgetsearch").css("width", "150px");
+      $lhs_search.find(".widgetsearch").css("width", "130px");
     } else {
       $this.addClass("active");
       $lhn.addClass("active").animate({left: "0"}, options);
@@ -859,6 +859,34 @@ $(document).ready(function(){
 
 });
 
+// Widget search active state
+function searchFilter() {
+  var $this = $(this),
+      $field = $this.closest(".lhs-search").find(".widgetsearch"),
+      $filter_icon = $this.closest(".lhs-search").find(".filter-off");
+  
+  $field.addClass("active");
+  $filter_icon.addClass("active");
+}
+
+function searchActive() {
+  var $this = $(this),
+      $button = $this.closest(".lhs-search").find(".widgetsearch-submit"),
+      $search_field = $this.closest(".lhs-search").find(".widgetsearch"),
+      $filter_icon = $this.closest(".lhs-search").find(".filter-off");
+
+  if($this.val().trim() !== "") {
+    $button.addClass("active");
+    $button.bind("click", searchFilter);
+  } else {
+    $button.removeClass("active");
+    $search_field.removeClass("active");
+    $filter_icon.removeClass("active");
+  }
+}
+
+$(".widgetsearch").on("keyup", searchActive);
+
 // Make sure the windows are resized properly
 
 jQuery(resize_areas);
@@ -918,7 +946,7 @@ function resize_areas() {
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);
   $topNav.css("width",objectWidth);
-  $(".widgetsearch").css("width", lhsSearchWidth - 16);
+  $(".widgetsearch").css("width", lhsSearchWidth - 36);
   $lhsSearchActive.css("width", lhsWidth - 40);
   $objectArea
     .css("margin-left","0")

@@ -118,6 +118,7 @@
   $warningBgnd: #fcf8e3;
   $contentBgnd: #e0e0e0;
   $itemBorder: #e0e0e0;
+  $searchBlue: #448aff;
 
   // compliance
   $defaultWidget: #444; // WCAG AAA
@@ -217,6 +218,14 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   
   @mixin default-border-top() {
     border-top: 1px solid $lightGray;
+  }
+
+  @mixin input-placeholder {
+    &.placeholder { @content; }
+    &:-moz-placeholder { @content; }
+    &::-moz-placeholder { @content; }
+    &:-ms-input-placeholder { @content; }
+    &::-webkit-input-placeholder { @content; } 
   }
 
 // Placeholders
