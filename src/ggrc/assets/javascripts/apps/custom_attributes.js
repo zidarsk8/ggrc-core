@@ -9,6 +9,9 @@
 
   can.Component.extend({
     tag: "custom-attributes",
+    scope: {
+      instance: null
+    },
     content: "<content/>",
     events: {
     },
