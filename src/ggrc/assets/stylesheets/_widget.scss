@@ -54,6 +54,16 @@
       }
     }
     @include row-fluid-fix();
+    &.tree-header {
+      padding: 0 12px 0 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin: -6px 0 4px 0;
+      height: 20px;
+      .title-heading {
+        padding-left: 60px;
+      }
+    }
     &.widget-nav {
       height: 40px;
       background: none;
@@ -477,8 +487,12 @@
     .state-value {
       text-transform: uppercase;
       font-weight: bold;
+      &.gray {
+        color: $draftGray;
+      }
       &.green {
         color: $lightGreen;
+        font-weight: bold;
       }
     }
     .wrap-row {

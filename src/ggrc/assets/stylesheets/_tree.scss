@@ -422,7 +422,7 @@ ul.new-tree {
 
   li.tree-item {
     min-height: 30px;
-    line-height: 24px;
+    line-height: 27px;
     position: relative;
     @include perspective(1200);
     @include transform-style(preserve-3d);
@@ -433,18 +433,11 @@ ul.new-tree {
       line-height: 20px;
       font-size: 13px;
     }
-    > .item-wrap {
-      padding: 6px 0 11px 0;
-      margin: 0 10px;
-      border-bottom: 1px solid $itemBorder;
-    }
     > .item-main {
       background: $white;
       > .openclose {
         > .item-wrap {
-          margin: 0 10px;
-          padding-top: 6px;
-          padding-bottom: 11px;
+          padding: 6px 12px;
           border-bottom: 1px solid $itemBorder;
         }
       }
@@ -669,6 +662,20 @@ ul.new-tree {
         &.left-space {
           margin-right: 30px;
         }
+        a {
+          .grcicon-to-right {
+            @include opacity(0.25);
+            @include transition(opacity 0.2s ease);
+          }
+          &:hover {
+            .grcicon-to-right {
+              @include opacity(1);
+            }
+          }
+        }
+      }
+      [class^="grcicon-"] {
+        margin-top: 6px;
       }
       &.tasks-action {
         li {
@@ -684,6 +691,25 @@ ul.new-tree {
     .wrap250 { float:left; min-width:250px; }
     .wrap300 { float:left; min-width:300px; }
     */
+  }
+  &.dashboard-tree {
+    li.tree-item {
+      line-height: 24px;
+      > .item-wrap {
+        padding: 6px 0 11px 0;
+        margin: 0 10px;
+        border-bottom: 1px solid $itemBorder;
+      }
+      > .item-main {
+        > .openclose {
+          > .item-wrap {
+            margin: 0 10px;
+            padding: 6px 0 11px 0;
+            border-bottom: 1px solid $itemBorder;
+          }
+        }
+      }
+    }
   }
   &.colored-list {
     > li.tree-item {
@@ -1047,6 +1073,10 @@ ul.new-tree {
         .inner-item-count {
           @include opacity(1);
         }
+        .grcicon-arrow-right {
+          background-position: -102px -80px;
+          @include opacity(1);
+        }
       }
       > .item-main {
         > .openclose {
@@ -1255,13 +1285,42 @@ ul.new-tree {
   &.no-space {
     padding-left: 0;
   }
+  .dashboard-tree & {
+    .tree-title-area {
+      font-size: 16px;
+    }
+  }
   .tree-title-area {
-    font-size: 16px;
+    font-size: 12px;
     @include oneline();
     &.w-status {
       float: left;
       width: 94%;
     }
+    &.title {
+      font-size: 16px;
+      width: 90%;
+    }
+    &.owner, &.code, &.state-value {
+      line-height: 28px;
+    }
+    &.code {
+      text-transform: uppercase;
+    }
+    &.state-value {
+      &.gray {
+        color: $draftGray;
+      }
+      &.green {
+        color: $lightGreen;
+        font-weight: bold;
+      }
+    }
+    .grcicon-arrow-right {
+      margin: 5px 9px 0 4px;
+      @include opacity(0.25);
+    }
+
     .event-action {
       font-size:13px;
       color:#777;

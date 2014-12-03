@@ -528,10 +528,10 @@
       }
       &.hidden-widgets-list {
         .dropdown-toggle {
-          color: lighten($blue, 35%);
+          //color: lighten($blue, 35%);
           &:hover {
-            background: none;
-            color: $blue;
+            //background: none;
+            //color: $blue;
           }
         }
       }
@@ -607,12 +607,13 @@
     li.active {
       a {
         color: $black;
+        font-weight: bold;
+        background: $contentBgnd;
         i {
           @include opacity(1);
         }
         &:hover {
           color: $black;
-          background: none;
         }
       }
     }
