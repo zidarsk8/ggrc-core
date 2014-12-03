@@ -130,6 +130,25 @@ $(document).ready(function(){
 
   });
 
+  $('body').on('click', '.inner-accordion-group > a', function() {
+    var $this = $(this),
+        $subNav = $this.closest('.inner-accordion-group').find('.lhn-items-list'),
+        $subAction = $this.closest('.inner-accordion-group').find('.lhn-items-list-actions');
+
+    if($this.hasClass("active")) {
+      $this.removeClass("active");
+      $subNav.slideUp('fast');
+      $subAction.slideUp('fast');
+    } else {
+      $this.addClass("active");
+      $subNav.slideDown('fast');
+      $subAction.slideDown('fast');
+    }
+
+    return false;
+
+  });
+
   $('body').on('click', '.accordion-group-inner > .arrow', function() {
     var $this = $(this),
         $subNav = $this.closest('.accordion-group-inner').find('.sub-level');
@@ -765,16 +784,19 @@ $(document).ready(function(){
         $lhn = $this.closest("body").find(".lhs-holder"),
         lhn_width = $lhn.width() - 20,
         $lhn_bar = $this.closest("body").find(".bar-v"),
+        $lhnType = $this.closest("body").find(".lhn-type"),
         $lhs_search = $this.closest("body").find(".lhs-search");
     if($this.hasClass("active")) {
       $this.removeClass("active");
       $lhn.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
+      $lhnType.removeClass("active").animate({left: "-246"}, options).css("width", "246px");
       $lhn_bar.removeClass("active").animate({left: "-8"}, options);
-      $lhs_search.removeClass("active").css("width", "220px");
-      $lhs_search.find(".widgetsearch").css("width", "191px");
+      $lhs_search.removeClass("active").css("width", "196px");
+      $lhs_search.find(".widgetsearch").css("width", "130px");
     } else {
       $this.addClass("active");
       $lhn.addClass("active").animate({left: "0"}, options);
+      $lhnType.addClass("active").animate({left: "0"}, options);
       $lhn_bar.addClass("active").animate({left: "240"}, options);
       $lhs_search.addClass("active");
     }
@@ -837,6 +859,34 @@ $(document).ready(function(){
 
 });
 
+// Widget search active state
+function searchFilter() {
+  var $this = $(this),
+      $field = $this.closest(".lhs-search").find(".widgetsearch"),
+      $filter_icon = $this.closest(".lhs-search").find(".filter-off");
+  
+  $field.addClass("active");
+  $filter_icon.addClass("active");
+}
+
+function searchActive() {
+  var $this = $(this),
+      $button = $this.closest(".lhs-search").find(".widgetsearch-submit"),
+      $search_field = $this.closest(".lhs-search").find(".widgetsearch"),
+      $filter_icon = $this.closest(".lhs-search").find(".filter-off");
+
+  if($this.val().trim() !== "") {
+    $button.addClass("active");
+    $button.bind("click", searchFilter);
+  } else {
+    $button.removeClass("active");
+    $search_field.removeClass("active");
+    $filter_icon.removeClass("active");
+  }
+}
+
+$(".widgetsearch").on("keyup", searchActive);
+
 // Make sure the windows are resized properly
 
 jQuery(resize_areas);
@@ -863,6 +913,7 @@ function resize_areas() {
   $barActive = $(".bar-v.active");
   $lhsSearch = $(".lhs-search");
   $lhsSearchActive = $(".lhs-search.active");
+  $lhnType = $(".lhn-type");
 
   winHeight = $window.height();
   winWidth = $window.width();
@@ -870,18 +921,19 @@ function resize_areas() {
   header_content_height = $(".header-content").height();
   top_nav_height = $(".top-inner-nav").height();
   footer_height = $(".footer").outerHeight();
-  lhsHeight = winHeight - header_height - header_content_height - top_nav_height - footer_height - 20;
+  lhsHeight = winHeight - header_height - header_content_height - top_nav_height - footer_height - 60;
   footerMargin = lhsHeight;
   internavHeight = winHeight - 156;
   lhsWidth = $lhsHolder.width();
-  lhsSearchWidth = $lhsSearch.width() - 29;
-  lhsSearchWidthActive = $lhsSearchActive.width() - 29;
+  lhsSearchWidth = $lhsSearch.width() - 30;
+  lhsSearchWidthActive = $lhsSearchActive.width() - 30;
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
   objectWidthActive = winWidth - lhsWidth - barWidth;
   objectWidth = winWidth;
   //headerWidth = winWidth - lhsWidth - barWidth - 20;
   headerWidth = winWidth - 20;
+  lhnType_width = lhsWidth + 6;
 
   $lhsHolder
     .css("height",lhsHeight);
@@ -894,9 +946,8 @@ function resize_areas() {
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);
   $topNav.css("width",objectWidth);
-  $(".widgetsearch").css("width", lhsSearchWidth);
-  $lhsSearchActive.css("width", lhsWidth - 20);
-  $lhsSearchActive.find(".widgetsearch").css("width", lhsWidth - 49);
+  $(".widgetsearch").css("width", lhsSearchWidth - 36);
+  $lhsSearchActive.css("width", lhsWidth - 40);
   $objectArea
     .css("margin-left","0")
     .css("height",internavHeight)
@@ -905,4 +956,5 @@ function resize_areas() {
     .css("margin-left", lhsWidth + 8)
     .css("width",objectWidthActive);
   $area.css("margin-left", "0");
+  $lhnType.css("width", lhnType_width);
 }

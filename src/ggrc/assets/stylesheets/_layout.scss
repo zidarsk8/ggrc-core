@@ -30,17 +30,27 @@
 }
 
 .lhs-holder {
-  position:fixed;
-  top:136px;
-  left:-240px;
-  width:240px;
-  height:500px;
-  overflow-y:auto;
+  position: fixed;
+  top: 176px;
+  left: -240px;
+  width: 240px;
+  height: 500px;
+  overflow-y: auto;
   background: $white;
   &.active {
-    @include box-shadow(2px -2px 4px rgba(0,0,0, 0.1));
+    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
   }
 }
+
+.lhn-type {
+  position: fixed;
+  top: 142px;
+  left: -246px;
+  &.active {
+    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
+  }
+}
+
 .area {
   margin-left:248px;
 }

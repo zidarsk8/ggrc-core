@@ -983,9 +983,6 @@
 }
 
 a.show-hidden-fields {
-  &.active {
-    border-top: 1px solid $itemBorder;
-  }
   display:block;
   padding-top:10px;
   font-size:16px;
@@ -1001,6 +998,12 @@ a.show-hidden-fields {
   }
   &:hover {
     text-decoration:none;
+  }
+  &.active {
+    border-top: 1px solid $itemBorder;
+    i {
+      @include opacity(1);
+    }
   }
 }
 
