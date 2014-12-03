@@ -31,7 +31,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this Risk and provide context for how and when this Risk might be used."></i>
       </label> {{#instance.computed_errors.description}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.description}}
       <div class="wysiwyg-area">
-        <textarea tabindex="3" id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{instance.description}}}</textarea>
+        <textarea tabindex="2" id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{instance.description}}}</textarea>
       </div>
     </div>
     <div class="span6 hide-wrap">
@@ -68,7 +68,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="7" class="input-block-level" name="slug" placeholder="RISK-XXX" type="text" value="{{slug}}">
+      <input tabindex="5" class="input-block-level" name="slug" placeholder="RISK-XXX" type="text" value="{{slug}}">
     </div>
 
     <div class="span4 hidable">
@@ -77,7 +77,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="Enter the date this object becomes effective."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="8" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+      <input tabindex="6" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
     </div>
     
     <div class="span4 hidable">
@@ -86,7 +86,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="Enter the date the object stops being effective."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="9" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+      <input tabindex="7" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
     </div>
   </div>
 
@@ -97,7 +97,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="Indicates the status of this object."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <select class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="10">
+      <select class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="8">
         <option value="" {{#if_equals status ""}}selected{{/if_equals}}>---</option>
         {{#iterate 'Draft', 'Final', 'Effective', 'Ineffective', 'Launched', 'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'}}
           <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
