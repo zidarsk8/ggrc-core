@@ -486,10 +486,12 @@ class CustomAttributable(object):
         from sqlalchemy import and_
         # 2) Delete all fulltext_record_properties for the list of values
         db.session.query(MysqlRecordProperty)\
-            .filter(and_(\
+            .filter(\
+                and_(\
                     MysqlRecordProperty.type==cls.__class__.__name__,
                     MysqlRecordProperty.property.in_(ftrp_properties))
-                ).delete(synchronize_session='fetch')
+                )\
+            .delete(synchronize_session='fetch')
 
         # 3) Delete the list of custom attribute values
         db.session.query(CustomAttributeValue)\
