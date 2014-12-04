@@ -473,13 +473,34 @@ class CustomAttributable(object):
         # attributes looks like this:
         #    {<id of attribute definition> : attribute value, ... }
 
-        # 1) Delete all custom attributes for the CustomAttributable instance
-        db.session.query(CustomAttributeValue)\
+        # 1) Get all custom attribute values for the CustomAttributable instance
+        attr_values = db.session.query(CustomAttributeValue)\
             .filter(CustomAttributeValue.attributable_type==cls.__class__.__name__)\
             .filter(CustomAttributeValue.attributable_id==cls.id)\
-            .delete()
+            .all()
+
+        attr_value_ids = [v.id for v in attr_values]
+        ftrp_properties = ["attribute_value_{id}".format(id=_id) for _id in attr_value_ids]
+
+        from ggrc.fulltext.mysql import MysqlRecordProperty
+        from sqlalchemy import and_
+        # 2) Delete all fulltext_record_properties for the list of values
+        db.session.query(MysqlRecordProperty)\
+            .filter(\
+                and_(\
+                    MysqlRecordProperty.type==cls.__class__.__name__,
+                    MysqlRecordProperty.property.in_(ftrp_properties))
+                )\
+            .delete(synchronize_session='fetch')
+
+        # 3) Delete the list of custom attribute values
+        db.session.query(CustomAttributeValue)\
+            .filter(CustomAttributeValue.id.in_(attr_value_ids))\
+            .delete(synchronize_session='fetch')
+
         db.session.commit()
-        # 2) Instantiate custom attribute values for each of the definitions
+
+        # 4) Instantiate custom attribute values for each of the definitions
         #    passed in (keys)
         for ad_id in attributes.keys():
             av = CustomAttributeValue()
@@ -487,10 +508,10 @@ class CustomAttributable(object):
             av.attributable_id = cls.id
             av.attributable_type = cls.__class__.__name__
             av.attribute_value = attributes[ad_id]
-            # 3) Set the context_id for each custom attribute value to the context id
+            # 5) Set the context_id for each custom attribute value to the context id
             #    of the custom attributable.
             av.context_id = cls.context_id
-            # 4) Save the new set of custom attribute values.
+            # 6) Save the new set of custom attribute values.
             db.session.add(av)
 
     _publish_attrs = [
