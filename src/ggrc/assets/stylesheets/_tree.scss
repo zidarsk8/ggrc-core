@@ -29,6 +29,14 @@ ul.new-tree {
       padding-left: 0;
     }
   }
+  .tree-action-list {
+    li {
+      line-height: 28px;
+    }
+    .counter {
+      @include opacity(1);
+    }
+  }
   &.request-list,
   &.responses-list {
     .short-field {
@@ -422,7 +430,7 @@ ul.new-tree {
 
   li.tree-item {
     min-height: 30px;
-    line-height: 27px;
+    line-height: 24px;
     position: relative;
     @include perspective(1200);
     @include transform-style(preserve-3d);
@@ -433,11 +441,17 @@ ul.new-tree {
       line-height: 20px;
       font-size: 13px;
     }
+    > .item-wrap {
+      padding: 6px 0 11px 0;
+      margin: 0 10px;
+      border-bottom: 1px solid $itemBorder;
+    }
     > .item-main {
       background: $white;
       > .openclose {
         > .item-wrap {
-          padding: 6px 12px;
+          padding: 6px 0;
+          margin: 0 10px;
           border-bottom: 1px solid $itemBorder;
         }
       }
@@ -626,64 +640,6 @@ ul.new-tree {
     .tree-action-right {
       float: right;
     }
-    .tree-action-list {
-      @include reset-list();
-      @include clearfix();
-      float: right;
-      li {
-        float: left;
-        margin-left: 10px;
-        line-height: 24px;
-        .item-data {
-          padding-left: 0;
-          float: none;
-          clear: both;
-          overflow: visible;
-        }
-        .tree-title-area {
-          width: 100%;
-        }
-        .info-action {
-          &.relevant-action {
-            padding-right: 0;
-          }
-        }
-        .objective-selector {
-          input {
-            margin-bottom: 0;
-          }
-        }
-        .inline-black {
-          line-height: 30px;
-          color: $black;
-          margin-bottom: 0;
-          margin-right: 4px;
-        }
-        &.left-space {
-          margin-right: 30px;
-        }
-        a {
-          .grcicon-to-right {
-            @include opacity(0.25);
-            @include transition(opacity 0.2s ease);
-          }
-          &:hover {
-            .grcicon-to-right {
-              @include opacity(1);
-            }
-          }
-        }
-      }
-      [class^="grcicon-"] {
-        margin-top: 6px;
-      }
-      &.tasks-action {
-        li {
-          float: none;
-          display: inline-block;
-        }
-      }
-    }
     /*
     .wrap100 { float:left; min-width:100px; }
     .wrap150 { float:left; min-width:150px; }
@@ -691,25 +647,6 @@ ul.new-tree {
     .wrap250 { float:left; min-width:250px; }
     .wrap300 { float:left; min-width:300px; }
     */
-  }
-  &.dashboard-tree {
-    li.tree-item {
-      line-height: 24px;
-      > .item-wrap {
-        padding: 6px 0 11px 0;
-        margin: 0 10px;
-        border-bottom: 1px solid $itemBorder;
-      }
-      > .item-main {
-        > .openclose {
-          > .item-wrap {
-            margin: 0 10px;
-            padding: 6px 0 11px 0;
-            border-bottom: 1px solid $itemBorder;
-          }
-        }
-      }
-    }
   }
   &.colored-list {
     > li.tree-item {
@@ -1078,6 +1015,16 @@ ul.new-tree {
           @include opacity(1);
         }
       }
+      &:first-child {
+        &.item-open {
+          margin-top: 0;
+        }
+      }
+      &:last-child {
+        &.item-open {
+          margin-bottom: 0;
+        }
+      }
       > .item-main {
         > .openclose {
           > .item-wrap {
@@ -1093,6 +1040,69 @@ ul.new-tree {
     .filter-wrap {
       .filter-border {
         border-color: $white;
+      }
+    }
+    .inner-tree {
+      border-top: 1px solid $itemBorder;
+      //margin-left: 38px; to revert
+      .status-label {
+        margin: 10px 5px 0 0;
+      }
+      li.tree-item {
+        @include scale(1);
+        @include opacity(1);
+        margin-top: 0;
+        margin-bottom: 0;
+        @include box-shadow(none);
+        background: $itemBgnd;
+        li.tree-item {
+          background: darken($itemBgnd,3%);
+          > .item-main {
+            background: none;
+          }
+        }
+        > .item-main {
+          background: none;
+          > .openclose {
+            > .item-wrap {
+              margin: 0;
+              border-color: $itemBorder;
+              // to revert
+              padding: 0 10px 0 70px;
+            }
+          }
+        }
+        .inner-tree {
+          li.tree-item {
+            > .item-main {
+              > .openclose {
+                > .item-wrap {
+                  // to revert
+                  padding: 0 10px 0 106px;
+                }
+              }
+            }
+          }
+        }
+        &.item-open {
+          margin-bottom: 20px;
+          > .item-main {
+            > .openclose {
+              > .item-wrap {
+                border-color: transparent;
+              }
+            }
+          }
+        }
+      }
+    }
+    &.dashboard-tree {
+      li.tree-item {
+        &:first-child {
+          &.item-open {
+            margin-top: 10px;
+          }
+        }
       }
     }
   }
@@ -1111,36 +1121,39 @@ ul.new-tree {
 
 .inner-tree {
   ul.new-tree {
-    @include reset-list();
     li.tree-item {
-      margin-left:20px;
-      margin-right:20px;
-      border-bottom:1px solid #ddd;
-      border-left:1px solid #ccc;
-      border-right:1px solid #ccc;
-      font-size:13px;
-      line-height:30px;
-      //&:first-child {
-      //  border-top:1px solid #ddd;
-      //}
-      //&:last-child {
-      //  border-bottom:1px solid #ccc;
-      //}
+      line-height: 28px;
       .generated-link {
         @include oneline();
       }
-    }
-    &.pbc-list {
-      li.tree-item {
-        a {
-          .row-fluid {
-            padding-top: 6px;
-            padding-bottom: 3px;
+      > .item-main {
+        > .openclose {
+          > .item-wrap {
+            padding: 0;
           }
         }
-        input,
-        select {
-          margin-bottom: 0;
+      }
+      .grcicon-arrow-right-small {
+        @include opacity(0.25);
+      }
+      .item-data {
+        .tree-title-area {
+          &.title {
+            font-size: 13px;
+            line-height: 29px;
+          }
+        }
+      }
+    }
+    &.tree-open {
+      li.tree-item {
+        &.item-open {
+          > .item-main {
+            .grcicon-arrow-right-small {
+              background-position: -126px -80px;
+              @include opacity(1);
+            }
+          }
         }
       }
     }
@@ -1152,6 +1165,9 @@ ul.new-tree {
         margin-right: 0;
       }
     }
+  }
+  .tier-2-info-content {
+    padding: 0;
   }
 }
 .selector-list ul.new-tree li.tree-item .item-content {
@@ -1180,7 +1196,7 @@ ul.new-tree {
   @include transition(all 0.6s cubic-bezier(0.000, 0.050, 1.000, 0.550));
 }
 .tier-2-info-content {
-  padding: 0 10px 0 32px;
+  //padding: 0 10px 0 32px; to revert
   position: relative;
   font-size: 13px;
   line-height: 20px;
@@ -1412,6 +1428,9 @@ ul.new-tree {
 .counter {
   color:#000;
   @include opacity(0.5);
+  .overdue & {
+    color: $red;
+  }
 }
 
 .section-expandable {
@@ -1488,68 +1507,6 @@ ul.new-tree {
         padding-top: 5px;
         margin-top: 5px;
       }
-    }
-  }
-}
-
-.inner-tree {
-  padding-top: 20px;
-  h6 {
-    @include border-radius(4px 4px 0 0);
-    border:1px solid #ccc;
-    border-bottom:none;
-    background:#ddd;
-    color:#666;
-    padding-left:20px;
-    margin-left:20px;
-    margin-right:20px;
-    line-height:24px;
-    .advanced-filter-trigger {
-      margin-right: 20px;
-      float: right;
-      color: $gray;
-      font-size: 11px;
-      @include transition(color 0.2s ease-in-out);
-      i {
-        @include opacity(0.3);
-        @include transition(opacity 0.2s ease-in-out);
-        margin-top: 4px;
-      }
-      &:hover {
-        color: $black;
-        text-decoration: none;
-        i {
-          @include opacity(1);
-        }
-      }
-      &.active {
-        color: $black;
-        i {
-          @include opacity(1);
-        }
-      }
-    }
-    .title-path {
-      text-transform: none;
-      color: $gray;
-      font-weight: normal;
-      float: right;
-      margin-right: 20px;
-      i {
-        margin-top: 4px;
-        @include opacity(0.3);
-      }
-    }
-  }
-  .inline-filtering {
-    h6 {
-      @include border-radius(0);
-      border: none;
-      background: transparent;
-      padding: 0;
-      margin: 0;
-      line-height:30px;
-      color:#000;
     }
   }
 }

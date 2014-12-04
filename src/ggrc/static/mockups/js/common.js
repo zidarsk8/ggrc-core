@@ -741,11 +741,13 @@ $(document).ready(function(){
     $(this).removeClass("active");
   });
 
-  $('.generated-report .dropdown-menu input').click(function(e) {
-    e.stopPropagation();
-  });
-  $('.generated-report .dropdown-menu select').click(function(e) {
-    e.stopPropagation();
+  // Dropdown menu form stop propagation
+  $(".dropdown-menu").on("click", function(el) {
+      var $this = $(this);
+    
+    if($this.hasClass("dropdown-menu-form")) {
+      el.stopPropagation();
+    }
   });
 
   // Top navigation show/hide
