@@ -868,6 +868,9 @@
               self.element.find('.option_column ul.new-tree').append(frag);
           }
           dfd.resolve();
+          if(self.context.attr('check_all')) {
+            self.check_all();
+          }
         });
         return dfd;
       }
@@ -878,20 +881,17 @@
           ;
 
         pager = function(objects, size) {//request_limit, render_limit) {
-          var refresh_queue = new RefreshQueue(),
-              dfd = $.Deferred();
+          var refresh_queue = new RefreshQueue()
+            ;
 
           self._show_next_page = null;
-          self._show_all = null;
+          self._load_and_check_all = null;
 
           refresh_queue.enqueue(objects.slice(0, size));
           page_size = size;
-          $.when(refresh_queue.trigger().then(function(options) {
-            var dfd = $.Deferred();
+          refresh_queue.trigger().then(function(options) {
             if (active_fn()) {
-              $.when(draw_fn(options)).done(function(){
-                dfd.resolve();
-              });
+              draw_fn(options);
 
               //  Enforce minimum wait between render operations
               setTimeout(function() {
@@ -901,28 +901,18 @@
                   }
                 }
               }, 50);
-              // show all
+              //load_and_check_all
               setTimeout(function() {
-                self._show_all = function() {
-                  var new_size,
-                      dfd = $.Deferred();
+                self._load_and_check_all = function() {
+                  var new_size;
                   if (objects.length > page_size) {
                     new_size = objects.length - page_size;
-                    $.when(pager(objects.slice(page_size), new_size)).done(function(){
-                        dfd.resolve();
-                    });
-                  } else {
-                    dfd.resolve();
+                    pager(objects.slice(page_size), new_size);
                   }
-                  return dfd;
                 }
-              }, 0);
+              }, 10);
             }
-            return dfd;
-          })).done(function(){
-            dfd.resolve();
           });
-          return dfd;
         }
 
         pager(objects, page_size);
@@ -935,18 +925,6 @@
       }
 
     , ".selector-list scrollNext": "show_next_page"
-
-    , show_all: function() {
-      var dfd = $.Deferred();
-      if (this._show_all){
-        $.when(this._show_all()).done(function(){
-          dfd.resolve();
-        });
-      } else {
-        dfd.resolve();
-      }
-      return dfd;
-    }
 
     , refresh_option_list: function() {
         var self = this
@@ -964,11 +942,7 @@
         };
 
         draw_fn = function(options) {
-          var dfd = $.Deferred();
-          $.when(self.insert_options(options)).done(function() {
-            dfd.resolve();
-          });
-          return dfd;
+          self.insert_options(options);
         };
 
         self.option_list.replace([]);
@@ -1519,7 +1493,8 @@
           item_selected: false,
           items_selected: 0,
           filter_list: [],
-          display_selection: display_selection ? display_selection : "Objects"
+          display_selection: display_selection ? display_selection : "Objects",
+          check_all: false
           }, this.options));
       }
       return this.context;
@@ -1632,31 +1607,53 @@
         this.update_selected_items(el, ev);
     }
 
+    , load_and_check_all: function(){
+      if (this._load_and_check_all) {
+          this._load_and_check_all();
+      }
+    }
+    , check_all: function(){
+      var $check = this.element.find('.object-check-single:not(:disabled)'),
+          all_checkbox = this.element.find('.object-check-all');
+
+          all_checkbox.prop('checked', true);
+          $check.prop('checked', true);
+          all_checkbox.removeAttr('disabled');
+          all_checkbox.removeClass('disabled pending-ajax');
+          this.update_selected_items(all_checkbox);
+    }
+
     , "input[type=checkbox].object-check-all click": function(el, ev) {
       if (el.hasClass('disabled')) {
         return;
       }
+      //No search result
       if(this.element.find('.object-check-single').length == 0) {
         el.prop('checked', false);
         return;
       }
 
-      var that = this,
-          $check,
-          info = this.element.find('.results-wrap span.info');
-          info.text('Wait loading data----');
-      el.attr('disabled', 'disabled');
-      el.addClass('disabled pending-ajax');
-      info.show();
-      $.when(this.show_all()).done(function(){
-        $check = $(that.element).find('.object-check-single:not(:disabled)');
+      var all_items = this.option_list.length,
+          loaded_items = this.element.find('.object-check-single').length,
+          $check;
 
-      $check.prop('checked', el.prop('checked'));
-      that.update_selected_items(el, ev);
-      el.removeAttr('disabled');
-      el.removeClass('disabled pending-ajax');
-      info.hide();
-      });
+      //All items loaded
+      if(loaded_items == all_items) {
+        $check = this.element.find('.object-check-single:not(:disabled)');
+        $check.prop('checked', el.prop('checked'));
+
+        this.update_selected_items(el, ev);
+        if(el.prop('checked')) {
+          this.context.attr('check_all', true);
+        } else {
+          this.context.attr('check_all', false);
+        }
+      } else {
+        this.context.attr('check_all', true);
+        el.attr('disabled', 'disabled');
+        el.addClass('disabled pending-ajax');
+        this.load_and_check_all();
+      }
     }
 
     , reset_selection_count: function(){
@@ -1694,11 +1691,7 @@
         };
 
         draw_fn = function(options) {
-          var dfd = $.Deferred();
-          $.when(self.insert_options(options)).done(function() {
-            dfd.resolve();
-          });
-          return dfd;
+          self.insert_options(options);
         };
 
         self.option_list.replace([]);
@@ -1828,9 +1821,6 @@
         // For All Objects, make sure to load only those objects in the list of all_models
         // Multilist loader might load objects like g-drive folder and context
         // The Search list loader will filter those objects
-
-        all_checkbox.prop('checked', false);
-
         if(selected === "AllObjects") {
             filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
               return GGRC.Models.Search.search_for_types(
@@ -1857,6 +1847,8 @@
         // Object selected count and Add selected button should reset.
         // User need to make their selection again
         this.reset_selection_count();
+        all_checkbox.prop('checked', false);
+        this.context.attr('check_all', false);
 
         if (filters.length === 1){
           loader = filters[0];
@@ -1875,11 +1867,7 @@
           };
 
           var draw_fn = function(options) {
-            var dfd = $.Deferred();
-            $.when(self.insert_options(options)).done(function() {
-              dfd.resolve();
-            });
-            return dfd;
+            self.insert_options(options);
           };
 
           self.option_list.push.apply(self.option_list, options);
@@ -1890,11 +1878,11 @@
         });
       }
       else {
-        all_checkbox.prop('checked', false);
-
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
         this.reset_selection_count();
+        all_checkbox.prop('checked', false);
+        this.context.attr('check_all', false);
 
         // With no mappings specified, just do a general search
         //  on the type selected.
