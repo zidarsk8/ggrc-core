@@ -31,7 +31,7 @@ Windows installation
 --------------------
 Download and install VirtualBox, Vagrant, `Ruby and DevKit <http://rubyinstaller.org/downloads/>`_ (choose Ruby 1.9.3).
 Unpack the DevKit into ``c:\ruby193\devkit``, ``cd`` there, and run ``ruby dk.rb init`` and ``ruby dk.rb install``.
-For problems, see the `DevKist guide <https://github.com/oneclick/rubyinstaller/wiki/Development-Kit>`_.
+For problems, see the `DevKit guide <https://github.com/oneclick/rubyinstaller/wiki/Development-Kit>`_.
 Then, run ``gem install librarian``, and ``gem install librarian-chef``.
 
 Quick Start
