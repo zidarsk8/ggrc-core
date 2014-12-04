@@ -348,13 +348,13 @@ can.Model("can.Model.Cacheable", {
       else
         return (new can.Deferred()).reject();
     };
-    
+
     // Register this type as a custom attributable type if it is one.
     if(this.is_custom_attributable) {
       if(!GGRC.custom_attributable_types) {
         GGRC.custom_attributable_types = [];
       }
-      GGRC.custom_attributable_types.push(this);//{'full_name': this.fullName});
+      GGRC.custom_attributable_types.push($.extend({}, this));
     }
   }
 
