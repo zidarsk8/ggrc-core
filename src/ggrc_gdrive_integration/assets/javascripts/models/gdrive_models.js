@@ -228,7 +228,7 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
 
   The docs have a special page about working with folders, which is
   worth reading:
-  https://developers.google.com/drive/folder
+  https://developers.google.com/drive/web/folder
 */
 CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
 
