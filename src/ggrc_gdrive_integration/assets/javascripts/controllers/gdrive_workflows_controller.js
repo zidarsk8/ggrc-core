@@ -929,6 +929,10 @@ can.Component.extend({
             }
             picker = picker.build();
             picker.setVisible(true);
+            // use undocumented fu to make the Picker be "modal" - https://b2.corp.google.com/issues/18628239
+            // this is the "mask" displayed behind the dialog box div
+            $('div.picker-dialog-bg').css('zIndex', 2000);  // there are multiple divs of that sort
+            // and this is the dialog box modal div, which we must display on top of our modal, if any
             picker.A.style.zIndex = 2001; // our modals start with 1050
           });
         }
