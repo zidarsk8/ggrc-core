@@ -940,14 +940,19 @@ can.Component.extend({
 
         function pickerCallback(data) {
 
-          var files, models,
+          var files, model,
               PICKED = google.picker.Action.PICKED,
               ACTION = google.picker.Response.ACTION,
               DOCUMENTS = google.picker.Response.DOCUMENTS,
               CANCEL = google.picker.Action.CANCEL;
 
           if (data[ACTION] == PICKED) {
-            files = CMS.Models.GDriveFolder.models(data[DOCUMENTS]);
+            if(el.data('type') === 'folders') {
+              model = CMS.Models.GDriveFolder;
+            } else {
+              model = CMS.Mdoels.GDriveFile;
+            }
+            files = model.models(data[DOCUMENTS]);
             el.trigger('picked', {
               files: files
             });
@@ -963,6 +968,17 @@ can.Component.extend({
           that = this,
           files = data.files || [],
           scope = this.scope;
+
+      if(el.data("type") === "folders" 
+         && files.length 
+         && files[0].mimeType !== "application/vnd.google-apps.folder"
+      ) {
+        $(document.body).trigger("ajax:flash", {
+          error: "ERROR: Something other than a Drive folder was chosen for a folder slot.  Please choose a folder."
+        });
+        return;
+      }
+
 
       this.scope.attr('_folder_change_pending', true);
       if (el.data('replace')) {
