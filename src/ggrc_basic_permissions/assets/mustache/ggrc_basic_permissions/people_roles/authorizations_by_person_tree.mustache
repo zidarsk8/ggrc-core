@@ -59,7 +59,7 @@
                   {{#if_match instance.name '\\\\S'}}
                     {{#instance.name}}
                       <span class="email">{{instance.email}}</span>
-                      {{^if is_enabled}}
+                      {{^if instance.is_enabled}}
                         <span class="user-disabled">
                           (Disabled)
                         </span>
