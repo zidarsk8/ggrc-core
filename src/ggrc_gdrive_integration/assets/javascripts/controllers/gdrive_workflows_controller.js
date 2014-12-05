@@ -915,6 +915,7 @@ can.Component.extend({
               var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
                 .setMimeTypes(["application/vnd.google-apps.folder"])
                 .setSelectFolderEnabled(true);
+              picker.setTitle('Select folder');
               picker.addView(view);
             }
             else{
