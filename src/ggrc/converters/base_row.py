@@ -512,6 +512,8 @@ class SectionTitleHandler(TitleHandler):
     # check for collisions within the directive
     directive = self.importer.obj.directive
     scoped_db_collisions = self.importer.model_class.query.filter_by(directive=directive, title=data).all()
+    scoped_db_collisions = [c for c in scoped_db_collisions
+                            if c.id != self.importer.obj.id]
     if scoped_db_collisions:
       self.add_error("Another item within this {type} already has this title.".format(type=self.importer.obj.directive.kind))
 
