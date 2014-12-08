@@ -746,7 +746,7 @@ can.Control("GGRC.Controllers.Modals", {
             finish();
           });
         } else {
-          var type = obj.type ? obj.type : '', 
+          var type = obj.type ? can.spaceCamelCase(obj.type) : '', 
               name = obj.title ? obj.title : '',
               msg;
           if(instance_id === undefined) { //new element
@@ -1084,6 +1084,12 @@ can.Component.extend({
 });
 
 
-
+can.spaceCamelCase = function (string) {
+    return can.underscore(string)
+        .split("_")
+        .map(can.capitalize)
+        .join(" ");
+};
 
 })(window.can, window.can.$);
+
