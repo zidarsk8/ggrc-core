@@ -1083,13 +1083,5 @@ can.Component.extend({
   },
 });
 
-
-can.spaceCamelCase = function (string) {
-    return can.underscore(string)
-        .split("_")
-        .map(can.capitalize)
-        .join(" ");
-};
-
 })(window.can, window.can.$);
 
