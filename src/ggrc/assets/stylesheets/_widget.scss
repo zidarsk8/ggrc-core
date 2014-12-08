@@ -597,98 +597,6 @@
       line-height:18px;
     }
   }
-  .info {
-    background: $white;
-    padding: 25px 30px 20px 30px;
-    font-size: 13px;
-    .state-value {
-      text-transform: uppercase;
-      font-weight: bold;
-      &.gray {
-        color: $draftGray;
-      }
-      &.green {
-        color: $lightGreen;
-        font-weight: bold;
-      }
-    }
-    .wrap-row {
-      p {
-        padding-top: 0;
-        margin-bottom: 9px;
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
-    }
-    h6 {
-      padding-bottom: 2px;
-    }
-    h3 {
-      font-size: 18px;
-      line-height: 23px;
-      font-weight: normal;
-      i {
-        cursor: pointer;
-        @include opacity(0.2);
-        margin-top: 5px;
-        &:hover {
-          @include opacity(0.7);
-        }
-      }
-    }
-    .rtf-block {
-      margin-bottom:10px;
-      p {
-        margin-bottom:10px;
-        line-height:22px;
-        color:$text;
-      }
-      h4.no-data {
-        font-style:italic;
-        color:#999;
-      }
-    }
-    .person-tooltip-trigger {
-      &:hover {
-        text-decoration: underline;
-        cursor: pointer;
-      }
-      &.active {
-        text-decoration: underline;
-      }
-    }
-    .url {
-      display: inline-block;
-      @include oneline();
-    }
-    .error {
-      font-weight:normal;
-    }
-    i.grcicon-goto {
-      @include opacity(0.4);
-      &:hover {
-        @include opacity(0.8);
-      }
-    }
-    &.tier-info {
-      padding:16px 0 0 0;
-      h3 {
-        .btn-mini {
-          font-weight:normal;
-          margin-left:10px;
-          padding-left:10px;
-          padding-right:10px;
-        }
-      }
-    }
-    &.person-info {
-      padding: 5px 0 0 0;
-      > div {
-        overflow: hidden;
-      }
-    }
-  }
   .risk-content {
     h3 {
       font-weight: normal;
@@ -797,6 +705,99 @@
     padding-left: 10px;
     a {
       color: $textGray;
+    }
+  }
+}
+
+.info {
+  background: $white;
+  padding: 25px 30px 20px 30px;
+  font-size: 13px;
+  .state-value {
+    text-transform: uppercase;
+    font-weight: bold;
+    &.gray {
+      color: $draftGray;
+    }
+    &.green {
+      color: $lightGreen;
+      font-weight: bold;
+    }
+  }
+  .wrap-row {
+    p {
+      padding-top: 0;
+      margin-bottom: 9px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  h6 {
+    padding-bottom: 2px;
+  }
+  h3 {
+    font-size: 18px;
+    line-height: 23px;
+    font-weight: normal;
+    i {
+      cursor: pointer;
+      @include opacity(0.2);
+      margin-top: 5px;
+      &:hover {
+        @include opacity(0.7);
+      }
+    }
+  }
+  .rtf-block {
+    margin-bottom:10px;
+    p {
+      margin-bottom:10px;
+      line-height:22px;
+      color:$text;
+    }
+    h4.no-data {
+      font-style:italic;
+      color:#999;
+    }
+  }
+  .person-tooltip-trigger {
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    &.active {
+      text-decoration: underline;
+    }
+  }
+  .url {
+    display: inline-block;
+    @include oneline();
+  }
+  .error {
+    font-weight:normal;
+  }
+  i.grcicon-goto {
+    @include opacity(0.4);
+    &:hover {
+      @include opacity(0.8);
+    }
+  }
+  &.tier-info {
+    padding:16px 0 0 0;
+    h3 {
+      .btn-mini {
+        font-weight:normal;
+        margin-left:10px;
+        padding-left:10px;
+        padding-right:10px;
+      }
+    }
+  }
+  &.person-info {
+    padding: 5px 0 0 0;
+    > div {
+      overflow: hidden;
     }
   }
 }
@@ -1620,5 +1621,42 @@ ul.attr-list {
   .title {
     text-align: right;
     display: inline-block;
+  }
+}
+
+// Pin content
+.pin-content {
+  position: fixed;
+  bottom: 40px;
+  left: 20px;
+  right: 20px;
+  background: $white;
+  z-index: 9999;
+  @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
+  .info {
+    height: 250px;
+    overflow: auto;
+    padding: 20px;
+  }
+}
+
+.pin-action {
+  @include clearfix();
+  @include reset-list();
+  margin-bottom: 20px;
+  li {
+    float: left;
+    margin-left: 10px;
+    a {
+      i {
+        @include opacity(0.25);
+        @include transition(opacity 0.2s ease);
+      }
+      &:hover {
+        i {
+          @include opacity(1);
+        }
+      }
+    }
   }
 }

@@ -468,6 +468,15 @@ ul.new-tree {
         }
       }
     }
+    &.active {
+      .show-datails {
+        a {
+          i {
+            @include opacity(1);
+          }
+        }
+      }
+    }
     &.object-filter {
       background: #b7b7b7;
       span {
