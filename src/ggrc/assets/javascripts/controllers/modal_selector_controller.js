@@ -868,9 +868,6 @@
               self.element.find('.option_column ul.new-tree').append(frag);
           }
           dfd.resolve();
-          if(self.context.attr('check_all')) {
-            self.check_all();
-          }
         });
         return dfd;
       }
@@ -880,15 +877,13 @@
           , pager
           ;
 
-        pager = function(objects, size) {//request_limit, render_limit) {
+        pager = function(objects) {//request_limit, render_limit) {
           var refresh_queue = new RefreshQueue()
             ;
 
           self._show_next_page = null;
-          self._load_and_check_all = null;
 
-          refresh_queue.enqueue(objects.slice(0, size));
-          page_size = size;
+          refresh_queue.enqueue(objects.slice(0, page_size));
           refresh_queue.trigger().then(function(options) {
             if (active_fn()) {
               draw_fn(options);
@@ -897,25 +892,32 @@
               setTimeout(function() {
                 self._show_next_page = function() {
                   if (objects.length > page_size) {
-                    pager(objects.slice(page_size), page_size);
+                    pager(objects.slice(page_size));
                   }
                 }
               }, 50);
               //load_and_check_all
               setTimeout(function() {
-                self._load_and_check_all = function() {
-                  var new_size;
-                  if (objects.length > page_size) {
-                    new_size = objects.length - page_size;
-                    pager(objects.slice(page_size), new_size);
+                self._load_and_check_all = function(obj) {
+                  var my_obj = obj ? obj : objects;
+                  if (my_obj.length > page_size) {
+                    pager(my_obj.slice(page_size));
+                  }
+                  else {
+                    self._load_and_check_all = null;
+                    self.check_all();
                   }
                 }
-              }, 10);
+              }, 100);
+
+              if(self.context.attr('check_all')){
+                self._load_and_check_all(objects);
+              }
             }
           });
         }
 
-        pager(objects, page_size);
+        pager(objects);
       }
 
     , show_next_page: function() {
@@ -1366,6 +1368,28 @@
       this.refresh_option_list();
     }
 
+    , init_spinner: function(){
+      var spinner,
+          $spinner,
+          $spinner_container;
+
+      spinner = new Spinner({
+          "radius": 4
+        , "length": 4
+        , "width": 2
+        }).spin();
+      $spinner = $(spinner.el);
+      $spinner_container = $('<div class="spinner-loading">loading...</div>');
+      $spinner_container.append($spinner);
+      $spinner.css({
+          display: 'inline-block'
+        , paddingLeft: '20px'
+        , left: '10px'
+        , top: '-4px'
+      });
+      this.element.find('.spinner-place-holder').append($spinner_container);
+    }
+
     , init_menu: function() {
         var menu,
           all_models = [],
@@ -1609,6 +1633,7 @@
 
     , load_and_check_all: function(){
       if (this._load_and_check_all) {
+          this.init_spinner();
           this._load_and_check_all();
       }
     }
@@ -1618,6 +1643,7 @@
 
           all_checkbox.prop('checked', true);
           $check.prop('checked', true);
+          this.element.find('.spinner-loading').remove();
           all_checkbox.removeAttr('disabled');
           all_checkbox.removeClass('disabled pending-ajax');
           this.update_selected_items(all_checkbox);
@@ -1643,11 +1669,6 @@
         $check.prop('checked', el.prop('checked'));
 
         this.update_selected_items(el, ev);
-        if(el.prop('checked')) {
-          this.context.attr('check_all', true);
-        } else {
-          this.context.attr('check_all', false);
-        }
       } else {
         this.context.attr('check_all', true);
         el.attr('disabled', 'disabled');
@@ -1770,6 +1791,14 @@
         search_text = this.element.find('.results-wrap span.info'),
         all_checkbox = this.element.find('.object-check-all');
 
+
+      //If user has already triggered check_all_button, clear all
+      all_checkbox.prop('checked', false);
+      this.context.attr('check_all', false);
+      all_checkbox.removeAttr('disabled');
+      all_checkbox.removeClass('disabled pending-ajax');
+      this.element.find('.spinner-loading').remove();
+
       // Remove Search Criteria text
       if(search_text.length)
         search_text.hide();
@@ -1847,8 +1876,6 @@
         // Object selected count and Add selected button should reset.
         // User need to make their selection again
         this.reset_selection_count();
-        all_checkbox.prop('checked', false);
-        this.context.attr('check_all', false);
 
         if (filters.length === 1){
           loader = filters[0];
@@ -1881,8 +1908,6 @@
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
         this.reset_selection_count();
-        all_checkbox.prop('checked', false);
-        this.context.attr('check_all', false);
 
         // With no mappings specified, just do a general search
         //  on the type selected.
