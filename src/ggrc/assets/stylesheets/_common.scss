@@ -1200,3 +1200,21 @@ p {
     }
   }
 }
+
+.dropdown-menu {
+  &.quick-search {
+    min-width: 100%;
+    padding: 15px 20px;
+    box-sizing: border-box;
+    select,
+    input {
+      margin-bottom: 0;
+    }
+    ul {
+      @include reset-list();
+    }
+    li {
+      margin-bottom: 20px;
+    }
+  }
+}
