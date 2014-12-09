@@ -746,11 +746,15 @@ can.Control("GGRC.Controllers.Modals", {
             finish();
           });
         } else {
-          var type = obj.type ? obj.type : '', 
+          var type = obj.type ? can.spaceCamelCase(obj.type) : '', 
               name = obj.title ? obj.title : '',
               msg;
           if(instance_id === undefined) { //new element
-            msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+            if (name) {
+                msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+            }else{
+                msg = "New " + type + " added successfully.";
+            }
           } else {
             msg = "<span class='user-string'>" + name + "</span>" + " modified successfully.";
           }
@@ -1079,7 +1083,5 @@ can.Component.extend({
   },
 });
 
-
-
-
 })(window.can, window.can.$);
+

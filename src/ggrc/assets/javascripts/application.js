@@ -1525,3 +1525,12 @@ can.Model.validateNonBlank = can.Map.validateNonBlank = function(attrNames, opti
 can.reduce ||
   (can.reduce = function(a, f, i) { if(a==null) return null; return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]) });
 })(window.jQuery);
+
+
+// Turn camelSpace strings into Camel Space strings
+can.spaceCamelCase = function (string) {
+    return can.underscore(string)
+        .split("_")
+        .map(can.capitalize)
+        .join(" ");
+};
