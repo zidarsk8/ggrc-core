@@ -2530,6 +2530,19 @@ Mustache.registerHelper("grdive_msg_to_id", function (message) {
   return msg[msg.length-1];
 });
 
+Mustache.registerHelper("disable_if_errors", function(instance){
+  var ins,
+      res;
+  ins = Mustache.resolve(instance);
+  res = ins.computed_unsuppressed_errors();
+  if (res == null ) {
+    return "";
+  }
+  else {
+    return "disabled" ;
+  }
+});
+
 /*
   toggle mustache helper
 
