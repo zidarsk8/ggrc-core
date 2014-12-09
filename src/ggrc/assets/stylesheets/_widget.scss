@@ -1634,7 +1634,6 @@ ul.attr-list {
   z-index: 9999;
   @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   .info {
-    height: 250px;
     overflow: auto;
     padding: 20px;
   }
