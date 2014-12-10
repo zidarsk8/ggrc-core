@@ -44,20 +44,6 @@ a.remove_filter i[class^="grcicon-"] {
   vertical-align: text-bottom !important;
 }
 
-// Top level tree items don't need icons
-.tree-item .tree-title-area [class^="grcicon-"] {
-  display: none;
-}
-.object-tree .tree-item .tree-title-area [class^="grcicon-"] {
-  display: inline-block;
-}
-.tree-item .tree-item .tree-title-area [class^="grcicon-"] {
-  display: inline-block;
-}
-.tree-item .tree-title-area .date-wrap [class^="grcicon-"] {
-  display: inline-block;
-}
-
 .grcicon-add {
   background-position:-222px -32px;
   .active & {
@@ -264,6 +250,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-close-tab { background-position: -342px -176px; }
 .grcicon-close-red { background-position: -342px -272px; }
 .grcicon-warning { background-position: -174px -8px; }
+.grcicon-to-right { background-position: -198px -200px; }
 .grcicon-arrow-left { background-position: -126px -56px; }
 .grcicon-arrow-right { background-position: -102px -56px; }
 .grcicon-arrow-bottom { background-position: -102px -80px; }
@@ -279,6 +266,10 @@ a.remove_filter i[class^="grcicon-"] {
 .grciconlarge-nav-trigger { background-position: -72px -8px; }
 .grciconlarge-nav-trigger-active { background-position: -72px -40px; }
 .grciconlarge-dashboard-new { background-position: -104px -8px; }
+
+.grcicon-maximize { background-position: -246px -224px; }
+.grcicon-minimize { background-position: -246px -248px }
+.grcicon-default { background-position: -150px -368px }
 
 // Large object icons
 .grciconlarge-product { background-position: -136px -8px; }
@@ -445,6 +436,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-cycle_task_group_object_task-color,.grcicon-task-color { background-position:-318px -344px; }
 .grcicon-task-black { background-position:-294px -392px; }
 .grcicon-task-white { background-position:-294px -344px; }
+.grcicon-task-red { background-position:-150px -344px; }
 .grcicon-task { background-position:-294px -344px; }
 .grcicon-task_group-color { background-position:-318px -8px; }
 

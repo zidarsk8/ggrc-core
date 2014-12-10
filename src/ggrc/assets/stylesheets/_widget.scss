@@ -9,6 +9,64 @@
 // widgets styles
 .widget {
   margin-bottom: 40px;
+  .tree-action-list {
+    @include reset-list();
+    @include clearfix();
+    float: right;
+    li {
+      float: left;
+      margin-left: 10px;
+      line-height: 24px;
+      .item-data {
+        padding-left: 0;
+        float: none;
+        clear: both;
+        overflow: visible;
+      }
+      .tree-title-area {
+        width: 100%;
+      }
+      .info-action {
+        &.relevant-action {
+          padding-right: 0;
+        }
+      }
+      .objective-selector {
+        input {
+          margin-bottom: 0;
+        }
+      }
+      .inline-black {
+        line-height: 30px;
+        color: $black;
+        margin-bottom: 0;
+        margin-right: 4px;
+      }
+      &.left-space {
+        margin-right: 30px;
+      }
+      a {
+        .grcicon-to-right {
+          @include opacity(0.25);
+          @include transition(opacity 0.2s ease);
+        }
+        &:hover {
+          .grcicon-to-right {
+            @include opacity(1);
+          }
+        }
+      }
+    }
+    [class^="grcicon-"] {
+      margin-top: 6px;
+    }
+    &.tasks-action {
+      li {
+        float: none;
+        display: inline-block;
+      }
+    }
+  }
   .header {
     height: 30px;
     background: none;
@@ -54,6 +112,75 @@
       }
     }
     @include row-fluid-fix();
+    &.tree-header {
+      padding: 0 12px 0 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin: -6px 0 4px 0;
+      height: 20px;
+      .title-heading {
+        padding-left: 60px;
+      }
+      .tree-action-list {
+        [class^="grcicon-"] {
+          margin-top: 1px;
+          @include opacity(0.25);
+          @include transition(opacity 0.2s ease);
+        }
+        li {
+          position: relative;
+          .dropdown-menu {
+            right: -12px;
+            left: auto;
+            top: 20px;
+            @include border-radius(0);
+            padding: 14px 30px 20px 30px;
+            min-width: 340px;
+            h5 {
+              font-size: 16px;
+              font-weight: normal;
+              text-transform: none;
+              line-height: 24px;
+            }
+            label {
+              font-size: 12px;
+            }
+            .attr-list {
+              margin-top: 11px;
+              margin-bottom: 14px;
+              li {
+                margin: 0;
+                text-transform: none;
+                label {
+                  display: inline-block;
+                  cursor: pointer;
+                }
+                &.disabled {
+                  color: $gray;
+                  label {
+                    cursor: not-allowed;
+                  }
+                }
+              }
+            }
+          }
+          &.open {
+            a {
+              [class^="grcicon-"] {
+                @include opacity(1);
+              }
+            }
+          }
+        }
+        a {
+          &:hover {
+            [class^="grcicon-"] {
+              @include opacity(1);
+            }
+          }
+        }
+      }
+    }
     &.widget-nav {
       height: 40px;
       background: none;
@@ -470,94 +597,6 @@
       line-height:18px;
     }
   }
-  .info {
-    background: $white;
-    padding: 25px 30px 20px 30px;
-    font-size: 13px;
-    .state-value {
-      text-transform: uppercase;
-      font-weight: bold;
-      &.green {
-        color: $lightGreen;
-      }
-    }
-    .wrap-row {
-      p {
-        padding-top: 0;
-        margin-bottom: 9px;
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
-    }
-    h6 {
-      padding-bottom: 2px;
-    }
-    h3 {
-      font-size: 18px;
-      line-height: 23px;
-      font-weight: normal;
-      i {
-        cursor: pointer;
-        @include opacity(0.2);
-        margin-top: 5px;
-        &:hover {
-          @include opacity(0.7);
-        }
-      }
-    }
-    .rtf-block {
-      margin-bottom:10px;
-      p {
-        margin-bottom:10px;
-        line-height:22px;
-        color:$text;
-      }
-      h4.no-data {
-        font-style:italic;
-        color:#999;
-      }
-    }
-    .person-tooltip-trigger {
-      &:hover {
-        text-decoration: underline;
-        cursor: pointer;
-      }
-      &.active {
-        text-decoration: underline;
-      }
-    }
-    .url {
-      display: inline-block;
-      @include oneline();
-    }
-    .error {
-      font-weight:normal;
-    }
-    i.grcicon-goto {
-      @include opacity(0.4);
-      &:hover {
-        @include opacity(0.8);
-      }
-    }
-    &.tier-info {
-      padding:16px 0 0 0;
-      h3 {
-        .btn-mini {
-          font-weight:normal;
-          margin-left:10px;
-          padding-left:10px;
-          padding-right:10px;
-        }
-      }
-    }
-    &.person-info {
-      padding: 5px 0 0 0;
-      > div {
-        overflow: hidden;
-      }
-    }
-  }
   .risk-content {
     h3 {
       font-weight: normal;
@@ -666,6 +705,99 @@
     padding-left: 10px;
     a {
       color: $textGray;
+    }
+  }
+}
+
+.info {
+  background: $white;
+  padding: 25px 30px 20px 30px;
+  font-size: 13px;
+  .state-value {
+    text-transform: uppercase;
+    font-weight: bold;
+    &.gray {
+      color: $draftGray;
+    }
+    &.green {
+      color: $lightGreen;
+      font-weight: bold;
+    }
+  }
+  .wrap-row {
+    p {
+      padding-top: 0;
+      margin-bottom: 9px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  h6 {
+    padding-bottom: 2px;
+  }
+  h3 {
+    font-size: 18px;
+    line-height: 23px;
+    font-weight: normal;
+    i {
+      cursor: pointer;
+      @include opacity(0.2);
+      margin-top: 5px;
+      &:hover {
+        @include opacity(0.7);
+      }
+    }
+  }
+  .rtf-block {
+    margin-bottom:10px;
+    p {
+      margin-bottom:10px;
+      line-height:22px;
+      color:$text;
+    }
+    h4.no-data {
+      font-style:italic;
+      color:#999;
+    }
+  }
+  .person-tooltip-trigger {
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    &.active {
+      text-decoration: underline;
+    }
+  }
+  .url {
+    display: inline-block;
+    @include oneline();
+  }
+  .error {
+    font-weight:normal;
+  }
+  i.grcicon-goto {
+    @include opacity(0.4);
+    &:hover {
+      @include opacity(0.8);
+    }
+  }
+  &.tier-info {
+    padding:16px 0 0 0;
+    h3 {
+      .btn-mini {
+        font-weight:normal;
+        margin-left:10px;
+        padding-left:10px;
+        padding-right:10px;
+      }
+    }
+  }
+  &.person-info {
+    padding: 5px 0 0 0;
+    > div {
+      overflow: hidden;
     }
   }
 }
@@ -1073,6 +1205,17 @@
   }
 }
 .inner-tree {
+  .tree-action-list {
+    li {
+      line-height: 28px;
+    }
+    [class^="grcicon-"] {
+      margin-top: 6px;
+    }
+    .counter {
+      @include opacity(1);
+    }
+  }
   .zero-state {
     margin: 0 20px;
     padding-bottom: 15px;
@@ -1478,5 +1621,41 @@ ul.attr-list {
   .title {
     text-align: right;
     display: inline-block;
+  }
+}
+
+// Pin content
+.pin-content {
+  position: fixed;
+  bottom: 40px;
+  left: 20px;
+  right: 20px;
+  background: $white;
+  z-index: 9999;
+  @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
+  .info {
+    overflow: auto;
+    padding: 20px;
+  }
+}
+
+.pin-action {
+  @include clearfix();
+  @include reset-list();
+  margin-bottom: 20px;
+  li {
+    float: left;
+    margin-left: 10px;
+    a {
+      i {
+        @include opacity(0.25);
+        @include transition(opacity 0.2s ease);
+      }
+      &:hover {
+        i {
+          @include opacity(1);
+        }
+      }
+    }
   }
 }

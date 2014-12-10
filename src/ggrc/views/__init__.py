@@ -327,6 +327,13 @@ def object_ui():
   """
   return render_template("mockups/dashboard-ui/object.html")
 
+@app.route("/mockups/dashboard-ui/tree.html")
+@login_required
+def tree_ui():
+  """Tree UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/tree.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():

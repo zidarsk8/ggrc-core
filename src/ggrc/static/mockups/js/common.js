@@ -741,11 +741,13 @@ $(document).ready(function(){
     $(this).removeClass("active");
   });
 
-  $('.generated-report .dropdown-menu input').click(function(e) {
-    e.stopPropagation();
-  });
-  $('.generated-report .dropdown-menu select').click(function(e) {
-    e.stopPropagation();
+  // Dropdown menu form stop propagation
+  $(".dropdown-menu").on("click", function(el) {
+      var $this = $(this);
+    
+    if($this.hasClass("dropdown-menu-form")) {
+      el.stopPropagation();
+    }
   });
 
   // Top navigation show/hide
@@ -886,6 +888,38 @@ function searchActive() {
 }
 
 $(".widgetsearch").on("keyup", searchActive);
+
+// Pin content height options
+function pinContent() {
+  var options = {
+        duration: 800,
+        easing: 'easeOutExpo'
+      },
+      $pin = $(".pin-content"),
+      $pin_height = $pin.height(),
+      $info = $(".pin-content").find(".info"),
+      $window = $(window),
+      $win_height = $window.height(),
+      $win_height_part = $win_height / 3,
+      $pin_max = $win_height_part * 2,
+      $pin_default = $win_height_part,
+      $pin_min = 14;
+
+  $info.css("height", $pin_default);
+
+  $(".pin-action .max").on("click", function() {
+    $info.animate({height: $pin_max}, options);
+  });
+  $(".pin-action .default").on("click", function() {
+    $info.animate({height: $pin_default}, options);
+  });
+  $(".pin-action .min").on("click", function() {
+    $info.animate({height: $pin_min}, options);
+  });
+}
+
+jQuery(pinContent);
+jQuery(window).on("resize", pinContent);
 
 // Make sure the windows are resized properly
 
