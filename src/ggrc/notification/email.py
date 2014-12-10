@@ -5,7 +5,7 @@
 
 
 """
- GGRC email notification module hook to prepares email, email digest, notify email to recipients 
+ GGRC email notification module hook to prepares email, email digest, notify email to recipients
 """
 
 
@@ -18,12 +18,12 @@ from ggrc import settings
 
 
 def getAppEngineEmail():
-  appengine_email = getattr(settings, 'APPENGINE_EMAIL') 
+  appengine_email = getattr(settings, 'APPENGINE_EMAIL')
   if appengine_email is not None and appengine_email != '' and appengine_email !=" ":
     return appengine_email
   else:
     return None
-   
+
 def isNotificationEnabled(person_id, notif_type):
   if notif_type == 'Email_Deferred':
     notif_type='Email_Now'
@@ -40,13 +40,14 @@ def isNotificationEnabled(person_id, notif_type):
       return False
   else:
     return notification_config.enable_flag
-  
+
 class NotificationBase(object):
   notif_type=None
   notif_pri=None
   appengine_email=None
 
   def __init__(self, notif_type):
+    print "INIT NOTIFICATION BASE"
     self.notif_type=notif_type
     self.appengine_email = getAppEngineEmail()
 
@@ -109,7 +110,7 @@ class EmailNotification(NotificationBase):
       cnt = 0
       if not valid_states.has_key(type):
         current_app.logger.error(
-          "EmailDeferredNotification: Error occured in handling state " + 
+          "EmailDeferredNotification: Error occured in handling state " +
           "transitions"
           )
         for (notif, notif_object) in target_notifs:
@@ -160,7 +161,7 @@ class EmailNotification(NotificationBase):
     if not len(updated_recipients) > 0:
       current_app.logger.info("EmailNotification: No recipients found with notification enabled")
       return None
-     
+
     now=datetime.now()
     notification=Notification(
       notif_pri=self.notif_pri,
@@ -179,7 +180,7 @@ class EmailNotification(NotificationBase):
         status='InProgress'
       notification_object=NotificationObject(
         created_at=datetime.now(),
-        object_id=obj.id, 
+        object_id=obj.id,
         object_type=obj.type,
         modified_by_id=sender.id,
         status=status,
@@ -230,7 +231,7 @@ class EmailNotification(NotificationBase):
         email_content[recipient_id]=notify_recipient.content
 
     if len(assignees) > 0:
-      sender_info="{} <{}>".format(sender.name, sender.email) 
+      sender_info="{} <{}>".format(sender.name, sender.email)
       email_headers={"On-Behalf-Of":sender_info}
       for recipient_id, recipient_email in assignees.items():
         message=mail.EmailMessage(
@@ -243,9 +244,10 @@ class EmailNotification(NotificationBase):
           headers=email_headers,
           html=email_content[recipient_id],
           body=email_content[recipient_id])
+        print "SENDING ONE EMAIL"
         try:
           message.send()
-        except: 
+        except:
           notif_error[id]="Unable to send email to {}".format(recipient_email)
           current_app.logger.error("Unable to send email to {}".format(recipient_email))
 
@@ -319,7 +321,7 @@ class EmailDigestNotification(EmailNotification):
             )
 
       for recipient_id, items in content.items():
-        recipient=to[recipient_id] 
+        recipient=to[recipient_id]
         import collections
         sorted_items=collections.OrderedDict(sorted(items.items()))
         body=""
@@ -327,15 +329,16 @@ class EmailDigestNotification(EmailNotification):
           body=''.join([body, value, "</ul></p>"])
         content_for_recipients[recipient_id] = \
           "Hello {}<br>{}<p>Thanks,<br> gGRC Team</p>".format(recipient.name, body)
-      
+
       for recipient_id, body in content_for_recipients.items():
-        recipient=to[recipient_id] 
+        recipient=to[recipient_id]
         message=mail.EmailMessage(
           sender="gGRC Administrator <{}>".format(self.appengine_email),
-          to="{} <{}>".format(recipient.name, recipient.email), 
+          to="{} <{}>".format(recipient.name, recipient.email),
           subject=subject,
           body=body,
           html=body)
+        print "SENDING A DIGEST"
         try:
           message.send()
         except:
@@ -364,7 +367,7 @@ class EmailDeferredNotification(EmailNotification):
       filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
     notifs_by_target={}
-    for notification in deferred_notifs: 
+    for notification in deferred_notifs:
       for notify_recipient in notification.recipients:
         user_id=notify_recipient.recipient_id
         break
@@ -378,7 +381,7 @@ class EmailDeferredNotification(EmailNotification):
     ignored_notifs=self.get_ignored_notifications(deferred_notifs)
     for notif in deferred_notifs:
       if not skipped_notifs.has_key(notif.id) and not ignored_notifs.has_key(notif.id):
-        self.notify_one(notif) 
+        self.notify_one(notif)
     for id, notif in skipped_notifs.items():
       for notify_recipient in notif.recipients:
         if notify_recipient.notif_type != self.notif_type:
@@ -405,8 +408,8 @@ class EmailDigestDeferredNotification(EmailDigestNotification):
       filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
     notifs_by_target={}
-    for notification in deferred_notifs: 
-      # ToDO(Mouli): The design supports only 1 recipient for notification object for handling deferred notification 
+    for notification in deferred_notifs:
+      # ToDO(Mouli): The design supports only 1 recipient for notification object for handling deferred notification
       for notify_recipient in notification.recipients:
         user_id=notify_recipient.recipient_id
         break

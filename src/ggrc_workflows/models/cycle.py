@@ -8,6 +8,7 @@ from ggrc import db
 from ggrc.models.mixins import (
     Slugged, Titled, Described, Timeboxed, Stateful, WithContact
     )
+from sqlalchemy import event
 
 
 class Cycle(
@@ -43,3 +44,12 @@ class Cycle(
       'is_current',
       'next_due_date',
       ]
+
+def after_insert_listener(target, value, initiator):
+  print "CYCLE INSERTED!"
+
+def after_update_listener(target, value, initiator):
+  print "CYCLE UPDATED!"
+
+event.listen(Cycle, 'after_insert', after_insert_listener)
+event.listen(Cycle, 'after_update', after_update_listener)

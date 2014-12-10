@@ -391,6 +391,7 @@ def handle_notification_config_changes(sender, obj=None, src=None, service=None)
         prepare_calendar_for_cycle(cycle, enable_flag)
 
 def handle_new_workflow_cycle_start():
+  print "HANDLE NEW WORKFLOW CYCLE START"
   cycles=db.session.query(models.Cycle).\
     filter(models.Cycle.is_current==True).\
     filter(models.Cycle.start_date == datetime.utcnow().date()).all()
@@ -838,6 +839,7 @@ class WorkflowCalendarService(CalendarService):
 def notify_email_digest():
   """ Preprocessing of tasks, cycles prior to generating email digest
   """
+  print "NOTIFY EMAIL DIGEST"
   handle_new_workflow_cycle_start()
   handle_tasks_overdue()
   handle_tasks_due(0)

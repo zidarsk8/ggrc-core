@@ -8,9 +8,10 @@
 """
 
 from sqlalchemy.orm import backref
+from sqlalchemy import event
 
 from ggrc.app import db
-from .mixins import Base, Stateful 
+from .mixins import Base, Stateful
 
 
 class NotificationConfig(Base, db.Model):
@@ -50,15 +51,20 @@ class Notification(Base, db.Model):
       'NotificationObject', backref='notification', cascade='all, delete-orphan')
 
 
+def notification_after_insert(mapper, connection, target):
+    print "JUST INSERTED NOTIFICATION"
+
+event.listen(Notification, 'after_insert', notification_after_insert)
+
 class NotificationObject(Base, Stateful, db.Model):
   __tablename__ = 'notification_objects'
 
   VALID_STATES = [
-    None, 
-    "InProgress", 
-    "Assigned", 
-    "Finished", 
-    "Declined", 
+    None,
+    "InProgress",
+    "Assigned",
+    "Finished",
+    "Declined",
     "Verified",
   ]
 
@@ -66,6 +72,11 @@ class NotificationObject(Base, Stateful, db.Model):
   notification_id = db.Column(db.Integer, db.ForeignKey('notifications.id'), nullable=False)
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
+
+def object_after_insert(mapper, connection, target):
+    print "JUST INSERTED NOTIFICATION OBJECT"
+
+event.listen(NotificationObject, 'after_insert', object_after_insert)
 
 class NotificationRecipient(Base, Stateful, db.Model):
   __tablename__ = 'notification_recipients'
