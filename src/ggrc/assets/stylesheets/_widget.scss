@@ -8,11 +8,12 @@
 
 // widgets styles
 .widget {
-  margin-bottom: 40px;
+  margin-bottom: 100px;
   .tree-action-list {
     @include reset-list();
     @include clearfix();
     float: right;
+    padding-right: 4px;
     li {
       float: left;
       margin-left: 10px;
