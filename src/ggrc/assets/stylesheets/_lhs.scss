@@ -86,6 +86,21 @@
   }
 }
 
+.lhn-pin {
+  position: absolute;
+  top: 5px;
+  right: -6px;
+  @include opacity(0.25);
+  @include transition(opacity 0.2s ease);
+  z-index: 9999;
+  &:hover {
+    @include opacity(1);
+  }
+  &.active {
+    @include opacity(1);
+  }
+}
+
 .lhn-type {
   @include clearfix();
   min-width: 246px;
@@ -483,6 +498,10 @@
   }
   &.active {
     @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
+  }
+  &.disabled {
+    @include opacity(0.5);
+    cursor: default;
   }
 }
 

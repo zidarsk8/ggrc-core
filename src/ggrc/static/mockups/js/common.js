@@ -921,6 +921,23 @@ function pinContent() {
 jQuery(pinContent);
 jQuery(window).on("resize", pinContent);
 
+// LHN pin
+$(".lhn-pin").on("click", function() {
+  var $this = $(this),
+      $lhn_button = $(".lhn-trigger"),
+      $lhn_bar = $(".bar-v");
+  
+  if ($this.hasClass("active")) {
+    $this.removeClass("active");
+    $lhn_button.removeClass("disabled");
+    $lhn_bar.removeClass("disabled");
+  } else {
+    $this.addClass("active");
+    $lhn_button.addClass("disabled");
+    $lhn_bar.addClass("disabled");
+  }
+});
+
 // Make sure the windows are resized properly
 
 jQuery(resize_areas);

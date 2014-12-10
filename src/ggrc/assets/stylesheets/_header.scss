@@ -225,8 +225,6 @@
       }
     }
   }
-  .lhn-trigger-wrap {
-  }
   .lhn-trigger {
     display: inline-block;
     height: 16px;
@@ -258,6 +256,10 @@
       margin: 6px 10px 0 14px;
       padding: 10px;
       background: $white;
+    }
+    &.disabled {
+      @include opacity(0.5);
+      cursor: default;
     }
   }
 }
