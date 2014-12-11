@@ -396,6 +396,7 @@ def handle_new_workflow_cycle_start():
     filter(models.Cycle.is_current==True).\
     filter(models.Cycle.start_date == datetime.utcnow().date()).all()
   notify_custom_message=True
+  print cycles
   for cycle in cycles:
     subject="New cycle of workflow  " + cycle.title + " begins today"
     prepare_notification_for_cycle(cycle, subject, " begins today", PRI_CYCLE, notify_custom_message)
@@ -416,6 +417,14 @@ def handle_taskgroup_deleted(sender, obj=None, service=None):
   from oauth2client.client import Credentials
   calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
   calendar_service.handle_taskgroup_calendar_delete(taskgroup)
+
+@Resource.model_posted.connect_via(models.Cycle)
+def handle_cycle_post(sender, obj=None, src=None, service=None):
+    handle_new_workflow_cycle_start()
+
+@Resource.model_put.connect_via(models.Cycle)
+def handle_cycle_put(sender, obj=None, src=None, service=None):
+    handle_new_workflow_cycle_start()
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_task_put(sender, obj=None, src=None, service=None):
@@ -648,6 +657,7 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
 
 def prepare_notification(src, notif_type, notif_pri, subject, content, owner, recipients, \
   override=False, notify_custom_message=None):
+  print "PREPARIVATING?"
   if notif_type == 'Email_Digest':
     emaildigest_notification = EmailDigestNotification()
     emaildigest_notification.notif_pri = notif_pri
