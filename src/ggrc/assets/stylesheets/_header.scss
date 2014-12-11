@@ -226,10 +226,13 @@
     }
   }
   .lhn-trigger {
-    display: inline-block;
-    height: 16px;
+    display: block;
+    height: 15px;
     width: 16px;
     margin: 16px 20px 0 24px;
+    padding: 0;
+    border: none;
+    background: none;
     @include transition-duration(0.3s);
     .icon-bar {
       display: block;
@@ -246,6 +249,8 @@
       @include border-radius(18px);
       margin: 6px 10px 0 14px;
       padding: 10px;
+      height: 35px;
+      width: 36px;
       background: $white;
       .icon-bar {
         background: #f60;
@@ -255,7 +260,12 @@
       @include border-radius(18px);
       margin: 6px 10px 0 14px;
       padding: 10px;
+      height: 35px;
+      width: 36px;
       background: $white;
+    }
+    &:focus {
+      @include outline-fix();
     }
     &.disabled {
       @include opacity(0.5);

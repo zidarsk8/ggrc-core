@@ -930,11 +930,15 @@ $(".lhn-pin").on("click", function() {
   if ($this.hasClass("active")) {
     $this.removeClass("active");
     $lhn_button.removeClass("disabled");
+    $lhn_button.attr("disabled", false);
     $lhn_bar.removeClass("disabled");
+    $lhn_bar.attr("disabled", false);
   } else {
     $this.addClass("active");
     $lhn_button.addClass("disabled");
+    $lhn_button.attr("disabled", true);
     $lhn_bar.addClass("disabled");
+    $lhn_bar.attr("disabled", true);
   }
 });
 

@@ -478,6 +478,45 @@
   top: 176px;
   left: -8px;
   height:100%;
+  z-index: 100;
+  width: 6px;
+  padding: 0;
+  border: none;
+  background-color: $white;
+  background-image: image-url("bgnds/drag-v.png");
+  @include background-size(2px 30px);
+  background-repeat: no-repeat;
+  background-position: 2px 50%;
+  cursor: ew-resize;
+  &:hover {
+    background-color: $white;
+  }
+  &.bar-closed {
+    left: 40px;
+    cursor: e-resize;
+  }
+  &.objnav {
+    z-index: 1;  // Show object nav bar-v below title
+  }
+  &.active {
+    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
+  }
+  &:focus {
+    @include outline-fix();
+  }
+  &.disabled {
+    @include opacity(0.5);
+    cursor: default;
+  }
+}
+
+// BAR-V old
+/*
+.bar-v {
+  position: fixed;
+  top: 176px;
+  left: -8px;
+  height:100%;
   z-index:100;
   width:6px;
   background-color:$white;
@@ -504,6 +543,7 @@
     cursor: default;
   }
 }
+*/
 
 // TOP INNER NAV
 .top-inner-nav {
