@@ -391,12 +391,10 @@ def handle_notification_config_changes(sender, obj=None, src=None, service=None)
         prepare_calendar_for_cycle(cycle, enable_flag)
 
 def handle_new_workflow_cycle_start():
-  print "HANDLE NEW WORKFLOW CYCLE START"
   cycles=db.session.query(models.Cycle).\
     filter(models.Cycle.is_current==True).\
     filter(models.Cycle.start_date == datetime.utcnow().date()).all()
   notify_custom_message=True
-  print cycles
   for cycle in cycles:
     subject="New cycle of workflow  " + cycle.title + " begins today"
     prepare_notification_for_cycle(cycle, subject, " begins today", PRI_CYCLE, notify_custom_message)
@@ -420,11 +418,11 @@ def handle_taskgroup_deleted(sender, obj=None, service=None):
 
 @Resource.model_posted.connect_via(models.Cycle)
 def handle_cycle_post(sender, obj=None, src=None, service=None):
-    handle_new_workflow_cycle_start()
+    subject="New cycle of workflow  " + obj.title + " begins today"
+    notify_custom_message=True
 
-@Resource.model_put.connect_via(models.Cycle)
-def handle_cycle_put(sender, obj=None, src=None, service=None):
-    handle_new_workflow_cycle_start()
+    prepare_notification_for_cycle(obj, subject, " begins today", PRI_CYCLE, notify_custom_message)
+    db.session.commit()
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_task_put(sender, obj=None, src=None, service=None):
