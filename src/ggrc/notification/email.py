@@ -47,10 +47,8 @@ class NotificationBase(object):
   appengine_email=None
 
   def __init__(self, notif_type):
-    print "INIT NOTIFICATION BASE"
     self.notif_type=notif_type
     self.appengine_email = getAppEngineEmail()
-    print "appengine_email", getattr(settings, 'APPENGINE_EMAIL')
 
   def prepare(self, target_objs, sender, recipients, subject, content, override):
     return None
@@ -137,10 +135,9 @@ class EmailNotification(NotificationBase):
     return skipped_notifs
 
   def prepare(self, target_objs, sender, recipients, subject, content, override=False):
-    print "PREPARING EmailNotification"
     if self.appengine_email is None:
       return None
-    print "Yup doing it"
+
     enable_notif={}
     existing_recipients={}
     updated_recipients=[]
@@ -207,7 +204,6 @@ class EmailNotification(NotificationBase):
     return notification
 
   def notify(self):
-    print "DOING THE NOTIFY"
     pending_notifications=db.session.query(Notification).\
       join(Notification.recipients).\
       filter(NotificationRecipient.status == 'InProgress').\
@@ -217,7 +213,6 @@ class EmailNotification(NotificationBase):
       self.notify_one(notification)
 
   def notify_one(self, notification, notify_custom_message=None):
-    print "DOING THE NOTIFY_ONE"
     sender=Person.query.filter(Person.id==notification.sender_id).first()
     assignees={}
     notif_error={}
@@ -236,7 +231,6 @@ class EmailNotification(NotificationBase):
         email_content[recipient_id]=notify_recipient.content
 
     if len(assignees) > 0:
-      print "GONNA SEND"
       sender_info="{} <{}>".format(sender.name, sender.email)
       email_headers={"On-Behalf-Of":sender_info}
       for recipient_id, recipient_email in assignees.items():
@@ -250,7 +244,6 @@ class EmailNotification(NotificationBase):
           headers=email_headers,
           html=email_content[recipient_id],
           body=email_content[recipient_id])
-        print "SENDING ONE EMAIL"
         try:
           message.send()
         except:
@@ -344,7 +337,7 @@ class EmailDigestNotification(EmailNotification):
           subject=subject,
           body=body,
           html=body)
-        print "SENDING A DIGEST"
+
         try:
           message.send()
         except:

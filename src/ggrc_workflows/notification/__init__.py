@@ -418,10 +418,13 @@ def handle_taskgroup_deleted(sender, obj=None, service=None):
 
 @Resource.model_posted.connect_via(models.Cycle)
 def handle_cycle_post(sender, obj=None, src=None, service=None):
-    subject="New cycle of workflow  " + obj.title + " begins today"
+    cycle = obj
+
+    subject="New cycle of workflow  " + cycle.title + " begins today"
     notify_custom_message=True
 
-    prepare_notification_for_cycle(obj, subject, " begins today", PRI_CYCLE, notify_custom_message)
+    prepare_notification_for_cycle(cycle, subject, " begins today", PRI_CYCLE, notify_custom_message)
+
     db.session.commit()
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
@@ -579,11 +582,14 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
   if workflow is None:
     current_app.logger.warn("Notification Trigger: Unable to find workflow for cycle")
     return
+
   workflow_owner=get_workflow_owner(workflow)
   if workflow_owner is None:
     current_app.logger.warn("Notification Trigger: Unable to find workflow owner for cycle")
     return
+
   override_flag=notify_on_change(workflow)
+
   empty_line="\n"
   email_contents={}
   email_digest_contents={}
@@ -655,7 +661,7 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
 
 def prepare_notification(src, notif_type, notif_pri, subject, content, owner, recipients, \
   override=False, notify_custom_message=None):
-  print "PREPARIVATING?"
+
   if notif_type == 'Email_Digest':
     emaildigest_notification = EmailDigestNotification()
     emaildigest_notification.notif_pri = notif_pri
@@ -847,7 +853,6 @@ class WorkflowCalendarService(CalendarService):
 def notify_email_digest():
   """ Preprocessing of tasks, cycles prior to generating email digest
   """
-  print "NOTIFY EMAIL DIGEST"
   handle_new_workflow_cycle_start()
   handle_tasks_overdue()
   handle_tasks_due(0)
