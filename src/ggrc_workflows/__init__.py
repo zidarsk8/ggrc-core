@@ -540,7 +540,7 @@ def calculate_min_start_date_and_max_end_date_for_workflow_from_basedate(workflo
         basedate, workflow.frequency, t.relative_end_month, t.relative_end_day)
       if min_start_date is None or start_date < min_start_date:
         min_start_date = start_date 
-      if max_end_date is None or end_date < max_end_date:
+      if max_end_date is None or end_date > max_end_date:
         max_end_date = end_date 
   return min_start_date, max_end_date 
   
@@ -565,10 +565,8 @@ def _get_or_create_personal_context(user):
   db.session.flush()
   return personal_context
 
-
 def _find_role(role_name):
   return db.session.query(Role).filter(Role.name == role_name).first()
-
 
 @Resource.model_posted.connect_via(models.WorkflowPerson)
 def handle_workflow_person_post(sender, obj=None, src=None, service=None):
@@ -584,7 +582,6 @@ def handle_workflow_person_post(sender, obj=None, src=None, service=None):
       modified_by=get_current_user(),
       )
   db.session.add(user_role)
-
 
 @Resource.model_posted.connect_via(models.Workflow)
 def handle_workflow_post(sender, obj=None, src=None, service=None):
@@ -677,7 +674,6 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
             workflow=obj,
             context=context))
 
-
 def add_public_workflow_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
       .filter(
@@ -694,11 +690,9 @@ def add_public_workflow_context_implication(context, check_exists=False):
     modified_by=get_current_user(),
     ))
 
-
 def init_extra_views(app):
   from . import views
   views.init_extra_views(app)
-
 
 def start_recurring_cycles():
   today = date.today()
@@ -736,14 +730,12 @@ def start_recurring_cycles():
   db.session.commit()
   db.session.flush()
 
-
 from ggrc_basic_permissions.contributed_roles import (
     RoleContributions, RoleDeclarations, DeclarativeRoleImplications
     )
 from ggrc_workflows.roles import (
     WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader
     )
-
 
 class WorkflowRoleContributions(RoleContributions):
   contributions = {
@@ -768,7 +760,6 @@ class WorkflowRoleContributions(RoleContributions):
         },
       }
 
-
 class WorkflowRoleDeclarations(RoleDeclarations):
   def roles(self):
     return {
@@ -777,7 +768,6 @@ class WorkflowRoleDeclarations(RoleDeclarations):
         'BasicWorkflowReader': BasicWorkflowReader,
         'WorkflowBasicReader': WorkflowBasicReader,
         }
-
 
 class WorkflowRoleImplications(DeclarativeRoleImplications):
   # (Source Context Type, Context Type)
@@ -797,6 +787,5 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
 ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
 ROLE_DECLARATIONS = WorkflowRoleDeclarations()
 ROLE_IMPLICATIONS = WorkflowRoleImplications()
-
 
 from ggrc_workflows.notification import notify_email_digest, notify_email_deferred
