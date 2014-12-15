@@ -23,22 +23,18 @@
       <div class="objective-selector">
           {{#using request=instance.request}}
           {{#using request_assignee=request.assignee}}
-            {{#if new_object_form}}
-              <input type="hidden" name="contact.id" value="{{request_assignee.id}}">
-            {{else}}
-              <input type="hidden" name="contact.id" value="{{contact.id}}">
-            {{/if}}
+
             {{#if_helpers "\
               #if_can_edit_request" instance "\
               and ^if_auditor" instance _1_include_admin=false "\
               or #is_allowed" "__GGRC_ADMIN__" instance }}
               <div class="objective-selector">
-                <input type="text" name="request_assignee.name" data-lookup="Person" data-params="Person:is_enabled=1" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty request_assignee.name request_assignee.email ''}}">
+                <input type="text" name="contact.name" data-lookup="Person" data-params="Person:is_enabled=1" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty contact.name contact.email ''}}">
               </div>
             {{else}}
               <p class="read-only oneline">
                 <i class="grcicon-person-green pull-left icon-field"></i>
-                {{{renderLive '/static/mustache/people/popover.mustache' person=request_assignee}}}
+                {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
               </p>
             {{/if_helpers}}
           {{/using}}
