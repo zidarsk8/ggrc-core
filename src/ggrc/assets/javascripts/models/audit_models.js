@@ -413,7 +413,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     }
 
     this.validateNonBlank("description");
-    this.validatePresenceOf("assignee");
+    this.validatePresenceOf("contact");
   }
   , create : "POST /api/responses"
   , update : "PUT /api/responses/{id}"
