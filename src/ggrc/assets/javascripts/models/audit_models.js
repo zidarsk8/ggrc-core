@@ -506,8 +506,8 @@ can.Model.Cacheable("CMS.Models.Response", {
 }, {
     display_name : function() {
       var desc = this.description
-        , max_len = 20;
-      out_name = desc;
+        , max_len = 20
+        , out_name = desc;
       // Truncate if greater than max_len chars
       if (desc.length > max_len) {
         out_name = desc.slice(0, max_len) + " ...";
