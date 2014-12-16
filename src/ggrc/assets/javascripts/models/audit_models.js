@@ -537,9 +537,13 @@ can.Model.Cacheable("CMS.Models.Response", {
   }
   , form_preload : function(new_object_form) {
     if(new_object_form && !this.contact) {
-        setTimeout(function(request) {
+        if (!this.request) {
+            this.bind("request", function (ev, request) {
+                this.attr('contact', request.reify().assignee);
+            });
+        }else{
             this.attr('contact', this.request.reify().assignee);
-        }.bind(this), 0);
+        };
     }
   }
 
