@@ -253,7 +253,7 @@ can.Model.Join("CMS.Models.UserRole", {
 }, {
   save: function() {
     var roles,
-        that = this
+        that = this,
         _super =  this._super;
     if(!this.role && this.role_name) {
       roles = can.map(

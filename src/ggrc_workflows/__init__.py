@@ -475,8 +475,6 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):
 
     obj.title = source_task_group.title + ' (copy ' + str(obj.id) + ')'
 
-  db.session.flush()
-
   ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
 
 

@@ -199,6 +199,7 @@
 
       return workflow.save().then(function(workflow) {
         GGRC.navigate(workflow.viewLink);
+        return this;
       });
 
     }
@@ -248,10 +249,7 @@
         clone_people: this.clone_people
       });
 
-      return task_group.save().then(function(task_group) {
-        GGRC.navigate(task_group.viewLink);
-      });
-
+      return task_group.save();
     }
   });
 
