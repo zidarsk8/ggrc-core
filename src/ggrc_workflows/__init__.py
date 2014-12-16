@@ -456,6 +456,22 @@ def handle_task_group_put(sender, obj=None, src=None, service=None):
 
 @Resource.model_posted.connect_via(models.TaskGroup)
 def handle_task_group_post(sender, obj=None, src=None, service=None):
+  source_task_group = None
+
+  if src.get('clone'):
+    source_task_group_id = src.get('clone')
+    source_task_group = models.TaskGroup.query.filter_by(
+        id=source_task_group_id
+        ).first()
+    source_task_group.copy(obj)
+
+    db.session.add(obj)
+    db.session.flush()
+
+    obj.title = source_task_group.title + ' (copy ' + str(obj.id) + ')'
+
+  db.session.flush()
+
   ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
 
 
