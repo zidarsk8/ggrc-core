@@ -181,10 +181,6 @@
       clone_objects: true
     }
   }, {
-    // form_preload: function(new_object_form) {
-    //   this.attr("clone_people", true);
-    //   this.attr("clone_tasks", true);
-    // },
     refresh: function() {
       return $.when(this);
     },
@@ -233,10 +229,6 @@
       clone_people: true
     }
   }, {
-    // form_preload: function(new_object_form) {
-    //   this.attr("clone_people", true);
-    //   this.attr("clone_tasks", true);
-    // },
     refresh: function() {
       return $.when(this);
     },
