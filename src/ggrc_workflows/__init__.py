@@ -463,7 +463,12 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):
     source_task_group = models.TaskGroup.query.filter_by(
         id=source_task_group_id
         ).first()
-    source_task_group.copy(obj)
+    source_task_group.copy(
+      obj,
+      clone_people=src.get('clone_people', False),
+      clone_tasks=src.get('clone_tasks', False),
+      clone_objects=src.get('clone_objects', False)
+    )
 
     db.session.add(obj)
     db.session.flush()

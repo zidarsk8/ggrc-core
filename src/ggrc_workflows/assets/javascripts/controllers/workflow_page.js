@@ -226,7 +226,8 @@
   can.Model.Cacheable("CMS.ModelHelpers.CloneTaskGroup", {
     defaults : {
       clone_objects: true,
-      clone_tasks: true
+      clone_tasks: true,
+      clone_people: true
     }
   }, {
     // form_preload: function(new_object_form) {
@@ -241,7 +242,8 @@
         clone: this.source_task_group.id,
         context: null,
         clone_objects: this.clone_objects,
-        clone_tasks: this.clone_tasks
+        clone_tasks: this.clone_tasks,
+        clone_people: this.clone_people
       });
 
       return task_group.save().then(function(task_group) {
