@@ -177,7 +177,8 @@
   can.Model.Cacheable("CMS.ModelHelpers.CloneWorkflow", {
     defaults : {
       clone_people: true,
-      clone_tasks: true
+      clone_tasks: true,
+      clone_objects: true
     }
   }, {
     // form_preload: function(new_object_form) {
@@ -192,7 +193,8 @@
         clone: this.source_workflow.id,
         context: null,
         clone_people: this.clone_people,
-        clone_tasks: this.clone_tasks
+        clone_tasks: this.clone_tasks,
+        clone_objects: this.clone_objects
       });
 
       return workflow.save().then(function(workflow) {

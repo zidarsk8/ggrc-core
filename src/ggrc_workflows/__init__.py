@@ -662,7 +662,8 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
     source_workflow.copy_task_groups(
       obj,
       clone_people=src.get('clone_people', False),
-      clone_tasks=src.get('clone_tasks', False)
+      clone_tasks=src.get('clone_tasks', False),
+      clone_objects=src.get('clone_objects', False)
       )
 
     if src.get('clone_people'):
