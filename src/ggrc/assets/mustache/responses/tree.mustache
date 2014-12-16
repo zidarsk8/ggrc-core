@@ -92,16 +92,17 @@
             {{#if_helpers '\
               #if' allow_mapping_or_creating '\
                 and #is_allowed' 'update' instance _1_context=instance.context.id '\
-                and #if_can_edit_request' parent_instance '\
                 and ^if_auditor' parent_instance '\
-              or #is_allowed' '__GGRC_ADMIN__' model.shortName _4_context=instance.context.id '\
+              or #is_allowed' '__GGRC_ADMIN__' model.shortName _3_context=instance.context.id '\
               and #if' allow_mapping_or_creating}}
+              {{#if_can_edit_request parent_instance}}
               <li>
                 <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Response" data-object-plural="responses" data-object-id="{{instance.id}}">
                   <i class="grcicon-edit"></i>
                   Edit Response
                 </a>
               </li>
+              {{/if_can_edit_request}}
             {{/if_helpers}}
           </ul>
         </div>

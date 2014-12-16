@@ -2167,8 +2167,8 @@ Mustache.registerHelper("if_auditor", function(instance, options){
 
 Mustache.registerHelper("if_can_edit_request", function(instance, options){
 
-    var instance, audit, auditors, accepted
-    , admin = Permission.is_allowed("__GGRC_ADMIN__");
+    var audit, auditors_dfd, accepted, prog_roles_dfd,
+        admin = Permission.is_allowed("__GGRC_ADMIN__");
 
     instance = resolve_computed(instance);
     instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
@@ -2183,8 +2183,21 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
 
     audit = audit.reify();
     auditors_dfd = audit.findAuditors();
+    prog_roles_dfd = new RefreshQueue()
+                     .enqueue(audit.attr("program").reify())
+                     .trigger().then(function(progs) {
+                       return progs[0].get_binding("program_authorizations").refresh_instances();
+                     }).then(function(user_role_bindings) {
+                        var rq = new RefreshQueue();
+                        can.each(user_role_bindings, function(urb) {
+                          if(urb.instance.person.id === GGRC.current_user.id) {
+                            rq.enqueue(urb.instance.role.reify());
+                          }
+                        });
+                        return rq.trigger();
+                     });
 
-    return defer_render("span", function(auditors) {
+    return defer_render("span", function(auditors, program_roles) {
       var accepted = instance.status === "Accepted"
         , update = Permission.is_allowed("update", instance)
         , map = Permission.is_allowed("mapping", instance)
@@ -2198,24 +2211,97 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
                           return auditor;
                         }
                     }).length > 0
-        , auditor_states = ["Draft", "Responded", "Amended Response"] // States in which an auditor can edit a request
+        , program_owner = can.reduce(program_roles, function(cur, role) { return cur || role.name === "ProgramOwner"; }, false)
+        , program_editor = can.reduce(program_roles, function(cur, role) { return cur || role.name === "ProgramEditor"; }, false)
         , assignee_states = ["Requested", "Amended Request"]
-        , can_auditor_edit = auditor && ~can.inArray(instance.attr("status"), auditor_states)
+        , program_editor_states = ["Requested", "Amended Request"]
         , can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.attr("status"), assignee_states)
+        , can_program_editor_edit = program_editor && ~can.inArray(instance.attr("status"), program_editor_states)
         ;
       //    instead of
       //    ^if' allow_mapping_or_creating '\
       //    or ^is_allowed' 'update' instance '\
       //    ' _1_context=instance.context.id
-      if(admin || can_auditor_edit || can_assignee_edit ||
-          (!accepted && (update || map || create))){
+      if(admin || can_assignee_edit || can_program_editor_edit ||
+          (!accepted && (update || map || create || program_owner || auditor || audit_lead))){
         return options.fn(options.contexts);
       }
       else{
         return options.inverse(options.contexts);
       }
-    }, auditors_dfd);
+    }, $.when(auditors_dfd, prog_roles_dfd));
 });
+
+
+Mustache.registerHelper("if_can_reassign_request", function(instance, options){
+
+    var audit, auditors_dfd, accepted, prog_roles_dfd,
+        admin = Permission.is_allowed("__GGRC_ADMIN__");
+
+    instance = resolve_computed(instance);
+    instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+
+    if(!instance)
+      return "";
+
+    audit = instance.attr("audit");
+
+    if(!audit)
+      return "";  //take no action until audit is available
+
+    audit = audit.reify();
+    auditors_dfd = audit.findAuditors();
+    prog_roles_dfd = new RefreshQueue()
+                     .enqueue(audit.attr("program").reify())
+                     .trigger().then(function(progs) {
+                       return progs[0].get_binding("program_authorizations").refresh_instances();
+                     }).then(function(user_role_bindings) {
+                        var rq = new RefreshQueue();
+                        can.each(user_role_bindings, function(urb) {
+                          if(urb.instance.person.id === GGRC.current_user.id) {
+                            rq.enqueue(urb.instance.role.reify());
+                          }
+                        });
+                        return rq.trigger();
+                     });
+
+    return defer_render("span", function(auditors, program_roles) {
+      var accepted = instance.status === "Accepted"
+        , update = Permission.is_allowed("update", instance)
+        , map = Permission.is_allowed("mapping", instance)
+        , create = Permission.is_allowed("creating", instance)
+        , assignee = !!instance.assignee && instance.assignee.id === GGRC.current_user.id
+        , audit_lead = !!audit.contact && audit.contact.id === GGRC.current_user.id
+        , auditor = can.map(
+                      auditors || [],
+                      function(auditor) {
+                        if(auditor.person.id === GGRC.current_user.id) {
+                          return auditor;
+                        }
+                    }).length > 0
+        , program_owner = can.reduce(program_roles, function(cur, role) { return cur || role.name === "ProgramOwner"; }, false)
+        , program_editor = can.reduce(program_roles, function(cur, role) { return cur || role.name === "ProgramEditor"; }, false)
+        , auditor_states = ["Responded", "Updated Response"] // States in which an auditor can edit a request
+        , assignee_states = ["Requested", "Amended Request", "Responded", "Updated Response"]
+        , program_editor_states = ["Requested", "Amended Request"]
+        , can_auditor_edit = auditor && ~can.inArray(instance.attr("status"), auditor_states)
+        , can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.attr("status"), assignee_states)
+        , can_program_editor_edit = program_editor && ~can.inArray(instance.attr("status"), program_editor_states)
+        ;
+      //    instead of
+      //    ^if' allow_mapping_or_creating '\
+      //    or ^is_allowed' 'update' instance '\
+      //    ' _1_context=instance.context.id
+      if(admin || can_auditor_edit || can_assignee_edit || can_program_editor_edit ||
+          (!accepted && (update || map || create || program_owner || audit_lead))){
+        return options.fn(options.contexts);
+      }
+      else{
+        return options.inverse(options.contexts);
+      }
+    }, $.when(auditors_dfd, prog_roles_dfd));
+});
+
 
 Mustache.registerHelper("strip_html_tags", function(str){
   return resolve_computed(str).replace(/<(?:.|\n)*?>/gm, '');
