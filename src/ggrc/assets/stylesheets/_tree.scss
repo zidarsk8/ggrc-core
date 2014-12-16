@@ -937,7 +937,7 @@ ul.new-tree {
     }
   }
   li.tree-item-add {
-    padding-left: 70px;
+    padding-left: 10px;
     line-height: 40px;
     background: $white;
     a {
@@ -947,8 +947,16 @@ ul.new-tree {
       padding-left: 0;
     }
     .inner-tree & {
-      padding-left: 37px;
+      padding-left: 0;
       line-height: 30px;
+      .btn {
+        margin: 5px 0;
+      }
+    }
+    .btn {
+      [class^="grcicon-"] {
+        margin-top: 1px;
+      }
     }
   }
   [class^="grcicon-"] {
@@ -1073,9 +1081,6 @@ ul.new-tree {
     .inner-tree {
       border-top: 1px solid $itemBorder;
       margin-left: 38px;
-      .status-label {
-        margin: 10px 5px 0 0;
-      }
       li.tree-item {
         @include scale(1);
         @include opacity(1);
@@ -1477,6 +1482,11 @@ ul.new-tree {
   position: relative;
   a {
     display: block;
+  }
+  &.pin {
+    margin-left: 10px;
+    width: 70px;
+    margin-top: 5px;
   }
   .dropdown-menu {
     @include reset-list();

@@ -903,7 +903,7 @@ function pinContent() {
       $win_height_part = $win_height / 3,
       $pin_max = $win_height_part * 2,
       $pin_default = $win_height_part,
-      $pin_min = 14;
+      $pin_min = 30;
 
   $info.css("height", $pin_default);
 

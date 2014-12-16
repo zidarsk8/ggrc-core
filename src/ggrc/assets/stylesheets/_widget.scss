@@ -8,7 +8,7 @@
 
 // widgets styles
 .widget {
-  margin-bottom: 100px;
+  margin-bottom: 115px;
   .tree-action-list {
     @include reset-list();
     @include clearfix();
@@ -1629,14 +1629,14 @@ ul.attr-list {
 .pin-content {
   position: fixed;
   bottom: 40px;
-  left: 20px;
-  right: 20px;
+  left: 12px;
+  right: 12px;
   background: $white;
   z-index: 9999;
   @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   .info {
     overflow: auto;
-    padding: 20px;
+    padding: 15px 20px 20px 20px;
   }
 }
 
@@ -1646,7 +1646,7 @@ ul.attr-list {
   margin-bottom: 20px;
   li {
     float: left;
-    margin-left: 10px;
+    margin-left: 5px;
     a {
       i {
         @include opacity(0.25);
@@ -1657,6 +1657,9 @@ ul.attr-list {
           @include opacity(1);
         }
       }
+    }
+    &:first-child {
+      margin-left: 0;
     }
   }
 }
