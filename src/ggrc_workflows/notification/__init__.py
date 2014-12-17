@@ -250,22 +250,31 @@ def handle_tasks_overdue():
     cycle=get_cycle(task)
     if cycle is None:
       continue
+
     if cycle.is_current != True:
       continue
+
     contact=get_task_contacts(task)
     if contact is None:
       continue
+
     workflow_owner=contact[0]
     assignee=contact[1]
     if not frequency_mapping.has_key(cycle.workflow.frequency):
       continue
+
     num_days=frequency_mapping[cycle.workflow.frequency]
     if task.end_date != (datetime.utcnow().date() + timedelta(num_days)):
       continue
+
     subject="One or more tasks assigned to you are due in "  + str(num_days) + " days"
+
     if not tasks_for_contact.has_key(assignee.id):
       tasks_for_contact[assignee.id]=[]
+
     tasks_for_contact[assignee.id].append((assignee, task, subject))
+
+  print tasks_for_contact
 
   email_contents={}
   for id, items in tasks_for_contact.items():
@@ -276,12 +285,16 @@ def handle_tasks_overdue():
       break
     for item in items:
       (assignee, task, subject)=item
+      due_in_days = (task.end_date-datetime.utcnow().date()).days
+
       task_object=get_task_object_string(task)
-      email_content=email_content+"<li>" + task.title + task_object + "</li>"
+      email_content += "<li>" + task.title + task_object + " in %d days</li>" % due_in_days
       email_digest_contents={}
       email_digest_contents[assignee.id]="<a href=" + '"'  + \
         request.url_root + "dashboard#task_widget"  + '"' + ">" + \
-        task.title + "</a>"
+        task.title + " in %d days</a>" % due_in_days
+      print "preparing notification for Task"
+      print task.title
       prepare_notification(assignee, 'Email_Digest', PRI_TASK_OVERDUE, subject, email_digest_contents, \
         assignee, [assignee], override=False)
     email_content=email_content + \

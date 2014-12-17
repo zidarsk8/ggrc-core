@@ -275,7 +275,9 @@ class EmailDigestNotification(EmailNotification):
 
   def notify_pending(self, pending_notifications):
     pending_notifications_by_date={}
+    print "PENDING NOTIFICATIONS"
     for notification in pending_notifications:
+      print "pending", notification
       notif_date=notification.notif_date.strftime('%Y/%m/%d')
       if not pending_notifications_by_date.has_key(notif_date):
         pending_notifications_by_date[notif_date]=[]
@@ -328,6 +330,9 @@ class EmailDigestNotification(EmailNotification):
           body=''.join([body, value, "</ul></p>"])
         content_for_recipients[recipient_id] = \
           "Hello {}<br>{}<p>Thanks,<br> gGRC Team</p>".format(recipient.name, body)
+
+      print "GONNA TRY SENDING"
+      print body
 
       for recipient_id, body in content_for_recipients.items():
         recipient=to[recipient_id]
