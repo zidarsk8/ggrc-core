@@ -278,6 +278,7 @@ def handle_tasks_overdue():
 
   email_contents={}
   for id, items in tasks_for_contact.items():
+    (assignee, task) = items[0]
     email_content="Hi " + assignee.name + ",<br>"  + "<p>Your tasks: <ul>"
 
     for item in items:
