@@ -23,6 +23,7 @@ from datetime import datetime
 from werkzeug.exceptions import Forbidden
 from ggrc.login import get_current_user
 from sqlalchemy import inspect
+from math import floor
 
 PRI_CYCLE=1
 PRI_TASK_OVERDUE=2
@@ -272,10 +273,8 @@ def handle_tasks_overdue():
 
     tasks_for_contact[assignee.id].append((assignee, task))
 
-  print tasks_for_contact
-
   soonest_due_days = sorted(tasks_for_contact.keys())[0]
-  subject = "Your tasks are due soon! First in %d days." % soonest_due_days
+  subject = "Your tasks are due soon! First %s." % humanize_due_days(soonest_due_days)
 
   email_contents={}
   for id, items in tasks_for_contact.items():
@@ -286,24 +285,21 @@ def handle_tasks_overdue():
       due_in_days = (task.end_date-datetime.utcnow().date()).days
 
       task_object = get_task_object_string(task)
-      email_content += "<li>" + task.title + task_object + " <i>[due in %d days]</i></li>" % due_in_days
+      email_content += "<li>" + task.title + task_object + " <i>[due %s]</i></li>" % humanize_due_days(due_in_days)
       email_digest_contents={}
       email_digest_contents[assignee.id]="<a href=" + '"'  + \
         request.url_root + "dashboard#task_widget"  + '"' + ">" + \
-        task.title + " <i>[due in %d days]</i></a>" % due_in_days
+        task.title + " <i>[due %s]</i></a>" % humanize_due_days(due_in_days)
 
       prepare_notification(assignee, 'Email_Digest', PRI_TASK_OVERDUE, subject, email_digest_contents, \
         assignee, [assignee], override=False)
 
     email_content=email_content + \
-     "</ul></p><p>" + "Are due soon. First in %d days!</p>" % soonest_due_days + \
+     "</ul></p><p>" + "Are due soon. First %s!</p>" % humanize_due_days(soonest_due_days) + \
      "<p>Click here to view your <a href=" + '"'  + \
      request.url_root + "dashboard#task_widget"  + '"' + ">" + \
      "<b>task(s)</b></a></p>" + \
      "Thanks,<br>gGRC Team"
-
-    print subject
-    print email_content
 
     prepare_notification_for_tasks_now(assignee, assignee, subject, email_content, PRI_TASK_OVERDUE)
 
@@ -362,6 +358,22 @@ def handle_tasks_due(num_days):
       "<b>task(s)</b></a></p>" + \
       "Thanks,<br>gGRC Team"
     prepare_notification_for_tasks_now(assignee, assignee, subject, email_content, PRI_TASK_DUE)
+
+def humanize_due_days(days):
+  """ returns a more human form of in X days"""
+  if days < 1:
+    return "today"
+  if days < 2:
+    return "tomorrow"
+  if days < 7:
+    return "in %d days" % days
+  if days == 7:
+    return "in a week"
+  if days < 30:
+    return "in %d weeks" % int(floor(days/7.0))
+  if days < 31:
+    return "in a month"
+  return "in %d months" % int(floor(days/30.0))
 
 def handle_tasks_completed_for_cycle():
   workflow_cycles=db.session.query(models.Cycle).\
