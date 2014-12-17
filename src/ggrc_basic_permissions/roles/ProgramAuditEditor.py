@@ -58,7 +58,7 @@ permissions = {
         {
             "terms": {
                 "property_name": "assignee",
-                "value": "$currentUser"
+                "value": "$current_user"
             },
             "type": "Request",
             "condition": "is"
