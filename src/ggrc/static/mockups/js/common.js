@@ -859,6 +859,19 @@ $(document).ready(function(){
 
   $(".title-trigger").on("click", slideRight);
 
+  $(".select").on("click", function(el) {
+    var $this = $(this),
+        $this_item = $this.closest(".tree-item"),
+        $all_items = $(".tree-item");
+
+    if($this_item.hasClass("active")) {
+      $all_items.removeClass("active");
+    } else {
+      $all_items.removeClass("active");
+      $this_item.addClass("active");
+    }
+  });
+
 });
 
 // Widget search active state
@@ -898,6 +911,7 @@ function pinContent() {
       $pin = $(".pin-content"),
       $pin_height = $pin.height(),
       $info = $(".pin-content").find(".info"),
+      $widget = $(".widget"),
       $window = $(window),
       $win_height = $window.height(),
       $win_height_part = $win_height / 3,
@@ -906,15 +920,18 @@ function pinContent() {
       $pin_min = 30;
 
   $info.css("height", $pin_default);
+  $widget.css("margin-bottom", $win_height_part + 80);
 
   $(".pin-action .max").on("click", function() {
     $info.animate({height: $pin_max}, options);
   });
   $(".pin-action .default").on("click", function() {
     $info.animate({height: $pin_default}, options);
+    $widget.css("margin-bottom", $win_height_part + 80);
   });
   $(".pin-action .min").on("click", function() {
     $info.animate({height: $pin_min}, options);
+    $widget.css("margin-bottom", 115);
   });
 }
 
