@@ -309,7 +309,7 @@ a {
   height: 8px;
   @include border-radius($default-border-radius);
   float: left;
-  margin: 9px 10px 0 4px;
+  margin: 9px 10px 0 10px;
   .entry-list & {
     margin: 5px 10px 0 4px;
   }
@@ -318,6 +318,12 @@ a {
     height: 4px;
     @include border-radius(2px);
     margin: 10px 8px 0 1px;
+  }
+  .inner-tree & {
+    margin: 10px 5px 0 10px;
+  }
+  .dashboard-tree & {
+    margin: 9px 10px 0 4px;
   }
 }
 
