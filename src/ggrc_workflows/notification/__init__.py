@@ -267,27 +267,25 @@ def handle_tasks_overdue():
     if task.end_date != (datetime.utcnow().date() + timedelta(num_days)):
       continue
 
-    subject="One or more tasks assigned to you are due in "  + str(num_days) + " days"
-
     if not tasks_for_contact.has_key(assignee.id):
       tasks_for_contact[assignee.id]=[]
 
-    tasks_for_contact[assignee.id].append((assignee, task, subject))
+    tasks_for_contact[assignee.id].append((assignee, task))
 
   print tasks_for_contact
 
+  soonest_due_days = sorted(tasks_for_contact.keys())[0]
+  subject = "Your tasks are due soon! First in %d days." % soonest_due_days
+
   email_contents={}
   for id, items in tasks_for_contact.items():
-    email_content=""
+    email_content="Hi " + assignee.name + ",<br>"  + "<p>Your tasks: <ul>"
+
     for item in items:
-      (assignee, task, subject)=item
-      email_content="Hi " + assignee.name + ",<br>"  + "<p>Your tasks: <ul>"
-      break
-    for item in items:
-      (assignee, task, subject)=item
+      (assignee, task)=item
       due_in_days = (task.end_date-datetime.utcnow().date()).days
 
-      task_object=get_task_object_string(task)
+      task_object = get_task_object_string(task)
       email_content += "<li>" + task.title + task_object + " <i>[due in %d days]</i></li>" % due_in_days
       email_digest_contents={}
       email_digest_contents[assignee.id]="<a href=" + '"'  + \
@@ -298,7 +296,7 @@ def handle_tasks_overdue():
         assignee, [assignee], override=False)
 
     email_content=email_content + \
-     "</ul></p><p>" + "Are due soon.</p>" + \
+     "</ul></p><p>" + "Are due soon. First in %d days!</p>" % soonest_due_days + \
      "<p>Click here to view your <a href=" + '"'  + \
      request.url_root + "dashboard#task_widget"  + '"' + ">" + \
      "<b>task(s)</b></a></p>" + \
