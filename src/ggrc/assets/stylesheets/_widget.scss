@@ -8,7 +8,9 @@
 
 // widgets styles
 .widget {
-  margin-bottom: 115px;
+  &.small-margin {
+    margin-bottom: 40px !important;
+  }
   .tree-action-list {
     @include reset-list();
     @include clearfix();
@@ -114,14 +116,11 @@
     }
     @include row-fluid-fix();
     &.tree-header {
-      padding: 0 12px 0 12px;
+      padding: 0 12px 0 70px;
       font-size: 11px;
       text-transform: uppercase;
       margin: -6px 0 4px 0;
       height: 20px;
-      .title-heading {
-        padding-left: 60px;
-      }
       .tree-action-list {
         [class^="grcicon-"] {
           margin-top: 1px;

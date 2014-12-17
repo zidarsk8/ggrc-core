@@ -9,6 +9,13 @@ ul.new-tree {
   @include reset-list();
   .openclose {
     cursor: pointer;
+    width: 60px;
+    float: left;
+    .dashboard & {
+      width: auto;
+      float: none;
+      clear: both;
+    }
     &.active {
       .tier-trigger {
         background: image-url('grcicons/open.png') no-repeat 20px center;
@@ -24,10 +31,9 @@ ul.new-tree {
       padding-left: 20px;
     }
   }
-  .task-item {
-    .item-data {
-      padding-left: 0;
-    }
+  .select {
+    overflow: hidden;
+    zoom: 1;
   }
   .tree-action-list {
     li {
@@ -35,6 +41,11 @@ ul.new-tree {
     }
     .counter {
       @include opacity(1);
+    }
+  }
+  .task-item {
+    .item-data {
+      padding-left: 0;
     }
   }
   &.request-list,
@@ -448,11 +459,16 @@ ul.new-tree {
     }
     > .item-main {
       background: $white;
-      > .openclose {
-        > .item-wrap {
+      > .item-wrap {
+        margin: 0 10px;
+        border-bottom: 1px solid $itemBorder;
+        .openclose,
+        .select {
           padding: 6px 0;
-          margin: 0 10px;
-          border-bottom: 1px solid $itemBorder;
+        }
+        .grcicon-arrow-right {
+          margin: 5px 0 0 4px;
+          @include opacity(0.25);
         }
       }
     }
@@ -461,18 +477,39 @@ ul.new-tree {
         border-bottom: none;
       }
       > .item-main {
+        > .item-wrap {
+          border-bottom: none;
+        }
+      }
+    }
+    .dashboard & {
+      > .item-main {
         > .openclose {
           > .item-wrap {
-            border-bottom: none;
+            padding: 6px 0;
+            margin: 0 10px;
+            border-bottom: 1px solid $itemBorder;
+          }
+        }
+      }
+      &:last-child {
+        > .item-wrap {
+          border-bottom: none;
+        }
+        > .item-main {
+          > .openclose {
+            > .item-wrap {
+              border-bottom: none;
+            }
           }
         }
       }
     }
     &.active {
       > .item-main {
-        > .openclose {
-          > .item-wrap {
-            background: $headerBgnd;
+        > .item-wrap {
+          background: $headerBgnd;
+          > .select {
             > .item-data {
               > .row-fluid {
                 > .span4 {
@@ -1062,9 +1099,16 @@ ul.new-tree {
         }
       }
       > .item-main {
-        > .openclose {
-          > .item-wrap {
-            border-color: transparent;
+        > .item-wrap {
+          border-color: transparent;
+        }
+      }
+      .dashboard & {
+        > .item-main {
+          > .openclose {
+            > .item-wrap {
+              border-color: transparent;
+            }
           }
         }
       }
@@ -1094,19 +1138,36 @@ ul.new-tree {
         }
         > .item-main {
           background: none;
-          > .openclose {
-            > .item-wrap {
-              margin: 0;
-              border-color: $itemBorder;
-            }
+          > .item-wrap {
+            margin: 0;
+            border-color: $itemBorder;
           }
         }
         &.item-open {
           margin-bottom: 20px;
           > .item-main {
+            > .item-wrap {
+              border-color: transparent;
+            }
+          }
+        }
+        .dashboard & {
+          > .item-main {
+            background: none;
             > .openclose {
               > .item-wrap {
-                border-color: transparent;
+                margin: 0;
+                border-color: $itemBorder;
+              }
+            }
+          }
+          &.item-open {
+            margin-bottom: 20px;
+            > .item-main {
+              > .openclose {
+                > .item-wrap {
+                  border-color: transparent;
+                }
               }
             }
           }
@@ -1144,9 +1205,19 @@ ul.new-tree {
         @include oneline();
       }
       > .item-main {
-        > .openclose {
-          > .item-wrap {
+        > .item-wrap {
+          .openclose,
+          .select {
             padding: 0;
+          }
+        }
+      }
+      .dashboard & {
+        > .item-main {
+          > .openclose {
+            > .item-wrap {
+              padding: 0;
+            }
           }
         }
       }
@@ -1332,7 +1403,7 @@ ul.new-tree {
     }
     &.title {
       font-size: 16px;
-      width: 90%;
+      width: 100%;
     }
     &.owner, &.code, &.state-value {
       line-height: 28px;
@@ -1349,11 +1420,6 @@ ul.new-tree {
         font-weight: bold;
       }
     }
-    .grcicon-arrow-right {
-      margin: 5px 9px 0 4px;
-      @include opacity(0.25);
-    }
-
     .event-action {
       font-size:13px;
       color:#777;
