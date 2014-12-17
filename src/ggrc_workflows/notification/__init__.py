@@ -288,21 +288,25 @@ def handle_tasks_overdue():
       due_in_days = (task.end_date-datetime.utcnow().date()).days
 
       task_object=get_task_object_string(task)
-      email_content += "<li>" + task.title + task_object + " in %d days</li>" % due_in_days
+      email_content += "<li>" + task.title + task_object + " <i>[due in %d days]</i></li>" % due_in_days
       email_digest_contents={}
       email_digest_contents[assignee.id]="<a href=" + '"'  + \
         request.url_root + "dashboard#task_widget"  + '"' + ">" + \
-        task.title + " in %d days</a>" % due_in_days
-      print "preparing notification for Task"
-      print task.title
+        task.title + " <i>[due in %d days]</i></a>" % due_in_days
+
       prepare_notification(assignee, 'Email_Digest', PRI_TASK_OVERDUE, subject, email_digest_contents, \
         assignee, [assignee], override=False)
+
     email_content=email_content + \
-     "</ul></p><p>" + "Are due in " + str(num_days) + " days.</p>" + \
+     "</ul></p><p>" + "Are due soon.</p>" + \
      "<p>Click here to view your <a href=" + '"'  + \
      request.url_root + "dashboard#task_widget"  + '"' + ">" + \
      "<b>task(s)</b></a></p>" + \
      "Thanks,<br>gGRC Team"
+
+    print subject
+    print email_content
+
     prepare_notification_for_tasks_now(assignee, assignee, subject, email_content, PRI_TASK_OVERDUE)
 
 def handle_tasks_due(num_days):
