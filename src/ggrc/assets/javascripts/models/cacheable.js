@@ -377,7 +377,7 @@ can.Model("can.Model.Cacheable", {
         });
         delete obj._pending_joins;
         return $.when.apply($, dfds).then(function() {
-          return obj;
+          return obj.refresh();
         });
       });
     } else {
