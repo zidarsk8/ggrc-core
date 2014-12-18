@@ -104,6 +104,8 @@ class GDriveRoleContributions(RoleContributions):
         },
       'ProgramAuditReader': {
         'read': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+        'create': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+        'delete': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
         },
       'ProgramOwner': {
         'read': ['ObjectFolder'],

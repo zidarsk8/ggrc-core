@@ -23,10 +23,53 @@ permissions = {
         "UserRole",
         "Context",
     ],
-    "create": [],
+    "create": [
+        "DocumentationResponse",
+        "InterviewResponse",
+        "Response",
+        "ObjectControl",
+        "ObjectDocument",
+        "ObjectObjective",
+        "ObjectPerson",
+        "ObjectSection",
+        "Relationship",
+        "Document"     
+    ],
     "view_object_page": [
         "__GGRC_ALL__"
     ],
-    "update": [],
-    "delete": []
+    "update": [
+        {
+            "terms": {
+                "property_name": "assignee",
+                "value": "$current_user"
+            },
+            "type": "Request",
+            "condition": "is"
+        },
+        {
+            "terms": {
+                "property_name": "contact",
+                "value": "$current_user"
+            },
+            "type": "DocumentationResponse",
+            "condition": "is"
+        },
+        {
+            "terms": {
+                "property_name": "contact",
+                "value": "$current_user"
+            },
+            "type": "InterviewResponse",
+            "condition": "is"
+        },
+    ],
+    "delete": [
+        "ObjectControl",
+        "ObjectDocument",
+        "ObjectObjective",
+        "ObjectPerson",
+        "ObjectSection",
+        "Relationship"
+    ]
 }

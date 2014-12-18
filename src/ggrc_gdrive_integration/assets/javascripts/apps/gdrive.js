@@ -15,7 +15,8 @@
       _canonical : {
         folders : "GDriveFolder"
       },
-      folders : new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder")
+      object_folders: new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable", "object_folders"),
+      folders: new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder")
     },
 
     fileable : {
