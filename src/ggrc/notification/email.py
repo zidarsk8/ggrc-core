@@ -275,6 +275,7 @@ class EmailDigestNotification(EmailNotification):
 
   def notify_pending(self, pending_notifications):
     pending_notifications_by_date={}
+
     for notification in pending_notifications:
       notif_date=notification.notif_date.strftime('%Y/%m/%d')
       if not pending_notifications_by_date.has_key(notif_date):
