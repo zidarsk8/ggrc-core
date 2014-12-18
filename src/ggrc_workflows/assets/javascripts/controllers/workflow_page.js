@@ -177,13 +177,10 @@
   can.Model.Cacheable("CMS.ModelHelpers.CloneWorkflow", {
     defaults : {
       clone_people: true,
-      clone_tasks: true
+      clone_tasks: true,
+      clone_objects: true
     }
   }, {
-    // form_preload: function(new_object_form) {
-    //   this.attr("clone_people", true);
-    //   this.attr("clone_tasks", true);
-    // },
     refresh: function() {
       return $.when(this);
     },
@@ -192,11 +189,13 @@
         clone: this.source_workflow.id,
         context: null,
         clone_people: this.clone_people,
-        clone_tasks: this.clone_tasks
+        clone_tasks: this.clone_tasks,
+        clone_objects: this.clone_objects
       });
 
       return workflow.save().then(function(workflow) {
         GGRC.navigate(workflow.viewLink);
+        return this;
       });
 
     }
@@ -216,6 +215,50 @@
           model: CMS.ModelHelpers.CloneWorkflow,
           instance: new CMS.ModelHelpers.CloneWorkflow({ source_workflow: this.scope.workflow }),
           content_view: GGRC.mustache_path + "/workflows/clone_modal_content.mustache",
+          custom_save_button_text: "Proceed",
+          button_view: GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
+        });
+      }
+    }
+  });
+
+  can.Model.Cacheable("CMS.ModelHelpers.CloneTaskGroup", {
+    defaults : {
+      clone_objects: true,
+      clone_tasks: true,
+      clone_people: true
+    }
+  }, {
+    refresh: function() {
+      return $.when(this);
+    },
+    save: function() {
+      var task_group = new CMS.Models.TaskGroup({
+        clone: this.source_task_group.id,
+        context: null,
+        clone_objects: this.clone_objects,
+        clone_tasks: this.clone_tasks,
+        clone_people: this.clone_people
+      });
+
+      return task_group.save();
+    }
+  });
+
+  can.Component.extend({
+    tag: "task-group-clone",
+    template: "<content/>",
+    events: {
+      click: function(el) {
+        var task_group, $target;
+
+        $target = $('<div class="modal hide"></div>').uniqueId();
+        $target.modal_form({}, el);
+        $target.ggrc_controllers_modals({
+          modal_title: "Clone Task Group",
+          model: CMS.ModelHelpers.CloneTaskGroup,
+          instance: new CMS.ModelHelpers.CloneTaskGroup({ source_task_group: this.scope.taskGroup }),
+          content_view: GGRC.mustache_path + "/task_groups/clone_modal_content.mustache",
           custom_save_button_text: "Proceed",
           button_view: GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
         });

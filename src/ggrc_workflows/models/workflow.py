@@ -101,12 +101,15 @@ class Workflow(
         workflow=target,
         context=target.context,
         clone_people=kwargs.get("clone_people", False),
+        clone_objects=kwargs.get("clone_objects", False),
         modified_by=get_current_user(),
         )
       target.task_groups.append(obj)
 
       if(kwargs.get("clone_tasks", False)):
-        task_group.copy_tasks(obj, clone_people=kwargs.get("clone_people", False))
+        task_group.copy_tasks(obj,
+                              clone_people=kwargs.get("clone_people", False),
+                              clone_objects=kwargs.get("clone_objects", True))
 
     return target
 
