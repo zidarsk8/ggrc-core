@@ -140,19 +140,11 @@ can.Control("GGRC.Controllers.Modals", {
       }
       else {
         path = path.join(".");
+        // we (ab)use databinding to make the input field change for us
+        // doing it three times like this ensures stability
+        this.options.instance.attr(path, null);
         this.options.instance.attr(path, ui.item.stub());
-        // Make sure person name/email gets written to the input field
-        setTimeout(function(){
-          el.val(ui.item.title || ui.item.name || ui.item.email);
-          instance._transient || instance.attr("_transient", new can.Observe({}));
-          can.reduce(path.split("."), function(current, next) {
-            current = current + "." + next;
-            instance.attr(current) || instance.attr(current, new can.Observe({}));
-            return current;
-          }, "_transient");
-          instance.attr("_transient." + path, ui.item[prop]);
-          el.blur();
-        }, 50);
+        this.options.instance.attr(path, ui.item.stub());
       }
   }
 
