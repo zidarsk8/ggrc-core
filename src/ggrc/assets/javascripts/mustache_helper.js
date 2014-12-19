@@ -2249,6 +2249,18 @@ Mustache.registerHelper("strip_html_tags", function (str) {
   return resolve_computed(str).replace(/<(?:.|\n)*?>/gm, '');
 });
 
+Mustache.registerHelper("truncate", function (str, len) {
+  str = resolve_computed(str);
+
+  if (str.length > len) {
+    str = str.substr(0, len)
+          .substr(0, this.lastIndexOf(' '));
+    str += "&hellip;";
+  }
+
+  return str;
+});
+
 Mustache.registerHelper("switch", function (value, options) {
   var frame = new can.Observe({});
   value = resolve_computed(value);
