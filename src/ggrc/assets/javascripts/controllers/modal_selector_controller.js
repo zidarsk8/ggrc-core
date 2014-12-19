@@ -1932,7 +1932,7 @@
 
       var that = this,
         joins = can.map(this.sync_selected_options(), function(option) {
-          var join, context_object, model, descriptor
+          var join, context_object, model, descriptor,
               context_id = null
               ;
 
