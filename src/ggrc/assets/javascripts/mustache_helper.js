@@ -2250,6 +2250,7 @@ Mustache.registerHelper("strip_html_tags", function (str) {
 });
 
 Mustache.registerHelper("truncate", function (len, str) {
+  // find a good source
   str = can.makeArray(arguments).reduce(function (res, arg, i) {
       var s = resolve_computed(arg);
       if (typeof s === "string") {
@@ -2259,11 +2260,18 @@ Mustache.registerHelper("truncate", function (len, str) {
       }
   }, "");
 
-  if (str.length > len) {
-    str = str.substr(0, len);
-    str = str.substr(0, str.lastIndexOf(' '));
-    str += "&hellip;";
+  if (typeof len === "number") {
+      // max len characters
+      if (str.length > len) {
+          str = str.substr(0, len);
+          str = str.substr(0, str.lastIndexOf(' '));
+      }
+  }else{
+      // first line of input
+      str = str.split(/<br*>|\n/gm)[0];
   }
+  
+  str += " &hellip;";
 
   return str;
 });
