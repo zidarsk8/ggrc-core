@@ -2249,12 +2249,19 @@ Mustache.registerHelper("strip_html_tags", function (str) {
   return resolve_computed(str).replace(/<(?:.|\n)*?>/gm, '');
 });
 
-Mustache.registerHelper("truncate", function (str, len) {
-  str = resolve_computed(str);
+Mustache.registerHelper("truncate", function (len, str) {
+  str = can.makeArray(arguments).reduce(function (res, arg, i) {
+      var s = resolve_computed(arg);
+      if (typeof s === "string") {
+          return s;
+      }else{
+          return res;
+      }
+  }, "");
 
   if (str.length > len) {
-    str = str.substr(0, len)
-          .substr(0, this.lastIndexOf(' '));
+    str = str.substr(0, len);
+    str = str.substr(0, str.lastIndexOf(' '));
     str += "&hellip;";
   }
 
