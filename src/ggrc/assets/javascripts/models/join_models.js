@@ -21,12 +21,16 @@ can.Model.Cacheable("can.Model.Join", {
 
         can.each(instance.constructor.join_keys, function(cls, key) {
           var obj;
-          if (instance[key].reify && instance[key].reify().refresh)
-            obj = instance[key].reify();
-          else
-            obj = cls.findInCacheById(instance[key].id);
-          if (obj)
+          if (instance[key]) {
+            if(instance[key].reify && instance[key].reify().refresh) {
+              obj = instance[key].reify();
+            } else {
+              obj = cls.findInCacheById(instance[key].id);
+            }
+          }
+          if (obj) {
             obj.refresh();
+          }
         });
       }
     }
