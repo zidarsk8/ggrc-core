@@ -2264,13 +2264,16 @@ Mustache.registerHelper("truncate", function (len, str) {
       // max len characters
       if (str.length > len) {
           str = str.substr(0, str.lastIndexOf(len, ' '));
+          str += " &hellip;";
       }
   }else{
       // first line of input
-      str = str.split(/<br*>|\n/gm)[0];
+      var strs = str.split(/<br*>|\n/gm);
+      if (strs.length > 1) {
+          str = strs[0];
+          str += " &hellip;";
+      }
   }
-  
-  str += " &hellip;";
 
   return str;
 });
