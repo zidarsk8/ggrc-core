@@ -2263,8 +2263,7 @@ Mustache.registerHelper("truncate", function (len, str) {
   if (typeof len === "number") {
       // max len characters
       if (str.length > len) {
-          str = str.substr(0, len);
-          str = str.substr(0, str.lastIndexOf(' '));
+          str = str.substr(0, str.lastIndexOf(len, ' '));
       }
   }else{
       // first line of input
