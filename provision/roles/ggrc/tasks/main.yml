@@ -45,6 +45,14 @@
     name: "{{ item.name }}"
     state: present
 
+- name: change root password
+  sudo: yes
+  mysql_user:
+    name: root
+    password: root
+    priv: "*.*:ALL"
+    state: present
+
 - name: configure bash
   sudo: yes
   template:
