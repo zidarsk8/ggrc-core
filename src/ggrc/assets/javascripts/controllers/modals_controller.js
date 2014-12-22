@@ -296,14 +296,17 @@ can.Control("GGRC.Controllers.Modals", {
   , "input:not(isolate-form input), textarea:not(isolate-form textarea), select:not(isolate-form select) change" : function(el, ev) {
       this.options.instance.removeAttr("_suppress_errors");
       // Set the value if it isn't a search field
-      if(!el.hasClass("search-icon")){
+      if(!el.hasClass("search-icon")
+        || el.is("[null-if-empty]")
+           && (!el.val() || el.val().length === 0)
+      ) {
         this.set_value_from_element(el);
       }
   }
 
   , "input:not([data-lookup], isolate-form *), textarea keyup" : function(el, ev) {
-      if (el.prop('value').length == 0 ||
-        (typeof el.attr('value') !== 'undefined' && el.attr('value').length == 0)) {
+      if (el.prop('value').length === 0 ||
+        (typeof el.attr('value') !== 'undefined' && el.attr('value').length === 0)) {
         this.set_value_from_element(el);
       }
   }
@@ -320,7 +323,7 @@ can.Control("GGRC.Controllers.Modals", {
       var $el = $(el)
         , name = $el.attr('name')
         , value = $el.val()
-        , that = this;
+        , that = this
         ;
 
       // If no model is specified, short circuit setting values
@@ -450,12 +453,18 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "{$footer} a.btn[data-toggle='modal-submit-addmore'] click" : function(el, ev){
+    if (el.hasClass('disabled')) {
+      return;
+    }
     this.options.attr("add_more", true);
     this.save_ui_status();
     this.triggerSave(el, ev);
   }
 
   , "{$footer} a.btn[data-toggle='modal-submit'] click" : function(el, ev){
+    if (el.hasClass('disabled')) {
+      return;
+    }
     this.options.attr("add_more", false);
     this.triggerSave(el, ev);
   }
@@ -489,9 +498,8 @@ can.Control("GGRC.Controllers.Modals", {
         }
       };
 
-      $hideButton.fadeOut(500);
-      $showButton.delay(499).fadeIn(500);
-
+      $hideButton.hide();
+      $showButton.show();
       return false;
   }
 
@@ -519,8 +527,8 @@ can.Control("GGRC.Controllers.Modals", {
       }
     }
 
-    el.fadeOut(500);
-    $showButton.delay(499).fadeIn(500);
+    el.hide();
+    $showButton.show();
     return false;
   }
 
@@ -544,13 +552,10 @@ can.Control("GGRC.Controllers.Modals", {
 
     var $hideButton = $(this.element).find('#formHide');
     this.options.reset_visible = false;
-    //$(this.element).find(".hidden").show();
-    //$(this.element).find('.inner-hide').parent('.hidable').show();
-    //$(this.element).find('.inner-hide').show();
     $(this.element).find(".hidden").removeClass("hidden");
     $(this.element).find('.inner-hide').removeClass('inner-hidable');
-    el.fadeOut(500);
-    $hideButton.delay(499).fadeIn(500);
+    el.hide();
+    $hideButton.show();
     return false
   }
 
@@ -561,7 +566,10 @@ can.Control("GGRC.Controllers.Modals", {
     //select the element with tab index and hide it
 
     if(this.options.reset_visible){//some elements are hidden
-      var $selected, str, tabindex;
+      var $selected,
+          str,
+          tabindex,
+          $form = $(this.element).find('form');;
 
       for (var i = 0; i < this.options.ui_array.length; i++){
         if(this.options.ui_array[i] == 1){
@@ -578,13 +586,33 @@ can.Control("GGRC.Controllers.Modals", {
         var $hideButton = $selected.closest('.modal-body').find('#formHide'),
           $showButton = $selected.closest('.modal-body').find('#formRestore');
 
-        $hideButton.fadeOut(500);
-        $showButton.delay(499).fadeIn(500);
+        $hideButton.hide();
+        $showButton.show();
       }
       return false;
     }
 
   }
+  //make buttons non-clickable when saving, make it disable afterwards
+  ,  bindXHRToButton_disable : function(xhr, el, newtext, disable) {
+      // binding of an ajax to a click is something we do manually
+      var $el = $(el),
+          oldtext = $el.text();
+
+      if (newtext) {
+        $el[0].innerHTML = newtext;
+      }
+      $el.addClass("disabled pending-ajax");
+      if (disable !== false) {
+        $el.attr("disabled", true);
+      }
+      xhr.always(function() {
+        // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
+        if ($el.length) {
+          $el.removeAttr("disabled").removeClass("pending-ajax")[0].innerHTML = oldtext;
+        }
+      });
+    }
 
   //make buttons non-clickable when saving
   , bindXHRToBackdrop : function(xhr, el, newtext, disable) {
@@ -610,25 +638,26 @@ can.Control("GGRC.Controllers.Modals", {
     }
 
   , triggerSave : function(el, ev) {
-    var ajd;
+    var ajd,
+        save_close_btn = this.element.find("a.btn[data-toggle=modal-submit]"),
+        save_addmore_btn = this.element.find("a.btn[data-toggle=modal-submit-addmore]"),
+        modal_backdrop = this.element.data("modal_form").$backdrop;
     // Normal saving process
     if (el.is(':not(.disabled)')) {
       ajd = this.save_instance(el, ev);
+
       if(this.options.add_more) {
         if(ajd) {
-          var save_close_btn = $(this.element).find("a.btn[data-toggle=modal-submit]");
-          var save_addmore_btn = $(this.element).find("a.btn[data-toggle=modal-submit-addmore]");
-          var modal_backdrop = this.element.data("modal_form").$backdrop;
-
-          $(save_addmore_btn).addClass("disabled pending-ajax");
-          $(save_close_btn).addClass("disabled pending-ajax");
+          this.bindXHRToButton_disable(ajd, save_close_btn);
+          this.bindXHRToButton_disable(ajd, save_addmore_btn);
 
           this.bindXHRToBackdrop(ajd, modal_backdrop, "Saving, please wait...");
         }
       }
       else {
         if(ajd) {
-          this.bindXHRToButton(ajd, el, "Saving, please wait...");
+          this.bindXHRToButton(ajd, save_close_btn, "Saving, please wait...");
+          this.bindXHRToButton(ajd, save_addmore_btn);
         }
       }
 
@@ -665,15 +694,18 @@ can.Control("GGRC.Controllers.Modals", {
         that.options.instance._transient || that.options.instance.attr("_transient", new can.Observe({}));
         that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
       })
+      .then(this.proxy("apply_object_params"))
+      .then(this.proxy("serialize_form"))
       .then(that.proxy("autocomplete"));
 
     this.restore_ui_status();
   }
 
   , "save_instance" : function(el, ev) {
-      var that = this
-      , instance = this.options.instance
-      , ajd;
+      var that = this,
+        instance = this.options.instance,
+        ajd,
+        instance_id = instance.id;
 
 
       if(instance.errors()) {
@@ -713,6 +745,19 @@ can.Control("GGRC.Controllers.Modals", {
             finish();
           });
         } else {
+          var type = obj.type ? can.spaceCamelCase(obj.type) : '', 
+              name = obj.title ? obj.title : '',
+              msg;
+          if(instance_id === undefined) { //new element
+            if (name) {
+                msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+            }else{
+                msg = "New " + type + " added successfully.";
+            }
+          } else {
+            msg = "<span class='user-string'>" + name + "</span>" + " modified successfully.";
+          }
+          $(document.body).trigger("ajax:flash", { success : msg });
           finish();
         }
       }).fail(function(xhr, status) {
@@ -752,7 +797,9 @@ can.Control("GGRC.Controllers.Modals", {
         ev.preventDefault();
         return false;
       }
-      delete this.options.instance._pending_joins;
+      if (this.options.instance) {
+        delete this.options.instance._pending_joins;
+      }
       if (this.options.instance instanceof can.Model
           // Ensure that this modal was hidden and not a child modal
           && ev.target === this.element[0]
@@ -980,7 +1027,7 @@ can.Component.extend({
       ev.stopPropagation();
 
       can.each(data.arr || [data], function(obj) {
-      
+
         if (that.scope.deferred) {
           that.scope.changes.push({ what: obj, how: "add" });
         } else {
@@ -1035,7 +1082,5 @@ can.Component.extend({
   },
 });
 
-
-
-
 })(window.can, window.can.$);
+

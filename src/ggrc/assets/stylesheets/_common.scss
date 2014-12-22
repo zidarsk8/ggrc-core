@@ -126,18 +126,21 @@ p {
 
 a {
   color: $blue;
+  text-decoration: none;
   &:hover {
     color: $blue;
+    text-decoration: underline;
+  }
+  &.icon-link {
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
 // helpers
 .centered {
   text-align: center;
-}
-
-.right {
-  text-align: right;
 }
 
 .no-results {
@@ -1180,6 +1183,11 @@ p {
   }
 }
 
+.border-l {
+  padding-bottom: 5px;
+  border-bottom: 1px solid $infoMessageBorder;
+}
+
 .hidden-widgets-list {
   .dropdown-menu {
     width: 320px;
@@ -1222,5 +1230,16 @@ p {
     li {
       margin-bottom: 20px;
     }
+  }
+}
+
+.user-string {
+  font-weight: bold;
+  background: $lightGray;
+  display: inline-block;
+  padding: 0 2px 2px 2px;
+  .flash & {
+    background: transparent;
+    color: $black;
   }
 }

@@ -1175,7 +1175,6 @@
 
         binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
           if (binding._refresh_stubs_deferred && binding._refresh_stubs_deferred.state() !== "pending") {
-            binding.list.splice(0, binding.list.length);
             self._refresh_stubs(binding);
           }
         });

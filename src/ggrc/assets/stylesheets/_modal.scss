@@ -66,6 +66,7 @@
   &.modal-wide {
     width:960px;
     margin-left:-480px;
+    left: 50% !important;
   }
   &.modal-selector {
     .content {
@@ -653,6 +654,9 @@
         margin-bottom: 0;
         input {
           margin-top: 2px;
+        }
+        i {
+          margin: 6px 0 0 0;
         }
       }
       .required {

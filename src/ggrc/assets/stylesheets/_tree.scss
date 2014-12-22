@@ -714,6 +714,9 @@ ul.new-tree {
       padding: 1px 1px 0px 1px;
       background: $white;
       border-bottom: none !important;
+      &.tree-item-add {
+        border-bottom: 1px solid #ddd !important;
+      }
       > .item-main {
         &:hover {
           .row-fluid {
@@ -1018,7 +1021,7 @@ ul.new-tree {
   .view-more-paging {
     line-height: 31px;
     min-height: 31px;
-    padding-right: 20px;
+    margin-right: 20px;
     font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;

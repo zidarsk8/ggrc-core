@@ -1186,3 +1186,12 @@ label {
 input[type="radio"].my-work {
   margin-top: -4px;
 }
+
+// Widgetsearch active state
+.widgetsearch {
+  &.active {
+    background-color: #dcedc8;
+    border: 1px solid #8bc34a;
+    background-position: -340px -3px !important;
+  }
+}

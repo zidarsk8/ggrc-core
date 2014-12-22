@@ -183,7 +183,7 @@
                 self.option_list.replace([]);
                 self.option_list.push.apply(self.option_list, options);
                 self._start_pager(options, 20, active_fn, draw_fn);
-                $('.advancedSearchButton').removeAttr('disabled');
+                self.element.find('.advancedSearchButton').removeAttr('disabled');
               }
             });
         }
@@ -202,7 +202,7 @@
               self.option_list.replace([]);
               self.option_list.push.apply(self.option_list, options);
               self._start_pager(options, 20, active_fn, draw_fn);
-              $('.advancedSearchButton').removeAttr('disabled');
+              self.element.find('.advancedSearchButton').removeAttr('disabled');
             }
           });
     }
@@ -224,14 +224,14 @@
     }
 
     , triggerSearch: function(){
-      $('.advancedSearchButton').attr('disabled','disabled');
+      this.element.find('.advancedSearchButton').attr('disabled','disabled');
       
       // Remove Search Criteria text
-      $('.results-wrap span.info').hide();
+      this.element.find('.results-wrap span.info').hide();
       var ctx = this.context;
 
       //Get the selected object value
-      var selected = $("select.option-type-selector").val(),
+      var selected = this.element.find("select.option-type-selector").val(),
         self = this,
         loader,
         term = ctx.option_search_term || "",
@@ -243,6 +243,7 @@
       ctx.filter_list.each(function(filter_obj) {
         if(cancel_filter || !filter_obj.search_filter) {
           cancel_filter = true;
+          self.element.find('.advancedSearchButton').removeAttr('disabled');
           return;
         }
         //All Object
@@ -273,6 +274,7 @@
       });
       if(cancel_filter) {
         //missing search term.
+        this.element.find('.advancedSearchButton').removeAttr('disabled');
         return;
       }
 
@@ -325,7 +327,7 @@
             self.insert_options(options);
           };
           self.option_list.push.apply(self.option_list, options);
-          $('.advancedSearchButton').removeAttr('disabled');
+          self.element.find('.advancedSearchButton').removeAttr('disabled');
           self._start_pager(can.map(options, function(op) {
               return op.instance;
             }), 20, active_fn, draw_fn);

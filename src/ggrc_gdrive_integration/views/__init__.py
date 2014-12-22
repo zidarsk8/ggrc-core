@@ -5,7 +5,7 @@
 
 
 import json
-from flask import render_template, request, flash
+from flask import render_template, request, flash, redirect
 from ggrc.views import base_context
 
 
@@ -33,13 +33,7 @@ def post_import_requests():
   count = unicode(len(json.loads(request.args.get('ids', '[]'))))
   flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
   return_to = unicode(request.args.get('return_to', u'/dashboard'))
-
-  return render_template(
-    "programs/post_import_requests.haml",
-    audit_id=request.args.get('audit_id', ''),
-    created_updated_request_ids=request.args.get("ids", "[]")
-  )
-
+  return redirect(return_to)
 
 def init_extra_views(app):
   from ggrc.login import login_required

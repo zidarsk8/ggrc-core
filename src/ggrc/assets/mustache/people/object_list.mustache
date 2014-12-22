@@ -154,6 +154,12 @@
   {{/each}}
 
   <li class="tree-footer tree-item tree-item-add">
+    {{#if has_prev_page}}
+    <a href="javascript://" class="view-more-paging">
+      Previous Page
+    </a>
+    {{/if}}
+
     <a class="btn-add" data-object-plural="people" data-modal-class="modal-wide" href="javascript://" data-object-singular="Person" data-toggle="modal-ajax-form" data-modal-reset="reset">
       Add Person
     </a>
@@ -161,11 +167,6 @@
     {{#if has_next_page}}
     <a href="javascript://" class="pull-right view-more-paging" data-next="true">
       Next Page
-    </a>
-    {{/if}}
-    {{#if has_prev_page}}
-    <a href="javascript://" class="pull-right view-more-paging">
-      Previous Page
     </a>
     {{/if}}
   </li>

@@ -27,6 +27,13 @@ environment:
    * - `librarian-chef (ruby gem) <http://rubygems.org/gems/librarian-chef>`_
      - `Opscode Chef <http://www.opscode.com/chef/>`_ cookbook manager.
 
+Windows installation
+--------------------
+Download and install VirtualBox, Vagrant, `Ruby and DevKit <http://rubyinstaller.org/downloads/>`_ (choose Ruby 1.9.3).
+Unpack the DevKit into ``c:\ruby193\devkit``, ``cd`` there, and run ``ruby dk.rb init`` and ``ruby dk.rb install``.
+For problems, see the `DevKit guide <https://github.com/oneclick/rubyinstaller/wiki/Development-Kit>`_.
+Then, run ``gem install librarian``, and ``gem install librarian-chef``.
+
 Quick Start
 ===========
 

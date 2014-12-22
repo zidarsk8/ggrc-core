@@ -177,6 +177,9 @@
           </ul>
         </div>
         {{/child_options.1}}
+        <div class="doc-folder">
+          {{{render_hooks 'DocumentationResponse.tree_evidence'}}}
+        </div>
         {{/if_equals}}
         </div>
         <div class="row-fluid">
@@ -190,63 +193,6 @@
         {{/if_equals}}
         </div>
         <div class="row-fluid">
-        {{#if_equals instance.response_type 'population sample'}}
-        <div class="tier-2-info-content population-content" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
-          <ul class="population-upload">
-            <li>
-              <div class="row-fluid">
-                <div class="span8 evidence">
-                  <label class="auto-save">Population worksheet {{#instance.population_worksheet.saved}}<span class="success" {{fadein}} {{fadeout 3000 instance.population_worksheet.saved}}>Saved</span>{{/instance.population_worksheet.saved}}</label>
-                  <div class="row-fluid">
-                  {{#using population_worksheet=instance.population_worksheet}}
-                    <div class="span9">
-                      <input type="text" name="population_worksheet.name" data-lookup="PopulationWorksheet" data-drop="link" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty population_worksheet.name population_worksheet.link ''}}">
-                    </div>
-                  {{/using}}
-                  </div>
-                </div>
-                <div class="span4">
-                  <label>Population #</label>
-                  <input type="text" name="population_count" class="input-block-level" placeholder="example: 1000" value="{{firstnonempty instance.population_count ''}}">
-                </div>
-              </div>
-            </li>
-            <li>
-              <div class="row-fluid">
-                <div class="span8 evidence">
-                  <label class="auto-save">Sample worksheet {{#instance.sample_worksheet.saved}}<span class="success" {{fadein}} {{fadeout 3000 instance.sample_worksheet.saved}}>Saved</span>{{/instance.sample_worksheet.saved}}</label>
-                  <div class="row-fluid">
-                  {{#using sample_worksheet=instance.sample_worksheet}}
-                    <div class="span9">
-                      <input type="text" name="sample_worksheet.name" data-lookup="SampleWorksheet" data-drop="link" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_worksheet.name sample_worksheet.link ''}}">
-                    </div>
-                  {{/using}}
-                  </div>
-                </div>
-                <div class="span4">
-                  <label>Sample #</label>
-                  <input type="text" name="sample_count" class="input-block-level" placeholder="example: 1000" value="{{firstnonempty instance.sample_count ''}}">
-                </div>
-              </div>
-            </li>
-            <li>
-              <div class="row-fluid">
-                <div class="span8 evidence">
-                  <label class="auto-save">Sample evidence {{#instance.sample_evidence.saved}}<span class="success" {{fadein}} {{fadeout 3000 instance.sample_evidence.saved}}>Saved</span>{{/instance.sample_evidence.saved}}</label>
-                  <div class="row-fluid">
-                  {{#using sample_evidence=instance.sample_evidence}}
-                    <div class="span9">
-                      <input type="text" name="sample_evidence.name" data-lookup="SampleEvidence" data-drop="link" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_evidence.name sample_evidence.link ''}}">
-                    </div>
-                  {{/using}}
-                  </div>
-                </div>
-                <div class="span4">&nbsp;</div>
-              </div>
-            </li>
-          </ul>
-        </div>
-        {{/if_equals}}
         {{#child_options.0}}
         <div class="span12 small-info info tier-info custom-state">
           <h6 class="border">Mapped Objects ({{child_options.0.list.length}})

@@ -11,7 +11,7 @@ class Request(Titled, Slugged, Described, Base, db.Model):
   __tablename__ = 'requests'
   _title_uniqueness = False
 
-  VALID_TYPES = (u'documentation', u'interview', u'population sample')
+  VALID_TYPES = (u'documentation', u'interview')
   VALID_STATES = (u'Draft', u'Requested', u'Responded', u'Amended Request',
     u'Updated Response', u'Accepted')
   requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'))

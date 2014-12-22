@@ -5,8 +5,11 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 {{!div class="modal-body"}}
+<div class="hideable-holder">
 {{#instance}}
 <form action="javascript://">
+  {{> /static/mustache/base_objects/form_restore.mustache}}
+
   <div class="row-fluid">
     <div class="span6">
       <label>
@@ -36,23 +39,30 @@
       <input tabindex="3" class="input-block-level date" name="requested_on" data-toggle="datepicker" data-before="due_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date requested_on}}">
     </div>
     <div class="span3">
-      <label>
-        Status
-      </label>
-      <select class="input-block-level" name="status"
-      {{#if_helpers '\
-        #if_auditor' instance '\
-        or #if' new_object_form '\
-        ' _0_include_admin=false }}disabled="true"{{/if_helpers}}>
-        {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
-        <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-        {{/iterate}}
-      </select>
-      <label>
-        Due On
-        <span class="required">*</span>
-      </label>
-      <input tabindex="4" class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
+      <div class="span12 hidable">
+        <label>
+          Status
+          <a href="javascript://" class="field-hide">hide</a>
+        </label>
+        <div tabindex="4">
+          <select class="input-block-level" name="status"
+          {{#if_helpers '\
+            #if_auditor' instance '\
+            or #if' new_object_form '\
+            ' _0_include_admin=false }}disabled="true"{{/if_helpers}}>
+            {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
+            <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
+          </select>
+        </div>
+      </div>
+      <div class="span12">
+        <label>
+          Due On
+          <span class="required">*</span>
+        </label>
+        <input tabindex="5" class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
+      </div>
     </div>
   </div>
 
@@ -60,22 +70,24 @@
     {{#using audit=instance.audit}}
     {{#using audit_object=instance.audit_object}}
     {{#using audit_object_object=audit_object.auditable}}
-    <div class="span6">
+    <div class="span6 hidable">
     {{#if_auditor instance include_admin=false}}
       &nbsp;
     {{else}}
       <label>
         {{audit.object_model.title_singular}}
+        <a href="javascript://" class="field-hide">hide</a>
       </label>
       <i class="grcicon-{{audit.object_model.table_singular}}-color pull-left icon-field"></i>
       <div class="objective-selector">
-        <input tabindex="5" type="text" name="audit_object_object.title" data-lookup="{{audit.object_type}}" class="span10 search-icon" value="{{firstnonempty audit_object_object.title ''}}" placeholder="Enter text to search for {{audit.object_type}}">
+        <input tabindex="6" type="text" name="audit_object_object.title" data-lookup="{{audit.object_type}}" class="span10 search-icon" value="{{firstnonempty audit_object_object.title ''}}" placeholder="Enter text to search for {{audit.object_type}}">
       </div>
     {{/if_auditor}}
     </div>
     {{/using}}
     {{/using}}
     {{/using}}
+
     <div class="span6">
       <label>
         Assignee
@@ -98,65 +110,47 @@
       {{else}}
         {{#using assignee=instance.assignee}}
         <div class="objective-selector">
-          <input tabindex="6" type="text" name="assignee.email" class="span10 search-icon" data-lookup="Person" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.email ''}}">
+          <input tabindex="7" type="text" name="assignee.email" class="span10 search-icon" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty assignee.email ''}}">
         </div>
         {{/using}}
       {{/if_auditor}}
     </div>
   </div>
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="expand-link">
-        <a class="show-hidden-fields" href="javascript://">
-          <span class="out">
-            <i class="grcicon-show-arrow"></i>
-            Show
-          </span>
-          <span class="in">
-            <i class="grcicon-hide-arrow"></i>
-            Hide
-          </span>
-          Advanced
-          <span class="hidden-fields out">
-            Test, Notes, Code
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div class="hidden-fields-area" style="display:none">
-    <div class="row-fluid">
-      <div class="span6">
-        <label>
-          Test
-        </label>
-        <div class="wysiwyg-area">
-          <textarea tabindex="7" id="test_description" class="span12 double wysihtml5" name="test" placeholder="Enter Test">{{{test}}}</textarea>
-        </div>
-      </div>
-      <div class="span6">
-        <label>
-          Notes
-        </label>
-        <div class="wysiwyg-area">
-          <textarea tabindex="8" id="notes_description" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
-        </div>
-      </div>
-    </div>
-    <div class="row-fluid">
-      <div class="span6">
-        <label>
-          Code
-          <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
-        </label>
-        <input tabindex="9" class="input-block-level" name="slug" placeholder="REQUEST-XXX" type="text" value="{{slug}}">
-      </div>
-    </div>
 
+  <div class="row-fluid">
+    <div class="span6 hidable">
+      <label>
+        Test
+        <a href="javascript://" class="field-hide">hide</a>
+      </label>
+      <div class="wysiwyg-area">
+        <textarea tabindex="8" id="test_description" class="span12 double wysihtml5" name="test" placeholder="Enter Test">{{{test}}}</textarea>
+      </div>
+    </div>
+    <div class="span6 hidable">
+      <label>
+        Notes
+        <a href="javascript://" class="field-hide">hide</a>
+      </label>
+      <div class="wysiwyg-area">
+        <textarea tabindex="9" id="notes_description" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
+      </div>
+    </div>
   </div>
+  <div class="row-fluid">
+    <div class="span6 hidable">
+      <label>
+        Code
+        <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+        <a href="javascript://" class="field-hide">hide</a>
+      </label>
+      <input tabindex="10" class="input-block-level" name="slug" placeholder="REQUEST-XXX" type="text" value="{{slug}}">
+    </div>
+  </div>
+
   {{#using audit=instance.audit}}
   <input type="hidden" name="audit.id" value="{{audit.id}}">
   {{/using}}
 </form>
 {{/instance}}
-{{!/div}}
+</div>

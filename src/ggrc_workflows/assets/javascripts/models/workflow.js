@@ -47,6 +47,20 @@
     init: function() {
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank("title");
+      this.bind("destroyed", function(ev, inst) {
+        if(inst instanceof CMS.Models.Workflow) {
+          can.each(inst.cycles, function(cycle) {
+            cycle = cycle.reify()
+            can.trigger(cycle, "destroyed");
+            can.trigger(cycle.constructor, "destroyed", cycle);
+          });
+          can.each(inst.task_groups, function(tg) {
+            tg = tg.reify();
+            can.trigger(tg, "destroyed");
+            can.trigger(tg.constructor, "destroyed", tg);
+          });
+        }
+      });
     },
   }, {
     save : function() {
@@ -55,16 +69,7 @@
           redirect_link;
 
       return this._super.apply(this, arguments).then(function(instance) {
-        // Check if gdrive folder was added
-        if (instance.workflow_folder) {
-          return $.when(
-            instance,
-            GGRC.Controllers.GDriveWorkflow.attach_files(instance.workflow_folder, 'folders', instance)
-          );
-        }
-        return instance;
-      }).then(function(instance) {
-        redirect_link = instance.viewLink + "#task_group_widget"
+        redirect_link = instance.viewLink + "#task_group_widget";
         if (!task_group_title) {
           instance.attr('_redirect', redirect_link);
           return instance;

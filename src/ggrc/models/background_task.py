@@ -80,7 +80,7 @@ def create_task(name, url, queued_task=None, parameters={}):
     taskqueue.add(
         queue_name="ggrc",
         url=url,
-        name=task.name,
+        name="{}_{}".format(task.name, task.id),
         params={'task_id': task.id},
         method=request.method,
         headers=headers)
@@ -102,7 +102,7 @@ def queued_task(func):
     if len(args) > 0 and isinstance(args[0], BackgroundTask):
       task = args[0]
     else:
-      task = BackgroundTask.query.get(request.form.get("task_id"))
+      task = BackgroundTask.query.get(request.values.get("task_id"))
     task.start()
     try:
       result = func(task)

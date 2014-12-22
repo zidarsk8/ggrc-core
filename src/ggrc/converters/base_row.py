@@ -9,11 +9,12 @@ from .common import *
 from ggrc.models.all_models import (
     Audit, ControlCategory, ControlAssertion,
     Control, Document, Objective, ObjectControl, ObjectiveControl,
-    ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process, 
+    ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process,
     Relationship, Request, Section, SectionBase, SectionObjective,
     System, SystemOrProcess,
 )
 from ggrc.models.exceptions import ValidationError
+from ggrc.app import app
 
 
 def unpack_list(vals):
@@ -511,6 +512,8 @@ class SectionTitleHandler(TitleHandler):
     # check for collisions within the directive
     directive = self.importer.obj.directive
     scoped_db_collisions = self.importer.model_class.query.filter_by(directive=directive, title=data).all()
+    scoped_db_collisions = [c for c in scoped_db_collisions
+                            if c.id != self.importer.obj.id]
     if scoped_db_collisions:
       self.add_error("Another item within this {type} already has this title.".format(type=self.importer.obj.directive.kind))
 
@@ -764,7 +767,11 @@ class ObjectiveHandler(ColumnHandler):
       return None
 
   def export(self):
-    objective_id = getattr(self.importer.obj, 'objective_id', '')
+    objective_id = None
+
+    if getattr(self.importer.obj, 'audit_object', ''):
+        if 'Objective' == self.importer.obj.audit_object.auditable_type:
+            objective_id = getattr(self.importer.obj.audit_object, 'auditable_id', '')
     if objective_id:
       objective = Objective.query.filter_by(id=objective_id).first()
       return objective.slug
@@ -779,6 +786,49 @@ class ObjectiveHandler(ColumnHandler):
       objective = Objective.query.get(objective_id)
       if objective:
         return objective.slug
+    return ''
+
+
+class ControlHandler(ColumnHandler):
+
+  def parse_item(self, value):
+    # if this slug exists, return the control_id, otherwise throw error
+    if value:
+      control = Control.query.filter_by(slug=value).first()
+      if not control:
+        self.add_error("Control code '{}' does not exist.".format(value))
+      else:
+        return control.id
+    else:
+      if self.options.get('is_needed_later'):
+        self.add_warning("A Control will need to be mapped later")
+      return None
+
+  def export(self):
+    control_id = None
+
+    if getattr(self.importer.obj, 'audit_object', ''):
+      if 'Control' == self.importer.obj.audit_object.auditable_type:
+        control_id = getattr(self.importer.obj.audit_object, 'auditable_id', '')
+
+    if control_id:
+      control = Control.query.filter_by(id=control_id).first()
+      return control.slug
+    else:
+      return control_id
+
+  def display(self):
+
+    # self.importer.obj[self.key] only returns control id
+    # need to return corresponding objective slug or empty string
+    control_id = getattr(self.importer.obj, 'control_id', '')
+
+    app.logger.info("DISPLAY: self.importer.object is a {}".format(self.importer.obj.__dict__))
+
+    if control_id:
+      control = Control.query.get(control_id)
+      if control:
+        return control.slug
     return ''
 
 
@@ -1113,4 +1163,3 @@ class LinkSectionObjective(LinkObjectHandler):
       if matching_relationship_count == 0:
         db.session.add(SectionObjective(
             section=sec, objective=obj))
-

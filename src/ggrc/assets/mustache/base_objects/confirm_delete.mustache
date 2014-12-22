@@ -9,11 +9,13 @@
 <p>
 {{#instance}}
 Are you sure you want to delete 
-  {{#if display_name}}
-    {{display_name}}?
-  {{else}}
-    this {{type_to_readable instance.type}}?
-  {{/if}}
+  <span class="user-string">
+    {{#if display_name}}
+      {{display_name}}?
+    {{else}}
+      this {{type_to_readable instance.type}}?
+    {{/if}}
+  </span>
   {{#if delete_counts.loading}}
 	<br/><span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block;' }}></span>
   {{else}}
