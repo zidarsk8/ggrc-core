@@ -34,7 +34,6 @@ have the prerequisite software installed. Here are the steps:
 .. sourcecode:: bash
 
   git submodule update --init
-  librarian-chef install
   vagrant up
   vagrant ssh
   build_compass
@@ -121,26 +120,15 @@ concerned about, leading to the second step:
 As the dependencies change over time it will be necessary for developers to
 update to a new revision for one or more of the submodules.
 
-Librian and Chef
+Ansible
 ----------------
 
-gGRC-Core provides both a ``Vagrantfile`` and a ``Cheffile`` to make standing
-up a development environment simple and repeatable thanks to the magic of
-Vagrant, Chef, and librarian-chef. Vagrant enables developers to use a
-consistent and shared VM configuration to perform application testing while
-allowing developers to use the source code editing environment of their choice.
-The librarian-chef gem provides management of the Chef cookbooks required to
-provision the development VM,  with required packages.
+gGRC-Core provides both a ``Vagrantfile`` and a Ansible playbook to make
+standing up a development environment simple and repeatable thanks to the magic
+of Vagrant and Ansible. Vagrant enables developers to use a consistent and
+shared VM configuration to perform application testing while allowing
+developers to use the source code editing environment of their choice.
 
-Updating Cookbooks with ``librarian-chef``
-''''''''''''''''''''''''''''''''''''''''
-
-When changes are made to the Cheffile ``librarian-chef`` will need to be run to
-update the installed cookbooks.
-
-.. sourcecode:: bash
-
-  librarian-chef install
 
 Vagrant
 -------
