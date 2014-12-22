@@ -1299,7 +1299,7 @@ jQuery(function($){
           if(ui.item) {
             return ctl.autocomplete_select($(this), ev, ui);
           } else {
-            original_event = event;
+            original_event = ev;
             $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
               ctl.autocomplete_select($(that), original_event, { item : new_obj });
               $(that).trigger("modal:success", new_obj);
