@@ -38,20 +38,22 @@
   args:
     chdir: /vagrant
 
+- name: change root password
+  mysql_user:
+    name: root
+    password: root
+    login_user: root
+    login_password: root
+    check_implicit_admin: yes
+    priv: "*.*:ALL"
+
 - name: create databases
-  sudo: yes
   with_items: ggrc_databases
   mysql_db:
     name: "{{ item.name }}"
     state: present
-
-- name: change root password
-  sudo: yes
-  mysql_user:
-    name: root
-    password: root
-    priv: "*.*:ALL"
-    state: present
+    login_user: root
+    login_password: root
 
 - name: configure bash
   sudo: yes
