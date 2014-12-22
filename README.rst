@@ -2,8 +2,6 @@
 gGRC-Core
 *********
 
-Google Governance, Risk and Compliance. Migrated from `Google <https://code.google.com/p/compliance-management/>`_ `Code <https://code.google.com/p/ggrc-core>`_.
-
 Requirements
 ============
 
@@ -20,19 +18,8 @@ environment:
      - Oracle VirtualBox Virtual Machine player
    * - `Vagrant <http://www.vagrantup.com/>`_
      - Handy scriptable VM management
-   * - Ruby and Ruby Dev
-     - sudo aptitude install ruby-dev
-   * - `librarian (ruby gem) <http://rubygems.org/gems/librarian>`_
-     - Ruby bundle management framework.
-   * - `librarian-chef (ruby gem) <http://rubygems.org/gems/librarian-chef>`_
-     - `Opscode Chef <http://www.opscode.com/chef/>`_ cookbook manager.
-
-Windows installation
---------------------
-Download and install VirtualBox, Vagrant, `Ruby and DevKit <http://rubyinstaller.org/downloads/>`_ (choose Ruby 1.9.3).
-Unpack the DevKit into ``c:\ruby193\devkit``, ``cd`` there, and run ``ruby dk.rb init`` and ``ruby dk.rb install``.
-For problems, see the `DevKit guide <https://github.com/oneclick/rubyinstaller/wiki/Development-Kit>`_.
-Then, run ``gem install librarian``, and ``gem install librarian-chef``.
+   * - `Ansible <http://www.ansible.com/home>`_
+     - Provisioning and deployment tool.
 
 Quick Start
 ===========
@@ -55,7 +42,7 @@ have the prerequisite software installed. Here are the steps:
   db_migrate
 
 If you see download errors during the ``vagrant up`` stage, or if any subsequent
-step fails, try running ``vagrant provision`` (See `Provision a running Vagrant 
+step fails, try running ``vagrant provision`` (See `Provision a running Vagrant
 VM`_ below for more).
 
 Now you're in the VM and ready to rock. Get to work!
@@ -63,8 +50,8 @@ Now you're in the VM and ready to rock. Get to work!
 Launching gGRC as Stand-alone Flask
 -----------------------------------
 
-Most development is done in a stand-alone flask. We strive to make getting up 
-and running as simple as possible; to that end, launching the application is 
+Most development is done in a stand-alone flask. We strive to make getting up
+and running as simple as possible; to that end, launching the application is
 simple:
 
 .. sourcecode:: bash
@@ -132,7 +119,7 @@ concerned about, leading to the second step:
   git submodule update
 
 As the dependencies change over time it will be necessary for developers to
-update to a new revision for one or more of the submodules. 
+update to a new revision for one or more of the submodules.
 
 Librian and Chef
 ----------------
@@ -251,7 +238,7 @@ them as they change:
 Importing Example Data
 ----------------------
 
-Example test data can be loaded by using the following command (with ``root`` 
+Example test data can be loaded by using the following command (with ``root``
 being the mysql password):
 
 .. sourcecode:: bash
@@ -263,7 +250,7 @@ Gotchas
 
 After sync'ing your local clone of gGRC-Core you may experience a failure when
 trying to run the application due to a change (usually an addition) to the
-prerequisites. 
+prerequisites.
 
 There are three primary classes of requirements for gGRC-Core: submodules,
 cookbooks and Python packages. Cookbooks are managed via specification in the
