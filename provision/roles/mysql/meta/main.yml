@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: Goran Mekić
+  description: MySQL
+  company: Reciprocity
+dependencies:
+  - {role: common}

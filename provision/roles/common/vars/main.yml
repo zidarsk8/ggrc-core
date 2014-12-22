@@ -1,0 +1,5 @@
+---
+common_packages:
+  - name: curl
+  - name: git-core
+  - name: python-pip

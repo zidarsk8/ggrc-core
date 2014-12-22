@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: Goran Mekić
+  description: gGRC
+  company: Reciprocity
+dependencies:
+  - {role: mysql}

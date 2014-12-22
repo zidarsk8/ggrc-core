@@ -1,0 +1,54 @@
+---
+- name: install requirements
+  sudo: yes
+  pip:
+    requirements: "/vagrant/src/requirements.txt"
+
+- name: install packages
+  sudo: yes
+  with_items: ggrc_packages
+  apt:
+    pkg: "{{ item.name }}"
+    state: latest
+
+- name: create development directories
+  sudo: yes
+  with_items: ggrc_development_directories
+  file:
+    path: "{{ item.name }}"
+    owner: vagrant
+    group: vagrant
+    state: directory
+
+- name: prepare development virtualenv
+  command: make setup_dev DEV_PREFIX=/vagrant-dev
+  args:
+    chdir: /vagrant
+
+- name: install gems
+  sudo: yes
+  with_items: ggrc_gems
+  gem:
+    name: "{{ item.name }}"
+    user_install: no
+    state: present
+
+- name: run make
+  command: make appengine DEV_PREFIX=/vagrant-dev
+  args:
+    chdir: /vagrant
+
+- name: create databases
+  sudo: yes
+  with_items: ggrc_databases
+  mysql_db:
+    name: "{{ item.name }}"
+    state: present
+
+- name: configure bash
+  sudo: yes
+  template:
+    src: .bashrc.j2
+    dest: /home/vagrant/.bashrc
+    owner: vagrant
+    group: vagrant
