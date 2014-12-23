@@ -510,7 +510,10 @@ def update_workflow_state(workflow):
     if cycle.is_current:
       return
 
-  # No recurrences and no active cycles, workflow is now Inactive
+  if workflow.status == 'Draft':
+    return
+
+  # Active workflow with no recurrences and no active cycles, workflow is now Inactive
   workflow.status = 'Inactive'
   db.session.add(workflow)
   db.session.flush()
@@ -539,11 +542,11 @@ def calculate_min_start_date_and_max_end_date_for_workflow_from_basedate(workflo
       end_date = RelativeTimeboxed._calc_end_date(
         basedate, workflow.frequency, t.relative_end_month, t.relative_end_day)
       if min_start_date is None or start_date < min_start_date:
-        min_start_date = start_date 
+        min_start_date = start_date
       if max_end_date is None or end_date > max_end_date:
-        max_end_date = end_date 
-  return min_start_date, max_end_date 
-  
+        max_end_date = end_date
+  return min_start_date, max_end_date
+
 # Check if workflow should be Inactive after cycle status change
 @status_change.connect_via(models.Cycle)
 def handle_cycle_status_change(sender, obj=None, new_status=None, old_status=None):
