@@ -112,21 +112,37 @@ can.Model.Cacheable("CMS.Models.Audit", {
       return $.when(
         programs[0],
         programs[0].get_binding("program_authorized_people").refresh_instances(),
-        CMS.Models.Role.findAll({ name : "ProgramReader" })
-      );
-    }).then(function(program, person_bindings, reader_roles) {
-      var authorized_people = can.map(person_bindings, function(pb) {
-        return pb.instance;
-      });
+        programs[0].get_binding("program_authorizations").refresh_instances(),
+        CMS.Models.Role.findAll({ name : "ProgramReader" }),
+        CMS.Models.Role.findAll({ name : "ProgramEditor" })
+        );
+    }).then(function(program, people_bindings, auth_bindings, reader_roles, editor_roles) {
+      // ignore readers.  Give users an editor role
+      var reader_authorizations = [],
+          authorized_people = can.map(people_bindings, function(pb) {
+            return pb.instance;
+          }),
+          editor_authorized_people = can.map(auth_bindings, function(ab) {
+            if(~can.inArray(ab.instance.role.reify(), reader_roles)) {
+              reader_authorizations.push(ab.instance);
+            } else {
+              return ab.instance.person.reify();
+            }
+          });
 
       if(Permission.is_allowed("create", "UserRole", program.context)
         && !~can.inArray(
           that.contact.reify(),
-          authorized_people
+          editor_authorized_people
       )) {
+        can.each(reader_authorizations, function(ra) {
+          if(ra.person.reify() === that.contact.reify()) {
+            ra.destroy();
+          }
+        });
         new CMS.Models.UserRole({
           person: that.contact,
-          role: reader_roles[0].stub(),
+          role: editor_roles[0].stub(),
           context: program.context
         }).save();
       }

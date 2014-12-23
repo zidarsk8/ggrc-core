@@ -23,6 +23,7 @@ from datetime import datetime
 from werkzeug.exceptions import Forbidden
 from ggrc.login import get_current_user
 from sqlalchemy import inspect
+from math import floor
 
 PRI_CYCLE=1
 PRI_TASK_OVERDUE=2
@@ -250,46 +251,57 @@ def handle_tasks_overdue():
     cycle=get_cycle(task)
     if cycle is None:
       continue
+
     if cycle.is_current != True:
       continue
+
     contact=get_task_contacts(task)
     if contact is None:
       continue
+
     workflow_owner=contact[0]
     assignee=contact[1]
     if not frequency_mapping.has_key(cycle.workflow.frequency):
       continue
+
     num_days=frequency_mapping[cycle.workflow.frequency]
     if task.end_date != (datetime.utcnow().date() + timedelta(num_days)):
       continue
-    subject="One or more tasks assigned to you are due in "  + str(num_days) + " days"
+
     if not tasks_for_contact.has_key(assignee.id):
       tasks_for_contact[assignee.id]=[]
-    tasks_for_contact[assignee.id].append((assignee, task, subject))
+
+    tasks_for_contact[assignee.id].append((assignee, task))
+
+  soonest_due_days = sorted(tasks_for_contact.keys())[0]
+  subject = "Your tasks are due soon! First %s." % humanize_due_days(soonest_due_days)
 
   email_contents={}
   for id, items in tasks_for_contact.items():
-    email_content=""
+    (assignee, task) = items[0]
+    email_content="Hi " + assignee.name + ",<br>"  + "<p>Your tasks: <ul>"
+
     for item in items:
-      (assignee, task, subject)=item
-      email_content="Hi " + assignee.name + ",<br>"  + "<p>Your tasks: <ul>"
-      break
-    for item in items:
-      (assignee, task, subject)=item
-      task_object=get_task_object_string(task)
-      email_content=email_content+"<li>" + task.title + task_object + "</li>"
+      (assignee, task)=item
+      due_in_days = (task.end_date-datetime.utcnow().date()).days
+
+      task_object = get_task_object_string(task)
+      email_content += "<li>" + task.title + task_object + " <i>[due %s]</i></li>" % humanize_due_days(due_in_days)
       email_digest_contents={}
       email_digest_contents[assignee.id]="<a href=" + '"'  + \
         request.url_root + "dashboard#task_widget"  + '"' + ">" + \
-        task.title + "</a>"
+        task.title + " <i>[due %s]</i></a>" % humanize_due_days(due_in_days)
+
       prepare_notification(assignee, 'Email_Digest', PRI_TASK_OVERDUE, subject, email_digest_contents, \
         assignee, [assignee], override=False)
+
     email_content=email_content + \
-     "</ul></p><p>" + "Are due in " + str(num_days) + " days.</p>" + \
+     "</ul></p><p>" + "Are due soon. First %s!</p>" % humanize_due_days(soonest_due_days) + \
      "<p>Click here to view your <a href=" + '"'  + \
      request.url_root + "dashboard#task_widget"  + '"' + ">" + \
      "<b>task(s)</b></a></p>" + \
      "Thanks,<br>gGRC Team"
+
     prepare_notification_for_tasks_now(assignee, assignee, subject, email_content, PRI_TASK_OVERDUE)
 
 def handle_tasks_due(num_days):
@@ -347,6 +359,22 @@ def handle_tasks_due(num_days):
       "<b>task(s)</b></a></p>" + \
       "Thanks,<br>gGRC Team"
     prepare_notification_for_tasks_now(assignee, assignee, subject, email_content, PRI_TASK_DUE)
+
+def humanize_due_days(days):
+  """ returns a more human form of in X days"""
+  if days < 1:
+    return "today"
+  if days < 2:
+    return "tomorrow"
+  if days < 7:
+    return "in %d days" % days
+  if days == 7:
+    return "in a week"
+  if days < 30:
+    return "in %d weeks" % int(floor(days/7.0))
+  if days < 31:
+    return "in a month"
+  return "in %d months" % int(floor(days/30.0))
 
 def handle_tasks_completed_for_cycle():
   workflow_cycles=db.session.query(models.Cycle).\
@@ -415,6 +443,17 @@ def handle_taskgroup_deleted(sender, obj=None, service=None):
   from oauth2client.client import Credentials
   calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
   calendar_service.handle_taskgroup_calendar_delete(taskgroup)
+
+@Resource.model_posted.connect_via(models.Cycle)
+def handle_cycle_post(sender, obj=None, src=None, service=None):
+    cycle = obj
+
+    subject="New cycle of workflow  " + cycle.title + " begins today"
+    notify_custom_message=True
+
+    prepare_notification_for_cycle(cycle, subject, " begins today", PRI_CYCLE, notify_custom_message)
+
+    db.session.commit()
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_task_put(sender, obj=None, src=None, service=None):
@@ -571,11 +610,14 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
   if workflow is None:
     current_app.logger.warn("Notification Trigger: Unable to find workflow for cycle")
     return
+
   workflow_owner=get_workflow_owner(workflow)
   if workflow_owner is None:
     current_app.logger.warn("Notification Trigger: Unable to find workflow owner for cycle")
     return
+
   override_flag=notify_on_change(workflow)
+
   empty_line="\n"
   email_contents={}
   email_digest_contents={}
@@ -647,6 +689,7 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
 
 def prepare_notification(src, notif_type, notif_pri, subject, content, owner, recipients, \
   override=False, notify_custom_message=None):
+
   if notif_type == 'Email_Digest':
     emaildigest_notification = EmailDigestNotification()
     emaildigest_notification.notif_pri = notif_pri

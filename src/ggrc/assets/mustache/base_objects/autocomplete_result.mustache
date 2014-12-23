@@ -6,15 +6,9 @@
 </li>
 {{/each}}
 {{^items}}
-  {{#is_allowed "create" model.shortName context=null}}
-  <li data-ui-autocomplete-item="">
-    No results
-  </li>
-  {{else}}
   <li class="ui-menu-item" data-ui-autocomplete-item="">
     No results
   </li>
-  {{/is_allowed}}
 {{/items}}
 {{#if items_loading}}
   <li class="spinner ui-menu-item" data-ui-autocomplete-item="">
