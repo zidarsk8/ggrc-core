@@ -464,7 +464,14 @@
             $.when(this._refresh_instances(binding));
         }
         return binding._refresh_instances_deferred
-          .then(function() { return binding.list; });
+          .then(
+            function() { return binding.list; },
+            function() {
+              setTimeout(function() {
+                delete binding._refresh_instances_deferred;
+              }, 10);
+              return this;
+            });
       }
 
     , _refresh_instances: function(binding) {

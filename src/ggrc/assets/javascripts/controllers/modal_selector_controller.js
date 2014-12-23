@@ -2064,7 +2064,7 @@
 
       var that = this,
         joins = can.map(this.sync_selected_options(), function(option) {
-          var join, context_object, model, descriptor
+          var join, context_object, model, descriptor,
               context_id = null
               ;
 
@@ -2104,11 +2104,15 @@
     }
 
     , autocomplete_select : function(el, ev, ui) {
-      setTimeout(function(){
-        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
-        el.trigger('change');
-      }, 0);
-      this.context.attr(el.attr("name"), ui.item);
+        var name = el.attr("name");
+        // we (ab)use databinding to make the input field change for us
+        // doing it three times like this ensures stability
+
+        // handle emptying field and choosing same suggestion
+        this.context.attr(name, null);
+        // the first change sets to null, 2nd works
+        this.context.attr(name, ui.item);
+        this.context.attr(name, ui.item);
     }
 
   });

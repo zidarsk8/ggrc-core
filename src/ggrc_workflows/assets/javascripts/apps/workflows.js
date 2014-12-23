@@ -553,7 +553,6 @@
           header_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/filters.mustache",
           footer_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree_footer.mustache",
           mapping: "assigned_tasks",
-          draw_children: true,
           sort_property: null,
           sort_function: _task_sort_function,
           draw_children: true,
