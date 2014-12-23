@@ -314,6 +314,8 @@ can.Control("CMS.Controllers.LHN", {
       return $(".lhs-holder").width()+8;
   }
   , hide_lhn: function() {
+    //UI-revamp
+    //Here we should hide the button ||| also
       var $area = $(".area")
         , $lhsHolder = $(".lhs-holder")
         , $bar = $('.bar-v')
@@ -366,16 +368,19 @@ can.Control("CMS.Controllers.LHN", {
         $lhs_label_right = $(".lhs-search .my-work-right"),
         $lhs_label = $(".lhs-search .my-work-label"),
         lhn_second_row = 201,
-        max_width = window.outerWidth / 2 - 4;
+        max_width = window.innerWidth - 30,
+        default_size = lhn_second_row;;
 
-    if(resize < 40 && !$lhs.hasClass("lhs-closed")) {
-      this.toggle_lhs(no_trigger);
-    }
-    if(resize < 40) {
-      return;
-    }
+    //New UI there is no lhs toggle-open-close
+    //if(resize < 40 && !$lhs.hasClass("lhs-closed")) {
+    //  this.toggle_lhs(no_trigger);
+    //}
+    //if(resize < 40) {
+    //  return;
+    //}
+    if (resize < default_size) resize = default_size;
     resize = Math.min(resize, max_width);
-    if($lhs.hasClass("lhs-closed")) this.toggle_lhs(no_trigger);
+    //if($lhs.hasClass("lhs-closed")) this.toggle_lhs(no_trigger);
     $lhsHolder.width(resize);
 
     // LHN search radio buttons oneline fix
@@ -387,17 +392,17 @@ can.Control("CMS.Controllers.LHN", {
       $lhs_label.removeClass("oneline");
     }
 
-    var a = (resize) + "px";
-    var b = (resize+8) + "px"
-    $area.css("margin-left",  b);
+    //var a = (resize) + "px";
+    //var b = (resize+8) + "px"
+    //$area.css("margin-left",  b);
 
-    $bar.css("left", a)
+    //$bar.css("left", a)
 
     $search.width(resize - 49);
-    window.resize_areas();
-    if (!no_trigger) {
-      $(window).trigger('resize');
-    }
+    //window.resize_areas();
+    //if (!no_trigger) {
+    //  $(window).trigger('resize');
+    //}
   }
   , ".bar-v mousedown" : function(el, ev) {
     var $target = $(ev.target);

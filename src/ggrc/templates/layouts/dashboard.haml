@@ -21,31 +21,36 @@
         .container-fluid
           .row-fluid
             .span12
+              %button{ 'class': 'lhn-trigger pull-left', 'href': 'javascript://'}
+                %span.icon-bar
+                %span.icon-bar
+                %span.icon-bar
               .logo.pull-left
-                %a{ 'href': "/dashboard" }
-                  -set logo_url = config.get("COMPANY_LOGO")
-                  -set logo_text = config.get("COMPANY_LOGO_TEXT")
-                  -if logo_url
-                    %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
-                  -elif logo_text != None
-                    =logo_text
-                  -else
-                    Google GRC
+                %h2
+                  %a{ 'class': 'to-my-work', 'href': '/dashboard' }
+                    -set logo_url = config.get("COMPANY_LOGO")
+                    -set logo_text = config.get("COMPANY_LOGO_TEXT")
+                    -if logo_url
+                      %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
+                    -elif logo_text != None
+                      =logo_text
+                    -else
+                      Google GRC
               %ul.menu
                 %li.black-link
                   %a{ 'href': 'javascript://', 'data-toggle': 'multitype-search-modal-selector', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
-                    %i.grcicon-search-white
+                    %i.grcicon-search
                     %span
                       Search
                 %li.black-link
                   %a#page-help{ 'href': "/dashboard#task_widget" }
-                    %i.grcicon-task
+                    %i.grcicon-task-black
                     %span
                       My Tasks
                       %span.task-count
                 %li.user.dropdown.dropdown-black.black-link
                   %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
-                    %i.grcicon-user
+                    %i.grcicon-user-black
                     %span
                       %strong
                         =current_user.email
@@ -99,16 +104,16 @@
                         Logout
                 %li.black-link
                   %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
-                    %i.grcicon-help
+                    %i.grcicon-help-black
                     %span
                       Help
     .area{ 'class': '={ model_display_class }' }
       .header-content
         .row-fluid
-          #page-header.span9
+          #page-header.span12
             -block header
-          .span3
-            -block subheader_extras
+          //.span3
+          //  -block subheader_extras
 
       .top-inner-nav
         .object-nav
