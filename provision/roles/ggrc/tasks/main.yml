@@ -25,6 +25,15 @@
   args:
     chdir: /vagrant
 
+- name: install npm modules
+  sudo: yes
+  with_items: ggrc_npm_modules
+  npm:
+    name: "{{ item.name }}"
+    global: yes
+    state: present
+    registry: http://registry.npmjs.org/
+
 - name: install gems
   sudo: yes
   with_items: ggrc_gems
