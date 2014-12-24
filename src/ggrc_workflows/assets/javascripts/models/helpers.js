@@ -65,7 +65,7 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
   save: function() {
     var that = this,
         aws_dfd = this.original_object.get_binding("approval_workflows").refresh_list();
-    
+
     return aws_dfd.then(function(aws){
       var ret;
       if (aws.length < 1) {
@@ -78,13 +78,13 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
                     + ' "' + that.original_object.title + '"',
             object_approval: true,
             notify_on_change: true,
-            notify_custom_message: "Hello " + that.contact.reify().name + ",<br/><br/>"
+            notify_custom_message: "<br/><br/>"
               + GGRC.current_user.name + " (" + GGRC.current_user.email
               + ") asked you to review newly created "
               + that.original_object.constructor.model_singular + ' "' + that.original_object.title
               + '" before ' + moment(that.end_date).format("MM/DD/YYYY") + ". "
               + "Click <a href='" + window.location.href.replace(/#.*$/, "#")
-              + "workflows_widget'>here</a> to perform a review.<br/><br/>Thanks,<br/>gGRC Team",
+              + "workflows_widget'>here</a> to perform a review.",
             context: that.original_object.context
           }).save()
         ).then(function(wf) {
