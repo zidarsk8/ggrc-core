@@ -10,11 +10,11 @@ class WorkflowDateCalculator(object):
     def __init__(self, workflow=None):
         self.workflow = workflow
 
-    @staticmethod
     '''
     direction = 1  indicates FORWARD
     direction = -1 indicates BACKWARD
     '''
+    @staticmethod
     def nearest_work_day(date_, direction):
         holidays = []
         while date_.weekday() > 4 or date_ in holidays:
