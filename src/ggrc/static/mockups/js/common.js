@@ -68,14 +68,14 @@ $(document).ready(function(){
 
       if (cmd === "close") {
 
-        use_slide ? $content.slideUp('fast') : $content.css("display", "none");
+        use_slide ? $content.slideUp(50) : $content.css("display", "none");
         $icon.removeClass('active');
         $li.removeClass('item-open');
         // Only remove tree open if there are no open siblings
         !$li.siblings('.item-open').length && $parentTree.removeClass('tree-open');
         $content.removeClass('content-open');
       } else if(cmd === "open") {
-        use_slide ? $content.slideDown('fast') : $content.css("display", "block");
+        use_slide ? $content.slideDown(50) : $content.css("display", "block");
         $icon.addClass('active');
         $li.addClass('item-open');
         $parentTree.addClass('tree-open');
