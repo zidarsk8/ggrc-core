@@ -1,6 +1,7 @@
 .*.swp
 cookbooks
 .vagrant
+vagrant_ansible_inventory_*
 Cheffile.lock
 tmp
 src/requirements.txt.md5
