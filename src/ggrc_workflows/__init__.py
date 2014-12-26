@@ -187,12 +187,19 @@ def update_cycle_dates(cycle):
 
 from ggrc.services.common import Resource
 
+
 @Resource.model_posted.connect_via(models.Cycle)
 def handle_cycle_post(sender, obj=None, src=None, service=None):
   if src.get('autogenerate', False):
     # When called via a REST POST, use current user.
     current_user = get_current_user()
     build_cycle(obj, current_user=current_user)
+    # calculate next_cycle_start_date
+    workflow = obj.workflow
+    if workflow.next_cycle_start_date == date.today():
+      workflow.next_cycle_start_date = date.today() + \
+          RelativeTimeboxed.freq_to_delta(workflow.frequency)
+    db.session.add(workflow)
 
 
 def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
