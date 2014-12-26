@@ -334,6 +334,13 @@ def tree_ui():
   """
   return render_template("/mockups/dashboard-ui/tree.html")
 
+@app.route("/mockups/dashboard-ui/workflow.html")
+@login_required
+def workflow_ui():
+  """Workflow UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/workflow.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():
