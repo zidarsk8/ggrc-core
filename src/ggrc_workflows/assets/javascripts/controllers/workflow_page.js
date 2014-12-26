@@ -118,12 +118,21 @@
         this.scope._handle_refresh(model);
       },
       "button click": function() {
-        var workflow = GGRC.page_instance();
+        var workflow = GGRC.page_instance(),
+            cycle;
         if (workflow.frequency !== 'one_time') {
           workflow.refresh().then(function() {
             workflow.attr('recurrences', true);
             workflow.attr('status', "Active");
-            workflow.save();
+            return workflow.save();
+          }).then(function(workflow) {
+            if (moment(workflow.next_cycle_start_date).isSame(moment(), "day")) {
+              return new CMS.Models.Cycle({
+                context: workflow.context.stub(),
+                workflow: { id: workflow.id, type: "Workflow" },
+                autogenerate: true
+              }).save();
+            }
           });
         } else {
           _generate_cycle().then(function() {

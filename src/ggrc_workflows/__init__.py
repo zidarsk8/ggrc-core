@@ -187,12 +187,19 @@ def update_cycle_dates(cycle):
 
 from ggrc.services.common import Resource
 
+
 @Resource.model_posted.connect_via(models.Cycle)
 def handle_cycle_post(sender, obj=None, src=None, service=None):
   if src.get('autogenerate', False):
     # When called via a REST POST, use current user.
     current_user = get_current_user()
     build_cycle(obj, current_user=current_user)
+    # calculate next_cycle_start_date
+    workflow = obj.workflow
+    if workflow.next_cycle_start_date == date.today():
+      workflow.next_cycle_start_date = date.today() + \
+          RelativeTimeboxed.freq_to_delta(workflow.frequency)
+    db.session.add(workflow)
 
 
 def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
@@ -539,11 +546,11 @@ def calculate_min_start_date_and_max_end_date_for_workflow_from_basedate(workflo
       end_date = RelativeTimeboxed._calc_end_date(
         basedate, workflow.frequency, t.relative_end_month, t.relative_end_day)
       if min_start_date is None or start_date < min_start_date:
-        min_start_date = start_date 
+        min_start_date = start_date
       if max_end_date is None or end_date > max_end_date:
-        max_end_date = end_date 
-  return min_start_date, max_end_date 
-  
+        max_end_date = end_date
+  return min_start_date, max_end_date
+
 # Check if workflow should be Inactive after cycle status change
 @status_change.connect_via(models.Cycle)
 def handle_cycle_status_change(sender, obj=None, new_status=None, old_status=None):
