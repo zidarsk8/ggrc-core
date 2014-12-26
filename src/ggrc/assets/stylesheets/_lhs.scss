@@ -89,7 +89,7 @@
 .lhn-pin {
   position: absolute;
   top: 5px;
-  right: -6px;
+  right: 0;
   @include opacity(0.25);
   @include transition(opacity 0.2s ease);
   z-index: 9999;
