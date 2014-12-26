@@ -109,12 +109,51 @@
     margin-right: 20px;
   }
   .full-width & {
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 40px;
+    margin-right: 40px;
   }
 }
 
 .footer {
   margin-top:500px;
   overflow:hidden;
+}
+
+// Pin content
+.pin-content {
+  position: fixed;
+  bottom: 40px;
+  left: 32px;
+  right: 32px;
+  background: $white;
+  z-index: 9999;
+  @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
+  .info {
+    overflow: auto;
+    padding: 15px 20px 20px 20px;
+  }
+}
+
+.pin-action {
+  @include clearfix();
+  @include reset-list();
+  margin-bottom: 20px;
+  li {
+    float: left;
+    margin-left: 5px;
+    a {
+      i {
+        @include opacity(0.25);
+        @include transition(opacity 0.2s ease);
+      }
+      &:hover {
+        i {
+          @include opacity(1);
+        }
+      }
+    }
+    &:first-child {
+      margin-left: 0;
+    }
+  }
 }

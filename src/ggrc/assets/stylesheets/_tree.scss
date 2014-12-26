@@ -443,11 +443,7 @@ ul.new-tree {
     min-height: 30px;
     line-height: 24px;
     position: relative;
-    @include perspective(1200);
-    @include transform-style(preserve-3d);
-    @include scale(1);
-    @include opacity(1);
-    @include transition(all 0.2s cubic-bezier(0.000, 0.050, 1.000, 0.550));
+    @include transition(all 0.18s cubic-bezier(.55,0,.1,1));
     p {
       line-height: 20px;
       font-size: 13px;
@@ -1070,25 +1066,22 @@ ul.new-tree {
   }
   // reduce visibility of closed tree-items
   &.tree-open {
-    @include perspective(1200);
     li.tree-item {
       background: $white;
-      @include scale(0.95);
-      @include opacity(0.5);
-      @include transition(all .3s cubic-bezier(0.000, 0.050, 1.000, 0.550));
       &.item-open {
-        @include scale(1);
-        @include opacity(1);
-        margin-top: 10px;
-        margin-bottom: 20px;
-        @include box-shadow(0px 6px 6px -6px rgba(0,0,0, 0.3), 0px -6px 6px -6px rgba(0,0,0, 0.2));
-        background: transparent;
+        margin: 25px -20px 25px -20px;
+        @include box-shadow(0 0 6px rgba(0,0,0, .16), 0 6px 12px rgba(0,0,0, .32));
         .inner-item-count {
           @include opacity(1);
         }
         .grcicon-arrow-right {
           background-position: -102px -80px;
           @include opacity(1);
+        }
+        > .item-main {
+          > .item-wrap {
+            border-color: transparent;
+          }
         }
       }
       &:first-child {
@@ -1101,11 +1094,6 @@ ul.new-tree {
           margin-bottom: 0;
         }
       }
-      > .item-main {
-        > .item-wrap {
-          border-color: transparent;
-        }
-      }
       .dashboard & {
         > .item-main {
           > .openclose {
@@ -1114,11 +1102,7 @@ ul.new-tree {
             }
           }
         }
-      }
-      .tier-2-info {
-        @include transform(rotateX(0deg));
-        background: $white;
-      }
+      } 
     }
     .filter-wrap {
       .filter-border {
@@ -1147,7 +1131,7 @@ ul.new-tree {
           }
         }
         &.item-open {
-          margin-bottom: 20px;
+          margin: 0;
           > .item-main {
             > .item-wrap {
               border-color: transparent;
@@ -1280,11 +1264,11 @@ ul.new-tree {
 
 .tier-2-info {
   display: none;
-  @include transform(rotateX(-89deg));
-  @include transform-origin(100%, 0, 0);
-  @include transform-style(preserve-3d);
-  background: $gray;
-  @include transition(all 0.6s cubic-bezier(0.000, 0.050, 1.000, 0.550));
+  //@include transform(rotateX(-89deg)); for remove
+  //@include transform-origin(100%, 0, 0); for remove
+  //@include transform-style(preserve-3d); for remove
+  //background: $gray; for remove
+  //@include transition(all 0.6s cubic-bezier(0.000, 0.050, 1.000, 0.550)); for remove
 }
 .tier-2-info-content {
   padding: 0 10px 0 32px;

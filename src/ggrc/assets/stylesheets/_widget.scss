@@ -45,6 +45,10 @@
         margin-bottom: 0;
         margin-right: 4px;
       }
+      &.inner-space-action {
+        width: 20px;
+        height: 1px;
+      }
       &.left-space {
         margin-right: 30px;
       }
@@ -1624,44 +1628,5 @@ ul.attr-list {
   .title {
     text-align: right;
     display: inline-block;
-  }
-}
-
-// Pin content
-.pin-content {
-  position: fixed;
-  bottom: 40px;
-  left: 12px;
-  right: 12px;
-  background: $white;
-  z-index: 9999;
-  @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
-  .info {
-    overflow: auto;
-    padding: 15px 20px 20px 20px;
-  }
-}
-
-.pin-action {
-  @include clearfix();
-  @include reset-list();
-  margin-bottom: 20px;
-  li {
-    float: left;
-    margin-left: 5px;
-    a {
-      i {
-        @include opacity(0.25);
-        @include transition(opacity 0.2s ease);
-      }
-      &:hover {
-        i {
-          @include opacity(1);
-        }
-      }
-    }
-    &:first-child {
-      margin-left: 0;
-    }
   }
 }
