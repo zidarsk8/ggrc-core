@@ -872,6 +872,31 @@ $(document).ready(function(){
     }
   });
 
+  // Workflow 2nd tier show/hide task-group, tasks and objects
+  $("#taskGroupPinSelect").on("click", function(e) {
+
+    $("#taskGroupPin").show();
+    $("#taskPin").hide();
+    $("#objectPin").hide();
+
+  });
+
+  $("#taskPinSelect").on("click", function(e) {
+
+    $("#taskGroupPin").hide();
+    $("#taskPin").show();
+    $("#objectPin").hide();
+
+  });
+
+  $("#objectPinSelect").on("click", function(e) {
+
+    $("#taskGroupPin").hide();
+    $("#taskPin").hide();
+    $("#objectPin").show();
+
+  });
+
 });
 
 // Widget search active state
