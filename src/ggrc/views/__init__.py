@@ -341,6 +341,20 @@ def workflow_ui():
   """
   return render_template("/mockups/dashboard-ui/workflow.html")
 
+@app.route("/mockups/dashboard-ui/workflow-info.html")
+@login_required
+def workflow_info_ui():
+  """Workflow info UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/workflow-info.html")
+
+@app.route("/mockups/dashboard-ui/workflow-people.html")
+@login_required
+def workflow_people_ui():
+  """Workflow people UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/workflow-people.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():
