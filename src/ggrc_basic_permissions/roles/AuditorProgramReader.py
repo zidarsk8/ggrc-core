@@ -15,6 +15,7 @@ permissions = {
         "ProgramDirective",
         "Relationship",
         "Context",
+        "UserRole"
     ],
     "create": [],
     "update": [],
