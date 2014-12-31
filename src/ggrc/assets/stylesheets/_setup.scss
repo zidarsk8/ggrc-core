@@ -414,7 +414,7 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 %btn-danger {
   @include btnBgnd($red);
 }
-%btn-gray {
+%btn-draft {
   @include btnBgnd($lightGray);
 }
 

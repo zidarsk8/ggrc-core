@@ -355,6 +355,13 @@ def workflow_people_ui():
   """
   return render_template("/mockups/dashboard-ui/workflow-people.html")
 
+@app.route("/mockups/dashboard-ui/audit.html")
+@login_required
+def audit_ui():
+  """Audit UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/audit.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():

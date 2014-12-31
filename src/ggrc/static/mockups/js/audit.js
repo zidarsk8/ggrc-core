@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
   can.Component.extend({
-    tag: "workflow",
+    tag: "audit",
     scope: {
     },
     template: "<content/>",
@@ -11,5 +11,5 @@ $(document).ready(function() {
     }
   });
 
-  $(".object-wrap").html(can.view("/static/mockups/mustache/workflow.mustache",{}));
+  $(".object-wrap").html(can.view("/static/mockups/mustache/audit.mustache",{}));
 });

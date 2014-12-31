@@ -408,7 +408,7 @@ a {
   }
 }
 
-@each $btn_color in primary, success, info, warning, danger, gray {
+@each $btn_color in primary, success, info, warning, danger, draft {
   .btn-#{$btn_color} {
     @extend %btn-#{$btn_color};
   }

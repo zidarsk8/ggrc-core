@@ -444,6 +444,14 @@ ul.new-tree {
     line-height: 24px;
     position: relative;
     @include transition(all 0.18s cubic-bezier(.55,0,.1,1));
+    .counter-wrap {
+      line-height: 28px;
+      text-align: right;
+      .counter {
+        @include opacity(1);
+        line-height: 28px;
+      }
+    }
     p {
       line-height: 20px;
       font-size: 13px;
