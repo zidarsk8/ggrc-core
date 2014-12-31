@@ -129,6 +129,9 @@ dashboard-js-template-files:
   - controls/object_list.mustache
   - controls/tree.mustache
   - dashboard/internav_list.mustache
+  - dashboard/info/info.mustache
+  - dashboard/info/get_started.mustache
+  - dashboard/info/workflow_progress.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache
   - dashboard/lhn.mustache
