@@ -132,6 +132,7 @@ dashboard-js-template-files:
   - dashboard/info/info.mustache
   - dashboard/info/get_started.mustache
   - dashboard/info/workflow_progress.mustache
+  - dashboard/info/my_tasks.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache
   - dashboard/lhn.mustache

@@ -27,19 +27,26 @@ can.Control("GGRC.Controllers.InfoWidget", {
 }, {
   init : function() {
     var that = this;
+    //console.log("Sasmita-----Initializing info widget");
+    this.init_menu();
 
     if (this.element.data('widget-view')) {
       this.options.widget_view = GGRC.mustache_path + this.element.data('widget-view');
     }
 
     this.options.context = new can.Observe({
-        model : this.options.model
-      , instance : this.options.instance
+        model : this.options.model,
+        instance : this.options.instance,
+        start_menu : this.options.start_menu,
+        object_menu : this.options.object_menu,
+        error_msg : 'This is global messaging letting you know that something is over due!',
+        error : true
       });
     can.view(this.get_widget_view(this.element), this.options.context, function(frag) {
       that.element.html(frag);
     });
 
+    var test_a = this.options.context;
   }
 
   , get_widget_view: function(el) {
@@ -50,6 +57,43 @@ can.Control("GGRC.Controllers.InfoWidget", {
       else
         return this.options.widget_view;
     }
+
+  , init_menu: function(){
+    var start_menu,
+        object_menu;
+
+    if(!this.options.start_menu) {
+      start_menu = [
+        { model_name: 'Program', model_lowercase: 'program', model_plural: 'programs', display_name: 'Start new Program'},
+        { model_name: 'Audit', model_lowercase: 'audit', model_plural: 'audits', display_name: 'Start new Audit'},
+        { model_name: 'Workflow', model_lowercase: 'workflow', model_plural: 'workflows', display_name: 'Start new Workflow'}
+      ];
+      this.options.start_menu = start_menu;
+    }
+    if(!this.options.object_menu) {
+      object_menu = [
+        { model_name: 'Regulation', model_lowercase: 'regulation', model_plural: 'regulations', display_name: 'Regulations'},
+        { model_name: 'Policy', model_lowercase: 'policy', model_plural: 'policies', display_name: 'Policies'},
+        { model_name: 'Standard', model_lowercase: 'standard', model_plural: 'standards', display_name: 'Standards'},
+        { model_name: 'Contract', model_lowercase: 'contract', model_plural: 'contracts', display_name: 'Contracts'},
+        { model_name: 'Clause', model_lowercase: 'clause', model_plural: 'clauses', display_name: 'Clauses'},
+        { model_name: 'Section', model_lowercase: 'section', model_plural: 'sections', display_name: 'Sections'},
+        { model_name: 'Objective', model_lowercase: 'objective', model_plural: 'objectives', display_name: 'Objectives'},
+        { model_name: 'Control', model_lowercase: 'control', model_plural: 'controls', display_name: 'Controls'},
+        { model_name: 'Person', model_lowercase: 'person', model_plural: 'people', display_name: 'People'},
+        { model_name: 'OrgGroup', model_lowercase: 'org_group', model_plural: 'org_groups', display_name: 'Org Groups'},
+        { model_name: 'Vendor', model_lowercase: 'vendor', model_plural: 'vendors', display_name: 'Vendors'},
+        { model_name: 'System', model_lowercase: 'system', model_plural: 'systems', display_name: 'Systems'},
+        { model_name: 'Process', model_lowercase: 'process', model_plural: 'processs', display_name: 'Processes'},
+        { model_name: 'DataAsset', model_lowercase: 'data_asset', model_plural: 'data_assets', display_name: 'Data Assets'},
+        { model_name: 'Product', model_lowercase: 'product', model_plural: 'products', display_name: 'Products'},
+        { model_name: 'Project', model_lowercase: 'project', model_plural: 'projects', display_name: 'Projects'},
+        { model_name: 'Facility', model_lowercase: 'facility', model_plural: 'facilities', display_name: 'Facilities'},
+        { model_name: 'Market', model_lowercase: 'market', model_plural: 'markets', display_name: 'Markets'}
+      ];
+      this.options.object_menu = object_menu;
+    }
+  }
 
 });
 
