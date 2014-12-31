@@ -5,69 +5,62 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-<section class="info">
+<!--section class="info"-->
   {{#instance}}  
     {{#is_dashboard}}
-    
-      <div class="action-bar">
-        <ul>
-          <li>
-            <a href="/people/{{instance.id}}">
-              View Profile Page
-              <i class="grcicon-goto"></i>
-            </a>
-          </li>
-        </ul>
-      </div>
-    
-    {{/is_dashboard}}
+      {{> /static/mustache/dashboard/info/info.mustache}}
 
-    {{#name}}
-    <div class="row-fluid">
-      <div class="span12">
-        <h6>Name</h6>
-        <h3>{{name}}
-            {{^if is_enabled}}
-                <span class="user-disabled">
-                  (Disabled)
-                </span>
-            {{/if}}
-        </h3>
+    {{else}}
+    <section class="info">
+      {{#name}}
+      <div class="row-fluid">
+        <div class="span12">
+          <h6>Name</h6>
+          <h3>{{name}}
+              {{^if is_enabled}}
+                  <span class="user-disabled">
+                    (Disabled)
+                  </span>
+              {{/if}}
+          </h3>
+        </div>
       </div>
-    </div>
-    {{/name}}
-    {{#email}}
-    <div class="row-fluid">
-      <div class="span12">
-        <h6>Email</h6>
+      {{/name}}
+      {{#email}}
+      <div class="row-fluid">
+        <div class="span12">
+          <h6>Email</h6>
+          <p>
+          {{email}}
+          </p>
+        </div>
+      </div>
+      {{/email}}
+      {{#company}}
+      <div class="row-fluid">
+        <div class="span12">
+          <h6>Company</h6>
+            <p>
+              {{company}}
+            </p>
+        </div>
+      </div>
+      {{/company}}
+
+      <div class="info-widget-footer">
         <p>
-        {{email}}
+          <small>
+          <em>
+            Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
+            <br>
+            Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+          </em>
+          </small>
         </p>
       </div>
-    </div>
-    {{/email}}
-    {{#company}}
-    <div class="row-fluid">
-      <div class="span12">
-        <h6>Company</h6>
-          <p>
-            {{company}}
-          </p>
-      </div>
-    </div>
-    {{/company}}
-    <div class="info-widget-footer">
-      <p>
-        <small>
-        <em>
-          Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
-          <br>
-          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
-        </em>
-        </small>
-      </p>
-    </div>
+    </section>
+    {{/is_dashboard}}
   {{/instance}}
-</section>
+<!--/section-->
 
 

@@ -1,0 +1,268 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita
+    Maintained By: sasmita
+}}
+
+<ul class="quick-list">
+  <li>
+    <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide"
+        data-object-singular="Program" data-object-plural="programs"
+        data-modal-reset="reset" data-form-target="redirect">
+      <span class="icon-wrap">
+        <i class="grcicon-program-color"></i>
+      </span>
+      Start new program
+    </a>
+  </li>
+  <li>
+    <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide"
+        data-object-singular="Audit" data-object-plural="audits" 
+        data-modal-reset="reset" data-form-target="redirect">
+      <span class="icon-wrap">
+        <i class="grcicon-audit-color"></i>
+      </span>
+      Start new audit
+    </a>
+  </li>
+  <li>
+    <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide"
+        data-object-singular="Workflow" data-object-plural="workflows" 
+        data-modal-reset="reset" data-form-target="redirect">
+      <span class="icon-wrap">
+        <i class="grcicon-workflow-color"></i>
+      </span>
+      Start new workflow
+    </a>
+  </li>
+  <!-- will do lookup objects later -->
+  <!--li class="top-space">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      <span class="icon-wrap">
+        <i class="grcicon-search-white"></i>
+      </span>
+      Lookup Objects
+    </a>
+    <div class="dropdown-menu dropdown-menu-form quick-search">
+      <ul>
+        <li>
+          <h6>Object Type</h6>
+          <select class="input-block-level option-type-selector">
+            <optgroup label="Governance">
+              <option value="AllObjects" label="All Objects">
+              </option>
+              <option value="Regulation" label="Regulations">
+              </option>
+              <option value="Policy" label="Policies">
+              </option>
+              <option value="Contract" label="Contracts">
+              </option>
+              <option value="Standard" label="Standards">
+              </option>
+              <option value="Program" label="Programs" selected="selected">
+              </option>
+              <option value="Objective" label="Objectives">
+              </option>
+              <option value="Section" label="Sections">
+              </option>
+              <option value="Clause" label="Clauses">
+              </option>
+              <option value="Control" label="Controls">
+              </option>
+              <option value="Audit" label="Audits">
+              </option>
+              <option value="Workflow" label="Workflows">
+              </option>
+            </optgroup>
+            <optgroup label="Assets/Business">
+              <option value="DataAsset" label="Data Assets">
+              </option>
+              <option value="Facility" label="Facilities">
+              </option>
+              <option value="Market" label="Markets">
+              </option>
+              <option value="Process" label="Processes">
+              </option>
+              <option value="Product" label="Products">
+              </option>
+              <option value="Project" label="Projects">
+              </option>
+              <option value="System" label="Systems">
+              </option>
+            </optgroup>
+            <optgroup label="People/Groups">
+              <option value="OrgGroup" label="Org Groups">
+              </option>
+              <option value="Vendor" label="Vendors">
+              </option>
+              <option value="Person" label="People">
+              </option>
+            </optgroup>
+          </select>
+        </li>
+        <li>
+          <h6>Matching terms</h6>
+          <input class="input-block-level" placeholder="Enter text to search..." type="text" autofocus="">
+        </li>
+        <li>
+          <button type="submit" class="btn btn-small btn-info">Search</button>
+        </li>
+      </ul>
+    </div>
+  </li -->
+  <li class="top-space hidden-widgets-list">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      <span class="icon-wrap">
+        <i class="grcicon-add-color"></i>
+      </span>
+      Create new object
+    </a>
+    <div class="dropdown-menu" role="menu">
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-regulation-color"></i>
+            Regulations
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-policy-color"></i>
+            Policies
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-standard-color"></i>
+            Standards
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-contract-color"></i>
+            Contracts
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-clause-color"></i>
+            Clauses
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-section-color"></i>
+            Sections
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-objective-color"></i>
+            Objectives
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-control-color"></i>
+            Controls
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-person-color"></i>
+            People
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-org_group-color"></i>
+            Org Groups
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-vendor-color"></i>
+            Vendors
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-system-color"></i>
+            Systems
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-process-color"></i>
+            Processes
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-data_asset-color"></i>
+            Data Assets
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-product-color"></i>
+            Products
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-project-color"></i>
+            Projects
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-facility-color"></i>
+            Facilities
+          </div>
+        </a>
+      </div>
+      <div class="inner-nav-item">
+        <a href="#">
+          <div class="oneline">
+            <i class="grcicon-market-color"></i>
+            Markets
+          </div>
+        </a>
+      </div>
+    </div>
+  </li>
+</ul><!-- tree-structure end -->
