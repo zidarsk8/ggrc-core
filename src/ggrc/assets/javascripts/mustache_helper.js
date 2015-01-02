@@ -285,10 +285,21 @@ Mustache.registerHelper("if_match", function(val1, val2, options) {
 });
 
 Mustache.registerHelper("in_array", function(needle, haystack, options) {
+  var found = false;
   needle = resolve_computed(needle);
   haystack = resolve_computed(haystack);
+  haystack.attr("length");
 
-  return options[~can.inArray(needle, haystack) ? "fn" : "inverse"](options.contexts);
+  can.each(haystack, function(_, index) {
+    if(haystack.attr(index) === needle) {
+      found = true;
+    }
+  });
+  if(found) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
 });
 
 Mustache.registerHelper("if_null", function(val1, options) {
