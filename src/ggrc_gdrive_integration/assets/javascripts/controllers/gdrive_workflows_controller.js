@@ -862,15 +862,27 @@ can.Component.extend({
       this.element.removeAttr("tabindex");
       this.scope.attr("_folder_change_pending", true);
       this.scope.instance.get_binding("folders").refresh_instances().then(function(folders) {
-        that.scope.removeAttr("_folder_change_pending");
         that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
         that.options.folder_list = folders;
-        that.on();
       }, function(error) {
         that.scope.removeAttr("_folder_change_pending");
         that.scope.attr('folder_error', error);
         that.options.instance = that.scope.instance;
-        that.on();
+      }).then(function() {
+        // Try to load extended folders if main folder was not found
+        if (!that.scope.instance.get_binding("extended_folders") || that.scope.current_folder || that.scope.folder_error) {
+          that.scope.removeAttr("_folder_change_pending");
+          return;
+        }
+        that.scope.instance.get_binding("extended_folders").refresh_instances().then(function(folders) {
+          that.scope.removeAttr("_folder_change_pending");
+          that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
+          that.options.folder_list = folders;
+        }, function(error) {
+          that.scope.removeAttr("_folder_change_pending");
+          that.scope.attr('folder_error', error);
+          that.options.instance = that.scope.instance;
+        });
       });
     },
     "{instance} change": function() {
