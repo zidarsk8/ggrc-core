@@ -273,6 +273,10 @@ def handle_tasks_overdue():
 
     tasks_for_contact[assignee.id].append((assignee, task))
 
+  # No overdue tasks at this time:
+  if not tasks_for_contact:
+    return
+
   soonest_due_days = sorted(tasks_for_contact.keys())[0]
   subject = "Your tasks are due soon! First %s." % humanize_due_days(soonest_due_days)
 
@@ -633,7 +637,7 @@ def prepare_notification_for_cycle(cycle, subject, begins_in_days, notif_pri, no
     if notify_custom_message is True and workflow.notify_custom_message is not None:
       # Object approval wfs should include the custom message wich states
       #   '<user> asked you to review...' only if the email is not being
-      #   sent to the mentioned <user> 
+      #   sent to the mentioned <user>
       if (not workflow.object_approval) or member.email not in workflow.notify_custom_message:
         email_content="<p>" + email_content + workflow.notify_custom_message + "</p>"
     email_digest_contents[member.id]= "<a href=" + '"' +  request.url_root + \
