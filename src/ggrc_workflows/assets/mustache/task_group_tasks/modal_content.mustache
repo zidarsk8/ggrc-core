@@ -22,7 +22,7 @@
         Assignee
         <i class="grcicon-help-black" rel="tooltip" title="This is the default assignee for this task."></i>
       </label>
-      <input tabindex="2" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
+      <input tabindex="2" class="input-block-level" name="contact.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
       {{/using}}
       <br>
     </div>
