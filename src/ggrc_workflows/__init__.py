@@ -552,6 +552,8 @@ def calculate_min_start_date_and_max_end_date_for_workflow_from_basedate(workflo
         min_start_date = start_date
       if max_end_date is None or end_date > max_end_date:
         max_end_date = end_date
+  if max_end_date < min_start_date:
+    max_end_date = max_end_date + RelativeTimeboxed.freq_to_delta(workflow.frequency)
   return min_start_date, max_end_date
 
 # Check if workflow should be Inactive after cycle status change
