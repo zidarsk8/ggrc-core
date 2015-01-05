@@ -24,10 +24,7 @@
           {{#using request=instance.request}}
           {{#using request_assignee=request.assignee}}
 
-            {{#if_helpers "\
-              #if_can_edit_request" instance "\
-              and ^if_auditor" instance _1_include_admin=false "\
-              or #is_allowed" "__GGRC_ADMIN__" instance }}
+            {{#if new_object_form}}
               <div class="objective-selector">
                 <input type="text" name="contact.name" data-lookup="Person" data-params="Person:is_enabled=1" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty contact.name contact.email ''}}">
               </div>
@@ -36,7 +33,7 @@
                 <i class="grcicon-person-green pull-left icon-field"></i>
                 {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
               </p>
-            {{/if_helpers}}
+            {{/if}}
           {{/using}}
           {{/using}}
       </div>
