@@ -937,6 +937,11 @@ can.Component.extend({
       if(this.scope.deferred) {
         if(this.scope.current_folder) {
           this.scope.instance.mark_for_deletion("folders", this.scope.current_folder);
+        } else if (this.scope.folder_error && !this.scope.instance.object_folders) {
+          // If object_folders are not defined for this instance the error
+          // is from extended_folders, we just need to clear folder_error
+          // in this case.
+          this.scope.attr('folder_error', null);
         } else {
           can.each(this.scope.instance.object_folders.reify(), function(object_folder){
             object_folder.refresh().then(function(of){
@@ -1022,6 +1027,11 @@ can.Component.extend({
         if(scope.deferred) {
           if(scope.current_folder) {
             scope.instance.mark_for_deletion("folders", scope.current_folder);
+          } else if (scope.folder_error && !scope.instance.object_folders) {
+            // If object_folders are not defined for this instance the error
+            // is from extended_folders, we just need to clear folder_error
+            // in this case.
+            scope.attr('folder_error', null);
           } else {
             can.each(this.scope.instance.object_folders.reify(), function(object_folder){
               object_folder.refresh().then(function(of){
