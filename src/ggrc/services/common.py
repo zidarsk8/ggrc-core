@@ -888,8 +888,8 @@ class Resource(ModelView):
     if '__fields' in request.args:
         custom_fields = request.args['__fields'].split(',')
         objs = [
-            {f: o[f] for f in custom_fields if f in o}  # https://docs.python.org/2/tutorial/datastructures.html#dictionaries comprehension
-            for o in objs]  # https://docs.python.org/2/tutorial/datastructures.html#list-comprehensions
+            {f: o[f] for f in custom_fields if f in o}
+            for o in objs]
 
     with benchmark("Serialize collection"):
       collection = self.build_collection_representation(
