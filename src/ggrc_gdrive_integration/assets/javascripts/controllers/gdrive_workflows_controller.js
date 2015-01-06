@@ -861,34 +861,38 @@ can.Component.extend({
       var that = this;
       this.element.removeAttr("tabindex");
       this.scope.attr("_folder_change_pending", true);
-      this.scope.instance.get_binding("folders").refresh_instances().then(function(folders) {
+      this.scope.instance.get_binding("folders").refresh_instances().then(that._ifNotRemoved(function(folders) {
         that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
         that.options.folder_list = folders;
-      }, function(error) {
+        that.on();
+      }), that._ifNotRemoved(function(error) {
         that.scope.removeAttr("_folder_change_pending");
         that.scope.attr('folder_error', error);
         that.options.instance = that.scope.instance;
-      }).then(function() {
+        that.on();
+      })).then(function() {
         // Try to load extended folders if main folder was not found
         if (!that.scope.instance.get_binding("extended_folders") || that.scope.current_folder || that.scope.folder_error) {
           that.scope.removeAttr("_folder_change_pending");
           return;
         }
-        that.scope.instance.get_binding("extended_folders").refresh_instances().then(function(folders) {
+        that.scope.instance.get_binding("extended_folders").refresh_instances().then(that._ifNotRemoved(function(folders) {
           that.scope.removeAttr("_folder_change_pending");
           that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
           that.options.folder_list = folders;
-        }, function(error) {
+          that.on();
+        }), that._ifNotRemoved(function(error) {
           that.scope.removeAttr("_folder_change_pending");
           that.scope.attr('folder_error', error);
           that.options.instance = that.scope.instance;
-        });
+          that.on();
+        }));
       });
     },
-    "{instance} change": function() {
+    "{instance} change": function(inst, ev, attr) {
       var that = this;
       // Error recovery from previous refresh_instances error when we couldn't set up the binding.
-      if(this.scope.folder_error) {
+      if(attr === "_transient.folder" && this.scope.folder_error) {
         this.scope.instance.get_binding("folders").refresh_instances().then(function(folders) {
           that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
           that.options.folder_list = folders;
@@ -897,6 +901,22 @@ can.Component.extend({
         }, function(error) {
           that.scope.removeAttr("_folder_change_pending");
           that.scope.attr('folder_error', error);
+        }).then(function() {
+          // Try to load extended folders if main folder was not found
+          if (!that.scope.instance.get_binding("extended_folders") || that.scope.current_folder || that.scope.folder_error) {
+            that.scope.removeAttr("_folder_change_pending");
+            return;
+          }
+          that.scope.instance.get_binding("extended_folders").refresh_instances().then(that._ifNotRemoved(function(folders) {
+            that.scope.removeAttr("_folder_change_pending");
+            that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
+            that.options.folder_list = folders;
+            delete that.options.instance;
+            that.on();
+          }), that._ifNotRemoved(function(error) {
+            that.scope.removeAttr("_folder_change_pending");
+            that.scope.attr('folder_error', error);
+          }));
         });
       }
     },
