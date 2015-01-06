@@ -1069,6 +1069,7 @@ can.Component.extend({
         }
       }).then(function() {
         scope.attr('_folder_change_pending', false);
+        scope.attr('folder_error', null);
         scope.attr("current_folder", files[0]);
         if(scope.deferred && scope.instance._transient) {
           scope.instance.attr("_transient.folder", files[0]);
