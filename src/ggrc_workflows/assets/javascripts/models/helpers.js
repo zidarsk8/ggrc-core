@@ -84,7 +84,7 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
               + that.original_object.constructor.model_singular + ' "' + that.original_object.title
               + '" before ' + moment(that.end_date).format("MM/DD/YYYY") + ". "
               + "Click <a href='" + window.location.href.replace(/#.*$/, "#")
-              + "workflows_widget'>here</a> to perform a review.",
+              + "#workflows_widget'>here</a> to perform a review.",
             context: that.original_object.context
           }).save()
         ).then(function(wf) {
