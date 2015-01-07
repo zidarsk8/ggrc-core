@@ -851,6 +851,7 @@ can.Component.extend({
   tag: "ggrc-gdrive-folder-picker",
   template: can.view(GGRC.mustache_path + "/gdrive/gdrive_folder.mustache"),
   scope : {
+    no_detach: "@",
     deferred: "@",
     tabindex: "@",
     placeholder: "@",
@@ -861,36 +862,74 @@ can.Component.extend({
       var that = this;
       this.element.removeAttr("tabindex");
       this.scope.attr("_folder_change_pending", true);
-      this.scope.instance.get_binding("folders").refresh_instances().then(function(folders) {
-        that.scope.removeAttr("_folder_change_pending");
+      this.scope.instance.get_binding("folders").refresh_instances().then(that._ifNotRemoved(function(folders) {
         that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
         that.options.folder_list = folders;
         that.on();
-      }, function(error) {
+      }), that._ifNotRemoved(function(error) {
         that.scope.removeAttr("_folder_change_pending");
         that.scope.attr('folder_error', error);
         that.options.instance = that.scope.instance;
         that.on();
+      })).then(function() {
+        // Try to load extended folders if main folder was not found
+        if (!that.scope.instance.get_binding("extended_folders") || that.scope.current_folder || that.scope.folder_error) {
+          that.scope.removeAttr("_folder_change_pending");
+          return;
+        }
+        that.scope.instance.get_binding("extended_folders").refresh_instances().then(that._ifNotRemoved(function(folders) {
+          that.scope.removeAttr("_folder_change_pending");
+          that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
+          that.options.folder_list = folders;
+          that.on();
+        }), that._ifNotRemoved(function(error) {
+          that.scope.removeAttr("_folder_change_pending");
+          that.scope.attr('folder_error', error);
+          that.options.instance = that.scope.instance;
+          that.on();
+        }));
       });
     },
-    "{instance} change": function() {
+    "{instance} change": function(inst, ev, attr) {
       var that = this;
       // Error recovery from previous refresh_instances error when we couldn't set up the binding.
       if(this.scope.folder_error) {
         this.scope.instance.get_binding("folders").refresh_instances().then(function(folders) {
           that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
+          that.scope.removeAttr("_folder_change_pending");
           that.options.folder_list = folders;
           delete that.options.instance;
           that.on();
         }, function(error) {
           that.scope.removeAttr("_folder_change_pending");
           that.scope.attr('folder_error', error);
+        }).then(function() {
+          // Try to load extended folders if main folder was not found
+          if (!that.scope.instance.get_binding("extended_folders") || that.scope.current_folder || that.scope.folder_error) {
+            that.scope.removeAttr("_folder_change_pending");
+            return;
+          }
+          that.scope.instance.get_binding("extended_folders").refresh_instances().then(that._ifNotRemoved(function(folders) {
+            that.scope.removeAttr("_folder_change_pending");
+            that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
+            that.options.folder_list = folders;
+            delete that.options.instance;
+            that.on();
+          }), that._ifNotRemoved(function(error) {
+            that.scope.removeAttr("_folder_change_pending");
+            that.scope.attr('folder_error', error);
+          }));
         });
       }
     },
     "{folder_list} change": function() {
       var pjlength;
-      this.scope.attr("current_folder", this.options.folder_list.length ? this.options.folder_list[0].instance : null);
+      var item = this.scope.instance.get_binding("folders").list[0];
+      if(!item && this.scope.instance.get_binding("extended_folders")) {
+        item = this.scope.instance.get_binding("extended_folders").list[0];
+      }
+      this.scope.attr("current_folder", item ? item.instance : null);
+
       if(this.scope.deferred && this.scope.instance._pending_joins) {
         pjlength = this.scope.instance._pending_joins.length;
         can.each(this.scope.instance._pending_joins.slice(0).reverse(), function(pj, i) {
@@ -905,6 +944,11 @@ can.Component.extend({
       if(this.scope.deferred) {
         if(this.scope.current_folder) {
           this.scope.instance.mark_for_deletion("folders", this.scope.current_folder);
+        } else if (this.scope.folder_error && !this.scope.instance.object_folders) {
+          // If object_folders are not defined for this instance the error
+          // is from extended_folders, we just need to clear folder_error
+          // in this case.
+          this.scope.attr('folder_error', null);
         } else {
           can.each(this.scope.instance.object_folders.reify(), function(object_folder){
             object_folder.refresh().then(function(of){
@@ -919,7 +963,25 @@ can.Component.extend({
           });
         });
       }
-      this.scope.attr("current_folder", null);
+
+      if(this.scope.instance.get_binding("extended_folders")) {
+        $.when(
+          this.scope.instance.get_binding("folders").refresh_instances(),
+          this.scope.instance.get_binding("extended_folders").refresh_instances()
+        ).then(function(local_bindings, extended_bindings) {
+          var self_folders, remote_folders;
+          self_folders = can.map(local_bindings, function(folder_binding) {
+            return folder_binding.instance;
+          });
+          remote_folders = can.map(extended_bindings, function(folder_binding) {
+            return ~can.inArray(folder_binding.instance, self_folders) ? undefined : folder_binding.instance;
+          });
+
+          that.scope.attr("current_folder", remote_folders[0] || null);
+        });
+      } else {
+        this.scope.attr("current_folder", null);
+      }
       this.scope.attr('folder_error', null);
     },
     "a[data-toggle=gdrive-picker] click" : function(el, ev) {
@@ -990,6 +1052,11 @@ can.Component.extend({
         if(scope.deferred) {
           if(scope.current_folder) {
             scope.instance.mark_for_deletion("folders", scope.current_folder);
+          } else if (scope.folder_error && !scope.instance.object_folders) {
+            // If object_folders are not defined for this instance the error
+            // is from extended_folders, we just need to clear folder_error
+            // in this case.
+            scope.attr('folder_error', null);
           } else {
             can.each(this.scope.instance.object_folders.reify(), function(object_folder){
               object_folder.refresh().then(function(of){
@@ -1027,6 +1094,7 @@ can.Component.extend({
         }
       }).then(function() {
         scope.attr('_folder_change_pending', false);
+        scope.attr('folder_error', null);
         scope.attr("current_folder", files[0]);
         if(scope.deferred && scope.instance._transient) {
           scope.instance.attr("_transient.folder", files[0]);
