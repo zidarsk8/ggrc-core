@@ -892,9 +892,10 @@ can.Component.extend({
     "{instance} change": function(inst, ev, attr) {
       var that = this;
       // Error recovery from previous refresh_instances error when we couldn't set up the binding.
-      if(attr === "_transient.folder" && this.scope.folder_error) {
+      if(this.scope.folder_error) {
         this.scope.instance.get_binding("folders").refresh_instances().then(function(folders) {
           that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
+          that.scope.removeAttr("_folder_change_pending");
           that.options.folder_list = folders;
           delete that.options.instance;
           that.on();
@@ -922,7 +923,12 @@ can.Component.extend({
     },
     "{folder_list} change": function() {
       var pjlength;
-      this.scope.attr("current_folder", this.options.folder_list.length ? this.options.folder_list[0].instance : null);
+      var item = this.scope.instance.get_binding("folders").list[0];
+      if(!item && this.scope.instance.get_binding("extended_folders")) {
+        item = this.scope.instance.get_binding("extended_folders").list[0];
+      }
+      this.scope.attr("current_folder", item ? item.instance : null);
+
       if(this.scope.deferred && this.scope.instance._pending_joins) {
         pjlength = this.scope.instance._pending_joins.length;
         can.each(this.scope.instance._pending_joins.slice(0).reverse(), function(pj, i) {
@@ -956,7 +962,25 @@ can.Component.extend({
           });
         });
       }
-      this.scope.attr("current_folder", null);
+
+      if(this.scope.instance.get_binding("extended_folders")) {
+        $.when(
+          this.scope.instance.get_binding("folders").refresh_instances(),
+          this.scope.instance.get_binding("extended_folders").refresh_instances()
+        ).then(function(local_bindings, extended_bindings) {
+          var self_folders, remote_folders;
+          self_folders = can.map(local_bindings, function(folder_binding) {
+            return folder_binding.instance;
+          });
+          remote_folders = can.map(extended_bindings, function(folder_binding) {
+            return ~can.inArray(folder_binding.instance, self_folders) ? undefined : folder_binding.instance;
+          });
+
+          that.scope.attr("current_folder", remote_folders[0] || null);
+        });
+      } else {
+        this.scope.attr("current_folder", null);
+      }
       this.scope.attr('folder_error', null);
     },
     "a[data-toggle=gdrive-picker] click" : function(el, ev) {
