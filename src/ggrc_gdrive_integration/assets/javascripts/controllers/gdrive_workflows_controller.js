@@ -851,6 +851,7 @@ can.Component.extend({
   tag: "ggrc-gdrive-folder-picker",
   template: can.view(GGRC.mustache_path + "/gdrive/gdrive_folder.mustache"),
   scope : {
+    no_detach: "@",
     deferred: "@",
     tabindex: "@",
     placeholder: "@",

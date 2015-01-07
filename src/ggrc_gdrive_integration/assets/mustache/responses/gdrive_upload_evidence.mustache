@@ -2,7 +2,7 @@
 <div>
   <br>
   {{#is_allowed "create" 'ObjectDocument' context=instance.context.id}}
-    <ggrc-gdrive-folder-picker deferred="true" instance="instance"/>
+    <ggrc-gdrive-folder-picker deferred="true" instance="instance" no_detach="true"/>
   {{/is_allowed}}
 </div>
 {{#if_helpers '\
