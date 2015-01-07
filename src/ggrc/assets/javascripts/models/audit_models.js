@@ -413,6 +413,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     }
 
     this.validateNonBlank("description");
+    this.validatePresenceOf("contact");
   }
   , create : "POST /api/responses"
   , update : "PUT /api/responses/{id}"
@@ -521,8 +522,8 @@ can.Model.Cacheable("CMS.Models.Response", {
 }, {
     display_name : function() {
       var desc = this.description
-        , max_len = 20;
-      out_name = desc;
+        , max_len = 20
+        , out_name = desc;
       // Truncate if greater than max_len chars
       if (desc.length > max_len) {
         out_name = desc.slice(0, max_len) + " ...";
@@ -534,9 +535,15 @@ can.Model.Cacheable("CMS.Models.Response", {
       this.attr("contact", this.request.reify().assignee);
     }
   }
-  , preload_form : function(new_object_form) {
+  , form_preload : function(new_object_form) {
     if(new_object_form && !this.contact) {
-      this.attr("contact", this.request.reify().assignee);
+        if (!this.request) {
+            this.bind("request", function (ev, request) {
+                this.attr('contact', request.reify().assignee);
+            });
+        }else{
+            this.attr('contact', this.request.reify().assignee);
+        };
     }
   }
 
