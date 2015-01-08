@@ -2268,7 +2268,7 @@ Mustache.registerHelper("truncate", function (len, str) {
       }
   }else{
       // first line of input
-      var strs = str.split(/<br*>|\n/gm);
+      var strs = str.split(/<br[^>]*>|\n/gm);
       if (strs.length > 1) {
           str = strs[0];
           str += " &hellip;";
