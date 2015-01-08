@@ -897,6 +897,21 @@ $(document).ready(function(){
 
   });
 
+  // Audit 2nd tier show/hide requests, responses and objects
+  $("#auditRequestSelect").on("click", function(e) {
+
+    $("#auditRequestPin").show();
+    $("#auditResponsePin").hide();
+
+  });
+
+  $("#auditResponseSelect").on("click", function(e) {
+
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").show();
+
+  });
+
 });
 
 // Widget search active state
