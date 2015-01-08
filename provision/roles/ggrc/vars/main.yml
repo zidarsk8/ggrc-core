@@ -27,6 +27,7 @@ ggrc_development_directories:
 ggrc_npm_modules:
   - name: nodeunit
   - name: pegjs
+  - name: mkdirp
 
 ggrc_gems:
   - name: sass
