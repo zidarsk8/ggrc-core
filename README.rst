@@ -2,6 +2,8 @@
 gGRC-Core
 *********
 
+Google Governance, Risk and Compliance. Migrated from `Google <https://code.google.com/p/compliance-management/>`_ `Code <https://code.google.com/p/ggrc-core>`_.
+
 Requirements
 ============
 
