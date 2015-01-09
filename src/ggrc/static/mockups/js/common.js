@@ -874,42 +874,40 @@ $(document).ready(function(){
 
   // Workflow 2nd tier show/hide task-group, tasks and objects
   $("#taskGroupPinSelect").on("click", function(e) {
-
     $("#taskGroupPin").show();
     $("#taskPin").hide();
     $("#objectPin").hide();
-
   });
 
   $("#taskPinSelect").on("click", function(e) {
-
     $("#taskGroupPin").hide();
     $("#taskPin").show();
     $("#objectPin").hide();
-
   });
 
   $("#objectPinSelect").on("click", function(e) {
-
     $("#taskGroupPin").hide();
     $("#taskPin").hide();
     $("#objectPin").show();
-
   });
 
   // Audit 2nd tier show/hide requests, responses and objects
   $("#auditRequestSelect").on("click", function(e) {
-
     $("#auditRequestPin").show();
     $("#auditResponsePin").hide();
-
+    $("#auditObjectPin").hide();
   });
 
   $("#auditResponseSelect").on("click", function(e) {
-
     $("#auditRequestPin").hide();
     $("#auditResponsePin").show();
+    $("#auditObjectPin").hide();
+  });
 
+  $("#auditObjectSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").show();
   });
 
 });
