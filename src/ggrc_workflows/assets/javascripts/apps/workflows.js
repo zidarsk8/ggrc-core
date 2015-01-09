@@ -111,6 +111,7 @@
           current_task_groups: Cross("current_cycle", "reify_cycle_task_groups"),
           current_task_group_objects: Cross("current_task_groups", "cycle_task_group_objects_for_page_object"),
           current_tasks: Cross("current_task_groups", "cycle_task_group_object_tasks_for_page_object"),
+          current_all_tasks: Cross("current_task_groups", "cycle_task_group_tasks"),
 
           people: Proxy(
             "Person", "person", "WorkflowPerson", "workflow", "workflow_people"),

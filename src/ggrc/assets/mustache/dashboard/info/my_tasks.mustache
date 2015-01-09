@@ -5,55 +5,11 @@
     Maintained By: sasmita
 }}
 
-<section class="content">
-  <ul class="tree-structure new-tree dashboard-tree">
-    <li class="filter-wrap">
-      <div class="filter-border">
-        <form>
-          <div class="row-fluid">
-            <div class="span9">
-              <ul>
-                <li>
-                  <label>
-                    Status
-                  </label>
-                  <select name="status" class="input-small">
-                    <option value="" selected="true">Any</option>
-                    <option>Draft</option>
-                    <option>Requested</option>
-                    <option>Responded</option>
-                    <option>Amended Request</option>
-                    <option>Updated Response</option>
-                    <option>Accepted</option>
-                  </select>
-                </li>
-                <li>
-                  <input type="text" class="input-medium" placeholder="Filter by Object">
-                </li>
-                <li>
-                  <input type="text" class="input-medium" placeholder="Filter by Workflow">
-                </li>
-                <li>
-                  <label class="checkbox-inline">
-                    <input class="checkbox" type="checkbox">
-                    Overdue only
-                  </label>
-                </li>
-              </ul>
-            </div>
-            <div class="span3">
-              <div class="pull-right">
-                <label class="checkbox-inline">
-                  <input class="checkbox" type="checkbox">
-                  Show history
-                </label>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </li>
-    <li class="tree-item">
+
+<ul class="tree-structure new-tree dashboard-tree task-tree">
+  {{#each options}}
+  {{#using ins=instance}}
+    <li class="tree-item"> <!-- actual data gies here -->
       <div class="item-main">
         <div class="openclose">
           <div class="item-wrap">
@@ -61,19 +17,23 @@
               <div class="span12">
                 <ul class="tree-action-list">
                   <li>
-                    Due in 3 days
+                    End date: {{ins.end_date}}
                   </li>
                   <li>
-                    <a href="#" class="btn btn-small btn-info">Start</a>
+                    <a href="javascript://" class="btn btn-small btn-info">Start</a>
                   </li>
                 </ul>
                 <div class="item-data">
                   <span class="status-label status-draft"></span>
                   <div class="tree-title-area w-status">
-                    <a href="#">Implement new password policy accross Google Play store modules</a>
+                    <a href="#">{{ins.title}}</a>
                     <ul class="item-util">
                       <li>
-                        Workflow: <a href="#">Google Fiber EOO</a>
+                        {{#using cycle=ins.cycle}}
+                          {{#using workflow=cycle.workflow}}
+                            Workflow: <a href="#">{{workflow.title}}</a>
+                          {{/using}}
+                        {{/using}}
                       </li>
                       <li>
                         Control: <a href="#">Login Access</a>
@@ -135,10 +95,7 @@
               <div class="span12">
                 <h6>Task Details</h6>
                 <p>
-                  Fanny pack kitsch fashion axe wolf photo booth, try-hard Banksy artisan sartorial salvia selvage Brooklyn. Art party next level plaid sartorial letterpress, flexitarian American Apparel chambray. Fashion axe before they sold out cred, cardigan selfies pug twee.
-                </p>
-                <p>
-                  Trust fund ugh polaroid, four dollar toast mumblecore Pinterest Blue Bottle tote bag. Intelligentsia crucifix art party DIY 90's cred Vice. Squid you probably haven't heard of them brunch 8-bit, fingerstache quinoa pop-up retro irony banh mi organic hashtag. Mumblecore tofu raw denim cronut chambray gentrify.
+                  {{description}}
                 </p>
               </div>
             </div><!-- row-fluid end -->
@@ -257,216 +214,217 @@
         </div><!-- tier-2-info-content end -->
       </div><!-- tier-2-info end -->
     </li>
-    <li class="tree-item">
-      <div class="item-main">
-        <div class="openclose">
-          <div class="item-wrap">
-            <div class="row-fluid">
-              <div class="span12">
-                <ul class="tree-action-list">
-                  <li>
-                    Due in 7 days
-                  </li>
-                  <li>
-                    <a href="#" class="btn btn-small btn-success">Verify</a>
-                  </li>
-                  <li>
-                    <a href="#" class="btn btn-small btn-danger">Decline</a>
-                  </li>
-                </ul>
-                <div class="item-data">
-                  <span class="status-label status-progress"></span>
-                  <div class="tree-title-area w-status">
-                    <a href="#">Check if food is still delicious in Stock Market after 6pm</a>
-                    <ul class="item-util">
-                      <li>
-                        Workflow: <a href="#">Vegan before 6 implementation</a>
-                      </li>
-                    </ul>
-                  </div>
+  {{/using}}
+  {{/each}}
+  <!--li class="tree-item">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul class="tree-action-list">
+                <li>
+                  Due in 7 days
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-success">Verify</a>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-danger">Decline</a>
+                </li>
+              </ul>
+              <div class="item-data">
+                <span class="status-label status-progress"></span>
+                <div class="tree-title-area w-status">
+                  <a href="#">Check if food is still delicious in Stock Market after 6pm</a>
+                  <ul class="item-util">
+                    <li>
+                      Workflow: <a href="#">Vegan before 6 implementation</a>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="tier-2-info item-content">
-        <div class="tier-2-info-content">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
-          </p>
-        </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
+        </p>
       </div>
-    </li>
-    <li class="tree-item">
-      <div class="item-main">
-        <div class="openclose">
-          <div class="item-wrap">
-            <div class="row-fluid">
-              <div class="span12">
-                <ul class="tree-action-list">
-                  <li>
-                    <span class="overdue">Overdue</span>
-                  </li>
-                  <li>
-                    <a href="#" class="btn btn-small btn-success">Verify</a>
-                  </li>
-                  <li>
-                    <a href="#" class="btn btn-small btn-danger">Decline</a>
-                  </li>
-                </ul>
-                <div class="item-data">
-                  <span class="status-label status-overdue"></span>
-                  <div class="tree-title-area w-status">
-                    <a href="#">Gather required doc for Fiber kick-off in Alaska</a>
-                    <ul class="item-util">
-                      <li>
-                        Workflow: <a href="#">Google Fiber EOO</a>
-                      </li>
-                      <li>
-                        Control: <a href="#">Alaska</a>
-                      </li>
-                    </ul>
-                  </div>
+    </div>
+  </li>
+  <li class="tree-item">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul class="tree-action-list">
+                <li>
+                  <span class="overdue">Overdue</span>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-success">Verify</a>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-danger">Decline</a>
+                </li>
+              </ul>
+              <div class="item-data">
+                <span class="status-label status-overdue"></span>
+                <div class="tree-title-area w-status">
+                  <a href="#">Gather required doc for Fiber kick-off in Alaska</a>
+                  <ul class="item-util">
+                    <li>
+                      Workflow: <a href="#">Google Fiber EOO</a>
+                    </li>
+                    <li>
+                      Control: <a href="#">Alaska</a>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="tier-2-info item-content">
-        <div class="tier-2-info-content">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
-          </p>
-        </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
+        </p>
       </div>
-    </li>
-    <li class="tree-item">
-      <div class="item-main">
-        <div class="openclose">
-          <div class="item-wrap">
-            <div class="row-fluid">
-              <div class="span12">
-                <ul class="tree-action-list">
-                  <li>
-                    Due in 3 days
-                  </li>
-                  <li>
-                    <a href="#" class="btn btn-small btn-info">Start</a>
-                  </li>
-                </ul>
-                <div class="item-data">
-                  <span class="status-label status-draft"></span>
-                  <div class="tree-title-area w-status">
-                    <a href="#">Implement new password policy accross Google Play store modules</a>
-                    <ul class="item-util">
-                      <li>
-                        Workflow: <a href="#">Google Fiber EOO</a>
-                      </li>
-                      <li>
-                        Control: <a href="#">Login Access</a>
-                      </li>
-                    </ul>
-                  </div>
+    </div>
+  </li>
+  <li class="tree-item">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul class="tree-action-list">
+                <li>
+                  Due in 3 days
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-info">Start</a>
+                </li>
+              </ul>
+              <div class="item-data">
+                <span class="status-label status-draft"></span>
+                <div class="tree-title-area w-status">
+                  <a href="#">Implement new password policy accross Google Play store modules</a>
+                  <ul class="item-util">
+                    <li>
+                      Workflow: <a href="#">Google Fiber EOO</a>
+                    </li>
+                    <li>
+                      Control: <a href="#">Login Access</a>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="tier-2-info item-content">
-        <div class="tier-2-info-content">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
-          </p>
-        </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
+        </p>
       </div>
-    </li>
-    <li class="tree-item">
-      <div class="item-main">
-        <div class="openclose">
-          <div class="item-wrap">
-            <div class="row-fluid">
-              <div class="span12">
-                <ul class="tree-action-list">
-                  <li>
-                    Due in 7 days
-                  </li>
-                  <li>
-                    <a href="#" class="btn btn-small btn-success">Verify</a>
-                  </li>
-                  <li>
-                    <a href="#" class="btn btn-small btn-danger">Decline</a>
-                  </li>
-                </ul>
-                <div class="item-data">
-                  <span class="status-label status-progress"></span>
-                  <div class="tree-title-area w-status">
-                    <a href="#">Check if food is still delicious in Stock Market after 6pm</a>
-                    <ul class="item-util">
-                      <li>
-                        Workflow: <a href="#">Vegan before 6 implementation</a>
-                      </li>
-                    </ul>
-                  </div>
+    </div>
+  </li>
+  <li class="tree-item">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul class="tree-action-list">
+                <li>
+                  Due in 7 days
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-success">Verify</a>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-danger">Decline</a>
+                </li>
+              </ul>
+              <div class="item-data">
+                <span class="status-label status-progress"></span>
+                <div class="tree-title-area w-status">
+                  <a href="#">Check if food is still delicious in Stock Market after 6pm</a>
+                  <ul class="item-util">
+                    <li>
+                      Workflow: <a href="#">Vegan before 6 implementation</a>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="tier-2-info item-content">
-        <div class="tier-2-info-content">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
-          </p>
-        </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
+        </p>
       </div>
-    </li>
-    <li class="tree-item">
-      <div class="item-main">
-        <div class="openclose">
-          <div class="item-wrap">
-            <div class="row-fluid">
-              <div class="span12">
-                <ul class="tree-action-list">
-                  <li>
-                    <span class="overdue">Overdue</span>
-                  </li>
-                  <li>
-                    <a href="#" class="btn btn-small btn-success">Verify</a>
-                  </li>
-                  <li>
-                    <a href="#" class="btn btn-small btn-danger">Decline</a>
-                  </li>
-                </ul>
-                <div class="item-data">
-                  <span class="status-label status-overdue"></span>
-                  <div class="tree-title-area w-status">
-                    <a href="#">Gather required doc for Fiber kick-off in Alaska</a>
-                    <ul class="item-util">
-                      <li>
-                        Workflow: <a href="#">Google Fiber EOO</a>
-                      </li>
-                      <li>
-                        Control: <a href="#">Alaska</a>
-                      </li>
-                    </ul>
-                  </div>
+    </div>
+  </li>
+  <li class="tree-item">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul class="tree-action-list">
+                <li>
+                  <span class="overdue">Overdue</span>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-success">Verify</a>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-danger">Decline</a>
+                </li>
+              </ul>
+              <div class="item-data">
+                <span class="status-label status-overdue"></span>
+                <div class="tree-title-area w-status">
+                  <a href="#">Gather required doc for Fiber kick-off in Alaska</a>
+                  <ul class="item-util">
+                    <li>
+                      Workflow: <a href="#">Google Fiber EOO</a>
+                    </li>
+                    <li>
+                      Control: <a href="#">Alaska</a>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="tier-2-info item-content">
-        <div class="tier-2-info-content">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
-          </p>
-        </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
+        </p>
       </div>
-    </li>
-  </ul><!-- tree-structure end -->
-</section><!-- Widget content end -->
+    </div>
+  </li-->
+</ul><!-- tree-structure end -->

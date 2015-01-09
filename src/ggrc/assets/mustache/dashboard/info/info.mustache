@@ -35,34 +35,87 @@
     <!-- Right side workflow and task trees area -->
     <div class="span9 content-wrap">
       <div class="inner-content">
-        <section class="widget small-margin">
-          <header class="header">
-            <h2>Workflow Progress</h2>
-          </header>
-          {{> /static/mustache/dashboard/info/workflow_progress.mustache}}
-        </section><!-- Widget end -->
-
-        <section class="widget dashboard small-margin">
-          <header class="header widget-nav">
-            <div class="row-fluid">
-              <div class="span12">
-                <ul>
-                  <li class="active">
-                    <a href="#">
-                      My Tasks (2)
-                    </a>
-                  </li>
-                  <!--li>
-                    <a href="#">
-                      Audit Requests (2)
-                    </a>
-                  </li-->
-                </ul>
+        {{#if workflow_view}}
+          <section class="widget small-margin">
+            <header class="header">
+              <h2>Workflow Progress</h2>
+            </header>
+          {{{ renderLive workflow_view }}}
+          </section>
+        {{/if}}
+        {{#if workflow_view}}
+          <section class="widget dashboard small-margin">
+            <header class="header widget-nav">
+              <div class="row-fluid">
+                <div class="span12">
+                  <ul>
+                    <li class="active">
+                      <a href="#">
+                        My Tasks (2)
+                      </a>
+                    </li>
+                    <!--li>
+                      <a href="#">
+                        Audit Requests (2)
+                      </a>
+                    </li-->
+                  </ul>
+                </div>
               </div>
-            </div>
-          </header>
-          {{> /static/mustache/dashboard/info/my_tasks.mustache}}
-        </section><!-- Widget end -->
+            </header>
+            <section class="content">
+              <ul class="tree-structure new-tree dashboard-tree">
+                <li class="filter-wrap">
+                  <div class="filter-border">
+                    <form>
+                      <div class="row-fluid">
+                        <div class="span9">
+                          <ul>
+                            <li>
+                              <label>
+                                Status
+                              </label>
+                              <select name="status" class="input-small">
+                                <option value="" selected="true">Any</option>
+                                <option>Draft</option>
+                                <option>Requested</option>
+                                <option>Responded</option>
+                                <option>Amended Request</option>
+                                <option>Updated Response</option>
+                                <option>Accepted</option>
+                              </select>
+                            </li>
+                            <li>
+                              <input type="text" class="input-medium" placeholder="Filter by Object">
+                            </li>
+                            <li>
+                              <input type="text" class="input-medium" placeholder="Filter by Workflow">
+                            </li>
+                            <li>
+                              <label class="checkbox-inline">
+                                <input class="checkbox" type="checkbox">
+                                Overdue only
+                              </label>
+                            </li>
+                          </ul>
+                        </div>
+                        <div class="span3">
+                          <div class="pull-right">
+                            <label class="checkbox-inline">
+                              <input class="checkbox" type="checkbox">
+                              Show history
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </li>
+              </ul>
+              {{{ renderLive task_view }}}
+            </section>
+          </section><!-- Widget end -->
+        {{/if}}
       </div><!-- inner-content end -->
     </div>
   </div>

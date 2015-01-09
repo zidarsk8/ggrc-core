@@ -6,50 +6,63 @@
 }}
 
 <section class="content">
-<ul class="new-tree tree-one dashboard-tree">
-  <li class="tree-item">
-    <div class="item-wrap">
-      <div class="row-fluid">
-        <div class="span5">
-          <div class="item-data">
-            <div class="tree-title-area">
-              <div class="oneline">
-                <a href="#">Master clause library review</a>
-                <ul class="item-util">
-                  <li>
-                    Owned by <a href="#">Predrag Kanazir</a>
-                  </li>
-                </ul>
+<ul class="new-tree tree-one dashboard-tree workflow-tree">
+  {{#each options}}
+  {{#using ins=this}}
+    {{!log ins}}
+    {{!#using cycles=ins.cycles}}
+      {{!#using task_groups=cycles.reify().task_groups}}
+        {{!log task_groups}}
+      {{!/using}}
+    {{!/using}}
+
+    <li class="tree-item">
+      <div class="item-wrap">
+        <div class="row-fluid">
+          <div class="span5">
+            <div class="item-data">
+              <div class="tree-title-area">
+                <div class="oneline">
+                  <a href="{{viewLink}}">{{ins.title}}</a>
+                  <ul class="item-util">
+                    <li>
+                      <!--Owned by <a href="#">Predrag Kanazir</a>-->
+                      {{{render '/static/mustache/dashboard/info/wf_owner.mustache' instance=ins stacked=true}}}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="span5">
-          <div class="tree-progress">
-            <div class="progress custom-progress">
-              <div class="bar bar-verify" style="width: 50%;" rel="tooltip" data-original-title="Verified"></div>
-              <div class="bar bar-progress" style="width: 14%;" rel="tooltip" data-original-title="In Progress"></div>
-              <div class="bar bar-pending" style="width: 21%;" rel="tooltip" data-original-title="Pending"></div>
+          <div class="span5">
+            <div class="tree-progress">
+              <div class="progress custom-progress">
+                <div class="bar bar-verify" style="width: 50%;" rel="tooltip" data-original-title="Verified 50%"></div>
+                <div class="bar bar-progress" style="width: 14%;" rel="tooltip" data-original-title="In Progress 14%"></div>
+                <div class="bar bar-pending" style="width: 35%;" rel="tooltip" data-original-title="Pending 35%"></div>
+              </div>
+              <ul class="item-util">
+                <li>
+                  120 tasks in total / 50% verified
+                </li>
+              </ul>
             </div>
-            <ul class="item-util">
-              <li>
-                120 tasks in total / 50% verified
-              </li>
-            </ul>
           </div>
-        </div>
-        <div class="span2">
-          <div class="right">
-            Due in 15 days
-            <ul class="item-util">
-              <li>11/03/2014</li>
-            <ul>
+          <div class="span2">
+            <div class="right">
+              Due in 15 days
+              <ul class="item-util">
+                <li>11/03/2014</li>
+              <ul>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </li>
-  <li class="tree-item">
+    </li>
+  {{/using}}
+  {{/each}}
+
+  <!--li class="tree-item">
     <div class="item-wrap">
       <div class="row-fluid">
         <div class="span5">
@@ -172,6 +185,6 @@
         </div>
       </div>
     </div>
-  </li>
+  </li -->
 </ul><!-- tree-structure end -->
 </section><!-- Widget content end -->
