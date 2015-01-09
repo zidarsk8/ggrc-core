@@ -2329,6 +2329,35 @@ Mustache.registerHelper("strip_html_tags", function (str) {
   return resolve_computed(str).replace(/<(?:.|\n)*?>/gm, '');
 });
 
+Mustache.registerHelper("truncate", function (len, str) {
+  // find a good source
+  str = can.makeArray(arguments).reduce(function (res, arg, i) {
+      var s = resolve_computed(arg);
+      if (typeof s === "string") {
+          return s;
+      }else{
+          return res;
+      }
+  }, "");
+
+  if (typeof len === "number") {
+      // max len characters
+      if (str.length > len) {
+          str = str.substr(0, str.lastIndexOf(len, ' '));
+          str += " &hellip;";
+      }
+  }else{
+      // first line of input
+      var strs = str.split(/<br[^>]*>|\n/gm);
+      if (strs.length > 1) {
+          str = strs[0];
+          str += " &hellip;";
+      }
+  }
+
+  return str;
+});
+
 Mustache.registerHelper("switch", function (value, options) {
   var frame = new can.Observe({});
   value = resolve_computed(value);
