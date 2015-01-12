@@ -1,0 +1,20 @@
+language: python
+python:
+  - "2.7"
+services: mysql
+
+install:
+  - "wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.17.zip  -nv"
+  - "unzip -qd src google_appengine_1.9.17.zip"
+  - "mv src/google_appengine/google src/"
+  - "pip install -r src/requirements.txt"
+  - "pip install -r src/dev-requirements.txt"
+  - "pip install hamlpy"
+  - "pip install google-api-python-client"
+  - "pip install mysql-python"
+before_script:
+  - "source bin/init_env"
+script:
+  - bin/run_behave_travis
+notifications:
+  email: false
