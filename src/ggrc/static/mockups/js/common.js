@@ -910,6 +910,20 @@ $(document).ready(function(){
     $("#auditObjectPin").show();
   });
 
+  // show/hide add auditor in audit info widget
+  $("#auditorFiledWrapTrigger").on("click", function() {
+    var $this = $(this),
+        $field_wrap = $this.closest(".wrap-row").find("#auditorFiledWrap");
+
+    if($this.hasClass("active")) {
+      $this.removeClass("active").show();
+      $field_wrap.slideUp();
+    } else {
+      $this.addClass("active").hide();
+      $field_wrap.slideDown();
+    }
+  });
+
 });
 
 // Widget search active state
