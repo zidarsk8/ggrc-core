@@ -15,6 +15,6 @@ install:
 before_script:
   - "source bin/init_env"
 script:
-  - bin/run_unittests
+  - bin/run_travis
 notifications:
   email: false
