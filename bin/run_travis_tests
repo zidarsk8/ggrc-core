@@ -7,16 +7,7 @@
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../src"
-echo "DROP DATABASE IF EXISTS ggrcdevtest; CREATE DATABASE ggrcdevtest;" |
+echo "DROP DATABASE IF EXISTS ggrcdev; CREATE DATABASE ggrcdev;" |
   mysql -u root;
 
-export GGRC_SETTINGS_MODULE="testing travis ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development"
-
-if [ ! -z "$1" ]  # if first argument given
-then
-    unittest_arg="python -m unittest $1"
-else  # otherwise run all tests
-    unittest_arg="python -m unittest discover"
-fi
-    GGRC_SETTINGS_MODULE="testing" \
-    $unittest_arg
+GGRC_SETTINGS_MODULE="testing travis ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development" python -m ggrc.behave ${@:1}
