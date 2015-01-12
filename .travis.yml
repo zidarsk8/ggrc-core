@@ -15,6 +15,6 @@ install:
 before_script:
   - "source bin/init_env"
 script:
-  - bin/run_behave_travis
+  - bin/run_unittests
 notifications:
   email: false
