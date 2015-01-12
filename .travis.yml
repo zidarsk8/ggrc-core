@@ -18,6 +18,11 @@ install:
   - "pip install django"
 before_script:
   - "source bin/init_env"
+  # weird travis-ci python paths
+  - "export PYTHONPATH=$PYTHONPATH:/usr/lib/pymodules/python2.7/"
+  - "export PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/dist-packages"
+  - "export PYTHONPATH=$PYTHONPATH:/usr/lib/pyshared/python2.7/"
+  - "export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages/"
 script:
   - bin/run_travis_tests
 notifications:
