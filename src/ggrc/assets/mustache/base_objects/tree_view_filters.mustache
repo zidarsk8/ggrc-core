@@ -1,0 +1,24 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: miha@reciprocitylabs.com
+    Maintained By: miha@reciprocitylabs.com
+}}
+<li class="sticky-filter inner-filter-sticky">
+  <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
+    <form>
+      <div class="row-fluid">
+        <div class="span2">
+          <div class="filter-title">
+            <h6>
+              Custom Filter
+            </h6>
+          </div>
+        </div>
+        <div class="span10">
+           <input name="filter_query" type="text">
+        </div>
+      </div>
+    </form>
+  </div>
+</li>
