@@ -14,7 +14,6 @@ install:
   - "pip install google-api-python-client"
   - "pip install mysql-python"
   - "pip install webob"
-  - "pip install django"
 before_script:
   - "source bin/init_env"
   # weird travis-ci python paths
