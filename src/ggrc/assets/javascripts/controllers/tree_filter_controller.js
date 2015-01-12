@@ -12,14 +12,18 @@ can.Control("GGRC.Controllers.TreeFilter", {
   }
 
   , "input, select change" : function(el, ev) {
-    
+
     if (el.is(":text")) {
+      // if we have a custom filter inside a text field.
+
+      var tree_view = this.element.closest('.cms_controllers_tree_view').control();
       this.current_query = GGRC.query_parser.parse(el.val());
       tree_view.options.attr('sort_function', this.current_query.order_by.compare);
       tree_view.options.attr('filter', this.current_query);
       tree_view.reload_list();
+
     } else {
-      // this is left from the old filters and should eventually be replaced 
+      // this is left from the old filters and should eventually be replaced
       // Convert '.' to '__' ('.' will cause can.Observe to try to update a path instead of just a key)
       var name = el.attr("name").replace(/\./g, '__');
       if(el.is(".hasDatepicker")) {
