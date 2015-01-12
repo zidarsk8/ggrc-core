@@ -7,6 +7,8 @@
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../src"
+echo "DROP DATABASE IF EXISTS ggrcdevtest; CREATE DATABASE ggrcdevtest;" |
+  mysql -u root --password=root;
 if [ ! -z "$1" ]  # if first argument given
 then
     unittest_arg="python -m unittest $1"
