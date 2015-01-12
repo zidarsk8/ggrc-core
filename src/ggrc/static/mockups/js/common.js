@@ -896,18 +896,28 @@ $(document).ready(function(){
     $("#auditRequestPin").show();
     $("#auditResponsePin").hide();
     $("#auditObjectPin").hide();
+    $("#auditEvidencePin").hide();
   });
 
   $("#auditResponseSelect").on("click", function(e) {
     $("#auditRequestPin").hide();
     $("#auditResponsePin").show();
     $("#auditObjectPin").hide();
+    $("#auditEvidencePin").hide();
   });
 
   $("#auditObjectSelect").on("click", function(e) {
     $("#auditRequestPin").hide();
     $("#auditResponsePin").hide();
     $("#auditObjectPin").show();
+    $("#auditEvidencePin").hide();
+  });
+
+  $("#auditEvidenceSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").hide();
+    $("#auditEvidencePin").show();
   });
 
   // show/hide add auditor in audit info widget
