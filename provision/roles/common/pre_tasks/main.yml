@@ -4,6 +4,12 @@
 # Maintained By: goran@reciprocitylabs.com
 
 ---
+
+- name: add the node.js PPA
+  action: command add-apt-repository -y ppa:chris-lea/node.js creates=/etc/apt/sources.list.d/chris-lea-node_js-precise.list
+  tags: nodejs
+  sudo: yes
+
 - name: update apt
   sudo: yes
   apt:

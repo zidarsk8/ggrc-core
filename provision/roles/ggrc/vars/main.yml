@@ -16,7 +16,6 @@ ggrc_packages:
   - name: python-dev
   - name: rubygems
   - name: nodejs
-  - name: npm
 
 ggrc_development_directories:
   - name: /vagrant-dev
