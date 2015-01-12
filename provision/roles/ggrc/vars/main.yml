@@ -30,6 +30,8 @@ ggrc_npm_modules:
   - name: karma
   - name: karma-cli
   - name: phantomjs
+  - name: karma-jasmine
+  - name: karma-phantomjs-launcher
 
 ggrc_gems:
   - name: sass
