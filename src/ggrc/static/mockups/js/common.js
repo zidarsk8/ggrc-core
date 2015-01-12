@@ -897,6 +897,7 @@ $(document).ready(function(){
     $("#auditResponsePin").hide();
     $("#auditObjectPin").hide();
     $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").hide();
   });
 
   $("#auditResponseSelect").on("click", function(e) {
@@ -904,6 +905,7 @@ $(document).ready(function(){
     $("#auditResponsePin").show();
     $("#auditObjectPin").hide();
     $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").hide();
   });
 
   $("#auditObjectSelect").on("click", function(e) {
@@ -911,6 +913,7 @@ $(document).ready(function(){
     $("#auditResponsePin").hide();
     $("#auditObjectPin").show();
     $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").hide();
   });
 
   $("#auditEvidenceSelect").on("click", function(e) {
@@ -918,6 +921,15 @@ $(document).ready(function(){
     $("#auditResponsePin").hide();
     $("#auditObjectPin").hide();
     $("#auditEvidencePin").show();
+    $("#auditMeetingPin").hide();
+  });
+
+  $("#auditMeetingSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").hide();
+    $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").show();
   });
 
   // show/hide add auditor in audit info widget
