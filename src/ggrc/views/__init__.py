@@ -369,6 +369,13 @@ def audit_info_ui():
   """
   return render_template("/mockups/dashboard-ui/audit-info.html")
 
+@app.route("/mockups/dashboard-ui/audit-people.html")
+@login_required
+def audit_people_ui():
+  """Audit people UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/audit-people.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():
