@@ -26,6 +26,9 @@ ggrc_development_directories:
 ggrc_npm_modules:
   - name: nodeunit
   - name: pegjs
+  - name: karma
+  - name: karma-cli
+  - name: phantomjs
 
 ggrc_gems:
   - name: sass
