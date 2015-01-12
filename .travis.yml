@@ -11,7 +11,6 @@ install:
   - "mv src/google_appengine/google src/"
   - "pip install -r src/requirements.txt"
   - "pip install -r src/dev-requirements.txt"
-  - "pip install hamlpy"
   - "pip install google-api-python-client"
   - "pip install mysql-python"
   - "pip install webob"
