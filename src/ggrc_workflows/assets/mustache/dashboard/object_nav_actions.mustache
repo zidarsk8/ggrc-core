@@ -21,6 +21,7 @@
           </button>
         {{/waiting}}
       {{else}}
+        {{^if_equals instance.status 'Inactive'}}
         {{#if waiting}}
           <span {{attach_spinner '{ "radius": 5, "length": 5, "width": 3 }' 'display:inline-block; margin: 15px;' }}></span>
         {{else}}
@@ -28,6 +29,7 @@
             <p class="alert tiny-help-text" style="margin-bottom:0px;"><strong>Note:</strong> At least one of the task groups is missing either a task or an object.</p>
           {{/can_activate}}
         {{/if}}
+        {{/if_equals}}
       {{/if_equals}}
     </workflow-activate>
   </li>

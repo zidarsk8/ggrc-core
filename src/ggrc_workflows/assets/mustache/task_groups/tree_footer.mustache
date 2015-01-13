@@ -11,6 +11,7 @@
 {{#if allow_mapping_or_creating}}
 {{#if allow_creating}}
 {{#is_allowed 'create' 'TaskGroup' context=parent_instance.context}}
+{{^if_equals parent_instance.status 'Inactive'}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
@@ -20,6 +21,7 @@
     </div>
   </div>
 </li>
+{{/if_equals}}
 {{/is_allowed}}
 {{/if}}
 {{/if}}
