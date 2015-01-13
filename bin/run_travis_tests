@@ -10,4 +10,8 @@ cd "${SCRIPTPATH}/../src"
 echo "DROP DATABASE IF EXISTS ggrcdev; CREATE DATABASE ggrcdev;" |
   mysql -u root;
 
-GGRC_SETTINGS_MODULE="testing travis ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development" python -m ggrc.behave ${@:1}
+export GGRC_SETTINGS_MODULE="testing travis ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development"
+
+python -m unittest discover ${@:1}
+
+#GGRC_SETTINGS_MODULE="testing travis ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development" python -m ggrc.behave ${@:1}
