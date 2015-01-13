@@ -20,6 +20,7 @@ module.exports = function(config) {
         'src/ggrc/static/dashboard-spec-helpers.js',
         'src/ggrc/static/dashboard-templates.js',
 
+        'src/ggrc/assets/js_specs/spec_setup.js',
         'src/**/*_spec.js'
 
         // {pattern: 'src/**/assets/js_specs/**/*.js',
