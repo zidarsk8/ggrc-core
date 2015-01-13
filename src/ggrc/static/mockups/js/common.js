@@ -807,6 +807,15 @@ $(document).ready(function(){
   $(".nav-trigger").on("click", topNav);
   $(".lhn-trigger").on("click", lhnAnimate);
 
+  /*
+  TO-DO: when clicking everywhere else except inside lhn if lhn is active it should be closed.
+  $(document).on('click', function(event) {
+    if (!$(event.target).closest(".lhs-holder.active").length) {
+      $(".lhs-holder").removeClass("active").animate({left: "-240"}, 800, 'easeOutExpo').css("width", "240px");
+    }
+  });
+  */
+
   // top nav dropdown position
   function dropdownPosition() {
     var $this = $(this),

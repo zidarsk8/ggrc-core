@@ -20,6 +20,16 @@
   }
 }
 
+.info {
+  .inner-count-list {
+    @include reset-list();
+    li {
+      margin-left: -2px;
+      margin-bottom: 6px;
+    }
+  }
+}
+
 .pin-action {
   @include clearfix();
   @include reset-list();
