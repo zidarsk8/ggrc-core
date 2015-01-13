@@ -15,10 +15,11 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        'src/ggrc/static/dashboard.js',
-        'src/ggrc/static/dashboard-templates.js',
-        'src/ggrc/static/dashboard-spec-helpers.js',
         'src/ggrc/static/dashboard-specs.js',
+        'src/ggrc/static/dashboard.js',
+        'src/ggrc/static/dashboard-spec-helpers.js',
+        'src/ggrc/static/dashboard-templates.js',
+
         {pattern: 'src/**/assets/js_specs/**/*.js',
          watched: true,
          served: false,
@@ -68,7 +69,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: [/*'PhantomJS'*/],
 
 
     // Continuous Integration mode
