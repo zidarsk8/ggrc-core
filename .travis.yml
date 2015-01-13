@@ -27,6 +27,8 @@ before_script:
   - "export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages/"
   - sudo apt-get install phantomjs
   - npm install karma karma-jasmine jasmine-core phantomjs karma-phantomjs-launcher karma-chrome-launcher
+  - 'gem install sass --version "=3.4.9"'
+  - 'gem install compass --version "=1.0.1"'
   - build_compass
   - build_assets
 script:
