@@ -12,6 +12,7 @@ Flask-Testing
 git+https://github.com/rbarrois/factory_boy.git#egg=factory-boy
 mock
 nose==1.3.0
+sniffer
 requests==2.0.0
 PyYAML
 Flask-Jasmine

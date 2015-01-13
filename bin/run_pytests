@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
@@ -9,11 +10,5 @@ SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 cd "${SCRIPTPATH}/../src"
 echo "DROP DATABASE IF EXISTS ggrcdevtest; CREATE DATABASE ggrcdevtest;" |
   mysql -u root --password=root;
-if [ ! -z "$1" ]  # if first argument given
-then
-    unittest_arg="python -m unittest $1"
-else  # otherwise run all tests
-    unittest_arg="python -m unittest discover"
-fi
-    GGRC_SETTINGS_MODULE="testing" \
-    $unittest_arg
+GGRC_SETTINGS_MODULE="testing ggrc_basic_permissions.settings.development" \
+  sniffer tests
