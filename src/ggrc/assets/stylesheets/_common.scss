@@ -28,7 +28,7 @@ h1 {
   }
   .title-slide {
     position: absolute;
-    left: 40px;
+    left: 39px;
     top: 0;
     z-index: 9999;
     background: $white;
@@ -141,6 +141,10 @@ a {
 // helpers
 .centered {
   text-align: center;
+}
+
+.right {
+  text-align: right;
 }
 
 .no-results {
@@ -408,7 +412,7 @@ a {
   }
 }
 
-@each $btn_color in primary, success, info, warning, danger, gray {
+@each $btn_color in primary, success, info, warning, danger, draft {
   .btn-#{$btn_color} {
     @extend %btn-#{$btn_color};
   }

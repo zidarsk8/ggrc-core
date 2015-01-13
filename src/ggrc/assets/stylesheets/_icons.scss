@@ -259,6 +259,9 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-arrow-right-small { background-position: -78px -80px; }
 .grcicon-arrow-bottom-small { background-position: -126px -80px; }
 .grcicon-pin { background-position: -198px -296px; }
+.grcicon-clone { background-position: -294px -320px; }
+.grcicon-manual { background-position: -318px -296px; }
+.grcicon-archive { background-position: -318px -272px; }
 
 // Large icons
 .grciconlarge-dashboard { background-position:-8px -8px; }
@@ -281,7 +284,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grciconlarge-objective { background-position: -232px -8px; }
 .grciconlarge-task { background-position: -264px -8px; }
 .grciconlarge-facility { background-position: -296px -8px; }
-.grciconlarge-audits { background-position: -328px -8px; }
+.grciconlarge-audit { background-position: -328px -8px; }
 .grciconlarge-person { background-position: -8px -104px; }
 .grciconlarge-data_asset { background-position: -40px -104px; }
 .grciconlarge-policy { background-position: -72px -104px; }
@@ -613,6 +616,13 @@ i.short {
   }
   .dropdown-menu {
     // turns icons to black
+    @extend %black-icons;
+  }
+}
+
+// inner tree icons to black
+.inner-tree {
+  .select {
     @extend %black-icons;
   }
 }

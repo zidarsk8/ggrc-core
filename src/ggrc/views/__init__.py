@@ -334,6 +334,48 @@ def tree_ui():
   """
   return render_template("/mockups/dashboard-ui/tree.html")
 
+@app.route("/mockups/dashboard-ui/workflow.html")
+@login_required
+def workflow_ui():
+  """Workflow UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/workflow.html")
+
+@app.route("/mockups/dashboard-ui/workflow-info.html")
+@login_required
+def workflow_info_ui():
+  """Workflow info UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/workflow-info.html")
+
+@app.route("/mockups/dashboard-ui/workflow-people.html")
+@login_required
+def workflow_people_ui():
+  """Workflow people UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/workflow-people.html")
+
+@app.route("/mockups/dashboard-ui/audit.html")
+@login_required
+def audit_ui():
+  """Audit UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/audit.html")
+
+@app.route("/mockups/dashboard-ui/audit-info.html")
+@login_required
+def audit_info_ui():
+  """Audit info UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/audit-info.html")
+
+@app.route("/mockups/dashboard-ui/audit-people.html")
+@login_required
+def audit_people_ui():
+  """Audit people UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/audit-people.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():
