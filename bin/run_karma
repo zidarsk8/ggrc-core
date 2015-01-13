@@ -4,5 +4,4 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-karma start
-watch_assets
+karma start & watch_assets
