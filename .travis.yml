@@ -21,7 +21,10 @@ before_script:
   - "export PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/dist-packages"
   - "export PYTHONPATH=$PYTHONPATH:/usr/lib/pyshared/python2.7/"
   - "export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages/"
+  - sudo apt-get install phantomjs
+  - npm install karma karma-jasmine jasmine-core phantomjs karma-phantomjs-launcher
 script:
   - bin/run_travis_tests
+  - ./node_modules/karma/bin/karma start --browsers PhantomJS --single-run
 notifications:
   email: false
