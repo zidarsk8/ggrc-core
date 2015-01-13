@@ -15,10 +15,12 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        'src/ggrc/static/dashboard-specs.js',
+        //'src/ggrc/static/dashboard-specs.js',
         'src/ggrc/static/dashboard.js',
         'src/ggrc/static/dashboard-spec-helpers.js',
         'src/ggrc/static/dashboard-templates.js',
+
+        'src/**/*_spec.js'
 
         // {pattern: 'src/**/assets/js_specs/**/*.js',
         //  watched: true,
