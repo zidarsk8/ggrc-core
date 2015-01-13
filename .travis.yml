@@ -5,6 +5,10 @@ services: mysql
 virtualenv:
   system_site_packages: true
 
+before_install:
+  - export CHROME_BIN=chromium-browser
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
 install:
   - "wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.17.zip  -nv"
   - "unzip -qd src google_appengine_1.9.17.zip"
@@ -22,9 +26,10 @@ before_script:
   - "export PYTHONPATH=$PYTHONPATH:/usr/lib/pyshared/python2.7/"
   - "export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages/"
   - sudo apt-get install phantomjs
-  - npm install karma karma-jasmine jasmine-core phantomjs karma-phantomjs-launcher
+  - npm install karma karma-jasmine jasmine-core phantomjs karma-phantomjs-launcher karma-chrome-launcher
+  - build_assets
 script:
   - bin/run_travis_tests
-  - ./node_modules/karma/bin/karma start --browsers PhantomJS --single-run
+  - ./node_modules/karma/bin/karma start --browsers Chrome --no-sandbox --single-run
 notifications:
   email: false
