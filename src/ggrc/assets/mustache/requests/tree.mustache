@@ -104,14 +104,18 @@
               {{/if_equals}}
               {{#if_equals instance.status "Requested"}}
                 {{#if_can_edit_request instance}}
+                {{^if_auditor instance include_admin=false}}
                 <button data-name="status" data-value="Responded" class="btn btn-primary {{instance._disabled}} {{^instance.responses.length}}disabled{{/instance.responses.length}}">Submit responses</button>
+                {{/if_auditor}}
                 {{else}}
                 <small class="gray"><em>{{instance.status}}</em></small>
                 {{/if_can_edit_request}}
               {{/if_equals}}
               {{#if_equals instance.status "Amended Request"}}
                 {{#if_can_edit_request instance}}
+                {{^if_auditor instance include_admin=false}}
                 <button data-name="status" data-value="Updated Response" class="btn btn-primary {{instance._disabled}}">Submit responses</button>
+                {{/if_auditor}}
                 {{else}}
                 <small class="gray"><em>Amended</em></small>
                 {{/if_can_edit_request}}
