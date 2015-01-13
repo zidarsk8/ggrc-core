@@ -20,14 +20,14 @@ module.exports = function(config) {
         'src/ggrc/static/dashboard-spec-helpers.js',
         'src/ggrc/static/dashboard-templates.js',
 
-        {pattern: 'src/**/assets/js_specs/**/*.js',
-         watched: true,
-         served: false,
-         included: false},
-        {pattern: 'src/**/assets/javascripts/**/*.js',
-         watched: true,
-         served: false,
-         included: false}
+        // {pattern: 'src/**/assets/js_specs/**/*.js',
+        //  watched: true,
+        //  served: false,
+        //  included: false},
+        // {pattern: 'src/**/assets/javascripts/**/*.js',
+        //  watched: true,
+        //  served: false,
+        //  included: false}
     ],
 
 

@@ -77,19 +77,18 @@ The application will be accessible via this URL: http://localhost:8080/
 If you're running the Google App Engine SDK, the App Engine management console
 will be avaiable via this URL: http://localhost:8000/
 
-Running Unit Tests
-------------------
+Running Tests
+------------
 
 .. sourcecode:: bash
 
-   run_unittests
+   run_karma
 
-Running Behave Integration Tests
---------------------------------
+Then open Chrome at URL: http://localhost:9876
 
-.. sourcecode:: bash
-
-   run_behave
+This will start a JavaScript test runner that runs tests on every
+JavaScript code change using Chrome. The same runner is used on
+Travis. Make sure your tests pass.
 
 Quickstart Breakdown
 ====================

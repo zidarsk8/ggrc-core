@@ -7,6 +7,8 @@
 
 describe("working tests", function () {
     it("will have to update to jasmine 2.0 ways", function () {});
+
+    it("should do", function () {});
 });
 
 xdescribe("display prefs model", function() {
