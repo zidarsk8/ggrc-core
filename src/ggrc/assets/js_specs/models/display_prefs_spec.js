@@ -5,7 +5,11 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-describe("display prefs model", function() {
+describe("working tests", function () {
+    it("will have to update to jasmine 2.0 ways", function () {});
+});
+
+xdescribe("display prefs model", function() {
   
   var display_prefs, exp;
   beforeEach(function() {
