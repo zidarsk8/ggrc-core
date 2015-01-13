@@ -18,6 +18,12 @@ install:
   - "pip install google-api-python-client"
   - "pip install mysql-python"
   - "pip install webob"
+#  - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+#  - sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+#  - sudo apt-get update -qq
+#  - sudo apt-get install -qq google-chrome-stable
+  - 'gem install sass --version "=3.4.9"'
+  - 'gem install compass --version "=1.0.1"'
 before_script:
   - "source bin/init_env"
   # weird travis-ci python paths
@@ -27,12 +33,10 @@ before_script:
   - "export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages/"
   - sudo apt-get install phantomjs
   - npm install karma karma-jasmine jasmine-core phantomjs karma-phantomjs-launcher karma-chrome-launcher
-  - 'gem install sass --version "=3.4.9"'
-  - 'gem install compass --version "=1.0.1"'
   - build_compass
   - build_assets
 script:
   - bin/run_travis_tests
-  - ./node_modules/karma/bin/karma start --browsers Chrome --no-sandbox --single-run
+  - ./node_modules/karma/bin/karma start karma.conf.js --single-run
 notifications:
   email: false
