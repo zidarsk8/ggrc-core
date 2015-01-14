@@ -17,6 +17,10 @@ class SystemRowConverter(BaseRowConverter):
     return SystemOrProcess.query.filter_by(slug=slug).first()
 
   def setup_object(self):
+    if self.importer.options.get('is_biz_process'):
+      self.model_class = Process
+    else:
+      self.model_class = System
     self.obj = self.setup_object_by_slug(self.attrs)
     if self.obj.id is None:
       self.obj.infrastructure = self.obj.infrastructure or False
