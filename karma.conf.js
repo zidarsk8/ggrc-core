@@ -1,5 +1,9 @@
-// Karma configuration
-// Generated on Mon Jan 12 2015 22:30:27 GMT+0000 (UTC)
+
+// Karma Configuration
+// Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+// Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+// Created By: swizec@reciprocitylabs.com
+// Maintained By: swizec@reciprocitylabs.com
 
 module.exports = function(config) {
   var configuration = {
