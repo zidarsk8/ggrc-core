@@ -6,36 +6,12 @@
 }}
 
 {{!section class="widget... }}
-  <!--header class="header">
-    <div class="row-fluid">
-      <div class="span9">
-        <h2>
-          <i class="{{widget_icon}}"></i>
-          {{{widget_name}}}
-          <span class="object_count">
-            {{#widget_count}}{{#count}}({{count}}){{/count}}{{/widget_count}}</span>
-          <span class="explanation">{{widget_info}}</span>
-        </h2>
-      </div>
-      <div class="span3">
-        {{#if 0}}
-        <div class="widget-action pull-right remove-widget" rel="tooltip" title="Remove">
-          <a class="remove" href="javascript://">
-            <i class="grcicon-x-grey"></i>
-          </a>
-        </div>
-        {{/if}}
-        <div class="widget-action pull-right widget-action-help">
-          <a data-placement="left" data-toggle="modal-ajax-helpform" data-help-slug="{{firstnonempty widget_help widget_id modal.table_plural}}" href="javascript://" rel="tooltip" data-original-title="Help">
-            <i class="grcicon-help-black"></i>
-          </a>
-        </div>
-        {{#if extra_widget_actions_view}}
-        {{{renderLive extra_widget_actions_view}}}
-        {{/if}}
-      </div>
-    </div>
-  </header-->
+  <header class="header">
+    <h2>
+      {{{widget_name}}}
+    </h2>
+  </header>
+  
   <section class="content">
     {{{widget_initial_content}}}
   </section>

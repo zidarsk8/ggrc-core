@@ -250,6 +250,9 @@ a {
       margin-bottom: 0;
     }
   }
+  .rtf-block {
+    margin-bottom: 0;
+  }
 }
 
 .gray {
@@ -1245,5 +1248,19 @@ p {
   .flash & {
     background: transparent;
     color: $black;
+  }
+}
+
+.state-value {
+  text-transform: uppercase;
+  font-weight: bold;
+  &.gray {
+    color: $draftGray;
+  }
+  &.green {
+    color: $lightGreen;
+  }
+  .tree-title-area & {
+    font-weight: normal;
   }
 }

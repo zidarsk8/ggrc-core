@@ -236,9 +236,6 @@
       }
     }
   }
-  .content {
-    @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
-  }
   &.bare {
     .content {
       @include box-shadow(none);
@@ -382,62 +379,6 @@
       color:$disabled;
       i {
         @include opacity(0.1);
-      }
-    }
-  }
-  &.governance {
-    .header {
-      h2 {
-      color:$governance;
-      }
-    }
-  }
-  &.programs {
-    .header {
-      h2 {
-      color:$programs;
-      }
-    }
-  }
-  &.risk {
-    .header {
-      h2 {
-      color:$risk;
-      }
-    }
-  }
-  &.business {
-    .header {
-      h2 {
-      color:$business;
-      }
-    }
-  }
-  &.controls {
-    .header {
-      h2 {
-      color:$controls;
-      }
-    }
-  }
-  &.objectives {
-    .header {
-      h2 {
-      color:$objectives;
-      }
-    }
-  }
-  &.entities {
-    .header {
-      h2 {
-      color:$entities;
-      }
-    }
-  }
-  &.workflow {
-    .header {
-      h2 {
-      color:$programs;
       }
     }
   }
@@ -724,17 +665,7 @@
   background: $white;
   padding: 25px 30px 20px 30px;
   font-size: 13px;
-  .state-value {
-    text-transform: uppercase;
-    font-weight: bold;
-    &.gray {
-      color: $draftGray;
-    }
-    &.green {
-      color: $lightGreen;
-      font-weight: bold;
-    }
-  }
+  @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
   .wrap-row {
     p {
       padding-top: 0;
@@ -758,18 +689,6 @@
       &:hover {
         @include opacity(0.7);
       }
-    }
-  }
-  .rtf-block {
-    margin-bottom:10px;
-    p {
-      margin-bottom:10px;
-      line-height:22px;
-      color:$text;
-    }
-    h4.no-data {
-      font-style:italic;
-      color:#999;
     }
   }
   .person-tooltip-trigger {
