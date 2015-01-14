@@ -29,11 +29,8 @@ ggrc_npm_modules:
   - name: pegjs
   - name: karma
   - name: karma-cli
-#  - name: phantomjs2
   - name: karma-jasmine
   - name: jasmine-core
-
-#  - name: karma-phantomjs-launcher
 
 ggrc_gems:
   - name: sass

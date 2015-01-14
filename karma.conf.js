@@ -19,29 +19,17 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        //'src/ggrc/static/dashboard-specs.js',
         'src/ggrc/static/dashboard.js',
         'src/ggrc/static/dashboard-spec-helpers.js',
         'src/ggrc/static/dashboard-templates.js',
 
         'src/ggrc/assets/js_specs/spec_setup.js',
         'src/**/*_spec.js'
-
-        // {pattern: 'src/**/assets/js_specs/**/*.js',
-        //  watched: true,
-        //  served: false,
-        //  included: false},
-        // {pattern: 'src/**/assets/javascripts/**/*.js',
-        //  watched: true,
-        //  served: false,
-        //  included: false}
     ],
 
 
     // list of files to exclude
     exclude: [
-      //'src/**/assets/js_specs/**/*_spec.js',
-      //'src/**/assets/javascripts/**/*.js'
     ],
 
 
