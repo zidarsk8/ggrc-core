@@ -6,8 +6,6 @@
 python:
   - "2.7"
 services: mysql
-virtualenv:
-  system_site_packages: true
 
 before_install:
   - export CHROME_BIN=chromium-browser
