@@ -9,4 +9,4 @@ SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 cd "${SCRIPTPATH}/../src"
 mysql -u root -e "DROP DATABASE IF EXISTS ggrcdevtest; CREATE DATABASE ggrcdevtest;"
 GGRC_SETTINGS_MODULE="testing ggrc_basic_permissions.settings.development" \
-  sniffer tests
+  sniffer -x tests
