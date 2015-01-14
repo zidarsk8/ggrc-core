@@ -19,11 +19,17 @@ var ADMIN_PERMISSION
     , is: function(instance, args) {
       var value = Permission._resolve_permission_variable(args.value);
       var property_value = instance[args.property_name];
+      if (property_value instanceof can.Stub) {
+        property_value = property_value.reify();
+      }
       return value == property_value;
     }
     , in: function(instance, args) {
       var value = Permission._resolve_permission_variable(args.value);
       var property_value = instance[args.property_name];
+      if (property_value instanceof can.Stub) {
+        property_value = property_value.reify();
+      }
       return value.indexOf(property_value) >= 0;
     }
   }
@@ -74,7 +80,7 @@ can.Construct("Permission", {
     if ($.type(value) == 'string') {
       if (value[0] == '$') {
         if (value == '$current_user') {
-          return GGRC.current_user;
+          return CMS.Models.get_instance(GGRC.current_user);
         }
         throw new Error('unknown permission variable: ' + value);
       }

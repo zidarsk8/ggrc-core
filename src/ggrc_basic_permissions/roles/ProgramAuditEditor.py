@@ -44,7 +44,25 @@ permissions = {
         "__GGRC_ALL__"
     ],
     "update": [
-        "Request",
+        {
+            "terms": {
+                "property_name": "status",
+                "value": [
+                    "Requested",
+                    "Amended Request"
+                ]
+            },
+            "type": "Request",
+            "condition": "in"
+        },
+        {
+            "terms": {
+                "property_name": "assignee",
+                "value": "$current_user"
+            },
+            "type": "Request",
+            "condition": "is"
+        },
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",

@@ -288,21 +288,10 @@ Mustache.registerHelper("if_match", function (val1, val2, options) {
 });
 
 Mustache.registerHelper("in_array", function (needle, haystack, options) {
-  var found = false;
   needle = resolve_computed(needle);
   haystack = resolve_computed(haystack);
-  haystack.attr("length");
 
-  can.each(haystack, function (_, index) {
-    if (haystack.attr(index) === needle) {
-      found = true;
-    }
-  });
-  if (found) {
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
+  return options[~can.inArray(needle, haystack) ? "fn" : "inverse"](options.contexts);
 });
 
 Mustache.registerHelper("if_null", function (val1, options) {
@@ -382,7 +371,7 @@ Mustache.registerHelper("is_beta", function () {
 });
 
 Mustache.registerHelper("if_page_type", function (page_type, options) {
-  var options = arguments[arguments.length - 1];  // FIXME duplicate declaration of 'options'
+  var options = arguments[arguments.length - 1];
   if (window.location.pathname.split('/')[1] == page_type)
     return options.fn(this);
   else
@@ -800,7 +789,7 @@ Mustache.registerHelper("show_long", function () {
         el = $(el);
 
         var content = el.prevAll('.short');
-        if (content.length)
+        if (content.length) {
           return !function hide() {
             // Trigger the "more" toggle if the height is the same as the scrollable area
             if (el[0].offsetHeight) {
@@ -825,7 +814,7 @@ Mustache.registerHelper("show_long", function () {
               }
             }
           }();
-
+        }
       })
     , ">...more</a>"
   ].join('');
@@ -1139,7 +1128,9 @@ Mustache.registerHelper("is_allowed", function () {
 
   // Resolve arguments
   can.each(args, function (arg, i) {
-    arg = typeof arg === 'function' && arg.isComputed ? arg() : arg;
+    while (typeof arg === 'function' && arg.isComputed) {
+      arg = arg();
+    }
 
     if (typeof arg === 'string' && can.inArray(arg, allowed_actions) > -1) {
       actions.push(arg);
@@ -1584,7 +1575,7 @@ Mustache.registerHelper("infer_roles", function (instance, options) {
             if (request.assignee && request.assignee.id === person.id
                 && !~can.inArray('Request Assignee', state.attr('roles'))) {
               state.attr('roles').push('Request Assignee');
-            }
+            };
           });
         });
       }
@@ -2193,60 +2184,178 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
   }
 });
 
-Mustache.registerHelper("if_can_edit_request", function (instance, options) {
+can.each({
+  "if_can_edit_request": {
+    assignee_states: ["Requested", "Amended Request"],
+    program_editor_states: ["Requested", "Amended Request"],
+    predicate: function(options) {
+      return options.admin
+          || options.can_assignee_edit
+          || options.can_program_editor_edit
+          || (!options.accepted
+              && (options.update
+                  || options.map
+                  || options.create
+                  || options.program_owner
+                  || options.auditor
+                  || options.audit_lead));
+    }
+  },
+  "if_can_reassign_request": {
+    auditor_states: ["Responded", "Updated Response"],
+    assignee_states: ["Requested", "Amended Request", "Responded", "Updated Response"],
+    program_editor_states: ["Requested", "Amended Request"],
+    predicate: function(options) {
+      return options.admin
+          || options.can_auditor_edit
+          || options.can_assignee_edit
+          || options.can_program_editor_edit
+          || (!options.accepted
+              && (options.update
+                || options.map
+                || options.create
+                || options.program_owner
+                || options.audit_lead));
+    }
+  },
+  "if_can_create_response": {
+    assignee_states: ["Requested", "Amended Request", "Responded", "Updated Response"],
+    program_editor_states: ["Requested", "Amended Request", "Responded", "Updated Response"],
+    predicate: function(options) {
+      return (!options.draft && options.admin)
+          || options.can_assignee_edit
+          || options.can_program_editor_edit
+          || (!options.accepted
+              && !options.draft
+              && (options.update
+                || options.map
+                || options.create
+                || options.program_owner
+                || options.audit_lead));
+    }
+  }
+}, function(fn_opts, name) {
 
-    var instance, audit, auditors, accepted  // FIXME duplicate declaration
-    , admin = Permission.is_allowed("__GGRC_ADMIN__");
+  Mustache.registerHelper(name, function(instance, options){
 
-    instance = resolve_computed(instance);
-    instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+      var audit, auditors_dfd, accepted, prog_roles_dfd,
+          admin = Permission.is_allowed("__GGRC_ADMIN__");
 
-    if (!instance)
-      return "";
+      instance = resolve_computed(instance);
+      instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
 
-    audit = instance.attr("audit");
+      if(!instance)
+        return "";
 
-    if (!audit)
-      return "";  //take no action until audit is available
+      audit = instance.attr("audit");
 
-    audit = audit.reify();
-    auditors_dfd = audit.findAuditors();
+      if(!audit)
+        return "";  //take no action until audit is available
 
-    return defer_render("span", function (auditors) {
-      var accepted = instance.status === "Accepted"
-        , update = Permission.is_allowed("update", instance)
-        , map = Permission.is_allowed("mapping", instance)
-        , create = Permission.is_allowed("creating", instance)
-        , assignee = !!instance.assignee && instance.assignee.id === GGRC.current_user.id
-        , audit_lead = !!audit.contact && audit.contact.id === GGRC.current_user.id
-        , auditor = can.map(
-                      auditors || [],
-                      function (auditor) {
-                        if (auditor.person.id === GGRC.current_user.id) {
-                          return auditor;
-                        }
-                    }).length > 0
-        , auditor_states = ["Draft", "Responded", "Amended Response"] // States in which an auditor can edit a request
-        , assignee_states = ["Requested", "Amended Request"]
-        , can_auditor_edit = auditor && ~can.inArray(instance.attr("status"), auditor_states)
-        , can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.attr("status"), assignee_states)
-        ;
-      //    instead of
-      //    ^if' allow_mapping_or_creating '\
-      //    or ^is_allowed' 'update' instance '\
-      //    ' _1_context=instance.context.id
-      if (admin || can_auditor_edit || can_assignee_edit ||
-          (!accepted && (update || map || create))) {
-        return options.fn(options.contexts);
-      }
-      else{
-        return options.inverse(options.contexts);
-      }
-    }, auditors_dfd);
+      audit = audit.reify();
+      auditors_dfd = audit.findAuditors();
+      prog_roles_dfd = new RefreshQueue()
+                       .enqueue(audit.attr("program").reify())
+                       .trigger().then(function(progs) {
+                         return progs[0].get_binding("program_authorizations").refresh_instances();
+                       }).then(function(user_role_bindings) {
+                          var rq = new RefreshQueue();
+                          can.each(user_role_bindings, function(urb) {
+                            if(urb.instance.person.id === GGRC.current_user.id) {
+                              rq.enqueue(urb.instance.role.reify());
+                            }
+                          });
+                          return rq.trigger();
+                       });
+
+      return defer_render("span", function(auditors, program_roles) {
+        var accepted = instance.status === "Accepted",
+            draft = instance.status === "Draft",
+            update = Permission.is_allowed("update", instance), //All-context allowance
+            map = Permission.is_allowed("mapping", instance),   //All-context allowance
+            create = Permission.is_allowed("creating", instance), //All-context allowance
+            assignee = !!instance.assignee && instance.assignee.id === GGRC.current_user.id, // User is request assignee
+            audit_lead = !!audit.contact && audit.contact.id === GGRC.current_user.id,  // User is audit lead
+            auditor = can.map(  // User has auditor role in audit
+                        auditors || [],
+                        function(auditor) {
+                          if(auditor.person.id === GGRC.current_user.id) {
+                            return auditor;
+                          }
+                      }).length > 0,
+            program_owner = can.reduce(  //user is owner of the audit's parent program
+                              program_roles,
+                              function(cur, role) { return cur || role.name === "ProgramOwner"; },
+                              false
+                              ),
+            program_editor = can.reduce(  //user is editor of the audit's parent program
+                              program_roles,
+                              function(cur, role) { return cur || role.name === "ProgramEditor"; },
+                              false
+                              ),
+            auditor_states = fn_opts.auditor_states || [], // States in which an auditor can edit a request
+            assignee_states = fn_opts.assignee_states || [], // " for assignee of request
+            program_editor_states = fn_opts.program_editor_states || [], // " for program editor
+            // Program owner currently has nearly the same state allowances as Admin --BM 2014-12-16
+            can_auditor_edit = auditor && ~can.inArray(instance.attr("status"), auditor_states),
+            can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.attr("status"), assignee_states),
+            can_program_editor_edit = program_editor && ~can.inArray(instance.attr("status"), program_editor_states)
+            ;
+
+        if(fn_opts.predicate({
+          admin: admin,
+          can_auditor_edit: can_auditor_edit,
+          can_assignee_edit: can_assignee_edit,
+          can_program_editor_edit: can_program_editor_edit,
+          accepted: accepted,
+          draft: draft,
+          update: update,
+          map: map,
+          create: create,
+          program_owner: program_owner,
+          auditor: auditor,
+          audit_lead: audit_lead
+        })) {
+          return options.fn(options.contexts);
+        }
+        else{
+          return options.inverse(options.contexts);
+        }
+      }, $.when(auditors_dfd, prog_roles_dfd));
+  });
 });
 
 Mustache.registerHelper("strip_html_tags", function (str) {
   return resolve_computed(str).replace(/<(?:.|\n)*?>/gm, '');
+});
+
+Mustache.registerHelper("truncate", function (len, str) {
+  // find a good source
+  str = can.makeArray(arguments).reduce(function (res, arg, i) {
+      var s = resolve_computed(arg);
+      if (typeof s === "string") {
+          return s;
+      }else{
+          return res;
+      }
+  }, "");
+
+  if (typeof len === "number") {
+      // max len characters
+      if (str.length > len) {
+          str = str.substr(0, str.lastIndexOf(len, ' '));
+          str += " &hellip;";
+      }
+  }else{
+      // first line of input
+      var strs = str.split(/<br[^>]*>|\n/gm);
+      if (strs.length > 1) {
+          str = strs[0];
+          str += " &hellip;";
+      }
+  }
+
+  return str;
 });
 
 Mustache.registerHelper("switch", function (value, options) {

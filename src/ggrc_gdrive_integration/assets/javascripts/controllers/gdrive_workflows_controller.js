@@ -869,7 +869,24 @@ can.Component.extend({
       }, function(error) {
         that.scope.removeAttr("_folder_change_pending");
         that.scope.attr('folder_error', error);
+        that.options.instance = that.scope.instance;
+        that.on();
       });
+    },
+    "{instance} change": function() {
+      var that = this;
+      // Error recovery from previous refresh_instances error when we couldn't set up the binding.
+      if(this.scope.folder_error) {
+        this.scope.instance.get_binding("folders").refresh_instances().then(function(folders) {
+          that.scope.attr("current_folder", folders[0] ? folders[0].instance : null);
+          that.options.folder_list = folders;
+          delete that.options.instance;
+          that.on();
+        }, function(error) {
+          that.scope.removeAttr("_folder_change_pending");
+          that.scope.attr('folder_error', error);
+        });
+      }
     },
     "{folder_list} change": function() {
       var pjlength;
@@ -884,17 +901,26 @@ can.Component.extend({
       }
     },
     "a[data-toggle=gdrive-remover] click" : function(el, ev) {
+      var that = this;
       if(this.scope.deferred) {
-        this.scope.instance.mark_for_deletion("folders", this.scope.current_folder);
+        if(this.scope.current_folder) {
+          this.scope.instance.mark_for_deletion("folders", this.scope.current_folder);
+        } else {
+          can.each(this.scope.instance.object_folders.reify(), function(object_folder){
+            object_folder.refresh().then(function(of){
+              that.scope.instance.mark_for_deletion("object_folders", of);
+            });
+          });
+        }
       } else {
-        object = CMS.Models[el.data("model")].findInCacheById(el.data("id"));
-        object.object_folders.forEach(function(object_folder){
-          object_folder.reify().refresh().then(function(instance){
-            instance.destroy();
+        can.each(this.scope.instance.object_folders.reify(), function(object_folder){
+          object_folder.refresh().then(function(of){
+            of.destroy();
           });
         });
       }
       this.scope.attr("current_folder", null);
+      this.scope.attr('folder_error', null);
     },
     "a[data-toggle=gdrive-picker] click" : function(el, ev) {
 
@@ -985,6 +1011,12 @@ can.Component.extend({
         if(scope.deferred) {
           if(scope.current_folder) {
             scope.instance.mark_for_deletion("folders", scope.current_folder);
+          } else {
+            can.each(this.scope.instance.object_folders.reify(), function(object_folder){
+              object_folder.refresh().then(function(of){
+                that.scope.instance.mark_for_deletion("object_folders", of);
+              });
+            });
           }
           dfd = $.when();
         } else {
