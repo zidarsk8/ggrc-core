@@ -23,12 +23,10 @@ class WorkflowDateCalculator(object):
         return date_
 
     def calc_nearest_start_date_after_basedate(self, basedate):
-        import monthdelta
+        from monthdelta import *
         frequency = self.workflow.frequency
         min_relative_start_day = self._calc_min_relative_start_day_from_tasks()
         min_relative_start_month=self._calc_min_relative_start_month_from_tasks()
-        print "(min_rel_start_month, min_rel_start_day) = ({m}, {d})"\
-          .format(d=min_relative_start_day, m=min_relative_start_month)
 
         basedate_day_of_week = basedate.weekday()
         basedate_day_of_month = basedate.day
@@ -52,14 +50,10 @@ class WorkflowDateCalculator(object):
                 day_delta = min_relative_start_day - basedate_day_of_month
                 return basedate + timedelta(days = day_delta)
             elif min_relative_start_day < basedate_day_of_month:
-                return basedate + monthdelta(1)
-                # next_month = basedate.month + 1
-                # year = basedate.year
-                # if 13 == next_month:
-                #     year = basedate.year + 1
-                # month = next_month % 12
-                # day = basedate.day
-                # return date(year=year, month=month, day=day)
+              start_date = basedate
+              while start_date.day > min_relative_start_day:
+                start_date = start_date + timedelta(days=-1)
+              return start_date + monthdelta(1)
         elif "quarterly" == frequency:
             base_quarter_month = (basedate_month_of_year % 3) + 1
             min_relative_start_quarter_month = min_relative_start_month
@@ -147,20 +141,18 @@ class WorkflowDateCalculator(object):
             if max_relative_end_day == start_date_day_of_week:
                 return start_date
             elif max_relative_end_day < start_date_day_of_week:
-                import ipdb; ipdb.set_trace()
-                return start_date + timedelta(days = max_relative_end_day + (6 - start_date_day_of_week))
+                return start_date + timedelta(days = max_relative_end_day + (7 - start_date_day_of_week))
             else:
                 return start_date + timedelta(days = (max_relative_end_day - start_date_day_of_week))
         elif "monthly" == frequency:
+            from monthdelta import *
             if max_relative_end_day == start_date_day_of_month:
                 return start_date
             elif max_relative_end_day < start_date_day_of_month:
-                _y = start_date_year
-                _m = start_date_month_of_year
-                if 12 == _m:
-                    _m = 1
-                    _y += 1
-                return date(year=_y, month=_m, day=max_relative_end_day)
+                end_date = start_date + monthdelta(1)
+                while end_date.day > max_relative_end_day:
+                  end_date = end_date + timedelta(days=-1)
+                return end_date
             else:
                 return start_date + timedelta(days = (max_relative_end_day - start_date_day_of_month))
         elif "quarterly" == frequency:
