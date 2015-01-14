@@ -57,12 +57,13 @@ root.jQuery = {
 
 console.log('building parser');
 var parser = peg.buildParser(parser_string);
+var parser_src = peg.buildParser(parser_string, {output: "source"});
 
 console.log('saving parser to js files');
-var parser_src = header_string + 'GGRC.query_parser = ' + parser.toSource();
+var ggrc_parser = header_string + 'GGRC.query_parser = ' + parser_src;
 
 mkdirp.sync(ggrc_parser_folder);
-fs.writeFileSync(ggrc_parser_folder + ggrc_parser_js_file, parser_src);
+fs.writeFileSync(ggrc_parser_folder + ggrc_parser_js_file, ggrc_parser);
 
 // some sanity checks:
 // actual tests are located in src/ggrc/assets/js_specs/generated
