@@ -427,7 +427,7 @@
 
     , Clause: {
         _mixins: ["section_base"]
-      , "canonical" : {
+      , _canonical: {
         contracts : "Contract"
       }
       , contracts: Proxy(
