@@ -6,19 +6,17 @@
 }}
 <li class="sticky-filter inner-filter-sticky">
   <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
-    <form>
-      <div class="row-fluid">
-        <div class="span2">
-          <div class="filter-title">
-            <h6>
-              Custom Filter
-            </h6>
-          </div>
-        </div>
-        <div class="span10">
-           <input name="filter_query" type="text">
+    <div class="row-fluid">
+      <div class="span2">
+        <div class="filter-title">
+          <h6>
+            Custom Filter
+          </h6>
         </div>
       </div>
-    </form>
+      <div class="span10">
+         <input name="filter_query" type="text">
+      </div>
+    </div>
   </div>
 </li>
