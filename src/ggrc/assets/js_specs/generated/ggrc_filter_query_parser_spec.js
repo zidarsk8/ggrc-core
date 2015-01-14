@@ -12,7 +12,7 @@ describe('GGRC.query_parser', function() {
     'a': 'b',
     'hello': 'world',
     'n': '22',
-    '5words': 'This are just 5 words',
+    '5words': 'These are just 5 words',
     'bacon ipsum': 'Bacon ipsum dolor amet meatloaf pork loin fatback ball'+
       'tip chicken frankfurter swine bresaola beef ribs ribeye shankle sho'+
       'rt ribs drumstick leberkas sirloin. Turducken hamburger drumstick g'+
@@ -184,7 +184,7 @@ describe('GGRC.query_parser', function() {
             .evaluate(values)).toEqual(true);
         expect(GGRC.query_parser.parse('n = 22')
             .evaluate(values)).toEqual(true);
-        expect(GGRC.query_parser.parse('5words = "This are just 5 words"')
+        expect(GGRC.query_parser.parse('5words = "These are just 5 words"')
             .evaluate(values)).toEqual(true);
         expect(GGRC.query_parser.parse('5words = "is a phraze"')
             .evaluate(values)).toEqual(false);
@@ -199,6 +199,8 @@ describe('GGRC.query_parser', function() {
         expect(GGRC.query_parser.parse('(n = 22 or n = 5)')
             .evaluate(values)).toEqual(true);
         expect(GGRC.query_parser.parse('(n = 22 and  n = 5) and ("bacon ipsum" !~ bacon)')
+            .evaluate(values)).toEqual(false);
+        expect(GGRC.query_parser.parse('("bacon ipsum" ~ bacon) and ("bacon ipsum" !~ bacon)')
             .evaluate(values)).toEqual(false);
         expect(GGRC.query_parser.parse('(n = 22 or n = 5) and ("bacon ipsum" ~ bacon)')
             .evaluate(values)).toEqual(true);
