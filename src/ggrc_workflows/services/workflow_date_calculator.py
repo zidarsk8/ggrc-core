@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+# import monthdelta
 
 '''
 All dates are calculated raw. They are not adjusted for holidays or workdays.
@@ -22,9 +23,12 @@ class WorkflowDateCalculator(object):
         return date_
 
     def calc_nearest_start_date_after_basedate(self, basedate):
+        import monthdelta
         frequency = self.workflow.frequency
         min_relative_start_day = self._calc_min_relative_start_day_from_tasks()
         min_relative_start_month=self._calc_min_relative_start_month_from_tasks()
+        print "(min_rel_start_month, min_rel_start_day) = ({m}, {d})"\
+          .format(d=min_relative_start_day, m=min_relative_start_month)
 
         basedate_day_of_week = basedate.weekday()
         basedate_day_of_month = basedate.day
@@ -39,7 +43,8 @@ class WorkflowDateCalculator(object):
                 day_delta = min_relative_start_day - basedate_day_of_week
                 return basedate + timedelta(days = day_delta)
             elif min_relative_start_day < basedate_day_of_week:
-                return basedate + timedelta(days = 7)
+                day_delta = basedate_day_of_week - min_relative_start_day
+                return basedate + timedelta(days = 7 - day_delta)
         elif "monthly" == frequency:
             if min_relative_start_day == basedate_day_of_month:
                 return basedate
@@ -47,13 +52,14 @@ class WorkflowDateCalculator(object):
                 day_delta = min_relative_start_day - basedate_day_of_month
                 return basedate + timedelta(days = day_delta)
             elif min_relative_start_day < basedate_day_of_month:
-                next_month = basedate.month + 1
-                year = basedate.year
-                if 13 == next_month:
-                    year = basedate.year + 1
-                month = next_month % 12
-                day = basedate.day
-                return date(year=year, month=month, day=day)
+                return basedate + monthdelta(1)
+                # next_month = basedate.month + 1
+                # year = basedate.year
+                # if 13 == next_month:
+                #     year = basedate.year + 1
+                # month = next_month % 12
+                # day = basedate.day
+                # return date(year=year, month=month, day=day)
         elif "quarterly" == frequency:
             base_quarter_month = (basedate_month_of_year % 3) + 1
             min_relative_start_quarter_month = min_relative_start_month
@@ -90,14 +96,16 @@ class WorkflowDateCalculator(object):
                 if tmp_month > 12:
                     tmp_year += 1
                     tmp_month -= 12
+                #return
                 return date(year=tmp_year, month=tmp_month, day=min_relative_start_day)
             else: #min_relative_start_quarter_month > base_quarter_month: Walk forward to a valid month
-                tmp_month = basedate_month_of_year + min_relative_start_quarter_month - base_quarter_month
-                tmp_year = basedate.year
-                if tmp_month > 12:
-                    tmp_year += 1
-                    tmp_month -= 12
-                return date(year=tmp_year, month=tmp_month, day=min_relative_start_day)
+                return basedate + monthdelta(min_relative_start_quarter_month) - base_quarter_month
+                # tmp_month = basedate_month_of_year + min_relative_start_quarter_month - base_quarter_month
+                # tmp_year = basedate.year
+                # if tmp_month > 12:
+                #     tmp_year += 1
+                #     tmp_month -= 12
+                # return date(year=tmp_year, month=tmp_month, day=min_relative_start_day)
         elif "annually" == frequency:
             if basedate_month_of_year == min_relative_start_month:
                 if basedate_day_of_month == min_relative_start_day:
@@ -118,7 +126,7 @@ class WorkflowDateCalculator(object):
         max_relative_end_day = self._calc_max_relative_end_day_from_tasks()
         max_relative_end_month=self._calc_max_relative_end_month_from_tasks()
 
-        start_date_day_of_week = start_date.weekday
+        start_date_day_of_week = start_date.weekday()
         start_date_day_of_month = start_date.day
         start_date_month_of_year = start_date.month
         start_date_year = start_date.year
@@ -139,7 +147,8 @@ class WorkflowDateCalculator(object):
             if max_relative_end_day == start_date_day_of_week:
                 return start_date
             elif max_relative_end_day < start_date_day_of_week:
-                return start_date + timedelta(days = max_relative_end_day + (7 - start_date_day_of_week))
+                import ipdb; ipdb.set_trace()
+                return start_date + timedelta(days = max_relative_end_day + (6 - start_date_day_of_week))
             else:
                 return start_date + timedelta(days = (max_relative_end_day - start_date_day_of_week))
         elif "monthly" == frequency:
@@ -245,11 +254,13 @@ class WorkflowDateCalculator(object):
                 _tmp_month += 12
             return date(year=_year, month=_tmp_month, day=start_date.day)
         elif "annually" == frequency:
+            #return start_date + timedelta(weeks=-365)
             return date(year=start_date.year - 1, month=start_date.month, day=start_date.day)
         else:
             pass
 
     def _calc_min_relative_start_month_from_tasks(self):
+        # import ipdb; ipdb.set_trace()
         min_start_month = None
         for tg in self.workflow.task_groups:
             for t in tg.task_group_tasks:
@@ -259,6 +270,7 @@ class WorkflowDateCalculator(object):
         return min_start_month
 
     def _calc_min_relative_start_day_from_tasks(self):
+        # import ipdb; ipdb.set_trace()
         min_start_day = None
         for tg in self.workflow.task_groups:
             for t in tg.task_group_tasks:
@@ -268,10 +280,21 @@ class WorkflowDateCalculator(object):
         return min_start_day
 
     def _calc_max_relative_end_day_from_tasks(self):
+        # import ipdb; ipdb.set_trace()
         max_end_day = None
         for tg in self.workflow.task_groups:
             for t in tg.task_group_tasks:
-                relative_end_day = t.relative_start_day
-                if max_end_day is None or relative_end_day < max_end_day:
+                relative_end_day = t.relative_end_day
+                if max_end_day is None or relative_end_day > max_end_day:
                     max_end_day = relative_end_day
         return max_end_day
+
+    def _calc_max_relative_end_month_from_tasks(self):
+        # import ipdb; ipdb.set_trace()
+        max_end_month = None
+        for tg in self.workflow.task_groups:
+            for t in tg.task_group_tasks:
+                relative_end_month = t.relative_end_month
+                if max_end_month is None or relative_end_month > max_end_month:
+                    max_end_month = relative_end_month
+        return max_end_month
