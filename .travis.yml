@@ -19,11 +19,11 @@ install:
   - "mv src/google_appengine/google src/"
   - "sudo pip install -r src/requirements.txt"
   - "sudo pip install -r src/dev-requirements.txt"
-  - "pip install google-api-python-client"
-  - "pip install mysql-python"
-  - "pip install webob"
-  - 'gem install sass --version "=3.4.9"'
-  - 'gem install compass --version "=1.0.1"'
+  - "sudo pip install google-api-python-client"
+  - "sudo pip install mysql-python"
+  - "sudo pip install webob"
+  - 'sudo gem install sass --version "=3.4.9"'
+  - 'sudo gem install compass --version "=1.0.1"'
 before_script:
   - "source bin/init_env"
   # weird travis-ci python paths
