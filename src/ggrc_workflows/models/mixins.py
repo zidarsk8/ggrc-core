@@ -88,24 +88,29 @@ class RelativeTimeboxed(Timeboxed):
     return ret
 
   @classmethod
-  def _calc_start_date_of_next_period(cls, min_start_date_of_cycle, frequency):
-    if frequency == "one_time":
-      return min_start_date_of_cycle
-    
+  def freq_to_delta(cls, frequency):
     freq_to_delta = {
         'annually': dict(years=1),
         'monthly': dict(months=1),
         'quarterly': dict(months=3),
         'weekly': dict(weeks=1)
     }
+    return relativedelta(**freq_to_delta.get(frequency, dict()))
+
+  @classmethod
+  def _calc_start_date_of_next_period(cls, min_start_date_of_cycle, frequency):
+    if frequency == "one_time":
+      return min_start_date_of_cycle
+
+
     from datetime import date
     today = date.today()
     next_start_date = min_start_date_of_cycle
-    # If the min_start_date_of_cycle has passed, the next start date would be 
-    # one cycle period past min_start_date_of_cycle. Otherwise, the 
+    # If the min_start_date_of_cycle has passed, the next start date would be
+    # one cycle period past min_start_date_of_cycle. Otherwise, the
     # next_cycle_start date would be the min start date itself.
     if today > min_start_date_of_cycle:
-      next_start_date = min_start_date_of_cycle + relativedelta(**freq_to_delta.get(frequency, dict()))
+      next_start_date = min_start_date_of_cycle + cls.freq_to_delta(frequency)
     return next_start_date
 
   @classmethod

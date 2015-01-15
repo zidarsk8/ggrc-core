@@ -514,7 +514,7 @@ xdescribe("mappers", function() {
     });
   });
 
-  describe("GGRC.ListLoaders.CustomFilteredListLoader", function() {
+  xdescribe("GGRC.ListLoaders.CustomFilteredListLoader", function() {
 
     var cfll, binding;
     beforeEach(function() {
@@ -551,7 +551,7 @@ xdescribe("mappers", function() {
         source_binding = new LL.ListBinding();
         binding = new LL.ListBinding();
         cfll = new LL.CustomFilteredListLoader(source_binding, jasmine.createSpy("filter_fn"));
-        binding._refresh_instances_deferred = $.when();
+        spyOn(binding, "refresh_instances").andReturn($.when());
       });
 
       describe("source_binding.list add", function() {
