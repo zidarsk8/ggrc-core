@@ -415,7 +415,6 @@ function resize_areas() {
   lhsHeight = winHeight - 220; //new ui
   footerMargin = lhsHeight + 130; //new UI
   internavHeight = lhsHeight; // new UI - 100;
-  objectHeight = winHeight - 156;
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
@@ -430,7 +429,7 @@ function resize_areas() {
   $topNav.css("width",objectWidth);
   $objectArea
     .css("margin-left",internavWidth)
-    .css("height",objectHeight)
+    .css("height",internavHeight)
     .css("width",objectWidth)
     ;
 
