@@ -23,7 +23,7 @@ describe('GGRC.query_parser', function() {
 
   var parser_structure = {
     parse: jasmine.any(Function),
-    toSource: jasmine.any(Function),
+    //toSource: jasmine.any(Function),
     SyntaxError: jasmine.any(Function)
   };
 
