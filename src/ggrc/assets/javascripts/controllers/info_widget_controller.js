@@ -39,8 +39,13 @@ can.Control("GGRC.Controllers.InfoWidget", {
         start_menu : this.options.start_menu,
         object_menu : this.options.object_menu,
         workflow_view : GGRC.mustache_path + "/dashboard/info/workflow_progress.mustache",
+        workflow_data: {},
         task_view : GGRC.mustache_path + "/dashboard/info/my_tasks.mustache",
-        error_msg : 'This is global messaging letting you know that something is over due!',
+        task_data: {},
+        //audit_view : GGRC.mustache_path + "/dashboard/info/my_audits.mustache",
+        //audit_data:{},
+        task_count : 0,
+        error_msg : '',
         error : true
       });
     can.view(this.get_widget_view(this.element), this.options.context, function(frag) {
@@ -48,9 +53,12 @@ can.Control("GGRC.Controllers.InfoWidget", {
     });
 
     var test_a = this.options.context;
-    //Fixme if dashboard then do these 2 lines below
-    this.load_my_workflows();
-    this.load_my_tasks();
+    //If dashboard then do these 2 lines below
+    if (/dashboard/.test(window.location)){
+      this.load_my_workflows();
+      this.load_my_tasks();
+      //this.load_my_audits();
+    }
   }
 
   , get_widget_view: function(el) {
@@ -101,13 +109,9 @@ can.Control("GGRC.Controllers.InfoWidget", {
 
   , insert_options: function(options, my_view, component_class, prepend){
     var self = this,
-        context = {},
         dfd = $.Deferred();
 
-        //console.log("insert_options");
-        context.options = options;
-
-        can.view(my_view, new can.Map(context), function(frag) {
+        can.view(my_view, new can.Map(options), function(frag) {
           if (self.element) {
             if (prepend)
               self.element.find(component_class).prepend(frag);//self.element.find('ul.workflow-tree').prepend(frag);
@@ -120,36 +124,69 @@ can.Control("GGRC.Controllers.InfoWidget", {
   }
 
   , update_tasks_for_workflow: function(workflow){
-    var dfd = $.Deferred(),
+    var self = this,
+        dfd = $.Deferred(),
         task_count = 0,
         finished = 0,
         in_progress = 0,
         assigned = 0,
         over_due = 0,
+        today = new Date(),
+        first_end_date,
         task_data = {};
+
       workflow.get_binding('current_all_tasks').refresh_instances().then(function(d){
-        task_count = d.length;
+        var mydata = d;
+        task_count = mydata.length;
         for(var i = 0; i < task_count; i++){
-          if (d[i].status === "Finished")
+          var data = mydata[i].instance,
+              end_date = new Date(data.end_date || null);
+
+          //Calculate first_end_date for the workflow / earliest end for all the tasks in a workflow
+          if (i === 0)
+            first_end_date = end_date;
+          else if (end_date.getTime() < first_end_date.getTime())
+            first_end_date = end_date;
+
+          if (data.status === 'Finished')
             finished++;
-          else if (d[i].status === "InProgress")
-            in_progress++;
           else {
-            var end_date = new Date(d[i].end_date || null);
-            var today = new Date();
-            if (end_date.getTime() < today.getTime())
+            if (end_date.getTime() < today.getTime()) {
               over_due++;
+              self.options.context.attr('error_msg', 'Some tasks are over due!')
+            }
+            else if (data.status === 'InProgress')
+              in_progress++;
             else
               assigned++;
           }
         }
         //Calculate %
+        if (task_count > 0) {
+          task_data.task_count = task_count;
+          task_data.finished = finished;
+          task_data.finished_percentage = Math.floor((finished * 100) / task_count); //ignore the decimal part
+          task_data.in_progress = in_progress;
+          task_data.in_progress_percentage = Math.floor((in_progress * 100) / task_count);
+          task_data.over_due = over_due;
+          task_data.over_due_percentage = Math.floor((over_due * 100) / task_count);
+          task_data.assigned = assigned;
+          task_data.assigned_percentage = Math.floor((assigned * 100) / task_count);
+          task_data.first_end_date = first_end_date.toLocaleDateString();
+          //calculate days left for first_end_date
+          if(today.getTime() >= first_end_date.getTime())
+            task_data.days_left_for_first_task = 0;
+          else {
+            var time_interval = first_end_date.getTime() - today.getTime();
+            var day_in_milli_secs = 24 * 60 * 60 * 1000;
+            task_data.days_left_for_first_task = Math.floor(time_interval/day_in_milli_secs);
+          }
 
-        task_data.finished = (finished * 100) / task_count;
-        task_data.in_progress = (in_progress * 100) / task_count;
-        task_data.over_due = (over_due * 100) / task_count;
-        task_data.assigned = (assigned * 100) / task_count;
-        workflow.task_data = task_data
+          //set overdue flag
+          task_data.over_due_flag = over_due ? true : false;
+        }
+
+        workflow.attr('task_data', new can.Map(task_data));
         dfd.resolve();
       });
 
@@ -157,70 +194,52 @@ can.Control("GGRC.Controllers.InfoWidget", {
   }
 
   , load_my_workflows: function(){
-    var my_workflows,
-        self = this,
+    var self = this,
         my_view = this.options.context.workflow_view,
         component_class = 'ul.workflow-tree',
-        prepend = true;
+        prepend = true,
+        workflow_data = this.options.context.workflow_data,
+        wfs;
 
-    GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
+      GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
       .then(function(result_set){
           var wf_data = result_set.getResultsForType('Workflow');
-          //FIX ME Load data 10 each time
           var refresh_queue = new RefreshQueue();
           refresh_queue.enqueue(wf_data);
-          refresh_queue.trigger().then(function(options){
-            var wf, i, tasklist;
-            for (i = 0; i < options.length; i++){
-              wf=options[i];
-              console.log(wf);
-              wf.get_binding('current_all_tasks').refresh_instances().then(function(d){
-                //console.log(d.length);
-              });
+          return refresh_queue.trigger();
+      }).then(function(options){
+          wfs = options;
 
-              //self.update_tasks_for_workflow(wf);
-              console.log(wf);
-            }
-            //Create a view and update here
-            if(options.length > 0)
-              self.insert_options(options, my_view, component_class, prepend);
-          });
+          return $.when.apply($, can.map(options, function(wf){
+            return self.update_tasks_for_workflow(wf);
+          }));
+      }).then(function(){
+        if(wfs.length > 0){
+          //TBD sort workflows for the first 5 workflow-end-dates
+          workflow_data.options = wfs;
+          self.insert_options(workflow_data, my_view, component_class, prepend);
+        }
       });
+
     return 0;
   }
 
   , load_my_tasks: function(){
-    var my_tasks,
-        self = this,
+    var self = this,
         my_view = this.options.context.task_view,
+        task_data = this.options.context.task_data,
         component_class = 'ul.task-tree',
         prepend = true;
-    //The below search loads all tasks so far, so history is also loaded
-    /*GGRC.Models.Search.search_for_types('', ['CycleTaskGroupObjectTask'], {contact_id: GGRC.current_user.id})
-      .then(function(result_set){
-          var task_data = result_set.getResultsForType('CycleTaskGroupObjectTask');
-          var refresh_queue = new RefreshQueue();
-          //FIX ME Load data 10 each time
-          refresh_queue.enqueue(task_data);
-          refresh_queue.trigger().then(function(options){
-            //Create a view and update here
-            self.insert_options(options, my_view, component_class, prepend);
-          });
-        });
-    */
+
     //To get the tasks only for the current person/current cycle
     var loader = GGRC.page_instance().get_binding("assigned_tasks");
     if(loader) {
       loader.refresh_instances().then(function(tasks) {
-        self.insert_options(tasks, my_view, component_class, prepend);
+        self.options.context.attr('task_count', tasks.length);
+        task_data.options = tasks;
+        self.insert_options(task_data, my_view, component_class, prepend);
       })
     }
-    /*GGRC.page_instance().get_binding("assigned_tasks").refresh_instances()
-      .then(function(tasks) {
-        //var mytasks=tasks; console.log(tasks)
-        if(tasks.length > 0)
-          self.insert_options(tasks, my_view, component_class, prepend);
-      })*/
     return 0;
   }
 

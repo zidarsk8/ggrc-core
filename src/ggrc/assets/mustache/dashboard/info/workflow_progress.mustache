@@ -9,13 +9,6 @@
 <ul class="new-tree tree-one dashboard-tree workflow-tree">
   {{#each options}}
   {{#using ins=this}}
-    {{!log ins}}
-    {{!#using cycles=ins.cycles}}
-      {{!#using task_groups=cycles.reify().task_groups}}
-        {{!log task_groups}}
-      {{!/using}}
-    {{!/using}}
-
     <li class="tree-item">
       <div class="item-wrap">
         <div class="row-fluid">
@@ -26,7 +19,6 @@
                   <a href="{{viewLink}}">{{ins.title}}</a>
                   <ul class="item-util">
                     <li>
-                      <!--Owned by <a href="#">Predrag Kanazir</a>-->
                       {{{render '/static/mustache/dashboard/info/wf_owner.mustache' instance=ins stacked=true}}}
                     </li>
                   </ul>
@@ -37,23 +29,36 @@
           <div class="span5">
             <div class="tree-progress">
               <div class="progress custom-progress">
-                <div class="bar bar-verify" style="width: 50%;" rel="tooltip" data-original-title="Verified 50%"></div>
-                <div class="bar bar-progress" style="width: 14%;" rel="tooltip" data-original-title="In Progress 14%"></div>
-                <div class="bar bar-pending" style="width: 35%;" rel="tooltip" data-original-title="Pending 35%"></div>
+                {{#if ins.task_data.finished_percentage}}
+                  <div class="bar bar-verify" style="width: {{ins.task_data.finished_percentage}}%;" rel="tooltip" data-original-title="Verified {{ins.task_data.finished_percentage}}%"></div>
+                {{/if}}
+                {{#if ins.task_data.in_progress_percentage}}
+                  <div class="bar bar-progress" style="width: {{ins.task_data.in_progress_percentage}}%;" rel="tooltip" data-original-title="In Progress {{ins.task_data.in_progress_percentage}}%"></div>
+                {{/if}}
+                {{#if ins.task_data.assigned_percentage}}
+                  <div class="bar bar-pending" style="width: {{ins.task_data.assigned_percentage}}%;" rel="tooltip" data-original-title="Pending {{ins.task_data.assigned_percentage}}%"></div>
+                {{/if}}
+                {{#if ins.task_data.over_due_percentage}}
+                  <div class="bar bar-warning" style="width: {{ins.task_data.over_due_percentage}}%;" rel="tooltip" data-original-title="Overdue {{ins.task_data.over_due_percentage}}%"></div>
+                {{/if}}
               </div>
               <ul class="item-util">
                 <li>
-                  120 tasks in total / 50% verified
+                  {{ins.task_data.task_count}} tasks in total / {{ins.task_data.finished_percentage}}% finished
                 </li>
               </ul>
             </div>
           </div>
           <div class="span2">
             <div class="right">
-              Due in 15 days
-              <ul class="item-util">
-                <li>11/03/2014</li>
-              <ul>
+              {{#if ins.task_data.over_due_flag}}
+                <span class="overdue">Overdue</span>
+              {{else}}
+                Due in {{ins.task_data.days_left_for_first_task}} days
+              {{/if}}
+                <ul class="item-util">
+                  <li>{{{ins.task_data.first_end_date}}}</li>
+                </ul>
             </div>
           </div>
         </div>
