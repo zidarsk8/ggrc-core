@@ -14,6 +14,7 @@ from ggrc.converters.controls import ControlsConverter
 from ggrc.models import Policy, System
 from tests.ggrc import TestCase
 from tests.ggrc.converters.helpers import AbstractCSV, compare_csvs
+from nose.plugins.skip import SkipTest
 
 
 THIS_ABS_PATH = abspath(dirname(__file__))
@@ -21,6 +22,7 @@ CSV_DIR = join(THIS_ABS_PATH, 'comparison_csvs/')
 TEST_FILE = "mappings_importEX.csv"
 
 
+@SkipTest
 class TestConsistency(TestCase):
   def setUp(self):
     self.csv_filename = "dummy_filename.csv"

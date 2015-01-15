@@ -16,6 +16,8 @@ from ggrc.services.common import Resource
 from tests.ggrc import TestCase
 from urlparse import urlparse
 from wsgiref.handlers import format_date_time
+from nose.plugins.skip import SkipTest
+
 
 class ServicesTestMockModel(Base, ggrc.db.Model):
   __tablename__ = 'test_model'
@@ -33,6 +35,7 @@ Resource.add_to(
 COLLECTION_ALLOWED = ['HEAD', 'GET', 'POST', 'OPTIONS']
 RESOURCE_ALLOWED = ['HEAD', 'GET', 'PUT', 'DELETE', 'OPTIONS']
 
+@SkipTest
 class TestResource(TestCase):
   def setUp(self):
     super(TestResource, self).setUp()

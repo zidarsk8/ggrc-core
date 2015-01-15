@@ -77,19 +77,26 @@ The application will be accessible via this URL: http://localhost:8080/
 If you're running the Google App Engine SDK, the App Engine management console
 will be avaiable via this URL: http://localhost:8000/
 
-Running Unit Tests
-------------------
+Running Tests
+------------
+
+Tests are your friend! Keep them running, keep them updated.
+
+For JavaScript tests:
 
 .. sourcecode:: bash
 
-   run_unittests
+   run_karma
 
-Running Behave Integration Tests
---------------------------------
+Then open Chrome at URL: http://localhost:9876
 
+For Python unit tests:
 .. sourcecode:: bash
 
-   run_behave
+   run_pytests
+
+Both will run tests that run in the background and refresh every time
+you save a file. Keep them passing.
 
 Quickstart Breakdown
 ====================

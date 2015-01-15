@@ -7,14 +7,12 @@
 
 //= require models/local_storage
 
+
 describe("can.Model.LocalStorage", function() {
   
   //run-once setup
-  describe("setup", function() {
-    it("dummy spec", function() {});
-    runs(function() {
+  beforeAll(function() {    
       can.Model.LocalStorage("SpecModel");
-    });
   });
 
   var model1 = { "id" : 1, "foo" : "bar" };
@@ -91,7 +89,7 @@ describe("can.Model.LocalStorage", function() {
       expect(success).toBe(true);
     });
 
-    it("fails with status 404 when the id is not found", function() {
+    it("fails with status 404 when the id is not found", function(done) {
       var failure = false;
       SpecModel.findOne({id : 3}).fail(function(xhr) {
         expect(xhr.status).toBe(404);
@@ -99,7 +97,7 @@ describe("can.Model.LocalStorage", function() {
       });
       waitsFor(function() {
         return failure;
-      }, 5000, "Failure callback never fired");
+      }, done);
     });
   });
 
@@ -155,7 +153,7 @@ describe("can.Model.LocalStorage", function() {
       expect(success).toBe(true);
     });
 
-    it("fails with status 404 when the id is not found", function() {
+    it("fails with status 404 when the id is not found", function(done) {
       var failure = false;
       new SpecModel().attr({id : 3}).save().fail(function(xhr) {
         expect(xhr.status).toBe(404);
@@ -163,7 +161,7 @@ describe("can.Model.LocalStorage", function() {
       });
       waitsFor(function() {
         return failure;
-      }, 5000, "failure callback to fire");
+      }, done);
     });
   });
 
@@ -183,7 +181,7 @@ describe("can.Model.LocalStorage", function() {
       expect(success).toBe(true);
     });
 
-    it("fails with status 404 when the id is not found", function() {
+    it("fails with status 404 when the id is not found", function(done) {
       var failure = false;
       new SpecModel().attr({id : 3}).destroy().fail(function(xhr) {
         expect(xhr.status).toBe(404);
@@ -191,7 +189,7 @@ describe("can.Model.LocalStorage", function() {
       });
       waitsFor(function() {
         return failure;
-      }, 5000, "failure callback to fire");
+      }, done);
     });
 
   });

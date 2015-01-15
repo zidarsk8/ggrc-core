@@ -277,3 +277,4 @@ dashboard-js-spec-files:
 
 dashboard-js-spec-helpers:
   - jasmine-fixture.js
+  - spec_helpers.js

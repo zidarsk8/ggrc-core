@@ -15,12 +15,14 @@ from ggrc.models.all_models import (
     ControlCategory, Control, Policy, ObjectControl, Option, System,
     )
 from tests.ggrc import TestCase
+from nose.plugins.skip import SkipTest
 
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'comparison_csvs/')
 
 
+@SkipTest
 class TestExport(TestCase):
   def setUp(self):
     self.csv_filename = "dummy_filename.csv"

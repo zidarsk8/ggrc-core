@@ -15,8 +15,8 @@ class TestCase(BaseTestCase):
   def setUp(self):
     create_db(use_migrations, quiet=True)
     if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
-      from google.appengine.api import memcache  
-      from google.appengine.ext import testbed 
+      from google.appengine.api import memcache
+      from google.appengine.ext import testbed
       self.testbed = testbed.Testbed()
       self.testbed.activate()
       self.testbed.init_memcache_stub()
@@ -25,8 +25,8 @@ class TestCase(BaseTestCase):
     db.session.remove()
     drop_db(use_migrations, quiet=True)
     if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
-      from google.appengine.api import memcache  
-      from google.appengine.ext import testbed 
+      from google.appengine.api import memcache
+      from google.appengine.ext import testbed
       self.testbed.deactivate()
 
   def create_app(self):
