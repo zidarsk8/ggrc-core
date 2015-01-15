@@ -2104,15 +2104,10 @@
     }
 
     , autocomplete_select : function(el, ev, ui) {
-        var name = el.attr("name");
-        // we (ab)use databinding to make the input field change for us
-        // doing it three times like this ensures stability
-
-        // handle emptying field and choosing same suggestion
-        this.context.attr(name, null);
-        // the first change sets to null, 2nd works
-        this.context.attr(name, ui.item);
-        this.context.attr(name, ui.item);
+      setTimeout(function(){
+        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
+      }, 0);
+      this.context.attr(el.attr("name"), ui.item);
     }
 
   });
