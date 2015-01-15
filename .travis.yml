@@ -24,15 +24,14 @@ install:
   - "sudo pip install webob"
   - 'gem install sass --version "=3.4.9"'
   - 'gem install compass --version "=1.0.1"'
-before_script:
-  - "source bin/init_env"
-  # weird travis-ci python paths
+ # weird travis-ci python paths
   - "export PYTHONPATH=$PYTHONPATH:/usr/lib/pymodules/python2.7/"
   - "export PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/dist-packages"
   - "export PYTHONPATH=$PYTHONPATH:/usr/lib/pyshared/python2.7/"
   - "export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages/"
-  - sudo apt-get install phantomjs
-  - npm install karma karma-jasmine jasmine-core phantomjs karma-phantomjs-launcher karma-chrome-launcher
+  - npm install karma karma-jasmine jasmine-core phantomjs karma-chrome-launcher
+before_script:
+  - "source bin/init_env"
   - build_compass
   - build_assets
 script:
