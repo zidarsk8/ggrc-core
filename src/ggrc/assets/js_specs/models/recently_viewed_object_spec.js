@@ -13,7 +13,7 @@ describe("working tests", function () {
 });
 
 
-xdescribe("can.Model.RecentlyViewedObjects", function() {
+describe("can.Model.RecentlyViewedObjects", function() {
 
   describe("::newInstance", function() {
     it("creates a new recently viewed object given non-Model instance", function() {
