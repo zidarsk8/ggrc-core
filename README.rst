@@ -2,6 +2,9 @@
 gGRC-Core
 *********
 
+.. image:: https://travis-ci.org/reciprocity/ggrc-core.svg
+    :target: https://travis-ci.org/reciprocity/ggrc-core
+
 Google Governance, Risk and Compliance. Migrated from `Google <https://code.google.com/p/compliance-management/>`_ `Code <https://code.google.com/p/ggrc-core>`_.
 
 Requirements
