@@ -1417,15 +1417,6 @@ ul.new-tree {
     &.code {
       text-transform: uppercase;
     }
-    &.state-value {
-      &.gray {
-        color: $draftGray;
-      }
-      &.green {
-        color: $lightGreen;
-        font-weight: bold;
-      }
-    }
     .event-action {
       font-size:13px;
       color:#777;
