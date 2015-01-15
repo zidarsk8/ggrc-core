@@ -19,11 +19,10 @@ describe('GGRC.query_parser', function() {
       'round round ham biltong. Alcatra turkey brisket pancetta jowl bilto'+
       'ng meatball, shank pork chop. Flank fatback capicola chuck chicken '+
       'jerky venison meatball beef drumstick.'
-  }
+  };
 
   var parser_structure = {
     parse: jasmine.any(Function),
-    //toSource: jasmine.any(Function),
     SyntaxError: jasmine.any(Function)
   };
 
@@ -42,7 +41,7 @@ describe('GGRC.query_parser', function() {
         keys: [],
         evaluate: jasmine.any(Function),
         order_by : { keys : [ ], order : '', compare : null }
-      }
+      };
 
       expect(GGRC.query_parser.parse("")).toEqual(empty_result);
       expect(GGRC.query_parser.parse(" ")).toEqual(empty_result);

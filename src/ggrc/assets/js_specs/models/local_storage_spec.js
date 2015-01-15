@@ -8,19 +8,11 @@
 //= require models/local_storage
 
 
-describe("working tests", function () {
-    it("will have to update to jasmine 2.0 ways", function () {});
-});
-
-
-xdescribe("can.Model.LocalStorage", function() {
+describe("can.Model.LocalStorage", function() {
   
   //run-once setup
-  describe("setup", function() {
-    it("dummy spec", function() {});
-    runs(function() {
+  beforeAll(function() {    
       can.Model.LocalStorage("SpecModel");
-    });
   });
 
   var model1 = { "id" : 1, "foo" : "bar" };
@@ -97,7 +89,7 @@ xdescribe("can.Model.LocalStorage", function() {
       expect(success).toBe(true);
     });
 
-    it("fails with status 404 when the id is not found", function() {
+    it("fails with status 404 when the id is not found", function(done) {
       var failure = false;
       SpecModel.findOne({id : 3}).fail(function(xhr) {
         expect(xhr.status).toBe(404);
@@ -105,7 +97,7 @@ xdescribe("can.Model.LocalStorage", function() {
       });
       waitsFor(function() {
         return failure;
-      }, 5000, "Failure callback never fired");
+      }, done);
     });
   });
 
@@ -161,7 +153,7 @@ xdescribe("can.Model.LocalStorage", function() {
       expect(success).toBe(true);
     });
 
-    it("fails with status 404 when the id is not found", function() {
+    it("fails with status 404 when the id is not found", function(done) {
       var failure = false;
       new SpecModel().attr({id : 3}).save().fail(function(xhr) {
         expect(xhr.status).toBe(404);
@@ -169,7 +161,7 @@ xdescribe("can.Model.LocalStorage", function() {
       });
       waitsFor(function() {
         return failure;
-      }, 5000, "failure callback to fire");
+      }, done);
     });
   });
 
@@ -189,7 +181,7 @@ xdescribe("can.Model.LocalStorage", function() {
       expect(success).toBe(true);
     });
 
-    it("fails with status 404 when the id is not found", function() {
+    it("fails with status 404 when the id is not found", function(done) {
       var failure = false;
       new SpecModel().attr({id : 3}).destroy().fail(function(xhr) {
         expect(xhr.status).toBe(404);
@@ -197,7 +189,7 @@ xdescribe("can.Model.LocalStorage", function() {
       });
       waitsFor(function() {
         return failure;
-      }, 5000, "failure callback to fire");
+      }, done);
     });
 
   });
