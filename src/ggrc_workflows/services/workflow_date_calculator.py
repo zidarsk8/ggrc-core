@@ -263,6 +263,13 @@ class WorkflowDateCalculator(object):
     else:
       pass
 
+  def nearest_work_day(date_, direction):
+    _date = date_
+    holidays = []
+    while _date.weekday() > 4 or _date in holidays:
+      _date = _date + datetime.timedelta(direction)
+    return _date
+
   def _calc_min_relative_start_month_from_tasks(self):
     min_start_month = None
     for tg in self.workflow.task_groups:
