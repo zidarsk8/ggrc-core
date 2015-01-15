@@ -35,7 +35,10 @@ class WorkflowDateCalculator(object):
     basedate_month_of_year = basedate.month
 
     if "one_time" == frequency:
-      return basedate
+      start_date = date(year=basedate.year, month=min_relative_start_month, day=min_relative_start_day)
+      if start_date < basedate:
+        start_date = start_date + monthdelta(12)
+      return start_date
     elif "weekly" == frequency:
       if min_relative_start_day == basedate_day_of_week:
         return basedate
@@ -75,13 +78,6 @@ class WorkflowDateCalculator(object):
         else:
           return date(year=basedate.year, month=basedate_month_of_year, day=min_relative_start_day)
       elif min_relative_start_quarter_month < base_quarter_month:
-        '''
-            2 < 3, where base actual month is Jun (6). Need to get Aug (8).
-            1 < 2, where base actual month is Feb (2). Need to get Apr (4).
-            1 < 3, where base actual month is Sep (9). Need to get Oct (10).
-
-            Need to compute the actual start date.
-        '''
         start_date = date(
           year=basedate.year,
           month=basedate.month,
@@ -98,6 +94,9 @@ class WorkflowDateCalculator(object):
           tmp_quarter_month = 3
         month_counter = 1
         while tmp_quarter_month < min_relative_start_quarter_month:
+          # Use start_date + monthdelta instead of adding 1 month at a time
+          # with monthdelta(1) because monthdelta(1) adjusts the end date of
+          # the month for the number of days in the month.
           tmp_start_date = start_date + monthdelta(month_counter)
           tmp_quarter_month = tmp_start_date.month % 3
           if tmp_quarter_month == 0:
@@ -184,14 +183,28 @@ class WorkflowDateCalculator(object):
           month=start_date_month_of_year + (max_relative_end_month - start_quarter_month),
           day=max_relative_end_day)
       else:
-        tmp_month = start_date_month_of_year
-        while ((tmp_month % 3) + 1) != max_relative_end_month:
-          tmp_month += 1
-        tmp_year = start_date_year
-        if tmp_month > 12:
-          tmp_year += 1
-          tmp_month -= 12
-        return date(year=tmp_year, month=tmp_month, day=max_relative_end_day)
+        from monthdelta import monthdelta
+        end_date = date(
+          year=start_date.year,
+          month=start_date.month,
+          day=max_relative_end_day
+        ) + monthdelta(1)
+        tmp_end_date = end_date
+        tmp_quarter_month = tmp_end_date.month % 3
+        if tmp_quarter_month == 0:
+          tmp_quarter_month = 3
+        month_counter = 1
+        # Can't use less_than operator here because of the looping
+        # around quarters.
+        while tmp_quarter_month != max_relative_end_month:
+          # Use start_date + monthdelta instead of adding 1 month at a time
+          # with monthdelta(1) because monthdelta(1) adjusts the end date of
+          # the month for the number of days in the month.
+          tmp_end_date = end_date + monthdelta(month_counter)
+          tmp_quarter_month = tmp_end_date.month % 3
+          if tmp_quarter_month == 0:
+            tmp_quarter_month = 3
+        return tmp_end_date
     elif "annually" == frequency:
       if start_date_month_of_year == max_relative_end_month:
         if start_date_day_of_month == max_relative_end_day:
@@ -234,29 +247,19 @@ class WorkflowDateCalculator(object):
       pass
 
   def calc_previous_cycle_start_date_before_basedate(self, basedate):
+    from monthdelta import monthdelta
     start_date = self.calc_nearest_start_date_after_basedate(basedate)
     frequency = self.workflow.frequency
     if "one_time" == frequency:
       return start_date
     elif "weekly" == frequency:
-      return start_date - timedelta(days=7)
+      return start_date + timedelta(days=-7)
     elif "monthly" == frequency:
-      _tmp_month = start_date.month - 1
-      _year = start_date.year
-      if _tmp_month < 1:
-        _year -= 1
-        _tmp_month += 12
-      return date(year=_year, month=_tmp_month, day=start_date.day)
+      return start_date + monthdelta(-1)
     elif "quarterly" == frequency:
-      _tmp_month = start_date.month - 3
-      _year = start_date.year
-      if _tmp_month < 1:
-        _year -= 1
-        _tmp_month += 12
-      return date(year=_year, month=_tmp_month, day=start_date.day)
+      return start_date + monthdelta(-3)
     elif "annually" == frequency:
-      # return start_date + timedelta(weeks=-365)
-      return date(year=start_date.year - 1, month=start_date.month, day=start_date.day)
+      return start_date + monthdelta(-12)
     else:
       pass
 
