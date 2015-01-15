@@ -120,30 +120,31 @@
       "{can.Model.Cacheable} destroyed": function(model) {
         this.scope._handle_refresh(model);
       },
-      "button click": function($el, event) {
-        var scope = this.scope;
-
+      "button click": function() {
+        var workflow = GGRC.page_instance(),
+            scope = this.scope,
+            cycle;
         scope.attr('waiting', true);
-                 
-        var workflow = GGRC.page_instance();
         if (workflow.frequency !== 'one_time') {
-          workflow.refresh()
-                .fail(scope._restore_button.bind(scope))
-                .then(function() {
-                    workflow.attr('recurrences', true);
-                    workflow.attr('status', "Active");
-                    workflow.save()
-                        .fail(scope._restore_button.bind(scope));
-                });
+          workflow.refresh().then(function() {
+            workflow.attr('recurrences', true);
+            workflow.attr('status', "Active");
+            return workflow.save();
+          }, scope._restore_button.bind(scope)).then(function(workflow) {
+            if (moment(workflow.next_cycle_start_date).isSame(moment(), "day")) {
+              return new CMS.Models.Cycle({
+                context: workflow.context.stub(),
+                workflow: { id: workflow.id, type: "Workflow" },
+                autogenerate: true
+              }).save();
+            }
+          }, scope._restore_button.bind(scope));
         } else {
-           _generate_cycle()
-                .fail(scope._restore_button.bind(scope))
-                .then(function() {
-                    workflow.refresh().then(function() {
-                        workflow.attr('status', "Active").save()
-                            .fail(scope._restore_button.bind(scope));
-                    });
-                });
+          _generate_cycle().then(function() {
+            workflow.refresh().then(function() {
+              workflow.attr('status', "Active").save();
+            }, scope._restore_button.bind(scope));
+          }, scope._restore_button.bind(scope));
         }
       }
     }

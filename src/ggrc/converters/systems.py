@@ -10,7 +10,7 @@ from .base_row import *
 from collections import OrderedDict
 
 class SystemRowConverter(BaseRowConverter):
-  model_class = System
+  model_class = SystemOrProcess
 
   def find_by_slug(self, slug):
     # must search systems and processes for this case
