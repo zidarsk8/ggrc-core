@@ -7,12 +7,15 @@
 
 {{!section class="widget... }}
   <header class="header">
+    {{! TO-DO: We need some way of if statement to present either Widget name if info widget or header title's
+      such as object title, owner, code and other fields that can be added or removed.
+    }}
     <h2>
       <i class="{{widget_icon}}"></i>
       {{{widget_name}}}
     </h2>
   </header>
-  
+
   <section class="content">
     {{{widget_initial_content}}}
   </section>

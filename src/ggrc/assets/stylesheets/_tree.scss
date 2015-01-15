@@ -724,6 +724,7 @@ ul.new-tree {
     .wrap300 { float:left; min-width:300px; }
     */
   }
+ /*
   &.colored-list {
     > li.tree-item {
       padding: 1px 1px 0px 1px;
@@ -757,11 +758,11 @@ ul.new-tree {
       &.tree-item-add {
         padding: 0 0 0 20px;
       }
-/*      .tree-title-area {
+      .tree-title-area {
         [class^="grcicon-"] {
           display: inline-block;
         }
-      }  */
+      }
       .new-tree {
         li.tree-item {
           &.tree-item-add {
@@ -991,6 +992,7 @@ ul.new-tree {
       }
     }
   }
+ */
   li.tree-item-add {
     padding-left: 10px;
     line-height: 40px;

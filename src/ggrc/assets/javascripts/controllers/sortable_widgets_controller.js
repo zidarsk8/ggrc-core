@@ -93,7 +93,8 @@ can.Control("CMS.Controllers.SortableWidgets", {
     //}
 
     this.sortable().sortable("refresh");
-    this.element.find(".widget").sticky_header();
+    // Sticky header should be disabled for widgets - check if this is correct
+    //this.element.find(".widget").sticky_header();
 
     // FIXME: Is `this.is_initialized` necessary anymore?
     this.is_initialized = true;
