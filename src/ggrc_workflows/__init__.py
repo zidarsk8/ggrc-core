@@ -3,21 +3,19 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-from datetime import datetime, date, timedelta
-import calendar
+from datetime import datetime, date
+
 from flask import Blueprint
 from sqlalchemy import inspect
-
-from ggrc import settings, db
-from ggrc.app import app
+from ggrc import db
 from ggrc.login import get_current_user
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
-
 import ggrc_workflows.models as models
 from ggrc_workflows.models.mixins import RelativeTimeboxed
+
 
 # Initialize signal handler for status changes
 from blinker import Namespace
@@ -197,8 +195,13 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
 
 def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
                        frequency, base_date):
-  start_date = task_group_task.calc_start_date(frequency, base_date)
-  end_date = task_group_task.calc_end_date(frequency, base_date, start_date)
+  from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
+  start_date = WorkflowDateCalculator.calc_nearest_start_date_after_basedate_from_dates(
+    base_date, frequency, task_group_task.relative_start_month, task_group_task.relative_start_day)
+  start_date = WorkflowDateCalculator.nearest_work_day(start_date, 1)
+  end_date = WorkflowDateCalculator.calc_nearest_end_date_after_start_date_from_dates(
+    frequency, start_date, task_group_task.relative_end_month, task_group_task.relative_end_day)
+  end_date = WorkflowDateCalculator.nearest_work_day(end_date, -1)
   cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
       context=cycle.context,
       cycle=cycle,
@@ -412,7 +415,7 @@ def ensure_assignee_is_workflow_member(workflow, assignee):
     db.session.add(workflow_person)
 
   # Check if assignee has a role assignment
-  from ggrc_basic_permissions.models import Role, UserRole
+  from ggrc_basic_permissions.models import UserRole
   user_roles = UserRole.query.filter(
       UserRole.context_id == workflow.context_id,
       UserRole.person_id == assignee.id).all()
@@ -485,8 +488,11 @@ def handle_cycle_task_group_put(
 
 def update_workflow_state(workflow):
   today = date.today()
-  min_start_date, max_end_date = \
-    calculate_min_start_date_and_max_end_date_for_workflow_from_basedate(workflow, today)
+  from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
+  calculator = WorkflowDateCalculator(workflow)
+  min_start_date = calculator.calc_nearest_start_date_after_basedate(today)
+  max_end_date = calculator.calc_nearest_end_date_after_start_date(min_start_date)
+
   # Start the first cycle if min_start_date < today < max_end_date
   if workflow.recurrences :
     # Only create the cycle if we're mid-cycle
@@ -500,8 +506,7 @@ def update_workflow_state(workflow):
     # Set the next_cycle_start_date to one frequency period (month, day, year)
     # ahead of the min_start_date
     workflow.next_cycle_start_date = \
-        RelativeTimeboxed._calc_start_date_of_next_period(
-          min_start_date, workflow.frequency)
+      calculator.nearest_work_day(calculator.calc_next_cycle_start_date_after_basedate(today), 1)
     db.session.add(workflow)
     db.session.flush()
     return
@@ -528,22 +533,6 @@ def handle_workflow_put(
     sender, obj=None, src=None, service=None):
   update_workflow_state(obj)
 
-def calculate_min_start_date_and_max_end_date_for_workflow_from_basedate(workflow, basedate):
-  # Calculate the min_start_date and max_end_date from task_group_tasks
-  min_start_date = None
-  max_end_date = None
-  for tg in workflow.task_groups:
-    for t in tg.task_group_tasks:
-      start_date = RelativeTimeboxed._calc_start_date(
-        basedate, workflow.frequency, t.relative_start_month, t.relative_start_day)
-      end_date = RelativeTimeboxed._calc_end_date(
-        basedate, workflow.frequency, t.relative_end_month, t.relative_end_day)
-      if min_start_date is None or start_date < min_start_date:
-        min_start_date = start_date 
-      if max_end_date is None or end_date > max_end_date:
-        max_end_date = end_date 
-  return min_start_date, max_end_date 
-  
 # Check if workflow should be Inactive after cycle status change
 @status_change.connect_via(models.Cycle)
 def handle_cycle_status_change(sender, obj=None, new_status=None, old_status=None):
@@ -695,8 +684,6 @@ def init_extra_views(app):
   views.init_extra_views(app)
 
 def start_recurring_cycles():
-  today = date.today()
-
   # Get all workflows that should start a new cycle today
   # (The next_cycle_start_date is precomputed and stored when a cycle is created)
   workflows = db.session.query(models.Workflow)\
@@ -720,11 +707,10 @@ def start_recurring_cycles():
     build_cycle(cycle)
 
     # Update the workflow next_cycle_start_date to push it ahead based on the frequency.
-    base_date = RelativeTimeboxed._calc_base_date(today, workflow.frequency)
+    from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
+    calculator = WorkflowDateCalculator(workflow)
     workflow.next_cycle_start_date = \
-      RelativeTimeboxed._calc_start_date_of_next_period(
-        base_date, workflow.frequency
-        )
+      calculator.nearest_work_day(calculator.calc_nearest_start_date_after_basedate(date.today()), 1)
     db.session.add(workflow)
 
   db.session.commit()
