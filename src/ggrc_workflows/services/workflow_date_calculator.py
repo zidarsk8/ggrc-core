@@ -23,7 +23,7 @@ class WorkflowDateCalculator(object):
   def nearest_work_day(date_, direction):
     holidays = []
     while date_.weekday() > 4 or date_ in holidays:
-      date_ = date_ + datetime.timedelta(direction)
+      date_ = date_ + timedelta(direction)
     return date_
 
   def calc_nearest_start_date_after_basedate(self, basedate):
