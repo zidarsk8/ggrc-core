@@ -11,8 +11,7 @@
       <div class="item-wrap">
         <div class="openclose">
           <!--<a class="openclose-placeholder" href="javascript://"> </a>-->
-          <!--<span class="status-label status-{{instance.status}}"></span>-->
-          <span class="status-label status-draft"></span>
+          <span class="status-label status-{{to_class instance.status '_'}}"></span>
           <i class="grcicon-arrow-right"></i>
         </div>
         <div class="select">
@@ -24,17 +23,17 @@
                 </div>
               </div>
               {{#instance}}
-                {{#if owners.length}}
-                  {{#using contacts=owners}}
-                  {{#contacts}}
-                    <div class="span2">
-                      <div class="owner tree-title-area">
+                <div class="span2">
+                  <div class="owner tree-title-area">
+                    {{#if owners.length}}
+                      {{#using contacts=owners}}
+                      {{#contacts}}
                         {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-                      </div>
-                    </div>
-                  {{/contacts}}
-                  {{/using}}
-                {{/if}}
+                      {{/contacts}}
+                      {{/using}}
+                    {{/if}}
+                  </div>
+                </div>
 
                 <div class="span1">
                   <div class="code tree-title-area">

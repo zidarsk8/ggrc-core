@@ -340,7 +340,7 @@ a {
   }
 }
 
-@each $status_label in draft, progress, overdue {
+@each $status_label in draft, progress, overdue, final {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }

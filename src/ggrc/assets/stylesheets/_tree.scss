@@ -1416,6 +1416,14 @@ ul.new-tree {
     &.owner, &.code, &.state-value {
       line-height: 28px;
     }
+    &.owner {
+      .person-holder {
+        margin-right: 8px;
+        &:last-child {
+          margin-right: 0;
+        }
+      } 
+    }
     &.code {
       text-transform: uppercase;
     }
