@@ -192,16 +192,36 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
     current_user = get_current_user()
     build_cycle(obj, current_user=current_user)
 
-
 def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
                        frequency, base_date):
+  # TaskGroupTasks for one_time workflows don't save relative start/end month/day.
+  # They only saves start/end dates.
+  # TaskGroupTasks for all other workflow frequencies save the relative start/end dates
+  # It should save the relative values instead of the dates. But it doesn't right now.
+  # So, to compensate/work around that, I'm going to calculate the relative dates and then
+  # use them to calculate the actual start/end dates for the cycletaskgrouptask
+
   from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
-  start_date = WorkflowDateCalculator.calc_nearest_start_date_after_basedate_from_dates(
-    base_date, frequency, task_group_task.relative_start_month, task_group_task.relative_start_day)
-  start_date = WorkflowDateCalculator.nearest_work_day(start_date, 1)
-  end_date = WorkflowDateCalculator.calc_nearest_end_date_after_start_date_from_dates(
-    frequency, start_date, task_group_task.relative_end_month, task_group_task.relative_end_day)
-  end_date = WorkflowDateCalculator.nearest_work_day(end_date, -1)
+  if "one_time" == frequency:
+    sd = task_group_task.start_date
+    ed = task_group_task.end_date
+    rsm = WorkflowDateCalculator.relative_month_from_date(sd, frequency)
+    rsd = WorkflowDateCalculator.relative_day_from_date(sd, frequency)
+    rem = WorkflowDateCalculator.relative_month_from_date(ed, frequency)
+    red = WorkflowDateCalculator.relative_day_from_date(ed, frequency)
+  else:
+    rsm = task_group_task.relative_start_month
+    rsd = task_group_task.relative_start_day
+    rem = task_group_task.relative_end_month
+    red = task_group_task.relative_end_day
+
+  from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
+  start_date = WorkflowDateCalculator.\
+    calc_nearest_start_date_after_basedate_from_dates(base_date, frequency, rsm, rsd)
+  start_date = WorkflowDateCalculator.adjust_start_date(start_date)
+  end_date = WorkflowDateCalculator.\
+    calc_nearest_end_date_after_start_date_from_dates(frequency, start_date, rem, red)
+  end_date = WorkflowDateCalculator.adjust_end_date(end_date)
   cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
       context=cycle.context,
       cycle=cycle,
@@ -220,8 +240,7 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
   )
   return cycle_task_group_object_task
 
-
-def build_cycle(cycle, current_user=None):
+def build_cycle(cycle, current_user=None, base_date=date.today()):
   # Determine the relevant Workflow
   workflow = cycle.workflow
   frequency = workflow.frequency
@@ -238,9 +257,6 @@ def build_cycle(cycle, current_user=None):
   cycle.title = workflow.title
   cycle.description = workflow.description
   cycle.status = 'Assigned'
-
-  # All dates are calculated relative to today.
-  base_date = date.today()
 
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
@@ -489,24 +505,31 @@ def handle_cycle_task_group_put(
 def update_workflow_state(workflow):
   today = date.today()
   from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
+
   calculator = WorkflowDateCalculator(workflow)
-  min_start_date = calculator.calc_nearest_start_date_after_basedate(today)
-  max_end_date = calculator.calc_nearest_end_date_after_start_date(min_start_date)
+  next_cycle_start_date = \
+    WorkflowDateCalculator.adjust_start_date(calculator.calc_nearest_start_date_after_basedate(today))
+  next_cycle_end_date = \
+    WorkflowDateCalculator.adjust_end_date(calculator.calc_nearest_end_date_after_start_date(next_cycle_start_date))
+  # Check the previous cycle to see if today is mid_cycle.
+  previous_cycle_start_date = \
+    WorkflowDateCalculator.adjust_start_date(calculator.calc_previous_cycle_start_date_before_basedate(today))
+  previous_cycle_end_date = \
+    WorkflowDateCalculator.adjust_end_date(calculator.calc_nearest_end_date_after_start_date(previous_cycle_start_date))
 
   # Start the first cycle if min_start_date < today < max_end_date
-  if workflow.recurrences :
+  if workflow.recurrences:
     # Only create the cycle if we're mid-cycle
-    if (min_start_date < today and today < max_end_date) and not workflow.cycles:
+    if (previous_cycle_start_date <= today and today <= previous_cycle_end_date) and not workflow.cycles:
       cycle = models.Cycle()
       cycle.workflow = workflow
       # Other cycle attributes will be set in build_cycle.
       # So, no need to set them here.
-      build_cycle(cycle)
+      build_cycle(cycle, None, previous_cycle_start_date)
 
     # Set the next_cycle_start_date to one frequency period (month, day, year)
     # ahead of the min_start_date
-    workflow.next_cycle_start_date = \
-      calculator.nearest_work_day(calculator.calc_next_cycle_start_date_after_basedate(today), 1)
+    workflow.next_cycle_start_date = next_cycle_start_date
     db.session.add(workflow)
     db.session.flush()
     return
