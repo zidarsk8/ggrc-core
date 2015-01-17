@@ -141,19 +141,11 @@ can.Control("GGRC.Controllers.Modals", {
       else {
         path = path.join(".");
 
-        // we (ab)use databinding to make the input field change for us
-        // doing it three times like this ensures stability
 
-        // handle emptying field and choosing same suggestion
-        this.options.instance.attr(path, null);
-        // the first change sets to null, 2nd works
-        this.options.instance.attr(path, ui.item.stub());
-        this.options.instance.attr(path, ui.item.stub());
-        // settign el.val manually is still needed for autocompletes inside
-        // deferred renderers such as control/object selector in audit
-        setTimeout(function() {
-          el.val(ui.item.title || ui.item.name || ui.item.email);
+        setTimeout(function(){
+          el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
         }, 0);
+        this.options.instance.attr(path, ui.item);
       }
   }
 
