@@ -62,9 +62,11 @@
                       </div>
                     </li>
                   {{/infer_roles}}
+                  {{#if instance.length}}
                   <li>
                     {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
                   </li>
+                  {{/if}}
                   <li class="show-datails">
                     {{#if instance.viewLink}}
                       {{#is_allowed "view_object_page" instance}}
@@ -84,24 +86,19 @@
     {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
+        {{#if draw_children}}
+          {{#if child_options.length}}
+            {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
+              <div class="inner-tree">
+                {{#child_options}}
+                  <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                {{/child_options}}
+              </div>
+            {{/prune_context}}
+          {{/if}}
+        {{/if}}
         {{> /static/mustache/documents/tier2_info.mustache}}
       </div>
-
-      {{#if draw_children}}
-        {{#if child_options.length}}
-          {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
-            <div class="inner-tree">
-              {{#child_options}}
-              <h6>Mapped Objects ({{child_count}})
-                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
-              </h6>
-                <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-              {{/child_options}}
-            </div>
-          {{/prune_context}}
-        {{/if}}
-      {{/if}}
-
     </div>
     {{/if}}
   </li>

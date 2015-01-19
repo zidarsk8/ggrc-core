@@ -62,54 +62,56 @@
                       </div>
                     </li>
                   {{/infer_roles}}
-                  <li>
-                    {{#with_page_object_as 'page_instance'}}
-                    {{#if_helpers '\
-                      ^if_instance_of' page_instance 'Directive' '\
-                      or ^if_instance_of' instance 'Section'}}
-                    {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
-                    {{/if_helpers}}
-                    {{/with_page_object_as}}
-                  </li>
+                  {{#with_page_object_as 'page_instance'}}
+                  {{#if_helpers '\
+                    ^if_instance_of' page_instance 'Directive' '\
+                    or ^if_instance_of' instance 'Section'}}
+                    <li>
+                      {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+                    </li>
+                  {{/if_helpers}}
+                  {{/with_page_object_as}}
                   <li>
                   {{#with_mapping_count instance 'related_objects'}}
                     {{#prune_context}}
-                        <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
-                          <i class="grcicon-object-black"></i>
-                            {{#if count}}
-                              <span>{{count}}</span>
-                            {{else}}
-                              <strong class="error">0</strong>
-                            {{/if}}
-                        </span>
-                    {{/prune_context}}
-                  {{/with_mapping_count}}
-
-                  {{#with_mapping_count instance 'objectives'}}
-                        <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
-                          <i class="grcicon-objective-black"></i>
-                            {{#if count}}
-                              <span>{{count}}</span>
-                            {{else}}
-                              <strong class="error">0</strong>
-                            {{/if}}
-                        </span>
-                  {{/with_mapping_count}}
-
-                  {{#with_mapping_count instance 'controls'}}
-                        <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
-                          <i class="grcicon-control-black"></i>
+                      <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
+                        <i class="grcicon-object-black"></i>
                           {{#if count}}
                             <span>{{count}}</span>
                           {{else}}
                             <strong class="error">0</strong>
                           {{/if}}
-                        </span>
+                      </span>
+                    {{/prune_context}}
+                  {{/with_mapping_count}}
+
+                  {{#with_mapping_count instance 'objectives'}}
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
+                      <i class="grcicon-objective-black"></i>
+                        {{#if count}}
+                          <span>{{count}}</span>
+                        {{else}}
+                          <strong class="error">0</strong>
+                        {{/if}}
+                    </span>
+                  {{/with_mapping_count}}
+
+                  {{#with_mapping_count instance 'controls'}}
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
+                      <i class="grcicon-control-black"></i>
+                      {{#if count}}
+                        <span>{{count}}</span>
+                      {{else}}
+                        <strong class="error">0</strong>
+                      {{/if}}
+                    </span>
                   {{/with_mapping_count}}
                   </li>
+                  {{#if instance.length}}
                   <li>
                     {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
                   </li>
+                  {{/if}}
                   <li class="show-datails">
                     {{#if instance.viewLink}}
                       {{#is_allowed "view_object_page" instance}}
@@ -129,23 +131,17 @@
     {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
+        {{#if draw_children}}
+          {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
+            <div class="inner-tree">
+              {{#child_options}}
+                <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              {{/child_options}}
+            </div>
+          {{/prune_context}}
+        {{/if}}
         {{> /static/mustache/sections/tier2_content.mustache}}
       </div>
-
-
-      {{#if draw_children}}
-        {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
-          <div class="inner-tree">
-            {{#child_options}}
-              <h6>Objectives, Controls, and Business Objects ({{child_count}})
-                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
-              </h6>
-              <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-            {{/child_options}}
-          </div>
-        {{/prune_context}}
-      {{/if}}
-
     </div>
     {{/if}}
   </li>

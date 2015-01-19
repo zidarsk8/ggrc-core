@@ -61,9 +61,11 @@
                       </div>
                     </li>
                   {{/infer_roles}}
+                  {{#if instance.length}}
                   <li>
                     {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
                   </li>
+                  {{/if}}
                   {{#instance}}
                     {{#is_private}}
                       <li>
@@ -81,9 +83,11 @@
                       </div>
                     </li>
                   {{/instance.contact}}
-                  <li>
-                    {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
-                  </li>
+                  {{#if instance.length}}
+                    <li>
+                      {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
+                    </li>
+                  {{/if}}
                   <li class="show-datails">
                     {{#if instance.viewLink}}
                       {{#is_allowed "view_object_page" instance}}
@@ -102,23 +106,17 @@
     {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
-
+        {{#if draw_children}}
+          {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
+              {{#child_options}}
+                <div class="inner-tree">
+                  <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                </div>
+              {{/child_options}}
+          {{/prune_context}}
+        {{/if}}
         {{> /static/mustache/base_objects/tier2_content.mustache}}
       </div>
-
-      {{#if draw_children}}
-        {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
-            {{#child_options}}
-              <div class="inner-tree">
-                <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})
-                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
-                </h6>
-                <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-              </div>
-            {{/child_options}}
-        {{/prune_context}}
-      {{/if}}
-
     </div>
     {{/if}}
   </li>

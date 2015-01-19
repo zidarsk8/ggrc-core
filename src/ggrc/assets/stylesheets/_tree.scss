@@ -1095,9 +1095,13 @@ ul.new-tree {
         .inner-item-count {
           @include opacity(1);
         }
-        .grcicon-arrow-right {
-          background-position: -102px -80px;
-          @include opacity(1);
+        .openclose {
+          &.active {
+            .grcicon-arrow-right {
+              background-position: -102px -80px;
+              @include opacity(1);
+            }
+          }
         }
         > .item-main {
           > .item-wrap {
@@ -1158,6 +1162,10 @@ ul.new-tree {
               border-color: transparent;
             }
           }
+          .grcicon-arrow-right {
+            background-position: -126px -80px;
+            @include opacity(1);
+          }
         }
         .dashboard & {
           > .item-main {
@@ -1217,6 +1225,17 @@ ul.new-tree {
           .openclose,
           .select {
             padding: 0;
+          }
+          .openclose {
+            .grcicon-arrow-right {
+              background-position: -78px -80px;
+            }
+            &.active {
+              .grcicon-arrow-right {
+                background-position: -126px -80px;
+                @include opacity(1);
+              }
+            }
           }
         }
       }
@@ -1285,11 +1304,6 @@ ul.new-tree {
 
 .tier-2-info {
   display: none;
-  //@include transform(rotateX(-89deg)); for remove
-  //@include transform-origin(100%, 0, 0); for remove
-  //@include transform-style(preserve-3d); for remove
-  //background: $gray; for remove
-  //@include transition(all 0.6s cubic-bezier(0.000, 0.050, 1.000, 0.550)); for remove
 }
 .tier-2-info-content {
   padding: 0 10px 0 32px;
@@ -1525,19 +1539,27 @@ ul.new-tree {
 
 .section-expandable {
   position:relative;
+  min-height: 40px !important;
   .section-expander {
     display:none;
     position:absolute;
     left:0;
     top:0;
-    i {
-      @include opacity(0.3);
-    }
     &:hover {
-     text-decoration:none;
-     i {
-       @include opacity(0.6);
-     }
+      text-decoration:none;
+    }
+    a {
+      display: inline-block;
+      line-height: 20px;
+      i {
+        margin-top: 2px;
+        @include opacity(0.3);
+      }
+      &:hover {
+        i {
+          @include opacity(0.6);
+        }
+      }
     }
   }
 }
