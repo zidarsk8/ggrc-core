@@ -71,9 +71,6 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     this.element.html(frag[0]);
     this.element.trigger("widgets_updated", this.element);
 
-    // Sticky header should be disabled for widgets - check if this is correct
-    //this.element.sticky_header();
-
     var content = this.element
       , controller_content = null;
     if(prefs.length < 1) {

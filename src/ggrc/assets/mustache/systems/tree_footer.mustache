@@ -10,7 +10,7 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
-<li class="tree-footer tree-item tree-item-add">
+<li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">
 
@@ -28,7 +28,6 @@
         data-exclude-option-types="{{exclude_option_types}}"
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
         <i class="grcicon-add-black"></i>
-        <!--+ {{model.title_singular}}-->
       </a>
       <span class="section-expander">
         <a
@@ -78,7 +77,6 @@
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
         data-object-params='{{#if_instance_of parent_instance "Section"}}{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{json_escape parent_instance.description}}" } }{{/if_instance_of}}'>
         <i class="grcicon-add-black"></i>
-        <!--+ Object-->
       </a>
       {{/if}}
     </div>

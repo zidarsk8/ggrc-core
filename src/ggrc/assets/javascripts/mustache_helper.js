@@ -1822,7 +1822,7 @@ Mustache.registerHelper("sum", function () {
 });
 
 Mustache.registerHelper("to_class", function (prop, delimiter, options) {
-  prop = resolve_computed(prop);
+  prop = resolve_computed(prop) || "";
   delimiter = (arguments.length > 2 && resolve_computed(delimiter)) || '-';
   return prop.toLowerCase().replace(/[\s\t]+/g, delimiter);
 });

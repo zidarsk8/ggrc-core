@@ -26,7 +26,6 @@
         data-join-object-type="{{parent_instance.class.shortName}}"
         data-exclude-option-types="{{exclude_option_types}}"
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-        <!--Map {{model.title_singular}}-->
         <i class="grcicon-add-black"></i>
       </a>
       {{#if null}}
@@ -52,7 +51,6 @@
         data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{json_escape parent_instance.description}}" } }'
         >
         <i class="grcicon-add-black"></i>
-        <!--Map Object-->
       </a>
       {{else}}
       <a
@@ -68,7 +66,6 @@
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
         >
         <i class="grcicon-add-black"></i>
-        <!--Map Object-->
       </a>
       {{/if_instance_of}}
       {{#if_instance_of parent_instance "SectionBase"}}
@@ -90,7 +87,6 @@
           data-original-title="Create new {{firstnonempty title_singular model.title_singular 'Objective'}} from this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
           data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}" }, "description": "{{json_escape parent_instance.description}}" }'>
           <i class="grcicon-add-black"></i>
-          <!--Create Objective-->
         </a>
       </span>
       {{/if_equals}}
