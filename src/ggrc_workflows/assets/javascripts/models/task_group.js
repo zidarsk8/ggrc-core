@@ -57,12 +57,21 @@
       // Refresh workflow people:
       this.bind("created", function(ev, instance) {
         if (instance instanceof that) {
-          instance.refresh_all_force('workflow', 'context')
+          instance.refresh_all_force('workflow', 'context');
         }
       });
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          instance.refresh_all_force('workflow', 'context')
+          instance.refresh_all_force('workflow', 'context');
+        }
+      });
+      this.bind("destroyed", function(ev, inst) {
+        if(inst instanceof that) {
+          can.each(inst.task_group_tasks, function(tgt) {
+            tgt = tgt.reify();
+            can.trigger(tgt, "destroyed");
+            can.trigger(tgt.constructor, "destroyed", tgt);
+          });
         }
       });
     }

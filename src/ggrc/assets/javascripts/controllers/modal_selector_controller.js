@@ -296,14 +296,14 @@
 
     get_new_join: function(option_id, option_type) {
       var join_params = {};
-      join_params[this.options.option_attr] = {}
+      join_params[this.options.option_attr] = {};
       join_params[this.options.option_attr].id = option_id;
       //join_params[this.options.option_id_field] = option_id;
       if (this.options.option_type_field) {
         join_params[this.options.option_attr].type = option_type;
         //join_params[this.options.option_type_field] = option_type;
       }
-      join_params[this.options.join_attr] = {}
+      join_params[this.options.join_attr] = {};
       join_params[this.options.join_attr].id = this.get_join_object_id();
       //join_params[this.options.join_id_field] = this.get_join_object_id();
       if (this.options.join_type_field) {
@@ -321,7 +321,7 @@
 
     get_join_object_type: function() {
       return this.options.join_object_type || this.options.join_object.constructor.shortName;
-    },
+    }
 
   });
 
@@ -896,6 +896,23 @@
                   }
                 }
               }, 50);
+              //load_and_check_all
+              setTimeout(function() {
+                self._load_and_check_all = function(obj) {
+                  var my_obj = obj ? obj : objects;
+                  if (my_obj.length > page_size) {
+                    pager(my_obj.slice(page_size));
+                  }
+                  else {
+                    self._load_and_check_all = null;
+                    self.check_all();
+                  }
+                }
+              }, 100);
+
+              if(self.context.attr('check_all')){
+                self._load_and_check_all(objects);
+              }
             }
           });
         }
@@ -1310,7 +1327,7 @@
       options.selected_object = CMS.Models.get_instance(
           data_set.join_object_type, data_set.join_object_id);
       options.binding = options.selected_object.get_binding(
-          data_set.join_mapping)
+          data_set.join_mapping);
 
       options.object_params = $this.data("object-params");
 
@@ -1345,10 +1362,32 @@
         , object_model: null
         , join_model: null
       }
-  },{
+  }, {
     init: function(){
       GGRC.Controllers.MultitypeModalSelector.prototype.init.apply(this, arguments);
       this.refresh_option_list();
+    }
+
+    , init_spinner: function(){
+      var spinner,
+          $spinner,
+          $spinner_container;
+
+      spinner = new Spinner({
+          "radius": 4
+        , "length": 4
+        , "width": 2
+        }).spin();
+      $spinner = $(spinner.el);
+      $spinner_container = $('<div class="spinner-loading">loading...</div>');
+      $spinner_container.append($spinner);
+      $spinner.css({
+          display: 'inline-block'
+        , paddingLeft: '20px'
+        , left: '10px'
+        , top: '-4px'
+      });
+      this.element.find('.spinner-place-holder').append($spinner_container);
     }
 
     , init_menu: function() {
@@ -1357,7 +1396,7 @@
           lookup,
           selected_object =  this.options.selected_object.type;
 
-        if(selected_object === "TaskGroup") { //workflow/TaskGroup don't have People/Groups sub catagory
+        if (selected_object === "TaskGroup") { //workflow/TaskGroup don't have People/Groups sub category
           lookup = {
               governance: 0
             , business: 1
@@ -1392,7 +1431,7 @@
                 //Save the model names for All Object search
                 all_models.push(descriptor.model.shortName);
               }
-            })
+            });
 
             this.options.option_type_menu = menu;
           }
@@ -1436,7 +1475,7 @@
                 //Save the model names for All Object search
                 all_models.push(descriptor.model.shortName);
               }
-            })
+            });
 
             this.options.option_type_menu = menu;
           }
@@ -1478,7 +1517,8 @@
           item_selected: false,
           items_selected: 0,
           filter_list: [],
-          display_selection: display_selection ? display_selection : "Objects"
+          display_selection: display_selection ? display_selection : "Objects",
+          check_all: false
           }, this.options));
       }
       return this.context;
@@ -1591,12 +1631,50 @@
         this.update_selected_items(el, ev);
     }
 
-    , "input[type=checkbox].object-check-all click": function(el, ev) {
-      var $el = $(el)
-        , $check = $(this.element).find('.object-check-single:not(:disabled)');
+    , load_and_check_all: function(){
+      if (this._load_and_check_all) {
+          this.init_spinner();
+          this._load_and_check_all();
+      }
+    }
+    , check_all: function(){
+      var $check = this.element.find('.object-check-single:not(:disabled)'),
+          all_checkbox = this.element.find('.object-check-all');
 
-      $check.prop('checked', $el.prop('checked'));
-      this.update_selected_items(el, ev);
+          all_checkbox.prop('checked', true);
+          $check.prop('checked', true);
+          this.element.find('.spinner-loading').remove();
+          all_checkbox.removeAttr('disabled');
+          all_checkbox.removeClass('disabled pending-ajax');
+          this.update_selected_items(all_checkbox);
+    }
+
+    , "input[type=checkbox].object-check-all click": function(el, ev) {
+      if (el.hasClass('disabled')) {
+        return;
+      }
+      //No search result
+      if(this.element.find('.object-check-single').length == 0) {
+        el.prop('checked', false);
+        return;
+      }
+
+      var all_items = this.option_list.length,
+          loaded_items = this.element.find('.object-check-single').length,
+          $check;
+
+      //All items loaded
+      if(loaded_items == all_items) {
+        $check = this.element.find('.object-check-single:not(:disabled)');
+        $check.prop('checked', el.prop('checked'));
+
+        this.update_selected_items(el, ev);
+      } else {
+        this.context.attr('check_all', true);
+        el.attr('disabled', 'disabled');
+        el.addClass('disabled pending-ajax');
+        this.load_and_check_all();
+      }
     }
 
     , reset_selection_count: function(){
@@ -1710,7 +1788,16 @@
         filters = [],
         cancel_filter,
         item_selected = this.element.find("select.option-type-selector").val(),
-        search_text = this.element.find('.results-wrap span.info');
+        search_text = this.element.find('.results-wrap span.info'),
+        all_checkbox = this.element.find('.object-check-all');
+
+
+      //If user has already triggered check_all_button, clear all
+      all_checkbox.prop('checked', false);
+      this.context.attr('check_all', false);
+      all_checkbox.removeAttr('disabled');
+      all_checkbox.removeClass('disabled pending-ajax');
+      this.element.find('.spinner-loading').remove();
 
       // Remove Search Criteria text
       if(search_text.length)
@@ -1877,8 +1964,8 @@
       //this.refresh_option_list();
     }
 
-    , on_map: $.debounce(500, true, function(el, ev) {
-        var that = this, ajd;
+    , on_map: $.debounce(500, true, function mapSelectedObjects(el, ev) {
+        var modalSelector = this, ajd;
 
         if(el.hasClass('disabled')){
           return;
@@ -1889,8 +1976,8 @@
 
         function map_post_process(obj) {
           // FIXME: Extension isolation violation
-          if(that.options.mapTaskGroup) {
-            //Modify the object to map to task group
+          if (modalSelector.options.mapTaskGroup) {
+            // Modify the object to map to task group
             var id = obj.object.id,
                 shortName = obj.object.type,
                 new_obj = {};
@@ -1899,33 +1986,34 @@
 
             obj_arr.push(new_obj);
           } else {
-            if (!that.options.deferred) {
+            if (!modalSelector.options.deferred) {
               $(document.body).trigger('ajax:flash',
-                { success: that.context.selected_options[0].constructor.shortName + " mapped successfully."});
+                { success: modalSelector.context.selected_options[0].constructor.shortName + " mapped successfully."});
             }
             obj_arr.push(obj);
           }
           pass += 1;
-          if(pass == its){
-              if(obj_arr.length >= 1){
+          if (pass == its) {
+              if (obj_arr.length >= 1) {
                 var obj_set = {};
                 obj_set.multi_map = true;
                 obj_set.arr = obj_arr;
 
-                ////trigger the to add selected objects to task group;
-                that.element.trigger("modal:success", [obj_set, {map_and_save: true}]);
+                ////trigger the ?? to add selected objects to task group;
+                modalSelector.element && modalSelector.element.trigger("modal:success", [obj_set, {map_and_save: true}]);
               }
-              $(that.element).modal_form('hide');
+              $(modalSelector.element).modal_form('hide');
             }
         }
 
         if (its < 1) {
           $(document.body).trigger("ajax:flash", {
-            error: "Select an object to map" });
+            error: "Select an object to map"
+          });
         }
         else {
-          if(that.options.deferred) {
-            join_instance = that.sync_selected_options();
+          if (modalSelector.options.deferred) {
+            join_instance = modalSelector.sync_selected_options();
             its = join_instance.length;
             can.each(join_instance, map_post_process);
           } else {
@@ -1934,17 +2022,17 @@
             for(var i = 0; i < its; i++){
             //We have multiple join_instances
               ajd = join_instance[i].save().done(map_post_process)
-              .fail(function(xhr) {
+              .fail(function (xhr) {
                   // Currently, the only error we encounter here is uniqueness
                   // constraint violations.  Let's use a nicer message!
-                  //that.element.trigger("ajax:flash", { error : xhr.responseText });
+                  //modalSelector.element.trigger("ajax:flash", { error : xhr.responseText });
                   //We should never get here, The mapped objects are already checked and disabled
-                  if (that.element) {
+                  if (modalSelector.element) {
                     var message = "That object is already mapped";
                     pass += 1;
                     $(document.body).trigger("ajax:flash", { error: message });
                     if(pass == its){
-                      $(that.element).modal_form('hide');
+                      $(modalSelector.element).modal_form('hide');
                     }
                   }
                 });
@@ -1977,7 +2065,7 @@
 
       var that = this,
         joins = can.map(this.sync_selected_options(), function(option) {
-          var join, context_object, model, descriptor
+          var join, context_object, model, descriptor,
               context_id = null
               ;
 
@@ -2019,7 +2107,6 @@
     , autocomplete_select : function(el, ev, ui) {
       setTimeout(function(){
         el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
-        el.trigger('change');
       }, 0);
       this.context.attr(el.attr("name"), ui.item);
     }

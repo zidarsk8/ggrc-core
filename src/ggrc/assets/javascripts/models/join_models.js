@@ -21,12 +21,16 @@ can.Model.Cacheable("can.Model.Join", {
 
         can.each(instance.constructor.join_keys, function(cls, key) {
           var obj;
-          if (instance[key].reify && instance[key].reify().refresh)
-            obj = instance[key].reify();
-          else
-            obj = cls.findInCacheById(instance[key].id);
-          if (obj)
+          if (instance[key]) {
+            if(instance[key].reify && instance[key].reify().refresh) {
+              obj = instance[key].reify();
+            } else {
+              obj = cls.findInCacheById(instance[key].id);
+            }
+          }
+          if (obj) {
             obj.refresh();
+          }
         });
       }
     }
@@ -253,7 +257,7 @@ can.Model.Join("CMS.Models.UserRole", {
 }, {
   save: function() {
     var roles,
-        that = this
+        that = this,
         _super =  this._super;
     if(!this.role && this.role_name) {
       roles = can.map(

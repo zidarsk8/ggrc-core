@@ -116,6 +116,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
 
   , tree_view_options : {
       show_view : "/static/mustache/sections/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
     , child_options : [{
         model : can.Model.Cacheable
@@ -180,6 +181,7 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
 
   , tree_view_options: {
       show_view: "/static/mustache/sections/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
     , child_options: [{
         model: can.Model.Cacheable

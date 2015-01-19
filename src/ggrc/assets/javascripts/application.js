@@ -1298,7 +1298,7 @@ jQuery(function($){
           if(ui.item) {
             return ctl.autocomplete_select($(this), ev, ui);
           } else {
-            original_event = event;
+            original_event = ev;
             $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
               ctl.autocomplete_select($(that), original_event, { item : new_obj });
               $(that).trigger("modal:success", new_obj);
@@ -1528,3 +1528,12 @@ can.Model.validateNonBlank = can.Map.validateNonBlank = function(attrNames, opti
 can.reduce ||
   (can.reduce = function(a, f, i) { if(a==null) return null; return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]) });
 })(window.jQuery);
+
+
+// Turn camelSpace strings into Camel Space strings
+can.spaceCamelCase = function (string) {
+    return can.underscore(string)
+        .split("_")
+        .map(can.capitalize)
+        .join(" ");
+};

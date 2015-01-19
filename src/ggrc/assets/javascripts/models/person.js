@@ -72,11 +72,12 @@ can.Model.Cacheable("CMS.Models.Person", {
       return result;
     }
   , tree_view_options: {
-        show_view: GGRC.mustache_path + "/people/tree.mustache"
-        , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
+      show_view: GGRC.mustache_path + "/people/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
+    , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
     }
   , list_view_options: {
-        find_params: { "__sort": "name,email" }
+      find_params: { "__sort": "name,email" }
     }
   , init : function() {
     this._super.apply(this, arguments);

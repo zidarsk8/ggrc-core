@@ -24,6 +24,7 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 8080, host: 8080, host_ip: "127.0.0.1"
   config.vm.network :forwarded_port, guest: 8000, host: 8000, host_ip: "127.0.0.1"
   config.vm.network :forwarded_port, guest: 3306, host: 3306, host_ip: "127.0.0.1"
+  config.vm.network :forwarded_port, guest: 9876, host: 9876, host_ip: "127.0.0.1"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -39,22 +40,8 @@ Vagrant.configure("2") do |config|
   #
   # View the documentation for the provider you're using for more
   # information on available options.
-
-  # Enable provisioning with chef solo, specifying a cookbooks path, roles
-  # path, and data_bags path (all relative to this Vagrantfile), and adding
-  # some recipes and/or roles.
-  #
-  config.vm.provision :chef_solo do |chef|
-    chef.json = {
-      "mysql" => {
-        "server_root_password" => "root",
-        "server_repl_password" => "root",
-        "server_debian_password" => "root",
-        "allow_remote_root" => true,
-        "bind_address" => "0.0.0.0",
-      }
-    }
-    chef.cookbooks_path = ["cookbooks","site-cookbooks"]
-    chef.add_recipe "ggrc"
+  config.vm.provision :ansible do |ansible|
+    ansible.playbook = "provision/site.yml"
+    ansible.host_key_checking = false
   end
 end

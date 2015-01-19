@@ -59,7 +59,8 @@ can.Model.Cacheable("CMS.Models.Program", {
     , audits : "CMS.Models.Audit.stubs"
   }
   , tree_view_options : {
-      "show_view" : GGRC.mustache_path + "/programs/tree.mustache"
+      show_view : GGRC.mustache_path + "/programs/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     }
   , links_to : {
@@ -144,6 +145,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
 
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/objectives/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/objectives/tree_footer.mustache"
     , create_link : true
     //, draw_children : true

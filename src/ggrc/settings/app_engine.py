@@ -9,6 +9,6 @@ LOGIN_MANAGER = 'ggrc.login.appengine'
 FULLTEXT_INDEXER = 'ggrc.fulltext.mysql.MysqlIndexer'
 # Cannot access filesystem on AppEngine or when using SDK
 AUTOBUILD_ASSETS = False
-SQLALCHEMY_RECORD_QUERIES = True
+SQLALCHEMY_RECORD_QUERIES = False
 MEMCACHE_MECHANISM = True
 CALENDAR_MECHANISM = False

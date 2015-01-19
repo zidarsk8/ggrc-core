@@ -1,5 +1,7 @@
 {{#is_allowed 'create' 'TaskGroupTask' context=parent_instance.context}}
 {{#if_task_group_assignee_privileges parent_instance}}
+{{#using workflow=parent_instance.workflow}}
+{{^if_equals workflow.status 'Inactive'}}
 <li class="tree-footer non-stick">
   <a
     class="inline-footer-link"
@@ -12,5 +14,7 @@
     + Create task
   </a>
 </li>
+{{/if_equals}}
+{{/using}}
 {{/if}}
 {{/is_allowed}}

@@ -24,37 +24,29 @@
         </div>
 
         {{#is_dashboard}}
-
-          {{#using instance=instance.cycle_task_group_object}}
-            {{#using object=instance.object}}
-
-              <div class="span2">
-                <div class="oneline">
-                  <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
-                  <span class="tiny-data">
-                    {{firstnonempty object.title ''}}
-                  </span>
-                </div>
-              </div>
-
+          <div class="span2">
+            {{#using instance=instance.cycle_task_group_object}}
+              {{#using object=instance.object}}
+                  <div class="oneline">
+                    <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
+                    <span class="tiny-data">
+                      {{firstnonempty object.title ''}}
+                    </span>
+                  </div>
+              {{/using}}
             {{/using}}
-          {{/using}}
-
-          {{#using cycle=instance.cycle}}
-            {{#using workflow=cycle.workflow}}
-
-
-              <div class="span2">
-                <div class="oneline">
-                  <span class="tiny-data" rel="tooltip" title="Workflow title">
-                    {{workflow.title}}
-                  </span>
-                </div>
-              </div>
-
+          </div>
+          <div class="span2">
+            {{#using cycle=instance.cycle}}
+              {{#using workflow=cycle.workflow}}
+                  <div class="oneline">
+                    <span class="tiny-data" rel="tooltip" title="Workflow title">
+                      {{workflow.title}}
+                    </span>
+                  </div>
+              {{/using}}
             {{/using}}
-          {{/using}}
-
+          </div>
         {{/is_dashboard}}
 
         <div class="span6">
@@ -136,7 +128,7 @@
           </div>
           <div class="span3">
             <h6>Assignee</h6>
-            {{#if_workflow_assignee_privileges instance}}
+            {{#if_cycle_assignee_privileges instance}}
             <div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
               {{#using contact=instance.contact}}
                 <div class="objective-selector">
@@ -148,7 +140,7 @@
               {{#using contact=instance.contact}}
               <div>{{firstnonempty contact.name contact.email ''}}</div>
               {{/using}}
-            {{/if_workflow_assignee_privileges}}
+            {{/if_cycle_assignee_privileges}}
           </div>
         </div>
 

@@ -70,6 +70,15 @@
       var that = this;
       this._super.apply(this, arguments);
       this.bind("created", refresh_attr_wrap('workflow').bind(this));
+      this.bind("destroyed", function(ev, inst) {
+        if(inst instanceof that) {
+          can.each(inst.cycle_task_groups, function(cycle_task_group) {
+            cycle_task_group = cycle_task_group.reify();
+            can.trigger(cycle_task_group, "destroyed");
+            can.trigger(cycle_task_group.constructor, "destroyed", cycle_task_group);
+          });
+        }
+      });
     }
   }, {
     init: function() {
@@ -178,7 +187,8 @@
       show_view: _mustache_path + "/tree.mustache",
       //footer_view: _mustache_path + "/tree_footer.mustache",
       draw_children: true,
-      child_options: [{
+      child_options: [
+        {
           title: 'Objects',
           model: "CycleTaskGroupObject",
           mapping: "cycle_task_group_objects",
@@ -188,7 +198,7 @@
           model: "CycleTaskGroupObjectTask",
           mapping: "cycle_task_group_tasks",
           allow_creating: false
-        },
+        }
       ]
     },
 
@@ -204,6 +214,20 @@
               instance.refresh_all_force('cycle_task_group_objects'),
               instance.refresh_all_force('cycle_task_group_tasks')
             );
+          });
+        }
+      });
+      this.bind("destroyed", function(ev, inst) {
+        if(inst instanceof that) {
+          can.each(inst.cycle_task_group_objects, function(ctgo) {
+            ctgo = ctgo.reify();
+            can.trigger(ctgo, "destroyed");
+            can.trigger(ctgo.constructor, "destroyed", ctgo);
+          });
+          can.each(inst.cycle_task_group_tasks, function(ctgt) {
+            ctgt = ctgt.reify();
+            can.trigger(ctgt, "destroyed");
+            can.trigger(ctgt.constructor, "destroyed", ctgt);
           });
         }
       });

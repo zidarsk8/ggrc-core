@@ -13,7 +13,7 @@
           <textarea id="response_description" tabindex="1" class="input-block-level double wysihtml5" placeholder="Response Title" name="description" autofocus>{{{description}}}</textarea>
       </div>
     </div>
-    
+
     {{#using contact=instance.contact}}
     <div class="span3">
       <label>
@@ -23,22 +23,24 @@
       <div class="objective-selector">
           {{#using request=instance.request}}
           {{#using request_assignee=request.assignee}}
+
             {{#if new_object_form}}
-              <input type="hidden" name="contact.id" value="{{request_assignee.id}}">
+              <div class="objective-selector">
+                <input type="text" name="contact.name" data-lookup="Person" data-params="Person:is_enabled=1" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty contact.name contact.email ''}}">
+              </div>
             {{else}}
-              <input type="hidden" name="contact.id" value="{{contact.id}}">
+              <p class="read-only oneline">
+                <i class="grcicon-person-green pull-left icon-field"></i>
+                {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+              </p>
             {{/if}}
-            <span class="read-only oneline">
-              <i class="grcicon-person-green pull-left icon-field"></i>
-              {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-            </span>
           {{/using}}
           {{/using}}
       </div>
     </div>
     {{/using}}
   </div>
-  
+
   <div class="row-fluid">
     {{#if_instance_of instance "DocumentationResponse"}}
     <div class="span6 hidable">
@@ -158,7 +160,7 @@
           <span class="gray"><em>No mapped objects</em></span>
         {{/list.length}}
         {{#prune_context}}
-          <div class="objective-selector">         
+          <div class="objective-selector">
             <div style="clear:both">
               <br>
                <a class="section-add section-sticky btn"

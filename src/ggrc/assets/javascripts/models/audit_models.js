@@ -38,6 +38,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , tree_view_options : {
     draw_children : true
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , child_options : [{
       model : "Request"
       , mapping: "requests"
@@ -113,21 +114,37 @@ can.Model.Cacheable("CMS.Models.Audit", {
       return $.when(
         programs[0],
         programs[0].get_binding("program_authorized_people").refresh_instances(),
-        CMS.Models.Role.findAll({ name : "ProgramReader" })
-      );
-    }).then(function(program, person_bindings, reader_roles) {
-      var authorized_people = can.map(person_bindings, function(pb) {
-        return pb.instance;
-      });
+        programs[0].get_binding("program_authorizations").refresh_instances(),
+        CMS.Models.Role.findAll({ name : "ProgramReader" }),
+        CMS.Models.Role.findAll({ name : "ProgramEditor" })
+        );
+    }).then(function(program, people_bindings, auth_bindings, reader_roles, editor_roles) {
+      // ignore readers.  Give users an editor role
+      var reader_authorizations = [],
+          authorized_people = can.map(people_bindings, function(pb) {
+            return pb.instance;
+          }),
+          editor_authorized_people = can.map(auth_bindings, function(ab) {
+            if(~can.inArray(ab.instance.role.reify(), reader_roles)) {
+              reader_authorizations.push(ab.instance);
+            } else {
+              return ab.instance.person.reify();
+            }
+          });
 
       if(Permission.is_allowed("create", "UserRole", program.context)
         && !~can.inArray(
           that.contact.reify(),
-          authorized_people
+          editor_authorized_people
       )) {
+        can.each(reader_authorizations, function(ra) {
+          if(ra.person.reify() === that.contact.reify()) {
+            ra.destroy();
+          }
+        });
         new CMS.Models.UserRole({
           person: that.contact,
-          role: reader_roles[0].stub(),
+          role: editor_roles[0].stub(),
           context: program.context
         }).save();
       }
@@ -398,6 +415,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     }
 
     this.validateNonBlank("description");
+    this.validatePresenceOf("contact");
   }
   , create : "POST /api/responses"
   , update : "PUT /api/responses/{id}"
@@ -461,6 +479,7 @@ can.Model.Cacheable("CMS.Models.Response", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/responses/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/responses/tree_footer.mustache"
     , draw_children : true
     , child_options : [{
@@ -506,8 +525,8 @@ can.Model.Cacheable("CMS.Models.Response", {
 }, {
     display_name : function() {
       var desc = this.description
-        , max_len = 20;
-      out_name = desc;
+        , max_len = 20
+        , out_name = desc;
       // Truncate if greater than max_len chars
       if (desc.length > max_len) {
         out_name = desc.slice(0, max_len) + " ...";
@@ -519,9 +538,15 @@ can.Model.Cacheable("CMS.Models.Response", {
       this.attr("contact", this.request.reify().assignee);
     }
   }
-  , preload_form : function(new_object_form) {
+  , form_preload : function(new_object_form) {
     if(new_object_form && !this.contact) {
-      this.attr("contact", this.request.reify().assignee);
+        if (!this.request) {
+            this.bind("request", function (ev, request) {
+                this.attr('contact', request.reify().assignee);
+            });
+        }else{
+            this.attr('contact', this.request.reify().assignee);
+        };
     }
   }
 

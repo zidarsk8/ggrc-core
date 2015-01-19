@@ -8,6 +8,7 @@ from ggrc import db
 from ggrc.models.mixins import (
     Slugged, Titled, Described, Timeboxed, Stateful, WithContact
     )
+from sqlalchemy import event
 
 
 class Cycle(

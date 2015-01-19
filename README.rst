@@ -2,6 +2,9 @@
 gGRC-Core
 *********
 
+.. image:: https://travis-ci.org/reciprocity/ggrc-core.svg
+    :target: https://travis-ci.org/reciprocity/ggrc-core
+
 Google Governance, Risk and Compliance. Migrated from `Google <https://code.google.com/p/compliance-management/>`_ `Code <https://code.google.com/p/ggrc-core>`_.
 
 Requirements
@@ -20,19 +23,8 @@ environment:
      - Oracle VirtualBox Virtual Machine player
    * - `Vagrant <http://www.vagrantup.com/>`_
      - Handy scriptable VM management
-   * - Ruby and Ruby Dev
-     - sudo aptitude install ruby-dev
-   * - `librarian (ruby gem) <http://rubygems.org/gems/librarian>`_
-     - Ruby bundle management framework.
-   * - `librarian-chef (ruby gem) <http://rubygems.org/gems/librarian-chef>`_
-     - `Opscode Chef <http://www.opscode.com/chef/>`_ cookbook manager.
-
-Windows installation
---------------------
-Download and install VirtualBox, Vagrant, `Ruby and DevKit <http://rubyinstaller.org/downloads/>`_ (choose Ruby 1.9.3).
-Unpack the DevKit into ``c:\ruby193\devkit``, ``cd`` there, and run ``ruby dk.rb init`` and ``ruby dk.rb install``.
-For problems, see the `DevKist guide <https://github.com/oneclick/rubyinstaller/wiki/Development-Kit>`_.
-Then, run ``gem install librarian``, and ``gem install librarian-chef``.
+   * - `Ansible <http://www.ansible.com/home>`_
+     - Provisioning and deployment tool.
 
 Quick Start
 ===========
@@ -47,7 +39,6 @@ have the prerequisite software installed. Here are the steps:
 .. sourcecode:: bash
 
   git submodule update --init
-  librarian-chef install
   vagrant up
   vagrant ssh
   build_compass
@@ -55,7 +46,7 @@ have the prerequisite software installed. Here are the steps:
   db_migrate
 
 If you see download errors during the ``vagrant up`` stage, or if any subsequent
-step fails, try running ``vagrant provision`` (See `Provision a running Vagrant 
+step fails, try running ``vagrant provision`` (See `Provision a running Vagrant
 VM`_ below for more).
 
 Now you're in the VM and ready to rock. Get to work!
@@ -63,8 +54,8 @@ Now you're in the VM and ready to rock. Get to work!
 Launching gGRC as Stand-alone Flask
 -----------------------------------
 
-Most development is done in a stand-alone flask. We strive to make getting up 
-and running as simple as possible; to that end, launching the application is 
+Most development is done in a stand-alone flask. We strive to make getting up
+and running as simple as possible; to that end, launching the application is
 simple:
 
 .. sourcecode:: bash
@@ -89,19 +80,26 @@ The application will be accessible via this URL: http://localhost:8080/
 If you're running the Google App Engine SDK, the App Engine management console
 will be avaiable via this URL: http://localhost:8000/
 
-Running Unit Tests
-------------------
+Running Tests
+------------
+
+Tests are your friend! Keep them running, keep them updated.
+
+For JavaScript tests:
 
 .. sourcecode:: bash
 
-   run_unittests
+   run_karma
 
-Running Behave Integration Tests
---------------------------------
+Then open Chrome at URL: http://localhost:9876
 
+For Python unit tests:
 .. sourcecode:: bash
 
-   run_behave
+   run_pytests
+
+Both will run tests that run in the background and refresh every time
+you save a file. Keep them passing.
 
 Quickstart Breakdown
 ====================
@@ -132,28 +130,17 @@ concerned about, leading to the second step:
   git submodule update
 
 As the dependencies change over time it will be necessary for developers to
-update to a new revision for one or more of the submodules. 
+update to a new revision for one or more of the submodules.
 
-Librian and Chef
+Ansible
 ----------------
 
-gGRC-Core provides both a ``Vagrantfile`` and a ``Cheffile`` to make standing
-up a development environment simple and repeatable thanks to the magic of
-Vagrant, Chef, and librarian-chef. Vagrant enables developers to use a
-consistent and shared VM configuration to perform application testing while
-allowing developers to use the source code editing environment of their choice.
-The librarian-chef gem provides management of the Chef cookbooks required to
-provision the development VM,  with required packages.
+gGRC-Core provides both a ``Vagrantfile`` and a Ansible playbook to make
+standing up a development environment simple and repeatable thanks to the magic
+of Vagrant and Ansible. Vagrant enables developers to use a consistent and
+shared VM configuration to perform application testing while allowing
+developers to use the source code editing environment of their choice.
 
-Updating Cookbooks with ``librarian-chef``
-''''''''''''''''''''''''''''''''''''''''
-
-When changes are made to the Cheffile ``librarian-chef`` will need to be run to
-update the installed cookbooks.
-
-.. sourcecode:: bash
-
-  librarian-chef install
 
 Vagrant
 -------
@@ -251,7 +238,7 @@ them as they change:
 Importing Example Data
 ----------------------
 
-Example test data can be loaded by using the following command (with ``root`` 
+Example test data can be loaded by using the following command (with ``root``
 being the mysql password):
 
 .. sourcecode:: bash
@@ -263,7 +250,7 @@ Gotchas
 
 After sync'ing your local clone of gGRC-Core you may experience a failure when
 trying to run the application due to a change (usually an addition) to the
-prerequisites. 
+prerequisites.
 
 There are three primary classes of requirements for gGRC-Core: submodules,
 cookbooks and Python packages. Cookbooks are managed via specification in the

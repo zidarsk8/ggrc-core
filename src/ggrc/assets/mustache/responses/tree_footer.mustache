@@ -1,5 +1,5 @@
 {{#if allow_creating}}
-{{#is_allowed '__GGRC_ADMIN__' model.shortName context=parent_instance.context.id}}
+  {{#if_can_create_response parent_instance}}
   <li class="tree-item tree-item-add tree-footer">
     <div class="row-fluid">
       <div class="span12">
@@ -11,25 +11,5 @@
       </div>
     </div>
   </li>
-{{else}}
-  {{^if_auditor parent_instance}}
-  {{#if_helpers '\
-    #is_allowed' 'create' model.shortName _0_context=parent_instance.context.id '\
-    and ^if_equals' parent_instance.status 'Accepted'}}
-  {{#if_can_edit_request parent_instance}}
-  <li class="tree-item tree-item-add tree-footer">
-    <div class="row-fluid">
-      <div class="span12">
-        {{#using audit=parent_instance.audit}}
-        <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{parent_instance.response_model_class}}" data-object-plural="responses" data-object-params='{ "{{parent_instance.class.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.class.model_singular}}" }, "context": { "id" : {{firstexist audit.context.id "null"}}, "href" : "{{audit.context.href}}", "type" : "{{audit.context.type}}" } }'>
-          Create Response
-        </a>
-        {{/using}}
-      </div>
-    </div>
-  </li>
-  {{/if_can_edit_request}}
-  {{/if_helpers}}
-  {{/if_auditor}}
-{{/is_allowed}}}
+{{/if_can_create_response}}
 {{/if}}

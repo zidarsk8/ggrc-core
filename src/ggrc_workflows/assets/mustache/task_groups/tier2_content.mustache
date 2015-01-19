@@ -1,6 +1,20 @@
+
 <div class="action-bar">
   <ul class="change-links">
-    {{> /static/mustache/base_objects/edit_object_link.mustache}}
+    {{#using workflow=instance.workflow}}
+      {{^if_equals workflow.status 'Inactive'}}
+        {{> /static/mustache/base_objects/edit_object_link.mustache}}
+      {{/if_equals}}
+    {{/using}}
+    {{#is_allowed 'update' instance context='for'}}
+    <li>
+      <task-group-clone task-group="instance">
+        <a href="javascript://">
+          Clone Task Group
+        </a>
+      </task-group-clone>
+    </li>
+    {{/is_allowed}}
   </ul>
 </div>
 

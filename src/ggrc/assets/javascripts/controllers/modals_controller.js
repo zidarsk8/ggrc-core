@@ -141,19 +141,20 @@ can.Control("GGRC.Controllers.Modals", {
       }
       else {
         path = path.join(".");
+
+        // we (ab)use databinding to make the input field change for us
+        // doing it three times like this ensures stability
+
+        // handle emptying field and choosing same suggestion
+        this.options.instance.attr(path, null);
+        // the first change sets to null, 2nd works
         this.options.instance.attr(path, ui.item.stub());
-        // Make sure person name/email gets written to the input field
-        setTimeout(function(){
+        this.options.instance.attr(path, ui.item.stub());
+        // settign el.val manually is still needed for autocompletes inside
+        // deferred renderers such as control/object selector in audit
+        setTimeout(function() {
           el.val(ui.item.title || ui.item.name || ui.item.email);
-          instance._transient || instance.attr("_transient", new can.Observe({}));
-          can.reduce(path.split("."), function(current, next) {
-            current = current + "." + next;
-            instance.attr(current) || instance.attr(current, new can.Observe({}));
-            return current;
-          }, "_transient");
-          instance.attr("_transient." + path, ui.item[prop]);
-          el.blur();
-        }, 50);
+        }, 0);
       }
   }
 
@@ -623,8 +624,7 @@ can.Control("GGRC.Controllers.Modals", {
       xhr.always(function() {
         // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
         if ($el.length) {
-          $el.removeAttr("disabled").removeClass("disabled pending-ajax")[0].innerHTML = oldtext;
-          $el.addClass("disabled");
+          $el.removeAttr("disabled").removeClass("pending-ajax")[0].innerHTML = oldtext;
         }
       });
     }
@@ -760,11 +760,15 @@ can.Control("GGRC.Controllers.Modals", {
             finish();
           });
         } else {
-          var type = obj.type ? obj.type : '',
+          var type = obj.type ? can.spaceCamelCase(obj.type) : '', 
               name = obj.title ? obj.title : '',
               msg;
           if(instance_id === undefined) { //new element
-            msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+            if (name) {
+                msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+            }else{
+                msg = "New " + type + " added successfully.";
+            }
           } else {
             msg = "<span class='user-string'>" + name + "</span>" + " modified successfully.";
           }
@@ -1093,7 +1097,5 @@ can.Component.extend({
   },
 });
 
-
-
-
 })(window.can, window.can.$);
+

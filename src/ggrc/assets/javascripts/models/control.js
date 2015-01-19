@@ -19,6 +19,7 @@ can.Model.Cacheable("CMS.Models.Control", {
   , destroy : "DELETE /api/controls/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
   , is_custom_attributable: true
+  , filter_keys : ['title', 'description', 'contact', 'owner', 'notes', 'code', 'reference_url']
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -68,6 +69,7 @@ can.Model.Cacheable("CMS.Models.Control", {
 
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/controls/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/controls/tree_footer.mustache"
     , draw_children : true
     , child_options : [{

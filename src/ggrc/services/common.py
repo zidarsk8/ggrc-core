@@ -700,10 +700,12 @@ class Resource(ModelView):
 
     if 'If-None-Match' in self.request.headers and \
         self.request.headers['If-None-Match'] == self.etag(object_for_json):
-      return current_app.make_response((
-        '', 304, [('Etag', self.etag(object_for_json))]))
-    return self.json_success_response(
-      object_for_json, self.modified_at(obj))
+      with benchmark("Make response"):
+        return current_app.make_response((
+          '', 304, [('Etag', self.etag(object_for_json))]))
+    with benchmark("Make response"):
+      return self.json_success_response(
+        object_for_json, self.modified_at(obj))
 
   def validate_headers_for_put_or_delete(self, obj):
     missing_headers = []
@@ -774,8 +776,9 @@ class Resource(ModelView):
       update_memcache_after_commit(self.request)
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
-    return self.json_success_response(
-        object_for_json, self.modified_at(obj))
+    with benchmark("Make response"):
+      return self.json_success_response(
+          object_for_json, self.modified_at(obj))
 
   def delete(self, id):
     if 'X-Appengine-Taskname' not in request.headers:
@@ -907,6 +910,14 @@ class Resource(ModelView):
 
       cache_op = 'Hit' if len(cache_objs) > 0 else 'Miss'
 
+    # Return custom fields specified via `__fields=id,title,description` etc.
+    # TODO this can be optimized by filter_resource() not retrieving the other fields to being with
+    if '__fields' in request.args:
+        custom_fields = request.args['__fields'].split(',')
+        objs = [
+            {f: o[f] for f in custom_fields if f in o}
+            for o in objs]
+
     with benchmark("Serialize collection"):
       collection = self.build_collection_representation(
           objs, extras=extras)
@@ -916,8 +927,9 @@ class Resource(ModelView):
       return current_app.make_response((
         '', 304, [('Etag', self.etag(collection))]))
 
-    return self.json_success_response(
-      collection, self.collection_last_modified(), cache_op=cache_op)
+    with benchmark("Make response"):
+      return self.json_success_response(
+        collection, self.collection_last_modified(), cache_op=cache_op)
 
   def get_resources_from_cache(self, matches):
     """Get resources from cache for specified matches"""
@@ -1022,8 +1034,9 @@ class Resource(ModelView):
       update_memcache_after_commit(self.request)
     with benchmark("Serialize object"):
       object_for_json = self.object_for_json(obj)
-    return self.json_success_response(
-      object_for_json, self.modified_at(obj), id=obj.id, status=201)
+    with benchmark("Make response"):
+      return self.json_success_response(
+        object_for_json, self.modified_at(obj), id=obj.id, status=201)
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):

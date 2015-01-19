@@ -20,26 +20,15 @@
       content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache",
       instance : workflow
     }, function(params, option) {
-      var data = {},
-          d = new Date(),
-          base_date;
+      var data = {};
 
       can.each(params, function(item) {
         data[item.name] = item.value;
       });
 
-      if (option === 'this') {
-        base_date = moment().format('MM/DD/YYYY');
-      }
-      else if (option === 'next') {
-        base_date = moment().add(
-          1, workflow.frequency_duration()).format('MM/DD/YYYY');
-      }
-
       cycle = new CMS.Models.Cycle({
         context: workflow.context.stub(),
         workflow: { id: workflow.id, type: "Workflow" },
-        start_date: base_date || null,
         autogenerate: true
       });
 
@@ -120,6 +109,9 @@
           this._can_activate_def();
         }
       },
+      _restore_button: function () {
+          this.attr('waiting', false);
+      }
     },
     events: {
       "{can.Model.Cacheable} created": function(model) {
@@ -129,19 +121,30 @@
         this.scope._handle_refresh(model);
       },
       "button click": function() {
-        var workflow = GGRC.page_instance();
+        var workflow = GGRC.page_instance(),
+            scope = this.scope,
+            cycle;
+        scope.attr('waiting', true);
         if (workflow.frequency !== 'one_time') {
           workflow.refresh().then(function() {
             workflow.attr('recurrences', true);
             workflow.attr('status', "Active");
-            workflow.save();
-          });
+            return workflow.save();
+          }, scope._restore_button.bind(scope)).then(function(workflow) {
+            if (moment(workflow.next_cycle_start_date).isSame(moment(), "day")) {
+              return new CMS.Models.Cycle({
+                context: workflow.context.stub(),
+                workflow: { id: workflow.id, type: "Workflow" },
+                autogenerate: true
+              }).save();
+            }
+          }, scope._restore_button.bind(scope));
         } else {
           _generate_cycle().then(function() {
             workflow.refresh().then(function() {
               workflow.attr('status', "Active").save();
-            });
-          });
+            }, scope._restore_button.bind(scope));
+          }, scope._restore_button.bind(scope));
         }
       }
     }
@@ -164,13 +167,10 @@
   can.Model.Cacheable("CMS.ModelHelpers.CloneWorkflow", {
     defaults : {
       clone_people: true,
-      clone_tasks: true
+      clone_tasks: true,
+      clone_objects: true
     }
   }, {
-    // form_preload: function(new_object_form) {
-    //   this.attr("clone_people", true);
-    //   this.attr("clone_tasks", true);
-    // },
     refresh: function() {
       return $.when(this);
     },
@@ -179,11 +179,13 @@
         clone: this.source_workflow.id,
         context: null,
         clone_people: this.clone_people,
-        clone_tasks: this.clone_tasks
+        clone_tasks: this.clone_tasks,
+        clone_objects: this.clone_objects
       });
 
       return workflow.save().then(function(workflow) {
         GGRC.navigate(workflow.viewLink);
+        return this;
       });
 
     }
@@ -203,6 +205,50 @@
           model: CMS.ModelHelpers.CloneWorkflow,
           instance: new CMS.ModelHelpers.CloneWorkflow({ source_workflow: this.scope.workflow }),
           content_view: GGRC.mustache_path + "/workflows/clone_modal_content.mustache",
+          custom_save_button_text: "Proceed",
+          button_view: GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
+        });
+      }
+    }
+  });
+
+  can.Model.Cacheable("CMS.ModelHelpers.CloneTaskGroup", {
+    defaults : {
+      clone_objects: true,
+      clone_tasks: true,
+      clone_people: true
+    }
+  }, {
+    refresh: function() {
+      return $.when(this);
+    },
+    save: function() {
+      var task_group = new CMS.Models.TaskGroup({
+        clone: this.source_task_group.id,
+        context: null,
+        clone_objects: this.clone_objects,
+        clone_tasks: this.clone_tasks,
+        clone_people: this.clone_people
+      });
+
+      return task_group.save();
+    }
+  });
+
+  can.Component.extend({
+    tag: "task-group-clone",
+    template: "<content/>",
+    events: {
+      click: function(el) {
+        var task_group, $target;
+
+        $target = $('<div class="modal hide"></div>').uniqueId();
+        $target.modal_form({}, el);
+        $target.ggrc_controllers_modals({
+          modal_title: "Clone Task Group",
+          model: CMS.ModelHelpers.CloneTaskGroup,
+          instance: new CMS.ModelHelpers.CloneTaskGroup({ source_task_group: this.scope.taskGroup }),
+          content_view: GGRC.mustache_path + "/task_groups/clone_modal_content.mustache",
           custom_save_button_text: "Proceed",
           button_view: GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
         });

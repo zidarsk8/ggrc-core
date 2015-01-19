@@ -48,6 +48,20 @@
     init: function() {
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank("title");
+      this.bind("destroyed", function(ev, inst) {
+        if(inst instanceof CMS.Models.Workflow) {
+          can.each(inst.cycles, function(cycle) {
+            cycle = cycle.reify()
+            can.trigger(cycle, "destroyed");
+            can.trigger(cycle.constructor, "destroyed", cycle);
+          });
+          can.each(inst.task_groups, function(tg) {
+            tg = tg.reify();
+            can.trigger(tg, "destroyed");
+            can.trigger(tg.constructor, "destroyed", tg);
+          });
+        }
+      });
     },
   }, {
     save : function() {
