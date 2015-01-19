@@ -15,7 +15,7 @@ from ggrc.rbac.permissions import is_allowed_update
 from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
 import ggrc_workflows.models as models
 from ggrc_workflows.models.mixins import RelativeTimeboxed
-
+from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
 
 # Initialize signal handler for status changes
 from blinker import Namespace
@@ -208,7 +208,6 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
   # So, to compensate/work around that, I'm going to calculate the relative dates and then
   # use them to calculate the actual start/end dates for the cycletaskgrouptask
 
-  from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
   if "one_time" == frequency:
     sd = task_group_task.start_date
     ed = task_group_task.end_date
@@ -222,7 +221,6 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
     rem = task_group_task.relative_end_month
     red = task_group_task.relative_end_day
 
-  from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
   start_date = WorkflowDateCalculator.\
     nearest_start_date_after_basedate_from_dates(base_date, frequency, rsm, rsd)
   start_date = WorkflowDateCalculator.adjust_start_date(start_date)
@@ -530,7 +528,6 @@ def handle_cycle_task_group_put(
 
 def update_workflow_state(workflow):
   today = date.today()
-  from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
 
   calculator = WorkflowDateCalculator(workflow)
   next_cycle_start_date = \
@@ -546,7 +543,7 @@ def update_workflow_state(workflow):
   # Start the first cycle if min_start_date < today < max_end_date
   if workflow.recurrences:
     # Only create the cycle if we're mid-cycle
-    if (previous_cycle_start_date <= today and today <= previous_cycle_end_date) and not workflow.cycles:
+    if (previous_cycle_start_date <= today <= previous_cycle_end_date) and not workflow.cycles:
       cycle = models.Cycle()
       cycle.workflow = workflow
       # Other cycle attributes will be set in build_cycle.
@@ -760,7 +757,6 @@ def start_recurring_cycles():
     build_cycle(cycle)
 
     # Update the workflow next_cycle_start_date to push it ahead based on the frequency.
-    from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
     calculator = WorkflowDateCalculator(workflow)
     workflow.next_cycle_start_date = \
       calculator.nearest_work_day(calculator.nearest_start_date_after_basedate(date.today()), 1)
