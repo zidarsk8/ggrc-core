@@ -10,11 +10,15 @@ from ggrc.models import create_db, drop_db
 from ggrc import settings
 
 class TestCase(BaseTestCase):
+  def drop_db(self):
+    db.engine.execute("DROP DATABASE IF EXISTS ggrcdevtest;")
+    db.engine.execute("CREATE DATABASE ggrcdevtest; USE ggrcdevtest;")
+
   def setUp(self):
-    pass
-    #db.engine.execute("DROP DATABASE IF EXISTS ggrcdevtest;")
-    #db.engine.execute("CREATE DATABASE ggrcdevtest;")
-    #create_db(True, quiet=True)
+    self.drop_db() # if error, tearDown doesn't happen
+
+    create_db(use_migrations=True, quiet=True)
+
     # if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
     #   from google.appengine.api import memcache
     #   from google.appengine.ext import testbed
@@ -23,9 +27,9 @@ class TestCase(BaseTestCase):
     #   self.testbed.init_memcache_stub()
 
   def tearDown(self):
-    pass
-    #db.session.remove()
-    #db.engine.execute("DROP DATABASE ggrcdevtest; CREATE DATABASE ggrcdevtest;")
+    db.session.remove()
+    self.drop_db()
+
     # if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
     #   from google.appengine.api import memcache
     #   from google.appengine.ext import testbed
