@@ -13,7 +13,6 @@ def create_db_with_create_all():
   db.create_all()
 
 def create_db_with_migrations(quiet=False):
-  from ggrc.app import db
   from ggrc.migrate import upgradeall
   import logging
   if quiet:
