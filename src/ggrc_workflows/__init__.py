@@ -3,21 +3,20 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-from datetime import datetime, date, timedelta
-import calendar
+from datetime import datetime, date
+
 from flask import Blueprint
 from sqlalchemy import inspect
 
-from ggrc import settings, db
-from ggrc.app import app
+from ggrc import db
 from ggrc.login import get_current_user
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
-
 import ggrc_workflows.models as models
 from ggrc_workflows.models.mixins import RelativeTimeboxed
+
 
 # Initialize signal handler for status changes
 from blinker import Namespace
@@ -419,7 +418,7 @@ def ensure_assignee_is_workflow_member(workflow, assignee):
     db.session.add(workflow_person)
 
   # Check if assignee has a role assignment
-  from ggrc_basic_permissions.models import Role, UserRole
+  from ggrc_basic_permissions.models import UserRole
   user_roles = UserRole.query.filter(
       UserRole.context_id == workflow.context_id,
       UserRole.person_id == assignee.id).all()
