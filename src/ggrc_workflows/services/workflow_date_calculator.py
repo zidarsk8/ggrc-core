@@ -24,17 +24,17 @@ The calculator works in two ways:
   1) Create an instance, giving it a workflow, and it call instance methods. This is a bit more object-oriented:
 
       # Get the boundary dates for a cycle
-      start_date = calculator.calc_nearest_start_date_after_basedate(basedate)
-      end_date   = calculator.calc_nearest_end_date_after_start_date(start_date)
+      start_date = calculator.nearest_start_date_after_basedate(basedate)
+      end_date   = calculator.nearest_end_date_after_start_date(start_date)
 
       # Calculate prior cycle periods from a basedate
-      prior_cycle_start_date = calculator.calc_previous_cycle_start_date_before_basedate(basedate)
-      prior_cycle_end_date   = calculator.calc_nearest_end_date_after_start_date(prior_cycle_start_date)
+      prior_cycle_start_date = calculator.previous_cycle_start_date_before_basedate(basedate)
+      prior_cycle_end_date   = calculator.nearest_end_date_after_start_date(prior_cycle_start_date)
 
       # For convenience, calculate subsequent cycle start date
-      next_cycle_start_date = calculator.calc_next_cycle_start_date_after_basedate(basedate)
+      next_cycle_start_date = calculator.next_cycle_start_date_after_basedate(basedate)
       # This is effectively the same as doing this:
-      next_cycle_start_date = calculator.calc_nearest_start_date_after_basedate(start_date + timedelta(days=1))
+      next_cycle_start_date = calculator.nearest_start_date_after_basedate(start_date + timedelta(days=1))
 
   2) Use the static methods which calculate cycle boundaries given dates. This is a bit more utilitarian, and
     is valuable in certain cases, such as when making calculations directly with TaskGroupTasks, where you may or may
@@ -43,18 +43,18 @@ The calculator works in two ways:
       # Get the boundary dates for a cycle
       # !Incidentally, for weekly cycles the relative_{start|end}_month can be None
       # !Notice that these methods below use relative month+day instead of date values.
-      start_date = WorkflowDateCalculator.calc_nearest_start_date_after_basedate_from_dates(\
+      start_date = WorkflowDateCalculator.nearest_start_date_after_basedate_from_dates(\
         basedate, frequency, relative_start_month, relative_start_day)
-      end_date   = WorkflowDateCalculator.calc_nearest_end_date_after_start_date_from_dates(\
+      end_date   = WorkflowDateCalculator.nearest_end_date_after_start_date_from_dates(\
         frequency, start_date, end_month, end_day)
-      prior_cycle_start_date = WorkflowDateCalculator.calc_previous_cycle_start_date_before_basedate_from_dates(
+      prior_cycle_start_date = WorkflowDateCalculator.previous_cycle_start_date_before_basedate_from_dates(
         basedate, frequency, relative_start_month, relative_start_day)
-      prior_cycle_end_date   = WorkflowDateCalculator.calc_nearest_end_date_after_start_date_from_dates(\
+      prior_cycle_end_date   = WorkflowDateCalculator.nearest_end_date_after_start_date_from_dates(\
         basedate, frequency, prior_cycle_start_date.month, prior_cycle_start_date.day)
-      next_cycle_start_date = WorkflowDateCalculator.calc_next_cycle_start_date_after_basedate_from_dates(\
+      next_cycle_start_date = WorkflowDateCalculator.next_cycle_start_date_after_basedate_from_dates(\
         basedate, frequency, relative_start_month, relative_start_day
       # Again, this is equivalent to this
-      next_cycle_start_date = WorkflowDateCalculator.calc_nearest_start_date_after_basedate(\
+      next_cycle_start_date = WorkflowDateCalculator.nearest_start_date_after_basedate(\
         basedate, frequency, relative_start_month, relative_start_day+1)
 
 Again, the dates returned by all of the methods above do not adjust for weekends or holidays.
@@ -101,15 +101,15 @@ class WorkflowDateCalculator(object):
   def adjust_end_date(end_date):
     return WorkflowDateCalculator.nearest_work_day(end_date, -1)
 
-  def calc_nearest_start_date_after_basedate(self, basedate):
+  def nearest_start_date_after_basedate(self, basedate):
     frequency = self.workflow.frequency
-    min_relative_start_day = self._calc_min_relative_start_day_from_tasks()
-    min_relative_start_month = self._calc_min_relative_start_month_from_tasks()
-    return WorkflowDateCalculator.calc_nearest_start_date_after_basedate_from_dates(
+    min_relative_start_day = self._min_relative_start_day_from_tasks()
+    min_relative_start_month = self._min_relative_start_month_from_tasks()
+    return WorkflowDateCalculator.nearest_start_date_after_basedate_from_dates(
       basedate, frequency, min_relative_start_month, min_relative_start_day)
 
   @staticmethod
-  def calc_nearest_start_date_after_basedate_from_dates(
+  def nearest_start_date_after_basedate_from_dates(
       basedate, frequency, relative_start_month, relative_start_day):
 
     from monthdelta import monthdelta
@@ -197,15 +197,15 @@ class WorkflowDateCalculator(object):
     else:
       pass
 
-  def calc_nearest_end_date_after_start_date(self, start_date):
+  def nearest_end_date_after_start_date(self, start_date):
     frequency = self.workflow.frequency
-    max_relative_end_day = self._calc_max_relative_end_day_from_tasks()
-    max_relative_end_month = self._calc_max_relative_end_month_from_tasks()
-    return WorkflowDateCalculator.calc_nearest_end_date_after_start_date_from_dates(
+    max_relative_end_day = self._max_relative_end_day_from_tasks()
+    max_relative_end_month = self._max_relative_end_month_from_tasks()
+    return WorkflowDateCalculator.nearest_end_date_after_start_date_from_dates(
       frequency, start_date, max_relative_end_month, max_relative_end_day)
 
   @staticmethod
-  def calc_nearest_end_date_after_start_date_from_dates(frequency, start_date, end_month, end_day):
+  def nearest_end_date_after_start_date_from_dates(frequency, start_date, end_month, end_day):
 
     start_date_day_of_week = start_date.isoweekday()
     start_date_day_of_month = start_date.day
@@ -304,7 +304,7 @@ class WorkflowDateCalculator(object):
       pass
 
   @staticmethod
-  def calc_next_cycle_start_date_after_start_date(start_date, frequency):
+  def next_cycle_start_date_after_start_date(start_date, frequency):
     from monthdelta import monthdelta
     if "one_time" == frequency:
       return start_date
@@ -320,29 +320,29 @@ class WorkflowDateCalculator(object):
       pass
 
   @staticmethod
-  def calc_next_cycle_start_date_after_basedate_from_dates(
+  def next_cycle_start_date_after_basedate_from_dates(
       basedate, frequency, relative_start_month, relative_start_day):
     start_date = WorkflowDateCalculator.\
-      calc_nearest_start_date_after_basedate_from_dates(
+      nearest_start_date_after_basedate_from_dates(
       basedate, frequency, relative_start_month, relative_start_day)
-    return WorkflowDateCalculator.calc_next_cycle_start_date_after_start_date(start_date, frequency)
+    return WorkflowDateCalculator.next_cycle_start_date_after_start_date(start_date, frequency)
 
-  def calc_next_cycle_start_date_after_basedate(self, basedate):
-    start_date = self.calc_nearest_start_date_after_basedate(basedate)
+  def next_cycle_start_date_after_basedate(self, basedate):
+    start_date = self.nearest_start_date_after_basedate(basedate)
     frequency = self.workflow.frequency
     return WorkflowDateCalculator.\
-      calc_next_cycle_start_date_after_start_date(start_date, frequency)
+      next_cycle_start_date_after_start_date(start_date, frequency)
 
   @staticmethod
-  def calc_previous_cycle_start_date_before_basedate_from_dates(basedate, frequency, relative_start_month, relative_start_day):
+  def previous_cycle_start_date_before_basedate_from_dates(basedate, frequency, relative_start_month, relative_start_day):
     start_date = WorkflowDateCalculator.\
-      calc_nearest_start_date_after_basedate_from_dates(
+      nearest_start_date_after_basedate_from_dates(
       basedate, frequency, relative_start_month, relative_start_day)
     return WorkflowDateCalculator.\
-      calc_previous_cycle_start_date(start_date, frequency)
+      previous_cycle_start_date(start_date, frequency)
 
   @staticmethod
-  def calc_previous_cycle_start_date(start_date, frequency):
+  def previous_cycle_start_date(start_date, frequency):
     from monthdelta import monthdelta
     if "one_time" == frequency:
       return start_date
@@ -390,13 +390,13 @@ class WorkflowDateCalculator(object):
     else:
       pass
 
-  def calc_previous_cycle_start_date_before_basedate(self, basedate):
-    start_date = self.calc_nearest_start_date_after_basedate(basedate)
+  def previous_cycle_start_date_before_basedate(self, basedate):
+    start_date = self.nearest_start_date_after_basedate(basedate)
     frequency = self.workflow.frequency
     return WorkflowDateCalculator.\
-      calc_previous_cycle_start_date(start_date, frequency)
+      previous_cycle_start_date(start_date, frequency)
 
-  def _calc_min_relative_start_month_from_tasks(self):
+  def _min_relative_start_month_from_tasks(self):
     min_start_month = None
     for tg in self.workflow.task_groups:
       for t in tg.task_group_tasks:
@@ -409,7 +409,7 @@ class WorkflowDateCalculator(object):
           min_start_month = relative_start_month
     return min_start_month
 
-  def _calc_min_relative_start_day_from_tasks(self):
+  def _min_relative_start_day_from_tasks(self):
     min_start_day = None
     for tg in self.workflow.task_groups:
       for t in tg.task_group_tasks:
@@ -422,7 +422,7 @@ class WorkflowDateCalculator(object):
           min_start_day = relative_start_day
     return min_start_day
 
-  def _calc_max_relative_end_day_from_tasks(self):
+  def _max_relative_end_day_from_tasks(self):
     max_end_day = None
     for tg in self.workflow.task_groups:
       for t in tg.task_group_tasks:
@@ -435,7 +435,7 @@ class WorkflowDateCalculator(object):
           max_end_day = relative_end_day
     return max_end_day
 
-  def _calc_max_relative_end_month_from_tasks(self):
+  def _max_relative_end_month_from_tasks(self):
     max_end_month = None
     for tg in self.workflow.task_groups:
       for t in tg.task_group_tasks:

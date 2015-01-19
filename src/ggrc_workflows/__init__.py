@@ -217,10 +217,10 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
 
   from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
   start_date = WorkflowDateCalculator.\
-    calc_nearest_start_date_after_basedate_from_dates(base_date, frequency, rsm, rsd)
+    nearest_start_date_after_basedate_from_dates(base_date, frequency, rsm, rsd)
   start_date = WorkflowDateCalculator.adjust_start_date(start_date)
   end_date = WorkflowDateCalculator.\
-    calc_nearest_end_date_after_start_date_from_dates(frequency, start_date, rem, red)
+    nearest_end_date_after_start_date_from_dates(frequency, start_date, rem, red)
   end_date = WorkflowDateCalculator.adjust_end_date(end_date)
   cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
       context=cycle.context,
@@ -527,14 +527,14 @@ def update_workflow_state(workflow):
 
   calculator = WorkflowDateCalculator(workflow)
   next_cycle_start_date = \
-    WorkflowDateCalculator.adjust_start_date(calculator.calc_nearest_start_date_after_basedate(today))
+    WorkflowDateCalculator.adjust_start_date(calculator.nearest_start_date_after_basedate(today))
   next_cycle_end_date = \
-    WorkflowDateCalculator.adjust_end_date(calculator.calc_nearest_end_date_after_start_date(next_cycle_start_date))
+    WorkflowDateCalculator.adjust_end_date(calculator.nearest_end_date_after_start_date(next_cycle_start_date))
   # Check the previous cycle to see if today is mid_cycle.
   previous_cycle_start_date = \
-    WorkflowDateCalculator.adjust_start_date(calculator.calc_previous_cycle_start_date_before_basedate(today))
+    WorkflowDateCalculator.adjust_start_date(calculator.previous_cycle_start_date_before_basedate(today))
   previous_cycle_end_date = \
-    WorkflowDateCalculator.adjust_end_date(calculator.calc_nearest_end_date_after_start_date(previous_cycle_start_date))
+    WorkflowDateCalculator.adjust_end_date(calculator.nearest_end_date_after_start_date(previous_cycle_start_date))
 
   # Start the first cycle if min_start_date < today < max_end_date
   if workflow.recurrences:
@@ -753,7 +753,7 @@ def start_recurring_cycles():
     from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
     calculator = WorkflowDateCalculator(workflow)
     workflow.next_cycle_start_date = \
-      calculator.nearest_work_day(calculator.calc_nearest_start_date_after_basedate(date.today()), 1)
+      calculator.nearest_work_day(calculator.nearest_start_date_after_basedate(date.today()), 1)
     db.session.add(workflow)
 
   db.session.commit()

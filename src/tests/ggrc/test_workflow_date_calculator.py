@@ -214,10 +214,10 @@ class TestWorkflowDateCalculator(TestCase):
 
     calc = WorkflowDateCalculator(workflow)
 
-    start_day = calc._calc_min_relative_start_day_from_tasks()
-    start_month = calc._calc_min_relative_start_month_from_tasks()
-    end_day = calc._calc_max_relative_end_day_from_tasks()
-    end_month = calc._calc_max_relative_end_month_from_tasks()
+    start_day = calc._min_relative_start_day_from_tasks()
+    start_month = calc._min_relative_start_month_from_tasks()
+    end_day = calc._max_relative_end_day_from_tasks()
+    end_month = calc._max_relative_end_month_from_tasks()
 
     self.assertEqual(start_day, self.tuesday().day)
     self.assertEqual(start_month, self.tuesday().month)
@@ -230,7 +230,7 @@ class TestWorkflowDateCalculator(TestCase):
       self._set_date_range_for_workflow(workflow,self.wednesday(),self.friday())
 
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(self.monday())
+    start_date = calc.nearest_start_date_after_basedate(self.monday())
     self.assertEqual(start_date, self.wednesday())
 
   def test_one_time_workflow_previous_start_date(self):
@@ -239,11 +239,11 @@ class TestWorkflowDateCalculator(TestCase):
     workflow = self._set_date_range_for_workflow(
       workflow, self.day_this_year(3,4), self.day_this_year(8,24))
     calculator = WorkflowDateCalculator(workflow)
-    start_date = calculator.calc_nearest_start_date_after_basedate(mar_1)
+    start_date = calculator.nearest_start_date_after_basedate(mar_1)
     self.assertEqual(start_date, self.day_this_year(3, 4))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     self.assertEqual(end_date, self.day_this_year(8, 24))
-    previous_cycle_start_date = calculator.calc_previous_cycle_start_date_before_basedate(mar_1)
+    previous_cycle_start_date = calculator.previous_cycle_start_date_before_basedate(mar_1)
     self.assertEqual(start_date, previous_cycle_start_date)
 
   # Weekly workflow tests
@@ -254,7 +254,7 @@ class TestWorkflowDateCalculator(TestCase):
       self._set_date_range_for_workflow(workflow,self.tuesday(),self.thursday())
 
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(self.monday())
+    start_date = calc.nearest_start_date_after_basedate(self.monday())
     self.assertEqual(start_date, self.tuesday())
 
   def test_weekly_workflow_basedate_after_start_date(self):
@@ -263,8 +263,8 @@ class TestWorkflowDateCalculator(TestCase):
       self._set_date_range_for_workflow(workflow, self.tuesday(), self.thursday())
 
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(self.wednesday())
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(self.wednesday())
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.wednesday() + timedelta(days=6))
     self.assertEqual(end_date, start_date + timedelta(days=2))
 
@@ -282,8 +282,8 @@ class TestWorkflowDateCalculator(TestCase):
     # end_date is a Friday
 
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(tuesday)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(tuesday)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, tuesday + timedelta(days=1))
     self.assertEqual(end_date, start_date + timedelta(days=2))
 
@@ -299,8 +299,8 @@ class TestWorkflowDateCalculator(TestCase):
     # end_date is a Tuesday
 
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(tuesday)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(tuesday)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, tuesday + timedelta(days=2))
     self.assertEqual(end_date, start_date + timedelta(days=5))
 
@@ -311,8 +311,8 @@ class TestWorkflowDateCalculator(TestCase):
 
     tuesday = self.tuesday()
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(tuesday)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(tuesday)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, tuesday + timedelta(days=1))
     self.assertEqual(end_date, start_date)
 
@@ -325,8 +325,8 @@ class TestWorkflowDateCalculator(TestCase):
 
     tuesday = self.tuesday()
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(tuesday)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(tuesday)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, tuesday)
     self.assertEqual(end_date, start_date)
 
@@ -339,8 +339,8 @@ class TestWorkflowDateCalculator(TestCase):
     workflow = self._set_date_range_for_workflow(workflow, day_5, day_10)
     day_4 = self.day_this_month(4)
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(day_4)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(day_4)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, day_4 + timedelta(days=1))
     self.assertEqual(end_date, start_date + timedelta(days=5))
 
@@ -350,8 +350,8 @@ class TestWorkflowDateCalculator(TestCase):
       workflow, self.day_this_month(5), self.day_this_month(10))
     day_5 = self.day_this_month(5)
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(day_5)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(day_5)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, day_5)
     self.assertEqual(end_date, start_date + timedelta(days=5))
 
@@ -365,8 +365,8 @@ class TestWorkflowDateCalculator(TestCase):
     day_5_next_month = day_5_this_month + monthdelta(1)
 
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(day_15_this_month)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(day_15_this_month)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, day_5_next_month)
     self.assertEqual(end_date, start_date + timedelta(days=5))
 
@@ -379,8 +379,8 @@ class TestWorkflowDateCalculator(TestCase):
     day_15_this_month = self.day_this_month(15)
 
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(day_5_this_month)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(day_5_this_month)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, day_10_this_month)
     self.assertEqual(end_date, day_15_this_month)
 
@@ -392,8 +392,8 @@ class TestWorkflowDateCalculator(TestCase):
     day_15_this_month = self.day_this_month(15)
 
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(day_10_this_month)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(day_10_this_month)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, day_10_this_month)
     self.assertEqual(end_date, day_15_this_month)
 
@@ -406,8 +406,8 @@ class TestWorkflowDateCalculator(TestCase):
     day_10_next_month = day_10_this_month + monthdelta(1)
     day_15_this_month = self.day_this_month(15)
     calc = WorkflowDateCalculator(workflow)
-    start_date = calc.calc_nearest_start_date_after_basedate(day_10_this_month)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(day_10_this_month)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, day_15_this_month)
     self.assertEqual(end_date, day_10_next_month)
 
@@ -418,13 +418,13 @@ class TestWorkflowDateCalculator(TestCase):
     workflow = self._set_date_range_for_workflow(
       workflow, self.day_this_month(4), self.day_this_month(24))
     calculator = WorkflowDateCalculator(workflow)
-    start_date = calculator.calc_nearest_start_date_after_basedate(oct_21)
+    start_date = calculator.nearest_start_date_after_basedate(oct_21)
     self.assertEqual(start_date, self.day_this_year(11, 4))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     self.assertEqual(end_date, self.day_this_year(11, 24))
-    previous_cycle_start_date = calculator.calc_previous_cycle_start_date_before_basedate(oct_21)
+    previous_cycle_start_date = calculator.previous_cycle_start_date_before_basedate(oct_21)
     self.assertEqual(previous_cycle_start_date, self.day_this_year(10, 4))
-    previous_cycle_end_date = calculator.calc_nearest_end_date_after_start_date(previous_cycle_start_date)
+    previous_cycle_end_date = calculator.nearest_end_date_after_start_date(previous_cycle_start_date)
     self.assertEqual(previous_cycle_end_date, self.day_this_year(10, 24))
 
   # Quarterly workflow tests
@@ -449,23 +449,23 @@ class TestWorkflowDateCalculator(TestCase):
       month_1_workflow, self.day_this_year(1,5), self.day_this_year(2,10))
     calc = WorkflowDateCalculator(month_1_workflow)
 
-    start_date = calc.calc_nearest_start_date_after_basedate(jan_4)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(jan_4)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(1, 5))
     self.assertEqual(end_date, self.day_this_year(2, 10))
 
-    start_date = calc.calc_nearest_start_date_after_basedate(apr_4)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(apr_4)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(4, 5))
     self.assertEqual(end_date, self.day_this_year(5, 10))
 
-    start_date = calc.calc_nearest_start_date_after_basedate(jul_4)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(jul_4)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(7, 5))
     self.assertEqual(end_date, self.day_this_year(8, 10))
 
-    start_date = calc.calc_nearest_start_date_after_basedate(oct_4)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(oct_4)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(10, 5))
     self.assertEqual(end_date, self.day_this_year(11, 10))
 
@@ -474,23 +474,23 @@ class TestWorkflowDateCalculator(TestCase):
       month_2_workflow, self.day_this_year(2,7), self.day_this_year(6,18))
     calc = WorkflowDateCalculator(month_2_workflow)
 
-    start_date = calc.calc_nearest_start_date_after_basedate(feb_3)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(feb_3)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(2, 7))
     self.assertEqual(end_date, self.day_this_year(3, 18))
 
-    start_date = calc.calc_nearest_start_date_after_basedate(may_3)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(may_3)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(5, 7))
     self.assertEqual(end_date, self.day_this_year(6, 18))
 
-    start_date = calc.calc_nearest_start_date_after_basedate(aug_3)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(aug_3)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(8, 7))
     self.assertEqual(end_date, self.day_this_year(9, 18))
 
-    start_date = calc.calc_nearest_start_date_after_basedate(nov_3)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(nov_3)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(11, 7))
     self.assertEqual(end_date, self.day_this_year(12, 18))
 
@@ -499,23 +499,23 @@ class TestWorkflowDateCalculator(TestCase):
       month_3_workflow, self.day_this_year(3,7), self.day_this_year(3,18))
     calc = WorkflowDateCalculator(month_3_workflow)
 
-    start_date = calc.calc_nearest_start_date_after_basedate(mar_2)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(mar_2)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(3, 7))
     self.assertEqual(end_date, self.day_this_year(3, 18))
 
-    start_date = calc.calc_nearest_start_date_after_basedate(jun_2)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(jun_2)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(6, 7))
     self.assertEqual(end_date, self.day_this_year(6, 18))
 
-    start_date = calc.calc_nearest_start_date_after_basedate(sep_2)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(sep_2)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(9, 7))
     self.assertEqual(end_date, self.day_this_year(9, 18))
 
-    start_date = calc.calc_nearest_start_date_after_basedate(dec_2)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(dec_2)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(12, 7))
     self.assertEqual(end_date, self.day_this_year(12, 18))
 
@@ -526,8 +526,8 @@ class TestWorkflowDateCalculator(TestCase):
     calc = WorkflowDateCalculator(month_3_workflow)
 
     mar_7 = self.day_this_year(3, 7)
-    start_date = calc.calc_nearest_start_date_after_basedate(mar_7)
-    end_date = calc.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calc.nearest_start_date_after_basedate(mar_7)
+    end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(3, 7))
     self.assertEqual(end_date, self.day_this_year(3, 18))
 
@@ -549,12 +549,12 @@ class TestWorkflowDateCalculator(TestCase):
     month_2_calc = WorkflowDateCalculator(month_2_workflow)
     month_3_calc = WorkflowDateCalculator(month_3_workflow)
 
-    month_1_start_date = month_1_calc.calc_nearest_start_date_after_basedate(mar_10)
-    month_1_end_date = month_1_calc.calc_nearest_end_date_after_start_date(month_1_start_date)
-    month_2_start_date = month_2_calc.calc_nearest_start_date_after_basedate(mar_10)
-    month_2_end_date = month_2_calc.calc_nearest_end_date_after_start_date(month_2_start_date)
-    month_3_start_date = month_3_calc.calc_nearest_start_date_after_basedate(mar_10)
-    month_3_end_date = month_3_calc.calc_nearest_end_date_after_start_date(month_3_start_date)
+    month_1_start_date = month_1_calc.nearest_start_date_after_basedate(mar_10)
+    month_1_end_date = month_1_calc.nearest_end_date_after_start_date(month_1_start_date)
+    month_2_start_date = month_2_calc.nearest_start_date_after_basedate(mar_10)
+    month_2_end_date = month_2_calc.nearest_end_date_after_start_date(month_2_start_date)
+    month_3_start_date = month_3_calc.nearest_start_date_after_basedate(mar_10)
+    month_3_end_date = month_3_calc.nearest_end_date_after_start_date(month_3_start_date)
 
     self.assertEqual(month_1_start_date, self.day_this_year(4, 7))
     self.assertEqual(month_1_end_date, self.day_this_year(6, 18))
@@ -569,17 +569,17 @@ class TestWorkflowDateCalculator(TestCase):
     workflow_one = self._set_date_range_for_workflow(
       workflow_one, self.day_this_year(2,12), self.day_this_year(1,19))
     calculator = WorkflowDateCalculator(workflow_one)
-    start_date = calculator.calc_nearest_start_date_after_basedate(may_9)
+    start_date = calculator.nearest_start_date_after_basedate(may_9)
     self.assertEqual(start_date, self.day_this_year(5, 12))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     self.assertEqual(end_date, self.day_this_year(7, 19))
 
     workflow_two = self._create_quarterly_workflow()
     workflow_two = self._set_date_range_for_workflow(
       workflow_two, self.day_this_year(2,12), self.day_this_year(2,3))
     calculator = WorkflowDateCalculator(workflow_two)
-    start_date = calculator.calc_nearest_start_date_after_basedate(may_9)
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    start_date = calculator.nearest_start_date_after_basedate(may_9)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, self.day_this_year(5, 12))
     self.assertEqual(end_date, self.day_this_year(8, 3))
 
@@ -589,9 +589,9 @@ class TestWorkflowDateCalculator(TestCase):
     workflow_one = self._set_date_range_for_workflow(
       workflow_one, self.day_this_year(3,12), self.day_this_year(1,19))
     calculator = WorkflowDateCalculator(workflow_one)
-    start_date = calculator.calc_nearest_start_date_after_basedate(dec_7)
+    start_date = calculator.nearest_start_date_after_basedate(dec_7)
     self.assertEqual(start_date, self.day_this_year(12, 12))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     from monthdelta import monthdelta
     self.assertEqual(end_date, self.day_this_year(1, 19) + monthdelta(12))
 
@@ -601,9 +601,9 @@ class TestWorkflowDateCalculator(TestCase):
     workflow_one = self._set_date_range_for_workflow(
       workflow_one, self.day_this_year(2,12), self.day_this_year(2,4))
     calculator = WorkflowDateCalculator(workflow_one)
-    start_date = calculator.calc_nearest_start_date_after_basedate(feb_3)
+    start_date = calculator.nearest_start_date_after_basedate(feb_3)
     self.assertEqual(start_date, self.day_this_year(2, 12))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     self.assertEqual(end_date, self.day_this_year(5, 4))
 
     feb_23 = self.day_this_year(2, 23)
@@ -611,9 +611,9 @@ class TestWorkflowDateCalculator(TestCase):
     workflow_one = self._set_date_range_for_workflow(
       workflow_one, self.day_this_year(2,12), self.day_this_year(2,4))
     calculator = WorkflowDateCalculator(workflow_one)
-    start_date = calculator.calc_nearest_start_date_after_basedate(feb_23)
+    start_date = calculator.nearest_start_date_after_basedate(feb_23)
     self.assertEqual(start_date, self.day_this_year(5, 12))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     self.assertEqual(end_date, self.day_this_year(8, 4))
 
   def test_quarterly_workflow_previous_start_date(self):
@@ -623,13 +623,13 @@ class TestWorkflowDateCalculator(TestCase):
     workflow = self._set_date_range_for_workflow(
       workflow, self.day_this_year(1,4), self.day_this_year(2,24))
     calculator = WorkflowDateCalculator(workflow)
-    start_date = calculator.calc_nearest_start_date_after_basedate(oct_21)
+    start_date = calculator.nearest_start_date_after_basedate(oct_21)
     self.assertEqual(start_date, self.day_next_year(1, 4))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     self.assertEqual(end_date, self.day_next_year(2, 24))
-    previous_cycle_start_date = calculator.calc_previous_cycle_start_date_before_basedate(oct_21)
+    previous_cycle_start_date = calculator.previous_cycle_start_date_before_basedate(oct_21)
     self.assertEqual(previous_cycle_start_date, self.day_this_year(10, 4))
-    previous_cycle_end_date = calculator.calc_nearest_end_date_after_start_date(previous_cycle_start_date)
+    previous_cycle_end_date = calculator.nearest_end_date_after_start_date(previous_cycle_start_date)
     self.assertEqual(previous_cycle_end_date, self.day_this_year(11, 24))
 
   # Annual workflow tests
@@ -640,9 +640,9 @@ class TestWorkflowDateCalculator(TestCase):
     workflow_one = self._set_date_range_for_workflow(
       workflow_one, self.day_this_year(5,9), self.day_this_year(7,19))
     calculator = WorkflowDateCalculator(workflow_one)
-    start_date = calculator.calc_nearest_start_date_after_basedate(apr_7)
+    start_date = calculator.nearest_start_date_after_basedate(apr_7)
     self.assertEqual(start_date, self.day_this_year(5, 9))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     self.assertEqual(end_date, self.day_this_year(7, 19))
 
   def test_annual_start_date_before_end_date_before_basedate(self):
@@ -651,10 +651,10 @@ class TestWorkflowDateCalculator(TestCase):
     workflow_one = self._set_date_range_for_workflow(
       workflow_one, self.day_this_year(5,9), self.day_this_year(7,19))
     calculator = WorkflowDateCalculator(workflow_one)
-    start_date = calculator.calc_nearest_start_date_after_basedate(jun_7)
+    start_date = calculator.nearest_start_date_after_basedate(jun_7)
     from monthdelta import monthdelta
     self.assertEqual(start_date, self.day_this_year(5, 9) + monthdelta(12))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     self.assertEqual(end_date, self.day_this_year(7, 19) + monthdelta(12))
 
   def test_annual_start_date_after_end_date_after_basedate(self):
@@ -663,9 +663,9 @@ class TestWorkflowDateCalculator(TestCase):
     workflow_one = self._set_date_range_for_workflow(
       workflow_one, self.day_this_year(7,9), self.day_this_year(5,19))
     calculator = WorkflowDateCalculator(workflow_one)
-    start_date = calculator.calc_nearest_start_date_after_basedate(apr_7)
+    start_date = calculator.nearest_start_date_after_basedate(apr_7)
     self.assertEqual(start_date, self.day_this_year(7, 9))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     from monthdelta import monthdelta
     self.assertEqual(end_date, self.day_this_year(5, 19) + monthdelta(12))
 
@@ -675,13 +675,13 @@ class TestWorkflowDateCalculator(TestCase):
     workflow = self._set_date_range_for_workflow(
       workflow, self.day_this_year(1,4), self.day_this_year(9,24))
     calculator = WorkflowDateCalculator(workflow)
-    start_date = calculator.calc_nearest_start_date_after_basedate(dec_8)
+    start_date = calculator.nearest_start_date_after_basedate(dec_8)
     self.assertEqual(start_date, self.day_next_year(1, 4))
-    end_date = calculator.calc_nearest_end_date_after_start_date(start_date)
+    end_date = calculator.nearest_end_date_after_start_date(start_date)
     self.assertEqual(end_date, self.day_next_year(9, 24))
-    previous_cycle_start_date = calculator.calc_previous_cycle_start_date_before_basedate(dec_8)
+    previous_cycle_start_date = calculator.previous_cycle_start_date_before_basedate(dec_8)
     self.assertEqual(previous_cycle_start_date, self.day_this_year(1, 4))
-    previous_cycle_end_date = calculator.calc_nearest_end_date_after_start_date(previous_cycle_start_date)
+    previous_cycle_end_date = calculator.nearest_end_date_after_start_date(previous_cycle_start_date)
     self.assertEqual(previous_cycle_end_date, self.day_this_year(9, 24))
 
   def test_nearest_workday_to_friday_is_friday(self):

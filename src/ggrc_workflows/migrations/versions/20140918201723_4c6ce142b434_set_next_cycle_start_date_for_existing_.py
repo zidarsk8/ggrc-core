@@ -36,7 +36,7 @@ def upgrade():
     base_date = date.today()
     calculator = WorkflowDateCalculator(workflow)
     workflow.next_cycle_start_date = \
-      calculator.calc_nearest_start_date_after_basedate(base_date)
+      calculator.nearest_start_date_after_basedate(base_date)
     db.session.add(workflow)
 
   # Save
