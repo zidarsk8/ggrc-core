@@ -39,10 +39,10 @@
           Owner
           <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
         </label>
-        <input tabindex="3" class="input-block-level search-icon" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+        <input tabindex="3" class="input-block-level search-icon" name="owners.0.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
         {{/using}}
         {{#using contact=contact}}
-        <input type="text" name="contact.email" data-lookup="Person" class="span9 audit-selector search-icon" value="{{firstnonempty contact.email ''}}">
+        <input type="text" name="contact.email" data-lookup="Person" data-params="Person:is_enabled=1" class="span9 audit-selector search-icon" value="{{firstnonempty contact.email ''}}">
         <i class="grcicon-person-green"></i>
         {{/using}}
       </div>
@@ -91,14 +91,15 @@
   {{/each}}
   {{#if list.length}}
   <li class="tree-footer tree-item tree-item-add">
+    {{#if has_prev_page}}
+    <a href="javascript://" class="view-more-paging">
+      Previous Page
+    </a>
+    {{/if}}
+
     {{#if has_next_page}}
     <a href="javascript://" class="pull-right view-more-paging" data-next="true">
       Next Page
-    </a>
-    {{/if}}
-    {{#if has_prev_page}}
-    <a href="javascript://" class="pull-right view-more-paging">
-      Previous Page
     </a>
     {{/if}}
   </li>

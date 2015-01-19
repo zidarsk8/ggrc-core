@@ -25,6 +25,11 @@
                 <span class="url-link">
                   {{#if instance.email}}{{instance.email}}{{/if}}
                 </span>
+                {{^if instance.is_enabled}}
+                  <span class="user-disabled">
+                    (Disabled)
+                  </span>
+                {{/if}}
               </div>
             </div>
           </div>          
@@ -38,7 +43,7 @@
                   <input type="checkbox" value="{{instance.title}}" checked="checked" disabled="true" class="object-check-single">
                 {{/result_direct_mappings}}
               {{else}}
-                <input type="checkbox" value="{{instance.title}}" class="object-check-single">
+                <input type="checkbox" value="{{instance.title}}" {{^if instance.is_enabled}}disabled="true"{{/if}} class="object-check-single">
               {{/if}}
             </div>
           </div>          

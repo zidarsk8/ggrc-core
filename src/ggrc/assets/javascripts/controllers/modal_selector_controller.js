@@ -896,6 +896,23 @@
                   }
                 }
               }, 50);
+              //load_and_check_all
+              setTimeout(function() {
+                self._load_and_check_all = function(obj) {
+                  var my_obj = obj ? obj : objects;
+                  if (my_obj.length > page_size) {
+                    pager(my_obj.slice(page_size));
+                  }
+                  else {
+                    self._load_and_check_all = null;
+                    self.check_all();
+                  }
+                }
+              }, 100);
+
+              if(self.context.attr('check_all')){
+                self._load_and_check_all(objects);
+              }
             }
           });
         }
@@ -1351,6 +1368,28 @@
       this.refresh_option_list();
     }
 
+    , init_spinner: function(){
+      var spinner,
+          $spinner,
+          $spinner_container;
+
+      spinner = new Spinner({
+          "radius": 4
+        , "length": 4
+        , "width": 2
+        }).spin();
+      $spinner = $(spinner.el);
+      $spinner_container = $('<div class="spinner-loading">loading...</div>');
+      $spinner_container.append($spinner);
+      $spinner.css({
+          display: 'inline-block'
+        , paddingLeft: '20px'
+        , left: '10px'
+        , top: '-4px'
+      });
+      this.element.find('.spinner-place-holder').append($spinner_container);
+    }
+
     , init_menu: function() {
         var menu,
           all_models = [],
@@ -1478,7 +1517,8 @@
           item_selected: false,
           items_selected: 0,
           filter_list: [],
-          display_selection: display_selection ? display_selection : "Objects"
+          display_selection: display_selection ? display_selection : "Objects",
+          check_all: false
           }, this.options));
       }
       return this.context;
@@ -1591,12 +1631,50 @@
         this.update_selected_items(el, ev);
     }
 
-    , "input[type=checkbox].object-check-all click": function(el, ev) {
-      var $el = $(el)
-        , $check = $(this.element).find('.object-check-single:not(:disabled)');
+    , load_and_check_all: function(){
+      if (this._load_and_check_all) {
+          this.init_spinner();
+          this._load_and_check_all();
+      }
+    }
+    , check_all: function(){
+      var $check = this.element.find('.object-check-single:not(:disabled)'),
+          all_checkbox = this.element.find('.object-check-all');
 
-      $check.prop('checked', $el.prop('checked'));
-      this.update_selected_items(el, ev);
+          all_checkbox.prop('checked', true);
+          $check.prop('checked', true);
+          this.element.find('.spinner-loading').remove();
+          all_checkbox.removeAttr('disabled');
+          all_checkbox.removeClass('disabled pending-ajax');
+          this.update_selected_items(all_checkbox);
+    }
+
+    , "input[type=checkbox].object-check-all click": function(el, ev) {
+      if (el.hasClass('disabled')) {
+        return;
+      }
+      //No search result
+      if(this.element.find('.object-check-single').length == 0) {
+        el.prop('checked', false);
+        return;
+      }
+
+      var all_items = this.option_list.length,
+          loaded_items = this.element.find('.object-check-single').length,
+          $check;
+
+      //All items loaded
+      if(loaded_items == all_items) {
+        $check = this.element.find('.object-check-single:not(:disabled)');
+        $check.prop('checked', el.prop('checked'));
+
+        this.update_selected_items(el, ev);
+      } else {
+        this.context.attr('check_all', true);
+        el.attr('disabled', 'disabled');
+        el.addClass('disabled pending-ajax');
+        this.load_and_check_all();
+      }
     }
 
     , reset_selection_count: function(){
@@ -1672,7 +1750,7 @@
                 self.option_list.replace([]);
                 self.option_list.push.apply(self.option_list, options);
                 self._start_pager(options, 20, active_fn, draw_fn);
-                $('.modalSearchButton').removeAttr('disabled');
+                self.element.find('.modalSearchButton').removeAttr('disabled');
               }
             });
         }
@@ -1690,7 +1768,7 @@
               options = search_result.getResultsForType(current_option_model_name);
               self.option_list.push.apply(self.option_list, options);
               self._start_pager(options, 20, active_fn, draw_fn);
-              $('.modalSearchButton').removeAttr('disabled');
+              self.element.find('.modalSearchButton').removeAttr('disabled');
             }
           });
     }
@@ -1698,41 +1776,92 @@
     //Search button click
     , ".modalSearchButton:not([disabled]) click": "triggerModalSearch"
 
-    , triggerModalSearch: function(){
-      $('.modalSearchButton').attr('disabled','disabled');
+    , triggerModalSearch: function() {
+      this.element.find('.modalSearchButton').attr('disabled','disabled');
 
-      var ctx = this.context;
-      var self = this,
+      //Get the selected object value
+      var ctx = this.context,
         selected = this.options.option_model.shortName,
+        self = this,
         loader,
         term = ctx.option_search_term || "",
         filters = [],
-        cancel_filter;
+        cancel_filter,
+        item_selected = this.element.find("select.option-type-selector").val(),
+        search_text = this.element.find('.results-wrap span.info'),
+        all_checkbox = this.element.find('.object-check-all');
+
+
+      //If user has already triggered check_all_button, clear all
+      all_checkbox.prop('checked', false);
+      this.context.attr('check_all', false);
+      all_checkbox.removeAttr('disabled');
+      all_checkbox.removeClass('disabled pending-ajax');
+      this.element.find('.spinner-loading').remove();
+
+      // Remove Search Criteria text
+      if(search_text.length)
+        search_text.hide();
+
+      if(item_selected !== undefined)
+        selected = item_selected;
 
       this.set_option_descriptor(selected);
 
       ctx.filter_list.each(function(filter_obj) {
         if(cancel_filter || !filter_obj.search_filter) {
           cancel_filter = true;
+          self.element.find('.modalSearchButton').removeAttr('disabled');
           return;
         }
-        //push into filter array
-        filters.push (
-          // Must type filter here because the canonical mapping may be polymorphic.
-          new GGRC.ListLoaders.TypeFilteredListLoader(
-            GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected),
-            [selected]
-          ).attach(filter_obj.search_filter)
-        );
+        if(selected === "AllObjects") {//create a multi filter
+          var loaders , local_loaders = [], multi_loader;
+          //Create a multi-list loader
+          loaders = GGRC.Mappings.get_mappings_for(filter_obj.search_filter.constructor.shortName);
+          can.each(loaders, function(loader, name) {
+            if (loader instanceof GGRC.ListLoaders.DirectListLoader
+                || loader instanceof GGRC.ListLoaders.ProxyListLoader) {
+              local_loaders.push(name);
+            }
+          });
 
+          multi_loader = new GGRC.ListLoaders.MultiListLoader(local_loaders).attach(filter_obj.search_filter);
+          filters.push(multi_loader);
+        }
+        else {
+          filters.push(
+            // Must type filter here because the canonical mapping
+            //  may be polymorphic.
+            new GGRC.ListLoaders.TypeFilteredListLoader(
+              GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected),
+              [selected]
+            ).attach(filter_obj.search_filter)
+          );
+        }
       });
-      if (cancel_filter) {
+      if(cancel_filter) {
         //missing search term.
+        this.element.find('.modalSearchButton').removeAttr('disabled');
+        //Also show a message that the search term should not be empty
         return;
       }
 
       if (filters.length > 0) {
-        if(ctx.owner || term){
+        // For All Objects, make sure to load only those objects in the list of all_models
+        // Multilist loader might load objects like g-drive folder and context
+        // The Search list loader will filter those objects
+        if(selected === "AllObjects") {
+            filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
+              return GGRC.Models.Search.search_for_types(
+                term,
+                self.options.all_models,
+                { contact_id: binding.instance && binding.instance.id }
+                ).then(function(mappings) {
+                  return mappings.entries;
+                });
+            }).attach(ctx.owner || {}));
+        }
+        else if(ctx.owner || term){
           filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
               return GGRC.Models.Search.search_for_types(
                 term,
@@ -1743,10 +1872,12 @@
                 });
             }).attach(ctx.owner || {}));
         }
-        //Object selected count and Add selected button should reset. User need to make their selection again
+
+        // Object selected count and Add selected button should reset.
+        // User need to make their selection again
         this.reset_selection_count();
 
-        if (filters.length === 1) {
+        if (filters.length === 1){
           loader = filters[0];
         }
         else {
@@ -1765,20 +1896,21 @@
           var draw_fn = function(options) {
             self.insert_options(options);
           };
+
           self.option_list.push.apply(self.option_list, options);
-          $('.modalSearchButton').removeAttr('disabled');
+          self.element.find('.modalSearchButton').removeAttr('disabled');
           self._start_pager(can.map(options, function(op) {
               return op.instance;
             }), 20, active_fn, draw_fn);
         });
-
-      } //end filters.length > 0
-      else{
+      }
+      else {
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
         this.reset_selection_count();
 
-        // With no mappings specified, just do a general search on the type selected.
+        // With no mappings specified, just do a general search
+        //  on the type selected.
         this.last_loader = null;
         this.options.option_search_term = term;
         this.refresh_option_list();
@@ -1972,11 +2104,15 @@
     }
 
     , autocomplete_select : function(el, ev, ui) {
-      setTimeout(function(){
-        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
-        el.trigger('change');
-      }, 0);
-      this.context.attr(el.attr("name"), ui.item);
+        var name = el.attr("name");
+        // we (ab)use databinding to make the input field change for us
+        // doing it three times like this ensures stability
+
+        // handle emptying field and choosing same suggestion
+        this.context.attr(name, null);
+        // the first change sets to null, 2nd works
+        this.context.attr(name, ui.item);
+        this.context.attr(name, ui.item);
     }
 
   });
@@ -2136,127 +2272,6 @@
     , " modal:success" : function(el, ev, data, options) {
       //no op
       this.options.$trigger.trigger("modal:success", [data, options]);
-    }
-
-    , triggerModalSearch: function(){
-      // Remove Search Criteria text
-      $('.results-wrap span.info').hide();
-      var ctx = this.context;
-
-      //Get the selected object value
-      var selected = $("select.option-type-selector").val(),
-        self = this,
-        loader,
-        term = ctx.option_search_term || "",
-        filters = [],
-        cancel_filter;
-
-      this.set_option_descriptor(selected);
-
-      ctx.filter_list.each(function(filter_obj) {
-        if(cancel_filter || !filter_obj.search_filter) {
-          cancel_filter = true;
-          return;
-        }
-        if(selected === "AllObjects") {//create a multi filter
-          var loaders , local_loaders = [], multi_loader;
-          //Create a multi-list loader
-          loaders = GGRC.Mappings.get_mappings_for(filter_obj.search_filter.constructor.shortName);
-          can.each(loaders, function(loader, name) {
-            if (loader instanceof GGRC.ListLoaders.DirectListLoader
-                || loader instanceof GGRC.ListLoaders.ProxyListLoader) {
-              local_loaders.push(name);
-            }
-          });
-
-          multi_loader = new GGRC.ListLoaders.MultiListLoader(local_loaders).attach(filter_obj.search_filter);
-          filters.push(multi_loader);
-        }
-        else {
-          filters.push(
-            // Must type filter here because the canonical mapping
-            //  may be polymorphic.
-            new GGRC.ListLoaders.TypeFilteredListLoader(
-              GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected),
-              [selected]
-            ).attach(filter_obj.search_filter)
-          );
-        }
-      });
-      if(cancel_filter) {
-        //missing search term.
-        return;
-      }
-
-      if (filters.length > 0) {
-        // For All Objects, make sure to load only those objects in the list of all_models
-        // Multilist loader might load objects like g-drive folder and context
-        // The Search list loader will filter those objects
-        if(selected === "AllObjects") {
-            filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
-              return GGRC.Models.Search.search_for_types(
-                term,
-                self.options.all_models,
-                { contact_id: binding.instance && binding.instance.id }
-                ).then(function(mappings) {
-                  return mappings.entries;
-                });
-            }).attach(ctx.owner || {}));
-        }
-        else if(ctx.owner || term){
-          filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
-              return GGRC.Models.Search.search_for_types(
-                term,
-                [selected],
-                { contact_id: binding.instance && binding.instance.id }
-                ).then(function(mappings) {
-                  return mappings.entries;
-                });
-            }).attach(ctx.owner || {}));
-        }
-
-        // Object selected count and Add selected button should reset.
-        // User need to make their selection again
-        this.reset_selection_count();
-
-        if (filters.length === 1){
-          loader = filters[0];
-        }
-        else {
-          loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
-        }
-
-        this.last_loader = loader;
-        self.option_list.replace([]);
-        self.element.find('.option_column ul.new-tree').empty();
-
-        loader.refresh_stubs().then(function(options) {
-          var active_fn = function() {
-            return self.element && self.last_loader === loader;
-          };
-
-          var draw_fn = function(options) {
-            self.insert_options(options);
-          };
-
-          self.option_list.push.apply(self.option_list, options);
-          self._start_pager(can.map(options, function(op) {
-              return op.instance;
-            }), 20, active_fn, draw_fn);
-        });
-      }
-      else {
-        //Object selected count and Add selected button should reset.
-        //User need to make their selection again
-        this.reset_selection_count();
-
-        // With no mappings specified, just do a general search
-        //  on the type selected.
-        this.last_loader = null;
-        this.options.option_search_term = term;
-        this.refresh_option_list();
-        this.constructor.last_option_search_term = term;
-      }
     }
 
   });

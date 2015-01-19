@@ -57,23 +57,32 @@ class TaskGroup(
 
     target = self.copy_into(_other, columns, **kwargs)
 
-    for task_group_object in self.task_group_objects:
-      target.task_group_objects.append(
-          task_group_object.copy(
-            task_group=target,
-            context=target.context,
-            ))
+    if kwargs.get('clone_objects', False):
+      self.copy_objects(target, **kwargs)
+
+    if kwargs.get('clone_tasks', False):
+      self.copy_tasks(target, **kwargs)
 
     return target
+
+  def copy_objects(self, target, **kwargs):
+    for task_group_object in self.task_group_objects:
+      target.task_group_objects.append(
+        task_group_object.copy(
+            task_group=target,
+            context=target.context,
+        ))
+
+    return target
+
 
   def copy_tasks(self, target, **kwargs):
     for task_group_task in self.task_group_tasks:
       target.task_group_tasks.append(
         task_group_task.copy(None,
           task_group=target,
-          context=target.context, 
+          context=target.context,
           clone_people=kwargs.get("clone_people", False),
           ))
 
     return target
-

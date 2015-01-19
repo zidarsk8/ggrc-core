@@ -2,7 +2,7 @@
 """Ensure all Audit Leads have Program Editor role or better
 
 Revision ID: 51e046bb002
-Revises: 5156e813935f
+Revises: 581a9621fac1
 Create Date: 2014-12-17 23:56:26.323023
 
 """
@@ -19,7 +19,7 @@ def upgrade():
 
     #1: remove programreader roles for assignees (they need to be program editor)
     op.execute("""
-      DELETE ur 
+      DELETE ur
       FROM user_roles ur, contexts c, audits a, roles r, programs p
       WHERE a.program_id=p.id AND p.context_id=c.id AND ur.context_id=c.id AND ur.role_id=r.id
       AND a.contact_id=ur.person_id

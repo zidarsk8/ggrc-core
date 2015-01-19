@@ -261,7 +261,7 @@
               <ggrc-quick-add parent_instance="instance" join_model="UserRole">
                 {{#prune_context}}
                 <div class="objective-selector field-wrap">
-                  <input tabindex="3" type="text" name="instance" data-lookup="Person" null-if-empty="true" class="search-icon" placeholder="Add Auditor" {{autocomplete_select}} value="{{instance.email}}">
+                  <input tabindex="3" type="text" name="instance" data-lookup="Person" data-params="Person:is_enabled=1" null-if-empty="true" class="search-icon" placeholder="Add Auditor" {{autocomplete_select}} value="{{instance.email}}">
                   <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
          
                   <a href="javascript://" class="btn btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>+Add</a>

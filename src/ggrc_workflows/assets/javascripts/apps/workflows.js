@@ -133,7 +133,8 @@
                    && binding.instance.attr("role")
                    && binding.instance.role.reify().attr("name") === "WorkflowOwner";
           }),
-          owners: Cross("owner_authorizations", "person")
+          owners: Cross("owner_authorizations", "person"),
+          orphaned_objects: Multi(["cycles", "task_groups", "tasks", "current_task_groups", "current_tasks", "folders"])
         },
 
         Cycle: {

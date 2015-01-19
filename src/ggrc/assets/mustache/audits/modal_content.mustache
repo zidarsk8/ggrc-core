@@ -5,48 +5,18 @@
   {{> /static/mustache/base_objects/form_restore.mustache}}
 
   {{#if new_object_form}}
-  {{#if object_params.program}}
-    <div class="row-fluid hidden">
+  {{^if object_params.program}}
+    <div class="row-fluid">
       <div class="span6">
         <div class="spacing-bottom">
           <label>
             Program
           </label>
-          <select class="input-block-level" name="program.id">
-            <option value="{{object_params.program.id}}">{{object_params.program.title}}</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  {{else}}
-    <div class="row-fluid">
-      <div class="span6">
-        <div class="spacing-bottom">
-          <label {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }' 'display:inline-block; top: -5px; margin-left: 5px;' }}>
-            Program
-          </label>
-          <select class="input-block-level" name="program.id" tabindex="1" autofocus>
-            {{#all 'Program' '{ "context_id__null" : false, "require_permission": "update" }'}}
-            <option value="{{id}}">{{title}}</option>
-            {{/all}}
-          </select>
+          <input type="text" class="input-block-level" name="program.id" tabindex="1" {{autocomplete_select}} data-lookup="Program" autofocus/>
         </div>
       </div>
     </div>
   {{/if}}
-  {{else}}
-    <div class="row-fluid hidden">
-      <div class="span6">
-        <div class="spacing-bottom">
-          <label>
-            Program
-          </label>
-          <select class="input-block-level" name="program.id">
-            <option value="{{program.id}}">{{program.title}}</option>
-          </select>
-        </div>
-      </div>
-    </div>
   {{/if}}
   <div class="row-fluid">
     <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
@@ -74,7 +44,7 @@
       <i class="grcicon-person-green pull-left icon-field"></i>
       <div class="objective-selector">
         {{#using contact=instance.contact}}
-          <input tabindex="3" type="text" name="contact.email" data-lookup="Person" class="span10 audit-selector search-icon" placeholder="Enter text to search for Internal Audit Lead" value="{{firstnonempty contact.email ''}}">
+          <input tabindex="3" type="text" name="contact.email" data-lookup="Person" data-params="Person:is_enabled=1" class="span10 audit-selector search-icon" placeholder="Enter text to search for Internal Audit Lead" value="{{firstnonempty contact.email ''}}">
         {{/using}}
       </div>
     </div>
@@ -189,7 +159,7 @@
             {{#toggle show_new_object_form}}
               {{#prune_context}}
                 <div class="span12 objective-selector field-wrap">
-                  <input tabindex="11" type="text" data-lookup="Person" null-if-empty="true" class="search-icon" placeholder="Enter text to search for Auditor" {{autocomplete_select}} value="{{instance.email}}">
+                  <input tabindex="11" type="text" data-lookup="Person" data-params="Person:is_enabled=1" null-if-empty="true" class="search-icon" placeholder="Enter text to search for Auditor" {{autocomplete_select}} value="{{instance.email}}">
                   <a class="remove-field" href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
          
                 </div>

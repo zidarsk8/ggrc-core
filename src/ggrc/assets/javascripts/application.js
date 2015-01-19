@@ -1194,7 +1194,7 @@ jQuery(function($){
         minLength: 0,
 
         source: function(request, response) {
-          // Search for the people based on the term
+          // Search based on the term
           var query = request.term || '',
               queue = new RefreshQueue(),
               that = this,
@@ -1273,12 +1273,8 @@ jQuery(function($){
             .search_for_types(
               request.term || '',
               this.options.searchtypes,
-              {
-              // FIXME: Remove or figure out when this is necessary.
-              //{
-              //  __permission_type: 'create'
-              //  , __permission_model: 'Object' + $that.data("lookup")
-              })
+              this.options.search_params
+            )
             .then(function(search_result) {
               var objects = [];
 
@@ -1299,7 +1295,7 @@ jQuery(function($){
           if(ui.item) {
             return ctl.autocomplete_select($(this), ev, ui);
           } else {
-            original_event = event;
+            original_event = ev;
             $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
               ctl.autocomplete_select($(that), original_event, { item : new_obj });
               $(that).trigger("modal:success", new_obj);
@@ -1331,9 +1327,11 @@ jQuery(function($){
             $that = $(this.element),
             base_search = $that.data("lookup"),
             from_list = $that.data("from-list"),
+            search_params = $that.data("params"),
             searchtypes;
 
         this._super.apply(this, arguments);
+        this.options.search_params = {extra_params: search_params};
 
         $that.data("autocomplete-widget-name", this.widgetFullName);
 
@@ -1527,3 +1525,12 @@ can.Model.validateNonBlank = can.Map.validateNonBlank = function(attrNames, opti
 can.reduce ||
   (can.reduce = function(a, f, i) { if(a==null) return null; return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]) });
 })(window.jQuery);
+
+
+// Turn camelSpace strings into Camel Space strings
+can.spaceCamelCase = function (string) {
+    return can.underscore(string)
+        .split("_")
+        .map(can.capitalize)
+        .join(" ");
+};

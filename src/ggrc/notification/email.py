@@ -314,7 +314,7 @@ class EmailDigestNotification(EmailNotification):
                 self.priority_mapping[notif_pri]
                 )
             else:
-              content[key][notif_pri]="<p>Items not classified<ul>"
+              content[key][notif_pri]="<p>Other tasks<ul>"
           content[key][notif_pri]="{} <li>{}</li>".format(
             content[key][notif_pri],
             notify_recipient.content

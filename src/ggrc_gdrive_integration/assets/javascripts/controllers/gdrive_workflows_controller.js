@@ -941,6 +941,7 @@ can.Component.extend({
               var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
                 .setMimeTypes(["application/vnd.google-apps.folder"])
                 .setSelectFolderEnabled(true);
+              picker.setTitle('Select folder');
               picker.addView(view);
             }
             else{
@@ -955,20 +956,29 @@ can.Component.extend({
             }
             picker = picker.build();
             picker.setVisible(true);
+            // use undocumented fu to make the Picker be "modal" - https://b2.corp.google.com/issues/18628239
+            // this is the "mask" displayed behind the dialog box div
+            $('div.picker-dialog-bg').css('zIndex', 2000);  // there are multiple divs of that sort
+            // and this is the dialog box modal div, which we must display on top of our modal, if any
             picker.A.style.zIndex = 2001; // our modals start with 1050
           });
         }
 
         function pickerCallback(data) {
 
-          var files, models,
+          var files, model,
               PICKED = google.picker.Action.PICKED,
               ACTION = google.picker.Response.ACTION,
               DOCUMENTS = google.picker.Response.DOCUMENTS,
               CANCEL = google.picker.Action.CANCEL;
 
           if (data[ACTION] == PICKED) {
-            files = CMS.Models.GDriveFolder.models(data[DOCUMENTS]);
+            if(el.data('type') === 'folders') {
+              model = CMS.Models.GDriveFolder;
+            } else {
+              model = CMS.Mdoels.GDriveFile;
+            }
+            files = model.models(data[DOCUMENTS]);
             el.trigger('picked', {
               files: files
             });
@@ -984,6 +994,17 @@ can.Component.extend({
           that = this,
           files = data.files || [],
           scope = this.scope;
+
+      if(el.data("type") === "folders" 
+         && files.length 
+         && files[0].mimeType !== "application/vnd.google-apps.folder"
+      ) {
+        $(document.body).trigger("ajax:flash", {
+          error: "ERROR: Something other than a Drive folder was chosen for a folder slot.  Please choose a folder."
+        });
+        return;
+      }
+
 
       this.scope.attr('_folder_change_pending', true);
       if (el.data('replace')) {
