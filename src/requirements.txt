@@ -29,3 +29,4 @@ httplib2==0.8
 # Flask-SQLAlchemy must be last - it somehow mangles `distribute` / `setuptools`
 Flask-SQLAlchemy==1.0
 python-dateutil==2.2
+MonthDelta==1.0b
