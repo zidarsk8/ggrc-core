@@ -3,16 +3,16 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-import csv, _csv
-import chardet
-import os
-from ggrc.models import Directive, Section
+import csv
+import _csv
 from StringIO import StringIO
+
 from flask import current_app
-from ggrc import db
+
+import chardet
+from ggrc.models import Directive
 from .common import ImportException
-from ggrc.converters.sections import SectionsConverter
-from ggrc.converters.controls import ControlsConverter
+
 
 def handle_csv_import(converter_class, filepath, **options):
   rows = []
