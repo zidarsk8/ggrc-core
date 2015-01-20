@@ -5,23 +5,13 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-{{#instance}}
-  <section class="info">
+{{#instance}} 
+  
+  {{#is_dashboard}}
+    {{> /static/mustache/dashboard/info/info.mustache}}
 
-    {{#is_dashboard}}
-      <div class="details-wrap">
-        <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-          <li>
-            <a href="/people/{{instance.id}}">
-              View Profile Page
-              <i class="grcicon-goto"></i>
-            </a>
-          </li>
-        </ul>
-      </div>
-    {{/is_dashboard}}
-
+  {{else}}
+  <section class="info"> 
     <div class="tier-content">
       {{#name}}
       <div class="row-fluid wrap-row">
@@ -63,15 +53,16 @@
 
   </section>
 
-  <div class="info-widget-footer">
-    <p>
-      <small>
-      <em>
-        Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
-          &nbsp;&nbsp;&nbsp;&nbsp;
-        Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
-      </em>
-      </small>
-    </p>
-  </div>
+    <div class="info-widget-footer">
+      <p>
+        <small>
+        <em>
+          Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+        </em>
+        </small>
+      </p>
+    </div>
+  {{/is_dashboard}}
 {{/instance}}
