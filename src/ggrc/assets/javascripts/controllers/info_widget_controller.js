@@ -129,6 +129,8 @@ can.Control("GGRC.Controllers.InfoWidget", {
         task_count = 0,
         finished = 0,
         in_progress = 0,
+        declined = 0,
+        verified = 0, 
         assigned = 0,
         over_due = 0,
         today = new Date(),
@@ -150,6 +152,8 @@ can.Control("GGRC.Controllers.InfoWidget", {
 
           if (data.status === 'Finished')
             finished++;
+          else if (data.status === 'Verified')
+            verified++;
           else {
             if (end_date.getTime() < today.getTime()) {
               over_due++;
@@ -157,6 +161,8 @@ can.Control("GGRC.Controllers.InfoWidget", {
             }
             else if (data.status === 'InProgress')
               in_progress++;
+            else if (data.status === 'Declined')
+              declined++;
             else
               assigned++;
           }
@@ -168,6 +174,10 @@ can.Control("GGRC.Controllers.InfoWidget", {
           task_data.finished_percentage = Math.floor((finished * 100) / task_count); //ignore the decimal part
           task_data.in_progress = in_progress;
           task_data.in_progress_percentage = Math.floor((in_progress * 100) / task_count);
+          task_data.verified = verified;
+          task_data.verified_percentage = Math.floor((verified * 100) / task_count);
+          task_data.declined = declined;
+          task_data.declined_percentage = Math.floor((declined * 100) / task_count);
           task_data.over_due = over_due;
           task_data.over_due_percentage = Math.floor((over_due * 100) / task_count);
           task_data.assigned = assigned;

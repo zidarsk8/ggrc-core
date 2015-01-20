@@ -32,11 +32,17 @@
                 {{#if ins.task_data.finished_percentage}}
                   <div class="bar bar-verify" style="width: {{ins.task_data.finished_percentage}}%;" rel="tooltip" data-original-title="Verified {{ins.task_data.finished_percentage}}%"></div>
                 {{/if}}
+                {{#if ins.task_data.verified_percentage}}
+                  <div class="bar bar-verify" style="width: {{ins.task_data.verified_percentage}}%;" rel="tooltip" data-original-title="Verified {{ins.task_data.verified_percentage}}%"></div>
+                {{/if}}
                 {{#if ins.task_data.in_progress_percentage}}
                   <div class="bar bar-progress" style="width: {{ins.task_data.in_progress_percentage}}%;" rel="tooltip" data-original-title="In Progress {{ins.task_data.in_progress_percentage}}%"></div>
                 {{/if}}
                 {{#if ins.task_data.assigned_percentage}}
                   <div class="bar bar-pending" style="width: {{ins.task_data.assigned_percentage}}%;" rel="tooltip" data-original-title="Pending {{ins.task_data.assigned_percentage}}%"></div>
+                {{/if}}
+                {{#if ins.task_data.declined_percentage}}
+                  <div class="bar bar-decline" style="width: {{ins.task_data.declined_percentage}}%;" rel="tooltip" data-original-title="Declined {{ins.task_data.declined_percentage}}%"></div>
                 {{/if}}
                 {{#if ins.task_data.over_due_percentage}}
                   <div class="bar bar-warning" style="width: {{ins.task_data.over_due_percentage}}%;" rel="tooltip" data-original-title="Overdue {{ins.task_data.over_due_percentage}}%"></div>
@@ -66,130 +72,5 @@
     </li>
   {{/using}}
   {{/each}}
-
-  <!--li class="tree-item">
-    <div class="item-wrap">
-      <div class="row-fluid">
-        <div class="span5">
-          <div class="item-data">
-            <div class="tree-title-area">
-              <div class="oneline">
-                <a href="#">Google Fiber EEO</a>
-                <ul class="item-util">
-                  <li>
-                    Owned by <a href="#">Chris Mizera</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="span5">
-          <div class="tree-progress">
-            <div class="progress custom-progress">
-              <div class="bar bar-progress" style="width: 28%;" rel="tooltip" data-original-title="In Progress"></div>
-              <div class="bar bar-pending" style="width: 28%;" rel="tooltip" data-original-title="Pending"></div>
-            </div>
-            <ul class="item-util">
-              <li>
-                33 tasks in total / 0% verified
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="span2">
-          <div class="right">
-            Due in 40 days
-            <ul class="item-util">
-              <li>12/13/2014</li>
-            <ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </li>
-  <li class="tree-item">
-    <div class="item-wrap">
-      <div class="row-fluid">
-        <div class="span5">
-          <div class="item-data">
-            <div class="tree-title-area">
-              <div class="oneline">
-                <a href="#">Vegan before 6 implementation</a>
-                <ul class="item-util">
-                  <li>
-                    Owned by <a href="#">Stock Market</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="span5">
-          <div class="tree-progress">
-            <div class="progress">
-              <div class="bar bar-pending" style="width: 48%;" rel="tooltip" data-original-title="Pending"></div>
-            </div>
-            <ul class="item-util">
-              <li>
-                10 tasks in total / 0% verified
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="span2">
-          <div class="right">
-            Due in 15 days
-            <ul class="item-util">
-              <li>11/03/2014</li>
-            <ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </li>
-  <li class="tree-item">
-    <div class="item-wrap">
-      <div class="row-fluid">
-        <div class="span5">
-          <div class="item-data">
-            <div class="tree-title-area">
-              <div class="oneline">
-                <a href="#">Food quality and variety assessment</a>
-                <ul class="item-util">
-                  <li>
-                    Owned by <a href="#">Alice Wonderland</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="span5">
-          <div class="tree-progress">
-            <div class="progress custom-progress">
-              <div class="bar bar-verify" style="width: 10%;" rel="tooltip" data-original-title="Verified"></div>
-              <div class="bar bar-progress" style="width: 40%;" rel="tooltip" data-original-title="In progress"></div>
-              <div class="bar bar-pending" style="width: 10%;" rel="tooltip" data-original-title="Pending"></div>
-              <div class="bar bar-warning" style="width: 15%;" rel="tooltip" data-original-title="Overdue"></div>
-            </div>
-            <ul class="item-util">
-              <li>
-                40 tasks in total / 10% verified
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="span2">
-          <div class="right">
-            <span class="overdue">Overdue</span>
-            <ul class="item-util">
-              <li>11/03/2012</li>
-            <ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </li -->
 </ul><!-- tree-structure end -->
 </section><!-- Widget content end -->

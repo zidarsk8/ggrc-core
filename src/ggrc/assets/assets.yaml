@@ -133,6 +133,7 @@ dashboard-js-template-files:
   - dashboard/info/get_started.mustache
   - dashboard/info/workflow_progress.mustache
   - dashboard/info/my_tasks.mustache
+  - dashboard/info/task_filters.mustache
   - dashboard/info/wf_owner.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache
