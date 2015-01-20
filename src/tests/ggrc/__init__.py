@@ -4,6 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from flask.ext.testing import TestCase as BaseTestCase
+import sys, os
 from ggrc import db
 from ggrc.app import app
 from ggrc.models import create_db, drop_db
