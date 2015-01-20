@@ -32,6 +32,7 @@ install:
   - npm install karma karma-jasmine jasmine-core phantomjs karma-chrome-launcher
 before_script:
   - "source bin/init_env"
+  - db_migrate_travis
   - build_compass
   - build_assets
 script:
