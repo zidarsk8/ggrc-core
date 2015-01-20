@@ -5,15 +5,16 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-<!--section class="info"-->
-  {{#instance}}  
-    {{#is_dashboard}}
-      {{> /static/mustache/dashboard/info/info.mustache}}
+{{#instance}} 
+  
+  {{#is_dashboard}}
+    {{> /static/mustache/dashboard/info/info.mustache}}
 
-    {{else}}
-    <section class="info">
+  {{else}}
+  <section class="info"> 
+    <div class="tier-content">
       {{#name}}
-      <div class="row-fluid">
+      <div class="row-fluid wrap-row">
         <div class="span12">
           <h6>Name</h6>
           <h3>{{name}}
@@ -26,8 +27,9 @@
         </div>
       </div>
       {{/name}}
+
       {{#email}}
-      <div class="row-fluid">
+      <div class="row-fluid wrap-row">
         <div class="span12">
           <h6>Email</h6>
           <p>
@@ -36,8 +38,9 @@
         </div>
       </div>
       {{/email}}
+
       {{#company}}
-      <div class="row-fluid">
+      <div class="row-fluid wrap-row">
         <div class="span12">
           <h6>Company</h6>
             <p>
@@ -46,21 +49,20 @@
         </div>
       </div>
       {{/company}}
+    </div><!-- tier-content end -->
 
-      <div class="info-widget-footer">
-        <p>
-          <small>
-          <em>
-            Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
-            <br>
-            Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
-          </em>
-          </small>
-        </p>
-      </div>
-    </section>
-    {{/is_dashboard}}
-  {{/instance}}
-<!--/section-->
+  </section>
 
-
+    <div class="info-widget-footer">
+      <p>
+        <small>
+        <em>
+          Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+        </em>
+        </small>
+      </p>
+    </div>
+  {{/is_dashboard}}
+{{/instance}}

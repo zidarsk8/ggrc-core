@@ -39,22 +39,8 @@ Vagrant.configure("2") do |config|
   #
   # View the documentation for the provider you're using for more
   # information on available options.
-
-  # Enable provisioning with chef solo, specifying a cookbooks path, roles
-  # path, and data_bags path (all relative to this Vagrantfile), and adding
-  # some recipes and/or roles.
-  #
-  config.vm.provision :chef_solo do |chef|
-    chef.json = {
-      "mysql" => {
-        "server_root_password" => "root",
-        "server_repl_password" => "root",
-        "server_debian_password" => "root",
-        "allow_remote_root" => true,
-        "bind_address" => "0.0.0.0",
-      }
-    }
-    chef.cookbooks_path = ["cookbooks","site-cookbooks"]
-    chef.add_recipe "ggrc"
+  config.vm.provision :ansible do |ansible|
+    ansible.playbook = "provision/site.yml"
+    ansible.host_key_checking = false
   end
 end

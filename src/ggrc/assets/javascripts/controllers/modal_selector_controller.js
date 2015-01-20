@@ -896,6 +896,23 @@
                   }
                 }
               }, 50);
+              //load_and_check_all
+              setTimeout(function() {
+                self._load_and_check_all = function(obj) {
+                  var my_obj = obj ? obj : objects;
+                  if (my_obj.length > page_size) {
+                    pager(my_obj.slice(page_size));
+                  }
+                  else {
+                    self._load_and_check_all = null;
+                    self.check_all();
+                  }
+                }
+              }, 100);
+
+              if(self.context.attr('check_all')){
+                self._load_and_check_all(objects);
+              }
             }
           });
         }
@@ -1351,6 +1368,28 @@
       this.refresh_option_list();
     }
 
+    , init_spinner: function(){
+      var spinner,
+          $spinner,
+          $spinner_container;
+
+      spinner = new Spinner({
+          "radius": 4
+        , "length": 4
+        , "width": 2
+        }).spin();
+      $spinner = $(spinner.el);
+      $spinner_container = $('<div class="spinner-loading">loading...</div>');
+      $spinner_container.append($spinner);
+      $spinner.css({
+          display: 'inline-block'
+        , paddingLeft: '20px'
+        , left: '10px'
+        , top: '-4px'
+      });
+      this.element.find('.spinner-place-holder').append($spinner_container);
+    }
+
     , init_menu: function() {
         var menu,
           all_models = [],
@@ -1478,7 +1517,8 @@
           item_selected: false,
           items_selected: 0,
           filter_list: [],
-          display_selection: display_selection ? display_selection : "Objects"
+          display_selection: display_selection ? display_selection : "Objects",
+          check_all: false
           }, this.options));
       }
       return this.context;
@@ -1591,12 +1631,50 @@
         this.update_selected_items(el, ev);
     }
 
-    , "input[type=checkbox].object-check-all click": function(el, ev) {
-      var $el = $(el)
-        , $check = $(this.element).find('.object-check-single:not(:disabled)');
+    , load_and_check_all: function(){
+      if (this._load_and_check_all) {
+          this.init_spinner();
+          this._load_and_check_all();
+      }
+    }
+    , check_all: function(){
+      var $check = this.element.find('.object-check-single:not(:disabled)'),
+          all_checkbox = this.element.find('.object-check-all');
 
-      $check.prop('checked', $el.prop('checked'));
-      this.update_selected_items(el, ev);
+          all_checkbox.prop('checked', true);
+          $check.prop('checked', true);
+          this.element.find('.spinner-loading').remove();
+          all_checkbox.removeAttr('disabled');
+          all_checkbox.removeClass('disabled pending-ajax');
+          this.update_selected_items(all_checkbox);
+    }
+
+    , "input[type=checkbox].object-check-all click": function(el, ev) {
+      if (el.hasClass('disabled')) {
+        return;
+      }
+      //No search result
+      if(this.element.find('.object-check-single').length == 0) {
+        el.prop('checked', false);
+        return;
+      }
+
+      var all_items = this.option_list.length,
+          loaded_items = this.element.find('.object-check-single').length,
+          $check;
+
+      //All items loaded
+      if(loaded_items == all_items) {
+        $check = this.element.find('.object-check-single:not(:disabled)');
+        $check.prop('checked', el.prop('checked'));
+
+        this.update_selected_items(el, ev);
+      } else {
+        this.context.attr('check_all', true);
+        el.attr('disabled', 'disabled');
+        el.addClass('disabled pending-ajax');
+        this.load_and_check_all();
+      }
     }
 
     , reset_selection_count: function(){
@@ -1710,7 +1788,16 @@
         filters = [],
         cancel_filter,
         item_selected = this.element.find("select.option-type-selector").val(),
-        search_text = this.element.find('.results-wrap span.info');
+        search_text = this.element.find('.results-wrap span.info'),
+        all_checkbox = this.element.find('.object-check-all');
+
+
+      //If user has already triggered check_all_button, clear all
+      all_checkbox.prop('checked', false);
+      this.context.attr('check_all', false);
+      all_checkbox.removeAttr('disabled');
+      all_checkbox.removeClass('disabled pending-ajax');
+      this.element.find('.spinner-loading').remove();
 
       // Remove Search Criteria text
       if(search_text.length)
@@ -1977,7 +2064,7 @@
 
       var that = this,
         joins = can.map(this.sync_selected_options(), function(option) {
-          var join, context_object, model, descriptor
+          var join, context_object, model, descriptor,
               context_id = null
               ;
 
@@ -2017,11 +2104,15 @@
     }
 
     , autocomplete_select : function(el, ev, ui) {
-      setTimeout(function(){
-        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
-        el.trigger('change');
-      }, 0);
-      this.context.attr(el.attr("name"), ui.item);
+        var name = el.attr("name");
+        // we (ab)use databinding to make the input field change for us
+        // doing it three times like this ensures stability
+
+        // handle emptying field and choosing same suggestion
+        this.context.attr(name, null);
+        // the first change sets to null, 2nd works
+        this.context.attr(name, ui.item);
+        this.context.attr(name, ui.item);
     }
 
   });

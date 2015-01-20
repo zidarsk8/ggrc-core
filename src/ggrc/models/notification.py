@@ -8,9 +8,10 @@
 """
 
 from sqlalchemy.orm import backref
+from sqlalchemy import event
 
 from ggrc.app import db
-from .mixins import Base, Stateful 
+from .mixins import Base, Stateful
 
 
 class NotificationConfig(Base, db.Model):
@@ -49,16 +50,15 @@ class Notification(Base, db.Model):
   notification_object = db.relationship(
       'NotificationObject', backref='notification', cascade='all, delete-orphan')
 
-
 class NotificationObject(Base, Stateful, db.Model):
   __tablename__ = 'notification_objects'
 
   VALID_STATES = [
-    None, 
-    "InProgress", 
-    "Assigned", 
-    "Finished", 
-    "Declined", 
+    None,
+    "InProgress",
+    "Assigned",
+    "Finished",
+    "Declined",
     "Verified",
   ]
 

@@ -418,8 +418,8 @@ function resize_areas() {
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
-  objectWidth = winWidth - internavWidth - barWidth; //takeout lhs width, new ui
-  headerWidth = winWidth - 5;// - lhsWidth;  new ui resize
+  objectWidth = winWidth;
+  headerWidth = winWidth - 40;// - lhsWidth;  new ui resize
 
   $lhsHolder.css("height",lhsHeight);
   $bar.css("height",lhsHeight);

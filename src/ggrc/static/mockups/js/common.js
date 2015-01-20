@@ -807,6 +807,15 @@ $(document).ready(function(){
   $(".nav-trigger").on("click", topNav);
   $(".lhn-trigger").on("click", lhnAnimate);
 
+  /*
+  TO-DO: when clicking everywhere else except inside lhn if lhn is active it should be closed.
+  $(document).on('click', function(event) {
+    if (!$(event.target).closest(".lhs-holder.active").length) {
+      $(".lhs-holder").removeClass("active").animate({left: "-240"}, 800, 'easeOutExpo').css("width", "240px");
+    }
+  });
+  */
+
   // top nav dropdown position
   function dropdownPosition() {
     var $this = $(this),
@@ -869,6 +878,80 @@ $(document).ready(function(){
     } else {
       $all_items.removeClass("active");
       $this_item.addClass("active");
+    }
+  });
+
+  // Workflow 2nd tier show/hide task-group, tasks and objects
+  $("#taskGroupPinSelect").on("click", function(e) {
+    $("#taskGroupPin").show();
+    $("#taskPin").hide();
+    $("#objectPin").hide();
+  });
+
+  $("#taskPinSelect").on("click", function(e) {
+    $("#taskGroupPin").hide();
+    $("#taskPin").show();
+    $("#objectPin").hide();
+  });
+
+  $("#objectPinSelect").on("click", function(e) {
+    $("#taskGroupPin").hide();
+    $("#taskPin").hide();
+    $("#objectPin").show();
+  });
+
+  // Audit 2nd tier show/hide requests, responses and objects
+  $("#auditRequestSelect").on("click", function(e) {
+    $("#auditRequestPin").show();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").hide();
+    $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").hide();
+  });
+
+  $("#auditResponseSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").show();
+    $("#auditObjectPin").hide();
+    $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").hide();
+  });
+
+  $("#auditObjectSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").show();
+    $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").hide();
+  });
+
+  $("#auditEvidenceSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").hide();
+    $("#auditEvidencePin").show();
+    $("#auditMeetingPin").hide();
+  });
+
+  $("#auditMeetingSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").hide();
+    $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").show();
+  });
+
+  // show/hide add auditor in audit info widget
+  $("#auditorFiledWrapTrigger").on("click", function() {
+    var $this = $(this),
+        $field_wrap = $this.closest(".wrap-row").find("#auditorFiledWrap");
+
+    if($this.hasClass("active")) {
+      $this.removeClass("active").show();
+      $field_wrap.slideUp();
+    } else {
+      $this.addClass("active").hide();
+      $field_wrap.slideDown();
     }
   });
 

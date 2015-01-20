@@ -59,7 +59,7 @@
     @include clearfix();
     @include reset-list();
     float:right;
-    margin-right: 10px;
+    margin-right: 30px;
     li {
       float:left;
       color: $black;
@@ -229,7 +229,7 @@
     display: block;
     height: 15px;
     width: 16px;
-    margin: 16px 20px 0 24px;
+    margin: 16px 19px 0 40px;
     padding: 0;
     border: none;
     background: none;
@@ -247,7 +247,7 @@
     &.active {
       @include rotate(90deg);
       @include border-radius(18px);
-      margin: 6px 10px 0 14px;
+      margin: 6px 9px 0 30px;
       padding: 10px;
       height: 35px;
       width: 36px;
@@ -258,7 +258,7 @@
     }
     &:hover {
       @include border-radius(18px);
-      margin: 6px 10px 0 14px;
+      margin: 6px 9px 0 30px;
       padding: 10px;
       height: 35px;
       width: 36px;
@@ -277,7 +277,7 @@
 .header-content {
   background: $white;
   z-index:3;
-  padding-left: 20px;
+  padding-left: 40px;
   h1 {
     span.private {
       i {
@@ -299,7 +299,7 @@
   }
   .nav-trigger {
     float: right;
-    margin-right: 20px;
+    margin-right: 40px;
     margin-top: 11px;
     i {
       margin: 0;
@@ -525,12 +525,11 @@
 
 small {
   &.count {
-    background:$error;
+    background: $error;
     @include border-radius(4px);
-    text-shadow:none;
-    color:$white;
-    &.count-zero {
-      background:#777;
-    }
+    text-align: center;
+    text-shadow: none;
+    color: $white;
+    padding: 0 0 0 1px;
   }
 }
