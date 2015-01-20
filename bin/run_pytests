@@ -4,9 +4,13 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+mysql -u root -e "DROP DATABASE IF EXISTS ggrcdevtest; CREATE DATABASE ggrcdevtest; USE ggrcdevtest;"
+GGRC_SETTINGS_MODULE="testing ggrc_basic_permissions.settings.development" \
+    db_migrate
+
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../src"
-mysql -u root -e "DROP DATABASE IF EXISTS ggrcdevtest; CREATE DATABASE ggrcdevtest;"
+#mysql -u root -e "DROP DATABASE IF EXISTS ggrcdevtest; CREATE DATABASE ggrcdevtest;"
 GGRC_SETTINGS_MODULE="testing ggrc_basic_permissions.settings.development" \
-  sniffer -x tests
+  sniffer -x tests -x--logging-clear-handlers

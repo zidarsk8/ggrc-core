@@ -35,7 +35,6 @@ Resource.add_to(
 COLLECTION_ALLOWED = ['HEAD', 'GET', 'POST', 'OPTIONS']
 RESOURCE_ALLOWED = ['HEAD', 'GET', 'PUT', 'DELETE', 'OPTIONS']
 
-@SkipTest
 class TestResource(TestCase):
   def setUp(self):
     super(TestResource, self).setUp()
@@ -140,6 +139,7 @@ class TestResource(TestCase):
     response = self.client.get(self.mock_url('foo'), headers=self.headers())
     self.assert404(response)
 
+  @SkipTest
   def test_collection_get(self):
     date1 = datetime(2013, 4, 17, 0, 0, 0, 0)
     date2 = datetime(2013, 4, 20, 0, 0, 0, 0)
@@ -163,6 +163,7 @@ class TestResource(TestCase):
     self.assertDictEqual(self.mock_json(mock2), collection[0])
     self.assertDictEqual(self.mock_json(mock1), collection[1])
 
+  @SkipTest
   def test_resource_get(self):
     date1 = datetime(2013, 4, 17, 0, 0, 0, 0)
     mock1 = self.mock_model(
@@ -281,6 +282,7 @@ class TestResource(TestCase):
         )
     self.assert400(response)
 
+  @SkipTest
   def test_put_and_delete_conflict(self):
     mock = self.mock_model(foo='mudder')
     response = self.client.get(self.mock_url(mock.id), headers=self.headers())
@@ -315,6 +317,7 @@ class TestResource(TestCase):
         )
     self.assertStatus(response, 409)
 
+  @SkipTest
   def test_put_and_delete_missing_precondition(self):
     mock = self.mock_model(foo='tricky')
     response = self.client.get(self.mock_url(mock.id), headers=self.headers())
@@ -332,6 +335,7 @@ class TestResource(TestCase):
     response = self.client.delete(url, headers=self.headers())
     self.assertStatus(response, 428)
 
+  @SkipTest
   def test_delete_successful(self):
     mock = self.mock_model(foo='delete me')
     response = self.client.get(self.mock_url(mock.id), headers=self.headers())
@@ -397,6 +401,7 @@ class TestResource(TestCase):
     self.assertStatus(response, 304)
     self.assertIn('Etag', response.headers)
 
+  @SkipTest
   def test_collection_get_if_non_match(self):
     self.mock_model(foo='baz')
     response = self.client.get(
