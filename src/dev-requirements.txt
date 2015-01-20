@@ -19,3 +19,4 @@ Flask-Jasmine
 Alembic==0.6.7
 ipdb
 ipython
+webob
