@@ -18,8 +18,6 @@ cd "${SCRIPTPATH}/../src"
 #   the same `noauth_local_webserver` workaround used in
 #   `extras/google_appengine__force_noauth_local_webserver.diff`
 
-export GGRC_SETTINGS_MODULE="testing"
-
 python -c "\
 import ggrc.migrate
 import sys, os
