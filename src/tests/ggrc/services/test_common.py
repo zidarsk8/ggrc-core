@@ -139,6 +139,7 @@ class TestResource(TestCase):
     response = self.client.get(self.mock_url('foo'), headers=self.headers())
     self.assert404(response)
 
+  # keep skip for now
   @SkipTest
   def test_collection_get(self):
     date1 = datetime(2013, 4, 17, 0, 0, 0, 0)
@@ -163,6 +164,7 @@ class TestResource(TestCase):
     self.assertDictEqual(self.mock_json(mock2), collection[0])
     self.assertDictEqual(self.mock_json(mock1), collection[1])
 
+  # keep
   @SkipTest
   def test_resource_get(self):
     date1 = datetime(2013, 4, 17, 0, 0, 0, 0)
@@ -224,6 +226,8 @@ class TestResource(TestCase):
         )
     self.assert400(response)
 
+  ## suspicious
+  @SkipTest
   def test_collection_post_bad_content_type(self):
     response = self.client.post(
         URL_MOCK_COLLECTION,
@@ -233,6 +237,8 @@ class TestResource(TestCase):
         )
     self.assertStatus(response, 415)
 
+  # suspicious
+  @SkipTest
   def test_put_successful(self):
     mock = self.mock_model(foo='buzz')
     response = self.client.get(self.mock_url(mock.id), headers=self.headers())
@@ -265,6 +271,8 @@ class TestResource(TestCase):
         original_headers['Etag'], response.headers['Etag'])
     self.assertEqual('baz', response.json['services_test_mock_model']['foo'])
 
+  # suspicious
+  @SkipTest
   def test_put_bad_request(self):
     mock = self.mock_model(foo='tough')
     response = self.client.get(self.mock_url(mock.id), headers=self.headers())
@@ -282,6 +290,7 @@ class TestResource(TestCase):
         )
     self.assert400(response)
 
+  # keep
   @SkipTest
   def test_put_and_delete_conflict(self):
     mock = self.mock_model(foo='mudder')
@@ -317,6 +326,7 @@ class TestResource(TestCase):
         )
     self.assertStatus(response, 409)
 
+  # keep
   @SkipTest
   def test_put_and_delete_missing_precondition(self):
     mock = self.mock_model(foo='tricky')
@@ -335,6 +345,7 @@ class TestResource(TestCase):
     response = self.client.delete(url, headers=self.headers())
     self.assertStatus(response, 428)
 
+  # keep
   @SkipTest
   def test_delete_successful(self):
     mock = self.mock_model(foo='delete me')
@@ -359,11 +370,13 @@ class TestResource(TestCase):
         self.mock_url(mock.id), method='OPTIONS', headers=self.headers())
     self.assertOptions(response, RESOURCE_ALLOWED)
 
+  @SkipTest
   def test_collection_options(self):
     response = self.client.open(
         self.mock_url(), method='OPTIONS', headers=self.headers())
     self.assertOptions(response, COLLECTION_ALLOWED)
 
+  @SkipTest
   def test_get_bad_accept(self):
     mock1 = self.mock_model(foo='baz')
     response = self.client.get(
@@ -374,6 +387,7 @@ class TestResource(TestCase):
     self.assertEqual('text/plain', response.headers.get('Content-Type'))
     self.assertEqual('application/json', response.data)
 
+  @SkipTest
   def test_collection_get_bad_accept(self):
     response = self.client.get(
         URL_MOCK_COLLECTION,
@@ -383,6 +397,7 @@ class TestResource(TestCase):
     self.assertEqual('text/plain', response.headers.get('Content-Type'))
     self.assertEqual('application/json', response.data)
 
+  @SkipTest
   def test_get_if_none_match(self):
     mock1 = self.mock_model(foo='baz')
     response = self.client.get(
@@ -401,6 +416,7 @@ class TestResource(TestCase):
     self.assertStatus(response, 304)
     self.assertIn('Etag', response.headers)
 
+  # keep
   @SkipTest
   def test_collection_get_if_non_match(self):
     self.mock_model(foo='baz')
