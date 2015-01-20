@@ -123,7 +123,6 @@ class TestResource(TestCase):
     ret.extend([(k,v) for k,v in kwargs.items()])
     return ret
 
-  @SkipTest
   def test_X_Requested_By_required(self):
     response = self.client.post(self.mock_url())
     self.assert400(response)
@@ -218,7 +217,6 @@ class TestResource(TestCase):
     self.assertEqual(
         'bar', response.json['test_model_collection']['test_model'][0]['foo'])
 
-  @SkipTest
   def test_collection_post_bad_request(self):
     response = self.client.post(
         URL_MOCK_COLLECTION,
@@ -269,7 +267,6 @@ class TestResource(TestCase):
         original_headers['Etag'], response.headers['Etag'])
     self.assertEqual('baz', response.json['services_test_mock_model']['foo'])
 
-  @SkipTest
   def test_put_bad_request(self):
     mock = self.mock_model(foo='tough')
     response = self.client.get(self.mock_url(mock.id), headers=self.headers())
