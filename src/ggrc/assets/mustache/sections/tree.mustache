@@ -62,6 +62,7 @@
                       </div>
                     </li>
                   {{/infer_roles}}
+
                   {{#with_page_object_as 'page_instance'}}
                   {{#if_helpers '\
                     ^if_instance_of' page_instance 'Directive' '\
@@ -71,6 +72,7 @@
                     </li>
                   {{/if_helpers}}
                   {{/with_page_object_as}}
+
                   {{#with_mapping_count instance 'related_objects'}}
                     {{#prune_context}}
                       <li rel="tooltip" data-placement="left" data-original-title="# of mapped objects">

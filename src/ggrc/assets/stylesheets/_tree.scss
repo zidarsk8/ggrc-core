@@ -1220,6 +1220,17 @@ ul.new-tree {
       .generated-link {
         @include oneline();
       }
+      .row-fluid {
+        [class*="span"] {
+          display: none;
+          &:first-child {
+            display: block;
+          }
+          &:last-child {
+            display: block;
+          }
+        }
+      }
       > .item-main {
         > .item-wrap {
           .openclose,
