@@ -123,6 +123,7 @@ class TestResource(TestCase):
     ret.extend([(k,v) for k,v in kwargs.items()])
     return ret
 
+  @SkipTest
   def test_X_Requested_By_required(self):
     response = self.client.post(self.mock_url())
     self.assert400(response)
@@ -217,6 +218,7 @@ class TestResource(TestCase):
     self.assertEqual(
         'bar', response.json['test_model_collection']['test_model'][0]['foo'])
 
+  @SkipTest
   def test_collection_post_bad_request(self):
     response = self.client.post(
         URL_MOCK_COLLECTION,
@@ -226,8 +228,6 @@ class TestResource(TestCase):
         )
     self.assert400(response)
 
-  ## suspicious
-  @SkipTest
   def test_collection_post_bad_content_type(self):
     response = self.client.post(
         URL_MOCK_COLLECTION,
@@ -237,8 +237,6 @@ class TestResource(TestCase):
         )
     self.assertStatus(response, 415)
 
-  # suspicious
-  @SkipTest
   def test_put_successful(self):
     mock = self.mock_model(foo='buzz')
     response = self.client.get(self.mock_url(mock.id), headers=self.headers())
@@ -271,7 +269,6 @@ class TestResource(TestCase):
         original_headers['Etag'], response.headers['Etag'])
     self.assertEqual('baz', response.json['services_test_mock_model']['foo'])
 
-  # suspicious
   @SkipTest
   def test_put_bad_request(self):
     mock = self.mock_model(foo='tough')
@@ -370,13 +367,11 @@ class TestResource(TestCase):
         self.mock_url(mock.id), method='OPTIONS', headers=self.headers())
     self.assertOptions(response, RESOURCE_ALLOWED)
 
-  @SkipTest
   def test_collection_options(self):
     response = self.client.open(
         self.mock_url(), method='OPTIONS', headers=self.headers())
     self.assertOptions(response, COLLECTION_ALLOWED)
 
-  @SkipTest
   def test_get_bad_accept(self):
     mock1 = self.mock_model(foo='baz')
     response = self.client.get(
@@ -387,7 +382,6 @@ class TestResource(TestCase):
     self.assertEqual('text/plain', response.headers.get('Content-Type'))
     self.assertEqual('application/json', response.data)
 
-  @SkipTest
   def test_collection_get_bad_accept(self):
     response = self.client.get(
         URL_MOCK_COLLECTION,
@@ -397,7 +391,6 @@ class TestResource(TestCase):
     self.assertEqual('text/plain', response.headers.get('Content-Type'))
     self.assertEqual('application/json', response.data)
 
-  @SkipTest
   def test_get_if_none_match(self):
     mock1 = self.mock_model(foo='baz')
     response = self.client.get(
