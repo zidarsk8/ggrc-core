@@ -20,9 +20,12 @@
     {{else}}
       {{#if owners.length}}
         {{#using contacts=owners}}
-        {{#contacts}}
+        {{#each contacts}}
+          {{^if_equals @index 0}}
+            <br>
+          {{/if_equals}}
           {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-        {{/contacts}}
+        {{/each}}
         {{/using}}
       {{else}}
         <span class="error">

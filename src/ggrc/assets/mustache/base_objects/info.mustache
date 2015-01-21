@@ -83,7 +83,7 @@
       <p>
         <small>
           <em>
-            Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
+            Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{^if_equals @index 0}}, {{/if_equals}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
             <br>
             Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
           </em>

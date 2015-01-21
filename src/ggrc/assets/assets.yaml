@@ -170,6 +170,7 @@ dashboard-js-template-files:
   - people/filters.mustache
   - people/info.mustache
   - people/list.mustache
+  - people/owners_modal_connector.mustache
   - people/modal_content.mustache
   - people/multitype_option_detail.mustache
   - people/multitype_option_items.mustache

@@ -59,13 +59,9 @@
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <div tabindex="4">
-            {{#with_mapping "authorizations" instance}}
-            {{#using owner=instance.owners.0 model_singular=model.model_singular}}
-            {{#with_current_user_as 'current_user'}}
-              <input class="input-block-level" name="owners.0.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="hidden" value="" />
-              <input class="input-block-level" readonly="true" disabled="true" placeholder="Enter email address" type="text" value="{{private_program_owner instance modal_title}}" />
-            {{/with_current_user_as}}
-            {{/using}}
+            {{#with_mapping "owners" instance}}
+              <input class="input-block-level" name="owners.0.instance.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="hidden" value="" />
+              <input class="input-block-level" readonly="true" disabled="true" placeholder="Enter email address" type="text" value="{{owners.0.instance.email}}" />
             {{/with_mapping}}
           </div>
         </div>
