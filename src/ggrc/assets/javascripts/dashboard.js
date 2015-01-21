@@ -387,6 +387,7 @@ function resize_areas() {
   ,   $area
   ,   $header
   ,   $footer
+  ,   $topNav
   ,   $innerNav
   ,   $objectArea
   ,   $bar
@@ -395,8 +396,11 @@ function resize_areas() {
   ,   objectWidth
   ,   headerWidth
   ,   lhsWidth
+  ,   lhsHeight
+  ,   barWidth
   ,   footerMargin
   ,   internavHeight
+  ,   internavWidth
   ;
 
   $window = $(window);
@@ -602,6 +606,7 @@ jQuery(function($) {
         $lhn_bar = $this.closest("body").find(".bar-v"),
         $lhnType = $this.closest("body").find(".lhn-type"),
         $lhs_search = $this.closest("body").find(".lhs-search");
+
     if($this.hasClass("active")) {
       $this.removeClass("active");
       $lhn.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
@@ -611,7 +616,7 @@ jQuery(function($) {
       $lhs_search.find(".widgetsearch").css("width", "130px");
     } else {
       $this.addClass("active");
-      $lhn.addClass("active").animate({left: "0"}, options);
+      $lhn.addClass("active").width(240).animate({left: "0"}, options);
       $lhnType.addClass("active").animate({left: "0"}, options);
       $lhn_bar.addClass("active").animate({left: "240"}, options);
       $lhs_search.addClass("active");
