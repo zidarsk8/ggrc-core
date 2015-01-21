@@ -296,14 +296,14 @@
 
     get_new_join: function(option_id, option_type) {
       var join_params = {};
-      join_params[this.options.option_attr] = {}
+      join_params[this.options.option_attr] = {};
       join_params[this.options.option_attr].id = option_id;
       //join_params[this.options.option_id_field] = option_id;
       if (this.options.option_type_field) {
         join_params[this.options.option_attr].type = option_type;
         //join_params[this.options.option_type_field] = option_type;
       }
-      join_params[this.options.join_attr] = {}
+      join_params[this.options.join_attr] = {};
       join_params[this.options.join_attr].id = this.get_join_object_id();
       //join_params[this.options.join_id_field] = this.get_join_object_id();
       if (this.options.join_type_field) {
@@ -321,7 +321,7 @@
 
     get_join_object_type: function() {
       return this.options.join_object_type || this.options.join_object.constructor.shortName;
-    },
+    }
 
   });
 
@@ -1327,7 +1327,7 @@
       options.selected_object = CMS.Models.get_instance(
           data_set.join_object_type, data_set.join_object_id);
       options.binding = options.selected_object.get_binding(
-          data_set.join_mapping)
+          data_set.join_mapping);
 
       options.object_params = $this.data("object-params");
 
@@ -1362,7 +1362,7 @@
         , object_model: null
         , join_model: null
       }
-  },{
+  }, {
     init: function(){
       GGRC.Controllers.MultitypeModalSelector.prototype.init.apply(this, arguments);
       this.refresh_option_list();
@@ -1396,7 +1396,7 @@
           lookup,
           selected_object =  this.options.selected_object.type;
 
-        if(selected_object === "TaskGroup") { //workflow/TaskGroup don't have People/Groups sub catagory
+        if (selected_object === "TaskGroup") { //workflow/TaskGroup don't have People/Groups sub category
           lookup = {
               governance: 0
             , business: 1
@@ -1431,7 +1431,7 @@
                 //Save the model names for All Object search
                 all_models.push(descriptor.model.shortName);
               }
-            })
+            });
 
             this.options.option_type_menu = menu;
           }
@@ -1475,7 +1475,7 @@
                 //Save the model names for All Object search
                 all_models.push(descriptor.model.shortName);
               }
-            })
+            });
 
             this.options.option_type_menu = menu;
           }
@@ -1964,8 +1964,8 @@
       //this.refresh_option_list();
     }
 
-    , on_map: $.debounce(500, true, function(el, ev) {
-        var that = this, ajd;
+    , on_map: $.debounce(500, true, function mapSelectedObjects(el, ev) {
+        var modalSelector = this, ajd;
 
         if(el.hasClass('disabled')){
           return;
@@ -1976,8 +1976,8 @@
 
         function map_post_process(obj) {
           // FIXME: Extension isolation violation
-          if(that.options.mapTaskGroup) {
-            //Modify the object to map to task group
+          if (modalSelector.options.mapTaskGroup) {
+            // Modify the object to map to task group
             var id = obj.object.id,
                 shortName = obj.object.type,
                 new_obj = {};
@@ -1986,33 +1986,34 @@
 
             obj_arr.push(new_obj);
           } else {
-            if (!that.options.deferred) {
+            if (!modalSelector.options.deferred) {
               $(document.body).trigger('ajax:flash',
-                { success: that.context.selected_options[0].constructor.shortName + " mapped successfully."});
+                { success: modalSelector.context.selected_options[0].constructor.shortName + " mapped successfully."});
             }
             obj_arr.push(obj);
           }
           pass += 1;
-          if(pass == its){
-              if(obj_arr.length >= 1){
+          if (pass == its) {
+              if (obj_arr.length >= 1) {
                 var obj_set = {};
                 obj_set.multi_map = true;
                 obj_set.arr = obj_arr;
 
-                ////trigger the to add selected objects to task group;
-                that.element.trigger("modal:success", [obj_set, {map_and_save: true}]);
+                ////trigger the ?? to add selected objects to task group;
+                modalSelector.element && modalSelector.element.trigger("modal:success", [obj_set, {map_and_save: true}]);
               }
-              $(that.element).modal_form('hide');
+              $(modalSelector.element).modal_form('hide');
             }
         }
 
         if (its < 1) {
           $(document.body).trigger("ajax:flash", {
-            error: "Select an object to map" });
+            error: "Select an object to map"
+          });
         }
         else {
-          if(that.options.deferred) {
-            join_instance = that.sync_selected_options();
+          if (modalSelector.options.deferred) {
+            join_instance = modalSelector.sync_selected_options();
             its = join_instance.length;
             can.each(join_instance, map_post_process);
           } else {
@@ -2021,17 +2022,17 @@
             for(var i = 0; i < its; i++){
             //We have multiple join_instances
               ajd = join_instance[i].save().done(map_post_process)
-              .fail(function(xhr) {
+              .fail(function (xhr) {
                   // Currently, the only error we encounter here is uniqueness
                   // constraint violations.  Let's use a nicer message!
-                  //that.element.trigger("ajax:flash", { error : xhr.responseText });
+                  //modalSelector.element.trigger("ajax:flash", { error : xhr.responseText });
                   //We should never get here, The mapped objects are already checked and disabled
-                  if (that.element) {
+                  if (modalSelector.element) {
                     var message = "That object is already mapped";
                     pass += 1;
                     $(document.body).trigger("ajax:flash", { error: message });
                     if(pass == its){
-                      $(that.element).modal_form('hide');
+                      $(modalSelector.element).modal_form('hide');
                     }
                   }
                 });
@@ -2104,15 +2105,10 @@
     }
 
     , autocomplete_select : function(el, ev, ui) {
-        var name = el.attr("name");
-        // we (ab)use databinding to make the input field change for us
-        // doing it three times like this ensures stability
-
-        // handle emptying field and choosing same suggestion
-        this.context.attr(name, null);
-        // the first change sets to null, 2nd works
-        this.context.attr(name, ui.item);
-        this.context.attr(name, ui.item);
+      setTimeout(function(){
+        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
+      }, 0);
+      this.context.attr(el.attr("name"), ui.item);
     }
 
   });

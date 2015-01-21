@@ -22,9 +22,19 @@
                 <i class="grcicon-person-green pull-left"></i>
                 {{#using assignee=instance.contact}}
                 {{#is_allowed 'update' 'TaskGroup' context=instance.context}}
+                  {{#using workflow=instance.workflow}}
+                  {{#if_equals workflow.status 'Inactive'}}
+                    <div class="item-data">
+                      <span class="tree-title-area oneline">
+                        {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
+                      </span>
+                    </div>
+                  {{else}}
                     <div class="objective-selector">
                       <input type="text" name="contact.name" data-lookup="Person" data-params="Person:is_enabled=1" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
                     </div>
+                  {{/if_equals}}
+                  {{/using}}
                 {{else}}
                   <div class="item-data">
                     <span class="tree-title-area oneline">

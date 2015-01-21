@@ -7,7 +7,9 @@ from ggrc import db
 from ggrc.models import ProgramDirective
 from tests.ggrc import TestCase
 from .factories import ProgramFactory, DirectiveFactory
+from nose.plugins.skip import SkipTest
 
+@SkipTest
 class TestCascadeDelete(TestCase):
   def test_cascade_delete(self):
     program = ProgramFactory()
@@ -15,7 +17,7 @@ class TestCascadeDelete(TestCase):
     program.directives.append(directive)
     db.session.commit()
     program_directives = db.session.query(ProgramDirective).one()
-    self.assertEqual(program, program_directives.program) 
+    self.assertEqual(program, program_directives.program)
     db.session.delete(program)
     db.session.commit()
     self.assertEqual(0, db.session.query(ProgramDirective).count(), 'Delete of Program should delete its ProgramDirectives')

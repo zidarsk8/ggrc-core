@@ -4,6 +4,12 @@
 # Maintained By: goran@reciprocitylabs.com
 
 ---
+
+- name: add the node.js PPA
+  apt_repository: repo="ppa:chris-lea/node.js"
+  tags: nodejs
+  sudo: yes
+
 - name: update apt
   sudo: yes
   apt:
