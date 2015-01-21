@@ -55,7 +55,12 @@
                   val = values[i].attribute_value;
                 }
               }
-              $el.val(val);
+              // A checkbox is a special case
+              if ($el.is(':checkbox')) {
+                $el.prop('checked', val == 1);
+              } else {
+                $el.val(val);
+              }
               // TODO: This bit triggers a validate form on load, causing the title
               //       cannot be blank error to show up on form load.
               $el.trigger('change');
@@ -70,7 +75,11 @@
                   val = values[i].attribute_value;
                 }
               }
-              $el.html(val);
+              if ($el.data('type') === 'Checkbox') {
+                $el.html(val == 1 ? "Yes" : "No");
+              } else {
+                $el.html(val);
+              }
             });
           });
 

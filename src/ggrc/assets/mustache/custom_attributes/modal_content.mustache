@@ -30,16 +30,21 @@
         {{/case}}
         {{#case 'Dropdown'}}
           <select class="input-block-level" name="custom_attributes.{{id}}" null-if-empty="null-if-empty" tabindex="20">
-            {{! TODO: itarate over items in `multi_choice_options`}}
-            {{#iterate ''}}
+            <option value="">--</option>
+            {{#iterate_string multi_choice_options ','}}
               <option {{!#if_equals iterator status}}selected="true"{{!/if_equals}}>{{iterator}}</option>
             {{/iterate}}
           </select>
         {{/case}}
         {{#case 'Checkbox'}}
           <div class="checkbox-area">
-            <input tabindex="20" name="custom_attributes.{{id}}" value="true" type="checkbox"> Private Program
+            <input tabindex="20" name="custom_attributes.{{id}}" type="checkbox">
           </div>
+        {{/case}}
+        {{#case 'Date'}}
+        <div class="date-area">
+          <input tabindex="20" name="custom_attributes.{{id}}"  class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+        </div>
         {{/case}}
         {{/switch}}
       </div>
