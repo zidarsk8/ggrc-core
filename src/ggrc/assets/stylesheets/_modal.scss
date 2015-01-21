@@ -471,6 +471,7 @@
   }
   .reset-form {
     margin-bottom: 10px;
+    margin-right: 4px;
     p {
       margin: 0;
     }
@@ -546,9 +547,17 @@
   }
   .modal-header {
     background: $white;
-    border-bottom: 1px solid $widgetHeader;
-    @include border-radius(2px 2px 0 0);
-    cursor:move;
+    padding: 16px 20px 14px 20px;
+    border: none;
+    cursor: move;
+    .modal-dismiss {
+      margin-top: 1px;
+      margin-right: -4px;
+      @include opacity(.3);
+      &:hover {
+        @include opacity(1);
+      }
+    }
     .btn {
       margin-top: 2px;
       padding: 2px 0;
@@ -557,14 +566,15 @@
       margin-right:6px;
       i {
         margin-top:1px;
-      }    
+      }
     }
     h2 {
       text-shadow: 0;
-      font-size: $f-headline;
+      font-size: 24px;
       font-weight: normal;
       color: $subTitle;
-      
+      font-family: $fontTitle;
+
       span {
         display: block;
         line-height: 26px;
@@ -621,8 +631,26 @@
       margin-top: 1px;
     }
     input,
-    textarea {
+    textarea,
+    select {
       @include placeholder($footerBorder);
+      margin-bottom: 16px;
+      border: 1px solid $status-draft;
+      @include box-shadow(none);
+      @include border-radius(0);
+      .choose-object-wrap & {
+        margin-bottom: 0;
+      }
+    }
+    .single-line-filter {
+      input,
+      textarea,
+      select {
+        margin-bottom: 0;
+      }
+    }
+    input[type="checkbox"] {
+      margin-bottom: 9px;
     }
     .objective-selector {
       .input-wide {
@@ -649,6 +677,7 @@
       font-weight: normal;
       color:#111;
       font-size: 16px;
+      margin-bottom: 7px;
       &.inline-check {
         line-height: 26px;
         margin-bottom: 0;
@@ -904,12 +933,11 @@
     }
   }
   .modal-footer {
-    background: $lightGray;
+    background: $white;
+    border: none;
+    @include box-shadow(none);
     text-align: left;
-    @include border-radius(0 0 2px 2px);
-    .btn {
-      font-size:$f-regular;
-    }
+    padding: 20px;
     .deny-buttons {
       .btn-danger {
         @include opacity(0.5);
@@ -1165,9 +1193,13 @@ p.modal-value {
   margin-left: 10px;
 }
 
+.results {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
 .results-wrap {
   height: 240px;
-  background: lighten($lightGray,3%);
   overflow-y: auto;
   .info {
     display: block;
@@ -1243,4 +1275,6 @@ label.second-in-column {
     }
   }
 }
-
+.modal-body {
+  padding: 20px 15px 20px 20px;
+}
