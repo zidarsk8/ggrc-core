@@ -10,19 +10,17 @@
         {{#if_equals unmapped_instances.length 0}}
           {{#with_allowed_as 'deletable_mappings' 'delete' mappings}}
             {{#if deletable_mappings.length}}
-              <a href="javascript://" class="info-action unmap pull-right relevant-action all-relevant" data-toggle="unmap">
+              <a href="javascript://" class="info-action unmap pull-right relevant-action all-relevant" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Make All Relevant">
                 {{#deletable_mappings}}<span class="result" {{data 'result'}}></span>{{/deletable_mappings}}
-                <i class="grcicon-checked"></i>
-                Make All Relevant
+                <i class="grcicon-checked-all"></i>
               </a>
             {{/if}}
           {{/with_allowed_as}}
         {{else}}
           {{#if unmapped_instances.length}}
             {{! we permission checked for create up in with_mappable_instances_as}}
-            <a class="info-action pull-right map-to-page-object relevant-action all-relevant" href="javascript://" {{#with processed_list}}{{data 'instance'}}{{/with}} {{#with mappings}}{{data 'existing_mappings'}}{{/with}}>
-              <i class="grcicon-check"></i>
-              Make All Relevant
+            <a class="info-action pull-right map-to-page-object relevant-action all-relevant" href="javascript://" {{#with processed_list}}{{data 'instance'}}{{/with}} {{#with mappings}}{{data 'existing_mappings'}}{{/with}} rel="tooltip" data-placement="left" data-original-title="Make All Relevant">
+              <i class="grcicon-check-all"></i>
             </a>
           {{/if}}
         {{/if_equals}}
@@ -35,17 +33,15 @@
         {{^if_equals page_instance instance}}
         {{#if mappings.length}}
           {{#is_allowed_all 'delete' mappings}}
-            <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap">
+            <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Make Relevant">
               {{#mappings}}<span class="result" {{data 'result'}}></span>{{/mappings}}
               <i class="grcicon-checked"></i>
-              Make Relevant
             </a>
           {{/is_allowed_all}}
         {{else}}
           {{#is_allowed_to_map page_instance instance join=true}}
-          <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}}>
+          <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}} rel="tooltip" data-placement="left" data-original-title="Make Relevant">
             <i class="grcicon-check"></i>
-            Make Relevant
           </a>
           {{/is_allowed_to_map}}
         {{/if}}

@@ -340,7 +340,7 @@ a {
   }
 }
 
-@each $status_label in draft, progress, overdue {
+@each $status_label in draft, progress, overdue, final {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }
@@ -1257,10 +1257,10 @@ p {
 .state-value {
   text-transform: uppercase;
   font-weight: bold;
-  &.gray {
+  &.draft {
     color: $draftGray;
   }
-  &.green {
+  &.final {
     color: $lightGreen;
   }
   .tree-title-area & {

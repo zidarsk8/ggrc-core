@@ -1,32 +1,27 @@
-<div class="action-bar">
-  <ul class="change-links">
-    {{> /static/mustache/base_objects/unmap.mustache}}
-    {{> /static/mustache/base_objects/edit_object_link.mustache}}
-  </ul>
-  <ul>
+<div class="details-wrap">
+  <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+  <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
     {{#if instance.viewLink}}
       {{#is_allowed "view_object_page" instance}}
         <li>
           <a href="{{instance.viewLink}}">
-            View {{instance.class.title_singular}}
             <i class="grcicon-goto"></i>
+            View {{instance.class.title_singular}}
           </a>
         </li>
       {{/is_allowed}}
     {{/if}}
+    {{> /static/mustache/base_objects/unmap.mustache}}
+    {{> /static/mustache/base_objects/edit_object_link.mustache}}
   </ul>
 </div>
 
-<div class="small-info">
-
+<div class="tier-content">
   {{{renderLive '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
-
   {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
-
   {{{renderLive '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-
   {{#instance.url}}
-    <div class="row-fluid">
+    <div class="row-fluid wrap-row">
       <div class="span6">
         <div class="tree-info">
           {{! FIXME: Add tree item - should be Contract OR Regulation OR Policy OR Standard NOT Directive }}
@@ -38,5 +33,4 @@
       </div>
     </div>
   {{/instance.url}}
-
 </div>

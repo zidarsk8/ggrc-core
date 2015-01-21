@@ -6,13 +6,175 @@
 }}
 
 {{!section class="widget... }}
-  <!--header class="header">
-    <h2>
-      <i class="{{widget_icon}}"></i>
-      {{{!widget_name}}}
-    </h2>
-  </header-->
-  
+  {{#if_equals widget_id "person"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span4">
+          <div class="title-heading oneline">
+            {{far_model.title_singular}} Name
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Email
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Authorizations
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Name
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Email
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Authorizations
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Company
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
+  {{#if_equals widget_id "info"}}
+    <header class="header">
+      <h2>
+        <i class="{{widget_icon}}"></i>
+        {{{widget_name}}}
+      </h2>
+    </header>
+  {{/if_equals}}
+
+  {{^if_equals widget_id "info"}}
+  {{^if_equals widget_id "person"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span4">
+          <div class="title-heading oneline">
+            {{far_model.title_singular}} Title
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Owner
+          </div>
+        </div>
+        <div class="span1">
+          <div class="oneline">
+            Code
+          </div>
+        </div>
+        <div class="span1">
+          <div class="oneline">
+            State
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li>
+              <a href="#">
+                <i class="grcicon-hide-relevant" rel="tooltip" data-placement="left" title="" data-original-title="Hide Irelevant"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Title
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" disabled="">
+                      Description
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" disabled="">
+                      Notes
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Owner
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Contact
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Code
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      State
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Network Zone
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      System url
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+  {{/if_equals}}
+
   <section class="content">
     {{{widget_initial_content}}}
   </section>
