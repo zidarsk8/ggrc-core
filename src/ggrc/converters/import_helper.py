@@ -63,7 +63,6 @@ def utf_8_encoder(csv_data):
 
 def handle_converter_csv_export(filename, objects, converter_class, **options):
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
-  status_code = 200
 
   exporter = converter_class(objects, **options)
   output_buffer = StringIO()
