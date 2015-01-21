@@ -1,21 +1,23 @@
 
-  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-      <div class="row-fluid">
-        <div class="span12">
-                      
+      <div class="item-wrap">
+        <div class="select">
           <div class="item-data">
-            <div class="tree-title-area">
-              <i class="grcicon-calendar"></i>
+            <div class="row-fluid">
+              <div class="span12">
+                <div class="title tree-title-area">
+                  <i class="grcicon-calendar"></i>
                   <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-content="{{render '/static/mustache/pbc/iframe_tooltip.mustache' url=instance.title}}" href="{{schemed_url instance.title}}" target="_blank">
                     {{instance.title}}
                   </a>
-              {{{!render_hooks 'Meeting.tree_view_info'}}}
+                  {{{!render_hooks 'Meeting.tree_view_info'}}}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-      
-    </div>
+          </div><!-- item-data end -->
+        </div><!-- select end -->
+      </div><!-- item-wrap end -->
+    </div><!-- item-main end -->
   </li>
 

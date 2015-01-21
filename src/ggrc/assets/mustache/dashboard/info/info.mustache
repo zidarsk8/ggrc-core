@@ -1,0 +1,124 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita
+    Maintained By: sasmita
+}}
+<!--div class="clearfix"-->
+<!--div class="row-fluid" -->
+  
+<!--div class="object-area wide"--> <!--This line makes the scrollbar work properly, but the css is messed up initially, which get fixed by window resize -->
+  <div class="alert warning">
+    <a href="#" class="close" data-dismiss="alert">x</a>
+    <span>
+      <i class="grcicon-warning"></i>
+      <!--This is global messaging letting you know that something is over due! -->
+      {{error_msg}}
+    </span>
+  </div>
+
+  <div class="row-fluid">
+    <!-- Left side Get started column -->
+    <div class="span3 side-wrap">
+      <div class="inner-content">
+        <section class="widget bare">
+          <header class="header">
+            <h2>Get Started</h2>
+          </header>
+          <section class="content">
+            {{> /static/mustache/dashboard/info/get_started.mustache}}
+          </section><!-- Widget content end -->
+        </section><!-- Widget end -->
+      </div><!-- inner-content end -->
+    </div>
+
+    <!-- Right side workflow and task trees area -->
+    <div class="span9 content-wrap">
+      <div class="inner-content">
+        {{#if workflow_view}}
+          <section class="widget small-margin">
+            <header class="header">
+              <h2>Workflow Progress</h2>
+            </header>
+          {{{ renderLive workflow_view }}}
+          </section>
+        {{/if}}
+        {{#if workflow_view}}
+          <section class="widget dashboard small-margin">
+            <header class="header widget-nav">
+              <div class="row-fluid">
+                <div class="span12">
+                  <ul>
+                    <li class="active">
+                      <a href="javascript://">
+                        My Tasks ({{task_count}})
+                      </a>
+                    </li>
+                    <!--li>
+                      <a href="#">
+                        Audit Requests (2)
+                      </a>
+                    </li-->
+                  </ul>
+                </div>
+              </div>
+            </header>
+            <section class="content">
+              <ul class="tree-structure new-tree dashboard-tree">
+                {{!> /static/mustache/dashboard/info/task_filters.mustache}}
+                <li class="filter-wrap">
+                  <div class="filter-border">
+                    <form>
+                      <div class="row-fluid">
+                        <div class="span9">
+                          <ul>
+                            <li>
+                              <label>
+                                Status
+                              </label>
+                              <select name="status" class="input-small">
+                                <option value="" selected="true">Any</option>
+                                <option>Draft</option>
+                                <option>Requested</option>
+                                <option>Responded</option>
+                                <option>Amended Request</option>
+                                <option>Updated Response</option>
+                                <option>Accepted</option>
+                              </select>
+                            </li>
+                            <li>
+                              <input type="text" class="input-medium" placeholder="Filter by Object">
+                            </li>
+                            <li>
+                              <input type="text" class="input-medium" placeholder="Filter by Workflow">
+                            </li>
+                            <li>
+                              <label class="checkbox-inline">
+                                <input class="checkbox" type="checkbox">
+                                Overdue only
+                              </label>
+                            </li>
+                          </ul>
+                        </div>
+                        <div class="span3">
+                          <div class="pull-right">
+                            <label class="checkbox-inline">
+                              <input class="checkbox" type="checkbox">
+                              Show history
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </li>
+              </ul>
+              {{{ renderLive task_view }}}
+            </section>
+          </section><!-- Widget end -->
+        {{/if}}
+      </div><!-- inner-content end -->
+    </div>
+  </div>
+      
+<!--/div-->

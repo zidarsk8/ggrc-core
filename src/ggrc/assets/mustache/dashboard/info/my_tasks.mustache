@@ -1,0 +1,492 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita
+    Maintained By: sasmita
+}}
+
+
+<ul class="tree-structure new-tree dashboard-tree task-tree">
+  {{#each options}}
+    <li class="tree-item item-list" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}} data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}> 
+      <div class="item-main" {{data 'model'}}>
+        <div class="openclose">
+          <div class="item-wrap">
+            <div class="row-fluid">
+              <div class="span12">
+                <ul class="tree-action-list tasks-action">
+                  <li> <!-- number of comment count -->
+                    {{#with_mapping_count instance 'cycle_task_entries'}}
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of comments">
+                      <i class="grcicon-object-black"></i>
+                      <strong class="error">{{count}}</strong>
+                    </span>
+                    {{/with_mapping_count}}
+                  </li>
+                  <li> <!-- due date -->
+                    <span rel="tooltip" data-placement="top" {{#is_overdue instance.end_date instance.status}}class="error"{{/is_overdue}} data-original-title="Due On">
+                      <i class="grcicon-history-{{#is_overdue instance.end_date instance.status}}red{{else}}color{{/if overdue_warning}}"></i>
+                      End Date: {{localize_date instance.end_date}}
+                    </span>
+                  </li>
+                  {{#using cycle=instance.cycle}}
+                    {{#if_equals cycle.is_current true}}
+                    <li> <!-- buttons -->
+                      <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }); }}>
+                        {{#if_equals instance.status 'Assigned'}}
+                          <button class="btn btn-primary change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">Start</button>
+                        {{/status}}
+                        {{#if_equals instance.status 'InProgress'}}
+                          <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+                        {{/if_equals}}
+                        {{#if_equals instance.status 'Declined'}}
+                          <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+                        {{/if_equals}}
+                        {{#if_equals instance.status 'Finished'}}
+                          <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
+                          <button class="btn btn-success change-task-status {{instance._disabled}}" data-openclose="close" data-name="status" data-value="Verified">Verify</button>
+                        {{/status}}
+                        {{#if_equals instance.status 'Verified'}}
+                          <span class="task-done">
+                            <em>Verified</em>
+                          </span>
+                        {{/if_equals}}
+                        {{#instance._undo.0}}
+                          <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
+                        {{/instance._undo.0}}
+                      </div>
+
+                        <!--a href="javascript://" class="btn btn-small btn-info">Start</a-->
+                    </li>
+                    {{/if_equals}}
+                  {{/using}}
+                </ul>
+                <div class="item-data">
+                  <span class="status-label status-draft"></span>
+                  <div class="tree-title-area w-status">
+                    <a href="#">{{instance.title}}</a>
+                    <ul class="item-util">
+                      <li>
+                        {{#using cycle=instance.cycle}}
+                          {{#using workflow=cycle.workflow}}
+                            Workflow: <a href="{{workflow.viewLink}}">{{workflow.title}}</a>
+                          {{/using}}
+                        {{/using}}
+                      </li>
+                      <li>
+                        {{#using instance=instance.cycle_task_group_object}}
+                          {{#using object=instance.object}}
+                            {{object.type}} : <a href="{{object.viewLink}}">{{firstnonempty object.title ''}}</a>
+                          {{/using}}
+                        {{/using}}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 2tier expanded info -->
+      <div class="tier-2-info item-content">
+        <div class="tier-2-info-content">
+          <div class="details-wrap">
+            <a class="btn btn-small btn-gray dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+            <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+              {{#is_allowed 'update' instance context='for'}}
+              <li>
+                <a href="javascript://"
+                    data-object-singular-override="Task for current Workflow Cycle"
+                    data-toggle="modal-ajax-form"
+                    data-modal-reset="reset"
+                    data-modal-class="modal-wide"
+                    data-object-singular="{{instance.class.model_singular}}"
+                    data-object-plural="{{instance.class.table_plural}}"
+                    data-object-id="{{instance.id}}">
+                  <i class="grcicon-edit"></i>
+                  Edit Task
+                </a>
+              </li>
+              {{/is_allowed}}
+            </ul>
+          </div>
+          <div class="tier-content">
+            
+            <div class="row-fluid wrap-row">
+              <div class="span12">
+                {{#if_helpers '\
+                  #if_equals' instance.task_type 'text' '\
+                  or #if_equals' instance.task_type "" '\
+                  or #if_null' instance.task_type}}
+                  <h6>Task details</h6>
+                  <div class="tree-description">
+                    {{{firstnonempty instance.description 'No additional details'}}}
+                  </div>
+                {{/if_helpers}}
+                {{#if_equals instance.task_type 'menu'}}
+                  <h6>Response Options</h6>
+                  {{! here we need to start a quick form or other componenet}}
+                  <ggrc-quick-update instance="instance">
+                    <select name="selected_response_options.0" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}}>
+                      {{#each instance.response_options}}
+                        <option value="{{.}}" {{#if_equals instance.selected_response_options.0 this}}selected="selected"{{/if_equals}}>{{.}}</option>
+                      {{/each}}
+                    </select>
+                  </ggrc-quick-update>
+                {{/if_equals}}
+                {{#if_equals instance.task_type 'checkbox'}}
+                  <h6>Response Options</h6>
+                  <ggrc-quick-update instance="instance">
+                    {{#each instance.response_options}}
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <input type="checkbox" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}} multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}checked="checked"{{/in_array}}> {{.}}
+                      </div>
+                    </div>
+                    {{/each}}
+                  </ggrc-quick-update>
+                {{/if_equals}}
+                <br>
+              </div>
+            </div><!-- row-fluid end -->
+
+            <div class="row-fluid wrap-row">
+              <div class="span6">
+                <h6>Assignee</h6>
+                {{#if_workflow_assignee_privileges instance}}
+                <div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+                  {{#using contact=instance.contact}}
+                    <div class="objective-selector">
+                      <input type="text" name="contact.name" data-lookup="Person" data-params="Person:is_enabled=1" class="search-icon input-block-level" {{#if_equals instance.status 'Verified'}}disabled="disabled"{{/if}} placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
+                    </div>
+                  {{/using}}
+                </div>
+                {{else}}
+                  {{#using contact=instance.contact}}
+                  <div>{{firstnonempty contact.name contact.email ''}}</div>
+                  {{/using}}
+                {{/if_workflow_assignee_privileges}}
+              </div>
+              <div class="span6">
+                <h6>Starts/Ends</h6>
+                {{instance.start_date}} / {{instance.end_date}}
+              </div>
+            </div><!-- row-fluid end -->
+
+            <div class="row-fluid wrap-row">
+              <div class="span12">
+                <h6>Comments (2)</h6>
+                <ul class="entry-list">
+                  <li>
+                    <span class="status-label status-draft"></span>
+                    <div class="w-status">
+                      Photo booth jean shorts cold-pressed narwhal slow-carb, Tumblr Williamsburg locavore tousled paleo iPhone. Forage iPhone +1 wolf organic fixie 8-bit keffiyeh single-origin coffee ennui.
+                      <div class="oneline">
+                        <a href="#" class="entry-attachment tree-item-add">
+                          <i class="grcicon-attach-color"></i><span>Attach supporting file</span>
+                        </a>
+                      </div>
+                      <span class="entry-author">
+                        Modified by <a href="#">Example User</a> on 10/28/2014 03:50:51am PST
+                      </span>
+                    </div>
+                    <div class="entry-actions pull-right">
+                      <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+                      <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+                        <li>
+                          <a href="#">
+                            <i class="grcicon-edit"></i>
+                            Edit Comment
+                          </a>
+                        </li>
+                        <li>
+                          <a href="#">
+                            <i class="grcicon-deleted"></i>
+                            Delete Comment
+                          </a>
+                        </li>
+                      </ul>
+                    </div><!-- entry-actions end -->
+                  </li>
+
+                  <li>
+                    <span class="status-label status-draft"></span>
+                    <div class="w-status">
+                      Carles 90's occupy swag. Tote bag viral occupy, authentic you probably haven't heard of them hashtag fap vegan small batch. Literally dreamcatcher butcher Echo Park YOLO.
+                      <ul class="attachment-list">
+                        <li>
+                          <a href="#">
+                            <i class="grcicon-attach-color"></i>
+                            <span>SuperSecretDocument.pdf</span>
+                          </a>
+                          <a href="#" class="info-action unmap">
+                            <span class="result"></span>
+                            <i class="grcicon-deleted"></i>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="#">
+                            <i class="grcicon-attach-color"></i>
+                            <span>Sneaky Ways to Holidays.doc</span>
+                          </a>
+                          <a href="#" class="info-action unmap">
+                            <span class="result"></span>
+                            <i class="grcicon-deleted"></i>
+                          </a>
+                        </li>
+                      </ul>
+                      <div class="oneline">
+                        <a href="#" class="entry-attachment tree-item-add">
+                          <i class="grcicon-attach-color"></i><span>Attach supporting file</span>
+                        </a>
+                      </div>
+                      <span class="entry-author">
+                        Modified by <a href="#">Example User</a> on 10/28/2014 03:50:51am PST
+                      </span>
+                    </div>
+                    <div class="entry-actions pull-right">
+                        <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+                        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+                          <li>
+                            <a href="#">
+                              <i class="grcicon-edit"></i>
+                              Edit Comment
+                            </a>
+                          </li>
+                          <li>
+                            <a href="#">
+                              <i class="grcicon-deleted"></i>
+                              Delete Comment
+                            </a>
+                          </li>
+                        </ul>
+                      </div><!-- entry-actions end -->
+                  </li>
+                  
+                  <li>
+                    <a href="#" class="btn btn-small btn-info">
+                      Add Comment
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div><!-- row-fluid end -->
+
+          </div><!-- tier-content end -->
+        </div><!-- tier-2-info-content end -->
+      </div><!-- tier-2-info end -->
+    </li>
+  {{/each}}
+  <!--li class="tree-item">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul class="tree-action-list">
+                <li>
+                  Due in 7 days
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-success">Verify</a>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-danger">Decline</a>
+                </li>
+              </ul>
+              <div class="item-data">
+                <span class="status-label status-progress"></span>
+                <div class="tree-title-area w-status">
+                  <a href="#">Check if food is still delicious in Stock Market after 6pm</a>
+                  <ul class="item-util">
+                    <li>
+                      Workflow: <a href="#">Vegan before 6 implementation</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
+        </p>
+      </div>
+    </div>
+  </li>
+  <li class="tree-item">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul class="tree-action-list">
+                <li>
+                  <span class="overdue">Overdue</span>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-success">Verify</a>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-danger">Decline</a>
+                </li>
+              </ul>
+              <div class="item-data">
+                <span class="status-label status-overdue"></span>
+                <div class="tree-title-area w-status">
+                  <a href="#">Gather required doc for Fiber kick-off in Alaska</a>
+                  <ul class="item-util">
+                    <li>
+                      Workflow: <a href="#">Google Fiber EOO</a>
+                    </li>
+                    <li>
+                      Control: <a href="#">Alaska</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
+        </p>
+      </div>
+    </div>
+  </li>
+  <li class="tree-item">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul class="tree-action-list">
+                <li>
+                  Due in 3 days
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-info">Start</a>
+                </li>
+              </ul>
+              <div class="item-data">
+                <span class="status-label status-draft"></span>
+                <div class="tree-title-area w-status">
+                  <a href="#">Implement new password policy accross Google Play store modules</a>
+                  <ul class="item-util">
+                    <li>
+                      Workflow: <a href="#">Google Fiber EOO</a>
+                    </li>
+                    <li>
+                      Control: <a href="#">Login Access</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
+        </p>
+      </div>
+    </div>
+  </li>
+  <li class="tree-item">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul class="tree-action-list">
+                <li>
+                  Due in 7 days
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-success">Verify</a>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-danger">Decline</a>
+                </li>
+              </ul>
+              <div class="item-data">
+                <span class="status-label status-progress"></span>
+                <div class="tree-title-area w-status">
+                  <a href="#">Check if food is still delicious in Stock Market after 6pm</a>
+                  <ul class="item-util">
+                    <li>
+                      Workflow: <a href="#">Vegan before 6 implementation</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
+        </p>
+      </div>
+    </div>
+  </li>
+  <li class="tree-item">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul class="tree-action-list">
+                <li>
+                  <span class="overdue">Overdue</span>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-success">Verify</a>
+                </li>
+                <li>
+                  <a href="#" class="btn btn-small btn-danger">Decline</a>
+                </li>
+              </ul>
+              <div class="item-data">
+                <span class="status-label status-overdue"></span>
+                <div class="tree-title-area w-status">
+                  <a href="#">Gather required doc for Fiber kick-off in Alaska</a>
+                  <ul class="item-util">
+                    <li>
+                      Workflow: <a href="#">Google Fiber EOO</a>
+                    </li>
+                    <li>
+                      Control: <a href="#">Alaska</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ut efficitur est. Quisque non pharetra urna, eu molestie mauris. Aenean aliquam mi ut sem rutrum vulputate a a nisl. Donec nec erat lectus. Donec cursus, ligula quis auctor lobortis, sapien dui ullamcorper purus, non semper nulla neque luctus leo. Aliquam erat volutpat. Nunc in sapien aliquam, ullamcorper quam vitae, euismod felis. Duis hendrerit ex posuere sollicitudin pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus eleifend lectus quis orci tincidunt, fringilla mattis diam ornare. Etiam libero ex, feugiat et mi a, volutpat consequat quam. Quisque hendrerit sapien at massa posuere accumsan. Phasellus blandit lectus nec enim interdum, vel lacinia neque gravida.
+        </p>
+      </div>
+    </div>
+  </li-->
+</ul><!-- tree-structure end -->

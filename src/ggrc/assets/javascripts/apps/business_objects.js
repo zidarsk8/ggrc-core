@@ -63,7 +63,7 @@
       var descriptor = {
         content_controller: CMS.Controllers.TreeView,
         content_controller_selector: "ul",
-        widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
+        widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
         widget_id: far_model.table_singular,
         widget_guard: function(){
           if (far_model.title_plural === "Audits"
