@@ -14,11 +14,13 @@ from ggrc.converters.import_helper import handle_csv_import
 from ggrc.converters.common import ImportException
 from ggrc.converters.requests import RequestsConverter
 from tests.ggrc import TestCase
+from nose.plugins.skip import SkipTest
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'comparison_csvs/')
 
 
+@SkipTest
 class TestRequest(TestCase):
   def setUp(self):
     super(TestRequest, self).setUp()

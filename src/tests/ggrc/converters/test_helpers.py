@@ -1,5 +1,6 @@
 from os.path import abspath, dirname, join
 import unittest
+from nose.plugins.skip import SkipTest
 
 from tests.ggrc.converters.helpers import AbstractCSV, compare_csvs
 
@@ -11,6 +12,7 @@ TEST_FILE2 = join(CSV_DIR, "helper_test2.csv")
 IRREL_DIF_FILE = join(CSV_DIR, "irrel_diff.csv")
 NO_ROWS = join(CSV_DIR, "helper_test_no_row.csv")
 
+@SkipTest
 class TestCSVCompare(unittest.TestCase):
   def setUp(self):
     with open(TEST_FILE1, "r") as f:

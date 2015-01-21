@@ -300,6 +300,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , sortable : false
     , sort_property : null
     , sort_function : null
+    , filter : null
     , start_expanded : false //true
     , draw_children : true
     , find_function : null
@@ -635,12 +636,15 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         , draw_items_dfds = []
         , sort_prop = this.options.sort_property
         , sort_function = this.options.sort_function
+        , filter = this.options.filter
         ;
       options_list = can.makeArray(options_list);
       can.map(options_list, function(options) {
-        var $li = $("<li />").cms_controllers_tree_view_node(options);
-        draw_items_dfds.push($li.control()._draw_node_deferred);
-        $items.push($li[0]);
+        if ( !filter || filter.evaluate(options.instance._data)) {
+          var $li = $("<li />").cms_controllers_tree_view_node(options);
+          draw_items_dfds.push($li.control()._draw_node_deferred);
+          $items.push($li[0]);
+        }
       });
 
       if (sort_prop || sort_function) {

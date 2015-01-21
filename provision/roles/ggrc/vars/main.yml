@@ -16,7 +16,7 @@ ggrc_packages:
   - name: python-dev
   - name: rubygems
   - name: nodejs
-  - name: npm
+  - name: libfontconfig
 
 ggrc_development_directories:
   - name: /vagrant-dev
@@ -27,6 +27,11 @@ ggrc_development_directories:
 ggrc_npm_modules:
   - name: nodeunit
   - name: pegjs
+  - name: karma
+  - name: karma-cli
+  - name: karma-jasmine
+  - name: jasmine-core
+  - name: mkdirp
 
 ggrc_gems:
   - name: sass

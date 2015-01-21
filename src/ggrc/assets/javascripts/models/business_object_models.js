@@ -37,6 +37,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
@@ -119,6 +120,7 @@ can.Model.Cacheable("CMS.Models.Project", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
@@ -186,6 +188,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
@@ -272,6 +275,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
@@ -356,6 +360,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
@@ -438,6 +443,7 @@ can.Model.Cacheable("CMS.Models.Market", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
@@ -505,6 +511,7 @@ can.Model.Cacheable("CMS.Models.Vendor", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null

@@ -38,6 +38,7 @@ dashboard-js-files:
   - client_record_replay.js
   - mustache_helper.js
   - sticky_header.js
+  - generated/ggrc_filter_query_parser.js
   - models/mappers.js
   - models/mappings.js
   - models/mixins.js
@@ -111,6 +112,7 @@ dashboard-js-template-files:
   - base_objects/tree.mustache
   - base_objects/tree_footer_no_access.mustache
   - base_objects/tree_footer_zero.mustache
+  - base_objects/tree_view_filters.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
   - base_objects/filters/advanced_search_filter_actions.mustache
@@ -273,6 +275,7 @@ dashboard-css-files:
 
 dashboard-js-spec-files:
   - spec_setup.js
+  - generated/ggrc_filter_query_parser_spec.js
   - models/local_storage_spec.js
   - models/recently_viewed_object_spec.js
   - models/display_prefs_spec.js
@@ -280,3 +283,4 @@ dashboard-js-spec-files:
 
 dashboard-js-spec-helpers:
   - jasmine-fixture.js
+  - spec_helpers.js

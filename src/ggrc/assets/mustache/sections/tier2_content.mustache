@@ -14,6 +14,9 @@
     {{#if_helpers '\
       if_instance_of' instance "Section" '\
       and if_instance_of' parent_instance "Directive"}}
+
+      {{> /static/mustache/base_objects/unmap.mustache}}
+
       {{#is_allowed 'update' instance}}
         <li class="border">
           <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-object-singular-override="{{#if_equals instance.directive.type 'Contract'}}Clause{{/if_equals}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{instance.class.model_singular}}" data-object-id="{{instance.id}}">
@@ -109,6 +112,3 @@
       </p>
     </div>
   </div>
-
-  {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
-</div>
