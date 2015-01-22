@@ -220,10 +220,16 @@ can.Control("CMS.Controllers.LHN", {
       var value;
       if(ev.which === 13) {
         value = $(ev.target).val();
-        this.obs.attr("value", value);
-        this.options.display_prefs.setLHNState("search_text", value);
+        this.do_search(value);
       }
     }
+
+  , "submit": function (el, ev) {
+      ev.preventDefault();
+      
+      var value = $(ev.target).find("input.widgetsearch").val();
+      this.do_search(value);
+  }
 
   , ".widgetsearch keyup": function(el, ev) {
       if(el.val().trim() !== "") {
@@ -356,6 +362,11 @@ can.Control("CMS.Controllers.LHN", {
         prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
       });
     }
+
+  , do_search: function (value) {
+    this.obs.attr("value", value);
+    this.options.display_prefs.setLHNState("search_text", value);
+  }
 
   , mousedown : false
   , dragged : false

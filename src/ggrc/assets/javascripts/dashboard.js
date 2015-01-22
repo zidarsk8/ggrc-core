@@ -616,7 +616,7 @@ jQuery(function($) {
       $lhs_search.find(".widgetsearch").css("width", "130px");
     } else {
       $this.addClass("active");
-      $lhn.addClass("active").width(240).animate({left: "0"}, options);
+      $lhn.addClass("active").animate({left: "0"}, options);
       $lhnType.addClass("active").animate({left: "0"}, options);
       $lhn_bar.addClass("active").animate({left: "240"}, options);
       $lhs_search.addClass("active");
