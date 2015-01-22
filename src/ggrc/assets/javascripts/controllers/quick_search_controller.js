@@ -210,6 +210,8 @@ can.Control("CMS.Controllers.LHN", {
       });
       this.element.find(".lhs-holder").on("scroll", self.lhs_holder_onscroll);
 
+      // this is ugly, but the trigger doesn't nest inside our top element
+      $(".lhn-trigger").on("click", this.lhn_animate.bind(this));
     }
 
   , should_show_lhn: function() {
@@ -247,7 +249,46 @@ can.Control("CMS.Controllers.LHN", {
       this.obs.attr("my_work", checked);
         //target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
       this.options.display_prefs.setLHNState("my_work", checked);
+      this.set_active_tab(checked);
     }
+
+  , lhn_animate: function () {
+      var options = {
+          duration: 800,
+          easing: 'easeOutExpo'
+      },
+          $this = this.element,
+          $lhn = $this.closest("body").find(".lhs-holder"),
+          lhn_width = $lhn.width() - 20,
+          $lhn_bar = $this.closest("body").find(".bar-v"),
+          $lhnType = $this.closest("body").find(".lhn-type"),
+          $lhs_search = $this.closest("body").find(".lhs-search");
+      
+      this.set_active_tab();
+
+      if($this.hasClass("active")) {
+          $this.removeClass("active");
+          $lhn.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
+          $lhnType.removeClass("active").animate({left: "-246"}, options).css("width", "246px");
+          $lhn_bar.removeClass("active").animate({left: "-8"}, options);
+          $lhs_search.removeClass("active").css("width", "196px");
+          $lhs_search.find(".widgetsearch").css("width", "130px");
+      } else {
+          $this.addClass("active");
+          $lhn.addClass("active").animate({left: "0"}, options);
+          $lhnType.addClass("active").animate({left: "0"}, options);
+          $lhn_bar.addClass("active").animate({left: "240"}, options);
+          $lhs_search.addClass("active");
+      }
+  }
+
+  , set_active_tab: function (newval) {
+    newval || (newval = this.obs.attr("my_work"));
+
+    var value = ["all", "my_work"][Number(newval)];
+    $("a[data-name='work_type']").removeClass("active");
+    $("a[data-name='work_type'][data-value='"+value+"'").addClass("active");
+  }
 
   , init_lhn: function() {
       var self = this;

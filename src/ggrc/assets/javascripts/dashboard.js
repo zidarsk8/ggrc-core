@@ -593,40 +593,6 @@ jQuery(function($) {
     return false
   });
 
-  //New Dashboard 
-  // LHN show/hide
-  function lhnAnimate() {
-    var options = {
-          duration: 800,
-          easing: 'easeOutExpo'
-        },
-        $this = $(this),
-        $lhn = $this.closest("body").find(".lhs-holder"),
-        lhn_width = $lhn.width() - 20,
-        $lhn_bar = $this.closest("body").find(".bar-v"),
-        $lhnType = $this.closest("body").find(".lhn-type"),
-        $lhs_search = $this.closest("body").find(".lhs-search");
-
-    if($this.hasClass("active")) {
-      $this.removeClass("active");
-      $lhn.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
-      $lhnType.removeClass("active").animate({left: "-246"}, options).css("width", "246px");
-      $lhn_bar.removeClass("active").animate({left: "-8"}, options);
-      $lhs_search.removeClass("active").css("width", "196px");
-      $lhs_search.find(".widgetsearch").css("width", "130px");
-    } else {
-      $this.addClass("active");
-      $lhn.addClass("active").animate({left: "0"}, options);
-      $lhnType.addClass("active").animate({left: "0"}, options);
-      $lhn_bar.addClass("active").animate({left: "240"}, options);
-      $lhs_search.addClass("active");
-    }
-  }
-
-  //$(".nav-trigger").on("click", topNav);
-  //$(".lhn-trigger").on("click", lhnAnimate);
-  $('body').on('click', '.lhn-trigger', lhnAnimate);
-
 });
 
 jQuery(resize_areas);
