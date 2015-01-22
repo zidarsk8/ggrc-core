@@ -13,6 +13,7 @@ from flask import redirect, flash
 from ggrc.services.common import get_modified_objects, update_index
 from ggrc.services.common import update_memcache_before_commit, update_memcache_after_commit
 from ggrc.utils import benchmark
+from ggrc.models import CustomAttributeDefinition
 
 CACHE_EXPIRY_IMPORT=600
 
@@ -36,6 +37,7 @@ class BaseConverter(object):
     self.total_imported = 0
     self.objects_created = 0
     self.objects_updated = 0
+    self.custom_attribute_definitions = {}
 
     self.create_metadata_map()
     self.create_object_map()
@@ -45,6 +47,13 @@ class BaseConverter(object):
 
   def create_object_map(self):
     self.object_map = self.object_map
+    definitions = db.session.query(CustomAttributeDefinition).\
+      filter(CustomAttributeDefinition.definition_type==self.row_converter.model_class.__name__).all()
+    for definition in definitions:
+      # Remember the definition title for use when exporting
+      self.object_map[definition.title] = definition.title
+      # Remember the definition for use when importing.
+      self.custom_attribute_definitions[definition.title] = definition
 
   def results(self):
     return self.objects
@@ -182,6 +191,7 @@ class BaseConverter(object):
       row = self.row_converter(self, row_attrs, index, **options)
       row.setup()
       row.reify()
+      row.reify_custom_attributes()
       self.objects.append(row)
 
     self.set_import_stats()

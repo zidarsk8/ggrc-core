@@ -4,18 +4,17 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from datetime import datetime
-import re
+
 from .common import *
 from ggrc.models.all_models import (
     Audit, ControlCategory, ControlAssertion,
     Control, Document, Objective, ObjectControl, ObjectiveControl,
     ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process,
-    Relationship, Request, Section, SectionBase, SectionObjective,
+    Relationship, Request, SectionBase, SectionObjective,
     System, SystemOrProcess,
 )
 from ggrc.models.exceptions import ValidationError
 from ggrc.app import app
-
 
 def unpack_list(vals):
   result = []
@@ -66,6 +65,9 @@ class BaseRowConverter(object):
     self.warnings = {}
     self.messages = {}
 
+  def reify_custom_attributes(self):
+    for definition in self.importer.custom_attribute_definitions:
+      return self.handle(definition.title(), CustomAttributeColumnHandler)
 
   def add_error(self, key, message):
     self.errors.setdefault(key, []).append(message)
@@ -193,6 +195,9 @@ class BaseRowConverter(object):
     except ValidationError as e: # Validation taken care of in handlers
       pass
 
+  def set_custom_attr(self, definition, value):
+    print ">>> FIXME: Setting custom attribute."
+
   def get_attr(self, name):
     return getattr(self.obj, name, '') or ''
 
@@ -272,6 +277,28 @@ class ColumnHandler(object):
   def export(self):
     return getattr(self.importer.obj, self.key, '')
 
+class CustomAttributeColumnHandler(ColumnHandler):
+
+  def validate(self, data):
+    definition = self.base_importer.custom_attribute_definitions[self.key]
+    if definition.mandatory and data in ("", None):
+      missing_column = self.base_importer.get_header_for_column(
+                        self.base_importer.object_map, self.key)
+      self.add_error("{} is required.".format(missing_column))
+
+  # def go_import(self, content):
+  #   # validate first to trigger error in case field is required but None
+  #   # TODO: Unit tests of imports with and without required fields
+  #   self.validate(content)
+  #   if content is not None:
+  #     data = self.parse_item(content)
+  #     if data is not None:
+  #       self.value = data
+  #       self.set_attr(data)
+
+  def set_attr(self, value):
+    self.importer.set_custom_attr(
+      self.base_importer.custom_attribute_definitions[self.key], value)
 
 class RequestTypeColumnHandler(ColumnHandler):
 
