@@ -10,6 +10,12 @@ from ggrc.app import app
 from ggrc.models import create_db, drop_db
 from ggrc import settings
 
+if os.environ.get('TRAVIS', False):
+    db.engine.execute("DROP DATABASE IF EXISTS ggrcdevtest;")
+    db.engine.execute("CREATE DATABASE ggrcdevtest; USE ggrcdevtest;")
+
+    create_db(use_migrations=True, quiet=True)
+
 class TestCase(BaseTestCase):
   def setUp(self):
     pass
