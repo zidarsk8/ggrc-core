@@ -7,6 +7,12 @@
 
 .lhs-holder {
   overflow-x: hidden;
+  @include transition-property(left);
+  @include transition-duration(.8s);
+  left: -240px;
+  &.active {
+    left: 0px;
+  }
 }
 
 .lhs {
@@ -103,7 +109,13 @@
 
 .lhn-type {
   @include clearfix();
+  @include transition-property(left);
+  @include transition-duration(.8s);
   min-width: 246px;
+  left: -246px;
+  &.active {
+    left: 0px;
+  }
   a {
     float: left;
     height: 34px;
@@ -474,6 +486,8 @@
 }
 
 .bar-v {
+  @include transition-property(left);
+  @include transition-duration(.8s);
   position: fixed;
   top: 176px;
   left: -8px;
@@ -488,6 +502,9 @@
   background-repeat: no-repeat;
   background-position: 2px 50%;
   cursor: ew-resize;
+  &.active {
+    left: 246px;
+  }
   &:hover {
     background-color: $white;
   }
@@ -1186,4 +1203,3 @@ label {
 input[type="radio"].my-work {
   margin-top: -4px;
 }
-

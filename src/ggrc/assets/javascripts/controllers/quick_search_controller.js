@@ -214,11 +214,11 @@ can.Control("CMS.Controllers.LHN", {
       $(".lhn-trigger").on("click", this.animate_lhn.bind(this));
 
       setTimeout(function () {
-          if (this.is_lhn_open()) {
-              this.open_lhn();
-          }else{
-              this.close_lhn();
-          }
+        if (this.is_lhn_open()) {
+          this.open_lhn();
+        }else{
+          this.close_lhn();
+        }
       }.bind(this), 500);
     }
 
@@ -281,17 +281,12 @@ can.Control("CMS.Controllers.LHN", {
   }
 
   , close_lhn: function () {
-      var options = {
-          duration: 800,
-          easing: 'easeOutExpo'
-      };
-
       // not nested
       $(".lhn-trigger").removeClass("active");
             
-      this.element.find(".lhs-holder").removeClass("active").animate({left: "-240"}, options).css("width", "240px");
-      this.element.find(".lhn-type").removeClass("active").animate({left: "-246"}, options).css("width", "246px");
-      this.element.find(".bar-v").removeClass("active").animate({left: "-8"}, options);
+      this.element.find(".lhs-holder").removeClass("active").css("width", "240px");
+      this.element.find(".lhn-type").removeClass("active").css("width", "246px");
+      this.element.find(".bar-v").removeClass("active");
       this.element.find(".lhs-search").removeClass("active").css("width", "196px");
       this.element.find(".widgetsearch").css("width", "130px");
 
@@ -304,14 +299,9 @@ can.Control("CMS.Controllers.LHN", {
       // not nested
       $(".lhn-trigger").addClass("active");
 
-      var options = {
-          duration: 800,
-          easing: 'easeOutExpo'
-      };
-      
-      this.element.find(".lhs-holder").animate({left: 0}, options);
-      this.element.find(".lhn-type").animate({left: 0}, options);
-      this.element.find(".bar-v").animate({left: 240}, options);
+      this.element.find(".lhs-holder").addClass("active");
+      this.element.find(".lhn-type").addClass("active");
+      this.element.find(".bar-v").addClass("active");
       this.element.find(".lhs-search").addClass("active");
       
       this.options.display_prefs.setLHNState({is_open: true});
