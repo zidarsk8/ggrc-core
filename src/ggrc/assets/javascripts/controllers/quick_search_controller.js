@@ -212,6 +212,14 @@ can.Control("CMS.Controllers.LHN", {
 
       // this is ugly, but the trigger doesn't nest inside our top element
       $(".lhn-trigger").on("click", this.animate_lhn.bind(this));
+
+      setTimeout(function () {
+          if (this.is_lhn_open()) {
+              this.open_lhn();
+          }else{
+              this.close_lhn();
+          }
+      }.bind(this), 500);
     }
 
   , should_show_lhn: function() {
