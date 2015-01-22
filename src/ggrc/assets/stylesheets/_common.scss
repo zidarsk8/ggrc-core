@@ -340,7 +340,7 @@ a {
   }
 }
 
-@each $status_label in draft, progress, overdue, final {
+@each $status_label in draft, progress, overdue, final, active {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }
@@ -974,6 +974,10 @@ select.multiple-selector {
         margin-top: 5px;
       }
     }
+    &.pull-right {
+      width: auto;
+      float: right;
+    }
   }
   &.task-wrap {
     span.empty {
@@ -1045,10 +1049,6 @@ a {
     padding-right:60px;
     margin-bottom:10px;
   }
-}
-
-.upp {
-  text-transform:uppercase;
 }
 
 .cap {
@@ -1262,6 +1262,9 @@ p {
   }
   &.final {
     color: $lightGreen;
+  }
+  &.active {
+    color: $lightBlue;
   }
   .tree-title-area & {
     font-weight: normal;

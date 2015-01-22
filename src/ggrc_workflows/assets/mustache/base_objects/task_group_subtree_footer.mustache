@@ -2,20 +2,21 @@
 {{#if_task_group_assignee_privileges parent_instance}}
 {{#using workflow=parent_instance.workflow}}
 {{^if_equals workflow.status 'Inactive'}}
-<li class="tree-footer non-stick">
+<li class="tree-item-add no-left-space">
   <a
+    class="btn btn-small btn-draft"
+    rel="tooltip"
+    data-placement="right"
+    data-original-title="Add Object"
     href="javascript://"
-    class="inline-footer-link"
     data-toggle="multitype-object-modal-selector"
     data-modal-class="modal-wide"
     data-modal-reset="reset"
-    data-placement="left"
     data-join-mapping="objects"
     data-join-object-id="{{parent_instance.id}}"
     data-join-object-type="TaskGroup"
-    data-exclude-option-types=""
-    >
-    + Add Object
+    data-exclude-option-types="">
+    <i class="grcicon-add-black"></i>
   </a>
 </li>
 {{/if_equals}}

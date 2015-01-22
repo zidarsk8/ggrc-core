@@ -4,67 +4,69 @@
     Created By: laran@reciprocitylabs.com
     Maintained By: laran@reciprocitylabs.com
 }}
-  <li class="tree-item program task-group-index" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <li class="tree-item task-group-index" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
-      <div class="openclose">
-        <div class="row-fluid">
-          <div class="span12">
-            <div class="item-data {{^if_equals parent_instance.task_groups.length 1}}ordered-item-data{{/if}}">
-              <div class="span7">
-                <div class="oneline">
+      <div class="item-wrap">
+        <div class="openclose">
+          <span class="status-label status-{{to_class parent_instance.status '_'}}"></span>
+          <i class="grcicon-arrow-right"></i>
+        </div>
+        <div class="select {{^if_equals parent_instance.task_groups.length 1}}ordered-item-data{{/if}}">
+          <div class="item-data">
+            <div class="row-fluid">
+              <div class="span6">
+                <div class="title tree-title-area">
+                  <!-- This drag icon is just temporary here until we move 2nd tier info to bottom info pin -->
                   {{^if_equals parent_instance.task_groups.length 1}}
                     <span class="drag"><i class="grcicon-drag"></i></span>
                   {{/if}}
                   {{instance.title}}
                 </div>
               </div>
-              <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-                <i class="grcicon-person-green pull-left"></i>
-                {{#using assignee=instance.contact}}
-                {{#is_allowed 'update' 'TaskGroup' context=instance.context}}
-                  {{#using workflow=instance.workflow}}
-                  {{#if_equals workflow.status 'Inactive'}}
-                    <div class="item-data">
-                      <span class="tree-title-area oneline">
-                        {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
-                      </span>
-                    </div>
-                  {{else}}
-                    <div class="objective-selector">
-                      <input type="text" name="contact.name" data-lookup="Person" data-params="Person:is_enabled=1" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
-                    </div>
-                  {{/if_equals}}
-                  {{/using}}
-                {{else}}
-                  <div class="item-data">
-                    <span class="tree-title-area oneline">
+              <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+                <div class="owner tree-title-area">
+                  {{#using assignee=instance.contact}}
+                  {{#is_allowed 'update' 'TaskGroup' context=instance.context}}
+                    {{#using workflow=instance.workflow}}
+                    {{#if_equals workflow.status 'Inactive'}}
                       {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
+                    {{else}}
+                      <div class="objective-selector">
+                        <input type="text" name="contact.name" data-lookup="Person" data-params="Person:is_enabled=1" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
+                      </div>
+                    {{/if_equals}}
+                    {{/using}}
+                  {{else}}
+                    {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
+                  {{/is_allowed}}
+                  {{/using}}
+                </div>
+              </div>
+              <div class="span4">
+                <ul class="tree-action-list">
+                  <li>
+                    {{#with_mapping 'objects' instance}}
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
+                      <i class="grcicon-object-black"></i>
+                      <strong class="error">{{objects.length}}</strong>
                     </span>
-                  </div>
-                {{/is_allowed}}
-                {{/using}}
-              </div>
-              <div class="span1">
-                {{#with_mapping 'objects' instance}}
-                <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
-                  <i class="grcicon-object-black"></i>
-                  <strong class="error">{{objects.length}}</strong>
-                </span>
-                {{/with_mapping}}
-              </div>
-              <div class="span1">
-                {{#with_mapping 'task_group_tasks' instance}}
-                <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                  <i class="grcicon-task-black"></i>
-                  <strong class="error">{{task_group_tasks.length}}</strong>
-                </span>
-                {{/with_mapping}}
+                    {{/with_mapping}}
+                  </li>
+                  <li>
+                    {{#with_mapping 'task_group_tasks' instance}}
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
+                      <i class="grcicon-task-black"></i>
+                      <strong class="error">{{task_group_tasks.length}}</strong>
+                    </span>
+                    {{/with_mapping}}
+                  </li>
+                </ul>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          </div><!-- item-data end -->
+        </div><!-- select end -->
+      </div><!-- item-wrap end -->
+    </div><!-- item-main end -->
 
     <div class="tier-2-info item-content" style="display: none;">
       <div class="tier-2-info-content">
@@ -73,21 +75,19 @@
 
           {{#if draw_children}}
             {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
-
             <div class="template-setup">
-              <div class="row-fluid">
+              <div class="row-fluid wrap-row">
                 <div class="span8 task-list">
                   {{#child_options.1}}
-
                     <h3>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
                     <h4 class="inline-explanation">Define and reorder tasks</h4>
                     <ul class="tree-structure new-tree" {{data 'options'}}
                       {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
                       {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
                     </ul>
-
                   {{/child_options.1}}
                 </div>
+
                 <div class="span4">
                   {{#child_options.0}}
                     <h3>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
@@ -96,18 +96,13 @@
                     <ul class="tree-structure new-tree" {{data 'options'}}
                       {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
                     </ul>
-
                   {{/child_options.0}}
-
-
                 </div>
               </div>
             </div>
-
             {{/prune_context}}
           {{/if}}
-
-
+        </div>
       </div>
     </div>
   </li>

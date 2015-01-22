@@ -400,6 +400,9 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 %status-final {
   background: $lightGreen;
 }
+%status-active {
+  background: $lightBlue;
+}
 
 // flat buttons color
 %btn-primary {

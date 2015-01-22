@@ -997,6 +997,9 @@ ul.new-tree {
     padding-left: 10px;
     line-height: 40px;
     background: $white;
+    &.no-left-space {
+      padding-left: 0;
+    }
     a {
       font-weight:bold;
     }
@@ -1447,7 +1450,12 @@ ul.new-tree {
         &:last-child {
           margin-right: 0;
         }
-      } 
+      }
+      .objective-selector {
+        input {
+          margin-bottom: 0;
+        }
+      }
     }
     &.code {
       text-transform: uppercase;

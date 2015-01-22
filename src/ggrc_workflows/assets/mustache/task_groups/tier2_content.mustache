@@ -1,6 +1,6 @@
-
-<div class="action-bar">
-  <ul class="change-links">
+<div class="details-wrap">
+  <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+  <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
     {{#using workflow=instance.workflow}}
       {{^if_equals workflow.status 'Inactive'}}
         {{> /static/mustache/base_objects/edit_object_link.mustache}}
@@ -10,6 +10,7 @@
     <li>
       <task-group-clone task-group="instance">
         <a href="javascript://">
+          <i class="grcicon-clone"></i>
           Clone Task Group
         </a>
       </task-group-clone>
@@ -18,25 +19,19 @@
   </ul>
 </div>
 
-<div class="small-info">
-  <div class="row-fluid">
+<div class="tier-content">
+  <div class="row-fluid wrap-row">
     <div class="span12">
       <h6>Task Group</h6>
-      <h3 class="taskGroupTitle">
+      <h3>
         {{instance.title}}
-        {{!<a href="javascript://" class="toggleClosest"><i class="grcicon-edit"></i></a>}}
       </h3>
-      <div class="taskGroupTitleForm edit-field hide">
-        <input type="text" value="{{title}}" class="pull-left saveTaskGroupField" data-index="{{@index}}" data-field="title">
-        <a href="javascript://" id="editFieldSave" class="btn btn-success pull-left toggleClosest">Save</a>
-        <a href="javascript://" id="editFieldCancel" class="pull-left toggleClosest cancel-text"><i class="grcicon-x-grey"></i>Cancel</a>
-      </div>
     </div>
   </div>
 
   {{#using workflow=instance.workflow}}
     {{#if_equals workflow.status 'Active'}}
-      <div class="row-fluid">
+      <div class="row-fluid wrap-row">
         <div class="span12">
             <div class="alert">
               <button type="button" class="close" data-dismiss="alert">
@@ -61,4 +56,3 @@
     </div>
     <br>
   {{/if_equals}}
-</div>

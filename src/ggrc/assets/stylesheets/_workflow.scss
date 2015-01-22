@@ -395,6 +395,8 @@ ul.new-tree {
 }
 
 .template-setup {
+  overflow: hidden;
+  zoom: 1;
   h3 {
     font-size:14px;
     font-weight:bold;
@@ -422,24 +424,12 @@ ul.new-tree {
   }
 }
 
-.inline-footer-link {
-  border-top:1px solid #eee;
-  display:block;
-  line-height:30px;
-  padding-top:0px;
-  color:$link;
-  font-weight:bold;
-}
-
 .inline-explanation {
   color:#777;
   font-style:italic;
   line-height:30px;
   font-size:12px;
-  
 }
-
-
 
 .btn.end-cycle.pull-right {
   margin-top:3px;
