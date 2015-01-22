@@ -66,12 +66,14 @@
   {{/if_equals}}
 
   {{#if_equals widget_id "info"}}
+  {{^is_dashboard}}
     <header class="header">
       <h2>
         <i class="{{widget_icon}}"></i>
         {{{widget_name}}}
       </h2>
     </header>
+  {{/is_dashboard}}
   {{/if_equals}}
 
   {{^if_equals widget_id "info"}}
