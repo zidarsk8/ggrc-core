@@ -239,15 +239,14 @@ can.Control("CMS.Controllers.LHN", {
       }
     }
 
-  , "input.my-work click": function(el, ev) {
+  , "a[data-name='work_type'] click": function(el, ev) {
       var target = $(ev.target),
           checked;
-      if (target.is('input.my-work')) {
-        checked = target.val() === 'my_work';
-        this.obs.attr("my_work", checked);
+      
+      checked = target.data('value') === 'my_work';
+      this.obs.attr("my_work", checked);
         //target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
-        this.options.display_prefs.setLHNState("my_work", checked);
-      }
+      this.options.display_prefs.setLHNState("my_work", checked);
     }
 
   , init_lhn: function() {
