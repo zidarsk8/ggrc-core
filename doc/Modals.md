@@ -4,23 +4,22 @@
  - Where the basic low level code for modals exists
  - ModalForm subclasses Form, and it's cloned from Bootstrap for historical reasons. Some of the code may not be used any more.
  - Can generate flash messages that aren't obscured by the backdrop
- 
- 
+
+
 ## `modal-ajax.js`:
- - Spawns modals; named that way for historical reasons since Rails
+ - Spawns modals; named that way for historical reasons (Rails)
  - A big click handler - looking at the `data-toggle` attribute to figure out which modal to open: `data-toggle=modal-ajax`
  - `GGRC.register_global_hook` instantiates modals based on links that have that attribute
- - The biggest one is form - all the edit object fields
- - We apply modals controller to in this file as well
- - We are handling modal:success on modal-ajax.js as well. We navigate to a new URL here.
- - Dirty checks - legacy code, can be removed. `data-dirty` sutff in .mustache marks elements that need reload, but there are only a few left any more
+ - The biggest one is form - all the edit object modals
+ - We apply modals controller in this file as well
+ - We are handling modal:success on modal-ajax.js. It's used to navigate to a new URL here.
+ - Dirty checks - legacy code, can possibly be removed. `data-dirty` stuff in .mustache marks elements that need reload, but there are only a few left any more
  - Adding a new type of modal - create a new handler
  - [_modal_show](https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L355-L423): handles stacking, positioning and prevents double submit and escape
  - [line 451](https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L451) extends the Bootstrap model
  - `GGRC.register_global_hook` can be used to add a special modal for a module
  - if you click Delete, a new modal is displayed, [lines 119-151](https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L119-L151)
 
- 
 Each modal can have its own controller that handles actions performed by the modals
 
 ## `modals_controller.js`:
@@ -32,7 +31,7 @@ Each modal can have its own controller that handles actions performed by the mod
  - regulations/modal_content.mustache line 52: data-params="Person:is_enabled=1" to look only for authorized
  - wysiwyg_html extension - we need it to fire triggers when the textarea is updates because we can't read the iframe, it's not in the same domain
 
- * init() 
+ * init()
    - fetch_all fetches the data and template
    - fetch_data a bit complex because we could be TBD
    - _transient property - added to the object instance while the object is open, but removed from the modal once the modal closes
@@ -60,6 +59,6 @@ Each modal can have its own controller that handles actions performed by the mod
 
 ## 'Deferred' modal elements
 
-`mark_for_deletion`/`mark_for_addition` in `cacheable.js` adds/removes itmes into `_pending_joins`. These pending joins are then handled in `resolve_deferred_bindings`. Removes are easy - it just destroys the mapping. Add case is a bit more complex, check if we aren't readding. 
+`mark_for_deletion`/`mark_for_addition` in `cacheable.js` adds/removes items into `_pending_joins`. These pending joins are then handled in `resolve_deferred_bindings`. Removes are easy - it just destroys the mapping. The "add" case is a bit more complex than the "remove" case, as we must check we aren't re-mapping something which is already mapped.
 
-`ggrc_modal_connector` Component used for mapping audits inside modals. Double layer of indirection in this case because context is not yet available when we are creating an new audit. When autocomplete selects a person the app is using `this.scope.changes` to handle the double deferred. Otherwise we just `mark_for_addition` (adding responses). `data-object-source` used for picker additions. `.ui-autocomplete-input` we listen on this for when a new object is created in the mapping modal. That object is created even if we cencel the modal.
+`ggrc_modal_connector` Component used for mapping audits inside modals. Double layer of indirection in this case because context is not yet available when we are creating a new audit. When autocomplete selects a person the app is using `this.scope.changes` to handle the double deferred. Otherwise we just `mark_for_addition` (adding responses). `data-object-source` used for picker additions. `.ui-autocomplete-input` we listen on this for when a new object is created in the mapping modal. That object is created even if we cancel the modal.
