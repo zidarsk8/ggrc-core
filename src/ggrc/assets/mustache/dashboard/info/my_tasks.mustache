@@ -7,7 +7,7 @@
 
 
 <ul class="tree-structure new-tree dashboard-tree task-tree">
-  {{#each options}}
+  {{#each list}}
     <li class="tree-item item-list" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}} data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}> 
       <div class="item-main" {{data 'model'}}>
         <div class="openclose">

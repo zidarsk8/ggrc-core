@@ -114,7 +114,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
         can.view(my_view, new can.Map(options), function(frag) {
           if (self.element) {
             if (prepend)
-              self.element.find(component_class).prepend(frag);//self.element.find('ul.workflow-tree').prepend(frag);
+              self.element.find(component_class).prepend(frag);
             else
               self.element.find(component_class).append(frag);
           }
@@ -208,7 +208,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
         my_view = this.options.context.workflow_view,
         component_class = 'ul.workflow-tree',
         prepend = true,
-        workflow_data = this.options.context.workflow_data,
+        workflow_data = {},
         wfs;
 
       GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
@@ -226,7 +226,8 @@ can.Control("GGRC.Controllers.InfoWidget", {
       }).then(function(){
         if(wfs.length > 0){
           //TBD sort workflows for the first 5 workflow-end-dates
-          workflow_data.options = wfs;
+          workflow_data.list = wfs;
+          self.options.context.attr('workflow_data', workflow_data);
           self.insert_options(workflow_data, my_view, component_class, prepend);
         }
       });
@@ -237,7 +238,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
   , load_my_tasks: function(){
     var self = this,
         my_view = this.options.context.task_view,
-        task_data = this.options.context.task_data,
+        task_data = {},
         component_class = 'ul.task-tree',
         prepend = true;
 
@@ -246,11 +247,59 @@ can.Control("GGRC.Controllers.InfoWidget", {
     if(loader) {
       loader.refresh_instances().then(function(tasks) {
         self.options.context.attr('task_count', tasks.length);
-        task_data.options = tasks;
+        task_data.list = tasks;
         self.insert_options(task_data, my_view, component_class, prepend);
+        self.options.context.attr('task_data', task_data);
       })
     }
     return 0;
+  }
+
+  ////button actions  
+  , "input[data-lookup] focus" : function(el, ev) {
+    this.autocomplete(el);
+  }
+
+  , autocomplete : function(el) {
+    $.cms_autocomplete.call(this, el);
+  }
+
+  , autocomplete_select : function(el, ev, ui) {
+      setTimeout(function(){
+        if (ui.item.title) {
+          el.val(ui.item.title, ui.item);
+        } else {
+          el.val(ui.item.name ? ui.item.name : ui.item.email, ui.item);
+        }
+        el.trigger('change');
+      }, 0);
+  }
+
+  , "input, select change" : function(el, ev) {
+    console.log("selection changed-------");
+
+    /*if (el.is(":text")) {
+      // if we have a custom filter inside a text field.
+
+      var tree_view = this.element.closest('.cms_controllers_tree_view').control();
+      this.current_query = GGRC.query_parser.parse(el.val());
+      tree_view.options.attr('sort_function', this.current_query.order_by.compare);
+      tree_view.options.attr('filter', this.current_query);
+      tree_view.reload_list();
+
+    } else {
+      // this is left from the old filters and should eventually be replaced
+      // Convert '.' to '__' ('.' will cause can.Observe to try to update a path instead of just a key)
+      var name = el.attr("name").replace(/\./g, '__');
+      if(el.is(".hasDatepicker")) {
+        this.options.states.attr(name, moment(el.val(), "MM/DD/YYYY"));
+      } else if (el.is(":checkbox") && !el.is(":checked")) {
+        this.options.states.removeAttr(name);
+      } else {
+        this.options.states.attr(name, el.val());
+      }
+    }*/
+    ev.stopPropagation();
   }
 
 });

@@ -1,57 +1,75 @@
 
-<li class="inline-filtering task-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }}>
-  <form class="form-search" onsubmit="return false" autocomplete="off">
-    <div class="row-fluid">
-      <div class="span2">
-        <div class="filter-title">
-          <h6>
-            Filter Tasks
-          </h6>
+<ul class="tree-structure new-tree dashboard-tree inline-task-filter">
+  {{log "sasmita task filter view---task data"}}{{log task_data}}
+
+  <li class="filter-wrap">
+    <div class="filter-border">
+      <form>
+        <div class="row-fluid">
+          <div class="span9">
+            <ul>
+              <li>
+                <label>
+                  Status
+                </label>
+                <select name="status" class="input-small">
+                  <option value="">Any</option>
+                  <option value="Verified">Verified</option>
+                  <option value="Finished">Finished</option>
+                  <option value="InProgress">In Progress</option>
+                  <option value="Assigned">Assigned</option>
+                </select>
+              </li>
+              <li>
+                <input
+                  class="input-block-level input-medium"
+                  placeholder="Filter by Object"
+                  type="text"
+                  name="cycle_task_group_object.title"
+                  value="{{cycle_task_group_object.title}}"
+                  {{#task_data}}
+                    {{data 'from-list'}}
+                  {{/task_data}}
+                  data-srclist="{{task_data}}"
+                  data-lookup="cycle_task_group_object.object"
+                  data-template="/directives/autocomplete_result.mustache"
+                  null-if-empty="null-if-empty"
+                  {{ autocomplete_select }}
+                >
+              </li>
+              <li>
+                <input
+                  class="input-block-level input-medium"
+                  placeholder="Filter by Workflow"
+                  type="text"
+                  name="cycle.workflow.title"
+                  value="{{cycle.workflow.title}}"
+                  {{#task_data}}
+                    {{data 'from-list'}}
+                  {{/task_data}}
+                  data-lookup="cycle.workflow"
+                  null-if-empty="null-if-empty"
+                  {{ autocomplete_select }}
+                >
+              </li>
+              <li>
+                <label class="checkbox-inline">
+                  <input class="checkbox" type="checkbox" value="overdue" name="overdue">
+                  Overdue only
+                </label>
+              </li>
+            </ul>
+          </div>
+          <div class="span3">
+            <div class="pull-right">
+              <label class="checkbox-inline">
+                <input class="checkbox" type="checkbox">
+                Show history
+              </label>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="span2">
-        {{#is_dashboard}}
-          <input type="text" name="cycle_task_group_object.title" {{data 'from-list'}} data-lookup="cycle_task_group_object.object" class="input-block-level" placeholder="Filter by Object" data-template="/directives/autocomplete_result.mustache" value="" {{^list}}disabled="disabled"{{/list}}>
-        {{/is_dashboard}}
-      </div>
-      <div class="span2">
-        <input type="text" name="cycle.workflow.title" {{data 'from-list'}} data-lookup="cycle.workflow" class="input-block-level" placeholder="Filter by Workflow" value="" {{^list}}disabled="disabled"{{/list}}>
-      </div>
-      <div class="span6">
-        <ul class="quick-filters">
-          <li>
-            <label>
-              By Status
-            </label>
-            <select name="status" class="input-small">
-              <option value="">Any</option>
-              <option value="Verified">Verified</option>
-              <option value="Finished">Finished</option>
-              <option value="InProgress">In Progress</option>
-              <option value="Assigned">Assigned</option>
-            </select>
-          </li>
-          <li>
-            <label>
-              <input class="checkbox" type="checkbox" value="overdue" name="overdue">
-              Show overdue only
-            </label>
-          </li>
-          <li>
-            <label>
-              <input class="checkbox" type="checkbox"
-                custom-event="show-history"
-                data-toggle="filter-reset"
-                name="h"
-                mapping="{{toggle_string mapping '_with_history'}}">
-              Show History
-            </label>
-          </li>
-          <li>
-            <button type="reset" class="btn btn-small" data-toggle="filter-reset">Reset</button>
-          </li>
-        </ul>
-      </div>
+      </form>
     </div>
-  </form>
-</li>
+  </li>
+</ul>
