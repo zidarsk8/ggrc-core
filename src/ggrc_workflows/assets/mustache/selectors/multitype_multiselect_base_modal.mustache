@@ -6,11 +6,9 @@
 }}
 
 <div class="modal-header">
-  <div class="pull-right">
-    <a class="modal-dismiss" href="javascript://" data-dismiss="modal">
-      <i class="grcicon-x-grey"></i>
-    </a>
-  </div>
+  <a class="pull-right modal-dismiss" href="javascript://" data-dismiss="modal">
+    <i class="grcicon-x-grey"></i>
+  </a>
   <h2>
     {{#if_equals option_type_count 2}}
           Map {{display_selection}} to {{selected_object.class.title_singular}}
@@ -61,9 +59,8 @@
 
 <!-- Add the list view and items below -->
 <div class="results">
-  <div class="bar-h"></div>
   <!-- Header line of the list -->
-  <ul class="new-tree multitype-tree">
+  <ul class="new-tree">
     <li class="tree-item object-filter">
       <div class="item-main">
         <div class="item-wrap">

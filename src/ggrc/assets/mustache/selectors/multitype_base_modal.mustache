@@ -7,11 +7,9 @@
 
 {{!<div id='{ id }' class='modal modal-selector fade hide' tabindex='-1'>}}
     <div class="modal-header">
-      <div class="pull-right">
-        <a class="modal-dismiss" href="javascript://" data-dismiss="modal">
-          <i class="grcicon-x-grey"></i>
-        </a>
-      </div>
+      <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
+        <i class="grcicon-x-grey"></i>
+      </a>
       <h2>
         {{#if_equals option_type_count 1}}
           {{#option_type_menu}}{{#items}}

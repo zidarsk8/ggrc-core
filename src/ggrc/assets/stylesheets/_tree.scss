@@ -1689,58 +1689,6 @@ ul.new-tree {
   z-index: 100 !important;
 }
 
-.multitype-tree {
-  .tree-item {
-    .tree-title-area {
-      [class^="grcicon-"] {
-        display: inline-block;
-      }
-    }
-  }
-  .tree-item-add {
-    .add-single-object {
-      padding-top: 4px;
-      select,
-      input {
-        margin-bottom: 5px;
-        margin-top: 0;
-      }
-      .btn {
-        &.btn-footer {
-          margin-top: -4px;
-        }
-      }
-    }
-  }
-  .object-check {
-    text-align: right;
-    &.all-check {
-      label {
-        line-height: 32px;
-        margin-bottom: 0;
-        input {
-          margin-top: -1px;
-        }
-      }
-    }
-  }
-  .object-add {
-    padding-right: 20px;
-    text-align: right;
-    .btn-small {
-      padding-top: 3px;
-      padding-bottom: 3px;
-    }
-  }
-  .task-done {
-    font-size: 13px;
-    color: $green;
-  }
-  .accepted {
-    color: $green;
-  }
-}
-
 .unmap {
   &:hover {
     color:$error;
