@@ -211,12 +211,22 @@ can.Control("CMS.Controllers.LHN", {
       this.element.find(".lhs-holder").on("scroll", self.lhs_holder_onscroll);
 
       // this is ugly, but the trigger doesn't nest inside our top element
-      $(".lhn-trigger").on("click", this.lhn_animate.bind(this));
+      $(".lhn-trigger").on("click", this.animate_lhn.bind(this));
     }
 
   , should_show_lhn: function() {
       return Permission.is_allowed("view_object_page", "__GGRC_ALL__", null);
     }
+
+  , is_lhn_open: function () {
+      var _is_open = this.options.display_prefs.getLHNState().is_open;
+
+      if (typeof _is_open === "undefined") {
+          return false;
+      }
+
+      return _is_open;
+  }
 
   , "input.widgetsearch keypress": function(el, ev) {
       var value;
@@ -252,35 +262,53 @@ can.Control("CMS.Controllers.LHN", {
       this.set_active_tab(checked);
     }
 
-  , lhn_animate: function () {
+  , animate_lhn: function () {
+      var is_open = this.is_lhn_open();
+
+      if(is_open) {
+          this.close_lhn();
+      } else {
+          this.open_lhn();
+      }
+  }
+
+  , close_lhn: function () {
       var options = {
           duration: 800,
           easing: 'easeOutExpo'
-      },
-          $this = this.element,
-          $lhn = $this.closest("body").find(".lhs-holder"),
-          lhn_width = $lhn.width() - 20,
-          $lhn_bar = $this.closest("body").find(".bar-v"),
-          $lhnType = $this.closest("body").find(".lhn-type"),
-          $lhs_search = $this.closest("body").find(".lhs-search");
-      
+      };
+
+      // not nested
+      $(".lhn-trigger").removeClass("active");
+            
+      this.element.find(".lhs-holder").removeClass("active").animate({left: "-240"}, options).css("width", "240px");
+      this.element.find(".lhn-type").removeClass("active").animate({left: "-246"}, options).css("width", "246px");
+      this.element.find(".bar-v").removeClass("active").animate({left: "-8"}, options);
+      this.element.find(".lhs-search").removeClass("active").css("width", "196px");
+      this.element.find(".widgetsearch").css("width", "130px");
+
+      this.options.display_prefs.setLHNState({is_open: false});
+   }
+
+  , open_lhn: function () {
       this.set_active_tab();
 
-      if($this.hasClass("active")) {
-          $this.removeClass("active");
-          $lhn.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
-          $lhnType.removeClass("active").animate({left: "-246"}, options).css("width", "246px");
-          $lhn_bar.removeClass("active").animate({left: "-8"}, options);
-          $lhs_search.removeClass("active").css("width", "196px");
-          $lhs_search.find(".widgetsearch").css("width", "130px");
-      } else {
-          $this.addClass("active");
-          $lhn.addClass("active").animate({left: "0"}, options);
-          $lhnType.addClass("active").animate({left: "0"}, options);
-          $lhn_bar.addClass("active").animate({left: "240"}, options);
-          $lhs_search.addClass("active");
-      }
+      // not nested
+      $(".lhn-trigger").addClass("active");
+
+      var options = {
+          duration: 800,
+          easing: 'easeOutExpo'
+      };
+      
+      this.element.find(".lhs-holder").animate({left: 0}, options);
+      this.element.find(".lhn-type").animate({left: 0}, options);
+      this.element.find(".bar-v").animate({left: 240}, options);
+      this.element.find(".lhs-search").addClass("active");
+      
+      this.options.display_prefs.setLHNState({is_open: true});
   }
+
 
   , set_active_tab: function (newval) {
     newval || (newval = this.obs.attr("my_work"));

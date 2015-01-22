@@ -590,7 +590,7 @@ jQuery(function($) {
       $this.addClass("active");
       $this.html('<i class="grcicon-search"></i> Hide Filters');
     }
-    return false
+    return false;
   });
 
 });
