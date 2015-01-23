@@ -283,11 +283,26 @@ can.Control("CMS.Controllers.LHN", {
   , close_lhn: function () {
       // not nested
       $(".lhn-trigger").removeClass("active");
+
+      var width = this.options.display_prefs.getLHNavSize().lhs;
             
-      this.element.find(".lhs-holder").removeClass("active").css("width", "240px");
-      this.element.find(".lhn-type").removeClass("active").css("width", "246px");
-      this.element.find(".bar-v").removeClass("active").css("left", "-8px");
-      this.element.find(".lhs-search").removeClass("active").css("width", "196px");
+      this.element.find(".lhs-holder")
+          .removeClass("active")
+          .css({left: (-width)+"px",
+                width: width});
+
+      this.element.find(".lhn-type")
+          .removeClass("active")
+          .css("left", (-width-6)+"px");
+
+      this.element.find(".bar-v")
+          .removeClass("active")
+          .css("left", "-8px");
+      
+      this.element.find(".lhs-search")
+          .removeClass("active")
+          .css("width", "196px");
+
       this.element.find(".widgetsearch").css("width", "130px");
 
       this.options.display_prefs.setLHNState({is_open: false});
@@ -301,10 +316,21 @@ can.Control("CMS.Controllers.LHN", {
 
       var width = this.options.display_prefs.getLHNavSize().lhs;
 
-      this.element.find(".lhs-holder").width(width).addClass("active");
-      this.element.find(".lhn-type").addClass("active");
-      this.element.find(".bar-v").addClass("active").css({left: width+"px"});
-      this.element.find(".lhs-search").addClass("active");
+      this.element.find(".lhs-holder")
+          .css({left: "",
+                width: width+"px"})
+          .addClass("active");
+
+      this.element.find(".lhn-type")
+          .css("left", "")
+          .addClass("active");
+      
+      this.element.find(".bar-v")
+          .addClass("active")
+          .css("left",  width+"px");
+
+      this.element.find(".lhs-search")
+          .addClass("active");
       
       this.options.display_prefs.setLHNState({is_open: true});
   }
