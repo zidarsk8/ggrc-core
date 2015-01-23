@@ -84,7 +84,10 @@ def process_import_template(admin_kind):
 
   if admin_kind in ADMIN_KIND_TEMPLATES:
     filename = ADMIN_KIND_TEMPLATES[admin_kind]
-    headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
+    headers = [
+      ('Content-Type', 'text/csv'),
+      ('Content-Disposition', 'attachment; filename="{}"'.format(filename))
+    ]
     body = render_template("csv_files/" + filename)
     return current_app.make_response((body, 200, headers))
   return current_app.make_response((
@@ -100,7 +103,10 @@ def system_program_import_template(program_id):
 
   if program:
     template_name = "System_Program_Import_Template.csv"
-    headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(template_name))]
+    headers = [
+      ('Content-Type', 'text/csv'),
+      ('Content-Disposition', 'attachment; filename="{}"'.format(template_name))
+    ]
     options = {"program_slug": program.slug}
     body = render_template("csv_files/" + template_name, **options)
     return current_app.make_response((body, 200, headers))
@@ -139,7 +145,8 @@ def import_people_task(task):
 
 @app.route("/admin/help_redirect/<count>", methods=["GET"])
 def help_redirect(count):
-  flash(u'Successfully imported {} help page{}'.format(count, 's' if count > 1 else ''), 'notice alert-success')
+  flash(u'Successfully imported {} help page{}'.format(
+    count, 's' if count > 1 else ''), 'notice alert-success')
   return redirect("/admin")
 
 @app.route("/_background_tasks/import_help", methods=['POST'])
@@ -183,7 +190,9 @@ def import_controls_to_program(program_id):
   return_to = unicode(request.args.get('return_to') or '')
 
   if request.method != 'POST':
-    return render_template("programs/import_controls.haml", program_id=program_id, import_kind='Controls', return_to=return_to, parent_type="Program")
+    return render_template(
+      "programs/import_controls.haml", program_id=program_id,
+      import_kind='Controls', return_to=return_to, parent_type="Program")
 
   if 'cancel' in request.form:
     program_url = request.args.get("return_to") or view_url_for(program)
@@ -225,7 +234,9 @@ def import_objectives(directive_id):
   return_to = unicode(request.args.get('return_to') or '')
 
   if request.method != 'POST':
-    return render_template("directives/import.haml", directive_id=directive_id, import_kind='Objectives', return_to=return_to, parent_type=(directive.kind or directive.meta_kind))
+    return render_template("directives/import.haml", directive_id=directive_id,
+                           import_kind='Objectives', return_to=return_to,
+                           parent_type=(directive.kind or directive.meta_kind))
 
   if 'cancel' in request.form:
     return import_redirect(return_to)
@@ -263,7 +274,8 @@ def import_objectives_to_program(program_id):
   return_to = unicode(request.args.get('return_to') or '')
 
   if request.method != 'POST':
-    return render_template("programs/import_objectives.haml", program_id=program_id, import_kind='Objectives', return_to=return_to, parent_type="Program")
+    return render_template("programs/import_objectives.haml", program_id=program_id,
+                           import_kind='Objectives', return_to=return_to, parent_type="Program")
 
   if 'cancel' in request.form:
     program_url = request.args.get("return_to") or view_url_for(program)
@@ -327,7 +339,9 @@ def import_objective_directive_task(task):
     return render_template("directives/import_errors.haml",
         directive_id=directive_id, exception_message=str(e))
 
-  return render_template("directives/import.haml", directive_id=directive_id, import_kind='Objectives', return_to=return_to, parent_type=(directive.kind or directive.meta_kind))
+  return render_template("directives/import.haml", directive_id=directive_id,
+                         import_kind='Objectives', return_to=return_to,
+                         parent_type=(directive.kind or directive.meta_kind))
 
 @app.route("/standards/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/regulations/<directive_id>/import_controls", methods=['GET', 'POST'])
@@ -344,7 +358,9 @@ def import_controls(directive_id):
   return_to = unicode(request.args.get('return_to') or '')
 
   if request.method != 'POST':
-    return render_template("directives/import.haml", directive_id=directive_id, import_kind='Controls', return_to=return_to, parent_type=(directive.kind or directive.meta_kind))
+    return render_template("directives/import.haml", directive_id=directive_id,
+                           import_kind='Controls', return_to=return_to,
+                           parent_type=(directive.kind or directive.meta_kind))
 
   if 'cancel' in request.form:
     return import_redirect(return_to)
@@ -385,7 +401,8 @@ def import_control_directive_task(task):
   directive_url = view_url_for(directive)
   return_to = task.parameters.get("return_to") or directive_url
   try:
-    converter = handle_csv_import(ControlsConverter, csv_file.splitlines(True), **task.parameters)
+    converter = handle_csv_import(
+      ControlsConverter, csv_file.splitlines(True), **task.parameters)
     if dry_run:
       options = {
           'converter': converter,
@@ -395,7 +412,8 @@ def import_control_directive_task(task):
       return render_template("directives/import_controls_result.haml", **options)
     else:
       count = len(converter.objects)
-      flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
+      flash(u'Successfully imported {} control{}'.format(
+        count, 's' if count > 1 else ''), 'notice')
       return import_redirect(return_to)
   except ImportException as e:
     if e.show_preview:
@@ -421,7 +439,8 @@ def import_control_program_task(task):
   return_to = task.parameters.get("return_to") or program_url
 
   try:
-    converter = handle_csv_import(ControlsConverter, csv_file.splitlines(True), **task.parameters)
+    converter = handle_csv_import(
+      ControlsConverter, csv_file.splitlines(True), **task.parameters)
     if dry_run:
       options = {
           'converter': converter,
@@ -431,7 +450,8 @@ def import_control_program_task(task):
       return render_template("programs/import_controls_result.haml", **options)
     else:
       count = len(converter.objects)
-      flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
+      flash(u'Successfully imported {} control{}'.format(
+        count, 's' if count > 1 else ''), 'notice')
       return import_redirect(return_to)
 
   except ImportException as e:
@@ -458,7 +478,8 @@ def import_objective_program_task(task):
   return_to = task.parameters.get("return_to") or program_url
 
   try:
-    converter = handle_csv_import(ObjectivesConverter, csv_file.splitlines(True), **task.parameters)
+    converter = handle_csv_import(
+      ObjectivesConverter, csv_file.splitlines(True), **task.parameters)
     if dry_run:
       options = {
           'converter': converter,
@@ -468,7 +489,8 @@ def import_objective_program_task(task):
       return render_template("programs/import_objectives_result.haml", **options)
     else:
       count = len(converter.objects)
-      flash(u'Successfully imported {} objectives{}'.format(count, 's' if count > 1 else ''), 'notice')
+      flash(u'Successfully imported {} objectives{}'.format(
+        count, 's' if count > 1 else ''), 'notice')
       return import_redirect(return_to)
 
   except ImportException as e:
@@ -494,18 +516,23 @@ def import_system_task(task):
   if object_kind == "processes":
     options["is_biz_process"] = '1'
   try:
-    converter = handle_csv_import(SystemsConverter, csv_file.splitlines(True), **options)
+    converter = handle_csv_import(
+      SystemsConverter, csv_file.splitlines(True), **options)
     if dry_run:
-      return render_template("systems/import_result.haml", converter=converter, results=converter.objects, heading_map=converter.object_map)
+      return render_template("systems/import_result.haml", converter=converter,
+                             results=converter.objects, heading_map=converter.object_map)
     else:
       count = len(converter.objects)
-      flash(u'Successfully imported {} {}'.format(count, kind_lookup[object_kind]), 'notice alert-success')
+      flash(u'Successfully imported {} {}'.format(
+        count, kind_lookup[object_kind]), 'notice alert-success')
       return import_redirect("/admin")
 
   except ImportException as e:
     if e.show_preview:
       converter = e.converter
-      return render_template("systems/import_result.haml", exception_message=e, converter=converter, results=converter.objects, heading_map=converter.object_map)
+      return render_template("systems/import_result.haml", exception_message=e,
+                             converter=converter, results=converter.objects,
+                             heading_map=converter.object_map)
     return render_template("directives/import_errors.haml", exception_message=e)
 
 @app.route("/_background_tasks/export_people", methods=['GET'])
@@ -559,7 +586,8 @@ def export_system_task(task):
 
 @app.route("/admin/people_redirect/<count>", methods=["GET"])
 def people_redirect(count):
-  flash(u'Successfully imported {} {}'.format(count, 'people' if count > 1 else 'person'), 'notice alert-success')
+  flash(u'Successfully imported {} {}'.format(
+    count, 'people' if count > 1 else 'person'), 'notice alert-success')
   return redirect("/admin")
 
 @app.route("/admin/import/<import_type>", methods=['GET', 'POST'])
@@ -631,7 +659,10 @@ def import_requests(audit_id):
           program_id=program.id, audit_id=audit.id, dry_run=dry_run)
 
         if dry_run:
-          return render_template("programs/import_request_result.haml", converter=converter, results=converter.objects, heading_map=converter.object_map, program_code=program.slug)
+          return render_template("programs/import_request_result.haml",
+                                 converter=converter, results=converter.objects,
+                                 heading_map=converter.object_map,
+                                 program_code=program.slug)
         else:
           count = len(converter.objects)
           urlparts = urlparse(request.args.get("return_to"))
@@ -661,7 +692,8 @@ def import_requests(audit_id):
       return render_template("programs/import_request_errors.haml",
             exception_message=e)
 
-  return render_template("programs/import_request.haml", import_kind='Requests', return_to=return_to)
+  return render_template(
+    "programs/import_request.haml", import_kind='Requests', return_to=return_to)
 
 @app.route("/audits/post_import_request_hook", methods=['GET'])
 def post_import_requests():
@@ -677,7 +709,9 @@ def import_requests_template(audit_id):
   program = audit.program
   template = "Request_Import_Template.csv"
   filename = "PBC Request Import Template.csv"
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
+  headers = [
+    ('Content-Type', 'text/csv'),
+    ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
   options = {'program_slug': program.slug}
   body = render_template("csv_files/" + template, **options)
   return current_app.make_response((body, 200, headers))
@@ -742,7 +776,8 @@ def import_sections(directive_id):
     except ImportException as e:
       if e.show_preview:
         converter = e.converter
-        return render_template("directives/import_sections_result.haml", exception_message=e,
+        return render_template(
+          "directives/import_sections_result.haml", exception_message=e,
             converter=converter, results=converter.objects,
             directive_id=int(directive_id), heading_map=converter.object_map)
       return render_template("directives/import_errors.haml",
@@ -782,7 +817,11 @@ def import_systems_processes(object_kind):
   else:
     file_msg = "Could not import: invalid csv file."
     return render_template("directives/import_errors.haml", exception_message=file_msg)
-  parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename, "object_kind": object_kind}
+  parameters = {
+    "dry_run": dry_run,
+    "csv_file": csv_file.read(),
+    "csv_filename": filename,
+    "object_kind": object_kind}
   tq = create_task(
       "import_system",
       url_for(import_system_task.__name__),
@@ -968,7 +1007,10 @@ def import_directive_sections_template(directive_id):
     section_term = "Section"
   output_filename = "{0}_{1}_Import_Template.csv".format(
       directive_type, section_term)
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(output_filename))]
+  headers = [
+    ('Content-Type', 'text/csv'),
+    ('Content-Disposition', 'attachment; filename="{}"'.format(output_filename))
+  ]
   options = {
     'section_term': section_term,
     'directive_type': directive_type,
