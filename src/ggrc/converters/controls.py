@@ -3,14 +3,15 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from collections import OrderedDict
+
 from .base import *
 from ggrc.models import (
-    Directive, Policy, Regulation, Contract, Standard, Control, System,
-    System, Process, Program, DirectiveControl, ProgramControl
+    Directive, Policy, Regulation, Contract, Standard, Program, DirectiveControl, ProgramControl
 )
 from ggrc.models.mixins import BusinessObject
 from .base_row import *
-from collections import OrderedDict
+
 
 DIRECTIVE_CLASSES = [Directive, Policy, Regulation, Contract, Standard]
 
