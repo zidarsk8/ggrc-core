@@ -64,6 +64,7 @@ class BaseRowConverter(object):
     self.errors = {}
     self.warnings = {}
     self.messages = {}
+    self.custom_attribute_values = {}
 
   def reify_custom_attributes(self):
     for definition in self.importer.custom_attribute_definitions:
@@ -148,6 +149,8 @@ class BaseRowConverter(object):
             ownable=self.obj,
             modified_by_id=current_user_id
         ))
+    if self.custom_attribute_values:
+      self.obj.custom_attributes({'custom_attributes': self.custom_attribute_values})
 
   def add_after_save_hook(self, hook = None, funct = None):
     if hook: self.after_save_hooks.append(hook)
@@ -196,7 +199,7 @@ class BaseRowConverter(object):
       pass
 
   def set_custom_attr(self, definition, value):
-    print ">>> FIXME: Setting custom attribute."
+    self.custom_attribute_values[definition.id] = value
 
   def get_attr(self, name):
     return getattr(self.obj, name, '') or ''
@@ -286,16 +289,6 @@ class CustomAttributeColumnHandler(ColumnHandler):
                         self.base_importer.object_map, self.key)
       self.add_error("{} is required.".format(missing_column))
 
-  # def go_import(self, content):
-  #   # validate first to trigger error in case field is required but None
-  #   # TODO: Unit tests of imports with and without required fields
-  #   self.validate(content)
-  #   if content is not None:
-  #     data = self.parse_item(content)
-  #     if data is not None:
-  #       self.value = data
-  #       self.set_attr(data)
-
   def set_attr(self, value):
     self.importer.set_custom_attr(
       self.base_importer.custom_attribute_definitions[self.key], value)
@@ -311,7 +304,6 @@ class RequestTypeColumnHandler(ColumnHandler):
             Request.VALID_TYPES
         ))
         return None
-
 
 class StatusColumnHandler(ColumnHandler):
 
