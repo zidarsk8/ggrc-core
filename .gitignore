@@ -38,3 +38,7 @@ Session.vim
 COMMIT_MSG
 
 node_modules
+
+# Some editors automagically compile sass
+src/**/.sass-cache
+src/**/_*.css
