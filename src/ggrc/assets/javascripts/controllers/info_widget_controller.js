@@ -312,7 +312,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
         today = new Date();
 
     //Any task that is not finished or verified are subject to overdue
-    if (task.status === "Finished" || task.status === "Verified")
+    if (task.instance.status === "Finished" || task.instance.status === "Verified")
       return false;
     else if (end_date.getTime() < today.getTime())
       return true;
@@ -342,22 +342,22 @@ can.Control("GGRC.Controllers.InfoWidget", {
     } else if (filter.status === "Verified"){
       status_flag = true;
       for (i = 0; i < list.length; i++)
-        if (list[i].status === "Verified")
+        if (list[i].instance.status === "Verified")
           list1.push(list[i]);
     } else if (filter.status === "Finished"){
       status_flag = true;
       for (i = 0; i < list.length; i++)
-        if (list[i].status === "Finished")
+        if (list[i].instance.status === "Finished")
           list1.push(list[i]);
     } else if (filter.status === "InProgress"){
       status_flag = true;
       for (i = 0; i < list.length; i++)
-        if (list[i].status === "InProgress")
+        if (list[i].instance.status === "InProgress")
           list1.push(list[i]);
     } else if (filter.status === "Assigned"){
       status_flag = true;
       for (i = 0; i < list.length; i++)
-        if (list[i].status === "Assigned")
+        if (list[i].instance.status === "Assigned")
           list1.push(list[i]);
     }
 
