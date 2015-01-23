@@ -9,7 +9,10 @@ from ggrc.builder.json import publish
 from ggrc.services.common import Resource
 from mock import MagicMock
 from tests.ggrc import TestCase
+from nose.plugins.skip import SkipTest
 
+
+@SkipTest
 class TestBuilder(TestCase):
   """Note: Since we are using module member lookup to wire the builders up,
   we have to clean up after every test. This is why we're using mock and

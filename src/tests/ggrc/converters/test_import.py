@@ -15,11 +15,13 @@ from ggrc.converters.common import ImportException
 from ggrc.converters.controls import ControlsConverter
 from ggrc.fulltext.mysql import MysqlRecordProperty
 from tests.ggrc import TestCase
+from nose.plugins.skip import SkipTest
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'comparison_csvs/')
 
 
+@SkipTest
 class TestImport(TestCase):
   def setUp(self):
     self.patcher = patch('ggrc.converters.base.log_event')

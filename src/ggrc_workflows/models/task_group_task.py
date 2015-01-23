@@ -3,18 +3,13 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-import datetime, calendar
-
 from ggrc import db
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from ggrc.models.mixins import (
-    deferred, Base, Titled, Slugged, Described, Timeboxed, WithContact
+  Base, Titled, Described, WithContact
     )
 from ggrc.login import get_current_user
 from ggrc.models.types import JsonType
-from ggrc.models.reflection import PublishOnly
 from ggrc_workflows.models.mixins import RelativeTimeboxed
 
 

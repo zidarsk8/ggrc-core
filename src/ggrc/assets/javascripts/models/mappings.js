@@ -53,6 +53,7 @@
       object - a string representing the object type's shortName
 
       return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by mapping name
+      Example: GGRC.Mappings.get_mappings_for('Program')
     */
     get_mappings_for : function(object) {
       var mappings = {};
@@ -427,7 +428,7 @@
 
     , Clause: {
         _mixins: ["section_base"]
-      , "canonical" : {
+      , _canonical: {
         contracts : "Contract"
       }
       , contracts: Proxy(

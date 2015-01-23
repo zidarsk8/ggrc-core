@@ -13,11 +13,13 @@ from ggrc.models.all_models import System, Process
 from ggrc.converters.import_helper import handle_csv_import
 from ggrc.converters.systems import SystemsConverter
 from tests.ggrc import TestCase
+from nose.plugins.skip import SkipTest
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'comparison_csvs/')
 
 
+@SkipTest
 class TestSystemProcess(TestCase):
   def setUp(self):
     super(TestSystemProcess, self).setUp()
@@ -54,4 +56,3 @@ class TestSystemProcess(TestCase):
     )
     actual_error = converter.objects[0].errors_for('slug')[0]
     self.assertEqual(expected_error, actual_error)
-
