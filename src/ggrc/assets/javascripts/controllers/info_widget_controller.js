@@ -250,26 +250,39 @@ can.Control("GGRC.Controllers.InfoWidget", {
     }
   }
 
-  , load_my_tasks: function(){
+  , display_tasks: function(loader) {
     var self = this,
         my_view = this.options.context.task_view,
         task_data = {},
         component_class = 'ul.task-tree',
         prepend = true;
 
-    //To get the tasks only for the current person/current cycle
-    var loader = GGRC.page_instance().get_binding("assigned_tasks");
-    if(loader) {
       loader.refresh_instances().then(function(tasks) {
         self.options.context.attr('task_count', tasks.length);
         task_data.list = tasks;
         task_data.filtered_list = tasks;
-        if (!self.options.task_data)
-          self.options.task_data = task_data;
+        self.options.task_data = task_data;
         self.options.context.attr('task_data', task_data);
-        //Here the data is not filtered
+        self.element.find(component_class).empty();
         self.insert_options(task_data, my_view, component_class, prepend);
       })
+      return 0;
+  }
+
+  , load_my_tasks: function(){
+    //To get the tasks only for the current person/current cycle
+    var loader = GGRC.page_instance().get_binding("assigned_tasks");
+    if(loader) {
+      this.display_tasks(loader);
+    }
+    return 0;
+  }
+
+  , load_task_with_history: function() {
+    //load assigned tasks and history
+    var loader = GGRC.page_instance().get_binding("assigned_tasks_with_history");
+    if(loader) {
+      this.display_tasks(loader);
     }
     return 0;
   }
@@ -407,7 +420,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
     var wf = this.element.find('input[name="workflow"]').val();
     var status = this.element.find('select[name="status"]').val();
     var overdue = this.element.find('input[type=checkbox].filter-overdue:checked').length;
-    console.log(obj + " : " + wf + " : " + status + " : " + overdue);
+    //console.log(obj + " : " + wf + " : " + status + " : " + overdue);
 
     //set up task filter
     this.options.task_filter.status = status;
@@ -418,9 +431,19 @@ can.Control("GGRC.Controllers.InfoWidget", {
     //filter task_data
     this.filter_task_data();
 
+    this.options.context.attr('task_count', this.options.task_data.filtered_list.length);
     this.element.find('ul.task-tree').empty();
     this.insert_options(this.options.task_data, this.options.context.task_view, 'ul.task-tree', true);
 
+    ev.stopPropagation();
+  }
+
+  , "input[type=checkbox].show-history change" : function(el, ev) {
+    if (this.element.find('input[type=checkbox].show-history:checked').length === 1) {
+      this.load_task_with_history();
+    } else {
+      this.load_my_tasks();
+    }
     ev.stopPropagation();
   }
 
