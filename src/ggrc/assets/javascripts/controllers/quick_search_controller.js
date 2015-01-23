@@ -286,7 +286,7 @@ can.Control("CMS.Controllers.LHN", {
             
       this.element.find(".lhs-holder").removeClass("active").css("width", "240px");
       this.element.find(".lhn-type").removeClass("active").css("width", "246px");
-      this.element.find(".bar-v").removeClass("active");
+      this.element.find(".bar-v").removeClass("active").css("left", "-8px");
       this.element.find(".lhs-search").removeClass("active").css("width", "196px");
       this.element.find(".widgetsearch").css("width", "130px");
 
@@ -299,9 +299,11 @@ can.Control("CMS.Controllers.LHN", {
       // not nested
       $(".lhn-trigger").addClass("active");
 
-      this.element.find(".lhs-holder").addClass("active");
+      var width = this.options.display_prefs.getLHNavSize().lhs;
+
+      this.element.find(".lhs-holder").addClass("active").width(width);
       this.element.find(".lhn-type").addClass("active");
-      this.element.find(".bar-v").addClass("active");
+      this.element.find(".bar-v").addClass("active").css({left: width+"px"});
       this.element.find(".lhs-search").addClass("active");
       
       this.options.display_prefs.setLHNState({is_open: true});
