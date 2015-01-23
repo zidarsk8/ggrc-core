@@ -301,7 +301,7 @@ can.Control("CMS.Controllers.LHN", {
 
       var width = this.options.display_prefs.getLHNavSize().lhs;
 
-      this.element.find(".lhs-holder").addClass("active").width(width);
+      this.element.find(".lhs-holder").width(width).addClass("active");
       this.element.find(".lhn-type").addClass("active");
       this.element.find(".bar-v").addClass("active").css({left: width+"px"});
       this.element.find(".lhs-search").addClass("active");
