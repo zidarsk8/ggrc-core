@@ -212,14 +212,6 @@ can.Control("CMS.Controllers.LHN", {
 
       // this is ugly, but the trigger doesn't nest inside our top element
       $(".lhn-trigger").on("click", this.animate_lhn.bind(this));
-
-      setTimeout(function () {
-        if (this.is_lhn_open()) {
-          this.open_lhn();
-        }else{
-          this.close_lhn();
-        }
-      }.bind(this), 500);
     }
 
   , should_show_lhn: function() {
@@ -381,10 +373,9 @@ can.Control("CMS.Controllers.LHN", {
               target = self.element.find('#lhs input.my-work[value='+value+']');
           target.prop('checked', true);
           target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
-          if(!$lhs.hasClass("lhs-closed")) {
-            $(".recent").ggrc_controllers_recently_viewed();
-            self.size && self.resize_lhn(self.size);
-          }
+          
+           // closed on refresh, but close_lhn sets widths and such
+           self.close_lhn();
 
           // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
           //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
@@ -483,6 +474,9 @@ can.Control("CMS.Controllers.LHN", {
     //if(resize < 40) {
     //  return;
     //}
+
+    console.log("meow resize");
+
     if (resize < default_size) resize = default_size;
     resize = Math.min(resize, max_width);
     //if($lhs.hasClass("lhs-closed")) this.toggle_lhs(no_trigger);
@@ -503,7 +497,7 @@ can.Control("CMS.Controllers.LHN", {
 
     //$bar.css("left", a)
 
-    $search.width(resize - 49);
+    //$search.width(resize - 49);
     //window.resize_areas();
     //if (!no_trigger) {
     //  $(window).trigger('resize');
