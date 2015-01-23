@@ -65,6 +65,60 @@
     </header>
   {{/if_equals}}
 
+  {{#if_equals widget_id "current"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="title-heading oneline">
+            Title
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            End Date
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Name
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Email
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Authorizations
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Company
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
   {{#if_equals widget_id "task_group"}}
     <header class="header tree-header">
       <div class="row-fluid">
@@ -133,6 +187,7 @@
   {{^if_equals widget_id "info"}}
   {{^if_equals widget_id "person"}}
   {{^if_equals widget_id "task_group"}}
+  {{^if_equals widget_id "current"}}
     <header class="header tree-header">
       <div class="row-fluid">
         <div class="span4">
@@ -229,6 +284,7 @@
         </div>
       </div>
     </header>
+  {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}

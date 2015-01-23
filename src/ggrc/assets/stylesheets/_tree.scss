@@ -441,7 +441,7 @@ ul.new-tree {
 
   li.tree-item {
     min-height: 30px;
-    line-height: 24px;
+    line-height: 28px;
     position: relative;
     @include transition(all 0.18s cubic-bezier(.55,0,.1,1));
     .counter-wrap {
