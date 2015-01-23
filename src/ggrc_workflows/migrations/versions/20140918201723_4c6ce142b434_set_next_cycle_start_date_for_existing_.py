@@ -29,12 +29,14 @@ def upgrade():
         models.Workflow.recurrences == True,
         models.Workflow.status == 'Active'
         ).all()
-  
+
+  from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalculator
   # Update all workflows.
   for workflow in workflows:
-    base_date = RelativeTimeboxed._calc_base_date(today, workflow.frequency)
-    next_date = RelativeTimeboxed._calc_start_date_of_next_period(base_date, workflow.frequency)
-    workflow.next_cycle_start_date = next_date
+    base_date = date.today()
+    calculator = WorkflowDateCalculator(workflow)
+    workflow.next_cycle_start_date = \
+      calculator.nearest_start_date_after_basedate(base_date)
     db.session.add(workflow)
 
   # Save
