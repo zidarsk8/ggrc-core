@@ -258,6 +258,7 @@ class BaseConverter(object):
       row = self.row_converter(self, obj, i, export = True)
       row.setup()
       row.reify()
+      row.reify_custom_attributes()
       if row and any(row.attrs.values()):
         self.rows.append(row.attrs)
     row_header_map = self.object_map

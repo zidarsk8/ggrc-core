@@ -293,6 +293,16 @@ class CustomAttributeColumnHandler(ColumnHandler):
     self.importer.set_custom_attr(
       self.base_importer.custom_attribute_definitions[self.key], value)
 
+  def export(self):
+    definition = self.base_importer.custom_attribute_definitions[self.key]
+    # TODO: This is computationally expensive. But the list of attributes should
+    # TODO: be small. So the impact should not be noticeable. Nonetheless, this
+    # TODO: can be improved in the future. It's just tricky to do right now.
+    for v in self.importer.obj.custom_attribute_values:
+      if v.custom_attribute_id == definition.id:
+        return v.attribute_value
+    return None
+
 class RequestTypeColumnHandler(ColumnHandler):
 
     def parse_item(self, value):

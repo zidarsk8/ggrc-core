@@ -10,9 +10,8 @@ from ggrc.models.all_models import OrgGroup, Program, Vendor
 from ggrc.models.mixins import BusinessObject
 from .base_row import *
 
-
 class SystemRowConverter(BaseRowConverter):
-  model_class = SystemOrProcess
+  model_class = System
 
   def find_by_slug(self, slug):
     # must search systems and processes for this case
@@ -123,6 +122,7 @@ class SystemsConverter(BaseConverter):
   row_converter = SystemRowConverter
 
   def create_object_map(self):
+    super(SystemsConverter, self).create_object_map()
     if self.options.get('is_biz_process'):
       self.object_map = OrderedDict( [(k.replace("System Code", 'Process Code'), v) \
                         if k == 'System Code' else (k, v) for k, v in self.object_map.items()] )
@@ -170,3 +170,10 @@ class SystemsConverter(BaseConverter):
     yield []
     yield []
     yield self.object_map.keys()
+
+class ProcessRowConverter(SystemRowConverter):
+  model_class = Process
+
+class ProcessesConverter(SystemsConverter):
+  row_converter = ProcessRowConverter
+

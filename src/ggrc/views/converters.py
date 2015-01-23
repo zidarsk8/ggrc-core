@@ -7,6 +7,7 @@ import json
 
 from flask import flash, render_template, request, redirect
 from werkzeug.exceptions import Forbidden
+from flask import url_for
 
 from ggrc.app import app
 from ggrc.converters.common import ImportException
@@ -14,7 +15,6 @@ from ggrc.converters.import_helper import handle_csv_import, handle_converter_cs
 from ggrc.login import get_current_user, login_required
 from ggrc.models.background_task import create_task, queued_task
 from ggrc.rbac import permissions
-from flask import url_for
 
 
 _default_context = object()
@@ -118,7 +118,6 @@ def system_program_import_template(program_id):
 @queued_task
 def import_people_task(task):
   from ggrc.converters.people import PeopleConverter
-  from ggrc.models import Person
 
   csv_file = task.parameters.get("csv_file")
   dry_run = task.parameters.get("dry_run")
@@ -153,7 +152,6 @@ def help_redirect(count):
 @queued_task
 def import_help_task(task):
   from ggrc.converters.help import HelpConverter
-  from ggrc.models import Help
 
   csv_file = task.parameters.get("csv_file")
   dry_run = task.parameters.get("dry_run")
@@ -506,18 +504,21 @@ def import_objective_program_task(task):
 @app.route("/_background_tasks/import_process", methods=["POST"])
 @queued_task
 def import_system_task(task):
-  from ggrc.converters.systems import SystemsConverter
+  from ggrc.converters.systems import SystemsConverter, ProcessesConverter
 
   kind_lookup = {"systems": "System(s)", "processes": "Process(es)"}
   csv_file = task.parameters.get("csv_file")
   object_kind = task.parameters.get("object_kind")
   dry_run = task.parameters.get("dry_run")
   options = {"dry_run": dry_run}
+  converter_kind = SystemsConverter
   if object_kind == "processes":
     options["is_biz_process"] = '1'
+    converter_kind = ProcessesConverter
+
   try:
     converter = handle_csv_import(
-      SystemsConverter, csv_file.splitlines(True), **options)
+      converter_kind, csv_file.splitlines(True), **options)
     if dry_run:
       return render_template("systems/import_result.haml", converter=converter,
                              results=converter.objects, heading_map=converter.object_map)
@@ -560,7 +561,7 @@ def export_help_task(task):
 @app.route("/_background_tasks/export_process", methods=['GET'])
 @queued_task
 def export_process_task(task):
-  from ggrc.converters.systems import SystemsConverter
+  from ggrc.converters.systems import ProcessesConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import Process
 
@@ -569,7 +570,7 @@ def export_process_task(task):
   options['is_biz_process'] = '1'
   procs = Process.query.all()
   filename = "PROCESSES.csv"
-  return handle_converter_csv_export(filename, procs, SystemsConverter, **options)
+  return handle_converter_csv_export(filename, procs, ProcessesConverter, **options)
 
 @app.route("/_background_tasks/export_system", methods=['GET'])
 @queued_task
@@ -635,7 +636,7 @@ def import_requests(audit_id):
   from ggrc.converters.common import ImportException
   from ggrc.converters.requests import RequestsConverter
   from ggrc.converters.import_helper import handle_csv_import
-  from ggrc.models import Audit, Program
+  from ggrc.models import Audit
   from ggrc.utils import view_url_for
   from urlparse import urlparse, urlunparse
   import urllib
@@ -703,7 +704,8 @@ def post_import_requests():
 @login_required
 def import_requests_template(audit_id):
   from flask import current_app
-  from ggrc.models.all_models import Audit, Program
+  from ggrc.models.all_models import Audit
+
   audit = Audit.query.get(audit_id)
   ensure_read_permissions_for(audit)
   program = audit.program
