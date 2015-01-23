@@ -118,6 +118,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
   , cache : can.getObject("cache", CMS.Models.SectionBase, true)
   , init : function() {
     can.extend(this.attributes, CMS.Models.SectionBase.attributes);
+    this._super.apply(this, arguments);
   }
 }, {
 });
@@ -166,6 +167,7 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
   , cache : can.getObject("cache", CMS.Models.SectionBase, true)
   , init : function() {
     can.extend(this.attributes, CMS.Models.SectionBase.attributes);
+    this._super.apply(this, arguments);
   }
 }, {
 });

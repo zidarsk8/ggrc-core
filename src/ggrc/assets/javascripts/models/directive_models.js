@@ -100,6 +100,10 @@ CMS.Models.Directive("CMS.Models.Standard", {
   , attributes : {}
   , meta_kinds : [ "Standard" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
+  , init : function() {
+    can.extend(this.attributes, CMS.Models.Directive.attributes);
+    this._super.apply(this, arguments);
+  }
 }, {});
 
 CMS.Models.Directive("CMS.Models.Regulation", {
@@ -129,6 +133,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , cache : can.getObject("cache", CMS.Models.Directive, true)
   , init : function() {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
+    this._super.apply(this, arguments);
   }
 }, {});
 
@@ -159,6 +164,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , cache : can.getObject("cache", CMS.Models.Directive, true)
   , init : function() {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
+    this._super.apply(this, arguments);
   }
 }, {});
 
@@ -190,6 +196,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , cache : can.getObject("cache", CMS.Models.Directive, true)
   , init : function() {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
+    this._super.apply(this, arguments);  
   }
 }, {});
 
