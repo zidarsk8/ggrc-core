@@ -6,11 +6,9 @@
 }}
 
 <div class="modal-header">
-  <div class="pull-right">
-    <a class="btn btn-danger btn-mini" href="javascript://" data-dismiss="modal">
-      <i class="grcicon-x-white"></i>
-    </a>
-  </div>
+  <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
+    <i class="grcicon-x-grey"></i>
+  </a>
   <h2>
       Search
   </h2>
@@ -29,7 +27,7 @@
       {{> "/static/mustache/base_objects/filters/filter_by_person.mustache"}}
     </div>
   </div>
-  
+
   {{> "/static/mustache/base_objects/filters/filter_by_relevance.mustache"}}
 
   {{> "/static/mustache/base_objects/filters/advanced_search_filter_actions.mustache"}}
@@ -66,19 +64,6 @@
       {{#if option_column_view}}
         {{{ renderLive option_column_view }}}
       {{/if}}
-    </div>
-  </div>
-</div>
-
-<!-- footer add/cancel buttons-->
-<div class="modal-footer">
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="deny-buttons pull-right">
-        <a class="btn" data-dismiss="modal" href="javascript://">
-          Cancel
-        </a>
-      </div>
     </div>
   </div>
 </div>
