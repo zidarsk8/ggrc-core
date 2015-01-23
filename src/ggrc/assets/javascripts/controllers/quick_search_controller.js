@@ -394,7 +394,7 @@ can.Control("CMS.Controllers.LHN", {
             return this.value;
           }).addClass('active');
         });
-        self.size = prefs[0].getLHNavSize(null, "lhs");
+        self.size = prefs[0].getLHNavSize().lhs;
         self.resize_lhn(self.size);
         // Collapse the LHN if they did it on a previous page
         self.collapsed = prefs[0].getCollapsed(null, "lhs");
@@ -465,39 +465,17 @@ can.Control("CMS.Controllers.LHN", {
         $lhs_label = $(".lhs-search .my-work-label"),
         lhn_second_row = 201,
         max_width = window.innerWidth - 30,
-        default_size = lhn_second_row;;
+        default_size = lhn_second_row;
 
-    //New UI there is no lhs toggle-open-close
-    //if(resize < 40 && !$lhs.hasClass("lhs-closed")) {
-    //  this.toggle_lhs(no_trigger);
-    //}
-    //if(resize < 40) {
-    //  return;
-    //}
-
-    console.log("meow resize");
-
-    if (resize < default_size) resize = default_size;
-    resize = Math.min(resize, max_width);
-    //if($lhs.hasClass("lhs-closed")) this.toggle_lhs(no_trigger);
-    $lhsHolder.width(resize);
-
-    // LHN search radio buttons oneline fix
-    if(resize < lhn_second_row) {
-      $lhs_label_right.removeClass("pull-right");
-      $lhs_label.addClass("oneline");
-    } else {
-      $lhs_label_right.addClass("pull-right");
-      $lhs_label.removeClass("oneline");
+    if (resize < default_size) {
+      resize = default_size;
     }
+    resize = Math.min(resize, max_width);
 
-    //var a = (resize) + "px";
-    //var b = (resize+8) + "px"
-    //$area.css("margin-left",  b);
+    this.element.find(".lhs-holder").width(resize);
+    this.element.find(".bar-v.active").css("left", resize+"px");
 
-    //$bar.css("left", a)
-
-    //$search.width(resize - 49);
+//    $search.width(resize - 49);
     //window.resize_areas();
     //if (!no_trigger) {
     //  $(window).trigger('resize');
