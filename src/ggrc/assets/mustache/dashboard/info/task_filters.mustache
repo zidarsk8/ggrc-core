@@ -1,7 +1,5 @@
 
 <ul class="tree-structure new-tree dashboard-tree inline-task-filter">
-  {{log "sasmita task filter view---task data"}}{{log task_data}}
-
   <li class="filter-wrap">
     <div class="filter-border">
       <form>
@@ -25,7 +23,7 @@
                   class="input-block-level input-medium"
                   placeholder="Filter by Object"
                   type="text"
-                  name="cycle_task_group_object.title"
+                  name="object"
                   value="{{cycle_task_group_object.title}}"
                   {{#task_data}}
                     {{data 'from-list'}}
@@ -42,7 +40,7 @@
                   class="input-block-level input-medium"
                   placeholder="Filter by Workflow"
                   type="text"
-                  name="cycle.workflow.title"
+                  name="workflow"
                   value="{{cycle.workflow.title}}"
                   {{#task_data}}
                     {{data 'from-list'}}
@@ -54,7 +52,7 @@
               </li>
               <li>
                 <label class="checkbox-inline">
-                  <input class="checkbox" type="checkbox" value="overdue" name="overdue">
+                  <input class="checkbox filter-overdue" type="checkbox" value="overdue" name="overdue">
                   Overdue only
                 </label>
               </li>
@@ -63,7 +61,7 @@
           <div class="span3">
             <div class="pull-right">
               <label class="checkbox-inline">
-                <input class="checkbox" type="checkbox">
+                <input class="checkbox" type="checkbox" name="show-history">
                 Show history
               </label>
             </div>
