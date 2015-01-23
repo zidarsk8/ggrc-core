@@ -19,7 +19,6 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -101,7 +100,6 @@ can.Model.Cacheable("CMS.Models.Project", {
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -168,7 +166,6 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -250,7 +247,6 @@ can.Model.Cacheable("CMS.Models.Product", {
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -338,7 +334,6 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -420,7 +415,6 @@ can.Model.Cacheable("CMS.Models.Market", {
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -487,7 +481,6 @@ can.Model.Cacheable("CMS.Models.Vendor", {
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"

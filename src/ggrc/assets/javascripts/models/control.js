@@ -20,7 +20,6 @@ can.Model.Cacheable("CMS.Models.Control", {
   , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"

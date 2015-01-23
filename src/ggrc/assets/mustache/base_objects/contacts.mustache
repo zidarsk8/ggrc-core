@@ -35,9 +35,9 @@
     {{/if}}
     </p>
   </div>
-  {{#using person=contact}}
     <div class="span6">
-      <h6>Contact</h6>
+      {{#using person=contact}}
+      <h6>Primary Contact</h6>
       <p class="oneline">
         {{#if person}}
           {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
@@ -47,7 +47,21 @@
           </span>      
         {{/if}}
       </p>
+      {{/using}}
+      {{#using person=secondary_contact}}
+      {{#if person}}
+      <h6>Secondary Contact</h6>
+      <p class="oneline">
+        {{#if person}}
+          {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
+        {{else}}
+          <span class="error">
+            Not Assigned
+          </span>      
+        {{/if}}
+      </p>
+      {{/if}}
+      {{/using}}
     </div>
-  {{/using}}
 </div>
 {{/instance}}

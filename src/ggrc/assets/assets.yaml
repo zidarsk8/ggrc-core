@@ -120,6 +120,7 @@ dashboard-js-template-files:
   - base_objects/filters/filter_by_text.mustache
   - base_objects/filters/filter_by_type.mustache
   - base_objects/notes_and_code.mustache
+  - base_objects/modal_contact_fields.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache

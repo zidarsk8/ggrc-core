@@ -42,7 +42,6 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
 
   , attributes: {
       context : "CMS.Models.Context.stub"
-    , contact: "CMS.Models.Person.stub"
     , owners: "CMS.Models.Person.stubs"
     , modified_by: "CMS.Models.Person.stub"
     , object_people: "CMS.Models.ObjectPerson.stubs"
@@ -86,26 +85,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
   , update : "PUT /api/sections/{id}"
   , destroy : "DELETE /api/sections/{id}"
 
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
-    , owners : "CMS.Models.Person.stubs"
-    , modified_by : "CMS.Models.Person.stub"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
-    , object_controls : "CMS.Models.ObjectControl.stubs"
-    , controls : "CMS.Models.Control.stubs"
-    , directive : "CMS.Models.get_stub"
-    , children : "CMS.Models.get_stubs"
-    , control_sections : "CMS.Models.ControlSection.stubs"
-    , directive_sections: "CMS.Models.DirectiveSection.stubs"
-    , directives: "CMS.Models.get_stubs"
-    , section_objectives : "CMS.Models.SectionObjective.stubs"
-    , objectives : "CMS.Models.Objective.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
-    }
+  , attributes : {}
 
   , init: function() {
     this._super.apply(this, arguments);
@@ -135,6 +115,9 @@ CMS.Models.SectionBase("CMS.Models.Section", {
     }
 
   , cache : can.getObject("cache", CMS.Models.SectionBase, true)
+  , init : function() {
+    can.extend(this.attributes, CMS.Models.SectionBase.attributes);
+  }
 }, {
 });
 
@@ -156,26 +139,7 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
   , update: "PUT /api/clauses/{id}"
   , destroy: "DELETE /api/clauses/{id}"
 
-  , attributes: {
-      context : "CMS.Models.Context.stub"
-    , contact: "CMS.Models.Person.stub"
-    , owners: "CMS.Models.Person.stubs"
-    , modified_by: "CMS.Models.Person.stub"
-    , object_people: "CMS.Models.ObjectPerson.stubs"
-    , people: "CMS.Models.Person.stubs"
-    , object_documents: "CMS.Models.ObjectDocument.stubs"
-    , documents: "CMS.Models.Document.stubs"
-    , object_controls: "CMS.Models.ObjectControl.stubs"
-    , controls: "CMS.Models.Control.stubs"
-    , directive: "CMS.Models.get_stub"
-    , children: "CMS.Models.get_stubs"
-    , control_sections: "CMS.Models.ControlSection.stubs"
-    , directive_sections: "CMS.Models.DirectiveSection.stubs"
-    , directives: "CMS.Models.get_stubs"
-    , section_objectives: "CMS.Models.SectionObjective.stubs"
-    , objectives: "CMS.Models.Objective.stubs"
-    , object_sections: "CMS.Models.ObjectSection.stubs"
-  }
+  , attributes: {}
 
   , tree_view_options: {
       show_view: "/static/mustache/sections/tree.mustache"
@@ -198,5 +162,8 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
       }]
     }
   , cache : can.getObject("cache", CMS.Models.SectionBase, true)
+  , init : function() {
+    can.extend(this.attributes, CMS.Models.SectionBase.attributes);
+  }
 }, {
 });
