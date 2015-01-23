@@ -3,7 +3,6 @@
 -# Created By: brad@reciprocitylabs.com
 -# Maintained By: brad@reciprocitylabs.com
 
--set default_width_pct = 5
 -set width_pcts = [4, 4, 10, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 2, 2, 2, 5]
 -set column_names = ["slug", "title", "description", "kind", "means", "start_date", "end_date", "url", "reference_url", "notes", "systems", "processes", "categories", "assertions", "verify_frequency", "documents", "contact", "key_control", "active", "fraud_related", "principal_assessor", "secondary_assessor", "status"]
 -set header_overrides = {"documents" : "References", "systems" : "Systems", "processes" : "Processes", "categories" : "Categories","assertions" : "Assertions", "contact" : "Person of Contact", "status": "State"}
@@ -15,6 +14,7 @@
 -set objects_created = converter.objects_created
 -set objects_updated = converter.objects_updated
 -set parent_meta_kind = converter.directive_kind()
+-set default_width_pct = 5
 -set custom_attribute_definitions = converter.custom_attribute_definitions
 
 .results-table

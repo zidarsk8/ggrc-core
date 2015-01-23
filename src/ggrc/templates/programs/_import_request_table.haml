@@ -6,6 +6,8 @@
 %table.ggrc-table{cellspacing:"0",cellpadding:"0"}
   -for a in width_pcts
     %col{style:"width:{{a}}%" }
+  -for a in custom_attribute_definitions
+    %col{style:"width:{{default_width_pct}}%" }
   %thead
     %tr
       -for a in column_names
