@@ -149,6 +149,9 @@ class BaseRowConverter(object):
             ownable=self.obj,
             modified_by_id=current_user_id
         ))
+    # This atomically deletes all existing custom attribute values for this object
+    # and sets all imported values. This will delete all custom attributes that
+    # were set on the object prior to import and not included in the import.
     if self.custom_attribute_values:
       self.obj.custom_attributes({'custom_attributes': self.custom_attribute_values})
 
