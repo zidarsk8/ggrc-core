@@ -7,11 +7,9 @@
 
 {{!<div id='{ id }' class='modal modal-selector fade hide' tabindex='-1'>}}
     <div class="modal-header">
-      <div class="pull-right">
-        <a class="btn btn-danger btn-mini" href="javascript://" data-dismiss="modal">
-          <i class="grcicon-x-white"></i>
-        </a>
-      </div>
+      <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
+        <i class="grcicon-x-grey"></i>
+      </a>
       <h2>
         {{#if_equals option_type_count 1}}
           {{#option_type_menu}}{{#items}}
@@ -125,18 +123,14 @@
     <div class="modal-footer">
       <div class="row-fluid">
         <div class="span6">
-          <div class="deny-buttons">
-            <a class="btn" data-dismiss="modal" href="javascript://">
-              Cancel
-            </a>
-          </div>
+          &nbsp;
         </div>
         <div class="span6">
           <div class="confirm-buttons">
             {{#is_page_instance}}
               <span class="error">Can't map an object to itself<span>
             {{/is_page_instance}}
-            <a class="btn btn-primary preventdoubleclick
+            <a class="btn btn-small btn-info preventdoubleclick
               {{#if_helpers '\
                 ^if' selected_option '\
                 or #if' is_page_instance}} disabled {{/if_helpers}}map-button" href="javascript://">
