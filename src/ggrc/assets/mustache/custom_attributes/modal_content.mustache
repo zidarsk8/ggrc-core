@@ -13,7 +13,7 @@
       {{#instance.custom_attribute_definitions}}
       {{#with_value_for_id id}}
 
-      <div class="hidable span6">
+      <div class="{{^mandatory}}hidable{{/mandatory}} span6">
         <label>
           {{title}}
           {{#mandatory}}<span class="required">*</span>{{/mandatory}}

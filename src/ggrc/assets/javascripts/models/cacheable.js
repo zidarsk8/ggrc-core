@@ -685,9 +685,40 @@ can.Model("can.Model.Cacheable", {
     var self = this;
     return CMS.Models.CustomAttributeDefinition.findAll({
       definition_type: self.class.root_object
-    }).then(function(definitions){
-      self.attr('custom_attribute_definitions', definitions);
+    }).then(function(definitions) {
+      if(!self.attr('custom_attribute_definitions')) {
+        self.attr('custom_attribute_definitions', definitions);
+      }
     });
+  }
+  , setup_custom_attributes: function setup_custom_attributes() {
+    var self = this, key;
+
+    // Remove existing custom_attribute validations,
+    // some of them might have changed
+    for (key in this.class.validations) {
+      if (key.indexOf('custom_attributes.') === 0) {
+        delete this.class.validations[key];
+      }
+    }
+    can.each(this.custom_attribute_definitions, function(definition) {
+      if (definition.mandatory) {
+        if (definition.attribute_type === 'Checkbox') {
+          self.class.validate('custom_attributes.' + definition.id, function(val){
+            return !val;
+          });
+        } else {
+          self.class.validateNonBlank('custom_attributes.' + definition.id);
+        }
+      }
+    });
+    if (!this.custom_attributes) {
+      this.attr('custom_attributes', new can.Map());
+      can.each(this.custom_attribute_values, function(value) {
+        value = value.reify();
+        self.custom_attributes.attr(value.custom_attribute_id, value.attribute_value);
+      });
+    }
   }
   , computed_errors : can.compute(function() {
       var errors = this.errors();
@@ -852,9 +883,6 @@ can.Model("can.Model.Cacheable", {
             return resources;
           })
           .then($.proxy(that.constructor, "model"))
-          .then(function(model){
-            return model;
-          })
           .done(function(d) {
             d.backup();
             dfd.resolve(d);

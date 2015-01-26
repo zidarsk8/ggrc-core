@@ -28,7 +28,7 @@
             </span>
             Custom Attributes
             <span class="hidden-fields out">
-              {{#each loaded_definitions}}{{^if_equals @index 0}}, {{/if}}{{title}}{{/each}}
+              {{#each instance.custom_attribute_definitions}}{{^if_equals @index 0}}, {{/if}}{{title}}{{/instance.custom_attribute_definitions}}
             </span>
           </a>
         </div>
@@ -38,7 +38,7 @@
     <div class="hidden-fields-area-custom" style="display:none;">
       <div class="bare">
         <div class="row-fluid">
-          {{#each instance.custom_attribute_definitions}}
+          {{#instance.custom_attribute_definitions}}
           <div class="span6">
             <h6>{{title}}</h6>
             <p data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
@@ -57,7 +57,7 @@
               {{/with_value_for_id}}
             </p>
           </div>
-          {{/each}}
+          {{/instance.custom_attribute_definitions}}
         </div>
       </div>
     </div>

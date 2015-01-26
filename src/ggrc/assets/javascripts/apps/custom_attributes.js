@@ -33,17 +33,6 @@
       }
     },
     helpers: {
-      value_for_id: function(id) {
-        var ret;
-        id = Mustache.resolve(id);
-        can.each(this.instance.custom_attribute_values, function(value) {
-          value = value.reify();
-          if (value.custom_attribute_id === id) {
-            ret = value.attribute_value;
-          }
-        });
-        return ret;
-      },
       with_value_for_id: function(id, options) {
         var ret;
         id = Mustache.resolve(id);
