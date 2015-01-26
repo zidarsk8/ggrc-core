@@ -121,7 +121,7 @@ class BaseRowConverter(object):
 
   def setup_object_by_slug(self, attrs):
     slug = prepare_slug(attrs['slug']) if attrs.get('slug') else ''
-    model_class = self.model_class if not self.importer.options.get('is_biz_process') else Process
+    model_class = self.model_class
 
     if not slug:
       self.obj = model_class()

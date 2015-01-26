@@ -84,10 +84,9 @@ class SystemRowConverter(BaseRowConverter):
             ))
 
 
-class SystemsConverter(BaseConverter):
+class SystemsAndProcessesBaseConverter(BaseConverter):
 
   metadata_export_order = ['type', 'slug']
-
 
   metadata_map = OrderedDict([
     ('Type','type')
@@ -98,31 +97,8 @@ class SystemsConverter(BaseConverter):
     'controls', 'created_at', 'updated_at'
   ]
 
-  object_map = OrderedDict([
-    ('System Code', 'slug'),
-    ('Title', 'title'),
-    ('Description' , 'description'),
-    ('Infrastructure', 'infrastructure'),
-    ('URL', 'url'),
-    ('Reference URL', 'reference_url'),
-    ('Notes', 'notes'),
-    ('Map:Person of Contact', 'contact'),
-    ('Map:Controls', 'controls'),
-    ('Map:System', 'sub_systems'),
-    ('Map:Process', 'sub_processes'),
-    ('Map:Org Group', 'org_groups'),
-    ('Map:Vendor', 'vendors'),
-    ('Effective Date', 'start_date'),
-    ('Created', 'created_at'),
-    ('Updated', 'updated_at'),
-    ('Network Zone', 'network_zone'),
-    ('State', 'status'),
-  ])
-
-  row_converter = SystemRowConverter
-
   def create_object_map(self):
-    super(SystemsConverter, self).create_object_map()
+    super(SystemsAndProcessesBaseConverter, self).create_object_map()
     if self.options.get('is_biz_process'):
       self.object_map = OrderedDict( [(k.replace("System Code", 'Process Code'), v) \
                         if k == 'System Code' else (k, v) for k, v in self.object_map.items()] )
@@ -171,9 +147,57 @@ class SystemsConverter(BaseConverter):
     yield []
     yield self.object_map.keys()
 
+
+class SystemsConverter(SystemsAndProcessesBaseConverter):
+
+  object_map = OrderedDict([
+    ('System Code', 'slug'),
+    ('Title', 'title'),
+    ('Description' , 'description'),
+    ('Infrastructure', 'infrastructure'),
+    ('URL', 'url'),
+    ('Reference URL', 'reference_url'),
+    ('Notes', 'notes'),
+    ('Map:Person of Contact', 'contact'),
+    ('Map:Controls', 'controls'),
+    ('Map:System', 'sub_systems'),
+    ('Map:Process', 'sub_processes'),
+    ('Map:Org Group', 'org_groups'),
+    ('Map:Vendor', 'vendors'),
+    ('Effective Date', 'start_date'),
+    ('Created', 'created_at'),
+    ('Updated', 'updated_at'),
+    ('Network Zone', 'network_zone'),
+    ('State', 'status'),
+  ])
+
+  row_converter = SystemRowConverter
+
 class ProcessRowConverter(SystemRowConverter):
   model_class = Process
 
-class ProcessesConverter(SystemsConverter):
+class ProcessesConverter(SystemsAndProcessesBaseConverter):
+
+  object_map = OrderedDict([
+    ('System Code', 'slug'),
+    ('Title', 'title'),
+    ('Description' , 'description'),
+    ('Infrastructure', 'infrastructure'),
+    ('URL', 'url'),
+    ('Reference URL', 'reference_url'),
+    ('Notes', 'notes'),
+    ('Map:Person of Contact', 'contact'),
+    ('Map:Controls', 'controls'),
+    ('Map:System', 'sub_systems'),
+    ('Map:Process', 'sub_processes'),
+    ('Map:Org Group', 'org_groups'),
+    ('Map:Vendor', 'vendors'),
+    ('Effective Date', 'start_date'),
+    ('Created', 'created_at'),
+    ('Updated', 'updated_at'),
+    ('Network Zone', 'network_zone'),
+    ('State', 'status'),
+  ])
+
   row_converter = ProcessRowConverter
 
