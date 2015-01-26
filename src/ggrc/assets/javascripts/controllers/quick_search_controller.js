@@ -210,20 +210,38 @@ can.Control("CMS.Controllers.LHN", {
       });
       this.element.find(".lhs-holder").on("scroll", self.lhs_holder_onscroll);
 
+      // this is ugly, but the trigger doesn't nest inside our top element
+      $(".lhn-trigger").on("click", this.animate_lhn.bind(this));
     }
 
   , should_show_lhn: function() {
       return Permission.is_allowed("view_object_page", "__GGRC_ALL__", null);
     }
 
+  , is_lhn_open: function () {
+      var _is_open = this.options.display_prefs.getLHNState().is_open;
+
+      if (typeof _is_open === "undefined") {
+          return false;
+      }
+
+      return _is_open;
+  }
+
   , "input.widgetsearch keypress": function(el, ev) {
       var value;
       if(ev.which === 13) {
         value = $(ev.target).val();
-        this.obs.attr("value", value);
-        this.options.display_prefs.setLHNState("search_text", value);
+        this.do_search(value);
       }
     }
+
+  , "submit": function (el, ev) {
+      ev.preventDefault();
+      
+      var value = $(ev.target).find("input.widgetsearch").val();
+      this.do_search(value);
+  }
 
   , ".widgetsearch keyup": function(el, ev) {
       if(el.val().trim() !== "") {
@@ -233,16 +251,90 @@ can.Control("CMS.Controllers.LHN", {
       }
     }
 
-  , "input.my-work click": function(el, ev) {
+  , "a[data-name='work_type'] click": function(el, ev) {
       var target = $(ev.target),
           checked;
-      if (target.is('input.my-work')) {
-        checked = target.val() === 'my_work';
-        this.obs.attr("my_work", checked);
+      
+      checked = target.data('value') === 'my_work';
+      this.obs.attr("my_work", checked);
         //target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
-        this.options.display_prefs.setLHNState("my_work", checked);
-      }
+      this.options.display_prefs.setLHNState("my_work", checked);
+      this.set_active_tab(checked);
     }
+
+  , animate_lhn: function () {
+      var is_open = this.is_lhn_open();
+
+      if(is_open) {
+          this.close_lhn();
+      } else {
+          this.open_lhn();
+      }
+  }
+
+  , close_lhn: function () {
+      // not nested
+      $(".lhn-trigger").removeClass("active");
+
+      var width = this.options.display_prefs.getLHNavSize().lhs;
+            
+      this.element.find(".lhs-holder")
+          .removeClass("active")
+          .css({left: (-width)+"px",
+                width: width});
+
+      this.element.find(".lhn-type")
+          .removeClass("active")
+          .css("left", (-width-6)+"px");
+
+      this.element.find(".bar-v")
+          .removeClass("active")
+          .css("left", "-8px");
+      
+      this.element.find(".lhs-search")
+          .removeClass("active")
+          .css("width", "196px");
+
+      this.element.find(".widgetsearch").css("width", "130px");
+
+      this.options.display_prefs.setLHNState({is_open: false});
+   }
+
+  , open_lhn: function () {
+      this.set_active_tab();
+
+      // not nested
+      $(".lhn-trigger").addClass("active");
+
+      var width = this.options.display_prefs.getLHNavSize().lhs;
+
+      this.element.find(".lhs-holder")
+          .css({left: "",
+                width: width+"px"})
+          .addClass("active");
+
+      this.element.find(".lhn-type")
+          .css("left", "")
+          .addClass("active");
+      
+      this.element.find(".bar-v")
+          .addClass("active")
+          .css("left",  width+"px");
+
+      this.element.find(".lhs-search")
+          .addClass("active");
+      
+      this.options.display_prefs.setLHNState({is_open: true});
+  }
+
+
+  , set_active_tab: function (newval) {
+    newval || (newval = this.obs.attr("my_work"));
+
+    var value = ["all", "my_work"][Number(newval)];
+    $("a[data-name='work_type']").removeClass("active");
+    $("a[data-name='work_type'][data-value='"+value+"'").addClass("active");
+  }
 
   , init_lhn: function() {
       var self = this;
@@ -281,10 +373,9 @@ can.Control("CMS.Controllers.LHN", {
               target = self.element.find('#lhs input.my-work[value='+value+']');
           target.prop('checked', true);
           target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
-          if(!$lhs.hasClass("lhs-closed")) {
-            $(".recent").ggrc_controllers_recently_viewed();
-            self.size && self.resize_lhn(self.size);
-          }
+          
+           // closed on refresh, but close_lhn sets widths and such
+           self.close_lhn();
 
           // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
           //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
@@ -303,7 +394,7 @@ can.Control("CMS.Controllers.LHN", {
             return this.value;
           }).addClass('active');
         });
-        self.size = prefs[0].getLHNavSize(null, "lhs");
+        self.size = prefs[0].getLHNavSize().lhs;
         self.resize_lhn(self.size);
         // Collapse the LHN if they did it on a previous page
         self.collapsed = prefs[0].getCollapsed(null, "lhs");
@@ -357,6 +448,11 @@ can.Control("CMS.Controllers.LHN", {
       });
     }
 
+  , do_search: function (value) {
+    this.obs.attr("value", value);
+    this.options.display_prefs.setLHNState("search_text", value);
+  }
+
   , mousedown : false
   , dragged : false
   , resize_lhn : function(resize, no_trigger){
@@ -369,36 +465,17 @@ can.Control("CMS.Controllers.LHN", {
         $lhs_label = $(".lhs-search .my-work-label"),
         lhn_second_row = 201,
         max_width = window.innerWidth - 30,
-        default_size = lhn_second_row;;
+        default_size = lhn_second_row;
 
-    //New UI there is no lhs toggle-open-close
-    //if(resize < 40 && !$lhs.hasClass("lhs-closed")) {
-    //  this.toggle_lhs(no_trigger);
-    //}
-    //if(resize < 40) {
-    //  return;
-    //}
-    if (resize < default_size) resize = default_size;
-    resize = Math.min(resize, max_width);
-    //if($lhs.hasClass("lhs-closed")) this.toggle_lhs(no_trigger);
-    $lhsHolder.width(resize);
-
-    // LHN search radio buttons oneline fix
-    if(resize < lhn_second_row) {
-      $lhs_label_right.removeClass("pull-right");
-      $lhs_label.addClass("oneline");
-    } else {
-      $lhs_label_right.addClass("pull-right");
-      $lhs_label.removeClass("oneline");
+    if (resize < default_size) {
+      resize = default_size;
     }
+    resize = Math.min(resize, max_width);
 
-    //var a = (resize) + "px";
-    //var b = (resize+8) + "px"
-    //$area.css("margin-left",  b);
+    this.element.find(".lhs-holder").width(resize);
+    this.element.find(".bar-v.active").css("left", resize+"px");
 
-    //$bar.css("left", a)
-
-    $search.width(resize - 49);
+//    $search.width(resize - 49);
     //window.resize_areas();
     //if (!no_trigger) {
     //  $(window).trigger('resize');
@@ -598,7 +675,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         }
         $.map(CMS.Models, function(model, name) {
           if (model.attributes && model.attributes.default_lhn_filters) {
-            self.options.filter_params.attr(model.attributes.default_lhn_filters)
+            self.options.filter_params.attr(model.attributes.default_lhn_filters);
           }
         });
         self.options.filter_params.attr(saved_filters);
@@ -1085,7 +1162,7 @@ can.Control("CMS.Controllers.LHN_Search", {
     },
 
   ".filters a click" : function(el, ev) {
-    var term = this.options.display_prefs.getLHNState().search_text || ""
+    var term = this.options.display_prefs.getLHNState().search_text || "",
         param = {},
         key = el.data('key'),
         value = el.data('value'),
