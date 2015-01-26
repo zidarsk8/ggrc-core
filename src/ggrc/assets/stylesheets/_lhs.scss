@@ -111,7 +111,7 @@
   @include clearfix();
   @include transition-property(left);
   @include transition-duration(.8s);
-  min-width: 246px;
+  min-width: 240px;
   left: -246px;
   &.active {
     left: 0px;
@@ -488,9 +488,9 @@
 .bar-v {
   @include transition-property(left);
   @include transition-duration(.8s);
-  position: fixed;
-  top: 176px;
-  left: -8px;
+  position: absolute;
+  top: 0;
+  right: 0;
   height:100%;
   z-index: 100;
   width: 6px;
@@ -502,16 +502,9 @@
   background-repeat: no-repeat;
   background-position: 2px 50%;
   cursor: ew-resize;
-  &.active {
-    left: 246px;
-  }
-  &:hover {
-    background-color: $white;
-  }
-  &.bar-closed {
-    left: 40px;
-    cursor: e-resize;
-  }
+  // &:hover {
+  //   background-color: $white;
+  // }
   &.objnav {
     z-index: 1;  // Show object nav bar-v below title
   }
