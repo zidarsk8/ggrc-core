@@ -372,8 +372,8 @@ can.Control("CMS.Controllers.LHN", {
           target.prop('checked', true);
           target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
           
-           // closed on refresh, but close_lhn sets widths and such
-           self.close_lhn();
+          // closed on refresh, but close_lhn sets widths and such
+          self.close_lhn();
 
           // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
           //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
@@ -682,6 +682,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         // Above, category scrolling is listened on to save the scroll position.  Below, on page load the
         //  open category is toggled open, and the search placed into the search box by display prefs is
         //  sent to the search service.
+
         if(lhn_prefs.open_category) {
           var selector = self.options.list_selector
                   .split(",")
@@ -715,6 +716,10 @@ can.Control("CMS.Controllers.LHN_Search", {
         // Refresh the counts whenever the lists change
         self.refresh_counts();
       });
+
+      // this is a hack, but for the life of me I couldn't find another way
+      // make sure lists with mid-level are closed on load
+      self.close_mid_levels();
     }
 
   , "{list_toggle_selector} click": "toggle_list_visibility"
@@ -749,7 +754,8 @@ can.Control("CMS.Controllers.LHN_Search", {
       } else {
         // Use a cached max-height if one exists
         var holder = el.closest('.lhs-holder')
-          , $content = $ul.filter(this.options.list_content_selector)
+          , $content = $ul.filter([this.options.list_content_selector,
+                                   this.options.list_mid_level_selector].join(","))
           , $siblings = $ul.closest(".lhs").find(selector)
           , extra_height = 0
           , top
@@ -788,8 +794,15 @@ can.Control("CMS.Controllers.LHN_Search", {
       ev && ev.preventDefault();
     }
 
+  , close_mid_levels: function () {
+    this.toggle_list_visibility($([".governance.list-toggle",
+                                   ".entities.list-toggle",
+                                   ".business.list-toggle"].join(",")));
+  }
+
   , " resize": function() {
-      var $content = this.element.find(this.options.list_content_selector).filter(':visible');
+      var $content = this.element.find([this.options.list_content_selector,
+                                       this.options.list_mid_level_selector].join(",")).filter(':visible');
 
 
       if ($content.length) {
@@ -855,11 +868,11 @@ can.Control("CMS.Controllers.LHN_Search", {
       });
       refresh_queue.trigger().then(function() {
         visible_list.push.apply(visible_list, new_visible_list);
-        visible_list.attr('is_loading', false)
+        visible_list.attr('is_loading', false);
         //visible_list.replace(new_visible_list);
         delete that._show_more_pending;
       }).done(tracker_stop);
-      visible_list.attr('is_loading', true)
+      visible_list.attr('is_loading', true);
     }
 
   , init_object_lists: function() {
@@ -881,6 +894,7 @@ can.Control("CMS.Controllers.LHN_Search", {
 
   , init_list_views: function() {
       var self = this;
+      
       can.each(this.get_lists(), function($list) {
         var model_name;
         $list = $($list);
@@ -1169,7 +1183,8 @@ can.Control("CMS.Controllers.LHN_Search", {
       var self = this;
       return can.map(this.get_lists(), function($list) {
         $list = $($list);
-        if ($list.find(self.options.list_content_selector).hasClass('in'))
+        if ($list.find([self.options.list_content_selector,
+                        self.options.list_mid_level_selector].join(",")).hasClass('in'))
           return $list;
       });
     },
