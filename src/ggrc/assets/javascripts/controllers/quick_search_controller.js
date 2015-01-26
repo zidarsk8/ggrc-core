@@ -289,8 +289,7 @@ can.Control("CMS.Controllers.LHN", {
 
       this.element.find(".bar-v")
           .removeClass("active")
-          .css("left", "-8px");
-      
+
       this.element.find(".lhs-search")
           .removeClass("active")
           .css("width", "196px");
@@ -319,7 +318,6 @@ can.Control("CMS.Controllers.LHN", {
       
       this.element.find(".bar-v")
           .addClass("active")
-          .css("left",  width+"px");
 
       this.element.find(".lhs-search")
           .addClass("active");
@@ -432,13 +430,11 @@ can.Control("CMS.Controllers.LHN", {
         $bar.removeClass("bar-closed");
         $lhsHolder.css("width", this.size + "px");
         $area.css("margin-left", (this.size + 8) + "px");
-        $bar.css("left", this.size + "px");
       } else {
         $lhs.addClass("lhs-closed");
         $bar.addClass("bar-closed");
         $lhsHolder.css("width","40px");
         $area.css("margin-left","48px");
-        $bar.css("left", "40px");
       }
 
       $search.width($lhs.width() - 49);
@@ -473,7 +469,6 @@ can.Control("CMS.Controllers.LHN", {
     resize = Math.min(resize, max_width);
 
     this.element.find(".lhs-holder").width(resize);
-    this.element.find(".bar-v.active").css("left", resize+"px");
 
 //    $search.width(resize - 49);
     //window.resize_areas();
