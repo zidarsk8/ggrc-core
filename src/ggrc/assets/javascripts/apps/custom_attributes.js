@@ -10,92 +10,52 @@
   can.Component.extend({
     tag: "custom-attributes",
     scope: {
-      instance: null
+      instance: null,
+      // Make sure custom_attribute_definitions & custom_attribute_values
+      // get loaded
+      load: "@",
+      loading: false
     },
     content: "<content/>",
     events: {
     },
+    init: function() {
+      var instance = this.scope.instance,
+          scope = this.scope;
+      if (this.scope.load) {
+        scope.attr('loading', true);
+        $.when(
+          instance.load_custom_attribute_definitions(),
+          instance.refresh_all('custom_attribute_values')
+        ).always(function() {
+          scope.attr('loading', false);
+        });
+      }
+    },
     helpers: {
-      with_custom_attribute_definitions: function(options) {
-        var instance = this.instance || GGRC.page_instance(),
-            self = this,
-            dfd;
-
-        if (!(instance && instance.custom_attribute_definitions)) {
-          return;
-        }
-
-        dfd = $.when(
-          instance.custom_attribute_definitions(),
-          // Making sure custom_attribute_values are loaded
-          instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
-        );
-
-        function finish(custom_attributes, values) {
-          setTimeout(function() {
-            // TODO: Find a better way of enabling rich text fields
-            $($.find('custom-attributes .wysihtml5')).each(function() {
-              $(this).cms_wysihtml5();
-            });
-
-            // TODO: Find a better way for inserting attribute values into DOM
-            $($.find("custom-attributes :input:not(isolate-form *)")).each(function(_, el) {
-              var $el = $(el), name, val = "", id, i;
-              if (!$el.attr('name')) {
-                return;
-              }
-              name = $el.attr('name').split('.');
-              if (name[0] != 'custom_attributes') {
-                return;
-              }
-              id = name[1];
-
-              for (i = 0; i < values.length; i++) {
-                if (values[i].custom_attribute_id == id) {
-                  val = values[i].attribute_value;
-                }
-              }
-              // A checkbox is a special case
-              if ($el.is(':checkbox')) {
-                $el.prop('checked', val == 1);
-              } else {
-                $el.val(val);
-              }
-              // TODO: This bit triggers a validate form on load, causing the title
-              //       cannot be blank error to show up on form load.
-              $el.trigger('change');
-            });
-            $($.find("custom-attributes [data-custom-attribute]")).each(function(_, el) {
-              var $el = $(el),
-                  id = $el.data('custom-attribute'),
-                  val = "";
-
-              for (i = 0; i < values.length; i++) {
-                if (values[i].custom_attribute_id == id) {
-                  val = values[i].attribute_value;
-                }
-              }
-              if ($el.data('type') === 'Checkbox') {
-                $el.html(val == 1 ? "Yes" : "No");
-              } else {
-                $el.html(val);
-              }
-            });
-          });
-
-          return options.fn(options.contexts.add({
-            loaded_definitions: custom_attributes.reverse()
-          }));
-        }
-
-        function progress() {
-          return options.inverse(options.contexts);
-        }
-
-        return Mustache.defer_render('div', {
-          done: finish,
-          progress: progress,
-        }, dfd);
+      value_for_id: function(id) {
+        var ret;
+        id = Mustache.resolve(id);
+        can.each(this.instance.custom_attribute_values, function(value) {
+          value = value.reify();
+          if (value.custom_attribute_id === id) {
+            ret = value.attribute_value;
+          }
+        });
+        return ret;
+      },
+      with_value_for_id: function(id, options) {
+        var ret;
+        id = Mustache.resolve(id);
+        can.each(this.instance.custom_attribute_values, function(value) {
+          value = value.reify();
+          if (value.custom_attribute_id === id) {
+            ret = value.attribute_value;
+          }
+        });
+        return options.fn(options.contexts.add({
+          value: ret
+        }));
       }
     }
   });

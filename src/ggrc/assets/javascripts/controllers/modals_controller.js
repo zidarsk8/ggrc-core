@@ -198,8 +198,9 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , fetch_data : function(params) {
-    var that = this;
-    var dfd;
+    var that = this,
+        dfd,
+        instance;
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
     if (this.options.skip_refresh && this.options.instance) {
@@ -232,7 +233,13 @@ can.Control("GGRC.Controllers.Modals", {
       that.on();
       dfd = new $.Deferred().resolve(this.options.instance);
     }
-
+    instance = this.options.instance;
+    dfd = dfd.then(function(){
+      return $.when(
+        instance.load_custom_attribute_definitions(),
+        instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
+      );
+    });
     return dfd.done(function() {
 
       // If the modal is closed early, the element no longer exists
@@ -760,7 +767,7 @@ can.Control("GGRC.Controllers.Modals", {
             finish();
           });
         } else {
-          var type = obj.type ? can.spaceCamelCase(obj.type) : '', 
+          var type = obj.type ? can.spaceCamelCase(obj.type) : '',
               name = obj.title ? obj.title : '',
               msg;
           if(instance_id === undefined) { //new element
@@ -1098,4 +1105,3 @@ can.Component.extend({
 });
 
 })(window.can, window.can.$);
-

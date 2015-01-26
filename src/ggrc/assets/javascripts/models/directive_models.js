@@ -119,6 +119,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
     , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , meta_kinds : [ "Standard" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -167,6 +168,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , meta_kinds : [ "Regulation" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -215,6 +217,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -263,6 +266,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
     , directive_sections: "CMS.Models.DirectiveSection.stubs"
     , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , meta_kinds : [ "Contract" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)

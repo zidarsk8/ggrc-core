@@ -44,6 +44,7 @@ can.Model.Cacheable("CMS.Models.Person", {
       , user_roles : "CMS.Models.UserRole.stubs"
       , name : "trimmed"
       , email : "trimmed"
+      , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
     }
     , defaults : {
       name : ""

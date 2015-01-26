@@ -35,6 +35,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -119,6 +120,7 @@ can.Model.Cacheable("CMS.Models.Project", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -188,6 +190,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -273,6 +276,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , kind : "CMS.Models.Option.stub"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
     kind : null
@@ -362,6 +366,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -446,6 +451,7 @@ can.Model.Cacheable("CMS.Models.Market", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -515,6 +521,7 @@ can.Model.Cacheable("CMS.Models.Vendor", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"

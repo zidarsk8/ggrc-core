@@ -30,6 +30,7 @@
       //workflow_task_groups: "CMS.Models.WorkflowTaskGroup.stubs"
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
+      custom_attribute_values: "CMS.Models.CustomAttributeValue.stubs",
       default_lhn_filters: {
         Workflow: {status: 'Active'},
         Workflow_All: {},

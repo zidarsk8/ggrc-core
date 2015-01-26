@@ -681,10 +681,12 @@ can.Model("can.Model.Cacheable", {
       }
     });
   }
-  , custom_attribute_definitions: function custom_attribute_definitions() {
+  , load_custom_attribute_definitions: function custom_attribute_definitions() {
     var self = this;
     return CMS.Models.CustomAttributeDefinition.findAll({
       definition_type: self.class.root_object
+    }).then(function(definitions){
+      self.attr('custom_attribute_definitions', definitions);
     });
   }
   , computed_errors : can.compute(function() {
@@ -850,6 +852,9 @@ can.Model("can.Model.Cacheable", {
             return resources;
           })
           .then($.proxy(that.constructor, "model"))
+          .then(function(model){
+            return model;
+          })
           .done(function(d) {
             d.backup();
             dfd.resolve(d);

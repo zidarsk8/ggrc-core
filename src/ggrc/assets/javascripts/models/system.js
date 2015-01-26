@@ -107,6 +107,7 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
     , sections : "CMS.Models.get_stubs"
     , response : "CMS.Models.Response.stub"
     , network_zone : "CMS.Models.Option.stub"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
     }
   , defaults : {
       title : ""
@@ -166,6 +167,7 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
     , sections : "CMS.Models.get_stubs"
     , network_zone : "CMS.Models.Option.stub"
     , response : "CMS.Models.Response.stub"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
     }
   , defaults : {
       title : ""
