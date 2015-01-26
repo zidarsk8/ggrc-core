@@ -49,6 +49,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     , verify_frequency : "CMS.Models.Option.stub"
     , principal_assessor : "CMS.Models.Person.stub"
     , secondary_assessor : "CMS.Models.Person.stub"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , links_to : {
     "Section" : "ControlSection"

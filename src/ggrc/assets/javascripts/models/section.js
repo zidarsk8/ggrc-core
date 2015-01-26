@@ -106,6 +106,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
     , section_objectives : "CMS.Models.SectionObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
     }
 
   , init: function() {
@@ -177,6 +178,7 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
     , section_objectives: "CMS.Models.SectionObjective.stubs"
     , objectives: "CMS.Models.Objective.stubs"
     , object_sections: "CMS.Models.ObjectSection.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
 
   , tree_view_options: {

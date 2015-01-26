@@ -198,8 +198,9 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , fetch_data : function(params) {
-    var that = this;
-    var dfd;
+    var that = this,
+        dfd,
+        instance;
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
     if (this.options.skip_refresh && this.options.instance) {
@@ -232,11 +233,20 @@ can.Control("GGRC.Controllers.Modals", {
       that.on();
       dfd = new $.Deferred().resolve(this.options.instance);
     }
-
+    instance = this.options.instance;
+    // Make sure custom attributes are preloaded:
+    dfd = dfd.then(function(){
+      return $.when(
+        instance.load_custom_attribute_definitions(),
+        instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
+      );
+    });
     return dfd.done(function() {
 
       // If the modal is closed early, the element no longer exists
       if (that.element) {
+        // Make sure custom attr validations/values are set
+        instance.setup_custom_attributes();
         // This is to trigger `focus_first_element` in modal_ajax handling
         that.element.trigger("loaded");
       }
@@ -275,7 +285,6 @@ can.Control("GGRC.Controllers.Modals", {
     if (custom_attributes != null && !('delete_counts' in this.options)) {
       this.options.$content.append(custom_attributes);
     }
-
     this.setup_wysihtml5();
 
     //Update UI status array
@@ -450,9 +459,6 @@ can.Control("GGRC.Controllers.Modals", {
       cur.splice.apply(cur, [0, cur.length].concat(value));
     } else {
       if (name[0] === "custom_attributes") {
-        if (!instance.custom_attributes) {
-          instance.attr('custom_attributes', new can.Map());
-        }
         instance.custom_attributes.attr(name[1], value[name[1]]);
       } else if(name[0] !== "people") {
         instance.attr(name[0], value);
@@ -507,11 +513,11 @@ can.Control("GGRC.Controllers.Modals", {
         }
       }
 
-      for(var i=0; i < $el.closest('.hide-wrap.hidable').find('.inner-hidable').length; i++) {
+      for(i=0; i < $el.closest('.hide-wrap.hidable').find('.inner-hidable').length; i++) {
         if(i == 1) {
           $el.closest('.inner-hide').parent('.hidable').addClass("hidden");
         }
-      };
+      }
 
       $hideButton.hide();
       $showButton.show();
@@ -584,8 +590,7 @@ can.Control("GGRC.Controllers.Modals", {
       var $selected,
           str,
           tabindex,
-          $form = $(this.element).find('form');;
-
+          $form = $(this.element).find('form');
       for (var i = 0; i < this.options.ui_array.length; i++){
         if(this.options.ui_array[i] == 1){
           tabindex = i+1;
@@ -694,9 +699,25 @@ can.Control("GGRC.Controllers.Modals", {
 
   , new_instance: function(data){
     var that = this,
-      params = this.find_params();
+      params = this.find_params(),
+      new_instance = new this.options.model(params)
+        .attr("_suppress_errors", true)
+        .attr('custom_attribute_definitions', this.options.instance.custom_attribute_definitions)
+        .attr('custom_attributes', new can.Map());
 
-    $.when(this.options.attr("instance", new this.options.model(params).attr("_suppress_errors", true)))
+    // Reset custom attribute values manually
+    can.each(new_instance.custom_attribute_definitions, function(definition) {
+      var element = that.element.find('[name="custom_attributes.' + definition.id + '"]');
+      if (definition.attribute_type === 'Checkbox') {
+        element.attr('checked', false);
+      } else if (definition.attribute_type === 'Rich Text') {
+        element.data("wysihtml5").editor.clear();
+      } else {
+        element.val('');
+      }
+    });
+
+    $.when(this.options.attr('instance', new_instance))
       .done (function() {
         // If the modal is closed early, the element no longer exists
         if (that.element) {
@@ -760,7 +781,7 @@ can.Control("GGRC.Controllers.Modals", {
             finish();
           });
         } else {
-          var type = obj.type ? can.spaceCamelCase(obj.type) : '', 
+          var type = obj.type ? can.spaceCamelCase(obj.type) : '',
               name = obj.title ? obj.title : '',
               msg;
           if(instance_id === undefined) { //new element
@@ -1098,4 +1119,3 @@ can.Component.extend({
 });
 
 })(window.can, window.can.$);
-

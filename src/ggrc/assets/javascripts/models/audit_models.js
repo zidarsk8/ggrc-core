@@ -31,6 +31,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     , contact : "CMS.Models.Person.stub"
     , audit_firm : "CMS.Models.OrgGroup.stub"
     , audit_objects : "CMS.Models.AuditObject.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
     status : "Draft",
