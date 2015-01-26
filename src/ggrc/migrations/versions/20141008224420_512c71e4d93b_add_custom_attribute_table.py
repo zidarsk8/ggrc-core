@@ -23,7 +23,7 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('title', sa.String(length=250), nullable=False),
     sa.Column('helptext', sa.String(length=250), nullable=False),
-    sa.Column('placeholder', sa.String(length=250), nullable=False),
+    sa.Column('placeholder', sa.String(length=250), nullable=True),
     sa.Column('definition_type', sa.String(length=250), nullable=False),
     sa.Column('attribute_type', sa.String(length=250), nullable=False),
     sa.Column('multi_choice_options', sa.Text(), nullable=True),
@@ -42,7 +42,7 @@ def upgrade():
     sa.Column('custom_attribute_id', sa.Integer(), nullable=False),
     sa.Column('attributable_id', sa.Integer(), nullable=True),
     sa.Column('attributable_type', sa.String(length=250), nullable=True),
-    sa.Column('attribute_value', sa.Text(), nullable=False),
+    sa.Column('attribute_value', sa.Text(), nullable=True),
     sa.ForeignKeyConstraint(['custom_attribute_id'], ['custom_attribute_definitions.id'], ),
     sa.PrimaryKeyConstraint('id')
   )
