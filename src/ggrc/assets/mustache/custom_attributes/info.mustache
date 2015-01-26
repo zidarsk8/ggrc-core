@@ -5,62 +5,49 @@
     Maintained By: anze@reciprocitylabs.com
 }}
 
-<custom-attributes instance="instance" load="true">
-  {{#if loading}}
-  <div class="row-fluid">
-    <div class="span12">
-      Loading Custom Attributes...<span  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' 'display:inline-block; top: -6px; left: 20px;' }}></span>
-    </div>
-  </div>
+<custom-attributes instance="instance">
+  {{#with_custom_attribute_definitions}}
+    {{#if loaded_definitions.length}}
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="info-expand-custom">
+            <a class="show-hidden-fields info-show-hide-cusotm" href="javascript://">
+              <span class="out">
+                <i class="grcicon-show-arrow"></i>
+                Show
+              </span>
+              <span class="in">
+                <i class="grcicon-hide-arrow"></i>
+                Hide
+              </span>
+              Custom Attributes
+              <span class="hidden-fields out">
+                {{#each loaded_definitions}}{{^if_equals @index 0}}, {{/if}}{{title}}{{/each}}
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hidden-fields-area-custom" style="display:none;">
+        <div class="bare">
+          <div class="row-fluid">
+            {{#each loaded_definitions}}
+            <div class="span6">
+              <h6>{{title}}</h6>
+              <p data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
+              </p>
+            </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+    {{/if}}
   {{else}}
-    {{#if instance.custom_attribute_definitions.length}}
     <div class="row-fluid">
       <div class="span12">
-        <div class="info-expand-custom">
-          <a class="show-hidden-fields info-show-hide-cusotm" href="javascript://">
-            <span class="out">
-              <i class="grcicon-show-arrow"></i>
-              Show
-            </span>
-            <span class="in">
-              <i class="grcicon-hide-arrow"></i>
-              Hide
-            </span>
-            Custom Attributes
-            <span class="hidden-fields out">
-              {{#each instance.custom_attribute_definitions}}{{^if_equals @index 0}}, {{/if}}{{title}}{{/instance.custom_attribute_definitions}}
-            </span>
-          </a>
-        </div>
+        Loading Custom Attributes...<span  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' 'display:inline-block; top: -6px; left: 20px;' }}></span>
       </div>
     </div>
-
-    <div class="hidden-fields-area-custom" style="display:none;">
-      <div class="bare">
-        <div class="row-fluid">
-          {{#instance.custom_attribute_definitions}}
-          <div class="span6">
-            <h6>{{title}}</h6>
-            <p data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
-              {{#with_value_for_id id}}
-                {{#switch attribute_type}}
-                {{#case 'Checkbox'}}
-                  <input type="checkbox" disabled="disabled" {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
-                {{/case}}
-                {{#case 'Rich Text'}}
-                  {{{value}}}
-                {{/case}}
-                {{#default}}
-                  {{value}}
-                {{/default}}
-                {{/switch}}
-              {{/with_value_for_id}}
-            </p>
-          </div>
-          {{/instance.custom_attribute_definitions}}
-        </div>
-      </div>
-    </div>
-    {{/if}}
-  {{/loading}}
+  {{/with_custom_attribute_definitions}}
 </custom-attributes>
