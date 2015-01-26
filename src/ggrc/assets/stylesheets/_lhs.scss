@@ -55,6 +55,7 @@
       @include box-shadow(none);
       color: $black;
       font-weight: bold;
+      width: calc(100% - 61px);
       @include input-placeholder {
         font-weight: normal;
       }
