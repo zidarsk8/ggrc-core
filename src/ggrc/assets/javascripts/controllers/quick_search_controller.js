@@ -688,8 +688,15 @@ can.Control("CMS.Controllers.LHN_Search", {
         //  open category is toggled open, and the search placed into the search box by display prefs is
         //  sent to the search service.
         if(lhn_prefs.open_category) {
+          var selector = self.options.list_selector
+                  .split(",")
+                  .map(function(s) {
+                      return s + " > a[data-object-singular=" + lhn_prefs.open_category + "]";
+                  })
+                  .join(",");
+
           self.toggle_list_visibility(
-            self.element.find(self.options.list_selector + " > a[data-object-singular=" + lhn_prefs.open_category + "]")
+            self.element.find(selector)
           );
         }
       });
