@@ -616,11 +616,13 @@ can.Control("CMS.Controllers.LHN_Search", {
     defaults : {
         list_view : GGRC.mustache_path + "/base_objects/search_result.mustache"
       , actions_view : GGRC.mustache_path + "/base_objects/search_actions.mustache"
-      , list_selector: 'ul.top-level > li'
+      , list_selector: 'ul.top-level > li, ul.mid-level > li'
+      , list_toggle_selector: 'li > a.list-toggle'
       , model_attr_selector: null
       , model_attr: 'data-model-name'
       , model_extra_attr: 'data-model-extra'
       , count_selector: '.item-count'
+      , list_mid_level_selector: 'ul.mid-level'
       , list_content_selector: 'ul.sub-level'
       , actions_content_selector: 'ul.sub-actions'
       , limit : 50
@@ -713,12 +715,22 @@ can.Control("CMS.Controllers.LHN_Search", {
       });
     }
 
-  , "{list_selector} > a click": "toggle_list_visibility"
+  , "{list_toggle_selector} click": "toggle_list_visibility"
 
   , toggle_list_visibility: function(el, ev) {
-      var selector = this.options.list_content_selector + ',' + this.options.actions_content_selector
-        , $ul = el.parent().find(selector)
+      var sub_selector = this.options.list_content_selector + ',' + this.options.actions_content_selector
+        , mid_selector = this.options.list_mid_level_selector
+        , $parent = el.parent("li")
+        , selector
         ;
+
+      if ($parent.find(mid_selector).size()) {
+        selector = mid_selector;
+      }else{
+        selector = sub_selector;
+      }
+
+      var $ul = $parent.find(selector);
 
       // Needed because the `list_selector` selector matches the Recently Viewed
       // list, which will cause errors
@@ -745,12 +757,12 @@ can.Control("CMS.Controllers.LHN_Search", {
         $siblings.slideUp().removeClass("in");
         // Expand this list
         $ul.slideDown().addClass("in");
-
+        
         // Remove active class from other lists
         holder.find(':not(.filters) > a.active').removeClass('active');
         // Add active class to this list
         el.addClass("active");
-
+        
         // Compute the extra height to add to the expandable height,
         // based on the size of the content that is sliding away.
         top = $content.offset().top;
@@ -760,14 +772,13 @@ can.Control("CMS.Controllers.LHN_Search", {
             extra_height += this.offsetHeight + (sibling_top < 0 ? -holder[0].scrollTop : 0);
           }
         });
-
+        
         // Determine the expandable height
         this._holder_height = holder.outerHeight();
         $content.filter(this.options.list_content_selector).css(
             'maxHeight'
           , Math.max(160, (this._holder_height - holder.position().top + extra_height - top - 40)) + 'px'
         );
-
         // Notify the display prefs that the category the user just opened is to be reopened on next page load.
         this.options.display_prefs.setLHNState({ "open_category" : el.attr("data-object-singular") });
         this.on_show_list($ul);

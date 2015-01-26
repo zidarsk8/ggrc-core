@@ -50,12 +50,12 @@
 
         <ul class="top-level">
           <li class="governance accordion-group">
-            <a class="governance" href="#">
+            <a class="governance list-toggle" href="#">
               <i class="grcicon-arrow-right"></i>
               Governance
             </a>
             <div class="content">
-              <ul class="sub-level">
+              <ul class="mid-level">
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Regulation" li_class="governance"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Policy" li_class="governance"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Standard" li_class="governance"}}}
@@ -69,12 +69,12 @@
           </li>
 
           <li class="entities accordion-group">
-            <a class="entities" href="#">
+            <a class="entities list-toggle" href="#">
               <i class="grcicon-arrow-right"></i>
               People/Groups
             </a>
             <div class="content">
-              <ul class="sub-level">
+              <ul class="mid-level">
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Person" li_class="entities" template_view='/static/mustache/people/search_result.mustache'}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="OrgGroup" li_class="entities"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Vendor" li_class="entities"}}}
@@ -83,12 +83,12 @@
           </li>
 
           <li class="business accordion-group">
-            <a class="business" href="#">
+            <a class="business list-toggle" href="#">
               <i class="grcicon-arrow-right"></i>
               Assets/Business
             </a>
             <div class="content">
-              <ul class="sub-level">
+              <ul class="mid-level">
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="System" li_class="business"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Process" li_class="business"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="DataAsset" li_class="business"}}}
