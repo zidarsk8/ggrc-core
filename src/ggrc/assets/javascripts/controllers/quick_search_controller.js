@@ -291,10 +291,7 @@ can.Control("CMS.Controllers.LHN", {
           .removeClass("active")
 
       this.element.find(".lhs-search")
-          .removeClass("active")
-          .css("width", "196px");
-
-      this.element.find(".widgetsearch").css("width", "130px");
+          .removeClass("active");
 
       this.options.display_prefs.setLHNState({is_open: false});
    }
@@ -437,7 +434,7 @@ can.Control("CMS.Controllers.LHN", {
         $area.css("margin-left","48px");
       }
 
-      $search.width($lhs.width() - 49);
+      // $search.width($lhs.width() - 49);
       window.resize_areas();
       CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
         prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
