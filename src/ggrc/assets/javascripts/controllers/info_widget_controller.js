@@ -56,6 +56,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
     //If dashboard then do these 2 lines below
     if (/dashboard/.test(window.location)){
       this.load_my_workflows();
+      this.initialize_task_filter();
       this.load_my_tasks();
       //this.load_my_audits();
     }
@@ -114,7 +115,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
         can.view(my_view, new can.Map(options), function(frag) {
           if (self.element) {
             if (prepend)
-              self.element.find(component_class).prepend(frag);//self.element.find('ul.workflow-tree').prepend(frag);
+              self.element.find(component_class).prepend(frag);
             else
               self.element.find(component_class).append(frag);
           }
@@ -150,6 +151,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
           else if (end_date.getTime() < first_end_date.getTime())
             first_end_date = end_date;
 
+          //Any task not finished or verified is subject to overdue
           if (data.status === 'Finished')
             finished++;
           else if (data.status === 'Verified')
@@ -208,7 +210,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
         my_view = this.options.context.workflow_view,
         component_class = 'ul.workflow-tree',
         prepend = true,
-        workflow_data = this.options.context.workflow_data,
+        workflow_data = {},
         wfs;
 
       GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
@@ -226,7 +228,8 @@ can.Control("GGRC.Controllers.InfoWidget", {
       }).then(function(){
         if(wfs.length > 0){
           //TBD sort workflows for the first 5 workflow-end-dates
-          workflow_data.options = wfs;
+          workflow_data.list = wfs;
+          self.options.context.attr('workflow_data', workflow_data);
           self.insert_options(workflow_data, my_view, component_class, prepend);
         }
       });
@@ -234,23 +237,214 @@ can.Control("GGRC.Controllers.InfoWidget", {
     return 0;
   }
 
-  , load_my_tasks: function(){
+  , initialize_task_filter: function(){
+    var filter = {
+      status: '',     //initialy any task should be displayed
+      object: '',     // not filtered by any object, object = empty string
+      workflow: '',   // not filtered by workflow, workflow = empty string
+      overdue: 0      // not filtered by overdue status
+    };
+    if (!this.options.task_filter) {
+      this.options.task_filter = filter;
+      //this.options.context.attr('task_filters', task_filters);
+    }
+  }
+
+  , display_tasks: function(loader) {
     var self = this,
         my_view = this.options.context.task_view,
-        task_data = this.options.context.task_data,
+        task_data = {},
         component_class = 'ul.task-tree',
         prepend = true;
 
+      loader.refresh_instances().then(function(tasks) {
+        self.options.context.attr('task_count', tasks.length);
+        task_data.list = tasks;
+        task_data.filtered_list = tasks;
+        self.options.task_data = task_data;
+        self.options.context.attr('task_data', task_data);
+        self.element.find(component_class).empty();
+        self.insert_options(task_data, my_view, component_class, prepend);
+      })
+      return 0;
+  }
+
+  , load_my_tasks: function(){
     //To get the tasks only for the current person/current cycle
     var loader = GGRC.page_instance().get_binding("assigned_tasks");
     if(loader) {
-      loader.refresh_instances().then(function(tasks) {
-        self.options.context.attr('task_count', tasks.length);
-        task_data.options = tasks;
-        self.insert_options(task_data, my_view, component_class, prepend);
-      })
+      this.display_tasks(loader);
     }
     return 0;
+  }
+
+  , load_task_with_history: function() {
+    //load assigned tasks and history
+    var loader = GGRC.page_instance().get_binding("assigned_tasks_with_history");
+    if(loader) {
+      this.display_tasks(loader);
+    }
+    return 0;
+  }
+
+  ////button actions  
+  , "input[data-lookup] focus" : function(el, ev) {
+    this.autocomplete(el);
+  }
+
+  , autocomplete : function(el) {
+    $.cms_autocomplete.call(this, el);
+  }
+
+  , autocomplete_select : function(el, ev, ui) {
+      setTimeout(function(){
+        if (ui.item.title) {
+          el.val(ui.item.title, ui.item);
+        } else {
+          el.val(ui.item.name ? ui.item.name : ui.item.email, ui.item);
+        }
+        el.trigger('change');
+      }, 0);
+  }
+
+  , is_overdue_task : function (task) {
+    var end_date = new Date(task.instance.end_date || null),
+        today = new Date();
+
+    //Any task that is not finished or verified are subject to overdue
+    if (task.instance.status === "Finished" || task.instance.status === "Verified")
+      return false;
+    else if (end_date.getTime() < today.getTime())
+      return true;
+  }
+
+  , filter_task_data : function() {
+    var list = this.options.context.task_data.list, //original list of data
+        i,
+        task_data = {},
+        list1 = [], //list filtered by status
+        my_list = [],
+        list2 = [], //list filtered by object or workflow
+        filtered_list = [], //final filtered list
+        filter = this.options.task_filter,
+        status_flag = false,
+        cycle,
+        obj,
+        obj_flag = false;
+
+    //Filter by status first
+    if (filter.overdue === 1) {
+      status_flag = true;
+      for (i = 0; i < list.length; i++) {
+        if (this.is_overdue_task(list[i]))
+          list1.push(list[i]);
+      }
+    } else if (filter.status === "Verified"){
+      status_flag = true;
+      for (i = 0; i < list.length; i++)
+        if (list[i].instance.status === "Verified")
+          list1.push(list[i]);
+    } else if (filter.status === "Finished"){
+      status_flag = true;
+      for (i = 0; i < list.length; i++)
+        if (list[i].instance.status === "Finished")
+          list1.push(list[i]);
+    } else if (filter.status === "InProgress"){
+      status_flag = true;
+      for (i = 0; i < list.length; i++)
+        if (list[i].instance.status === "InProgress")
+          list1.push(list[i]);
+    } else if (filter.status === "Assigned"){
+      status_flag = true;
+      for (i = 0; i < list.length; i++)
+        if (list[i].instance.status === "Assigned")
+          list1.push(list[i]);
+    }
+
+    //Now filter by object and workflow
+    if (status_flag){
+        my_list = list1;
+    } else {
+        my_list = list;
+    }
+
+    if (filter.workflow !== '' && filter.object !== '') {
+      obj_flag = true;
+      for (i = 0; i < my_list.length; i++) {
+        cycle = my_list[i].cycle.reify();
+        obj = my_list[i].cycle_task_group_object;
+        if (filter.workflow === cycle.workflow.title && filter.object === obj.object.title)
+          list2.push(my_list[i]);
+      }
+
+    } else if (filter.workflow !== '') {
+      obj_flag = true;
+      for (i = 0; i < my_list.length; i++) {
+        cycle = my_list[i].instance.cycle.reify();
+        if (filter.workflow === cycle.title)
+          list2.push(my_list[i]);
+      }
+    } else if (filter.object !== '') {
+      obj_flag = true;
+      for (i = 0; i < my_list.length; i++) {
+        if (my_list[i].instance.cycle_task_group_object) {
+          obj = my_list[i].instance.cycle_task_group_object.reify();
+          if (filter.object === obj.title)
+            list2.push(my_list[i]);
+        }
+      }
+    }
+
+    if (obj_flag) {
+      filtered_list = list2;
+    } else if (status_flag) {
+      filtered_list = list1;
+    } else {
+      filtered_list = list;
+    }
+
+    task_data.list = list;
+    task_data.filtered_list = filtered_list;
+    this.options.task_data = task_data;
+    this.options.context.attr('task_data', task_data);
+  }
+
+  , "input[type=text], input[type=checkbox].filter-overdue, select change" : function(el, ev) {
+    //console.log("selection changed-------");
+    var filter_task_data = {};
+    filter_task_data.list = [];
+    var filters = {};
+    //find all the filters, filter the existing task_data, don't need to go to the server
+    //show the data
+    var obj = this.element.find('input[name="object"]').val();
+    var wf = this.element.find('input[name="workflow"]').val();
+    var status = this.element.find('select[name="status"]').val();
+    var overdue = this.element.find('input[type=checkbox].filter-overdue:checked').length;
+    //console.log(obj + " : " + wf + " : " + status + " : " + overdue);
+
+    //set up task filter
+    this.options.task_filter.status = status;
+    this.options.task_filter.object = obj;
+    this.options.task_filter.workflow = wf;
+    this.options.task_filter.overdue = overdue;
+
+    //filter task_data
+    this.filter_task_data();
+
+    this.options.context.attr('task_count', this.options.task_data.filtered_list.length);
+    this.element.find('ul.task-tree').empty();
+    this.insert_options(this.options.task_data, this.options.context.task_view, 'ul.task-tree', true);
+
+    ev.stopPropagation();
+  }
+
+  , "input[type=checkbox].show-history change" : function(el, ev) {
+    if (this.element.find('input[type=checkbox].show-history:checked').length === 1) {
+      this.load_task_with_history();
+    } else {
+      this.load_my_tasks();
+    }
+    ev.stopPropagation();
   }
 
 });
