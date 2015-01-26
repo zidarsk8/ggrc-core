@@ -74,17 +74,17 @@
                   <li>
                     <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }); }}>
                       {{#if_equals instance.status 'Assigned'}}
-                        <button class="btn btn-small btn-info change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">Start</button>
+                        <button class="btn btn-mini btn-info change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">Start</button>
                       {{/status}}
                       {{#if_equals instance.status 'InProgress'}}
-                        <button class="btn btn-small btn-draft change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+                        <button class="btn btn-mini btn-draft change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
                       {{/if_equals}}
                       {{#if_equals instance.status 'Declined'}}
-                        <button class="btn btn-small btn-draft change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+                        <button class="btn btn-mini btn-draft change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
                       {{/if_equals}}
                       {{#if_equals instance.status 'Finished'}}
-                        <button class="btn btn-small btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
-                        <button class="btn btn-small btn-success change-task-status {{instance._disabled}}" data-openclose="close" data-name="status" data-value="Verified">Verify</button>
+                        <button class="btn btn-mini btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
+                        <button class="btn btn-mini btn-success change-task-status {{instance._disabled}}" data-openclose="close" data-name="status" data-value="Verified">Verify</button>
                       {{/status}}
                       {{#if_equals instance.status 'Verified'}}
                         <span class="task-done">
@@ -111,8 +111,9 @@
     <div class="tier-2-info-content">
 
       {{#is_allowed 'update' instance context='for'}}
-      <div class="action-bar">
-        <ul class="change-links">
+      <div class="details-wrap">
+        <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
           <li>
             <a href="javascript://" data-object-singular-override="Task for current Workflow Cycle" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
               <i class="grcicon-edit"></i>
@@ -123,40 +124,34 @@
       </div>
       {{/is_allowed}}
 
-      <section class="small-info info tier-info">
-        <div class="row-fluid">
-          <div class="span9">
+      <div class="tier-content">
+        <div class="row-fluid wrap-row">
+          <div class="span6">
             <h6>Task</h6>
             <h3>
               {{instance.title}}
             </h3>
           </div>
-          <div class="span3">
+          <div class="span6">
             <h6>Assignee</h6>
             {{#if_cycle_assignee_privileges instance}}
             <div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
               {{#using contact=instance.contact}}
-                <div class="objective-selector">
-                  <input type="text" name="contact.name" data-lookup="Person" data-params="Person:is_enabled=1" class="search-icon input-block-level" {{#if_equals instance.status 'Verified'}}disabled="disabled"{{/if}} placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
-                </div>
+                {{firstnonempty contact.name contact.email ''}}
               {{/using}}
             </div>
-            {{else}}
-              {{#using contact=instance.contact}}
-              <div>{{firstnonempty contact.name contact.email ''}}</div>
-              {{/using}}
             {{/if_cycle_assignee_privileges}}
           </div>
         </div>
 
-        <div class="row-fluid">
+        <div class="row-fluid wrap-row">
           <div class="span12">
           {{#if_helpers '\
             #if_equals' instance.task_type 'text' '\
             or #if_equals' instance.task_type "" '\
             or #if_null' instance.task_type}}
             <h6>Task details</h6>
-            <div class="tree-description">
+            <div class="rtf-block">
               {{{firstnonempty instance.description 'No additional details'}}}
             </div>
           {{/if_helpers}}
@@ -175,7 +170,7 @@
             <h6>Response Options</h6>
             <ggrc-quick-update instance="instance">
               {{#each instance.response_options}}
-              <div class="row-fluid">
+              <div class="row-fluid wrap-row">
                 <div class="span12">
                   <input type="checkbox" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}} multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}checked="checked"{{/in_array}}> {{.}}
                 </div>
@@ -191,7 +186,7 @@
           {{#using instance=instance.cycle_task_group_object}}
             {{#using object=instance.object}}
               {{#if object.viewLink}}
-              <div class="row-fluid">
+              <div class="row-fluid wrap-row">
                 <div class="span9">
                   <h6>Task to be performed on object</h6>
                   <p>
@@ -227,7 +222,7 @@
           #is_dashboard' '\
           or ^is_page_instance' workflow}}
 
-            <div class="row-fluid">
+            <div class="row-fluid wrap-row">
               <div class="span12">
                 <h6>Part of the workflow</h6>
                 <p>
@@ -236,20 +231,17 @@
                     <i class="grcicon-goto smallmargin"></i>
                   </a>
                 </p>
-                <br>
               </div>
             </div>
         {{/if_helpers}}
         {{/using}}
         {{/using}}
 
-
-
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
             {{#child_options}}
 
-            <div class="row-fluid">
+            <div class="row-fluid wrap-row">
               <div class="span12">
                 <h6>Comments ({{list.length}})</h6>
                 <ul class="entry-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>

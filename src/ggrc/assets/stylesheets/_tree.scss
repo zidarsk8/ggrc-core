@@ -466,6 +466,18 @@ ul.new-tree {
       > .item-wrap {
         margin: 0 10px;
         border-bottom: 1px solid $itemBorder;
+        > .openclose {
+          .grcicon-arrow-right {
+            margin: 5px 0 0 4px;
+            @include opacity(0.25);
+          }
+          &.active {
+            .grcicon-arrow-right {
+              background-position: -102px -80px;
+              @include opacity(1);
+            }
+          }
+        }
         .openclose,
         .select {
           padding: 6px 0;
@@ -480,10 +492,6 @@ ul.new-tree {
               @include opacity(1);
             }
           }
-        }
-        .grcicon-arrow-right {
-          margin: 5px 0 0 4px;
-          @include opacity(0.25);
         }
       }
     }
@@ -1098,14 +1106,6 @@ ul.new-tree {
         .inner-item-count {
           @include opacity(1);
         }
-        .openclose {
-          &.active {
-            .grcicon-arrow-right {
-              background-position: -102px -80px;
-              @include opacity(1);
-            }
-          }
-        }
         > .item-main {
           > .item-wrap {
             border-color: transparent;
@@ -1164,10 +1164,6 @@ ul.new-tree {
             > .item-wrap {
               border-color: transparent;
             }
-          }
-          .grcicon-arrow-right {
-            background-position: -126px -80px;
-            @include opacity(1);
           }
         }
         .dashboard & {
@@ -1262,26 +1258,11 @@ ul.new-tree {
           }
         }
       }
-      .grcicon-arrow-right-small {
-        @include opacity(0.25);
-      }
       .item-data {
         .tree-title-area {
           &.title {
             font-size: 13px;
             line-height: 29px;
-          }
-        }
-      }
-    }
-    &.tree-open {
-      li.tree-item {
-        &.item-open {
-          > .item-main {
-            .grcicon-arrow-right-small {
-              background-position: -126px -80px;
-              @include opacity(1);
-            }
           }
         }
       }
