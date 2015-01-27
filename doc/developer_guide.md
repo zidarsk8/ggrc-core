@@ -11,7 +11,6 @@
       - [General REST parameters](#general-rest-parameters)
         - [REST Response Result Paging](#rest-response-result-paging)
       - [Search](#search)
-      - [The server-side logic that handles search is in [`src/ggrc/services/search.py`](/src/ggrc/services/search.py).](#the-server-side-logic-that-handles-search-is-in-srcggrcservicessearchpysrcggrcservicessearchpy)
       - [Routing](#routing)
     - [Data Layer](#data-layer)
       - [Data Model](#data-model)
@@ -125,7 +124,7 @@ Every REST request (except for search) must pass an `'Accept':'application/json'
 
 #### Search
 
-#### The server-side logic that handles search is in [`src/ggrc/services/search.py`](/src/ggrc/services/search.py).
+The server-side logic that handles search is in [`src/ggrc/services/search.py`](/src/ggrc/services/search.py).
 
 Parameters:
 
