@@ -1169,6 +1169,13 @@ p.modal-value {
         text-align: right;
       }
     }
+    &.tree-open {
+      li.tree-item {
+        &.item-open {
+          margin: 0;
+        }
+      }
+    }
   }
 }
 
