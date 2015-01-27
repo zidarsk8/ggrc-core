@@ -687,7 +687,7 @@ can.Control("CMS.Controllers.LHN_Search", {
                       return s + " > a[data-object-singular=" + lhn_prefs.open_category + "]";
                   })
                   .join(",");
-
+          
           self.toggle_list_visibility(
             self.element.find(selector)
           );
@@ -719,9 +719,21 @@ can.Control("CMS.Controllers.LHN_Search", {
       self.close_mid_levels();
     }
 
-  , "{list_toggle_selector} click": "toggle_list_visibility"
+  , "{list_toggle_selector} click": function (el, ev) {
+      ev && ev.preventDefault();
+      this.toggle_list_visibility(el);
+  }
 
-  , toggle_list_visibility: function(el, ev) {
+  , ensure_parent_open: function (el) {
+      var $toggle = el.parents(this.options.list_mid_level_selector).parents("li").find("a.list-toggle.top"),
+          $ul = $toggle.parent("li").find(this.options.list_mid_level_selector);
+
+      if ($toggle.size() && !$toggle.hasClass("active")) {
+          this.open_list($toggle, $ul, null, true);
+      }
+  }
+
+  , toggle_list_visibility: function(el, dont_update_prefs) {
       var sub_selector = this.options.list_content_selector + ',' + this.options.actions_content_selector
         , mid_selector = this.options.list_mid_level_selector
         , $parent = el.parent("li")
@@ -743,58 +755,73 @@ can.Control("CMS.Controllers.LHN_Search", {
       }
 
       if ($ul.is(":visible")) {
-        el.removeClass("active");
-        $ul.slideUp().removeClass("in");
-        // on closing a category, set the display prefs to reflect that there is no open category and no scroll
-        //  for the next category opened.
-        this.options.display_prefs.setLHNState({ "open_category" : null, category_scroll : 0 });
+        this.close_list(el, $ul, dont_update_prefs);
       } else {
-        // Use a cached max-height if one exists
-        var holder = el.closest('.lhs-holder')
-          , $content = $ul.filter([this.options.list_content_selector,
-                                   this.options.list_mid_level_selector].join(","))
-          , $siblings = $ul.closest(".lhs").find(selector)
-          , extra_height = 0
-          , top
-          ;
+        this.open_list(el, $ul, selector, dont_update_prefs);
+      }
+    }
 
-        // Collapse other lists
-        $siblings.slideUp().removeClass("in");
-        // Expand this list
-        $ul.slideDown().addClass("in");
-        
-        // Remove active class from other lists
-        holder.find(':not(.filters) > a.active').removeClass('active');
-        // Add active class to this list
-        el.addClass("active");
-        
-        // Compute the extra height to add to the expandable height,
-        // based on the size of the content that is sliding away.
-        top = $content.offset().top;
-        $siblings.filter(':visible').each(function() {
+  , open_list: function (el, $ul, selector, dont_update_prefs) {
+      // Use a cached max-height if one exists
+      var holder = el.closest('.lhs-holder')
+      , $content = $ul.filter([this.options.list_content_selector,
+                               this.options.list_mid_level_selector].join(","))
+      , $siblings = selector ? $ul.closest(".lhs").find(selector) : $(false)
+      , extra_height = 0
+      , top
+      ;
+      
+      // Collapse other lists
+      $siblings.slideUp().removeClass("in");
+      // Expand this list
+      $ul.slideDown().addClass("in");
+      
+      // Remove active class from other lists
+      holder.find(':not(.filters) > a.active').removeClass('active');
+      // Add active class to this list
+      el.addClass("active");
+      
+      // Compute the extra height to add to the expandable height,
+      // based on the size of the content that is sliding away.
+      top = $content.offset().top;
+      $siblings.filter(':visible').each(function() {
           var sibling_top = $(this).offset().top;
           if (sibling_top <= top) {
-            extra_height += this.offsetHeight + (sibling_top < 0 ? -holder[0].scrollTop : 0);
+              extra_height += this.offsetHeight + (sibling_top < 0 ? -holder[0].scrollTop : 0);
           }
-        });
-        
-        // Determine the expandable height
-        this._holder_height = holder.outerHeight();
-        $content.filter(this.options.list_content_selector).css(
-            'maxHeight'
+      });
+      
+      // Determine the expandable height
+      this._holder_height = holder.outerHeight();
+      $content.filter(this.options.list_content_selector).css(
+          'maxHeight'
           , Math.max(160, (this._holder_height - holder.position().top + extra_height - top - 40)) + 'px'
-        );
-        // Notify the display prefs that the category the user just opened is to be reopened on next page load.
-        this.options.display_prefs.setLHNState({ "open_category" : el.attr("data-object-singular") });
-        this.on_show_list($ul);
+      );
+
+      // Notify the display prefs that the category the user just opened is to be reopened on next page load.
+      if (!dont_update_prefs) {
+          this.options.display_prefs.setLHNState({ "open_category" : el.attr("data-object-singular") });
       }
-      ev && ev.preventDefault();
-    }
+      
+      this.ensure_parent_open(el);
+      this.on_show_list($ul);
+  }
+
+  , close_list: function (el, $ul, dont_update_prefs) {
+      el.removeClass("active");
+      $ul.slideUp().removeClass("in");
+      // on closing a category, set the display prefs to reflect that there is no open category and no scroll
+        //  for the next category opened.
+      if (!dont_update_prefs) {
+          this.options.display_prefs.setLHNState({ "open_category" : null, category_scroll : 0 });
+      }
+  }
 
   , close_mid_levels: function () {
     this.toggle_list_visibility($([".governance.list-toggle",
                                    ".entities.list-toggle",
-                                   ".business.list-toggle"].join(",")));
+                                   ".business.list-toggle"].join(",")),
+                                true);
   }
 
   , " resize": function() {
