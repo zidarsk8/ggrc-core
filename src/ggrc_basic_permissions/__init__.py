@@ -365,21 +365,23 @@ def handle_relationship_post(sender, obj=None, src=None, service=None):
             ContextImplication.source_context_id == obj.source.context.id))\
       .count() < 1:
     #Create the audit -> program implication for the Program added to the Response
-    db.session.add(ContextImplication(
-      source_context=obj.source.context,
-      context=obj.destination.context,
-      source_context_scope='Audit',
-      context_scope='Program',
-      modified_by=get_current_user(),
-      ))
+    parent_program = obj.source.request.audit.program
+    if(parent_program != obj.destination):
+      db.session.add(ContextImplication(
+        source_context=obj.source.context,
+        context=obj.destination.context,
+        source_context_scope='Audit',
+        context_scope='Program',
+        modified_by=get_current_user(),
+        ))
 
-    db.session.add(ContextImplication(
-      source_context=obj.source.request.audit.program.context,
-      context=obj.destination.context,
-      source_context_scope='Program',
-      context_scope='Program',
-      modified_by=get_current_user(),
-      ))
+      db.session.add(ContextImplication(
+        source_context=parent_program.context,
+        context=obj.destination.context,
+        source_context_scope='Program',
+        context_scope='Program',
+        modified_by=get_current_user(),
+        ))
 
 # When adding a private program to an Audit Response, ensure Auditors
 #  can read it
