@@ -15,13 +15,9 @@ class SystemRowConverter(BaseRowConverter):
 
   def find_by_slug(self, slug):
     # must search systems and processes for this case
-    return SystemOrProcess.query.filter_by(slug=slug).first()
+    return System.query.filter_by(slug=slug).first()
 
   def setup_object(self):
-    if self.importer.options.get('is_biz_process'):
-      self.model_class = Process
-    else:
-      self.model_class = System
     self.obj = self.setup_object_by_slug(self.attrs)
     if self.obj.id is None:
       self.obj.infrastructure = self.obj.infrastructure or False
@@ -173,8 +169,74 @@ class SystemsConverter(SystemsAndProcessesBaseConverter):
 
   row_converter = SystemRowConverter
 
-class ProcessRowConverter(SystemRowConverter):
+class ProcessRowConverter(BaseRowConverter):
   model_class = Process
+
+  def find_by_slug(self, slug):
+    # must search systems and processes for this case
+    return Process.query.filter_by(slug=slug).first()
+
+  def setup_object(self):
+    self.obj = self.setup_object_by_slug(self.attrs)
+    if self.obj.id is None:
+      self.obj.infrastructure = self.obj.infrastructure or False
+      self.obj.is_biz_process = self.importer.options.get('is_biz_process') or False
+    else:
+      if self.obj.is_biz_process and not self.importer.options.get('is_biz_process'):
+        self.add_error('slug', "Code is already used for a Process")
+      elif (not self.obj.is_biz_process) and self.importer.options.get('is_biz_process'):
+        self.add_error('slug', "Code is already used for a System")
+      else:
+        sys_type = "Process" if self.importer.options.get('is_biz_process') else "System"
+        self.add_warning('slug', "{} already exists and will be updated".format(sys_type))
+
+  def reify(self):
+    self.handle('slug', SlugColumnHandler)
+    self.handle('controls', LinkControlsHandler)
+    self.handle('contact', ContactEmailHandler, person_must_exist=True)
+    self.handle_raw_attr('url')
+    self.handle_raw_attr('reference_url')
+    self.handle_raw_attr('notes')
+    self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)
+    self.handle('sub_systems', LinkRelationshipsHandler, model_class=System,
+        direction='from')
+    self.handle('sub_processes', LinkRelationshipsHandler, model_class=Process,
+        direction='from')
+    self.handle_option('network_zone')
+    self.handle('org_groups', LinkRelationshipsHandler, model_class=OrgGroup,
+                 direction='from', model_human_name='Org Group')
+    self.handle('vendors', LinkRelationshipsHandler, model_class=Vendor,
+                 direction='from', model_human_name='Vendor')
+    self.handle_date('start_date')
+    self.handle_date('created_at', no_import=True)
+    self.handle_date('updated_at', no_import=True)
+    self.handle_text_or_html('description')
+    self.handle_boolean('infrastructure', truthy_values=['infrastructure'])
+    self.handle_title('title', is_required=True)
+
+  def save_object(self, db_session, **options):
+    db_session.add(self.obj)
+
+  def after_save(self, db_session, **options):
+    super(ProcessRowConverter, self).after_save(db_session, **options)
+    # Check whether a relationship has the program as source
+    # and system as destination; if not, connect the two in session
+    if options.get('parent_type'):
+      program_id = options.get('parent_id')
+      matching_relatinship_count = Relationship.query\
+        .filter(Relationship.source_id==program_id)\
+        .filter(Relationship.source_type==u'Program')\
+        .filter(Relationship.destination_id==self.obj.id)\
+        .filter(Relationship.destination_type==u'System')\
+        .count()
+      if matching_relatinship_count == 0:
+        program = Program.query.get(program_id)
+        if program:
+            db_session.add(Relationship(
+                source=program,
+                context_id=program.context_id,
+                destination=self.obj
+            ))
 
 class ProcessesConverter(SystemsAndProcessesBaseConverter):
 

@@ -67,8 +67,9 @@ class BaseRowConverter(object):
     self.custom_attribute_values = {}
 
   def reify_custom_attributes(self):
-    for definition in self.importer.custom_attribute_definitions:
-      return self.handle(definition.title(), CustomAttributeColumnHandler)
+    for key in self.importer.custom_attribute_definitions:
+      definition = self.importer.custom_attribute_definitions[key]
+      self.handle(definition.title, CustomAttributeColumnHandler)
 
   def add_error(self, key, message):
     self.errors.setdefault(key, []).append(message)
@@ -308,15 +309,15 @@ class CustomAttributeColumnHandler(ColumnHandler):
 
 class RequestTypeColumnHandler(ColumnHandler):
 
-    def parse_item(self, value):
-      formatted_type = value.lower()
-      if formatted_type in Request.VALID_TYPES:
-        return formatted_type
-      else:
-        self.add_error("Value must be one of the following: {}".format(
-            Request.VALID_TYPES
-        ))
-        return None
+  def parse_item(self, value):
+    formatted_type = value.lower()
+    if formatted_type in Request.VALID_TYPES:
+      return formatted_type
+    else:
+      self.add_error("Value must be one of the following: {}".format(
+          Request.VALID_TYPES
+      ))
+      return None
 
 class StatusColumnHandler(ColumnHandler):
 
@@ -358,11 +359,10 @@ class StatusColumnHandler(ColumnHandler):
 
 class TextOrHtmlColumnHandler(ColumnHandler):
 
- def parse_item(self, value):
-   if value:
+  def parse_item(self, value):
+    if value:
      value = value.strip()
-   return value or ''
-
+    return value or ''
 
 class ContactEmailHandler(ColumnHandler):
 

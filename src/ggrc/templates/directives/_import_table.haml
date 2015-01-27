@@ -19,7 +19,7 @@
             {{converter.get_header_for_object_column(a)}}
       -for c in custom_attribute_definitions
         %th
-          {{c.title()}}
+          {{c}}
   %tbody
     %tr
       %td{colspan:"{{width_pcts|length}}",cellspacing:"0",cellpadding:"0"}
@@ -35,5 +35,5 @@
                     -set cellvalue = result[col_name]
                     -include "directives/_import_cell.haml"
                   -for definition in custom_attribute_definitions
-                    -set cellvalue = result.handlers[definition.title()]
+                    -set cellvalue = result.handlers[definition]
                     -include "directives/_import_cell.haml"
