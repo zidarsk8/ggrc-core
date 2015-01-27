@@ -79,12 +79,11 @@ class SystemRowConverter(BaseRowConverter):
                 destination=self.obj
             ))
 
-
 class SystemsAndProcessesBaseConverter(BaseConverter):
 
   metadata_export_order = ['type', 'slug']
 
-  metadata_map = OrderedDict([
+  _metadata_map = OrderedDict([
     ('Type','type')
   ])
 
@@ -100,11 +99,12 @@ class SystemsAndProcessesBaseConverter(BaseConverter):
                         if k == 'System Code' else (k, v) for k, v in self.object_map.items()] )
 
   def create_metadata_map(self):
+    super(SystemsAndProcessesBaseConverter, self).create_metadata_map()
     if self.has_parent():
       # Then put the parent code's type label in B1, slug in B2
       parent_key = '{} Code'.format(self.parent_type_string())
       parent_value = "slug"
-      self.metadata_map[parent_key] = parent_value
+      self.metadata_map()[parent_key] = parent_value
 
   def validate_metadata(self, attrs):
     if self.options.get('is_biz_process'):
@@ -146,7 +146,7 @@ class SystemsAndProcessesBaseConverter(BaseConverter):
 
 class SystemsConverter(SystemsAndProcessesBaseConverter):
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('System Code', 'slug'),
     ('Title', 'title'),
     ('Description' , 'description'),
@@ -240,7 +240,7 @@ class ProcessRowConverter(BaseRowConverter):
 
 class ProcessesConverter(SystemsAndProcessesBaseConverter):
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('System Code', 'slug'),
     ('Title', 'title'),
     ('Description' , 'description'),

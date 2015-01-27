@@ -76,7 +76,7 @@ class SectionsConverter(BaseConverter):
 
   metadata_export_order = ['type', 'slug']
 
-  metadata_map = OrderedDict([
+  _metadata_map = OrderedDict([
     ('Type','type'),
     ('Directive Code','slug'),
   ])
@@ -86,7 +86,7 @@ class SectionsConverter(BaseConverter):
     'controls', 'created_at', 'updated_at'
   ]
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('Section Code', 'slug'),
     ('Section Title', 'title'),
     ('Section Description' , 'description'),

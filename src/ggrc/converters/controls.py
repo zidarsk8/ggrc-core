@@ -88,12 +88,12 @@ class ControlRowConverter(BaseRowConverter):
 
 class ControlsConverter(BaseConverter):
 
-  metadata_map = OrderedDict([
+  _metadata_map = OrderedDict([
     ('Type', 'type'),
     ('Directive Code', 'slug')
   ])
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('Control Code', 'slug'),
     ('Title', 'title'),
     ('Description', 'description'),
@@ -137,10 +137,10 @@ class ControlsConverter(BaseConverter):
     parent_type = self.options.get('parent_type')
     if parent_type in DIRECTIVE_CLASSES:
       self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive_kind()), v) \
-                          if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
+                          if 'Directive' in k else (k, v) for k, v in self.metadata_map().items()] )
     elif parent_type == Program:
       self.metadata_map = OrderedDict( [(k.replace("Directive", "Program"), v) if 'Directive' in k else (k, v) \
-          for k, v in self.metadata_map.items()] )
+          for k, v in self.metadata_map().items()] )
 
   def validate_metadata(self, attrs):
     self.validate_metadata_type(attrs, "Controls")
@@ -160,7 +160,7 @@ class ControlsConverter(BaseConverter):
     return parent_object.meta_kind
 
   def do_export_metadata(self):
-    yield self.metadata_map.keys()
+    yield self.metadata_map().keys()
     yield ['Controls', self.parent_object().slug]
     yield[]
     yield[]

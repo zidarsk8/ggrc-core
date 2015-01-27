@@ -36,11 +36,11 @@ class HelpRowConverter(BaseRowConverter):
 
 class HelpConverter(BaseConverter):
 
-  metadata_map = OrderedDict([
+  _metadata_map = OrderedDict([
     ('Type','type'),
   ])
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('Code', 'slug'),
     ('Title', 'title'),
     ('Content', 'content')

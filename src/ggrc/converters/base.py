@@ -43,10 +43,16 @@ class BaseConverter(object):
     self.create_object_map()
 
   def create_metadata_map(self):
-    self.metadata_map = self.metadata_map
+    self.metadata_map = self._metadata_map
 
   def create_object_map(self):
-    self.object_map = self.object_map
+    # Moving object_map to an instance attribute rather than a class attribute
+    # because when CustomAttribute definitions change on a type, exports/imports
+    # that occur after the change and before a server restart will have an object_map
+    # that will include the attributes defined before the change merged with the new
+    # attributes. To avoid this we scope the object map to the instance and not to
+    # the class.
+    self.object_map = self._object_map
     definitions = db.session.query(CustomAttributeDefinition).\
       filter(CustomAttributeDefinition.definition_type==self.row_converter.model_class.__name__).all()
     for definition in definitions:
@@ -277,24 +283,10 @@ class BaseConverter(object):
       csv_writer.writerow([ele.encode("utf-8") if ele else ''.encode("utf-8") for ele in csv_row])
 
   def metadata_map(self):
-    return self.__class__.metadata_map
-
-  @classmethod
-  def metadata_map():
     return self.metadata_map
 
-  def object_map():
-    return self.__class__.object_map()
+  def object_map(self):
+    return self.object_map
 
-  @classmethod
-  def object_map():
-    return self.__class__.object_map
-
-  def row_converter():
-    return self.__class__.row_converter()
-
-  @classmethod
-  def row_converter():
-    return self.__class__.row_converter
-
-
+  def row_converter(self):
+    return self.row_converter

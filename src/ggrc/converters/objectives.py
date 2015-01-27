@@ -73,12 +73,12 @@ class ObjectiveRowConverter(BaseRowConverter):
 
 class ObjectivesConverter(BaseConverter):
 
-  metadata_map = OrderedDict([
+  _metadata_map = OrderedDict([
     ('Type', 'type'),
     ('Directive Code', 'slug')
   ])
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('Objective Code', 'slug'),
     ('Title', 'title'),
     ('Description', 'description'),

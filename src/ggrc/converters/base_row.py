@@ -258,9 +258,8 @@ class ColumnHandler(object):
 
   def validate(self, data):
     if self.options.get('is_required') and data in ("", None):
-      obj_map = self.base_importer.object_map
       missing_column = self.base_importer.get_header_for_column(
-                        self.base_importer.object_map, self.key)
+                        self.base_importer.object_map(), self.key)
       self.add_error("{} is required.".format(missing_column))
 
   def do_import(self, content):
@@ -290,7 +289,7 @@ class CustomAttributeColumnHandler(ColumnHandler):
     definition = self.base_importer.custom_attribute_definitions[self.key]
     if definition.mandatory and data in ("", None):
       missing_column = self.base_importer.get_header_for_column(
-                        self.base_importer.object_map, self.key)
+                        self.base_importer.object_map(), self.key)
       self.add_error("{} is required.".format(missing_column))
 
   def set_attr(self, value):
