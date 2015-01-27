@@ -44,7 +44,7 @@ class Workflow(
   notify_on_change = deferred(
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
   notify_custom_message = deferred(
-      db.Column(db.String, nullable=True), 'Workflow')
+      db.Column(db.Text, nullable=True), 'Workflow')
 
   frequency = deferred(
     db.Column(db.String, nullable=True, default=default_frequency),
