@@ -324,7 +324,7 @@ a {
   float: left;
   margin: 9px 10px 0 10px;
   .entry-list & {
-    margin: 5px 10px 0 4px;
+    margin: 5px 10px 0 4px !important;
   }
   .lhn-items-list & {
     width: 4px;
@@ -340,7 +340,7 @@ a {
   }
 }
 
-@each $status_label in draft, progress, overdue, final {
+@each $status_label in draft, inprogress, overdue, final, active, inprogress, verified {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }
@@ -369,17 +369,16 @@ a {
 
 // buttons
 .btn {
-  font-size: 16px;
-  line-height: 24px;
+  @include btn-size();
   font-weight: bold;
-  padding: 4px 14px;
   border: none;
   @include box-shadow(none);
   text-shadow: none;
   &.btn-small {
-    font-size: 12px;
-    line-height: 18px;
-    padding: 4px 14px;
+    @include btn-size(12px, 18px, 4px 14px);
+  }
+  &.btn-mini {
+    @include btn-size(11px, 16px, 2px 12px);
   }
   [class^="grcicon-"] {
     @include opacity(0.7);
@@ -974,6 +973,10 @@ select.multiple-selector {
         margin-top: 5px;
       }
     }
+    &.pull-right {
+      width: auto;
+      float: right;
+    }
   }
   &.task-wrap {
     span.empty {
@@ -1045,10 +1048,6 @@ a {
     padding-right:60px;
     margin-bottom:10px;
   }
-}
-
-.upp {
-  text-transform:uppercase;
 }
 
 .cap {
@@ -1262,6 +1261,9 @@ p {
   }
   &.final {
     color: $lightGreen;
+  }
+  &.active {
+    color: $lightBlue;
   }
   .tree-title-area & {
     font-weight: normal;

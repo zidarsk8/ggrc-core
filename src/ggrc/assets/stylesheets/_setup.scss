@@ -274,6 +274,12 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
     &::-webkit-input-placeholder { @content; } 
   }
 
+  @mixin btn-size($font: 16px, $l-height: 24px, $padding: 4px 14px) {
+    font-size: $font;
+    line-height: $l-height;
+    padding: $padding;
+  }
+
 // Placeholders
 
 // Turn icons to black
@@ -391,13 +397,19 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 %status-draft {
   background: $status-draft;
 }
-%status-progress {
+%status-inprogress {
   background: $lightBlue;
 }
 %status-overdue {
   background: $red;
 }
 %status-final {
+  background: $lightGreen;
+}
+%status-active {
+  background: $lightBlue;
+}
+%status-verified {
   background: $lightGreen;
 }
 
