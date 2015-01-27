@@ -772,7 +772,21 @@ can.Control("CMS.Controllers.LHN_Search", {
       ;
       
       // Collapse other lists
-      $siblings.slideUp().removeClass("in");
+      var $mids = $ul.closest(".lhs").find(this.options.list_mid_level_selector)
+                    .not(el.parents(this.options.list_mid_level_selector))
+                    .not(el.parent().find(this.options.list_mid_level_selector)),
+          $non_children = $ul.closest(".lhs")
+              .find([this.options.list_content_selector,
+                     this.options.actions_content_selector].join(","))
+              .filter(".in")
+              .filter(function (i, el) {
+                  return !$.contains($ul[0], el);
+              });
+    
+      [$siblings, $mids, $non_children].map(function ($selection) {
+          $selection.slideUp().removeClass("in");
+      });
+      
       // Expand this list
       $ul.slideDown().addClass("in");
       
