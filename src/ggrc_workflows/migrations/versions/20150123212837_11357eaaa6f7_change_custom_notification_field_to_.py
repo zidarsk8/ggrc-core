@@ -9,7 +9,7 @@ Create Date: 2015-01-23 21:28:37.046054
 
 # revision identifiers, used by Alembic.
 revision = '11357eaaa6f7'
-down_revision = '1865596d21dc'
+down_revision = '529e4f55c8ed'
 
 from alembic import op
 import sqlalchemy as sa
@@ -29,4 +29,3 @@ def downgrade():
       type_=sa.String(length=250),
       existing_type=sa.Text(),
       nullable=True)
-
