@@ -57,7 +57,7 @@
           }
           return configs[index];
         });
-        return $.map(all_types, function(config){
+        return $.when.apply($, $.map(all_types, function(config){
           var enabled = active.indexOf(config.notif_type) != -1;
           if(config.attr('enable_flag') === enabled){
             // There was no change to this config object
@@ -72,7 +72,7 @@
             refreshed_config.attr('enable_flag', enabled);
             return refreshed_config.save();
           });
-        });
+        }));
       });
     }
   }, {});
