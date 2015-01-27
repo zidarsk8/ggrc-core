@@ -149,9 +149,13 @@
               #show_columns.column-set{ 'data-resize': "true" }
                 #middle_column
                   .row-fluid
-                    .span12.full-width
+                    -if request.path == '/dashboard'
                       .inner-content.widget-area
-                        -block widget_area
+                        -# -block widget_area
+                    -else
+                      .span12.full-width
+                        .inner-content.widget-area
+                          -# -block widget_area
 
     %section.footer
       .row-fluid
