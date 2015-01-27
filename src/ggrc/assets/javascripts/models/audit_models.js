@@ -27,7 +27,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
     , report_end_date : "date"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
-    , contact : "CMS.Models.Person.stub"
     , audit_firm : "CMS.Models.OrgGroup.stub"
     , audit_objects : "CMS.Models.AuditObject.stubs"
   }

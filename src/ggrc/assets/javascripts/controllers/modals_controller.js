@@ -852,7 +852,7 @@ can.Component.extend({
   },
   events: {
     init: function() {
-      var key;
+      var key, that = this;
       this.scope.attr("controller", this);
 
       if (!this.scope.instance) {
@@ -869,14 +869,19 @@ can.Component.extend({
       }
 
       if (this.scope[this.scope.source_mapping_source]) {
-        this.scope.attr(
-          "list",
-          can.map(
-            this.scope[this.scope.source_mapping_source].get_mapping(this.scope.source_mapping),
-            function(binding) {
-              return binding.instance;
-            })
-        );
+        this.scope[this.scope.source_mapping_source]
+        .get_binding(this.scope.source_mapping)
+        .refresh_instances()
+        .then(function(list) {
+          that.scope.attr(
+            "list",
+            can.map(
+              list,
+              function(binding) {
+                return binding.instance;
+              })
+          );          
+        });
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
         key = this.scope.instance_attr + "_" + (this.scope.mapping || this.scope.source_mapping);

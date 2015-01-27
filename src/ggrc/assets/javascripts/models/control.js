@@ -21,7 +21,6 @@ can.Model.Cacheable("CMS.Models.Control", {
   , filter_keys : ['title', 'description', 'contact', 'owner', 'notes', 'code', 'reference_url']
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"

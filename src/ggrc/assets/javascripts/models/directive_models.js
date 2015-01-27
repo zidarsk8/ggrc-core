@@ -41,7 +41,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
 
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
@@ -98,29 +97,13 @@ CMS.Models.Directive("CMS.Models.Standard", {
     , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
-    , owners : "CMS.Models.Person.stubs"
-    , modified_by : "CMS.Models.Person.stub"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
-    , related_sources : "CMS.Models.Relationship.stubs"
-    , related_destinations : "CMS.Models.Relationship.stubs"
-    , object_objectives : "CMS.Models.ObjectObjective.stubs"
-    , objectives : "CMS.Models.Objective.stubs"
-    , program_directives : "CMS.Models.ProgramDirective.stubs"
-    , directive_controls : "CMS.Models.DirectiveControl.stubs"
-    , programs : "CMS.Models.Program.stubs"
-    , directive_sections: "CMS.Models.DirectiveSection.stubs"
-    , joined_sections: "CMS.Models.get_stubs"
-    , sections : "CMS.Models.get_stubs"
-    , controls : "CMS.Models.Control.stubs"
-  }
+  , attributes : {}
   , meta_kinds : [ "Standard" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
+  , init : function() {
+    can.extend(this.attributes, CMS.Models.Directive.attributes);
+    this._super.apply(this, arguments);
+  }
 }, {});
 
 CMS.Models.Directive("CMS.Models.Regulation", {
@@ -145,29 +128,13 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
-    , owners : "CMS.Models.Person.stubs"
-    , modified_by : "CMS.Models.Person.stub"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
-    , related_sources : "CMS.Models.Relationship.stubs"
-    , related_destinations : "CMS.Models.Relationship.stubs"
-    , object_objectives : "CMS.Models.ObjectObjective.stubs"
-    , objectives : "CMS.Models.Objective.stubs"
-    , program_directives : "CMS.Models.ProgramDirective.stubs"
-    , directive_controls : "CMS.Models.DirectiveControl.stubs"
-    , programs : "CMS.Models.Program.stubs"
-    , directive_sections: "CMS.Models.DirectiveSection.stubs"
-    , joined_sections: "CMS.Models.get_stubs"
-    , sections : "CMS.Models.get_stubs"
-    , controls : "CMS.Models.Control.stubs"
-  }
+  , attributes : {}
   , meta_kinds : [ "Regulation" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
+  , init : function() {
+    can.extend(this.attributes, CMS.Models.Directive.attributes);
+    this._super.apply(this, arguments);
+  }
 }, {});
 
 CMS.Models.Directive("CMS.Models.Policy", {
@@ -192,29 +159,13 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
-    , owners : "CMS.Models.Person.stubs"
-    , modified_by : "CMS.Models.Person.stub"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
-    , related_sources : "CMS.Models.Relationship.stubs"
-    , related_destinations : "CMS.Models.Relationship.stubs"
-    , object_objectives : "CMS.Models.ObjectObjective.stubs"
-    , objectives : "CMS.Models.Objective.stubs"
-    , program_directives : "CMS.Models.ProgramDirective.stubs"
-    , directive_controls : "CMS.Models.DirectiveControl.stubs"
-    , programs : "CMS.Models.Program.stubs"
-    , directive_sections: "CMS.Models.DirectiveSection.stubs"
-    , joined_sections: "CMS.Models.get_stubs"
-    , sections : "CMS.Models.get_stubs"
-    , controls : "CMS.Models.Control.stubs"
-  }
+  , attributes : {}
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
+  , init : function() {
+    can.extend(this.attributes, CMS.Models.Directive.attributes);
+    this._super.apply(this, arguments);
+  }
 }, {});
 
 CMS.Models.Directive("CMS.Models.Contract", {
@@ -240,28 +191,13 @@ CMS.Models.Directive("CMS.Models.Contract", {
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
-      context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
-    , owners : "CMS.Models.Person.stubs"
-    , modified_by : "CMS.Models.Person.stub"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
-    , related_sources : "CMS.Models.Relationship.stubs"
-    , related_destinations : "CMS.Models.Relationship.stubs"
-    , object_objectives : "CMS.Models.ObjectObjective.stubs"
-    , objectives : "CMS.Models.Objective.stubs"
-    , program_directives : "CMS.Models.ProgramDirective.stubs"
-    , directive_controls : "CMS.Models.DirectiveControl.stubs"
-    , controls : "CMS.Models.Control.stubs"
-    , programs : "CMS.Models.Program.stubs"
-    , directive_sections: "CMS.Models.DirectiveSection.stubs"
-    , joined_sections: "CMS.Models.get_stubs"
-    , sections : "CMS.Models.get_stubs"
   }
   , meta_kinds : [ "Contract" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
+  , init : function() {
+    can.extend(this.attributes, CMS.Models.Directive.attributes);
+    this._super.apply(this, arguments);  
+  }
 }, {});
 
 })(this.can);
