@@ -68,28 +68,6 @@
         <i class="grcicon-add-black"></i>
       </a>
       {{/if_instance_of}}
-      {{#if_instance_of parent_instance "SectionBase"}}
-      <span class="section-expander">
-        &nbsp;
-        &nbsp;
-        <a
-          class="btn btn-small btn-draft"
-          href="javascript://"
-          rel="tooltip"
-          data-placement="right"
-          data-toggle="modal-ajax-form"
-          data-modal-reset="reset"
-          data-dirty="#category_objectives, #combo"
-          data-route="category_objectives"
-          data-modal-class="modal-wide"
-          data-object-singular="Objective"
-          data-object-plural="objectives"
-          data-original-title="Create new {{firstnonempty title_singular model.title_singular 'Objective'}} from this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
-          data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}" }, "description": "{{json_escape parent_instance.description}}" }'>
-          <i class="grcicon-add-black"></i>
-        </a>
-      </span>
-      {{/if_equals}}
       {{/if}}
     </div>
   </div>

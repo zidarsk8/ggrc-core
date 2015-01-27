@@ -18,10 +18,10 @@
       {{> /static/mustache/base_objects/unmap.mustache}}
 
       {{#is_allowed 'update' instance}}
-        <li class="border">
+        <li>
           <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-object-singular-override="{{#if_equals instance.directive.type 'Contract'}}Clause{{/if_equals}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{instance.class.model_singular}}" data-object-id="{{instance.id}}">
             <i class="grcicon-edit"></i>
-            Edit {{instance.class.model_singular}}
+            Edit {{instance.class.model_singular}} aaa
           </a>
         </li>
       {{/is_allowed}}
@@ -43,6 +43,29 @@
       {{/if}}
       {{> /static/mustache/base_objects/edit_object_link.mustache}}
     {{/if_helpers}}
+
+    {{#is_allowed_to_map parent_instance model.shortName}}
+    {{#if allow_mapping_or_creating}}
+      {{#if model.root_object}}
+        {{#if_instance_of instance "SectionBase"}}
+          <li>
+            <a
+              href="javascript://"
+              data-toggle="modal-ajax-form"
+              data-modal-reset="reset"
+              data-dirty="#category_objectives, #combo"
+              data-route="category_objectives"
+              data-modal-class="modal-wide"
+              data-object-singular="Objective"
+              data-object-plural="objectives"
+              data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}" }, "description": "{{json_escape parent_instance.description}}" }'>
+              Convert to Object
+            </a>
+          </li>
+        {{/if_equals}}
+      {{/if}}
+    {{/if}}
+    {{/is_allowed_to_map}}
   </ul>
 </div>
 
