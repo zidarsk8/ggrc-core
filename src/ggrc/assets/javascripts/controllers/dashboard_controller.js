@@ -616,8 +616,6 @@ can.Control("CMS.Controllers.InnerNav", {
         remain_height = win_height - footer_height,
         win_width = win.width();
 
-        console.log(dropdown_height);
-
       if(win_width - left_pos < 322) {
         $dropdown.addClass("right-pos");
       } else {
