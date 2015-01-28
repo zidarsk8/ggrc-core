@@ -276,12 +276,11 @@ can.Control("CMS.Controllers.LHN", {
       // not nested
       $(".lhn-trigger").removeClass("active");
 
-      var width = this.options.display_prefs.getLHNavSize().lhs;
+      var width = this.element.find(".lhs-holder").width();
             
       this.element.find(".lhs-holder")
           .removeClass("active")
-          .css({left: (-width)+"px",
-                width: width});
+          .css("left", (-width)+"px");
 
       this.element.find(".lhn-type")
           .removeClass("active")
@@ -302,11 +301,8 @@ can.Control("CMS.Controllers.LHN", {
       // not nested
       $(".lhn-trigger").addClass("active");
 
-      var width = this.options.display_prefs.getLHNavSize().lhs;
-
       this.element.find(".lhs-holder")
-          .css({left: "",
-                width: width+"px"})
+          .css("left", "")
           .addClass("active");
 
       this.element.find(".lhn-type")
@@ -369,9 +365,6 @@ can.Control("CMS.Controllers.LHN", {
           target.prop('checked', true);
           target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
           
-          // closed on refresh, but close_lhn sets widths and such
-          self.close_lhn();
-
           // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
           //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
           //  open section is handled in the LHN Search controller.
@@ -389,11 +382,12 @@ can.Control("CMS.Controllers.LHN", {
             return this.value;
           }).addClass('active');
         });
-        self.size = prefs[0].getLHNavSize().lhs;
-        self.resize_lhn(self.size);
-        // Collapse the LHN if they did it on a previous page
-        self.collapsed = prefs[0].getCollapsed(null, "lhs");
-        self.collapsed && self.toggle_lhs();
+
+        // give everything a bit of time to render
+        setTimeout(function () {
+            self.resize_lhn();
+            self.close_lhn();
+        }, 1000);
       });
     }
   , lhn_width : function(){
@@ -405,40 +399,16 @@ can.Control("CMS.Controllers.LHN", {
       var $area = $(".area")
         , $lhsHolder = $(".lhs-holder")
         , $bar = $('.bar-v')
+        , $lhnTrigger = $(".lhn-trigger")
         ;
 
       this.element.hide();
       $lhsHolder.css("width", 0);
       $area.css("margin-left", 0);
       $bar.hide();
+      $lhnTrigger.hide();
 
       window.resize_areas();
-    }
-
-  , toggle_lhs: function() {
-      var $lhs = $("#lhs")
-        , $lhsHolder = $(".lhs-holder")
-        , $area = $(".area")
-        , $bar = $("#lhn > .bar-v")
-        , $search = $('.widgetsearch')
-        ;
-      if($lhs.hasClass("lhs-closed")) {
-        $lhs.removeClass("lhs-closed");
-        $bar.removeClass("bar-closed");
-        $lhsHolder.css("width", this.size + "px");
-        $area.css("margin-left", (this.size + 8) + "px");
-      } else {
-        $lhs.addClass("lhs-closed");
-        $bar.addClass("bar-closed");
-        $lhsHolder.css("width","40px");
-        $area.css("margin-left","48px");
-      }
-
-      // $search.width($lhs.width() - 49);
-      window.resize_areas();
-      CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
-        prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
-      });
     }
 
   , do_search: function (value) {
@@ -449,6 +419,8 @@ can.Control("CMS.Controllers.LHN", {
   , mousedown : false
   , dragged : false
   , resize_lhn : function(resize, no_trigger){
+    resize || (resize = this.options.display_prefs.getLHNavSize(null, null).lhs);
+      
     var $lhs = $("#lhs"),
         $lhsHolder = $(".lhs-holder"),
         $area = $(".area"),
@@ -456,9 +428,8 @@ can.Control("CMS.Controllers.LHN", {
         $search = $('.widgetsearch'),
         $lhs_label_right = $(".lhs-search .my-work-right"),
         $lhs_label = $(".lhs-search .my-work-label"),
-        lhn_second_row = 201,
-        max_width = window.innerWidth - 30,
-        default_size = lhn_second_row;
+        max_width = window.innerWidth*.75,
+        default_size = 240;
 
     if (resize < default_size) {
       resize = default_size;
@@ -466,12 +437,14 @@ can.Control("CMS.Controllers.LHN", {
     resize = Math.min(resize, max_width);
 
     this.element.find(".lhs-holder").width(resize);
+    
+    if (resize) {
+      this.options.display_prefs.setLHNavSize(null, "lhs", resize);
+    }
 
-//    $search.width(resize - 49);
-    //window.resize_areas();
-    //if (!no_trigger) {
-    //  $(window).trigger('resize');
-    //}
+    if (!no_trigger) {
+      $(window).trigger("resize");
+    }
   }
   , ".bar-v mousedown" : function(el, ev) {
     var $target = $(ev.target);
@@ -485,55 +458,17 @@ can.Control("CMS.Controllers.LHN", {
 
     ev.preventDefault();
     this.dragged = true;
-    this.size = ev.pageX;
-    this.resize_lhn(this.size);
+    this.resize_lhn(ev.pageX);
   }
   , "{window} mouseup" : function(el, ev){
     var self = this;
     if(!this.mousedown) return;
 
     this.mousedown = false;
-    if(!this.dragged){
-      this.toggle_lhs();
-      return;
-    }
-    self.size = self.size;
-
-    CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
-        prefs[0].setLHNavSize(null, "lhs", self.size);
-    });
   }
   , "{window} resize" : function(el, ev) {
-    if (this.size) {
-      this.resize_lhn(this.size, true);
-    }
+    this.resize_lhn(null, true); // takes care of height and min/max width
   }
-  , "#lhs click": function(el, ev) {
-      this.resize_search();
-    }
-
-  , resize_search: function() {
-      // Resize search input as necessary
-      /*
-      var input = this.element.find('#lhs input.widgetsearch')
-        , width;
-
-      width =
-        input.closest('.form-search').width()
-        - input.parent().outerWidth() + input.parent().width()
-        - input.next().outerWidth() - input.outerWidth() + input.width();
-
-      input.css('width', width + 'px');
-      */
-    }
-
-  , "#lhs input.widgetsearch focus": function(el, ev) {
-      this.resize_search();
-    }
-
-  , ".lhs-closed click": function(el, ev) {
-      this.toggle_lhs();
-    }
 
   , destroy : function() {
     this.element.find(".lhs-holder").off("scroll", self.lhs_holder_onscroll);
