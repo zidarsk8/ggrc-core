@@ -189,11 +189,6 @@
       draw_children: true,
       child_options: [
         {
-          title: 'Objects',
-          model: "CycleTaskGroupObject",
-          mapping: "cycle_task_group_objects",
-          allow_creating: false
-        }, {
           title: 'Tasks',
           model: "CycleTaskGroupObjectTask",
           mapping: "cycle_task_group_tasks",
@@ -262,7 +257,7 @@
     tree_view_options: {
       show_view: _mustache_path + "/tree.mustache",
       //footer_view: _mustache_path + "/tree_footer.mustache",
-      draw_children: true,
+      draw_children: false,
       child_options: [
         {
           model: "CycleTaskGroupObjectTask",
@@ -311,6 +306,11 @@
         {
           model: "CycleTaskEntry",
           mapping: "cycle_task_entries",
+          allow_creating: true
+        },
+        {
+          model: "CycleTaskGroupObject",
+          mapping: "cycle_task_group_object",
           allow_creating: true
         }
       ]

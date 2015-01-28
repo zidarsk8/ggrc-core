@@ -24,6 +24,14 @@
             </div>
             <div class="span4">
               <ul class="tree-action-list">
+                {{#with_mapping_count instance 'cycle_task_group_tasks'}}
+                  <li>
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
+                      <i class="grcicon-task-black"></i>
+                      <strong class="error">{{count}}</strong>
+                    </span>
+                  </li>
+                {{/with_mapping_count}}
                 <li>
                 {{#using cycle=instance.cycle}}
                   {{#if_equals cycle.is_current true}}
@@ -57,22 +65,6 @@
                   {{/if_equals}}
                 {{/using}}
                 </li>
-                {{#with_mapping_count instance 'cycle_task_group_objects'}}
-                  <li>
-                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
-                      <i class="grcicon-object-black"></i>
-                      <strong class="error">{{count}}</strong>
-                    </span>
-                  </li>
-                {{/with_mapping_count}}
-                {{#with_mapping_count instance 'cycle_task_group_tasks'}}
-                  <li>
-                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                      <i class="grcicon-task-black"></i>
-                      <strong class="error">{{count}}</strong>
-                    </span>
-                  </li>
-                {{/with_mapping_count}}
               </ul>
             </div>
           </div>
@@ -91,6 +83,7 @@
           </div>
         {{/child_options}}
       {{/if}}
+      <!--
       <div class="show-description">
         <div class="row-fluid">
           <div class="span12">
@@ -105,6 +98,7 @@
           </div>
         </div>
       </div>
+       -->
     </div>
   </div>
   {{/if}}
