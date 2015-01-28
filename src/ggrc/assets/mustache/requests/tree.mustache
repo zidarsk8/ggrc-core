@@ -14,7 +14,7 @@
       <div class="select">
         <div class="item-data">
           <div class="row-fluid">
-            <div class="span4">
+            <div class="span3">
               <div class="title tree-title-area">
                 <span>{{strip_html_tags instance.description}}</span>
               </div>
@@ -77,8 +77,8 @@
                 </span>
               </div>
             </div>
-            <div class="span3">
-              <ul class="tree-action-list">
+            <div class="span4">
+              <ul class="tree-action-list" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
                 {{#if allow_creating}}
                 {{#if_can_create_response instance}}
                   {{#using audit=instance.audit}}
