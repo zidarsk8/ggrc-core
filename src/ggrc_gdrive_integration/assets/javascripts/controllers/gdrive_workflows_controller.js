@@ -1128,7 +1128,7 @@ can.Component.extend({
 
 can.Component.extend({
   tag: "ggrc-gdrive-picker-launcher",
-  template: '<a href="javascript://" class="{{link_class}}" '
+  template: '<a href="javascript://" class="{{link_class}} btn-small btn-draft" '
             + 'data-object-source="true" data-toggle="evidence-gdrive-picker" '
             + 'can-click="trigger_upload">{{firstexist link_text "Upload Files to GDrive"}}</a>'
             + '{{#pending}}<span {{attach_spinner \'{ "radius": 3, "length": 2.5, "width": 2 }\' '
