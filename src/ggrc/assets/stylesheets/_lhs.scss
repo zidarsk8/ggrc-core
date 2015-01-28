@@ -147,26 +147,6 @@
   ul {
     @include reset-list();
     margin-bottom:14px;
-    &.sub-level {
-      margin-bottom:0px;
-      li.spinny {
-        padding:0;
-        margin:0;
-        > .spinner {
-          width: 30px;
-          height: 30px;
-          left: 40px;
-          top: 14px;
-        }
-      }
-      li {
-        > a {
-          font-size: 12px;
-          text-transform: none;
-          font-weight: normal;
-        }
-      }
-    }
     &.sub-actions {
       margin-bottom:14px;
     }
@@ -302,12 +282,24 @@
   }
 
   ul.sub-level,
-  ul.sub-actions {
+  ul.sub-actions,
+  ul.mid-level {
     background:#fff;
     display: none;
+    margin-bottom:0px;
     overflow: auto;
     li {
       font-size:12px;
+      &.spinny {
+        padding:0;
+        margin:0;
+        > .spinner {
+          width: 30px;
+          height: 30px;
+          left: 40px;
+          top: 14px;
+        }
+      }
       &.no-access {
         padding-left:28px;
       }
@@ -315,7 +307,10 @@
         [class*="span"] {
           min-height:24px;
         }
-        padding-left: 18px;
+        font-size: 12px;
+        text-transform: none;
+        font-weight: normal;
+        padding-left: 28px;
         background:$white;
         span.lhs-item {
           display:block;
@@ -330,18 +325,9 @@
           }
 
         }
-        .grcicon-arrow-right-small {
-          @include opacity(0.25);
-          margin: 4px 0 0 7px;
-        }
-        &.active {
-          .grcicon-arrow-right-small {
-            @include opacity(1);
-            background-position: -126px -80px;
-          }
-        }
         &:hover {
-          text-decoration: underline;
+          background: $lightGray;
+          text-decoration: none;
         }
         .lhs-private {
           margin-right: 17px;
@@ -364,8 +350,10 @@
       &.add-new {
         a {
           text-transform: none;
+          padding-left: 32px;
           background:#fff;
           color:$link;
+          font-weight: bold;
         }
       }
       &.filters {
@@ -408,48 +396,69 @@
         }
       }
     }
-    &.custom {
-      li {
-        a {
-          padding-left: 28px;
-          &:hover {
-            background: $lightGray;
-            text-decoration: none;
-          }
-        }
-        &.add-new {
-          a {
-            padding-left: 32px;
-          }
-        }
-      }
-    }
   }
-
-  ul.lhn-items-list,
-  ul.lhn-items-list-actions {
+  ul.mid-level {
     li {
       a {
-        padding-left: 48px;
+        padding-left: 18px;
+        .grcicon-arrow-right {
+          @include opacity(0.25);
+          margin: 4px 0 0 7px;
+          background-position: -78px -80px;
+        }
+        &.active {
+          .grcicon-arrow-right {
+            @include opacity(1);
+            background-position: -126px -80px;
+          }
+        }
         &:hover {
-          background: $lightGray;
-          text-decoration: none;
+          background: $white;
+          text-decoration: underline;
+        }
+        &.list-toggle {
+          [class^="grcicon-"] {
+            display: none;
+          }
+          .grcicon-arrow-right {
+            display: inline-block;
+          }
+        }
+      }
+      ul.sub-level {
+        li {
+          a {
+            padding-left: 48px;
+          }
         }
       }
     }
   }
 
-  ul.lhn-items-list {
-    margin-bottom: 0;
-  }
+  // ul.lhn-items-list,
+  // ul.lhn-items-list-actions {
+  //   li {
+  //     a {
+  //       padding-left: 48px;
+  //       &:hover {
+  //         background: $lightGray;
+  //         text-decoration: none;
+  //       }
+  //     }
+  //   }
+  // }
 
-  ul.lhn-items-list-actions {
-    li {
-      a {
-        font-weight: bold;
-      }
-    }
-  }
+  // ul.lhn-items-list {
+  //   margin-bottom: 0;
+  // }
+
+  // ul.lhn-items-list-actions {
+  //   li {
+  //     a {
+  //       font-weight: bold;
+  //     }
+  //   }
+  // }
 
   ul.with-filters {
     margin-top: 24px;
@@ -520,41 +529,6 @@
     cursor: default;
   }
 }
-
-// BAR-V old
-/*
-.bar-v {
-  position: fixed;
-  top: 176px;
-  left: -8px;
-  height:100%;
-  z-index:100;
-  width:6px;
-  background-color:$white;
-  background-image: image-url("bgnds/drag-v.png");
-  @include background-size(2px 30px);
-  background-repeat:no-repeat;
-  background-position:2px 50%;
-  cursor:ew-resize;
-  &:hover {
-    background-color:$white;
-  };
-  &.bar-closed {
-    left:40px;
-    cursor:e-resize;
-  }
-  &.objnav {
-    z-index: 1;  // Show object nav bar-v below title
-  }
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
-  }
-  &.disabled {
-    @include opacity(0.5);
-    cursor: default;
-  }
-}
-*/
 
 // TOP INNER NAV
 .top-inner-nav {
@@ -758,273 +732,6 @@
     }
   }
 }
-
-// INNER NAV
-/* Inner nav dont exist anymore. It is moved up to top-inner-nav
-.inner-nav {
-  .object-nav {
-    .add-nav-item {
-      position:relative;
-      display:block;
-      background:#fff;
-      a.dropdown-toggle {
-        padding-left:20px;
-        display:block;
-        line-height:24px;
-        font-size:12px;
-        font-weight:bold;
-      }
-      ul.dropdown-menu {
-        padding:10px;
-        width:240px;
-        font-size:12px;
-        li.title {
-          font-weight:bold;
-        }
-      }
-    }
-    .add-more-objects {
-      padding-left:20px;
-      display:block;
-      line-height:30px;
-      font-size:13px;
-      border-bottom:1px solid #ddd;
-      color:$link;
-    }
-  }
-  ul.internav {
-    @include reset-list();
-    margin-top:10px;
-    overflow-y:auto;
-    li {
-      background:$white;
-      position:relative;
-      .drag {
-        position:absolute;
-        top:0;
-        left:0;
-        width:16px;
-        height:24px;
-        line-height:24px;
-        cursor:move;
-        &:hover {
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -316px;
-        }
-      }
-      &.inner-nav-button {
-        text-align: center;
-        border-bottom: 1px solid #ddd;
-        padding: 10px;
-        .message {
-          color: $green;
-        }
-        .tiny-help-text {
-          padding-top:4px;
-          font-size:10px;
-          line-height:13px;
-        }
-      }
-      &.finished {
-        background: $rqAccepted;
-      }
-      &.started {
-        background: $rqStarted;
-      }
-      &.overdue {
-        background: $red;
-        a {
-          color: $white;
-          i {
-            @include opacity(1);
-          }
-        }
-      }
-    }
-    a {
-      padding-left:20px;
-      display:block;
-      line-height:24px;
-      font-size:13px;
-      color:#777;
-      &:hover {
-        background-color:#444;
-        background-image: image-url("grcicons/icons.png");
-        background-repeat: no-repeat;
-        @include background-size(368px 416px);
-        background-position: -270px -316px;
-        color:#fff;
-        text-decoration:none;
-      }
-      span {
-        font-size:11px;
-      }
-    }
-    i {
-      margin-top:3px;
-      margin-right:6px;
-      @include opacity(0.3);
-    }
-    li.active {
-      a {
-        color:#000;
-        font-weight:bold;
-        i {
-          @include opacity(1);
-        }
-      }
-    }
-    li:hover {
-      a {
-        background-color:#444;
-        color:#fff;
-        i {
-          @include opacity(1);
-        }
-      }
-      &.overdue {
-        a {
-          background-color: $red;
-          color: $white;
-        }
-      }
-    }
-    &.business {
-      li:hover {
-        a {
-          color:#fff;
-          background-color:$business;
-        }
-      }
-    }
-    &.governance {
-      li:hover {
-        a {
-          background-color:$governance;
-        }
-      }
-    }
-    &.risk {
-      li:hover {
-        a {
-          background-color:$risk;
-        }
-      }
-    }
-    &.program {
-      li:hover {
-        a {
-          color:#fff;
-          background-color:$programs;
-        }
-      }
-    }
-    &.objectives {
-      li:hover {
-        a {
-          background-color:$objectives;
-        }
-      }
-    }
-    &.controls {
-      li:hover {
-        a {
-          color:#fff;
-          background-color:$controls;
-        }
-      }
-    }
-    &.entities {
-      li:hover {
-        a {
-          color:#fff;
-          background-color:$entities;
-        }
-      }
-    }
-    &.workflow {
-      li:hover {
-        a {
-          color:#fff;
-          background-color:$programs;
-        }
-      }
-    }
-  }
-  ul.innernav-arrow {
-    a {
-      &.w-arrow {
-        padding-left: 48px;
-      }
-    }
-    .arrow {
-      background: image-url('grcicons/not-open.png') no-repeat 0 0;
-      @include background-size(17px 12px);
-      width: 17px;
-      height: 12px;
-      position: absolute;
-      top: 8px;
-      left: 24px;
-      padding: 0;
-      cursor: pointer;
-      &.active {
-        background: image-url('grcicons/open.png') no-repeat 0 0;
-        @include background-size(17px 12px);
-      }
-    }
-    li {
-      ul.sub-level {
-        @include reset-list();
-        li {
-          a {
-            border-bottom: 1px dotted #ddd;
-            font-size: 11px;
-            padding-left: 22px;
-            &:hover {
-              background-color: $rqAccepted;
-              background-image: none;
-              background-position: 0 0;
-              color: #777;
-            }
-            i {
-              @include opacity(1);
-            }
-          }
-          &:hover {
-            a {
-              background-color: $rqAccepted;
-              color:#777;
-            }
-          }
-          &:last-child {
-            a {
-              border-bottom: 1px solid #ddd;
-            }
-          }
-        }
-      }
-      &:hover,
-      &.active {
-        ul.sub-level {
-          li {
-            a {
-              background-color:#fff;
-              color:#777;
-              background-image: none;
-              background-position: 0 0;
-              &:hover {
-                background-color: $rqAccepted;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-*/
 
 .extended-info {
   position:absolute;
