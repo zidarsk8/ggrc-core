@@ -429,6 +429,10 @@
         li {
           a {
             padding-left: 48px;
+            &:hover {
+              background: $lightGray;
+              text-decoration: none;
+            }
           }
         }
       }
