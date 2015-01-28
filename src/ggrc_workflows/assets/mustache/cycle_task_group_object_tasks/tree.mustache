@@ -197,6 +197,9 @@
                         {{firstnonempty object.title instance.title}}
                         <i class="grcicon-goto smallmargin"></i>
                       </a>
+                      <a class="btn btn-primary btn-mini" href="{{object.viewLink}}" rel="tooltip" data-original-title="Open {{instance.object.reify.class.table_singular}} in a new tab" target="_blank">
+                        Open in new tab
+                      </a>
                     {{else}}
                       {{firstnonempty object.title instance.title}}
                     {{/is_allowed}}
