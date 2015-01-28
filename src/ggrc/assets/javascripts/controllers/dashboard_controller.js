@@ -606,6 +606,7 @@ can.Control("CMS.Controllers.InnerNav", {
     ".dropdown-toggle click": function(el, ev) {
       var $dropdown = el.closest(".hidden-widgets-list").find(".dropdown-menu"),
         $menu_item = $dropdown.find(".inner-nav-item").find("a"),
+        dropdown_height = $dropdown.outerHeight(),
         offset = el.offset(),
         top_pos = offset.top + 36,
         left_pos = offset.left,
@@ -615,10 +616,17 @@ can.Control("CMS.Controllers.InnerNav", {
         remain_height = win_height - footer_height,
         win_width = win.width();
 
+        console.log(dropdown_height);
+
       if(win_width - left_pos < 322) {
         $dropdown.addClass("right-pos");
       } else {
         $dropdown.removeClass("right-pos");
+      }
+      if(remain_height - top_pos < dropdown_height) {
+        $dropdown.addClass("mid-pos");
+      } else {
+        $dropdown.removeClass("mid-pos");
       }
       if($menu_item.length === 1) {
         $dropdown.addClass("one-item");
