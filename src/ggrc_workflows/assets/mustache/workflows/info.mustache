@@ -94,6 +94,13 @@
     </div>
 
   </div>
-
-  <ggrc-gdrive-folder-picker instance="instance" placeholder="If selected, all workflow attachments go here." />
+  <div class="row-fluid">
+    <div class="span12">
+      <ggrc-gdrive-folder-picker instance="instance" placeholder="If selected, all workflow attachments go here." />
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+      {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}    </div>
+  </div>
 </section>
