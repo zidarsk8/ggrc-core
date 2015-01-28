@@ -785,14 +785,22 @@ can.Control("CMS.Controllers.LHN_Search", {
     
       [$siblings, $mids, $non_children].map(function ($selection) {
           $selection.slideUp().removeClass("in");
-          $selection.find("a.active").removeClass("active");
       });
       
       // Expand this list
       $ul.slideDown().addClass("in");
       
-      // Remove active class from other lists
-      //holder.find(':not(.filters) > a.active').removeClass('active');
+      // Remove active classes from others
+      // remove all except current element or children
+      // this works because open_list is called twice if we ensure parent is open
+      var $others = $ul.closest(".lhs").find(this.options.list_selector)
+              .find("a.active")
+              .not(el)
+              .filter(function (i, el) {
+                  return !$.contains($ul[0], el);
+              });
+      $others.removeClass("active");
+
       // Add active class to this list
       el.addClass("active");
       
