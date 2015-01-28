@@ -288,7 +288,7 @@ can.Control("CMS.Controllers.LHN", {
           .css("left", (-width-6)+"px");
 
       this.element.find(".bar-v")
-          .removeClass("active")
+          .removeClass("active");
 
       this.element.find(".lhs-search")
           .removeClass("active");
@@ -314,7 +314,7 @@ can.Control("CMS.Controllers.LHN", {
           .addClass("active");
       
       this.element.find(".bar-v")
-          .addClass("active")
+          .addClass("active");
 
       this.element.find(".lhs-search")
           .addClass("active");
@@ -785,13 +785,14 @@ can.Control("CMS.Controllers.LHN_Search", {
     
       [$siblings, $mids, $non_children].map(function ($selection) {
           $selection.slideUp().removeClass("in");
+          $selection.find("a.active").removeClass("active");
       });
       
       // Expand this list
       $ul.slideDown().addClass("in");
       
       // Remove active class from other lists
-      holder.find(':not(.filters) > a.active').removeClass('active');
+      //holder.find(':not(.filters) > a.active').removeClass('active');
       // Add active class to this list
       el.addClass("active");
       
