@@ -104,7 +104,7 @@ class SystemsAndProcessesBaseConverter(BaseConverter):
       # Then put the parent code's type label in B1, slug in B2
       parent_key = '{} Code'.format(self.parent_type_string())
       parent_value = "slug"
-      self.metadata_map()[parent_key] = parent_value
+      self.metadata_map[parent_key] = parent_value
 
   def validate_metadata(self, attrs):
     if self.options.get('is_biz_process'):

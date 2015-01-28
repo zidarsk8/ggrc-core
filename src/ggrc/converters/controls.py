@@ -134,13 +134,14 @@ class ControlsConverter(BaseConverter):
 
   # Creates the correct metadata_map for the specific directive kind.
   def create_metadata_map(self):
+    super(ControlsConverter, self).create_metadata_map()
     parent_type = self.options.get('parent_type')
     if parent_type in DIRECTIVE_CLASSES:
       self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive_kind()), v) \
-                          if 'Directive' in k else (k, v) for k, v in self.metadata_map().items()] )
+                          if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
     elif parent_type == Program:
       self.metadata_map = OrderedDict( [(k.replace("Directive", "Program"), v) if 'Directive' in k else (k, v) \
-          for k, v in self.metadata_map().items()] )
+          for k, v in self.metadata_map.items()] )
 
   def validate_metadata(self, attrs):
     self.validate_metadata_type(attrs, "Controls")
@@ -160,7 +161,7 @@ class ControlsConverter(BaseConverter):
     return parent_object.meta_kind
 
   def do_export_metadata(self):
-    yield self.metadata_map().keys()
+    yield self.metadata_map.keys()
     yield ['Controls', self.parent_object().slug]
     yield[]
     yield[]

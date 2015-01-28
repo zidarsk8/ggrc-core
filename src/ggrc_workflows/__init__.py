@@ -7,19 +7,29 @@ from datetime import datetime, date
 
 from flask import Blueprint
 from sqlalchemy import inspect
+import sqlalchemy.orm
+from blinker import Namespace
 
 from ggrc import db
 from ggrc.login import get_current_user
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
 from ggrc.rbac.permissions import is_allowed_update
-from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
+from ggrc_basic_permissions.models import Role, ContextImplication
 import ggrc_workflows.models as models
 from ggrc_workflows.models.mixins import RelativeTimeboxed
-
+from ggrc.models import all_models
+from ggrc.services.common import Resource
+from ggrc_basic_permissions.models import UserRole
+from ggrc_basic_permissions.contributed_roles import (
+    RoleContributions, RoleDeclarations, DeclarativeRoleImplications
+    )
+from ggrc_workflows.roles import (
+    WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader
+    )
+from ggrc_workflows.notification import notify_email_digest, notify_email_deferred
 
 # Initialize signal handler for status changes
-from blinker import Namespace
 signals = Namespace()
 status_change = signals.signal(
   'Status Changed',
@@ -44,8 +54,6 @@ blueprint = Blueprint(
   static_url_path='/static/ggrc_workflows',
 )
 
-
-from ggrc.models import all_models
 
 _workflow_object_types = [
     "Program",
@@ -153,7 +161,6 @@ def _get_date_range(timeboxed_objects):
 
 
 def update_cycle_dates(cycle):
-  import sqlalchemy.orm
   if cycle.id:
     # If `cycle` is already in the database, then eager load required objects
     cycle = models.Cycle.query.filter_by(id=cycle.id).\
@@ -182,9 +189,6 @@ def update_cycle_dates(cycle):
           ctg.cycle_task_group_objects)
   cycle.start_date, cycle.end_date = _get_date_range(cycle.cycle_task_groups)
   cycle.next_due_date = _get_min_next_due_date(cycle.cycle_task_groups)
-
-
-from ggrc.services.common import Resource
 
 
 @Resource.model_posted.connect_via(models.Cycle)
@@ -418,7 +422,6 @@ def ensure_assignee_is_workflow_member(workflow, assignee):
     db.session.add(workflow_person)
 
   # Check if assignee has a role assignment
-  from ggrc_basic_permissions.models import UserRole
   user_roles = UserRole.query.filter(
       UserRole.context_id == workflow.context_id,
       UserRole.person_id == assignee.id).all()
@@ -761,13 +764,6 @@ def start_recurring_cycles():
   db.session.commit()
   db.session.flush()
 
-from ggrc_basic_permissions.contributed_roles import (
-    RoleContributions, RoleDeclarations, DeclarativeRoleImplications
-    )
-from ggrc_workflows.roles import (
-    WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader
-    )
-
 class WorkflowRoleContributions(RoleContributions):
   contributions = {
       'ProgramCreator': {
@@ -818,5 +814,3 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
 ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
 ROLE_DECLARATIONS = WorkflowRoleDeclarations()
 ROLE_IMPLICATIONS = WorkflowRoleImplications()
-
-from ggrc_workflows.notification import notify_email_digest, notify_email_deferred

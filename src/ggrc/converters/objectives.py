@@ -106,6 +106,7 @@ class ObjectivesConverter(BaseConverter):
 
   # Creates the correct metadata_map for the specific directive kind.
   def create_metadata_map(self):
+    super(ObjectivesConverter, self).create_metadata_map()
     parent_type = self.options.get('parent_type')
     if parent_type in DIRECTIVE_CLASSES:
       self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive_kind()), v) \
