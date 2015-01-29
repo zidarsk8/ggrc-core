@@ -1779,13 +1779,15 @@ Mustache.registerHelper("owned_by_current_user", function(instance, options) {
   return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("person_owned", function (owner_id, options) {
-  owner_id = resolve_computed(owner_id);
-  var page_instance = GGRC.page_instance();
-  if (!(page_instance instanceof CMS.Models.Person) || (owner_id && page_instance.id === owner_id))
+Mustache.registerHelper("current_user_is_contact", function (instance, options) {
+  var current_user_id = GGRC.current_user.id;
+  instance = Mustache.resolve(instance);
+  var contact = instance.contact;
+  if (current_user_id == contact.id) {
     return options.fn(options.contexts);
-  else
+  } else {
     return options.inverse(options.contexts);
+  }
 });
 
 Mustache.registerHelper("default_audit_title", function (instance, options) {

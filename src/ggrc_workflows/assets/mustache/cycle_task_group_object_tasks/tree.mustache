@@ -53,7 +53,8 @@
           <ul class="tree-action-list tasks-action">
             {{#with_mapping '_object' instance}}
               {{#if_helpers '\
-                #owned_by_current_user' _object.0.instance '\
+                #current_user_is_contact' instance '\
+                or #owned_by_current_user' _object.0.instance '\
                 or #current_user_is_admin'}}
                 <li>
                   {{#if_equals instance.task_group_task.object_review True}}
@@ -86,7 +87,7 @@
               {{#if_equals cycle.is_current true}}
                 {{#with_mapping '_object' instance}}
                   {{#if_helpers '\
-                    #owned_by_current_user' _object.0.instance '\
+                    #current_user_is_contact' instance '\
                     or #current_user_is_admin'}}
                     <li>
                       <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }); }}>
