@@ -7,50 +7,47 @@
 
 
 {{#each options}}
-<li class="tree-item control governance task-item" 
-  data-object-type="{{instance.class.table_singular}}"
-  {{#instance}}{{ data 'option' }}{{/instance}} 
-  data-id="{{ instance.id }}">
+  <li class="tree-item task-item" data-object-type="{{instance.class.table_singular}}"{{#instance}}{{ data 'option' }}{{/instance}} data-id="{{ instance.id }}">
     <div class="item-main">
-      <div class="openclose">
-      <a href="javascript://" class="openclose-placeholder">           
-        <div class="row-fluid">
-          <div class="span10">
-            <span class="tier-trigger">
-            </span>
-            <div class="item-data">
-              <div class="tree-title-area">
-                <i class="grcicon-{{instance.class.table_singular}}-color"></i>                 
-                {{#if instance.name}}{{instance.name}}{{/if}}
-                <span class="url-link">
-                  {{#if instance.email}}{{instance.email}}{{/if}}
-                </span>
-                {{^if instance.is_enabled}}
-                  <span class="user-disabled">
-                    (Disabled)
+      <div class="item-wrap">
+        <div class="openclose">
+          <i class="grcicon-arrow-right"></i>
+        </div>
+        <div class="select">
+          <div class="item-data">
+            <div class="row-fluid">
+              <div class="span10">
+                <div class="tree-title-area">
+                  {{#if instance.name}}{{instance.name}}{{/if}}
+                  <span class="url-link">
+                    {{#if instance.email}}{{instance.email}}{{/if}}
                   </span>
-                {{/if}}
+                  {{^if instance.is_enabled}}
+                    <span class="user-disabled">
+                      (Disabled)
+                    </span>
+                  {{/if}}
+                </div>
+              </div>
+
+              <div class="span1">&nbsp;</div>
+
+              <div class="span1">
+                <div class="object-check" align="left">
+                  {{#if mappings.length}}
+                    {{#result_direct_mappings bindings_compute selected_object}}
+                      <input type="checkbox" value="{{instance.title}}" checked="checked" disabled="true" class="object-check-single">
+                    {{/result_direct_mappings}}
+                  {{else}}
+                    <input type="checkbox" value="{{instance.title}}" {{^if instance.is_enabled}}disabled="true"{{/if}} class="object-check-single">
+                  {{/if}}
+                </div>
               </div>
             </div>
-          </div>          
-          <div class="span1">
-            &nbsp;
-          </div>
-          <div class="span1">
-            <div class="object-check" align="left">
-              {{#if mappings.length}}
-                {{#result_direct_mappings bindings_compute selected_object}}
-                  <input type="checkbox" value="{{instance.title}}" checked="checked" disabled="true" class="object-check-single">
-                {{/result_direct_mappings}}
-              {{else}}
-                <input type="checkbox" value="{{instance.title}}" {{^if instance.is_enabled}}disabled="true"{{/if}} class="object-check-single">
-              {{/if}}
-            </div>
-          </div>          
-        </div>          
-      </a>
-      </div>
-    </div>
+          </div><!-- item-data end -->
+        </div><!-- select end -->
+      </div><!-- item-wrap end -->
+    </div><!-- item-main end -->
 
     {{! #if expanded}}
     <div class="tier-2-info item-content">
@@ -59,5 +56,5 @@
       </div>
     </div>
     {{!/if}}
-</li>
+  </li>
 {{/each}}
