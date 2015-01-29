@@ -772,6 +772,9 @@
               } else {
                 self.remove_instance(binding, result.instance, result);
               }
+            }, function() {
+              //remove instance (if it exists) if the deferred rejects
+              self.remove_instance(binding, result.instance, result);
             });
           } else {
             self.insert_results(binding, [new_result]);

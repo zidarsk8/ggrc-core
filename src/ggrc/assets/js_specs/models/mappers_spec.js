@@ -1,11 +1,5 @@
 
-
-describe("working tests", function () {
-    it("will have to update to jasmine 2.0 ways", function () {});
-});
-
-
-xdescribe("mappers", function() {
+describe("mappers", function() {
   
   var LL;
   beforeEach(function() {
@@ -15,7 +9,9 @@ xdescribe("mappers", function() {
     }
   });
 
-  describe("ListBinding", function() {});
+  describe("ListBinding", function() {
+    it("TODO add list binding specs", function() {});
+  });
 
   describe("MappingResult", function() {
 
@@ -23,7 +19,7 @@ xdescribe("mappers", function() {
 
       it("sets the named properties to the positional parameters", function() {
         var mr;
-        spyOn(LL.MappingResult.prototype, "_make_mappings").andCallFake(function(mapping_name) {
+        spyOn(LL.MappingResult.prototype, "_make_mappings").and.callFake(function(mapping_name) {
           expect(mapping_name).toBe("mappings");
           return "_mapping";
         });
@@ -37,7 +33,7 @@ xdescribe("mappers", function() {
 
       it("sets the named properties to the object properties if called with an object", function() {
         var mr;
-        spyOn(LL.MappingResult.prototype, "_make_mappings").andCallFake(function(mapping_name) {
+        spyOn(LL.MappingResult.prototype, "_make_mappings").and.callFake(function(mapping_name) {
           expect(mapping_name).toBe("mappings");
           return "_mapping";
         });
@@ -175,7 +171,7 @@ xdescribe("mappers", function() {
 
       it("inits the listeners", function() {
         var fake_binding = {};
-        spyOn(GGRC.ListLoaders.BaseListLoader, "binding_factory").andReturn(fake_binding);
+        spyOn(GGRC.ListLoaders.BaseListLoader, "binding_factory").and.returnValue(fake_binding);
 
         ll.attach("instance");
         expect(ll.init_listeners).toHaveBeenCalledWith(fake_binding);
@@ -246,7 +242,7 @@ xdescribe("mappers", function() {
         fake_find_result = { mappings : [] };
         spyOn(ll, "find_result_by_instance");
         spyOn(ll, "is_duplicate_result");
-        spyOn(ll, "make_result").andReturn(fake_find_result);
+        spyOn(ll, "make_result").and.returnValue(fake_find_result);
         binding = { list : [] };
       });
 
@@ -265,8 +261,8 @@ xdescribe("mappers", function() {
 
       it("returns an empty list, and pushes nothing to binding, if results are duplicates", function() {
         var ret;
-        ll.find_result_by_instance.andReturn(fake_find_result);
-        ll.is_duplicate_result.andReturn(true);
+        ll.find_result_by_instance.and.returnValue(fake_find_result);
+        ll.is_duplicate_result.and.returnValue(true);
         ret = ll.insert_results(binding, ['a']);
         expect(ret).toEqual([]);
         expect(binding.list).toEqual([]);
@@ -341,7 +337,7 @@ xdescribe("mappers", function() {
         var ret,
             binding = { list : [] },
             sanity = false;
-        ll._refresh_stubs = jasmine.createSpy().andReturn($.when());
+        ll._refresh_stubs = jasmine.createSpy().and.returnValue($.when());
         ret = ll.refresh_stubs(binding);
         ret.done(function(data) {
           expect(data).toBe(binding.list);
@@ -375,7 +371,7 @@ xdescribe("mappers", function() {
         var ret,
             binding = { list : [] },
             sanity = false;
-        ll._refresh_instances = jasmine.createSpy().andReturn($.when());
+        ll._refresh_instances = jasmine.createSpy().and.returnValue($.when());
         ret = ll.refresh_instances(binding);
         ret.done(function(data) {
           expect(data).toBe(binding.list);
@@ -394,8 +390,8 @@ xdescribe("mappers", function() {
         var ret,
             binding = { list : [{instance : 'a'}] },
             sanity = false;
-        spyOn(ll, "refresh_stubs").andReturn($.when());
-        spyOn(RefreshQueue.prototype, "trigger").andCallFake(function() {
+        spyOn(ll, "refresh_stubs").and.returnValue($.when());
+        spyOn(RefreshQueue.prototype, "trigger").and.callFake(function() {
           return $.when(this.objects);
         });
 
@@ -438,7 +434,7 @@ xdescribe("mappers", function() {
 
     describe("#insert_from_source_binding", function() {
       beforeEach(function() {
-        spyOn(RefreshQueue.prototype, "trigger").andCallFake(function() {
+        spyOn(RefreshQueue.prototype, "trigger").and.callFake(function() {
           return $.when(this.objects);
         });
       });
@@ -502,7 +498,7 @@ xdescribe("mappers", function() {
       describe("source_binding.list remove", function() {
         it("calls remove_instance on the list loader for each item", function() {
           var new_result = new LL.MappingResult({id : 1}, []);
-          spyOn(RefreshQueue.prototype, "trigger").andReturn($.when()); //Avoid AJAX
+          spyOn(RefreshQueue.prototype, "trigger").and.returnValue($.when()); //Avoid AJAX
           spyOn(rll, "remove_instance");
           binding.list.push(new_result);
           source_binding.list.push(new_result);
@@ -514,7 +510,7 @@ xdescribe("mappers", function() {
     });
   });
 
-  xdescribe("GGRC.ListLoaders.CustomFilteredListLoader", function() {
+  describe("GGRC.ListLoaders.CustomFilteredListLoader", function() {
 
     var cfll, binding;
     beforeEach(function() {
@@ -527,7 +523,7 @@ xdescribe("mappers", function() {
 
       it("gets results from binding's source binding", function() {
         var mock_inst = new GGRC.Jasmine.MockModel({ value : 'a' });
-        spyOn(binding.source_binding, "refresh_instances").andReturn(new $.Deferred().reject());
+        spyOn(binding.source_binding, "refresh_instances").and.returnValue(new $.Deferred().reject());
 
         cfll._refresh_stubs(binding);
         expect(binding.source_binding.refresh_instances).toHaveBeenCalled();
@@ -536,7 +532,10 @@ xdescribe("mappers", function() {
       it("runs all results from source binding through filter function", function() {
         var mock_inst = new GGRC.Jasmine.MockModel({ value : 'a' });
         var mock_result = { instance : mock_inst, mappings: [] };
-        spyOn(binding.source_binding, "refresh_instances").andReturn(new $.Deferred().resolve([mock_result]));
+        spyOn(binding.source_binding, "refresh_instances").and.returnValue(new $.Deferred().resolve([mock_result]));
+
+        // Items are sent through a refresh queue before continuing.
+        spyOn(RefreshQueue.prototype, "trigger").and.returnValue($.when([mock_inst]));
 
         cfll._refresh_stubs(binding);
         expect(cfll.filter_fn).toHaveBeenCalledWith(mock_result);
@@ -551,7 +550,9 @@ xdescribe("mappers", function() {
         source_binding = new LL.ListBinding();
         binding = new LL.ListBinding();
         cfll = new LL.CustomFilteredListLoader(source_binding, jasmine.createSpy("filter_fn"));
-        spyOn(binding, "refresh_instances").andReturn($.when());
+        spyOn(binding, "refresh_instances").and.returnValue($.when());
+        // Items are sent through a refresh queue before continuing.
+        spyOn(RefreshQueue.prototype, "trigger").and.returnValue($.when([new_result.instance]));
       });
 
       describe("source_binding.list add", function() {
@@ -561,18 +562,11 @@ xdescribe("mappers", function() {
           expect(cfll.filter_fn).toHaveBeenCalledWith(new_result);
         });
 
-        it("does not call the filter func when the binding has not yet been refreshed.", function() {
-          delete binding._refresh_instances_deferred;
-          cfll.init_listeners(binding);
-          source_binding.list.push(new_result);
-          expect(cfll.filter_fn).not.toHaveBeenCalled();
-        });
-
         it("adds the new item when the filter func returns true", function() {
           var filter_result = new LL.MappingResult({id : 2}, [new_result]);
-          cfll.filter_fn.andReturn(true);
+          cfll.filter_fn.and.returnValue(true);
           cfll.init_listeners(binding);
-          spyOn(cfll, "make_result").andReturn(filter_result);
+          spyOn(cfll, "make_result").and.returnValue(filter_result);
           spyOn(cfll, "insert_results");
           source_binding.list.push(new_result);
           expect(cfll.insert_results).toHaveBeenCalledWith(binding, [filter_result]);
@@ -580,20 +574,21 @@ xdescribe("mappers", function() {
 
         it("does not add the new item when the filter func returns false", function() {
           var filter_result = new LL.MappingResult({id : 2}, [new_result]);
-          cfll.filter_fn.andReturn(false);
+          cfll.filter_fn.and.returnValue(false);
           cfll.init_listeners(binding);
-          spyOn(cfll, "make_result").andReturn(filter_result);
+          spyOn(cfll, "make_result").and.returnValue(filter_result);
           spyOn(cfll, "insert_results");
+          spyOn(cfll, "remove_instance");
           source_binding.list.push(new_result);
           expect(cfll.insert_results).not.toHaveBeenCalledWith(binding, [filter_result]);
-          expect(cfll.insert_results).toHaveBeenCalledWith(binding, []);
+          expect(cfll.remove_instance).toHaveBeenCalledWith(binding, new_result.instance, new_result);
         });
 
         it("adds the new item when the filter func returns a deferred resolving to true", function() {
           var filter_result = new LL.MappingResult({id : 2}, [new_result]);
-          cfll.filter_fn.andReturn($.when(true));
+          cfll.filter_fn.and.returnValue($.when(true));
           cfll.init_listeners(binding);
-          spyOn(cfll, "make_result").andReturn(filter_result);
+          spyOn(cfll, "make_result").and.returnValue(filter_result);
           spyOn(cfll, "insert_results");
           source_binding.list.push(new_result);
           expect(cfll.insert_results).toHaveBeenCalledWith(binding, [filter_result]);
@@ -601,24 +596,26 @@ xdescribe("mappers", function() {
 
         it("does not add the new item when the filter func returns a deferred resolving to false", function() {
           var filter_result = new LL.MappingResult({id : 2}, [new_result]);
-          cfll.filter_fn.andReturn($.when(false));
+          cfll.filter_fn.and.returnValue($.when(false));
           cfll.init_listeners(binding);
-          spyOn(cfll, "make_result").andReturn(filter_result);
+          spyOn(cfll, "make_result").and.returnValue(filter_result);
           spyOn(cfll, "insert_results");
+          spyOn(cfll, "remove_instance");
           source_binding.list.push(new_result);
           expect(cfll.insert_results).not.toHaveBeenCalledWith(binding, [filter_result]);
-          expect(cfll.insert_results).toHaveBeenCalledWith(binding, []);
+          expect(cfll.remove_instance).toHaveBeenCalledWith(binding, new_result.instance, new_result);
         });
 
         it("does not add the new item when the filter func returns a deferred that rejects", function() {
           var filter_result = new LL.MappingResult({id : 2}, [new_result]);
-          cfll.filter_fn.andReturn(new $.Deferred().reject());
+          cfll.filter_fn.and.returnValue(new $.Deferred().reject());
           cfll.init_listeners(binding);
-          spyOn(cfll, "make_result").andReturn(filter_result);
+          spyOn(cfll, "make_result").and.returnValue(filter_result);
           spyOn(cfll, "insert_results");
+          spyOn(cfll, "remove_instance");
           source_binding.list.push(new_result);
           expect(cfll.insert_results).not.toHaveBeenCalledWith(binding, [filter_result]);
-          expect(cfll.insert_results).toHaveBeenCalledWith(binding, []);
+          expect(cfll.remove_instance).toHaveBeenCalledWith(binding, new_result.instance, new_result);
         });
 
       });
@@ -626,7 +623,6 @@ xdescribe("mappers", function() {
       describe("source_binding.list remove", function() {
         it("calls remove_instance on the list loader for each item", function() {
           var new_result = new LL.MappingResult({id : 1}, []);
-          spyOn(RefreshQueue.prototype, "trigger").andReturn($.when()); //Avoid AJAX
           spyOn(cfll, "remove_instance");
           binding.list.push(new_result);
           source_binding.list.push(new_result);
