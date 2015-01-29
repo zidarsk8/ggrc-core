@@ -5,14 +5,6 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-//= require models/local_storage
-
-
-describe("working tests", function () {
-    it("will have to update to jasmine 2.0 ways", function () {});
-});
-
-
 describe("can.Model.RecentlyViewedObjects", function() {
 
   describe("::newInstance", function() {

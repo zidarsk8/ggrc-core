@@ -19,7 +19,7 @@ var COLLAPSE = "collapse"
 , PBC_LISTS = "pbc_lists"
 , GLOBAL = "global"
 , LHN_STATE = "lhn_state"
-, path = window.location.pathname;
+, path = window.location.pathname.replace(/\./g, "/");
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   autoupdate : true

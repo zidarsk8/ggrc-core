@@ -2,18 +2,12 @@ window.GGRC = window.GGRC || {};
 GGRC.config = GGRC.config || {};
 GGRC.config.GAPI_ADMIN_GROUP = GGRC.config.GAPI_ADMIN_GROUP || "admins@example.com";
 
-
-describe("working tests", function () {
-    it("will have to update to jasmine 2.0 ways", function () {});
-});
-
-
-xdescribe("GDrive Workflows Controller", function() {
+describe("GDrive Workflows Controller", function() {
   var ctl;
-  beforeEach(function() {
+  beforeAll(function(done) {
     waitsFor(function() {
       return (ctl = $(document.body).control(GGRC.Controllers.GDriveWorkflow));
-    }, 5000);
+    }, done);
   });
   describe("#update_permission_for", function() {
 
@@ -29,7 +23,7 @@ xdescribe("GDrive Workflows Controller", function() {
       role = "writer";
       saved_object = undefined;
 
-      spyOn(CMS.Models.GDriveFolderPermission.prototype, "save").andCallFake(function() {
+      spyOn(CMS.Models.GDriveFolderPermission.prototype, "save").and.callFake(function() {
         saved_object = this;
         expect(saved_object.folder).toBe(item);
         expect(saved_object.role).toBe(role);
@@ -40,7 +34,7 @@ xdescribe("GDrive Workflows Controller", function() {
     it("creates permission object for user by email address", function() {
       var person = "foo@example.com";
       
-      spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions").andCallFake(function() { return $.when([]); });
+      spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions").and.callFake(function() { return $.when([]); });
 
       ctl.update_permission_for(item, person, permissionId, role);
       expect(saved_object).toBeDefined();
@@ -54,7 +48,7 @@ xdescribe("GDrive Workflows Controller", function() {
         , email : "foo@example.com"
       });
 
-      spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions").andCallFake(function() { return $.when([]); });
+      spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions").and.callFake(function() { return $.when([]); });
 
       ctl.update_permission_for(item, person, permissionId, role);
       expect(saved_object).toBeDefined();
@@ -63,7 +57,7 @@ xdescribe("GDrive Workflows Controller", function() {
     });
 
     it("creates group permission object when passed Admin group", function() {
-      spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions").andCallFake(function() { return $.when([]); });
+      spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions").and.callFake(function() { return $.when([]); });
 
       ctl.update_permission_for(item, GGRC.config.GAPI_ADMIN_GROUP, permissionId, role);
       expect(saved_object).toBeDefined();
@@ -71,28 +65,11 @@ xdescribe("GDrive Workflows Controller", function() {
       expect(saved_object.permission_type).toBe("group");
     });
 
-    //This spec is no longer correct, as all of the extant permissions are now divined in resolve_permissions --BM 4/5/2014
-    xit("does not create permissions for users who already have an equivalent permission", function() {
-      var person = "foo@example.com";
-      
-      spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions")
-      .andCallFake(function() {
-        return $.when([{
-          "id" : permissionId
-          , "email" : person
-          , "role" : "writer"
-        }]);
-      });
-
-      ctl.update_permission_for(item, person, permissionId, role);
-      expect(saved_object).not.toBeDefined();
-    });
-
     it("creates writer permission for users who currently have reader", function() {
       var person = "foo@example.com";
       
       spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions")
-      .andCallFake(function() {
+      .and.callFake(function() {
         return $.when([{
           "id" : permissionId
           , "email" : person
@@ -121,15 +98,16 @@ xdescribe("GDrive Workflows Controller", function() {
           id : 1
           , title : "a program"
         });
-        spyOn(program, "get_mapping").andReturn([]);
+        var original_create_folder = ctl.create_folder_if_nonexistent;
+        spyOn(program, "get_mapping").and.returnValue([]);
 
-        spyOn(ctl, "create_folder_if_nonexistent").andThrow("ERROR: function tried calling itself for parent object");
-        spyOn(ctl.request_create_queue, "push").andThrow("ERROR: function pushed Program folder creation onto the Request queue");
-        spyOn(ctl, "link_request_to_new_folder_or_audit_folder").andThrow("ERROR: function tried linking a Program to an Audit's folder");
+        spyOn(ctl, "create_folder_if_nonexistent").and.throwError("ERROR: function tried calling itself for parent object");
+        spyOn(ctl.request_create_queue, "push").and.throwError("ERROR: function pushed Program folder creation onto the Request queue");
+        spyOn(ctl, "link_request_to_new_folder_or_audit_folder").and.throwError("ERROR: function tried linking a Program to an Audit's folder");
 
         spyOn(ctl, "create_program_folder");
         //get a little tricky.  We're already spying on the SUT, so go through it
-        ctl.create_folder_if_nonexistent.originalValue.call(ctl, program);
+        original_create_folder.call(ctl, program);
         expect(ctl.create_program_folder).toHaveBeenCalledWith(program.constructor, jasmine.any(Object), program);
       });
 
@@ -144,21 +122,22 @@ xdescribe("GDrive Workflows Controller", function() {
           , program : new CMS.Models.Program({ id : 1 })
           , requests : []
         });
-        spyOn(can.Model.Cacheable.prototype, "get_mapping").andReturn([]);
-        spyOn(ctl, "create_audit_folder").andReturn($.when());
-        spyOn(ctl, "create_program_folder").andReturn($.when());
+        spyOn(can.Model.Cacheable.prototype, "get_mapping").and.returnValue([]);
+        spyOn(ctl, "create_audit_folder").and.returnValue($.when());
+        spyOn(ctl, "create_program_folder").and.returnValue($.when());
       });
 
       it("recursively calls for program", function() {
-        spyOn(ctl, "create_folder_if_nonexistent").andReturn($.when());
-        ctl.create_folder_if_nonexistent.originalValue.call(ctl, audit);
+        var original_create_folder = ctl.create_folder_if_nonexistent;
+        spyOn(ctl, "create_folder_if_nonexistent").and.returnValue($.when());
+        original_create_folder.call(ctl, audit);
         expect(ctl.create_folder_if_nonexistent).toHaveBeenCalledWith(jasmine.any(CMS.Models.Program));
       });
 
       it("calls out to create_audit_folder", function() {
 
-        spyOn(ctl.request_create_queue, "push").andThrow("ERROR: function pushed audit folder creation onto the Request queue");
-        spyOn(ctl, "link_request_to_new_folder_or_audit_folder").andThrow("ERROR: function tried linking a audit to another Audit's folder");
+        spyOn(ctl.request_create_queue, "push").and.throwError("ERROR: function pushed audit folder creation onto the Request queue");
+        spyOn(ctl, "link_request_to_new_folder_or_audit_folder").and.throwError("ERROR: function tried linking a audit to another Audit's folder");
         //get a little tricky.  We're already spying on the SUT, so go through it
         ctl.create_folder_if_nonexistent(audit);
         expect(ctl.create_audit_folder).toHaveBeenCalledWith(audit.constructor, jasmine.any(Object), audit);
@@ -171,12 +150,12 @@ xdescribe("GDrive Workflows Controller", function() {
         });
         var sanity = false;
         audit.requests.push(request);
-        spyOn(CMS.Models.ObjectFolder.prototype, "save").andCallFake(function() {
+        spyOn(CMS.Models.ObjectFolder.prototype, "save").and.callFake(function() {
           sanity = true;
           expect(this instanceof CMS.Models.ObjectFolder).toBe(true);
           expect(this.folderable.reify()).toBe(request);
         });
-        spyOn(RefreshQueue.prototype, "trigger").andReturn($.when([request]));
+        spyOn(RefreshQueue.prototype, "trigger").and.returnValue($.when([request]));
         ctl.create_folder_if_nonexistent(audit);
         expect(sanity).toBe(true);
       });
@@ -195,14 +174,14 @@ xdescribe("GDrive Workflows Controller", function() {
             , program : new CMS.Models.Program({ id : 1 }) })
         });
         request.audit.reify().attr("requests", [request]);
-        spyOn(can.Model.Cacheable.prototype, "get_mapping").andReturn([]);
-        spyOn(can.Model.Cacheable.prototype, "get_binding").andReturn({ refresh_instances : function() { return $.when(); }});
+        spyOn(can.Model.Cacheable.prototype, "get_mapping").and.returnValue([]);
+        spyOn(can.Model.Cacheable.prototype, "get_binding").and.returnValue({ refresh_instances : function() { return $.when(); }});
         spyOn(ctl, "link_request_to_new_folder_or_audit_folder");
         spyOn(ctl.request_create_queue, "push");
 
-        spyOn(ctl, "create_audit_folder").andReturn($.when());
-        spyOn(ctl, "create_program_folder").andReturn($.when());
-        spyOn(RefreshQueue.prototype, "trigger").andReturn($.when());
+        spyOn(ctl, "create_audit_folder").and.returnValue($.when());
+        spyOn(ctl, "create_program_folder").and.returnValue($.when());
+        spyOn(RefreshQueue.prototype, "trigger").and.returnValue($.when());
       });
 
       it("recursively creates an audit folder", function() {
@@ -211,8 +190,8 @@ xdescribe("GDrive Workflows Controller", function() {
       });
 
       it("calls out to create_request_folder if audit is created", function() {
-        ctl.request_create_queue.push.andThrow("ERROR: queued request when audit create was not in progress");
-        can.Model.Cacheable.prototype.get_mapping.andCallFake(function() {
+        ctl.request_create_queue.push.and.throwError("ERROR: queued request when audit create was not in progress");
+        can.Model.Cacheable.prototype.get_mapping.and.callFake(function() {
           if(this instanceof CMS.Models.Audit) {
             return [{}];
           } else {
@@ -226,7 +205,7 @@ xdescribe("GDrive Workflows Controller", function() {
       it("queues Request if Audit create is in progress", function() {
         try {
           ctl._audit_create_in_progress = true;
-          ctl.link_request_to_new_folder_or_audit_folder.andThrow("ERROR: created request folder while audit create is in progress");
+          ctl.link_request_to_new_folder_or_audit_folder.and.throwError("ERROR: created request folder while audit create is in progress");
           ctl.create_folder_if_nonexistent(request);
           expect(ctl.request_create_queue.push).toHaveBeenCalledWith(request);
         } finally {
@@ -236,34 +215,6 @@ xdescribe("GDrive Workflows Controller", function() {
 
     });
 
-
-  });
-
-  describe("UserRole created event", function() {
-
-    it("calls update_permissions only for program with matching context", function() {
-      spyOn(ctl, "update_permissions").andReturn(new $.Deferred().resolve({}));
-
-      var p1 = new CMS.Models.Program({id : 1, context : { id : 1 }});
-      var p2 = new CMS.Models.Program({id : 2, context : { id : 2 }});
-
-      var role = new CMS.Models.Role({ id : 1, name : "ProgramOwner"});
-
-      var userrole = new CMS.Models.UserRole({
-        role : role.stub()
-        , context : { id : 1 }
-      });
-
-      ctl["{CMS.Models.UserRole} created"](CMS.Models.UserRole, {}, userrole);
-
-      waitsFor(function() {
-        return ctl.update_permissions.callCount;
-      }, "waiting on delayed update_permissions");
-      runs(function() {
-        expect(ctl.update_permissions).toHaveBeenCalledWith(CMS.Models.Program, jasmine.any(Object), p1);
-        expect(ctl.update_permissions).not.toHaveBeenCalledWith(CMS.Models.Program, jasmine.any(Object), p2);
-      });
-    });
 
   });
 
