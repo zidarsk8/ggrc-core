@@ -146,7 +146,7 @@
                   {{/if_match}}
                   {{#if_equals instance.status "Accepted"}}
                     <li>
-                      <small class="accepted"><em>Accepted</em></small>
+                      <small class="accepted"><em>Accepted on {{date instance.updated_at true}}</em></small>
                     </li>
                   {{/if_equals}}
                   {{#instance._undo.0}}

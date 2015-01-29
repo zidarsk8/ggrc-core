@@ -389,7 +389,8 @@ $(function() {
             , content_controller: GGRC.Controllers.TreeView
             , content_controller_options: {
               mapping: "authorized_people"
-              , allow_mapping : false
+              , allow_mapping: false
+              , allow_creating: false
             }
           },
           history: {
@@ -580,6 +581,8 @@ $(function() {
             , model: "Request"
             , show_view : GGRC.mustache_path + "/requests/tree.mustache"
             , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+            , allow_mapping: false
+            , allow_creating: false
           }
         }
 

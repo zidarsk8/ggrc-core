@@ -1100,10 +1100,17 @@ Mustache.registerHelper("link_to_tree", function () {
   return link.join("/");
 });
 
+// Returns date formated like 01/28/2015 02:59:02am PST
+// To omit time pass in a second parameter {{date updated_at true}}
 Mustache.registerHelper("date", function (date) {
   var m = moment(new Date(date.isComputed ? date() : date))
     , dst = m.isDST()
+    , no_time = arguments.length > 2
     ;
+
+  if (no_time) {
+    return m.format("MM/DD/YYYY");
+  }
   return m.zone(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
 });
 
