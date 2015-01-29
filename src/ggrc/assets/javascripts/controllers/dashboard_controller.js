@@ -643,11 +643,6 @@ can.Control("CMS.Controllers.InnerNav", {
       } else {
         $dropdown.removeClass("right-pos");
       }
-      if(remain_height - top_pos < dropdown_height) {
-        $dropdown.addClass("mid-pos");
-      } else {
-        $dropdown.removeClass("mid-pos");
-      }
       if($menu_item.length === 1) {
         $dropdown.addClass("one-item");
       } else {

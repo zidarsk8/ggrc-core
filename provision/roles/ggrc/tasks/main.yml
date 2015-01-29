@@ -30,14 +30,23 @@
   args:
     chdir: /vagrant
 
-- name: install npm modules
+- name: install global npm modules
   sudo: yes
-  with_items: ggrc_npm_modules
+  with_items: ggrc_global_npm_modules
   npm:
     name: "{{ item.name }}"
     global: yes
     state: present
     registry: http://registry.npmjs.org/
+
+- name: install local npm modules
+  sudo: no
+  with_items: ggrc_local_npm_modules
+  npm:
+    name: "{{ item.name }}"
+    state: present
+    registry: http://registry.npmjs.org/
+    path: "/vagrant/node_modules"
 
 - name: install gems
   sudo: yes

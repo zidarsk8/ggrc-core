@@ -103,14 +103,24 @@
 
 .inner-content {
   .side-wrap & {
-    margin-left: 20px;
+    margin-left: 40px;
   }
   .content-wrap & {
-    margin-right: 20px;
+    margin-right: 40px;
   }
   .full-width & {
     margin-left: 40px;
     margin-right: 40px;
+    .side-wrap {
+      .inner-content {
+        margin: 0;
+      }
+    }
+    .content-wrap {
+      .inner-content {
+        margin: 0;
+      }
+    }
   }
 }
 
