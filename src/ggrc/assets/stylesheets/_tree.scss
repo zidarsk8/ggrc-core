@@ -196,12 +196,6 @@ ul.new-tree {
         width: 80px;
       }
     }
-    .request-control {
-      float: left;
-      width: 66%;
-      margin-left: 4%;
-      text-align: right;
-    }
   }
   .request-readonly {
     width: 6px;
@@ -584,9 +578,6 @@ ul.new-tree {
       background: $lightGray !important;
       padding-right: 20px !important;
       padding-left: 20px !important;
-      .request-control {
-        text-align: right;
-      }
     }
     &.progress-color {
       > .item-main {

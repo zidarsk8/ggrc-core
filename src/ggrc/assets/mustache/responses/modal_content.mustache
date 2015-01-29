@@ -83,12 +83,12 @@
             </div>
             <div style="float:left"><input type="text" tabindex="4" name="title" placeholder="Enter title here" value="{{attributes.title}}"></div>
             <div style="clear:both">
-              <a href="javascript://" class="btn btn-success {{^attributes.title}}disabled{{/attributes.title}} no-float" data-toggle="submit">Add</a>
+              <a href="javascript://" class="btn btn-small btn-success {{^attributes.title}}disabled{{/attributes.title}} no-float" data-toggle="submit">Add</a>
             </div>
           </div>
         {{/prune_context}}
         {{/if_hooks}}
-        <div tabindex="5"></div><!this dummy div is needed for save&add another button for hidden elements for the below dynamically loaded g-drive connector buttons. -->
+        <div tabindex="5"></div><!-- this dummy div is needed for save&add another button for hidden elements for the below dynamically loaded g-drive connector buttons. -->
         {{{render_hooks 'DocumentationResponse.modal_connector'}}}
       </ggrc-modal-connector>
     </div>
@@ -128,7 +128,7 @@
             <input type="hidden" name="context" model="Context" value="{{instance.context.id}}">
             <input type="hidden" name="start_at" value="{{localize_datetime}}">
             <input type="hidden" name="end_at" value="{{localize_datetime}}">
-            <a href="javascript://" class="btn btn-success {{^attributes.title}}disabled{{/attributes.title}} no-float" data-toggle="submit" tabindex="4">Add</a>
+            <a href="javascript://" class="btn btn-small btn-success {{^attributes.title}}disabled{{/attributes.title}} no-float" data-toggle="submit" tabindex="4">Add</a>
           </div>
         {{/prune_context}}
       </ggrc-modal-connector>
@@ -163,7 +163,7 @@
           <div class="objective-selector">
             <div style="clear:both">
               <br>
-               <a class="section-add section-sticky btn"
+               <a class="section-add section-sticky btn btn-small btn-draft"
                  href="javascript://" rel="tooltip"
                  {{#instance}}{{data 'join-object'}}{{/instance}}
                  data-placement="left"

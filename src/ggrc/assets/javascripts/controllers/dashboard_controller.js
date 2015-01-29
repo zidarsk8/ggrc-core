@@ -107,7 +107,6 @@ can.Control("CMS.Controllers.Dashboard", {
         this.open_nav(el);
       }
     }
-
   , open_nav: function (el) {
     el || (el = $(".nav-trigger"));
     var options = {
