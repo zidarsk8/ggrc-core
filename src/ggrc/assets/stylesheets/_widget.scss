@@ -143,6 +143,13 @@
               }
             }
           }
+          &.filter-trigger {
+            .active {
+              i {
+                @include opacity(1);
+              }
+            }
+          }
           &.open {
             a {
               [class^="grcicon-"] {
