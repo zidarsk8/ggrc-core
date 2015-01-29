@@ -106,8 +106,6 @@ can.Control("CMS.Controllers.Dashboard", {
       } else {
         this.open_nav(el);
       }
-
-      $(window).trigger("resize");
     }
 
   , open_nav: function (el) {
@@ -128,6 +126,7 @@ can.Control("CMS.Controllers.Dashboard", {
     $fake_merge.animate({top: "136"}, options);
 
     this.display_prefs.setNavHidden("", false);
+    $(window).trigger("resize");
   }
 
   , close_nav: function (el) {
@@ -148,6 +147,7 @@ can.Control("CMS.Controllers.Dashboard", {
     $fake_merge.animate({top: "106"}, options);
 
     this.display_prefs.setNavHidden("", true);
+    $(window).trigger("resize");
   }
 
   , init_widget_descriptors: function() {
