@@ -24,7 +24,7 @@ var COLLAPSE = "collapse"
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   autoupdate : true
-  , version : 20140403 // Last updated due to default sort of InnerNav being broken.
+  , version : 20150129 // Last updated to add 2 accessors
 
   , findAll : function() {
     var that = this;
@@ -68,6 +68,22 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   , update : function(id, opts) {
     opts.version = this.version;
     return this._super(id, opts);
+  }
+
+  , getSingleton : function () {
+    var deferred,
+        prefs;
+
+    this.findAll().then(function(d) {
+        if(d.length > 0) {
+            prefs = d[0];
+        } else {
+            prefs = self.options.display_prefs = new CMS.Models.DisplayPrefs();
+            prefs.save();
+        }
+    });
+
+    return $.when(prefs);
   }
 }, {
   init : function() {
@@ -122,6 +138,11 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
   , getNavHidden: function (page_id) {
     var value = this.getObject(page_id === null ? page_id : path, NAV_HIDDEN);
+
+    if (typeof value === "undefined") {
+      this.setNavHidden("", false);
+      return false;
+    }
 
     return !!value.is_hidden;
   }

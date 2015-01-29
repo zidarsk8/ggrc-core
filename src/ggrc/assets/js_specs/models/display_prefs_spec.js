@@ -89,6 +89,10 @@ describe("display prefs model", function() {
       expect(display_prefs.getNavHidden()).toBe(true);
     });
 
+    it("returns false by default", function () {
+      expect(display_prefs.getNavHidden()).toBe(false);
+    });
+
   });
 
   xdescribe("#setCollapsed", function() {
