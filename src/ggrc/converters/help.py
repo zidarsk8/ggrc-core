@@ -10,20 +10,20 @@ from .base_row import *
 from collections import OrderedDict
 
 class HelpRowConverter(BaseRowConverter):
-  modal_class = Help
+  model_class = Help
 
   def setup_object(self):
     slug = self.attrs.get('slug')
     if slug:
-      self.obj = self.modal_class.query.filter_by(slug = slug).first()
-      self.obj = self.obj or self.importer.find_object(self.modal_class, slug)
-      self.obj = self.obj or self.modal_class()
-      self.importer.add_object(self.modal_class, slug, self.obj)
+      self.obj = self.model_class.query.filter_by(slug = slug).first()
+      self.obj = self.obj or self.importer.find_object(self.model_class, slug)
+      self.obj = self.obj or self.model_class()
+      self.importer.add_object(self.model_class, slug, self.obj)
       if self.obj.id:
         self.add_warning('slug', "{} already exists and will be updated.".format(slug))
       return self.obj
     else:
-      self.obj = self.modal_class()
+      self.obj = self.model_class()
       return self.obj
 
   def reify(self):
@@ -36,11 +36,11 @@ class HelpRowConverter(BaseRowConverter):
 
 class HelpConverter(BaseConverter):
 
-  metadata_map = OrderedDict([
+  _metadata_map = OrderedDict([
     ('Type','type'),
   ])
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('Code', 'slug'),
     ('Title', 'title'),
     ('Content', 'content')
@@ -55,4 +55,3 @@ class HelpConverter(BaseConverter):
     yield []
     yield []
     yield self.object_map.keys()
-

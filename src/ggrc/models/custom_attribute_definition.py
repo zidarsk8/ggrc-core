@@ -28,3 +28,10 @@ class CustomAttributeDefinition(Base, Titled, db.Model):
       'helptext',
       'placeholder',
   ]
+
+  class ValidTypes(object):
+    TEXT = "Text"
+    RICH_TEXT = "Rich Text"
+    DROPDOWN = "Dropdown"
+    CHECKBOX = "Checkbox"
+    FILE_UPLOAD = "File upload"
