@@ -5,8 +5,7 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-<h1 class="{{model.category}}">
-
+<h1 class="entities">
   {{#is_dashboard}}
     <i class="grciconlarge-dashboard-new"></i>
     My Work
@@ -16,10 +15,17 @@
       </i>
     </a>
   {{else}}
-    <div class="grcobject {{model.category}}" rel="tooltip" data-placement="bottom"
-      title="{{model.title_singular}}">
-      <i class="grcicon-{{model.table_singular}}"></i>
-    </div>
-  	{{firstnonempty instance.name instance.email}}
+    <span class="title-prev">
+      <a class="title-trigger" href="/dashboard"><i class="grciconlarge-dashboard-new"></i></a>
+      My Dashboard
+    </span>
+    <span class="title-slide">
+      <i class="grciconlarge-{{model.table_singular}}"></i>
+      {{firstnonempty instance.name instance.email}}
+    </span>
+    <a class="nav-trigger active" href="javascript://">
+      <i class="grciconlarge-nav-trigger" rel="tooltip" data-placement="left" title="" data-original-title="Hide menu">
+      </i>
+    </a>
   {{/is_dashboard}}
 </h1>

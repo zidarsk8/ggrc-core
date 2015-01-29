@@ -97,7 +97,7 @@
             
             {{#if_match name '\\\\S'}}
               {{#name}}
-                <div class="row-fluid">
+                <div class="row-fluid wrap-row">
                   <div class="span12">
                     <h6>Name</h6>
                     <h3>{{name}}</h3>
@@ -108,7 +108,7 @@
 
             {{#if_match email '\\\\S'}}
               {{#email}}
-                <div class="row-fluid">
+                <div class="row-fluid wrap-row">
                   <div class="span12">
                     <h6>Email</h6>
                     <p>
@@ -123,7 +123,7 @@
 
             {{#if_match company '\\\\S'}}
               {{#company}}
-                <div class="row-fluid">
+                <div class="row-fluid wrap-row">
                   <div class="span12">
                     <h6>Company</h6>
                     <h3>{{company}}</h3>
@@ -132,7 +132,7 @@
               {{/company}}
             {{/if_match}}
 
-            <div class="row-fluid">
+            <div class="row-fluid wrap-row">
               <div class="span12">
                 <h6>Authorizations</h6>
                 <p>
@@ -153,7 +153,7 @@
     </li>
   {{/each}}
 
-  <li class="tree-footer tree-item tree-item-add">
+  <li class="tree-item tree-item-add">
     {{#if has_prev_page}}
     <a href="javascript://" class="view-more-paging">
       Previous Page

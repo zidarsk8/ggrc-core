@@ -162,6 +162,13 @@ a {
   color: $black;
 }
 
+small {
+  font-size: 11px;
+  &.accepted {
+    color: $green;
+  }
+}
+
 .inline {
   display:inline;
 }
@@ -340,7 +347,7 @@ a {
   }
 }
 
-@each $status_label in draft, inprogress, overdue, final, active, inprogress, verified {
+@each $status_label in draft, inprogress, overdue, final, active, inprogress, verified, planned, accepted {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }
@@ -1014,12 +1021,6 @@ select.multiple-selector {
   }
 }
 
-a {
-  &.object-title {
-    color: $text;
-  }
-}
-
 .top-separator {
   border-top:1px dotted #ccc;
   padding-top:20px;
@@ -1256,7 +1257,8 @@ p {
 .state-value {
   text-transform: uppercase;
   font-weight: bold;
-  &.draft {
+  &.draft,
+  &.planned {
     color: $draftGray;
   }
   &.final {
@@ -1267,6 +1269,17 @@ p {
   }
   .tree-title-area & {
     font-weight: normal;
+  }
+}
+
+.inner-count-list {
+  @include reset-list();
+  li {
+    margin-left: -2px;
+    margin-bottom: 6px;
+    [class^="grcicon-"] {
+      margin-top: 0 !important;
+    }
   }
 }
 

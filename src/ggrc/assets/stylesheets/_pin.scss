@@ -11,23 +11,6 @@
     overflow: auto;
     padding: 15px 20px 20px 20px;
   }
-  .inner-count-list {
-    @include reset-list();
-    li {
-      margin-left: -2px;
-      margin-bottom: 6px;
-    }
-  }
-}
-
-.info {
-  .inner-count-list {
-    @include reset-list();
-    li {
-      margin-left: -2px;
-      margin-bottom: 6px;
-    }
-  }
 }
 
 .pin-action {
