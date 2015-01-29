@@ -47,6 +47,7 @@
   WorkflowExtension.init_mappings = function init_mappings() {
     var Proxy = GGRC.MapperHelpers.Proxy,
         Direct = GGRC.MapperHelpers.Direct,
+        Indirect = GGRC.MapperHelpers.Indirect,
         Cross = GGRC.MapperHelpers.Cross,
         Multi = GGRC.MapperHelpers.Multi,
         CustomFilter = GGRC.MapperHelpers.CustomFilter,
@@ -78,6 +79,10 @@
             null, "object", "TaskGroupObject", "task_group", "task_group_objects"),
           workflow: Direct(
             "Workflow", "task_groups", "workflow")
+        },
+
+        TaskGroupObject: {
+          object: Direct('object')
         },
 
         Workflow: {
@@ -174,6 +179,7 @@
           task_group_object: Direct(
             "TaskGroupObject", "task_group_objects", "task_group_object"
           ),
+          _object: Direct(null, null, 'object'),
           //task_group_object: Direct(
           //  "TaskGroupObject", "cycle", "tasks")
           cycle_task_group_object_tasks: Direct(
@@ -198,7 +204,10 @@
           cycle_task_entries: Direct(
             "CycleTaskEntry",
             "cycle_task_group_object_task",
-            "cycle_task_entries")
+            "cycle_task_entries"),
+          _object: Cross(
+            "cycle_task_group_object", '_object'
+          )
         },
 
         CycleTaskEntry: {

@@ -1760,6 +1760,25 @@ Mustache.registerHelper("is_profile", function (parent_instance, options) {
     return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("current_user_is_admin", function(options) {
+  if(Permission.is_allowed("__GGRC_ADMIN__")) {
+    return options.fn(options.contexts);
+  }
+  return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("owned_by_current_user", function(instance, options) {
+  var current_user_id = GGRC.current_user.id;
+  instance = Mustache.resolve(instance);
+  owners = instance.attr('owners');
+  for(var i =0; i < owners.length; i++) {
+    if(current_user_id == owners[i].id) {
+      return options.fn(options.contexts);
+    }
+  }
+  return options.inverse(options.contexts);
+});
+
 Mustache.registerHelper("person_owned", function (owner_id, options) {
   owner_id = resolve_computed(owner_id);
   var page_instance = GGRC.page_instance();
