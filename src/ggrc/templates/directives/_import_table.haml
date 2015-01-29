@@ -21,19 +21,12 @@
         %th
           {{c}}
   %tbody
-    %tr
-      %td{colspan:"{{width_pcts|length}}",cellspacing:"0",cellpadding:"0"}
-        .inner-ggrc-table
-          %table.inner-ggrc-table{cellspacing:"0",cellpadding:"0"}
-            -for a in width_pcts
-              %col{style:"width:{{a}}%"}
-            %tbody
-              -for result in results
-                -set parity = "even" if (loop.index % 2 == 0) else "odd"
-                %tr{class:"={parity}"}
-                  -for col_name in column_names
-                    -set cellvalue = result[col_name]
-                    -include "directives/_import_cell.haml"
-                  -for definition in custom_attribute_definitions
-                    -set cellvalue = result.handlers[definition]
-                    -include "directives/_import_cell.haml"
+    -for result in results
+      -set parity = "even" if (loop.index % 2 == 0) else "odd"
+      %tr{class:"={parity}"}
+        -for col_name in column_names
+          -set cellvalue = result[col_name]
+          -include "directives/_import_cell.haml"
+        -for definition in custom_attribute_definitions
+          -set cellvalue = result.handlers[definition]
+          -include "directives/_import_cell.haml"
