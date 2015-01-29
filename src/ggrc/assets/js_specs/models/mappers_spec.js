@@ -5,7 +5,6 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-
 describe("mappers", function() {
   
   var LL;
