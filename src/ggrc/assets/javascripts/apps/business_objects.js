@@ -393,7 +393,6 @@ $(function() {
             }
           },
           history: {
-            content_controller: CMS.Controllers.TreeView,
             widget_id: "history",
             widget_name: "History",
             widget_icon: "history",
