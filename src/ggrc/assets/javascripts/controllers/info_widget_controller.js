@@ -40,6 +40,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
         object_menu : this.options.object_menu,
         workflow_view : GGRC.mustache_path + "/dashboard/info/workflow_progress.mustache",
         workflow_data: {},
+        workflow_count: 0,
         task_view : GGRC.mustache_path + "/dashboard/info/my_tasks.mustache",
         task_data: {},
         //audit_view : GGRC.mustache_path + "/dashboard/info/my_audits.mustache",
@@ -55,6 +56,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
     var test_a = this.options.context;
     //If dashboard then do these 2 lines below
     if (/dashboard/.test(window.location)){
+      this.options.initial_wf_size = 5;
       this.load_my_workflows();
       this.initialize_task_filter();
       this.load_my_tasks();
@@ -151,16 +153,16 @@ can.Control("GGRC.Controllers.InfoWidget", {
           else if (end_date.getTime() < first_end_date.getTime())
             first_end_date = end_date;
 
-          //Any task not finished or verified is subject to overdue
-          if (data.status === 'Finished')
-            finished++;
-          else if (data.status === 'Verified')
+          //Any task not verified is subject to overdue
+          if (data.status === 'Verified')
             verified++;
           else {
             if (end_date.getTime() < today.getTime()) {
               over_due++;
               self.options.context.attr('error_msg', 'Some tasks are over due!')
             }
+            else if (data.status === 'Finished')
+              finished++;
             else if (data.status === 'InProgress')
               in_progress++;
             else if (data.status === 'Declined')
@@ -169,7 +171,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
               assigned++;
           }
         }
-        //Calculate %
+        //Update Task_data object for workflow and Calculate %
         if (task_count > 0) {
           task_data.task_count = task_count;
           task_data.finished = finished;
@@ -184,6 +186,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
           task_data.over_due_percentage = Math.floor((over_due * 100) / task_count);
           task_data.assigned = assigned;
           task_data.assigned_percentage = Math.floor((assigned * 100) / task_count);
+          task_data.first_end_dateD = first_end_date;
           task_data.first_end_date = first_end_date.toLocaleDateString();
           //calculate days left for first_end_date
           if(today.getTime() >= first_end_date.getTime())
@@ -205,13 +208,43 @@ can.Control("GGRC.Controllers.InfoWidget", {
       return dfd;
   }
 
+  /*
+    filter_current_workflows filters the workflows with current tasks in a 
+    new array and returns the new array.
+    filter_current_workflows should be called after update_tasks_for_workflow.
+    It looks at the task_data.task_count for each workflow
+    For workflow with current tasks, task_data.task_count must be > 0;
+  */
+
+  , filter_current_workflows: function(workflows){
+    var filtered_wfs = [];
+
+    can.each(workflows, function(item){
+      if (item.task_data) {
+        if (item.task_data.task_count > 0)
+          filtered_wfs.push(item);
+      }
+    })
+    return filtered_wfs;
+  }
+
+  /*
+    sort_by_end_date sorts workflows in assending order with respect to task_data.first_end_date
+    This should be called with workflows with current tasks.
+  */
+  , sort_by_end_date: function(a, b) {
+      return (a.task_data.first_end_dateD.getTime() - b.task_data.first_end_dateD.getTime());
+  }
+
   , load_my_workflows: function(){
     var self = this,
         my_view = this.options.context.workflow_view,
         component_class = 'ul.workflow-tree',
         prepend = true,
         workflow_data = {},
-        wfs;
+        wfs,              // list of all workflows
+        cur_wfs,          // list of workflows with current cycles
+        cur_wfs5;         // list of top 5 workflows with current cycle
 
       GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
       .then(function(result_set){
@@ -227,9 +260,25 @@ can.Control("GGRC.Controllers.InfoWidget", {
           }));
       }).then(function(){
         if(wfs.length > 0){
-          //TBD sort workflows for the first 5 workflow-end-dates
-          workflow_data.list = wfs;
+          //Filter workflows with a current cycle
+          cur_wfs = self.filter_current_workflows(wfs);
+          self.options.context.attr('workflow_count', cur_wfs.length);
+          //Sort the workflows in accending order by first_end_date
+          cur_wfs.sort(self.sort_by_end_date);
+          workflow_data.cur_wfs = cur_wfs;
+
+          if (cur_wfs.length > self.options.initial_wf_size) {
+            cur_wfs5 = cur_wfs.slice(0, self.options.initial_wf_size);
+          } else {
+            cur_wfs5 = cur_wfs;
+            self.element.find('a.workflow-trigger').hide();
+          }
+
+          workflow_data.cur_wfs5 = cur_wfs5
+          workflow_data.list = cur_wfs5;
+          self.options.workflow_data = workflow_data;
           self.options.context.attr('workflow_data', workflow_data);
+          self.element.find(component_class).empty();
           self.insert_options(workflow_data, my_view, component_class, prepend);
         }
       });
@@ -410,7 +459,6 @@ can.Control("GGRC.Controllers.InfoWidget", {
   }
 
   , "input[type=text], input[type=checkbox].filter-overdue, select change" : function(el, ev) {
-    //console.log("selection changed-------");
     var filter_task_data = {};
     filter_task_data.list = [];
     var filters = {};
@@ -420,7 +468,6 @@ can.Control("GGRC.Controllers.InfoWidget", {
     var wf = this.element.find('input[name="workflow"]').val();
     var status = this.element.find('select[name="status"]').val();
     var overdue = this.element.find('input[type=checkbox].filter-overdue:checked').length;
-    //console.log(obj + " : " + wf + " : " + status + " : " + overdue);
 
     //set up task filter
     this.options.task_filter.status = status;
@@ -444,6 +491,32 @@ can.Control("GGRC.Controllers.InfoWidget", {
     } else {
       this.load_my_tasks();
     }
+    ev.stopPropagation();
+  }
+
+  // Click action to show all workflows
+  , "a.workflow-trigger.show-all click" : function(el, ev) {
+    this.options.workflow_data.list = this.options.workflow_data.cur_wfs;
+    this.element.find('ul.workflow-tree').empty();
+    this.insert_options(this.options.workflow_data, this.options.context.workflow_view, 'ul.workflow-tree', true);
+
+    el.text('Show top 5 workflows');
+    el.removeClass('show-all');
+    el.addClass('show-5');
+
+    ev.stopPropagation();
+  }
+
+  //Show onlt top 5 workflows
+  , "a.workflow-trigger.show-5 click" : function(el, ev) {
+    this.options.workflow_data.list = this.options.workflow_data.cur_wfs5;
+    this.element.find('ul.workflow-tree').empty();
+    this.insert_options(this.options.workflow_data, this.options.context.workflow_view, 'ul.workflow-tree', true);
+
+    el.text('Show all my workflows');
+    el.removeClass('show-5');
+    el.addClass('show-all');
+
     ev.stopPropagation();
   }
 
