@@ -10,7 +10,10 @@
       <div class="span2">
         <div class="filter-title">
           <h6>
-            Filter {{instance.class.title_singular}}
+            Filter
+            {{#instance}}
+              {{firstnonempty constructor.title_singular}}
+            {{/instance}}
           </h6>
         </div>
       </div>
