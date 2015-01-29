@@ -10,7 +10,145 @@ describe("mappers", function() {
   });
 
   describe("ListBinding", function() {
-    it("TODO add list binding specs", function() {});
+
+    describe("#init", function() {
+
+      it("sets instance and loader to supplied arguments", function() {
+        var lb = new LL.ListBinding(1, 2);
+        expect(lb.instance).toBe(1);
+        expect(lb.loader).toBe(2);
+      });
+
+      it("creates a new observable list", function() {
+        expect(new LL.ListBinding().list).toEqual(jasmine.any(can.List));
+      });
+
+    });
+
+    describe("#refresh_stubs", function() {
+
+      it("calls refresh_stubs on its loader", function() {
+        var loader = jasmine.createSpyObj('loader', ['refresh_stubs']);
+        var binding = new LL.ListBinding({}, loader);
+        binding.refresh_stubs();
+        expect(loader.refresh_stubs).toHaveBeenCalledWith(binding);
+      });
+
+    });
+
+    describe("#refresh_instances", function() {
+
+      it("calls refresh_instances on its loader", function() {
+        var loader = jasmine.createSpyObj('loader', ['refresh_instances']);
+        var binding = new LL.ListBinding({}, loader);
+        binding.refresh_instances();
+        expect(loader.refresh_instances).toHaveBeenCalledWith(binding);
+      });
+
+    });
+
+    describe("#refresh_count", function() {
+
+      var binding;
+      beforeEach(function() {
+        binding = new LL.ListBinding({}, {});
+      });
+
+      it("calls refresh_stubs on itself", function() {
+        spyOn(binding, "refresh_stubs").and.returnValue($.when());
+        binding.refresh_count();
+        expect(binding.refresh_stubs).toHaveBeenCalledWith();
+      });
+
+      it("returns a deferred that resolves to a compute", function(done) {
+        var deferred;
+        spyOn(binding, "refresh_stubs").and.returnValue($.when());
+        deferred = binding.refresh_count();
+        expect(typeof deferred.then).toBe("function");
+        deferred.then(function(value) {
+          expect(value.isComputed).toBeTruthy();
+          done();
+        }, function() {
+          fail("Deferred returned from refresh_count was rejected");
+        });
+      });
+
+      it("...and the compute returns the list length", function(done) {
+        var deferred;
+        binding.list.push(1, 2, 3);
+        spyOn(binding, "refresh_stubs").and.returnValue($.when());
+        deferred = binding.refresh_count();
+        deferred.then(function(value) {
+          expect(value()).toBe(3);
+          done();
+        }, function() {
+          fail("Deferred returned from refresh_count was rejected");
+        });
+      });
+
+    });
+
+    describe("#refresh_list", function() {
+
+      var binding, loader, other_binding;
+      beforeEach(function() {
+        other_binding = jasmine.createSpyObj('other_binding', ['refresh_instances']);
+        other_binding.refresh_instances.and.returnValue($.when());
+        loader = jasmine.createSpyObj('loader', ['attach', 'refresh_instances']);
+        loader.refresh_instances.and.returnValue($.when());
+        loader.attach.and.returnValue(other_binding);
+        spyOn(LL.ReifyingListLoader, "newInstance").and.returnValue(loader);
+        binding = new LL.ListBinding({}, {});
+        spyOn(binding, "refresh_instances").and.returnValue($.when());
+      });
+
+      it("attaches its instance to a new ReifyingListLoader", function() {
+        binding.refresh_list();
+        expect(LL.ReifyingListLoader.newInstance).toHaveBeenCalledWith(binding);
+        expect(loader.attach).toHaveBeenCalledWith(binding.instance);
+      });
+
+      it("sets the name of the ReifyingListLoader's ListBinding to its own name plus \"_instances\"", function() {
+        binding.name = "foo";
+        binding.refresh_list();
+        expect(other_binding.name).toBe("foo_instances");
+      });
+
+      it("refreshes instances on the new binding", function() {
+        binding.refresh_list();
+        expect(other_binding.refresh_instances).toHaveBeenCalledWith(binding);
+      });
+
+      it("refreshes its own instances after refreshing the new binding's instances", function(done) {
+        var dfd = binding.refresh_list();
+        dfd.then(function() {
+          expect(binding.refresh_instances).toHaveBeenCalledWith();
+          done();
+        }, function() {
+          fail("deferred was rejected in refresh_instances");
+        });
+      });
+    });
+
+    describe("#refresh_instance", function() {
+
+      it("enqueues the instance in a triggered RefreshQueue", function() {
+        spyOn(RefreshQueue.prototype, "enqueue");
+        spyOn(RefreshQueue.prototype, "trigger");
+        new LL.ListBinding(1, {}).refresh_instance();
+        expect(RefreshQueue.prototype.enqueue).toHaveBeenCalledWith(1);
+        expect(RefreshQueue.prototype.trigger).toHaveBeenCalledWith();
+      });
+
+      it("returns the deferred from the refresh queue", function() {
+        var dfd = $.when();
+        spyOn(RefreshQueue.prototype, "enqueue");
+        spyOn(RefreshQueue.prototype, "trigger").and.returnValue(dfd);
+        expect(new LL.ListBinding(1, {}).refresh_instance()).toBe(dfd);
+      });
+
+    });
+
   });
 
   describe("MappingResult", function() {
