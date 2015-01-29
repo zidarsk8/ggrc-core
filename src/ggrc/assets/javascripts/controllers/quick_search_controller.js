@@ -330,28 +330,23 @@ can.Control("CMS.Controllers.LHN", {
   , init_lhn: function() {
       var self = this;
 
-      CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+      CMS.Models.DisplayPrefs.getSingleton().done(function(prefs) {
         var checked
           , $lhs = $("#lhs")
           , lhn_search_dfd
           ;
 
-        if(prefs.length < 1) {
-          prefs.push(new CMS.Models.DisplayPrefs());
-          prefs[0].save();
-        }
-
-        self.options.display_prefs = prefs[0];
+        self.options.display_prefs = prefs;
 
         checked = true;
-        if (typeof prefs[0].getLHNState().my_work !== "undefined")
-          checked = !!prefs[0].getLHNState().my_work;
+        if (typeof prefs.getLHNState().my_work !== "undefined")
+          checked = !!prefs.getLHNState().my_work;
         self.obs.attr("my_work", checked);
 
         lhn_search_dfd = $lhs
           .cms_controllers_lhn_search({
             observer: self.obs,
-            display_prefs: prefs[0]
+            display_prefs: prefs
           })
           .control('lhn_search')
           .display();
@@ -565,19 +560,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         , template_path = GGRC.mustache_path + this.element.data('template')
         ;
 
-
-      if(!prefs) {
-        prefs_dfd = CMS.Models.DisplayPrefs.findAll().then(function(d) {
-          if(d.length > 0) {
-            prefs = self.options.display_prefs = d[0];
-          } else {
-            prefs = self.options.display_prefs = new CMS.Models.DisplayPrefs();
-            prefs.save();
-          }
-        });
-      } else {
-        prefs_dfd = $.when(prefs);
-      }
+      prefs_dfd = CMS.Models.DisplayPrefs.getSingleton();
 
       // 2-way binding is set up in the view using can-value, directly connecting the
       //  search box and the display prefs to save the search value between page loads.
