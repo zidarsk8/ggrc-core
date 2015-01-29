@@ -347,7 +347,7 @@ small {
   }
 }
 
-@each $status_label in draft, inprogress, overdue, final, active, inprogress, verified {
+@each $status_label in draft, inprogress, overdue, final, active, inprogress, verified, planned {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }
@@ -1257,7 +1257,8 @@ p {
 .state-value {
   text-transform: uppercase;
   font-weight: bold;
-  &.draft {
+  &.draft,
+  &.planned {
     color: $draftGray;
   }
   &.final {

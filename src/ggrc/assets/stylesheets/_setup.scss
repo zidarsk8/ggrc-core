@@ -397,6 +397,9 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 %status-draft {
   background: $status-draft;
 }
+%status-planned {
+  background: $status-draft;
+}
 %status-inprogress {
   background: $lightBlue;
 }
