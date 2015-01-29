@@ -89,6 +89,29 @@ can.Control("CMS.Controllers.Dashboard", {
       }
     }
 
+  , ".nav-trigger click": function(el, ev) {
+      var options = {
+            duration: 800,
+            easing: 'easeOutExpo'
+          },
+          $tooltip = el.find("i"),
+          $nav = el.closest("body").find(".top-inner-nav"),
+          $lhn_nav = el.closest("body").find(".lhs-holder"),
+          $content = el.closest("body").find(".object-area"),
+          $fake_merge = $content.add($lhn_nav);
+      if(el.hasClass("active")) {
+        el.removeClass("active");
+        $tooltip.attr("data-original-title", "Show menu");
+        $nav.animate({top: "66"}, options);
+        $fake_merge.animate({top: "106"}, options);
+      } else {
+        el.addClass("active");
+        $tooltip.attr("data-original-title", "Hide menu");
+        $nav.animate({top: "96"}, options);
+        $fake_merge.animate({top: "136"}, options);
+      }
+    }
+
   , init_widget_descriptors: function() {
       var that = this;
 
