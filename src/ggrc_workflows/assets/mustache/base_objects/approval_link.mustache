@@ -6,15 +6,15 @@
   {{#person_owned instance.owner.id}}
     {{#with_mapping_count instance 'current_approval_cycles'}}
       {{#if_equals count 0}}
-      <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
-        <i class="grcicon-review"></i>
-        Submit For Review
-      </a>
+        <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
+          <i class="grcicon-review"></i>
+          Submit For Review
+        </a>
       {{else}}
-      <i class="grcicon-review"></i>
-      <span class="setup-link">Review in progress</span>
-      {{/if}}
-    {{/with_mapping}}
+        <i class="grcicon-review"></i>
+        <span class="setup-link">Review in progress</span>
+      {{/if_equals}}
+    {{/with_mapping_count}}
   {{/person_owned}}
-  {{/if}}
+  {{/if_equals}}
 </li>
