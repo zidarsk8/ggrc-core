@@ -19,7 +19,8 @@ var COLLAPSE = "collapse"
 , PBC_LISTS = "pbc_lists"
 , GLOBAL = "global"
 , LHN_STATE = "lhn_state"
-, path = window.location.pathname;
+, NAV_HIDDEN = "nav_hidden"
+, path = window.location.pathname.replace(/\./g, "/");
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   autoupdate : true
@@ -110,6 +111,19 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     }
 
     return widget_id ? collapsed.attr(widget_id) : collapsed;
+  }
+
+  , setNavHidden: function (page_id, is_hidden) {
+    this.makeObject(page_id === null ? page_id : path, NAV_HIDDEN).attr("is_hidden", !!is_hidden);
+    
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getNavHidden: function (page_id) {
+    var value = this.getObject(page_id === null ? page_id : path, NAV_HIDDEN);
+
+    return !!value.is_hidden;
   }
 
   , setLHNavSize : function(page_id, widget_id, size) {

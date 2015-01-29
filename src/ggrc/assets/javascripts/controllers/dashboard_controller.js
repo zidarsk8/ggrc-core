@@ -99,6 +99,7 @@ can.Control("CMS.Controllers.Dashboard", {
           $lhn_nav = el.closest("body").find(".lhs-holder"),
           $content = el.closest("body").find(".object-area"),
           $fake_merge = $content.add($lhn_nav);
+
       if(el.hasClass("active")) {
         el.removeClass("active");
         $tooltip.attr("data-original-title", "Show menu");
@@ -110,6 +111,8 @@ can.Control("CMS.Controllers.Dashboard", {
         $nav.animate({top: "96"}, options);
         $fake_merge.animate({top: "136"}, options);
       }
+
+      $(window).trigger("resize");
     }
 
   , init_widget_descriptors: function() {
@@ -412,7 +415,7 @@ can.Control("CMS.Controllers.InnerNav", {
           placeholder: 'drop-placeholder'
         , items : "li:not(.hidden-widgets-list)"
         , disabled: true
-      })
+      });
     }
 
   , " sortupdate": "apply_widget_list_sort"
