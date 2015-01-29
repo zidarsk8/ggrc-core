@@ -347,7 +347,7 @@ small {
   }
 }
 
-@each $status_label in draft, inprogress, overdue, final, active, inprogress, verified, planned {
+@each $status_label in draft, inprogress, overdue, final, active, inprogress, verified, planned, accepted {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }
