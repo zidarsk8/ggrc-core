@@ -1154,22 +1154,52 @@
 }
 
 // new filters (former - advanced-filters)
-
 .inline-filtering {
-  line-height:30px;
-  background:#ddd;
-  border-top:1px solid #ccc;
-  border-bottom:1px solid #ccc;
-  padding: 0;
+  line-height: 39px;
+  height: 39px;
+  background: $white;
+  border-bottom: 3px solid $warmGray;
+  padding: 0 16px 0 10px;
+  margin-bottom: 8px;
   .filter-title {
-    padding-left: 20px;
+    h6 {
+      @include oneline();
+      font-weight: normal;
+      text-transform: none;
+      font-size: 16px;
+      line-height: 20px;
+      padding-top: 10px;
+    }
   }
-  input {
-    margin: -1px 3px 0 0;
-    line-height: 14px;
-    height: 14px;
+  .filter-button {
+    @include clearfix();
+    input[type="submit"] {
+      margin-top: 7px;
+      float: right;
+    }
+    i {
+      float: right;
+      margin-top: 12px !important;
+      margin-left: 10px;
+      @include opacity(0.25);
+      @include transition(opacity 0.2s ease);
+      &:hover {
+        @include opacity(1);
+      }
+    }
+  }
+  input[type="text"] {
+    @include box-shadow(none);
+    @include border-radius(0);
+    line-height: 26px;
+    height: 26px;
     padding: 2px 4px;
     font-size: 12px;
+    margin: -2px 0 0 0;
+    box-sizing: border-box;
+    &.input-wide {
+      width: 100%;
+    }
     &.input-medium {
       width: 170px;
     }
@@ -1177,7 +1207,7 @@
       width: 80px;
       padding: 2px 4px 2px 26px;
       &.date {
-        background-position: -342px -367px;
+        background-position: -342px -365px;
       }
     }
   }
@@ -1211,7 +1241,7 @@
     float:right;
     li {
       display:inline-block;
-      margin-right:20px;
+      margin-left: 20px;
     }
   }
   &.task-filtering {
