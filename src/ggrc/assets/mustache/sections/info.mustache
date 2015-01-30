@@ -7,14 +7,14 @@
 
 {{#instance}}
   <section class="info">
-    {{#is_info_pane}}
+    {{#is_info_pin}}
     <div class="clearfix">
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
       <div class="tier-content">
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       </div>
     </div>
-    {{/is_info_pane}}
+    {{/is_info_pin}}
 
     {{#is_allowed 'update' instance context='for'}}  
       <div class="details-wrap">
@@ -31,7 +31,7 @@
       </div>
     {{/is_allowed}}
 
-    {{^is_info_pane}}
+    {{^is_info_pin}}
       <div class="tier-content">
         <div class="row-fluid wrap-row">
           <div class="span12">
@@ -45,7 +45,7 @@
           </div>
         </div>
       </div>
-    {{/is_info_pane}}
+    {{/is_info_pin}}
 
       {{#using directive=instance.directive}}
         <div class="row-fluid wrap-row">

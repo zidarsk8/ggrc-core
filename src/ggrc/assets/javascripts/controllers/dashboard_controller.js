@@ -28,7 +28,7 @@ can.Control("CMS.Controllers.Dashboard", {
           this.init_inner_nav();
         }
         this.update_inner_nav();
-          
+
         // Before initializing widgets, hide the container to not show
         // loading state of multiple widgets before reducing to one.
         this.hide_widget_area();
@@ -36,6 +36,7 @@ can.Control("CMS.Controllers.Dashboard", {
         if (!this.widget_area_controller) {
           this.init_widget_area();
         }
+        this.init_info_pin();
       }.bind(this));
     }
 
@@ -99,6 +100,10 @@ can.Control("CMS.Controllers.Dashboard", {
         setTimeout(this.close_nav.bind(this), 500);
       }
     }
+
+  , init_info_pin: function() {
+    new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
+  }
 
   , ".nav-trigger click": function(el, ev) {
       if(el.hasClass("active")) {
@@ -332,7 +337,6 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
     init: function() {
       this.options.model = this.options.instance.constructor;
       this._super();
-      this.init_info_pane();
     }
 
   , init_page_title: function() {
@@ -351,9 +355,6 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
 
       this.options.widget_descriptors = this.options.widget_descriptors || {};
     }
-  , init_info_pane: function() {
-      new CMS.Controllers.InfoPane(this.element.find('.pin-content'), {});
-  }
 });
 
 

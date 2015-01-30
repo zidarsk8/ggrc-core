@@ -6,7 +6,7 @@
 */
 
 
-can.Control("CMS.Controllers.InfoPane", {
+can.Control("CMS.Controllers.InfoPin", {
   defaults: {
     view: GGRC.mustache_path + "/base_objects/info.mustache"
   }
@@ -63,15 +63,15 @@ can.Control("CMS.Controllers.InfoPane", {
     this.element.html(can.view(view, {
       instance: instance,
       model: instance.class,
-      is_info_pane: true,
+      is_info_pin: true,
       options: options,
       result: options.result
     }));
 
-    // Load trees inside info pane
+    // Load trees inside info pin
     this.loadChildTrees();
 
-    // Make sure pane is visible
+    // Make sure pin is visible
     if (!this.element.height()) {
       this.element.animate({ height: $(window).height() / 3 }, {
         duration: 800,

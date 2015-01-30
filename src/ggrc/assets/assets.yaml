@@ -69,7 +69,7 @@ dashboard-js-files:
   - controllers/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
   - controllers/mapping_count_controller.js
-  - controllers/info_pane_controller.js
+  - controllers/info_pin_controller.js
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
