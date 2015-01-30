@@ -45,32 +45,33 @@
             <a href="javascript://" class="workflow-trigger show-all">Show all my workflows</a>
           </section>
         {{/if}}
-        {{#if task_view}}
-          <section class="widget dashboard small-margin">
-            <header class="header widget-nav">
-              <div class="row-fluid">
-                <div class="span12">
-                  <ul>
-                    <li class="active">
-                      <a href="javascript://">
-                        My Tasks ({{task_count}})
-                      </a>
-                    </li>
-                    <!--li>
-                      <a href="#">
-                        Audit Requests (2)
-                      </a>
-                    </li-->
-                  </ul>
-                </div>
+
+        <section class="widget dashboard small-margin">
+          <header class="header widget-nav">
+            <div class="row-fluid">
+              <div class="span12">
+                <ul>
+                  <li class="active task-tab">
+                    <a href="javascript://">
+                      My Tasks ({{task_count}})
+                    </a>
+                  </li>
+                  <li class="audit-tab">
+                    <a href="javascript://">
+                      Audit Requests ({{audit_count}})
+                    </a>
+                  </li>
+                </ul>
               </div>
-            </header>
-            <section class="content">
-              {{> /static/mustache/dashboard/info/task_filters.mustache}}
-              {{{ renderLive task_view }}}
-            </section>
-          </section><!-- Widget end -->
-        {{/if}}
+            </div>
+          </header>
+          <section class="content"> 
+            {{> /static/mustache/dashboard/info/task_filters.mustache}}
+            {{{ renderLive task_view }}}
+            {{{ renderLive audit_view }}}
+          </section>
+        </section><!-- Widget end -->
+
       </div><!-- inner-content end -->
     </div>
   </div>
