@@ -1,0 +1,41 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita
+    Maintained By: sasmita
+}}
+
+<ul class="tree-structure new-tree dashboard-tree audit-tree">
+	{{#each list}}
+	{{log "Sasmita---------------"}}{{log this}}
+		<li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+			<div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
+				<div class="item-wrap">
+					<div class="openclose">
+		  		<!--/div>
+      		<div class="select"--> <!-- Fix in css- this puts the data in 2 lines -->
+      			<div class="item-data">
+          		<div class="row-fluid">
+          			<span class="status-label status-{{to_class instance.status '_'}}"></span>
+        				<!--i class="grcicon-arrow-right"></i-->
+        				<div class="span4">
+		              <div class="title tree-title-area">
+		                {{instance.title}}
+		              </div>
+		            </div>
+								
+							</div> <!-- row-fluid end -->
+						</div> <!-- item-data end -->
+					</div> <!-- openclose end -->
+				</div> <!-- item-wrap end -->
+		  </div> <!-- item-main end -->
+
+		  <!-- Tier 2 info -->
+		  <div class="tier-2-info item-content">
+		  	<div class="tier-2-info-content">
+		  		Details will go here--------
+		  	</div>	
+		  </div> <!-- tier-2-info -->
+		</li>
+	{{/each}}
+</ul>
