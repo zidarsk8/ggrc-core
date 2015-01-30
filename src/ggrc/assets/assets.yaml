@@ -139,6 +139,7 @@ dashboard-js-template-files:
   - dashboard/info/my_tasks.mustache
   - dashboard/info/task_filters.mustache
   - dashboard/info/wf_owner.mustache
+  - dashboard/info/my_audits.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache
   - dashboard/lhn.mustache
