@@ -196,38 +196,74 @@ describe("mappers", function() {
           ]);
       });
     });
+
+    describe("#get_bindings", function() {
+
+      it("finds all depth-1 bindings touched by walk_instances", function() {
+        var mr = new LL.MappingResult("foo", ["bar"], "baz");
+        var phony_binding = {};
+        var phony_result = { binding: phony_binding };
+        spyOn(mr, "walk_instances").and.callFake(function(fn) {
+          fn({}, phony_result, 1);
+          fn({}, { binding: {} }, 2);
+        });
+        expect(mr.get_bindings()).toEqual([phony_binding]);
+      });
+
+    });
+
+    describe("#bindings_compute", function() {
+
+      var mr;
+      beforeEach(function() {
+        mr = new LL.MappingResult("foo", ["bar"], "baz");
+      })
+
+      it("returns the saved compute if it exists.", function() {
+        var compute = can.compute();
+        mr._bindings_compute = compute;
+        expect(mr.bindings_compute()).toBe(compute);
+      });
+
+      it("calls get_bindings_compute if no saved compute exists.", function() {
+        spyOn(mr, "get_bindings_compute");
+        mr.bindings_compute();
+        expect(mr.get_bindings_compute).toHaveBeenCalled();
+      });
+
+    });
+
+    describe("#get_bindings_compute", function() {
+
+      var mr;
+      beforeEach(function() {
+        mr = new LL.MappingResult("foo", ["bar"], "baz");
+      });
+
+      it("returns a can.compute", function() {
+        var result = mr.get_bindings_compute();
+        expect(typeof result).toBe("function");
+        expect(result.isComputed).toBe(true);
+      });
+
+      describe("returned compute", function() {
+        it("returns the bindings", function() {
+          var result, phony_binding = {};
+          spyOn(mr, "get_bindings").and.returnValue([phony_binding]);
+          result = (mr.get_bindings_compute())();
+          expect(result).toEqual([phony_binding]);
+        });
+
+        it("watches the observe trigger", function() {
+          spyOn(mr, "watch_observe_trigger");
+          (mr.get_bindings_compute())();
+          expect(mr.watch_observe_trigger).toHaveBeenCalled();
+        });
+      });
+
+    });
+
 /*
-    //  `get_bindings`, `bindings_compute`, `get_bindings_compute`
-    //  - Returns a list of the `ListBinding` instances which are the source
-    //    of "first-level mappings".
-    , get_bindings: function() {
-        var self = this
-          , bindings = []
-          ;
-
-        this.walk_instances(function(instance, result, depth) {
-          if (depth === 1)
-            bindings.push(result.binding);
-        });
-        return bindings;
-      }
-
-    , bindings_compute: function() {
-        if (!this._bindings_compute)
-          this._bindings_compute = this.get_bindings_compute();
-        return this._bindings_compute;
-      }
-
-    , get_bindings_compute: function() {
-        var self = this;
-
-        return can.compute(function() {
-          // Unnecessarily access observe_trigger to be able to trigger change
-          self.watch_observe_trigger();
-          return self.get_bindings();
-        });
-      }
-
     //  `get_mappings`, `mappings_compute`, and `get_mappings_compute`
     //  - Returns a list of first-level mapping instances, even if they're
     //    several levels down due to virtual mappers like Multi or Cross
