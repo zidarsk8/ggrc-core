@@ -142,19 +142,11 @@ can.Control("GGRC.Controllers.Modals", {
       else {
         path = path.join(".");
 
-        // we (ab)use databinding to make the input field change for us
-        // doing it three times like this ensures stability
 
-        // handle emptying field and choosing same suggestion
-        this.options.instance.attr(path, null);
-        // the first change sets to null, 2nd works
-        this.options.instance.attr(path, ui.item.stub());
-        this.options.instance.attr(path, ui.item.stub());
-        // settign el.val manually is still needed for autocompletes inside
-        // deferred renderers such as control/object selector in audit
-        setTimeout(function() {
-          el.val(ui.item.title || ui.item.name || ui.item.email);
+        setTimeout(function(){
+          el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
         }, 0);
+        this.options.instance.attr(path, ui.item);
       }
   }
 
@@ -895,7 +887,7 @@ can.Component.extend({
   },
   events: {
     init: function() {
-      var key;
+      var key, that = this;
       this.scope.attr("controller", this);
 
       if (!this.scope.instance) {
@@ -912,14 +904,19 @@ can.Component.extend({
       }
 
       if (this.scope[this.scope.source_mapping_source]) {
-        this.scope.attr(
-          "list",
-          can.map(
-            this.scope[this.scope.source_mapping_source].get_mapping(this.scope.source_mapping),
-            function(binding) {
-              return binding.instance;
-            })
-        );
+        this.scope[this.scope.source_mapping_source]
+        .get_binding(this.scope.source_mapping)
+        .refresh_instances()
+        .then(function(list) {
+          that.scope.attr(
+            "list",
+            can.map(
+              list,
+              function(binding) {
+                return binding.instance;
+              })
+          );          
+        });
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
         key = this.scope.instance_attr + "_" + (this.scope.mapping || this.scope.source_mapping);

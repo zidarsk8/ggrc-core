@@ -21,7 +21,6 @@
     mixins: ["contactable"],
 
     attributes: {
-      contact : "CMS.Models.Person.stub",
       workflow: "CMS.Models.Workflow.stub",
       task_group_tasks: "CMS.Models.TaskGroupTask.stubs",
       tasks: "CMS.Models.Task.stubs",
@@ -89,7 +88,6 @@
     mixins : ["contactable"],
     attributes: {
       context: "CMS.Models.Context.stub",
-      contact: "CMS.Models.Person.stub",
       modified_by: "CMS.Models.Person.stub",
       task_group: "CMS.Models.TaskGroup.stub",
     },

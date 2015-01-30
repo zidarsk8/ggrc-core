@@ -419,6 +419,27 @@ can.Model.Join("CMS.Models.ObjectPerson", {
 
 }, {});
 
+can.Model.Join("CMS.Models.ObjectOwner", {
+  root_object : "object_owner"
+  , root_collection : "object_owners"
+  , findAll: "GET /api/object_owners"
+  , create : "POST /api/object_owners"
+  , update : "PUT /api/object_owners/{id}"
+  , destroy : "DELETE /api/object_owners/{id}"
+  , join_keys : {
+    ownable : can.Model.Cacheable
+    , person : CMS.Models.Person
+  }
+  , attributes : {
+      context : "CMS.Models.Context.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , person : "CMS.Models.Person.stub"
+    , ownable : "CMS.Models.get_stub"
+  }
+
+}, {});
+
+
 can.Model.Join("CMS.Models.ObjectDocument", {
   root_object : "object_document"
   , root_collection : "object_documents"

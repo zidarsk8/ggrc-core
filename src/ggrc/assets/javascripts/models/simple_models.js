@@ -39,7 +39,6 @@ can.Model.Cacheable("CMS.Models.Program", {
   , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -124,7 +123,6 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , section_objectives : "CMS.Models.SectionObjective.stubs"

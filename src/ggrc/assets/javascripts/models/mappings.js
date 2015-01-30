@@ -259,7 +259,7 @@
 
     // Governance
     , Control: {
-        _mixins: ["personable"] //controllable
+        _mixins: ["personable", "ownable"] //controllable
       , _canonical : {
         "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System"],
         "programs" : "Program",
@@ -333,7 +333,7 @@
         ])
       }
     , Objective: {
-        _mixins: ["personable"] //objectiveable
+        _mixins: ["personable", "ownable"] //objectiveable
       , _canonical : {
           "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System",
                                "Regulation", "Contract", "Policy", "Standard", "Program"]
@@ -385,7 +385,7 @@
         ])
       }
     , section_base: {
-        _mixins: ["personable"] //sectionable
+        _mixins: ["personable", "ownable"] //sectionable
       , _canonical : {
         "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System"],
         "objectives" : "Objective",
@@ -467,6 +467,11 @@
         },
         people: Proxy(
           "Person", "person", "ObjectPerson", "personable", "object_people")
+      }
+
+    , ownable: {
+        owners: Proxy(
+          "Person", "person", "ObjectOwner", "ownable", "object_owners")
       }
 
     , documentable: {
@@ -556,6 +561,16 @@
       , mapped_and_or_authorized_people: Multi([
           "people", "authorized_people"])
 
+      , owner_authorizations: CustomFilter("program_authorizations", function(auth_binding) {
+        return new RefreshQueue().enqueue(auth_binding.instance.role.reify()).trigger().then(function(roles) {
+          return roles[0].name === "ProgramOwner";
+        });
+      })
+      , program_owners: Cross("owner_authorizations", "person")
+      , owners_via_object_owners: Proxy(
+        "Person", "person", "ObjectOwner", "ownable", "object_owners")
+      , owners: Multi(["program_owners", "owners_via_object_owners"])
+
       , orphaned_objects: Multi([
           "related_objects"
         , "controls"
@@ -566,7 +581,7 @@
 
     , directive_object: {
         _mixins: [
-          "related_object", "personable", "objectiveable"
+          "related_object", "personable", "objectiveable", "ownable"
           ]
       , _canonical : {
           "sections" : "Section"
@@ -617,8 +632,9 @@
     // Business objects
     , business_object: {
         _mixins: [
-            "related_object", "personable"
-          , "controllable", "objectiveable", "sectionable"
+          "related_object", "personable",
+          "controllable", "objectiveable", "sectionable",
+          "ownable"
           ]
       , orphaned_objects: Multi([
           "related_objects"

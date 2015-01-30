@@ -215,7 +215,7 @@ class MysqlIndexer(SqlIndexer):
           ).distinct()
         type_union_queries.append(model_type_query)
 
-      # Objects for which the user is the "contact"
+      # Objects for which the user is the "contact" or "secondary contact"
       if hasattr(model, 'contact_id'):
         model_type_query = db.session.query(
             model.id.label('id'),
@@ -225,6 +225,17 @@ class MysqlIndexer(SqlIndexer):
               model.contact_id == contact_id
           ).distinct()
         type_union_queries.append(model_type_query)
+      # Objects for which the user is the "contact"
+      if hasattr(model, 'secondary_contact_id'):
+        model_type_query = db.session.query(
+            model.id.label('id'),
+            type_column.label('type'),
+            literal(None).label('context_id')
+          ).filter(
+              model.secondary_contact_id == contact_id
+          ).distinct()
+        type_union_queries.append(model_type_query)
+
 
       if model is all_models.Control:
         # Control also has `principal_assessor` and `secondary_assessor`

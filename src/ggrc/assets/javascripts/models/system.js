@@ -11,6 +11,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , title_plural : "Systems/Processes"
     , category : "business"
     , findAll : "GET /api/systems_or_processes"
+
     , model : function(params) {
         if (this.shortName !== 'SystemOrProcess')
           return this._super(params);
@@ -27,7 +28,28 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
             return CMS.Models.System.model(params);
         }
       }
+
     , mixins : ["ownable", "contactable", "unique_title"]
+    , attributes : {
+        context : "CMS.Models.Context.stub"
+      , owners : "CMS.Models.Person.stubs"
+      , modified_by : "CMS.Models.Person.stub"
+      , object_people : "CMS.Models.ObjectPerson.stubs"
+      , people : "CMS.Models.Person.stubs"
+      , object_documents : "CMS.Models.ObjectDocument.stubs"
+      , documents : "CMS.Models.Document.stubs"
+      , related_sources : "CMS.Models.Relationship.stubs"
+      , related_destinations : "CMS.Models.Relationship.stubs"
+      , object_objectives : "CMS.Models.ObjectObjective.stubs"
+      , objectives : "CMS.Models.Objective.stubs"
+      , object_controls : "CMS.Models.ObjectControl.stubs"
+      , controls : "CMS.Models.Control.stubs"
+      , object_sections : "CMS.Models.ObjectSection.stubs"
+      , sections : "CMS.Models.get_stubs"
+      , response : "CMS.Models.Response.stub"
+      , network_zone : "CMS.Models.Option.stub"
+      , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
+    }
     , tree_view_options : {
       show_view : "/static/mustache/base_objects/tree.mustache"
       , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
@@ -86,34 +108,16 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
   , create : "POST /api/systems"
   , update : "PUT /api/systems/{id}"
   , destroy : "DELETE /api/systems/{id}"
+
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , is_custom_attributable: true
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
-    , owners : "CMS.Models.Person.stubs"
-    , modified_by : "CMS.Models.Person.stub"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
-    , related_sources : "CMS.Models.Relationship.stubs"
-    , related_destinations : "CMS.Models.Relationship.stubs"
-    , object_objectives : "CMS.Models.ObjectObjective.stubs"
-    , objectives : "CMS.Models.Objective.stubs"
-    , object_controls : "CMS.Models.ObjectControl.stubs"
-    , controls : "CMS.Models.Control.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.get_stubs"
-    , response : "CMS.Models.Response.stub"
-    , network_zone : "CMS.Models.Option.stub"
-    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
-    }
+  , attributes: {}
   , defaults : {
       title : ""
     , url : ""
     }
   , init : function() {
+    can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
     this._super && this._super.apply(this, arguments);
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options, {
       // systems is a special case; can be imported to programs
@@ -148,32 +152,13 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , destroy : "DELETE /api/processes/{id}"
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , is_custom_attributable: true
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
-    , owners : "CMS.Models.Person.stubs"
-    , modified_by : "CMS.Models.Person.stub"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
-    , related_sources : "CMS.Models.Relationship.stubs"
-    , related_destinations : "CMS.Models.Relationship.stubs"
-    , object_objectives : "CMS.Models.ObjectObjective.stubs"
-    , objectives : "CMS.Models.Objective.stubs"
-    , object_controls : "CMS.Models.ObjectControl.stubs"
-    , controls : "CMS.Models.Control.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.get_stubs"
-    , network_zone : "CMS.Models.Option.stub"
-    , response : "CMS.Models.Response.stub"
-    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
-    }
+  , attributes : {}
   , defaults : {
       title : ""
     , url : ""
     }
   , init : function() {
+    can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
     this._super && this._super.apply(this, arguments);
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);
     this.tree_view_options.child_options[1].model = this;

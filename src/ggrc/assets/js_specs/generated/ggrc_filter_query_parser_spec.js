@@ -7,7 +7,6 @@
 
 describe('GGRC.query_parser', function() {
 
-
   var values = {
     'a': 'b',
     'hello': 'world',

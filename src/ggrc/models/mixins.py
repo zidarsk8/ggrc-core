@@ -425,19 +425,32 @@ class WithContact(object):
         db.Column(db.Integer, db.ForeignKey('people.id')), cls.__name__)
 
   @declared_attr
+  def secondary_contact_id(cls):
+    return deferred(
+      db.Column(db.Integer, db.ForeignKey('people.id')), cls.__name__)
+
+  @declared_attr
   def contact(cls):
     return db.relationship(
         'Person',
         uselist=False,
         foreign_keys='{}.contact_id'.format(cls.__name__))
 
+  @declared_attr
+  def secondary_contact(cls):
+    return db.relationship(
+        'Person',
+        uselist=False,
+        foreign_keys='{}.secondary_contact_id'.format(cls.__name__))
+
   @staticmethod
   def _extra_table_args(cls):
     return (
         db.Index('fk_{}_contact'.format(cls.__tablename__), 'contact_id'),
+        db.Index('fk_{}_secondary_contact'.format(cls.__tablename__), 'secondary_contact_id'),
         )
 
-  _publish_attrs = ['contact']
+  _publish_attrs = ['contact', 'secondary_contact']
 
 
 class BusinessObject(
