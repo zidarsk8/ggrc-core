@@ -8,7 +8,14 @@
 
 {{#instance}}
   <section class="info">
-    {{#is_info_pane}}{{{render '/static/mustache/base_objects/info-pin.mustache'}}}{{/is_info_pane}}
+    {{#is_info_pane}}
+    <div class="clearfix">
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      <div class="tier-content">
+        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      </div>
+    </div>
+    {{/is_info_pane}}
 
     {{#is_allowed 'update' instance context='for'}}
     <div class="details-wrap">
@@ -26,12 +33,6 @@
 
     <div class="tier-content">
       <div class="row-fluid wrap-row">
-        <div class="span6">
-          <h6>Task</h6>
-          <h3>
-            {{instance.title}}
-          </h3>
-        </div>
         <div class="span6">
           <h6>Assignee</h6>
           {{#if_cycle_assignee_privileges instance}}

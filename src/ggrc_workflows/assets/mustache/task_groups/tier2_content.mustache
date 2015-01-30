@@ -20,14 +20,6 @@
 </div>
 
 <div class="tier-content">
-  <div class="row-fluid wrap-row">
-    <div class="span12">
-      <h6>Task Group</h6>
-      <h3>
-        {{instance.title}}
-      </h3>
-    </div>
-  </div>
 
   {{#using workflow=instance.workflow}}
     {{#if_equals workflow.status 'Active'}}

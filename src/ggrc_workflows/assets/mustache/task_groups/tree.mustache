@@ -57,42 +57,4 @@
         </div><!-- select end -->
       </div><!-- item-wrap end -->
     </div><!-- item-main end -->
-
-    <div class="tier-2-info item-content" style="display: none;">
-      <div class="tier-2-info-content">
-
-          {{> /static/mustache/task_groups/tier2_content.mustache}}
-
-          {{#if draw_children}}
-            {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
-            <div class="template-setup">
-              <div class="row-fluid wrap-row">
-                <div class="span8 task-list">
-                  {{#child_options.1}}
-                    <h3>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
-                    <h4 class="inline-explanation">Define and reorder tasks</h4>
-                    <ul class="tree-structure new-tree" {{data 'options'}}
-                      {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
-                      {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
-                    </ul>
-                  {{/child_options.1}}
-                </div>
-
-                <div class="span4">
-                  {{#child_options.0}}
-                    <h3>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
-                    <h4 class="inline-explanation">Choose objects that tasks will apply to</h4>
-
-                    <ul class="tree-structure new-tree" {{data 'options'}}
-                      {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
-                    </ul>
-                  {{/child_options.0}}
-                </div>
-              </div>
-            </div>
-            {{/prune_context}}
-          {{/if}}
-        </div>
-      </div>
-    </div>
   </li>

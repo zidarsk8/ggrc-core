@@ -8,9 +8,17 @@
 
 {{#instance}}
   <section class="info">
-    {{#is_info_pane}}{{{render '/static/mustache/base_objects/info-pin.mustache'}}}{{/is_info_pane}}
+    {{#is_info_pane}}
+    <div class="clearfix">
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      <div class="tier-content">
+        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      </div>
+    </div>
+    {{/is_info_pane}}
 
     {{> /static/mustache/task_groups/tier2_content.mustache}}
+
     {{#options}}
     <div class="template-setup">
       <div class="row-fluid wrap-row">
@@ -38,5 +46,6 @@
       </div>
     </div>
     {{/options}}
+    </div>
   </section>
 {{/instance}}
