@@ -5,13 +5,14 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-{{#instance}} 
-  
+{{#instance}}
+
   {{#is_dashboard}}
     {{> /static/mustache/dashboard/info/info.mustache}}
 
   {{else}}
-  <section class="info"> 
+  <section class="info">
+    {{#is_info_pane}}{{{render '/static/mustache/base_objects/info-pin.mustache'}}}{{/is_info_pane}}
     <div class="tier-content">
       {{#name}}
       <div class="row-fluid wrap-row">

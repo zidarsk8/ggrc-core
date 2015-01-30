@@ -1,0 +1,101 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#instance}}
+  <section class="info">
+    {{#is_info_pane}}
+    <div class="clearfix">
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      <div class="tier-content">
+        {{#instance}}
+          <div class="row-fluid wrap-row">
+            <div class="span6">
+              <h6>Request</h6>
+              <div class="rtf-block">
+                {{{firstnonempty instance.description '<i>State your request here...</i>'}}}
+              </div>
+            </div>
+            <div class="span6">
+              <h6>State</h6>
+              <span class="state-value {{to_class status '_'}}">{{status}}</span>
+            </div>
+          </div>
+        {{/instance}}
+      </div>
+    </div>
+    {{/is_info_pane}}
+
+    <div class="details-wrap">
+      <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+        {{#if_can_edit_request instance}}
+          <li>
+            <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
+              <i class="grcicon-edit"></i>
+              Edit {{model.title_singular}}
+            </a>
+          </li>
+        {{/if_can_edit_request}}
+      </ul>
+    </div>
+
+    <div class="tier-content">
+      <div class="row-fluid wrap-row">
+        <div class="span6">
+          <h6>Requested on</h6>
+          {{#if instance.requested_on}}
+            {{#using requested_on=instance.requested_on}}
+              {{localize_date requested_on}}
+            {{/using}}
+          {{/if}}
+        </div>
+        <div class="span6" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+          <h6>Assignee</h6>
+          {{#using assignee=instance.assignee}}
+            {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
+          {{/using}}
+        </div>
+      </div>
+      {{#using audit=instance.audit}}
+        {{#with_mapping "audit_object_object" instance}}
+          {{#if audit_object_object.0.instance}}
+            <div class="row-fluid wrap-row">
+              <div class="span12">
+                <h6>{{audit.object_model.table_singular}}</h6>
+                <p class="oneline">
+                  <i class="grcicon-{{audit.object_model.table_singular}}-color nomargin"></i>
+                  {{#is_allowed "view_object_page" audit_object_object.0.instance}}
+                    <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
+                  {{else}}
+                    <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
+                  {{/is_allowed}}
+                </p>
+              </div>
+            </div>
+          {{/if}}
+        {{/using}}
+      {{/using}}
+
+      {{{render_hooks 'Request.tree_view_info'}}}
+
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <h6>Notes</h6>
+          {{{instance.notes}}}
+        </div>
+      </div>
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <h6>Test</h6>
+          {{{instance.test}}}
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+{{/instance}}

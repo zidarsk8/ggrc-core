@@ -200,7 +200,7 @@ ul.new-tree {
     .entry-attachment {
       &.tree-item-add {
         display: inline-block;
-        margin: 5px 0 5px -6px;
+        margin: 0px 0 0px -6px;
         i {
           margin-top: 1px;
         }
@@ -262,6 +262,9 @@ ul.new-tree {
         }
       }
     }
+  }
+  .sticky-filter {
+    display: none;
   }
 }
 

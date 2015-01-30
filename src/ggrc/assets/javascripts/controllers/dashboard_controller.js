@@ -295,6 +295,7 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
     init: function() {
       this.options.model = this.options.instance.constructor;
       this._super();
+      this.init_info_pane();
     }
 
   , init_page_title: function() {
@@ -313,12 +314,16 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
 
       this.options.widget_descriptors = this.options.widget_descriptors || {};
     }
+  , init_info_pane: function() {
+      new CMS.Controllers.InfoPane(this.element.find('.pin-content'), {});
+  }
 });
 
 
 can.Control("CMS.Controllers.InnerNav", {
   defaults: {
       internav_view : "/static/mustache/dashboard/internav_list.mustache"
+    , pin_view : ".pin-content"
     , widget_list : null
     , spinners : {}
     , contexts : null
@@ -430,7 +435,7 @@ can.Control("CMS.Controllers.InnerNav", {
 
   , set_active_widget : function(widget) {
     var active_widget = widget;
-
+    $(this.options.pin_view).control().unsetInstance();
     if (typeof widget === 'string') {
       active_widget = this.widget_by_selector(widget);
     }

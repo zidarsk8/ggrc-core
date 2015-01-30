@@ -613,27 +613,6 @@
       border-bottom: 1px solid $itemBorder;
     }
   }
-  .info-expand {
-    border-bottom: 1px solid $itemBorder;
-    a {
-      display: block;
-      padding: 9px 0 10px 4px;
-      font-size: 13px;
-      font-weight: bold;
-      line-height: 20px;
-    }
-    .in, .out.active, .active .out {
-      display : none;
-    };
-    .in.active, .active .in, .out {
-      display : inline;
-    }
-    .show-hidden-fields {
-      &.active {
-        border-top: none;
-      }
-    }
-  }
   .info-widget-footer {
     padding-top: 3px;
     padding-left: 10px;
@@ -1161,6 +1140,11 @@
 }
 
 // new filters (former - advanced-filters)
+.inner-tree {
+  .sticky-filter {
+    display: none;
+  }
+}
 .inline-filtering {
   line-height: 39px;
   height: 39px;
@@ -1562,5 +1546,27 @@ ul.attr-list {
   .title {
     text-align: right;
     display: inline-block;
+  }
+}
+
+.info-expand {
+  border-bottom: 1px solid $itemBorder;
+  a {
+    display: block;
+    padding: 9px 0 10px 4px;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 20px;
+  }
+  .in, .out.active, .active .out {
+    display : none;
+  };
+  .in.active, .active .in, .out {
+    display : inline;
+  }
+  .show-hidden-fields {
+    &.active {
+      border-top: none;
+    }
   }
 }
