@@ -7,7 +7,15 @@
 
 {{#instance}}
   <section class="info">
-    {{#is_info_pane}}{{{render '/static/mustache/base_objects/info-pin.mustache'}}}{{/is_info_pane}}
+    {{#is_info_pane}}
+    <div class="clearfix">
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      <div class="tier-content">
+        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      </div>
+    </div>
+    {{/is_info_pane}}
+
     {{#is_allowed 'update' instance context='for'}}
       <div class="details-wrap">
         <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
@@ -25,7 +33,10 @@
 
 
     <div class="tier-content">
-      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      {{^is_info_pane}}
+        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      {{/is_info_pane}}
+      {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/urls.mustache' instance=instance}}}

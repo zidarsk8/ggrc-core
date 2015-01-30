@@ -90,15 +90,18 @@
                             'value': 'Calendar'
                           }
                           Calendar notifications
+
+                    -#Removed temporary till we decide should this be functional or not
+                      %li
+                        %a.set-display-settings-default{'href': "javascript://", 'tabindex': "-1"}
+                          %i.grcicon-desktop-black
+                          Save Layout
+                      %li
+                        %a.clear-display-settings{'href': "javascript://", 'tabindex': "-1"}
+                          %i.grcicon-reset-black
+                          Reset Layout
+
                     %li
-                      %a.set-display-settings-default{'href': "javascript://", 'tabindex': "-1"}
-                        %i.grcicon-desktop-black
-                        Save Layout
-                    %li
-                      %a.clear-display-settings{'href': "javascript://", 'tabindex': "-1"}
-                        %i.grcicon-reset-black
-                        Reset Layout
-                    %li.logout-wrap
                       %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
                         %i.grcicon-logout-black
                         Logout
