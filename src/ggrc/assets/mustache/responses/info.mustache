@@ -24,24 +24,22 @@
       </div>
     </div>
     {{/is_info_pane}}
-
+    {{#if options.allow_mapping_or_creating}}
+    {{! NB: Creating and editing responses have the same rules. }}
+    {{#if_can_create_response options.parent_instance}}
     <div class="details-wrap">
       <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
       <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-        {{#if allow_mapping_or_creating}}
-          {{! NB: Creating and editing responses have the same rules. }}
-          {{#if_can_create_response parent_instance}}
-          <li>
-            <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Response" data-object-plural="responses" data-object-id="{{instance.id}}">
-              <i class="grcicon-edit"></i>
-              Edit Response
-            </a>
-          </li>
-          {{/if_can_create_response}}
-        {{/if}}
+        <li>
+          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Response" data-object-plural="responses" data-object-id="{{instance.id}}">
+            <i class="grcicon-edit"></i>
+            Edit Response
+          </a>
+        </li>
       </ul>
     </div>
-
+    {{/if_can_create_response}}
+    {{/if}}
     <div class="tier-content">
       <div class="row-fluid wrap-row">
         <div class="span6">
@@ -87,7 +85,23 @@
         {{/using}}
       {{/if_instance_of}}
     </div>
+    <div class="inner-tree">
+      {{#if_equals instance.response_type 'documentation'}}
+        {{#options.child_options.1}}
+          <ul class="tree-structure new-tree generated-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
+          </ul>
+        {{/options.child_options.1}}
+        <div class="doc-folder">
+          {{{render_hooks 'DocumentationResponse.tree_evidence'}}}
+        </div>
+      {{/if_equals}}
 
+      {{#if_equals instance.response_type 'interview'}}
+        {{#options.child_options.3}}
+          <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}></ul>
+        {{/options.child_options.3}}
+      {{/if_equals}}
+    </div>
   </section>
 
 {{/instance}}

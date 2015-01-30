@@ -20,6 +20,8 @@ can.Control("CMS.Controllers.InfoPane", {
 
     if (instance instanceof CMS.Models.Person) {
       view = GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/info.mustache";
+    } else if (instance instanceof CMS.Models.Response) {
+      view = GGRC.mustache_path + "/responses/info.mustache";
     } else if (view in GGRC.Templates) {
       view = GGRC.mustache_path + "/" + view + ".mustache";
     } else {
