@@ -1,0 +1,42 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+
+{{#instance}}
+  <section class="info">
+    {{#is_info_pane}}{{{render '/static/mustache/base_objects/info-pin.mustache'}}}{{/is_info_pane}}
+
+    {{> /static/mustache/task_groups/tier2_content.mustache}}
+    {{#options}}
+    <div class="template-setup">
+      <div class="row-fluid wrap-row">
+        <div class="span8 task-list">
+          {{#child_options.1}}
+            <h3>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
+            <h4 class="inline-explanation">Define and reorder tasks</h4>
+            <ul class="tree-structure new-tree" {{data 'options'}}
+              {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
+              {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
+            </ul>
+          {{/child_options.1}}
+        </div>
+
+        <div class="span4">
+          {{#child_options.0}}
+            <h3>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
+            <h4 class="inline-explanation">Choose objects that tasks will apply to</h4>
+
+            <ul class="tree-structure new-tree" {{data 'options'}}
+              {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+            </ul>
+          {{/child_options.0}}
+        </div>
+      </div>
+    </div>
+    {{/options}}
+  </section>
+{{/instance}}

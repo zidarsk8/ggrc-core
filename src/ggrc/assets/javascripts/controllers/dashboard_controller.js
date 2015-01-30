@@ -435,7 +435,7 @@ can.Control("CMS.Controllers.InnerNav", {
 
   , set_active_widget : function(widget) {
     var active_widget = widget;
-    $(this.options.pin_view).control().setInstance();
+    $(this.options.pin_view).control().unsetInstance();
     if (typeof widget === 'string') {
       active_widget = this.widget_by_selector(widget);
     }

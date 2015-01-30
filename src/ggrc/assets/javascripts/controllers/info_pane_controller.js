@@ -1,8 +1,8 @@
 /*!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: brad@reciprocitylabs.com
-    Maintained By: brad@reciprocitylabs.com
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
 */
 
 
@@ -27,46 +27,54 @@ can.Control("CMS.Controllers.InfoPane", {
     }
     return view;
   },
-  findTreeController: function(el) {
-    return el.closest('.cms_controllers_tree_view').control();
+  findOptions: function(el) {
+    var tree_node = el.closest('.cms_controllers_tree_view_node').control();
+    return tree_node.options;
   },
-  findResult: function(el) {
-    var tree_node = el.closest('.cms_controllers_tree_view_node'),
-        tree_controller = this.findTreeController(el),
-        result;
+  loadChildTrees: function() {
+    var child_tree_dfds = []
+      , that = this
+      ;
 
-    can.each(tree_controller.options.original_list, function(item) {
-      var id = tree_node.data('object-id');
-      if (id && item.instance && item.instance.id === id) {
-        result = item;
+    this.element.find('.' + CMS.Controllers.TreeView._fullName).each(function(_, el) {
+      var $el = $(el)
+        , child_tree_control
+        ;
+
+      //  Ensure this targets only direct child trees, not sub-tree trees
+      if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
+        child_tree_control = $el.control();
+        if (child_tree_control)
+          child_tree_dfds.push(child_tree_control.display());
       }
     });
-    return result;
+  },
+  unsetInstance: function() {
+    this.element.html('');
+    this.element.height(0);
+    $('.cms_controllers_tree_view_node').removeClass('active');
   },
   setInstance: function(instance, el) {
-    if (!instance) {
-      this.element.html('');
-      this.element.height(0);
-      $('.cms_controllers_tree_view_node').removeClass('active');
-      return;
-    }
-    var result = this.findResult(el),
-        view = this.findView(instance),
-        options = this.findTreeController(el).options;
+    var options = this.findOptions(el),
+        view = this.findView(instance);
+
     this.element.html(can.view(view, {
       instance: instance,
       model: instance.class,
-      result: result,
-      mappings: result.mappings_compute(),
       is_info_pane: true,
-      options: options
+      options: options,
+      result: options.result
     }));
-    var height = $(window).height(),options = {
+
+    // Load trees inside info pane
+    this.loadChildTrees();
+
+    // Make sure pane is visible
+    if (!this.element.height()) {
+      this.element.animate({ height: $(window).height() / 3 }, {
         duration: 800,
         easing: 'easeOutExpo'
-    };
-    if (!this.element.height()) {
-      this.element.animate({ height: height / 3 }, options);
+      });
     }
   },
   '.pin-action a click': function(el) {
