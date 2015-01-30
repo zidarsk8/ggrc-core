@@ -237,6 +237,7 @@ dashboard-js-template-files:
   - audits/search_result.mustache
   - audits/extended_info.mustache
   - requests/tree.mustache
+  - requests/info.mustache
   - requests/tree_footer.mustache
   - requests/modal_content.mustache
   - people/autocomplete_result.mustache
