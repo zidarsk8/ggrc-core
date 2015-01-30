@@ -69,6 +69,7 @@ dashboard-js-files:
   - controllers/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
   - controllers/mapping_count_controller.js
+  - controllers/info_pane_controller.js
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
@@ -115,6 +116,7 @@ dashboard-js-template-files:
   - base_objects/tree_view_filters.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
+  - base_objects/info-pin.mustache
   - base_objects/filters/advanced_search_filter_actions.mustache
   - base_objects/filters/modal_filter_actions.mustache
   - base_objects/filters/filter_by_person.mustache

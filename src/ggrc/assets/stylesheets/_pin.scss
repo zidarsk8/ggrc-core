@@ -5,11 +5,14 @@
   left: 32px;
   right: 32px;
   background: $white;
-  z-index: 9999;
+  z-index: 0;
+  overflow: auto;
   @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   .info {
-    overflow: auto;
     padding: 15px 20px 20px 20px;
+  }
+  .info-widget-footer {
+    display: none;
   }
 }
 
