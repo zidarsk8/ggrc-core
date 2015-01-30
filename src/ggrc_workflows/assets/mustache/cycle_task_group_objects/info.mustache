@@ -7,14 +7,14 @@
 
 {{#instance}}
   <section class="info">
-    {{#is_info_pane}}
+    {{#is_info_pin}}
     <div class="clearfix">
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
       <div class="tier-content">
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       </div>
     </div>
-    {{/is_info_pane}}
+    {{/is_info_pin}}
 
     {{#using object=instance.object}}
 
