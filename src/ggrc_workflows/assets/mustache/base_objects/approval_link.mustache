@@ -3,20 +3,22 @@
     <i class="grcicon-review-color"></i>
     <span class="object-approved">Reviewed and approved</span>
   {{else}}
-    {{#if_helpers '\
-      #owned_by_current_user' instance '\
-      or #current_user_is_admin'}}
-      {{#with_mapping_count instance 'current_approval_cycles'}}
-        {{#if_equals count 0}}
-          <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
+    {{#with_mapping '_object' instance}}
+      {{#if_helpers '\
+        #owned_by_current_user' _object.0.instance '\
+        or #current_user_is_admin'}}
+        {{#with_mapping_count instance 'current_approval_cycles'}}
+          {{#if_equals count 0}}
+            <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
+              <i class="grcicon-review"></i>
+              Submit For Review
+            </a>
+          {{else}}
             <i class="grcicon-review"></i>
-            Submit For Review
-          </a>
-        {{else}}
-          <i class="grcicon-review"></i>
-          <span class="setup-link">Review in progress</span>
-        {{/if_equals}}
-      {{/with_mapping_count}}
-    {{/if_helpers}}
+            <span class="setup-link">Review in progress</span>
+          {{/if_equals}}
+        {{/with_mapping_count}}
+      {{/if_helpers}}
+    {{/with_mapping}}
   {{/if_equals}}
 </li>
