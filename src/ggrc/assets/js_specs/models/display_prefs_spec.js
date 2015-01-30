@@ -69,6 +69,32 @@ describe("display prefs model", function() {
     });
   });
 
+  describe("top nav hiddenness", function () {
+    afterEach(function() {
+      display_prefs.resetPagePrefs();
+      //display_prefs.removeAttr(exp.path);
+    });
+
+    it("sets nav hidden", function() {
+      display_prefs.setNavHidden("this arg is ignored", true);
+
+      expect(
+          display_prefs.attr([exp.path, exp.NAV_HIDDEN].join(".")).nav_hidden.is_hidden
+      ).toBe(true);
+    });
+
+    it("gets nav hidden", function () {
+      display_prefs.setNavHidden("this arg is ignored", true);
+
+      expect(display_prefs.getNavHidden()).toBe(true);
+    });
+
+    it("returns false by default", function () {
+      expect(display_prefs.getNavHidden()).toBe(false);
+    });
+
+  });
+
   xdescribe("#setCollapsed", function() {
     afterEach(function() {
       display_prefs.removeAttr(exp.COLLAPSE);

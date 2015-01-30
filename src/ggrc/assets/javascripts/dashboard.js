@@ -386,6 +386,7 @@ function resize_areas() {
   ,   $lhsHolder
   ,   $area
   ,   $header
+  ,   $headerBar
   ,   $footer
   ,   $topNav
   ,   $innerNav
@@ -408,6 +409,7 @@ function resize_areas() {
   $lhsHolder = $(".lhs-holder");
   $footer = $(".footer");
   $header = $(".header-content");
+  $headerBar = $(".header-bar");
   $innerNav = $(".inner-nav");
   $objectArea = $(".object-area");
   $topNav = $(".top-inner-nav");
@@ -418,12 +420,24 @@ function resize_areas() {
   winWidth = $window.width();
   lhsHeight = winHeight - 220; //new ui
   footerMargin = lhsHeight + 130; //new UI
-  internavHeight = lhsHeight; // new UI - 100;
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
   objectWidth = winWidth;
   headerWidth = winWidth - 40;// - lhsWidth;  new ui resize
+
+  var UIHeight = [$topNav.height(), $header.height(), 
+                  $headerBar.height(), $footer.height()]
+          .reduce(function (m, h) { return m+h; }, 0);
+  internavHeight = winHeight - UIHeight;
+
+  // adjust internavHeight if topNav hidden
+  if ($topNav.height() > 0) {
+    var top = Number($topNav.css("top").replace("px", ""));
+    if (top < $header.height()+$headerBar.height()) {
+      internavHeight -= $topNav.height();
+    }
+  }    
 
   $lhsHolder.css("height",lhsHeight);
   $bar.css("height",lhsHeight);

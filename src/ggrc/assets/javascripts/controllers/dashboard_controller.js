@@ -17,20 +17,26 @@ can.Control("CMS.Controllers.Dashboard", {
 
 }, {
     init: function(el, options) {
-      this.init_page_title();
-      this.init_page_help();
-      this.init_page_header();
-      this.init_widget_descriptors();
-      if (!this.inner_nav_controller)
-        this.init_inner_nav();
-      this.update_inner_nav();
+      CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
+        this.display_prefs = prefs;
 
-      // Before initializing widgets, hide the container to not show
-      // loading state of multiple widgets before reducing to one.
-      this.hide_widget_area();
-      this.init_default_widgets();
-      if (!this.widget_area_controller)
-        this.init_widget_area();
+        this.init_page_title();
+        this.init_page_help();
+        this.init_page_header();
+        this.init_widget_descriptors();
+        if (!this.inner_nav_controller) {
+          this.init_inner_nav();
+        }
+        this.update_inner_nav();
+          
+        // Before initializing widgets, hide the container to not show
+        // loading state of multiple widgets before reducing to one.
+        this.hide_widget_area();
+        this.init_default_widgets();
+        if (!this.widget_area_controller) {
+          this.init_widget_area();
+        }
+      }.bind(this));
     }
 
   , init_page_title: function() {
@@ -87,30 +93,61 @@ can.Control("CMS.Controllers.Dashboard", {
                 dashboard_controller: this
             });
       }
+
+      if (this.display_prefs.getNavHidden()) {
+        // page needs time to render
+        setTimeout(this.close_nav.bind(this), 500);
+      }
     }
 
   , ".nav-trigger click": function(el, ev) {
-      var options = {
-            duration: 800,
-            easing: 'easeOutExpo'
-          },
-          $tooltip = el.find("i"),
-          $nav = el.closest("body").find(".top-inner-nav"),
-          $lhn_nav = el.closest("body").find(".lhs-holder"),
-          $content = el.closest("body").find(".object-area"),
-          $fake_merge = $content.add($lhn_nav);
       if(el.hasClass("active")) {
-        el.removeClass("active");
-        $tooltip.attr("data-original-title", "Show menu");
-        $nav.animate({top: "66"}, options);
-        $fake_merge.animate({top: "106"}, options);
+        this.close_nav(el);
       } else {
-        el.addClass("active");
-        $tooltip.attr("data-original-title", "Hide menu");
-        $nav.animate({top: "96"}, options);
-        $fake_merge.animate({top: "136"}, options);
+        this.open_nav(el);
       }
     }
+  , open_nav: function (el) {
+    el || (el = $(".nav-trigger"));
+    var options = {
+        duration: 800,
+        easing: 'easeOutExpo'
+    },
+        $tooltip = el.find("i"),
+        $nav = el.closest("body").find(".top-inner-nav"),
+        $lhn_nav = el.closest("body").find(".lhs-holder"),
+        $content = el.closest("body").find(".object-area"),
+        $fake_merge = $content.add($lhn_nav);
+
+    el.addClass("active");
+    $tooltip.attr("data-original-title", "Hide menu");
+    $nav.animate({top: "96"}, options);
+    $fake_merge.animate({top: "136"}, options);
+
+    this.display_prefs.setNavHidden("", false);
+    $(window).trigger("resize");
+  }
+
+  , close_nav: function (el) {
+    el || (el = $(".nav-trigger"));
+    var options = {
+        duration: 800,
+        easing: 'easeOutExpo'
+    },
+        $tooltip = el.find("i"),
+        $nav = el.closest("body").find(".top-inner-nav"),
+        $lhn_nav = el.closest("body").find(".lhs-holder"),
+        $content = el.closest("body").find(".object-area"),
+        $fake_merge = $content.add($lhn_nav);
+
+    el.removeClass("active");
+    $tooltip.attr("data-original-title", "Show menu");
+    $nav.animate({top: "66"}, options);
+    $fake_merge.animate({top: "106"}, options);
+
+    this.display_prefs.setNavHidden("", true);
+    $(window).trigger("resize");
+  }
 
   , init_widget_descriptors: function() {
       var that = this;
@@ -417,7 +454,7 @@ can.Control("CMS.Controllers.InnerNav", {
           placeholder: 'drop-placeholder'
         , items : "li:not(.hidden-widgets-list)"
         , disabled: true
-      })
+      });
     }
 
   , " sortupdate": "apply_widget_list_sort"
