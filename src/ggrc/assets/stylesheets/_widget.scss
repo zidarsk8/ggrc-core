@@ -1140,6 +1140,11 @@
 }
 
 // new filters (former - advanced-filters)
+.inner-tree {
+  .sticky-filter {
+    display: none;
+  }
+}
 .inline-filtering {
   line-height: 39px;
   height: 39px;
