@@ -1792,7 +1792,7 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
 
 Mustache.registerHelper("current_user_is_object_reviewer", function (instance, options) {
   instance = Mustache.resolve(instance);
-  var finish = function() {
+  var finish = function(current_object_review_tasks) {
     console.log('finishing');
     var current_user_id = GGRC.current_user.id;
     var contact = instance.contact;
