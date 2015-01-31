@@ -4,19 +4,34 @@
     <span class="object-approved">Reviewed and approved</span>
   {{else}}
     {{#if_helpers '\
-      #owned_by_current_user' instance '\
-      or #current_user_is_admin'}}
+      #current_user_is_object_reviewer' instance}}
       {{#with_mapping_count instance 'current_approval_cycles'}}
-        {{#if_equals count 0}}
-          <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
-            <i class="grcicon-review"></i>
-            Submit For Review
-          </a>
+        {{^if_equals count 0}}
+          <div class="request-control">
+            <button class="btn btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Approve</button>
+            <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
+          </div>
         {{else}}
-          <i class="grcicon-review"></i>
-          <span class="setup-link">Review in progress</span>
+          <div>No current approval cycles.</div>
         {{/if_equals}}
       {{/with_mapping_count}}
+    {{else}}
+      <p>User is not object reviewer.</p>
+      {{#if_helpers '\
+        #owned_by_current_user' instance '\
+        or #current_user_is_admin'}}
+        {{#with_mapping_count instance 'current_approval_cycles'}}
+          {{#if_equals count 0}}
+            <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
+              <i class="grcicon-review"></i>
+              Submit For Review
+            </a>
+          {{else}}
+            <i class="grcicon-review"></i>
+            <span class="setup-link">Review in progress</span>
+          {{/if_equals}}
+        {{/with_mapping_count}}
+      {{/if_helpers}}
     {{/if_helpers}}
   {{/if_equals}}
 </li>

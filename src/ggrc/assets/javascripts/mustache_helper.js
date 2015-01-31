@@ -1790,6 +1790,28 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
   }
 });
 
+Mustache.registerHelper("current_user_is_object_reviewer", function (instance, options) {
+  instance = Mustache.resolve(instance);
+  var finish = function() {
+    console.log('finishing');
+    var current_user_id = GGRC.current_user.id;
+    var contact = instance.contact;
+    for(i = 0; i < current_object_review_tasks.length; i++) {
+      var _task = current_object_review_tasks[i].instance;
+      if (current_user_id == _task.contact.id) {
+        return options.fn(options.contexts);
+      }
+    }
+    return options.inverse(options.contexts);
+  };
+
+  return defer_render(
+    "div",
+    finish,
+    instance.get_binding('current_object_review_tasks').refresh_instances()
+  );
+});
+
 Mustache.registerHelper("default_audit_title", function (instance, options) {
   var program, default_title, current_title
     , index = 1
