@@ -10,7 +10,7 @@ from .associationproxy import association_proxy
 from .exceptions import ValidationError
 from .mixins import (
     deferred, Hierarchical, Noted, Described, Hyperlinked, WithContact,
-    Titled, Slugged,
+    Titled, Slugged, CustomAttributable
     )
 from .object_document import Documentable
 from .object_owner import Ownable
@@ -107,7 +107,7 @@ class SectionBase(
         orm.subqueryload('object_sections'))
 
 
-class Section(Documentable, Personable, Ownable, SectionBase):
+class Section(CustomAttributable, Documentable, Personable, Ownable, SectionBase):
   __mapper_args__ = {
       'polymorphic_identity': 'Section'
       }
@@ -126,7 +126,7 @@ class Section(Documentable, Personable, Ownable, SectionBase):
     return out_json
 
 
-class Clause(Documentable, Personable, Ownable, SectionBase):
+class Clause(CustomAttributable, Documentable, Personable, Ownable, SectionBase):
   __mapper_args__ = {
       'polymorphic_identity': 'Clause'
       }

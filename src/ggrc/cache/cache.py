@@ -80,6 +80,10 @@ def all_cache_entries():
     resource('notification_recipients', 'NotificationRecipient'),
     resource('notification_objects', 'NotificationObject'),
 
+    # ggrc custom attribuess
+    resource('custom_attribute_definitions', 'CustomAttributeDefinition'),
+    resource('custom_attribute_values', 'CustomAttributeValue'),
+
     # FIXME: Extension-defined models should be registered from the extensions.
 
     # ggrc_basic_permissions models

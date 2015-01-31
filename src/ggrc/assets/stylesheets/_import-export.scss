@@ -63,15 +63,7 @@ form.import {
       padding: 4px;
       border: 1px solid $gray;
       background: $widgetHeader;
-      word-break: break-all;
     }
-    .inner-table {
-      height: 500px;
-      overflow-y: auto;
-      width: 100%;
-    }
-  }
-  .inner-ggrc-table {
     width: 100%;
     margin-bottom: 10px;
     td {

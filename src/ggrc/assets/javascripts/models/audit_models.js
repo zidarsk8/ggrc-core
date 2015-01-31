@@ -16,6 +16,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
   , mixins : ["contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , program: "CMS.Models.Program.stub"
@@ -29,6 +30,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     , people : "CMS.Models.Person.stubs"
     , audit_firm : "CMS.Models.OrgGroup.stub"
     , audit_objects : "CMS.Models.AuditObject.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
     status : "Draft",
@@ -106,7 +108,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   },
   after_save: function() {
     var that = this;
-    
+
     new RefreshQueue().enqueue(this.program.reify()).trigger()
     .then(function(programs) {
       return $.when(

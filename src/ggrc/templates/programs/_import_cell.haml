@@ -80,7 +80,10 @@
   -elif cell == "TextOrHtmlColumnHandler"
     ={cell.display()}
   -else
-    {{cell.display()}}
+    -if cellvalue.__class__.__name__ == "CustomAttributeColumnHandler"
+      {{cellvalue.value}}
+    -else
+      {{cell.display()}}
 
   -if result.errors_for(col_name)
     .help-inline

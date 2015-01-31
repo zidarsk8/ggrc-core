@@ -57,6 +57,22 @@ var admin_list_descriptors = {
     , object_display : "Events"
     , list_view : "/static/mustache/events/object_list.mustache"
   }
+  , "custom_attributes" : {
+    parent_instance: CMS.Models.CustomAttributable,
+    model: CMS.Models.CustomAttributable,
+    show_view: GGRC.mustache_path + "/custom_attribute_definitions/tree.mustache",
+    sortable: false,
+    list_loader: function(instance) {
+      return instance.findAll();
+    },
+    draw_children: true,
+    child_options: [{
+      model: CMS.Models.CustomAttributeDefinition,
+      mapping: "custom_attribute_definitions",
+      show_view: GGRC.mustache_path + "/custom_attribute_definitions/subtree.mustache",
+      footer_view: null
+    }]
+  }
 };
 
 $(function() {
@@ -103,6 +119,16 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
         return "";
       }
     }
+    , custom_attributes : {
+      widget_id: "custom_attribute",
+      widget_name: "Custom Attributes",
+      widget_icon: "workflow",
+      content_controller: CMS.Controllers.TreeView,
+      content_controller_selector: "ul",
+      model: CMS.Models.CustomAttributable,
+      widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
+      content_controller_options: admin_list_descriptors["custom_attributes"]
+    }
   }
 });
 
@@ -147,8 +173,8 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
       defaults = Object.keys(GGRC.WidgetList.get_widget_list_for(model_name));
 
       $area.cms_controllers_page_object($.extend({
-          //model_descriptors: model_descriptors
-        /*,*/ widget_descriptors: GGRC.WidgetList.get_widget_list_for(model_name)
+        //model_descriptors: model_descriptors,
+        widget_descriptors: GGRC.WidgetList.get_widget_list_for(model_name)
         , default_widgets: defaults || GGRC.default_widgets || []
         , instance: GGRC.page_instance()
         , header_view: GGRC.mustache_path + "/base_objects/page_header.mustache"
@@ -160,10 +186,11 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
           }
         }, extra_page_options[model_name]));
     } else if (/^\/admin\/?$/.test(window.location.pathname)) {
+
       $area.cms_controllers_dashboard({
           widget_descriptors: GGRC.WidgetList.get_widget_list_for("admin")
         , menu_tree_spec: GGRC.admin_menu_spec
-        , default_widgets : ["people", "roles", "events"]
+        , default_widgets : ["people", "roles", "events", "custom_attributes"]
       });
 
       // Ensure each extension has had a chance to initialize admin widgets
@@ -171,6 +198,7 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
         if (extension.init_admin_widgets)
           extension.init_admin_widgets();
       });
+
     } else {
       $area.cms_controllers_dashboard({
         widget_descriptors: GGRC.widget_descriptors,
@@ -178,8 +206,7 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
       });
     }
 
-
-  $("body").on("click", ".note-trigger, .edit-notes", function(ev) {
+    $("body").on("click", ".note-trigger, .edit-notes", function(ev) {
     ev.stopPropagation();
     var $object = $(ev.target).closest("[data-object-id]")
     , type = $object.data("object-type")

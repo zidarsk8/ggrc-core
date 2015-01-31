@@ -18,6 +18,7 @@
     create: "POST /api/workflows",
     update: "PUT /api/workflows/{id}",
     destroy: "DELETE /api/workflows/{id}",
+    is_custom_attributable: true,
 
     attributes: {
       people: "CMS.Models.Person.stubs",
@@ -29,6 +30,7 @@
       //workflow_task_groups: "CMS.Models.WorkflowTaskGroup.stubs"
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
+      custom_attribute_values: "CMS.Models.CustomAttributeValue.stubs",
       default_lhn_filters: {
         Workflow: {status: 'Active'},
         Workflow_All: {},

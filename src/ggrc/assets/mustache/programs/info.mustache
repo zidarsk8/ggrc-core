@@ -8,7 +8,7 @@
 <section class="info">
   {{#instance}}
 
-    {{#is_allowed 'update' instance context='for'}}  
+    {{#is_allowed 'update' instance context='for'}}
       <div class="action-bar">
         <ul class="change-links">
           {{{render_hooks 'Program.info_widget_actions'}}}
@@ -21,12 +21,12 @@
         </ul>
       </div>
     {{/is_allowed}}
-  
+
     {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
     {{{render '/static/mustache/base_objects/contacts.mustache' is_program=true instance=instance}}}
     {{{render '/static/mustache/base_objects/urls.mustache' is_program=true instance=instance}}}
     {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
-  
+
     <br>
 
     <div class="row-fluid">
@@ -35,7 +35,7 @@
           <a class="show-hidden-fields info-show-hide" href="javascript://">
             <span class="out">
               <i class="grcicon-show-arrow"></i>
-              Show 
+              Show
             </span>
             <span class="in">
               <i class="grcicon-hide-arrow"></i>
@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-  
+
     <div class="hidden-fields-area" style="display:none;">
       <div class="row-fluid">
         <div class="span4">
@@ -72,6 +72,8 @@
         </div>
       </div>
     </div>
+
+    {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
 
     <div class="info-widget-footer">
       <p>

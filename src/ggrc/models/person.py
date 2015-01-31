@@ -5,15 +5,15 @@
 
 from ggrc.app import app, db
 from sqlalchemy.orm import validates
-from .mixins import deferred, Base
+from .mixins import deferred, Base, CustomAttributable
 from .reflection import PublishOnly
 from .utils import validate_option
 from .exceptions import ValidationError
 from .context import HasOwnContext
 import re
 
-class Person(HasOwnContext, Base, db.Model):
-  
+class Person(CustomAttributable, HasOwnContext, Base, db.Model):
+
   __tablename__ = 'people'
   EMAIL_RE_STRING = "\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])\Z"
 
@@ -39,7 +39,7 @@ class Person(HasOwnContext, Base, db.Model):
     if 'is_enabled' not in kwargs:
       kwargs['is_enabled'] = True
     super(Person, self).__init__(**kwargs)
-      
+
   @staticmethod
   def _extra_table_args(cls):
     return (
@@ -123,7 +123,7 @@ class Person(HasOwnContext, Base, db.Model):
     ROLE_HIERARCHY = {
         u'gGRC Admin': 0,
         u'ProgramCreator': 1,
-        u'ObjectEditor': 2, 
+        u'ObjectEditor': 2,
         u'Reader': 3
     }
     unique_roles = set([
@@ -138,4 +138,3 @@ class Person(HasOwnContext, Base, db.Model):
       sorted_roles = sorted(unique_roles,
           key=lambda x: ROLE_HIERARCHY.get(x, -1))
       return sorted_roles[0]
-
