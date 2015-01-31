@@ -263,65 +263,139 @@ describe("mappers", function() {
 
     });
 
-/*
-    //  `get_mappings`, `mappings_compute`, and `get_mappings_compute`
-    //  - Returns a list of first-level mapping instances, even if they're
-    //    several levels down due to virtual mappers like Multi or Cross
-    //  - "First-level mappings" are the objects whose existence causes the
-    //    `binding.instance` to be in the current `binding.list`.  (E.g.,
-    //    if any of the "first-level mappings" exist, the instance will
-    //    appear in the list.
-    , get_mappings: function() {
-        var self = this
-          , mappings = []
-          ;
+    describe("#get_mappings", function() {
 
-        this.walk_instances(function(instance, result, depth) {
-          if (depth == 1) {
-            if (instance === true)
-              mappings.push(self.instance);
-            else
-              mappings.push(instance);
-          }
+      it("calls walk_instances", function() {
+        var mr = new LL.MappingResult("foo", ["bar"], "baz");
+        spyOn(mr, "walk_instances");
+        mr.get_mappings();
+        expect(mr.walk_instances).toHaveBeenCalled();
+      });
+
+      it("gets all instances where depth is 1", function() {
+        var mr = new LL.MappingResult("foo", ["bar"], "baz");
+        spyOn(mr, "walk_instances").and.callFake(function(fn) {
+          fn("foo", {}, 1);
+          fn("bar", {}, 2);
         });
-        return mappings;
-      }
+        expect(mr.get_mappings()).toEqual(["foo"]);
+      });
 
-    , mappings_compute: function() {
-        if (!this._mappings_compute)
-          this._mappings_compute = this.get_mappings_compute();
-        return this._mappings_compute;
-      }
-
-    , get_mappings_compute: function() {
-        var self = this;
-
-        return can.compute(function() {
-          // Unnecessarily access _observe_trigger to be able to trigger change
-          self.watch_observe_trigger();
-          return self.get_mappings();
+      it("adds self for depth=1 and instance=true", function() {
+        var instance = {};
+        var mr = new LL.MappingResult(instance, ["bar"], "baz");
+        spyOn(mr, "walk_instances").and.callFake(function(fn) {
+          fn(true, {}, 1);
         });
-      }
+        expect(mr.get_mappings().length).toBe(1);
+        expect(mr.get_mappings()[0]).toBe(instance);
+      });
+    });
 
-    //  `walk_instances`
-    //  - `binding.mappings` can have several "virtual" levels due to mappers
-    //    like `Multi`, `Cross`, and `Filter` -- e.g., mappers which just
-    //    aggregate or filter results of other mappers.  `walk_instances`
-    //    iterates over these "virtual" levels to emit instances only once
-    //    per time they appear in a traversal path of `binding.mappings`.
-    , walk_instances: function(fn, last_instance, depth) {
-        var i;
-        if (depth == null)
-          depth = 0;
-        if (this.instance !== last_instance) {
-          fn(this.instance, this, depth);
-          depth++;
-        }
-        for (i=0; i<this.mappings.length; i++) {
-          this.mappings[i].walk_instances(fn, this.instance, depth);
-        }
-      }
-*/
+    describe("#mappings_compute", function() {
+
+      var mr;
+      beforeEach(function() {
+        mr = new LL.MappingResult("foo", ["bar"], "baz");
+      })
+
+      it("returns the saved compute if it exists.", function() {
+        var compute = can.compute();
+        mr._mappings_compute = compute;
+        expect(mr.mappings_compute()).toBe(compute);
+      });
+
+      it("calls get_mappings_compute if no saved compute exists.", function() {
+        spyOn(mr, "get_mappings_compute");
+        mr.mappings_compute();
+        expect(mr.get_mappings_compute).toHaveBeenCalled();
+      });
+
+    });
+
+    describe("#get_mappings_compute", function() {
+
+      var mr;
+      beforeEach(function() {
+        mr = new LL.MappingResult("foo", ["bar"], "baz");
+      });
+
+      it("returns a can.compute", function() {
+        var result = mr.get_mappings_compute();
+        expect(typeof result).toBe("function");
+        expect(result.isComputed).toBe(true);
+      });
+
+      describe("returned compute", function() {
+        it("returns the mappings", function() {
+          var result, phony_binding = {};
+          spyOn(mr, "get_mappings").and.returnValue([phony_binding]);
+          result = (mr.get_mappings_compute())();
+          expect(result).toEqual([phony_binding]);
+        });
+
+        it("watches the observe trigger", function() {
+          spyOn(mr, "watch_observe_trigger");
+          (mr.get_mappings_compute())();
+          expect(mr.watch_observe_trigger).toHaveBeenCalled();
+        });
+      });
+
+    });
+
+    describe("#walk_instances", function() {
+
+      describe("when last_instance is not this MappingResult's instance", function() {
+        it("calls the function on itself", function() {
+          var sanity_check = false;
+          var mr = new LL.MappingResult("foo", [], "bar");
+          mr.walk_instances(function(instance, _result, depth) {
+            expect(instance).toBe("foo");
+            expect(depth).toBe(0);
+            sanity_check = true;
+          }, "bar", 0);
+          expect(sanity_check).toBe(true);
+        });
+
+        describe("when mappings length is greater than zero", function() {
+          it("calls walk_instances on each mapping with depth incremented", function() {
+            var fake_result = jasmine.createSpyObj("fake_result", ['walk_instances']);
+            spyOn(LL.MappingResult.prototype, "_make_mappings").and.returnValue([fake_result]);
+            var mr = new LL.MappingResult("foo", [], "bar");
+            var func = function() {};
+            console.log(mr.mappings);
+            mr.walk_instances(func, "bar", 0);
+            expect(fake_result.walk_instances).toHaveBeenCalledWith(func, "foo", 1);
+          });
+        });
+
+      });
+
+      describe("when last_instance is the same as this MappingResult's instance", function() {
+
+        describe("when mappings length is greater than zero", function() {
+          it("calls walk_instances on each mapping without incrementing depth", function() {
+            var fake_result = jasmine.createSpyObj("fake_result", ['walk_instances']);
+            spyOn(LL.MappingResult.prototype, "_make_mappings").and.returnValue([fake_result]);
+            var mr = new LL.MappingResult("foo", [], "bar");
+            var func = function() {};
+            console.log(mr.mappings);
+            mr.walk_instances(func, "foo", 0);
+            expect(fake_result.walk_instances).toHaveBeenCalledWith(func, "foo", 0);
+          });
+        });
+
+        it("no action is taken", function() {
+          var sanity_check = false;
+          var mr = new LL.MappingResult("foo", [], "bar");
+          mr.walk_instances(function(instance, _result, depth) {
+            fail("fn was called");
+          }, "foo", 0);
+          expect(sanity_check).toBe(false);
+        });
+      });
+
+    });
 
   });
 
