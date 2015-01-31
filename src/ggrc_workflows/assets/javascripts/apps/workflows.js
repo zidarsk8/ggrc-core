@@ -298,7 +298,7 @@
       mappings[type].current_approval_cycles = Cross("approval_workflows", "current_cycle");
       mappings[type].current_object_review_tasks = CustomFilter(
         "object_tasks", function(binding) {
-        return RefreshQueue().enqueue(
+        return new RefreshQueue().enqueue(
             binding.instance.attr("task_group_task").reify()
           ).trigger().then(
             function(data){
