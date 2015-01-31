@@ -7,7 +7,6 @@
 
 <ul class="tree-structure new-tree dashboard-tree audit-tree">
 	{{#each list}}
-	{{log "Sasmita---------------"}}{{log this}}
 		<li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
 			<div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
 				<div class="item-wrap">
