@@ -458,8 +458,8 @@ can.Control("GGRC.Controllers.InfoWidget", {
     if (filter.workflow !== '' && filter.object !== '') {
       obj_flag = true;
       for (i = 0; i < my_list.length; i++) {
-        cycle = my_list[i].cycle.reify();
-        obj = my_list[i].cycle_task_group_object;
+        cycle = my_list[i].instance.cycle.reify();
+        obj = my_list[i].instance.cycle_task_group_object;
         if (filter.workflow === cycle.workflow.title && filter.object === obj.object.title)
           list2.push(my_list[i]);
       }

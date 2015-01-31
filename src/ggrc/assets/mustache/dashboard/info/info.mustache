@@ -9,6 +9,8 @@
   
 <!--div class="object-area wide"--> <!--This line makes the scrollbar work properly, but the css is messed up initially, which get fixed by window resize -->
 
+  {{#if_equals error_msg ''}}
+  {{else}}
   <div class="alert warning">
     <a href="#" class="close" data-dismiss="alert">x</a>
     <span>
@@ -17,6 +19,7 @@
       {{error_msg}}
     </span>
   </div>
+  {{/if_equals}}
 
   <div class="row-fluid">
     <!-- Left side Get started column -->
