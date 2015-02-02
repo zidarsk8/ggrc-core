@@ -2736,4 +2736,20 @@ can.each({
   });
 });
 
+Mustache.registerHelper("iterate_by_two", function (list, options) {
+  var i, arr, output = [];
+  list = Mustache.resolve(list);
+
+  for (i = 0; i < list.length; i+=2) {
+    if ((i + 1) === list.length) {
+      arr = [list[i]];
+    } else {
+      arr = [list[i], list[i+1]];
+    }
+    output.push(options.fn(
+      options.contexts.add({list: arr})));
+  }
+  return output.join("");
+});
+
 })(this, jQuery, can);

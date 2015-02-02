@@ -33,26 +33,29 @@
     </div>
 
     <div class="hidden-fields-area-custom" style="display:none;">
-      <div class="row-fluid wrap-row">
-        {{#instance.custom_attribute_definitions}}
-        <div class="span6">
-          <h6>{{title}}</h6>
-          <p data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
-            {{#with_value_for_id id}}
-              {{#switch attribute_type}}
-              {{#case 'Checkbox'}}
-                <input type="checkbox" disabled="disabled" {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
-              {{/case}}
-              {{#case 'Rich Text'}}
-                {{{value}}}
-              {{/case}}
-              {{#default}}
-                {{value}}
-              {{/default}}
-              {{/switch}}
-            {{/with_value_for_id}}
-          </p>
-        </div>
+        {{#iterate_by_two instance.custom_attribute_definitions}}
+          <div class="row-fluid wrap-row">
+          {{#list}}
+            <div class="span6">
+              <h6>{{title}}</h6>
+              <p data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
+                {{#with_value_for_id id}}
+                  {{#switch attribute_type}}
+                  {{#case 'Checkbox'}}
+                    <input type="checkbox" disabled="disabled" {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
+                  {{/case}}
+                  {{#case 'Rich Text'}}
+                    {{{value}}}
+                  {{/case}}
+                  {{#default}}
+                    {{value}}
+                  {{/default}}
+                  {{/switch}}
+                {{/with_value_for_id}}
+              </p>
+            </div>
+          {{/list}}
+          </div>
         {{/instance.custom_attribute_definitions}}
       </div>
     </div>
