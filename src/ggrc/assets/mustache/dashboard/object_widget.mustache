@@ -6,6 +6,86 @@
 }}
 
 {{!section class="widget... }}
+  {{#if_equals widget_id "roles_list"}}
+    <header class="header tree-header no-left-space">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="title-heading oneline">
+            Role
+          </div>
+        </div>
+        <div class="span6">
+          <div class="title-heading oneline right">
+            Role Scope
+          </div>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+  {{#if_equals widget_id "people_list"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span4">
+          <div class="title-heading oneline">
+            {{far_model.title_singular}} Name
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Email
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Authorizations
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li class="filter-trigger">
+              <a href="#" class="active">
+                <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Name
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Email
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Authorizations
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Company
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
   {{#if_equals widget_id "person"}}
     <header class="header tree-header">
       <div class="row-fluid">
@@ -321,6 +401,17 @@
     </header>
   {{/if_equals}}
 
+  {{#if_equals widget_id "events_list"}}
+  {{^is_dashboard}}
+    <header class="header">
+      <h2>
+        <i class="grcicon-event-color"></i>
+        {{{widget_name}}}
+      </h2>
+    </header>
+  {{/is_dashboard}}
+  {{/if_equals}}
+
   {{#if_equals widget_id "info"}}
   {{^is_dashboard}}
     <header class="header">
@@ -334,10 +425,13 @@
 
   {{^if_equals widget_id "info"}}
   {{^if_equals widget_id "person"}}
+  {{^if_equals widget_id "people_list"}}
   {{^if_equals widget_id "task_group"}}
+  {{^if_equals widget_id "roles_list"}}
   {{^if_equals widget_id "current"}}
   {{^if_equals widget_id "history"}}
   {{^if_equals widget_id "request"}}
+  {{^if_equals widget_id "events_list"}}
     <header class="header tree-header">
       <div class="row-fluid">
         <div class="span4">
@@ -439,6 +533,9 @@
         </div>
       </div>
     </header>
+  {{/if_equals}}
+  {{/if_equals}}
+  {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}

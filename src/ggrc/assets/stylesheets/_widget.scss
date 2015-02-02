@@ -166,6 +166,9 @@
           }
         }
       }
+      &.no-left-space {
+        padding-left: 10px;
+      }
     }
     &.default-left-space {
       padding: 0 12px 0 10px;
