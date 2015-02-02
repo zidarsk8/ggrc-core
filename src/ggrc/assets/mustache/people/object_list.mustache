@@ -81,11 +81,18 @@
 
       <div class="tier-2-info item-content">
         <div class="tier-2-info-content">
-            
-          <div class="action-bar">
-            <ul class="change-links">              
+
+          <div class="details-wrap">
+            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+            <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+              <li>
+                <a href="/people/{{id}}">
+                  <i class="grcicon-goto"></i>
+                  View Profile Page
+                </a>
+              </li>
               {{#is_allowed 'create' 'delete' 'UserRole' context=parent_instance.context.id}}
-                <li>
+                <li class="border">
                   <a href="javascript://" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{ id }}">
                     <i class="grcicon-role-color"></i>
                     <span>Edit Authorizations</span>
@@ -101,18 +108,9 @@
                 </li>
               {{/is_allowed}}
             </ul>
-            <ul>
-              <li>
-                <a href="/people/{{id}}">
-                  View Profile Page
-                  <i class="grcicon-goto"></i>
-                </a>
-              </li>
-            </ul>
           </div>
-          
-          <div class="small-info">
-            
+
+          <div class="tier-content">
             {{#if_match name '\\\\S'}}
               {{#name}}
                 <div class="row-fluid wrap-row">
@@ -160,12 +158,12 @@
                         {{permission_summary}}
                       </span>
                     {{/roles}}
-                  {{/person_roles}}                  
+                  {{/person_roles}}
                 </p>
               </div>
-            </div>            
-          </div>          
-          
+            </div>
+          </div>
+
         </div>
       </div>
     </li>
