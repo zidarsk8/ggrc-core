@@ -531,5 +531,8 @@ small {
     text-shadow: none;
     color: $white;
     padding: 0 0 0 1px;
+    &.count-zero {
+      background:#777;
+    }
   }
 }
