@@ -51,7 +51,7 @@
       </div>
 
       {{! The parent is Audit on My Work/Profile pages }}
-      {{#if_instance_of parent_instance "Audit"}}
+      {{#if_instance_of options.parent_instance "Audit"}}
         {{#using request=instance.request}}
 
           <div class="row-fluid wrap-row">
