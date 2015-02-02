@@ -25,7 +25,7 @@
                     </li>
                   {{/if_helpers}}
                 {{/with_program_roles_as}}
-                {{#is_allowed 'create' 'delete' 'UserRole' context=parent_instance.context.id}}
+                {{#is_allowed 'create' 'delete' 'UserRole' context=options.parent_instance.context.id}}
                   <li>
                     <a href="javascript://" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{instance.id}}">
                       <i class="grcicon-role-color"></i> <span>Edit Authorizations</span>
