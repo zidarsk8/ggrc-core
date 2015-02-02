@@ -37,11 +37,11 @@ class PeopleRowConverter(BaseRowConverter):
 
 class PeopleConverter(BaseConverter):
 
-  metadata_map = OrderedDict([
+  _metadata_map = OrderedDict([
     ('Type','type'),
   ])
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('Name', 'name'),
     ('Email', 'email'),
     ('Company', 'company')

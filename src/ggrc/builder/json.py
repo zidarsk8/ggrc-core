@@ -115,6 +115,11 @@ class UpdateAttrHandler(object):
       # invoke the callable to get the value
       attr_name = attr.attr_name
       value = attr(cls, obj, json_obj)
+    elif not hasattr(cls, class_attr.__class__.__name__):
+      # The attribute is a function on the obj like custom_attributes in
+      # CustomAttributable mixin
+      attr_name = attr
+      value = class_attr(obj, json_obj)
     else:
       # Lookup the method to use to perform the update. Use reflection to
       # key off of the type of the attribute and invoke the method of the

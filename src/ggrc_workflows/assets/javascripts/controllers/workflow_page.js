@@ -101,10 +101,10 @@
           });
           self.attr('can_activate', can_activate);
           self.attr('waiting', false);
-        })
+        });
       },
       _handle_refresh: function(model) {
-        var models = ['TaskGroup', 'TaskGroupTask', 'TaskGroupObject']
+        var models = ['TaskGroup', 'TaskGroupTask', 'TaskGroupObject'];
         if (models.indexOf(model.shortName) > -1) {
           this._can_activate_def();
         }
@@ -123,6 +123,7 @@
       "button click": function() {
         var workflow = GGRC.page_instance(),
             scope = this.scope,
+            restore_button = scope._restore_button.bind(scope),
             cycle;
         scope.attr('waiting', true);
         if (workflow.frequency !== 'one_time') {
@@ -130,7 +131,7 @@
             workflow.attr('recurrences', true);
             workflow.attr('status', "Active");
             return workflow.save();
-          }, scope._restore_button.bind(scope)).then(function(workflow) {
+          }, restore_button).then(function(workflow) {
             if (moment(workflow.next_cycle_start_date).isSame(moment(), "day")) {
               return new CMS.Models.Cycle({
                 context: workflow.context.stub(),
@@ -138,13 +139,13 @@
                 autogenerate: true
               }).save();
             }
-          }, scope._restore_button.bind(scope));
+          }, restore_button).then(restore_button);
         } else {
           _generate_cycle().then(function() {
-            workflow.refresh().then(function() {
-              workflow.attr('status', "Active").save();
-            }, scope._restore_button.bind(scope));
-          }, scope._restore_button.bind(scope));
+            return workflow.refresh();
+          }, restore_button).then(function(workflow) {
+            return workflow.attr('status', "Active").save();
+          }, restore_button).then(restore_button);
         }
       }
     }

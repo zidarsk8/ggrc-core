@@ -161,6 +161,11 @@ class BasicRoleImplications(DeclarativeRoleImplications):
       ('Audit', None): {
         'Auditor': ['AuditorReader'],
         },
+      ('Program', 'Program'): {
+        'ProgramOwner': ['ProgramReader'],
+        'ProgramEditor': ['ProgramReader'],
+        'ProgramReader': ['ProgramReader'],
+        },
       ('Program', None): {
         'ProgramOwner': ['ProgramBasicReader'],
         'ProgramEditor': ['ProgramBasicReader'],

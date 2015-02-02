@@ -1549,7 +1549,7 @@ ul.attr-list {
   }
 }
 
-.info-expand {
+.info-expand, .info-expand-custom {
   border-bottom: 1px solid $itemBorder;
   a {
     display: block;

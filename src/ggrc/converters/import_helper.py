@@ -3,16 +3,16 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-import csv, _csv
-import chardet
-import os
-from ggrc.models import Directive, Section
+import csv
+import _csv
 from StringIO import StringIO
+
 from flask import current_app
-from ggrc import db
+
+import chardet
+from ggrc.models import Directive
 from .common import ImportException
-from ggrc.converters.sections import SectionsConverter
-from ggrc.converters.controls import ControlsConverter
+
 
 def handle_csv_import(converter_class, filepath, **options):
   rows = []
@@ -63,7 +63,6 @@ def utf_8_encoder(csv_data):
 
 def handle_converter_csv_export(filename, objects, converter_class, **options):
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
-  status_code = 200
 
   exporter = converter_class(objects, **options)
   output_buffer = StringIO()
