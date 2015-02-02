@@ -3,11 +3,13 @@
 # Created By: silas@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from collections import OrderedDict
+
 from .base import *
-from ggrc.models import Control, Directive, Policy, Program, Regulation, Contract, Standard, Section, Objective, ObjectObjective, SectionObjective
+from ggrc.models import Directive, Policy, Program, Regulation, Contract, Standard
 from ggrc.models.mixins import BusinessObject
 from .base_row import *
-from collections import OrderedDict
+
 
 DIRECTIVE_CLASSES = [Directive, Policy, Regulation, Contract, Standard]
 
@@ -71,12 +73,12 @@ class ObjectiveRowConverter(BaseRowConverter):
 
 class ObjectivesConverter(BaseConverter):
 
-  metadata_map = OrderedDict([
+  _metadata_map = OrderedDict([
     ('Type', 'type'),
     ('Directive Code', 'slug')
   ])
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('Objective Code', 'slug'),
     ('Title', 'title'),
     ('Description', 'description'),
@@ -104,6 +106,7 @@ class ObjectivesConverter(BaseConverter):
 
   # Creates the correct metadata_map for the specific directive kind.
   def create_metadata_map(self):
+    super(ObjectivesConverter, self).create_metadata_map()
     parent_type = self.options.get('parent_type')
     if parent_type in DIRECTIVE_CLASSES:
       self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive_kind()), v) \

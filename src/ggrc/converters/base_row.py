@@ -4,18 +4,17 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from datetime import datetime
-import re
+
 from .common import *
 from ggrc.models.all_models import (
     Audit, ControlCategory, ControlAssertion,
     Control, Document, Objective, ObjectControl, ObjectiveControl,
     ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process,
-    Relationship, Request, Section, SectionBase, SectionObjective,
+    Relationship, Request, SectionBase, SectionObjective,
     System, SystemOrProcess,
 )
 from ggrc.models.exceptions import ValidationError
 from ggrc.app import app
-
 
 def unpack_list(vals):
   result = []
@@ -65,7 +64,12 @@ class BaseRowConverter(object):
     self.errors = {}
     self.warnings = {}
     self.messages = {}
+    self.custom_attribute_values = {}
 
+  def reify_custom_attributes(self):
+    for key in self.importer.custom_attribute_definitions:
+      definition = self.importer.custom_attribute_definitions[key]
+      self.handle(definition.title, CustomAttributeColumnHandler)
 
   def add_error(self, key, message):
     self.errors.setdefault(key, []).append(message)
@@ -118,7 +122,7 @@ class BaseRowConverter(object):
 
   def setup_object_by_slug(self, attrs):
     slug = prepare_slug(attrs['slug']) if attrs.get('slug') else ''
-    model_class = self.model_class if not self.importer.options.get('is_biz_process') else Process
+    model_class = self.model_class
 
     if not slug:
       self.obj = model_class()
@@ -146,6 +150,11 @@ class BaseRowConverter(object):
             ownable=self.obj,
             modified_by_id=current_user_id
         ))
+    # This atomically deletes all existing custom attribute values for this object
+    # and sets all imported values. This will delete all custom attributes that
+    # were set on the object prior to import and not included in the import.
+    if self.custom_attribute_values:
+      self.obj.custom_attributes({'custom_attributes': self.custom_attribute_values})
 
   def add_after_save_hook(self, hook = None, funct = None):
     if hook: self.after_save_hooks.append(hook)
@@ -192,6 +201,9 @@ class BaseRowConverter(object):
       setattr(self.obj, name, value)
     except ValidationError as e: # Validation taken care of in handlers
       pass
+
+  def set_custom_attr(self, definition, value):
+    self.custom_attribute_values[definition.id] = value
 
   def get_attr(self, name):
     return getattr(self.obj, name, '') or ''
@@ -246,9 +258,8 @@ class ColumnHandler(object):
 
   def validate(self, data):
     if self.options.get('is_required') and data in ("", None):
-      obj_map = self.base_importer.object_map
       missing_column = self.base_importer.get_header_for_column(
-                        self.base_importer.object_map, self.key)
+                        self.base_importer.object_map(), self.key)
       self.add_error("{} is required.".format(missing_column))
 
   def do_import(self, content):
@@ -272,19 +283,40 @@ class ColumnHandler(object):
   def export(self):
     return getattr(self.importer.obj, self.key, '')
 
+class CustomAttributeColumnHandler(ColumnHandler):
+
+  def validate(self, data):
+    definition = self.base_importer.custom_attribute_definitions[self.key]
+    if definition.mandatory and data in ("", None):
+      missing_column = self.base_importer.get_header_for_column(
+                        self.base_importer.object_map(), self.key)
+      self.add_error("{} is required.".format(missing_column))
+
+  def set_attr(self, value):
+    self.importer.set_custom_attr(
+      self.base_importer.custom_attribute_definitions[self.key], value)
+
+  def export(self):
+    definition = self.base_importer.custom_attribute_definitions[self.key]
+    # TODO: This is computationally expensive. But the list of attributes should
+    # TODO: be small. So the impact should not be noticeable. Nonetheless, this
+    # TODO: can be improved in the future. It's just tricky to do right now.
+    for v in self.importer.obj.custom_attribute_values:
+      if v.custom_attribute_id == definition.id:
+        return v.attribute_value
+    return None
 
 class RequestTypeColumnHandler(ColumnHandler):
 
-    def parse_item(self, value):
-      formatted_type = value.lower()
-      if formatted_type in Request.VALID_TYPES:
-        return formatted_type
-      else:
-        self.add_error("Value must be one of the following: {}".format(
-            Request.VALID_TYPES
-        ))
-        return None
-
+  def parse_item(self, value):
+    formatted_type = value.lower()
+    if formatted_type in Request.VALID_TYPES:
+      return formatted_type
+    else:
+      self.add_error("Value must be one of the following: {}".format(
+          Request.VALID_TYPES
+      ))
+      return None
 
 class StatusColumnHandler(ColumnHandler):
 
@@ -326,11 +358,10 @@ class StatusColumnHandler(ColumnHandler):
 
 class TextOrHtmlColumnHandler(ColumnHandler):
 
- def parse_item(self, value):
-   if value:
+  def parse_item(self, value):
+    if value:
      value = value.strip()
-   return value or ''
-
+    return value or ''
 
 class ContactEmailHandler(ColumnHandler):
 

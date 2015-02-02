@@ -17,9 +17,9 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , update : "PUT /api/org_groups/{id}"
   , destroy : "DELETE /api/org_groups/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -34,6 +34,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -100,9 +101,9 @@ can.Model.Cacheable("CMS.Models.Project", {
   , update : "PUT /api/projects/{id}"
   , destroy : "DELETE /api/projects/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -117,6 +118,7 @@ can.Model.Cacheable("CMS.Models.Project", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -168,9 +170,9 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , update : "PUT /api/facilities/{id}"
   , destroy : "DELETE /api/facilities/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -185,6 +187,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -251,9 +254,9 @@ can.Model.Cacheable("CMS.Models.Product", {
   , update : "PUT /api/products/{id}"
   , destroy : "DELETE /api/products/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -269,6 +272,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , kind : "CMS.Models.Option.stub"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
     kind : null
@@ -340,9 +344,9 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , update : "PUT /api/data_assets/{id}"
   , destroy : "DELETE /api/data_assets/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -357,6 +361,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -423,9 +428,9 @@ can.Model.Cacheable("CMS.Models.Market", {
   , update : "PUT /api/markets/{id}"
   , destroy : "DELETE /api/markets/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -440,6 +445,7 @@ can.Model.Cacheable("CMS.Models.Market", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -491,9 +497,9 @@ can.Model.Cacheable("CMS.Models.Vendor", {
   , update : "PUT /api/vendors/{id}"
   , destroy : "DELETE /api/vendors/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -508,6 +514,7 @@ can.Model.Cacheable("CMS.Models.Vendor", {
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"

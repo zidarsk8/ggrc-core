@@ -1,19 +1,21 @@
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: david@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-import bleach
+from uuid import uuid1
+
 from flask import current_app
-from ggrc import settings, db
 from sqlalchemy import event
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.orm.session import Session
-from uuid import uuid1
+
+from ggrc import db
 from .inflector import ModelInflectorDescriptor
-from .reflection import AttributeInfo, PublishOnly
+from .reflection import AttributeInfo
 from .computed_property import computed_property
+
 
 """Mixins to add common attributes and relationships. Note, all model classes
 must also inherit from ``db.Model``. For example:
@@ -93,7 +95,9 @@ class Identifiable(object):
     return tuple(table_args,)
 
   # FIXME: This is not the right place, but there is no better common base
-  #   class
+  # FIXME: class. I don't know what copy_into is used for. My guess would
+  # FIXME: be cloning of some sort. I'm not sure that this code will work
+  # FIXME: with custom attributes.
   def copy_into(self, _other, columns, **kwargs):
     target = _other or type(self)()
 
@@ -421,19 +425,32 @@ class WithContact(object):
         db.Column(db.Integer, db.ForeignKey('people.id')), cls.__name__)
 
   @declared_attr
+  def secondary_contact_id(cls):
+    return deferred(
+      db.Column(db.Integer, db.ForeignKey('people.id')), cls.__name__)
+
+  @declared_attr
   def contact(cls):
     return db.relationship(
         'Person',
         uselist=False,
         foreign_keys='{}.contact_id'.format(cls.__name__))
 
+  @declared_attr
+  def secondary_contact(cls):
+    return db.relationship(
+        'Person',
+        uselist=False,
+        foreign_keys='{}.secondary_contact_id'.format(cls.__name__))
+
   @staticmethod
   def _extra_table_args(cls):
     return (
         db.Index('fk_{}_contact'.format(cls.__tablename__), 'contact_id'),
+        db.Index('fk_{}_secondary_contact'.format(cls.__tablename__), 'secondary_contact_id'),
         )
 
-  _publish_attrs = ['contact']
+  _publish_attrs = ['contact', 'secondary_contact']
 
 
 class BusinessObject(
@@ -449,3 +466,85 @@ class BusinessObject(
       'Not in Scope',
       'Deprecated',
       ]
+
+# This class is just a marker interface/mixin to indicate that a model type
+# supports custom attributes.
+class CustomAttributable(object):
+    @declared_attr
+    def custom_attribute_values(cls):
+        joinstr = 'and_(foreign(CustomAttributeValue.attributable_id) == {type}.id, '\
+                        'foreign(CustomAttributeValue.attributable_type) == "{type}")'
+        joinstr = joinstr.format(type=cls.__name__)
+        return relationship(
+            "CustomAttributeValue",
+            primaryjoin=joinstr,
+            backref='{0}_custom_attributable'.format(cls.__name__),
+            cascade='all, delete-orphan',
+            )
+
+    def custom_attributes(cls, attributes):
+        if 'custom_attributes' not in attributes:
+          return
+        attributes = attributes['custom_attributes']
+        from .custom_attribute_value import CustomAttributeValue
+        # attributes looks like this:
+        #    {<id of attribute definition> : attribute value, ... }
+
+        # 1) Get all custom attribute values for the CustomAttributable instance
+        attr_values = db.session.query(CustomAttributeValue)\
+            .filter(CustomAttributeValue.attributable_type==cls.__class__.__name__)\
+            .filter(CustomAttributeValue.attributable_id==cls.id)\
+            .all()
+
+        attr_value_ids = [v.id for v in attr_values]
+        ftrp_properties = ["attribute_value_{id}".format(id=_id) for _id in attr_value_ids]
+
+        from ggrc.fulltext.mysql import MysqlRecordProperty
+        from sqlalchemy import and_
+        # 2) Delete all fulltext_record_properties for the list of values
+        db.session.query(MysqlRecordProperty)\
+            .filter(
+                and_(
+                    MysqlRecordProperty.type==cls.__class__.__name__,
+                    MysqlRecordProperty.property.in_(ftrp_properties))
+                )\
+            .delete(synchronize_session='fetch')
+
+        # 3) Delete the list of custom attribute values
+        db.session.query(CustomAttributeValue)\
+            .filter(CustomAttributeValue.id.in_(attr_value_ids))\
+            .delete(synchronize_session='fetch')
+
+        db.session.commit()
+
+        # 4) Instantiate custom attribute values for each of the definitions
+        #    passed in (keys)
+        for ad_id in attributes.keys():
+            av = CustomAttributeValue()
+            av.custom_attribute_id = ad_id
+            av.attributable_id = cls.id
+            av.attributable_type = cls.__class__.__name__
+            av.attribute_value = attributes[ad_id]
+            # 5) Set the context_id for each custom attribute value to the context id
+            #    of the custom attributable.
+            av.context_id = cls.context_id
+            # 6) Save the new set of custom attribute values.
+            db.session.add(av)
+
+    _publish_attrs = [
+        'custom_attribute_values'
+    ]
+    _update_attrs = [
+        'custom_attributes'
+    ]
+    _include_links = [
+        # 'custom_attribute_values',
+    ]
+    #
+    # @declared_attr
+    # def custom_attribute_definitions(cls):
+    #     from .custom_attribute_definition import CustomAttributeDefinition
+    #     # FIXME definitions should be class scoped, not instance scoped.
+    #     joinstr = 'foreign(CustomAttributeDefinition.definition_type) == "{name}"'
+    #     joinstr = joinstr.format(name=cls.__name__)
+    #     return db.relationship("CustomAttributeDefinition",primaryjoin=joinstr)

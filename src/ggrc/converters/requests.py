@@ -73,12 +73,12 @@ class RequestRowConverter(BaseRowConverter):
 
 class RequestsConverter(BaseConverter):
 
-  metadata_map = OrderedDict([
+  _metadata_map = OrderedDict([
     ('Type', 'type'),
     ('Program Code', 'slug')
   ])
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('Request Code', 'slug'),
     ('Request Type', 'request_type'),
     ('Request Description', 'description'),

@@ -8,45 +8,38 @@
 resources.
 """
 
-
 import datetime
-import ggrc.builder.json
 import hashlib
 import logging
 import time
-from blinker import Namespace
 from exceptions import TypeError
+from wsgiref.handlers import format_date_time
+from urllib import urlencode
+
+from blinker import Namespace
 from flask import url_for, request, current_app, g, has_request_context
-from flask.ext.sqlalchemy import Pagination
 from flask.views import View
+from sqlalchemy import and_
+from sqlalchemy.exc import IntegrityError
+import sqlalchemy.orm.exc
+from werkzeug.exceptions import BadRequest, Forbidden
+from sqlalchemy.orm.properties import RelationshipProperty
+
+import ggrc.builder.json
+from flask.ext.sqlalchemy import Pagination
 from ggrc import db, utils
 from ggrc.utils import as_json, UnicodeSafeJsonWrapper, benchmark
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
-from ggrc.models.context import Context
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
 from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.rbac import permissions, context_query_filter
-from sqlalchemy import or_, and_
-from sqlalchemy.exc import IntegrityError
-import sqlalchemy.orm.exc
-from werkzeug.exceptions import BadRequest, Forbidden
-from wsgiref.handlers import format_date_time
-from urllib import urlencode
 from .attribute_query import AttributeQueryBuilder
 from ggrc.models.background_task import BackgroundTask, create_task
-
 from ggrc import settings
-from copy import deepcopy
-from sqlalchemy.orm.session import Session
-from sqlalchemy import event
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy.orm.properties import RelationshipProperty
-from sqlalchemy.ext.associationproxy import AssociationProxy
 
 
 CACHE_EXPIRY_COLLECTION=60
@@ -118,6 +111,28 @@ def get_related_keys_for_expiration(context, o):
             keys.append(key)
   return keys
 
+
+def set_ids_for_new_custom_attribute_values(objects, obj):
+  """
+  When we are creating custom attribute values for
+  POST requests, obj.id is not yet defined. This is why we update
+  custom attribute values at this point and set the correct attributable_id
+
+  Args:
+    objects: newly created objects (we update only the ones that are CustomAttributeValue
+    obj: parent object to be set as attributable
+
+  Returns:
+    None
+  """
+
+  from ggrc.models.custom_attribute_value import CustomAttributeValue
+  for object in objects:
+    if not isinstance(object, CustomAttributeValue):
+      continue
+    object.attributable_id = obj.id
+    db.session.add(object)
+  db.session.flush()
 
 def update_memcache_before_commit(context, modified_objects, expiry_time):
   """
@@ -387,8 +402,10 @@ class ModelView(View):
     columns.append(mapper.primary_key[0].label('id'))
     #columns.append(model.id.label('id'))
     columns.append(self._get_type_select_column(model).label('type'))
-    columns.append(mapper.c.context_id.label('context_id'))
-    columns.append(mapper.c.updated_at.label('updated_at'))
+    if hasattr(mapper.c, 'context_id'):
+      columns.append(mapper.c.context_id.label('context_id'))
+    if hasattr(mapper.c, 'updated_at'):
+      columns.append(mapper.c.updated_at.label('updated_at'))
     #columns.append(self._get_polymorphic_column(model))
     return columns
 
@@ -855,8 +872,6 @@ class Resource(ModelView):
 
     matches_query = self.get_collection_matches(self.model)
 
-    matches = None
-    extras = None
     if '__page' in request.args or '__page_only' in request.args:
       matches, extras = self.apply_paging(matches_query)
     else:
@@ -999,6 +1014,7 @@ class Resource(ModelView):
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     modified_objects = get_modified_objects(db.session)
+    set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
     log_event(db.session, obj)
     with benchmark("Update memcache before commit for resource collection POST"):
       update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
@@ -1201,9 +1217,6 @@ def filter_resource(resource, depth=0, user_permissions=None):
           if type(value) is dict and 'type' in value:
             resource[key] = filter_resource(
               value, depth=depth+1, user_permissions=user_permissions)
-          # elif type(value) in (list,tuple):
-          #   resource[key] = filter_resource(
-          #     value, depth=depth+1, user_permissions=user_permissions)
 
       return resource
   else:

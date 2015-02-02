@@ -5,7 +5,7 @@
 
 from ggrc import db
 from .associationproxy import association_proxy
-from .mixins import deferred, BusinessObject, Timeboxed
+from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
 from .object_document import Documentable
 from .object_person import Personable
 from .object_objective import Objectiveable
@@ -126,7 +126,8 @@ class Directive(Timeboxed, BusinessObject, db.Model):
 
 # FIXME: For subclasses, restrict kind
 class Policy(
-    Relatable, Objectiveable, Documentable, Personable, Ownable, Directive):
+    CustomAttributable, Relatable, Objectiveable, Documentable, Personable,
+    Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
       }
@@ -141,7 +142,8 @@ class Policy(
     return 'Policy'
 
 class Regulation(
-    Relatable, Objectiveable, Documentable, Personable, Ownable, Directive):
+    CustomAttributable, Relatable, Objectiveable, Documentable, Personable,
+    Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
       }
@@ -153,7 +155,8 @@ class Regulation(
     return 'Regulation'
 
 class Standard(
-    Relatable, Objectiveable, Documentable, Personable, Ownable, Directive):
+    CustomAttributable, Relatable, Objectiveable, Documentable, Personable,
+    Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Standard'
       }
@@ -165,7 +168,8 @@ class Standard(
     return 'Standard'
 
 class Contract(
-    Relatable, Objectiveable, Documentable, Personable, Ownable, Directive):
+    CustomAttributable, Relatable, Objectiveable, Documentable, Personable,
+    Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'
       }

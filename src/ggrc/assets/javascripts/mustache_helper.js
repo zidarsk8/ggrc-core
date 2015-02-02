@@ -665,6 +665,21 @@ Mustache.registerHelper("iterate", function () {
   return ret.join("");
 });
 
+// Iterate over a string by spliting it by a separator
+Mustache.registerHelper("iterate_string", function (str, separator, options) {
+  var i = 0, args, ctx = {}, ret = [];
+
+  str = Mustache.resolve(str);
+  separator = Mustache.resolve(separator);
+  args = str.split(separator);
+  for (; i < args.length; i += 1) {
+    ctx.iterator = typeof args[i] === "string" ? new String(args[i]) : args[i];
+    ret.push(options.fn(options.contexts.add(ctx)));
+  }
+
+  return ret.join("");
+});
+
 Mustache.registerHelper("is_private", function (options) {
   var context = this;
   if (options.isComputed) {

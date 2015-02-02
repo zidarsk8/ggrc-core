@@ -71,7 +71,11 @@ can.Construct("can.Model.Mixin", {
               break;
             }
           } else {
-            obj[key] = fn;
+            if(aspect === "extend") {
+              obj[key] = $.extend(obj[key], fn);
+            } else {
+              obj[key] = fn;
+            }
           }
         }
       };
@@ -109,6 +113,16 @@ can.Model.Mixin("ownable", {
 });
 
 can.Model.Mixin("contactable", {
+  // NB : Because the attributes object
+  //  isn't automatically cloned into subclasses by CanJS (this is an intentional
+  //  exception), when subclassing a class that uses this mixin, be sure to pull in the 
+  //  parent class's attributes using `can.extend(this.attributes, <parent_class>.attributes);`
+  //  in the child class's static init function.
+  "extend:attributes" : {
+    "contact": "CMS.Models.Person.stub",
+    "secondary_contact": "CMS.Models.Person.stub"
+  }
+}, {
   before_create : function() {
     if(!this.contact) {
       this.attr('contact', { id: GGRC.current_user.id, type : "Person" });

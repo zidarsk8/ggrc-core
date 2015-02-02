@@ -7,7 +7,7 @@
 from ggrc import db
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
-    deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful
+    deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful, CustomAttributable
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.context import HasOwnContext
@@ -20,7 +20,7 @@ from datetime import date
 
 
 class Workflow(
-    HasOwnContext, Timeboxed, Described, Titled, Slugged, Stateful, Base, db.Model):
+    CustomAttributable, HasOwnContext, Timeboxed, Described, Titled, Slugged, Stateful, Base, db.Model):
   __tablename__ = 'workflows'
   _title_uniqueness = False
 
@@ -44,7 +44,7 @@ class Workflow(
   notify_on_change = deferred(
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
   notify_custom_message = deferred(
-      db.Column(db.String, nullable=True), 'Workflow')
+      db.Column(db.Text, nullable=True), 'Workflow')
 
   frequency = deferred(
     db.Column(db.String, nullable=True, default=default_frequency),

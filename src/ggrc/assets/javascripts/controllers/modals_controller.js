@@ -18,6 +18,7 @@ can.Control("GGRC.Controllers.Modals", {
     preload_view : GGRC.mustache_path + "/dashboard/modal_preload.mustache"
     , content_view : GGRC.mustache_path + "/help/help_modal_content.mustache"
     , header_view : GGRC.mustache_path + "/modals/modal_header.mustache"
+    , custom_attributes_view : GGRC.mustache_path + "/custom_attributes/modal_content.mustache"
     , button_view : null
     , model : null    // model class to use when finding or creating new
     , instance : null // model instance to use instead of finding/creating (e.g. for update)
@@ -141,19 +142,11 @@ can.Control("GGRC.Controllers.Modals", {
       else {
         path = path.join(".");
 
-        // we (ab)use databinding to make the input field change for us
-        // doing it three times like this ensures stability
 
-        // handle emptying field and choosing same suggestion
-        this.options.instance.attr(path, null);
-        // the first change sets to null, 2nd works
-        this.options.instance.attr(path, ui.item.stub());
-        this.options.instance.attr(path, ui.item.stub());
-        // settign el.val manually is still needed for autocompletes inside
-        // deferred renderers such as control/object selector in audit
-        setTimeout(function() {
-          el.val(ui.item.title || ui.item.name || ui.item.email);
+        setTimeout(function(){
+          el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
         }, 0);
+        this.options.instance.attr(path, ui.item);
       }
   }
 
@@ -192,12 +185,14 @@ can.Control("GGRC.Controllers.Modals", {
       can.view(this.options.content_view, dfd)
       , can.view(this.options.header_view, dfd)
       , can.view(this.options.button_view, dfd)
+      , can.view(this.options.custom_attributes_view, dfd)
     ).done(this.proxy('draw'));
   }
 
   , fetch_data : function(params) {
-    var that = this;
-    var dfd;
+    var that = this,
+        dfd,
+        instance;
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
     if (this.options.skip_refresh && this.options.instance) {
@@ -230,11 +225,20 @@ can.Control("GGRC.Controllers.Modals", {
       that.on();
       dfd = new $.Deferred().resolve(this.options.instance);
     }
-
+    instance = this.options.instance;
+    // Make sure custom attributes are preloaded:
+    dfd = dfd.then(function(){
+      return $.when(
+        instance.load_custom_attribute_definitions(),
+        instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
+      );
+    });
     return dfd.done(function() {
 
       // If the modal is closed early, the element no longer exists
       if (that.element) {
+        // Make sure custom attr validations/values are set
+        instance.setup_custom_attributes();
         // This is to trigger `focus_first_element` in modal_ajax handling
         that.element.trigger("loaded");
       }
@@ -253,7 +257,7 @@ can.Control("GGRC.Controllers.Modals", {
     return this.options.find_params.serialize ? this.options.find_params.serialize() : this.options.find_params
   }
 
-  , draw : function(content, header, footer) {
+  , draw : function(content, header, footer, custom_attributes) {
     // Don't draw if this has been destroyed previously
     if (!this.element) {
       return;
@@ -262,11 +266,17 @@ can.Control("GGRC.Controllers.Modals", {
     can.isArray(content) && (content = content[0]);
     can.isArray(header) && (header = header[0]);
     can.isArray(footer) && (footer = footer[0]);
+    if (can.isArray(custom_attributes)) {
+      custom_attributes = custom_attributes[0];
+    }
 
     header != null && this.options.$header.find("h2").html(header);
     content != null && this.options.$content.html(content).removeAttr("style");
     footer != null && this.options.$footer.html(footer);
 
+    if (custom_attributes != null && !('delete_counts' in this.options)) {
+      this.options.$content.append(custom_attributes);
+    }
     this.setup_wysihtml5();
 
     //Update UI status array
@@ -401,7 +411,6 @@ can.Control("GGRC.Controllers.Modals", {
       if(can.isArray(value)) {
         value = new can.Observe.List(can.map(value, function(v) { return new can.Observe({}).attr(name.slice(1).join("."), v); }));
       } else {
-
         if($elem.is("[data-lookup]")) {
           if(!value) {
             value = null;
@@ -441,8 +450,11 @@ can.Control("GGRC.Controllers.Modals", {
       value = value || [];
       cur.splice.apply(cur, [0, cur.length].concat(value));
     } else {
-      if(name[0] !== "people")
+      if (name[0] === "custom_attributes") {
+        instance.custom_attributes.attr(name[1], value[name[1]]);
+      } else if(name[0] !== "people") {
         instance.attr(name[0], value);
+      }
     }
     this.setup_wysihtml5(); //in case the changes in values caused a new wysi box to appear.
   }
@@ -493,11 +505,11 @@ can.Control("GGRC.Controllers.Modals", {
         }
       }
 
-      for(var i=0; i < $el.closest('.hide-wrap.hidable').find('.inner-hidable').length; i++) {
+      for(i=0; i < $el.closest('.hide-wrap.hidable').find('.inner-hidable').length; i++) {
         if(i == 1) {
           $el.closest('.inner-hide').parent('.hidable').addClass("hidden");
         }
-      };
+      }
 
       $hideButton.hide();
       $showButton.show();
@@ -570,8 +582,7 @@ can.Control("GGRC.Controllers.Modals", {
       var $selected,
           str,
           tabindex,
-          $form = $(this.element).find('form');;
-
+          $form = $(this.element).find('form');
       for (var i = 0; i < this.options.ui_array.length; i++){
         if(this.options.ui_array[i] == 1){
           tabindex = i+1;
@@ -680,9 +691,25 @@ can.Control("GGRC.Controllers.Modals", {
 
   , new_instance: function(data){
     var that = this,
-      params = this.find_params();
+      params = this.find_params(),
+      new_instance = new this.options.model(params)
+        .attr("_suppress_errors", true)
+        .attr('custom_attribute_definitions', this.options.instance.custom_attribute_definitions)
+        .attr('custom_attributes', new can.Map());
 
-    $.when(this.options.attr("instance", new this.options.model(params).attr("_suppress_errors", true)))
+    // Reset custom attribute values manually
+    can.each(new_instance.custom_attribute_definitions, function(definition) {
+      var element = that.element.find('[name="custom_attributes.' + definition.id + '"]');
+      if (definition.attribute_type === 'Checkbox') {
+        element.attr('checked', false);
+      } else if (definition.attribute_type === 'Rich Text') {
+        element.data("wysihtml5").editor.clear();
+      } else {
+        element.val('');
+      }
+    });
+
+    $.when(this.options.attr('instance', new_instance))
       .done (function() {
         // If the modal is closed early, the element no longer exists
         if (that.element) {
@@ -746,7 +773,7 @@ can.Control("GGRC.Controllers.Modals", {
             finish();
           });
         } else {
-          var type = obj.type ? can.spaceCamelCase(obj.type) : '', 
+          var type = obj.type ? can.spaceCamelCase(obj.type) : '',
               name = obj.title ? obj.title : '',
               msg;
           if(instance_id === undefined) { //new element
@@ -860,7 +887,7 @@ can.Component.extend({
   },
   events: {
     init: function() {
-      var key;
+      var key, that = this;
       this.scope.attr("controller", this);
 
       if (!this.scope.instance) {
@@ -877,14 +904,19 @@ can.Component.extend({
       }
 
       if (this.scope[this.scope.source_mapping_source]) {
-        this.scope.attr(
-          "list",
-          can.map(
-            this.scope[this.scope.source_mapping_source].get_mapping(this.scope.source_mapping),
-            function(binding) {
-              return binding.instance;
-            })
-        );
+        this.scope[this.scope.source_mapping_source]
+        .get_binding(this.scope.source_mapping)
+        .refresh_instances()
+        .then(function(list) {
+          that.scope.attr(
+            "list",
+            can.map(
+              list,
+              function(binding) {
+                return binding.instance;
+              })
+          );          
+        });
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
         key = this.scope.instance_attr + "_" + (this.scope.mapping || this.scope.source_mapping);
@@ -1084,4 +1116,3 @@ can.Component.extend({
 });
 
 })(window.can, window.can.$);
-

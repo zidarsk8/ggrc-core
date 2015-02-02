@@ -4,8 +4,6 @@
 # Maintained By: dan@reciprocitylabs.com
 
 import re
-from ggrc import db
-from copy import *
 
 # Temporary as I test new import functionality
 DEBUG_IMPORT = True
