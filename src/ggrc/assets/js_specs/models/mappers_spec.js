@@ -1,3 +1,10 @@
+/*!
+    Copyright (C) 2013-2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
+
 
 describe("mappers", function() {
   
@@ -363,7 +370,6 @@ describe("mappers", function() {
             spyOn(LL.MappingResult.prototype, "_make_mappings").and.returnValue([fake_result]);
             var mr = new LL.MappingResult("foo", [], "bar");
             var func = function() {};
-            console.log(mr.mappings);
             mr.walk_instances(func, "bar", 0);
             expect(fake_result.walk_instances).toHaveBeenCalledWith(func, "foo", 1);
           });
@@ -379,7 +385,6 @@ describe("mappers", function() {
             spyOn(LL.MappingResult.prototype, "_make_mappings").and.returnValue([fake_result]);
             var mr = new LL.MappingResult("foo", [], "bar");
             var func = function() {};
-            console.log(mr.mappings);
             mr.walk_instances(func, "foo", 0);
             expect(fake_result.walk_instances).toHaveBeenCalledWith(func, "foo", 0);
           });
@@ -748,7 +753,6 @@ describe("mappers", function() {
         spyOn(rll, "insert_from_source_binding");
         rll.init_listeners(binding);
         expect(binding.source_binding).toBe(source_binding);
-        console.log(source_binding.list)
         expect(rll.insert_from_source_binding).toHaveBeenCalledWith(binding, source_binding.list, 0);
       });
 
