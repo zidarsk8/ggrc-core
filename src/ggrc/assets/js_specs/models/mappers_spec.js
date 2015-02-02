@@ -520,50 +520,88 @@ describe("mappers", function() {
 
     describe("#remove_instances", function() {
 
+      var Dummy;
+      beforeAll(function() {
+        Dummy = can.Map.extend();
+        Dummy.shortName = "Dummy";
+      });
+
       it("removes no instance when nothing is supplied to remove", function() {
-        var binding = { list : [{ instance : { id : 3 }, mappings : [] }] };
+        var instance =  new Dummy({ id : 3 });
+        var binding = { list : [{ instance : instance, mappings : [] }] };
         ll.remove_instance(binding, {}, 'b');
-        expect(binding.list).toEqual([{ instance : { id : 3 }, mappings : [] }]);
+        expect(binding.list).toEqual([{ instance : instance, mappings : [] }]);
+      });
+
+      it("removes no instance when instance doesn't match type", function() {
+        var instance =  new Dummy({ id : 3 });
+        var WrongClass = can.Map.extend();
+        WrongClass.shortName = "Wrong";
+        var wrong_instance = new WrongClass({ id : 3 });
+        var binding = { list : [{ instance : instance, mappings : [] }] };
+        ll.remove_instance(binding, wrong_instance, 'b');
+        expect(binding.list).toEqual([{ instance : instance, mappings : [] }]);
+      });
+
+      it("removes the instance from mappings when matching", function() {
+        var instance =  new Dummy({ id : 3 });
+        var binding = { list : [{ instance : instance, mappings : [] }] };
+        ll.remove_instance(binding, instance, 'b');
+        expect(binding.list).toEqual([]);
+      });
+
+      it("removes the instance from mappings on just type and ID match", function() {
+        var instance =  new Dummy({ id : 3 });
+        var matching_instance = new Dummy({ id : 3 });
+        var binding = { list : [{ instance : instance, mappings : [] }] };
+        expect(matching_instance).not.toBe(instance);
+        ll.remove_instance(binding, matching_instance, 'b');
+        expect(binding.list).toEqual([]);
+      });
+      
+      describe("with mappings defined", function() {
+
+        it("deletes only if all mappings are accounted for in instance", function() {
+          var instance =  new Dummy({ id : 3 });
+          var binding = {
+            list : [{
+              instance : instance,
+              mappings : ['a', 'b'],
+              remove_mapping: function(mapping) {
+                var idx = can.inArray(mapping, this.mappings);
+                if(~idx) {
+                  this.mappings.splice(idx, 1);
+                  return true;
+                }
+              }
+            }]
+          };
+          ll.remove_instance(binding, instance, ['a', 'b']);
+          expect(binding.list).toEqual([]);
+        });
+
+        it("does not delete if not all mappings are accounted for", function() {
+          var instance =  new Dummy({ id : 3 });
+          var binding = {
+            list : [{
+              instance : instance,
+              mappings : ['a', 'b'],
+              remove_mapping: function(mapping) {
+                var idx = can.inArray(mapping, this.mappings);
+                if(~idx) {
+                  this.mappings.splice(idx, 1);
+                  return true;
+                }
+              }
+            }]
+          };
+          ll.remove_instance(binding, instance, ['a']); //only one of the mappings
+          expect(binding.list).toEqual([{ instance : instance, mappings : ['b'], remove_mapping: jasmine.any(Function) }]);
+        });
       });
 
     });
-/*
 
-
-    , remove_instance: function(binding, instance, mappings) {
-        var self = this
-          , mappings
-          , mapping_index
-          , instance_index_to_remove = -1
-          , indexes_to_remove = []
-          ;
-
-        if (!(can.isArray(mappings) || mappings instanceof can.Observe.List))
-          mappings = [mappings];
-
-        can.each(binding.list, function(data, instance_index) {
-          var mapping_attr = binding.list[instance_index].mappings;
-
-          if (data.instance.id == instance.id
-              && data.instance.constructor.shortName == instance.constructor.shortName) {
-            if (mapping_attr.length == 0) {
-              indexes_to_remove.push(instance_index);
-            } else {
-              can.each(mappings, function(mapping) {
-                var was_removed = data.remove_mapping(mapping);
-                if (was_removed) {
-                  if (mapping_attr.length == 0)
-                    indexes_to_remove.push(instance_index);
-                }
-              });
-            }
-          }
-        });
-        can.each(indexes_to_remove.sort(), function(index_to_remove, count) {
-          binding.list.splice(index_to_remove - count, 1);
-        });
-      }
-  */
     describe("#refresh_stubs", function() {
 
       it("returns promise based on existing deferred, returning binding list, if it exists", function() {
