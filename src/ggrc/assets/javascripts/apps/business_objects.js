@@ -271,7 +271,7 @@ $(function() {
 
   var base_widgets_by_type = {
     "Program": ["Regulation", "Contract", "Policy", "Standard", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Audit": ["Person", "Request", 'history'],
+    "Audit": ["Person", "Request", "program", "history"],
     "Regulation" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Policy" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Standard" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
@@ -392,6 +392,11 @@ $(function() {
               , allow_mapping: false
               , allow_creating: false
             }
+          },
+          program: {
+            widget_id: "program",
+            widget_name: "Program",
+            widget_icon: "program"
           },
           history: {
             widget_id: "history",
@@ -573,6 +578,15 @@ $(function() {
             , draw_children : true
             , show_view : GGRC.mustache_path + "/requests/tree.mustache"
             , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+          },
+          program: {
+            mapping: "_program"
+            , parent_instance: GGRC.page_instance()
+            , draw_children : false
+            , model: CMS.Models.Program
+            , show_view : GGRC.mustache_path + "/programs/tree.mustache"
+            , allow_mapping: false
+            , allow_creating: false
           },
           history: {
             mapping: "history"
