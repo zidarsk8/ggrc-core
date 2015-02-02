@@ -32,9 +32,9 @@ try:
   BUILD_NUMBER = build_number.BUILD_NUMBER
 except (ImportError):
   pass
-  
+
 MAJOR_VERSION = "0.9"
-MINOR_VERSION = "0"
+MINOR_VERSION = "1"
 VERSION = "v" + MAJOR_VERSION + "." + MINOR_VERSION + "." + BUILD_NUMBER
 
 # Google Analytics variables
