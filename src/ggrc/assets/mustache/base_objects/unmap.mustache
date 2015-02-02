@@ -2,7 +2,7 @@
   {{#if mappings}}
     {{#is_allowed_all 'delete' mappings}}
       {{^is_dashboard}}
-        <li>
+        <li class="border">
           <a href="javascript://" class="unmap" data-toggle="unmap">
             {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
             <i class="grcicon-remove"></i>

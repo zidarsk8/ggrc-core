@@ -63,7 +63,7 @@
       var descriptor = {
         content_controller: CMS.Controllers.TreeView,
         content_controller_selector: "ul",
-        widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
+        widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
         widget_id: far_model.table_singular,
         widget_guard: function(){
           if (far_model.title_plural === "Audits"
@@ -271,24 +271,37 @@ $(function() {
 
   var base_widgets_by_type = {
     "Program": ["Regulation", "Contract", "Policy", "Standard", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Audit": ["Person", "Request", "program", "history"],
     "Regulation" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Policy" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Standard" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Contract" : ["Program", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Clause" : ["Contract", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Section" : ["Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
-    "Objective" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
-    "Control" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Person" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Audit"],
-    "OrgGroup" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Vendor" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "System" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Process" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "DataAsset" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Product" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Project" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Facility" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Market" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"]
+    "Objective" : ["Program", "Regulation", "Contract", "Policy",
+                   "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
+    "Control" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System",
+                  "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Person" : ["Program", "Regulation", "Contract", "Policy", "Standard",
+                "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Audit"],
+    "OrgGroup" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control",
+                  "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Vendor" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
+                "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "System" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
+                "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Process" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
+                 "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "DataAsset" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
+                   "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Product" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
+                 "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Project" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
+                  "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Facility" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
+                  "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
+    "Market" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
+                  "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"]
   };
 
   function sort_sections(sections) {
@@ -366,6 +379,29 @@ $(function() {
             , widget_name: "People"
             , widget_icon: "person"
             , content_controller: GGRC.Controllers.TreeView
+          }
+        }
+        , Audit : {
+          Person: {
+              widget_id: "person"
+            , widget_name: "People"
+            , widget_icon: "person"
+            , content_controller: GGRC.Controllers.TreeView
+            , content_controller_options: {
+              mapping: "authorized_people"
+              , allow_mapping: false
+              , allow_creating: false
+            }
+          },
+          program: {
+            widget_id: "program",
+            widget_name: "Program",
+            widget_icon: "program"
+          },
+          history: {
+            widget_id: "history",
+            widget_name: "History",
+            widget_icon: "history",
           }
         }
       }
@@ -536,6 +572,33 @@ $(function() {
               , mapping: "mapped_and_or_authorized_people"
             }
           }
+        , Audit: {
+          Request: {
+            mapping: "active_requests"
+            , draw_children : true
+            , show_view : GGRC.mustache_path + "/requests/tree.mustache"
+            , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+          },
+          program: {
+            mapping: "_program"
+            , parent_instance: GGRC.page_instance()
+            , draw_children : false
+            , model: CMS.Models.Program
+            , show_view : GGRC.mustache_path + "/programs/tree.mustache"
+            , allow_mapping: false
+            , allow_creating: false
+          },
+          history: {
+            mapping: "history"
+            , parent_instance: GGRC.page_instance()
+            , draw_children : true
+            , model: "Request"
+            , show_view : GGRC.mustache_path + "/requests/tree.mustache"
+            , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+            , allow_mapping: false
+            , allow_creating: false
+          }
+        }
 
         , directive: {
               _mixins: [
@@ -736,15 +799,19 @@ $(function() {
             && overridden_models[object.constructor.shortName].hasOwnProperty(model_name)
             && !overridden_models[object.constructor.shortName][model_name]))
       return;
+    var sources = [], far_model, descriptor = {}, widget_id;
 
-    var sources = [];
-
-    var far_model = CMS.Models[model_name];
-    var descriptor = {
-      instance : object,
-      far_model : far_model,
-      mapping : GGRC.Mappings.get_canonical_mapping(object.constructor.shortName, far_model.shortName)
-    };
+    far_model = CMS.Models[model_name];
+    if (far_model) {
+      widget_id = far_model.table_singular;
+      descriptor = {
+        instance : object,
+        far_model : far_model,
+        mapping : GGRC.Mappings.get_canonical_mapping(object.constructor.shortName, far_model.shortName)
+      };
+    } else {
+      widget_id = model_name;
+    }
 
     // Custom overrides
     if (extra_descriptor_options.all
@@ -768,10 +835,8 @@ $(function() {
       $.extend(true, descriptor, { content_controller_options : extra_content_controller_options[object.constructor.shortName][model_name] });
     }
 
-    widget_list.add_widget(object.constructor.shortName, far_model.table_singular, descriptor);
+    widget_list.add_widget(object.constructor.shortName, widget_id, descriptor);
   });
-
-
 });
 
 })(window.can, window.can.$);

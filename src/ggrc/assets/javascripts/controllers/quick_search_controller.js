@@ -210,20 +210,38 @@ can.Control("CMS.Controllers.LHN", {
       });
       this.element.find(".lhs-holder").on("scroll", self.lhs_holder_onscroll);
 
+      // this is ugly, but the trigger doesn't nest inside our top element
+      $(".lhn-trigger").on("click", this.animate_lhn.bind(this));
     }
 
   , should_show_lhn: function() {
       return Permission.is_allowed("view_object_page", "__GGRC_ALL__", null);
     }
 
+  , is_lhn_open: function () {
+      var _is_open = this.options.display_prefs.getLHNState().is_open;
+
+      if (typeof _is_open === "undefined") {
+          return false;
+      }
+
+      return _is_open;
+  }
+
   , "input.widgetsearch keypress": function(el, ev) {
       var value;
       if(ev.which === 13) {
         value = $(ev.target).val();
-        this.obs.attr("value", value);
-        this.options.display_prefs.setLHNState("search_text", value);
+        this.do_search(value);
       }
     }
+
+  , "submit": function (el, ev) {
+      ev.preventDefault();
+      
+      var value = $(ev.target).find("input.widgetsearch").val();
+      this.do_search(value);
+  }
 
   , ".widgetsearch keyup": function(el, ev) {
       if(el.val().trim() !== "") {
@@ -233,42 +251,102 @@ can.Control("CMS.Controllers.LHN", {
       }
     }
 
-  , "input.my-work click": function(el, ev) {
+  , "a[data-name='work_type'] click": function(el, ev) {
       var target = $(ev.target),
           checked;
-      if (target.is('input.my-work')) {
-        checked = target.val() === 'my_work';
-        this.obs.attr("my_work", checked);
+      
+      checked = target.data('value') === 'my_work';
+      this.obs.attr("my_work", checked);
         //target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
-        this.options.display_prefs.setLHNState("my_work", checked);
-      }
+      this.options.display_prefs.setLHNState("my_work", checked);
+      this.set_active_tab(checked);
     }
+
+  , animate_lhn: function () {
+      var is_open = this.is_lhn_open();
+
+      if(is_open) {
+          this.close_lhn();
+      } else {
+          this.open_lhn();
+      }
+  }
+
+  , close_lhn: function () {
+      // not nested
+      $(".lhn-trigger").removeClass("active");
+
+      var width = this.element.find(".lhs-holder").width();
+            
+      this.element.find(".lhs-holder")
+          .removeClass("active")
+          .css("left", (-width)+"px");
+
+      this.element.find(".lhn-type")
+          .removeClass("active")
+          .css("left", (-width-6)+"px");
+
+      this.element.find(".bar-v")
+          .removeClass("active");
+
+      this.element.find(".lhs-search")
+          .removeClass("active");
+
+      this.options.display_prefs.setLHNState({is_open: false});
+   }
+
+  , open_lhn: function () {
+      this.set_active_tab();
+
+      // not nested
+      $(".lhn-trigger").addClass("active");
+
+      this.element.find(".lhs-holder")
+          .css("left", "")
+          .addClass("active");
+
+      this.element.find(".lhn-type")
+          .css("left", "")
+          .addClass("active");
+      
+      this.element.find(".bar-v")
+          .addClass("active");
+
+      this.element.find(".lhs-search")
+          .addClass("active");
+      
+      this.options.display_prefs.setLHNState({is_open: true});
+  }
+
+
+  , set_active_tab: function (newval) {
+    newval || (newval = this.obs.attr("my_work"));
+
+    var value = ["all", "my_work"][Number(newval)];
+    $("a[data-name='work_type']").removeClass("active");
+    $("a[data-name='work_type'][data-value='"+value+"'").addClass("active");
+  }
 
   , init_lhn: function() {
       var self = this;
 
-      CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+      CMS.Models.DisplayPrefs.getSingleton().done(function(prefs) {
         var checked
           , $lhs = $("#lhs")
           , lhn_search_dfd
           ;
 
-        if(prefs.length < 1) {
-          prefs.push(new CMS.Models.DisplayPrefs());
-          prefs[0].save();
-        }
-
-        self.options.display_prefs = prefs[0];
+        self.options.display_prefs = prefs;
 
         checked = true;
-        if (typeof prefs[0].getLHNState().my_work !== "undefined")
-          checked = !!prefs[0].getLHNState().my_work;
+        if (typeof prefs.getLHNState().my_work !== "undefined")
+          checked = !!prefs.getLHNState().my_work;
         self.obs.attr("my_work", checked);
 
         lhn_search_dfd = $lhs
           .cms_controllers_lhn_search({
             observer: self.obs,
-            display_prefs: prefs[0]
+            display_prefs: prefs
           })
           .control('lhn_search')
           .display();
@@ -281,11 +359,7 @@ can.Control("CMS.Controllers.LHN", {
               target = self.element.find('#lhs input.my-work[value='+value+']');
           target.prop('checked', true);
           target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
-          if(!$lhs.hasClass("lhs-closed")) {
-            $(".recent").ggrc_controllers_recently_viewed();
-            self.size && self.resize_lhn(self.size);
-          }
-
+          
           // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
           //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
           //  open section is handled in the LHN Search controller.
@@ -303,61 +377,45 @@ can.Control("CMS.Controllers.LHN", {
             return this.value;
           }).addClass('active');
         });
-        self.size = prefs[0].getLHNavSize(null, "lhs");
-        self.resize_lhn(self.size);
-        // Collapse the LHN if they did it on a previous page
-        self.collapsed = prefs[0].getCollapsed(null, "lhs");
-        self.collapsed && self.toggle_lhs();
+
+        // give everything a bit of time to render
+        setTimeout(function () {
+            self.resize_lhn();
+            self.close_lhn();
+        }, 1000);
       });
     }
   , lhn_width : function(){
       return $(".lhs-holder").width()+8;
   }
   , hide_lhn: function() {
+    //UI-revamp
+    //Here we should hide the button ||| also
       var $area = $(".area")
         , $lhsHolder = $(".lhs-holder")
         , $bar = $('.bar-v')
+        , $lhnTrigger = $(".lhn-trigger")
         ;
 
       this.element.hide();
       $lhsHolder.css("width", 0);
       $area.css("margin-left", 0);
       $bar.hide();
+      $lhnTrigger.hide();
 
       window.resize_areas();
     }
 
-  , toggle_lhs: function() {
-      var $lhs = $("#lhs")
-        , $lhsHolder = $(".lhs-holder")
-        , $area = $(".area")
-        , $bar = $("#lhn > .bar-v")
-        , $search = $('.widgetsearch')
-        ;
-      if($lhs.hasClass("lhs-closed")) {
-        $lhs.removeClass("lhs-closed");
-        $bar.removeClass("bar-closed");
-        $lhsHolder.css("width", this.size + "px");
-        $area.css("margin-left", (this.size + 8) + "px");
-        $bar.css("left", this.size + "px");
-      } else {
-        $lhs.addClass("lhs-closed");
-        $bar.addClass("bar-closed");
-        $lhsHolder.css("width","40px");
-        $area.css("margin-left","48px");
-        $bar.css("left", "40px");
-      }
-
-      $search.width($lhs.width() - 49);
-      window.resize_areas();
-      CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
-        prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
-      });
-    }
+  , do_search: function (value) {
+    this.obs.attr("value", value);
+    this.options.display_prefs.setLHNState("search_text", value);
+  }
 
   , mousedown : false
   , dragged : false
   , resize_lhn : function(resize, no_trigger){
+    resize || (resize = this.options.display_prefs.getLHNavSize(null, null).lhs);
+      
     var $lhs = $("#lhs"),
         $lhsHolder = $(".lhs-holder"),
         $area = $(".area"),
@@ -365,38 +423,22 @@ can.Control("CMS.Controllers.LHN", {
         $search = $('.widgetsearch'),
         $lhs_label_right = $(".lhs-search .my-work-right"),
         $lhs_label = $(".lhs-search .my-work-label"),
-        lhn_second_row = 201,
-        max_width = window.outerWidth / 2 - 4;
+        max_width = window.innerWidth*.75,
+        default_size = 240;
 
-    if(resize < 40 && !$lhs.hasClass("lhs-closed")) {
-      this.toggle_lhs(no_trigger);
-    }
-    if(resize < 40) {
-      return;
+    if (resize < default_size) {
+      resize = default_size;
     }
     resize = Math.min(resize, max_width);
-    if($lhs.hasClass("lhs-closed")) this.toggle_lhs(no_trigger);
-    $lhsHolder.width(resize);
 
-    // LHN search radio buttons oneline fix
-    if(resize < lhn_second_row) {
-      $lhs_label_right.removeClass("pull-right");
-      $lhs_label.addClass("oneline");
-    } else {
-      $lhs_label_right.addClass("pull-right");
-      $lhs_label.removeClass("oneline");
+    this.element.find(".lhs-holder").width(resize);
+    
+    if (resize) {
+      this.options.display_prefs.setLHNavSize(null, "lhs", resize);
     }
 
-    var a = (resize) + "px";
-    var b = (resize+8) + "px"
-    $area.css("margin-left",  b);
-
-    $bar.css("left", a)
-
-    $search.width(resize - 49);
-    window.resize_areas();
     if (!no_trigger) {
-      $(window).trigger('resize');
+      $(window).trigger("resize");
     }
   }
   , ".bar-v mousedown" : function(el, ev) {
@@ -411,55 +453,17 @@ can.Control("CMS.Controllers.LHN", {
 
     ev.preventDefault();
     this.dragged = true;
-    this.size = ev.pageX;
-    this.resize_lhn(this.size);
+    this.resize_lhn(ev.pageX);
   }
   , "{window} mouseup" : function(el, ev){
     var self = this;
     if(!this.mousedown) return;
 
     this.mousedown = false;
-    if(!this.dragged){
-      this.toggle_lhs();
-      return;
-    }
-    self.size = self.size;
-
-    CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
-        prefs[0].setLHNavSize(null, "lhs", self.size);
-    });
   }
   , "{window} resize" : function(el, ev) {
-    if (this.size) {
-      this.resize_lhn(this.size, true);
-    }
+    this.resize_lhn(null, true); // takes care of height and min/max width
   }
-  , "#lhs click": function(el, ev) {
-      this.resize_search();
-    }
-
-  , resize_search: function() {
-      // Resize search input as necessary
-      /*
-      var input = this.element.find('#lhs input.widgetsearch')
-        , width;
-
-      width =
-        input.closest('.form-search').width()
-        - input.parent().outerWidth() + input.parent().width()
-        - input.next().outerWidth() - input.outerWidth() + input.width();
-
-      input.css('width', width + 'px');
-      */
-    }
-
-  , "#lhs input.widgetsearch focus": function(el, ev) {
-      this.resize_search();
-    }
-
-  , ".lhs-closed click": function(el, ev) {
-      this.toggle_lhs();
-    }
 
   , destroy : function() {
     this.element.find(".lhs-holder").off("scroll", self.lhs_holder_onscroll);
@@ -534,11 +538,13 @@ can.Control("CMS.Controllers.LHN_Search", {
     defaults : {
         list_view : GGRC.mustache_path + "/base_objects/search_result.mustache"
       , actions_view : GGRC.mustache_path + "/base_objects/search_actions.mustache"
-      , list_selector: 'ul.top-level > li'
+      , list_selector: 'ul.top-level > li, ul.mid-level > li'
+      , list_toggle_selector: 'li > a.list-toggle'
       , model_attr_selector: null
       , model_attr: 'data-model-name'
       , model_extra_attr: 'data-model-extra'
       , count_selector: '.item-count'
+      , list_mid_level_selector: 'ul.mid-level'
       , list_content_selector: 'ul.sub-level'
       , actions_content_selector: 'ul.sub-actions'
       , limit : 50
@@ -554,19 +560,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         , template_path = GGRC.mustache_path + this.element.data('template')
         ;
 
-
-      if(!prefs) {
-        prefs_dfd = CMS.Models.DisplayPrefs.findAll().then(function(d) {
-          if(d.length > 0) {
-            prefs = self.options.display_prefs = d[0];
-          } else {
-            prefs = self.options.display_prefs = new CMS.Models.DisplayPrefs();
-            prefs.save();
-          }
-        });
-      } else {
-        prefs_dfd = $.when(prefs);
-      }
+      prefs_dfd = CMS.Models.DisplayPrefs.getSingleton();
 
       // 2-way binding is set up in the view using can-value, directly connecting the
       //  search box and the display prefs to save the search value between page loads.
@@ -593,7 +587,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         }
         $.map(CMS.Models, function(model, name) {
           if (model.attributes && model.attributes.default_lhn_filters) {
-            self.options.filter_params.attr(model.attributes.default_lhn_filters)
+            self.options.filter_params.attr(model.attributes.default_lhn_filters);
           }
         });
         self.options.filter_params.attr(saved_filters);
@@ -603,9 +597,17 @@ can.Control("CMS.Controllers.LHN_Search", {
         // Above, category scrolling is listened on to save the scroll position.  Below, on page load the
         //  open category is toggled open, and the search placed into the search box by display prefs is
         //  sent to the search service.
+
         if(lhn_prefs.open_category) {
+          var selector = self.options.list_selector
+                  .split(",")
+                  .map(function(s) {
+                      return s + " > a[data-object-singular=" + lhn_prefs.open_category + "]";
+                  })
+                  .join(",");
+          
           self.toggle_list_visibility(
-            self.element.find(self.options.list_selector + " > a[data-object-singular=" + lhn_prefs.open_category + "]")
+            self.element.find(selector)
           );
         }
       });
@@ -629,14 +631,40 @@ can.Control("CMS.Controllers.LHN_Search", {
         // Refresh the counts whenever the lists change
         self.refresh_counts();
       });
+
+      // this is a hack, but for the life of me I couldn't find another way
+      // make sure lists with mid-level are closed on load
+      self.close_mid_levels();
     }
 
-  , "{list_selector} > a click": "toggle_list_visibility"
+  , "{list_toggle_selector} click": function (el, ev) {
+      ev && ev.preventDefault();
+      this.toggle_list_visibility(el);
+  }
 
-  , toggle_list_visibility: function(el, ev) {
-      var selector = this.options.list_content_selector + ',' + this.options.actions_content_selector
-        , $ul = el.parent().find(selector)
+  , ensure_parent_open: function (el) {
+      var $toggle = el.parents(this.options.list_mid_level_selector).parents("li").find("a.list-toggle.top"),
+          $ul = $toggle.parent("li").find(this.options.list_mid_level_selector);
+
+      if ($toggle.size() && !$toggle.hasClass("active")) {
+          this.open_list($toggle, $ul, null, true);
+      }
+  }
+
+  , toggle_list_visibility: function(el, dont_update_prefs) {
+      var sub_selector = this.options.list_content_selector + ',' + this.options.actions_content_selector
+        , mid_selector = this.options.list_mid_level_selector
+        , $parent = el.parent("li")
+        , selector
         ;
+
+      if ($parent.find(mid_selector).size()) {
+        selector = mid_selector;
+      }else{
+        selector = sub_selector;
+      }
+
+      var $ul = $parent.find(selector);
 
       // Needed because the `list_selector` selector matches the Recently Viewed
       // list, which will cause errors
@@ -645,56 +673,101 @@ can.Control("CMS.Controllers.LHN_Search", {
       }
 
       if ($ul.is(":visible")) {
-        el.removeClass("active");
-        $ul.slideUp().removeClass("in");
-        // on closing a category, set the display prefs to reflect that there is no open category and no scroll
-        //  for the next category opened.
-        this.options.display_prefs.setLHNState({ "open_category" : null, category_scroll : 0 });
+        this.close_list(el, $ul, dont_update_prefs);
       } else {
-        // Use a cached max-height if one exists
-        var holder = el.closest('.lhs-holder')
-          , $content = $ul.filter(this.options.list_content_selector)
-          , $siblings = $ul.closest(".lhs").find(selector)
-          , extra_height = 0
-          , top
-          ;
-
-        // Collapse other lists
-        $siblings.slideUp().removeClass("in");
-        // Expand this list
-        $ul.slideDown().addClass("in");
-
-        // Remove active class from other lists
-        holder.find(':not(.filters) > a.active').removeClass('active');
-        // Add active class to this list
-        el.addClass("active");
-
-        // Compute the extra height to add to the expandable height,
-        // based on the size of the content that is sliding away.
-        top = $content.offset().top;
-        $siblings.filter(':visible').each(function() {
-          var sibling_top = $(this).offset().top;
-          if (sibling_top <= top) {
-            extra_height += this.offsetHeight + (sibling_top < 0 ? -holder[0].scrollTop : 0);
-          }
-        });
-
-        // Determine the expandable height
-        this._holder_height = holder.outerHeight();
-        $content.filter(this.options.list_content_selector).css(
-            'maxHeight'
-          , Math.max(160, (this._holder_height - holder.position().top + extra_height - top - 40)) + 'px'
-        );
-
-        // Notify the display prefs that the category the user just opened is to be reopened on next page load.
-        this.options.display_prefs.setLHNState({ "open_category" : el.attr("data-object-singular") });
-        this.on_show_list($ul);
+        this.open_list(el, $ul, selector, dont_update_prefs);
       }
-      ev && ev.preventDefault();
     }
 
+  , open_list: function (el, $ul, selector, dont_update_prefs) {
+      // Use a cached max-height if one exists
+      var holder = el.closest('.lhs-holder')
+      , $content = $ul.filter([this.options.list_content_selector,
+                               this.options.list_mid_level_selector].join(","))
+      , $siblings = selector ? $ul.closest(".lhs").find(selector) : $(false)
+      , extra_height = 0
+      , top
+      ;
+      
+      // Collapse other lists
+      var $mids = $ul.closest(".lhs").find(this.options.list_mid_level_selector)
+                    .not(el.parents(this.options.list_mid_level_selector))
+                    .not(el.parent().find(this.options.list_mid_level_selector)),
+          $non_children = $ul.closest(".lhs")
+              .find([this.options.list_content_selector,
+                     this.options.actions_content_selector].join(","))
+              .filter(".in")
+              .filter(function (i, el) {
+                  return !$.contains($ul[0], el);
+              });
+    
+      [$siblings, $mids, $non_children].map(function ($selection) {
+          $selection.slideUp().removeClass("in");
+      });
+      
+      // Expand this list
+      $ul.slideDown().addClass("in");
+      
+      // Remove active classes from others
+      // remove all except current element or children
+      // this works because open_list is called twice if we ensure parent is open
+      var $others = $ul.closest(".lhs").find(this.options.list_selector)
+              .find("a.active")
+              .not(el)
+              .filter(function (i, el) {
+                  return !$.contains($ul[0], el);
+              });
+      $others.removeClass("active");
+
+      // Add active class to this list
+      el.addClass("active");
+      
+      // Compute the extra height to add to the expandable height,
+      // based on the size of the content that is sliding away.
+      top = $content.offset().top;
+      $siblings.filter(':visible').each(function() {
+          var sibling_top = $(this).offset().top;
+          if (sibling_top <= top) {
+              extra_height += this.offsetHeight + (sibling_top < 0 ? -holder[0].scrollTop : 0);
+          }
+      });
+      
+      // Determine the expandable height
+      this._holder_height = holder.outerHeight();
+      $content.filter(this.options.list_content_selector).css(
+          'maxHeight'
+          , Math.max(160, (this._holder_height - holder.position().top + extra_height - top - 40)) + 'px'
+      );
+
+      // Notify the display prefs that the category the user just opened is to be reopened on next page load.
+      if (!dont_update_prefs) {
+          this.options.display_prefs.setLHNState({ "open_category" : el.attr("data-object-singular") });
+      }
+      
+      this.ensure_parent_open(el);
+      this.on_show_list($ul);
+  }
+
+  , close_list: function (el, $ul, dont_update_prefs) {
+      el.removeClass("active");
+      $ul.slideUp().removeClass("in");
+      // on closing a category, set the display prefs to reflect that there is no open category and no scroll
+        //  for the next category opened.
+      if (!dont_update_prefs) {
+          this.options.display_prefs.setLHNState({ "open_category" : null, category_scroll : 0 });
+      }
+  }
+
+  , close_mid_levels: function () {
+    this.toggle_list_visibility($([".governance.list-toggle",
+                                   ".entities.list-toggle",
+                                   ".business.list-toggle"].join(",")),
+                                true);
+  }
+
   , " resize": function() {
-      var $content = this.element.find(this.options.list_content_selector).filter(':visible');
+      var $content = this.element.find([this.options.list_content_selector,
+                                       this.options.list_mid_level_selector].join(",")).filter(':visible');
 
 
       if ($content.length) {
@@ -760,11 +833,11 @@ can.Control("CMS.Controllers.LHN_Search", {
       });
       refresh_queue.trigger().then(function() {
         visible_list.push.apply(visible_list, new_visible_list);
-        visible_list.attr('is_loading', false)
+        visible_list.attr('is_loading', false);
         //visible_list.replace(new_visible_list);
         delete that._show_more_pending;
       }).done(tracker_stop);
-      visible_list.attr('is_loading', true)
+      visible_list.attr('is_loading', true);
     }
 
   , init_object_lists: function() {
@@ -786,6 +859,7 @@ can.Control("CMS.Controllers.LHN_Search", {
 
   , init_list_views: function() {
       var self = this;
+      
       can.each(this.get_lists(), function($list) {
         var model_name;
         $list = $($list);
@@ -1074,13 +1148,14 @@ can.Control("CMS.Controllers.LHN_Search", {
       var self = this;
       return can.map(this.get_lists(), function($list) {
         $list = $($list);
-        if ($list.find(self.options.list_content_selector).hasClass('in'))
+        if ($list.find([self.options.list_content_selector,
+                        self.options.list_mid_level_selector].join(",")).hasClass('in'))
           return $list;
       });
     },
 
   ".filters a click" : function(el, ev) {
-    var term = this.options.display_prefs.getLHNState().search_text || ""
+    var term = this.options.display_prefs.getLHNState().search_text || "",
         param = {},
         key = el.data('key'),
         value = el.data('value'),

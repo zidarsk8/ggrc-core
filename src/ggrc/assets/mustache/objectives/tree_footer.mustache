@@ -16,11 +16,11 @@
   or #if' allow_creating '\
   and #is_allowed' 'create' model.shortName _3_context=null '\
   or #if' list.length}}
-<li class="tree-footer tree-item tree-item-add">
+<li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">
-      <a href="javascript://" class="section-add">
-        + Objective
+      <a href="javascript://" class="section-add btn btn-small btn-draft" rel="tooltip" data-placement="right" data-original-title="+ Objective">
+        <i class="grcicon-add-black"></i>
       </a>
       <span class="section-expander">
         {{#if allow_mapping}}
@@ -28,7 +28,7 @@
         <a
           href="javascript://"
           rel="tooltip"
-          data-placement="left"
+          data-placement="right"
           data-toggle="multitype-multiselect-modal-selector"
           data-join-mapping="{{mapping}}"
           data-join-option-type="{{model.shortName}}"
@@ -67,20 +67,21 @@
 
 {{#if allow_mapping}}
 {{#is_allowed_to_map parent_instance model.shortName}}
-<li class="tree-footer tree-item tree-item-add">
+<li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
       <a
+        class="btn btn-small btn-draft"
         href="javascript://"
         rel="tooltip"
-        data-placement="left"
+        data-placement="right"
         data-toggle="multitype-multiselect-modal-selector"
         data-join-mapping="{{mapping}}"
         data-join-option-type="{{model.shortName}}"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.class.shortName}}"
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-        Map Objective
+        <i class="grcicon-add-black"></i>
       </a>
     </div>
   </div>

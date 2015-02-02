@@ -1,0 +1,188 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita
+    Maintained By: sasmita
+}}
+
+<ul class="tree-structure new-tree dashboard-tree audit-tree">
+	{{#each list}}
+		<li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+			<div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
+				<div class="item-wrap">
+					<div class="openclose">
+		  		<!--/div>
+      		<div class="select"--> <!-- Fix in css- this puts the data in 2 lines -->
+      			<div class="item-data">
+          		<div class="row-fluid">
+          			<span class="status-label status-{{to_class instance.status '_'}}"></span>
+        				<!--i class="grcicon-arrow-right"></i-->
+								<div class="span6">
+		              <div class="tree-title-area w-status">
+		                <a href="{{instance.viewLink}}">{{instance.title}}</a>
+		                <ul class="item-util">
+                      <li>
+                        {{#using program=instance.program}}
+                          Program: <a href="{{program.viewLink}}">{{program.title}}</a>
+                        {{/using}}
+                      </li>
+                      <li>
+												{{#if instance.contact}}
+			                    {{#using contact=instance.contact}}
+			                      Owner: {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+			                    {{/using}}
+			                  {{else}}
+			                    Owner: Not defined
+			                  {{/if}}
+                      </li>
+	                   </ul>
+		              </div>
+		            </div>
+		            <div class="span4">
+									<div class="tree-title-area">
+		                Status: {{instance.status}}
+		              </div>
+		            </div>
+		            <div class="span1">
+									<ul class="tree-action-list">
+										{{#with_page_object_as 'page_object'}}
+		                  {{#if_instance_of page_object 'Person'}}
+		                    {{#mapping_count instance 'related_owned_objects'}}
+		                      <li>
+		                        <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of requests">
+		                          <i class="grcicon-object-black"></i>
+		                          {{.}}
+		                        </span>
+		                      </li>
+		                      {{else}}
+		                      <li>
+		                        <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of requests">
+		                          <i class="grcicon-object-black"></i>
+		                            ...
+		                        </span>
+		                      </li>
+		                    {{/mapping_count}}
+		                  {{/if_instance_of}}
+		                {{/with_page_object_as}}
+									</ul>
+		            </div>
+							</div> <!-- row-fluid end -->
+						</div> <!-- item-data end -->
+					</div> <!-- openclose end -->
+				</div> <!-- item-wrap end -->
+		  </div> <!-- item-main end -->
+
+		  <!-- Tier 2 info -->
+		  <div class="tier-2-info item-content">
+		  	<div class="tier-2-info-content">
+					<div class="tier-content">
+		        <div class="row-fluid wrap-row">
+		          <div class="span6" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
+		            <h6>Status</h6> <!-- else block is not working -->
+		            {{#if_helpers '\
+									^if' allow_mapping_or_creating '\
+									or ^is_allowed' 'update' instance '\
+									or #if' responses.length '\
+									' _1_context=instance.context.id}}
+		              {{instance.status}}
+		            {{else}}
+		              <select class="input-block-level" name="status">
+		                {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
+		                <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+		                {{/iterate}}
+		              </select>
+		            {{/if_helpers}}
+
+		          </div>
+		        </div>
+
+		        {{#instance.description}}
+		          <div class="row-fluid wrap-row">
+		            <div class="span12">
+		              <h6>Description</h6>
+		              <div class="rtf-block">
+		                {{{instance.description}}}
+		              </div>
+		            </div>
+		          </div>
+		        {{/instance.description}}
+
+		        <div class="row-fluid wrap-row">
+		          <div class="span4">
+		            <h6>Planned Start Date</h6>
+		            {{#if instance.start_date}}
+		              {{localize_date instance.start_date}}
+		            {{else}}
+		              Not set
+		            {{/if}}
+		          </div>
+		          <div class="span4">
+		            <h6>Planned End Date</h6>
+		            {{#if instance.end_date}}
+		              {{localize_date instance.end_date}}
+		            {{else}}
+		              Not set
+		            {{/if}}
+		          </div>
+		          <div class="span4">
+		            <h6>Planned Report Period</h6>
+		            {{#if instance.report_start_date}}
+		              {{#if instance.report_end_date}}
+		                {{localize_date instance.report_start_date}} - {{localize_date instance.report_end_date}}
+		              {{else}}
+		                Starts {{localize_date instance.report_start_date}}
+		              {{/if}}
+		            {{else}}
+		              {{#if instance.report_end_date}}
+		                Ends {{localize_date instance.report_end_date}}
+		              {{else}}
+		                Not set
+		              {{/if}}
+		            {{/if}}
+		          </div>
+		        </div>
+
+		        <div class="row-fluid wrap-row">
+		          <div class="span4">
+		            <h6>Audit Lead</h6>
+		            {{#if instance.contact}}
+		              {{#using contact=instance.contact}}
+		                {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+		              {{/using}}
+		            {{else}}
+		              Not defined
+		            {{/if}}
+		          </div>
+		          <div class="span4">
+		            <h6>Audit Firm</h6>
+		            {{#using firm=instance.audit_firm}}
+		              {{{firstnonempty firm.title 'None'}}}
+		            {{/using}}
+		          </div>
+		          <div class="span4">
+		            {{! `with_auditors` requires `authorizations` mapping, so preload it }}
+		            {{#with_mapping 'auditor_authorizations' instance}}
+		              {{#if auditor_authorizations.length}}
+		                <h6>{{#if_equals auditor_authorizations.length 1}}Auditor{{else}}Auditors{{/if_equals}}</h6>
+		                <ul class="inner-count-list">
+		                  {{#each auditor_authorizations}}
+		                    <li>
+		                      {{#using auditor=instance.person}}
+		                        {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
+		                      {{/using}}
+		                    </li>
+		                  {{/each}}
+		                </ul>
+		              {{else}}
+		                <h6>Auditors</h6>
+		                No auditor assigned
+		              {{/if}}
+		            {{/with_mapping}}
+		          </div>
+		        </div>
+		      </div>
+		  	</div>	
+		  </div> <!-- tier-2-info -->
+		</li>
+	{{/each}}
+</ul>

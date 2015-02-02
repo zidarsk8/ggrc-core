@@ -6,82 +6,115 @@
 }}
 
 
-  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
+  <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-      <div class="openclose">
-        <a class="openclose-placeholder" href="javascript://"> </a>
-        <div class="row-fluid">
-          <div class="span12">
-
-            <ul class="tree-action-list">
-              {{#infer_roles instance}}
-                <li>
-                  <div class="item-data">
-                    <div class="tree-title-area">
-                      <span class="role">
-                        {{.}}
-                      </span>
-                    </div>
-                  </div>
-                </li>
-              {{/infer_roles}}
-              <li>
-                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
-              </li>
+      <div class="item-wrap">
+        <div class="openclose">
+          <span class="status-label status-{{to_class instance.status '_'}}"></span>
+          <i class="grcicon-arrow-right"></i>
+        </div>
+        <div class="select">
+          <div class="item-data">
+            <div class="row-fluid">
+              <div class="span4">
+                <div class="title tree-title-area">
+                  {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
+                </div>
+              </div>
               {{#instance}}
-                {{#is_private}}
-                  <li>
-                    <div class="counter">
-                      <i class="grcicon-private"></i>
-                    </div>
-                  </li>
-                {{/is_private}}
-              {{/instance}}
-
-              {{^instance.contact}}
-                <li>
-                  <div class="counter">
-                    <i class="grcicon-people-warning"></i>
+                <div class="span2">
+                  <div class="owner tree-title-area">
+                    {{#if owners.length}}
+                      {{#using contacts=owners}}
+                      {{#contacts}}
+                        {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+                      {{/contacts}}
+                      {{/using}}
+                    {{/if}}
                   </div>
-                </li>
-              {{/instance.contact}}
-              <li>
-                {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
-              </li>
-            </ul>
+                </div>
 
-            <div class="item-data">
-              <div class="tree-title-area">
-                <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-                {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
+                <div class="span1">
+                  <div class="code tree-title-area">
+                    {{slug}}
+                  </div>
+                </div>
+
+                <div class="span1">
+                  <div class="state-value {{to_class status '_'}} tree-title-area">
+                    {{status}}
+                  </div>
+                </div>
+
+              {{/instance}}
+              <div class="span4">
+                <ul class="tree-action-list">
+                  {{#infer_roles instance}}
+                    <li>
+                      <div class="item-data">
+                        <div class="tree-title-area">
+                          <span class="role">
+                            {{.}}
+                          </span>
+                        </div>
+                      </div>
+                    </li>
+                  {{/infer_roles}}
+                  {{#if instance.length}}
+                  <li>
+                    {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+                  </li>
+                  {{/if}}
+                  {{#instance}}
+                    {{#is_private}}
+                      <li>
+                        <div class="counter">
+                          <i class="grcicon-private"></i>
+                        </div>
+                      </li>
+                    {{/is_private}}
+                  {{/instance}}
+
+                  {{^instance.contact}}
+                    <li>
+                      <div class="counter">
+                        <i class="grcicon-people-warning"></i>
+                      </div>
+                    </li>
+                  {{/instance.contact}}
+                  {{#if instance.length}}
+                    <li>
+                      {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
+                    </li>
+                  {{/if}}
+                  <li class="show-datails">
+                    {{#if instance.viewLink}}
+                      {{#is_allowed "view_object_page" instance}}
+                        <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                      {{/is_allowed}}
+                    {{/if}}
+                  </li>
+                </ul>
               </div>
             </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
+          </div><!-- item-data end -->
+        </div><!-- select end -->
+      </div><!-- item-wrap end -->
+    </div><!-- item-main end -->
 
     {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
-
-        {{> /static/mustache/base_objects/tier2_content.mustache}}
+        {{#if draw_children}}
+          {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
+              {{#child_options}}
+                <div class="inner-tree">
+                  <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                </div>
+              {{/child_options}}
+          {{/prune_context}}
+        {{/if}}
       </div>
-
-      {{#if draw_children}}
-        {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
-            {{#child_options}}
-              <div class="inner-tree">
-                <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})
-                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
-                </h6>
-                <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-              </div>
-            {{/child_options}}
-        {{/prune_context}}
-      {{/if}}
-
     </div>
     {{/if}}
   </li>

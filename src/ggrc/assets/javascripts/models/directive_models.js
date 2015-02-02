@@ -57,6 +57,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
   }
@@ -97,6 +98,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
     , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
+  , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [ "Standard" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -128,6 +130,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
+  , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [ "Regulation" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -159,6 +162,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
+  , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -190,13 +194,14 @@ CMS.Models.Directive("CMS.Models.Contract", {
     , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
+  , is_custom_attributable: true
   , attributes : {
   }
   , meta_kinds : [ "Contract" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
   , init : function() {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
-    this._super.apply(this, arguments);  
+    this._super.apply(this, arguments);
   }
 }, {});
 

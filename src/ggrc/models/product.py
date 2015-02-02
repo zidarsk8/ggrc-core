@@ -5,7 +5,7 @@
 
 from ggrc import db
 from sqlalchemy.orm import validates
-from .mixins import deferred, BusinessObject, Timeboxed
+from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
 from .object_control import Controllable
 from .object_document import Documentable
 from .object_objective import Objectiveable
@@ -16,8 +16,8 @@ from .relationship import Relatable
 from .utils import validate_option
 
 class Product(
-    Documentable, Personable, Objectiveable, Controllable, Sectionable,
-    Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
+    CustomAttributable, Documentable, Personable, Objectiveable, Controllable,
+    Sectionable, Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'products'
 
   kind_id = deferred(db.Column(db.Integer), 'Product')

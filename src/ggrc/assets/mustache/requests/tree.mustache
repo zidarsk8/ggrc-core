@@ -6,256 +6,179 @@
 }}
 <li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "rq-" instance.status}}>
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
-    <div class="openclose">
-      <a class="openclose-placeholder" href="javascript://"> </a>
-      <div class="row-fluid">
-        <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-          <div class="item-data">
-            <div class="type">
-              <i class="grcicon-{{remove_space instance.request_type}}" rel="tooltip" data-placement="top" data-original-title="{{instance.request_type}}"></i>
-              <div class="state-type dropdown">
-                {{#if_helpers '\
-                  #if_equals' 'Draft' instance.status '\
-                  and ^if' instance.responses.length '\
-                  ' _1_context=instance.context.id }}
-                <span class="dropdown-toggle" data-toggle="dropdown" role="button">
-                  <i class="grcicon-carot"></i>
-                </span>
-
-                <ul class="dropdown-menu" aria-labelledby="drop2" role="menu">
-                  {{#iterate 'Documentation' 'Interview'}}
-                  <li data-value="{{iterator.toLowerCase}}" data-name="request_type">
-                    <span>
-                      <i class="grcicon-{{remove_space iterator.toLowerCase}}"></i>
-                      {{iterator}}
-                    </span>
-                  </li>
-                  {{/iterate}}
-                </ul>
-                {{else}}
-
-                <span rel="tooltip" data-placement="top" data-original-title="# of Responses">{{instance.responses.length}}</span>
-                {{/if_helpers}}
+    <div class="item-wrap">
+      <div class="openclose">
+        <span class="status-label status-{{to_class instance.status '_'}}"></span>
+        <i class="grcicon-arrow-right"></i>
+      </div>
+      <div class="select">
+        <div class="item-data">
+          <div class="row-fluid">
+            <div class="span3">
+              <div class="title tree-title-area">
+                <span>{{strip_html_tags instance.description}}</span>
               </div>
             </div>
-            <div class="tree-title-area">
-              &nbsp; <span>{{strip_html_tags instance.description}}</span>
-            </div>
-          </div>
-        </div>
-        <div class="span3">
-          <div class="item-data">
-            {{#using audit=instance.audit}}
-            {{#with_mapping "audit_object_object" instance}}
-              {{#if audit_object_object.0.instance}}
-                <div class="tree-title-area" rel="tooltip" data-placement="top" data-original-title="{{audit_object_object.0.instance.title}}">
-                  <i class="grcicon-{{audit.object_model.table_singular}}-color"></i>
-                  {{#is_allowed "view_object_page" audit_object_object.0.instance}}
-                    <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
-                  {{else}}
-                    <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
-                  {{/is_allowed}}
-                </div>
-              {{else}}
-                {{#with_mapping "authorizations" audit}}
-                {{#if_helpers "\
-                  ^if_equals" instance.status "Accepted" "\
-                  and ^if_auditor" instance _1_include_admin=false}}
+            <div class="span3">
+              <div class="row-fluid">
+                <div class="span6">
                   <div class="tree-title-area">
-                    <a class="utility-link controls danger" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
-                      <i class="grcicon-{{audit.object_model.table_singular}}-danger"></i>
-                      Map {{audit.object_model.title_singular}}
-                    </a>
+                    {{#using audit=instance.audit}}
+                    {{#with_mapping "audit_object_object" instance}}
+                      {{#if audit_object_object.0.instance}}
+                        {{#is_allowed "view_object_page" audit_object_object.0.instance}}
+                          <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
+                        {{else}}
+                          <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
+                        {{/is_allowed}}
+                      {{else}}
+                        {{#with_mapping "authorizations" audit}}
+                        {{#if_helpers "\
+                          ^if_equals" instance.status "Accepted" "\
+                          and ^if_auditor" instance _1_include_admin=false}}
+                          No Control
+                        {{/if_helpers}}
+                        {{/with_mapping}}
+                      {{/if}}
+                    {{/with_mapping}}
+                    {{/using}}
                   </div>
-                {{/if_helpers}}
+                </div>
+                <div class="span6">
+                <div class="owner tree-title-area">
+                  {{#using assignee=instance.assignee}}
+                    {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
+                  {{/using}}
+                </div>
+                </div>
+              </div>
+            </div>
+            <div class="span1">
+              <div class="gray tree-title-area">
+                {{#if instance.due_on}}
+                  {{localize_date instance.due_on}}
+                {{/if}}
+              </div>
+            </div>
+            <div class="span1">
+              <div class="counter-wrap">
+                <i class="{{#if_equals instance.request_type "documentation"}}grcicon-directive-black{{else}}grcicon-interview{{/if_equals}}"></i>
+                <span class="counter">
+                  {{#if_equals instance.response_type "documentation"}}
+                  {{#child_options.1}}
+                    {{child_options.1.list.length}}
+                  {{/child_options.1}}
+                  {{/if_equals}}
+                  {{#if_equals instance.response_type 'interview'}}
+                  {{#child_options.3}}
+                    {{child_options.3.list.length}}
+                  {{/child_options.3}}
+                  {{/if_equals}}
+                </span>
+              </div>
+            </div>
+            <div class="span4">
+              <ul class="tree-action-list" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+                {{#if allow_creating}}
+                {{#if_can_create_response instance}}
+                  {{#using audit=instance.audit}}
+                  <li>
+                    <a href="javascript://" class="section-create btn btn-mini btn-info" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.response_model_class}}" data-object-plural="responses" data-object-params='{ "{{instance.class.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.class.model_singular}}" }, "context": { "id" : {{firstexist audit.context.id "null"}}, "href" : "{{audit.context.href}}", "type" : "{{audit.context.type}}" } }'>
+                      Create Response
+                    </a>
+                  </li>
+                  {{/using}}
+                {{/if_can_create_response}}}
+                {{/if}}
+                {{#using audit=instance.audit}}
+                {{#with_mapping "authorizations" audit}}
+                  {{#if_equals instance.status "Draft"}}
+                    <li>
+                      {{#if_auditor instance}}
+                        <button data-name="status" data-value="Requested" class="btn btn-mini btn-warning {{instance._disabled}}">Request</button>
+                      {{else}}
+                        <small class="gray"><em>{{instance.status}}</em></small>
+                      {{/if_auditor}}
+                    </li>
+                  {{/if_equals}}
+                  {{#if_equals instance.status "Requested"}}
+                    <li>
+                      {{#if_can_edit_request instance}}
+                        {{^if_auditor instance include_admin=false}}
+                        <button data-name="status" data-value="Responded" class="btn btn-mini btn-info {{instance._disabled}} {{^instance.responses.length}}disabled{{/instance.responses.length}}">Submit responses</button>
+                        {{/if_auditor}}
+                      {{else}}
+                        <small class="gray"><em>{{instance.status}}</em></small>
+                      {{/if_can_edit_request}}
+                    </li>
+                  {{/if_equals}}
+                  {{#if_equals instance.status "Amended Request"}}
+                    <li>
+                      {{#if_can_edit_request instance}}
+                        {{^if_auditor instance include_admin=false}}
+                          <button data-name="status" data-value="Updated Response" class="btn btn-mini btn-info {{instance._disabled}}">Submit responses</button>
+                        {{/if_auditor}}
+                      {{else}}
+                        <small class="gray"><em>Amended</em></small>
+                      {{/if_can_edit_request}}
+                    </li>
+                  {{/if_equals}}
+                  {{#if_match instance.status "Respon"}}
+                    <li>
+                      {{#if_auditor instance}}
+                        <button data-name="status" data-value="Accepted" class="btn btn-mini btn-success {{instance._disabled}}">Accept</button>
+                        <a href="javascript://"
+                           data-toggle="modal-ajax-form"
+                           data-object-singular="Request"
+                           data-object-params='{"modal_title":"Amend Request"}'
+                           data-object-plural="requests"
+                           data-object-id="{{instance.id}}"
+                           class="btn btn-mini btn-warning {{instance._disabled}} undoable"
+                           data-modal-class="modal-wide"
+                           data-template="/static/mustache/requests/amend_modal_content.mustache"
+                           data-name="status"
+                           data-value="{{instance.status}}"
+                           data-also-undo="notes">Amend</a>
+                      {{else}}
+                        <small class="gray"><em>Responded</em></small>
+                      {{/if_auditor}}
+                    </li>
+                  {{/if_match}}
+                  {{#if_equals instance.status "Accepted"}}
+                    <li>
+                      <small class="accepted"><em>Accepted on {{date instance.updated_at true}}</em></small>
+                    </li>
+                  {{/if_equals}}
+                  {{#instance._undo.0}}
+                    <li>
+                      <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
+                    </li>
+                  {{/instance._undo.0}}
                 {{/with_mapping}}
-              {{/if}}
-            {{/with_mapping}}
-            {{/using}}
-          </div>
-        </div>
-        <div class="span5">
-          <div class="control-wrap">
-            <div class="date">
-              {{#if instance.due_on}}
-              <span rel="tooltip" data-placement="top" {{#is_overdue instance.due_on}}class="error"{{/is_overdue}} data-original-title="Due On"><span>{{localize_date instance.due_on}}</span></span>
-              {{/if}}
+                {{/using}}
+              </ul>
             </div>
-            <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-              {{! taken from responses/tree_footer}}
-              {{#if allow_creating}}
-              &nbsp;&nbsp;
-              {{#if_can_create_response instance}}
-                      {{#using audit=instance.audit}}
-                      <a href="javascript://" class="section-create btn btn-primary" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.response_model_class}}" data-object-plural="responses" data-object-params='{ "{{instance.class.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.class.model_singular}}" }, "context": { "id" : {{firstexist audit.context.id "null"}}, "href" : "{{audit.context.href}}", "type" : "{{audit.context.type}}" } }'>
-                        Create Response
-                      </a>
-                      {{/using}}
-              {{/if_can_create_response}}}
-              {{/if}}
-              {{#using audit=instance.audit}}
-              {{#with_mapping "authorizations" audit}}
-              {{#if_equals instance.status "Draft"}}
-                {{#if_auditor instance}}
-                <button data-name="status" data-value="Requested" class="btn btn-warning {{instance._disabled}}">Request</button>
-                {{else}}
-                <small class="gray"><em>{{instance.status}}</em></small>
-                {{/if_auditor}}
-              {{/if_equals}}
-              {{#if_equals instance.status "Requested"}}
-                {{#if_can_edit_request instance}}
-                {{^if_auditor instance include_admin=false}}
-                <button data-name="status" data-value="Responded" class="btn btn-primary {{instance._disabled}} {{^instance.responses.length}}disabled{{/instance.responses.length}}">Submit responses</button>
-                {{/if_auditor}}
-                {{else}}
-                <small class="gray"><em>{{instance.status}}</em></small>
-                {{/if_can_edit_request}}
-              {{/if_equals}}
-              {{#if_equals instance.status "Amended Request"}}
-                {{#if_can_edit_request instance}}
-                {{^if_auditor instance include_admin=false}}
-                <button data-name="status" data-value="Updated Response" class="btn btn-primary {{instance._disabled}}">Submit responses</button>
-                {{/if_auditor}}
-                {{else}}
-                <small class="gray"><em>Amended</em></small>
-                {{/if_can_edit_request}}
-              {{/if_equals}}
-              {{#if_match instance.status "Respon"}}
-                {{#if_auditor instance}}
-                <button data-name="status" data-value="Accepted" class="btn btn-add {{instance._disabled}}">Accept</button>
-                <a href="javascript://"
-                   data-toggle="modal-ajax-form"
-                   data-object-singular="Request"
-                   data-object-params='{"modal_title":"Amend Request"}'
-                   data-object-plural="requests"
-                   data-object-id="{{instance.id}}"
-                   class="btn btn-warning {{instance._disabled}} undoable"
-                   data-modal-class="modal-wide"
-                   data-template="/static/mustache/requests/amend_modal_content.mustache"
-                   data-name="status"
-                   data-value="{{instance.status}}"
-                   data-also-undo="notes">Amend</a>
-                {{else}}
-                <small class="gray"><em>Responded</em></small>
-                {{/if_auditor}}
-              {{/if_match}}
-              {{#if_equals instance.status "Accepted"}}
-                <small class="accepted"><em>Accepted</em></small>
-              {{/if_equals}}
-              {{#instance._undo.0}}
-                <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
-              {{/instance._undo.0}}
-              {{/with_mapping}}
-              {{/using}}
-            </div>
+
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        </div><!-- item-data end -->
+      </div><!-- select end -->
+    </div><!-- item-wrap end -->
+  </div><!-- tree-item end -->
 
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-
-      <div class="action-bar">
-        <ul class="change-links">
-          {{#if_can_edit_request instance}}
-            <li>
-              <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
-                <i class="grcicon-edit"></i>
-                Edit {{model.title_singular}}
-              </a>
-            </li>
-          {{/if_can_edit_request}}
-
-        </ul>
-      </div>
-
-      <div class="small-info">
-
-        <div class="row-fluid">
-          <div class="span6">
-            <h6>Request</h6>
-            <div class="tree-description">
-              {{{firstnonempty instance.description '<i>State your request here...</i>'}}}
-            </div>
-            <br>
-          </div>
-          <div class="span3">
-            <h6>Requested on</h6>
-            {{#if instance.requested_on}}
-              <p>
-                {{#using requested_on=instance.requested_on}}
-                  {{localize_date requested_on}}
-                {{/using}}
-              </p>
-            {{/if}}
-          </div>
-          <div class="span3" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
-            <h6>Assignee</h6>
-            {{#using assignee=instance.assignee}}
-              {{#if_can_reassign_request instance}}
-                <div class="objective-selector">
-                  <input type="text" name="assignee.name" data-lookup="Person" data-params="Person:is_enabled=1" class="input-block-level search-icon" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty assignee.name assignee.email ''}}">
-                </div>
-              {{else}}
-                <p class="read-only oneline">
-                  {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
-                </p>
-              {{/if_can_reassign_request}}
-            {{/using}}
-          </div>
-        </div>
-        {{#using audit=instance.audit}}
-          {{#with_mapping "audit_object_object" instance}}
-            {{#if audit_object_object.0.instance}}
-              <div class="row-fluid">
-                <div class="span12">
-                  <h6>{{audit.object_model.table_singular}}</h6>
-                  <p class="oneline">
-                    <i class="grcicon-{{audit.object_model.table_singular}}-color nomargin"></i>
-                    {{#is_allowed "view_object_page" audit_object_object.0.instance}}
-                      <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
-                    {{else}}
-                      <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
-                    {{/is_allowed}}
-                  </p>
-                </div>
-              </div>
-            {{/if}}
-          {{/using}}
-        {{/using}}
-
-        {{{render_hooks 'Request.tree_view_info'}}}
-
-        <div class="row-fluid">
-          <div class="span6">
-            <h6>Test</h6>
-            {{{instance.test}}}
-          </div>
-          <div class="span6">
-          <h6>Notes</h6>
-          {{{instance.notes}}}
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    {{^if_equals instance.status "Draft"}}
-    {{#if draw_children}}
-      {{#each child_options}}
+      {{^if_equals instance.status "Draft"}}
+      {{#if draw_children}}
+        {{#each child_options}}
           <div class="inner-tree">
-            <h6>{{#prune_context}}{{firstnonempty title_plural model.title_plural}} ({{#if_null original_list}}...{{else}}{{original_list.length}}{{/if_null}}{{/prune_context}})</h6>
-            <ul class="tree-structure new-tree responses-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
+            <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
             </ul>
           </div>
-      {{/each}}
-    {{/if}}
-    {{/if_equals}}
-
+        {{/each}}
+      {{/if}}
+      {{/if_equals}}
+    </div>
   </div>
   {{/if}}
 

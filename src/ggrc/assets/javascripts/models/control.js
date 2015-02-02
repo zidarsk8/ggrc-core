@@ -12,12 +12,13 @@ can.Model.Cacheable("CMS.Models.Control", {
   // static properties
     root_object : "control"
   , root_collection : "controls"
-  , category : "controls"
+  , category : "governance"
   , findOne : "GET /api/controls/{id}"
   , create : "POST /api/controls"
   , update : "PUT /api/controls/{id}"
   , destroy : "DELETE /api/controls/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , is_custom_attributable: true
   , filter_keys : ['title', 'description', 'contact', 'owner', 'notes', 'code', 'reference_url']
   , attributes : {
       context : "CMS.Models.Context.stub"
@@ -47,6 +48,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     , verify_frequency : "CMS.Models.Option.stub"
     , principal_assessor : "CMS.Models.Person.stub"
     , secondary_assessor : "CMS.Models.Person.stub"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , links_to : {
     "Section" : "ControlSection"

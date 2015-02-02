@@ -161,13 +161,13 @@
                 <div class="span12 objective-selector field-wrap">
                   <input tabindex="11" type="text" data-lookup="Person" data-params="Person:is_enabled=1" null-if-empty="true" class="search-icon" placeholder="Enter text to search for Auditor" {{autocomplete_select}} value="{{instance.email}}">
                   <a class="remove-field" href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
-         
+
                 </div>
                 <input type="hidden" name="role_name" value="Auditor" />
                 {{/prune_context}}
             {{else}}
-              <a data-id="add_auditor" href="javascript://" class="btn" tabindex="11" {{toggle_button}}>+ Add Auditor</a>
-              
+              <a data-id="add_auditor" href="javascript://" class="btn btn-small btn-draft" tabindex="11" {{toggle_button}}>+ Add Auditor</a>
+
             {{/toggle}}
             </ggrc-modal-connector>
           </div>

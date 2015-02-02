@@ -36,6 +36,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
   , mixins : ["contactable", "unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -55,6 +56,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , program_controls : "CMS.Models.ProgramControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , audits : "CMS.Models.Audit.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/programs/tree.mustache"
@@ -118,6 +120,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , links_to : {
       "Section" : "SectionObjective"
   }
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -134,6 +137,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
     , objective_objects : "CMS.Models.ObjectObjective.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
 
   , defaults : {

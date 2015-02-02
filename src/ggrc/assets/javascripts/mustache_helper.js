@@ -665,6 +665,21 @@ Mustache.registerHelper("iterate", function () {
   return ret.join("");
 });
 
+// Iterate over a string by spliting it by a separator
+Mustache.registerHelper("iterate_string", function (str, separator, options) {
+  var i = 0, args, ctx = {}, ret = [];
+
+  str = Mustache.resolve(str);
+  separator = Mustache.resolve(separator);
+  args = str.split(separator);
+  for (; i < args.length; i += 1) {
+    ctx.iterator = typeof args[i] === "string" ? new String(args[i]) : args[i];
+    ret.push(options.fn(options.contexts.add(ctx)));
+  }
+
+  return ret.join("");
+});
+
 Mustache.registerHelper("is_private", function (options) {
   var context = this;
   if (options.isComputed) {
@@ -1100,10 +1115,17 @@ Mustache.registerHelper("link_to_tree", function () {
   return link.join("/");
 });
 
+// Returns date formated like 01/28/2015 02:59:02am PST
+// To omit time pass in a second parameter {{date updated_at true}}
 Mustache.registerHelper("date", function (date) {
   var m = moment(new Date(date.isComputed ? date() : date))
     , dst = m.isDST()
+    , no_time = arguments.length > 2
     ;
+
+  if (no_time) {
+    return m.format("MM/DD/YYYY");
+  }
   return m.zone(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
 });
 
@@ -1822,7 +1844,7 @@ Mustache.registerHelper("sum", function () {
 });
 
 Mustache.registerHelper("to_class", function (prop, delimiter, options) {
-  prop = resolve_computed(prop);
+  prop = resolve_computed(prop) || "";
   delimiter = (arguments.length > 2 && resolve_computed(delimiter)) || '-';
   return prop.toLowerCase().replace(/[\s\t]+/g, delimiter);
 });
@@ -2712,6 +2734,22 @@ can.each({
       return options.inverse(options.contexts);
     }
   });
+});
+
+Mustache.registerHelper("iterate_by_two", function (list, options) {
+  var i, arr, output = [];
+  list = Mustache.resolve(list);
+
+  for (i = 0; i < list.length; i+=2) {
+    if ((i + 1) === list.length) {
+      arr = [list[i]];
+    } else {
+      arr = [list[i], list[i+1]];
+    }
+    output.push(options.fn(
+      options.contexts.add({list: arr})));
+  }
+  return output.join("");
 });
 
 })(this, jQuery, can);

@@ -169,6 +169,7 @@ def contributed_object_views():
   return [
       object_view(models.BackgroundTask),
       object_view(models.Program),
+      object_view(models.Audit),
       object_view(models.Directive, RedirectedPolymorphView),
       object_view(models.Contract),
       object_view(models.Policy),
@@ -319,6 +320,62 @@ def dashboard_ui():
   """Dashboard UI UX mockup
   """
   return render_template("mockups/dashboard-ui/index.html")
+
+@app.route("/mockups/dashboard-ui/object.html")
+@login_required
+def object_ui():
+  """Object UI UX mockup
+  """
+  return render_template("mockups/dashboard-ui/object.html")
+
+@app.route("/mockups/dashboard-ui/tree.html")
+@login_required
+def tree_ui():
+  """Tree UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/tree.html")
+
+@app.route("/mockups/dashboard-ui/workflow.html")
+@login_required
+def workflow_ui():
+  """Workflow UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/workflow.html")
+
+@app.route("/mockups/dashboard-ui/workflow-info.html")
+@login_required
+def workflow_info_ui():
+  """Workflow info UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/workflow-info.html")
+
+@app.route("/mockups/dashboard-ui/workflow-people.html")
+@login_required
+def workflow_people_ui():
+  """Workflow people UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/workflow-people.html")
+
+@app.route("/mockups/dashboard-ui/audit.html")
+@login_required
+def audit_ui():
+  """Audit UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/audit.html")
+
+@app.route("/mockups/dashboard-ui/audit-info.html")
+@login_required
+def audit_info_ui():
+  """Audit info UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/audit-info.html")
+
+@app.route("/mockups/dashboard-ui/audit-people.html")
+@login_required
+def audit_people_ui():
+  """Audit people UI UX mockup
+  """
+  return render_template("/mockups/dashboard-ui/audit-people.html")
 
 @app.route("/permissions")
 @login_required

@@ -806,6 +806,12 @@
           , "context" : "Context"
         }
       , requests: Direct("Request", "audit", "requests")
+      , active_requests: CustomFilter('requests', function(result) {
+        return result.instance.status !== 'Accepted';
+      })
+      , history: CustomFilter('requests', function(result) {
+        return result.instance.status === 'Accepted';
+      })
       , _program: Direct("Program", "audits", "program")
       , objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects")
       , objectives: TypeFilter("objects", "Objective")
@@ -814,6 +820,9 @@
       , related_objects: Multi(['requests', 'responses_via_requests'])
       , context: Direct("Context", "related_object", "context")
       , authorizations: Cross("context", "user_roles")
+      , authorized_program_people: Cross("_program", 'authorized_people')
+      , authorized_audit_people: Cross("authorizations", "person")
+      , authorized_people: Multi(['authorized_audit_people', 'authorized_program_people'])
 
       , auditor_authorizations: CustomFilter("authorizations", function(result) {
         return new RefreshQueue().enqueue(result.instance.role.reify()).trigger().then(function(roles) {
@@ -945,6 +954,14 @@
     }
     , AuditObject : {
       _auditable : Direct(null, null, "auditable")
+    }
+    // Used by Custom Attributes widget
+    , CustomAttributable : {
+      custom_attribute_definitions: Search(function(binding) {
+        return CMS.Models.CustomAttributeDefinition.findAll({
+          definition_type: binding.instance.root_object
+        });
+      })
     }
   });
 })(GGRC, can);

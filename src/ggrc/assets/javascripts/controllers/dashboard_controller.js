@@ -17,20 +17,27 @@ can.Control("CMS.Controllers.Dashboard", {
 
 }, {
     init: function(el, options) {
-      this.init_page_title();
-      this.init_page_help();
-      this.init_page_header();
-      this.init_widget_descriptors();
-      if (!this.inner_nav_controller)
-        this.init_inner_nav();
-      this.update_inner_nav();
+      CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
+        this.display_prefs = prefs;
 
-      // Before initializing widgets, hide the container to not show
-      // loading state of multiple widgets before reducing to one.
-      this.hide_widget_area();
-      this.init_default_widgets();
-      if (!this.widget_area_controller)
-        this.init_widget_area();
+        this.init_page_title();
+        this.init_page_help();
+        this.init_page_header();
+        this.init_widget_descriptors();
+        if (!this.inner_nav_controller) {
+          this.init_inner_nav();
+        }
+        this.update_inner_nav();
+
+        // Before initializing widgets, hide the container to not show
+        // loading state of multiple widgets before reducing to one.
+        this.hide_widget_area();
+        this.init_default_widgets();
+        if (!this.widget_area_controller) {
+          this.init_widget_area();
+        }
+        this.init_info_pin();
+      }.bind(this));
     }
 
   , init_page_title: function() {
@@ -87,7 +94,65 @@ can.Control("CMS.Controllers.Dashboard", {
                 dashboard_controller: this
             });
       }
+
+      if (this.display_prefs.getNavHidden()) {
+        // page needs time to render
+        setTimeout(this.close_nav.bind(this), 500);
+      }
     }
+
+  , init_info_pin: function() {
+    new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
+  }
+
+  , ".nav-trigger click": function(el, ev) {
+      if(el.hasClass("active")) {
+        this.close_nav(el);
+      } else {
+        this.open_nav(el);
+      }
+    }
+  , open_nav: function (el) {
+    el || (el = $(".nav-trigger"));
+    var options = {
+        duration: 800,
+        easing: 'easeOutExpo'
+    },
+        $tooltip = el.find("i"),
+        $nav = el.closest("body").find(".top-inner-nav"),
+        $lhn_nav = el.closest("body").find(".lhs-holder"),
+        $content = el.closest("body").find(".object-area"),
+        $fake_merge = $content.add($lhn_nav);
+
+    el.addClass("active");
+    $tooltip.attr("data-original-title", "Hide menu");
+    $nav.animate({top: "96"}, options);
+    $fake_merge.animate({top: "136"}, options);
+
+    this.display_prefs.setNavHidden("", false);
+    $(window).trigger("resize");
+  }
+
+  , close_nav: function (el) {
+    el || (el = $(".nav-trigger"));
+    var options = {
+        duration: 800,
+        easing: 'easeOutExpo'
+    },
+        $tooltip = el.find("i"),
+        $nav = el.closest("body").find(".top-inner-nav"),
+        $lhn_nav = el.closest("body").find(".lhs-holder"),
+        $content = el.closest("body").find(".object-area"),
+        $fake_merge = $content.add($lhn_nav);
+
+    el.removeClass("active");
+    $tooltip.attr("data-original-title", "Show menu");
+    $nav.animate({top: "66"}, options);
+    $fake_merge.animate({top: "106"}, options);
+
+    this.display_prefs.setNavHidden("", true);
+    $(window).trigger("resize");
+  }
 
   , init_widget_descriptors: function() {
       var that = this;
@@ -296,6 +361,7 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
 can.Control("CMS.Controllers.InnerNav", {
   defaults: {
       internav_view : "/static/mustache/dashboard/internav_list.mustache"
+    , pin_view : ".pin-content"
     , widget_list : null
     , spinners : {}
     , contexts : null
@@ -389,7 +455,7 @@ can.Control("CMS.Controllers.InnerNav", {
           placeholder: 'drop-placeholder'
         , items : "li:not(.hidden-widgets-list)"
         , disabled: true
-      })
+      });
     }
 
   , " sortupdate": "apply_widget_list_sort"
@@ -407,7 +473,7 @@ can.Control("CMS.Controllers.InnerNav", {
 
   , set_active_widget : function(widget) {
     var active_widget = widget;
-
+    $(this.options.pin_view).control().unsetInstance();
     if (typeof widget === 'string') {
       active_widget = this.widget_by_selector(widget);
     }
@@ -600,6 +666,31 @@ can.Control("CMS.Controllers.InnerNav", {
       widget.attr('force_show', false);
       this.route(widgets[0].selector); // Switch to the first widget
       return false; // Prevent the url change back to the widget we are hiding
+    },
+
+    // top nav dropdown position
+    ".dropdown-toggle click": function(el, ev) {
+      var $dropdown = el.closest(".hidden-widgets-list").find(".dropdown-menu"),
+        $menu_item = $dropdown.find(".inner-nav-item").find("a"),
+        offset = el.offset(),
+        top_pos = offset.top + 36,
+        left_pos = offset.left,
+        win = $(window),
+        win_height = win.height(),
+        footer_height = $(".footer").outerHeight(),
+        remain_height = win_height - footer_height,
+        win_width = win.width();
+
+      if(win_width - left_pos < 322) {
+        $dropdown.addClass("right-pos");
+      } else {
+        $dropdown.removeClass("right-pos");
+      }
+      if($menu_item.length === 1) {
+        $dropdown.addClass("one-item");
+      } else {
+        $dropdown.removeClass("one-item");
+      }
     }
 });
 
