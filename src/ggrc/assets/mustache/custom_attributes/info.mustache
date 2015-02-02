@@ -19,46 +19,44 @@
         <div class="info-expand-custom">
           <a class="show-hidden-fields info-show-hide-cusotm" href="javascript://">
             <span class="out">
-              <i class="grcicon-show-arrow"></i>
+              <i class="grcicon-arrow-right"></i>
               Show
             </span>
             <span class="in">
-              <i class="grcicon-hide-arrow"></i>
+              <i class="grcicon-arrow-bottom"></i>
               Hide
             </span>
             Custom Attributes
-            <span class="hidden-fields out">
-              {{#each instance.custom_attribute_definitions}}{{^if_equals @index 0}}, {{/if}}{{title}}{{/instance.custom_attribute_definitions}}
-            </span>
           </a>
         </div>
       </div>
     </div>
 
     <div class="hidden-fields-area-custom" style="display:none;">
-      <div class="bare">
-        <div class="row-fluid">
-          {{#instance.custom_attribute_definitions}}
-          <div class="span6">
-            <h6>{{title}}</h6>
-            <p data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
-              {{#with_value_for_id id}}
-                {{#switch attribute_type}}
-                {{#case 'Checkbox'}}
-                  <input type="checkbox" disabled="disabled" {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
-                {{/case}}
-                {{#case 'Rich Text'}}
-                  {{{value}}}
-                {{/case}}
-                {{#default}}
-                  {{value}}
-                {{/default}}
-                {{/switch}}
-              {{/with_value_for_id}}
-            </p>
+        {{#iterate_by_two instance.custom_attribute_definitions}}
+          <div class="row-fluid wrap-row">
+          {{#list}}
+            <div class="span6">
+              <h6>{{title}}</h6>
+              <p data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
+                {{#with_value_for_id id}}
+                  {{#switch attribute_type}}
+                  {{#case 'Checkbox'}}
+                    <input type="checkbox" disabled="disabled" {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
+                  {{/case}}
+                  {{#case 'Rich Text'}}
+                    {{{value}}}
+                  {{/case}}
+                  {{#default}}
+                    {{value}}
+                  {{/default}}
+                  {{/switch}}
+                {{/with_value_for_id}}
+              </p>
+            </div>
+          {{/list}}
           </div>
-          {{/instance.custom_attribute_definitions}}
-        </div>
+        {{/instance.custom_attribute_definitions}}
       </div>
     </div>
     {{/if}}

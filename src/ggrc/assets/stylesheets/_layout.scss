@@ -30,22 +30,37 @@
 }
 
 .lhs-holder {
-  position:fixed;
-  top:30px;
-  left:0;
-  width:240px;
-  height:500px;
-  overflow-y:auto;
+  position: fixed;
+  top: 176px;
+  left: -240px;
+  width: 240px;
+  height: 500px;
+  overflow-y: auto;
+  background: $white;
+  &.active {
+    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
+  }
 }
+
+.lhn-type {
+  position: fixed;
+  top: 142px;
+  left: -246px;
+  &.active {
+    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
+  }
+}
+
 .area {
-  margin-left:248px;
+  margin-left:0px;
 }
 .header-content {
-  height:50px;
-  line-height:50px;
+  height:47px;
+  line-height:47px;
   position:fixed;
-  top: 30px;
+  top: 48px;
   width:100%;
+  border-bottom: 1px solid $headerBorder;
 }
 /* Inner nav dont exist anymore. It is moved up to top-inner-nav
 .inner-nav {
@@ -61,15 +76,18 @@
   width: 100%;
   position: fixed;
   z-index: 1;
-  top: 80px;
-  border-bottom: 1px solid $tabBorder;
+  top: 96px;
+  background: $tabBgnd;
+  @include box-shadow(inset 1px 4px 9px -6px rgba(0,0,0,0.4));
 }
 .object-area {
   position:fixed;
-  top: 130px;
+  top: 126px;
   overflow-y:auto;
   overflow-x:hidden;
   height:445px;
+  padding-top: 20px;
+  background: $contentBgnd;
   &.import-area {
     margin-left:0;
     .widget {
@@ -85,10 +103,24 @@
 
 .inner-content {
   .side-wrap & {
-    margin-left: 20px;
+    margin-left: 40px;
   }
   .content-wrap & {
-    margin-right: 20px;
+    margin-right: 40px;
+  }
+  .full-width & {
+    margin-left: 40px;
+    margin-right: 40px;
+    .side-wrap {
+      .inner-content {
+        margin: 0;
+      }
+    }
+    .content-wrap {
+      .inner-content {
+        margin: 0;
+      }
+    }
   }
 }
 

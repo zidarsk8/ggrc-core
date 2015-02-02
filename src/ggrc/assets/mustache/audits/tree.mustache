@@ -7,362 +7,110 @@
 
 
 {{!tree node mustache}}
-<li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
-    <div class="openclose">
-      <a class="openclose-placeholder" href="javascript://"> </a>
-      <div class="row-fluid">
-        <div class="span12">
-
-          <ul class="tree-action-list">
-            {{#infer_roles instance}}
-              <li>
-                <div class="item-data">
-                  <div class="tree-title-area">
-                    <span class="role">
-                      {{.}}
-                    </span>
-                  </div>
-                </div>
-              </li>
-            {{/infer_roles}}
-            {{#with_page_object_as 'page_object'}}
-              {{#if_instance_of page_object 'Person'}}
-
-                {{^instance.contact}}
-                  <li>
-                    <div class="counter">
-                      <i class="grcicon-people-warning"></i>
-                    </div>
-                  </li>
-                {{/instance.contact}}
-
-                {{#mapping_count instance 'related_owned_objects'}}
-                  <li>
-                    <div class="counter">
-                      <i class="grcicon-object-black"></i>
-                        {{.}}
-                    </div>
-                  </li>
-                  {{else}}
-                  <li>
-                    <div class="counter">
-                      <i class="grcicon-object-black"></i>
-                        ...
-                    </div>
-                  </li>
-                {{/mapping_count}}
-                {{else}}
-                {{^instance.contact}}
-                  <li>
-                    <div class="counter">
-                      <i class="grcicon-people-warning"></i>
-                    </div>
-                  </li>
-                {{/instance.contact}}
-              {{/if_instance_of}}
-            {{/with_page_object_as}}
-          </ul>
-
-          <div class="item-data">
-            <div class="tree-title-area">
-              <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-              {{instance.title}}
-              <span class="small gray">{{instance.status}}</span>
-            </div>
-          </div>
-
-        </div>
+    <div class="item-wrap">
+      <div class="openclose">
+        <span class="status-label status-{{to_class instance.status '_'}}"></span>
+        <i class="grcicon-arrow-right"></i>
       </div>
-    </div>
-  </div>
-
-  {{#if expanded}}
-  <div class="tier-2-info item-content">
-    <div class="tier-2-info-content">
-
-      <div class="action-bar">
-        <ul class="change-links">
-          {{#is_allowed 'update' instance context='for'}}
-            <li>
-              <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
-                <i class="grcicon-edit"></i>
-                Edit {{model.title_singular}}
-              </a>
-            </li>
-          {{/is_allowed}}
-        </ul>
-        <ul>
-          {{#using program=instance.program}}
-            {{#with_mapping 'authorizations' instance}}
-              {{#if_helpers '\
-                  #is_allowed' 'view_object_page' '__GGRC_ALL__' '\
-                  and ^if_auditor' instance '\
-                  and ^is_page_instance' instance.program '\
-                 ' _0_context='' _1_include_admin=false}}
-                  <li>
-                    <a href="{{program.viewLink}}#audit_widget">
-                      View {{instance.class.title_singular}}
-                      <i class="grcicon-goto"></i>
-                    </a>
-                  </li>
-              {{/if_helpers}}
-            {{/with_mapping}}
-          {{/using}}
-          {{#if_helpers '\
-            #is_page_instance' instance.program '\
-            or #is_profile'}}
-  	        {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
-  	          <li>
-  	          {{! FIXME: Better way to get the Audit link }}
-  	            <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}">
-  	              <i class="grcicon-imp-exp"></i>
-  	              Import Requests
-  	            </a>
-  	          </li>
-  	        {{/is_allowed}}
-  	        {{#is_allowed 'read' 'Request' context=instance.context.id}}
-  	          <li>
-  	            <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}">
-  	              <i class="grcicon-export"></i>
-  	              Export Requests
-  	            </a>
-  	          </li>
-  	        {{/is_allowed}}
-          {{/if_helpers}}
-        </ul>
-      </div>
-
-      <div class="small-info">
-
-        <div class="row-fluid">
-          <div class="span8">
-            <h6>Title</h6>
-            <h3>{{instance.title}}</h3>
-          </div>
-          <div class="span4" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
-            <h6>Status</h6>
-            {{#if_helpers '\
-              ^if' allow_mapping_or_creating '\
-              or ^is_allowed' 'update' instance '\
-              or #if' responses.length '\
-            ' _1_context=instance.context.id}}
-              {{instance.status}}
-            {{else}}
-              <select class="input-block-level" name="status">
-                {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
-                <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                {{/iterate}}
-              </select>
-            {{/if_helpers}}
-          </div>
-        </div>
-        
-        {{#instance.description}}
+      <div class="select">
+        <div class="item-data">
           <div class="row-fluid">
-            <div class="span12">
-              <h6>Description</h6>
-              <div class="tree-description">
-                {{{instance.description}}}
+            <div class="span4">
+              <div class="title tree-title-area">
+                {{instance.title}}
               </div>
             </div>
-          </div>
-          <br>
-        {{/instance.description}}
-        
-        <div class="row-fluid">
-          <div class="span4">
-            <h6>Planned Start Date</h6>
-            <p>
-              {{#if instance.start_date}}
-                {{localize_date instance.start_date}}
-              {{else}}
-                Not set
-              {{/if}}
-            </p>
-          </div>
-          <div class="span4">
-            <h6>Planned End Date</h6>
-            <p>
-              {{#if instance.end_date}}
-                {{localize_date instance.end_date}}
-              {{else}}
-                Not set
-              {{/if}}
-            </p>
-          </div>
-          <div class="span4">
-            <h6>Planned Report Period</h6>
-            <p>
-              {{#if instance.report_start_date}}
-                {{#if instance.report_end_date}}
-                  {{localize_date instance.report_start_date}} - {{localize_date instance.report_end_date}}
-                {{else}}
-                  Starts {{localize_date instance.report_start_date}}
-                {{/if}}
-              {{else}}
-                {{#if instance.report_end_date}}
-                  Ends {{localize_date instance.report_end_date}}
-                {{else}}
-                  Not set
-                {{/if}}
-              {{/if}}
-            </p>
-          </div>
-        </div>
-
-        <div class="row-fluid">
-          <div class="span4">
-            <h6>Audit Lead</h6>
-            <p>
-              {{#if instance.contact}}
-                {{#using contact=instance.contact}}
-                  {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                {{/using}}
-              {{else}}
-                Not defined
-              {{/if}}
-            </p>
-          </div>
-          <div class="span4">
-            <h6>Audit Firm</h6>
-            <p>
-              {{#using firm=instance.audit_firm}}
-                {{{firstnonempty firm.title 'None'}}}
-              {{/using}}
-            </p>
-          </div>
-          <div class="span4">
-            {{! `with_auditors` requires `authorizations` mapping, so preload it }}
-            {{#with_mapping 'auditor_authorizations' instance}}
-              {{#if auditor_authorizations.length}}
-                <h6>{{#if_equals auditor_authorizations.length 1}}Auditor{{else}}Auditors{{/if_equals}}</h6>
-                {{#each auditor_authorizations}}
-                <p>
-                {{#using auditor=instance.person}}
-                  {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
-                {{/using}}
-                {{#is_allowed 'delete' this}}
-                  <a href="javascript://" class="unmap" data-toggle="unmap">
-                    <span class="result" {{data 'result'}}></span>
-                    <i class="grcicon-deleted"></i>
-                  </a>
-                {{/is_allowed}}
-                </p>
-                {{/each}}
-              {{else}}
-                <h6>Auditors</h6>
-                <p>No auditor assigned</p>
-              {{/if}}
-            {{/with_mapping}}
-            {{#is_allowed 'create' 'UserRole' context=instance.context.id}}
-            {{#toggle show_new_object_form}}
-              {{#with_page_object_as 'page_instance'}}
-              <ggrc-quick-add parent_instance="instance" join_model="UserRole">
-                {{#prune_context}}
-                <div class="objective-selector field-wrap">
-                  <input tabindex="3" type="text" name="instance" data-lookup="Person" data-params="Person:is_enabled=1" null-if-empty="true" class="search-icon" placeholder="Add Auditor" {{autocomplete_select}} value="{{instance.email}}">
-                  <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
-         
-                  <a href="javascript://" class="btn btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>+Add</a>
+            {{#instance}}
+              <div class="span2">
+                <div class="owner tree-title-area">
+                  {{#if instance.contact}}
+                    {{#using contact=instance.contact}}
+                      {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                    {{/using}}
+                  {{else}}
+                    Not defined
+                  {{/if}}
                 </div>
-                <input type="hidden" name="role_name" value="Auditor" />
-                {{/prune_context}}
-              </ggrc-quick-add>
-              {{/with_page_object_as}}
-            {{else}}
-                <a href="javascript://" class="btn" {{toggle_button}}>+ Add Auditor</a>
-            {{/toggle}}
-            {{/is_allowed}}
-          </div>
-        </div>
+              </div>
 
-        {{#instance.url}}
-          <div class="row-fluid">
-            <div class="span12">
-              <h6>URL</h6>
-              <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-content="{{renderLive '/static/mustache/pbc/iframe_tooltip.mustache' url=instance.url}}" href="{{schemed_url instance.url}}" target="_blank">
-                {{instance.url}}
-              </a>
+              <div class="span1">
+                <div class="code tree-title-area">
+                  {{slug}}
+                </div>
+              </div>
+            {{/instance}}
+
+            <div class="span1">
+              <div class="state-value {{to_class instance.status '_'}} tree-title-area">
+                {{instance.status}}
+              </div>
+            </div>
+
+            <div class="span4">
+              <ul class="tree-action-list">
+                {{#infer_roles instance}}
+                  <li>
+                    <div class="item-data">
+                      <div class="tree-title-area">
+                        <span class="role">
+                          {{.}}
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                {{/infer_roles}}
+                {{#with_page_object_as 'page_object'}}
+                  {{#if_instance_of page_object 'Person'}}
+
+                    {{^instance.contact}}
+                      <li>
+                        <div class="counter">
+                          <i class="grcicon-people-warning"></i>
+                        </div>
+                      </li>
+                    {{/instance.contact}}
+
+                    {{#mapping_count instance 'related_owned_objects'}}
+                      <li>
+                        <div class="counter">
+                          <i class="grcicon-object-black"></i>
+                            {{.}}
+                        </div>
+                      </li>
+                      {{else}}
+                      <li>
+                        <div class="counter">
+                          <i class="grcicon-object-black"></i>
+                            ...
+                        </div>
+                      </li>
+                    {{/mapping_count}}
+                    {{else}}
+                    {{^instance.contact}}
+                      <li>
+                        <div class="counter">
+                          <i class="grcicon-people-warning"></i>
+                        </div>
+                      </li>
+                    {{/instance.contact}}
+                  {{/if_instance_of}}
+                {{/with_page_object_as}}
+                <li class="show-datails">
+                  {{#if instance.viewLink}}
+                    {{#is_allowed "view_object_page" instance}}
+                      <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                    {{/is_allowed}}
+                  {{/if}}
+                </li>
+              </ul>
+
             </div>
           </div>
-        {{/instance.url}}
-
-      </div>
-
-      {{{render_hooks 'Audit.tree_view_info'}}}
-
-    </div>
-
-    {{#if draw_children}}
-      {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
-        {{#is_profile}}
-          {{#with_mapping 'authorizations' instance}}
-          {{#if_auditor instance}}
-            <div class="inner-tree">
-              <h6>{{#is_dashboard}}My {{/is_dashboard}}Requests ({{#if_null child_options.0.original_list}}...{{else}}{{child_options.0.original_list.length}}{{/if_null}})</h6>
-              {{#child_options.0}}
-                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
-              {{/child_options.0}}
-            </div>
-
-            <div class="inner-tree">
-              <h6>{{#is_dashboard}}My {{/is_dashboard}}Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
-              {{#child_options.2}}
-                <ul class="tree-structure new-tree responses-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
-              {{/child_options.2}}
-            </div>
-          {{else}}
-          <div class="inner-tree">
-            <h6>{{#is_dashboard}}My {{/is_dashboard}}Requests ({{#if_null child_options.1.original_list}}...{{else}}{{child_options.1.original_list.length}}{{/if_null}})</h6>
-            {{#child_options.1}}
-              <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
-            {{/child_options.1}}
-          </div>
-
-          <div class="inner-tree">
-            <h6>{{#is_dashboard}}My {{/is_dashboard}}Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
-            {{#child_options.2}}
-              <ul class="tree-structure new-tree responses-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
-            {{/child_options.2}}
-          </div>
-          {{/if_auditor}}
-          {{/with_mapping}}
-        {{else}}
-          {{#with_page_object_as 'page_object'}}
-          {{#if_instance_of page_object 'Audit|Program|Person'}}
-            <div class="inner-tree">
-              <h6>
-                Requests ({{#if_null child_options.0.original_list}}...{{else}}{{child_options.0.original_list.length}}{{/if_null}})
-                {{#child_options.0.header_view}}
-                <a href="javascript://" class="advanced-filter-trigger active"><i class="grcicon-search"></i> Hide Filters</a>
-                {{/child_options.0.header_view}}
-              </h6>
-              {{#child_options.0}}
-                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
-              {{/child_options.0}}
-            </div>
-          {{else}}
-            <div class="inner-tree">
-              <h6>Requests which contain object ({{#if_null child_options.3.original_list}}...{{else}}{{child_options.3.original_list.length}}{{/if_null}})</h6>
-              {{#child_options.3}}
-                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
-              {{/child_options.3}}
-            </div>
-
-            <div class="inner-tree">
-              <h6>Responses which contain object ({{#if_null child_options.4.original_list}}...{{else}}{{child_options.4.original_list.length}}{{/if_null}})</h6>
-              {{#child_options.4}}
-                <ul class="tree-structure responses-list new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
-              {{/child_options.4}}
-            </div>
-          {{/if_instance_of}}
-          {{/with_page_object_as}}
-        {{/is_profile}}
-      {{/prune_context}}
-    {{/if}}
-
-  </div>
-  {{/if}}
+        </div><!-- item-data end -->
+      </div><!-- select end -->
+    </div><!-- item-wrap end -->
+  </div><!-- item-main end -->
 
 </li>

@@ -212,6 +212,10 @@ can.Control("CMS.Controllers.TreeLoader", {
         this._loading_deferred = null;
         loading_deferred.resolve();
       }
+
+      // change inner tree title span4 into span8 class
+      $(".inner-tree > .tree-structure > .tree-item > .item-main").find(".row-fluid").find("[class*=span]:first").attr("class", "span8");
+
     }
 
   , enqueue_items: function(items) {
@@ -995,6 +999,13 @@ can.Control("CMS.Controllers.TreeViewNode", {
     // Ignore unless it's a direct child
     if (el.closest('.' + this.constructor._fullName).is(this.element))
       this.expand();
+  }
+  , ".select click": function(el, ev) {
+    var tree = el.closest('.cms_controllers_tree_view_node'),
+        node = tree.control();
+    tree.closest('section').find('.cms_controllers_tree_view_node').removeClass('active');
+    tree.addClass('active');
+    $('.pin-content').control().setInstance(node.options.instance, el);
   }
 
   , "input,select click" : function(el, ev) {

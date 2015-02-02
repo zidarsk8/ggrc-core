@@ -7,11 +7,9 @@
 
 {{!<div id='{ id }' class='modal modal-selector fade hide' tabindex='-1'>}}
     <div class="modal-header">
-      <div class="pull-right">
-        <a class="btn btn-danger btn-mini" href="javascript://" data-dismiss="modal">
-          <i class="grcicon-x-white"></i>
-        </a>
-      </div>
+      <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
+        <i class="grcicon-x-grey"></i>
+      </a>
       <h2>
         {{ modal_title }}
       </h2>
@@ -64,7 +62,7 @@
         </div>
         <div class="span6">
           <div class="confirm-buttons">
-            <a class="btn btn-primary preventdoubleclick" xdata-toggle="modal-submit" data-dismiss="modal" href="javascript://">
+            <a class="btn btn-small btn-info preventdoubleclick" xdata-toggle="modal-submit" data-dismiss="modal" href="javascript://">
               Done
             </a>
           </div>

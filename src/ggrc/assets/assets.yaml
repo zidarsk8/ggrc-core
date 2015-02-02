@@ -69,6 +69,7 @@ dashboard-js-files:
   - controllers/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
   - controllers/mapping_count_controller.js
+  - controllers/info_pin_controller.js
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
@@ -99,6 +100,7 @@ dashboard-js-template-files:
   - base_objects/confirm_unmap.mustache
   - base_objects/contacts.mustache
   - base_objects/general_info.mustache
+  - base_objects/description.mustache
   - base_objects/extended_info.mustache
   - base_objects/urls.mustache
   - base_objects/notes.mustache
@@ -117,6 +119,7 @@ dashboard-js-template-files:
   - base_objects/tree_view_filters.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
+  - base_objects/info-pin.mustache
   - base_objects/filters/advanced_search_filter_actions.mustache
   - base_objects/filters/modal_filter_actions.mustache
   - base_objects/filters/filter_by_person.mustache
@@ -139,6 +142,13 @@ dashboard-js-template-files:
   - custom_attribute_definitions/tree.mustache
   - custom_attribute_definitions/subtree.mustache
   - dashboard/internav_list.mustache
+  - dashboard/info/info.mustache
+  - dashboard/info/get_started.mustache
+  - dashboard/info/workflow_progress.mustache
+  - dashboard/info/my_tasks.mustache
+  - dashboard/info/task_filters.mustache
+  - dashboard/info/wf_owner.mustache
+  - dashboard/info/my_audits.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache
   - dashboard/lhn.mustache
@@ -231,16 +241,19 @@ dashboard-js-template-files:
   - documents/tree_footer.mustache
   - audits/modal_content.mustache
   - audits/tree.mustache
+  - audits/info.mustache
   - audits/tree_footer.mustache
   - audits/search_result.mustache
   - audits/extended_info.mustache
   - requests/tree.mustache
+  - requests/info.mustache
   - requests/tree_footer.mustache
   - requests/modal_content.mustache
   - people/autocomplete_result.mustache
   - objectives/autocomplete_result.mustache
   - responses/confirm_delete_evidence.mustache
   - responses/tree.mustache
+  - responses/info.mustache
   - responses/tree_footer.mustache
   - responses/modal_content.mustache
   - meetings/modal_content.mustache

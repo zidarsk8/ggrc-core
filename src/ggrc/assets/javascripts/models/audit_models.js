@@ -36,6 +36,9 @@ can.Model.Cacheable("CMS.Models.Audit", {
     status : "Draft",
     object_type: "Control"
   }
+  , obj_nav_options: {
+    show_all_tabs: true,
+  }
   , tree_view_options : {
     draw_children : true
     , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"

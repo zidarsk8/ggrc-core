@@ -386,7 +386,9 @@ function resize_areas() {
   ,   $lhsHolder
   ,   $area
   ,   $header
+  ,   $headerBar
   ,   $footer
+  ,   $topNav
   ,   $innerNav
   ,   $objectArea
   ,   $bar
@@ -395,8 +397,11 @@ function resize_areas() {
   ,   objectWidth
   ,   headerWidth
   ,   lhsWidth
+  ,   lhsHeight
+  ,   barWidth
   ,   footerMargin
   ,   internavHeight
+  ,   internavWidth
   ;
 
   $window = $(window);
@@ -404,6 +409,7 @@ function resize_areas() {
   $lhsHolder = $(".lhs-holder");
   $footer = $(".footer");
   $header = $(".header-content");
+  $headerBar = $(".header-bar");
   $innerNav = $(".inner-nav");
   $objectArea = $(".object-area");
   $topNav = $(".top-inner-nav");
@@ -412,14 +418,26 @@ function resize_areas() {
 
   winHeight = $window.height();
   winWidth = $window.width();
-  lhsHeight = winHeight - 70;
-  footerMargin = lhsHeight;
-  internavHeight = lhsHeight - 100;
+  lhsHeight = winHeight - 220; //new ui
+  footerMargin = lhsHeight + 130; //new UI
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
-  objectWidth = winWidth - lhsWidth - internavWidth - barWidth;
-  headerWidth = winWidth - lhsWidth;
+  objectWidth = winWidth;
+  headerWidth = winWidth - 40;// - lhsWidth;  new ui resize
+
+  var UIHeight = [$topNav.height(), $header.height(), 
+                  $headerBar.height(), $footer.height()]
+          .reduce(function (m, h) { return m+h; }, 0);
+  internavHeight = winHeight - UIHeight;
+
+  // adjust internavHeight if topNav hidden
+  if ($topNav.height() > 0) {
+    var top = Number($topNav.css("top").replace("px", ""));
+    if (top < $header.height()+$headerBar.height()) {
+      internavHeight -= $topNav.height();
+    }
+  }    
 
   $lhsHolder.css("height",lhsHeight);
   $bar.css("height",lhsHeight);
@@ -586,7 +604,7 @@ jQuery(function($) {
       $this.addClass("active");
       $this.html('<i class="grcicon-search"></i> Hide Filters');
     }
-    return false
+    return false;
   });
 
 });

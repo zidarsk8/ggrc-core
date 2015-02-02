@@ -4,9 +4,7 @@
   padding: 4px 0 0 0;
   li {
     margin-left: -6px;
-    color: $gray;
-    border-bottom: none;
-    padding-bottom: 4px;
+    margin-bottom: 6px !important;
     .info-action {
       @include opacity(1);
       i {
@@ -14,22 +12,15 @@
       }
     }
     a {
-      color: $gray;
-      span {
-        text-decoration: underline;
-      }
       &:hover {
-        text-decoration: none;
+        text-decoration: underline;
         span {
-          text-decoration: none;
+          text-decoration: underline;
         }
-      }
-      i {
-        @include opacity(0.5);
       }
     }
     [class^="grcicon-"] {
-      margin-top: 3px;
+      margin-top: 1px;
     }
   }
 }
@@ -114,9 +105,6 @@ ul.new-tree {
     }
     .control-wrap {
       padding-right: 20px;
-      .request-control {
-        text-align: right;
-      }
     }
     .assessment-review {
       padding: 10px 20px 0 20px;
@@ -193,12 +181,10 @@ ul.new-tree {
 }
 .entry-list {
   @include reset-list();
-  border-top: 1px solid $footerBorder;
-  padding-top: 6px;
+  margin-top: 4px;
   li {
-    border-bottom: 1px solid $footerBorder;
-    padding-bottom: 6px;
-    margin-bottom: 6px;
+    margin-bottom: 14px;
+    @include clearfix();
     .entry-author {
       color: $gray;
       font-size: 11px;
@@ -214,12 +200,14 @@ ul.new-tree {
     .entry-attachment {
       &.tree-item-add {
         display: inline-block;
-        margin-left: -6px;
-        margin-bottom: 10px;
+        margin: 0px 0 0px -6px;
         i {
           margin-top: 1px;
         }
       }
+    }
+    &:last-child {
+      margin-bottom: 6px;
     }
     &.add-entry {
       border-bottom: none;
@@ -239,6 +227,44 @@ ul.new-tree {
         }
       }
     }
+    .entry-actions {
+      position: relative;
+      [class^="grcicon-"] {
+        margin-top: 0px;
+      }
+      .dropdown-menu {
+        @include border-radius(0);
+        min-width: 210px;
+        top: 100%;
+        right: 0;
+        left: auto;
+        li {
+          margin-bottom: 0;
+          a {
+            line-height: 30px;
+            padding: 0 10px;
+            background: none;
+            color: $gray;
+            @include transition(background 0.2s ease, color 0.2s ease);
+            i {
+              margin: 7px 4px 0 0;
+              @include opacity(0.4);
+              @include transition(opacity 0.2s ease);
+            }
+            &:hover {
+              background: $headerBgnd;
+              color: $black;
+              i {
+                @include opacity(1);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .sticky-filter {
+    display: none;
   }
 }
 
@@ -369,6 +395,8 @@ ul.new-tree {
 }
 
 .template-setup {
+  overflow: hidden;
+  zoom: 1;
   h3 {
     font-size:14px;
     font-weight:bold;
@@ -396,24 +424,12 @@ ul.new-tree {
   }
 }
 
-.inline-footer-link {
-  border-top:1px solid #eee;
-  display:block;
-  line-height:30px;
-  padding-top:0px;
-  color:$link;
-  font-weight:bold;
-}
-
 .inline-explanation {
   color:#777;
   font-style:italic;
   line-height:30px;
   font-size:12px;
-  
 }
-
-
 
 .btn.end-cycle.pull-right {
   margin-top:3px;

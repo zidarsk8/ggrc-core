@@ -2,16 +2,19 @@
 {{#if_task_group_assignee_privileges parent_instance}}
 {{#using workflow=parent_instance.workflow}}
 {{^if_equals workflow.status 'Inactive'}}
-<li class="tree-footer non-stick">
+<li class="tree-item-add no-left-space">
   <a
-    class="inline-footer-link"
+    class="btn btn-small btn-draft"
+    rel="tooltip"
+    data-placement="right"
+    data-original-title="Create Task"
     data-object-plural="task_group_tasks"
     data-modal-class="modal-wide" href="javascript://"
     data-object-singular="TaskGroupTask"
     data-toggle="modal-ajax-form"
     data-modal-reset="reset"
     data-object-params='{ "task_group": {{parent_instance.id}}, "context": {{parent_instance.context.id}}, "sort_index": "{{sort_index_at_end original_list}}", "modal_title": "Create New Task" }'>
-    + Create task
+    <i class="grcicon-add-black"></i>
   </a>
 </li>
 {{/if_equals}}

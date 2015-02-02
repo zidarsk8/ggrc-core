@@ -53,7 +53,7 @@
         Task Type
       </label>
       <select name="task_type">
-        {{#iterate 'text' 'Task Details' 'menu' 'One Response Option' 'checkbox' 'Mutiple Response Options' step=2}}
+        {{#iterate 'text' 'Rich text' 'menu' 'Dropdown' 'checkbox' 'Checkboxes' step=2}}
           <option value="{{iterator_0}}" {{#if_equals instance.task_type iterator_0}}selected="selected"{{/if_equals}}>{{iterator_1}}</option>
         {{/iterate}}
       </select>

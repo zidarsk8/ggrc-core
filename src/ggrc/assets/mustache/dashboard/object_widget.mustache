@@ -6,36 +6,543 @@
 }}
 
 {{!section class="widget... }}
-  <header class="header">
-    <div class="row-fluid">
-      <div class="span9">
-        <h2>
-          <i class="{{widget_icon}}"></i>
-          {{{widget_name}}}
-          <span class="object_count">
-            {{#widget_count}}{{#count}}({{count}}){{/count}}{{/widget_count}}</span>
-          <span class="explanation">{{widget_info}}</span>
-        </h2>
-      </div>
-      <div class="span3">
-        {{#if 0}}
-        <div class="widget-action pull-right remove-widget" rel="tooltip" title="Remove">
-          <a class="remove" href="javascript://">
-            <i class="grcicon-x-grey"></i>
-          </a>
+  {{#if_equals widget_id "roles_list"}}
+    <header class="header tree-header no-left-space">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="title-heading oneline">
+            Role
+          </div>
         </div>
-        {{/if}}
-        <div class="widget-action pull-right widget-action-help">
-          <a data-placement="left" data-toggle="modal-ajax-helpform" data-help-slug="{{firstnonempty widget_help widget_id modal.table_plural}}" href="javascript://" rel="tooltip" data-original-title="Help">
-            <i class="grcicon-help-black"></i>
-          </a>
+        <div class="span6">
+          <div class="title-heading oneline right">
+            Role Scope
+          </div>
         </div>
-        {{#if extra_widget_actions_view}}
-        {{{renderLive extra_widget_actions_view}}}
-        {{/if}}
       </div>
-    </div>
-  </header>
+    </header>
+  {{/if_equals}}
+  {{#if_equals widget_id "people_list"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span4">
+          <div class="title-heading oneline">
+            {{far_model.title_singular}} Name
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Email
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Authorizations
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li class="filter-trigger">
+              <a href="#" class="active">
+                <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Name
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Email
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Authorizations
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Company
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
+  {{#if_equals widget_id "person"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span4">
+          <div class="title-heading oneline">
+            {{far_model.title_singular}} Name
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Email
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Authorizations
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li class="filter-trigger">
+              <a href="#" class="active">
+                <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Name
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Email
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Authorizations
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Company
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
+  {{#if_equals widget_id "current"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="title-heading oneline">
+            Title
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            End Date
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li class="filter-trigger">
+              <a href="#" class="active">
+                <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Name
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Email
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Authorizations
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Company
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
+  {{#if_equals widget_id "history"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="title-heading oneline">
+            Title
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            End Date
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li class="filter-trigger">
+              <a href="#" class="active">
+                <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Name
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Email
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Authorizations
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Company
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
+  {{#if_equals widget_id "task_group"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="title-heading oneline">
+            Task Group
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Assignee
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li class="filter-trigger">
+              <a href="#" class="active">
+                <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Name
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Email
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Authorizations
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Company
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
+  {{#if_equals widget_id "request"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="title-heading oneline">
+            {{far_model.title_singular}} Title
+          </div>
+        </div>
+        <div class="span3">
+          <div class="row-fluid">
+            <div class="span6">
+              <div class="oneline">
+                Control
+              </div>
+            </div>
+            <div class="span6">
+              <div class="oneline">
+                Owner
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="span1">
+          <div class="oneline">
+            Due Date
+          </div>
+        </div>
+        <div class="span1">&nbsp;</div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li class="filter-trigger">
+              <a href="#" class="active">
+                <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Name
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Email
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Authorizations
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Company
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
+  {{#if_equals widget_id "events_list"}}
+  {{^is_dashboard}}
+    <header class="header">
+      <h2>
+        <i class="grcicon-event-color"></i>
+        {{{widget_name}}}
+      </h2>
+    </header>
+  {{/is_dashboard}}
+  {{/if_equals}}
+
+  {{#if_equals widget_id "info"}}
+  {{^is_dashboard}}
+    <header class="header">
+      <h2>
+        <i class="{{widget_icon}}"></i>
+        {{{widget_name}}}
+      </h2>
+    </header>
+  {{/is_dashboard}}
+  {{/if_equals}}
+
+  {{^if_equals widget_id "info"}}
+  {{^if_equals widget_id "person"}}
+  {{^if_equals widget_id "people_list"}}
+  {{^if_equals widget_id "task_group"}}
+  {{^if_equals widget_id "roles_list"}}
+  {{^if_equals widget_id "current"}}
+  {{^if_equals widget_id "history"}}
+  {{^if_equals widget_id "request"}}
+  {{^if_equals widget_id "events_list"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span4">
+          <div class="title-heading oneline">
+            {{far_model.title_singular}} Title
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Owner
+          </div>
+        </div>
+        <div class="span1">
+          <div class="oneline">
+            Code
+          </div>
+        </div>
+        <div class="span1">
+          <div class="oneline">
+            State
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li class="filter-trigger">
+              <a href="#" class="active">
+                <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="grcicon-hide-relevant" rel="tooltip" data-placement="left" title="" data-original-title="Hide Irelevant"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Title
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" disabled="">
+                      Description
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" disabled="">
+                      Notes
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Owner
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Contact
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Code
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      State
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Network Zone
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      System url
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+  {{/if_equals}}
+  {{/if_equals}}
+  {{/if_equals}}
+  {{/if_equals}}
+  {{/if_equals}}
+  {{/if_equals}}
+  {{/if_equals}}
+  {{/if_equals}}
+
   <section class="content">
     {{{widget_initial_content}}}
   </section>

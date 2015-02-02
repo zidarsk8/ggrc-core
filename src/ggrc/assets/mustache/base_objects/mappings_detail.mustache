@@ -6,7 +6,7 @@
 }}
 
 {{#if_result_has_extended_mappings result.bindings_compute parent_instance}}
-<div class="row-fluid">
+<div class="row-fluid wrap-row">
   This {{instance.class.title_singular}} is mapped to
   {{#each_with_extras_as "binding" result.bindings_compute}}
     {{#unless isFirst}}{{#if isLast}}and{{/if}}{{/unless}}
