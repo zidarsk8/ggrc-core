@@ -226,19 +226,23 @@ can.Control("GGRC.Controllers.Modals", {
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     instance = this.options.instance;
-    // Make sure custom attributes are preloaded:
-    dfd = dfd.then(function(){
-      return $.when(
-        instance.load_custom_attribute_definitions(),
-        instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
-      );
-    });
+    if (instance) {
+      // Make sure custom attributes are preloaded:
+      dfd = dfd.then(function(){
+        return $.when(
+          instance.load_custom_attribute_definitions(),
+          instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
+        );
+      });
+    }
     return dfd.done(function() {
 
       // If the modal is closed early, the element no longer exists
       if (that.element) {
         // Make sure custom attr validations/values are set
-        instance.setup_custom_attributes();
+        if (instance) {
+          instance.setup_custom_attributes();
+        }
         // This is to trigger `focus_first_element` in modal_ajax handling
         that.element.trigger("loaded");
       }
@@ -915,7 +919,7 @@ can.Component.extend({
               function(binding) {
                 return binding.instance;
               })
-          );          
+          );
         });
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
