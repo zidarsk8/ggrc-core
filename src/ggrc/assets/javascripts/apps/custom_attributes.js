@@ -22,6 +22,9 @@
     init: function() {
       var instance = this.scope.instance,
           scope = this.scope;
+      if (!instance.class.is_custom_attributable) {
+        return;
+      }
       if (this.scope.load) {
         scope.attr('loading', true);
         $.when(
