@@ -1000,7 +1000,8 @@ can.Control("CMS.Controllers.TreeViewNode", {
     if (el.closest('.' + this.constructor._fullName).is(this.element))
       this.expand();
   }
-  , ".select click": function(el, ev) {
+  , ".select:not(.disabled) click": function(el, ev) {
+
     var tree = el.closest('.cms_controllers_tree_view_node'),
         node = tree.control();
     tree.closest('section').find('.cms_controllers_tree_view_node').removeClass('active');
