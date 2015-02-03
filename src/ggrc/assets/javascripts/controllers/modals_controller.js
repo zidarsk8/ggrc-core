@@ -240,7 +240,9 @@ can.Control("GGRC.Controllers.Modals", {
       // If the modal is closed early, the element no longer exists
       if (that.element) {
         // Make sure custom attr validations/values are set
-        if (instance) instance.setup_custom_attributes();
+        if (instance) {
+          instance.setup_custom_attributes();
+        }
         // This is to trigger `focus_first_element` in modal_ajax handling
         that.element.trigger("loaded");
       }
