@@ -1,11 +1,12 @@
-<li>
+<li data-object-id="{{instance.id}}"
+    data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}>
   {{#if_equals instance.status 'Final'}}
     <i class="grcicon-review-color"></i>
     <span class="object-approved">Reviewed and approved</span>
   {{else}}
     {{#with_mapping 'current_object_review_tasks' instance}}
       {{#current_user_is_object_reviewer}}
-        <div class="request-control">
+        <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('li').data('model')}); }); }}>
           <span class="setup-link">Approval applies only to this object and not to mapped objects.</span>
           <button class="btn btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Approve</button>
           <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
