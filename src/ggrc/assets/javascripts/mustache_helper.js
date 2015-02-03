@@ -1790,16 +1790,18 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
   }
 });
 
-Mustache.registerHelper("current_user_is_object_reviewer", function (options) {
+Mustache.registerHelper("with_is_reviewer", function (options) {
   var tasks = options.context['current_object_review_tasks'];
   var current_user_id = GGRC.current_user.id;
   tasks = Mustache.resolve(tasks);
   for(i = 0; i < tasks.length; i++) {
     if (current_user_id == tasks[i].instance.contact.id) {
-      return options.fn(options.contexts);
+    // NOTE: Note that the review_task is set into the context here as well.
+    }
+      return options.fn(options.contexts.add({is_reviewer: true, review_task: tasks[i].instance}));
     }
   }
-  return options.inverse(options.contexts);
+  return options.fn(options.contexts);
 });
 
 Mustache.registerHelper("default_audit_title", function (instance, options) {

@@ -5,30 +5,31 @@
     <span class="object-approved">Reviewed and approved</span>
   {{else}}
     {{#with_mapping 'current_object_review_tasks' instance}}
-      {{#current_user_is_object_reviewer}}
-        <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('li').data('model')}); }); }}>
-          <span class="setup-link">Approval applies only to this object and not to mapped objects.</span>
-          <button class="btn btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Approve</button>
-          <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
-        </div>
-      {{/current_user_is_object_reviewer}}
-      {{^current_user_is_object_reviewer}}
-        {{#if_helpers '\
-          #owned_by_current_user' instance '\
-          or #current_user_is_admin'}}
-          {{#with_mapping_count instance 'current_approval_cycles'}}
-            {{#if_equals count 0}}
-              <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
+      {{#with_is_reviewer}}
+        {{#if is_reviewer}}
+          <div class="" {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
+            <span class="setup-link">Approval applies only to this object and not to mapped objects.</span>
+            <button class="btn btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Approve</button>
+            <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
+          </div>
+        {{else}}
+          {{#if_helpers '\
+            #owned_by_current_user' instance '\
+            or #current_user_is_admin'}}
+            {{#with_mapping_count instance 'current_approval_cycles'}}
+              {{#if_equals count 0}}
+                <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
+                  <i class="grcicon-review"></i>
+                  Submit For Review
+                </a>
+              {{else}}
                 <i class="grcicon-review"></i>
-                Submit For Review
-              </a>
-            {{else}}
-              <i class="grcicon-review"></i>
-              <span class="setup-link">Review in progress</span>
-            {{/if_equals}}
-          {{/with_mapping_count}}
-        {{/if_helpers}}
-      {{/current_user_is_object_reviewer}}
+                <span class="setup-link">Review in progress</span>
+              {{/if_equals}}
+            {{/with_mapping_count}}
+          {{/if_helpers}}
+        {{/if}}
+      {{/with_is_reviewer}}
     {{/with_mapping}}
   {{/if_equals}}
 </li>
