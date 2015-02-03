@@ -296,6 +296,17 @@
           return binding.instance.attr("object_approval");
         });
       mappings[type].current_approval_cycles = Cross("approval_workflows", "current_cycle");
+      mappings[type].current_object_review_tasks = CustomFilter(
+        "object_tasks", function(binding) {
+        return new RefreshQueue().enqueue(
+            binding.instance.attr("task_group_task").reify()
+          ).trigger().then(
+            function(data){
+              var tgt = data[0];
+              return tgt.attr("object_approval");
+            }
+          )
+        });
       mappings[type]._canonical = {
        "workflows": "Workflow",
        "task_groups": "TaskGroup"
