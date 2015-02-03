@@ -347,7 +347,7 @@ small {
   }
 }
 
-@each $status_label in draft, inprogress, overdue, final, active, inprogress, verified, planned, accepted {
+@each $status_label in draft, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }
@@ -1257,18 +1257,14 @@ p {
 .state-value {
   text-transform: uppercase;
   font-weight: bold;
-  &.draft,
-  &.planned {
-    color: $draftGray;
-  }
-  &.final {
-    color: $lightGreen;
-  }
-  &.active {
-    color: $lightBlue;
-  }
   .tree-title-area & {
     font-weight: normal;
+  }
+}
+
+@each $state_label in draft, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+  .state-#{$state_label} {
+    @extend %state-#{$state_label};
   }
 }
 
