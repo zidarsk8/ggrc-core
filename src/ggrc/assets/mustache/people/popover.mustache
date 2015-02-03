@@ -11,6 +11,11 @@
     <a href='mailto:{{email}}' target="_blank"><span class="person-tooltip-trigger" data-placement="top">
       {{email}}
     </span></a>
+    {{^if is_enabled}}
+      <span class="user-disabled">
+        (Disabled)
+      </span>
+    {{/if}}
   {{else}}
     <a href="/people/{{id}}"><span class="person-tooltip-trigger" data-placement="top">
       {{firstnonempty name email}}
