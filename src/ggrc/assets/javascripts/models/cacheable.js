@@ -336,19 +336,6 @@ can.Model("can.Model.Cacheable", {
       return ret;
     };
 
-
-    var _refresh = this.makeFindOne({ type : "get", url : "{href}" });
-    this.refresh = function(params) {
-      var that = this,
-          href = params.selfLink || params.href;
-
-      if (href)
-        return _refresh.call(this, {href : params.selfLink || params.href})
-               .done(function(d) { d.backup(); });
-      else
-        return (new can.Deferred()).reject();
-    };
-
     // Register this type as a custom attributable type if it is one.
     if(this.is_custom_attributable) {
       if(!GGRC.custom_attributable_types) {
@@ -862,8 +849,9 @@ can.Model("can.Model.Cacheable", {
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
   }
   , refresh : function(params) {
-    var href = this.selfLink || this.href
-    , that = this;
+    var dfd,
+      href = this.selfLink || this.href,
+      that = this;
 
     if (!href)
       return (new can.Deferred()).reject();
@@ -893,8 +881,9 @@ can.Model("can.Model.Cacheable", {
         })
       };
     }
+    dfd = this._pending_refresh.dfd
     this._pending_refresh.fn();
-    return this._pending_refresh.dfd;
+    return dfd;
   }
   , serialize : function() {
     var that = this, serial = {};
