@@ -431,8 +431,6 @@ function resize_areas() {
           .reduce(function (m, h) { return m+h; }, 0);
   internavHeight = winHeight - UIHeight;
 
-  console.log(internavHeight);
-
   // adjust internavHeight if topNav hidden
   if ($topNav.height() > 0) {
     var top = Number($topNav.css("top").replace("px", ""));
