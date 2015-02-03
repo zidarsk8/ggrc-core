@@ -74,7 +74,9 @@
                       <li>
                         {{#using instance=instance.cycle_task_group_object}}
                           {{#using object=instance.object}}
-                            {{object.type}} : <a href="{{object.viewLink}}">{{firstnonempty object.title ''}}</a>
+                            {{#if object.type}}
+                              {{object.type}} : <a href="{{object.viewLink}}">{{firstnonempty object.title ''}}</a>
+                            {{/if}}
                           {{/using}}
                         {{/using}}
                       </li>
