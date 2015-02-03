@@ -19,7 +19,9 @@
             <div class="span4">
               <div class="title tree-title-area">
                 <i class="grcicon-object-black"></i>
-                {{instance.title}}
+                {{#using object=instance.object}}
+                  {{object.title}}
+                {{/using}}
               </div>
             </div>
             <div class="span4">

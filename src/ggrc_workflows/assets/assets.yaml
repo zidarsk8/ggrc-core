@@ -23,6 +23,7 @@ dashboard-js-template-files:
   - cycle_task_entries/documents.mustache
   - cycle_task_entries/documents_footer.mustache
   - cycle_task_groups/tree.mustache
+  - cycle_task_groups/info.mustache
   - cycle_task_group_objects/tree.mustache
   - cycle_task_group_objects/info.mustache
   - cycle_task_group_object_tasks/info.mustache
