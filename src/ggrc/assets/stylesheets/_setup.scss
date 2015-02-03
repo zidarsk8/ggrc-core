@@ -401,22 +401,84 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   background: $status-draft;
 }
 %status-inprogress {
-  background: $lightBlue;
+  background: $orange;
 }
 %status-overdue {
   background: $red;
 }
-%status-final {
-  background: $lightGreen;
-}
 %status-active {
-  background: $lightBlue;
+  background: $orange;
 }
 %status-verified {
   background: $lightGreen;
 }
 %status-accepted {
   background: $lightGreen;
+}
+%status-pending {
+  background: $status-draft;
+}
+%status-finished {
+  background: $lightBlue;
+}
+%status-requested {
+  background: $orange;
+}
+%status-responded {
+  background: $lightBlue;
+}
+%status-amended_request {
+  background: $orange;
+}
+%status-updated_response {
+  background: $lightBlue;
+}
+%status-assigned {
+  background: $status-draft;
+}
+
+// state label placeholder colors
+%state-draft {
+  color: $status-draft;
+}
+%state-planned {
+  color: $status-draft;
+}
+%state-inprogress {
+  color: $orange;
+}
+%state-overdue {
+  background: $red;
+}
+%state-active {
+  color: $orange;
+}
+%state-verified {
+  color: $lightGreen;
+}
+%state-accepted {
+  color: $lightGreen;
+}
+%state-pending {
+  color: $status-draft;
+}
+%state-finished {
+ color: $lightBlue;
+}
+%state-requested {
+  color: $orange;
+}
+%state-responded {
+  color: $lightBlue;
+}
+%state-amended_request {
+  color: $orange;
+}
+%state-updated_response {
+  color: $lightBlue;
+}
+%state-assigned {
+  color: $status-draft;
 }
 
 // flat buttons color
