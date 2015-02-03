@@ -502,20 +502,20 @@ class CustomAttributable(object):
         from ggrc.fulltext.mysql import MysqlRecordProperty
         from sqlalchemy import and_
         # 2) Delete all fulltext_record_properties for the list of values
-        db.session.query(MysqlRecordProperty)\
-            .filter(
-                and_(
-                    MysqlRecordProperty.type==cls.__class__.__name__,
-                    MysqlRecordProperty.property.in_(ftrp_properties))
-                )\
-            .delete(synchronize_session='fetch')
+        if len(attr_value_ids) > 0:
+          db.session.query(MysqlRecordProperty)\
+              .filter(
+                  and_(
+                      MysqlRecordProperty.type == cls.__class__.__name__,
+                      MysqlRecordProperty.property.in_(ftrp_properties)))\
+              .delete(synchronize_session='fetch')
 
-        # 3) Delete the list of custom attribute values
-        db.session.query(CustomAttributeValue)\
-            .filter(CustomAttributeValue.id.in_(attr_value_ids))\
-            .delete(synchronize_session='fetch')
+          # 3) Delete the list of custom attribute values
+          db.session.query(CustomAttributeValue)\
+              .filter(CustomAttributeValue.id.in_(attr_value_ids))\
+              .delete(synchronize_session='fetch')
 
-        db.session.commit()
+          db.session.commit()
 
         # 4) Instantiate custom attribute values for each of the definitions
         #    passed in (keys)
