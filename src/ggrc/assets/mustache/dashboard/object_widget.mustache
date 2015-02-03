@@ -401,11 +401,20 @@
     </header>
   {{/if_equals}}
 
+  {{#if_equals widget_id "custom_attribute"}}
+  {{^is_dashboard}}
+    <header class="header">
+      <h2>
+        {{{widget_name}}}
+      </h2>
+    </header>
+  {{/is_dashboard}}
+  {{/if_equals}}
+
   {{#if_equals widget_id "events_list"}}
   {{^is_dashboard}}
     <header class="header">
       <h2>
-        <i class="grcicon-event-color"></i>
         {{{widget_name}}}
       </h2>
     </header>
@@ -416,7 +425,6 @@
   {{^is_dashboard}}
     <header class="header">
       <h2>
-        <i class="{{widget_icon}}"></i>
         {{{widget_name}}}
       </h2>
     </header>
@@ -432,6 +440,7 @@
   {{^if_equals widget_id "history"}}
   {{^if_equals widget_id "request"}}
   {{^if_equals widget_id "events_list"}}
+  {{^if_equals widget_id "custom_attribute"}}
     <header class="header tree-header">
       <div class="row-fluid">
         <div class="span4">
@@ -533,6 +542,7 @@
         </div>
       </div>
     </header>
+  {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}

@@ -1259,6 +1259,38 @@
 // Table
 .table-wrap {
   padding-top: 20px;
+  .tree-item-add {
+    .btn {
+      [class^="grcicon-"] {
+        margin-top: 1px;
+      }
+    }
+  }
+  .tree-action-list {
+    float: none;
+    clear: both;
+    li {
+      margin: 0;
+    }
+    a {
+      display: inline-block;
+      line-height: 28px;
+      color: $gray;
+      @include transition(color 0.2s ease);
+      i {
+        margin: 7px 4px 0 0;
+        @include opacity(0.4);
+        @include transition(opacity 0.2s ease);
+      }
+      &:hover {
+        color: $black;
+        text-decoration: none;
+        i {
+          @include opacity(1);
+        }
+      }
+    }
+  }
 }
 .table {
   tbody {
@@ -1561,6 +1593,18 @@ ul.attr-list {
     font-size: 13px;
     font-weight: bold;
     line-height: 20px;
+    i {
+      margin-top: 2px;
+      @include opacity(0.25);
+    }
+    &:hover {
+      text-decoration:none;
+    }
+    &.active {
+      i {
+        @include opacity(1);
+      }
+    }
   }
   .in, .out.active, .active .out {
     display : none;
@@ -1571,6 +1615,33 @@ ul.attr-list {
   .show-hidden-fields {
     &.active {
       border-top: none;
+    }
+  }
+}
+
+.expand-link {
+  a.show-hidden-fields {
+    display:block;
+    padding-top:10px;
+    font-size:16px;
+    span.hidden-fields {
+      margin-left:10px;
+      font-style:italic;
+      font-size:14px;
+      color:$gray;
+    }
+    i {
+      margin-top: 2px;
+      @include opacity(0.25);
+    }
+    &:hover {
+      text-decoration:none;
+    }
+    &.active {
+      border-top: 1px solid $itemBorder;
+      i {
+        @include opacity(1);
+      }
     }
   }
 }

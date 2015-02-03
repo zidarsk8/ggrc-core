@@ -427,9 +427,11 @@ function resize_areas() {
   headerWidth = winWidth - 40;// - lhsWidth;  new ui resize
 
   var UIHeight = [$topNav.height(), $header.height(), 
-                  $headerBar.height(), $footer.height()]
+                  $headerBar.height(), $footer.height(), 23]
           .reduce(function (m, h) { return m+h; }, 0);
   internavHeight = winHeight - UIHeight;
+
+  console.log(internavHeight);
 
   // adjust internavHeight if topNav hidden
   if ($topNav.height() > 0) {
@@ -448,8 +450,7 @@ function resize_areas() {
   $objectArea
     .css("margin-left",internavWidth)
     .css("height",internavHeight)
-    .css("width",objectWidth)
-    ;
+    .css("width",objectWidth);
 
 }
 
@@ -609,5 +610,5 @@ jQuery(function($) {
 
 });
 
-jQuery(resize_areas);
+jQuery(window).on("load", resize_areas);
 jQuery(window).on("resize", resize_areas);
