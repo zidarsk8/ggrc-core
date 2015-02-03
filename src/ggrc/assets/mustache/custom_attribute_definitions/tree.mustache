@@ -8,20 +8,28 @@
 
 <li class="tree-item" data-model="true">
   <div class="item-main" {{data 'model'}}>
-    <div class="openclose">
-      <a class="openclose-placeholder" href="javascript://"> </a>
-      <div class="row-fluid">
-        <div class="span12">
-          <div class="item-data">
-            <div>
-              <i class="grcicon-{{instance.root_object}}-color"></i>
-              {{instance.title_plural}}
+    <div class="item-wrap">
+      <div class="openclose">
+        <span class="status-label status-{{to_class instance.status '_'}}"></span>
+        <i class="grcicon-arrow-right"></i>
+      </div>
+      <div class="select">
+        <div class="item-data">
+          <div class="row-fluid">
+            <div class="span12">
+              <div class="item-data">
+                <div>
+                  <i class="grcicon-{{instance.root_object}}-color"></i>
+                  {{instance.title_plural}}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        </div><!-- item-data end -->
+      </div><!-- select end -->
+    </div><!-- item-wrap end -->
+  </div><!-- item-main end -->
+
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
       <div class="table-wrap">
@@ -48,16 +56,21 @@
           <!-- Custom attribute definitions here -->
           <tfoot class="add-item">
             <tr>
-              <td colspan="4" class="tree-item-add">
+              <td colspan="4" class="tree-item tree-item-add">
                 <div class="row-fluid">
                   <div class="span12">
-                    <a href="javascript://"
+                    <a
+                      href="javascript://"
                       data-toggle="modal-ajax-form"
+                      class="btn btn-small btn-draft"
+                      rel="tooltip"
+                      data-placement="right"
                       data-object-title="{{instance.title_singular}}"
                       data-object-singular="CustomAttributeDefinition"
                       data-object-plural="custom_attribute_definitions"
-                      data-object-params='{ "definition_type": "{{instance.table_singular}}", "modal_title": "Add Attribute to type {{instance.title_singular}}" }'>
-                      Add Attribute
+                      data-object-params='{ "definition_type": "{{instance.table_singular}}", "modal_title": "Add Attribute to type {{instance.title_singular}}" }'
+                      data-original-title="Add Attribute">
+                      <i class="grcicon-add-black"></i>
                     </a>
                   </div>
                 </div>
