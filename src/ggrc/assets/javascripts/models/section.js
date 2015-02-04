@@ -89,12 +89,6 @@ CMS.Models.SectionBase("CMS.Models.Section", {
 
   , attributes : {}
 
-  , init: function() {
-    this._super.apply(this, arguments);
-    // Only Sections (not Clauses) need a parent Directive.
-    this.validatePresenceOf("directive");
-  }
-
   , tree_view_options : {
       show_view : "/static/mustache/sections/tree.mustache"
     , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
@@ -121,6 +115,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
   , init : function() {
     can.extend(this.attributes, CMS.Models.SectionBase.attributes);
     this._super.apply(this, arguments);
+    this.validatePresenceOf("directive");
   }
 }, {
 });
