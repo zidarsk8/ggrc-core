@@ -7,18 +7,24 @@
 
 {{!div class="modal-footer"}}
   <div class="row-fluid">
-    <div class="span3">
-      <div class="deny-buttons">
-        {{^new_object_form}}
-          {{#is_allowed 'delete' instance}}
-            {{^if_equals modal_title 'Edit Person'}}
-              <a tabindex="27" class="btn btn-small btn-danger" data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">Delete</a>
-            {{/if_equals}}
-          {{/is_allowed}}
-        {{/new_object_form}}
-      </div>
+    <div class="span5">
+      {{#if instance.hide_delete_button}}
+        {{#if_equals instance.type 'CustomAttributeDefinition'}}
+          <span class="gray">Can't delete. Custom Attribute is in use.</span>
+        {{/if_equals}}
+      {{else}}
+        <div class="deny-buttons">
+          {{^new_object_form}}
+            {{#is_allowed 'delete' instance}}
+              {{^if_equals modal_title 'Edit Person'}}
+                <a tabindex="27" class="btn btn-small btn-danger" data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">Delete</a>
+              {{/if_equals}}
+            {{/is_allowed}}
+          {{/new_object_form}}
+        </div>
+      {{/if}}
     </div>
-    <div class="span9">
+    <div class="span7">
       <div class="confirm-buttons">
         {{#mapping}}
         <input type="checkbox" id="map-and-save" checked="checked">&nbsp;<label style="display:inline" for="map-and-save"> Map and save</label>
