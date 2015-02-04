@@ -36,6 +36,8 @@
         </ul>
       </div>
 
+      <div class="bar-h"></div>
+
       <div class="lhs-nav">
         <h2>Objects</h2>
 
@@ -43,7 +45,7 @@
           <li class="governance accordion-group">
             <a class="governance list-toggle top" href="#">
               <i class="grcicon-arrow-right"></i>
-              Governance
+              Directives
             </a>
             <div class="content">
               <ul class="mid-level">
@@ -53,8 +55,19 @@
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Contract" li_class="governance"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Clause" li_class="governance"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Section" li_class="governance"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Objective" li_class="objectives"}}}
+              </ul>
+            </div>
+          </li>
+
+          <li class="governance accordion-group">
+            <a class="governance list-toggle top" href="#">
+              <i class="grcicon-arrow-right"></i>
+              Controls/Objectives
+            </a>
+            <div class="content">
+              <ul class="mid-level">
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Control" li_class="controls"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Objective" li_class="objectives"}}}
               </ul>
             </div>
           </li>
