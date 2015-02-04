@@ -147,6 +147,24 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     return !!value.is_hidden;
   }
 
+  , setTopNavWidgets: function (page_id, widget_list) {
+    this.makeObject(page_id === null ? page_id : path, TOP_NAV).attr("widget_list", widget_list);
+
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getTopNavWidgets: function (page_id) {
+    var value = this.getObject(page_id === null ? page_id : path, TOP_NAV);
+
+    if (typeof value === "undefined") {
+      this.setTopNavWidgets(page_id, []);
+      return this.getTopNavWidgets(page_id);
+    }
+
+    return value.widget_list;
+  }
+
   , setLHNavSize : function(page_id, widget_id, size) {
     this.makeObject(page_id === null ? page_id : path, LHN_SIZE).attr(widget_id, size);
     this.autoupdate && this.save();
