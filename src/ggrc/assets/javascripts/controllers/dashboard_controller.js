@@ -369,37 +369,45 @@ can.Control("CMS.Controllers.InnerNav", {
   }
 }, {
     init: function(options) {
-      var that = this
-        ;
+      CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {        
+        this.display_prefs = prefs;
 
-      if (!this.options.widget_list)
-        this.options.widget_list = new can.Observe.List([]);
+        console.log(typeof this.options.widget_list, this.options.widget_list);
 
-      this.options.instance = GGRC.page_instance();
-
-      this.sortable();
-
-      if (!(this.options.contexts instanceof can.Observe))
-        this.options.contexts = new can.Observe(this.options.contexts);
-
-      // FIXME: Initialize from `*_widget` hash when hash has no `#!`
-      can.bind.call(window, 'hashchange', function() {
-        that.route(window.location.hash);
-      });
-
-      can.view(this.options.internav_view, this.options, function(frag) {
-        function fn() {
-          that.element.append(frag);
-          that.route(window.location.hash);
-          delete that.delayed_display;
+        if (!this.options.widget_list) {
+          this.options.widget_list = new can.Observe.List([]);
         }
-        that.delayed_display = {
-          fn : fn
-          , timeout : setTimeout(fn, 50)
-        };
-      });
 
-      this.on();
+        console.log(this.options.widget_list);
+
+        this.options.instance = GGRC.page_instance();
+
+        this.sortable();
+
+        if (!(this.options.contexts instanceof can.Observe)) {
+         this.options.contexts = new can.Observe(this.options.contexts);
+        }
+
+        // FIXME: Initialize from `*_widget` hash when hash has no `#!`
+        can.bind.call(window, 'hashchange', function() {
+          this.route(window.location.hash);
+        }.bind(this));
+
+        can.view(this.options.internav_view, this.options, function(frag) {
+          var fn = function () {
+            this.element.append(frag);
+            this.route(window.location.hash);
+            delete this.delayed_display;
+          }.bind(this);
+
+          this.delayed_display = {
+            fn : fn
+            , timeout : setTimeout(fn, 50)
+          };
+        }.bind(this));
+
+        this.on();
+      }.bind(this));
     }
 
   , route: function(path) {
@@ -424,7 +432,7 @@ can.Control("CMS.Controllers.InnerNav", {
           widget_list = this.options.widget_list;
 
       // Find and make active the widget specified by `step`
-      widget = this.find_widget_by_target("#" + step);
+      var widget = this.find_widget_by_target("#" + step);
       if (!widget && widget_list.length) {
         // Target was not found, but we can select the first widget in the list
         widget = widget_list[0];
