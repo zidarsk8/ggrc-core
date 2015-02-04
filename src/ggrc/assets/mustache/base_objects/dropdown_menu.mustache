@@ -1,0 +1,23 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+{{> /static/mustache/base_objects/edit_object_link.mustache}}
+{{#is_info_pin}}
+  {{^options.is_in_selector}}
+    {{> /static/mustache/base_objects/unmap.mustache}}
+  {{/options}}
+  {{#if instance.viewLink}}
+    {{#is_allowed "view_object_page" instance}}
+      <li>
+        <a href="{{instance.viewLink}}">
+          View {{instance.class.title_singular}}
+          <i class="grcicon-goto"></i>
+        </a>
+      </li>
+    {{/is_allowed}}
+  {{/if}}
+{{/is_info_pin}}
