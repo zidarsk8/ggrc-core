@@ -465,12 +465,19 @@ can.Control("CMS.Controllers.InnerNav", {
   , " sortupdate": "apply_widget_list_sort"
 
   , apply_widget_list_sort: function() {
-      var widget_ids
-        ;
+      var widget_ids,
+          indexes = this.display_prefs.getTopNavWidgets(window.getPageToken());
 
       widget_ids = this.element.find("li > a").map(function() {
         return $(this).attr("href");
       }).toArray();
+
+      widget_ids.forEach(function (id, index) {
+        indexes[id.replace("#", "")] = index;
+      });
+
+      this.display_prefs.setTopNavWidgets(window.getPageToken());
+      this.display_prefs.save();
 
       this.element.trigger("inner_nav_sort_updated", [widget_ids]);
     }
