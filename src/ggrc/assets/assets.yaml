@@ -296,6 +296,7 @@ dashboard-js-spec-files:
   - models/recently_viewed_object_spec.js
   - models/display_prefs_spec.js
   - models/mappers_spec.js
+  - models/cacheable_spec.js
 
 dashboard-js-spec-helpers:
   - jasmine-fixture.js

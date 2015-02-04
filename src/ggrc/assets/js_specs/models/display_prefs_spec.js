@@ -9,8 +9,8 @@
 describe("display prefs model", function() {
   
   var display_prefs, exp;
-  beforeEach(function() {
-    display_prefs || (display_prefs = new CMS.Models.DisplayPrefs());
+  beforeAll(function() {
+    display_prefs = new CMS.Models.DisplayPrefs();
     exp = CMS.Models.DisplayPrefs.exports;
   });
 
@@ -65,7 +65,7 @@ describe("display prefs model", function() {
 
       it("returns undefined when the key is not found", function(){
         expect(display_prefs.getObject("xyzzy")).not.toBeDefined();
-      })
+      });
     });
   });
 
@@ -95,7 +95,7 @@ describe("display prefs model", function() {
 
   });
 
-  xdescribe("#setCollapsed", function() {
+  describe("#setCollapsed", function() {
     afterEach(function() {
       display_prefs.removeAttr(exp.COLLAPSE);
       display_prefs.removeAttr(exp.path);
@@ -106,10 +106,6 @@ describe("display prefs model", function() {
 
       expect(display_prefs.attr([exp.path, exp.COLLAPSE, "foo"].join("."))).toBe(true);
     });
-
-    xit("sets all collapse values as a collection", function() {
-      //TODO: this feature isn't currently supported for collapse
-    });
   });
 
   function getSpecs (func, token, fooValue, barValue) {
@@ -118,11 +114,11 @@ describe("display prefs model", function() {
 
     return function() {
       function getTest() {
-          var fooActual = display_prefs[func]("unit_test", "foo");
-          var barActual = display_prefs[func]("unit_test", "bar");
-         
-          expect(fooActual.serialize ? fooActual.serialize() : fooActual)[fooMatcher](fooValue);
-          expect(barActual.serialize ? barActual.serialize() : barActual)[barMatcher](barValue);
+        var fooActual = display_prefs[func]("unit_test", "foo");
+        var barActual = display_prefs[func]("unit_test", "bar");
+       
+        expect(fooActual.serialize ? fooActual.serialize() : fooActual)[fooMatcher](fooValue);
+        expect(barActual.serialize ? barActual.serialize() : barActual)[barMatcher](barValue);
       }
 
       var exp_token;
@@ -131,7 +127,7 @@ describe("display prefs model", function() {
       });
 
       // TODO: figure out why these fail, error is "can.Map: Object does not exist thrown"
-      xdescribe("when set for a page", function() {
+      describe("when set for a page", function() {
         beforeEach(function() {
           display_prefs.makeObject(exp.path, exp_token).attr("foo", fooValue);
           display_prefs.makeObject(exp.path, exp_token).attr("bar", barValue);
@@ -143,7 +139,7 @@ describe("display prefs model", function() {
         it("returns the value set for the page", getTest);
       });
 
-      xdescribe("when not set for a page", function() {
+      describe("when not set for a page", function() {
         beforeEach(function() {
           display_prefs.makeObject(exp_token, "unit_test").attr("foo", fooValue);
           display_prefs.makeObject(exp_token, "unit_test").attr("bar", barValue);
@@ -157,11 +153,11 @@ describe("display prefs model", function() {
 
         it("sets the default value as the page value", function() {
           display_prefs[func]("unit_test", "foo");
-          var fooActual = display_prefs.attr([exp.path, exp_token, "foo"].join("."))
+          var fooActual = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
           expect(fooActual.serialize ? fooActual.serialize() : fooActual)[fooMatcher](fooValue);
         });
       });
-    }
+    };
   }
 
   describe("#getCollapsed", getSpecs("getCollapsed", "COLLAPSE", true, false));
@@ -181,21 +177,20 @@ describe("display prefs model", function() {
       });
 
       
-      // TODO: figure out why these fail, error is "can.Map: Object does not exist thrown"
-      // it("sets the value for a widget", function() {
-      //   display_prefs[func]("this arg is ignored", "foo", fooValue);
-      //   var fooActual  = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
-      //   expect(fooActual.serialize ? fooActual.serialize() : fooActual).toEqual(fooValue);
-      // });
+      it("sets the value for a widget", function() {
+        display_prefs[func]("this arg is ignored", "foo", fooValue);
+        var fooActual  = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
+        expect(fooActual.serialize ? fooActual.serialize() : fooActual).toEqual(fooValue);
+      });
 
-      // it("sets all values as a collection", function() {
-      //   display_prefs[func]("this arg is ignored", {"foo" : fooValue, "bar" : barValue});
-      //   var fooActual = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
-      //   var barActual = display_prefs.attr([exp.path, exp_token, "bar"].join("."));
-      //   expect(fooActual.serialize ? fooActual.serialize() : fooActual).toEqual(fooValue);
-      //   expect(barActual.serialize ? barActual.serialize() : barActual).toEqual(barValue);
-      // });
-    }
+      it("sets all values as a collection", function() {
+        display_prefs[func]("this arg is ignored", {"foo" : fooValue, "bar" : barValue});
+        var fooActual = display_prefs.attr([exp.path, exp_token, "foo"].join("."));
+        var barActual = display_prefs.attr([exp.path, exp_token, "bar"].join("."));
+        expect(fooActual.serialize ? fooActual.serialize() : fooActual).toEqual(fooValue);
+        expect(barActual.serialize ? barActual.serialize() : barActual).toEqual(barValue);
+      });
+    };
   }
 
   describe("#setSorts", setSpecs("setSorts", "SORTS", ["bar", "baz"], ["thud", "jeek"]));
@@ -222,7 +217,7 @@ describe("display prefs model", function() {
 
   describe("#setColumnWidths", setSpecs("setColumnWidths", "COLUMNS", [6,6], [4,8]));
 
-  xdescribe("Set/Reset functions", function() {
+  describe("Set/Reset functions", function() {
 
     describe("#resetPagePrefs", function() {
 
@@ -243,7 +238,7 @@ describe("display prefs model", function() {
         display_prefs.resetPagePrefs();
         can.each(["getSorts", "getCollapsed", "getWidgetHeight", "getColumnWidths"], function(func) {
           expect(display_prefs[func]("unit_test", "foo")).toBe("bar");
-        })
+        });
       });
 
     });
@@ -358,34 +353,6 @@ describe("display prefs model", function() {
         fail("Should have resolved on findOne for the current display pref");
       });
     });
-  });
-
-  describe("PBC-only functions", function() {
-
-    describe("#getPbcListPrefs", function() {
-
-    });
-
-    describe("#setPbcListPrefs", function() {
-
-    });
-
-    describe("#getPbcResponseOpen", function() {
-
-    });
-
-    describe("#getPbcRequestOpen", function() {
-
-    });
-
-    describe("#setPbcResponseOpen", function() {
-
-    });
-
-    describe("#setPbcRequestOpen", function() {
-
-    });
-
   });
 
 });
