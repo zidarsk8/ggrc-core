@@ -429,6 +429,7 @@ function resize_areas() {
   margins = [$objectArea.css("margin-top"), $objectArea.css("margin-bottom"),
              $objectArea.css("padding-top"), $objectArea.css("padding-bottom")]
         .map(function (margin) {
+          margin || (margin = "0");
           return Number(margin.replace("px", ""));
         })
         .reduce(function (m, h) { return m+h; }, 0);
@@ -440,7 +441,9 @@ function resize_areas() {
   internavHeight = winHeight - UIHeight;
 
   // adjust internavHeight if topNav hidden
-  var top = Number($topNav.css("top").replace("px", ""));
+  var top = $topNav.css("top") 
+          ? Number($topNav.css("top").replace("px", ""))
+          : 0;
   if (top < $header.height()+$headerBar.height()) {
     internavHeight -= $topNav.height();
   }
