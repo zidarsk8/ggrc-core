@@ -322,7 +322,10 @@ View logic is defined within the control (as functions on the control itself).
 
 ### QuickFormController
 
-**TODO**:
+This controller derives from the Modals controller in that it takes form input, converts it into properties on model instances, and
+saves the changes back to the server.  A primary difference in QuickForm is that any update to the instance triggered by QuickForm
+results in an immediate save().  Also, QuickForm was created with the expectation that the instance already exists on the server;
+attempts to work with new model instances before first save may result in unexpected behavior.
 
 * How do controllers interact with controls?
 * How do controllers interact with the backend?
@@ -352,18 +355,43 @@ In contrast, all of the models referenced by a full-form model are not just plac
 
 A stub can be converted into a full-form instance by calling `reify()` on the stub. See also `builder.json`.
 
-#### Lifecycle of a Model **TODO**
+#### Lifecycle of a Model
 
+* Primary Operations
+  * Saving 
+  
+  Saving is either done as an update or create operation.  See Updating and Creating below.
+  * Updating
+ 
+  Updating happens when an instance is known to exist on the server (the determinant is whether the id property is set on the instance)
+and `save()` is called on the instance. The update is executed with a PUT request to the object endpoint.
+  * Creating
+  
+  Creating happens when an instance is known not to exist on the server (id property is not set) and `save()` is called on the instance.
+The create is executed with a POST request to the collection endpoint.
+  * Deleting
+  Deleting can only happen on an instance which is known to exist on the server (see Updating above), when `destroy()` is called on a
+  model instance.  The delete is executed with a
+DELETE request to the object endpoint.  Deletion may execute immediately on the server, in which case the former data of the deleted
+object is returned, or deletion may be offloaded to a background task, in which case the returned content from the operation will
+reference the background_task object.  On the client side, the deferred returned from `destroy()` will not resolve until the background
+task completes.
 
-Saving
+* Non-lifecycle Model Interactions
+ * _transient property
 
-Updating
+ This property is set on instances during modal operation.  _transient is meant to hold data that is not sent to the server and does
+ not need to be kept after the modal completes or is canceled.  This is useful for intermediary values for validation, or calculated
+ default values for a property.
+ * \_pending_joins() / "deferred bindings"
 
-Creating
+ Model instances can be joined to other objects as part of their regular update cycles.  After an update completes successfully, any
+ deferred binding operations contained in `<instance>._pending_joins` are resolved by adding or removing join objects.  These 
+ deferred bindings are usually created by using `<instance>.mark_for_addition()` and `<instance>.mark_for_deletion()`
+ * other modal-based ops
 
-Deleting
-
-THINGS THAT ARE DONE TO MODELS AS THEY ARE INTERACTED WITH THROUGHOUT THE SYSTEM (**TODO**)
+ The modal includes a connector widget that allows pending join object creation and destruction.  Since the connector widget automates
+ the deferred bindings for an instance in deferred mode, no action is taken until the modal is saved.
 
 Are they cached?
 
@@ -375,6 +403,9 @@ Are they cached?
 * Client-side:
     * can.Model.Cacheable
         * Once a model is retrieved to the browser, it is stored in `CMS.Models.<model_name>.cache[<id>]`.  Once present, it is only requested again via the `<instance>.refresh()` method.
+        * A model can be conditionally pulled from the server (if it only exists on the client in stub form) by enqueueing it into a
+        RefreshQueue, and then subsequently triggering the RefreshQueue.  If an enqueued model has already been synched (i.e. if 
+        the selfLink property exists on the instance), it will not be re-fetched by the RefreshQueue.
 
 How/when are they validated?
 
@@ -383,6 +414,7 @@ How/when are they validated?
     * SQLAlchemy validations (using `@validates`)
 * Client-side:
     * Defined in class `init()` method on Model classes, and uses Can Validations ([http://canjs.com/docs/can.Map.validations.html](http://canjs.com/docs/can.Map.validations.html))
+    * Includes a custom `validateNonBlank()` validation function that trims strings before checking for empty strings.
 
 ### View
 
