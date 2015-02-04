@@ -21,12 +21,7 @@
         <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
         <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
           {{{render_hooks 'System.info_widget_actions'}}}
-          <li>
-            <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
-              <i class="grcicon-edit"></i>
-              <span>Edit {{instance.class.title_singular}}</span>
-            </a>
-          </li>
+          {{> /static/mustache/base_objects/dropdown_menu.mustache}}
         </ul>
       </div>
     {{/is_allowed}}
