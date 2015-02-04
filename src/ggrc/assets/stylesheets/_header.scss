@@ -353,7 +353,7 @@
 .actions {
   @include clearfix();
 	@include reset-list();
-	padding-right:20px;
+	padding-right:40px;
   margin-top: 16px;
   li {
     li a {

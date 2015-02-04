@@ -91,16 +91,6 @@
                           }
                           Calendar notifications
 
-                    -#Removed temporary till we decide should this be functional or not
-                      %li
-                        %a.set-display-settings-default{'href': "javascript://", 'tabindex': "-1"}
-                          %i.grcicon-desktop-black
-                          Save Layout
-                      %li
-                        %a.clear-display-settings{'href': "javascript://", 'tabindex': "-1"}
-                          %i.grcicon-reset-black
-                          Reset Layout
-
                     %li
                       %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
                         %i.grcicon-logout-black
@@ -115,8 +105,8 @@
         .row-fluid
           #page-header.span12
             -block header
-          //.span3
-          //  -block subheader_extras
+          -# .span3
+            -block subheader_extras
 
       .top-inner-nav
         .object-nav
