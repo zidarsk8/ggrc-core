@@ -111,12 +111,7 @@ describe("can.Model.Cacheable", function() {
       destroy(2).then(function() {
         expect(CMS.Models.BackgroundTask.findOne).toHaveBeenCalledWith({ id: 1 });
         done();
-      }, function() {
-        can.each(arguments, function(arg) {
-          fail(JSON.stringify(arg));
-        });
-        done();
-      });
+      }, failAll(done));
     });
 
     it("polls background task if found", function(done) {
@@ -129,12 +124,7 @@ describe("can.Model.Cacheable", function() {
         expect(CMS.Models.BackgroundTask.findOne).toHaveBeenCalledWith({ id: 1 });
         expect(poll_spy.poll).toHaveBeenCalled();
         done();
-      }, function() {
-        can.each(arguments, function(arg) {
-          fail(JSON.stringify(arg));
-        });
-        done();
-      });
+      }, failAll(done));
     });
 
     it("continues normally if no background task specified", function(done) {
@@ -144,12 +134,7 @@ describe("can.Model.Cacheable", function() {
       destroy(2).then(function() {
         expect(CMS.Models.BackgroundTask.findOne).not.toHaveBeenCalled();
         done();
-      }, function() {
-        can.each(arguments, function(arg) {
-          fail(JSON.stringify(arg));
-        });
-        done();
-      });
+      }, failAll(done));
     });
 
   });
@@ -161,6 +146,84 @@ describe("can.Model.Cacheable", function() {
         "No default findAll() exists for subclasses of Cacheable"
       );
     });
+
+    it("unboxes collections when passed back from the find", function(done) {
+      spyOn(can, "ajax").and.returnValue($.when({ dummy_models_collection: { dummy_models: [{id: 1}] }}));
+      CMS.Models.DummyModel.findAll().then(function(data) {
+        expect(can.ajax).toHaveBeenCalled();
+        expect(data).toEqual(jasmine.any(can.List));
+        expect(data.length).toBe(1);
+        expect(data[0]).toEqual(jasmine.any(CMS.Models.DummyModel));
+        expect(data[0]).toEqual(jasmine.objectContaining({ id: 1 }));
+        done();
+      }, failAll(done));
+    });
+
+    it("makes a collection of a single object when passed back from the find", function(done) {
+      spyOn(can, "ajax").and.returnValue($.when({id: 1}));
+      CMS.Models.DummyModel.findAll().then(function(data) {
+        expect(can.ajax).toHaveBeenCalled();
+        expect(data).toEqual(jasmine.any(can.List));
+        expect(data.length).toBe(1);
+        expect(data[0]).toEqual(jasmine.any(CMS.Models.DummyModel));
+        expect(data[0]).toEqual(jasmine.objectContaining({ id: 1 }));
+        done();
+      }, failAll(done));
+    });
+
+    // NB -- This unit test is brittle.  It's difficult to unit test for 
+    //  things like timing, and it's a bit of a hack to spy on Date.now()
+    //  since that function is used in more places than just our modelize function.
+    //  -- BM 2015-02-03
+    it("only pushes instances into the list for 100ms before yielding", function(done) {
+      var list = new CMS.Models.DummyModel.List();
+      var dummy_models = [
+          {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7}
+        ];
+      // Have our modelized instances ready for when 
+      var dummy_insts = CMS.Models.DummyModel.models(dummy_models);
+      // we want to see how our observable list gets items over time, so spy on the push method
+      spyOn(list, "push").and.callThrough();
+      spyOn(can, "ajax").and.returnValue($.when(dummy_models));
+      var st = 4; // preload Date.now() because it's called once before we even get to modelizing
+      spyOn(Date, "now").and.callFake(function() {
+        // Date.now() is called once at the start of modelizeMS (internal function in findAll)
+        //  once in an unknown location
+        //  and once per item.
+        if((++st % 5) === 0)
+          st += 100; // after three, push the time ahead 100ms to force a new call to modelizeMS
+        return st;
+      });
+      // return model instances for the list of returned items from the server
+      spyOn(CMS.Models.DummyModel.List, "newInstance").and.returnValue(list);
+      //spy so we don't return the list to observe more than once.  That is,
+      //  models calls new DummyModel.List() which we're already spying out,
+      //  so spy models() out in order to *not* call it.
+      spyOn(CMS.Models.DummyModel, "models").and.callFake(function(items) {
+        var ids = can.map(items, function(item) { return item.id; });
+        return can.map(dummy_insts, function(inst) {
+          return ~can.inArray(inst.id, ids) ? inst : undefined;
+        });
+      });
+      CMS.Models.DummyModel.findAll().then(function() {
+        // finally, we show that with the 100ms gap between pushing ids 3 and 4, we force a separate push.
+        expect(list.push).toHaveBeenCalledWith(
+          jasmine.objectContaining({id: 1}),
+          jasmine.objectContaining({id: 2}),
+          jasmine.objectContaining({id: 3})
+        );
+        expect(list.push).toHaveBeenCalledWith(
+          jasmine.objectContaining({id: 4}),
+          jasmine.objectContaining({id: 5}),
+          jasmine.objectContaining({id: 6})
+        );
+        expect(list.push).toHaveBeenCalledWith(
+          jasmine.objectContaining({id: 7})
+        );
+        done();
+      }, failAll(done));
+    });
+
   });
 
   describe("::findPage", function() {
@@ -177,7 +240,7 @@ describe("can.Model.Cacheable", function() {
     var inst;
     beforeEach(function() {
       inst = new CMS.Models.DummyModel({ href : '/api/dummy_models/1' });
-      spyOn($, "ajax").and.returnValue(new $.Deferred(function(dfd) {
+      spyOn(can, "ajax").and.returnValue(new $.Deferred(function(dfd) {
         setTimeout(function() {
           dfd.resolve(inst.serialize());
         }, 10);
@@ -189,7 +252,7 @@ describe("can.Model.Cacheable", function() {
 
     it("calls the object endpoint with the supplied href if no selfLink", function(done) {
       inst.refresh().then(function() {
-        expect($.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+        expect(can.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
           url: "/api/dummy_models/1",
           type: "get"
         }));
@@ -202,12 +265,12 @@ describe("can.Model.Cacheable", function() {
       inst.refresh();
       setTimeout(function() {
         inst.refresh().then(function() {
-          expect($.ajax.calls.count()).toBe(2);
+          expect(can.ajax.calls.count()).toBe(2);
           done();
         }, fail);
       }, 1000); // 1000ms is enough to trigger a new call to the debounced function
       inst.refresh().then(function() {
-        expect($.ajax.calls.count()).toBe(1);
+        expect(can.ajax.calls.count()).toBe(1);
       }, fail);
     });
 

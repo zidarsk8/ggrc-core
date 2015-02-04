@@ -860,7 +860,7 @@ can.Model("can.Model.Cacheable", {
         dfd : new $.Deferred()
         , fn : $.throttle(1000, true, function() {
           var dfd = that._pending_refresh.dfd;
-          $.ajax({
+          can.ajax({
             url : href
             , params : params
             , type : "get"
