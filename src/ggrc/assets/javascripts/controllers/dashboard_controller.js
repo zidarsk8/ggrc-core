@@ -95,7 +95,7 @@ can.Control("CMS.Controllers.Dashboard", {
             });
       }
 
-      if (this.display_prefs.getNavHidden()) {
+      if (this.display_prefs.getTopNavHidden()) {
         // page needs time to render
         setTimeout(this.close_nav.bind(this), 500);
       }
@@ -129,7 +129,7 @@ can.Control("CMS.Controllers.Dashboard", {
     $nav.animate({top: "96"}, options);
     $fake_merge.animate({top: "136"}, options);
 
-    this.display_prefs.setNavHidden("", false);
+    this.display_prefs.setTopNavHidden("", false);
     $(window).trigger("resize");
   }
 
@@ -150,7 +150,7 @@ can.Control("CMS.Controllers.Dashboard", {
     $nav.animate({top: "66"}, options);
     $fake_merge.animate({top: "106"}, options);
 
-    this.display_prefs.setNavHidden("", true);
+    this.display_prefs.setTopNavHidden("", true);
     $(window).trigger("resize");
   }
 
@@ -378,7 +378,7 @@ can.Control("CMS.Controllers.InnerNav", {
           this.options.widget_list = new can.Observe.List([]);
         }
 
-        console.log(this.options.widget_list);
+        console.log(this.options.widget_list.serialize());
 
         this.options.instance = GGRC.page_instance();
 
