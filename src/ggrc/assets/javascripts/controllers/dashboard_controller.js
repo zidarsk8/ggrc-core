@@ -372,13 +372,9 @@ can.Control("CMS.Controllers.InnerNav", {
       CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {        
         this.display_prefs = prefs;
 
-        console.log(typeof this.options.widget_list, this.options.widget_list);
-
         if (!this.options.widget_list) {
           this.options.widget_list = new can.Observe.List([]);
         }
-
-        console.log(this.options.widget_list.serialize());
 
         this.options.instance = GGRC.page_instance();
 
@@ -562,6 +558,8 @@ can.Control("CMS.Controllers.InnerNav", {
         , existing_index
         ;
 
+      index = this.saved_widget_index($widget, index);
+
       if(this.delayed_display) {
         clearTimeout(this.delayed_display.timeout);
         this.delayed_display.timeout = setTimeout(this.delayed_display.fn, 50);
@@ -610,6 +608,21 @@ can.Control("CMS.Controllers.InnerNav", {
         }
       }
       return widget;
+  }
+
+  , saved_widget_index: function ($widget, index) {
+    var widgets = this.display_prefs.getTopNavWidgets(window.getPageToken()),
+        id = $widget.attr("id");
+
+    if (widgets[id]) {
+      index = widgets[id];
+    }else{
+      widgets[id] = index;
+      this.display_prefs.setTopNavWidgets(window.getPageToken(), widgets);
+      this.display_prefs.save();
+    }
+
+    return index;
   }
 
   , update_widget_count : function($el, count) {

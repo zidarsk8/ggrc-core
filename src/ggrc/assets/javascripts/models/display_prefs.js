@@ -158,11 +158,11 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     var value = this.getObject(page_id === null ? page_id : path, TOP_NAV);
 
     if (typeof value === "undefined") {
-      this.setTopNavWidgets(page_id, []);
+      this.setTopNavWidgets(page_id, {});
       return this.getTopNavWidgets(page_id);
     }
 
-    return value.widget_list;
+    return value.widget_list && value.widget_list.serialize() || {};
   }
 
   , setLHNavSize : function(page_id, widget_id, size) {

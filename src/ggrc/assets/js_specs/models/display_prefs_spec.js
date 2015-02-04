@@ -97,21 +97,21 @@ describe("display prefs model", function() {
 
     describe("widget list", function () {
       it("sets widget list", function () {
-        display_prefs.setTopNavWidgets("this arg is ignored", [1, 2, 3]);
+        display_prefs.setTopNavWidgets("this arg is ignored", {a:1, b: 2});
 
         expect(
           display_prefs.attr([exp.path, exp.TOP_NAV].join(".")).top_nav.widget_list.serialize()
-        ).toEqual([1, 2, 3]);
+        ).toEqual({a: 1, b: 2});
       });
         
       it("gets widget list", function () {
-        display_prefs.setTopNavWidgets("this arg is ignored", [1, 2, 3]);
+        display_prefs.setTopNavWidgets("this arg is ignored", {a: 1, b: 2});
 
-        expect(display_prefs.getTopNavWidgets().serialize()).toEqual([1, 2, 3]);
+        expect(display_prefs.getTopNavWidgets()).toEqual({a: 1, b: 2});
       });
 
-      it("returns [] by default", function () {
-        expect(display_prefs.getTopNavWidgets().serialize()).toEqual([]);
+      it("returns {} by default", function () {
+        expect(display_prefs.getTopNavWidgets()).toEqual({});
       });
     });
   });
