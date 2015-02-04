@@ -12,34 +12,67 @@
 
   {{else}}
   <section class="info">
-    {{#is_info_pin}}{{{render '/static/mustache/base_objects/info-pin.mustache'}}}{{/is_info_pin}}
+    {{#is_info_pin}}
+    <div class="clearfix">
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      <div class="tier-content">
+        {{#name}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Name</h6>
+            <h3>{{name}}
+                {{^if is_enabled}}
+                    <span class="user-disabled">
+                      (Disabled)
+                    </span>
+                {{/if}}
+            </h3>
+          </div>
+        </div>
+        {{/name}}
+
+        {{#email}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Email</h6>
+            <p>
+            {{email}}
+            </p>
+          </div>
+        </div>
+        {{/email}}
+      </div>
+    </div>
+    {{/is_info_pin}}
+
     <div class="tier-content">
-      {{#name}}
-      <div class="row-fluid wrap-row">
-        <div class="span12">
-          <h6>Name</h6>
-          <h3>{{name}}
-              {{^if is_enabled}}
-                  <span class="user-disabled">
-                    (Disabled)
-                  </span>
-              {{/if}}
-          </h3>
+      {{^is_info_pin}}
+        {{#name}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Name</h6>
+            <h3>{{name}}
+                {{^if is_enabled}}
+                    <span class="user-disabled">
+                      (Disabled)
+                    </span>
+                {{/if}}
+            </h3>
+          </div>
         </div>
-      </div>
-      {{/name}}
+        {{/name}}
 
-      {{#email}}
-      <div class="row-fluid wrap-row">
-        <div class="span12">
-          <h6>Email</h6>
-          <p>
-          {{email}}
-          </p>
+        {{#email}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Email</h6>
+            <p>
+            {{email}}
+            </p>
+          </div>
         </div>
-      </div>
-      {{/email}}
-
+        {{/email}}
+      {{/is_info_pin}}
       {{#company}}
       <div class="row-fluid wrap-row">
         <div class="span12">
