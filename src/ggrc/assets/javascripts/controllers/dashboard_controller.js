@@ -464,9 +464,10 @@ can.Control("CMS.Controllers.InnerNav", {
 
   , " sortupdate": "apply_widget_list_sort"
 
-  , apply_widget_list_sort: function() {
+  , apply_widget_list_sort: function(container, event, target) {
       var widget_ids,
-          indexes = this.display_prefs.getTopNavWidgets(window.getPageToken());
+          indexes = this.display_prefs.getTopNavWidgets(window.getPageToken()),
+          widget = target.item.find("a").attr("href");
 
       widget_ids = this.element.find("li > a").map(function() {
         return $(this).attr("href");
@@ -478,6 +479,13 @@ can.Control("CMS.Controllers.InnerNav", {
 
       this.display_prefs.setTopNavWidgets(window.getPageToken());
       this.display_prefs.save();
+
+      // for some reason the .parent().addClass doesn't work without timeout
+      if ($(target.item).hasClass("active")) {
+        setTimeout(function () {
+          this.element.find("li > a[href='"+widget+"']").parent().addClass("active");
+        }.bind(this), 0);
+      }
 
       this.element.trigger("inner_nav_sort_updated", [widget_ids]);
     }
