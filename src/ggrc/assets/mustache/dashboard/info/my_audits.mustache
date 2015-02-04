@@ -15,9 +15,8 @@
       		<div class="select"--> <!-- Fix in css- this puts the data in 2 lines -->
       			<div class="item-data">
           		<div class="row-fluid">
-          			<span class="status-label status-{{to_class instance.status '_'}}"></span>
-        				<!--i class="grcicon-arrow-right"></i-->
 								<div class="span6">
+                  <span class="status-label status-{{to_class instance.status '_'}}"></span>
 		              <div class="tree-title-area w-status">
 		                <a href="{{instance.viewLink}}">{{instance.title}}</a>
 		                <ul class="item-util">
@@ -39,11 +38,9 @@
 		              </div>
 		            </div>
 		            <div class="span4">
-									<div class="tree-title-area">
-		                Status: {{instance.status}}
-		              </div>
+                  <span class="state-value state-{{to_class instance.status '_'}}">{{instance.status}}</span>
 		            </div>
-		            <div class="span1">
+		            <div class="span2">
 									<ul class="tree-action-list">
 										{{#with_page_object_as 'page_object'}}
 		                  {{#if_instance_of page_object 'Person'}}
