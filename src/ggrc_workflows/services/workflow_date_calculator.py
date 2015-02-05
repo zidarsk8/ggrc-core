@@ -111,7 +111,7 @@ class WorkflowDateCalculator(object):
     min_relative_start_month = self._min_relative_start_month_from_tasks()
 
     # Both min_relative_start values will be None when the workflow has no tasks.
-    if min_relative_start_day is None or min_relative_start_month is None:
+    if min_relative_start_day is None and min_relative_start_month is None:
       return None
 
     return WorkflowDateCalculator.nearest_start_date_after_basedate_from_dates(
