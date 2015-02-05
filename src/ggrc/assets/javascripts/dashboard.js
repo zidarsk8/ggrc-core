@@ -380,7 +380,7 @@ jQuery(function($) {
 });
 
 
-function resize_areas() {
+function resize_areas(event, target_info_pin_height) {
   var $window
   ,   $lhs
   ,   $lhsHolder
@@ -462,10 +462,14 @@ function resize_areas() {
               })
               .reduce(function (m, h) { return m+h; }, 0),
 
+          pin_height = $.isNumeric(target_info_pin_height)
+              ? target_info_pin_height
+              : $pin.height(),
+
           // the 5 gives user peace of mind they've reached bottom
           UIHeight = [$topNav.height(), $header.height(), 
                       $headerBar.height(), $footer.height(), 
-                      margins, $pin.height(), 5]
+                      margins, pin_height, 5]
               .reduce(function (m, h) { return m+h; }, 0);
 
       return UIHeight;
