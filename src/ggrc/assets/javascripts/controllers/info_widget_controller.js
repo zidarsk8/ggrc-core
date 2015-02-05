@@ -163,7 +163,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
           else {
             if (end_date.getTime() < today.getTime()) {
               over_due++;
-              self.options.context.attr('error_msg', 'Some tasks are over due!')
+              self.options.context.attr('error_msg', 'Some tasks are overdue!')
             }
             else if (data.status === 'Finished')
               finished++;
