@@ -483,7 +483,53 @@ extenions (e.g. "mustache_helper.js" and "models/mixins.js" already exist in ggr
 
 DB migrations should be set up in `migrations/versions` as in ggrc-core.  Once the extension is created and the settings path added to
 GGRC\_SETTINGS\_MODULE, db_migrate should pick up any migrations automatically.  To completely undo the migrations from an extension
-(in order to remove it without possible database breakage), use the command `db_downgrade &lt;name_of_extension&gt; -1`
+(in order to remove it without possible database breakage), use the command `db_downgrade <name_of_extension> -1`
+
+#### Extension contributions
+
+* Models
+ Define models in your `<extension_name>/models/` folder, and use the same patterns for implementing them as ggrc-core does (derive from ggrc.db.Model, use provided mixins, make association proxy tables and models, etc.).  Be sure to import all files from models 
+ as part of the extension's \_\_init\_\_.py
+
+* Services
+ Services provide the CRUD object endpoints over REST to allow instaces of your extension models.  ggrc-core provides a contributions
+ mechanism for defining more services from your extension at startup time.  The services contribution is done as such:
+
+ ```python
+ from . import models
+ from ggrc.services.registry import service
+  
+ def contributed_services():
+  return [
+    service(m.__table__.name, m)
+    for m in models.__dict__.values()
+    if isinstance(m, type)
+    and issubclass(m, db.Model)
+    ]
+ ```
+
+* Views
+ * Any special templates should be placed under &lt;extension\_module\_name&gt;/templates/ and called as normal. 
+ * To set up an object page for one of the contributed model classes, declare a function similar to this (this function will work as long as your module hierarchy is flat with all models at the first level and you want all of your objects to have pages):
+ 
+ ```python
+ from ggrc.views.registry import object_view
+ from . import models
+ from ggrc import db
+
+ def contributed\_object\_views():
+   return [
+     object_view(m)
+     for m in models.__dict__.values()
+     if isinstance(m, type)
+     and issubclass(m, db.Model)
+     ]
+ ```
+
+* Roles
+ * ROLE_CONTRIBUTIONS: at module level, subclass `RoleContributions`, overriding `contributions`, and set this property to an instance of the subclass.
+ * ROLE_DECLARATIONS: at module level, subclass `RoleDeclarations`, overriding `roles()`, and set this property to an instance of the subclass.
+ * ROLE_IMPLICATIONS: at module level, subclass `DeclarativeRoleImplications`, overriding `implications`, and set this property to an instance of the subclass.
 
 ### Modals
 
