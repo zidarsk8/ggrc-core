@@ -234,6 +234,9 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
     rem = task_group_task.relative_end_month
     red = task_group_task.relative_end_day
 
+  description = models.CycleTaskGroupObjectTask.default_description if \
+    task_group_task.object_approval else task_group_task.description
+
   start_date = WorkflowDateCalculator.\
     nearest_start_date_after_basedate_from_dates(base_date, frequency, rsm, rsd)
   start_date = WorkflowDateCalculator.adjust_start_date(start_date)
@@ -246,7 +249,7 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
       cycle_task_group=cycle_task_group,
       task_group_task=task_group_task,
       title=task_group_task.title,
-      description=task_group_task.description,
+      description=description,
       sort_index=task_group_task.sort_index,
       start_date=start_date,
       end_date=end_date,
