@@ -30,6 +30,10 @@
   args:
     chdir: /vagrant
 
+- name: remove gems
+  sudo: yes
+  shell: gem list | cut -d " " -f1 | xargs gem uninstall -aIx
+
 - name: install gems
   sudo: yes
   with_items: ggrc_gems
