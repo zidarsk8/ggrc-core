@@ -75,14 +75,20 @@ can.Control("CMS.Controllers.InfoPin", {
     if (!this.element.height()) {
       this.element.animate({ height: $(window).height() / 3 }, {
         duration: 800,
-        easing: 'easeOutExpo'
+        easing: 'easeOutExpo',
+        complete: function () {
+          $(window).trigger('resize');
+        }
       });
     }
   },
   '.pin-action a click': function(el) {
     var options = {
         duration: 800,
-        easing: 'easeOutExpo'
+        easing: 'easeOutExpo',
+        complete: function () {
+          $(window).trigger('resize');
+        }
       },
       $info = this.element.find('.info'),
       height = $(window).height();

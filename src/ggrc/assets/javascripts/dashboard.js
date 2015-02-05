@@ -462,9 +462,10 @@ function resize_areas() {
               })
               .reduce(function (m, h) { return m+h; }, 0),
 
+          // the 5 gives user peace of mind they've reached bottom
           UIHeight = [$topNav.height(), $header.height(), 
                       $headerBar.height(), $footer.height(), 
-                      margins, 5] // the 5 gives user peace of mind they've reached bottom
+                      margins, $pin.height(), 5]
               .reduce(function (m, h) { return m+h; }, 0);
 
       return UIHeight;
