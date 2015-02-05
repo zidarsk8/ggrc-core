@@ -19,7 +19,7 @@ var COLLAPSE = "collapse"
 , PBC_LISTS = "pbc_lists"
 , GLOBAL = "global"
 , LHN_STATE = "lhn_state"
-, NAV_HIDDEN = "nav_hidden"
+, TOP_NAV = "top_nav"
 , path = window.location.pathname.replace(/\./g, "/");
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
@@ -129,22 +129,40 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     return widget_id ? collapsed.attr(widget_id) : collapsed;
   }
 
-  , setNavHidden: function (page_id, is_hidden) {
-    this.makeObject(page_id === null ? page_id : path, NAV_HIDDEN).attr("is_hidden", !!is_hidden);
+  , setTopNavHidden: function (page_id, is_hidden) {
+    this.makeObject(page_id === null ? page_id : path, TOP_NAV).attr("is_hidden", !!is_hidden);
     
     this.autoupdate && this.save();
     return this;
   }
 
-  , getNavHidden: function (page_id) {
-    var value = this.getObject(page_id === null ? page_id : path, NAV_HIDDEN);
+  , getTopNavHidden: function (page_id) {
+    var value = this.getObject(page_id === null ? page_id : path, TOP_NAV);
 
     if (typeof value === "undefined") {
-      this.setNavHidden("", false);
+      this.setTopNavHidden("", false);
       return false;
     }
 
     return !!value.is_hidden;
+  }
+
+  , setTopNavWidgets: function (page_id, widget_list) {
+    this.makeObject(page_id === null ? page_id : path, TOP_NAV).attr("widget_list", widget_list);
+
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getTopNavWidgets: function (page_id) {
+    var value = this.getObject(page_id === null ? page_id : path, TOP_NAV);
+
+    if (typeof value === "undefined") {
+      this.setTopNavWidgets(page_id, {});
+      return this.getTopNavWidgets(page_id);
+    }
+
+    return value.widget_list && value.widget_list.serialize() || {};
   }
 
   , setLHNavSize : function(page_id, widget_id, size) {

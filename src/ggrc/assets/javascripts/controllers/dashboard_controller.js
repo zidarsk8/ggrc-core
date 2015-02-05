@@ -95,7 +95,7 @@ can.Control("CMS.Controllers.Dashboard", {
             });
       }
 
-      if (this.display_prefs.getNavHidden()) {
+      if (this.display_prefs.getTopNavHidden()) {
         // page needs time to render
         setTimeout(this.close_nav.bind(this), 500);
       }
@@ -129,7 +129,7 @@ can.Control("CMS.Controllers.Dashboard", {
     $nav.animate({top: "96"}, options);
     $fake_merge.animate({top: "136"}, options);
 
-    this.display_prefs.setNavHidden("", false);
+    this.display_prefs.setTopNavHidden("", false);
     $(window).trigger("resize");
   }
 
@@ -150,7 +150,7 @@ can.Control("CMS.Controllers.Dashboard", {
     $nav.animate({top: "66"}, options);
     $fake_merge.animate({top: "106"}, options);
 
-    this.display_prefs.setNavHidden("", true);
+    this.display_prefs.setTopNavHidden("", true);
     $(window).trigger("resize");
   }
 
@@ -369,37 +369,41 @@ can.Control("CMS.Controllers.InnerNav", {
   }
 }, {
     init: function(options) {
-      var that = this
-        ;
+      CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {        
+        this.display_prefs = prefs;
 
-      if (!this.options.widget_list)
-        this.options.widget_list = new can.Observe.List([]);
-
-      this.options.instance = GGRC.page_instance();
-
-      this.sortable();
-
-      if (!(this.options.contexts instanceof can.Observe))
-        this.options.contexts = new can.Observe(this.options.contexts);
-
-      // FIXME: Initialize from `*_widget` hash when hash has no `#!`
-      can.bind.call(window, 'hashchange', function() {
-        that.route(window.location.hash);
-      });
-
-      can.view(this.options.internav_view, this.options, function(frag) {
-        function fn() {
-          that.element.append(frag);
-          that.route(window.location.hash);
-          delete that.delayed_display;
+        if (!this.options.widget_list) {
+          this.options.widget_list = new can.Observe.List([]);
         }
-        that.delayed_display = {
-          fn : fn
-          , timeout : setTimeout(fn, 50)
-        };
-      });
 
-      this.on();
+        this.options.instance = GGRC.page_instance();
+
+        this.sortable();
+
+        if (!(this.options.contexts instanceof can.Observe)) {
+         this.options.contexts = new can.Observe(this.options.contexts);
+        }
+
+        // FIXME: Initialize from `*_widget` hash when hash has no `#!`
+        can.bind.call(window, 'hashchange', function() {
+          this.route(window.location.hash);
+        }.bind(this));
+
+        can.view(this.options.internav_view, this.options, function(frag) {
+          var fn = function () {
+            this.element.append(frag);
+            this.route(window.location.hash);
+            delete this.delayed_display;
+          }.bind(this);
+
+          this.delayed_display = {
+            fn : fn
+            , timeout : setTimeout(fn, 50)
+          };
+        }.bind(this));
+
+        this.on();
+      }.bind(this));
     }
 
   , route: function(path) {
@@ -424,7 +428,7 @@ can.Control("CMS.Controllers.InnerNav", {
           widget_list = this.options.widget_list;
 
       // Find and make active the widget specified by `step`
-      widget = this.find_widget_by_target("#" + step);
+      var widget = this.find_widget_by_target("#" + step);
       if (!widget && widget_list.length) {
         // Target was not found, but we can select the first widget in the list
         widget = widget_list[0];
@@ -460,13 +464,28 @@ can.Control("CMS.Controllers.InnerNav", {
 
   , " sortupdate": "apply_widget_list_sort"
 
-  , apply_widget_list_sort: function() {
-      var widget_ids
-        ;
+  , apply_widget_list_sort: function(container, event, target) {
+      var widget_ids,
+          indexes = this.display_prefs.getTopNavWidgets(window.getPageToken()),
+          widget = target.item.find("a").attr("href");
 
       widget_ids = this.element.find("li > a").map(function() {
         return $(this).attr("href");
       }).toArray();
+
+      widget_ids.forEach(function (id, index) {
+        indexes[id.replace("#", "")] = index;
+      });
+
+      this.display_prefs.setTopNavWidgets(window.getPageToken());
+      this.display_prefs.save();
+
+      // for some reason the .parent().addClass doesn't work without timeout
+      if ($(target.item).hasClass("active")) {
+        setTimeout(function () {
+          this.element.find("li > a[href='"+widget+"']").parent().addClass("active");
+        }.bind(this), 0);
+      }
 
       this.element.trigger("inner_nav_sort_updated", [widget_ids]);
     }
@@ -554,6 +573,8 @@ can.Control("CMS.Controllers.InnerNav", {
         , existing_index
         ;
 
+      index = this.saved_widget_index($widget, index);
+
       if(this.delayed_display) {
         clearTimeout(this.delayed_display.timeout);
         this.delayed_display.timeout = setTimeout(this.delayed_display.fn, 50);
@@ -602,6 +623,21 @@ can.Control("CMS.Controllers.InnerNav", {
         }
       }
       return widget;
+  }
+
+  , saved_widget_index: function ($widget, index) {
+    var widgets = this.display_prefs.getTopNavWidgets(window.getPageToken()),
+        id = $widget.attr("id");
+
+    if (widgets[id]) {
+      index = widgets[id];
+    }else{
+      widgets[id] = index;
+      this.display_prefs.setTopNavWidgets(window.getPageToken(), widgets);
+      this.display_prefs.save();
+    }
+
+    return index;
   }
 
   , update_widget_count : function($el, count) {

@@ -69,30 +69,51 @@ describe("display prefs model", function() {
     });
   });
 
-  describe("top nav hiddenness", function () {
+  describe("top nav", function () {
     afterEach(function() {
       display_prefs.resetPagePrefs();
       //display_prefs.removeAttr(exp.path);
     });
 
-    it("sets nav hidden", function() {
-      display_prefs.setNavHidden("this arg is ignored", true);
+    describe("hiddenness", function () {
+      it("sets nav hidden", function() {
+        display_prefs.setTopNavHidden("this arg is ignored", true);
+            
+        expect(
+          display_prefs.attr([exp.path, exp.TOP_NAV].join(".")).top_nav.is_hidden
+        ).toBe(true);
+      });
+        
+      it("gets nav hidden", function () {
+        display_prefs.setTopNavHidden("this arg is ignored", true);
+            
+        expect(display_prefs.getTopNavHidden()).toBe(true);
+      });
+        
+      it("returns false by default", function () {
+        expect(display_prefs.getTopNavHidden()).toBe(false);
+      });
+    }); 
 
-      expect(
-          display_prefs.attr([exp.path, exp.NAV_HIDDEN].join(".")).nav_hidden.is_hidden
-      ).toBe(true);
+    describe("widget list", function () {
+      it("sets widget list", function () {
+        display_prefs.setTopNavWidgets("this arg is ignored", {a:1, b: 2});
+
+        expect(
+          display_prefs.attr([exp.path, exp.TOP_NAV].join(".")).top_nav.widget_list.serialize()
+        ).toEqual({a: 1, b: 2});
+      });
+        
+      it("gets widget list", function () {
+        display_prefs.setTopNavWidgets("this arg is ignored", {a: 1, b: 2});
+
+        expect(display_prefs.getTopNavWidgets()).toEqual({a: 1, b: 2});
+      });
+
+      it("returns {} by default", function () {
+        expect(display_prefs.getTopNavWidgets()).toEqual({});
+      });
     });
-
-    it("gets nav hidden", function () {
-      display_prefs.setNavHidden("this arg is ignored", true);
-
-      expect(display_prefs.getNavHidden()).toBe(true);
-    });
-
-    it("returns false by default", function () {
-      expect(display_prefs.getNavHidden()).toBe(false);
-    });
-
   });
 
   describe("#setCollapsed", function() {
