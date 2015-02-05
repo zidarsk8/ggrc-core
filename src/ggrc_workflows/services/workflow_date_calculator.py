@@ -89,6 +89,9 @@ class WorkflowDateCalculator(object):
   '''
   @staticmethod
   def nearest_work_day(date_, direction):
+    if date_ is None:
+      return None
+
     holidays = []
     while date_.isoweekday() > 5 or date_ in holidays:
       date_ = date_ + timedelta(direction)
@@ -106,12 +109,20 @@ class WorkflowDateCalculator(object):
     frequency = self.workflow.frequency
     min_relative_start_day = self._min_relative_start_day_from_tasks()
     min_relative_start_month = self._min_relative_start_month_from_tasks()
+
+    # Both min_relative_start values will be None when the workflow has no tasks.
+    if min_relative_start_day is None or min_relative_start_month is None:
+      return None
+
     return WorkflowDateCalculator.nearest_start_date_after_basedate_from_dates(
       basedate, frequency, min_relative_start_month, min_relative_start_day)
 
   @staticmethod
   def nearest_start_date_after_basedate_from_dates(
       basedate, frequency, relative_start_month, relative_start_day):
+
+    if basedate is None:
+      return None
 
     basedate_day_of_week = basedate.isoweekday()
     basedate_day_of_month = basedate.day
@@ -206,6 +217,9 @@ class WorkflowDateCalculator(object):
 
   @staticmethod
   def nearest_end_date_after_start_date_from_dates(frequency, start_date, end_month, end_day):
+    # Handle no start_date, which will happen when the workflow has no tasks.
+    if start_date is None:
+      return None
 
     start_date_day_of_week = start_date.isoweekday()
     start_date_day_of_month = start_date.day
@@ -302,6 +316,9 @@ class WorkflowDateCalculator(object):
 
   @staticmethod
   def next_cycle_start_date_after_start_date(start_date, frequency):
+    if start_date is None:
+      return None
+
     if "one_time" == frequency:
       return start_date
     elif "weekly" == frequency:
@@ -330,7 +347,8 @@ class WorkflowDateCalculator(object):
       next_cycle_start_date_after_start_date(start_date, frequency)
 
   @staticmethod
-  def previous_cycle_start_date_before_basedate_from_dates(basedate, frequency, relative_start_month, relative_start_day):
+  def previous_cycle_start_date_before_basedate_from_dates(
+      basedate, frequency, relative_start_month, relative_start_day):
     start_date = WorkflowDateCalculator.\
       nearest_start_date_after_basedate_from_dates(
       basedate, frequency, relative_start_month, relative_start_day)
@@ -339,6 +357,9 @@ class WorkflowDateCalculator(object):
 
   @staticmethod
   def previous_cycle_start_date(start_date, frequency):
+    if start_date is None:
+      return None
+
     if "one_time" == frequency:
       return start_date
     elif "weekly" == frequency:
