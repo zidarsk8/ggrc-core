@@ -51,3 +51,10 @@ class CycleTaskGroupObjectTask(
       'response_options',
       'selected_response_options'
       ]
+
+  default_description = "<ol>"\
+                        +"<li>Click \"Start\" to start reviewing an object.</li>"\
+                        +"<li>Review the object in the Info tab.</li>"\
+                        +"<li>Click \"Approve\" to approve the object.</li>"\
+                        +"<li>Click \"Decline\" to decline the object.</li>"\
+                        +"</ol>"
