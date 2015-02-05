@@ -322,7 +322,10 @@ View logic is defined within the control (as functions on the control itself).
 
 ### QuickFormController
 
-**TODO**:
+This controller derives from the Modals controller in that it takes form input, converts it into properties on model instances, and
+saves the changes back to the server.  A primary difference in QuickForm is that any update to the instance triggered by QuickForm
+results in an immediate save().  Also, QuickForm was created with the expectation that the instance already exists on the server;
+attempts to work with new model instances before first save may result in unexpected behavior.
 
 * How do controllers interact with controls?
 * How do controllers interact with the backend?
@@ -352,18 +355,43 @@ In contrast, all of the models referenced by a full-form model are not just plac
 
 A stub can be converted into a full-form instance by calling `reify()` on the stub. See also `builder.json`.
 
-#### Lifecycle of a Model **TODO**
+#### Lifecycle of a Model
 
+* Primary Operations
+  * Saving 
+  
+  Saving is either done as an update or create operation.  See Updating and Creating below.
+  * Updating
+ 
+  Updating happens when an instance is known to exist on the server (the determinant is whether the id property is set on the instance)
+and `save()` is called on the instance. The update is executed with a PUT request to the object endpoint.
+  * Creating
+  
+  Creating happens when an instance is known not to exist on the server (id property is not set) and `save()` is called on the instance.
+The create is executed with a POST request to the collection endpoint.
+  * Deleting
+  Deleting can only happen on an instance which is known to exist on the server (see Updating above), when `destroy()` is called on a
+  model instance.  The delete is executed with a
+DELETE request to the object endpoint.  Deletion may execute immediately on the server, in which case the former data of the deleted
+object is returned, or deletion may be offloaded to a background task, in which case the returned content from the operation will
+reference the background_task object.  On the client side, the deferred returned from `destroy()` will not resolve until the background
+task completes.
 
-Saving
+* Non-lifecycle Model Interactions
+ * _transient property
 
-Updating
+ This property is set on instances during modal operation.  _transient is meant to hold data that is not sent to the server and does
+ not need to be kept after the modal completes or is canceled.  This is useful for intermediary values for validation, or calculated
+ default values for a property.
+ * \_pending_joins() / "deferred bindings"
 
-Creating
+ Model instances can be joined to other objects as part of their regular update cycles.  After an update completes successfully, any
+ deferred binding operations contained in `<instance>._pending_joins` are resolved by adding or removing join objects.  These 
+ deferred bindings are usually created by using `<instance>.mark_for_addition()` and `<instance>.mark_for_deletion()`
+ * other modal-based ops
 
-Deleting
-
-THINGS THAT ARE DONE TO MODELS AS THEY ARE INTERACTED WITH THROUGHOUT THE SYSTEM (**TODO**)
+ The modal includes a connector widget that allows pending join object creation and destruction.  Since the connector widget automates
+ the deferred bindings for an instance in deferred mode, no action is taken until the modal is saved.
 
 Are they cached?
 
@@ -375,6 +403,9 @@ Are they cached?
 * Client-side:
     * can.Model.Cacheable
         * Once a model is retrieved to the browser, it is stored in `CMS.Models.<model_name>.cache[<id>]`.  Once present, it is only requested again via the `<instance>.refresh()` method.
+        * A model can be conditionally pulled from the server (if it only exists on the client in stub form) by enqueueing it into a
+        RefreshQueue, and then subsequently triggering the RefreshQueue.  If an enqueued model has already been synched (i.e. if 
+        the selfLink property exists on the instance), it will not be re-fetched by the RefreshQueue.
 
 How/when are they validated?
 
@@ -383,6 +414,7 @@ How/when are they validated?
     * SQLAlchemy validations (using `@validates`)
 * Client-side:
     * Defined in class `init()` method on Model classes, and uses Can Validations ([http://canjs.com/docs/can.Map.validations.html](http://canjs.com/docs/can.Map.validations.html))
+    * Includes a custom `validateNonBlank()` validation function that trims strings before checking for empty strings.
 
 ### View
 
@@ -415,14 +447,96 @@ View helpers are defined using the Mustache [helper mechanism provided by CanJS]
 
 ### Extensions
 
-An extension is **TODO**.
+An extension is a bundle of code and assets packaged into a folder hierarchy similar to ggrc-core.  Extensions have at minimum a 
+startup script at &lt;extension-folder&gt;/\_\_init\_\_.py and a settings file in &lt;extension-folder&gt;/settings
+
+The extensions which are used in any GGRC instance are determined by the GGRC\_SETTINGS\_MODULE shell variable. To add an extension to
+a GGRC deployment, append a space separator and the Python path to the settings file (e.g. 
+" ggrc\_some\_extension.settings.development") to this shell variable, and restart or redeploy the GGRC server.
+
+The minimum that the extension settings file must contain is `EXTENSIONS = ['<name_of_extension>']`.  Additionally, global settings
+can be provided; any variable set at the top level in this file will be added to the `ggrc.settings` object and later accessible 
+through `from ggrc import settings`.  Setting `exports =` to an array of key names in the extension settings file will make those keys
+and their values available to the client side through the `GGRC.config` object.
+
+The minimum that \_\_init\_\_.py must contain is:
+
+```python
+from flask import Blueprint
+
+blueprint = Blueprint(
+    '<name_of_extension>',
+    __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/static/<name_of_extension>',
+    )
+```
+
+This will set up an extension to be recognized by Flask.
+
+Asset hierarchies in extensions should follow the ggrc-core model: assets.yaml should define the bundles for dasboard-js, 
+dashboard-templates, and dashboard-js-specs; The folder naming convension for these bundles (`assets/javascripts`, `assets/mustache`, 
+and `assets/js_specs`, respectively) should be followed for each extension.  An important caveat is that the assets bundler can only 
+bundle one asset with a given path over all base folders, so you should avoid re-using paths known to exist in ggrc-core or other 
+extenions (e.g. "mustache_helper.js" and "models/mixins.js" already exist in ggrc-core, so don't name your files the same as these).
+
+DB migrations should be set up in `migrations/versions` as in ggrc-core.  Once the extension is created and the settings path added to
+GGRC\_SETTINGS\_MODULE, db_migrate should pick up any migrations automatically.  To completely undo the migrations from an extension
+(in order to remove it without possible database breakage), use the command `db_downgrade <name_of_extension> -1`
+
+#### Extension contributions
+
+* Models
+ Define models in your `<extension_name>/models/` folder, and use the same patterns for implementing them as ggrc-core does (derive from ggrc.db.Model, use provided mixins, make association proxy tables and models, etc.).  Be sure to import all files from models 
+ as part of the extension's \_\_init\_\_.py
+
+* Services
+ Services provide the CRUD object endpoints over REST to allow instaces of your extension models.  ggrc-core provides a contributions
+ mechanism for defining more services from your extension at startup time.  The services contribution is done as such:
+
+ ```python
+ from . import models
+ from ggrc.services.registry import service
+  
+ def contributed_services():
+  return [
+    service(m.__table__.name, m)
+    for m in models.__dict__.values()
+    if isinstance(m, type)
+    and issubclass(m, db.Model)
+    ]
+ ```
+
+* Views
+ * Any special templates should be placed under &lt;extension\_module\_name&gt;/templates/ and called as normal. 
+ * To set up an object page for one of the contributed model classes, declare a function similar to this (this function will work as long as your module hierarchy is flat with all models at the first level and you want all of your objects to have pages):
+ 
+ ```python
+ from ggrc.views.registry import object_view
+ from . import models
+ from ggrc import db
+
+ def contributed\_object\_views():
+   return [
+     object_view(m)
+     for m in models.__dict__.values()
+     if isinstance(m, type)
+     and issubclass(m, db.Model)
+     ]
+ ```
+
+* Roles
+ * ROLE_CONTRIBUTIONS: at module level, subclass `RoleContributions`, overriding `contributions`, and set this property to an instance of the subclass.
+ * ROLE_DECLARATIONS: at module level, subclass `RoleDeclarations`, overriding `roles()`, and set this property to an instance of the subclass.
+ * ROLE_IMPLICATIONS: at module level, subclass `DeclarativeRoleImplications`, overriding `implications`, and set this property to an instance of the subclass.
 
 ### Modals
 
 The core logic and functionality related to modals is defined in the following files:
 
 - [`ggrc/assets/javascripts/bootstrap/modal-ajax.js`](/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js)
-- `[ggrc/assets/javascripts/bootstrap/modal-form.js`](/src/ggrc/assets/javascripts/bootstrap/modal-form.js)
+- [`ggrc/assets/javascripts/bootstrap/modal-form.js`](/src/ggrc/assets/javascripts/bootstrap/modal-form.js)
 - [`ggrc/assets/javascripts/controllers/modals_controller.js`](/src/ggrc/assets/javascripts/controllers/modals_controller.js)
 
 The view for a modal is defined in `/src/<module>/assets/mustache/<class_name>/modal_content.mustache`.
