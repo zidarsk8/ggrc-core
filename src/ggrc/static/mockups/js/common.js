@@ -68,14 +68,14 @@ $(document).ready(function(){
 
       if (cmd === "close") {
 
-        use_slide ? $content.slideUp('fast') : $content.css("display", "none");
+        use_slide ? $content.slideUp(50) : $content.css("display", "none");
         $icon.removeClass('active');
         $li.removeClass('item-open');
         // Only remove tree open if there are no open siblings
         !$li.siblings('.item-open').length && $parentTree.removeClass('tree-open');
         $content.removeClass('content-open');
       } else if(cmd === "open") {
-        use_slide ? $content.slideDown('fast') : $content.css("display", "block");
+        use_slide ? $content.slideDown(50) : $content.css("display", "block");
         $icon.addClass('active');
         $li.addClass('item-open');
         $parentTree.addClass('tree-open');
@@ -124,6 +124,25 @@ $(document).ready(function(){
       $subNav.slideDown('fast');
       $subAction.slideDown('fast');
       $this.addClass("active");
+    }
+
+    return false;
+
+  });
+
+  $('body').on('click', '.inner-accordion-group > a', function() {
+    var $this = $(this),
+        $subNav = $this.closest('.inner-accordion-group').find('.lhn-items-list'),
+        $subAction = $this.closest('.inner-accordion-group').find('.lhn-items-list-actions');
+
+    if($this.hasClass("active")) {
+      $this.removeClass("active");
+      $subNav.slideUp('fast');
+      $subAction.slideUp('fast');
+    } else {
+      $this.addClass("active");
+      $subNav.slideDown('fast');
+      $subAction.slideDown('fast');
     }
 
     return false;
@@ -722,16 +741,309 @@ $(document).ready(function(){
     $(this).removeClass("active");
   });
 
-  $('.generated-report .dropdown-menu input').click(function(e) {
-    e.stopPropagation();
+  // Dropdown menu form stop propagation
+  $(".dropdown-menu").on("click", function(el) {
+      var $this = $(this);
+    
+    if($this.hasClass("dropdown-menu-form")) {
+      el.stopPropagation();
+    }
   });
-  $('.generated-report .dropdown-menu select').click(function(e) {
-    e.stopPropagation();
+
+  // Top navigation show/hide
+  function topNav() {
+    var options = {
+          duration: 800,
+          easing: 'easeOutExpo'
+        },
+        $this = $(this),
+        $tooltip = $this.find("i"),
+        $nav = $this.closest("body").find(".top-inner-nav"),
+        $lhn_nav = $this.closest("body").find(".lhs-holder"),
+        $bar = $this.closest("body").find(".bar-v"),
+        $content = $this.closest("body").find(".object-area"),
+        $fake_merge = $content.add($lhn_nav).add($bar);
+    if($this.hasClass("active")) {
+      $this.removeClass("active");
+      $tooltip.attr("data-original-title", "Show menu");
+      $nav.animate({top: "66"}, options);
+      $fake_merge.animate({top: "106"}, options);
+    } else {
+      $this.addClass("active");
+      $tooltip.attr("data-original-title", "Hide menu");
+      $nav.animate({top: "96"}, options);
+      $fake_merge.animate({top: "136"}, options);
+    }
+  }
+
+  // LHN show/hide
+  function lhnAnimate() {
+    var options = {
+          duration: 800,
+          easing: 'easeOutExpo'
+        },
+        $this = $(this),
+        $lhn = $this.closest("body").find(".lhs-holder"),
+        lhn_width = $lhn.width() - 20,
+        $lhn_bar = $this.closest("body").find(".bar-v"),
+        $lhnType = $this.closest("body").find(".lhn-type"),
+        $lhs_search = $this.closest("body").find(".lhs-search");
+    if($this.hasClass("active")) {
+      $this.removeClass("active");
+      $lhn.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
+      $lhnType.removeClass("active").animate({left: "-246"}, options).css("width", "246px");
+      $lhn_bar.removeClass("active").animate({left: "-8"}, options);
+      $lhs_search.removeClass("active").css("width", "196px");
+      $lhs_search.find(".widgetsearch").css("width", "130px");
+    } else {
+      $this.addClass("active");
+      $lhn.addClass("active").animate({left: "0"}, options);
+      $lhnType.addClass("active").animate({left: "0"}, options);
+      $lhn_bar.addClass("active").animate({left: "240"}, options);
+      $lhs_search.addClass("active");
+    }
+  }
+
+  $(".nav-trigger").on("click", topNav);
+  $(".lhn-trigger").on("click", lhnAnimate);
+
+  /*
+  TO-DO: when clicking everywhere else except inside lhn if lhn is active it should be closed.
+  $(document).on('click', function(event) {
+    if (!$(event.target).closest(".lhs-holder.active").length) {
+      $(".lhs-holder").removeClass("active").animate({left: "-240"}, 800, 'easeOutExpo').css("width", "240px");
+    }
+  });
+  */
+
+  // top nav dropdown position
+  function dropdownPosition() {
+    var $this = $(this),
+        $dropdown = $this.closest(".hidden-widgets-list").find(".dropdown-menu"),
+        $menu_item = $dropdown.find(".inner-nav-item").find("a"),
+        dropdown_height = $dropdown.outerHeight(),
+        offset = $this.offset(),
+        top_pos = offset.top + 36,
+        left_pos = offset.left,
+        win = $(window),
+        win_height = win.height(),
+        footer_height = $(".footer").outerHeight(),
+        remain_height = win_height - footer_height,
+        win_width = win.width();
+
+    if(win_width - left_pos < 322) {
+      $dropdown.addClass("right-pos");
+    } else {
+      $dropdown.removeClass("right-pos");
+    }
+    if(remain_height - top_pos < dropdown_height) {
+      $dropdown.addClass("mid-pos");
+    } else {
+      $dropdown.removeClass("mid-pos");
+    }
+    if($menu_item.length === 1) {
+      $dropdown.addClass("one-item");
+    } else {
+      $dropdown.removeClass("one-item");
+    }
+
+  }
+  $(".dropdown-toggle").on("click", dropdownPosition);
+
+  // Main title slide to right
+  function slideRight() {
+    var options = {
+          duration: 1500,
+          easing: 'easeOutExpo'
+        },
+        $this = $(this),
+        $to_slide = $this.closest("h1").find(".title-slide"),
+        $to_show = $this.closest("h1").find(".title-prev"),
+        win = $(window),
+        win_width = win.width(),
+        slide_amount = win_width;
+
+    $to_slide.animate({ "left": "+=" + slide_amount }, options);
+  }
+
+  $(".title-trigger").on("click", slideRight);
+
+  $(".select").on("click", function(el) {
+    var $this = $(this),
+        $this_item = $this.closest(".tree-item"),
+        $all_items = $(".tree-item");
+
+    if($this_item.hasClass("active")) {
+      $all_items.removeClass("active");
+    } else {
+      $all_items.removeClass("active");
+      $this_item.addClass("active");
+    }
+  });
+
+  // Workflow 2nd tier show/hide task-group, tasks and objects
+  $("#taskGroupPinSelect").on("click", function(e) {
+    $("#taskGroupPin").show();
+    $("#taskPin").hide();
+    $("#objectPin").hide();
+  });
+
+  $("#taskPinSelect").on("click", function(e) {
+    $("#taskGroupPin").hide();
+    $("#taskPin").show();
+    $("#objectPin").hide();
+  });
+
+  $("#objectPinSelect").on("click", function(e) {
+    $("#taskGroupPin").hide();
+    $("#taskPin").hide();
+    $("#objectPin").show();
+  });
+
+  // Audit 2nd tier show/hide requests, responses and objects
+  $("#auditRequestSelect").on("click", function(e) {
+    $("#auditRequestPin").show();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").hide();
+    $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").hide();
+  });
+
+  $("#auditResponseSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").show();
+    $("#auditObjectPin").hide();
+    $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").hide();
+  });
+
+  $("#auditObjectSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").show();
+    $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").hide();
+  });
+
+  $("#auditEvidenceSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").hide();
+    $("#auditEvidencePin").show();
+    $("#auditMeetingPin").hide();
+  });
+
+  $("#auditMeetingSelect").on("click", function(e) {
+    $("#auditRequestPin").hide();
+    $("#auditResponsePin").hide();
+    $("#auditObjectPin").hide();
+    $("#auditEvidencePin").hide();
+    $("#auditMeetingPin").show();
+  });
+
+  // show/hide add auditor in audit info widget
+  $("#auditorFiledWrapTrigger").on("click", function() {
+    var $this = $(this),
+        $field_wrap = $this.closest(".wrap-row").find("#auditorFiledWrap");
+
+    if($this.hasClass("active")) {
+      $this.removeClass("active").show();
+      $field_wrap.slideUp();
+    } else {
+      $this.addClass("active").hide();
+      $field_wrap.slideDown();
+    }
   });
 
 });
 
+// Widget search active state
+function searchFilter() {
+  var $this = $(this),
+      $field = $this.closest(".lhs-search").find(".widgetsearch"),
+      $filter_icon = $this.closest(".lhs-search").find(".filter-off");
+  
+  $field.addClass("active");
+  $filter_icon.addClass("active");
+}
+
+function searchActive() {
+  var $this = $(this),
+      $button = $this.closest(".lhs-search").find(".widgetsearch-submit"),
+      $search_field = $this.closest(".lhs-search").find(".widgetsearch"),
+      $filter_icon = $this.closest(".lhs-search").find(".filter-off");
+
+  if($this.val().trim() !== "") {
+    $button.addClass("active");
+    $button.bind("click", searchFilter);
+  } else {
+    $button.removeClass("active");
+    $search_field.removeClass("active");
+    $filter_icon.removeClass("active");
+  }
+}
+
+$(".widgetsearch").on("keyup", searchActive);
+
+// Pin content height options
+function pinContent() {
+  var options = {
+        duration: 800,
+        easing: 'easeOutExpo'
+      },
+      $pin = $(".pin-content"),
+      $pin_height = $pin.height(),
+      $info = $(".pin-content").find(".info"),
+      $widget = $(".widget"),
+      $window = $(window),
+      $win_height = $window.height(),
+      $win_height_part = $win_height / 3,
+      $pin_max = $win_height_part * 2,
+      $pin_default = $win_height_part,
+      $pin_min = 30;
+
+  $info.css("height", $pin_default);
+  $widget.css("margin-bottom", $win_height_part + 80);
+
+  $(".pin-action .max").on("click", function() {
+    $info.animate({height: $pin_max}, options);
+  });
+  $(".pin-action .default").on("click", function() {
+    $info.animate({height: $pin_default}, options);
+    $widget.css("margin-bottom", $win_height_part + 80);
+  });
+  $(".pin-action .min").on("click", function() {
+    $info.animate({height: $pin_min}, options);
+    $widget.css("margin-bottom", 115);
+  });
+}
+
+jQuery(pinContent);
+jQuery(window).on("resize", pinContent);
+
+// LHN pin
+$(".lhn-pin").on("click", function() {
+  var $this = $(this),
+      $lhn_button = $(".lhn-trigger"),
+      $lhn_bar = $(".bar-v");
+  
+  if ($this.hasClass("active")) {
+    $this.removeClass("active");
+    $lhn_button.removeClass("disabled");
+    $lhn_button.attr("disabled", false);
+    $lhn_bar.removeClass("disabled");
+    $lhn_bar.attr("disabled", false);
+  } else {
+    $this.addClass("active");
+    $lhn_button.addClass("disabled");
+    $lhn_button.attr("disabled", true);
+    $lhn_bar.addClass("disabled");
+    $lhn_bar.attr("disabled", true);
+  }
+});
+
 // Make sure the windows are resized properly
+
 jQuery(resize_areas);
 jQuery(window).on("resize", resize_areas);
 
@@ -744,260 +1056,60 @@ function resize_areas() {
   $window = $(window);
   $lhs = $(".lhs");
   $lhsHolder = $(".lhs-holder");
+  $lhsHolderActive = $(".lhs-holder.active");
   $footer = $(".footer");
   $header = $(".header-content");
   $innerNav = $(".inner-nav");
   $objectArea = $(".object-area");
+  $objectAreaActive = $(".object-area.active");
   $topNav = $(".top-inner-nav");
   $area = $(".area");
   $bar = $(".bar-v");
+  $barActive = $(".bar-v.active");
   $lhsSearch = $(".lhs-search");
+  $lhsSearchActive = $(".lhs-search.active");
+  $lhnType = $(".lhn-type");
 
   winHeight = $window.height();
   winWidth = $window.width();
-  lhsHeight = winHeight - 70;
+  header_height = $(".header").height();
+  header_content_height = $(".header-content").height();
+  top_nav_height = $(".top-inner-nav").height();
+  footer_height = $(".footer").outerHeight();
+  lhsHeight = winHeight - header_height - header_content_height - top_nav_height - footer_height - 60;
   footerMargin = lhsHeight;
-  internavHeight = lhsHeight - 100;
+  internavHeight = winHeight - 156;
   lhsWidth = $lhsHolder.width();
-  lhsSearchWidth = $lhsSearch.width() - 29;
+  lhsSearchWidth = $lhsSearch.width() - 30;
+  lhsSearchWidthActive = $lhsSearchActive.width() - 30;
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
-  objectWidth = winWidth - lhsWidth - internavWidth - barWidth;
-  headerWidth = winWidth - lhsWidth;
+  objectWidthActive = winWidth - lhsWidth - barWidth;
+  objectWidth = winWidth;
+  //headerWidth = winWidth - lhsWidth - barWidth - 20;
+  headerWidth = winWidth - 20;
+  lhnType_width = lhsWidth + 6;
 
-  $lhsHolder.css("height",lhsHeight);
-  $bar.css("height",lhsHeight);
+  $lhsHolder
+    .css("height",lhsHeight);
+  $lhsHolderActive.css("left", "0");
+  $bar
+    .css("height",lhsHeight)
+    .css("left","-8px");
+  $barActive.css("left", lhsWidth);
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);
   $topNav.css("width",objectWidth);
-  $(".widgetsearch").css("width", lhsSearchWidth);
+  $(".widgetsearch").css("width", lhsSearchWidth - 36);
+  $lhsSearchActive.css("width", lhsWidth - 40);
   $objectArea
-    .css("margin-left",internavWidth)
+    .css("margin-left","0")
     .css("height",internavHeight)
     .css("width",objectWidth);
+  $objectAreaActive
+    .css("margin-left", lhsWidth + 8)
+    .css("width",objectWidthActive);
+  $area.css("margin-left", "0");
+  $lhnType.css("width", lhnType_width);
 }
-
-// Grid View Example
-/*
-var dataView;
-var grid;
-var data = [];
-var columns = [
-  {id: "title", name: "Title", field: "title", width: 330, minWidth: 120, cssClass: "cell-title", editor: Slick.Editors.Text, validator: requiredFieldValidator, sortable: true},
-  {id: "assignee", name: "Assignee", field: "assignee", width: 170, minWidth: 100, cssClass: "cell-assignee", editor: Slick.Editors.Auto, sortable: true},
-  {id: "status", name: "Status", field: "status", width: 140, minWidth: 80, cssClass: "cell-status", options: "Assigned,Accepted,Completed", editor: Slick.Editors.Select, sortable: true},
-  {id: "due-on", name: "Due on", field: "due-on", width: 140, minWidth: 80, cssClass: "cell-due-on", editor: Slick.Editors.Date, sortable: true}
-];
-
-var options = {
-  editable: true,
-  enableAddRow: true,
-  enableCellNavigation: true,
-  asyncEditorLoading: true,
-  forceFitColumns: true,
-  topPanelHeight: 25,
-  rowHeight: 32,
-};
-
-var sortcol = "title";
-var sortdir = 1;
-var percentCompleteThreshold = 0;
-var searchString = "";
-
-function requiredFieldValidator(value) {
-  if (value == null || value == undefined || !value.length) {
-    return {valid: false, msg: "This is a required field"};
-  }
-  else {
-    return {valid: true, msg: null};
-  }
-}
-
-function myFilter(item, args) {
-  if (args.searchString != "" && item["title"].indexOf(args.searchString) == -1) {
-    return false;
-  }
-
-  return true;
-}
-
-function comparer(a, b) {
-  var x = a[sortcol], y = b[sortcol];
-  return (x == y ? 0 : (x > y ? 1 : -1));
-}
-
-function toggleFilterRow() {
-  grid.setTopPanelVisibility(!grid.getOptions().showTopPanel);
-}
-
-$(function () {
-  // prepare the data
-  for (var i = 0; i < 500; i++) {
-    var d = (data[i] = {});
-
-    d["id"] = "id_" + i;
-    d["num"] = i;
-    d["title"] = "Collect documentation " + i;
-    d["assignee"] = "Cassius Clay";
-    d["status"] = "Assigned";
-    d["due-on"] = "Due on: 01/05/13";
-  }
-
-
-  dataView = new Slick.Data.DataView({inlineFilters: true});
-  grid = new Slick.Grid("#myGrid", dataView, columns, options);
-  grid.setSelectionModel(new Slick.RowSelectionModel());
-
-  var pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
-  var columnpicker = new Slick.Controls.ColumnPicker(columns, grid, options);
-
-
-  // move the filter panel defined in a hidden div into grid top panel
-  $("#inlineFilterPanel")
-      .appendTo(grid.getTopPanel())
-      .show();
-
-  grid.onCellChange.subscribe(function (e, args) {
-    dataView.updateItem(args.item.id, args.item);
-  });
-
-  grid.onAddNewRow.subscribe(function (e, args) {
-    var item = {"num": data.length, "id": "new_" + (Math.round(Math.random() * 10000)), "title": "New task", "assignee": "Cassius Clay", "status": "Assigned", "due-on": "Due on: 01/05/13"};
-    $.extend(item, args.item);
-    dataView.addItem(item);
-  });
-
-  grid.onKeyDown.subscribe(function (e) {
-    // select all rows on ctrl-a
-    if (e.which != 65 || !e.ctrlKey) {
-      return false;
-    }
-
-    var rows = [];
-    for (var i = 0; i < dataView.getLength(); i++) {
-      rows.push(i);
-    }
-
-    grid.setSelectedRows(rows);
-    e.preventDefault();
-  });
-
-  grid.onSort.subscribe(function (e, args) {
-    sortdir = args.sortAsc ? 1 : -1;
-    sortcol = args.sortCol.field;
-
-    if ($.browser.msie && $.browser.version <= 8) {
-      // using temporary Object.prototype.toString override
-      // more limited and does lexicographic sort only by default, but can be much faster
-
-      var percentCompleteValueFn = function () {
-        var val = this["percentComplete"];
-        if (val < 10) {
-          return "00" + val;
-        } else if (val < 100) {
-          return "0" + val;
-        } else {
-          return val;
-        }
-      };
-
-      // use numeric sort of % and lexicographic for everything else
-      dataView.fastSort((sortcol == "percentComplete") ? percentCompleteValueFn : sortcol, args.sortAsc);
-    } else {
-      // using native sort with comparer
-      // preferred method but can be very slow in IE with huge datasets
-      dataView.sort(comparer, args.sortAsc);
-    }
-  });
-
-  // wire up model events to drive the grid
-  dataView.onRowCountChanged.subscribe(function (e, args) {
-    grid.updateRowCount();
-    grid.render();
-  });
-
-  dataView.onRowsChanged.subscribe(function (e, args) {
-    grid.invalidateRows(args.rows);
-    grid.render();
-  });
-
-  dataView.onPagingInfoChanged.subscribe(function (e, pagingInfo) {
-    var isLastPage = pagingInfo.pageNum == pagingInfo.totalPages - 1;
-    var enableAddRow = isLastPage || pagingInfo.pageSize == 0;
-    var options = grid.getOptions();
-
-    if (options.enableAddRow != enableAddRow) {
-      grid.setOptions({enableAddRow: enableAddRow});
-    }
-  });
-
-
-  var h_runfilters = null;
-
-  // wire up the slider to apply the filter to the model
-  $("#pcSlider,#pcSlider2").slider({
-    "range": "min",
-    "slide": function (event, ui) {
-      Slick.GlobalEditorLock.cancelCurrentEdit();
-
-      if (percentCompleteThreshold != ui.value) {
-        window.clearTimeout(h_runfilters);
-        h_runfilters = window.setTimeout(updateFilter, 10);
-        percentCompleteThreshold = ui.value;
-      }
-    }
-  });
-
-
-  // wire up the search textbox to apply the filter to the model
-  $("#txtSearch,#txtSearch2").keyup(function (e) {
-    Slick.GlobalEditorLock.cancelCurrentEdit();
-
-    // clear on Esc
-    if (e.which == 27) {
-      this.value = "";
-    }
-
-    searchString = this.value;
-    updateFilter();
-  });
-
-  function updateFilter() {
-    dataView.setFilterArgs({
-      searchString: searchString
-    });
-    dataView.refresh();
-  }
-
-  $("#btnSelectRows").click(function () {
-    if (!Slick.GlobalEditorLock.commitCurrentEdit()) {
-      return;
-    }
-
-    var rows = [];
-    for (var i = 0; i < 10 && i < dataView.getLength(); i++) {
-      rows.push(i);
-    }
-
-    grid.setSelectedRows(rows);
-  });
-
-
-  // initialize the model after all the events have been hooked up
-  dataView.beginUpdate();
-  dataView.setItems(data);
-  dataView.setFilterArgs({
-    searchString: searchString
-  });
-  dataView.setFilter(myFilter);
-  dataView.endUpdate();
-
-  // if you don't want the items that are not visible (due to being filtered out
-  // or being on a different page) to stay selected, pass 'false' to the second arg
-  dataView.syncGridSelection(grid, true);
-
-  $("#gridContainer").resizable();
-
-})
-*/

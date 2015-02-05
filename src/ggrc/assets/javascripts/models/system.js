@@ -48,6 +48,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , sections : "CMS.Models.get_stubs"
       , response : "CMS.Models.Response.stub"
       , network_zone : "CMS.Models.Option.stub"
+      , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
     }
     , tree_view_options : {
       show_view : "/static/mustache/base_objects/tree.mustache"
@@ -109,6 +110,7 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
   , destroy : "DELETE /api/systems/{id}"
 
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
+  , is_custom_attributable: true
   , attributes: {}
   , defaults : {
       title : ""
@@ -149,6 +151,7 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , update : "PUT /api/processes/{id}"
   , destroy : "DELETE /api/processes/{id}"
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
+  , is_custom_attributable: true
   , attributes : {}
   , defaults : {
       title : ""

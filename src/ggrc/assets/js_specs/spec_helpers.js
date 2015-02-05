@@ -6,11 +6,21 @@
 
 // polls check function and calls done when truthy
 function waitsFor(check, done) {
-    if (!check()) {
-        setTimeout(function () {
-            waitsFor(check, done);
-        }, 1);
-    }else{
-        done();
-    }
+  if (!check()) {
+    setTimeout(function () {
+      waitsFor(check, done);
+    }, 1);
+  } else {
+    done();
+  }
+}
+
+// This is primarily useful for passing as the fail case for
+//  promises, since every item passed to it will show up in 
+//  the jasmine output.
+window.failAll = function(done) {
+  return function() {
+    can.each(arguments, fail);
+    done && done();
+  };
 };

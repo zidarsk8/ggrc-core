@@ -17,20 +17,27 @@ can.Control("CMS.Controllers.Dashboard", {
 
 }, {
     init: function(el, options) {
-      this.init_page_title();
-      this.init_page_help();
-      this.init_page_header();
-      this.init_widget_descriptors();
-      if (!this.inner_nav_controller)
-        this.init_inner_nav();
-      this.update_inner_nav();
+      CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
+        this.display_prefs = prefs;
 
-      // Before initializing widgets, hide the container to not show
-      // loading state of multiple widgets before reducing to one.
-      this.hide_widget_area();
-      this.init_default_widgets();
-      if (!this.widget_area_controller)
-        this.init_widget_area();
+        this.init_page_title();
+        this.init_page_help();
+        this.init_page_header();
+        this.init_widget_descriptors();
+        if (!this.inner_nav_controller) {
+          this.init_inner_nav();
+        }
+        this.update_inner_nav();
+
+        // Before initializing widgets, hide the container to not show
+        // loading state of multiple widgets before reducing to one.
+        this.hide_widget_area();
+        this.init_default_widgets();
+        if (!this.widget_area_controller) {
+          this.init_widget_area();
+        }
+        this.init_info_pin();
+      }.bind(this));
     }
 
   , init_page_title: function() {
@@ -87,7 +94,65 @@ can.Control("CMS.Controllers.Dashboard", {
                 dashboard_controller: this
             });
       }
+
+      if (this.display_prefs.getTopNavHidden()) {
+        // page needs time to render
+        setTimeout(this.close_nav.bind(this), 500);
+      }
     }
+
+  , init_info_pin: function() {
+    new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
+  }
+
+  , ".nav-trigger click": function(el, ev) {
+      if(el.hasClass("active")) {
+        this.close_nav(el);
+      } else {
+        this.open_nav(el);
+      }
+    }
+  , open_nav: function (el) {
+    el || (el = $(".nav-trigger"));
+    var options = {
+        duration: 800,
+        easing: 'easeOutExpo'
+    },
+        $tooltip = el.find("i"),
+        $nav = el.closest("body").find(".top-inner-nav"),
+        $lhn_nav = el.closest("body").find(".lhs-holder"),
+        $content = el.closest("body").find(".object-area"),
+        $fake_merge = $content.add($lhn_nav);
+
+    el.addClass("active");
+    $tooltip.attr("data-original-title", "Hide menu");
+    $nav.animate({top: "96"}, options);
+    $fake_merge.animate({top: "136"}, options);
+
+    this.display_prefs.setTopNavHidden("", false);
+    $(window).trigger("resize");
+  }
+
+  , close_nav: function (el) {
+    el || (el = $(".nav-trigger"));
+    var options = {
+        duration: 800,
+        easing: 'easeOutExpo'
+    },
+        $tooltip = el.find("i"),
+        $nav = el.closest("body").find(".top-inner-nav"),
+        $lhn_nav = el.closest("body").find(".lhs-holder"),
+        $content = el.closest("body").find(".object-area"),
+        $fake_merge = $content.add($lhn_nav);
+
+    el.removeClass("active");
+    $tooltip.attr("data-original-title", "Show menu");
+    $nav.animate({top: "66"}, options);
+    $fake_merge.animate({top: "106"}, options);
+
+    this.display_prefs.setTopNavHidden("", true);
+    $(window).trigger("resize");
+  }
 
   , init_widget_descriptors: function() {
       var that = this;
@@ -296,6 +361,7 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
 can.Control("CMS.Controllers.InnerNav", {
   defaults: {
       internav_view : "/static/mustache/dashboard/internav_list.mustache"
+    , pin_view : ".pin-content"
     , widget_list : null
     , spinners : {}
     , contexts : null
@@ -303,37 +369,41 @@ can.Control("CMS.Controllers.InnerNav", {
   }
 }, {
     init: function(options) {
-      var that = this
-        ;
+      CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {        
+        this.display_prefs = prefs;
 
-      if (!this.options.widget_list)
-        this.options.widget_list = new can.Observe.List([]);
-
-      this.options.instance = GGRC.page_instance();
-
-      this.sortable();
-
-      if (!(this.options.contexts instanceof can.Observe))
-        this.options.contexts = new can.Observe(this.options.contexts);
-
-      // FIXME: Initialize from `*_widget` hash when hash has no `#!`
-      can.bind.call(window, 'hashchange', function() {
-        that.route(window.location.hash);
-      });
-
-      can.view(this.options.internav_view, this.options, function(frag) {
-        function fn() {
-          that.element.append(frag);
-          that.route(window.location.hash);
-          delete that.delayed_display;
+        if (!this.options.widget_list) {
+          this.options.widget_list = new can.Observe.List([]);
         }
-        that.delayed_display = {
-          fn : fn
-          , timeout : setTimeout(fn, 50)
-        };
-      });
 
-      this.on();
+        this.options.instance = GGRC.page_instance();
+
+        this.sortable();
+
+        if (!(this.options.contexts instanceof can.Observe)) {
+         this.options.contexts = new can.Observe(this.options.contexts);
+        }
+
+        // FIXME: Initialize from `*_widget` hash when hash has no `#!`
+        can.bind.call(window, 'hashchange', function() {
+          this.route(window.location.hash);
+        }.bind(this));
+
+        can.view(this.options.internav_view, this.options, function(frag) {
+          var fn = function () {
+            this.element.append(frag);
+            this.route(window.location.hash);
+            delete this.delayed_display;
+          }.bind(this);
+
+          this.delayed_display = {
+            fn : fn
+            , timeout : setTimeout(fn, 50)
+          };
+        }.bind(this));
+
+        this.on();
+      }.bind(this));
     }
 
   , route: function(path) {
@@ -358,7 +428,7 @@ can.Control("CMS.Controllers.InnerNav", {
           widget_list = this.options.widget_list;
 
       // Find and make active the widget specified by `step`
-      widget = this.find_widget_by_target("#" + step);
+      var widget = this.find_widget_by_target("#" + step);
       if (!widget && widget_list.length) {
         // Target was not found, but we can select the first widget in the list
         widget = widget_list[0];
@@ -389,25 +459,44 @@ can.Control("CMS.Controllers.InnerNav", {
           placeholder: 'drop-placeholder'
         , items : "li:not(.hidden-widgets-list)"
         , disabled: true
-      })
+      });
     }
 
   , " sortupdate": "apply_widget_list_sort"
 
-  , apply_widget_list_sort: function() {
-      var widget_ids
-        ;
+  , apply_widget_list_sort: function(container, event, target) {
+      var widget_ids,
+          indexes = this.display_prefs.getTopNavWidgets(window.getPageToken()),
+          widget = target.item.find("a").attr("href");
 
       widget_ids = this.element.find("li > a").map(function() {
         return $(this).attr("href");
       }).toArray();
 
+      widget_ids.forEach(function (id, index) {
+        indexes[id.replace("#", "")] = index;
+      });
+
+      this.display_prefs.setTopNavWidgets(window.getPageToken());
+      this.display_prefs.save();
+
+      // for some reason the .parent().addClass doesn't work without timeout
+      if ($(target.item).hasClass("active")) {
+        setTimeout(function () {
+          this.element.find("li > a[href='"+widget+"']").parent().addClass("active");
+        }.bind(this), 0);
+      }
+
       this.element.trigger("inner_nav_sort_updated", [widget_ids]);
     }
 
   , set_active_widget : function(widget) {
-    var active_widget = widget;
+    var active_widget = widget,
+        info_pin = $(this.options.pin_view).control();
 
+    if (info_pin) {
+      info_pin.unsetInstance();
+    }
     if (typeof widget === 'string') {
       active_widget = this.widget_by_selector(widget);
     }
@@ -484,6 +573,8 @@ can.Control("CMS.Controllers.InnerNav", {
         , existing_index
         ;
 
+      index = this.saved_widget_index($widget, index);
+
       if(this.delayed_display) {
         clearTimeout(this.delayed_display.timeout);
         this.delayed_display.timeout = setTimeout(this.delayed_display.fn, 50);
@@ -532,6 +623,21 @@ can.Control("CMS.Controllers.InnerNav", {
         }
       }
       return widget;
+  }
+
+  , saved_widget_index: function ($widget, index) {
+    var widgets = this.display_prefs.getTopNavWidgets(window.getPageToken()),
+        id = $widget.attr("id");
+
+    if (widgets[id]) {
+      index = widgets[id];
+    }else{
+      widgets[id] = index;
+      this.display_prefs.setTopNavWidgets(window.getPageToken(), widgets);
+      this.display_prefs.save();
+    }
+
+    return index;
   }
 
   , update_widget_count : function($el, count) {
@@ -600,6 +706,31 @@ can.Control("CMS.Controllers.InnerNav", {
       widget.attr('force_show', false);
       this.route(widgets[0].selector); // Switch to the first widget
       return false; // Prevent the url change back to the widget we are hiding
+    },
+
+    // top nav dropdown position
+    ".dropdown-toggle click": function(el, ev) {
+      var $dropdown = el.closest(".hidden-widgets-list").find(".dropdown-menu"),
+        $menu_item = $dropdown.find(".inner-nav-item").find("a"),
+        offset = el.offset(),
+        top_pos = offset.top + 36,
+        left_pos = offset.left,
+        win = $(window),
+        win_height = win.height(),
+        footer_height = $(".footer").outerHeight(),
+        remain_height = win_height - footer_height,
+        win_width = win.width();
+
+      if(win_width - left_pos < 322) {
+        $dropdown.addClass("right-pos");
+      } else {
+        $dropdown.removeClass("right-pos");
+      }
+      if($menu_item.length === 1) {
+        $dropdown.addClass("one-item");
+      } else {
+        $dropdown.removeClass("one-item");
+      }
     }
 });
 

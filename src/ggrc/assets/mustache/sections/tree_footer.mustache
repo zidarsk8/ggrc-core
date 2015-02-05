@@ -6,18 +6,18 @@
 }}
 
 
-{{{renderLive '/static/mustache/base_objects/tree_footer_zero.mustache'}}}
+<!-- {{{renderLive '/static/mustache/base_objects/tree_footer_zero.mustache'}}} -->
 
 {{#if allow_mapping_or_creating}}
 {{#if_instance_of parent_instance 'Directive'}}
 {{#if allow_creating}}
 {{#is_allowed 'create' model.shortName context=null}}
 {{#if_instance_of parent_instance 'Contract|Standard|Policy|Regulation'}}
-<li class="tree-footer tree-item tree-item-add">
+<li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">
-      <a href="javascript://" class="section-add">
-        + {{#if_instance_of parent_instance 'Contract'}}Clause{{else}}Section{{/if_instance_of}}
+      <a href="javascript://" class="section-add btn btn-small btn-draft" rel="tooltip" data-placement="right" data-original-title="+ {{#if_instance_of parent_instance 'Contract'}}Clause{{else}}Section{{/if_instance_of}}">
+        <i class="grcicon-add-black"></i>
       </a>
       <span class="section-expander">
         {{#if_instance_of parent_instance 'Contract'}}
@@ -80,20 +80,21 @@
 
 {{#if allow_mapping}}
 {{#is_allowed_to_map parent_instance model.shortName}}
-<li class="tree-footer tree-item tree-item-add">
+<li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
       <a
+        class="btn btn-small btn-draft"
         href="javascript://"
         rel="tooltip"
-        data-placement="left"
+        data-placement="right"
         data-toggle="multitype-multiselect-modal-selector"
         data-join-mapping="{{mapping}}"
         data-join-option-type="{{model.shortName}}"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.class.shortName}}"
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-        Map {{model.title_singular}}
+        <i class="grcicon-add-black"></i>
       </a>
     </div>
   </div>

@@ -16,3 +16,4 @@ dashboard-js-template-files:
   - ggrc_basic_permissions/people_roles/object_column.mustache
   - ggrc_basic_permissions/people_roles/object_detail.mustache
   - ggrc_basic_permissions/people_roles/option_column.mustache
+  - ggrc_basic_permissions/people_roles/info.mustache

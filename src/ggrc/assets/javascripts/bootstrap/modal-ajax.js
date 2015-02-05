@@ -17,8 +17,8 @@
   function preload_content() {
     var template =
       [ '<div class="modal-header">'
-      , '  <a class="btn btn-danger btn-mini pull-right" href="#" data-dismiss="modal">'
-      , '    <i class="grcicon-x-white"></i>'
+      , '  <a class="pull-right modal-dismiss" href="#" data-dismiss="modal">'
+      , '    <i class="grcicon-x-grey"></i>'
       , '  </a>'
       , '  <h2>Loading...</h2>'
       , '</div>'

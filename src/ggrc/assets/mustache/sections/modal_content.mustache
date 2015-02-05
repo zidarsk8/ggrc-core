@@ -12,7 +12,7 @@
   {{> /static/mustache/base_objects/form_restore.mustache}}
 
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
       <label>
         Title
         <span class="required">*</span>

@@ -76,7 +76,7 @@ class SectionsConverter(BaseConverter):
 
   metadata_export_order = ['type', 'slug']
 
-  metadata_map = OrderedDict([
+  _metadata_map = OrderedDict([
     ('Type','type'),
     ('Directive Code','slug'),
   ])
@@ -86,7 +86,7 @@ class SectionsConverter(BaseConverter):
     'controls', 'created_at', 'updated_at'
   ]
 
-  object_map = OrderedDict([
+  _object_map = OrderedDict([
     ('Section Code', 'slug'),
     ('Section Title', 'title'),
     ('Section Description' , 'description'),
@@ -111,11 +111,13 @@ class SectionsConverter(BaseConverter):
 
   # Creates the correct metadata_map for the specific directive kind.
   def create_metadata_map(self):
+    super(SectionsConverter, self).create_metadata_map()
     if self.options.get('directive'):
       self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive().type), v) if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
 
   # Called in case the object_map headers change amongst similar imports
   def create_object_map(self):
+    super(SectionsConverter, self).create_object_map()
     if self.directive_kind() == "Contract":
       self.object_map = OrderedDict( [(k.replace("Section", "Clause"), v) \
                           if 'Section' in k else (k, v) for k, v in self.object_map.items()] )

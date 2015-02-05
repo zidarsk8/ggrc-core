@@ -21,48 +21,52 @@
         .container-fluid
           .row-fluid
             .span12
+              %button{ 'class': 'lhn-trigger pull-left', 'href': 'javascript://'}
+                %span.icon-bar
+                %span.icon-bar
+                %span.icon-bar
               .logo.pull-left
-                %a{ 'href': "/dashboard" }
-                  -set logo_url = config.get("COMPANY_LOGO")
-                  -set logo_text = config.get("COMPANY_LOGO_TEXT")
-                  -if logo_url
-                    %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
-                  -elif logo_text != None
-                    =logo_text
-                  -else
-                    Google GRC
+                %h2
+                  %a{ 'class': 'to-my-work', 'href': '/dashboard' }
+                    -set logo_url = config.get("COMPANY_LOGO")
+                    -set logo_text = config.get("COMPANY_LOGO_TEXT")
+                    -if logo_url
+                      %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
+                    -elif logo_text != None
+                      =logo_text
+                    -else
+                      Google GRC
               %ul.menu
-                %li.black-link
+                %li
                   %a{ 'href': 'javascript://', 'data-toggle': 'multitype-search-modal-selector', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
-                    %i.grcicon-search-white
+                    %i.grcicon-search
                     %span
                       Search
-                %li.black-link
+                %li
                   %a#page-help{ 'href': "/dashboard#task_widget" }
-                    %i.grcicon-task
+                    %i.grcicon-task-black
                     %span
                       My Tasks
                       %span.task-count
-                %li.user.dropdown.dropdown-black.black-link
+                %li.user.dropdown
                   %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
-                    %i.grcicon-user
+                    %i.grcicon-user-black
                     %span
-                      %strong
-                        =current_user.email
-                    %i.grcicon-carot-white
+                      =current_user.email
+                    %i.grcicon-carot
                   %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
                     %li
                       %a{'href': "/dashboard"}
-                        %i.grcicon-dashboard
+                        %i.grcicon-dashboard-black
                         My Work ({{current_user.system_wide_role}})
                     -if permissions.is_allowed_read('/admin', 1)
                       %li
                         %a{'href': "/admin#people_list_widget"}
-                          %i.grcicon-admin
+                          %i.grcicon-admin-black
                           Admin Dashboard
                     %li.notify-wrap
                       %span
-                        %i.grcicon-alarm
+                        %i.grcicon-alarm-black
                         Notifications
                       %div.inner-list
                         %label
@@ -86,33 +90,27 @@
                             'value': 'Calendar'
                           }
                           Calendar notifications
-                    %li.layout-wrap
-                      %a.set-display-settings-default{'href': "javascript://", 'tabindex': "-1"}
-                        %i.grcicon-desktop
-                        Save Layout
-                      %a.clear-display-settings{'href': "javascript://", 'tabindex': "-1"}
-                        %i.grcicon-reset
-                        Reset Layout
-                    %li.logout-wrap
+
+                    %li
                       %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
-                        %i.grcicon-logout
+                        %i.grcicon-logout-black
                         Logout
-                %li.black-link
+                %li
                   %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
-                    %i.grcicon-help
+                    %i.grcicon-help-black
                     %span
                       Help
     .area{ 'class': '={ model_display_class }' }
       .header-content
         .row-fluid
-          #page-header.span9
+          #page-header.span12
             -block header
-          .span3
+          -# .span3
             -block subheader_extras
 
       .top-inner-nav
         .object-nav
-          %ul.nav{ 'class': "internav ={ model_display_class }" }
+          %ul.nav{ 'class': "internav" }
 
       %section.content
         .flash
@@ -142,8 +140,12 @@
                 %ul.nav{ 'class': "internav ={ model_display_class }" }
             .object-area
               #show_columns.column-set{ 'data-resize': "true" }
-                #middle_column.widget-area
-                  -block widget_area
+                #middle_column
+                  .row-fluid
+                    .span12.full-width
+                      .inner-content.widget-area
+                        -block widget_area
+            .pin-content
 
     %section.footer
       .row-fluid
@@ -159,7 +161,4 @@
             =config.get('VERSION')
 
     #lhn
-      .bar-v
-      .lhs-holder
-        .affix-holder
-          #lhs.lhs.accordion{ 'data-template': '/dashboard/lhn.mustache' }
+      #lhs.lhs.accordion{ 'data-template': '/dashboard/lhn.mustache' }

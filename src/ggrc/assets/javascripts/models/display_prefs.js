@@ -19,11 +19,12 @@ var COLLAPSE = "collapse"
 , PBC_LISTS = "pbc_lists"
 , GLOBAL = "global"
 , LHN_STATE = "lhn_state"
-, path = window.location.pathname;
+, TOP_NAV = "top_nav"
+, path = window.location.pathname.replace(/\./g, "/");
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   autoupdate : true
-  , version : 20140403 // Last updated due to default sort of InnerNav being broken.
+  , version : 20150129 // Last updated to add 2 accessors
 
   , findAll : function() {
     var that = this;
@@ -68,6 +69,22 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     opts.version = this.version;
     return this._super(id, opts);
   }
+
+  , getSingleton : function () {
+    var deferred,
+        prefs;
+
+    this.findAll().then(function(d) {
+        if(d.length > 0) {
+            prefs = d[0];
+        } else {
+            prefs = self.options.display_prefs = new CMS.Models.DisplayPrefs();
+            prefs.save();
+        }
+    });
+
+    return $.when(prefs);
+  }
 }, {
   init : function() {
     this.autoupdate = this.constructor.autoupdate;
@@ -110,6 +127,42 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     }
 
     return widget_id ? collapsed.attr(widget_id) : collapsed;
+  }
+
+  , setTopNavHidden: function (page_id, is_hidden) {
+    this.makeObject(page_id === null ? page_id : path, TOP_NAV).attr("is_hidden", !!is_hidden);
+    
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getTopNavHidden: function (page_id) {
+    var value = this.getObject(page_id === null ? page_id : path, TOP_NAV);
+
+    if (typeof value === "undefined") {
+      this.setTopNavHidden("", false);
+      return false;
+    }
+
+    return !!value.is_hidden;
+  }
+
+  , setTopNavWidgets: function (page_id, widget_list) {
+    this.makeObject(page_id === null ? page_id : path, TOP_NAV).attr("widget_list", widget_list);
+
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getTopNavWidgets: function (page_id) {
+    var value = this.getObject(page_id === null ? page_id : path, TOP_NAV);
+
+    if (typeof value === "undefined") {
+      this.setTopNavWidgets(page_id, {});
+      return this.getTopNavWidgets(page_id);
+    }
+
+    return value.widget_list && value.widget_list.serialize() || {};
   }
 
   , setLHNavSize : function(page_id, widget_id, size) {
@@ -267,7 +320,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   , setLHNState : function(new_prefs, val) {
     var prefs = this.makeObject(LHN_STATE);
     can.each(
-      ["open_category", "panel_scroll", "category_scroll", "search_text", "my_work", "filter_params"]
+      ["open_category", "panel_scroll", "category_scroll", "search_text", "my_work", "filter_params", "is_open"]
       , function(token) {
         if(typeof new_prefs[token] !== "undefined") {
           prefs.attr(token, new_prefs[token]);

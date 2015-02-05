@@ -5,182 +5,92 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-    <li class="tree-item person" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+    <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
       <div class="item-main" {{#instance}}{{data 'person'}}{{/instance}}>
-        <div class="openclose">
-          <a class="openclose-placeholder" href="javascript://"> </a>
-          <div class="row-fluid">
-            <div class="span12">
+        <div class="item-wrap">
+          <div class="openclose">
+            <i class="grcicon-arrow-right"></i>
+          </div>
+          <div class="select">
+            <div class="item-data">
+              <div class="row-fluid">
+                <div class="span4">
+                  <div class="title tree-title-area">
+                    {{{render '/static/mustache/people/popover.mustache' person=instance}}}
+                  </div>
+                </div>
+                <div class="span2">
+                  <div class="email tree-title-area">
+                    {{#if_match instance.name '\\\\S'}}
+                      {{#instance.name}}
+                        <span class="email">{{instance.email}}</span>
+                        {{^if instance.is_enabled}}
+                          <span class="user-disabled">
+                            (Disabled)
+                          </span>
+                        {{/if}}
+                      {{/instance.name}}
+                    {{/if_match}}
+                  </div>
+                </div>
+                <div class="span2">
+                  <div class="role tree-title-area">
+                    {{#with_program_roles_as "roles" result}}
+                    {{#if roles.length}}
+                      <li>
+                        <div class="item-data">
+                          <div class="tree-title-area">
+                            <span class="role" title="{{#roles}}{{role.permission_summary}} {{/roles}}">
+                              {{#if_helpers '\
+                                #if_equals' roles.0.role.permission_summary 'Mapped' '\
+                                and ^if_equals' roles.length 1}}
+                                {{roles.1.role.permission_summary}}
+                              {{else}}
+                                {{roles.0.role.permission_summary}}
+                              {{/if_helpers}}
+                              {{#roles.1}}
+                                {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
+                                  {{^if_equals roles.length 2}}
+                                    + {{sum roles.length '-2'}}
+                                  {{/if_equals}}
+                                {{else}}
+                                  + {{sum roles.length '-1'}}
+                                {{/if_in_map}}
+                              {{/roles.1}}
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                      {{else}}
+                      <li>
+                        <div class="item-data">
+                          <div class="tree-title-area">
+                            <span class="no-role">
+                              No Access
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    {{/if}}
+                    {{/with_program_roles_as}}
+                  </div>
+                </div>
 
-              <ul class="tree-action-list">
-                {{#with_program_roles_as "roles" result}}
-                {{#if roles.length}}
-                  <li>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        <span class="role" title="{{#roles}}{{role.permission_summary}} {{/roles}}">
-                          {{#if_helpers '\
-                            #if_equals' roles.0.role.permission_summary 'Mapped' '\
-                            and ^if_equals' roles.length 1}}
-                            {{roles.1.role.permission_summary}}
-                          {{else}}
-                            {{roles.0.role.permission_summary}}
-                          {{/if_helpers}}
-                          {{#roles.1}}
-                            {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
-                              {{^if_equals roles.length 2}}
-                                + {{sum roles.length '-2'}}
-                              {{/if_equals}}
-                            {{else}}
-                              + {{sum roles.length '-1'}}
-                            {{/if_in_map}}
-                          {{/roles.1}}
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                  {{else}}
-                  <li>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        <span class="no-role">
-                          No Access
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                {{/if}}
-                {{/with_program_roles_as}}
-              </ul>
-
-              <div class="item-data">
-                <div class="tree-title-area">
-                  {{{render '/static/mustache/people/popover.mustache' person=instance}}}
-                  {{#if_match instance.name '\\\\S'}}
-                    {{#instance.name}}
-                      <span class="email">{{instance.email}}</span>
-                      {{^if instance.is_enabled}}
-                        <span class="user-disabled">
-                          (Disabled)
-                        </span>
+                <div class="span4">
+                  <ul class="tree-action-list">
+                    <li class="show-datails">
+                      {{#if instance.viewLink}}
+                        {{#is_allowed "view_object_page" instance}}
+                          <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                        {{/is_allowed}}
                       {{/if}}
-                    {{/instance.name}}
-                  {{/if_match}}
+                    </li>
+                  </ul>
                 </div>
               </div>
+            </div><!-- item-data end -->
+          </div><!-- select end -->
+        </div><!-- item-wrap end -->
+      </div><!-- item-main end -->
 
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {{#if expanded}}
-      
-        <div class="tier-2-info item-content">
-          <div class="tier-2-info-content">
-            
-            <div class="action-bar">
-              <ul class="change-links">              
-                {{#with_program_roles_as "roles" result}}
-                  {{#if_helpers '\
-                    and #if' allow_mapping '\
-                    and #if_equals' roles.length 1 '\
-                    and #if_equals' roles.0.role.permission_summary "Mapped" '\
-                    and #if' result.mappings '\
-                    and #is_allowed_all' 'delete' result.mappings}}
-                    <li>
-                      <a href="javascript://" class="unmap" data-toggle="unmap">
-                        {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-                        <i class="grcicon-remove"></i>
-                        Unmap
-                      </a>
-                    </li>
-                  {{/if_helpers}}
-                {{/with_program_roles_as}}
-                {{#is_allowed 'create' 'delete' 'UserRole' context=parent_instance.context.id}}
-                  <li>
-                    <a href="javascript://" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{instance.id}}">
-                      <i class="grcicon-role-color"></i> <span>Edit Authorizations</span>
-                    </a>
-                  </li>
-                {{/is_allowed}}
-              </ul>
-              <ul>
-                <li>
-                  <a href="/people/{{instance.id}}">
-                    View Profile Page
-                    <i class="grcicon-goto"></i>
-                  </a>
-                </li>
-              </ul>
-            </div>
-            
-            <div class="small-info">
-              
-              {{#if_match instance.name '\\\\S'}}
-                {{#instance.name}}
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <h6>Name</h6>
-                      <h3>{{instance.name}}</h3>
-                    </div>
-                  </div>
-                {{/instance.name}}
-              {{/if_match}}
-
-              {{#if_match instance.email '\\\\S'}}
-                {{#instance.email}}
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <h6>Email</h6>
-                      <p>
-                        <a href='mailto:{{instance.email}}' target="_blank">
-                          {{instance.email}}
-                        </a>
-                      </p>
-                    </div>
-                  </div>
-                {{/instance.email}}
-              {{/if}}
-
-              {{#if_match instance.company '\\\\S'}}
-                {{#instance.company}}
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <h6>Company</h6>
-                      <h3>{{instance.company}}</h3>
-                    </div>
-                  </div>
-                {{/instance.company}}
-              {{/if_match}}
-
-              <div class="row-fluid">
-                <div class="span12">
-                  <h6>Authorizations</h6>
-                  <p>
-                    {{#with_program_roles_as "roles" result}}
-                      {{#roles}}
-                        {{#if_helpers '\
-                          ^if_equals' role.permission_summary 'Mapped' '\
-                          or #if_equals' roles.length 1}}                    
-                            {{role.permission_summary}}
-                            {{#if_equals role.permission_summary 'Auditor'}}:
-                              {{#with_mapping 'audit_via_context' user_role}}
-                                <span class="role">
-                                  {{audit_via_context.0.instance.title}}
-                                </span>
-                              {{/with_mapping}}
-                            {{/if_equals}}
-                        {{/if_helpers}}
-                      {{/roles}}
-                    {{/with_program_roles_as}}
-                  </p>
-                </div>
-              </div>            
-            </div>          
-          
-          </div>
-        </div>
-      
-      {{/if}}
     </li>

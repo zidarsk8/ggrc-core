@@ -113,9 +113,10 @@
           current_cycle: CustomFilter("cycles", function(result) {
               return result.instance.attr("is_current");
             }),
-          current_task_groups: Cross("current_cycle", "reify_cycle_task_groups"),
+          current_task_groups: Cross("current_cycle", "cycle_task_groups"),
           current_task_group_objects: Cross("current_task_groups", "cycle_task_group_objects_for_page_object"),
           current_tasks: Cross("current_task_groups", "cycle_task_group_object_tasks_for_page_object"),
+          current_all_tasks: Cross("current_task_groups", "cycle_task_group_tasks"),
 
           people: Proxy(
             "Person", "person", "WorkflowPerson", "workflow", "workflow_people"),
@@ -476,7 +477,7 @@
           widget_icon: "task_group",
           content_controller: CMS.Controllers.TreeView,
           content_controller_selector: "ul",
-          widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
+          widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
           content_controller_options: {
             parent_instance: object,
             model: CMS.Models.TaskGroup,
@@ -513,7 +514,7 @@
     history_widget_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
       widget_id: "history",
       widget_name: "History",
       widget_icon: "history",
@@ -528,7 +529,7 @@
     current_widget_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
       widget_id: "current",
       widget_name: "Active Cycles",
       widget_icon: "cycle",

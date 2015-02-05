@@ -380,23 +380,29 @@ jQuery(function($) {
 });
 
 
-function resize_areas() {
+function resize_areas(event, target_info_pin_height) {
   var $window
   ,   $lhs
   ,   $lhsHolder
   ,   $area
   ,   $header
+  ,   $headerBar
   ,   $footer
+  ,   $topNav
   ,   $innerNav
   ,   $objectArea
   ,   $bar
+  ,   $pin
   ,   winHeight
   ,   winWidth
   ,   objectWidth
   ,   headerWidth
   ,   lhsWidth
+  ,   lhsHeight
+  ,   barWidth
   ,   footerMargin
   ,   internavHeight
+  ,   internavWidth
   ;
 
   $window = $(window);
@@ -404,22 +410,24 @@ function resize_areas() {
   $lhsHolder = $(".lhs-holder");
   $footer = $(".footer");
   $header = $(".header-content");
+  $headerBar = $(".header-bar");
   $innerNav = $(".inner-nav");
   $objectArea = $(".object-area");
   $topNav = $(".top-inner-nav");
   $area = $(".area");
   $bar = $(".bar-v");
+  $pin = $(".pin-content");
 
   winHeight = $window.height();
   winWidth = $window.width();
-  lhsHeight = winHeight - 70;
-  footerMargin = lhsHeight;
-  internavHeight = lhsHeight - 100;
+  lhsHeight = winHeight - 220; //new ui
+  footerMargin = lhsHeight + 130; //new UI
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
-  objectWidth = winWidth - lhsWidth - internavWidth - barWidth;
-  headerWidth = winWidth - lhsWidth;
+  objectWidth = winWidth;
+  headerWidth = winWidth - 40;// - lhsWidth;  new ui resize
+  internavHeight = object_area_height();
 
   $lhsHolder.css("height",lhsHeight);
   $bar.css("height",lhsHeight);
@@ -430,9 +438,42 @@ function resize_areas() {
   $objectArea
     .css("margin-left",internavWidth)
     .css("height",internavHeight)
-    .css("width",objectWidth)
-    ;
+    .css("width",objectWidth);
 
+  function object_area_height() {
+      var height = winHeight - not_main_elements_height(),
+          nav_pos = $topNav.css("top") 
+              ? Number($topNav.css("top").replace("px", ""))
+              : 0;
+
+      if (nav_pos < $header.height()+$headerBar.height()) {
+          height -= $topNav.height();
+      }
+
+      return height;
+  }
+
+  function not_main_elements_height() {
+      var margins = [$objectArea.css("margin-top"), $objectArea.css("margin-bottom"),
+                     $objectArea.css("padding-top"), $objectArea.css("padding-bottom")]
+              .map(function (margin) {
+                  margin || (margin = "0");
+                  return Number(margin.replace("px", ""));
+              })
+              .reduce(function (m, h) { return m+h; }, 0),
+
+          pin_height = $.isNumeric(target_info_pin_height)
+              ? target_info_pin_height
+              : $pin.height(),
+
+          // the 5 gives user peace of mind they've reached bottom
+          UIHeight = [$topNav.height(), $header.height(), 
+                      $headerBar.height(), $footer.height(), 
+                      margins, pin_height, 5]
+              .reduce(function (m, h) { return m+h; }, 0);
+
+      return UIHeight;
+  }
 }
 
 
@@ -586,10 +627,10 @@ jQuery(function($) {
       $this.addClass("active");
       $this.html('<i class="grcicon-search"></i> Hide Filters');
     }
-    return false
+    return false;
   });
 
 });
 
-jQuery(resize_areas);
+jQuery(window).on("load", resize_areas);
 jQuery(window).on("resize", resize_areas);

@@ -178,13 +178,13 @@
 
       this.init_context();
       this.init_bindings();
-      this.init_view(),
-      this.init_data()
+      this.init_view();
+      this.init_data();
     },
 
     ".object_column li click": "select_object",
     ".option_column li click": "select_option",
-    ".confirm-buttons a.btn-primary:not(.disabled) click": "change_option",
+    ".confirm-buttons a.btn:not(.disabled) click": "change_option",
 
     init_bindings: function() {
       this.join_list.bind("change", this.proxy("update_active_list"));

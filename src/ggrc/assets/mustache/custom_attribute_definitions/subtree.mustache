@@ -1,0 +1,25 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+
+<tr>
+  {{#instance}}
+  <td>{{title}}</td>
+  <td>{{attribute_type}}</td>
+  <td>{{#if mandatory}}Yes{{else}}No{{/mandatory}}</td>
+  <td>
+    <ul class="tree-action-list">
+      <li>
+        <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-object-singular="{{class.model_singular}}" data-object-plural="{{class.table_plural}}" data-object-id="{{id}}">
+          <i class="grcicon-edit"></i>
+          Edit
+        </a>
+      </li>
+    </ul>
+  </td>
+  {{/instance}}
+</tr>

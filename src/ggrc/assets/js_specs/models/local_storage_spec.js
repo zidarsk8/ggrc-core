@@ -11,8 +11,8 @@
 describe("can.Model.LocalStorage", function() {
   
   //run-once setup
-  beforeAll(function() {    
-      can.Model.LocalStorage("SpecModel");
+  beforeAll(function() {
+    can.Model.LocalStorage("SpecModel");
   });
 
   var model1 = { "id" : 1, "foo" : "bar" };

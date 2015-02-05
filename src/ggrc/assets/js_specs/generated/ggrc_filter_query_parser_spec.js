@@ -7,7 +7,6 @@
 
 describe('GGRC.query_parser', function() {
 
-
   var values = {
     'a': 'b',
     'hello': 'world',
@@ -143,7 +142,7 @@ describe('GGRC.query_parser', function() {
           order_by : { keys : [ ], order : '', compare : null },
           keys: ['5words'],
           evaluate: jasmine.any(Function)
-        })
+        });
 
     });
 
@@ -163,7 +162,7 @@ describe('GGRC.query_parser', function() {
           },
           keys: ['5words'],
           evaluate: jasmine.any(Function)
-        })
+        });
 
     });
 

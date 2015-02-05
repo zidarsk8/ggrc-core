@@ -1,0 +1,78 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita
+    Maintained By: sasmita
+}}
+
+
+  {{#if_equals error_msg ''}}
+  {{else}}
+  <div class="alert warning">
+    <a href="#" class="close" data-dismiss="alert">x</a>
+    <span>
+      <i class="grcicon-warning"></i>
+      <!--This is global messaging letting you know that something is over due! -->
+      {{error_msg}}
+    </span>
+  </div>
+  {{/if_equals}}
+
+  <div class="row-fluid">
+    <!-- Left side Get started column -->
+    <div class="span3 side-wrap">
+      <div class="inner-content">
+        <section class="widget bare">
+          <header class="header">
+            <h2>Get Started</h2>
+          </header>
+          <section class="content">
+            {{> /static/mustache/dashboard/info/get_started.mustache}}
+          </section><!-- Widget content end -->
+        </section><!-- Widget end -->
+      </div><!-- inner-content end -->
+    </div>
+
+    <!-- Right side workflow and task trees area -->
+    <div class="span9 content-wrap">
+      <div class="inner-content">
+        {{#if workflow_view}}
+          <section class="widget small-margin">
+            <header class="header">
+              <h2>My Workflows({{workflow_count}})</h2>
+            </header>
+            {{{ renderLive workflow_view }}}
+            <a href="javascript://" class="workflow-trigger show-all">Show all my workflows</a>
+          </section>
+        {{/if}}
+
+        <section class="widget dashboard small-margin">
+          <header class="header widget-nav">
+            <div class="row-fluid">
+              <div class="span12">
+                <ul>
+                  <li class="active task-tab">
+                    <a href="javascript://">
+                      My Tasks ({{task_count}})
+                    </a>
+                  </li>
+                  <li class="audit-tab">
+                    <a href="javascript://">
+                      Audit Requests ({{audit_count}})
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </header>
+          <section class="content"> 
+            {{> /static/mustache/dashboard/info/task_filters.mustache}}
+            {{{ renderLive task_view }}}
+            {{{ renderLive audit_view }}}
+          </section>
+        </section><!-- Widget end -->
+
+      </div><!-- inner-content end -->
+    </div>
+  </div>
+

@@ -13,11 +13,26 @@ class RecordBuilder(object):
         tgt_class, '_fulltext_attrs')
 
   def as_record(self, obj):
-    properties = dict([(attr, getattr(obj, attr)) \
-        for attr in self._fulltext_attrs])
+    # Defaults. These work when the record is not a custom attribute
+    properties = dict([(attr, getattr(obj, attr))
+                       for attr in self._fulltext_attrs])
+    record_id = obj.id
+    record_type = obj.__class__.__name__
+
+    # Override defaults to index custom attribute values as attributes of the
+    # parent object (the CustomAttributable).
+    if "CustomAttributeValue" == record_type:
+      record_id = obj.attributable_id
+      record_type = obj.attributable_type
+      # The name of the attribute property needs to be unique for each object,
+      # the value comes from the custom_attribute_value
+      properties = {"attribute_value_" + str(obj.id): obj.attribute_value}
     return Record(
-        obj.id,
-        obj.__class__.__name__,
+        # This logic saves custom attribute values as attributes of the object
+        # that owns the attribute values. When obj is not a CustomAttributeValue
+        # the values are saved directly.
+        record_id,
+        record_type,
         obj.context_id,
         '', #FIXME get any qualifying fields to help in search partitioning...
         **properties

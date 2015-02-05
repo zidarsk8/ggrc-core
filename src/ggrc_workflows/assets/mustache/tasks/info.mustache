@@ -8,6 +8,15 @@
 {{! DEPRECATED }}
 
 <section class="info">
+  {{#is_info_pin}}
+  <div class="clearfix">
+    {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+    <div class="tier-content">
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+    </div>
+  </div>
+  {{/is_info_pin}}
+
 	{{#instance}}
   <div class="row-fluid">
     <div class="span6">
@@ -31,7 +40,7 @@
   <div class="info-widget-footer">
     {{#is_allowed 'update' instance context='for'}}
     <p class="pull-right">
-      <a href="javascript://" class="info-edit" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="page">
+      <a href="javascript://" class="info-edit" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
         <i class="grcicon-edit"></i>
         <span>Edit {{model.model_title}}</span>
       </a>

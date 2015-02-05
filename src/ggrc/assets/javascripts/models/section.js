@@ -58,6 +58,7 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
     , section_objectives: "CMS.Models.SectionObjective.stubs"
     , objectives: "CMS.Models.Objective.stubs"
     , object_sections: "CMS.Models.ObjectSection.stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
 
   , init: function() {
@@ -84,14 +85,9 @@ CMS.Models.SectionBase("CMS.Models.Section", {
   , create : "POST /api/sections"
   , update : "PUT /api/sections/{id}"
   , destroy : "DELETE /api/sections/{id}"
+  , is_custom_attributable: true
 
   , attributes : {}
-
-  , init: function() {
-    this._super.apply(this, arguments);
-    // Only Sections (not Clauses) need a parent Directive.
-    this.validatePresenceOf("directive");
-  }
 
   , tree_view_options : {
       show_view : "/static/mustache/sections/tree.mustache"
@@ -119,6 +115,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
   , init : function() {
     can.extend(this.attributes, CMS.Models.SectionBase.attributes);
     this._super.apply(this, arguments);
+    this.validatePresenceOf("directive");
   }
 }, {
 });
@@ -140,7 +137,7 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
   , create: "POST /api/clauses"
   , update: "PUT /api/clauses/{id}"
   , destroy: "DELETE /api/clauses/{id}"
-
+  , is_custom_attributable: true
   , attributes: {}
 
   , tree_view_options: {

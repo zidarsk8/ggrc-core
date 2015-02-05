@@ -7,18 +7,32 @@
 
 body {
   font-size:$f-regular;
+  background: $contentBgnd;
 }
 
 // typography
 h1 {
-  color:$headerTitle;
-  font-size:$f-headline;
-  line-height:36px;
-  span {
-    color: $disabled;
-    font-weight: normal;
-  }
+  color: $headerTitle;
+  font-size: 24px;
+  line-height: 48px;
+  height: 47px;
+  font-family: $fontTitle;
+  font-weight: normal;
   @include oneline();
+  position: relative;
+  .title-prev {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+  }
+  .title-slide {
+    position: absolute;
+    left: 39px;
+    top: 0;
+    z-index: 9999;
+    background: $white;
+  }
 }
 
 h2 {
@@ -37,7 +51,7 @@ h3 {
 }
 
 h4 {
-  font-size: $f-regular;
+  font-size: 16px;
   line-height: 20px;
   font-weight: normal;
   color: $subTitle;
@@ -48,6 +62,10 @@ h4 {
 
 h6 {
   font-weight:normal;
+  font-size: 11px;
+  color: $darkText;
+  line-height: 17px;
+  font-weight: bold;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -70,7 +88,7 @@ h1, h2, h3, h4, h5, h6 {
     color:$controls;
   }
   &.entities {
-    color:$entities;
+    color:$black;
   }
   &.workflow {
     color:$programs;
@@ -100,9 +118,17 @@ u {
   }
 }
 
+p {
+  small {
+    color: $textGray;
+  }
+}
+
 a {
+  color: $blue;
   text-decoration: none;
   &:hover {
+    color: $blue;
     text-decoration: underline;
   }
   &.icon-link {
@@ -115,6 +141,10 @@ a {
 // helpers
 .centered {
   text-align: center;
+}
+
+.right {
+  text-align: right;
 }
 
 .no-results {
@@ -130,6 +160,13 @@ a {
   padding-right: 20px;
   font-style: italic;
   color: $black;
+}
+
+small {
+  font-size: 11px;
+  &.accepted {
+    color: $green;
+  }
 }
 
 .inline {
@@ -194,12 +231,37 @@ a {
 
 .checkbox-inline {
   input[type="checkbox"] {
-    margin-top: -1px;
+    margin: -1px 0 0 0;
   }
 }
 .radio-inline {
   input[type="radio"] {
-    margin-top: -1px;
+    margin: -1px 0 0 0;
+  }
+}
+
+.btn {
+  &.dropdown-toggle {
+    [class^="grcicon-"] {
+      margin-top: 1px !important;
+    }
+  }
+}
+
+.wrap-row {
+  margin-bottom: 20px;
+  p {
+    padding-top: 6px;
+    margin-bottom: 3px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .rtf-block {
+    margin-bottom: 0;
+    pre {
+      margin-bottom: 0;
+    }
   }
 }
 
@@ -262,40 +324,50 @@ a {
   z-index: 2000 !important;
 }
 
-.custom-label {
-  width: 50px;
-  display: inline-block;
-  text-align: center;
-  font-weight: normal;
-  text-shadow: none;
-  margin-right: 4px;
-  border: 1px solid $gray;
+.status-label {
+  width: 8px;
+  height: 8px;
+  @include border-radius($default-border-radius);
+  float: left;
+  margin: 9px 10px 0 10px;
+  .entry-list & {
+    margin: 5px 10px 0 4px !important;
+  }
+  .lhn-items-list & {
+    width: 4px;
+    height: 4px;
+    @include border-radius(2px);
+    margin: 10px 8px 0 1px;
+  }
+  .inner-tree & {
+    margin: 10px 5px 0 10px;
+  }
+  .dashboard-tree & {
+    margin: 9px 10px 0 4px;
+  }
 }
-.label-white {
-  background: $white;
-  color: $black;
+
+@each $status_label in draft, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+  .status-#{$status_label} {
+    @extend %status-#{$status_label};
+  }
 }
 
 // progress bar
 .progress {
-  background: transparent;
-  border: 1px solid $warmGray;
-  height: 19px;
+  background: $lightGray;
+  height: 20px;
   @include box-shadow(none);
-  @include border-radius(0);
-  margin: 5px 0 0 0;
+  @include border-radius($default-border-radius);
+  margin: 4px 0 0 0;
   .bar {
-    height: 19px;
-    line-height: 19px;
-    color: $black;
-    text-shadow: none;
-    font-weight: normal;
-    font-size: 11px;
+    height: 20px;
     @include box-shadow(none);
-    float:left;
+    float: left;
+    margin-right: 1px;
   }
 
-  @each $bar_color in success, danger, warning, base {
+  @each $bar_color in verify, progress, pending, warning {
     .bar-#{$bar_color} {
       @extend %bar-#{$bar_color};
     }
@@ -304,53 +376,28 @@ a {
 
 // buttons
 .btn {
-  font-size: $f-regular;
+  @include btn-size();
   font-weight: bold;
+  border: none;
   @include box-shadow(none);
-  .request-control & {
-    padding: 2px 3px;
-    line-height: 13px;
-    font-size:11px;
+  text-shadow: none;
+  &.btn-small {
+    @include btn-size(12px, 18px, 4px 14px);
   }
-  .response-control & {
-    padding: 2px 3px;
-    line-height: 13px;
-    font-size:11px;
+  &.btn-mini {
+    @include btn-size(11px, 16px, 2px 12px);
   }
-  i {
-    margin-top: 1px;
+  [class^="grcicon-"] {
+    @include opacity(0.7);
   }
-  &:hover {
-    @include box-shadow(inset 0 0 2px rgba(0,0,0,0.3));
+  &:active {
+    @include box-shadow(inset 0 0 4px rgba(0,0,0,0.4));
+    [class^="grcicon-"] {
+      @include opacity(1);
+    }
   }
   &.btn-footer {
     margin-top: 4px;
-  }
-  &.btn-add {
-    color:$white;
-    background: $addBtn;
-    @include background-image(linear-gradient(center top, lighten($addBtn, 5%) 5%, darken($addBtn, 5%) 100% ));
-    text-shadow: 1px 1px 1px $btnAddShadow;
-    border: 1px solid $addBtnBorder;
-    &:active {
-      @include box-shadow(inset 0 0 3px $darkGray);
-      @include background-image(linear-gradient(center top, darken($addBtn, 5%) 5%, lighten($addBtn, 5%) 100% ));
-    }
-    &:hover {
-      color:$white;
-    }
-  }
-  .open & {
-    &.btn-add {
-      color:$white;
-      background: $addBtn;
-      @include background-image(linear-gradient(center top, lighten($addBtn, 5%) 5%, darken($addBtn, 5%) 100% ));
-      text-shadow: 1px 1px 1px $btnAddShadow;
-      border: 1px solid $addBtnBorder;
-      &:hover {
-        color:$white;
-      }
-    }
   }
   .population-upload & {
     width: 100%;
@@ -375,52 +422,18 @@ a {
       @include box-shadow(none);
     }
   }
-  &.btn-mini {
-    font-size: $f-small;
-    line-height: 13px;
-    text-shadow: none;
-    &.pending-ajax {
-      background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 1px;
-    }
-  }
-  &.btn-large {
-    &.pending-ajax {
-      background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 8px;
-    }
-  }
 }
 
-.btn-add,
-.btn-warning,
-.btn-danger {
-  &.disabled {
-    cursor: default;
-    background-color: $btnActive;
-    @include opacity(0.65);
-    @include box-shadow(none);
-    text-shadow: none;
-    color: $responsTitle;
-    border: 1px solid $warmGray;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-    &:active,
-    &:hover {
-      @include box-shadow(none);
-      color: $responsTitle;
-    }
+@each $btn_color in primary, success, info, warning, danger, draft {
+  .btn-#{$btn_color} {
+    @extend %btn-#{$btn_color};
   }
-}
-
-.btn-small {
-  padding: 3px 6px;
-  font-size: $f-small;
-  line-height: 16px;
 }
 
 // Disabled state
 .btn.disabled, .btn[disabled] {
   @include opacity(0.25);
 }
-
 
 // removing outline on anchor element
 .nav-tabs,
@@ -967,6 +980,10 @@ select.multiple-selector {
         margin-top: 5px;
       }
     }
+    &.pull-right {
+      width: auto;
+      float: right;
+    }
   }
   &.task-wrap {
     span.empty {
@@ -1004,12 +1021,6 @@ select.multiple-selector {
   }
 }
 
-a {
-  &.object-title {
-    color: $text;
-  }
-}
-
 .top-separator {
   border-top:1px dotted #ccc;
   padding-top:20px;
@@ -1038,10 +1049,6 @@ a {
     padding-right:60px;
     margin-bottom:10px;
   }
-}
-
-.upp {
-  text-transform:uppercase;
 }
 
 .cap {
@@ -1108,6 +1115,84 @@ p {
   font-size: $f-small;
 }
 
+.item-util {
+  @include reset-list();
+  @include clearfix();
+  font-size: 11px;
+  line-height: 16px;
+  color: $black;
+  li {
+    margin-right: 30px;
+    float: left;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  .tree-progress & {
+    li {
+      @extend %item-util-wide;
+      text-align: center;
+    }
+  }
+  .right & {
+    li {
+      @extend %item-util-wide;
+      text-align: right;
+    }
+  }
+}
+
+.overdue {
+  color: $red;
+  font-weight: bold;
+}
+
+.filter-wrap {
+  background: $white;
+  .filter-border {
+    border-bottom: 1px solid $itemBorder;
+    padding: 12px 0 4px 0;
+    margin: 0 10px;
+  }
+  form {
+    margin: 0;
+  }
+  label {
+    font-size: 12px;
+    color: $tabTitle;
+    margin: 0;
+    display: inline-block;
+  }
+  input[type="text"] {
+    height: 20px;
+    min-height: 20px;
+    line-height: 18px;
+    margin-bottom: 0;
+  }
+  select {
+    height: 20px;
+    line-height: 18px;
+    margin: 0;
+  }
+  .input-medium {
+    @extend input[type="text"];
+    box-sizing: border-box;
+    max-width: 130px;
+  }
+  ul {
+    @include reset-list();
+    @include clearfix();
+    @include oneline();
+    li {
+      display: inline-block;
+      margin-left: 20px;
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+  }
+}
+
 .border-l {
   padding-bottom: 5px;
   border-bottom: 1px solid $infoMessageBorder;
@@ -1125,12 +1210,35 @@ p {
       right: 0;
       left: auto;
     }
+    &.mid-pos {
+      right: auto;
+      left: 300px;
+      top: -146px;
+    }
     &.one-item {
       width: 160px;
       .inner-nav-item {
         float: none;
         clear: both;
       }
+    }
+  }
+}
+
+.dropdown-menu {
+  &.quick-search {
+    min-width: 100%;
+    padding: 15px 20px;
+    box-sizing: border-box;
+    select,
+    input {
+      margin-bottom: 0;
+    }
+    ul {
+      @include reset-list();
+    }
+    li {
+      margin-bottom: 20px;
     }
   }
 }
@@ -1144,4 +1252,36 @@ p {
     background: transparent;
     color: $black;
   }
+}
+
+.state-value {
+  text-transform: uppercase;
+  font-weight: bold;
+  .tree-title-area & {
+    font-weight: normal;
+  }
+}
+
+@each $state_label in draft, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+  .state-#{$state_label} {
+    @extend %state-#{$state_label};
+  }
+}
+
+.inner-count-list {
+  @include reset-list();
+  li {
+    margin-left: -2px;
+    margin-bottom: 6px;
+    [class^="grcicon-"] {
+      margin-top: 0 !important;
+    }
+  }
+}
+
+.workflow-trigger {
+  font-size: 12px;
+  float: right;
+  display: inline-block;
+  margin-top: 6px;
 }
