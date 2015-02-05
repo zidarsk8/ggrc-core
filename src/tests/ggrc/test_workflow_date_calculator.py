@@ -700,6 +700,26 @@ class TestWorkflowDateCalculator(TestCase):
     self.assertEqual(self.friday(), WorkflowDateCalculator.adjust_end_date(self.saturday()))
     self.assertEqual(self.friday(), WorkflowDateCalculator.adjust_end_date(self.sunday()))
 
+  def test_update_state_on_workflows_without_tasks(self):
+    workflows = [
+        self._create_one_time_workflow(),
+        self._create_weekly_workflow(),
+        self._create_monthly_workflow(),
+        self._create_quarterly_workflow(),
+        self._create_annual_workflow(),
+    ]
+    for workflow in workflows:
+      calculator = WorkflowDateCalculator(workflow)
+      next_cycle_start_date = \
+          WorkflowDateCalculator.adjust_start_date(calculator.nearest_start_date_after_basedate(self.today()))
+      next_cycle_end_date = \
+          WorkflowDateCalculator.adjust_end_date(calculator.nearest_end_date_after_start_date(next_cycle_start_date))
+      # Check the previous cycle to see if today is mid_cycle.
+      previous_cycle_start_date = \
+          WorkflowDateCalculator.adjust_start_date(calculator.previous_cycle_start_date_before_basedate(self.today()))
+      previous_cycle_end_date = \
+          WorkflowDateCalculator.adjust_end_date(calculator.nearest_end_date_after_start_date(previous_cycle_start_date))
+
 if __name__ == '__main__':
   import unittest
   unittest.main()
