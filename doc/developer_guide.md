@@ -447,14 +447,50 @@ View helpers are defined using the Mustache [helper mechanism provided by CanJS]
 
 ### Extensions
 
-An extension is **TODO**.
+An extension is a bundle of code and assets packaged into a folder hierarchy similar to ggrc-core.  Extensions have at minimum a 
+startup script at &lt;extension-folder&gt;/\_\_init\_\_.py and a settings file in &lt;extension-folder&gt;/settings
+
+The extensions which are used in any GGRC instance are determined by the GGRC\_SETTINGS\_MODULE shell variable. To add an extension to
+a GGRC deployment, append a space separator and the Python path to the settings file (e.g. 
+" ggrc\_some\_extension.settings.development") to this shell variable, and restart or redeploy the GGRC server.
+
+The minimum that the extension settings file must contain is `EXTENSIONS = ['<name_of_extension>']`.  Additionally, global settings
+can be provided; any variable set at the top level in this file will be added to the `ggrc.settings` object and later accessible 
+through `from ggrc import settings`.  Setting `exports =` to an array of key names in the extension settings file will make those keys
+and their values available to the client side through the `GGRC.config` object.
+
+The minimum that \_\_init\_\_.py must contain is:
+
+```python
+from flask import Blueprint
+
+blueprint = Blueprint(
+    '<name_of_extension>',
+    __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/static/<name_of_extension>',
+    )
+```
+
+This will set up an extension to be recognized by Flask.
+
+Asset hierarchies in extensions should follow the ggrc-core model: assets.yaml should define the bundles for dasboard-js, 
+dashboard-templates, and dashboard-js-specs; The folder naming convension for these bundles (`assets/javascripts`, `assets/mustache`, 
+and `assets/js_specs`, respectively) should be followed for each extension.  An important caveat is that the assets bundler can only 
+bundle one asset with a given path over all base folders, so you should avoid re-using paths known to exist in ggrc-core or other 
+extenions (e.g. "mustache_helper.js" and "models/mixins.js" already exist in ggrc-core, so don't name your files the same as these).
+
+DB migrations should be set up in `migrations/versions` as in ggrc-core.  Once the extension is created and the settings path added to
+GGRC\_SETTINGS\_MODULE, db_migrate should pick up any migrations automatically.  To completely undo the migrations from an extension
+(in order to remove it without possible database breakage), use the command `db_downgrade &lt;name_of_extension&gt; -1`
 
 ### Modals
 
 The core logic and functionality related to modals is defined in the following files:
 
 - [`ggrc/assets/javascripts/bootstrap/modal-ajax.js`](/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js)
-- `[ggrc/assets/javascripts/bootstrap/modal-form.js`](/src/ggrc/assets/javascripts/bootstrap/modal-form.js)
+- [`ggrc/assets/javascripts/bootstrap/modal-form.js`](/src/ggrc/assets/javascripts/bootstrap/modal-form.js)
 - [`ggrc/assets/javascripts/controllers/modals_controller.js`](/src/ggrc/assets/javascripts/controllers/modals_controller.js)
 
 The view for a modal is defined in `/src/<module>/assets/mustache/<class_name>/modal_content.mustache`.
