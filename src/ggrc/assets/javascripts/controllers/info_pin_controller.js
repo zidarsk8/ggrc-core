@@ -55,6 +55,7 @@ can.Control("CMS.Controllers.InfoPin", {
     this.element.html('');
     this.element.height(0);
     $('.cms_controllers_tree_view_node').removeClass('active');
+    $(window).trigger('resize');
   },
   setInstance: function(instance, el) {
     var options = this.findOptions(el),
@@ -75,7 +76,10 @@ can.Control("CMS.Controllers.InfoPin", {
     if (!this.element.height()) {
       this.element.animate({ height: $(window).height() / 3 }, {
         duration: 800,
-        easing: 'easeOutExpo'
+        easing: 'easeOutExpo',
+        complete: function () {
+          $(window).trigger('resize');
+        }
       });
     }
   },
@@ -85,17 +89,30 @@ can.Control("CMS.Controllers.InfoPin", {
         easing: 'easeOutExpo'
       },
       $info = this.element.find('.info'),
-      height = $(window).height();
+      win_height = $(window).height(),
+      target_height;
+
     this.element.find('.pin-action i').css({'opacity': 0.25});
+
     if (el.hasClass('min')) {
-      this.element.animate({height: 75}, options);
-      el.find('i').css({'opacity':1});
+      target_height = 75;
     } else if (el.hasClass('max')) {
-      this.element.animate({ height: height * 3 / 4 }, options);
-      el.find('i').css({'opacity':1});
+      target_height = win_height * 3 / 4;
     } else {
-      this.element.animate({height: height / 3}, options);
-      el.find('i').css({'opacity':1});
+      target_height = win_height / 3;
     }
+
+    if (target_height < $info.height()) {
+      options.start = function () {
+        $(window).trigger("resize", target_height);
+      };
+    }else{
+      options.complete = function () {
+        $(window).trigger("resize");
+      };
+    }
+
+    this.element.animate({height: target_height}, options);
+    el.find('i').css({'opacity':1});
   }
 });
