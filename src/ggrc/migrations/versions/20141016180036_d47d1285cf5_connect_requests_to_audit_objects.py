@@ -11,12 +11,12 @@ Create Date: 2014-06-16 18:00:36.877630
 revision = 'd47d1285cf5'
 down_revision = '4da382b50349'
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.sql import table, column
-from sqlalchemy.sql.expression import literal_column, literal, subquery,\
-                                      and_, join, alias, select
+from sqlalchemy.sql.expression import literal, and_, select
 from  sqlalchemy.engine.reflection import Inspector
+
+from alembic import op
 
 
 def upgrade():
