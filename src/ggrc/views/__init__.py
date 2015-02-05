@@ -96,7 +96,7 @@ def base_context():
       current_user_json=get_current_user_json,
       )
 
-from flask import render_template
+from flask import render_template, flash
 
 # Actual HTML-producing routes
 #
@@ -105,6 +105,9 @@ from flask import render_template
 def index():
   """The initial entry point of the app
   """
+  from ggrc import settings
+  if (settings.DEBUG) or (settings.TESTING):
+    flash(u'WARNING. This is not the production instance of the GGRC application. Company confidential, sensitive or personally identifiable information MUST NOT be entered or stored here. For any questions, please contact eng-compliance@google.com.', 'alert alert-warning')
   return render_template("welcome/index.haml")
 
 from ggrc.login import login_required

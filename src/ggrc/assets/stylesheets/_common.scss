@@ -1034,12 +1034,13 @@ select.multiple-selector {
 
 .welcome {
   h1 {
-    text-align:center;
-    padding-top:1em;
-    padding-bottom:0.5em;
-    font-size:44px;
-    font-weight:normal;
-    line-height:1.5em;
+    text-align: center;
+    margin-top: 2em;  // allow space for flash messages
+    padding-top: 1em;
+    padding-bottom: 0.5em;
+    font-size: 44px;
+    font-weight: normal;
+    line-height: 1.5em;
   }
   h2 {
     text-align:center;
