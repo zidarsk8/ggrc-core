@@ -392,6 +392,7 @@ function resize_areas() {
   ,   $innerNav
   ,   $objectArea
   ,   $bar
+  ,   $pin
   ,   winHeight
   ,   winWidth
   ,   objectWidth
@@ -402,7 +403,6 @@ function resize_areas() {
   ,   footerMargin
   ,   internavHeight
   ,   internavWidth
-  ,   margins
   ;
 
   $window = $(window);
@@ -416,6 +416,7 @@ function resize_areas() {
   $topNav = $(".top-inner-nav");
   $area = $(".area");
   $bar = $(".bar-v");
+  $pin = $(".pin-content");
 
   winHeight = $window.height();
   winWidth = $window.width();
@@ -426,27 +427,7 @@ function resize_areas() {
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
   objectWidth = winWidth;
   headerWidth = winWidth - 40;// - lhsWidth;  new ui resize
-  margins = [$objectArea.css("margin-top"), $objectArea.css("margin-bottom"),
-             $objectArea.css("padding-top"), $objectArea.css("padding-bottom")]
-        .map(function (margin) {
-          margin || (margin = "0");
-          return Number(margin.replace("px", ""));
-        })
-        .reduce(function (m, h) { return m+h; }, 0);
-
-  var UIHeight = [$topNav.height(), $header.height(), 
-                  $headerBar.height(), $footer.height(), 
-                  margins, 5] // the 5 gives user peace of mind they've reached bottom
-          .reduce(function (m, h) { return m+h; }, 0);
-  internavHeight = winHeight - UIHeight;
-
-  // adjust internavHeight if topNav hidden
-  var top = $topNav.css("top") 
-          ? Number($topNav.css("top").replace("px", ""))
-          : 0;
-  if (top < $header.height()+$headerBar.height()) {
-    internavHeight -= $topNav.height();
-  }
+  internavHeight = object_area_height();
 
   $lhsHolder.css("height",lhsHeight);
   $bar.css("height",lhsHeight);
@@ -459,6 +440,35 @@ function resize_areas() {
     .css("height",internavHeight)
     .css("width",objectWidth);
 
+  function object_area_height() {
+      var height = winHeight - not_main_elements_height(),
+          nav_pos = $topNav.css("top") 
+              ? Number($topNav.css("top").replace("px", ""))
+              : 0;
+
+      if (nav_pos < $header.height()+$headerBar.height()) {
+          height -= $topNav.height();
+      }
+
+      return height;
+  }
+
+  function not_main_elements_height() {
+      var margins = [$objectArea.css("margin-top"), $objectArea.css("margin-bottom"),
+                     $objectArea.css("padding-top"), $objectArea.css("padding-bottom")]
+              .map(function (margin) {
+                  margin || (margin = "0");
+                  return Number(margin.replace("px", ""));
+              })
+              .reduce(function (m, h) { return m+h; }, 0),
+
+          UIHeight = [$topNav.height(), $header.height(), 
+                      $headerBar.height(), $footer.height(), 
+                      margins, 5] // the 5 gives user peace of mind they've reached bottom
+              .reduce(function (m, h) { return m+h; }, 0);
+
+      return UIHeight;
+  }
 }
 
 
