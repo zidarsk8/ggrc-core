@@ -1133,6 +1133,7 @@ p.modal-value {
   height: 240px;
   overflow-y: auto;
   .info {
+    @include box-shadow(none);
     display: block;
     text-align: center;
     padding-top: 95px;
@@ -1217,8 +1218,8 @@ label.second-in-column {
     }
     .filter-actions {
       margin-bottom: 0;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 2em;
+      border-bottom: 1px solid $itemBorder;
+      padding-bottom: 20px;
     }
     .single-line-filter {
       margin-bottom:6px;
