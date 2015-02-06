@@ -144,20 +144,6 @@ def admin():
     raise Forbidden()
   return render_template("admin/index.haml")
 
-@app.route("/design/with_new_layout")
-@login_required
-def styleguide_with_new_layout():
-  """The style guide page with the new layout
-  """
-  return render_template("styleguide/styleguide_with_new_layout.haml")
-
-@app.route("/design")
-@login_required
-def styleguide():
-  """The style guide page
-  """
-  return render_template("styleguide/styleguide.haml")
-
 @app.route("/background_task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
   return make_task_response(id_task)
