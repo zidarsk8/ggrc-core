@@ -32,7 +32,7 @@
 
 - name: remove gems
   sudo: yes
-  shell: gem list | cut -d " " -f1 | xargs gem uninstall -aIx 2> /dev/null || echo "a"
+  shell: gem list | cut -d " " -f1 | xargs gem uninstall -aIx 2> /dev/null || true
 
 - name: install gems
   sudo: yes
