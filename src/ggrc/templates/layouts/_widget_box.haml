@@ -23,24 +23,9 @@
   %section{ 'class': "widget {{ widget_class }}", 'id': '{{ widget_id }}', 'data-widget-view': '{{ widget_view }}' }
     %header.header
       .row-fluid
-        .span10
+        .span12
           %h2
             -block widget_title
-
-        .span2
-          .widget-action.pull-right.widget-showhide
-            %a.active{ 'href': "javascript://" }
-          -if widget_help is not none
-            .widget-action.pull-right.widget-action-help
-              %a{ 'href': "javascript://",
-                  'rel': "tooltip",
-                  'title': "Help",
-                  'data-toggle': "modal-ajax-helpform",
-                  'data-placement': "left",
-                  'data-help-slug' : "={widget_id}"
-                }
-                %i.grcicon-help-black
-          -block widget_actions
 
     -block widget_buttons
 

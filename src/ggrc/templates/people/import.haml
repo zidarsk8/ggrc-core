@@ -9,14 +9,23 @@
   Import/Export
 
 -block header
-  %h1.business
-    .grcobject.business
-      %i.grcicon-imp-exp-white
-    Import {{import_kind}}
+  %h1.entities
+    %span.title-prev
+      %a.title-trigger{'href': '/dashboard' }
+        %i.grciconlarge-dashboard-new{'rel': 'tooltip', 'data-original-title': 'My Work'}
+
+    %span.title-slide
+      %i.grciconlarge-import
+      Import {{import_kind}}
+
+    %a.nav-trigger.active{'href': 'javascript://'}
+      %i.grciconlarge-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Hide menu'}
 
 -block main
   .clearfix
     .object-area.import-area
       .column-set
-        .widget-area
-          -include 'people/_import.haml'
+        .row-fluid
+          .span12.full-width
+            .widget-area.inner-content
+              -include 'people/_import.haml'
