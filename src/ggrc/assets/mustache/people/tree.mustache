@@ -35,11 +35,12 @@
               <div class="span4">
 
                 <ul class="tree-action-list">
-                  {{#if instance.length}}
                   <li>
+                    {{#child_options}}
+                      {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance multiple_mapping_case=true}}}
+                    {{/child_options}}
                     {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
                   </li>
-                  {{/if}}
                   <li class="show-datails">
                     {{#if instance.viewLink}}
                       {{#is_allowed "view_object_page" instance}}
@@ -74,4 +75,3 @@
     </div>
     {{/if}}
   </li>
-
