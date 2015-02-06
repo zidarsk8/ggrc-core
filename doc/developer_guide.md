@@ -45,7 +45,7 @@
     - [QuickFormController](#quickformcontroller)
     - [Model](#model)
       - [Stubs vs. Full-form Models](#stubs-vs-full-form-models)
-      - [Lifecycle of a Model](#lifecycle-of-a-model-todo)
+      - [Lifecycle of a Model](#lifecycle-of-a-model)
     - [View](#view)
       - [Standard view templates](#standard-view-templates)
       - [Where to find view templates](#where-to-find-view-templates)
