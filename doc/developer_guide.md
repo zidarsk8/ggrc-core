@@ -488,10 +488,12 @@ GGRC\_SETTINGS\_MODULE, db_migrate should pick up any migrations automatically. 
 #### Extension contributions
 
 * Models
+
  Define models in your `<extension_name>/models/` folder, and use the same patterns for implementing them as ggrc-core does (derive from ggrc.db.Model, use provided mixins, make association proxy tables and models, etc.).  Be sure to import all files from models 
  as part of the extension's \_\_init\_\_.py
 
 * Services
+
  Services provide the CRUD object endpoints over REST to allow instaces of your extension models.  ggrc-core provides a contributions
  mechanism for defining more services from your extension at startup time.  The services contribution is done as such:
 
