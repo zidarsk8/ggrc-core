@@ -20,22 +20,12 @@
       <div class="details-wrap">
         <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
         <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-          {{#using program=instance.program}}
-            {{#with_mapping 'authorizations' instance}}
-              {{#if_helpers '\
-                  #is_allowed' 'view_object_page' '__GGRC_ALL__' '\
-                  and ^if_auditor' instance '\
-                  and ^is_page_instance' instance.program '\
-                 ' _0_context='' _1_include_admin=false}}
-                  <li>
-                    <a href="{{program.viewLink}}#audit_widget">
-                      <i class="grcicon-goto"></i>
-                      View {{instance.class.title_singular}}
-                    </a>
-                  </li>
-              {{/if_helpers}}
-            {{/with_mapping}}
-          {{/using}}
+          <li>
+            <a href="{{viewLink}}">
+              <i class="grcicon-goto"></i>
+              View {{instance.class.title_singular}}
+            </a>
+          </li>
           {{#if_helpers '\
             #is_page_instance' instance.program '\
             or #is_profile'}}
