@@ -13,13 +13,13 @@
   <span class="title-slide">
     <i class="grciconlarge-{{model.table_singular}}"></i>
     {{instance.title}}
+    {{#if instance.private}}
+      <span class="private">
+        <i class="grcicon-private" rel="tooltip" title="Private"></i>
+      </span>
+    {{/if}}
   </span>
   <a class="nav-trigger active" href="javascript://">
     <i class="grciconlarge-nav-trigger" rel="tooltip" data-placement="left" title="" data-original-title="Hide menu"></i>
   </a>
-  {{#if instance.private}}
-  <span class="private">
-    <i class="grcicon-private" rel="tooltip" title="Private"></i>
-  </span>
-  {{/if}}
 </h1>
