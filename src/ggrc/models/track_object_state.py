@@ -1,16 +1,5 @@
 from sqlalchemy import event
 
-# from .program import Program
-# from .objective import Objective
-# from .control import Control
-# from .section import SectionBase
-# from .data_asset import DataAsset
-# from .facility import Facility
-# from .market import Market
-# from .product import Product
-# from .project import Project
-# from .system import SystemOrProcess
-# from .directive import Directive
 from datetime import datetime
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
