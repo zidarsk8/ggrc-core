@@ -414,8 +414,8 @@ can.Control("CMS.Controllers.LHN", {
   , mousedown : false
   , dragged : false
   , resize_lhn : function(resize, no_trigger){
-    resize || (resize = this.options.display_prefs.getLHNavSize(null, null).lhs);
-      
+    resize || (resize = this.options.display_prefs && this.options.display_prefs.getLHNavSize(null, null).lhs);
+
     var $lhs = $("#lhs"),
         $lhsHolder = $(".lhs-holder"),
         $area = $(".area"),
