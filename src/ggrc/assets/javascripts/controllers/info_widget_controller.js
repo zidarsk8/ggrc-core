@@ -250,6 +250,9 @@ can.Control("GGRC.Controllers.InfoWidget", {
         cur_wfs,          // list of workflows with current cycles
         cur_wfs5;         // list of top 5 workflows with current cycle
 
+      if (!GGRC.current_user) {
+        return;
+      }
       GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
       .then(function(result_set){
           var wf_data = result_set.getResultsForType('Workflow');
@@ -343,6 +346,11 @@ can.Control("GGRC.Controllers.InfoWidget", {
 
   , load_audit_count:function() {
     var self = this;
+
+    if (!GGRC.current_user) {
+      return 0;
+    }
+
     GGRC.Models.Search.search_for_types('', ['Audit'], {contact_id: GGRC.current_user.id})
       .then(function(result) {
         self.options.context.attr('audit_count', result.entries.length);
