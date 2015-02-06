@@ -369,7 +369,7 @@ can.Control("CMS.Controllers.InnerNav", {
   }
 }, {
     init: function(options) {
-      CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {        
+      CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
         this.display_prefs = prefs;
 
         if (!this.options.widget_list) {
@@ -655,7 +655,7 @@ can.Control("CMS.Controllers.InnerNav", {
 
     update_add_more_link: function() {
       var has_hidden_widgets = false,
-          $hidden_widgets = $('.hidden-widgets-list'),
+          $hidden_widgets = $('.hidden-widgets-list:not(.top-space)'),
           instance = this.options.instance || {},
           model = instance.constructor,
           show_all_tabs = false;
