@@ -44,8 +44,8 @@
       {{> /static/mustache/base_objects/edit_object_link.mustache}}
     {{/if_helpers}}
 
-    {{#is_allowed_to_map parent_instance model.shortName}}
     {{#if allow_mapping_or_creating}}
+    {{#is_allowed_to_map parent_instance model.shortName}}
       {{#if model.root_object}}
         {{#if_instance_of instance "SectionBase"}}
           <li>
@@ -64,8 +64,8 @@
           </li>
         {{/if_equals}}
       {{/if}}
-    {{/if}}
     {{/is_allowed_to_map}}
+    {{/if}}
   </ul>
 </div>
 
