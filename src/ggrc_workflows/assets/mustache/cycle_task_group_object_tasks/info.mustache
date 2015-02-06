@@ -36,7 +36,7 @@
         <div class="span6">
           <h6>Assignee</h6>
           {{#if_cycle_assignee_privileges instance}}
-          <div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+          <div data-force-refresh="true" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
             {{#using contact=instance.contact}}
               {{firstnonempty contact.name contact.email ''}}
             {{/using}}
