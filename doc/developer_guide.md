@@ -45,7 +45,7 @@
     - [QuickFormController](#quickformcontroller)
     - [Model](#model)
       - [Stubs vs. Full-form Models](#stubs-vs-full-form-models)
-      - [Lifecycle of a Model **TODO**](#lifecycle-of-a-model-todo)
+      - [Lifecycle of a Model](#lifecycle-of-a-model-todo)
     - [View](#view)
       - [Standard view templates](#standard-view-templates)
       - [Where to find view templates](#where-to-find-view-templates)
@@ -553,7 +553,18 @@ Most client-side logic is implemented in Controls. Much of this logic is impleme
 
 ### Error Handling
 
-**TODO**
+Most errors are reported to the system with a `window.onerror` handler that generates flash messages at the top of the page and reports
+the exception back to Tracker.  For maximum coverage, the script that defines this handler is inlined into base.haml.
+
+AJAX failures that happen while a modal is active are reported back to a flash handler at the modal level (so that the flash messages
+are not covered by modals or overlays).
+
+Because the error handler at the window level handles most of our needs, try/catch blocks are rare in GGRC.  However, it is worth 
+noting that errors in Deferred callbacks may not fire the onerror handler, *and* "break the chain" inasmuch as the state of the 
+deferred never changes from "pending" after that, and other deferreds waiting for the result of that deferred will never run.  This
+is a failure of the jQuery Deferred object to sensibly handle uncaught errors (they should reject the deferred instead). In the case
+where it's possible that a callback will throw an error, it is recommended to wrap the content of the callback in `try/catch` and 
+return a rejected deferred when an error happens.
 
 ### Problem Areas
 
@@ -587,13 +598,18 @@ Each type of mapping is defined below:
 
 * **Indirect**: An indirect mapping is the reverse of `Direct`, but the implementation is inconsistent with the rest of the mappers.
 
-* **Search**: A search mapping is a relationship where **TODO**
+* **Search**: A search mapping is a relationship where results are produced by a function returning a deferred. This mapping is f
+foremost used by the Advanced Search feature and for getting owned objects for a Person, but other uses are also possible.  Note that the search function is run at attach time and also when a new object of any type is created, so it is recommended to use this mapper
+sparingly in the system if it makes a number of large AJAX calls.
 
 * **Multi**: Constructs a mapping which is the union of zero or more other mappings.  Specifically, the set of `result.instance` values is the union of `result.instance` from the contributing mappings.
 
-* **TypeFilter**: An indirect mapping is a relationship where **TODO**
+* **TypeFilter**: A TypeFiltered mapping takes the result of another mapping and returns only the results which are instances of a 
+specified type.  This is useful for filtering polymorphic proxies.
 
-* **CustomFilter**: An indirect mapping is a relationship where **TODO**
+* **CustomFilter**: A custom filtered mapping runs a filter function on every result coming from a source mapping and returns all
+results where the function returns either a truthy value or a deferred that resolves to a truthy value.  The filter function is re-run
+whenever an instance in the source mapping changes, and adds and removes a mapping to that instance accordingly.
 
 * **Cross**: Similar to Proxy mapping, but joins across other mappings.  For example, the result of `m = Cross("a", "b")` would be the union of the “b” mappings for every instance in the root object’s “a” result set.
 
