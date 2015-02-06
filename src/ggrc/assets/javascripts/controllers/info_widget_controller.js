@@ -137,7 +137,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
         finished = 0,
         in_progress = 0,
         declined = 0,
-        verified = 0, 
+        verified = 0,
         assigned = 0,
         over_due = 0,
         today = new Date(),
@@ -213,7 +213,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
   }
 
   /*
-    filter_current_workflows filters the workflows with current tasks in a 
+    filter_current_workflows filters the workflows with current tasks in a
     new array and returns the new array.
     filter_current_workflows should be called after update_tasks_for_workflow.
     It looks at the task_data.task_count for each workflow
@@ -382,7 +382,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
     return 0;
   }
 
-  ////button actions  
+  ////button actions
   , "input[data-lookup] focus" : function(el, ev) {
     this.autocomplete(el);
   }

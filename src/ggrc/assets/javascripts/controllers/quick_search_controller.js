@@ -238,7 +238,7 @@ can.Control("CMS.Controllers.LHN", {
 
   , "submit": function (el, ev) {
       ev.preventDefault();
-      
+
       var value = $(ev.target).find("input.widgetsearch").val();
       this.do_search(value);
   }
@@ -254,7 +254,7 @@ can.Control("CMS.Controllers.LHN", {
   , "a[data-name='work_type'] click": function(el, ev) {
       var target = $(ev.target),
           checked;
-      
+
       checked = target.data('value') === 'my_work';
       this.obs.attr("my_work", checked);
         //target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
@@ -277,7 +277,7 @@ can.Control("CMS.Controllers.LHN", {
       $(".lhn-trigger").removeClass("active");
 
       var width = this.element.find(".lhs-holder").width();
-            
+
       this.element.find(".lhs-holder")
           .removeClass("active")
           .css("left", (-width)+"px");
@@ -308,13 +308,13 @@ can.Control("CMS.Controllers.LHN", {
       this.element.find(".lhn-type")
           .css("left", "")
           .addClass("active");
-      
+
       this.element.find(".bar-v")
           .addClass("active");
 
       this.element.find(".lhs-search")
           .addClass("active");
-      
+
       this.options.display_prefs.setLHNState({is_open: true});
   }
 
@@ -359,7 +359,7 @@ can.Control("CMS.Controllers.LHN", {
               target = self.element.find('#lhs input.my-work[value='+value+']');
           target.prop('checked', true);
           target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
-          
+
           // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
           //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
           //  open section is handled in the LHN Search controller.
@@ -432,7 +432,7 @@ can.Control("CMS.Controllers.LHN", {
     resize = Math.min(resize, max_width);
 
     this.element.find(".lhs-holder").width(resize);
-    
+
     if (resize) {
       this.options.display_prefs.setLHNavSize(null, "lhs", resize);
     }
@@ -605,7 +605,7 @@ can.Control("CMS.Controllers.LHN_Search", {
                       return s + " > a[data-object-singular=" + lhn_prefs.open_category + "]";
                   })
                   .join(",");
-          
+
           self.toggle_list_visibility(
             self.element.find(selector)
           );
@@ -688,7 +688,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       , extra_height = 0
       , top
       ;
-      
+
       // Collapse other lists
       var $mids = $ul.closest(".lhs").find(this.options.list_mid_level_selector)
                     .not(el.parents(this.options.list_mid_level_selector))
@@ -700,14 +700,14 @@ can.Control("CMS.Controllers.LHN_Search", {
               .filter(function (i, el) {
                   return !$.contains($ul[0], el);
               });
-    
+
       [$siblings, $mids, $non_children].map(function ($selection) {
           $selection.slideUp().removeClass("in");
       });
-      
+
       // Expand this list
       $ul.slideDown().addClass("in");
-      
+
       // Remove active classes from others
       // remove all except current element or children
       // this works because open_list is called twice if we ensure parent is open
@@ -721,7 +721,7 @@ can.Control("CMS.Controllers.LHN_Search", {
 
       // Add active class to this list
       el.addClass("active");
-      
+
       // Compute the extra height to add to the expandable height,
       // based on the size of the content that is sliding away.
       top = $content.offset().top;
@@ -731,7 +731,7 @@ can.Control("CMS.Controllers.LHN_Search", {
               extra_height += this.offsetHeight + (sibling_top < 0 ? -holder[0].scrollTop : 0);
           }
       });
-      
+
       // Determine the expandable height
       this._holder_height = holder.outerHeight();
       $content.filter(this.options.list_content_selector).css(
@@ -743,7 +743,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       if (!dont_update_prefs) {
           this.options.display_prefs.setLHNState({ "open_category" : el.attr("data-object-singular") });
       }
-      
+
       this.ensure_parent_open(el);
       this.on_show_list($ul);
   }
@@ -859,7 +859,7 @@ can.Control("CMS.Controllers.LHN_Search", {
 
   , init_list_views: function() {
       var self = this;
-      
+
       can.each(this.get_lists(), function($list) {
         var model_name;
         $list = $($list);
