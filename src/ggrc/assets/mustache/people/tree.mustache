@@ -17,7 +17,9 @@
             <div class="row-fluid">
               <div class="span7">
                 <div class="title tree-title-area">
-                  <i class="grcicon-person-color"></i>
+                  {{#if_draw_icon instance}}
+                    <i class="grcicon-person-color"></i>
+                  {{/if_draw_icon}}
                   {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
                 </div>
               </div>
