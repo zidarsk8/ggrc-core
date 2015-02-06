@@ -20,11 +20,9 @@
            for this. I'll just put this in here for now and let Vlad put in
            the correct selector later on. -->
       <ul style="list-style-type: none">
-          {{#if instance}}
-            {{#if class}}
-              {{{render_hooks shortName 'info_widget_actions'}}}
-            {{/if}}
-          {{/if}}
+        {{#if class}}
+          {{{render_hooks class.shortName 'info_widget_actions'}}}
+        {{/if}}
       </ul>
     </div>
   </div>
