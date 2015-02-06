@@ -65,8 +65,10 @@
               </div>
             </div>
           </header>
-          <section class="content"> 
-            {{> /static/mustache/dashboard/info/task_filters.mustache}}
+          <section class="content">
+            {{#tasks_loaded}}
+              {{> /static/mustache/dashboard/info/task_filters.mustache}}
+            {{/tasks_loaded}}
             {{{ renderLive task_view }}}
             {{{ renderLive audit_view }}}
           </section>
@@ -75,4 +77,3 @@
       </div><!-- inner-content end -->
     </div>
   </div>
-
