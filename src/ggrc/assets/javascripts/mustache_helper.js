@@ -2791,6 +2791,17 @@ Mustache.registerHelper("if_draw_icon", function(instance, options) {
     return options.fn(options.contexts);
   else
     return options.inverse(options.contexts);
-})
+});
+
+Mustache.registerHelper("update_link", function(instance, options) {
+
+  instance = Mustache.resolve(instance);
+  if (instance.viewLink) {
+    var link = window.location.host + instance.viewLink;
+    instance.attr('link', link);
+    console.log(link);
+  }
+  return options.fn(options.contexts);
+});
 
 })(this, jQuery, can);
