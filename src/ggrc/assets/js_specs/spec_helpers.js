@@ -20,7 +20,7 @@ function waitsFor(check, done) {
 //  the jasmine output.
 window.failAll = function(done) {
   return function() {
-    can.each(arguments, fail);
+    can.each(arguments, function(arg) { fail(JSON.stringify(arg)); });
     done && done();
   };
 };

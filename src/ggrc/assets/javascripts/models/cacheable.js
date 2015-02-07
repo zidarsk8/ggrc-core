@@ -195,6 +195,7 @@ can.Model("can.Model.Cacheable", {
 
   , setup : function(construct, name, statics, prototypes) {
     var overrideFindAll = false;
+
     if(this.fullName === "can.Model.Cacheable") {
       this.findAll = function() {
         throw "No default findAll() exists for subclasses of Cacheable";
@@ -273,8 +274,11 @@ can.Model("can.Model.Cacheable", {
     this.bind("destroyed", function(ev, old_obj) {
       delete can.getObject("cache", old_obj.constructor, true)[old_obj[id_key]];
     });
-    //can.getObject("cache", this, true);
-
+    
+    // FIXME:  This gets set up in a chain of multiple calls to the function defined
+    //  below when the update endpoint isn't set in the model's static config.
+    //  This leads to conflicts not actually rejecting because on the second go-round
+    //  the local and remote objects look the same.  --BM 2015-02-06
     var _update = this.update;
     this.update = function(id, params) {
       var that = this,
@@ -282,8 +286,9 @@ can.Model("can.Model.Cacheable", {
         .call(this, id, this.process_args(params))
         .then(
           $.proxy(this, "resolve_deferred_bindings")
-          , function(xhr) {
-            var dfd, obj, attrs, base_attrs;
+          , function(xhr, status, e) {
+            var dfd, obj, attrs, base_attrs,
+            orig_dfd = this;
             if(xhr.status === 409) {
               obj = that.findInCacheById(id);
               attrs = obj.attr();
@@ -312,7 +317,7 @@ can.Model("can.Model.Cacheable", {
                     $(document.body).trigger("ajax:flash", {
                       warning: "There was a conflict while saving. Your changes have not yet been saved. please check any fields you were editing and try saving again"
                     });
-                    return xhr;
+                    return orig_dfd;
                   } else {
                     return obj.save();
                   }

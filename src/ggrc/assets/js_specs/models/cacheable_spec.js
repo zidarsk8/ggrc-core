@@ -14,14 +14,24 @@ describe("can.Model.Cacheable", function() {
     can.Model.Cacheable.extend("CMS.Models.DummyModel", {
       root_object: "dummy_model",
       root_collection: "dummy_models",
+      // The string update key has to be here to make the update conflict tests work.
+      //  See can.Model.Cacheable.init for details on how the software
+      //  under test is broken. --BM
+      update: "PUT /api/dummy_models/{id}",
       mixins: ["dummyable"],
       attributes: { dummy_attribute: "dummy_convert" },
       is_custom_attributable: true
+    }, {});
+
+    can.Model.Cacheable.extend("CMS.Models.DummyJoin", {
+      root_object: "dummy_join",
+      root_collection: "dummy_joins",
     }, {});
   });
 
   afterAll(function() {
     delete CMS.Models.DummyModel;
+    delete CMS.Models.DummyJoin;
     delete CMS.Models.Mixins.dummyable;
   });
 
@@ -138,6 +148,212 @@ describe("can.Model.Cacheable", function() {
     });
 
   });
+
+  describe("::update", function() {
+
+    var _obj, id = 0;
+
+    beforeEach(function(done) {
+      _obj = new CMS.Models.DummyModel({ id: ++id });
+      done();
+    });
+    
+    it("processes args before sending", function(done) {
+      var obj = _obj;
+      spyOn(CMS.Models.DummyModel, "process_args");
+      spyOn(can, "ajax").and.returnValue($.when({}));
+      CMS.Models.DummyModel.update(obj.id, obj).then(function() {
+        expect(CMS.Models.DummyModel.process_args).toHaveBeenCalledWith(obj);
+        done();
+      });
+    });
+
+    it("calls resolve_deferred_bindings after send success", function(done) {
+      var obj = _obj;
+      spyOn(CMS.Models.DummyModel, "resolve_deferred_bindings").and.returnValue(obj);
+      spyOn(can, "ajax").and.returnValue($.when({ dummy_model: {id: obj.id}}));
+      CMS.Models.DummyModel.update(obj.id, obj.serialize()).then(function() {
+        expect(CMS.Models.DummyModel.resolve_deferred_bindings).toHaveBeenCalledWith(obj);
+        setTimeout(function() {
+          done();
+        }, 10);
+      }, failAll(done));
+
+    });
+
+    describe("update conflict", function() {
+
+      it("triggers error flash when one property has an update conflict", function(done) {
+        var obj = _obj;
+        obj.attr("foo", "bar");
+        obj.backup();
+        expect(obj._backupStore).toEqual(jasmine.objectContaining({ id: obj.id, foo: "bar" }));
+        obj.attr("foo", "plonk");
+        spyOn($.fn, "trigger").and.callThrough();
+        spyOn(obj, "save").and.callFake(function() {
+          return new $.Deferred(function(dfd) {
+            setTimeout(function() {
+              dfd.resolve(obj);
+            }, 10);
+          });
+        });
+        spyOn(obj, "refresh").and.callFake(function() {
+          obj.attr("foo", "thud"); //uh-oh!  The same attr has been changed locally and remotely!
+          return new $.Deferred(function(dfd) {
+            setTimeout(function() {
+              dfd.resolve(obj);
+            }, 10);
+          });
+        });
+        spyOn(can, "ajax")//.and.returnValue(new $.Deferred().reject({status: 409}, 409, "CONFLICT"));
+        .and.callFake(function() {
+          return new $.Deferred(function(dfd) {
+            setTimeout(function() {
+              dfd.reject({status: 409}, 409, "CONFLICT");
+            }, 10);
+          });
+        });
+        CMS.Models.DummyModel.update(obj.id.toString(), obj.serialize()).then(function() {
+          fail("The update handler isn't supposed to resolve here.");
+          done();
+        }, function() {
+          expect($.fn.trigger).toHaveBeenCalledWith("ajax:flash", {warning : [ jasmine.any(String) ] });
+          setTimeout(function() {
+            done();
+          }, 10);
+        });
+      });
+
+      it("refreshes model", function(done) {
+        var obj = _obj;
+        spyOn(obj, "refresh").and.returnValue($.when(obj));
+        spyOn(can, "ajax").and.returnValue(new $.Deferred().reject({status: 409}, 409, "CONFLICT"));
+        CMS.Models.DummyModel.update(obj.id, obj.serialize()).then(function() {
+          expect(obj.refresh).toHaveBeenCalledWith();
+          setTimeout(function() {
+            done();
+          }, 10);
+        }, failAll(done));
+      });
+
+      it("merges changed properties and saves", function(done) {
+        var obj = _obj;
+        obj.attr("foo", "bar");
+        obj.backup();
+        expect(obj._backupStore).toEqual(jasmine.objectContaining({ id: obj.id, foo: "bar" }));
+        obj.attr("foo", "plonk");
+        spyOn(obj, "save").and.returnValue($.when(obj));
+        spyOn(obj, "refresh").and.callFake(function() {
+          obj.attr("baz", "quux");
+          return $.when(obj);
+        });
+        spyOn(can, "ajax").and.returnValue(new $.Deferred().reject({status: 409}, 409, "CONFLICT"));
+        CMS.Models.DummyModel.update(obj.id, obj.serialize()).then(function() {
+          expect(obj).toEqual(jasmine.objectContaining({ id: obj.id, foo: "plonk", baz: "quux"}));
+          expect(obj.save).toHaveBeenCalled();
+          setTimeout(function() {
+            done();
+          }, 10);
+        }, failAll(done));
+      });
+
+      it("lets other error statuses pass through", function(done) {
+        var obj = new CMS.Models.DummyModel({ id: 1 });
+        var xhr = {status: 400};
+        spyOn(obj, "refresh").and.returnValue($.when(obj.serialize()));
+        spyOn(can, "ajax").and.returnValue(new $.Deferred().reject(xhr, 400, "BAD REQUEST"));
+        CMS.Models.DummyModel.update(1, obj.serialize()).then(
+          failAll(done),
+          function(_xhr) {
+            expect(_xhr).toBe(xhr);
+            done();
+          }
+        );
+      });
+    });
+
+  });
+
+  describe("::resolve_deferred_bindings", function() {
+
+    it("iterates _pending_joins, calling refresh_stubs on each binding", function() {
+
+      var instance = jasmine.createSpyObj("instance", ["get_binding"]);
+      var binding = jasmine.createSpyObj("binding", ["refresh_stubs"]);
+      instance._pending_joins = [{ what: {}, how: "add", through: "foo" }];
+      instance.get_binding.and.returnValue(binding);
+      spyOn($.when, "apply").and.returnValue(new $.Deferred().reject());
+
+      can.Model.Cacheable.resolve_deferred_bindings(instance);
+      expect(binding.refresh_stubs).toHaveBeenCalled();
+
+    });
+
+    describe("add case", function() {
+      
+      var instance, binding, dummy;
+      beforeEach(function() {
+        dummy = new CMS.Models.DummyModel({id:1});
+        instance = jasmine.createSpyObj("instance", ["get_binding", "isNew", "refresh"]);
+        binding = jasmine.createSpyObj("binding", ["refresh_stubs"]);
+        instance._pending_joins = [{ what: dummy, how: "add", through: "foo" }];
+        instance.isNew.and.returnValue(false);
+        instance.get_binding.and.returnValue(binding);
+        binding.loader = { model_name: "DummyJoin" };
+        binding.list = [];
+        spyOn(CMS.Models.DummyJoin, "newInstance");
+        spyOn(CMS.Models.DummyJoin.prototype, "save");
+      });
+
+      afterEach(function() {
+        delete CMS.Models.DummyModel.cache[1];
+      });
+
+      it("creates a proxy object when it does not exist", function() {
+        can.Model.Cacheable.resolve_deferred_bindings(instance);
+        expect(CMS.Models.DummyJoin.newInstance).toHaveBeenCalled();
+        expect(CMS.Models.DummyJoin.prototype.save).toHaveBeenCalled();
+      });
+
+      it("does not create proxy object when it already exists", function() {
+        binding.list.push({ instance: dummy });
+        can.Model.Cacheable.resolve_deferred_bindings(instance);
+        expect(CMS.Models.DummyJoin.newInstance).not.toHaveBeenCalled();
+        expect(CMS.Models.DummyJoin.prototype.save).not.toHaveBeenCalled();
+      });
+
+    });
+
+
+    describe("remove case", function() {
+
+      var instance, binding, dummy, dummy_join;
+      beforeEach(function() {
+        dummy = new CMS.Models.DummyModel({id:1});
+        dummy_join = new CMS.Models.DummyJoin({id:1});
+        instance = jasmine.createSpyObj("instance", ["get_binding", "isNew", "refresh"]);
+        binding = jasmine.createSpyObj("binding", ["refresh_stubs"]);
+        instance._pending_joins = [{ what: dummy, how: "remove", through: "foo" }];
+        instance.isNew.and.returnValue(false);
+        instance.get_binding.and.returnValue(binding);
+        binding.loader = { model_name: "DummyJoin" };
+        binding.list = [];
+        spyOn(CMS.Models.DummyJoin, "newInstance");
+        spyOn(CMS.Models.DummyJoin.prototype, "save");
+      });
+
+      it("removes proxy object if it exists", function() {
+        binding.list.push({instance: dummy, get_mappings: function() {return [dummy_join]; }});
+        spyOn(dummy_join, "refresh").and.returnValue($.when());
+        spyOn(dummy_join, "destroy");
+        can.Model.Cacheable.resolve_deferred_bindings(instance);
+        expect(dummy_join.destroy).toHaveBeenCalled();
+      });
+
+    });
+
+  });
+
 
   describe("::findAll", function() {
 
