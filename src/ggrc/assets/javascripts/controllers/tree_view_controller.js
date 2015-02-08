@@ -92,7 +92,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       if (this.element.next().length > 0)
         return;
 
-      $footer = this.element.children('.tree-footer').first()
+      $footer = this.element.children('.tree-footer').first();
       spinner = new Spinner({
           "radius": 4
         , "length": 4
@@ -131,7 +131,7 @@ can.Control("CMS.Controllers.TreeLoader", {
 
     this._attached_deferred.then(function() {
       if (that.element) {
-        that.element.trigger("updateCount", 0)
+        that.element.trigger("updateCount", 0);
         that.init_count();
       }
     });
@@ -191,7 +191,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       }
     });
 
-    temp_list = can.map(temp_list, function(o) { if (o.instance.selfLink) return o; })
+    temp_list = can.map(temp_list, function(o) { if (o.instance.selfLink) return o; });
     this._draw_list_deferred = this.enqueue_items(temp_list);
     return this._draw_list_deferred;
   }
