@@ -1,7 +1,7 @@
 <div class="row-fluid wrap-row">
   <div class="span12 small-info ">
     <h6>
-      {{instance.class.title_singular}} Folder <i class="grcicon-help-black" style="margin-top:0px;" rel="tooltip" data-original-title="If selected, all {{instance.class.title_singular}} attachments go here."></i>
+      {{instance.class.title_singular}} Folder <label style="display: inline"><i class="grcicon-help-black" rel="tooltip" data-original-title="If selected, all {{instance.class.title_singular}} attachments go here."></i></label>
     </h6>
     {{#if _folder_change_pending}}
       <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 8px;' }}></span>
