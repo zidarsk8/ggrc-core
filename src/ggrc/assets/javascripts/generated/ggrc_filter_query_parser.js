@@ -129,7 +129,7 @@ GGRC.query_parser = {
                 keys: word_list,
                 order: order,
                 compare: function(val1, val2){
-                  for (var i in word_list){
+                  for (var i=0 ; i < word_list.length; i++){
                     var key = word_list[i];
                     if (val1[key] !== val2[key]){
                       var a = parseFloat(val1[key]) || val1[key],
@@ -210,13 +210,13 @@ GGRC.query_parser = {
                   recursive = typeof recursive !== 'undefined' ? recursive : true;
                   keys = typeof keys !== 'undefined' ? keys : [];
 
-                  for (var i in keys){
+                  for (var i=0 ; i < keys.length ; i++){
                     if (values.hasOwnProperty(keys[i])){
                       if (jQuery.type(values[keys[i]]) === "string" &&
                           values[keys[i]].toUpperCase().indexOf(this.text.toUpperCase()) > -1 ){
                         return true;
                       } else if (keys[i] == "owners" ) {
-                        for (var j in values[keys[i]]){
+                        for (var j=0; j < values[keys[i]].length; j++){
                           var person = values[keys[i]][j].reify();
                           if (person.email.toUpperCase().indexOf(this.text.toUpperCase()) > -1 ||
                               person.name.toUpperCase().indexOf(this.text.toUpperCase()) > -1 ) {
@@ -287,7 +287,7 @@ GGRC.query_parser = {
                   } else if (jQuery.type(val1) === "object" &&
                       val1.length) {
                     var result = false;
-                    for (var i in val1){
+                    for (var i=0; i < val1.length; i++){
                       result |= this.evaluate(val1[i], val2);
                     }
                     return result;
@@ -320,7 +320,7 @@ GGRC.query_parser = {
                   } else if (jQuery.type(val1) === "object" &&
                       val1.length) {
                     var result = false;
-                    for (var i in val1){
+                    for (var i=0; i < val1.length; i++){
                       result &= this.evaluate(val1[i], val2);
                     }
                     return result;
@@ -371,7 +371,7 @@ GGRC.query_parser = {
                   } else if (jQuery.type(val1) === "object" &&
                       val1.length) {
                     var result = false;
-                    for (var i in val1){
+                    for (var i=0; i < val1.length; i++){
                       result |= this.evaluate(val1[i], val2);
                     }
                     return result;
@@ -404,7 +404,7 @@ GGRC.query_parser = {
                   } else if (jQuery.type(val1) === "object" &&
                       val1.length) {
                     var result = false;
-                    for (var i in val1){
+                    for (var i=0; i < val1.length; i++){
                       result &= this.evaluate(val1[i], val2);
                     }
                     return result;
