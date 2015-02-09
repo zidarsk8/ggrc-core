@@ -318,7 +318,6 @@ can.Control("CMS.Controllers.LHN", {
       this.options.display_prefs.setLHNState({is_open: true});
   }
 
-
   , set_active_tab: function (newval) {
     newval || (newval = this.obs.attr("my_work"));
 
@@ -376,6 +375,10 @@ can.Control("CMS.Controllers.LHN", {
           self.element.find('.widgetsearch').filter(function() {
             return this.value;
           }).addClass('active');
+
+          if (self.options.display_prefs.getLHNState().is_pinned) {
+            self.pin();
+          }
         });
 
         // give everything a bit of time to render
@@ -468,6 +471,26 @@ can.Control("CMS.Controllers.LHN", {
   , destroy : function() {
     this.element.find(".lhs-holder").off("scroll", self.lhs_holder_onscroll);
     this._super && this._super.apply(this, arguments);
+  }
+
+  , ".lhn-pin click": function (element, event) {
+    if (this.options.display_prefs.getLHNState().is_pinned) {
+      this.unpin();
+    }else{
+      this.pin();
+    }
+  }
+
+  , unpin: function () {
+    this.element.find(".lhn-pin").removeClass("active");
+    this.element.find(".bar-va").removeClass("disabled");
+    this.options.display_prefs.setLHNState("is_pinned", false);
+  }
+
+  , pin: function () {
+    this.element.find(".lhn-pin").addClass("active");
+    this.element.find(".bar-v").addClass("disabled");
+    this.options.display_prefs.setLHNState("is_pinned", true);
   }
 });
 
