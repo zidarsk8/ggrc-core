@@ -11,12 +11,10 @@
       {{#if_equals instance.class.table_singular 'person'}}
         <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
           {{firstnonempty name email}}
-          <i class="grcicon-goto"></i>
         </a>
       {{else}}
         <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
           {{title}}
-          <i class="grcicon-goto"></i>
         </a>
       {{/if_equals}}
     </div>
