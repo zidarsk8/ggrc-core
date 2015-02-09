@@ -365,7 +365,7 @@ can.Control("CMS.Controllers.LHN", {
           //  open section is handled in the LHN Search controller.
           
           if(this.options.display_prefs.getLHNState().open_category) {
-            this.element.one("list_displayed", this.initial_scroll);
+            this.element.one("list_displayed", this.initial_scroll.bind(this));
           } else {
             this.initial_scroll();
           }
