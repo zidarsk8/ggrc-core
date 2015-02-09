@@ -37,22 +37,26 @@
           <div class="row-fluid wrap-row">
           {{#list}}
             <div class="span6">
-              <h6>{{title}}</h6>
-              <p data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
+              <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
                 {{#with_value_for_id id}}
                   {{#switch attribute_type}}
                   {{#case 'Checkbox'}}
-                    <input type="checkbox" disabled="disabled" {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
+                    <h6>
+                      <input type="checkbox" disabled="disabled" {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
+                      {{title}}
+                    </h6>
                   {{/case}}
                   {{#case 'Rich Text'}}
+                    <h6>{{title}}</h6>
                     {{{value}}}
                   {{/case}}
                   {{#default}}
+                    <h6>{{title}}</h6>
                     {{value}}
                   {{/default}}
                   {{/switch}}
                 {{/with_value_for_id}}
-              </p>
+              </div>
             </div>
           {{/list}}
           </div>

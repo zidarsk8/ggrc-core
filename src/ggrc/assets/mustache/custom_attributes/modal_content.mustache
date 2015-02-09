@@ -14,22 +14,34 @@
       {{#with_value_for_id id}}
 
       <div class="{{^mandatory}}hidable{{/mandatory}} span6">
-        <label>
-          {{title}}
-          {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-          {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
-          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        </label>
         {{#switch attribute_type}}
         {{#case 'Text'}}
+          <label>
+            {{title}}
+            {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+            {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          </label>
           <input tabindex="20" class="input-block-level" value="{{value}}" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text">
         {{/case}}
         {{#case 'Rich Text'}}
+          <label>
+            {{title}}
+            {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+            {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          </label>
           <div class="wysiwyg-area">
             <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{{value}}}</textarea>
           </div>
         {{/case}}
         {{#case 'Dropdown'}}
+          <label>
+            {{title}}
+            {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+            {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          </label>
           <select class="input-block-level" name="custom_attributes.{{id}}" null-if-empty="null-if-empty" tabindex="20">
             <option value="" {{#if_equals "" value}}selected="true"{{/if_equals}}>---</option>
             {{#iterate_string multi_choice_options ','}}
@@ -38,11 +50,24 @@
           </select>
         {{/case}}
         {{#case 'Checkbox'}}
+          <label>&nbsp;</label>
           <div class="checkbox-area">
-            <input tabindex="20" name="custom_attributes.{{id}}" type="checkbox"  {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
+            <label>
+              <input tabindex="20" name="custom_attributes.{{id}}" type="checkbox"  {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
+              {{title}}
+              {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+              {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+            </label>
           </div>
         {{/case}}
         {{#case 'Date'}}
+        <label>
+          {{title}}
+          {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+          {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        </label>
         <div class="date-area">
           <input tabindex="20" name="custom_attributes.{{id}}" value="{{value}}" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
         </div>
