@@ -66,7 +66,7 @@ GGRC.query_parser = {
                 evaluate: function(values, keys) {
                   // functions evaluates the current expresion tree, with the given values
                   //
-                  // * values, Object with all the keys as in the this keys array, 
+                  // * values, Object with all the keys as in the this keys array,
                   //   with the coresponding values
                   return true;
                 }
@@ -82,7 +82,7 @@ GGRC.query_parser = {
                 evaluate: function(values, keys) {
                   // functions evaluates the current expresion tree, with the given values
                   //
-                  // * values, Object with all the keys as in the this keys array, 
+                  // * values, Object with all the keys as in the this keys array,
                   //   with the coresponding values
                   try {
                     return or_exp.evaluate(values, keys);
@@ -96,8 +96,8 @@ GGRC.query_parser = {
               return {
                 expression: {},
                 keys: [],
-                order_by: { 
-                  keys: [], 
+                order_by: {
+                  keys: [],
                   order: '',
                   compare: null
                 },
@@ -116,8 +116,8 @@ GGRC.query_parser = {
               return only_order_by;
             },
         peg$c10 = function() {
-              return { 
-                keys: [], 
+              return {
+                keys: [],
                 order: '',
                 compare: null
               };
@@ -125,8 +125,8 @@ GGRC.query_parser = {
         peg$c11 = "order by",
         peg$c12 = { type: "literal", value: "order by", description: "\"order by\"" },
         peg$c13 = function(word_list, order) {
-              return { 
-                keys: word_list, 
+              return {
+                keys: word_list,
                 order: order,
                 compare: function(val1, val2){
                   for (var i in word_list){
@@ -215,7 +215,7 @@ GGRC.query_parser = {
                       if (jQuery.type(values[keys[i]]) === "string" &&
                           values[keys[i]].toUpperCase().indexOf(this.text.toUpperCase()) > -1 ){
                         return true;
-                      } else if (recursive && jQuery.type(values[keys[i]]) === "object" && 
+                      } else if (recursive && jQuery.type(values[keys[i]]) === "object" &&
                           jQuery.type(values[keys[i]].reify) === "function"){
                         return this.evaluate(values[keys[i]].reify(), keys, false);
                       }
@@ -237,8 +237,8 @@ GGRC.query_parser = {
         peg$c35 = { type: "class", value: "[a-zA-Z0-9_\\-.]", description: "[a-zA-Z0-9_\\-.]" },
         peg$c36 = "\\\"",
         peg$c37 = { type: "literal", value: "\\\"", description: "\"\\\\\\\"\"" },
-        peg$c38 = function() { 
-              return '"'; 
+        peg$c38 = function() {
+              return '"';
             },
         peg$c39 = /^[^"]/,
         peg$c40 = { type: "class", value: "[^\"]", description: "[^\"]" },
@@ -265,7 +265,30 @@ GGRC.query_parser = {
               return {
                 name: op,
                 evaluate: function(val1, val2) {
-                  return val1 == val2;
+
+                  // handle if object is person or a list of persons
+                  if (jQuery.type(val1) === "object" &&
+                      jQuery.type(val1.reify) === "function" &&
+                      val1.type === "Person") {
+                    var person = val1.reify();
+                    return this.evaluate(person.name, val2) ||
+                           this.evaluate(person.email, val2);
+
+                  } else if (jQuery.type(val1) === "object" &&
+                      val1.length) {
+                    var result = false;
+                    for (var i in val1){
+                      result |= this.evaluate(val1[i], val2);
+                    }
+                    return result;
+
+                  } else if (jQuery.type(val1) === "string") {
+                    // the comparison is done here
+                    return val1.toUpperCase() == val2.toUpperCase();
+
+                  } else {
+                    return val1 == val2;
+                  }
                 }
               };
             },
@@ -275,7 +298,30 @@ GGRC.query_parser = {
               return {
                 name: op,
                 evaluate: function(val1, val2) {
-                  return val1 != val2;
+
+                  // handle if object is person or a list of persons
+                  if (jQuery.type(val1) === "object" &&
+                      jQuery.type(val1.reify) === "function" &&
+                      val1.type === "Person") {
+                    var person = val1.reify();
+                    return this.evaluate(person.name, val2) &&
+                           this.evaluate(person.email, val2);
+
+                  } else if (jQuery.type(val1) === "object" &&
+                      val1.length) {
+                    var result = false;
+                    for (var i in val1){
+                      result &= this.evaluate(val1[i], val2);
+                    }
+                    return result;
+
+                  } else if (jQuery.type(val1) === "string") {
+                    // the comparison is done here
+                    return val1.toUpperCase() != val2.toUpperCase();
+
+                  } else {
+                    return val1 != val2;
+                  }
                 }
               };
             },
@@ -303,7 +349,30 @@ GGRC.query_parser = {
               return {
                 name: op,
                 evaluate: function(val1, val2) {
-                  return val1.toUpperCase().indexOf(val2.toUpperCase()) > -1 ;
+
+                  // handle if object is person or a list of persons
+                  if (jQuery.type(val1) === "object" &&
+                      jQuery.type(val1.reify) === "function" &&
+                      val1.type === "Person") {
+                    var person = val1.reify();
+                    return this.evaluate(person.name, val2) ||
+                           this.evaluate(person.email, val2);
+
+                  } else if (jQuery.type(val1) === "object" &&
+                      val1.length) {
+                    var result = false;
+                    for (var i in val1){
+                      result |= this.evaluate(val1[i], val2);
+                    }
+                    return result;
+
+                  } else if (jQuery.type(val1) === "string") {
+                    // the comparison is done here
+                    return val1.toUpperCase().indexOf(val2.toUpperCase()) > -1 ;
+
+                  } else {
+                    return false;
+                  }
                 }
               };
             },
@@ -313,7 +382,29 @@ GGRC.query_parser = {
               return {
                 name: op,
                 evaluate: function(val1, val2) {
-                  return val1.toUpperCase().indexOf(val2.toUpperCase()) == -1 ;
+
+                  // handle if object is person or a list of persons
+                  if (jQuery.type(val1) === "object" &&
+                      jQuery.type(val1.reify) === "function" &&
+                      val1.type === "Person") {
+                    var person = val1.reify();
+                    return this.evaluate(person.name, val2) &&
+                           this.evaluate(person.email, val2);
+
+                  } else if (jQuery.type(val1) === "object" &&
+                      val1.length) {
+                    var result = false;
+                    for (var i in val1){
+                      result &= this.evaluate(val1[i], val2);
+                    }
+                    return result;
+
+                  } else if (jQuery.type(val1) === "string") {
+                    // the comparison is done here
+                    return val1.toUpperCase().indexOf(val2.toUpperCase()) == -1 ;
+                  } else {
+                    return false;
+                  }
                 }
               };
             },
