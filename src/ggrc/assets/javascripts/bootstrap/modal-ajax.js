@@ -238,6 +238,10 @@
       if (object_params.section) {
         modal_title = "Map " + modal_title + " to " + object_params.section.title;
       }
+      var title_override = $trigger.attr("data-modal-title-override");
+      if (title_override) {
+        modal_title = title_override;
+      }
 
       var content_view = $trigger.data('template') || GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache";
 
