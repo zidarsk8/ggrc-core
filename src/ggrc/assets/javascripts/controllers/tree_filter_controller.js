@@ -6,17 +6,19 @@ can.Control("GGRC.Controllers.TreeFilter", {
     var parent_control;
     this._super && this._super.apply(this, arguments);
     this.options.states = new can.Observe();
-    parent_control = this.element.closest(".cms_controllers_tree_view").control();
+    parent_control = this.element.closest('.cms_controllers_dashboard_widgets')
+        .find(".cms_controllers_tree_view").control();
     parent_control && parent_control.options.attr("states", this.options.states);
     this.on();
   }
 
   , apply_filter : function(filter_string){
-      var tree_view = this.element.closest('.cms_controllers_tree_view').control();
+      var parent_control = this.element.closest('.cms_controllers_dashboard_widgets')
+        .find(".cms_controllers_tree_view").control();
       this.current_query = GGRC.query_parser.parse(filter_string);
-      tree_view.options.attr('sort_function', this.current_query.order_by.compare);
-      tree_view.options.attr('filter', this.current_query);
-      tree_view.reload_list();
+      parent_control.options.attr('sort_function', this.current_query.order_by.compare);
+      parent_control.options.attr('filter', this.current_query);
+      parent_control.reload_list();
   }
          
   , ".btn click" : function(el, ev) {
