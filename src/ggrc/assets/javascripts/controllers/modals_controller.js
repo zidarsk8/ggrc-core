@@ -266,6 +266,7 @@ can.Control("GGRC.Controllers.Modals", {
     if (!this.element) {
       return;
     }
+    var is_object_modal = this.options.modal_title.indexOf('Edit') === 0 || this.options.modal_title.indexOf('New') === 0;
 
     can.isArray(content) && (content = content[0]);
     can.isArray(header) && (header = header[0]);
@@ -278,7 +279,7 @@ can.Control("GGRC.Controllers.Modals", {
     content != null && this.options.$content.html(content).removeAttr("style");
     footer != null && this.options.$footer.html(footer);
 
-    if (custom_attributes != null && !('delete_counts' in this.options) && this.options.modal_title !== "Confirm") {
+    if (custom_attributes != null && is_object_modal) {
       this.options.$content.append(custom_attributes);
     }
     this.setup_wysihtml5();
