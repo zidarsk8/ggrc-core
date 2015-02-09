@@ -6,16 +6,16 @@ TODO (Please add any questions or clarification requests here):
 
 1. Add a summary of deployment-specific values (e.g., filename of deployment settings file, filename of `ggrc/settings/*` file) and/or use some convention to denote these as variable in this document
 
-2. Add a CHANGELOG’ or version/upgrade matrix in steps 2 and 3 (and 5, for settings modules) to make it clear when the step must be repeated or more closely examined (or which values/APIs have changed)
+2. Add a CHANGELOGâ€™ or version/upgrade matrix in steps 2 and 3 (and 5, for settings modules) to make it clear when the step must be repeated or more closely examined (or which values/APIs have changed)
 
 3. Add note about how to verify backup in Cloud Storage
 
-4. Update `deploy_appengine` to (optionally) handle migrations -- environment variables and database settings are too opaque and error-prone.  Could also have it check and warn about valid settings in settings files, maybe?  At least several “verify this value” steps for database and App Engine instance name.
+4. Update `deploy_appengine` to (optionally) handle migrations -- environment variables and database settings are too opaque and error-prone. Â Could also have it check and warn about valid settings in settings files, maybe? Â At least several â€œverify this valueâ€ steps for database and App Engine instance name.
 
 
 ### 0. Complete initial development environment setup
 
-This step should only need to be done once per deployment machine, following instructions in the main [README](README.md).
+This step should only need to be done once per deployment machine, following instructions inÂ the main [README](README.md).
 
 ### 1. Start and connect to the virtual machine (if necessary):
 
@@ -26,9 +26,9 @@ This step should only need to be done once per deployment machine, following ins
 
 ### 2. Create/Update deployment settings file(s).
 
-By convention, this file will be called `deploy_settings_<something>.sh` where `<something>` is the name of the deployment instance.  This file should not be part of the repository, as it is deployment-specific.  There is, however, an example file in the repository at `extras/deploy_settings_local.sh`.  You can use this file as a starting point.
+By convention, this file will be called `deploy_settings_<something>.sh` where `<something>` is the name of the deployment instance. Â This file should not be part of the repository, as it is deployment-specific. Â There is, however, an example file in the repository at [`extras/deploy_settings_local.sh`](../extras/deploy_settings_local.sh). Â You can use this file as a starting point.
 
-Update deployment settings file (e.g. `deploy_settings_ggrc_prod.sh`).  If this is an upgrade, this file will likely be almost complete, but check for changes.  It should look similar to the following:
+Update deployment settings file (e.g. `deploy_settings_ggrc_prod.sh`). Â If this is an upgrade, this file will likely be almost complete, but check for changes. Â It should look similar to the following:
 
     #!/usr/bin/env bash
     
@@ -39,7 +39,7 @@ Update deployment settings file (e.g. `deploy_settings_ggrc_prod.sh`).  If this 
     GAPI_CLIENT_ID='YYY'
     GAPI_CLIENT_SECRET='ZZZ'
     GAPI_ADMIN_GROUP='ggrc-admin@prod.google.com'
-    BOOTSTRAP_ADMIN_USERS='hsainion@google.com [tommyward@google.com](mailto:tommyward@google.com)'
+    BOOTSTRAP_ADMIN_USERS='hsainion@google.comÂ [tommyward@google.com](mailto:tommyward@google.com)'
     RISK_ASSESSMENT_URL='https://ggrc-risk-dev.googleplex.com'
     SECRET_KEY='--CHANGE-TO-SOMETHING-SECRET--'
     APPENGINE_EMAIL='prasannav@google.com'
@@ -48,26 +48,26 @@ Remember to update the required values (the `GAPI_KEY` and `GAPI_CLIENT_ID` will
 
 | Setting            | Description
 |--------------------|---------------------------------------------------------------------------------|
-| APPENGINE_INSTANCE | The “Application Identifier” you see at <https://appengine.google.com/settings> |
+| APPENGINE_INSTANCE | The â€œApplication Identifierâ€ you see at <https://appengine.google.com/settings> |
 | DATABASE_URI       | The connection string for the database
-| GAPI_KEY           | The “Browser Key” from Step 3
-| GAPI_CLIENT_ID     | The “OAuth Client ID” from Step 3
-| GAPI_CLIENT_SECRET | The “OAuth Client Secret” from Step 3
+| GAPI_KEY           | The â€œBrowser Keyâ€ from Step 3
+| GAPI_CLIENT_ID     | The â€œOAuth Client IDâ€ from Step 3
+| GAPI_CLIENT_SECRET | The â€œOAuth Client Secretâ€ from Step 3
 | GAPI_ADMIN_GROUP   | The group which is granted permissions to all files and folders in GDrive
-| APPENGINE_EMAIL    | The email address to use as the “From” address in outgoing emails
+| APPENGINE_EMAIL    | The email address to use as the â€œFromâ€ address in outgoing emails
 
-There may also be a customized `src/ggrc/settings/<something>.py` file, for example, [`src/ggrc/settings/app_engine_ggrc_test.py`](src/ggrc/settings/app_engine_ggrc_test.py).  (This file should also not be included in the repository, though examples can be found at [`src/ggrc/`](src/ggrc).) This file can contain additional configuration variables, including:
+There may also be a customized `src/ggrc/settings/<something>.py` file, for example, [`src/ggrc/settings/app_engine_ggrc_test.py`](../src/ggrc/settings/app_engine_ggrc_test.py). Â (This file should also not be included in the repository, though examples can be found at [`src/ggrc/settings`](../src/ggrc/settings).) This file can contain additional configuration variables, including:
 
 | Setting                   | Description
 |---------------------------|------------
-| COMPANY                   | This is the company name shown in the “Copyright” footer at the bottom of each page
+| COMPANY                   | This is the company name shown in the â€œCopyrightâ€ footer at the bottom of each page
 | COMPANY_LOGO              | If specified, this is an image to be displayed in the top-left corner of each page.
 | COMPANY_LOGO_TEXT         | If COMPANY_LOGO is not set, this (text) value is used instead of an image in the top-left corner of each page.
-| SQLALCHEMY_RECORD_QUERIES | This flag causes all queries to be recorded in the App Engine logs.  This is useful for debugging purposes.
+| SQLALCHEMY_RECORD_QUERIES | This flag causes all queries to be recorded in the App Engine logs. Â This is useful for debugging purposes.
 | CALENDAR_MECHANISM | If True, Workflow includes Google Calendar integration
-        
+Â Â Â Â Â Â Â Â 
 
-Please note: Both settings files must use ASCII quotation marks, not the stylized marks used in rich text documents.  E.g., they should be straight, like " or ', not “” or ‘’.
+Please note: Both settings files must use ASCII quotation marks, not the stylized marks used in rich text documents. Â E.g., they should be straight, like " or ', not â€œâ€ or â€˜â€™.
 
 ### 3. Configure Google APIs
 
@@ -75,7 +75,7 @@ Note: This step only needs to be done once, but required APIs might change, so d
 
 1. Go to the Google Developers Console at <https://cloud.google.com/console> and click the Project being updated.
 
-2. Click “APIs & Auth” in the left-hand column.  Find each of the following APIs and click the “OFF” button to toggle the API to “ON”.
+2. Click â€œAPIs & Authâ€ in the left-hand column.  Find each of the following APIs and click the â€œOFFâ€ button to toggle the API to â€œONâ€.
 
    * Calendar API
    * Drive API
@@ -86,25 +86,25 @@ Note: This step only needs to be done once, but required APIs might change, so d
 
    ![Enable APIs](deployment1.png)
 
-3. Select “Credentials” in the left-hand column, and click “CREATE NEW CLIENT ID”.
+3. Select â€œCredentialsâ€ in the left-hand column, and click â€œCREATE NEW CLIENT IDâ€.
 
-  * Select “Web Application”
-  * Add “<https://ggrc-prod.googleplex.com>” to the box labeled “Authorized JavaScript origins”
-  * Delete the content from the box labeled “Authorized redirect URI”
+  * Select â€œWeb Applicationâ€
+  * Add â€œ<https://ggrc-prod.googleplex.com>â€ to the box labeled â€œAuthorized JavaScript originsâ€
+  * Delete the content from the box labeled â€œAuthorized redirect URIâ€
 
    Your screen should look like the following:
 
    ![Create Client ID](deployment2.png)
 
-   * Click “Create Client ID”
+   * Click â€œCreate Client IDâ€
 
-   * Now click “CREATE NEW KEY”, and then “BROWSER KEY”:
+   * Now click â€œCREATE NEW KEYâ€, and then â€œBROWSER KEYâ€:
    
    ![Create a new key](deployment3.png)
 
    * If the text box in the modal contains text, delete it.
 
-   * Click “Create”.
+   * Click â€œCreateâ€.
    
    ![Create a browser key](deployment4.png)
 
@@ -113,31 +113,31 @@ Note: This step only needs to be done once, but required APIs might change, so d
 
    > Please note!
 
-   > The “Client Secret” should never be revealed to untrusted parties.  GGRC doesn’t currently use it, but may at some time in the future.  If other parties have the “Client secret” value, they may be able to impersonate the GGRC deployment.
+   > The â€œClient Secretâ€ should never be revealed to untrusted parties.  GGRC doesnâ€™t currently use it, but may at some time in the future.  If other parties have the â€œClient secretâ€ value, they may be able to impersonate the GGRC deployment.
 
    ![Credentials](deployment5-credentials.png)
 
    * Copy two of these values into the `deploy_settings_ggrc_prod.sh` file from above:
 
-      * First, copy the “Client ID”, and paste it in place of the “YYY” on the line beginning with `GAPI_CLIENT_ID`:
+      * First, copy the â€œClient IDâ€, and paste it in place of the â€œYYYâ€ on the line beginning with `GAPI_CLIENT_ID`:
 
         ![Credentials Client ID](deployment5-credentials-selected_client_ID.png)
 
-      * Second, copy the “API key”, and paste it in place of the “XXX” on the line beginning with `GAPI_KEY`:
+      * Second, copy the â€œAPI keyâ€, and paste it in place of the â€œXXXâ€ on the line beginning with `GAPI_KEY`:
       
         ![Credentials API Key](deployment5-credentials-selected_API_key.png)
 
-4. Click “Consent Screen” in the left-hand column, assign the email address, and fill in at least the “PRODUCT NAME” box:
+4. Click â€œConsent Screenâ€ in the left-hand column, assign the email address, and fill in at least the â€œPRODUCT NAMEâ€ box:
 
 ![Consent screen](deployment6-consent_screen.png)
 
-Now we’re done setting up the Google APIs, so let’s deploy.
+Now weâ€™re done setting up the Google APIs, so letâ€™s deploy.
 
 ### 4. Backup the database via Google Cloud Console
 
-In the left-hand column of the Google Developers Console (<https://cloud.google.com/console/project>), select “Cloud SQL” and select the database instance to be used.
+In the left-hand column of the Google Developers Console (<https://cloud.google.com/console/project>), select â€œCloud SQLâ€ and select the database instance to be used.
 
-In the top line, click the “Export...” button, select a Cloud Storage path, and click “OK”.  The Cloud Storage Path should look something like:
+In the top line, click the â€œExport...â€ button, select a Cloud Storage path, and click â€œOKâ€.  The Cloud Storage Path should look something like:
 
 * test: `gs://ggrc-db-backups/ggrc-test-yyyymmdd.sql`
 * prod: `gs://ggrc-prod-backup/ggrc-prod.yyyymmdd.sql`
@@ -183,21 +183,21 @@ Go back to the virtual machine, and do the following (note the `GGRC_DATABASE_UR
 
 
 
-The first time you run the command above, you’ll be prompted to “Go to the following link in your browser:” to complete the Oauth2 process. Paste the auth code as requested.
+The first time you run the command above, youâ€™ll be prompted to â€œGo to the following link in your browser:â€ to complete the Oauth2 process. Paste the auth code as requested.
 
 ### Troubleshooting
 
 Q: `httplib2.ServerNotFoundError: Unable to find the server at appengine.google.com`
 
-A: This may be caused by the VirtualBox machine losing connectivity when you resume your machine from sleep. Exit the vagrantu shell and run vagrant reload; or run `sudo shutdown now` in the VM, and `vagrant up` to bring it up again.
+A: This may be caused by the VirtualBox machine losing connectivity when you resume your machine from sleep. Exit the vagrantu shell and runÂ vagrant reload; or runÂ `sudo shutdown now`Â in the VM, andÂ `vagrant up`Â to bring it up again.
 
 Q: App Engine logs show `ImportError: No module named flask.ext.sqlalchemy`
 
-A: Make sure make `appengine_packages_zip` outputs a zip file containing a `flask_sqlalchemy` directory
+A: Make sureÂ make `appengine_packages_zip`Â outputs a zip file containing a `flask_sqlalchemy`Â directory
 
-Q: 500 Internal error and logs show `IOError: [Errno 30] Read-only file system: '/vagrant/src/ggrc/static/webassets-external/12345….67890_dashboard.css'`
+Q: 500 Internal error and logs show `IOError: [Errno 30] Read-only file system: '/vagrant/src/ggrc/static/webassets-external/12345â€¦.67890_dashboard.css'`
 
-A: AppEngine doesn’t support file writes. Caused by `DEBUG_ASSETS = True` in `ggrc/settings/default.py`. Set it to `False`.
+A: AppEngine doesnâ€™t support file writes. Caused byÂ `DEBUG_ASSETS = True`Â in `ggrc/settings/default.py`. Set it to `False`.
 
 Q: I get some other error
 
