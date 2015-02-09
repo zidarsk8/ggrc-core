@@ -278,7 +278,7 @@ can.Control("GGRC.Controllers.Modals", {
     content != null && this.options.$content.html(content).removeAttr("style");
     footer != null && this.options.$footer.html(footer);
 
-    if (custom_attributes != null && !('delete_counts' in this.options)) {
+    if (custom_attributes != null && !('delete_counts' in this.options) && this.options.modal_title !== "Confirm") {
       this.options.$content.append(custom_attributes);
     }
     this.setup_wysihtml5();
