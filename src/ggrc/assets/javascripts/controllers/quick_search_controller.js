@@ -460,7 +460,10 @@ can.Control("CMS.Controllers.LHN", {
 
     ev.preventDefault();
     this.dragged = true;
-    this.resize_lhn(ev.pageX);
+      
+    if (!this.element.find(".bar-v").hasClass("disabled")) {
+      this.resize_lhn(ev.pageX);
+    }
   }
   , "{window} mouseup" : function(el, ev){
     var self = this;
@@ -487,7 +490,7 @@ can.Control("CMS.Controllers.LHN", {
 
   , unpin: function () {
     this.element.find(".lhn-pin").removeClass("active");
-    this.element.find(".bar-va").removeClass("disabled");
+    this.element.find(".bar-v").removeClass("disabled");
     this.options.display_prefs.setLHNState("is_pinned", false);
   }
 
