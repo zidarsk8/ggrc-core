@@ -127,7 +127,7 @@
       context: "CMS.Models.Context.stub",
       object_documents: "CMS.Models.ObjectDocument.stubs",
       documents: "CMS.Models.Document.stubs",
-      cycle: "CMS.Models.Cycle.stub",
+      cycle: "CMS.Models.Cycle.stub"
     },
 
     tree_view_options: {
