@@ -381,8 +381,12 @@ can.Control("CMS.Controllers.LHN", {
 
         // give everything a bit of time to render
         setTimeout(function () {
-            this.resize_lhn();
+          this.resize_lhn();
+          if (this.options.display_prefs.getLHNState().is_pinned) {
+            this.open_lhn();
+          }else{
             this.close_lhn();
+          }
         }.bind(this), 1000);
       }.bind(this));
     }
