@@ -88,6 +88,7 @@
 
     </div>
   </div>
+
   <div class="row-fluid">
     <div class="span12">
       <ggrc-gdrive-folder-picker instance="instance" placeholder="If selected, all workflow attachments go here." />
@@ -95,7 +96,22 @@
   </div>
   <div class="row-fluid">
     <div class="span12">
-      {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}    </div>
+      {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+    </div>
   </div>
 
 </section>
+
+{{#instance}}
+  <div class="info-widget-footer">
+    <p>
+      <small>
+        <em>
+          Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+        </em>
+      </small>
+    </p>
+  </div>
+{{/instance}}
