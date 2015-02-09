@@ -478,6 +478,24 @@ can.Control("CMS.Controllers.LHN", {
   , "{window} resize" : function(el, ev) {
     this.resize_lhn(null, true); // takes care of height and min/max width
   }
+  , "{window} click": function (el, event) {
+    var x = event.pageX,
+        y = event.pageY;
+
+    var on_lhn = _.any([".lhn-trigger", ".lhn-type", ".lhs-holder"]
+                       .map(function (selector) {
+                           var bounds = $(selector)[0].getBoundingClientRect();
+                           
+                           return x >= bounds.left
+                               && x <= bounds.right
+                               && y >= bounds.top
+                               && y <= bounds.bottom;
+                       }));
+   
+    if (!on_lhn && !this.options.display_prefs.getLHNState().is_pinned) {
+      this.close_lhn();
+    }
+  }
 
   , destroy : function() {
     this.element.find(".lhs-holder").off("scroll", self.lhs_holder_onscroll);
