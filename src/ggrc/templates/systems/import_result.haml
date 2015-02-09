@@ -20,11 +20,7 @@
   %h2
     Data to Import
 
-  -#%h3
-    Directive:
-    %strong {{converter.import_slug}}
-
-  .row-fluid
+  .row-fluid.wrap-row
     #sampleData.span12
       -if has_errors
         -for i in all_errors
@@ -57,7 +53,7 @@
   .import-actions
     .row-fluid
         .span6
-          %input{ 'value': 'Cancel', 'class': 'btn btn-large', 'type': 'submit', 'name': 'cancel' }
+          %input{ 'value': 'Cancel', 'class': 'btn btn-large btn-draft', 'type': 'submit', 'name': 'cancel' }
         .span6
           -if has_errors
             &nbsp;
