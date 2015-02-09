@@ -2799,7 +2799,6 @@ Mustache.registerHelper("update_link", function(instance, options) {
   if (instance.viewLink) {
     var link = window.location.host + instance.viewLink;
     instance.attr('link', link);
-    console.log(link);
   }
   return options.fn(options.contexts);
 });
