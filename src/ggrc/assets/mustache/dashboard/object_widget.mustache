@@ -45,63 +45,9 @@
   </div>
   {{/if_equals}}
 
-  {{#if_equals widget_id "request"}}
-  <div class="filter-holder" {{#filter_is_hidden}}style="height: 0px" data-height="42"{{/filter_is_hidden}}>
-    <div class="sticky-filter inner-filter-sticky">
-      <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
-        <form>
-          <div class="row-fluid">
-            <div class="span3">
-              <div class="filter-title">
-                <h6>
-                  Filter Requests
-                </h6>
-              </div>
-            </div>
-            <div class="span9">
-              <ul class="quick-filters">
-                <li>
-                  <label>
-                    Requested before
-                  </label>
-                  <input class="input-date date" name="requested_on" data-toggle="datepicker" data-after="filter_start_date" placeholder="/ /" type="text" value="">
-                </li>
-                <li>
-                  <label>
-                    By Type
-                  </label>
-                  <select name="request_type">
-                    {{#iterate "" "Documentation" "Interview"}}
-                    <option value="{{iterator.toLowerCase}}" {{#iterator.toLowerCase}}{{#trim}}{{#if_equals this states.request_type}}selected="true"{{/trim}}{{/iterator.toLowerCase}}{{/if_equals}}>{{firstnonempty iterator "Any"}}</option>
-                    {{/iterate}}
-                  </select>
-                </li>
-                <li>
-                  <label>
-                    By Status
-                  </label>
-                  <select name="status">
-                    <option value="" selected="true">Any</option>
-                    <option>Draft</option>
-                    <option>Requested</option>
-                    <option>Responded</option>
-                    <option>Amended Request</option>
-                    <option>Updated Response</option>
-                    <option>Accepted</option>
-                  </select>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  {{/if_equals}}
 
   {{^if_equals widget_id "info"}}
   {{^if_equals widget_id "people_list"}}
-  {{^if_equals widget_id "request"}}
   <div class="filter-holder" {{#filter_is_hidden}}style="height: 0px" data-height="42"{{/filter_is_hidden}}>
     <div class="sticky-filter inner-filter-sticky">
       <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
@@ -131,7 +77,6 @@
       </div>
     </div>
   </div>
-  {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}
 
