@@ -1812,27 +1812,20 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
   }
 });
 
-Mustache.registerHelper("with_is_reviewer", function (options) {
-  var tasks = options.context['current_object_review_tasks'];
+Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
+  review_task = Mustache.resolve(review_task);
   var current_user_id = GGRC.current_user.id;
-  tasks = Mustache.resolve(tasks);
-  if(tasks) {
-    for(i = 0; i < tasks.length; i++) {
-      if (current_user_id == tasks[i].instance.contact.id) {
-        return options.fn(options.contexts.add({is_reviewer: true}));
-      }
-    }
-  }
-  return options.fn(options.contexts);
+  var is_reviewer = review_task && current_user_id == review_task.contact.id;
+  return options.fn(options.contexts.add({is_reviewer: is_reviewer}));
 });
 
 Mustache.registerHelper("with_review_task", function (options) {
-  var tasks = options.context['current_object_review_tasks'];
+  var tasks = options.contexts.attr('current_object_review_tasks');
   tasks = Mustache.resolve(tasks);
   for(i = 0; i < tasks.length; i++) {
     return options.fn(options.contexts.add({review_task: tasks[i].instance}));
   }
-  return options.fn(options.contexts);
+  return options.fn(options.contexts.add({review_task: undefined}));
 });
 
 Mustache.registerHelper("default_audit_title", function (instance, options) {

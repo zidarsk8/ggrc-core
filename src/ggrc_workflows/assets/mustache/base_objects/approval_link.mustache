@@ -19,9 +19,7 @@
             {{/with_mapping}}
           {{/if_equals}}
         {{/if_helpers}}
-      {{/with_review_task}}
-      {{#with_review_task}}
-        {{#with_is_reviewer}}
+        {{#with_is_reviewer review_task}}
           {{#if is_reviewer}}
             <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
               <span class="setup-link">Approval applies only to this object and not to mapped objects.</span>
