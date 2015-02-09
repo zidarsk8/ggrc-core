@@ -16,7 +16,7 @@ start
         evaluate: function(values, keys) {
           // functions evaluates the current expresion tree, with the given values
           //
-          // * values, Object with all the keys as in the this keys array, 
+          // * values, Object with all the keys as in the this keys array,
           //   with the coresponding values
           return true;
         }
@@ -33,7 +33,7 @@ start
         evaluate: function(values, keys) {
           // functions evaluates the current expresion tree, with the given values
           //
-          // * values, Object with all the keys as in the this keys array, 
+          // * values, Object with all the keys as in the this keys array,
           //   with the coresponding values
           try {
             return or_exp.evaluate(values, keys);
@@ -43,13 +43,13 @@ start
         }
       };
     }
-  / _* 
+  / _*
     {
       return {
         expression: {},
         keys: [],
-        order_by: { 
-          keys: [], 
+        order_by: {
+          keys: [],
           order: '',
           compare: null
         },
@@ -58,7 +58,7 @@ start
         }
       };
     }
-  / .* 
+  / .*
     {
       return false;
     }
@@ -70,8 +70,8 @@ order_by
     }
   / _*
     {
-      return { 
-        keys: [], 
+      return {
+        keys: [],
         order: '',
         compare: null
       };
@@ -80,8 +80,8 @@ order_by
 only_order_by
   = _* 'order by'i _+ word_list:word_list order:order
     {
-      return { 
-        keys: word_list, 
+      return {
+        keys: word_list,
         order: order,
         compare: function(val1, val2){
           for (var i in word_list){
@@ -107,7 +107,7 @@ word_list
     {
       return [word];
     }
- 
+
 order
   = _+ 'desc'i _*
     {
@@ -194,7 +194,7 @@ text_exp
               if (jQuery.type(values[keys[i]]) === "string" &&
                   values[keys[i]].toUpperCase().indexOf(this.text.toUpperCase()) > -1 ){
                 return true;
-              } else if (recursive && jQuery.type(values[keys[i]]) === "object" && 
+              } else if (recursive && jQuery.type(values[keys[i]]) === "object" &&
                   jQuery.type(values[keys[i]].reify) === "function"){
                 return this.evaluate(values[keys[i]].reify(), keys, false);
               }
@@ -205,7 +205,7 @@ text_exp
       };
     }
 
-paren_exp 
+paren_exp
   = LEFT_P or_exp:or_exp RIGHT_P
     {
       return or_exp;
@@ -234,9 +234,9 @@ unqoted_char = [a-zA-Z0-9_\-.]
 
 
 quoted_char
-  = '\\"' 
-    { 
-      return '"'; 
+  = '\\"'
+    {
+      return '"';
     }
   / [^"]
 
@@ -269,7 +269,30 @@ OP
       return {
         name: op,
         evaluate: function(val1, val2) {
-          return val1 == val2;
+
+          // handle if object is person or a list of persons
+          if (jQuery.type(val1) === "object" &&
+              jQuery.type(val1.reify) === "function" &&
+              val1.type === "Person") {
+            var person = val1.reify();
+            return this.evaluate(person.name, val2) ||
+                   this.evaluate(person.email, val2);
+
+          } else if (jQuery.type(val1) === "object" &&
+              val1.length) {
+            var result = false;
+            for (var i in val1){
+              result |= this.evaluate(val1[i], val2);
+            }
+            return result;
+
+          } else if (jQuery.type(val1) === "string") {
+            // the comparison is done here
+            return val1.toUpperCase() == val2.toUpperCase();
+
+          } else {
+            return val1 == val2;
+          }
         }
       };
     }
@@ -278,7 +301,30 @@ OP
       return {
         name: op,
         evaluate: function(val1, val2) {
-          return val1 != val2;
+
+          // handle if object is person or a list of persons
+          if (jQuery.type(val1) === "object" &&
+              jQuery.type(val1.reify) === "function" &&
+              val1.type === "Person") {
+            var person = val1.reify();
+            return this.evaluate(person.name, val2) &&
+                   this.evaluate(person.email, val2);
+
+          } else if (jQuery.type(val1) === "object" &&
+              val1.length) {
+            var result = false;
+            for (var i in val1){
+              result &= this.evaluate(val1[i], val2);
+            }
+            return result;
+
+          } else if (jQuery.type(val1) === "string") {
+            // the comparison is done here
+            return val1.toUpperCase() != val2.toUpperCase();
+
+          } else {
+            return val1 != val2;
+          }
         }
       };
     }
@@ -305,7 +351,30 @@ OP
       return {
         name: op,
         evaluate: function(val1, val2) {
-          return val1.toUpperCase().indexOf(val2.toUpperCase()) > -1 ;
+
+          // handle if object is person or a list of persons
+          if (jQuery.type(val1) === "object" &&
+              jQuery.type(val1.reify) === "function" &&
+              val1.type === "Person") {
+            var person = val1.reify();
+            return this.evaluate(person.name, val2) ||
+                   this.evaluate(person.email, val2);
+
+          } else if (jQuery.type(val1) === "object" &&
+              val1.length) {
+            var result = false;
+            for (var i in val1){
+              result |= this.evaluate(val1[i], val2);
+            }
+            return result;
+
+          } else if (jQuery.type(val1) === "string") {
+            // the comparison is done here
+            return val1.toUpperCase().indexOf(val2.toUpperCase()) > -1 ;
+
+          } else {
+            return false;
+          }
         }
       };
     }
@@ -314,7 +383,29 @@ OP
       return {
         name: op,
         evaluate: function(val1, val2) {
-          return val1.toUpperCase().indexOf(val2.toUpperCase()) == -1 ;
+
+          // handle if object is person or a list of persons
+          if (jQuery.type(val1) === "object" &&
+              jQuery.type(val1.reify) === "function" &&
+              val1.type === "Person") {
+            var person = val1.reify();
+            return this.evaluate(person.name, val2) &&
+                   this.evaluate(person.email, val2);
+
+          } else if (jQuery.type(val1) === "object" &&
+              val1.length) {
+            var result = false;
+            for (var i in val1){
+              result &= this.evaluate(val1[i], val2);
+            }
+            return result;
+
+          } else if (jQuery.type(val1) === "string") {
+            // the comparison is done here
+            return val1.toUpperCase().indexOf(val2.toUpperCase()) == -1 ;
+          } else {
+            return false;
+          }
         }
       };
     }

@@ -80,7 +80,7 @@ var vals3 = {a:'bi', c:'d', dd:'something', aoeu:'dd', y:'neki'};
 console.log('true  :', p.evaluate(vals));
 console.log('false :', p.evaluate(vals2));
 console.log('true  :', pp.evaluate(vals2));
-console.log("true  :", parser.parse('~  b  ').evaluate(vals2))
+console.log("true  :", parser.parse('~  b  ').evaluate(vals,['a','dd']))
 
 console.log("exp: ", parser.parse('a = oueo order by a,b,"c c"'))
 console.log("exp: ", parser.parse('~ order by  aaa'))
