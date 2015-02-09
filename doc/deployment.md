@@ -28,7 +28,7 @@ This step should only need to be done once per deployment machine, following ins
 
 By convention, this file will be called `deploy_settings_<something>.sh` where `<something>` is the name of the deployment instance.  This file should not be part of the repository, as it is deployment-specific.  There is, however, an example file in the repository at [`extras/deploy_settings_local.sh`](../extras/deploy_settings_local.sh).  You can use this file as a starting point.
 
-Update deployment settings file (e.g. `deploy_settings_ggrc_prod.sh`).  If this is an upgrade, this file will likely be almost complete, but check for changes.  It should look similar to the following:
+Create or update the deployment settings file (e.g. `deploy_settings_ggrc_prod.sh`).  If this is an upgrade, this file will likely be almost complete, but check for changes.  It should look similar to the following:
 
     #!/usr/bin/env bash
     
@@ -43,6 +43,16 @@ Update deployment settings file (e.g. `deploy_settings_ggrc_prod.sh`).  If this
     RISK_ASSESSMENT_URL='https://ggrc-risk-dev.googleplex.com'
     SECRET_KEY='--CHANGE-TO-SOMETHING-SECRET--'
     APPENGINE_EMAIL='prasannav@google.com'
+
+The line `SETTINGS_MODULE` specifies what `.py` files from `settings` subdirectories should be included. For example,
+
+    SETTINGS_MODULE='app_engine ggrc_basic_permissions.settings.development'
+
+means "Include `src/ggrc/settings/app_engine.py` and `src/ggrc_basic_permissions/settings/development.py`. Note hoe `ggrc` is the default module.
+
+For production, include the [`production.py`](../src/ggrc/settings/production.py) file among the settings:
+
+    SETTINGS_MODULE="app_engine production ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development"
 
 Remember to update the required values (the `GAPI_KEY` and `GAPI_CLIENT_ID` will be found in step 3).
 
