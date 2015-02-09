@@ -352,7 +352,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             , admin = Permission.is_allowed("__GGRC_ADMIN__")
             ;
           this.options.attr("allow_mapping_or_creating", (admin || !is_accepted) &&
-                            (this.options.allow_mapping || thisoptions.allow_creating));
+                            (this.options.allow_mapping || this.options.allow_creating));
         }.bind(this);
         setAllowMapping();
         opts.parent_instance.bind('change', setAllowMapping);
