@@ -1082,23 +1082,6 @@
   }
 }
 
-.zero-state {
-  background: $lightGray;
-  border-bottom: 1px solid $infoMessageBorder;
-  padding-bottom:40px;
-  h2 {
-    line-height:36px;
-    font-size:24px;
-    padding:40px 40px 0 40px;
-    font-weight:normal;
-    text-align:center;
-    color: $infoMessageText;
-  }
-  h3 {
-    font-weight:normal;
-    text-align:center;
-  }
-}
 .inner-tree {
   .tree-action-list {
     li {
@@ -1111,32 +1094,11 @@
       @include opacity(1);
     }
   }
-  .zero-state {
-    margin: 0 20px;
-    padding-bottom: 15px;
-    border-left: 1px solid $warmGray;
-    border-right: 1px solid $warmGray;
-    h2 {
-      padding: 15px 40px 0 40px;
-    }
-  }
   .tier-2-info-content {
     .custom-state {
       h6 {
         &.border {
           border-bottom: 1px solid $infoMessageBorder;
-        }
-      }
-      .zero-state {
-        margin: 0;
-        background: none;
-        border: none;
-        padding-bottom: 0;
-        h2 {
-          padding: 0;
-          text-align: left;
-          line-height: 26px;
-          font-size: 14px;
         }
       }
     }

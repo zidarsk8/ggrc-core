@@ -5,49 +5,37 @@
     Maintained By: laran@reciprocitylabs.com
 }}
 
-<li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="risk_assessment">
+<li class="tree-item" data-object-id="{{instance.id}}" data-object-type="risk_assessment">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-
-    <div class="openclose">
-      <a class="openclose-placeholder" href="javascript://"> </a>
-      <div class="row-fluid">
-
-        <div class="span6">
-          <div class="item-data">
-            <div class="tree-title-area">
-              {{instance.title}}
-            </div>
-          </div>
-        </div>
-
-        <div class="span3">
-          <div class="item-data">
-            <div class="tree-title-area title-minor">
-              Started on
-              {{{localize_date instance.start_date}}}
-            </div>
-          </div>
-        </div>
-
-        <div class="span3">
-          <div class="item-data">
-            <div class="tree-title-area title-minor">
-              Completed on
-              {{{localize_date instance.end_date}}}
-            </div>
-          </div>
-        </div>
-
+    <div class="item-wrap">
+      <div class="openclose">
+        <i class="grcicon-arrow-right"></i>
       </div>
-    </div>
-  </div>
+      <div class="select">
+        <div class="item-data">
+          <div class="row-fluid">
+            <div class="span4">
+              <div class="title tree-title-area">
+                {{instance.title}}
+              </div>
+            </div>
 
-  {{#if expanded}}
-  <div class="tier-2-info item-content">
-    <div class="tier-2-info-content">
-      {{> '/static/mustache/risk_assessments/tier2_content.mustache'}}
-    </div>
-  </div>
-  {{/if}}
+            <div class="span2">
+              <div class="date tree-title-area">
+                {{{localize_date instance.start_date}}}
+              </div>
+            </div>
+
+            <div class="span2">
+              <div class="date tree-title-area">
+                {{{localize_date instance.end_date}}}
+              </div>
+            </div>
+
+          </div>
+        </div><!-- item-data end -->
+      </div><!-- select end -->
+    </div><!-- item-wrap end -->
+  </div><!-- item-main end -->
 
 </li>
