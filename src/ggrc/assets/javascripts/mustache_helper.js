@@ -1816,11 +1816,21 @@ Mustache.registerHelper("with_is_reviewer", function (options) {
   var tasks = options.context['current_object_review_tasks'];
   var current_user_id = GGRC.current_user.id;
   tasks = Mustache.resolve(tasks);
-  for(i = 0; i < tasks.length; i++) {
-    if (current_user_id == tasks[i].instance.contact.id) {
-      // NOTE: Note that the review_task is set into the context here as well.
-      return options.fn(options.contexts.add({is_reviewer: true, review_task: tasks[i].instance}));
+  if(tasks) {
+    for(i = 0; i < tasks.length; i++) {
+      if (current_user_id == tasks[i].instance.contact.id) {
+        return options.fn(options.contexts.add({is_reviewer: true}));
+      }
     }
+  }
+  return options.fn(options.contexts);
+});
+
+Mustache.registerHelper("with_review_task", function (options) {
+  var tasks = options.context['current_object_review_tasks'];
+  tasks = Mustache.resolve(tasks);
+  for(i = 0; i < tasks.length; i++) {
+    return options.fn(options.contexts.add({review_task: tasks[i].instance}));
   }
   return options.fn(options.contexts);
 });
@@ -2826,5 +2836,10 @@ Mustache.registerHelper("if_draw_icon", function(instance, options) {
   else
     return options.inverse(options.contexts);
 })
-
+Mustache.registerHelper("debug", function(options) {
+    // This just gives you a helper that you can wrap around some code in a
+    // template to see what's in the context. Set a breakpoint in dev tools
+    // on the return statement on the line below to debug.
+    return options.fn(options.contexts);
+});
 })(this, jQuery, can);

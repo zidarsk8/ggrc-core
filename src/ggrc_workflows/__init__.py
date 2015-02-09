@@ -8,7 +8,7 @@ from datetime import datetime, date
 from flask import Blueprint
 from sqlalchemy import inspect
 from ggrc import db
-from ggrc.login import get_current_user
+from ggrc.login import get_current_user, get_current_user_id
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
 from ggrc.rbac.permissions import is_allowed_update
@@ -507,6 +507,17 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):
 
   ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
 
+def set_internal_object_state(task_group_object, object_state, status):
+  if status is not None:
+    task_group_object.status = status
+  if object_state == "Approved":
+    task_group_object.os_approved_on = datetime.now()
+  task_group_object.os_state = object_state
+  task_group_object.os_last_modified = datetime.now()
+  task_group_object.os_last_updated_by_user_id = get_current_user_id()
+  task_group_object.skip_os_state_update()
+
+  db.session.add(task_group_object)
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
@@ -521,11 +532,20 @@ def handle_cycle_task_group_object_task_put(
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_object_parent_state(obj)
 
-    if obj.cycle.workflow.object_approval \
-        and obj.cycle.status == 'Verified':
+    if obj.task_group_task.object_approval:
+      os_state = None
+      status = None
+      if obj.status == 'Verified':
+        os_state = "Approved"
+        status = "Final"
+      elif obj.status == 'Declined':
+        os_state = "Declined"
+      elif obj.status == 'InProgress':
+        os_state = "UnderReview"
+
       for tgobj in obj.task_group_task.task_group.objects:
         old_status = tgobj.status
-        tgobj.status = 'Final'
+        set_internal_object_state(tgobj, os_state, status)
         status_change.send(
             tgobj.__class__,
             obj=tgobj,
@@ -534,6 +554,7 @@ def handle_cycle_task_group_object_task_put(
             )
         db.session.add(tgobj)
       db.session.flush()
+
 
 @Resource.model_put.connect_via(models.CycleTaskGroup)
 def handle_cycle_task_group_put(
