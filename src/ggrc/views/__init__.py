@@ -107,7 +107,8 @@ def index():
   """
   from ggrc import settings
   if not settings.PRODUCTION:
-    flash(u'WARNING. This is not the production instance of the GGRC application. Company confidential, sensitive or personally identifiable information MUST NOT be entered or stored here. For any questions, please contact eng-compliance@google.com.', 'alert alert-warning')
+    flash(u'WARNING - This is not the production instance of the GGRC application.', 'alert alert-warning')
+    flash(u'Company confidential, sensitive or personally identifiable information *MUST NOT* be entered or stored here. For any questions, please contact eng-compliance@google.com.', 'alert alert-warning')
   return render_template("welcome/index.haml")
 
 from ggrc.login import login_required
