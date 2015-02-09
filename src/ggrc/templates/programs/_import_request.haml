@@ -14,13 +14,15 @@
 -block widget_buttons
 
 -block widget_title
-  Import from file
+  .oneline
+    %i.grcicon-imp-exp
+    Import from file
 
 -block main
-  %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'}
-    .import-interface
+  .info
+    %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'}
       %input{'name': 'return_to', 'value': '{{return_to}}', 'type': 'hidden'}
-      .row-fluid
+      .row-fluid.wrap-row
         .span8
           %h3
             Choose CSV file to upload
@@ -29,13 +31,12 @@
             %a{"href": 'import_pbc_template'}
               %i.grcicon-imp-exp
               Download PBC Import template
-      .row-fluid
+      .row-fluid.wrap-row
         .span12
           %input{ 'name': 'file', 'value': 'choose file' , 'type': 'file' }
           .import-buttons
-            %input{ 'value': 'Upload and Review', 'class': 'btn btn-primary', 'type': 'submit' }
-            -#%a{ 'href': 'javascript://', 'class': 'import-help', 'data-toggle': 'modal-ajax-helpform', 'data-original-title': 'help' }
-              -#View Help
+            %input{ 'value': 'Upload and Review', 'class': 'btn btn-large btn-info', 'type': 'submit' }
+
     -if exception_message is defined and not exception_message.show_preview
       -include 'programs/import_request_errors.haml'
     #results-container

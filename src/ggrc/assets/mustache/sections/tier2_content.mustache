@@ -21,7 +21,7 @@
         <li>
           <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-object-singular-override="{{#if_equals instance.directive.type 'Contract'}}Clause{{/if_equals}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{instance.class.model_singular}}" data-object-id="{{instance.id}}">
             <i class="grcicon-edit"></i>
-            Edit {{instance.class.model_singular}} aaa
+            Edit {{instance.class.model_singular}}
           </a>
         </li>
       {{/is_allowed}}
@@ -44,8 +44,8 @@
       {{> /static/mustache/base_objects/edit_object_link.mustache}}
     {{/if_helpers}}
 
-    {{#is_allowed_to_map parent_instance model.shortName}}
     {{#if allow_mapping_or_creating}}
+    {{#is_allowed_to_map parent_instance model.shortName}}
       {{#if model.root_object}}
         {{#if_instance_of instance "SectionBase"}}
           <li>
@@ -64,8 +64,8 @@
           </li>
         {{/if_equals}}
       {{/if}}
-    {{/if}}
     {{/is_allowed_to_map}}
+    {{/if}}
   </ul>
 </div>
 
