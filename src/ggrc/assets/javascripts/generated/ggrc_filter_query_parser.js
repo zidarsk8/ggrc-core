@@ -215,9 +215,19 @@ GGRC.query_parser = {
                       if (jQuery.type(values[keys[i]]) === "string" &&
                           values[keys[i]].toUpperCase().indexOf(this.text.toUpperCase()) > -1 ){
                         return true;
+                      } else if (keys[i] == "owners" ) {
+                        for (var j in values[keys[i]]){
+                          var person = values[keys[i]][j].reify();
+                          if (person.email.toUpperCase().indexOf(this.text.toUpperCase()) > -1 ||
+                              person.name.toUpperCase().indexOf(this.text.toUpperCase()) > -1 ) {
+                            return true;
+                          }
+                        }
                       } else if (recursive && jQuery.type(values[keys[i]]) === "object" &&
                           jQuery.type(values[keys[i]].reify) === "function"){
-                        return this.evaluate(values[keys[i]].reify(), keys, false);
+                        if (this.evaluate(values[keys[i]].reify(), keys, false)){
+                          return true;
+                        }
                       }
                     }
                   }
