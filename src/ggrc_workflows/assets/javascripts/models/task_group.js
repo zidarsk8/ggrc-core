@@ -67,6 +67,9 @@
       this.bind("destroyed", function(ev, inst) {
         if(inst instanceof that) {
           can.each(inst.task_group_tasks, function(tgt) {
+            if (!tgt) {
+              return;
+            }
             tgt = tgt.reify();
             can.trigger(tgt, "destroyed");
             can.trigger(tgt.constructor, "destroyed", tgt);
