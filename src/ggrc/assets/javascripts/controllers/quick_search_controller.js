@@ -733,8 +733,10 @@ can.Control("CMS.Controllers.LHN_Search", {
       // Determine the expandable height
       this._holder_height = holder.outerHeight();
       $content.filter(this.options.list_content_selector).css(
-          'maxHeight'
-          , Math.max(160, (this._holder_height - holder.position().top + extra_height - top - 40)) + 'px'
+          'maxHeight',
+          Math.max(160, 
+                   (this._holder_height - holder.position().top 
+                    + extra_height - top - 40))
       );
 
       // Notify the display prefs that the category the user just opened is to be reopened on next page load.
@@ -768,8 +770,9 @@ can.Control("CMS.Controllers.LHN_Search", {
         this._holder_height = holder.outerHeight();
 
         $content.css(
-            'maxHeight'
-          , (parseFloat($content.css('maxHeight')) + this._holder_height - last_height) + 'px'
+            'maxHeight',
+            Math.max(160, 
+                     (this._holder_height - last_height))
         );
       }
     }
