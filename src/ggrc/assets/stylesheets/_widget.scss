@@ -1128,11 +1128,33 @@
       padding-top: 10px;
     }
   }
+  .filter-input {
+    position: relative;
+    .is-expresion {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      @include opacity(0.25);
+    }
+    &.expresion {
+      .is-expresion {
+        i {
+          background-position: -246px -176px;
+        }
+        @include opacity(1);
+      }
+    }
+  }
   .filter-button {
     @include clearfix();
     input[type="submit"] {
       margin-top: 7px;
       float: right;
+    }
+    input[type="reset"] {
+      @extend input[type="submit"];
+      margin-left: 10px;
+      font-weight: normal;
     }
     i {
       float: right;
