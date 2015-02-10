@@ -138,6 +138,12 @@ can.Control("CMS.Controllers.TreeLoader", {
 
     return this._prepare_deferred;
   }
+
+  , show_info_pin: function(){
+     var children = this.element.children();
+     children && children.first().find('.select').click();
+  }
+
   , display: function() {
       var that = this
         , tracker_stop = GGRC.Tracker.start(
@@ -145,6 +151,7 @@ can.Control("CMS.Controllers.TreeLoader", {
         ;
 
       if (this._display_deferred) {
+        this.show_info_pin();
         return this._display_deferred;
       }
 
@@ -154,6 +161,10 @@ can.Control("CMS.Controllers.TreeLoader", {
         return $.when(that.fetch_list(), that.init_view())
           .then(that._ifNotRemoved(that.proxy("draw_list")));
       })).done(tracker_stop);
+
+      this._display_deferred.then(function(e){
+        this.show_info_pin();
+      }.bind(this));
 
       return this._display_deferred;
     }
