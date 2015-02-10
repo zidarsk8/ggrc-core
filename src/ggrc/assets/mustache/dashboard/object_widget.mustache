@@ -48,7 +48,7 @@
 
   {{^if_equals widget_id "info"}}
   {{^if_equals widget_id "people_list"}}
-  <div class="filter-holder" {{#filter_is_hidden}}style="height: 0px" data-height="42"{{/filter_is_hidden}}>
+  <div class="filter-holder" {{#filter_is_hidden}}style="height: 0px"{{/filter_is_hidden}} data-height="42">
     <div class="sticky-filter inner-filter-sticky">
       <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
         <div class="row-fluid">
@@ -126,7 +126,7 @@
         <div class="span2">
           <ul class="tree-action-list">
             <li class="filter-trigger">
-              <a href="#" class="active">
+              <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
                 <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
               </a>
             </li>
@@ -192,7 +192,7 @@
         <div class="span4">
           <ul class="tree-action-list">
             <li class="filter-trigger">
-              <a href="javascript://" class="active">
+              <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
                 <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
               </a>
             </li>
@@ -253,7 +253,7 @@
         <div class="span4">
           <ul class="tree-action-list">
             <li class="filter-trigger">
-              <a href="javascript://" class="active">
+              <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
                 <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
               </a>
             </li>
@@ -314,7 +314,7 @@
         <div class="span4">
           <ul class="tree-action-list">
             <li class="filter-trigger">
-              <a href="javascript://" class="active">
+              <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
                 <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
               </a>
             </li>
@@ -375,7 +375,7 @@
         <div class="span4">
           <ul class="tree-action-list">
             <li class="filter-trigger">
-              <a href="javascript://" class="active">
+              <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
                 <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
               </a>
             </li>
@@ -451,7 +451,7 @@
         <div class="span4">
           <ul class="tree-action-list">
             <li class="filter-trigger">
-              <a href="javascript://" class="active">
+              <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
                 <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
               </a>
             </li>
@@ -626,7 +626,7 @@
         <div class="span4">
           <ul class="tree-action-list">
             <li class="filter-trigger">
-              <a href="javascript://" class="active">
+              <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
                 <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
               </a>
             </li>
@@ -885,7 +885,7 @@
         <div class="span4">
           <ul class="tree-action-list">
             <li class="filter-trigger">
-              <a href="#" class="active">
+              <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
                 <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
               </a>
             </li>
