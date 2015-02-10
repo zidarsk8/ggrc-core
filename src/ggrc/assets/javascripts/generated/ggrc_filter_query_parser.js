@@ -210,28 +210,31 @@ GGRC.query_parser = {
                   recursive = typeof recursive !== 'undefined' ? recursive : true;
                   keys = typeof keys !== 'undefined' ? keys : [];
 
-                  for (var i=0 ; i < keys.length ; i++){
-                    if (values.hasOwnProperty(keys[i])){
-                      if (jQuery.type(values[keys[i]]) === "string" &&
-                          values[keys[i]].toUpperCase().indexOf(this.text.toUpperCase()) > -1 ){
-                        return true;
-                      } else if (keys[i] == "owners" ) {
-                        for (var j=0; j < values[keys[i]].length; j++){
-                          var person = values[keys[i]][j].reify();
-                          if (person.email.toUpperCase().indexOf(this.text.toUpperCase()) > -1 ||
-                              person.name.toUpperCase().indexOf(this.text.toUpperCase()) > -1 ) {
-                            return true;
-                          }
+                  function comparator(a, b){
+                    return a.toUpperCase().indexOf(b.toUpperCase()) > -1
+                  }
+
+                  return keys.reduce(function(result, key){
+                    if (result) return result; // for performance
+                    if (values.hasOwnProperty(key)){
+                      var value = values[key];
+                      if (jQuery.type(value) === "string" ){
+                        return comparator(value, this.text);
+                      } else if (key == "owners" && value ) {
+                        // check if any of the owners contains search text
+                        for (var j=0; j < value.length; j++){
+                          var person = value[j].reify();
+                          result |= comparator(person.email, this.text);
+                          result |= comparator(person.name, this.text);
                         }
-                      } else if (recursive && jQuery.type(values[keys[i]]) === "object" &&
-                          jQuery.type(values[keys[i]].reify) === "function"){
-                        if (this.evaluate(values[keys[i]].reify(), keys, false)){
-                          return true;
-                        }
+                      } else if (recursive && key != "owners" &&
+                          jQuery.type(value) === "object" &&
+                          jQuery.type(value.reify) === "function"){
+                        result |= this.evaluate(value.reify(), keys, false);
                       }
                     }
-                  }
-                  return false;
+                    return result;
+                  }.bind(this), false);
                 }
               };
             },
