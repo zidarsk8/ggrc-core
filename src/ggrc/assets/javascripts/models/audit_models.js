@@ -101,13 +101,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
       this.attr('context', this.program.reify().context);
     }
 
-    return this._super.apply(this, arguments).then(function(instance) {
-      // Since Audits have a non-standard url for viewing, the url has to be set here
-      // so that the browser can be redirected properly after creating.
-      instance.attr('_redirect',
-        instance.program.reify().viewLink + "#audit_widget/audit/" + instance.id);
-      return instance;
-    });
+    return this._super.apply(this, arguments);
   },
   after_save: function() {
     var that = this;

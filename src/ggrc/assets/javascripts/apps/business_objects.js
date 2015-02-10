@@ -253,6 +253,7 @@ $(function() {
   //  objects.
   var info_widget_views = {
       'programs': GGRC.mustache_path + "/programs/info.mustache"
+    , 'audits': GGRC.mustache_path + "/audits/info.mustache"
     , 'people': GGRC.mustache_path + "/people/info.mustache"
     , 'policies': GGRC.mustache_path + "/policies/info.mustache"
     , 'sections': GGRC.mustache_path + "/sections/info.mustache"

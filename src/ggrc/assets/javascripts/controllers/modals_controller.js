@@ -230,7 +230,7 @@ can.Control("GGRC.Controllers.Modals", {
       // Make sure custom attributes are preloaded:
       dfd = dfd.then(function(){
         return $.when(
-          instance.load_custom_attribute_definitions(),
+          instance.load_custom_attribute_definitions && instance.load_custom_attribute_definitions(),
           instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
         );
       });
@@ -240,7 +240,7 @@ can.Control("GGRC.Controllers.Modals", {
       // If the modal is closed early, the element no longer exists
       if (that.element) {
         // Make sure custom attr validations/values are set
-        if (instance) {
+        if (instance && instance.setup_custom_attributes) {
           instance.setup_custom_attributes();
         }
         // This is to trigger `focus_first_element` in modal_ajax handling
