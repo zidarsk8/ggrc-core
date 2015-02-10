@@ -59,11 +59,9 @@ def state_before_insert_listener(mapper, connection, target):
     target.os_last_updated_by_user_id = get_current_user_id()
 
 def state_before_update_listener(mapper, connection, target):
-  # import ipdb; ipdb.set_trace()
   if hasattr(target, 'os_state'):
-    # import ipdb; ipdb.set_trace()
-    if hasattr(target, 'skip_os_state_update'):
-      if True == target.skip_os_state_update:
+    if hasattr(target, '_skip_os_state_update'):
+      if True == target._skip_os_state_update:
         return
     target.os_state = ObjectStates.MODIFIED
     target.os_last_updated = datetime.now()
