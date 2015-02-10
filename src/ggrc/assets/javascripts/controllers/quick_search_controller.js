@@ -631,10 +631,6 @@ can.Control("CMS.Controllers.LHN_Search", {
         // Refresh the counts whenever the lists change
         self.refresh_counts();
       });
-
-      // this is a hack, but for the life of me I couldn't find another way
-      // make sure lists with mid-level are closed on load
-      self.close_mid_levels();
     }
 
   , "{list_toggle_selector} click": function (el, ev) {
@@ -756,13 +752,6 @@ can.Control("CMS.Controllers.LHN_Search", {
       if (!dont_update_prefs) {
           this.options.display_prefs.setLHNState({ "open_category" : null, category_scroll : 0 });
       }
-  }
-
-  , close_mid_levels: function () {
-    this.toggle_list_visibility($([".governance.list-toggle",
-                                   ".entities.list-toggle",
-                                   ".business.list-toggle"].join(",")),
-                                true);
   }
 
   , " resize": function() {
