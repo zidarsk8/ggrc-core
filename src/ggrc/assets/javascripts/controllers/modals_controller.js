@@ -266,7 +266,8 @@ can.Control("GGRC.Controllers.Modals", {
     if (!this.element) {
       return;
     }
-    var is_object_modal = this.options.modal_title.indexOf('Edit') === 0 || this.options.modal_title.indexOf('New') === 0;
+    var modal_title = this.options.modal_title,
+        is_object_modal = modal_title && (modal_title.indexOf('Edit') === 0 || modal_title.indexOf('New') === 0);
 
     can.isArray(content) && (content = content[0]);
     can.isArray(header) && (header = header[0]);
