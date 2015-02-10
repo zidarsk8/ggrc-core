@@ -12,20 +12,39 @@ can.Control("GGRC.Controllers.TreeFilter", {
     this.on();
   }
 
+  , toggle_indicator: function(current_filter){
+      var is_expression = !!current_filter && !!current_filter.expression.op &&
+            current_filter.expression.op != "text_search";
+
+      this.element.find('.filter-input').toggleClass("expression", is_expression);
+      this.element.find('.filter-input span i')
+        .toggleClass("grcicon-check-green", is_expression);
+      this.element.find('.filter-input span i')
+        .toggleClass("grcicon-check-black", !is_expression);
+  }
   , apply_filter : function(filter_string){
-      var parent_control = this.element.closest('.cms_controllers_dashboard_widgets')
-        .find(".cms_controllers_tree_view").control();
-      this.current_query = GGRC.query_parser.parse(filter_string);
-      parent_control.options.attr('sort_function', this.current_query.order_by.compare);
-      parent_control.options.attr('filter', this.current_query);
+      var current_filter = GGRC.query_parser.parse(filter_string),
+          parent_control = this.element.closest('.cms_controllers_dashboard_widgets')
+            .find(".cms_controllers_tree_view").control();
+
+      this.toggle_indicator(current_filter);
+      parent_control.options.attr('sort_function', current_filter.order_by.compare);
+      parent_control.options.attr('filter', current_filter);
       parent_control.reload_list();
   }
-         
-  , ".btn click" : function(el, ev) {
+
+  , "input[type=reset] click" : function(el, ev) {
+    this.element.find("input[type=text]")[0].value = "";
+    this.apply_filter("");
+  }
+
+  , "input[type=submit] click" : function(el, ev) {
     this.apply_filter(this.element.find("input[type=text]")[0].value)
   }
 
   , "input keyup" : function(el, ev) {
+    this.toggle_indicator(GGRC.query_parser.parse(el.val()));
+
     if (ev.keyCode == 13){
       this.apply_filter(el.val());
     }
@@ -33,7 +52,7 @@ can.Control("GGRC.Controllers.TreeFilter", {
   }
 
   , "input, select change" : function(el, ev) {
-    
+
     // this is left from the old filters and should eventually be replaced
     // Convert '.' to '__' ('.' will cause can.Observe to try to update a path instead of just a key)
     var name = el.attr("name").replace(/\./g, '__');
