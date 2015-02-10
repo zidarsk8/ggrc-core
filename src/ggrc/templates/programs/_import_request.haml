@@ -37,6 +37,6 @@
           .import-buttons
             %input{ 'value': 'Upload and Review', 'class': 'btn btn-large btn-info', 'type': 'submit' }
 
-    -if exception_message is defined and not exception_message.show_preview
-      -include 'programs/import_request_errors.haml'
-    #results-container
+      -if exception_message is defined and not exception_message.show_preview
+        -include 'programs/import_request_errors.haml'
+      #results-container
