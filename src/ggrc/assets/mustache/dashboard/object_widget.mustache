@@ -418,6 +418,107 @@
     </header>
   {{/if_equals}}
 
+  {{#if_equals widget_id "task"}}
+    <header class="header tree-header">
+      <div class="row-fluid">
+        <div class="span4">
+          <div class="title-heading oneline">
+            {{model.title_singular}} Title
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Mapped Objects
+          </div>
+        </div>
+        <div class="span2">
+          <div class="oneline">
+            Workflows
+          </div>
+        </div>
+        <div class="span4">
+          <ul class="tree-action-list">
+            <li class="filter-trigger">
+              <a href="#" class="active">
+                <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="grcicon-hide-relevant" rel="tooltip" data-placement="left" title="" data-original-title="Hide Irelevant"></i>
+              </a>
+            </li>
+            <!-- Temporary hidden. Do not remove this.
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+              <div class="dropdown-menu dropdown-menu-form">
+                <h5>Set visible fields</h5>
+                <ul class="attr-list">
+                  <li class="disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="" disabled="">
+                      Title
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" disabled="">
+                      Description
+                    </label>
+                  </li>
+                  <li class=" disabled">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" disabled="">
+                      Notes
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Owner
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Contact
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      Code
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox" checked="">
+                      State
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      Network Zone
+                    </label>
+                  </li>
+                  <li>
+                    <label class="checkbox-inline">
+                      <input type="checkbox">
+                      System url
+                    </label>
+                  </li>
+                </ul>
+                <button class="btn btn-small btn-info">Set fields</button>
+              </div>
+            </li>
+            -->
+          </ul>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
   {{#if_equals widget_id "risk_assessments"}}
     <header class="header tree-header">
       <div class="row-fluid">
@@ -556,6 +657,7 @@
   {{^if_equals widget_id "person"}}
   {{^if_equals widget_id "people_list"}}
   {{^if_equals widget_id "task_group"}}
+  {{^if_equals widget_id "task"}}
   {{^if_equals widget_id "roles_list"}}
   {{^if_equals widget_id "current"}}
   {{^if_equals widget_id "history"}}
@@ -666,6 +768,7 @@
         </div>
       </div>
     </header>
+  {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}
