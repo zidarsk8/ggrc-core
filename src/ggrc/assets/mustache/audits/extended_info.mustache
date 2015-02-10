@@ -5,7 +5,6 @@
       {{#using program=instance.program}}
         <a class="main-title {{instance.class.category}} oneline" href="{{#is_allowed 'view_object_page' 'Program' context=program.context}}{{viewLink}}{{else}}/dashboard#audit_widget/audit/{{id}}{{/is_allowed}}">
           {{instance.title}}
-          <i class="grcicon-goto"></i>
         </a>
       {{/using}}
     </div>

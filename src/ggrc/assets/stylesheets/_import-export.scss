@@ -15,14 +15,15 @@ form.import {
     font-weight:normal;
     padding-bottom:16px;
   }
-  .import-buttons {
-    margin-top:16px;
-    padding-top:16px;
-    border-top:1px solid #ddd;
-  }
   input[type="file"] {
     width: 100%;
   }
+}
+
+.import-buttons {
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid #ddd;
 }
 
 .results-table {

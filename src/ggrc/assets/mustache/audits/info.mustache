@@ -10,22 +10,24 @@
     {{#is_info_pin}}
     <div class="clearfix">
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content">
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-      </div>
     </div>
     {{/is_info_pin}}
+    <div class="tier-content">
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+    </div>
 
     {{#is_allowed 'update' instance context='for'}}
       <div class="details-wrap">
         <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
         <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+          {{#is_info_pin}}
           <li>
             <a href="{{viewLink}}">
               <i class="grcicon-goto"></i>
               View {{instance.class.title_singular}}
             </a>
           </li>
+          {{/is_info_pin}}
           {{#if_helpers '\
             #is_page_instance' instance.program '\
             or #is_profile'}}
@@ -48,8 +50,8 @@
   	        {{/is_allowed}}
           {{/if_helpers}}
           {{#is_allowed 'update' instance context='for'}}
-            <li class="border">
-              <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{options.parent_instance.class.table_singular}}": { "id" : {{options.parent_instance.id}}, "title" : "{{options.parent_instance.title}}" } }'>
+            <li>
+              <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{{#options}}{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }{{/options}}'>
                 <i class="grcicon-edit"></i>
                 Edit {{model.title_singular}}
               </a>

@@ -18,7 +18,9 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
       this.options.model = this.options.instance.constructor;
     }
     this.options.$content = this.element;
-    this.options.instance.refresh();
+    if (this.element.data('force-refresh')) {
+      this.options.instance.refresh();
+    }
   }
 
   , "input, textarea, select change" : function(el, ev) {
@@ -240,14 +242,14 @@ can.Component.extend({
         multi_map = data.multi_map,
         join_model_class,
         join_object;
-      
+
       if(multi_map){
-        var length = data.arr.length, 
+        var length = data.arr.length,
             my_data;
 
         if (length == 1){
           my_data = data.arr[0];
-          
+
           GGRC.Mappings.make_join_object(
             this.scope.parent_instance,
             my_data,
@@ -260,11 +262,11 @@ can.Component.extend({
             that.element.find("a[data-toggle=submit]").trigger("modal:success");
           });
         }
-      
+
         else{
           for(var i = 0; i < length-1; i++){
             my_data = data.arr[i];
-            
+
             GGRC.Mappings.make_join_object(
               this.scope.parent_instance,
               my_data,

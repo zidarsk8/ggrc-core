@@ -63,12 +63,16 @@
         {{/if_helpers}}
       {{/with_program_roles_as}}
       {{#is_allowed 'create' 'delete' 'UserRole' context=options.parent_instance.context.id}}
+      {{#is_info_pin}}
+      {{#if_equals options.mapping "mapped_and_or_authorized_people"}}
         <li>
           <a href="javascript://" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{instance.id}}">
             <i class="grcicon-role-color"></i>
             Edit Authorizations
           </a>
         </li>
+      {{/options.mapped_and_or_authorized_people}}
+      {{/is_info_pin}}
       {{/is_allowed}}
     </ul>
   </div>

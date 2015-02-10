@@ -2828,11 +2828,23 @@ Mustache.registerHelper("if_draw_icon", function(instance, options) {
     return options.fn(options.contexts);
   else
     return options.inverse(options.contexts);
-})
-Mustache.registerHelper("debug", function(options) {
-    // This just gives you a helper that you can wrap around some code in a
-    // template to see what's in the context. Set a breakpoint in dev tools
-    // on the return statement on the line below to debug.
-    return options.fn(options.contexts);
 });
+
+Mustache.registerHelper("debug", function(options) {
+  // This just gives you a helper that you can wrap around some code in a
+  // template to see what's in the context. Set a breakpoint in dev tools
+  // on the return statement on the line below to debug.
+  return options.fn(options.contexts);
+});
+
+Mustache.registerHelper("update_link", function(instance, options) {
+
+  instance = Mustache.resolve(instance);
+  if (instance.viewLink) {
+    var link = window.location.host + instance.viewLink;
+    instance.attr('link', link);
+  }
+  return options.fn(options.contexts);
+});
+
 })(this, jQuery, can);

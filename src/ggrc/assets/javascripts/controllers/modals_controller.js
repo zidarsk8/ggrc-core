@@ -230,7 +230,7 @@ can.Control("GGRC.Controllers.Modals", {
       // Make sure custom attributes are preloaded:
       dfd = dfd.then(function(){
         return $.when(
-          instance.load_custom_attribute_definitions(),
+          instance.load_custom_attribute_definitions && instance.load_custom_attribute_definitions(),
           instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
         );
       });
@@ -240,7 +240,7 @@ can.Control("GGRC.Controllers.Modals", {
       // If the modal is closed early, the element no longer exists
       if (that.element) {
         // Make sure custom attr validations/values are set
-        if (instance) {
+        if (instance && instance.setup_custom_attributes) {
           instance.setup_custom_attributes();
         }
         // This is to trigger `focus_first_element` in modal_ajax handling
@@ -266,6 +266,7 @@ can.Control("GGRC.Controllers.Modals", {
     if (!this.element) {
       return;
     }
+    var is_object_modal = this.options.modal_title.indexOf('Edit') === 0 || this.options.modal_title.indexOf('New') === 0;
 
     can.isArray(content) && (content = content[0]);
     can.isArray(header) && (header = header[0]);
@@ -278,7 +279,7 @@ can.Control("GGRC.Controllers.Modals", {
     content != null && this.options.$content.html(content).removeAttr("style");
     footer != null && this.options.$footer.html(footer);
 
-    if (custom_attributes != null && !('delete_counts' in this.options)) {
+    if (custom_attributes != null && is_object_modal) {
       this.options.$content.append(custom_attributes);
     }
     this.setup_wysihtml5();

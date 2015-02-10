@@ -96,7 +96,7 @@ def base_context():
       current_user_json=get_current_user_json,
       )
 
-from flask import render_template
+from flask import render_template, flash
 
 # Actual HTML-producing routes
 #
@@ -105,6 +105,10 @@ from flask import render_template
 def index():
   """The initial entry point of the app
   """
+  from ggrc import settings
+  if not settings.PRODUCTION:
+    flash(u'WARNING - This is not the production instance of the GGRC application.', 'alert alert-warning')
+    flash(u'Company confidential, sensitive or personally identifiable information *MUST NOT* be entered or stored here. For any questions, please contact eng-compliance@google.com.', 'alert alert-warning')
   return render_template("welcome/index.haml")
 
 from ggrc.login import login_required
@@ -143,20 +147,6 @@ def admin():
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
   return render_template("admin/index.haml")
-
-@app.route("/design/with_new_layout")
-@login_required
-def styleguide_with_new_layout():
-  """The style guide page with the new layout
-  """
-  return render_template("styleguide/styleguide_with_new_layout.haml")
-
-@app.route("/design")
-@login_required
-def styleguide():
-  """The style guide page
-  """
-  return render_template("styleguide/styleguide.haml")
 
 @app.route("/background_task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
