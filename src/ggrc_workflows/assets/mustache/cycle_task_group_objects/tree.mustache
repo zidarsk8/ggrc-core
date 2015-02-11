@@ -18,8 +18,8 @@
           <div class="row-fluid">
             <div class="span4">
               <div class="title tree-title-area">
-                <i class="grcicon-object-black"></i>
                 {{#using object=instance.object}}
+                  <i class="grcicon-{{object.class.table_singular}}-black"></i>
                   {{object.title}}
                 {{/using}}
               </div>
