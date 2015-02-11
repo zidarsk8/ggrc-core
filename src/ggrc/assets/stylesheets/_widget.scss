@@ -695,6 +695,14 @@
       overflow: hidden;
     }
   }
+  .multi-type-label {
+    padding-bottom: 2px;
+    font-size: 11px;
+    color: $darkText;
+    line-height: 17px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
 }
 
 .widget-filters {
