@@ -215,11 +215,17 @@
       this.bind("destroyed", function(ev, inst) {
         if(inst instanceof that) {
           can.each(inst.cycle_task_group_objects, function(ctgo) {
+            if (!ctgo) {
+              return;
+            }
             ctgo = ctgo.reify();
             can.trigger(ctgo, "destroyed");
             can.trigger(ctgo.constructor, "destroyed", ctgo);
           });
           can.each(inst.cycle_task_group_tasks, function(ctgt) {
+            if (!ctgt) {
+              return;
+            }
             ctgt = ctgt.reify();
             can.trigger(ctgt, "destroyed");
             can.trigger(ctgt.constructor, "destroyed", ctgt);

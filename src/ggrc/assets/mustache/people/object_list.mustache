@@ -174,15 +174,17 @@
   {{/each}}
 
   <li class="tree-item tree-item-add">
+    <a class="btn btn-small btn-draft" data-object-plural="people" data-modal-class="modal-wide" href="javascript://" data-object-singular="Person" data-toggle="modal-ajax-form" data-modal-reset="reset" rel="tooltip" data-placement="right" data-original-title="Add Person">
+      <i class="grcicon-add-black"></i>
+    </a>
+  </li>
+
+  <li>
     {{#if has_prev_page}}
     <a href="javascript://" class="view-more-paging">
       Previous Page
     </a>
     {{/if}}
-
-    <a class="btn-add" data-object-plural="people" data-modal-class="modal-wide" href="javascript://" data-object-singular="Person" data-toggle="modal-ajax-form" data-modal-reset="reset">
-      Add Person
-    </a>
 
     {{#if has_next_page}}
     <a href="javascript://" class="pull-right view-more-paging" data-next="true">
