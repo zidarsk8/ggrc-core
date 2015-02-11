@@ -645,8 +645,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         ;
       options_list = can.makeArray(options_list);
       can.map(options_list, function(options) {
-        options.instance.owner || (options.instance.owner = options.instance.owners);
-        if ( !filter || filter.evaluate(options.instance, 
+        if ( !filter || filter.evaluate(options.instance.get_filter_vals(),
               options.instance.class.filter_keys)) {
           var $li = $("<li />").cms_controllers_tree_view_node(options);
           draw_items_dfds.push($li.control()._draw_node_deferred);
