@@ -10,6 +10,7 @@
   @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   .info {
     padding: 15px 20px 20px 20px;
+    @include box-shadow(none);
   }
   .info-widget-footer {
     display: none;
