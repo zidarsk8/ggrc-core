@@ -39,7 +39,7 @@ var admin_list_descriptors = {
       }
     , object_display : "People"
     , tooltip_view : "/static/mustache/people/object_tooltip.mustache"
-    , header_view : "/static/mustache/people/filters.mustache"
+    , header_view : "/static/mustache/people/filters.mustache"  // includes only the filter, not the column headers
     , list_view : "/static/mustache/people/object_list.mustache"
     , fetch_post_process : sort_by_name_email
   }
