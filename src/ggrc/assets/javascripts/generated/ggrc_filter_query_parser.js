@@ -205,32 +205,25 @@ GGRC.query_parser = {
                 text: characters.join("").trim(),
                 op: 'text_search',
                 keys: [],
-                evaluate: function(values, keys, recursive){
-
-                  recursive = typeof recursive !== 'undefined' ? recursive : true;
-                  keys = typeof keys !== 'undefined' ? keys : [];
+                evaluate: function(values, keys){
+                  typeof keys === 'undefined' && (keys = []);
 
                   function comparator(a, b){
                     return a.toUpperCase().indexOf(b.toUpperCase()) > -1
                   }
 
                   return keys.reduce(function(result, key){
-                    if (result) return result; // for performance
+                    if (result) return result;
                     if (values.hasOwnProperty(key)){
                       var value = values[key];
                       if (jQuery.type(value) === "string" ){
                         return comparator(value, this.text);
-                      } else if (key == "owners" && value ) {
-                        // check if any of the owners contains search text
-                        for (var j=0; j < value.length; j++){
-                          var person = value[j].reify();
-                          result |= comparator(person.email, this.text);
-                          result |= comparator(person.name, this.text);
-                        }
-                      } else if (recursive && key != "owners" &&
-                          jQuery.type(value) === "object" &&
-                          jQuery.type(value.reify) === "function"){
-                        result |= this.evaluate(value.reify(), keys, false);
+                      } else if (jQuery.type(value) === "array") {
+                        return value.reduce(function(result, val){
+                          return result || this.evaluate(val,keys);
+                        }.bind(this), false);
+                      } else if (jQuery.type(value) === "object"){
+                        return this.evaluate(value, keys, false);
                       }
                     }
                     return result;
@@ -279,26 +272,16 @@ GGRC.query_parser = {
                 name: op,
                 evaluate: function(val1, val2) {
 
-                  // handle if object is person or a list of persons
-                  if (jQuery.type(val1) === "object" &&
-                      jQuery.type(val1.reify) === "function" &&
-                      val1.type === "Person") {
-                    var person = val1.reify();
-                    return this.evaluate(person.name, val2) ||
-                           this.evaluate(person.email, val2);
-
-                  } else if (jQuery.type(val1) === "object" &&
-                      val1.length) {
-                    var result = false;
-                    for (var i=0; i < val1.length; i++){
-                      result |= this.evaluate(val1[i], val2);
-                    }
-                    return result;
-
+                  if (jQuery.type(val1) === "array") {
+                    return val1.reduce(function(result, value) {
+                      return result || this.evaluate(value, val2);
+                    }.bind(this), false);
+                  } else if (jQuery.type(val1) === "object") {
+                    return Object.keys(val1).reduce(function(result, key) {
+                      return result || this.evaluate(val1[key], val2);
+                    }.bind(this), false);
                   } else if (jQuery.type(val1) === "string") {
-                    // the comparison is done here
                     return val1.toUpperCase() == val2.toUpperCase();
-
                   } else {
                     return val1 == val2;
                   }
@@ -312,26 +295,16 @@ GGRC.query_parser = {
                 name: op,
                 evaluate: function(val1, val2) {
 
-                  // handle if object is person or a list of persons
-                  if (jQuery.type(val1) === "object" &&
-                      jQuery.type(val1.reify) === "function" &&
-                      val1.type === "Person") {
-                    var person = val1.reify();
-                    return this.evaluate(person.name, val2) &&
-                           this.evaluate(person.email, val2);
-
-                  } else if (jQuery.type(val1) === "object" &&
-                      val1.length) {
-                    var result = false;
-                    for (var i=0; i < val1.length; i++){
-                      result &= this.evaluate(val1[i], val2);
-                    }
-                    return result;
-
+                  if (jQuery.type(val1) === "array") {
+                    return val1.reduce(function(result, value) {
+                      return result || this.evaluate(value, val2);
+                    }.bind(this), false);
+                  } else if (jQuery.type(val1) === "object") {
+                    return Object.keys(val1).reduce(function(result, key) {
+                      return result || this.evaluate(val1[key], val2);
+                    }.bind(this), false);
                   } else if (jQuery.type(val1) === "string") {
-                    // the comparison is done here
                     return val1.toUpperCase() != val2.toUpperCase();
-
                   } else {
                     return val1 != val2;
                   }
@@ -363,26 +336,16 @@ GGRC.query_parser = {
                 name: op,
                 evaluate: function(val1, val2) {
 
-                  // handle if object is person or a list of persons
-                  if (jQuery.type(val1) === "object" &&
-                      jQuery.type(val1.reify) === "function" &&
-                      val1.type === "Person") {
-                    var person = val1.reify();
-                    return this.evaluate(person.name, val2) ||
-                           this.evaluate(person.email, val2);
-
-                  } else if (jQuery.type(val1) === "object" &&
-                      val1.length) {
-                    var result = false;
-                    for (var i=0; i < val1.length; i++){
-                      result |= this.evaluate(val1[i], val2);
-                    }
-                    return result;
-
+                  if (jQuery.type(val1) === "array") {
+                    return val1.reduce(function(result, value) {
+                      return result || this.evaluate(value, val2);
+                    }.bind(this), false);
+                  } else if (jQuery.type(val1) === "object") {
+                    return Object.keys(val1).reduce(function(result, key) {
+                      return result || this.evaluate(val1[key], val2);
+                    }.bind(this), false);
                   } else if (jQuery.type(val1) === "string") {
-                    // the comparison is done here
                     return val1.toUpperCase().indexOf(val2.toUpperCase()) > -1 ;
-
                   } else {
                     return false;
                   }
@@ -395,23 +358,14 @@ GGRC.query_parser = {
               return {
                 name: op,
                 evaluate: function(val1, val2) {
-
-                  // handle if object is person or a list of persons
-                  if (jQuery.type(val1) === "object" &&
-                      jQuery.type(val1.reify) === "function" &&
-                      val1.type === "Person") {
-                    var person = val1.reify();
-                    return this.evaluate(person.name, val2) &&
-                           this.evaluate(person.email, val2);
-
-                  } else if (jQuery.type(val1) === "object" &&
-                      val1.length) {
-                    var result = false;
-                    for (var i=0; i < val1.length; i++){
-                      result &= this.evaluate(val1[i], val2);
-                    }
-                    return result;
-
+                  if (jQuery.type(val1) === "array") {
+                    return val1.reduce(function(result, value) {
+                      return result || this.evaluate(value, val2);
+                    }.bind(this), false);
+                  } else if (jQuery.type(val1) === "object") {
+                    return Object.keys(val1).reduce(function(result, key) {
+                      return result || this.evaluate(val1[key], val2);
+                    }.bind(this), false);
                   } else if (jQuery.type(val1) === "string") {
                     // the comparison is done here
                     return val1.toUpperCase().indexOf(val2.toUpperCase()) == -1 ;
