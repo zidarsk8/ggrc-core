@@ -237,6 +237,9 @@ can.Model.Mixin("requestorable", {
 
 can.Model.Cacheable("CMS.Models.Request", {
   root_object : "request"
+  , filter_keys : ["assignee", "code", "company", "control",
+                   "name", "notes", "request",
+                   "requested on", "status", "test", "title"]
   , root_collection : "requests"
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
@@ -385,6 +388,24 @@ can.Model.Cacheable("CMS.Models.Request", {
         });
       }
     }
+  }
+  , get_filter_vals: function(){
+    var filter_vals = can.Model.Cacheable.prototype.get_filter_vals;
+    var mappings = jQuery.extend({
+      'title': 'description'
+    }, this.class.filter_mappings);
+
+    var vals = filter_vals.apply(this, [this.class.filter_keys, mappings]);
+
+    if (this.assignee){
+      vals.assignee = filter_vals.apply(this.assignee.reify(), []);
+    }
+    try {
+      var control = this.audit_object.reify().auditable.reify();
+      vals.control = filter_vals.apply(control, [['title']]).title;
+    } catch (e) {}
+
+    return vals;
   }
 
 });
