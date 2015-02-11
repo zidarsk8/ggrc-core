@@ -99,8 +99,8 @@ jQuery(function($) {
 //   an iframe to achieve AJAX file upload (using remoteipart)
 jQuery(function($) {
 
-  var submit_import = 'form.import div.import-interface input[type=submit]',
-      file_select_elem = 'form.import div.import-interface input[type=file]';
+  var submit_import = 'form.import input[type=submit]',
+      file_select_elem = 'form.import input[type=file]';
 
   function onSubmitClick(ev){
     if ($(this).hasClass('disabled') || $(file_select_elem).val() === "") {
@@ -442,7 +442,7 @@ function resize_areas(event, target_info_pin_height) {
 
   function object_area_height() {
       var height = winHeight - not_main_elements_height(),
-          nav_pos = $topNav.css("top") 
+          nav_pos = $topNav.css("top")
               ? Number($topNav.css("top").replace("px", ""))
               : 0;
 
@@ -467,8 +467,8 @@ function resize_areas(event, target_info_pin_height) {
               : $pin.height(),
 
           // the 5 gives user peace of mind they've reached bottom
-          UIHeight = [$topNav.height(), $header.height(), 
-                      $headerBar.height(), $footer.height(), 
+          UIHeight = [$topNav.height(), $header.height(),
+                      $headerBar.height(), $footer.height(),
                       margins, pin_height, 5]
               .reduce(function (m, h) { return m+h; }, 0);
 
