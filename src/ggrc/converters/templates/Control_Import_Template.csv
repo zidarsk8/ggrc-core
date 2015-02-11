@@ -38,7 +38,7 @@ Example:
 OCCURANCE
 UNDERSTANDABILITY","*Optional.
 This is an optional text field that lets you describe the documentation","*Optional.  
-Can be ""Continuous"", ""Ad-Hoc"", ""Semi-Annual"", ""Bi-Annual"", ""Annual"", ""Indeterminate"", ""Hourly"", ""Daily"", ""Weakly"", ""Monthly"", ""Quarterly"", or ""Transactional""","*Optional.
+Can be ""Continuous"", ""Ad-Hoc"", ""Semi-Annual"", ""Bi-Annual"", ""Annual"", ""Indeterminate"", ""Hourly"", ""Daily"", ""Weekly"", ""Monthly"", ""Quarterly"", or ""Transactional""","*Optional.
 Enter a valid URL for References.  Use <option><return> to delineate between multiple References.
 Example:
 

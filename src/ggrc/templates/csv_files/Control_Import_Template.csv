@@ -52,7 +52,7 @@ Example:
 
 OCCURANCE
 UNDERSTANDABILITY","*Optional.  
-Can be ""Continuous"", ""Ad-Hoc"", ""Semi-Annual"", ""Bi-Annual"", ""Annual"", ""Indeterminate"", ""Hourly"", ""Daily"", ""Weakly"", ""Monthly"", ""Quarterly"", or ""Transactional""","*Optional.
+Can be ""Continuous"", ""Ad-Hoc"", ""Semi-Annual"", ""Bi-Annual"", ""Annual"", ""Indeterminate"", ""Hourly"", ""Daily"", ""Weekly"", ""Monthly"", ""Quarterly"", or ""Transactional""","*Optional.
 You can map a person to be the Person of Contact for the Control by entering an email address that already exists in your gGRC instance. Only 1 email address may be entered.
 
 Example:
