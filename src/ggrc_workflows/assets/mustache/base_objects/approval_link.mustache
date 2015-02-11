@@ -6,26 +6,25 @@
   {{else}}
     {{#with_mapping 'current_object_review_tasks' instance}}
       {{#with_review_task}}
-        {{#if_helpers '\
-          #owned_by_current_user' instance '\
-          or #current_user_is_admin'}}
-          {{#if_equals review_task.status 'Declined'}}
-            {{#with_mapping 'cycle_task_group_object' review_task}}
-              {{#using tgo=review_task.cycle_task_group_object}}
-                {{#using obj=tgo.object}}
-                  <div>Review was declined on {{#date obj.os_last_updated true}}{{/date}}.</div>
-                {{/using}}
-              {{/using}}
-            {{/with_mapping}}
-          {{/if_equals}}
-        {{/if_helpers}}
         {{#with_is_reviewer review_task}}
+          {{#if_helpers '\
+            #owned_by_current_user' instance '\
+            or #current_user_is_admin'}}
+            {{^if is_reviewer}}
+              {{#if_equals instance.os_state 'Declined'}}
+                <div>Review was declined on {{#date instance.os_last_updated true}}{{/date}}.</div>
+              {{/if_equals}}
+            {{/if}}
+          {{/if_helpers}}
           {{#if is_reviewer}}
+            {{#if_equals instance.os_state 'Declined'}}
+              <div>Review was declined on {{#date instance.os_last_updated true}}{{/date}}.</div>
+            {{/if_equals}}
             <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
               <span class="setup-link">Approval applies only to this object and not to mapped objects.</span>
               <button class="btn btn-mini btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Approve</button>
               {{!Dont show the declined button when the task is already declined. Clicking it won't change the object, and therefore won't update either the model or the UI.}}
-              {{^if_equals review_task.status 'Declined'}}
+              {{^if_equals instance.os_state 'Declined'}}
                 <a class="btn btn-mini btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined"
                   data-placement="right" data-original-title="Decline Review" data-toggle="modal-ajax-form"
                   data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="CycleTaskEntry"
@@ -37,7 +36,7 @@
                     "cycle" : {{review_task.cycle.id}}, \
                     "cycle_task_group_object_task" : {{review_task.id}} \
                   }'>Decline</a>
-              {{/if}}
+              {{/if_equals}}
             </div>
           {{else}}
             {{#if_helpers '\

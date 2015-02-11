@@ -532,28 +532,31 @@ def handle_cycle_task_group_object_task_put(
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_object_parent_state(obj)
 
-    if obj.task_group_task.object_approval:
-      os_state = None
-      status = None
-      if obj.status == 'Verified':
-        os_state = "Approved"
-        status = "Final"
-      elif obj.status == 'Declined':
-        os_state = "Declined"
-      elif obj.status == 'InProgress':
-        os_state = "UnderReview"
+  # Doing this regardless of status.history.has_changes() is important in order
+  # to update objects that have been declined. It updates the os_last_updated
+  # date and last_updated_by via the call to set_internal_object_state.
+  if obj.task_group_task.object_approval:
+    os_state = None
+    status = None
+    if obj.status == 'Verified':
+      os_state = "Approved"
+      status = "Final"
+    elif obj.status == 'Declined':
+      os_state = "Declined"
+    elif obj.status == 'InProgress':
+      os_state = "UnderReview"
 
-      for tgobj in obj.task_group_task.task_group.objects:
-        old_status = tgobj.status
-        set_internal_object_state(tgobj, os_state, status)
-        status_change.send(
-            tgobj.__class__,
-            obj=tgobj,
-            new_status=tgobj.status,
-            old_status=old_status
-            )
-        db.session.add(tgobj)
-      db.session.flush()
+    for tgobj in obj.task_group_task.task_group.objects:
+      old_status = tgobj.status
+      set_internal_object_state(tgobj, os_state, status)
+      status_change.send(
+          tgobj.__class__,
+          obj=tgobj,
+          new_status=tgobj.status,
+          old_status=old_status
+          )
+      db.session.add(tgobj)
+    db.session.flush()
 
 
 @Resource.model_put.connect_via(models.CycleTaskGroup)
