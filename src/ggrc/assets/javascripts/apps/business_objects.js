@@ -272,7 +272,7 @@ $(function() {
 
   var base_widgets_by_type = {
     "Program": ["Regulation", "Contract", "Policy", "Standard", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Audit": ["Person", "Request", "program", "history"],
+    "Audit": ["Request", "history", "Person", "program"],
     "Regulation" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Policy" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Standard" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
@@ -394,15 +394,19 @@ $(function() {
               , allow_creating: false
             }
           },
+          Request: {
+            widget_id: "Request",
+            widget_name: "Open requests"
+          },
+          history: {
+            widget_id: "history",
+            widget_name: "Complete",
+            widget_icon: "history"
+          },
           program: {
             widget_id: "program",
             widget_name: "Program",
             widget_icon: "program"
-          },
-          history: {
-            widget_id: "history",
-            widget_name: "History",
-            widget_icon: "history",
           }
         }
       }
@@ -580,15 +584,6 @@ $(function() {
             , show_view : GGRC.mustache_path + "/requests/tree.mustache"
             , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
           },
-          program: {
-            mapping: "_program"
-            , parent_instance: GGRC.page_instance()
-            , draw_children : false
-            , model: CMS.Models.Program
-            , show_view : GGRC.mustache_path + "/programs/tree.mustache"
-            , allow_mapping: false
-            , allow_creating: false
-          },
           history: {
             mapping: "history"
             , parent_instance: GGRC.page_instance()
@@ -596,6 +591,15 @@ $(function() {
             , model: "Request"
             , show_view : GGRC.mustache_path + "/requests/tree.mustache"
             , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+            , allow_mapping: false
+            , allow_creating: false
+          },
+          program: {
+            mapping: "_program"
+            , parent_instance: GGRC.page_instance()
+            , draw_children : false
+            , model: CMS.Models.Program
+            , show_view : GGRC.mustache_path + "/programs/tree.mustache"
             , allow_mapping: false
             , allow_creating: false
           }
