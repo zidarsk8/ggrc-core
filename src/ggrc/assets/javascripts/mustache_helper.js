@@ -1795,9 +1795,11 @@ Mustache.registerHelper("owned_by_current_user", function(instance, options) {
   var current_user_id = GGRC.current_user.id;
   instance = Mustache.resolve(instance);
   owners = instance.attr('owners');
-  for(var i =0; i < owners.length; i++) {
-    if(current_user_id == owners[i].id) {
-      return options.fn(options.contexts);
+  if(owners) {
+    for(var i =0; i < owners.length; i++) {
+      if(current_user_id == owners[i].id) {
+        return options.fn(options.contexts);
+      }
     }
   }
   return options.inverse(options.contexts);
