@@ -356,7 +356,7 @@ small {
   }
 }
 
-@each $status_label in draft, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+@each $status_label in draft, inactive, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }
@@ -1272,7 +1272,7 @@ p {
   }
 }
 
-@each $state_label in draft, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+@each $state_label in draft, inactive, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
   .state-#{$state_label} {
     @extend %state-#{$state_label};
   }
