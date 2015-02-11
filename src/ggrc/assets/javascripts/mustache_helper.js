@@ -2219,8 +2219,7 @@ can.each({
                   || options.map
                   || options.create
                   || options.program_owner
-                  || options.auditor
-                  || options.audit_lead));
+                  || options.auditor));
     }
   },
   "if_can_reassign_request": {
@@ -2235,14 +2234,12 @@ can.each({
           || (!options.accepted
               && (options.update
                 || options.map
-                || options.create
-                || options.program_owner
-                || options.audit_lead));
+                || options.create));
     }
   },
   "if_can_create_response": {
-    assignee_states: ["Requested", "Amended Request", "Responded", "Updated Response"],
-    program_editor_states: ["Requested", "Amended Request", "Responded", "Updated Response"],
+    assignee_states: ["Requested", "Amended Request"],
+    program_editor_states: ["Requested", "Amended Request"],
     predicate: function(options) {
       return (!options.draft && options.admin)
           || options.can_assignee_edit
@@ -2251,9 +2248,7 @@ can.each({
               && !options.draft
               && (options.update
                 || options.map
-                || options.create
-                || options.program_owner
-                || options.audit_lead));
+                || options.create));
     }
   }
 }, function(fn_opts, name) {
@@ -2321,7 +2316,7 @@ can.each({
             // Program owner currently has nearly the same state allowances as Admin --BM 2014-12-16
             can_auditor_edit = auditor && ~can.inArray(instance.attr("status"), auditor_states),
             can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.attr("status"), assignee_states),
-            can_program_editor_edit = program_editor && ~can.inArray(instance.attr("status"), program_editor_states)
+            can_program_editor_edit = (program_editor || program_owner) && ~can.inArray(instance.attr("status"), program_editor_states)
             ;
 
         if(fn_opts.predicate({
