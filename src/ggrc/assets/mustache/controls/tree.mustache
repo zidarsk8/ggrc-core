@@ -52,6 +52,13 @@
               {{/instance}}
               <div class="span4">
 
+                <div class="show-details">
+                  {{#if instance.viewLink}}
+                    {{#is_allowed "view_object_page" instance}}
+                      <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                    {{/is_allowed}}
+                  {{/if}}
+                </div>
                 <ul class="tree-action-list">
                   {{#infer_roles instance}}
                     <li>
@@ -82,13 +89,6 @@
                     {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
                   </li>
                   {{/if}}
-                  <li class="show-datails">
-                    {{#if instance.viewLink}}
-                      {{#is_allowed "view_object_page" instance}}
-                        <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
-                      {{/is_allowed}}
-                    {{/if}}
-                  </li>
                 </ul>
               </div>
             </div>

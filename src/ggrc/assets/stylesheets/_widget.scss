@@ -15,9 +15,8 @@
     @include reset-list();
     @include clearfix();
     float: right;
-    padding-right: 4px;
     li {
-      float: left;
+      display: inline-block;
       margin-left: 10px;
       line-height: 24px;
       .item-data {
@@ -52,17 +51,6 @@
       &.left-space {
         margin-right: 30px;
       }
-      a {
-        .grcicon-to-right {
-          @include opacity(0.25);
-          @include transition(opacity 0.2s ease);
-        }
-        &:hover {
-          .grcicon-to-right {
-            @include opacity(1);
-          }
-        }
-      }
     }
     [class^="grcicon-"] {
       margin-top: 6px;
@@ -71,6 +59,23 @@
       li {
         float: none;
         display: inline-block;
+      }
+    }
+  }
+  .show-details {
+    float: right;
+    padding-right: 4px;
+    margin-left: 10px;
+    a {
+      .grcicon-to-right {
+        margin-top: 6px;
+        @include opacity(0.25);
+        @include transition(opacity 0.2s ease);
+      }
+      &:hover {
+        .grcicon-to-right {
+          @include opacity(1);
+        }
       }
     }
   }
@@ -694,6 +699,14 @@
     > div {
       overflow: hidden;
     }
+  }
+  .multi-type-label {
+    padding-bottom: 2px;
+    font-size: 11px;
+    color: $darkText;
+    line-height: 17px;
+    font-weight: bold;
+    text-transform: uppercase;
   }
 }
 
