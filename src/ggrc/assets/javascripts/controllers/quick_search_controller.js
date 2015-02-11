@@ -276,15 +276,17 @@ can.Control("CMS.Controllers.LHN", {
       // not nested
       $(".lhn-trigger").removeClass("active");
 
-      var width = this.element.find(".lhs-holder").width();
+      var _width = this.options.display_prefs.getLHNavSize(null, null).lhs,
+          width = _width || this.element.find(".lhs-holder").width(),
+          safety = 20;
 
       this.element.find(".lhs-holder")
           .removeClass("active")
-          .css("left", (-width)+"px");
+          .css("left", (-width-safety)+"px");
 
       this.element.find(".lhn-type")
           .removeClass("active")
-          .css("left", (-width-6)+"px");
+          .css("left", (-width-safety)+"px");
 
       this.element.find(".bar-v")
           .removeClass("active");
