@@ -351,6 +351,9 @@ small {
   .dashboard-tree & {
     margin: 9px 10px 0 4px;
   }
+  &.status- {
+    background: $status-draft;
+  }
 }
 
 @each $status_label in draft, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
