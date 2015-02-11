@@ -65,7 +65,7 @@
             </div>
             <div class="span1">
               <div class="counter-wrap">
-                <i class="{{#if_equals instance.request_type "documentation"}}grcicon-directive-black{{else}}grcicon-interview{{/if_equals}}"></i>
+                <i rel="tooltip" data-placement="right" {{#if_equals instance.request_type "documentation"}}data-original-title="# of attached documents" class="grcicon-directive-black"{{else}}data-original-title="# of attached meetings" class="grcicon-interview"{{/if_equals}}></i>
                 <span class="counter">
                   {{#if_equals instance.response_type "documentation"}}
                   {{#child_options.1}}
