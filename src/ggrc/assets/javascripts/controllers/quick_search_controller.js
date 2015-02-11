@@ -732,12 +732,14 @@ can.Control("CMS.Controllers.LHN_Search", {
 
       // Determine the expandable height
       this._holder_height = holder.outerHeight();
-      $content.filter(this.options.list_content_selector).css(
-          'maxHeight',
-          Math.max(160, 
-                   (this._holder_height - holder.position().top 
-                    + extra_height - top - 40))
-      );
+      if (!$ul.hasClass("mid-level")) {
+        $content.filter(this.options.list_content_selector).css(
+            'maxHeight',
+            Math.max(160, 
+                     (this._holder_height - holder.position().top 
+                      + extra_height - top - 40))
+        );
+      }
 
       // Notify the display prefs that the category the user just opened is to be reopened on next page load.
       if (!dont_update_prefs) {
@@ -759,8 +761,7 @@ can.Control("CMS.Controllers.LHN_Search", {
   }
 
   , " resize": function() {
-      var $content = this.element.find([this.options.list_content_selector,
-                                       this.options.list_mid_level_selector].join(",")).filter(':visible');
+      var $content = this.element.find([this.options.list_content_selector].join(",")).filter(':visible');
 
 
       if ($content.length) {
@@ -769,6 +770,7 @@ can.Control("CMS.Controllers.LHN_Search", {
           ;
         this._holder_height = holder.outerHeight();
 
+        
         $content.css(
             'maxHeight',
             Math.max(160, 
