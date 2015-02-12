@@ -265,7 +265,7 @@
       mappings[type].object_tasks_with_history = Search(function(binding) {
         return CMS.Models.CycleTaskGroupObjectTask.findAll({
           'cycle_task_group_object.object_id': binding.instance.id,
-          'cycle_task_group_object.object_type': binding.instance.type,
+          'cycle_task_group_object.object_type': binding.instance.type
         });
       });
       mappings[type].workflows = Cross("task_groups", "workflow");
@@ -277,8 +277,12 @@
       mappings[type].current_object_review_tasks = CustomFilter(
         "object_tasks", function(binding) {
         return new RefreshQueue().enqueue(
-            binding.instance.attr("task_group_task").reify()
-          ).trigger().then(
+          function() {
+            var tgt_binding = binding.instance.attr("task_group_task");
+            if(tgt_binding) {
+              return tgt_binding.reify();
+            }
+          }()).trigger().then(
             function(data){
               var tgt = data[0];
               return tgt.attr("object_approval");
@@ -385,7 +389,7 @@
                 footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
                 draw_children: true,
                 allow_creating: true
-              },
+              }
             ]
           }
         }
@@ -404,11 +408,9 @@
         new_default_widgets = [
           "info", "person", "task_group", "current", "history"
         ],
-        objects_widget_descriptor,
         history_widget_descriptor,
         current_widget_descriptor,
-        object = GGRC.page_instance(),
-        object_descriptors = {};
+        object = GGRC.page_instance();
 
     can.each(GGRC.WidgetList.get_current_page_widgets(), function(descriptor, name) {
       if (~new_default_widgets.indexOf(name))
@@ -500,7 +502,7 @@
         draw_children: true,
         parent_instance: object,
         model: "Cycle",
-        mapping: "previous_cycles",
+        mapping: "previous_cycles"
       }
     };
     current_widget_descriptor = {
@@ -515,7 +517,7 @@
         parent_instance: object,
         model: "Cycle",
         mapping: "current_cycle",
-        header_view: GGRC.mustache_path + "/cycles/tree_header.mustache",
+        header_view: GGRC.mustache_path + "/cycles/tree_header.mustache"
       }
     };
     new_widget_descriptors.history = history_widget_descriptor;
@@ -567,7 +569,7 @@
               show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
               footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
               allow_creating: true
-            },
+            }
           ]
         }
       }
