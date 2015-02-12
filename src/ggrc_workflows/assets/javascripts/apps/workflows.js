@@ -56,25 +56,12 @@
 
     // Add mappings for basic workflow objects
     var mappings = {
-        /*Task: {
-          _canonical: {
-            subtasks: "Task",
-            task_groups: "TaskGroup"
-          },
-          task_groups: Proxy(
-            "TaskGroup", "task_group", "TaskGroupTask", "task", "task_group_tasks"),
-        },*/
-
         TaskGroup: {
           _canonical: {
-            //tasks: "Task",
-            //objects: _workflow_object_types
             objects: _workflow_object_types.concat(["Cacheable"])
           },
           task_group_tasks: Direct(
             "TaskGroupTask", "task_group", "task_group_tasks"),
-          //tasks: Proxy(
-          //  "Task", "task", "TaskGroupTask", "task_group", "task_group_tasks"),
           objects: Proxy(
             null, "object", "TaskGroupObject", "task_group", "task_group_objects"),
           workflow: Direct(
@@ -87,17 +74,11 @@
 
         Workflow: {
           _canonical: {
-            //objects: _workflow_object_types.concat(["Cacheable"]),
-            //tasks: "Task",
             task_groups: "TaskGroup",
             people: "Person",
             folders: "GDriveFolder",
             context: "Context"
           },
-          //objects: Proxy(
-          //  null, "object", "WorkflowObject", "workflow", "workflow_objects"),
-          //tasks: Proxy(
-          //  "Task", "task", "WorkflowTask", "workflow", "workflow_tasks"),
 
           task_groups: Direct(
             "TaskGroup", "workflow", "task_groups"),
@@ -153,8 +134,6 @@
         CycleTaskGroup: {
           cycle: Direct(
             "Cycle", "cycle_task_groups", "cycle"),
-          //task_group: Direct(
-          //  "TaskGroup", "cycle", "tasks"),
           cycle_task_group_objects: Direct(
             "CycleTaskGroupObject",
             "cycle_task_group",
@@ -182,8 +161,6 @@
             "TaskGroupObject", "task_group_objects", "task_group_object"
           ),
           _object: Direct(null, null, 'object'),
-          //task_group_object: Direct(
-          //  "TaskGroupObject", "cycle", "tasks")
           cycle_task_group_object_tasks: Direct(
             "CycleTaskGroupObjectTask",
             "cycle_task_group_object",
@@ -201,8 +178,6 @@
             "CycleTaskGroup",
             "cycle_task_group_object_tasks",
             "cycle_task_group"),
-          //task_group_object: Direct(
-          //  "TaskGroupObject", "cycle", "tasks")
           cycle_task_entries: Direct(
             "CycleTaskEntry",
             "cycle_task_group_object_task",
@@ -228,13 +203,14 @@
 
         People: {
           _canonical: {
-            workflows: "Workflow",
+            workflows: "Workflow"
           },
           workflows: Proxy(
-            "Workflow", "workflow", "WorkflowPerson", "person", "workflow_people"),
+            "Workflow", "workflow", "WorkflowPerson", "person", "workflow_people"
+          )
 
         },
-        OrgGroup: {
+/*        OrgGroup: {
           // Make sure OrgGroups don't have workflows
           //   in orphaned objects:
           orphaned_objects: Multi([
@@ -257,7 +233,7 @@
             "sections",
             "clauses",
           ])
-        },
+        },*/
         Person: {
           assigned_tasks: Search(function(binding) {
             return CMS.Models.CycleTaskGroupObjectTask.findAll({
