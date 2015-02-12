@@ -15,47 +15,50 @@
   </div>
   {{/is_info_pin}}
 
-  {{#is_allowed 'update' instance context='for'}}
-    <div class="details-wrap">
-      <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-      <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-        {{{render_hooks instance.class.shortName 'info_widget_actions'}}}
-        <li>
-          <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
-            <i class="grcicon-edit"></i>
-            Edit Workflow Info
-          </a>
-        </li>
-        <li>
-          <workflow-clone workflow="instance">
-            <a href="javascript://">
-              <i class="grcicon-clone"></i>
-              Clone Workflow
+  {{^is_info_pin}}
+    {{#is_allowed 'update' instance context='for'}}
+      <div class="details-wrap">
+        <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+          {{{render_hooks instance.class.shortName 'info_widget_actions'}}}
+          <li>
+            <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
+              <i class="grcicon-edit"></i>
+              Edit Workflow Info
             </a>
-          </workflow-clone>
-        </li>
-        {{#if instance.recurrences}}
-        <li>
-          <workflow-start-cycle workflow="instance">
-            <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
-              <i class="grcicon-manual"></i>
-              Manually Start a Cycle
-            </a>
-          </workflow-start-cycle>
-        </li>
-        <li>
-          <workflow-deactivate workflow="instance">
-            <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
-              <i class="grcicon-archive"></i>
-              Archive workflow
-            </a>
-          </workflow-deactivate>
-        </li>
-        {{/if}}
-      </ul>
-    </div>
-  {{/is_allowed}}
+          </li>
+          <li>
+            <workflow-clone workflow="instance">
+              <a href="javascript://">
+                <i class="grcicon-clone"></i>
+                Clone Workflow
+              </a>
+            </workflow-clone>
+          </li>
+          {{#if instance.recurrences}}
+          <li>
+            <workflow-start-cycle workflow="instance">
+              <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+                <i class="grcicon-manual"></i>
+                Manually Start a Cycle
+              </a>
+            </workflow-start-cycle>
+          </li>
+          <li>
+            <workflow-deactivate workflow="instance">
+              <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+                <i class="grcicon-archive"></i>
+                Archive workflow
+              </a>
+            </workflow-deactivate>
+          </li>
+          {{/if}}
+        </ul>
+      </div>
+    {{/is_allowed}}
 
+    {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+  {{/is_info_pin}}
 
   <div class="tier-content">
     <div class="row-fluid wrap-row">
