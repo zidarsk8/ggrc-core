@@ -140,8 +140,10 @@ can.Control("CMS.Controllers.TreeLoader", {
   }
 
   , show_info_pin: function(){
-     var children = this.element.children();
-     children && children.first().find('.select').click();
+    if (this.element){
+      var children = this.element.children();
+      children && children.first().find('.select').click();
+    }
   }
 
   , display: function() {
