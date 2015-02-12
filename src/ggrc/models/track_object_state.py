@@ -49,7 +49,8 @@ class ObjectStateTables:
   table_names = [
     'programs', 'objectives', 'controls', 'sections',
     'systems', 'data_assets', 'facilities',
-    'markets', 'products', 'projects', 'directives'
+    'markets', 'products', 'projects', 'directives',
+    'org_groups', 'vendors'
   ]
 
 def state_before_insert_listener(mapper, connection, target):

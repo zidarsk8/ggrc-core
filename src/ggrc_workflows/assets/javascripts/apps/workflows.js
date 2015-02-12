@@ -9,7 +9,7 @@
 (function($, CMS, GGRC) {
   var WorkflowExtension = {},
       _workflow_object_types = [
-        "Program",
+        "Program", "Vendor", "OrgGroup",
         "Regulation", "Standard", "Policy", "Contract",
         "Objective", "Control", "Section", "Clause",
         "System", "Process",
@@ -331,6 +331,7 @@
         );
 
     });
+
     new GGRC.Mappings("ggrc_workflows", mappings);
   };
 
