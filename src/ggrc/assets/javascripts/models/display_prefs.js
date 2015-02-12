@@ -79,7 +79,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
         if(d.length > 0) {
             prefs = d[0];
         } else {
-            prefs = self.options.display_prefs = new CMS.Models.DisplayPrefs();
+            prefs = new CMS.Models.DisplayPrefs();
             prefs.save();
         }
     });
@@ -132,7 +132,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
   , setTopNavHidden: function (page_id, is_hidden) {
     this.makeObject(page_id === null ? page_id : path, TOP_NAV).attr("is_hidden", !!is_hidden);
-    
+
     this.autoupdate && this.save();
     return this;
   }

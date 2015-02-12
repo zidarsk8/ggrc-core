@@ -365,7 +365,7 @@ can.Control("CMS.Controllers.LHN", {
           // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
           //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
           //  open section is handled in the LHN Search controller.
-          
+
           if(this.options.display_prefs.getLHNState().open_category) {
             this.element.one("list_displayed", this.initial_scroll.bind(this));
           } else {
@@ -394,7 +394,7 @@ can.Control("CMS.Controllers.LHN", {
     }
   , initial_scroll: function () {
     this.element.find(".lhs-holder").scrollTop(
-        this.options.display_prefs.getLHNState().panel_scroll 
+        this.options.display_prefs.getLHNState().panel_scroll
         || 0
     );
   }
@@ -466,7 +466,7 @@ can.Control("CMS.Controllers.LHN", {
 
     ev.preventDefault();
     this.dragged = true;
-      
+
     if (!this.element.find(".bar-v").hasClass("disabled")) {
       this.resize_lhn(ev.pageX);
     }
@@ -484,18 +484,25 @@ can.Control("CMS.Controllers.LHN", {
     var x = event.pageX,
         y = event.pageY;
 
-    var on_lhn = [".lhn-trigger", ".lhn-type", ".lhs-holder"]
+    var on_lhn = [".lhn-trigger:visible", ".lhn-type:visible", ".lhs-holder:visible"]
             .reduce(function (yes, selector) {
-                var bounds = $(selector)[0].getBoundingClientRect();
-                
-                return yes 
+                var $selector = $(selector),
+                    bounds;
+
+                if (!$selector.length) {
+                  return;
+                }
+
+                bounds = $selector[0].getBoundingClientRect();
+
+                return yes
                     || x >= bounds.left
                     && x <= bounds.right
                     && y >= bounds.top
                     && y <= bounds.bottom;
             }, false);
-   
-    if (!on_lhn && !this.options.display_prefs.getLHNState().is_pinned) {
+
+    if (!on_lhn && this.options.display_prefs && !this.options.display_prefs.getLHNState().is_pinned) {
       this.close_lhn();
     }
   }
@@ -788,8 +795,8 @@ can.Control("CMS.Controllers.LHN_Search", {
       if (!$ul.hasClass("mid-level")) {
         $content.filter(this.options.list_content_selector).css(
             'maxHeight',
-            Math.max(160, 
-                     (this._holder_height - holder.position().top 
+            Math.max(160,
+                     (this._holder_height - holder.position().top
                       + extra_height - top - 40))
         );
       }
@@ -823,10 +830,10 @@ can.Control("CMS.Controllers.LHN_Search", {
           ;
         this._holder_height = holder.outerHeight();
 
-        
+
         $content.css(
             'maxHeight',
-            Math.max(160, 
+            Math.max(160,
                      (this._holder_height - last_height))
         );
       }
