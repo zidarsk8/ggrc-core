@@ -409,7 +409,7 @@ $(function() {
             widget_icon: "program"
           }
         }
-        , Control : { //sasmita1
+        , Control : { //CORE-1200
           Request: {
             widget_id: "Request",
             widget_name: "Audit requests"
@@ -648,7 +648,7 @@ $(function() {
             }
           }
 
-        , extended_requests: { //Sasmita 2
+        , extended_requests: { //CORE-1200
             Request: {
               mapping: "related_requests"
               , allow_mapping : false
@@ -669,7 +669,7 @@ $(function() {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Control: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits", "extended_requests"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "extended_requests"] //CORE-1200
           }
         , DataAsset: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]

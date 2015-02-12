@@ -297,7 +297,7 @@
                                                 , "related_population_sample_responses"
                                                 ])
       , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
-      //sasmita---------
+      //CORE-1200
       //, related_requests:    TypeFilter("related_objects", "Request")
       //, related_requests:    Direct("Request", "control", "request")
       , related_requests:    Cross("related_responses", "_request")
