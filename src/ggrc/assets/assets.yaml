@@ -63,7 +63,6 @@ dashboard-js-files:
   - controllers/help_controller.js
   - controllers/quick_search_controller.js
   - controllers/recently_viewed_controller.js
-  - controllers/sortable_widgets_controller.js
   - controllers/tree_view_controller.js
   - controllers/list_view_controller.js
   - controllers/tree_filter_controller.js

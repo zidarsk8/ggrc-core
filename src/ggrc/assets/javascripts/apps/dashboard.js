@@ -6,7 +6,6 @@
 */
 
 //= require controllers/resize_widgets_controller
-//= require controllers/sortable_widgets_controller
 //= require controllers/dashboard_widgets
 //= require models/simple_models
 //= require controls/control
