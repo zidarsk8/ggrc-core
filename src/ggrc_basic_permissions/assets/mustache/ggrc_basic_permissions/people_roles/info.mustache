@@ -106,15 +106,6 @@
     {{/is_info_pin}}
 
     <div class="row-fluid wrap-row">
-      {{#if_match instance.company '\\\\S'}}
-        {{#instance.company}}
-          <div class="span6">
-            <h6>Company</h6>
-            <h3>{{instance.company}}</h3>
-          </div>
-        {{/instance.company}}
-      {{/if_match}}
-
       <div class="span6">
         <h6>Authorizations</h6>
         <p>
@@ -136,6 +127,15 @@
           {{/with_program_roles_as}}
         </p>
       </div>
+      {{#if_match instance.company '\\\\S'}}
+        {{#instance.company}}
+          <div class="span6">
+            <h6>Company</h6>
+            {{instance.company}}
+          </div>
+        {{/instance.company}}
+      {{/if_match}}
+
     </div>
   </div>
 
