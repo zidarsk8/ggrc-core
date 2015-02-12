@@ -493,7 +493,7 @@ can.Control("CMS.Controllers.LHN", {
                   return;
                 }
 
-                bounds = $selector.first().getBoundingClientRect();
+                bounds = $selector[0].getBoundingClientRect();
 
                 return yes
                     || x >= bounds.left
