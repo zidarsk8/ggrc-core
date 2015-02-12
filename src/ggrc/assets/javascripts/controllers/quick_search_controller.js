@@ -320,7 +320,6 @@ can.Control("CMS.Controllers.LHN", {
       this.options.display_prefs.setLHNState({is_open: true});
   }
 
-
   , set_active_tab: function (newval) {
     newval || (newval = this.obs.attr("my_work"));
 
@@ -330,63 +329,75 @@ can.Control("CMS.Controllers.LHN", {
   }
 
   , init_lhn: function() {
-      var self = this;
-
       CMS.Models.DisplayPrefs.getSingleton().done(function(prefs) {
         var checked
           , $lhs = $("#lhs")
           , lhn_search_dfd
           ;
 
-        self.options.display_prefs = prefs;
+        this.options.display_prefs = prefs;
 
         checked = true;
-        if (typeof prefs.getLHNState().my_work !== "undefined")
+        if (typeof prefs.getLHNState().my_work !== "undefined") {
           checked = !!prefs.getLHNState().my_work;
-        self.obs.attr("my_work", checked);
+        }
+        this.obs.attr("my_work", checked);
 
         lhn_search_dfd = $lhs
           .cms_controllers_lhn_search({
-            observer: self.obs,
+            observer: this.obs,
             display_prefs: prefs
           })
           .control('lhn_search')
           .display();
+
         $lhs.cms_controllers_lhn_tooltips();
 
         // Delay LHN initializations until after LHN is rendered
         lhn_search_dfd.then(function() {
-          var checked = self.obs.attr('my_work'),
+          var checked = this.obs.attr('my_work'),
               value = checked ? "my_work" : "all",
-              target = self.element.find('#lhs input.my-work[value='+value+']');
+              target = this.element.find('#lhs input.my-work[value='+value+']');
+
           target.prop('checked', true);
           target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
 
           // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
           //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
           //  open section is handled in the LHN Search controller.
-          function initial_scroll() {
-            self.element.find(".lhs-holder").scrollTop(self.options.display_prefs.getLHNState().panel_scroll || 0);
-          }
-
-          if(self.options.display_prefs.getLHNState().open_category) {
-            self.element.one("list_displayed", initial_scroll );
+          
+          if(this.options.display_prefs.getLHNState().open_category) {
+            this.element.one("list_displayed", this.initial_scroll.bind(this));
           } else {
-            initial_scroll();
+            this.initial_scroll();
           }
           // Set active state to search field if the input is not empty:
-          self.element.find('.widgetsearch').filter(function() {
+          this.element.find('.widgetsearch').filter(function() {
             return this.value;
           }).addClass('active');
-        });
+
+          if (this.options.display_prefs.getLHNState().is_pinned) {
+            this.pin();
+          }
+        }.bind(this));
 
         // give everything a bit of time to render
         setTimeout(function () {
-            self.resize_lhn();
-            self.close_lhn();
-        }, 1000);
-      });
+          this.resize_lhn();
+          if (this.options.display_prefs.getLHNState().is_pinned) {
+            this.open_lhn();
+          }else{
+            this.close_lhn();
+          }
+        }.bind(this), 1000);
+      }.bind(this));
     }
+  , initial_scroll: function () {
+    this.element.find(".lhs-holder").scrollTop(
+        this.options.display_prefs.getLHNState().panel_scroll 
+        || 0
+    );
+  }
   , lhn_width : function(){
       return $(".lhs-holder").width()+8;
   }
@@ -455,7 +466,10 @@ can.Control("CMS.Controllers.LHN", {
 
     ev.preventDefault();
     this.dragged = true;
-    this.resize_lhn(ev.pageX);
+      
+    if (!this.element.find(".bar-v").hasClass("disabled")) {
+      this.resize_lhn(ev.pageX);
+    }
   }
   , "{window} mouseup" : function(el, ev){
     var self = this;
@@ -466,10 +480,49 @@ can.Control("CMS.Controllers.LHN", {
   , "{window} resize" : function(el, ev) {
     this.resize_lhn(null, true); // takes care of height and min/max width
   }
+  , "{window} click": function (el, event) {
+    var x = event.pageX,
+        y = event.pageY;
+
+    var on_lhn = [".lhn-trigger", ".lhn-type", ".lhs-holder"]
+            .reduce(function (yes, selector) {
+                var bounds = $(selector)[0].getBoundingClientRect();
+                
+                return yes 
+                    || x >= bounds.left
+                    && x <= bounds.right
+                    && y >= bounds.top
+                    && y <= bounds.bottom;
+            }, false);
+   
+    if (!on_lhn && !this.options.display_prefs.getLHNState().is_pinned) {
+      this.close_lhn();
+    }
+  }
 
   , destroy : function() {
     this.element.find(".lhs-holder").off("scroll", self.lhs_holder_onscroll);
     this._super && this._super.apply(this, arguments);
+  }
+
+  , ".lhn-pin click": function (element, event) {
+    if (this.options.display_prefs.getLHNState().is_pinned) {
+      this.unpin();
+    }else{
+      this.pin();
+    }
+  }
+
+  , unpin: function () {
+    this.element.find(".lhn-pin").removeClass("active");
+    this.element.find(".bar-v").removeClass("disabled");
+    this.options.display_prefs.setLHNState("is_pinned", false);
+  }
+
+  , pin: function () {
+    this.element.find(".lhn-pin").addClass("active");
+    this.element.find(".bar-v").addClass("disabled");
+    this.options.display_prefs.setLHNState("is_pinned", true);
   }
 });
 

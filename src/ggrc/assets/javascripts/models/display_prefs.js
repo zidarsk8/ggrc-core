@@ -320,7 +320,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   , setLHNState : function(new_prefs, val) {
     var prefs = this.makeObject(LHN_STATE);
     can.each(
-      ["open_category", "panel_scroll", "category_scroll", "search_text", "my_work", "filter_params", "is_open"]
+      ["open_category", "panel_scroll", "category_scroll", "search_text", "my_work", "filter_params", "is_open", "is_pinned"]
       , function(token) {
         if(typeof new_prefs[token] !== "undefined") {
           prefs.attr(token, new_prefs[token]);
