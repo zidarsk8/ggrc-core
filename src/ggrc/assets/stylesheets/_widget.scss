@@ -1143,14 +1143,14 @@
   }
   .filter-input {
     position: relative;
-    .is-expresion {
+    .is-expression {
       position: absolute;
       right: 6px;
-      top: 6px;
+      top: 12px;
       @include opacity(0.25);
     }
-    &.expresion {
-      .is-expresion {
+    &.expression {
+      .is-expression {
         i {
           background-position: -246px -176px;
         }
@@ -1641,4 +1641,9 @@ ul.attr-list {
       }
     }
   }
+}
+
+.filter-holder {
+  margin-bottom: 25px;
+  overflow: hidden;
 }

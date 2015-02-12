@@ -237,6 +237,9 @@ can.Model.Mixin("requestorable", {
 
 can.Model.Cacheable("CMS.Models.Request", {
   root_object : "request"
+  , filter_keys : ["assignee", "code", "company", "control",
+                   "due date", "due", "name", "notes", "request",
+                   "requested on", "status", "test", "title"]
   , root_collection : "requests"
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
@@ -259,7 +262,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
-    , header_view : GGRC.mustache_path + "/requests/filters.mustache"
+    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
     , draw_children : true
     , child_options : [{
@@ -385,6 +388,36 @@ can.Model.Cacheable("CMS.Models.Request", {
         });
       }
     }
+  }
+  , get_filter_vals: function(){
+    var filter_vals = can.Model.Cacheable.prototype.get_filter_vals;
+    var mappings = jQuery.extend({}, this.class.filter_mappings, {
+      'title': 'description',
+      'due date': 'due_on',
+      'due': 'due_on'
+    });
+
+    var vals = filter_vals.apply(this, [this.class.filter_keys, mappings]);
+
+    try {
+      if (this.assignee){
+        vals.assignee = filter_vals.apply(this.assignee.reify(), []);
+      }
+      if ($.type(vals['due date'])){
+        // we need momentjs !
+        var y = vals['due date'].getFullYear().toString(),
+            m = (vals['due date'].getMonth() + 1).toString(),
+            d = vals['due date'].getDate().toString(),
+            date = y + '-' + (m[1]?m:"0"+m[0]) + '-' + (d[1]?d:"0"+d[0]);
+        
+        vals['due date'] = date;
+        vals['due'] = date;
+      }
+      var control = this.audit_object.reify().auditable.reify();
+      vals.control = filter_vals.apply(control, [['title']]).title;
+    } catch (e) {}
+
+    return vals;
   }
 
 });
