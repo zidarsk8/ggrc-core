@@ -13,22 +13,6 @@
   }
 }
 
-// placeholder for widgets drag and drop
-.drop-placeholder {
-  background:$dropPlaceholder;
-  border:1px dotted $gray;
-  height:24px;
-  line-height:24px;
-  font-size: $f-regular;
-  font-weight: bold;
-  @include border-radius($default-border-radius);
-  text-align: center;
-  &:before {
-    content:"Drop Here";
-  }
-  color: $darkGray;
-}
-
 .lhs-holder {
   position: fixed;
   top: 176px;

@@ -33,9 +33,7 @@ can.Control("CMS.Controllers.Dashboard", {
         // loading state of multiple widgets before reducing to one.
         this.hide_widget_area();
         this.init_default_widgets();
-        if (!this.widget_area_controller) {
-          this.init_widget_area();
-        }
+        this.init_widget_area();
         this.init_info_pin();
       }.bind(this));
     }
@@ -70,11 +68,6 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , init_widget_area: function() {
-      this.widget_area_controller = new CMS.Controllers.SortableWidgets(
-          this.element.find('.widget-area'), {
-              dashboard_controller: this,
-              sort: GGRC.WidgetList.get_default_widget_sort()
-          });
       if (!this.inner_nav_controller) {
         //  If there is no inner-nav, then ensure widgets are shown
         //  FIXME: This is a workaround because widgets and widget-areas are
@@ -184,19 +177,6 @@ can.Control("CMS.Controllers.Dashboard", {
 
   , " updateCount": function(el, ev, count) {
       this.inner_nav_controller.update_widget_count($(ev.target), count);
-    }
-
-  , " inner_nav_sort_updated": function(el, ev, widget_ids) {
-        this.apply_widget_sort(widget_ids);
-      }
-
-  , apply_widget_sort: function(widget_ids) {
-      var that = this
-        ;
-
-      can.each(this.get_active_widget_containers().toArray(), function(elem) {
-        $(elem).trigger("apply_widget_sort", [widget_ids])
-      });
     }
 
   , update_inner_nav: function(el, ev, data) {
@@ -378,8 +358,6 @@ can.Control("CMS.Controllers.InnerNav", {
 
         this.options.instance = GGRC.page_instance();
 
-        this.sortable();
-
         if (!(this.options.contexts instanceof can.Observe)) {
          this.options.contexts = new can.Observe(this.options.contexts);
         }
@@ -454,42 +432,6 @@ can.Control("CMS.Controllers.InnerNav", {
       }
     }
 
-  , sortable: function() {
-      return this.element.sortable({
-          placeholder: 'drop-placeholder'
-        , items : "li:not(.hidden-widgets-list)"
-        , disabled: true
-      });
-    }
-
-  , " sortupdate": "apply_widget_list_sort"
-
-  , apply_widget_list_sort: function(container, event, target) {
-      var widget_ids,
-          indexes = this.display_prefs.getTopNavWidgets(window.getPageToken()),
-          widget = target.item.find("a").attr("href");
-
-      widget_ids = this.element.find("li > a").map(function() {
-        return $(this).attr("href");
-      }).toArray();
-
-      widget_ids.forEach(function (id, index) {
-        indexes[id.replace("#", "")] = index;
-      });
-
-      this.display_prefs.setTopNavWidgets(window.getPageToken());
-      this.display_prefs.save();
-
-      // for some reason the .parent().addClass doesn't work without timeout
-      if ($(target.item).hasClass("active")) {
-        setTimeout(function () {
-          this.element.find("li > a[href='"+widget+"']").parent().addClass("active");
-        }.bind(this), 0);
-      }
-
-      this.element.trigger("inner_nav_sort_updated", [widget_ids]);
-    }
-
   , set_active_widget : function(widget) {
     var active_widget = widget,
         info_pin = $(this.options.pin_view).control();
@@ -536,10 +478,6 @@ can.Control("CMS.Controllers.InnerNav", {
     return $.map(this.options.widget_list, function(widget) {
       return widget.selector === selector ? widget : undefined;
     })[0] || undefined;
-  }
-
-  , "{document.body} loaded" : function(body, ev) {
-    this.element.sortable("enable");
   }
 
   , update_widget_list : function(widget_elements) {
