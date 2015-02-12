@@ -47,7 +47,7 @@ blueprint = Blueprint(
 from ggrc.models import all_models
 
 _workflow_object_types = [
-    "Program",
+    "Program", "Vendor", "OrgGroup",
     "Regulation", "Standard", "Policy", "Contract",
     "Objective", "Control", "Section", "Clause",
     "System", "Process",
