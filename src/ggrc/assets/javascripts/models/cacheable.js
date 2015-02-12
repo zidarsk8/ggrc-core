@@ -104,6 +104,15 @@ function makeDateSerializer(type, key) {
 can.Model("can.Model.Cacheable", {
 
   root_object : ""
+  , filter_keys : ["assignee", "code", "company", "contact", "description",
+                   "email", "kind", "name", "notes", "owner", "owners",
+                   "reference_url", "status", "test", "title"]
+  , filter_mappings: {
+    //'search term', 'actual value in the object'
+    'owner' : 'owners',
+    'due date' : 'end_date',
+    'requested on' : 'end_date'
+  }
   , root_collection : ""
   , model_singular : ""
   , model_plural : ""
@@ -274,7 +283,7 @@ can.Model("can.Model.Cacheable", {
     this.bind("destroyed", function(ev, old_obj) {
       delete can.getObject("cache", old_obj.constructor, true)[old_obj[id_key]];
     });
-    
+
     // FIXME:  This gets set up in a chain of multiple calls to the function defined
     //  below when the update endpoint isn't set in the model's static config.
     //  This leads to conflicts not actually rejecting because on the second go-round
@@ -437,8 +446,6 @@ can.Model("can.Model.Cacheable", {
   , process_args : function(args, names) {
     var pargs = {};
     var obj = pargs;
-    // NB possible improvement for the next line:
-    //if(this.root_object && (!(this.root_object in args) || typeof args[this.root_object] !== "object")) {
     if(this.root_object && !(this.root_object in args)) {
       obj = pargs[this.root_object] = {};
     }
@@ -1022,6 +1029,34 @@ can.Model("can.Model.Cacheable", {
     var props = Array.prototype.slice.call(arguments, 0);
 
     return RefreshQueue.refresh_all(this, props, true);
+  },
+  get_filter_vals: function(keys, mappings){
+    typeof keys === 'undefined' && (keys = this.class.filter_keys);
+    typeof mappings === 'undefined' && (mappings = this.class.filter_mappings);
+    var values = {};
+    $.map(keys, function(key){
+      var val = mappings[key] ?
+        this[mappings[key]] :
+        this[key];
+
+      if (typeof val !== 'undefined' && val !== null){
+        if (key == 'owner' || key == 'owners'){
+          values[key] = [];
+          val.forEach(function(owner_stub){
+            var owner = owner_stub.reify();
+            values[key].push({
+              name: owner.name,
+              email: owner.email
+            });
+          });
+        } else {
+          values[key] = val;
+        }
+
+      }
+    }.bind(this));
+
+    return values;
   }
 });
 

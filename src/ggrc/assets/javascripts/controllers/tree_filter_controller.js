@@ -6,33 +6,62 @@ can.Control("GGRC.Controllers.TreeFilter", {
     var parent_control;
     this._super && this._super.apply(this, arguments);
     this.options.states = new can.Observe();
-    parent_control = this.element.closest(".cms_controllers_tree_view").control();
+    parent_control = this.element.closest('.cms_controllers_dashboard_widgets')
+        .find(".cms_controllers_tree_view").control();
     parent_control && parent_control.options.attr("states", this.options.states);
     this.on();
   }
 
+  , toggle_indicator: function(current_filter){
+      var is_expression = !!current_filter && !!current_filter.expression.op &&
+            current_filter.expression.op != "text_search";
+
+      this.element.find('.filter-input').toggleClass("expression", is_expression);
+      this.element.find('.filter-input span i')
+        .toggleClass("grcicon-expression-green", is_expression);
+      this.element.find('.filter-input span i')
+        .toggleClass("grcicon-expression-black", !is_expression);
+  }
+  , apply_filter : function(filter_string){
+      var current_filter = GGRC.query_parser.parse(filter_string),
+          parent_control = this.element.closest('.cms_controllers_dashboard_widgets')
+            .find(".cms_controllers_tree_view").control();
+
+      this.toggle_indicator(current_filter);
+      parent_control.options.attr('sort_function', current_filter.order_by.compare);
+      parent_control.options.attr('filter', current_filter);
+      parent_control.reload_list();
+  }
+
+  , "input[type=reset] click" : function(el, ev) {
+    this.element.find("input[type=text]")[0].value = "";
+    this.apply_filter("");
+  }
+
+  , "input[type=submit] click" : function(el, ev) {
+    this.apply_filter(this.element.find("input[type=text]")[0].value)
+  }
+
+  , "input keyup" : function(el, ev) {
+    this.toggle_indicator(GGRC.query_parser.parse(el.val()));
+
+    if (ev.keyCode == 13){
+      this.apply_filter(el.val());
+    }
+    ev.stopPropagation();
+  }
+
   , "input, select change" : function(el, ev) {
 
-    if (el.is(":text")) {
-      // if we have a custom filter inside a text field.
-
-      var tree_view = this.element.closest('.cms_controllers_tree_view').control();
-      this.current_query = GGRC.query_parser.parse(el.val());
-      tree_view.options.attr('sort_function', this.current_query.order_by.compare);
-      tree_view.options.attr('filter', this.current_query);
-      tree_view.reload_list();
-
+    // this is left from the old filters and should eventually be replaced
+    // Convert '.' to '__' ('.' will cause can.Observe to try to update a path instead of just a key)
+    var name = el.attr("name").replace(/\./g, '__');
+    if(el.is(".hasDatepicker")) {
+      this.options.states.attr(name, moment(el.val(), "MM/DD/YYYY"));
+    } else if (el.is(":checkbox") && !el.is(":checked")) {
+      this.options.states.removeAttr(name);
     } else {
-      // this is left from the old filters and should eventually be replaced
-      // Convert '.' to '__' ('.' will cause can.Observe to try to update a path instead of just a key)
-      var name = el.attr("name").replace(/\./g, '__');
-      if(el.is(".hasDatepicker")) {
-        this.options.states.attr(name, moment(el.val(), "MM/DD/YYYY"));
-      } else if (el.is(":checkbox") && !el.is(":checked")) {
-        this.options.states.removeAttr(name);
-      } else {
-        this.options.states.attr(name, el.val());
-      }
+      this.options.states.attr(name, el.val());
     }
     ev.stopPropagation();
   }

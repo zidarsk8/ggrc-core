@@ -13,10 +13,10 @@ start
         expression: {},
         keys: [],
         order_by: only_order_by,
-        evaluate: function(values) {
+        evaluate: function(values, keys) {
           // functions evaluates the current expresion tree, with the given values
           //
-          // * values, Object with all the keys as in the this keys array, 
+          // * values, Object with all the keys as in the this keys array,
           //   with the coresponding values
           return true;
         }
@@ -30,35 +30,35 @@ start
         expression: or_exp,
         keys: keys,
         order_by: order_by,
-        evaluate: function(values) {
+        evaluate: function(values, keys) {
           // functions evaluates the current expresion tree, with the given values
           //
-          // * values, Object with all the keys as in the this keys array, 
+          // * values, Object with all the keys as in the this keys array,
           //   with the coresponding values
           try {
-            return or_exp.evaluate(values);
+            return or_exp.evaluate(values, keys);
           } catch (e) {
             return false;
           }
         }
       };
     }
-  / _* 
+  / _*
     {
       return {
         expression: {},
         keys: [],
-        order_by: { 
-          keys: [], 
+        order_by: {
+          keys: [],
           order: '',
           compare: null
         },
-        evaluate: function(values) {
+        evaluate: function(values, keys) {
           return true;
         }
       };
     }
-  / .* 
+  / .*
     {
       return false;
     }
@@ -70,8 +70,8 @@ order_by
     }
   / _*
     {
-      return { 
-        keys: [], 
+      return {
+        keys: [],
         order: '',
         compare: null
       };
@@ -80,15 +80,15 @@ order_by
 only_order_by
   = _* 'order by'i _+ word_list:word_list order:order
     {
-      return { 
-        keys: word_list, 
+      return {
+        keys: word_list,
         order: order,
         compare: function(val1, val2){
-          for (var i in word_list){
+          for (var i=0 ; i < word_list.length; i++){
             var key = word_list[i];
-            if (val1._data[key] !== val2._data[key]){
-              var a = parseFloat(val1._data[key]) || val1._data[key],
-                  b = parseFloat(val2._data[key]) || val2._data[key];
+            if (val1[key] !== val2[key]){
+              var a = parseFloat(val1[key]) || val1[key],
+                  b = parseFloat(val2[key]) || val2[key];
               return (a < b) ^ (order !== 'asc')
             }
           }
@@ -107,7 +107,7 @@ word_list
     {
       return [word];
     }
- 
+
 order
   = _+ 'desc'i _*
     {
@@ -174,21 +174,44 @@ simple_exp
         }
       };
     }
-  / left:word
+  / paren_exp
+  / text_exp
+
+text_exp
+  = _* "~" characters:.*
     {
       return {
-        left: left,
-        op: 'boolean',
-        keys: [left],
-        evaluate: function(values){
-          return values(left);
+        text: characters.join("").trim(),
+        op: 'text_search',
+        keys: [],
+        evaluate: function(values, keys){
+          typeof keys === 'undefined' && (keys = []);
+
+          function comparator(a, b){
+            return a.toUpperCase().indexOf(b.toUpperCase()) > -1
+          }
+
+          return keys.reduce(function(result, key){
+            if (result) return result;
+            if (values.hasOwnProperty(key)){
+              var value = values[key];
+              if (jQuery.type(value) === "string" ){
+                return comparator(value, this.text);
+              } else if (jQuery.type(value) === "array") {
+                return value.reduce(function(result, val){
+                  return result || this.evaluate(val,keys);
+                }.bind(this), false);
+              } else if (jQuery.type(value) === "object"){
+                return this.evaluate(value, keys, false);
+              }
+            }
+            return result;
+          }.bind(this), false);
         }
       };
     }
-  / paren_exp
 
-
-paren_exp 
+paren_exp
   = LEFT_P or_exp:or_exp RIGHT_P
     {
       return or_exp;
@@ -217,9 +240,9 @@ unqoted_char = [a-zA-Z0-9_\-.]
 
 
 quoted_char
-  = '\\"' 
-    { 
-      return '"'; 
+  = '\\"'
+    {
+      return '"';
     }
   / [^"]
 
@@ -252,16 +275,20 @@ OP
       return {
         name: op,
         evaluate: function(val1, val2) {
-          return val1 == val2;
-        }
-      };
-    }
-  / _* op:'~' _*
-    {
-      return {
-        name: op,
-        evaluate: function(val1, val2) {
-          return val1.toUpperCase().indexOf(val2.toUpperCase()) > -1 ;
+
+          if (jQuery.type(val1) === "array") {
+            return val1.reduce(function(result, value) {
+              return result || this.evaluate(value, val2);
+            }.bind(this), false);
+          } else if (jQuery.type(val1) === "object") {
+            return Object.keys(val1).reduce(function(result, key) {
+              return result || this.evaluate(val1[key], val2);
+            }.bind(this), false);
+          } else if (jQuery.type(val1) === "string") {
+            return val1.toUpperCase() == val2.toUpperCase();
+          } else {
+            return val1 == val2;
+          }
         }
       };
     }
@@ -270,7 +297,60 @@ OP
       return {
         name: op,
         evaluate: function(val1, val2) {
-          return val1 != val2;
+
+          if (jQuery.type(val1) === "array") {
+            return val1.reduce(function(result, value) {
+              return result || this.evaluate(value, val2);
+            }.bind(this), false);
+          } else if (jQuery.type(val1) === "object") {
+            return Object.keys(val1).reduce(function(result, key) {
+              return result || this.evaluate(val1[key], val2);
+            }.bind(this), false);
+          } else if (jQuery.type(val1) === "string") {
+            return val1.toUpperCase() != val2.toUpperCase();
+          } else {
+            return val1 != val2;
+          }
+        }
+      };
+    }
+  / _* op:'<' _*
+    {
+      return {
+        name: op,
+        evaluate: function(val1, val2) {
+          return val1 < val2;
+        }
+      };
+    }
+  / _* op:'>' _*
+    {
+      return {
+        name: op,
+        evaluate: function(val1, val2) {
+          return val1 > val2;
+        }
+      };
+    }
+  / _* op:'~' _*
+    {
+      return {
+        name: op,
+        evaluate: function(val1, val2) {
+
+          if (jQuery.type(val1) === "array") {
+            return val1.reduce(function(result, value) {
+              return result || this.evaluate(value, val2);
+            }.bind(this), false);
+          } else if (jQuery.type(val1) === "object") {
+            return Object.keys(val1).reduce(function(result, key) {
+              return result || this.evaluate(val1[key], val2);
+            }.bind(this), false);
+          } else if (jQuery.type(val1) === "string") {
+            return val1.toUpperCase().indexOf(val2.toUpperCase()) > -1 ;
+          } else {
+            return false;
+          }
         }
       };
     }
@@ -279,7 +359,20 @@ OP
       return {
         name: op,
         evaluate: function(val1, val2) {
-          return val1.toUpperCase().indexOf(val2.toUpperCase()) == -1 ;
+          if (jQuery.type(val1) === "array") {
+            return val1.reduce(function(result, value) {
+              return result || this.evaluate(value, val2);
+            }.bind(this), false);
+          } else if (jQuery.type(val1) === "object") {
+            return Object.keys(val1).reduce(function(result, key) {
+              return result || this.evaluate(val1[key], val2);
+            }.bind(this), false);
+          } else if (jQuery.type(val1) === "string") {
+            // the comparison is done here
+            return val1.toUpperCase().indexOf(val2.toUpperCase()) == -1 ;
+          } else {
+            return false;
+          }
         }
       };
     }
