@@ -851,7 +851,7 @@
 
     , insert_options: function(options, prepend) {
         var self = this
-          , option_results
+          , options_results
           , context = {}
           , dfd = $.Deferred()
           ;
