@@ -2829,10 +2829,11 @@ Mustache.registerHelper("if_draw_icon", function(instance, options) {
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("debug", function(options) {
+Mustache.registerHelper("debugger", function(options) {
   // This just gives you a helper that you can wrap around some code in a
   // template to see what's in the context. Set a breakpoint in dev tools
   // on the return statement on the line below to debug.
+  debugger;
   return options.fn(options.contexts);
 });
 
