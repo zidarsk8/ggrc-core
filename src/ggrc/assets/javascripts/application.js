@@ -1168,11 +1168,6 @@ jQuery(function($){
     return this;
   };
 
-  $(document.body).on("shown", ".bootstrap-wysihtml5-insert-link-modal", function(e) {
-    $(this).draggable({ handle : ".modal-header"})
-    .find(".modal-header [data-dismiss='modal']").css("opacity", 1);
-  });
-
   $(document.body).on("change", ".rotate_control_assessment", function(ev) {
     ev.currentTarget.click(function() {
       ev.currentTarget.toggle();
