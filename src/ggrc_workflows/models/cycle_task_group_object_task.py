@@ -53,7 +53,8 @@ class CycleTaskGroupObjectTask(
       ]
 
   default_description = "<ol>"\
-                        +"<li>Click \"Start\" to start reviewing an object.</li>"\
+                        +"<li>Expand the object review task.</li>"\
+                        +"<li>Click on the Object to be reviewed.</li>"\
                         +"<li>Review the object in the Info tab.</li>"\
                         +"<li>Click \"Approve\" to approve the object.</li>"\
                         +"<li>Click \"Decline\" to decline the object.</li>"\
