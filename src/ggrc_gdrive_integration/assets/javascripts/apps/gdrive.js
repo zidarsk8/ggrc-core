@@ -98,7 +98,7 @@
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
 
-  can.view.mustache("picker-tag-default", "<ggrc-gdrive-folder-picker instance='instance'/>");
+  can.view.mustache("picker-tag-default", "<ggrc-gdrive-folder-picker {{^is_allowed 'update' instance context='for'}}readonly=true{{/is_allowed}} instance='instance'/>");
   GGRC.register_hook("Audit.tree_view_info", "picker-tag-default");
 
 
