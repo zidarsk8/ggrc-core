@@ -373,7 +373,7 @@ small {
     height: 20px;
     @include box-shadow(none);
     float: left;
-    margin-right: 1px;
+    margin-right: 0px;
   }
 
   @each $bar_color in verify, progress, pending, warning {
