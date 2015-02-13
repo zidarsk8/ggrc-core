@@ -1,3 +1,7 @@
+{{#if_helpers "\
+   #if" instance.viewLink "\
+   or #is_allowed" "update" instance "\
+   or #if" allow_mapping_or_creating}}
 <div class="details-wrap">
   <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
   <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
@@ -68,6 +72,7 @@
     {{/if}}
   </ul>
 </div>
+{{/if_helpers}}
 
 <div class="tier-content">
   {{{renderLive '/static/mustache/base_objects/general_info.mustache' instance=instance }}}

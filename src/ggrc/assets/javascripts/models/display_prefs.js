@@ -20,6 +20,7 @@ var COLLAPSE = "collapse"
 , GLOBAL = "global"
 , LHN_STATE = "lhn_state"
 , TOP_NAV = "top_nav"
+, FILTER_WIDGET = "filter_widget"
 , path = window.location.pathname.replace(/\./g, "/");
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
@@ -78,7 +79,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
         if(d.length > 0) {
             prefs = d[0];
         } else {
-            prefs = self.options.display_prefs = new CMS.Models.DisplayPrefs();
+            prefs = new CMS.Models.DisplayPrefs();
             prefs.save();
         }
     });
@@ -131,7 +132,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
   , setTopNavHidden: function (page_id, is_hidden) {
     this.makeObject(page_id === null ? page_id : path, TOP_NAV).attr("is_hidden", !!is_hidden);
-    
+
     this.autoupdate && this.save();
     return this;
   }
@@ -163,6 +164,24 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     }
 
     return value.widget_list && value.widget_list.serialize() || {};
+  }
+
+  , setFilterHidden: function (is_hidden) {
+    this.makeObject(path, FILTER_WIDGET).attr("is_hidden", is_hidden);
+
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getFilterHidden: function () {
+    var value = this.getObject(path, FILTER_WIDGET);
+
+    if (typeof value === "undefined") {
+      this.setFilterHidden(false);
+      return false;
+    }
+
+    return value.is_hidden;
   }
 
   , setLHNavSize : function(page_id, widget_id, size) {
@@ -320,7 +339,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   , setLHNState : function(new_prefs, val) {
     var prefs = this.makeObject(LHN_STATE);
     can.each(
-      ["open_category", "panel_scroll", "category_scroll", "search_text", "my_work", "filter_params", "is_open"]
+      ["open_category", "panel_scroll", "category_scroll", "search_text", "my_work", "filter_params", "is_open", "is_pinned"]
       , function(token) {
         if(typeof new_prefs[token] !== "undefined") {
           prefs.attr(token, new_prefs[token]);

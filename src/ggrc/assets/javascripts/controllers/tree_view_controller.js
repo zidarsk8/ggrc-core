@@ -92,14 +92,14 @@ can.Control("CMS.Controllers.TreeLoader", {
       if (this.element.next().length > 0)
         return;
 
-      $footer = this.element.children('.tree-footer').first();
+      $footer = this.element.children('.tree-item-add').first();
       spinner = new Spinner({
           "radius": 4
         , "length": 4
         , "width": 2
         }).spin();
       $spinner = $(spinner.el);
-      $spinner_li = $('<li class="tree-footer tree-item tree-spinner" />');
+      $spinner_li = $('<li class="tree-item-add tree-item tree-spinner" />');
       $spinner_li.append($spinner);
       $spinner.css({
           display: 'inline-block'
@@ -138,6 +138,14 @@ can.Control("CMS.Controllers.TreeLoader", {
 
     return this._prepare_deferred;
   }
+
+  , show_info_pin: function(){
+    if (this.element){
+      var children = this.element.children();
+      children && children.first().find('.select').click();
+    }
+  }
+
   , display: function() {
       var that = this
         , tracker_stop = GGRC.Tracker.start(
@@ -145,6 +153,7 @@ can.Control("CMS.Controllers.TreeLoader", {
         ;
 
       if (this._display_deferred) {
+        this.show_info_pin();
         return this._display_deferred;
       }
 
@@ -154,6 +163,10 @@ can.Control("CMS.Controllers.TreeLoader", {
         return $.when(that.fetch_list(), that.init_view())
           .then(that._ifNotRemoved(that.proxy("draw_list")));
       })).done(tracker_stop);
+
+      this._display_deferred.then(function(e){
+        this.show_info_pin();
+      }.bind(this));
 
       return this._display_deferred;
     }
@@ -297,7 +310,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , list : null
     , single_object : false
     , find_params : {}
-    , sortable : false
     , sort_property : null
     , sort_function : null
     , filter : null
@@ -343,39 +355,44 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , init : function(el, opts) {
-    this.element.uniqueId();
-    var that = this;
+    CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
+      this.element.uniqueId();
 
-    if('parent_instance' in opts && 'status' in opts.parent_instance){
-      var setAllowMapping = function(){
-        var is_accepted = opts.parent_instance.attr('status') === 'Accepted'
-          , admin = Permission.is_allowed("__GGRC_ADMIN__")
-          ;
-        that.options.attr("allow_mapping_or_creating", (admin || !is_accepted) &&
-            (that.options.allow_mapping || that.options.allow_creating));
+      if('parent_instance' in opts && 'status' in opts.parent_instance){
+        var setAllowMapping = function(){
+          var is_accepted = opts.parent_instance.attr('status') === 'Accepted'
+            , admin = Permission.is_allowed("__GGRC_ADMIN__")
+            ;
+          this.options.attr("allow_mapping_or_creating", (admin || !is_accepted) &&
+                            (this.options.allow_mapping || this.options.allow_creating));
+        }.bind(this);
+        setAllowMapping();
+        opts.parent_instance.bind('change', setAllowMapping);
       }
-      setAllowMapping();
-      opts.parent_instance.bind('change', setAllowMapping);
-    }
-    else{
-      this.options.attr("allow_mapping_or_creating",
-        this.options.allow_mapping || this.options.allow_creating);
-    }
+      else{
+        this.options.attr("allow_mapping_or_creating",
+          this.options.allow_mapping || this.options.allow_creating);
+      }
 
-    // Override nested child options for allow_* properties
-    var allowed = {};
-    this.options.each(function(item, prop) {
-      if (prop.indexOf('allow') === 0 && item === false)
-        allowed[prop] = item;
-    });
-    this.options.attr('child_options', this.options.child_options.slice(0));
-    can.each(this.options.child_options, function(options, i) {
-      that.options.child_options.attr(i, new can.Observe(can.extend(options.attr(), allowed)));
-    });
+      // Override nested child options for allow_* properties
+      var allowed = {};
+      this.options.each(function(item, prop) {
+        if (prop.indexOf('allow') === 0 && item === false) {
+          allowed[prop] = item;
+        }
+      });
+      this.options.attr('child_options', this.options.child_options.slice(0));
+      can.each(this.options.child_options, function(options, i) {
+        this.options.child_options.attr(i, new can.Observe(can.extend(options.attr(), allowed)));
+      }.bind(this));
 
-    this._attached_deferred = new $.Deferred();
-    if (this.element && this.element.closest('body').length)
-      this._attached_deferred.resolve();
+      this.options.attr('filter_is_hidden', display_prefs.getFilterHidden());
+
+      this._attached_deferred = new $.Deferred();
+      if (this.element && this.element.closest('body').length) {
+        this._attached_deferred.resolve();
+      }
+    }.bind(this));
   }
 
   , " inserted": function() {
@@ -630,7 +647,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
   , draw_items : function(options_list) {
       var that = this
-        , $footer = this.element.children('.tree-footer').first()
+        , $footer = this.element.children('.tree-item-add').first()
         , $items = $()
         , $existing = this.element.children('li.cms_controllers_tree_view_node')
         , draw_items_dfds = []
@@ -640,7 +657,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         ;
       options_list = can.makeArray(options_list);
       can.map(options_list, function(options) {
-        if ( !filter || filter.evaluate(options.instance._data)) {
+        if ( !filter || filter.evaluate(options.instance.get_filter_vals(),
+              options.instance.class.filter_keys)) {
           var $li = $("<li />").cms_controllers_tree_view_node(options);
           draw_items_dfds.push($li.control()._draw_node_deferred);
           $items.push($li[0]);
@@ -649,7 +667,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       if (sort_prop || sort_function) {
          $items.each(function(i, item) {
-            var j, $item = $(item);
+            var j, $item = $(item), compare;
             for(j = $existing.length - 1; j >= 0; j--) {
               var old_item = $existing.eq(j).control().options.instance,
                   new_item = $item.control().options.instance;
@@ -677,9 +695,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             }
             $existing.splice(0, 0, item);
          });
-        if (this.options.sortable) {
-          $(this.element).sortable({element: 'li.tree-item', handle: '.drag'})
-        }
       } else {
         if($footer.length) {
           $items.insertBefore($footer);

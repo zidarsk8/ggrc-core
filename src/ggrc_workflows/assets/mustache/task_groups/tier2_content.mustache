@@ -1,3 +1,4 @@
+{{#is_allowed 'update' instance}}
 <div class="details-wrap">
   <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
   <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
@@ -6,7 +7,6 @@
         {{> /static/mustache/base_objects/edit_object_link.mustache}}
       {{/if_equals}}
     {{/using}}
-    {{#is_allowed 'update' instance context='for'}}
     <li>
       <task-group-clone task-group="instance">
         <a href="javascript://">
@@ -15,9 +15,9 @@
         </a>
       </task-group-clone>
     </li>
-    {{/is_allowed}}
   </ul>
 </div>
+{{/is_allowed}}
 
 <div class="tier-content">
 

@@ -463,7 +463,6 @@
             parent_instance: object,
             model: CMS.Models.TaskGroup,
             show_view: GGRC.mustache_path + "/task_groups/tree.mustache",
-            sortable: true,
             sort_property: "sort_index",
             mapping: "task_groups",
             draw_children: true,

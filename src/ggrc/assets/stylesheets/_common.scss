@@ -351,9 +351,12 @@ small {
   .dashboard-tree & {
     margin: 9px 10px 0 4px;
   }
+  &.status- {
+    background: $status-draft;
+  }
 }
 
-@each $status_label in draft, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+@each $status_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }
@@ -370,7 +373,7 @@ small {
     height: 20px;
     @include box-shadow(none);
     float: left;
-    margin-right: 1px;
+    margin-right: 0px;
   }
 
   @each $bar_color in verify, progress, pending, warning {
@@ -1269,7 +1272,7 @@ p {
   }
 }
 
-@each $state_label in draft, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+@each $state_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
   .state-#{$state_label} {
     @extend %state-#{$state_label};
   }
