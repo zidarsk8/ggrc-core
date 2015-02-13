@@ -12,9 +12,6 @@
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
     </div>
     {{/is_info_pin}}
-    <div class="tier-content">
-      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-    </div>
 
     {{#is_allowed 'update' instance context='for'}}
       <div class="details-wrap">
@@ -31,23 +28,23 @@
           {{#if_helpers '\
             #is_page_instance' instance.program '\
             or #is_profile'}}
-  	        {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
-  	          <li>
-  	          {{! FIXME: Better way to get the Audit link }}
-  	            <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}">
-  	              <i class="grcicon-imp-exp"></i>
-  	              Import Requests
-  	            </a>
-  	          </li>
-  	        {{/is_allowed}}
-  	        {{#is_allowed 'read' 'Request' context=instance.context.id}}
-  	          <li>
-  	            <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}">
-  	              <i class="grcicon-export"></i>
-  	              Export Requests
-  	            </a>
-  	          </li>
-  	        {{/is_allowed}}
+            {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
+              <li>
+              {{! FIXME: Better way to get the Audit link }}
+                <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}">
+                  <i class="grcicon-imp-exp"></i>
+                  Import Requests
+                </a>
+              </li>
+            {{/is_allowed}}
+            {{#is_allowed 'read' 'Request' context=instance.context.id}}
+              <li>
+                <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}">
+                  <i class="grcicon-export"></i>
+                  Export Requests
+                </a>
+              </li>
+            {{/is_allowed}}
           {{/if_helpers}}
           {{#is_allowed 'update' instance context='for'}}
             <li>
@@ -60,6 +57,10 @@
         </ul>
       </div>
     {{/is_allowed}}
+
+    <div class="tier-content">
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+    </div>
 
     <div class="tier-content">
       {{#instance.description}}
