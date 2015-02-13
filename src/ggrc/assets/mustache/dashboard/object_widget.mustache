@@ -6,6 +6,7 @@
 }}
 
 {{!section class="widget... }}
+{{log "sasmita"}} {{log this}} {{log eidget_id}}
   {{#if_equals widget_id "people_list"}}
   <div class="filter-holder" {{#filter_is_hidden}}style="height: 0px" data-height="42"{{/filter_is_hidden}}>
     <div class="inline-filtering sticky-filter search-filters" >
@@ -422,7 +423,7 @@
     </header>
   {{/if_equals}}
 
-  {{#if_equals widget_id "request"}}
+  {{#if_equals widget_id "Request"}}
     <header class="header tree-header">
       <div class="row-fluid">
         <div class="span3">
@@ -430,7 +431,7 @@
             {{far_model.title_singular}} Title
           </div>
         </div>
-        <div class="span3">
+        <div class="span2">
           <div class="row-fluid">
             <div class="span6">
               <div class="oneline">
@@ -447,6 +448,11 @@
         <div class="span1">
           <div class="oneline">
             Due Date
+          </div>
+        </div>
+        <div class="span1">
+          <div class="oneline">
+            State
           </div>
         </div>
         <div class="span1">&nbsp;</div>
@@ -858,7 +864,7 @@
   {{^if_equals widget_id "roles_list"}}
   {{^if_equals widget_id "current"}}
   {{^if_equals widget_id "history"}}
-  {{^if_equals widget_id "request"}}
+  {{^if_equals widget_id "Request"}}
   {{^if_equals widget_id "events_list"}}
   {{^if_equals widget_id "custom_attribute"}}
   {{^if_equals widget_id "risk_assessments"}}
