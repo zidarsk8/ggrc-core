@@ -56,8 +56,9 @@
         </ul>
       </div>
     {{/is_allowed}}
-
-    {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+    <div class="tier-content">
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+    </div>
   {{/is_info_pin}}
 
   <div class="tier-content">
