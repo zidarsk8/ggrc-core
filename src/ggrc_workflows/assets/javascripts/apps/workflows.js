@@ -252,13 +252,11 @@
       mappings[type].current_approval_cycles = Cross("approval_workflows", "current_cycle");
       mappings[type].current_object_review_tasks = CustomFilter(
         "object_tasks", function(binding) {
-        return new RefreshQueue().enqueue(
-          function() {
-            var tgt_binding = binding.instance.attr("task_group_task");
-            if(tgt_binding) {
-              return tgt_binding.reify();
-            }
-          }()).trigger().then(
+        var tgt_binding = binding.instance.attr("task_group_task");
+        if(!tgt_binding) {
+          return;
+        }
+        return new RefreshQueue().enqueue(tgt_binding.reify()).trigger().then(
             function(data){
               var tgt = data[0];
               return tgt.attr("object_approval");
