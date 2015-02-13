@@ -104,9 +104,10 @@ can.Model.Cacheable("CMS.Models.Audit", {
     return this._super.apply(this, arguments);
   },
   after_save: function() {
-    var that = this;
+    var that = this,
+        dfd;
 
-    new RefreshQueue().enqueue(this.program.reify()).trigger()
+    dfd = new RefreshQueue().enqueue(this.program.reify()).trigger()
     .then(function(programs) {
       return $.when(
         programs[0],
@@ -139,13 +140,14 @@ can.Model.Cacheable("CMS.Models.Audit", {
             ra.destroy();
           }
         });
-        new CMS.Models.UserRole({
+        return new CMS.Models.UserRole({
           person: that.contact,
           role: editor_roles[0].stub(),
           context: program.context
         }).save();
       }
     });
+    GGRC.delay_leaving_page_until(dfd);
   },
   findAuditors : function(return_list){
     // If return_list is true, use findAuditors in the
@@ -323,9 +325,10 @@ can.Model.Cacheable("CMS.Models.Request", {
     }
   }
   , after_save: function() {
-    var that = this;
+    var that = this,
+        dfd;
 
-    new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
+    dfd = new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
       return new RefreshQueue().enqueue(audits[0].program).trigger();
     }).then(function(programs) {
       return $.when(
@@ -342,13 +345,14 @@ can.Model.Cacheable("CMS.Models.Request", {
           that.assignee.reify(),
           authorized_people
       )) {
-        new CMS.Models.UserRole({
+        return new CMS.Models.UserRole({
           person: that.assignee,
           role: reader_roles[0].stub(),
           context: program.context
         }).save();
       }
     });
+    GGRC.delay_leaving_page_until(dfd);
   },
   before_save: function(notifier) {
     var that = this,
@@ -409,7 +413,7 @@ can.Model.Cacheable("CMS.Models.Request", {
             m = (vals['due date'].getMonth() + 1).toString(),
             d = vals['due date'].getDate().toString(),
             date = y + '-' + (m[1]?m:"0"+m[0]) + '-' + (d[1]?d:"0"+d[0]);
-        
+
         vals['due date'] = date;
         vals['due'] = date;
       }
