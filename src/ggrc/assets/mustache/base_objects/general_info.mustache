@@ -21,7 +21,9 @@
            the correct selector later on. -->
       <ul style="list-style-type: none">
         {{#if class}}
-          {{{render_hooks instance.class.shortName 'info_widget_actions'}}}
+          {{#class}}
+            {{{render_hooks shortName 'info_widget_actions'}}}
+          {{/class}}
         {{/if}}
       </ul>
     </div>

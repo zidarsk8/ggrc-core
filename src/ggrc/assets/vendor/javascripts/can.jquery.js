@@ -2373,9 +2373,7 @@
                         }
                     } else {
                         // use attr to get that value
-                        if(cur.attr) {
-                          cur = cur.attr(reads[i]);
-                        }
+                        cur = cur.attr(reads[i]);
                     }
                 } else {
                     // just do the dot operator
