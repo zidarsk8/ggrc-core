@@ -92,14 +92,14 @@ can.Control("CMS.Controllers.TreeLoader", {
       if (this.element.next().length > 0)
         return;
 
-      $footer = this.element.children('.tree-footer').first();
+      $footer = this.element.children('.tree-item-add').first();
       spinner = new Spinner({
           "radius": 4
         , "length": 4
         , "width": 2
         }).spin();
       $spinner = $(spinner.el);
-      $spinner_li = $('<li class="tree-footer tree-item tree-spinner" />');
+      $spinner_li = $('<li class="tree-item-add tree-item tree-spinner" />');
       $spinner_li.append($spinner);
       $spinner.css({
           display: 'inline-block'
@@ -647,7 +647,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
   , draw_items : function(options_list) {
       var that = this
-        , $footer = this.element.children('.tree-footer').first()
+        , $footer = this.element.children('.tree-item-add').first()
         , $items = $()
         , $existing = this.element.children('li.cms_controllers_tree_view_node')
         , draw_items_dfds = []
