@@ -532,6 +532,14 @@
       background:none;
       line-height: 18px;
     }
+    i {
+      @include opacity(.25);
+      @include transition(opacity 0.2s ease);
+      cursor: pointer;
+      &:hover {
+        @include opacity(1);
+      }
+    }
     p {
       line-height:18px;
       i {
