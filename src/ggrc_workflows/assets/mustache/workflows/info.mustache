@@ -56,12 +56,11 @@
         </ul>
       </div>
     {{/is_allowed}}
-    <div class="tier-content">
-      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-    </div>
   {{/is_info_pin}}
 
   <div class="tier-content">
+    {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+
     <div class="row-fluid wrap-row">
       <div class="span12">
         <h6>Description</h6>
@@ -89,20 +88,18 @@
           {{/if_equals}}
         </p>
       </div>
-
     </div>
-  </div>
-
-  <div class="row-fluid">
-    <div class="span12">
-      <ggrc-gdrive-folder-picker instance="instance" placeholder="If selected, all workflow attachments go here." />
+    <div class="row-fluid">
+      <div class="span12">
+        <ggrc-gdrive-folder-picker instance="instance" placeholder="If selected, all workflow attachments go here." />
+      </div>
     </div>
-  </div>
-  <div class="row-fluid">
-    <div class="span12">
-      {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+    <div class="row-fluid">
+      <div class="span12">
+        {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+      </div>
     </div>
-  </div>
+  </div> <!-- end tier-content -->
 
 </section>
 
