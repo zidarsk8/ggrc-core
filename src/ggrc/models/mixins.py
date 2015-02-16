@@ -527,7 +527,8 @@ class CustomAttributable(object):
             av.attribute_value = attributes[ad_id]
             # 5) Set the context_id for each custom attribute value to the context id
             #    of the custom attributable.
-            av.context_id = cls.context_id
+            # TODO: We are ignoring contexts for now
+            # av.context_id = cls.context_id
             # 6) Save the new set of custom attribute values.
             db.session.add(av)
 
