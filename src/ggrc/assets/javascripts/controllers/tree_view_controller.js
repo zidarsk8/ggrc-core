@@ -44,6 +44,7 @@ function _display_tree_subpath(el, path) {
 
     if ($node[0] && $node[0].scrollIntoView) {
       $node[0].scrollIntoView();
+      $node.click();
     }
 
     node_controller = $node.control();
