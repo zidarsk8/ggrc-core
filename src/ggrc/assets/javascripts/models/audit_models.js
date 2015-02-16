@@ -583,6 +583,15 @@ can.Model.Cacheable("CMS.Models.Response", {
         };
     }
   }
+  , after_create: function () {
+    var hash = window.location.hash.split("/")[0];
+
+    window.location.hash = [hash,
+                            "request",
+                            this.request.id,
+                            "response",
+                            this.id].join("/");
+  }
 
 });
 
