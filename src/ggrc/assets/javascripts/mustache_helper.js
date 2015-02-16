@@ -879,7 +879,8 @@ Mustache.registerHelper("with_mapping", function (binding, options) {
 
   loader = context.get_binding(binding);
   if (!loader)
-    return;
+    return options.fn(options.context);
+
   frame.attr(binding, loader.list);
 
   options = arguments[2] || options;
@@ -1826,8 +1827,10 @@ Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
 Mustache.registerHelper("with_review_task", function (options) {
   var tasks = options.contexts.attr('current_object_review_tasks');
   tasks = Mustache.resolve(tasks);
-  for(i = 0; i < tasks.length; i++) {
-    return options.fn(options.contexts.add({review_task: tasks[i].instance}));
+  if(tasks) {
+    for(i = 0; i < tasks.length; i++) {
+      return options.fn(options.contexts.add({review_task: tasks[i].instance}));
+    }
   }
   return options.fn(options.contexts.add({review_task: undefined}));
 });
