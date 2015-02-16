@@ -287,6 +287,7 @@ def build_cycle(cycle, current_user=None, base_date=date.today()):
         end_date=cycle.end_date,
         modified_by=current_user,
         contact=task_group.contact,
+        status="Assigned",
         sort_index=task_group.sort_index,
         )
 
