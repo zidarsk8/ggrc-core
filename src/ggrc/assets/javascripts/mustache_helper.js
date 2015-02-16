@@ -2798,4 +2798,8 @@ Mustache.registerHelper("update_link", function(instance, options) {
   return options.fn(options.contexts);
 });
 
+Mustache.registerHelper("inject_parent_instance", function(instance, options) {
+  return options.fn(options.contexts.add($.extend({parent_instance: Mustache.resolve(instance)}, options.contexts._context)));
+});
+
 })(this, jQuery, can);
