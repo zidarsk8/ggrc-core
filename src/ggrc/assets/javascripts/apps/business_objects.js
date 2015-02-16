@@ -396,7 +396,7 @@ $(function() {
           },
           Request: {
             widget_id: "Request",
-            widget_name: "Open requests"
+            widget_name: "Open Requests"
           },
           history: {
             widget_id: "history",
@@ -412,7 +412,7 @@ $(function() {
         , Control : { //CORE-1200
           Request: {
             widget_id: "Request",
-            widget_name: "Audit requests"
+            widget_name: "Audit Requests"
           }
         }
       }
