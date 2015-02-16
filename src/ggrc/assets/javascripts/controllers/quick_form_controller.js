@@ -65,7 +65,7 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     }, 100);
   }
 
-  , "button[data-name][data-value]:not(.disabled), a[data-name][data-value]:not(.disabled), a.undoable[data-toggle*=modal] click": function(el, ev) {
+  , "button[data-name][data-value]:not(.disabled), a.undoable[data-toggle*=modal] click": function(el, ev) {
 
     var that = this
       , name = el.data('name')
@@ -110,9 +110,7 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     } else {
       ev.stopPropagation();
       that.options.instance.attr('_undo').unshift(old_value);
-    }
 
-    // Allow links/buttons that spawn modals to also set model attributes.
     that.options.instance.attr('_disabled', 'disabled');
     that.options.instance.refresh().then(function(instance){
       that.set_value({ name: el.data('name'), value: el.data('value') });
@@ -121,6 +119,8 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
       that.options.instance.attr('_disabled', '');
     });
   }
+  }
+
 
   , "a.undo click" : function(el, ev){
     ev.stopPropagation();
