@@ -510,10 +510,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , display_path: function(path) {
-      var that = this;
       return this.display().then(this._ifNotRemoved(function() {
-        return _display_tree_subpath(that.element, path);
-      }));
+        return _display_tree_subpath(this.element, path);
+      }.bind(this)));
     }
 
   , prepare_child_options: function(v) {
@@ -958,10 +957,9 @@ can.Control("CMS.Controllers.TreeViewNode", {
     }
 
   , display_path: function(path) {
-      var that = this;
       return this.display().then(this._ifNotRemoved(function() {
-        return _display_tree_subpath(that.element, path);
-      }));
+        return _display_tree_subpath(this.element, path);
+      }.bind(this)));
     }
 
   , display_subtrees: function() {

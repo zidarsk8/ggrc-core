@@ -589,7 +589,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     window.location.hash = [hash,
                             "request",
                             this.request.id,
-                            "response",
+                            this.response_type+"_response",
                             this.id].join("/");
   }
 
