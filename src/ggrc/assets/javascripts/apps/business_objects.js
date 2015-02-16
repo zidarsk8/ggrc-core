@@ -409,7 +409,7 @@ $(function() {
             widget_icon: "program"
           }
         }
-        , Control : { //CORE-1200
+        , Control : {
           Request: {
             widget_id: "Request",
             widget_name: "Audit Requests"
@@ -648,9 +648,9 @@ $(function() {
             }
           }
 
-        , extended_requests: { //CORE-1200
+        , open_requests: {
             Request: {
-              mapping: "related_requests"
+              mapping: "open_requests"
               , allow_mapping : false
               , allow_creating : false
               , draw_children : true
@@ -669,7 +669,7 @@ $(function() {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Control: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits", "extended_requests"] //CORE-1200
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "open_requests"]
           }
         , DataAsset: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
