@@ -806,6 +806,7 @@
     }
   }
   .code {
+    @include oneline();
     font-size:11px;
     font-style:italic;
     color:#777;
@@ -844,7 +845,9 @@
     }
   }
   .info {
+    @include box-shadow(none);
     font-size:12px;
+    padding: 0;
   }
   a {
     padding-left:0;
