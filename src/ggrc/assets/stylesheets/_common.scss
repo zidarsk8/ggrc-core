@@ -110,6 +110,15 @@ u {
   text-decoration: underline;
 }
 
+.welcome {
+  background: $white;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  bottom: auto;
+  right: auto;
+}
+
 .about-link {
   font-size: 12px;
   text-decoration: underline;
