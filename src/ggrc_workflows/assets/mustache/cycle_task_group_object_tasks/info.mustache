@@ -118,6 +118,21 @@
                 </p>
               </div>
             </div>
+            {{else}}
+              <div class="row-fluid wrap-row">
+                <div class="span9">
+                  <h6>Task to be performed on object</h6>
+                  <p>No object assigned</p>
+                </div>
+                <div class="span3">
+                  <h6>Start/End dates</h6>
+                  <p>
+                    {{localize_date instance.start_date}}
+                    -
+                    {{localize_date instance.end_date}}
+                  </p>
+                </div>
+              </div>
             {{/if}}
           {{/using}}
         {{/using}}
