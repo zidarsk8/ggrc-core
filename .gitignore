@@ -6,6 +6,7 @@ Cheffile.lock
 tmp
 src/requirements.txt.md5
 src/packages.zip
+src/app.yaml
 *.pyc
 src/instance
 .DS_Store
