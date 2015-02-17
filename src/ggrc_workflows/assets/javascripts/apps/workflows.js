@@ -184,7 +184,15 @@
             "cycle_task_entries"),
           _object: Cross(
             "cycle_task_group_object", '_object'
-          )
+          ),
+          // This code needs to be reworked to figure out how to return the single
+          // most recent task entry with is_declining_review = true.
+          declining_cycle_task_entries: Search(function(binding) {
+            return CMS.Models.CycleTaskEntry.findAll({
+              cycle_task_group_object_task_id: binding.instance.id,
+              is_declining_review: 1
+            });
+          })
         },
 
         CycleTaskEntry: {
@@ -215,7 +223,7 @@
             return CMS.Models.CycleTaskGroupObjectTask.findAll({
               contact_id: binding.instance.id,
               'cycle.is_current': true,
-              status__in: 'Assigned,InProgress,Finished,Declined',
+              status__in: 'Assigned,InProgress,Finished,Declined'
             });
           }),
           assigned_tasks_with_history: Search(function(binding) {

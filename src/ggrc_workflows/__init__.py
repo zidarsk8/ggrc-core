@@ -601,6 +601,13 @@ def handle_workflow_put(
     sender, obj=None, src=None, service=None):
   update_workflow_state(obj)
 
+@Resource.model_posted.connect_via(models.CycleTaskEntry)
+def handle_cycle_task_entry_post(
+    sender, obj=None, src=None, service=None):
+  if src['is_declining_review'] == '1':
+    obj.cycle_task_group_object_task.status = 'Declined'
+    db.session.add(obj)
+
 # Check if workflow should be Inactive after cycle status change
 @status_change.connect_via(models.Cycle)
 def handle_cycle_status_change(sender, obj=None, new_status=None, old_status=None):

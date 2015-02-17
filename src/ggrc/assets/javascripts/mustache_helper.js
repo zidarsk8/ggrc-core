@@ -8,247 +8,252 @@
 (function (namespace, $, can) {
 
 //chrome likes to cache AJAX requests for Mustaches.
-var mustache_urls = {};
-$.ajaxPrefilter(function ( options, originalOptions, jqXHR ) {
-  if ( /\.mustache$/.test(options.url) ) {
-    if (mustache_urls[options.url]) {
-      options.url = mustache_urls[options.url];
-    } else {
-      mustache_urls[options.url] = options.url += "?r=" + Math.random();
+  var mustache_urls = {};
+  $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+    if (/\.mustache$/.test(options.url)) {
+      if (mustache_urls[options.url]) {
+        options.url = mustache_urls[options.url];
+      } else {
+        mustache_urls[options.url] = options.url += "?r=" + Math.random();
+      }
     }
-  }
-});
+  });
 
-function get_template_path(url) {
-  var match;
-  match = url.match(/\/static\/mustache\/(.*)\.mustache/);
-  return match && match[1];
-}
+  function get_template_path(url) {
+    var match;
+    match = url.match(/\/static\/mustache\/(.*)\.mustache/);
+    return match && match[1];
+  }
 
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
 
-$.ajaxTransport("text", function (options, _originalOptions, _jqXHR) {
-  var template_path = get_template_path(options.url),
+  $.ajaxTransport("text", function (options, _originalOptions, _jqXHR) {
+    var template_path = get_template_path(options.url),
       template = template_path && GGRC.Templates[template_path];
 
-  if (template) {
-    return {
-      send: function (headers, completeCallback) {
-        function done() {
-          if (template) {
-            completeCallback(200, "success", { text: template });
+    if (template) {
+      return {
+        send: function (headers, completeCallback) {
+          function done() {
+            if (template) {
+              completeCallback(200, "success", {text: template});
+            }
           }
+
+          if (options.async) {
+            //Use requestAnimationFrame where possible because we want
+            // these to run as quickly as possible but still release
+            // the thread.
+            (window.requestAnimationFrame || window.setTimeout)(done, 0);
+          } else {
+            done();
+          }
+        },
+
+        abort: function () {
+          template = null;
         }
-        if (options.async) {
-          //Use requestAnimationFrame where possible because we want
-          // these to run as quickly as possible but still release
-          // the thread.
-          (window.requestAnimationFrame || window.setTimeout)(done, 0);
-        } else {
-          done();
-        }
-      },
-
-      abort: function () {
-        template = null;
-      }
-    };
-  }
-});
-
-var quickHash = function (str, seed) {
-  var bitval = seed || 1;
-  str = str || "";
-  for (var i = 0; i < str.length; i++)
-  {
-    bitval *= str.charCodeAt(i);
-    bitval = Math.pow(bitval, 7);
-    bitval %= Math.pow(7, 37);
-  }
-  return bitval;
-};
-
-
-var getParentNode = function (el, defaultParentNode) {
-  return defaultParentNode && el.parentNode.nodeType === 11 ? defaultParentNode : el.parentNode;
-};
-
-
-function isExtendedFalsy(obj) {
-  return !obj
-    || (typeof obj === "object" && can.isEmptyObject(obj))
-    || (obj.length != null && obj.length === 0)
-    || (obj.serialize && can.isEmptyObject(obj.serialize()));
-}
-
-function preprocessClassString(str) {
-  var ret = []
-  , src = str.split(" ");
-
-  for (var i = 0; i < src.length; i++) {
-    var expr = src[i].trim();
-    if (expr.charAt(0) === "=") {
-      ret.push({ attr : src[i].trim().substr(1) });
-    } else if (expr.indexOf(":") > -1) {
-      var spl = expr.split(":");
-      var arr = [];
-      for (var j = 0; j < spl.length - 1; j ++) {
-        var inverse = spl[j].trim()[0] === "!"
-        , attr_name = spl[j].trim().substr(inverse ? 1 : 0);
-
-        arr.push({attr : attr_name, inverse : inverse});
-      }
-      arr.value = spl[spl.length - 1];
-      ret.push(arr);
-    } else {
-      ret.push(expr);
+      };
     }
-  }
-  return ret;
-}
-
-function buildClassString(arr, context) {
-  var ret = [];
-  for (var i = 0; i < arr.length; i++) {
-    if (typeof arr[i] === "string") {
-      ret.push(arr[i]);
-    } else if (typeof arr[i] === "object" && arr[i].attr) {
-      ret.push(can.getObject(arr[i].attr, context));
-    } else if (can.isArray(arr[i]) && arr[i].value) {
-      var p = true;
-      for (var j = 0; j < arr[i].length; j ++) {
-        var attr = can.getObject(arr[i][j].attr, context);
-        if (arr[i][j].inverse ? !isExtendedFalsy(attr) : isExtendedFalsy(attr)) {
-          p = false;
-          break;
-        }
-      }
-      if (p) {
-        ret.push(arr[i].value);
-      }
-    } else {
-      throw "Unsupported class building expression: " + JSON.stringify(arr[i]);
-    }
-  }
-
-  return ret.join(" ");
-}
-
-Mustache.registerHelper("addclass", function (prefix, compute, options) {
-  prefix = resolve_computed(prefix);
-  return function (el) {
-    var curClass = null
-      , wasAttached = false
-      , callback
-      ;
-
-    callback = function (_ev, newVal, _oldVal) {
-      var nowAttached = $(el).closest('body').length > 0
-        , newClass = null
-        ;
-
-      //  If we were once attached and now are not, unbind this callback.
-      if (wasAttached && !nowAttached) {
-        compute.unbind('change', callback);
-        return;
-      } else if (nowAttached && !wasAttached) {
-        wasAttached = true;
-      }
-
-      if (newVal && newVal.toLowerCase) {
-        newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, '-');
-      }
-
-      if (curClass) {
-        $(el).removeClass(curClass);
-        curClass = null;
-      }
-      if (newClass) {
-        $(el).addClass(newClass);
-        curClass = newClass;
-      }
-    };
-
-    compute.bind('change', callback);
-    callback(null, resolve_computed(compute));
-  };
-});
-
-/**
-  Add a live bound attribute to an element, avoiding buggy CanJS attribute interpolations.
-  Usage:
-  {{#withattr attrname attrvalue attrname attrvalue...}}<element/>{{/withattr}} to apply to the child element
-  {{{withattr attrname attrvalue attrname attrvalue...}}} to apply to the parent element a la XSLT <xsl:attribute>. Note the triple braces!
-  attrvalue can take mustache tokens, but they should be backslash escaped.
-*/
-Mustache.registerHelper("withattr", function () {
-  var args = can.makeArray(arguments).slice(0, arguments.length - 1)
-  , options = arguments[arguments.length - 1]
-  , attribs = []
-  , that = this.___st4ck ? this[this.length-1] : this
-  , data = can.extend({}, that)
-  , hash = quickHash(args.join("-"), quickHash(that._cid)).toString(36)
-  , attr_count = 0;
-
-  var hook = can.view.hook(function (el, parent, view_id) {
-    var content = options.fn(that);
-
-    if (content) {
-      var frag = can.view.frag(content, parent);
-      var $newel = $(frag.querySelector("*"));
-      var newel = $newel[0];
-
-      el.parentNode ? el.parentNode.replaceChild(newel, el) : $(parent).append($newel);
-      el = newel;
-    } else {
-      //we are inside the element we want to add attrs to.
-      var p = el.parentNode;
-      p.removeChild(el);
-      el = p;
-    }
-
-    function sub_all(el, ev, newVal, oldVal) {
-      var $el = $(el);
-      can.each(attribs, function (attrib) {
-        $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data)).html());
-      });
-    }
-
-    for (var i = 0; i < args.length - 1; i += 2) {
-      var attr_name = args[i];
-      var attr_tmpl = args[i + 1];
-      //set up bindings where appropriate
-      attr_tmpl = attr_tmpl.replace(/\{[^\}]*\}/g, function (match, offset, string) {
-        var token = match.substring(1, match.length - 1);
-        if (typeof data[token] === "function") {
-          data[token].bind && data[token].bind("change." + hash, $.proxy(sub_all, that, el));
-          data[token] = data[token].call(that);
-        }
-
-        that.bind && that.bind(token + "." + hash, $.proxy(sub_all, that, el));
-
-        return "{" + match + "}";
-      });
-      can.view.mustache("withattr_" + hash + "_" + (++attr_count), attr_tmpl);
-      attribs.push({name : attr_name, value : "withattr_" + hash + "_" + attr_count });
-    }
-
-    sub_all(el);
-
   });
 
-  return "<div"
-  + hook
-  + " data-replace='true'/>";
-});
+  var quickHash = function (str, seed) {
+    var bitval = seed || 1;
+    str = str || "";
+    for (var i = 0; i < str.length; i++) {
+      bitval *= str.charCodeAt(i);
+      bitval = Math.pow(bitval, 7);
+      bitval %= Math.pow(7, 37);
+    }
+    return bitval;
+  };
 
-Mustache.registerHelper("if_equals", function (val1, val2, options) {
-  var that = this, _val1, _val2;
-  function exec() {
-    if (_val1 == _val2) return options.fn(options.contexts);
-    else return options.inverse(options.contexts);
+
+  var getParentNode = function (el, defaultParentNode) {
+    return defaultParentNode && el.parentNode.nodeType === 11 ? defaultParentNode : el.parentNode;
+  };
+
+
+  function isExtendedFalsy(obj) {
+    return !obj
+      || (typeof obj === "object" && can.isEmptyObject(obj))
+      || (obj.length != null && obj.length === 0)
+      || (obj.serialize && can.isEmptyObject(obj.serialize()));
   }
+
+  function preprocessClassString(str) {
+    var ret = []
+      , src = str.split(" ");
+
+    for (var i = 0; i < src.length; i++) {
+      var expr = src[i].trim();
+      if (expr.charAt(0) === "=") {
+        ret.push({attr: src[i].trim().substr(1)});
+      } else if (expr.indexOf(":") > -1) {
+        var spl = expr.split(":");
+        var arr = [];
+        for (var j = 0; j < spl.length - 1; j++) {
+          var inverse = spl[j].trim()[0] === "!"
+            , attr_name = spl[j].trim().substr(inverse ? 1 : 0);
+
+          arr.push({attr: attr_name, inverse: inverse});
+        }
+        arr.value = spl[spl.length - 1];
+        ret.push(arr);
+      } else {
+        ret.push(expr);
+      }
+    }
+    return ret;
+  }
+
+  function buildClassString(arr, context) {
+    var ret = [];
+    for (var i = 0; i < arr.length; i++) {
+      if (typeof arr[i] === "string") {
+        ret.push(arr[i]);
+      } else if (typeof arr[i] === "object" && arr[i].attr) {
+        ret.push(can.getObject(arr[i].attr, context));
+      } else if (can.isArray(arr[i]) && arr[i].value) {
+        var p = true;
+        for (var j = 0; j < arr[i].length; j++) {
+          var attr = can.getObject(arr[i][j].attr, context);
+          if (arr[i][j].inverse ? !isExtendedFalsy(attr) : isExtendedFalsy(attr)) {
+            p = false;
+            break;
+          }
+        }
+        if (p) {
+          ret.push(arr[i].value);
+        }
+      } else {
+        throw "Unsupported class building expression: " + JSON.stringify(arr[i]);
+      }
+    }
+
+    return ret.join(" ");
+  }
+
+  Mustache.registerHelper("addclass", function (prefix, compute, options) {
+    prefix = resolve_computed(prefix);
+    return function (el) {
+      var curClass = null
+        , wasAttached = false
+        , callback
+        ;
+
+      callback = function (_ev, newVal, _oldVal) {
+        var nowAttached = $(el).closest('body').length > 0
+          , newClass = null
+          ;
+
+        //  If we were once attached and now are not, unbind this callback.
+        if (wasAttached && !nowAttached) {
+          compute.unbind('change', callback);
+          return;
+        } else if (nowAttached && !wasAttached) {
+          wasAttached = true;
+        }
+
+        if (newVal && newVal.toLowerCase) {
+          newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, '-');
+        }
+
+        if (curClass) {
+          $(el).removeClass(curClass);
+          curClass = null;
+        }
+        if (newClass) {
+          $(el).addClass(newClass);
+          curClass = newClass;
+        }
+      };
+
+      compute.bind('change', callback);
+      callback(null, resolve_computed(compute));
+    };
+  });
+
+  /**
+   Add a live bound attribute to an element, avoiding buggy CanJS attribute interpolations.
+   Usage:
+   {{#withattr attrname attrvalue attrname attrvalue...}}<element/>{{/withattr}} to apply to the child element
+   {{{withattr attrname attrvalue attrname attrvalue...}}} to apply to the parent element a la XSLT <xsl:attribute>. Note the triple braces!
+   attrvalue can take mustache tokens, but they should be backslash escaped.
+   */
+  Mustache.registerHelper("withattr", function () {
+    var args = can.makeArray(arguments).slice(0, arguments.length - 1)
+      , options = arguments[arguments.length - 1]
+      , attribs = []
+      , that = this.___st4ck ? this[this.length - 1] : this
+      , data = can.extend({}, that)
+      , hash = quickHash(args.join("-"), quickHash(that._cid)).toString(36)
+      , attr_count = 0;
+
+    var hook = can.view.hook(function (el, parent, view_id) {
+      var content = options.fn(that);
+
+      if (content) {
+        var frag = can.view.frag(content, parent);
+        var $newel = $(frag.querySelector("*"));
+        var newel = $newel[0];
+
+        el.parentNode ? el.parentNode.replaceChild(newel, el) : $(parent).append($newel);
+        el = newel;
+      } else {
+        //we are inside the element we want to add attrs to.
+        var p = el.parentNode;
+        p.removeChild(el);
+        el = p;
+      }
+
+      function sub_all(el, ev, newVal, oldVal) {
+        var $el = $(el);
+        can.each(attribs, function (attrib) {
+          $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data)).html());
+        });
+      }
+
+      for (var i = 0; i < args.length - 1; i += 2) {
+        var attr_name = args[i];
+        var attr_tmpl = args[i + 1];
+        //set up bindings where appropriate
+        attr_tmpl = attr_tmpl.replace(/\{[^\}]*\}/g, function (match, offset, string) {
+          var token = match.substring(1, match.length - 1);
+          if (typeof data[token] === "function") {
+            data[token].bind && data[token].bind("change." + hash, $.proxy(sub_all, that, el));
+            data[token] = data[token].call(that);
+          }
+
+          that.bind && that.bind(token + "." + hash, $.proxy(sub_all, that, el));
+
+          return "{" + match + "}";
+        });
+        can.view.mustache("withattr_" + hash + "_" + (++attr_count), attr_tmpl);
+        attribs.push({
+          name: attr_name,
+          value: "withattr_" + hash + "_" + attr_count
+        });
+      }
+
+      sub_all(el);
+
+    });
+
+    return "<div"
+      + hook
+      + " data-replace='true'/>";
+  });
+
+  Mustache.registerHelper("if_equals", function (val1, val2, options) {
+    var that = this, _val1, _val2;
+
+    function exec() {
+      if (_val1 == _val2) return options.fn(options.contexts);
+      else return options.inverse(options.contexts);
+    }
+
     if (typeof val1 === "function") {
       if (val1.isComputed) {
         val1.bind("change", function (ev, newVal, oldVal) {
@@ -272,34 +277,38 @@ Mustache.registerHelper("if_equals", function (val1, val2, options) {
       _val2 = val2;
     }
 
-  return exec();
-});
+    return exec();
+  });
 
-Mustache.registerHelper("if_match", function (val1, val2, options) {
-  var that = this
-  , _val1 = resolve_computed(val1)
-  , _val2 = resolve_computed(val2);
-  function exec() {
-    var re = new RegExp(_val2);
-    if (re.test(_val1)) return options.fn(options.contexts);
-    else return options.inverse(options.contexts);
-  }
-  return exec();
-});
+  Mustache.registerHelper("if_match", function (val1, val2, options) {
+    var that = this
+      , _val1 = resolve_computed(val1)
+      , _val2 = resolve_computed(val2);
 
-Mustache.registerHelper("in_array", function (needle, haystack, options) {
-  needle = resolve_computed(needle);
-  haystack = resolve_computed(haystack);
+    function exec() {
+      var re = new RegExp(_val2);
+      if (re.test(_val1)) return options.fn(options.contexts);
+      else return options.inverse(options.contexts);
+    }
 
-  return options[~can.inArray(needle, haystack) ? "fn" : "inverse"](options.contexts);
-});
+    return exec();
+  });
 
-Mustache.registerHelper("if_null", function (val1, options) {
-  var that = this, _val1;
-  function exec() {
-    if (_val1 == null) return options.fn(that);
-    else return options.inverse(that);
-  }
+  Mustache.registerHelper("in_array", function (needle, haystack, options) {
+    needle = resolve_computed(needle);
+    haystack = resolve_computed(haystack);
+
+    return options[~can.inArray(needle, haystack) ? "fn" : "inverse"](options.contexts);
+  });
+
+  Mustache.registerHelper("if_null", function (val1, options) {
+    var that = this, _val1;
+
+    function exec() {
+      if (_val1 == null) return options.fn(that);
+      else return options.inverse(that);
+    }
+
     if (typeof val1 === "function") {
       if (val1.isComputed) {
         val1.bind("change", function (ev, newVal, oldVal) {
@@ -311,130 +320,130 @@ Mustache.registerHelper("if_null", function (val1, options) {
     } else {
       _val1 = val1;
     }
-  return exec();
-});
+    return exec();
+  });
 
 // Resolve and return the first computed value from a list
-Mustache.registerHelper("firstexist", function () {
-  var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)
-  for (var i = 0; i < args.length; i++) {
-    var v = resolve_computed(args[i]);
-    if (v != null) return v.toString();
-  }
-  return "";
-});
+  Mustache.registerHelper("firstexist", function () {
+    var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)
+    for (var i = 0; i < args.length; i++) {
+      var v = resolve_computed(args[i]);
+      if (v != null) return v.toString();
+    }
+    return "";
+  });
 
 // Return the first value from a list that computes to a non-empty string
-Mustache.registerHelper("firstnonempty", function () {
-  var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)
-  for (var i = 0; i < args.length; i++) {
-    var v = resolve_computed(args[i]);
-    if (v != null && !!v.toString().trim().replace(/&nbsp;|\s|<br *\/?>/g, "")) return v.toString();
-  }
-  return "";
-});
+  Mustache.registerHelper("firstnonempty", function () {
+    var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)
+    for (var i = 0; i < args.length; i++) {
+      var v = resolve_computed(args[i]);
+      if (v != null && !!v.toString().trim().replace(/&nbsp;|\s|<br *\/?>/g, "")) return v.toString();
+    }
+    return "";
+  });
 
-Mustache.registerHelper("pack", function () {
-  var options = arguments[arguments.length - 1];
-  var objects = can.makeArray(arguments).slice(0, arguments.length - 1);
-  var pack = {};
-  can.each(objects, function (obj, i) {
+  Mustache.registerHelper("pack", function () {
+    var options = arguments[arguments.length - 1];
+    var objects = can.makeArray(arguments).slice(0, arguments.length - 1);
+    var pack = {};
+    can.each(objects, function (obj, i) {
       if (typeof obj === "function") {
         objects[i] = obj = obj();
       }
 
-    if (obj._data) {
-      obj = obj._data;
-    }
-    for (var k in obj) {
-      if (obj.hasOwnProperty(k)) {
-        pack[k] = obj[k];
+      if (obj._data) {
+        obj = obj._data;
+      }
+      for (var k in obj) {
+        if (obj.hasOwnProperty(k)) {
+          pack[k] = obj[k];
+        }
+      }
+    });
+    if (options.hash) {
+      for (var k in options.hash) {
+        if (options.hash.hasOwnProperty(k)) {
+          pack[k] = options.hash[k];
+        }
       }
     }
+    pack = new can.Observe(pack);
+    return options.fn(pack);
   });
-  if (options.hash) {
-    for (var k in options.hash) {
-      if (options.hash.hasOwnProperty(k)) {
-        pack[k] = options.hash[k];
-      }
-    }
-  }
-  pack = new can.Observe(pack);
-  return options.fn(pack);
-});
 
 
-Mustache.registerHelper("is_beta", function () {
-  var options = arguments[arguments.length - 1];
-  if ($(document.body).hasClass('BETA')) return options.fn(this);
-  else return options.inverse(this);
-});
+  Mustache.registerHelper("is_beta", function () {
+    var options = arguments[arguments.length - 1];
+    if ($(document.body).hasClass('BETA')) return options.fn(this);
+    else return options.inverse(this);
+  });
 
-Mustache.registerHelper("if_page_type", function (page_type, options) {
-  var options = arguments[arguments.length - 1];
-  if (window.location.pathname.split('/')[1] == page_type)
-    return options.fn(this);
-  else
-    return options.inverse(this);
-});
+  Mustache.registerHelper("if_page_type", function (page_type, options) {
+    var options = arguments[arguments.length - 1];
+    if (window.location.pathname.split('/')[1] == page_type)
+      return options.fn(this);
+    else
+      return options.inverse(this);
+  });
 
 // Render a named template with the specified context, serialized and
 // augmented by 'options.hash'
-Mustache.registerHelper("render", function (template, context, options) {
-  if (!options) {
-    options = context;
-    context = this;
-  }
+  Mustache.registerHelper("render", function (template, context, options) {
+    if (!options) {
+      options = context;
+      context = this;
+    }
 
-  if (typeof context === "function") {
-    context = context();
-  }
+    if (typeof context === "function") {
+      context = context();
+    }
 
-  if (typeof template === "function") {
-    template = template();
-  }
+    if (typeof template === "function") {
+      template = template();
+    }
 
-  context = $.extend({}, context.serialize ? context.serialize() : context);
+    context = $.extend({}, context.serialize ? context.serialize() : context);
 
-  if (options.hash) {
-    for (var k in options.hash) {
-      if (options.hash.hasOwnProperty(k)) {
-        context[k] = options.hash[k];
-        if (typeof context[k] == "function")
-          context[k] = context[k]();
+    if (options.hash) {
+      for (var k in options.hash) {
+        if (options.hash.hasOwnProperty(k)) {
+          context[k] = options.hash[k];
+          if (typeof context[k] == "function")
+            context[k] = context[k]();
+        }
       }
     }
-  }
 
-  var ret = can.view.render(template, context instanceof can.view.Scope ? context : new can.view.Scope(context));
-  //can.view.hookup(ret);
-  return ret;
-});
+    var ret = can.view.render(template, context instanceof can.view.Scope ? context : new can.view.Scope(context));
+    //can.view.hookup(ret);
+    return ret;
+  });
 
 // Like 'render', but doesn't serialize the 'context' object, and doesn't
 // apply options.hash
-Mustache.registerHelper("renderLive", function (template, context, options) {
-  if (!options) {
-    options = context;
-    context = this;
-  } else {
-    options.contexts = options.contexts.add(context);
-  }
+  Mustache.registerHelper("renderLive", function (template, context, options) {
+    if (!options) {
+      options = context;
+      context = this;
+    } else {
+      options.contexts = options.contexts.add(context);
+    }
 
-  if (typeof context === "function") {
-    context = context();
-  }
+    if (typeof context === "function") {
+      context = context();
+    }
 
-  if (typeof template === "function") {
-    template = template();
-  }
+    if (typeof template === "function") {
+      template = template();
+    }
 
-  if (options.hash) {
-    options.contexts = options.contexts.add(options.hash);
-  }
+    if (options.hash) {
+      options.contexts = options.contexts.add(options.hash);
+    }
 
-  return can.view.render(template, options.contexts);
-});
+    return can.view.render(template, options.contexts);
+  });
 
 // Renders one or more "hooks", which are templates registered under a
 //  particular key using GGRC.register_hook(), using the current context.
@@ -443,364 +452,373 @@ Mustache.registerHelper("renderLive", function (template, context, options) {
 //
 // Example: {{{render_hooks 'Audit' 'test_info'}}}  renders all hooks registered
 //  with GGRC.register_hook("Audit.test_info", <template path>)
-Mustache.registerHelper("render_hooks", function () {
-  var args = can.makeArray(arguments),
+  Mustache.registerHelper("render_hooks", function () {
+    var args = can.makeArray(arguments),
       options = args.splice(args.length - 1, 1)[0],
       hook = can.map(args, Mustache.resolve).join(".");
 
-  return can.map(can.getObject(hook, GGRC.hooks) || [], function (hook_tmpl) {
-    return can.Mustache.getHelper("renderLive", options.contexts).fn(hook_tmpl, options.contexts, options);
-  }).join("\n");
-});
+    return can.map(can.getObject(hook, GGRC.hooks) || [], function (hook_tmpl) {
+      return can.Mustache.getHelper("renderLive", options.contexts).fn(hook_tmpl, options.contexts, options);
+    }).join("\n");
+  });
 
 // Checks whether any hooks are registered for a particular key
-Mustache.registerHelper("if_hooks", function () {
-  var args = can.makeArray(arguments),
+  Mustache.registerHelper("if_hooks", function () {
+    var args = can.makeArray(arguments),
       options = args.splice(args.length - 1, 1)[0],
       hook = can.map(args, Mustache.resolve).join(".");
 
-  if ((can.getObject(hook, GGRC.hooks) || []).length > 0) {
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
-});
-
-var defer_render = Mustache.defer_render = function defer_render(tag_prefix, funcs, deferred) {
-  var hook
-    , tag_name = tag_prefix.split(" ")[0]
-    ;
-
-  tag_name = tag_name || "span";
-
-  if (typeof funcs === "function") {
-    funcs = { done : funcs };
-  }
-
-  function hookup(element, parent, view_id) {
-    var $element = $(element)
-    , f = function () {
-      var g = deferred && deferred.state() === "rejected" ? funcs.fail : funcs.done
-        , args = arguments
-        , term = element.nextSibling
-        , compute = can.compute(function () { return g.apply(this, args) || ""; }, this)
-        ;
-
-      if (element.parentNode) {
-        can.view.live.html(element, compute, parent);
-      } else {
-        $element.after(compute());
-        if ($element.next().get(0)) {
-          can.view.nodeLists.update($element.get(), $element.nextAll().get());
-          $element.remove();
-        }
-      }
-    };
-    if (deferred) {
-      deferred.done(f);
-      if (funcs.fail) {
-        deferred.fail(f);
-      }
-    }
-    else
-      setTimeout(f, 13);
-
-    if (funcs.progress) {
-      // You would think that we could just do $element.append(funcs.progress()) here
-      //  but for some reason we have to hookup our own fragment.
-      $element.append(can.view.hookup($("<div>").html(funcs.progress())).html());
-    }
-  }
-
-  hook = can.view.hook(hookup);
-  return ["<", tag_prefix, " ", hook, ">", "</", tag_name, ">"].join("");
-};
-
-Mustache.registerHelper("defer", function (prop, deferred, options) {
-  var context = this;
-  var tag_name;
-  if (!options) {
-    options = prop;
-    prop = "result";
-  }
-
-  tag_name = (options.hash || {}).tag_name || "span";
-  allow_fail = (options.hash || {}).allow_fail || false;
-
-  deferred = resolve_computed(deferred);
-  if (typeof deferred === "function") deferred = deferred();
-  function finish(items) {
-    var ctx = {};
-    ctx[prop] = items;
-    return options.fn(options.contexts.add(ctx));
-  }
-  function progress() {
-    return options.inverse(options.contexts);
-  }
-
-  return defer_render(tag_name, { done: finish, fail: allow_fail ? finish : null, progress: progress }, deferred);
-});
-
-Mustache.registerHelper("allow_help_edit", function () {
-  var options = arguments[arguments.length - 1];
-  var instance = this && this.instance ? this.instance : options.context.instance;
-  if (instance) {
-    var action = instance.isNew() ? "create" : "update";
-    if (Permission.is_allowed(action, "Help", null)) {
-      return options.fn(this);
-    } else {
-      return options.inverse(this);
-    }
-  }
-  return options.inverse(this);
-});
-
-Mustache.registerHelper("all", function (type, params, options) {
-  var model = CMS.Models[type] || GGRC.Models[type]
-  , $dummy_content = $(options.fn({}).trim()).first()
-  , tag_name = $dummy_content.prop("tagName")
-  , context = this.instance ? this.instance : this instanceof can.Model.Cacheable ? this : null
-  , require_permission = ""
-  , items_dfd, hook;
-
-  if (!options) {
-    options = params;
-    params = {};
-  } else {
-    params = JSON.parse(resolve_computed(params));
-  }
-  if ("require_permission" in params) {
-    require_permission = params.require_permission;
-    delete params.require_permission;
-  }
-
-  function hookup(element, parent, view_id) {
-    items_dfd.done(function (items) {
-      var val
-      , $parent = $(element.parentNode)
-      , $el = $(element);
-      items = can.map(items, function (item) {
-        if (require_permission === "" || Permission.is_allowed(require_permission, type, item.context.id)) {
-          return item;
-        }
-      });
-      can.each(items, function (item) {
-        $(can.view.frag(options.fn(item), parent)).appendTo(element.parentNode);
-      });
-      if ($parent.is("select")
-        && $parent.attr("name")
-        && context
-      ) {
-        val = context.attr($parent.attr("name"));
-        if (val) {
-          $parent.find("option[value=" + val + "]").attr("selected", true);
-        } else {
-          context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0] || null);
-        }
-      }
-      $parent.parent().find(":data(spinner)").each(function (i, el) {
-        var spinner = $(el).data("spinner");
-        if (spinner) spinner.stop();
-      });
-      $el.remove();
-      //since we are removing the original live bound element, replace the
-      // live binding reference to it, with a reference to the new
-      // child nodes. We assume that at least one new node exists.
-      can.view.nodeLists.update($el.get(), $parent.children().get());
-    });
-    return element.parentNode;
-  }
-
-  if ($dummy_content.attr("data-view-id")) {
-    can.view.hookups[$dummy_content.attr("data-view-id")] = hookup;
-  } else {
-    hook = can.view.hook(hookup);
-    $dummy_content.attr.apply($dummy_content, can.map(hook.split('='), function (s) { return s.replace(/'|"| /, "");}));
-  }
-
-  items_dfd = model.findAll(params);
-  return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
-});
-
-can.each(["with_page_object_as", "with_current_user_as"], function (fname) {
-  Mustache.registerHelper(fname, function (name, options) {
-    if (!options) {
-      options = name;
-      name = fname.replace(/with_(.*)_as/, "$1");
-    }
-    var page_object = (fname === "with_current_user_as"
-                       ? (CMS.Models.Person.findInCacheById(GGRC.current_user.id)
-                          || CMS.Models.Person.model(GGRC.current_user))
-                       : GGRC.page_instance()
-                       );
-    if (page_object) {
-      var p = {};
-      p[name] = page_object;
-      options.contexts = options.contexts.add(p);
+    if ((can.getObject(hook, GGRC.hooks) || []).length > 0) {
       return options.fn(options.contexts);
     } else {
       return options.inverse(options.contexts);
     }
   });
-});
 
-Mustache.registerHelper("iterate", function () {
-  var i = 0, j = 0
-  , args = can.makeArray(arguments).slice(0, arguments.length - 1)
-  , options = arguments[arguments.length - 1]
-  , step = options.hash && options.hash.step || 1
-  , ctx = {}
-  , ret = [];
+  var defer_render = Mustache.defer_render = function defer_render(tag_prefix, funcs, deferred) {
+    var hook
+      , tag_name = tag_prefix.split(" ")[0]
+      ;
 
-  options.hash && options.hash.listen && Mustache.resolve(options.hash.listen);
+    tag_name = tag_name || "span";
 
-  for (; i < args.length; i += step) {
-    ctx.iterator = typeof args[i] === "string" ? new String(args[i]) : args[i];
-    for (j = 0; j < step; j++) {
-      ctx["iterator_" + j] = typeof args[i + j] === "string" ? new String(args[i + j]) : args[i + j];
+    if (typeof funcs === "function") {
+      funcs = {done: funcs};
     }
-    ret.push(options.fn(options.contexts.add(ctx)));
-  }
 
-  return ret.join("");
-});
+    function hookup(element, parent, view_id) {
+      var $element = $(element)
+        , f = function () {
+          var g = deferred && deferred.state() === "rejected" ? funcs.fail : funcs.done
+            , args = arguments
+            , term = element.nextSibling
+            , compute = can.compute(function () {
+              return g.apply(this, args) || "";
+            }, this)
+            ;
+
+          if (element.parentNode) {
+            can.view.live.html(element, compute, parent);
+          } else {
+            $element.after(compute());
+            if ($element.next().get(0)) {
+              can.view.nodeLists.update($element.get(), $element.nextAll().get());
+              $element.remove();
+            }
+          }
+        };
+      if (deferred) {
+        deferred.done(f);
+        if (funcs.fail) {
+          deferred.fail(f);
+        }
+      }
+      else
+        setTimeout(f, 13);
+
+      if (funcs.progress) {
+        // You would think that we could just do $element.append(funcs.progress()) here
+        //  but for some reason we have to hookup our own fragment.
+        $element.append(can.view.hookup($("<div>").html(funcs.progress())).html());
+      }
+    }
+
+    hook = can.view.hook(hookup);
+    return ["<", tag_prefix, " ", hook, ">", "</", tag_name, ">"].join("");
+  };
+
+  Mustache.registerHelper("defer", function (prop, deferred, options) {
+    var context = this;
+    var tag_name;
+    if (!options) {
+      options = prop;
+      prop = "result";
+    }
+
+    tag_name = (options.hash || {}).tag_name || "span";
+    allow_fail = (options.hash || {}).allow_fail || false;
+
+    deferred = resolve_computed(deferred);
+    if (typeof deferred === "function") deferred = deferred();
+    function finish(items) {
+      var ctx = {};
+      ctx[prop] = items;
+      return options.fn(options.contexts.add(ctx));
+    }
+
+    function progress() {
+      return options.inverse(options.contexts);
+    }
+
+    return defer_render(tag_name, {
+      done: finish,
+      fail: allow_fail ? finish : null,
+      progress: progress
+    }, deferred);
+  });
+
+  Mustache.registerHelper("allow_help_edit", function () {
+    var options = arguments[arguments.length - 1];
+    var instance = this && this.instance ? this.instance : options.context.instance;
+    if (instance) {
+      var action = instance.isNew() ? "create" : "update";
+      if (Permission.is_allowed(action, "Help", null)) {
+        return options.fn(this);
+      } else {
+        return options.inverse(this);
+      }
+    }
+    return options.inverse(this);
+  });
+
+  Mustache.registerHelper("all", function (type, params, options) {
+    var model = CMS.Models[type] || GGRC.Models[type]
+      , $dummy_content = $(options.fn({}).trim()).first()
+      , tag_name = $dummy_content.prop("tagName")
+      , context = this.instance ? this.instance : this instanceof can.Model.Cacheable ? this : null
+      , require_permission = ""
+      , items_dfd, hook;
+
+    if (!options) {
+      options = params;
+      params = {};
+    } else {
+      params = JSON.parse(resolve_computed(params));
+    }
+    if ("require_permission" in params) {
+      require_permission = params.require_permission;
+      delete params.require_permission;
+    }
+
+    function hookup(element, parent, view_id) {
+      items_dfd.done(function (items) {
+        var val
+          , $parent = $(element.parentNode)
+          , $el = $(element);
+        items = can.map(items, function (item) {
+          if (require_permission === "" || Permission.is_allowed(require_permission, type, item.context.id)) {
+            return item;
+          }
+        });
+        can.each(items, function (item) {
+          $(can.view.frag(options.fn(item), parent)).appendTo(element.parentNode);
+        });
+        if ($parent.is("select")
+          && $parent.attr("name")
+          && context
+        ) {
+          val = context.attr($parent.attr("name"));
+          if (val) {
+            $parent.find("option[value=" + val + "]").attr("selected", true);
+          } else {
+            context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0] || null);
+          }
+        }
+        $parent.parent().find(":data(spinner)").each(function (i, el) {
+          var spinner = $(el).data("spinner");
+          if (spinner) spinner.stop();
+        });
+        $el.remove();
+        //since we are removing the original live bound element, replace the
+        // live binding reference to it, with a reference to the new
+        // child nodes. We assume that at least one new node exists.
+        can.view.nodeLists.update($el.get(), $parent.children().get());
+      });
+      return element.parentNode;
+    }
+
+    if ($dummy_content.attr("data-view-id")) {
+      can.view.hookups[$dummy_content.attr("data-view-id")] = hookup;
+    } else {
+      hook = can.view.hook(hookup);
+      $dummy_content.attr.apply($dummy_content, can.map(hook.split('='), function (s) {
+        return s.replace(/'|"| /, "");
+      }));
+    }
+
+    items_dfd = model.findAll(params);
+    return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
+  });
+
+  can.each(["with_page_object_as", "with_current_user_as"], function (fname) {
+    Mustache.registerHelper(fname, function (name, options) {
+      if (!options) {
+        options = name;
+        name = fname.replace(/with_(.*)_as/, "$1");
+      }
+      var page_object = (fname === "with_current_user_as"
+        ? (CMS.Models.Person.findInCacheById(GGRC.current_user.id)
+      || CMS.Models.Person.model(GGRC.current_user))
+        : GGRC.page_instance()
+      );
+      if (page_object) {
+        var p = {};
+        p[name] = page_object;
+        options.contexts = options.contexts.add(p);
+        return options.fn(options.contexts);
+      } else {
+        return options.inverse(options.contexts);
+      }
+    });
+  });
+
+  Mustache.registerHelper("iterate", function () {
+    var i = 0, j = 0
+      , args = can.makeArray(arguments).slice(0, arguments.length - 1)
+      , options = arguments[arguments.length - 1]
+      , step = options.hash && options.hash.step || 1
+      , ctx = {}
+      , ret = [];
+
+    options.hash && options.hash.listen && Mustache.resolve(options.hash.listen);
+
+    for (; i < args.length; i += step) {
+      ctx.iterator = typeof args[i] === "string" ? new String(args[i]) : args[i];
+      for (j = 0; j < step; j++) {
+        ctx["iterator_" + j] = typeof args[i + j] === "string" ? new String(args[i + j]) : args[i + j];
+      }
+      ret.push(options.fn(options.contexts.add(ctx)));
+    }
+
+    return ret.join("");
+  });
 
 // Iterate over a string by spliting it by a separator
-Mustache.registerHelper("iterate_string", function (str, separator, options) {
-  var i = 0, args, ctx = {}, ret = [];
+  Mustache.registerHelper("iterate_string", function (str, separator, options) {
+    var i = 0, args, ctx = {}, ret = [];
 
-  str = Mustache.resolve(str);
-  separator = Mustache.resolve(separator);
-  args = str.split(separator);
-  for (; i < args.length; i += 1) {
-    ctx.iterator = typeof args[i] === "string" ? new String(args[i]) : args[i];
-    ret.push(options.fn(options.contexts.add(ctx)));
-  }
+    str = Mustache.resolve(str);
+    separator = Mustache.resolve(separator);
+    args = str.split(separator);
+    for (; i < args.length; i += 1) {
+      ctx.iterator = typeof args[i] === "string" ? new String(args[i]) : args[i];
+      ret.push(options.fn(options.contexts.add(ctx)));
+    }
 
-  return ret.join("");
-});
+    return ret.join("");
+  });
 
-Mustache.registerHelper("is_private", function (options) {
-  var context = this;
-  if (options.isComputed) {
-    context = resolve_computed(options);
-    options = arguments[1];
-  }
-  if (context && context.attr('private')) {
-    return options.fn(context);
-  }
-  return options.inverse(context);
-});
+  Mustache.registerHelper("is_private", function (options) {
+    var context = this;
+    if (options.isComputed) {
+      context = resolve_computed(options);
+      options = arguments[1];
+    }
+    if (context && context.attr('private')) {
+      return options.fn(context);
+    }
+    return options.inverse(context);
+  });
 
-Mustache.registerHelper("option_select", function (object, attr_name, role, options) {
-  var selected_option = object.attr(attr_name)
-    , selected_id = selected_option ? selected_option.id : null
-    , options_dfd = CMS.Models.Option.for_role(role)
-    , tabindex = options.hash && options.hash.tabindex
-    , tag_prefix = 'select class="span12"'
-    ;
+  Mustache.registerHelper("option_select", function (object, attr_name, role, options) {
+    var selected_option = object.attr(attr_name)
+      , selected_id = selected_option ? selected_option.id : null
+      , options_dfd = CMS.Models.Option.for_role(role)
+      , tabindex = options.hash && options.hash.tabindex
+      , tag_prefix = 'select class="span12"'
+      ;
 
-  function get_select_html(options) {
-    return [
+    function get_select_html(options) {
+      return [
         '<select class="span12" model="Option" name="' + attr_name + '"'
-      ,   tabindex ? ' tabindex=' + tabindex : ''
-      , '>'
-      , '<option value=""'
-      ,   !selected_id ? ' selected=selected' : ''
-      , '>---</option>'
-      , can.map(options, function (option) {
+        , tabindex ? ' tabindex=' + tabindex : ''
+        , '>'
+        , '<option value=""'
+        , !selected_id ? ' selected=selected' : ''
+        , '>---</option>'
+        , can.map(options, function (option) {
           return [
             '<option value="', option.id, '"'
-          ,   selected_id == option.id ? ' selected=selected' : ''
-          , '>'
-          ,   option.title
-          , '</option>'
+            , selected_id == option.id ? ' selected=selected' : ''
+            , '>'
+            , option.title
+            , '</option>'
           ].join('');
         }).join('\n')
-      , '</select>'
-    ].join('');
-  }
+        , '</select>'
+      ].join('');
+    }
 
-  return defer_render(tag_prefix, get_select_html, options_dfd);
-});
+    return defer_render(tag_prefix, get_select_html, options_dfd);
+  });
 
-Mustache.registerHelper("category_select", function (object, attr_name, category_type, options) {
-  var selected_options = object[attr_name] || [] //object.attr(attr_name) || []
-    , selected_ids = can.map(selected_options, function (selected_option) {
+  Mustache.registerHelper("category_select", function (object, attr_name, category_type, options) {
+    var selected_options = object[attr_name] || [] //object.attr(attr_name) || []
+      , selected_ids = can.map(selected_options, function (selected_option) {
         return selected_option.id;
       })
-    , options_dfd = CMS.Models[category_type].findAll()
-    , tab_index = options.hash && options.hash.tabindex
-    , tag_prefix = 'select class="span12" multiple="multiple"'
-    ;
+      , options_dfd = CMS.Models[category_type].findAll()
+      , tab_index = options.hash && options.hash.tabindex
+      , tag_prefix = 'select class="span12" multiple="multiple"'
+      ;
 
-  tab_index = typeof tab_index !== 'undefined' ? ' tabindex="' + tab_index + '"' : '';
-  function get_select_html(options) {
-    return [
+    tab_index = typeof tab_index !== 'undefined' ? ' tabindex="' + tab_index + '"' : '';
+    function get_select_html(options) {
+      return [
         '<select class="span12" multiple="multiple"'
-      ,   ' model="' + category_type + '"'
-      ,   ' name="' + attr_name + '"'
-      ,   tab_index
-      , '>'
-      , can.map(options, function (option) {
+        , ' model="' + category_type + '"'
+        , ' name="' + attr_name + '"'
+        , tab_index
+        , '>'
+        , can.map(options, function (option) {
           return [
             '<option value="', option.id, '"'
-          ,   selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''
-          , '>'
-          ,   option.name
-          , '</option>'
+            , selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''
+            , '>'
+            , option.name
+            , '</option>'
           ].join('');
         }).join('\n')
-      , '</select>'
-    ].join('');
+        , '</select>'
+      ].join('');
+    }
+
+    return defer_render(tag_prefix, get_select_html, options_dfd);
+  });
+
+  Mustache.registerHelper("schemed_url", function (url) {
+    if (url) {
+      url = url.isComputed ? url() : url;
+      if (url && !url.match(/^[a-zA-Z]+:/)) {
+        return (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
+      }
+    }
+    return url;
+  });
+
+  function when_attached_to_dom(el, cb) {
+    // Trigger the "more" toggle if the height is the same as the scrollable area
+    el = $(el);
+    return !function poll() {
+      if (el.closest(document.documentElement).length) {
+        cb();
+      }
+      else {
+        setTimeout(poll, 100);
+      }
+    }();
   }
 
-  return defer_render(tag_prefix, get_select_html, options_dfd);
-});
+  Mustache.registerHelper("open_on_create", function (style) {
+    return function (el) {
+      when_attached_to_dom(el, function () {
+        $(el).openclose("open");
+      });
+    };
+  });
 
-Mustache.registerHelper("schemed_url", function (url) {
-  if (url) {
-    url = url.isComputed? url(): url;
-    if (url && !url.match(/^[a-zA-Z]+:/)) {
-      return (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
-    }
-  }
-  return url;
-});
+  Mustache.registerHelper("trigger_created", function () {
+    return function (el) {
+      when_attached_to_dom(el, function () {
+        $(el).trigger("contentAttached");
+      });
+    };
+  });
 
-function when_attached_to_dom(el, cb) {
-  // Trigger the "more" toggle if the height is the same as the scrollable area
-  el = $(el);
-  return !function poll() {
-    if (el.closest(document.documentElement).length) {
-      cb();
-    }
-    else {
-      setTimeout(poll, 100);
-    }
-  }();
-}
-
-Mustache.registerHelper("open_on_create", function (style) {
-  return function (el) {
-    when_attached_to_dom(el, function () {
-      $(el).openclose("open");
-    });
-  };
-});
-
-Mustache.registerHelper("trigger_created", function () {
-  return function (el) {
-    when_attached_to_dom(el, function () {
-      $(el).trigger("contentAttached");
-    });
-  };
-});
-
-Mustache.registerHelper("show_long", function () {
-  return  [
+  Mustache.registerHelper("show_long", function () {
+    return [
       '<a href="javascript://" class="show-long"'
-    , can.view.hook(function (el, parent, view_id) {
+      , can.view.hook(function (el, parent, view_id) {
         el = $(el);
 
         var content = el.prevAll('.short');
@@ -831,725 +849,739 @@ Mustache.registerHelper("show_long", function () {
           }();
         }
       })
-    , ">...more</a>"
-  ].join('');
-});
+      , ">...more</a>"
+    ].join('');
+  });
 
-Mustache.registerHelper("using", function (options) {
-  var refresh_queue = new RefreshQueue()
-    , context
-    , frame = new can.Observe()
-    , args = can.makeArray(arguments)
-    , i, arg;
+  Mustache.registerHelper("using", function (options) {
+    var refresh_queue = new RefreshQueue()
+      , context
+      , frame = new can.Observe()
+      , args = can.makeArray(arguments)
+      , i, arg;
 
-  options = args.pop();
-  context = options.contexts || this;
+    options = args.pop();
+    context = options.contexts || this;
 
-  if (options.hash) {
-    for (i in options.hash) {
-      if (options.hash.hasOwnProperty(i)) {
-        arg = options.hash[i];
-        arg = Mustache.resolve(arg);
-        if (arg && arg.reify) {
-          refresh_queue.enqueue(arg.reify());
-          frame.attr(i, arg.reify());
-        } else {
-          frame.attr(i, arg);
+    if (options.hash) {
+      for (i in options.hash) {
+        if (options.hash.hasOwnProperty(i)) {
+          arg = options.hash[i];
+          arg = Mustache.resolve(arg);
+          if (arg && arg.reify) {
+            refresh_queue.enqueue(arg.reify());
+            frame.attr(i, arg.reify());
+          } else {
+            frame.attr(i, arg);
+          }
         }
       }
     }
-  }
 
-  function finish() {
-    return options.fn(options.contexts.add(frame));
-  }
+    function finish() {
+      return options.fn(options.contexts.add(frame));
+    }
 
-  return defer_render('span', finish, refresh_queue.trigger());
-});
+    return defer_render('span', finish, refresh_queue.trigger());
+  });
 
-Mustache.registerHelper("with_mapping", function (binding, options) {
-  var refresh_queue = new RefreshQueue()
-    , context = arguments.length > 2 ? resolve_computed(options) : this
-    , frame = new can.Observe()
-    , loader
-    , stack;
+  Mustache.registerHelper("with_mapping", function (binding, options) {
+    var refresh_queue = new RefreshQueue()
+      , context = arguments.length > 2 ? resolve_computed(options) : this
+      , frame = new can.Observe()
+      , loader
+      , stack;
 
-  if (!context) // can't find an object to map to.  Do nothing;
-    return;
+    if (!context) // can't find an object to map to.  Do nothing;
+      return;
 
-  loader = context.get_binding(binding);
-  if (!loader)
-    return options.fn(options.context);
+    loader = context.get_binding(binding);
+    if (!loader)
+      return options.fn(options.context);
 
-  frame.attr(binding, loader.list);
+    frame.attr(binding, loader.list);
 
-  options = arguments[2] || options;
+    options = arguments[2] || options;
 
-  function finish(list) {
-    return options.fn(options.contexts.add(frame));
-  }
-  function fail(error) {
-    return options.inverse(options.contexts.add({error : error}));
-  }
+    function finish(list) {
+      return options.fn(options.contexts.add(frame));
+    }
 
-  return defer_render('span', { done : finish, fail : fail }, loader.refresh_instances());
-});
+    function fail(error) {
+      return options.inverse(options.contexts.add({error: error}));
+    }
+
+    return defer_render('span', {
+      done: finish,
+      fail: fail
+    }, loader.refresh_instances());
+  });
 
 
-Mustache.registerHelper("person_roles", function (person, scope, options) {
-  var roles_deferred = new $.Deferred()
-    , refresh_queue = new RefreshQueue()
-    ;
-
-  if (!options) {
-    options = scope;
-    scope = null;
-  }
-
-  person = Mustache.resolve(person);
-  person = person.reify();
-  refresh_queue.enqueue(person);
-  // Force monitoring of changes to `person.user_roles`
-  person.attr("user_roles");
-  refresh_queue.trigger().then(function () {
-    var user_roles = person.user_roles.reify()
-      , user_roles_refresh_queue = new RefreshQueue()
+  Mustache.registerHelper("person_roles", function (person, scope, options) {
+    var roles_deferred = new $.Deferred()
+      , refresh_queue = new RefreshQueue()
       ;
-    user_roles_refresh_queue.enqueue(user_roles);
-    user_roles_refresh_queue.trigger().then(function () {
-      var roles = can.map(
-        can.makeArray(user_roles),
-        function (user_role) {
-          if (user_role.role) {
-            return user_role.role.reify();
-          }
-        })
-        , roles_refresh_queue = new RefreshQueue()
-        ;
-      roles_refresh_queue.enqueue(roles.splice());
-      roles_refresh_queue.trigger().then(function () {
-        roles = can.map(can.makeArray(roles), function (role) {
-          if (!scope || new RegExp(scope).test(role.scope)) {
-            return role;
-          }
-        });
 
-        //  "Superuser" roles are determined from config
-        //  FIXME: Abstraction violation
-        if ((!scope || new RegExp(scope).test("System"))
+    if (!options) {
+      options = scope;
+      scope = null;
+    }
+
+    person = Mustache.resolve(person);
+    person = person.reify();
+    refresh_queue.enqueue(person);
+    // Force monitoring of changes to `person.user_roles`
+    person.attr("user_roles");
+    refresh_queue.trigger().then(function () {
+      var user_roles = person.user_roles.reify()
+        , user_roles_refresh_queue = new RefreshQueue()
+        ;
+      user_roles_refresh_queue.enqueue(user_roles);
+      user_roles_refresh_queue.trigger().then(function () {
+        var roles = can.map(
+            can.makeArray(user_roles),
+            function (user_role) {
+              if (user_role.role) {
+                return user_role.role.reify();
+              }
+            })
+          , roles_refresh_queue = new RefreshQueue()
+          ;
+        roles_refresh_queue.enqueue(roles.splice());
+        roles_refresh_queue.trigger().then(function () {
+          roles = can.map(can.makeArray(roles), function (role) {
+            if (!scope || new RegExp(scope).test(role.scope)) {
+              return role;
+            }
+          });
+
+          //  "Superuser" roles are determined from config
+          //  FIXME: Abstraction violation
+          if ((!scope || new RegExp(scope).test("System"))
             && GGRC.config.BOOTSTRAP_ADMIN_USERS
             && ~GGRC.config.BOOTSTRAP_ADMIN_USERS.indexOf(person.email)) {
-          roles.unshift({
-            permission_summary: "Superuser",
-            name: "Superuser"
-          });
-        }
+            roles.unshift({
+              permission_summary: "Superuser",
+              name: "Superuser"
+            });
+          }
 
-        roles_deferred.resolve(roles);
+          roles_deferred.resolve(roles);
+        });
       });
     });
+
+    function finish(roles) {
+      return options.fn({roles: roles});
+    }
+
+    return defer_render('span', finish, roles_deferred);
   });
 
-  function finish(roles) {
-    return options.fn({ roles: roles });
-  }
-
-  return defer_render('span', finish, roles_deferred);
-});
-
-Mustache.registerHelper("unmap_or_delete", function (instance, mappings) {
+  Mustache.registerHelper("unmap_or_delete", function (instance, mappings) {
     instance = resolve_computed(instance);
     mappings = resolve_computed(mappings);
-  if (mappings.indexOf(instance) > -1) {
-    if (mappings.length == 1) {
-      if (mappings[0] instanceof CMS.Models.Control)
-        return "Unmap";
-      else
-        return "Delete";
-    }
-    else
-      return "Unmap";// "Unmap and Delete"
-  } else
-    return "Unmap";
-});
-
-Mustache.registerHelper("with_direct_mappings_as",
-    function (var_name, parent_instance, instance, options) {
-  // Finds the mapping, if any, between `parent_object` and `instance`, then
-  // renders the block with those mappings available in the scope as `var_name`
-
-  parent_instance = Mustache.resolve(parent_instance);
-  instance = Mustache.resolve(instance);
-
-  if (!instance) {
-      instance = [];
-  } else if (typeof instance.length === "number") {
-      instance = can.map(instance, function (inst) {
-        return inst.instance ? inst.instance : inst;
-      });
-  } else if (instance.instance) {
-      instance = [instance.instance];
-  } else {
-      instance = [instance];
-  }
-
-  var frame = new can.Observe();
-  frame.attr(var_name, []);
-  GGRC.all_local_results(parent_instance).then(function (results) {
-    var instance_only = options.hash && options.hash.instances_only;
-    can.each(results, function (result) {
-      if (~can.inArray(result.instance, instance)) {
-        frame.attr(var_name).push(instance_only ? result.instance : result);
+    if (mappings.indexOf(instance) > -1) {
+      if (mappings.length == 1) {
+        if (mappings[0] instanceof CMS.Models.Control)
+          return "Unmap";
+        else
+          return "Delete";
       }
-    });
+      else
+        return "Unmap";// "Unmap and Delete"
+    } else
+      return "Unmap";
   });
 
-  return options.fn(options.contexts.add(frame));
-});
+  Mustache.registerHelper("with_direct_mappings_as",
+    function (var_name, parent_instance, instance, options) {
+      // Finds the mapping, if any, between `parent_object` and `instance`, then
+      // renders the block with those mappings available in the scope as `var_name`
 
-Mustache.registerHelper("result_direct_mappings", function (
-    bindings, parent_instance, options) {
-  bindings = Mustache.resolve(bindings);
-  bindings = resolve_computed(bindings);
-  parent_instance = Mustache.resolve(parent_instance);
-  var has_direct_mappings = false
-    , has_external_mappings = false
-    , mappings_type = ""
-    , i
-    ;
+      parent_instance = Mustache.resolve(parent_instance);
+      instance = Mustache.resolve(instance);
 
-  if (bindings && bindings.length > 0) {
-    for (i=0; i<bindings.length; i++) {
-      if (bindings[i].instance && parent_instance
+      if (!instance) {
+        instance = [];
+      } else if (typeof instance.length === "number") {
+        instance = can.map(instance, function (inst) {
+          return inst.instance ? inst.instance : inst;
+        });
+      } else if (instance.instance) {
+        instance = [instance.instance];
+      } else {
+        instance = [instance];
+      }
+
+      var frame = new can.Observe();
+      frame.attr(var_name, []);
+      GGRC.all_local_results(parent_instance).then(function (results) {
+        var instance_only = options.hash && options.hash.instances_only;
+        can.each(results, function (result) {
+          if (~can.inArray(result.instance, instance)) {
+            frame.attr(var_name).push(instance_only ? result.instance : result);
+          }
+        });
+      });
+
+      return options.fn(options.contexts.add(frame));
+    });
+
+  Mustache.registerHelper("result_direct_mappings", function (bindings, parent_instance, options) {
+    bindings = Mustache.resolve(bindings);
+    bindings = resolve_computed(bindings);
+    parent_instance = Mustache.resolve(parent_instance);
+    var has_direct_mappings = false
+      , has_external_mappings = false
+      , mappings_type = ""
+      , i
+      ;
+
+    if (bindings && bindings.length > 0) {
+      for (i = 0; i < bindings.length; i++) {
+        if (bindings[i].instance && parent_instance
           && bindings[i].instance.reify() === parent_instance.reify())
-        has_direct_mappings = true;
-      else {
-        has_external_mappings = true;
+          has_direct_mappings = true;
+        else {
+          has_external_mappings = true;
+        }
       }
     }
-  }
-  mappings_type = has_direct_mappings ?
+    mappings_type = has_direct_mappings ?
       (has_external_mappings ? "Dir & Ext" : "Dir") : "Ext";
-  options.context.mappings_type = mappings_type;
-  return options.fn(options.contexts);
-});
-
-Mustache.registerHelper("if_result_has_extended_mappings", function (
-    bindings, parent_instance, options) {
-  //  Render the `true` / `fn` block if the `result` exists (in this list)
-  //  due to mappings other than directly to the `parent_instance`.  Otherwise
-  //  Render the `false` / `inverse` block.
-  bindings = Mustache.resolve(bindings);
-  bindings = resolve_computed(bindings);
-  parent_instance = Mustache.resolve(parent_instance);
-  var has_extended_mappings = false
-    , i
-    ;
-
-  if (bindings && bindings.length > 0) {
-    for (i=0; i<bindings.length; i++) {
-      if (bindings[i].instance && parent_instance
-          && bindings[i].instance.reify() !== parent_instance.reify())
-        has_extended_mappings = true;
-    }
-  }
-
-  if (has_extended_mappings)
+    options.context.mappings_type = mappings_type;
     return options.fn(options.contexts);
-  else
-    return options.inverse(options.contexts);
-});
+  });
 
-Mustache.registerHelper("each_with_extras_as", function (name, list, options) {
-  //  Iterate over `list` and render the provided block with additional
-  //  variables available in the context, specifically to enable joining with
-  //  commas and using "and" in the right place.
-  //
-  //  * `<name>`: Instead of rendering with the item as the current context,
-  //      make the item available at the specified `name`
-  //  * index
-  //  * length
-  //  * isFirst
-  //  * isLast
-  name = Mustache.resolve(name);
-  list = Mustache.resolve(list);
-  list = resolve_computed(list);
-  var i
-    , output = []
-    , frame
-    , length = list.length
-    ;
-  for (i=0; i<length; i++) {
-    frame = {
-      index : i
-      , isFirst : i === 0
-      , isLast : i === length - 1
-      , isSecondToLast : i === length - 2
-      , length : length
-    };
-    frame[name] = list[i];
-    output.push(options.fn(new can.Observe(frame)));
+  Mustache.registerHelper("if_result_has_extended_mappings", function (bindings, parent_instance, options) {
+    //  Render the `true` / `fn` block if the `result` exists (in this list)
+    //  due to mappings other than directly to the `parent_instance`.  Otherwise
+    //  Render the `false` / `inverse` block.
+    bindings = Mustache.resolve(bindings);
+    bindings = resolve_computed(bindings);
+    parent_instance = Mustache.resolve(parent_instance);
+    var has_extended_mappings = false
+      , i
+      ;
 
-    //  FIXME: Is this legit?  It seems necessary in some cases.
-    //context = $.extend([], options.contexts, options.contexts.concat([frame]));
-    //output.push(options.fn(context));
-    // ...or...
-    //contexts = options.contexts.concat([frame]);
-    //contexts.___st4ck3d = true;
-    //output.push(options.fn(contexts));
-  }
-  return output.join("");
-});
+    if (bindings && bindings.length > 0) {
+      for (i = 0; i < bindings.length; i++) {
+        if (bindings[i].instance && parent_instance
+          && bindings[i].instance.reify() !== parent_instance.reify())
+          has_extended_mappings = true;
+      }
+    }
 
-Mustache.registerHelper("link_to_tree", function () {
-  var args = [].slice.apply(arguments)
-    , options = args.pop()
-    , link = []
-    ;
+    if (has_extended_mappings)
+      return options.fn(options.contexts);
+    else
+      return options.inverse(options.contexts);
+  });
 
-  args = can.map(args, Mustache.resolve);
-  args = can.map(args, function (stub) { return stub.reify(); });
-  link.push("#" + args[0].constructor.table_singular + "_widget");
-  //  FIXME: Add this back when extended-tree-routing is enabled
-  //for (i=0; i<args.length; i++)
-  //  link.push(args[i].constructor.table_singular + "-" + args[i].id);
-  return link.join("/");
-});
+  Mustache.registerHelper("each_with_extras_as", function (name, list, options) {
+    //  Iterate over `list` and render the provided block with additional
+    //  variables available in the context, specifically to enable joining with
+    //  commas and using "and" in the right place.
+    //
+    //  * `<name>`: Instead of rendering with the item as the current context,
+    //      make the item available at the specified `name`
+    //  * index
+    //  * length
+    //  * isFirst
+    //  * isLast
+    name = Mustache.resolve(name);
+    list = Mustache.resolve(list);
+    list = resolve_computed(list);
+    var i
+      , output = []
+      , frame
+      , length = list.length
+      ;
+    for (i = 0; i < length; i++) {
+      frame = {
+        index: i
+        , isFirst: i === 0
+        , isLast: i === length - 1
+        , isSecondToLast: i === length - 2
+        , length: length
+      };
+      frame[name] = list[i];
+      output.push(options.fn(new can.Observe(frame)));
+
+      //  FIXME: Is this legit?  It seems necessary in some cases.
+      //context = $.extend([], options.contexts, options.contexts.concat([frame]));
+      //output.push(options.fn(context));
+      // ...or...
+      //contexts = options.contexts.concat([frame]);
+      //contexts.___st4ck3d = true;
+      //output.push(options.fn(contexts));
+    }
+    return output.join("");
+  });
+
+  Mustache.registerHelper("link_to_tree", function () {
+    var args = [].slice.apply(arguments)
+      , options = args.pop()
+      , link = []
+      ;
+
+    args = can.map(args, Mustache.resolve);
+    args = can.map(args, function (stub) {
+      return stub.reify();
+    });
+    link.push("#" + args[0].constructor.table_singular + "_widget");
+    //  FIXME: Add this back when extended-tree-routing is enabled
+    //for (i=0; i<args.length; i++)
+    //  link.push(args[i].constructor.table_singular + "-" + args[i].id);
+    return link.join("/");
+  });
 
 // Returns date formated like 01/28/2015 02:59:02am PST
 // To omit time pass in a second parameter {{date updated_at true}}
-Mustache.registerHelper("date", function (date) {
-  if(typeof date == 'undefined')
-    return '';
-  var m = moment(new Date(date.isComputed ? date() : date))
-    , dst = m.isDST()
-    , no_time = arguments.length > 2
-    ;
-
-  if (no_time) {
-    return m.format("MM/DD/YYYY");
-  }
-  return m.zone(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
-});
-
-/**
- * Checks permissions.
- * Usage:
- *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE_STRING context=CONTEXT_ID}} content {{/is_allowed}}
- *  {{#is_allowed ACTION RESOURCE_INSTANCE}} content {{/is_allowed}}
- */
-var allowed_actions = ["create", "read", "update", "delete", "view_object_page", "__GGRC_ADMIN__"];
-Mustache.registerHelper("is_allowed", function () {
-  var args = Array.prototype.slice.call(arguments, 0)
-    , actions = []
-    , resource
-    , resource_type
-    , context_unset = {}
-    , context_id = context_unset
-    , context_override
-    , options = args[args.length-1]
-    , passed = true
-    ;
-
-  // Resolve arguments
-  can.each(args, function (arg, i) {
-    while (typeof arg === 'function' && arg.isComputed) {
-      arg = arg();
-    }
-
-    if (typeof arg === 'string' && can.inArray(arg, allowed_actions) > -1) {
-      actions.push(arg);
-    }
-    else if (typeof arg === 'string') {
-      resource_type = arg;
-    }
-    else if (typeof arg === 'object' && arg instanceof can.Model) {
-      resource = arg;
-    }
-  });
-  if (options.hash && options.hash.hasOwnProperty("context")) {
-    context_id = options.hash.context;
-    if (typeof context_id === 'function' && context_id.isComputed) {
-      context_id = context_id();
-    }
-    if (context_id && typeof context_id === "object" && context_id.id) {
-      // Passed in the context object instead of the context ID, so use the ID
-      context_id = context_id.id;
-    }
-    //  Using `context=null` in Mustache templates, when `null` is not defined,
-    //  causes `context_id` to be `""`.
-    if (context_id === "" || context_id === undefined) {
-      context_id = null;
-    } else if (context_id === 'for' || context_id === 'any') {
-      context_override = context_id;
-      context_id = undefined;
-    }
-  }
-
-  if (resource_type && context_id === context_unset) {
-    throw new Error(
-        "If `resource_type` is a string, `context` must be explicit");
-  }
-  if (actions.length === 0) {
-    throw new Error(
-        "Must specify at least one action");
-  }
-
-  if (resource) {
-    resource_type = resource.constructor.shortName;
-    context_id = resource.context ? resource.context.id : null;
-  }
-
-  // Check permissions
-  can.each(actions, function (action) {
-    if (context_id !== undefined) {
-      passed = passed && Permission.is_allowed(action, resource_type, context_id);
-    }
-    if (passed && context_override === 'for' && resource) {
-      passed = passed && Permission.is_allowed_for (action, resource);
-    }
-    else if (passed && context_override === 'any' && resource_type) {
-      passed = passed && Permission.is_allowed_any(action, resource_type);
-    }
-  });
-
-  return passed
-    ? options.fn(options.contexts || this)
-    : options.inverse(options.contexts || this)
-    ;
-});
-
-Mustache.registerHelper("is_allowed_all", function (action, instances, options) {
-  var passed = true;
-
-  action = resolve_computed(action);
-  instances = resolve_computed(instances);
-
-  can.each(instances, function (instance) {
-    var resource_type
-      , context_id
-      , base_mappings = []
+  Mustache.registerHelper("date", function (date) {
+    if (typeof date == 'undefined')
+      return '';
+    var m = moment(new Date(date.isComputed ? date() : date))
+      , dst = m.isDST()
+      , no_time = arguments.length > 2
       ;
 
-    if (instance instanceof GGRC.ListLoaders.MappingResult) {
-      instance.walk_instances(function (inst, mapping) {
-        if (can.reduce(mapping.mappings, function (a, b) { return a || (b.instance === true); }, false)) {
-          base_mappings.push(inst);
-        }
-      });
-    } else {
-      base_mappings.push(instance);
+    if (no_time) {
+      return m.format("MM/DD/YYYY");
     }
-
-    can.each(base_mappings, function (instance) {
-      resource_type = instance.constructor.shortName;
-      context_id = instance.context ? instance.context.id : null;
-      passed = passed && Permission.is_allowed(action, resource_type, context_id);
-    });
+    return m.zone(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
   });
 
-  if (passed)
-    return options.fn(options.contexts || this);
-  else
-    return options.inverse(options.contexts || this);
-});
+  /**
+   * Checks permissions.
+   * Usage:
+   *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE_STRING context=CONTEXT_ID}} content {{/is_allowed}}
+   *  {{#is_allowed ACTION RESOURCE_INSTANCE}} content {{/is_allowed}}
+   */
+  var allowed_actions = ["create", "read", "update", "delete", "view_object_page", "__GGRC_ADMIN__"];
+  Mustache.registerHelper("is_allowed", function () {
+    var args = Array.prototype.slice.call(arguments, 0)
+      , actions = []
+      , resource
+      , resource_type
+      , context_unset = {}
+      , context_id = context_unset
+      , context_override
+      , options = args[args.length - 1]
+      , passed = true
+      ;
 
-Mustache.registerHelper("is_allowed_to_map", function (source, target, options) {
-  //  For creating mappings, we only care if the user can create instances of
-  //  the join model.
-  //  - `source` must be a model instance
-  //  - `target` must be the name of the target model
-  //
-  //  FIXME: This should actually iterate through all applicable join models
-  //    and return success if any one matches.
-  var target_type
-    , resource_type
-    , context_id
-    , can_map
-    ;
-
-  source = resolve_computed(source);
-  target = resolve_computed(target);
-
-  if (target instanceof can.Model)
-    target_type = target.constructor.shortName;
-  else
-    target_type = target;
-
-  //if (!(source instanceof can.Model)) {
-  //  //  If `source` is not a model instance, assume they want to link to the
-  //  //  page object.
-  //  options = target;
-  //  target = source;
-  //  source = GGRC.page_instance();
-  //}
-
-  context_id = source.context ? source.context.id : null;
-
-  resource_type = GGRC.Mappings.join_model_name_for (
-    source.constructor.shortName, target_type);
-
-  // The special case for `Cacheable` should no longer be necessary given
-  // correct definition of the canonical mapping for Cacheable.
-  if (!resource_type && target_type === 'Cacheable') {
-    //  FIXME: This will *not* work for customizable roles -- this *only* works
-    //    for the limited default roles as of 2013-10-07, and assumes that:
-    //    1.  All `Cacheable` mappings (e.g. where you might map multiple types
-    //        to a single object) are in the `null` context; and
-    //    2.  If a user has permission for creating `Relationship` objects in
-    //        the `null` context, they have permission for creating all mapping
-    //        objects in `null` context.
-    //  UPDATE 2013-03-05: Passing source context solved the issue where user
-    //    with reader sys-wide role and program owner role was unable to map
-    //    objects.
-    can_map = Permission.is_allowed('create', 'Relationship', context_id);
-  }
-  else {
-    if (!(source instanceof CMS.Models.Program)
-        && target instanceof CMS.Models.Program)
-      context_id = target.context ? target.context.id : null;
-
-    // We should only map objects that have join models
-    can_map = (!(options.hash && options.hash.join) || resource_type)
-      && Permission.is_allowed('create', resource_type, context_id);
-  }
-  if (can_map)
-    return options.fn(options.contexts || this);
-  else
-    return options.inverse(options.contexts || this);
-});
-
-function resolve_computed(maybe_computed, always_resolve) {
-  return (typeof maybe_computed === "function"
-    && (maybe_computed.isComputed || always_resolve)) ? resolve_computed(maybe_computed(), always_resolve) : maybe_computed;
-}
-
-Mustache.registerHelper("attach_spinner", function (spin_opts, styles) {
-  spin_opts = Mustache.resolve(spin_opts);
-  styles = Mustache.resolve(styles);
-  spin_opts = typeof spin_opts === "string" ? JSON.parse(spin_opts) : {};
-  styles = typeof styles === "string" ? styles : "";
-  return function (el) {
-    var spinner = new Spinner(spin_opts).spin();
-    $(el).append($(spinner.el).attr("style", $(spinner.el).attr("style") + ";" + styles)).data("spinner", spinner);
-  };
-});
-
-Mustache.registerHelper("determine_context", function (page_object, target) {
-  if (page_object.constructor.shortName == "Program") {
-    return page_object.context ? page_object.context.id : null;
-  } else if (target.constructor.shortName == "Program") {
-    return target.context ? target.context.id : null;
-  }
-  return page_object.context ? page_object.context.id : null;
-});
-
-Mustache.registerHelper("json_escape", function (obj, options) {
-  var s = JSON.stringify("" + (resolve_computed(obj) || ""));
-  return s.substr(1, s.length - 2);
-  /*return (""+(resolve_computed(obj) || ""))
-    .replace(/\\/g, '\\')
-    .replace(/"/g, '\\"')
-    //  FUNFACT: JSON does not allow wrapping strings with single quotes, and
-    //    thus does not allow backslash-escaped single quotes within strings.
-    //    E.g., make sure attributes use double quotes, or use character
-    //    entities instead -- but these aren't replaced by the JSON parser, so
-    //    the output is not identical to input (hence, not using them now.)
-    //.replace(/'/g, "\\'")
-    //.replace(/"/g, '&#34;').replace(/'/g, "&#39;")
-    .replace(/\n/g, "\\n")
-    .replace(/\r/g, "\\r")
-    .replace(/\u2028/g, "\\u2028") // Line separator
-    .replace(/\u2029/g, "\\u2029") // Paragraph separator
-    .replace(/\t/g, "\\t")
-    .replace(/[\b]/g, "\\b")
-    .replace(/\f/g, "\\f")
-    .replace(/\v/g, "\\v");
-  */
-});
-
-can.each({
-  "localize_date" : "MM/DD/YYYY"
-  , "localize_datetime" : "MM/DD/YYYY hh:mm:ss A"
-}, function (tmpl, fn) {
-  Mustache.registerHelper(fn, function (date, options) {
-    if (!options) {
-      date = new Date();
-    } else {
-      date = resolve_computed(date);
-    }
-    return date ? moment(date).format(tmpl) : "";
-  });
-});
-
-Mustache.registerHelper("instance_ids", function (list, options) {
-  //  `instance_ids` is used only to extract a comma-separated list of
-  //  instance `id` values for use by `Export Controls` link in
-  //  `assets/mustache/controls/tree_footer.mustache`
-  var ids;
-  list = resolve_computed(Mustache.resolve(list));
-  if (list) {
-    list.attr("length");
-    ids = can.map(list, function (result) { return result.attr("instance.id"); });
-  }
-  else {
-    ids = [];
-  }
-  return ids.join(",");
-});
-
-Mustache.registerHelper("local_time_range", function (value, start, end, options) {
-  var tokens = [];
-  var sod;
-  value = resolve_computed(value) || undefined;
-  //  Calculate "start of day" in UTC and offsets in local timezone
-  sod = moment(value).startOf("day").utc();
-  start = moment(value).startOf("day").add(moment(start, "HH:mm").diff(moment("0", "Y")));
-  end = moment(value).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
-
-  function selected(time) {
-    if (time
-      && value
-      && time.hours() === value.getHours()
-      && time.minutes() === value.getMinutes()
-    ) {
-      return " selected='true'";
-    } else {
-      return "";
-    }
-  }
-
-  while(start.isBefore(end) || start.isSame(end)) {
-    tokens.push("<option value='", start.diff(sod), "'", selected(start), ">", start.format("hh:mm A"), "</option>\n");
-    start.add(1, "hour");
-  }
-  return new Mustache.safeString(tokens.join(""));
-});
-
-Mustache.registerHelper("mapping_count", function (instance) {
-  var args = can.makeArray(arguments)
-    , mappings = args.slice(1, args.length - 1)
-    , options = args[args.length-1]
-    , root = options.contexts.attr('__mapping_count')
-    , refresh_queue = new RefreshQueue()
-    , mapping
-    , dfd
-    ;
-  instance = resolve_computed(args[0]);
-
-  // Find the most appropriate mapping
-  for (var i = 0; i < mappings.length; i++) {
-    if (instance.get_binding(mappings[i])) {
-      mapping = mappings[i];
-      break;
-    }
-  }
-
-  if (!root) {
-    root = new can.Observe();
-    get_observe_context(options.contexts).attr("__mapping_count", root);
-  }
-
-  function update() {
-    return options.fn(''+root.attr(mapping).attr('length'));
-  }
-
-  if (!mapping) {
-    return "";
-  }
-
-  if (!root[mapping]) {
-    root.attr(mapping, new can.Observe.List());
-    root.attr(mapping).attr('loading', true);
-    refresh_queue.enqueue(instance);
-    dfd = refresh_queue.trigger()
-      .then(function (instances) { return instances[0]; })
-      .done(function (refreshed_instance) {
-        if (refreshed_instance && refreshed_instance.get_binding(mapping)) {
-          refreshed_instance.get_list_loader(mapping).done(function (list) {
-            root.attr(mapping, list);
-          });
-        }
-        else
-          root.attr(mapping).attr('loading', false);
-    });
-  }
-
-  var ret = defer_render('span', { done : update, progress : function () { return options.inverse(options.contexts); } }, dfd);
-  return ret;
-});
-
-Mustache.registerHelper("visibility_delay", function (delay, options) {
-  delay = resolve_computed(delay);
-
-  return function (el) {
-    setTimeout(function () {
-      if ($(el.parentNode).is(':visible')) {
-        $(el).append(options.fn(options.contexts));
+    // Resolve arguments
+    can.each(args, function (arg, i) {
+      while (typeof arg === 'function' && arg.isComputed) {
+        arg = arg();
       }
-        can.view.hookup($(el).children());  // FIXME dubious indentation - was this intended to be in the 'if'?
-    }, delay);
-    return el;
-  };
-});
 
-
-Mustache.registerHelper("with_program_roles_as", function (
-      var_name, result, options) {
-  var dfd = $.when()
-    , frame = new can.Observe()
-    , user_roles = []
-    , mappings
-    , refresh_queue = new RefreshQueue()
-    ;
-
-  result = resolve_computed(result);
-  mappings = resolve_computed(result.get_mappings_compute());
-
-  frame.attr("roles", []);
-
-  can.each(mappings, function (mapping) {
-    if (mapping instanceof CMS.Models.UserRole) {
-      refresh_queue.enqueue(mapping.role);
+      if (typeof arg === 'string' && can.inArray(arg, allowed_actions) > -1) {
+        actions.push(arg);
+      }
+      else if (typeof arg === 'string') {
+        resource_type = arg;
+      }
+      else if (typeof arg === 'object' && arg instanceof can.Model) {
+        resource = arg;
+      }
+    });
+    if (options.hash && options.hash.hasOwnProperty("context")) {
+      context_id = options.hash.context;
+      if (typeof context_id === 'function' && context_id.isComputed) {
+        context_id = context_id();
+      }
+      if (context_id && typeof context_id === "object" && context_id.id) {
+        // Passed in the context object instead of the context ID, so use the ID
+        context_id = context_id.id;
+      }
+      //  Using `context=null` in Mustache templates, when `null` is not defined,
+      //  causes `context_id` to be `""`.
+      if (context_id === "" || context_id === undefined) {
+        context_id = null;
+      } else if (context_id === 'for' || context_id === 'any') {
+        context_override = context_id;
+        context_id = undefined;
+      }
     }
+
+    if (resource_type && context_id === context_unset) {
+      throw new Error(
+        "If `resource_type` is a string, `context` must be explicit");
+    }
+    if (actions.length === 0) {
+      throw new Error(
+        "Must specify at least one action");
+    }
+
+    if (resource) {
+      resource_type = resource.constructor.shortName;
+      context_id = resource.context ? resource.context.id : null;
+    }
+
+    // Check permissions
+    can.each(actions, function (action) {
+      if (context_id !== undefined) {
+        passed = passed && Permission.is_allowed(action, resource_type, context_id);
+      }
+      if (passed && context_override === 'for' && resource) {
+        passed = passed && Permission.is_allowed_for(action, resource);
+      }
+      else if (passed && context_override === 'any' && resource_type) {
+        passed = passed && Permission.is_allowed_any(action, resource_type);
+      }
+    });
+
+    return passed
+      ? options.fn(options.contexts || this)
+      : options.inverse(options.contexts || this)
+      ;
   });
 
-  dfd = refresh_queue.trigger().then(function (roles) {
-    can.each(mappings, function (mapping) {
-      if (mapping instanceof CMS.Models.UserRole) {
-        frame.attr("roles").push({
-          user_role: mapping,
-          role: mapping.role.reify()
-        });
-      } else {
-        frame.attr("roles").push({
-          role: {
-            "permission_summary": "Mapped"
+  Mustache.registerHelper("is_allowed_all", function (action, instances, options) {
+    var passed = true;
+
+    action = resolve_computed(action);
+    instances = resolve_computed(instances);
+
+    can.each(instances, function (instance) {
+      var resource_type
+        , context_id
+        , base_mappings = []
+        ;
+
+      if (instance instanceof GGRC.ListLoaders.MappingResult) {
+        instance.walk_instances(function (inst, mapping) {
+          if (can.reduce(mapping.mappings, function (a, b) {
+              return a || (b.instance === true);
+            }, false)) {
+            base_mappings.push(inst);
           }
         });
+      } else {
+        base_mappings.push(instance);
       }
+
+      can.each(base_mappings, function (instance) {
+        resource_type = instance.constructor.shortName;
+        context_id = instance.context ? instance.context.id : null;
+        passed = passed && Permission.is_allowed(action, resource_type, context_id);
+      });
+    });
+
+    if (passed)
+      return options.fn(options.contexts || this);
+    else
+      return options.inverse(options.contexts || this);
+  });
+
+  Mustache.registerHelper("is_allowed_to_map", function (source, target, options) {
+    //  For creating mappings, we only care if the user can create instances of
+    //  the join model.
+    //  - `source` must be a model instance
+    //  - `target` must be the name of the target model
+    //
+    //  FIXME: This should actually iterate through all applicable join models
+    //    and return success if any one matches.
+    var target_type
+      , resource_type
+      , context_id
+      , can_map
+      ;
+
+    source = resolve_computed(source);
+    target = resolve_computed(target);
+
+    if (target instanceof can.Model)
+      target_type = target.constructor.shortName;
+    else
+      target_type = target;
+
+    //if (!(source instanceof can.Model)) {
+    //  //  If `source` is not a model instance, assume they want to link to the
+    //  //  page object.
+    //  options = target;
+    //  target = source;
+    //  source = GGRC.page_instance();
+    //}
+
+    context_id = source.context ? source.context.id : null;
+
+    resource_type = GGRC.Mappings.join_model_name_for(
+      source.constructor.shortName, target_type);
+
+    // The special case for `Cacheable` should no longer be necessary given
+    // correct definition of the canonical mapping for Cacheable.
+    if (!resource_type && target_type === 'Cacheable') {
+      //  FIXME: This will *not* work for customizable roles -- this *only* works
+      //    for the limited default roles as of 2013-10-07, and assumes that:
+      //    1.  All `Cacheable` mappings (e.g. where you might map multiple types
+      //        to a single object) are in the `null` context; and
+      //    2.  If a user has permission for creating `Relationship` objects in
+      //        the `null` context, they have permission for creating all mapping
+      //        objects in `null` context.
+      //  UPDATE 2013-03-05: Passing source context solved the issue where user
+      //    with reader sys-wide role and program owner role was unable to map
+      //    objects.
+      can_map = Permission.is_allowed('create', 'Relationship', context_id);
+    }
+    else {
+      if (!(source instanceof CMS.Models.Program)
+        && target instanceof CMS.Models.Program)
+        context_id = target.context ? target.context.id : null;
+
+      // We should only map objects that have join models
+      can_map = (!(options.hash && options.hash.join) || resource_type)
+      && Permission.is_allowed('create', resource_type, context_id);
+    }
+    if (can_map)
+      return options.fn(options.contexts || this);
+    else
+      return options.inverse(options.contexts || this);
+  });
+
+  function resolve_computed(maybe_computed, always_resolve) {
+    return (typeof maybe_computed === "function"
+    && (maybe_computed.isComputed || always_resolve)) ? resolve_computed(maybe_computed(), always_resolve) : maybe_computed;
+  }
+
+  Mustache.registerHelper("attach_spinner", function (spin_opts, styles) {
+    spin_opts = Mustache.resolve(spin_opts);
+    styles = Mustache.resolve(styles);
+    spin_opts = typeof spin_opts === "string" ? JSON.parse(spin_opts) : {};
+    styles = typeof styles === "string" ? styles : "";
+    return function (el) {
+      var spinner = new Spinner(spin_opts).spin();
+      $(el).append($(spinner.el).attr("style", $(spinner.el).attr("style") + ";" + styles)).data("spinner", spinner);
+    };
+  });
+
+  Mustache.registerHelper("determine_context", function (page_object, target) {
+    if (page_object.constructor.shortName == "Program") {
+      return page_object.context ? page_object.context.id : null;
+    } else if (target.constructor.shortName == "Program") {
+      return target.context ? target.context.id : null;
+    }
+    return page_object.context ? page_object.context.id : null;
+  });
+
+  Mustache.registerHelper("json_escape", function (obj, options) {
+    var s = JSON.stringify("" + (resolve_computed(obj) || ""));
+    return s.substr(1, s.length - 2);
+    /*return (""+(resolve_computed(obj) || ""))
+     .replace(/\\/g, '\\')
+     .replace(/"/g, '\\"')
+     //  FUNFACT: JSON does not allow wrapping strings with single quotes, and
+     //    thus does not allow backslash-escaped single quotes within strings.
+     //    E.g., make sure attributes use double quotes, or use character
+     //    entities instead -- but these aren't replaced by the JSON parser, so
+     //    the output is not identical to input (hence, not using them now.)
+     //.replace(/'/g, "\\'")
+     //.replace(/"/g, '&#34;').replace(/'/g, "&#39;")
+     .replace(/\n/g, "\\n")
+     .replace(/\r/g, "\\r")
+     .replace(/\u2028/g, "\\u2028") // Line separator
+     .replace(/\u2029/g, "\\u2029") // Paragraph separator
+     .replace(/\t/g, "\\t")
+     .replace(/[\b]/g, "\\b")
+     .replace(/\f/g, "\\f")
+     .replace(/\v/g, "\\v");
+     */
+  });
+
+  can.each({
+    "localize_date": "MM/DD/YYYY"
+    , "localize_datetime": "MM/DD/YYYY hh:mm:ss A"
+  }, function (tmpl, fn) {
+    Mustache.registerHelper(fn, function (date, options) {
+      if (!options) {
+        date = new Date();
+      } else {
+        date = resolve_computed(date);
+      }
+      return date ? moment(date).format(tmpl) : "";
     });
   });
 
-  function finish(list) {
-    return options.fn(options.contexts.add(frame));
-  }
-  function fail(error) {
-    return options.inverse(options.contexts.add({error : error}));
-  }
+  Mustache.registerHelper("instance_ids", function (list, options) {
+    //  `instance_ids` is used only to extract a comma-separated list of
+    //  instance `id` values for use by `Export Controls` link in
+    //  `assets/mustache/controls/tree_footer.mustache`
+    var ids;
+    list = resolve_computed(Mustache.resolve(list));
+    if (list) {
+      list.attr("length");
+      ids = can.map(list, function (result) {
+        return result.attr("instance.id");
+      });
+    }
+    else {
+      ids = [];
+    }
+    return ids.join(",");
+  });
 
-  return defer_render('span', { done : finish, fail : fail }, dfd);
-});
+  Mustache.registerHelper("local_time_range", function (value, start, end, options) {
+    var tokens = [];
+    var sod;
+    value = resolve_computed(value) || undefined;
+    //  Calculate "start of day" in UTC and offsets in local timezone
+    sod = moment(value).startOf("day").utc();
+    start = moment(value).startOf("day").add(moment(start, "HH:mm").diff(moment("0", "Y")));
+    end = moment(value).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
+
+    function selected(time) {
+      if (time
+        && value
+        && time.hours() === value.getHours()
+        && time.minutes() === value.getMinutes()
+      ) {
+        return " selected='true'";
+      } else {
+        return "";
+      }
+    }
+
+    while (start.isBefore(end) || start.isSame(end)) {
+      tokens.push("<option value='", start.diff(sod), "'", selected(start), ">", start.format("hh:mm A"), "</option>\n");
+      start.add(1, "hour");
+    }
+    return new Mustache.safeString(tokens.join(""));
+  });
+
+  Mustache.registerHelper("mapping_count", function (instance) {
+    var args = can.makeArray(arguments)
+      , mappings = args.slice(1, args.length - 1)
+      , options = args[args.length - 1]
+      , root = options.contexts.attr('__mapping_count')
+      , refresh_queue = new RefreshQueue()
+      , mapping
+      , dfd
+      ;
+    instance = resolve_computed(args[0]);
+
+    // Find the most appropriate mapping
+    for (var i = 0; i < mappings.length; i++) {
+      if (instance.get_binding(mappings[i])) {
+        mapping = mappings[i];
+        break;
+      }
+    }
+
+    if (!root) {
+      root = new can.Observe();
+      get_observe_context(options.contexts).attr("__mapping_count", root);
+    }
+
+    function update() {
+      return options.fn('' + root.attr(mapping).attr('length'));
+    }
+
+    if (!mapping) {
+      return "";
+    }
+
+    if (!root[mapping]) {
+      root.attr(mapping, new can.Observe.List());
+      root.attr(mapping).attr('loading', true);
+      refresh_queue.enqueue(instance);
+      dfd = refresh_queue.trigger()
+        .then(function (instances) {
+          return instances[0];
+        })
+        .done(function (refreshed_instance) {
+          if (refreshed_instance && refreshed_instance.get_binding(mapping)) {
+            refreshed_instance.get_list_loader(mapping).done(function (list) {
+              root.attr(mapping, list);
+            });
+          }
+          else
+            root.attr(mapping).attr('loading', false);
+        });
+    }
+
+    var ret = defer_render('span', {
+      done: update, progress: function () {
+        return options.inverse(options.contexts);
+      }
+    }, dfd);
+    return ret;
+  });
+
+  Mustache.registerHelper("visibility_delay", function (delay, options) {
+    delay = resolve_computed(delay);
+
+    return function (el) {
+      setTimeout(function () {
+        if ($(el.parentNode).is(':visible')) {
+          $(el).append(options.fn(options.contexts));
+        }
+        can.view.hookup($(el).children());  // FIXME dubious indentation - was this intended to be in the 'if'?
+      }, delay);
+      return el;
+    };
+  });
+
+
+  Mustache.registerHelper("with_program_roles_as", function (var_name, result, options) {
+    var dfd = $.when()
+      , frame = new can.Observe()
+      , user_roles = []
+      , mappings
+      , refresh_queue = new RefreshQueue()
+      ;
+
+    result = resolve_computed(result);
+    mappings = resolve_computed(result.get_mappings_compute());
+
+    frame.attr("roles", []);
+
+    can.each(mappings, function (mapping) {
+      if (mapping instanceof CMS.Models.UserRole) {
+        refresh_queue.enqueue(mapping.role);
+      }
+    });
+
+    dfd = refresh_queue.trigger().then(function (roles) {
+      can.each(mappings, function (mapping) {
+        if (mapping instanceof CMS.Models.UserRole) {
+          frame.attr("roles").push({
+            user_role: mapping,
+            role: mapping.role.reify()
+          });
+        } else {
+          frame.attr("roles").push({
+            role: {
+              "permission_summary": "Mapped"
+            }
+          });
+        }
+      });
+    });
+
+    function finish(list) {
+      return options.fn(options.contexts.add(frame));
+    }
+
+    function fail(error) {
+      return options.inverse(options.contexts.add({error: error}));
+    }
+
+    return defer_render('span', {done: finish, fail: fail}, dfd);
+  });
 
 
 // Determines and serializes the roles for a user
-var program_roles;
-Mustache.registerHelper("infer_roles", function (instance, options) {
-  instance = resolve_computed(instance);
-  var state = options.contexts.attr("__infer_roles")
-    , page_instance = GGRC.page_instance()
-    , person = page_instance instanceof CMS.Models.Person ? page_instance : null
-    , init_state = function () {
+  var program_roles;
+  Mustache.registerHelper("infer_roles", function (instance, options) {
+    instance = resolve_computed(instance);
+    var state = options.contexts.attr("__infer_roles")
+      , page_instance = GGRC.page_instance()
+      , person = page_instance instanceof CMS.Models.Person ? page_instance : null
+      , init_state = function () {
         if (!state.roles) {
           state.attr({
             status: 'loading'
@@ -1558,176 +1590,187 @@ Mustache.registerHelper("infer_roles", function (instance, options) {
           });
         }
       }
-    ;
+      ;
 
-  if (!state) {
-    state = new can.Observe();
-    options.context.attr("__infer_roles", state);
-  }
+    if (!state) {
+      state = new can.Observe();
+      options.context.attr("__infer_roles", state);
+    }
 
-  if (!state.attr('status')) {
-    if (person) {
-      init_state();
+    if (!state.attr('status')) {
+      if (person) {
+        init_state();
 
-      // Check for contact
-      if (instance.contact && instance.contact.id === person.id) {
-        state.attr('roles').push('Contact');
-      }
+        // Check for contact
+        if (instance.contact && instance.contact.id === person.id) {
+          state.attr('roles').push('Contact');
+        }
 
-      // Check for Audit roles
-      if (instance instanceof CMS.Models.Audit) {
-        var requests = instance.requests || new can.Observe.List()
-          , refresh_queue = new RefreshQueue()
-          ;
+        // Check for Audit roles
+        if (instance instanceof CMS.Models.Audit) {
+          var requests = instance.requests || new can.Observe.List()
+            , refresh_queue = new RefreshQueue()
+            ;
 
-        refresh_queue.enqueue(requests.reify());
-        refresh_queue.trigger().then(function (requests) {
-          can.each(requests, function (request) {
-            var responses = request.responses || new can.Observe.List()
-              , refresh_queue = new RefreshQueue()
-              ;
+          refresh_queue.enqueue(requests.reify());
+          refresh_queue.trigger().then(function (requests) {
+            can.each(requests, function (request) {
+              var responses = request.responses || new can.Observe.List()
+                , refresh_queue = new RefreshQueue()
+                ;
 
-            refresh_queue.enqueue(responses.reify());
-            refresh_queue.trigger().then(function (responses) {
-              can.each(responses, function (response) {
-                if (response.contact && response.contact.id === person.id
+              refresh_queue.enqueue(responses.reify());
+              refresh_queue.trigger().then(function (responses) {
+                can.each(responses, function (response) {
+                  if (response.contact && response.contact.id === person.id
                     && !~can.inArray('Response Contact', state.attr('roles'))) {
-                  state.attr('roles').push('Response Contact');
+                    state.attr('roles').push('Response Contact');
+                  }
+                });
+              });
+
+              if (request.assignee && request.assignee.id === person.id
+                && !~can.inArray('Request Assignee', state.attr('roles'))) {
+                state.attr('roles').push('Request Assignee');
+              }
+              ;
+            });
+          });
+        }
+
+        // Check for assessor roles
+        if (instance.attr('principal_assessor') && instance.principal_assessor.id === person.id) {
+          state.attr('roles').push('Principal Assessor');
+        }
+        if (instance.attr('secondary_assessor') && instance.secondary_assessor.id === person.id) {
+          state.attr('roles').push('Secondary Assessor');
+        }
+
+        // Check for people
+        if (instance.people && ~can.inArray(person.id, $.map(instance.people, function (person) {
+            return person.id;
+          }))) {
+          state.attr('roles').push('Mapped');
+        }
+
+        if (instance instanceof CMS.Models.Audit) {
+          $.when(
+            instance.reify().get_binding('authorizations').refresh_list(),
+            instance.findAuditors()
+          ).then(function (authorizations, auditors) {
+              if (~can.inArray(person.id, $.map(auditors, function (p) {
+                  return p.person.id;
+                }))) {
+                state.attr('roles').push('Auditor');
+              }
+              authorizations.bind("change", function () {
+                state.attr('roles', can.map(state.attr('roles'), function (role) {
+                  if (role != 'Auditor')
+                    return role;
+                }));
+                instance.findAuditors().then(function (auds) {
+                  if (~can.inArray(person.id, $.map(auds, function (p) {
+                      return p.person.id;
+                    }))) {
+                    state.attr('roles').push('Auditor');
+                  }
+                });
+              });
+            });
+        }
+
+        // Check for ownership
+        if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function (person) {
+            return person.id;
+          }))) {// && !~can.inArray("Auditor", state.attr('roles'))) {
+          state.attr('roles').push('Owner');
+        }
+
+        // Check for authorizations
+        if (instance instanceof CMS.Models.Program && instance.context && instance.context.id) {
+          person.get_list_loader("authorizations").done(function (authorizations) {
+            authorizations = can.map(authorizations, function (auth) {
+              if (auth.instance.context && auth.instance.context.id === instance.context.id) {
+                return auth.instance;
+              }
+            });
+            !program_roles && (program_roles = CMS.Models.Role.findAll({scope__in: "Private Program,Audit"}));
+            program_roles.done(function (roles) {
+              can.each(authorizations, function (auth) {
+                var role = CMS.Models.Role.findInCacheById(auth.role.id);
+                if (role) {
+                  state.attr('roles').push(role.name);
                 }
               });
             });
-
-            if (request.assignee && request.assignee.id === person.id
-                && !~can.inArray('Request Assignee', state.attr('roles'))) {
-              state.attr('roles').push('Request Assignee');
-            };
           });
-        });
+        }
       }
-
-      // Check for assessor roles
-      if (instance.attr('principal_assessor') && instance.principal_assessor.id === person.id) {
-        state.attr('roles').push('Principal Assessor');
-      }
-      if (instance.attr('secondary_assessor') && instance.secondary_assessor.id === person.id) {
-        state.attr('roles').push('Secondary Assessor');
-      }
-
-      // Check for people
-      if (instance.people && ~can.inArray(person.id, $.map(instance.people, function (person) { return person.id; }))) {
-        state.attr('roles').push('Mapped');
-      }
-
-      if (instance instanceof CMS.Models.Audit) {
-        $.when(
-          instance.reify().get_binding('authorizations').refresh_list(),
-          instance.findAuditors()
-        ).then(function (authorizations, auditors) {
-          if (~can.inArray(person.id, $.map(auditors, function (p) { return p.person.id; }))) {
-            state.attr('roles').push('Auditor');
-          }
-          authorizations.bind("change", function () {
-            state.attr('roles', can.map(state.attr('roles'), function (role) {
-              if (role != 'Auditor')
-                return role;
-            }));
-            instance.findAuditors().then(function (auds) {
-              if (~can.inArray(person.id, $.map(auds, function (p) { return p.person.id; }))) {
-                state.attr('roles').push('Auditor');
-              }
-            });
-          });
-        });
-      }
-
-      // Check for ownership
-      if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function (person) { return person.id; }))) {// && !~can.inArray("Auditor", state.attr('roles'))) {
-        state.attr('roles').push('Owner');
-      }
-
-      // Check for authorizations
-      if (instance instanceof CMS.Models.Program && instance.context && instance.context.id) {
-        person.get_list_loader("authorizations").done(function (authorizations) {
-          authorizations = can.map(authorizations, function (auth) {
-            if (auth.instance.context && auth.instance.context.id === instance.context.id) {
-              return auth.instance;
-            }
-          });
-          !program_roles && (program_roles = CMS.Models.Role.findAll({ scope__in: "Private Program,Audit" }));
-          program_roles.done(function (roles) {
-            can.each(authorizations, function (auth) {
-              var role = CMS.Models.Role.findInCacheById(auth.role.id);
-              if (role) {
-                state.attr('roles').push(role.name);
-              }
-            });
-          });
-        });
+      // When we're not on a profile page
+      else {
+        // Check for ownership
+        if (instance.owners && ~can.inArray(GGRC.current_user.id, $.map(instance.owners, function (person) {
+            return person.id;
+          }))) {
+          init_state();
+          state.attr('roles').push('Yours');
+        }
       }
     }
-    // When we're not on a profile page
+
+    // Return the result
+    if (!state.attr('roles') || state.attr('status') === 'failed') {
+      return '';
+    }
+    else if (state.attr('roles').attr('length') === 0 && state.attr('status') === 'loading') {
+      return options.inverse(options.contexts);
+    }
     else {
-      // Check for ownership
-      if (instance.owners && ~can.inArray(GGRC.current_user.id, $.map(instance.owners, function (person) { return person.id; }))) {
-        init_state();
-        state.attr('roles').push('Yours');
+      if (state.attr('roles').attr('length')) {
+        var result = [];
+        can.each(state.attr('roles'), function (role) {
+          result.push(options.fn(role));
+        });
+        return result.join('');
       }
     }
-  }
+  });
 
-  // Return the result
-  if (!state.attr('roles') || state.attr('status') === 'failed') {
-    return '';
+  function get_observe_context(scope) {
+    if (!scope) return null;
+    if (scope._context instanceof can.Observe) return scope._context;
+    return get_observe_context(scope._parent);
   }
-  else if (state.attr('roles').attr('length') === 0 && state.attr('status') === 'loading') {
-    return options.inverse(options.contexts);
-  }
-  else {
-    if (state.attr('roles').attr('length')) {
-      var result = [];
-      can.each(state.attr('roles'), function (role) {
-        result.push(options.fn(role));
-      });
-      return result.join('');
-    }
-  }
-});
-
-function get_observe_context(scope) {
-  if (!scope) return null;
-  if (scope._context instanceof can.Observe) return scope._context;
-  return get_observe_context(scope._parent);
-}
 
 
 // Uses search to find the counts for a model type
-Mustache.registerHelper("global_count", function (model_type, options) {
-  model_type = resolve_computed(model_type);
-  var state = options.contexts.attr("__global_count")
-    ;
+  Mustache.registerHelper("global_count", function (model_type, options) {
+    model_type = resolve_computed(model_type);
+    var state = options.contexts.attr("__global_count")
+      ;
 
-  if (!state) {
-    state = new can.Observe();
-    get_observe_context(options.contexts).attr("__global_count", state);
-  }
-
-  if (!state.attr('status')) {
-    state.attr('status', 'loading');
-
-    if (!GGRC._search_cache_deferred) {
-      //  TODO: This should really be RefreshQueue-style
-      var models = [
-          "Program", "Regulation", "Contract", "Policy", "Standard"
-        , "Section", "Objective", "Control"
-        , "System", "Process"
-        , "DataAsset", "Product", "Project", "Facility", "OrgGroup"
-        , "Audit"
-        ];
-      GGRC._search_cache_deferred = GGRC.Models.Search.counts_for_types(null, models);
+    if (!state) {
+      state = new can.Observe();
+      get_observe_context(options.contexts).attr("__global_count", state);
     }
 
-    var model = CMS.Models[model_type]
-      , update_count = function (ev, instance) {
+    if (!state.attr('status')) {
+      state.attr('status', 'loading');
+
+      if (!GGRC._search_cache_deferred) {
+        //  TODO: This should really be RefreshQueue-style
+        var models = [
+          "Program", "Regulation", "Contract", "Policy", "Standard"
+          , "Section", "Objective", "Control"
+          , "System", "Process"
+          , "DataAsset", "Product", "Project", "Facility", "OrgGroup"
+          , "Audit"
+        ];
+        GGRC._search_cache_deferred = GGRC.Models.Search.counts_for_types(null, models);
+      }
+
+      var model = CMS.Models[model_type]
+        , update_count = function (ev, instance) {
           if (!instance || instance instanceof model) {
             GGRC._search_cache_deferred.then(function (result) {
               if (!result.counts.hasOwnProperty(model_type)) {
@@ -1738,1116 +1781,1147 @@ Mustache.registerHelper("global_count", function (model_type, options) {
               }
             }).then(function (result) {
               state.attr({
-                  status: 'loaded'
+                status: 'loaded'
                 , count: result.counts[model_type]
               });
             });
           }
         }
-      ;
+        ;
 
-    update_count();
-    if (model) {
-      model.bind('created', update_count);
-      model.bind('destroyed', update_count);
-    }
-  }
-
-  // Return the result
-  if (state.attr('status') === 'failed') {
-    return '';
-  }
-  else if (state.attr('status') === 'loading' || state.attr('count') === undefined) {
-    return options.inverse(options.contexts);
-  }
-  else {
-    return options.fn(state.attr('count'));
-  }
-});
-
-Mustache.registerHelper("is_dashboard", function (options) {
-  if (/dashboard/.test(window.location))
-    return options.fn(options.contexts);
-  else
-    return options.inverse(options.contexts);
-});
-
-Mustache.registerHelper("is_profile", function (parent_instance, options) {
-  var instance;
-  if (options)
-    instance = resolve_computed(parent_instance);
-  else
-    options = parent_instance;
-
-  if (GGRC.page_instance() instanceof CMS.Models.Person && (!instance || instance.constructor.shortName !== 'DocumentationResponse'))
-    return options.fn(options.contexts);
-  else
-    return options.inverse(options.contexts);
-});
-
-Mustache.registerHelper("current_user_is_admin", function(options) {
-  if(Permission.is_allowed("__GGRC_ADMIN__")) {
-    return options.fn(options.contexts);
-  }
-  return options.inverse(options.contexts);
-});
-
-Mustache.registerHelper("owned_by_current_user", function(instance, options) {
-  var current_user_id = GGRC.current_user.id;
-  instance = Mustache.resolve(instance);
-  owners = instance.attr('owners');
-  if(owners) {
-    for(var i =0; i < owners.length; i++) {
-      if(current_user_id == owners[i].id) {
-        return options.fn(options.contexts);
+      update_count();
+      if (model) {
+        model.bind('created', update_count);
+        model.bind('destroyed', update_count);
       }
     }
-  }
-  return options.inverse(options.contexts);
-});
 
-Mustache.registerHelper("current_user_is_contact", function (instance, options) {
-  var current_user_id = GGRC.current_user.id;
-  instance = Mustache.resolve(instance);
-  var contact = instance.contact;
-  if (current_user_id == contact.id) {
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
-});
-
-Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
-  review_task = Mustache.resolve(review_task);
-  var current_user_id = GGRC.current_user.id;
-  var is_reviewer = review_task && current_user_id == review_task.contact.id;
-  return options.fn(options.contexts.add({is_reviewer: is_reviewer}));
-});
-
-Mustache.registerHelper("with_review_task", function (options) {
-  var tasks = options.contexts.attr('current_object_review_tasks');
-  tasks = Mustache.resolve(tasks);
-  if(tasks) {
-    for(i = 0; i < tasks.length; i++) {
-      return options.fn(options.contexts.add({review_task: tasks[i].instance}));
+    // Return the result
+    if (state.attr('status') === 'failed') {
+      return '';
     }
-  }
-  return options.fn(options.contexts.add({review_task: undefined}));
-});
+    else if (state.attr('status') === 'loading' || state.attr('count') === undefined) {
+      return options.inverse(options.contexts);
+    }
+    else {
+      return options.fn(state.attr('count'));
+    }
+  });
 
-Mustache.registerHelper("default_audit_title", function (instance, options) {
-  var program, default_title, current_title
-    , index = 1
-    ;
+  Mustache.registerHelper("is_dashboard", function (options) {
+    if (/dashboard/.test(window.location))
+      return options.fn(options.contexts);
+    else
+      return options.inverse(options.contexts);
+  });
+
+  Mustache.registerHelper("is_profile", function (parent_instance, options) {
+    var instance;
+    if (options)
+      instance = resolve_computed(parent_instance);
+    else
+      options = parent_instance;
+
+    if (GGRC.page_instance() instanceof CMS.Models.Person && (!instance || instance.constructor.shortName !== 'DocumentationResponse'))
+      return options.fn(options.contexts);
+    else
+      return options.inverse(options.contexts);
+  });
+
+  Mustache.registerHelper("current_user_is_admin", function (options) {
+    if (Permission.is_allowed("__GGRC_ADMIN__")) {
+      return options.fn(options.contexts);
+    }
+    return options.inverse(options.contexts);
+  });
+
+  Mustache.registerHelper("owned_by_current_user", function (instance, options) {
+    var current_user_id = GGRC.current_user.id;
+    instance = Mustache.resolve(instance);
+    owners = instance.attr('owners');
+    if (owners) {
+      for (var i = 0; i < owners.length; i++) {
+        if (current_user_id == owners[i].id) {
+          return options.fn(options.contexts);
+        }
+      }
+    }
+    return options.inverse(options.contexts);
+  });
+
+  Mustache.registerHelper("current_user_is_contact", function (instance, options) {
+    var current_user_id = GGRC.current_user.id;
+    instance = Mustache.resolve(instance);
+    var contact = instance.contact;
+    if (current_user_id == contact.id) {
+      return options.fn(options.contexts);
+    } else {
+      return options.inverse(options.contexts);
+    }
+  });
+
+  Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
+    review_task = Mustache.resolve(review_task);
+    var current_user_id = GGRC.current_user.id;
+    var is_reviewer = review_task && current_user_id == review_task.contact.id;
+    return options.fn(options.contexts.add({is_reviewer: is_reviewer}));
+  });
+
+  Mustache.registerHelper("with_review_task", function (options) {
+    var tasks = options.contexts.attr('current_object_review_tasks');
+    tasks = Mustache.resolve(tasks);
+    if (tasks) {
+      for (i = 0; i < tasks.length; i++) {
+        return options.fn(options.contexts.add({review_task: tasks[i].instance}));
+      }
+    }
+    return options.fn(options.contexts.add({review_task: undefined}));
+  });
+
+  Mustache.registerHelper("default_audit_title", function (instance, options) {
+    var program, default_title, current_title
+      , index = 1
+      ;
 
     instance = Mustache.resolve(instance);
     program = instance.attr("program");
 
-  if (!instance._transient) {
-    instance.attr("_transient", { default_title : "" });
-  }
+    if (!instance._transient) {
+      instance.attr("_transient", {default_title: ""});
+    }
 
-  if (program == null) {
-    // Mark the title to be populated when computed_program is defined,
-    // returning an empty string here would disable the save button.
-    instance.attr("title", "");
-    instance.attr("_transient.default_title", instance.title);
-    return;
-  }
-  if (instance._transient.default_title !== instance.title) {
-    return;
-  }
+    if (program == null) {
+      // Mark the title to be populated when computed_program is defined,
+      // returning an empty string here would disable the save button.
+      instance.attr("title", "");
+      instance.attr("_transient.default_title", instance.title);
+      return;
+    }
+    if (instance._transient.default_title !== instance.title) {
+      return;
+    }
 
-  program = program.reify();
+    program = program.reify();
 
-  new RefreshQueue().enqueue(program).trigger().then(function () {
+    new RefreshQueue().enqueue(program).trigger().then(function () {
 
-    default_title = new Date().getFullYear() + ": " + program.title + " - Audit";
+      default_title = new Date().getFullYear() + ": " + program.title + " - Audit";
 
-    // Count the current number of audits with default_title
-    $.map(CMS.Models['Audit'].cache, function (audit) {
-      if (audit.title && audit.title.indexOf(default_title) === 0) {
-        index += 1;
-      }
-    });
-    instance.attr("title", new Date().getFullYear() + ": " + program.title + " - Audit " + index);
-    instance.attr("_transient.default_title", instance.title);
-  });
-});
-
-Mustache.registerHelper('param_current_location', function () {
-  return GGRC.current_url_compute();
-});
-
-Mustache.registerHelper("sum", function () {
-  var sum = 0;
-  for (var i = 0; i < arguments.length - 1; i++) {
-    sum += parseInt(resolve_computed(arguments[i]), 10);
-  }
-  return ''+sum;
-});
-
-Mustache.registerHelper("to_class", function (prop, delimiter, options) {
-  prop = resolve_computed(prop) || "";
-  delimiter = (arguments.length > 2 && resolve_computed(delimiter)) || '-';
-  return prop.toLowerCase().replace(/[\s\t]+/g, delimiter);
-});
-
-/*
-  Evaluates multiple helpers as if they were a single condition
-
-  Each new statement is begun with a newline-prefixed string. The type of logic
-  to apply as well as whether it should be a truthy or falsy evaluation may also
-  be included with the statement in addition to the helper name.
-
-  Currently, if_helpers only supports Disjunctive Normal Form. All "and" statements are grouped,
-  groups are split by "or" statements.
-
-  All hash arguments (some_val=37) must go in the last line and should be prefixed by the
-  zero-based index of the corresponding helper. This is necessary because all hash arguments
-  are required to be the final arguments for a helper. Here's an example:
-    _0_some_val=37 would pass some_val=37 to the first helper.
-
-  Statement syntax:
-    '\
-    [LOGIC] [TRUTHY_FALSY]HELPER_NAME' arg1 arg2 argN
-
-  Defaults:
-    LOGIC = and (accepts: and or)
-    TRUTHY_FALSEY = # (accepts: # ^)
-    HELPER_NAME = some_helper_name
-
-  Example:
-    {{#if_helpers '\
-      #if_match' page_object.constructor.shortName 'Project' '\
-      and ^if_match' page_object.constructor.shortName 'Audit|Program|Person' '\
-    ' _1_hash_arg_for_second_statement=something}}
-      matched all conditions
-    {{else}}
-      failed
-    {{/if_helpers}}
-
-  FIXME: Only synchronous helpers (those which call options.fn() or options.inverse()
-    without yielding the thread through defer_render or otherwise) can currently be used
-    with if_helpers.  if_helpers should support all helpers by changing the walk through
-    conjunctions and disjunctions to one using a can.reduce(Array, function (Deferred, item) {}, $.when())
-    pattern instead of can.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
-*/
-Mustache.registerHelper("if_helpers", function () {
-  var args = arguments
-    , options = arguments[arguments.length - 1]
-    , helper_result
-    , helper_options = can.extend({}, options, {
-        fn: function () { helper_result = 'fn'; }
-      , inverse: function () { helper_result = 'inverse'; }
-      })
-    ;
-
-  // Parse statements
-  var statements = []
-    , statement
-    , match
-    , disjunctions = []
-    , index = 0
-    ;
-  can.each(args, function (arg, i) {
-    if (i < args.length - 1) {
-      if (typeof arg === 'string' && arg.match(/^\n\s*/)) {
-        if (statement) {
-          if (statement.logic === "or") {
-            disjunctions.push(statements);
-            statements = [];
-          }
-          statements.push(statement);
-          index = index + 1;
+      // Count the current number of audits with default_title
+      $.map(CMS.Models['Audit'].cache, function (audit) {
+        if (audit.title && audit.title.indexOf(default_title) === 0) {
+          index += 1;
         }
-        if (match = arg.match(/^\n\s*((and|or) )?([#^])?(\S+?)$/)) {
-          statement = {
-              fn_name: match[3] === '^' ? 'inverse' : 'fn'
-            , helper: Mustache.getHelper(match[4], options.contexts)
-            , args: []
-            , logic: match[2] === 'or' ? 'or' : 'and'
-          };
+      });
+      instance.attr("title", new Date().getFullYear() + ": " + program.title + " - Audit " + index);
+      instance.attr("_transient.default_title", instance.title);
+    });
+  });
 
-          // Add hash arguments
-          if (options.hash) {
-            var hash = {}
-              , prefix = '_' + index + '_'
-              , prop
-              ;
-            for (prop in options.hash) {
-              if (prop.indexOf(prefix) === 0) {
-                hash[prop.substr(prefix.length)] = options.hash[prop];
+  Mustache.registerHelper('param_current_location', function () {
+    return GGRC.current_url_compute();
+  });
+
+  Mustache.registerHelper("sum", function () {
+    var sum = 0;
+    for (var i = 0; i < arguments.length - 1; i++) {
+      sum += parseInt(resolve_computed(arguments[i]), 10);
+    }
+    return '' + sum;
+  });
+
+  Mustache.registerHelper("to_class", function (prop, delimiter, options) {
+    prop = resolve_computed(prop) || "";
+    delimiter = (arguments.length > 2 && resolve_computed(delimiter)) || '-';
+    return prop.toLowerCase().replace(/[\s\t]+/g, delimiter);
+  });
+
+  /*
+   Evaluates multiple helpers as if they were a single condition
+
+   Each new statement is begun with a newline-prefixed string. The type of logic
+   to apply as well as whether it should be a truthy or falsy evaluation may also
+   be included with the statement in addition to the helper name.
+
+   Currently, if_helpers only supports Disjunctive Normal Form. All "and" statements are grouped,
+   groups are split by "or" statements.
+
+   All hash arguments (some_val=37) must go in the last line and should be prefixed by the
+   zero-based index of the corresponding helper. This is necessary because all hash arguments
+   are required to be the final arguments for a helper. Here's an example:
+   _0_some_val=37 would pass some_val=37 to the first helper.
+
+   Statement syntax:
+   '\
+   [LOGIC] [TRUTHY_FALSY]HELPER_NAME' arg1 arg2 argN
+
+   Defaults:
+   LOGIC = and (accepts: and or)
+   TRUTHY_FALSEY = # (accepts: # ^)
+   HELPER_NAME = some_helper_name
+
+   Example:
+   {{#if_helpers '\
+   #if_match' page_object.constructor.shortName 'Project' '\
+   and ^if_match' page_object.constructor.shortName 'Audit|Program|Person' '\
+   ' _1_hash_arg_for_second_statement=something}}
+   matched all conditions
+   {{else}}
+   failed
+   {{/if_helpers}}
+
+   FIXME: Only synchronous helpers (those which call options.fn() or options.inverse()
+   without yielding the thread through defer_render or otherwise) can currently be used
+   with if_helpers.  if_helpers should support all helpers by changing the walk through
+   conjunctions and disjunctions to one using a can.reduce(Array, function (Deferred, item) {}, $.when())
+   pattern instead of can.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
+   */
+  Mustache.registerHelper("if_helpers", function () {
+    var args = arguments
+      , options = arguments[arguments.length - 1]
+      , helper_result
+      , helper_options = can.extend({}, options, {
+        fn: function () {
+          helper_result = 'fn';
+        }
+        , inverse: function () {
+          helper_result = 'inverse';
+        }
+      })
+      ;
+
+    // Parse statements
+    var statements = []
+      , statement
+      , match
+      , disjunctions = []
+      , index = 0
+      ;
+    can.each(args, function (arg, i) {
+      if (i < args.length - 1) {
+        if (typeof arg === 'string' && arg.match(/^\n\s*/)) {
+          if (statement) {
+            if (statement.logic === "or") {
+              disjunctions.push(statements);
+              statements = [];
+            }
+            statements.push(statement);
+            index = index + 1;
+          }
+          if (match = arg.match(/^\n\s*((and|or) )?([#^])?(\S+?)$/)) {
+            statement = {
+              fn_name: match[3] === '^' ? 'inverse' : 'fn'
+              , helper: Mustache.getHelper(match[4], options.contexts)
+              , args: []
+              , logic: match[2] === 'or' ? 'or' : 'and'
+            };
+
+            // Add hash arguments
+            if (options.hash) {
+              var hash = {}
+                , prefix = '_' + index + '_'
+                , prop
+                ;
+              for (prop in options.hash) {
+                if (prop.indexOf(prefix) === 0) {
+                  hash[prop.substr(prefix.length)] = options.hash[prop];
+                }
+              }
+              for (prop in hash) {
+                statement.hash = hash;
+                break;
               }
             }
-            for (prop in hash) {
-              statement.hash = hash;
-              break;
-            }
           }
+          else
+            statement = null;
         }
-        else
-          statement = null;
+        else if (statement) {
+          statement.args.push(arg);
+        }
       }
-      else if (statement) {
-        statement.args.push(arg);
+    });
+    if (statement) {
+      if (statement.logic === "or") {
+        disjunctions.push(statements);
+        statements = [];
+      }
+      statements.push(statement);
+    }
+    disjunctions.push(statements);
+
+    if (disjunctions.length) {
+      // Evaluate statements
+      var result = can.reduce(disjunctions, function (disjunctive_result, conjunctions) {
+        if (disjunctive_result)
+          return true;
+
+        var conjunctive_result = can.reduce(conjunctions, function (current_result, stmt) {
+          if (!current_result)
+            return false; //short circuit
+
+          helper_result = null;
+          stmt.helper.fn.apply(stmt.helper, stmt.args.concat([
+            can.extend({}, helper_options, {hash: stmt.hash || helper_options.hash})
+          ]));
+          helper_result = helper_result === stmt.fn_name;
+          return current_result && helper_result;
+        }, true);
+        return disjunctive_result || conjunctive_result;
+      }, false);
+
+      // Execute based on the result
+      if (result) {
+        return options.fn(options.contexts);
+      }
+      else {
+        return options.inverse(options.contexts);
       }
     }
   });
-  if (statement) {
-    if (statement.logic === "or") {
-      disjunctions.push(statements);
-      statements = [];
+
+  Mustache.registerHelper("with_model_as", function (var_name, model_name, options) {
+    var frame = {};
+    model_name = resolve_computed(Mustache.resolve(model_name));
+    frame[var_name] = CMS.Models[model_name];
+    return options.fn(options.contexts.add(frame));
+  });
+
+  Mustache.registerHelper("private_program_owner", function (instance, modal_title, options) {
+    var state = options.contexts.attr('__private_program_owner');
+    if (resolve_computed(modal_title).indexOf('New ') === 0) {
+      return GGRC.current_user.email;
     }
-    statements.push(statement);
-  }
-  disjunctions.push(statements);
+    else {
+      var loader = resolve_computed(instance).get_binding('authorizations');
+      return $.map(loader.list, function (binding) {
+        if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+          return binding.instance.person.reify().attr('email');
+        }
+      }).join(', ');
+    }
+  });
 
-  if (disjunctions.length) {
-    // Evaluate statements
-    var result = can.reduce(disjunctions, function (disjunctive_result, conjunctions) {
-      if (disjunctive_result)
-        return true;
 
-      var conjunctive_result = can.reduce(conjunctions, function (current_result, stmt) {
-        if (!current_result)
-          return false; //short circuit
+// Determines whether the value matches one in the $.map'd list
+// {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
+  Mustache.registerHelper("if_in_map", function (list, path, value, options) {
+    list = resolve_computed(list);
 
-        helper_result = null;
-        stmt.helper.fn.apply(stmt.helper, stmt.args.concat([
-          can.extend({}, helper_options, { hash: stmt.hash || helper_options.hash })
-        ]));
-        helper_result = helper_result === stmt.fn_name;
-        return current_result && helper_result;
-      }, true);
-      return disjunctive_result || conjunctive_result;
+    if (!list.attr || list.attr('length')) {
+      path = path.split('.');
+      var map = $.map(list, function (obj) {
+        can.each(path, function (prop) {
+          obj = (obj && obj[prop]) || null;
+        });
+        return obj;
+      });
+
+      if (map.indexOf(value) > -1)
+        return options.fn(options.contexts);
+    }
+    return options.inverse(options.contexts);
+  });
+
+  Mustache.registerHelper("with_auditors", function (instance, options) {
+    var auditors, auditors_dfd
+      , decoy
+      ;
+
+    instance = resolve_computed(instance);
+    if (options.hash && options.hash.decoy) {
+      decoy = Mustache.resolve(options.hash.decoy);
+      decoy.attr();
+    }
+
+    if (!instance)
+      return "";
+
+    auditors_dfd = Mustache.resolve(instance).findAuditors().done(function (aud) {
+      auditors = aud;
+    });
+    return defer_render("span", function () {
+      if (auditors && auditors.attr("length") > 0) {
+        return options.fn(options.contexts.add({"auditors": auditors}));
+      }
+      else {
+        return options.inverse(options.contexts);
+      }
+    }, auditors_dfd);
+  });
+
+  Mustache.registerHelper("if_instance_of", function (inst, cls, options) {
+    var result;
+    cls = resolve_computed(cls);
+    inst = resolve_computed(inst);
+
+    if (typeof cls === "string") {
+      cls = cls.split("|").map(function (c) {
+        return CMS.Models[c];
+      });
+    } else if (typeof cls !== "function") {
+      cls = [cls.constructor];
+    } else {
+      cls = [cls];
+    }
+
+    result = can.reduce(cls, function (res, c) {
+      return res || inst instanceof c;
     }, false);
 
-    // Execute based on the result
-    if (result) {
+    return options[result ? "fn" : "inverse"](options.contexts);
+  });
+
+  Mustache.registerHelper("prune_context", function (options) {
+    return options.fn(new can.view.Scope(options.context));
+  });
+
+// Turns DocumentationResponse to Response
+  Mustache.registerHelper("type_to_readable", function (str, options) {
+    return resolve_computed(str, true).replace(/([A-Z])/g, ' $1').split(' ').pop();
+  });
+
+  Mustache.registerHelper("mixed_content_check", function (url, options) {
+    url = Mustache.getHelper("schemed_url", options.contexts).fn(url);
+    if (window.location.protocol === "https:" && !/^https:/.test(url)) {
+      return options.inverse(options.contexts);
+    } else {
+      return options.fn(options.contexts);
+    }
+  });
+
+  /**
+   scriptwrap - create live-bound content contained within a <script> tag as CDATA
+   to prevent, e.g. iframes being rendered in hidden fields, or temporary storage
+   of markup being found by $().
+
+   Usage
+   -----
+   To render a section of markup in a script tag:
+   {{#scriptwrap}}<section content>{{/scriptwrap}}
+
+   To render the output of another helper in a script tag:
+   {{scriptwrap "name_of_other_helper" helper_arg helper_arg... hashkey=hashval}}
+
+   Hash keys starting with "attr_" will be treated as attributes to place on the script tag itself.
+   e.g. {{#scriptwrap attr_class="data-popover-content" attr_aria_
+*/
+  Mustache.registerHelper("scriptwrap", function (helper) {
+    var extra_attrs = ""
+      , args = can.makeArray(arguments).slice(1, arguments.length)
+      , options = args[args.length - 1] || helper
+      , ret = "<script type='text/html'" + can.view.hook(function (el, parent, view_id) {
+          var c = can.compute(function () {
+            var $d = $("<div>").html(
+              helper === options
+                ? options.fn(options.contexts)  //not calling a separate helper case
+                : Mustache.getHelper(helper, options.contexts).fn.apply(options.context, args));
+            can.view.hookup($d);
+            return "<script type='text/html'" + extra_attrs + ">" + $d.html() + "</script>";
+          });
+
+          can.view.live.html(el, c, parent);
+        });
+
+    if (options.hash) {
+      can.each(Object.keys(options.hash), function (key) {
+        if (/^attr_/.test(key)) {
+          extra_attrs += " " + key.substr(5).replace("_", "-") + "='" + resolve_computed(options.hash[key]) + "'";
+          delete options.hash[key];
+        }
+      });
+    }
+
+    ret += "></script>";
+    return new Mustache.safeString(ret);
+  });
+
+  Mustache.registerHelper("ggrc_config_value", function (key, default_, options) {
+    key = resolve_computed(key);
+    if (!options) {
+      options = default_;
+      default_ = null;
+    }
+    default_ = resolve_computed(default_);
+    default_ = default_ || "";
+    return can.getObject(key, [GGRC.config]) || default_;
+  });
+
+  Mustache.registerHelper("is_page_instance", function (instance, options) {
+    var instance = resolve_computed(instance)  // FIXME duplicate declaration
+      , page_instance = GGRC.page_instance()
+      ;
+
+    if (instance && instance.type === page_instance.type && instance.id === page_instance.id) {
       return options.fn(options.contexts);
     }
     else {
       return options.inverse(options.contexts);
     }
-  }
-});
-
-Mustache.registerHelper("with_model_as", function (var_name, model_name, options) {
-  var frame = {};
-  model_name = resolve_computed(Mustache.resolve(model_name));
-  frame[var_name] = CMS.Models[model_name];
-  return options.fn(options.contexts.add(frame));
-});
-
-Mustache.registerHelper("private_program_owner", function (instance, modal_title, options) {
-  var state = options.contexts.attr('__private_program_owner');
-  if (resolve_computed(modal_title).indexOf('New ') === 0) {
-    return GGRC.current_user.email;
-  }
-  else {
-    var loader = resolve_computed(instance).get_binding('authorizations');
-    return $.map(loader.list, function (binding) {
-      if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
-        return binding.instance.person.reify().attr('email');
-      }
-    }).join(', ');
-  }
-});
-
-
-// Determines whether the value matches one in the $.map'd list
-// {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
-Mustache.registerHelper("if_in_map", function (list, path, value, options) {
-  list = resolve_computed(list);
-
-  if (!list.attr || list.attr('length')) {
-    path = path.split('.');
-    var map = $.map(list, function (obj) {
-      can.each(path, function (prop) {
-        obj = (obj && obj[prop]) || null;
-      });
-      return obj;
-    });
-
-    if (map.indexOf(value) > -1)
-      return options.fn(options.contexts);
-  }
-  return options.inverse(options.contexts);
-});
-
-Mustache.registerHelper("with_auditors", function (instance, options) {
-  var auditors, auditors_dfd
-    , decoy
-    ;
-
-  instance = resolve_computed(instance);
-  if (options.hash && options.hash.decoy) {
-    decoy = Mustache.resolve(options.hash.decoy);
-    decoy.attr();
-  }
-
-  if (!instance)
-    return "";
-
-  auditors_dfd = Mustache.resolve(instance).findAuditors().done(function (aud) {
-    auditors = aud;
   });
-  return defer_render("span", function () {
-    if (auditors && auditors.attr("length") > 0) {
-      return options.fn(options.contexts.add({"auditors": auditors}));
-    }
-    else{
+
+  Mustache.registerHelper("remove_space", function (str, options) {
+    return resolve_computed(str, true).replace(' ', '');
+  });
+
+  Mustache.registerHelper("if_auditor", function (instance, options) {
+    var audit, auditors_dfd, auditors
+      , admin = Permission.is_allowed("__GGRC_ADMIN__")
+      , include_admin = !options.hash || options.hash.include_admin !== false;
+
+    instance = Mustache.resolve(instance);
+    instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+
+    if (!instance)
+      return "";
+
+    audit = instance instanceof CMS.Models.Request ? instance.attr("audit") : instance;
+
+    if (!audit)
+      return "";  //take no action until audit is available
+
+    audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
+    auditors = audit.findAuditors(true); // immediate-mode findAuditors
+
+    if ((include_admin && admin)
+      || can.map(
+        auditors,
+        function (auditor) {
+          if (auditor.person.id === GGRC.current_user.id) {
+            return auditor;
+          }
+        }).length > 0) {
+      return options.fn(options.contexts);
+    } else {
       return options.inverse(options.contexts);
     }
-  }, auditors_dfd);
-});
-
-Mustache.registerHelper("if_instance_of", function (inst, cls, options) {
-  var result;
-  cls = resolve_computed(cls);
-  inst = resolve_computed(inst);
-
-  if (typeof cls === "string") {
-    cls = cls.split("|").map(function (c) {
-      return CMS.Models[c];
-    });
-  } else if (typeof cls !== "function") {
-    cls = [cls.constructor];
-  } else {
-    cls = [cls];
-  }
-
-  result = can.reduce(cls, function (res, c) {
-    return res || inst instanceof c;
-  }, false);
-
-  return options[result ? "fn" : "inverse"](options.contexts);
-});
-
-Mustache.registerHelper("prune_context", function (options) {
-  return options.fn(new can.view.Scope(options.context));
-});
-
-// Turns DocumentationResponse to Response
-Mustache.registerHelper("type_to_readable", function (str, options) {
-  return resolve_computed(str, true).replace(/([A-Z])/g, ' $1').split(' ').pop();
-});
-
-Mustache.registerHelper("mixed_content_check", function (url, options) {
-  url = Mustache.getHelper("schemed_url", options.contexts).fn(url);
-  if (window.location.protocol === "https:" && !/^https:/.test(url)) {
-    return options.inverse(options.contexts);
-  } else {
-    return options.fn(options.contexts);
-  }
-});
-
-/**
-  scriptwrap - create live-bound content contained within a <script> tag as CDATA
-  to prevent, e.g. iframes being rendered in hidden fields, or temporary storage
-  of markup being found by $().
-
-  Usage
-  -----
-  To render a section of markup in a script tag:
-  {{#scriptwrap}}<section content>{{/scriptwrap}}
-
-  To render the output of another helper in a script tag:
-  {{scriptwrap "name_of_other_helper" helper_arg helper_arg... hashkey=hashval}}
-
-  Hash keys starting with "attr_" will be treated as attributes to place on the script tag itself.
-  e.g. {{#scriptwrap attr_class="data-popover-content" attr_aria_
-*/
-Mustache.registerHelper("scriptwrap", function (helper) {
-  var extra_attrs = ""
-  , args = can.makeArray(arguments).slice(1, arguments.length)
-  , options = args[args.length - 1] || helper
-  , ret = "<script type='text/html'" + can.view.hook(function (el, parent, view_id) {
-    var c = can.compute(function () {
-      var $d = $("<div>").html(
-        helper === options
-        ? options.fn(options.contexts)  //not calling a separate helper case
-        : Mustache.getHelper(helper, options.contexts).fn.apply(options.context, args));
-      can.view.hookup($d);
-      return "<script type='text/html'" + extra_attrs + ">" + $d.html() + "</script>";
-    });
-
-    can.view.live.html(el, c, parent);
   });
 
-  if (options.hash) {
-    can.each(Object.keys(options.hash), function (key) {
-      if (/^attr_/.test(key)) {
-        extra_attrs += " " + key.substr(5).replace("_", "-") + "='" + resolve_computed(options.hash[key]) + "'";
-        delete options.hash[key];
-      }
-    });
-  }
-
-  ret += "></script>";
-  return new Mustache.safeString(ret);
-});
-
-Mustache.registerHelper("ggrc_config_value", function (key, default_, options) {
-  key = resolve_computed(key);
-  if (!options) {
-    options = default_;
-    default_ = null;
-  }
-  default_ = resolve_computed(default_);
-  default_ = default_ || "";
-  return can.getObject(key, [GGRC.config]) || default_;
-});
-
-Mustache.registerHelper("is_page_instance", function (instance, options) {
-  var instance = resolve_computed(instance)  // FIXME duplicate declaration
-    , page_instance = GGRC.page_instance()
-    ;
-
-  if (instance && instance.type === page_instance.type && instance.id === page_instance.id) {
-    return options.fn(options.contexts);
-  }
-  else{
-    return options.inverse(options.contexts);
-  }
-});
-
-Mustache.registerHelper("remove_space", function (str, options) {
-  return resolve_computed(str, true).replace(' ', '');
-});
-
-Mustache.registerHelper("if_auditor", function (instance, options) {
-  var audit, auditors_dfd, auditors
-    , admin = Permission.is_allowed("__GGRC_ADMIN__")
-    , include_admin = !options.hash || options.hash.include_admin !== false;
-
-  instance = Mustache.resolve(instance);
-  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
-
-  if (!instance)
-    return "";
-
-  audit = instance instanceof CMS.Models.Request ? instance.attr("audit") : instance;
-
-  if (!audit)
-    return "";  //take no action until audit is available
-
-  audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
-  auditors = audit.findAuditors(true); // immediate-mode findAuditors
-
-  if ((include_admin && admin)
-     || can.map(
-          auditors,
-          function (auditor) {
-            if (auditor.person.id === GGRC.current_user.id) {
-              return auditor;
-            }
-        }).length > 0) {
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
-});
-
-can.each({
-  "if_can_edit_request": {
-    assignee_states: ["Requested", "Amended Request"],
-    program_editor_states: ["Requested", "Amended Request"],
-    predicate: function(options) {
-      return options.admin
+  can.each({
+    "if_can_edit_request": {
+      assignee_states: ["Requested", "Amended Request"],
+      program_editor_states: ["Requested", "Amended Request"],
+      predicate: function (options) {
+        return options.admin
           || options.can_assignee_edit
           || options.can_program_editor_edit
           || (!options.accepted
-              && (options.update
-                  || options.map
-                  || options.create
-                  || options.program_owner
-                  || options.auditor));
-    }
-  },
-  "if_can_reassign_request": {
-    auditor_states: ["Responded", "Updated Response"],
-    assignee_states: ["Requested", "Amended Request", "Responded", "Updated Response"],
-    program_editor_states: ["Requested", "Amended Request"],
-    predicate: function(options) {
-      return options.admin
+          && (options.update
+          || options.map
+          || options.create
+          || options.program_owner
+          || options.auditor));
+      }
+    },
+    "if_can_reassign_request": {
+      auditor_states: ["Responded", "Updated Response"],
+      assignee_states: ["Requested", "Amended Request", "Responded", "Updated Response"],
+      program_editor_states: ["Requested", "Amended Request"],
+      predicate: function (options) {
+        return options.admin
           || options.can_auditor_edit
           || options.can_assignee_edit
           || options.can_program_editor_edit
           || (!options.accepted
-              && (options.update
-                || options.map
-                || options.create));
-    }
-  },
-  "if_can_create_response": {
-    assignee_states: ["Requested", "Amended Request"],
-    program_editor_states: ["Requested", "Amended Request"],
-    predicate: function(options) {
-      return (!options.draft && options.admin)
+          && (options.update
+          || options.map
+          || options.create));
+      }
+    },
+    "if_can_create_response": {
+      assignee_states: ["Requested", "Amended Request"],
+      program_editor_states: ["Requested", "Amended Request"],
+      predicate: function (options) {
+        return (!options.draft && options.admin)
           || options.can_assignee_edit
           || options.can_program_editor_edit
           || (!options.accepted
-              && !options.draft
-              && (options.update
-                || options.map
-                || options.create));
+          && !options.draft
+          && (options.update
+          || options.map
+          || options.create));
+      }
     }
-  }
-}, function(fn_opts, name) {
+  }, function (fn_opts, name) {
 
-  Mustache.registerHelper(name, function(instance, options){
+    Mustache.registerHelper(name, function (instance, options) {
 
       var audit, auditors_dfd, accepted, prog_roles_dfd,
-          admin = Permission.is_allowed("__GGRC_ADMIN__");
+        admin = Permission.is_allowed("__GGRC_ADMIN__");
 
       instance = resolve_computed(instance);
       instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
 
-      if(!instance)
+      if (!instance)
         return "";
 
       audit = instance.attr("audit");
 
-      if(!audit)
+      if (!audit)
         return "";  //take no action until audit is available
 
       audit = audit.reify();
       auditors_dfd = audit.findAuditors();
       prog_roles_dfd = new RefreshQueue()
-                       .enqueue(audit.attr("program").reify())
-                       .trigger().then(function(progs) {
-                         return progs[0].get_binding("program_authorizations").refresh_instances();
-                       }).then(function(user_role_bindings) {
-                          var rq = new RefreshQueue();
-                          can.each(user_role_bindings, function(urb) {
-                            if(urb.instance.person.id === GGRC.current_user.id) {
-                              rq.enqueue(urb.instance.role.reify());
-                            }
-                          });
-                          return rq.trigger();
-                       });
+        .enqueue(audit.attr("program").reify())
+        .trigger().then(function (progs) {
+          return progs[0].get_binding("program_authorizations").refresh_instances();
+        }).then(function (user_role_bindings) {
+          var rq = new RefreshQueue();
+          can.each(user_role_bindings, function (urb) {
+            if (urb.instance.person.id === GGRC.current_user.id) {
+              rq.enqueue(urb.instance.role.reify());
+            }
+          });
+          return rq.trigger();
+        });
 
-      return defer_render("span", function(auditors, program_roles) {
+      return defer_render("span", function (auditors, program_roles) {
         var accepted = instance.status === "Accepted",
-            draft = instance.status === "Draft",
-            update = Permission.is_allowed("update", instance), //All-context allowance
-            map = Permission.is_allowed("mapping", instance),   //All-context allowance
-            create = Permission.is_allowed("creating", instance), //All-context allowance
-            assignee = !!instance.assignee && instance.assignee.id === GGRC.current_user.id, // User is request assignee
-            audit_lead = !!audit.contact && audit.contact.id === GGRC.current_user.id,  // User is audit lead
-            auditor = can.map(  // User has auditor role in audit
-                        auditors || [],
-                        function(auditor) {
-                          if(auditor.person.id === GGRC.current_user.id) {
-                            return auditor;
-                          }
-                      }).length > 0,
-            program_owner = can.reduce(  //user is owner of the audit's parent program
-                              program_roles,
-                              function(cur, role) { return cur || role.name === "ProgramOwner"; },
-                              false
-                              ),
-            program_editor = can.reduce(  //user is editor of the audit's parent program
-                              program_roles,
-                              function(cur, role) { return cur || role.name === "ProgramEditor"; },
-                              false
-                              ),
-            auditor_states = fn_opts.auditor_states || [], // States in which an auditor can edit a request
-            assignee_states = fn_opts.assignee_states || [], // " for assignee of request
-            program_editor_states = fn_opts.program_editor_states || [], // " for program editor
-            // Program owner currently has nearly the same state allowances as Admin --BM 2014-12-16
-            can_auditor_edit = auditor && ~can.inArray(instance.attr("status"), auditor_states),
-            can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.attr("status"), assignee_states),
-            can_program_editor_edit = (program_editor || program_owner) && ~can.inArray(instance.attr("status"), program_editor_states)
-            ;
+          draft = instance.status === "Draft",
+          update = Permission.is_allowed("update", instance), //All-context allowance
+          map = Permission.is_allowed("mapping", instance),   //All-context allowance
+          create = Permission.is_allowed("creating", instance), //All-context allowance
+          assignee = !!instance.assignee && instance.assignee.id === GGRC.current_user.id, // User is request assignee
+          audit_lead = !!audit.contact && audit.contact.id === GGRC.current_user.id,  // User is audit lead
+          auditor = can.map(  // User has auditor role in audit
+              auditors || [],
+              function (auditor) {
+                if (auditor.person.id === GGRC.current_user.id) {
+                  return auditor;
+                }
+              }).length > 0,
+          program_owner = can.reduce(  //user is owner of the audit's parent program
+            program_roles,
+            function (cur, role) {
+              return cur || role.name === "ProgramOwner";
+            },
+            false
+          ),
+          program_editor = can.reduce(  //user is editor of the audit's parent program
+            program_roles,
+            function (cur, role) {
+              return cur || role.name === "ProgramEditor";
+            },
+            false
+          ),
+          auditor_states = fn_opts.auditor_states || [], // States in which an auditor can edit a request
+          assignee_states = fn_opts.assignee_states || [], // " for assignee of request
+          program_editor_states = fn_opts.program_editor_states || [], // " for program editor
+        // Program owner currently has nearly the same state allowances as Admin --BM 2014-12-16
+          can_auditor_edit = auditor && ~can.inArray(instance.attr("status"), auditor_states),
+          can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.attr("status"), assignee_states),
+          can_program_editor_edit = (program_editor || program_owner) && ~can.inArray(instance.attr("status"), program_editor_states)
+          ;
 
-        if(fn_opts.predicate({
-          admin: admin,
-          can_auditor_edit: can_auditor_edit,
-          can_assignee_edit: can_assignee_edit,
-          can_program_editor_edit: can_program_editor_edit,
-          accepted: accepted,
-          draft: draft,
-          update: update,
-          map: map,
-          create: create,
-          program_owner: program_owner,
-          auditor: auditor,
-          audit_lead: audit_lead
-        })) {
+        if (fn_opts.predicate({
+            admin: admin,
+            can_auditor_edit: can_auditor_edit,
+            can_assignee_edit: can_assignee_edit,
+            can_program_editor_edit: can_program_editor_edit,
+            accepted: accepted,
+            draft: draft,
+            update: update,
+            map: map,
+            create: create,
+            program_owner: program_owner,
+            auditor: auditor,
+            audit_lead: audit_lead
+          })) {
           return options.fn(options.contexts);
         }
-        else{
+        else {
           return options.inverse(options.contexts);
         }
       }, $.when(auditors_dfd, prog_roles_dfd));
+    });
   });
-});
 
-Mustache.registerHelper("strip_html_tags", function (str) {
-  return resolve_computed(str).replace(/<(?:.|\n)*?>/gm, '');
-});
+  Mustache.registerHelper("strip_html_tags", function (str) {
+    return resolve_computed(str).replace(/<(?:.|\n)*?>/gm, '');
+  });
 
-Mustache.registerHelper("truncate", function (len, str) {
-  // find a good source
-  str = can.makeArray(arguments).reduce(function (res, arg, i) {
+  Mustache.registerHelper("truncate", function (len, str) {
+    // find a good source
+    str = can.makeArray(arguments).reduce(function (res, arg, i) {
       var s = resolve_computed(arg);
       if (typeof s === "string") {
-          return s;
-      }else{
-          return res;
+        return s;
+      } else {
+        return res;
       }
-  }, "");
+    }, "");
 
-  if (typeof len === "number") {
+    if (typeof len === "number") {
       // max len characters
       if (str.length > len) {
-          str = str.substr(0, str.lastIndexOf(len, ' '));
-          str += " &hellip;";
+        str = str.substr(0, str.lastIndexOf(len, ' '));
+        str += " &hellip;";
       }
-  }else{
+    } else {
       // first line of input
       var strs = str.split(/<br[^>]*>|\n/gm);
       if (strs.length > 1) {
-          str = strs[0];
-          str += " &hellip;";
+        str = strs[0];
+        str += " &hellip;";
       }
-  }
+    }
 
-  return str;
-});
+    return str;
+  });
 
-Mustache.registerHelper("switch", function (value, options) {
-  var frame = new can.Observe({});
-  value = resolve_computed(value);
-  frame.attr(value || "default", true);
-  frame.attr("default", true);
-  return options.fn(options.contexts.add(frame), {
-    helpers : {
-      case : function (val, options) {
-        val = resolve_computed(val);
-        if (options.context[val]) {
-          options.context.attr ? options.context.attr("default", false) : (options.context.default = false);
-          return options.fn(options.contexts);
+  Mustache.registerHelper("switch", function (value, options) {
+    var frame = new can.Observe({});
+    value = resolve_computed(value);
+    frame.attr(value || "default", true);
+    frame.attr("default", true);
+    return options.fn(options.contexts.add(frame), {
+      helpers: {
+        case: function (val, options) {
+          val = resolve_computed(val);
+          if (options.context[val]) {
+            options.context.attr ? options.context.attr("default", false) : (options.context.default = false);
+            return options.fn(options.contexts);
+          }
         }
       }
-    }
+    });
   });
-});
 
 
-Mustache.registerHelper("fadein", function (delay, prop, options) {
-  switch(arguments.length) {
-    case 1:
-    options = delay;
-    delay = 500;
-    break;
-    case 2:
-    options = prop;
-    prop = null;
-    break;
-  }
-  resolve_computed(prop);
-  return function (el) {
-    var $el = $(el);
-    $el.css("display", "none");
-    if (!prop || resolve_computed(prop)) {
-      setTimeout(function () {
-        $el.fadeIn({
-          duration : (options.hash && options.hash.duration) || 500
-          , complete : function () {
-            return typeof prop === "function" && prop(true);
-          }
-        });
-      }, delay);
+  Mustache.registerHelper("fadein", function (delay, prop, options) {
+    switch (arguments.length) {
+      case 1:
+        options = delay;
+        delay = 500;
+        break;
+      case 2:
+        options = prop;
+        prop = null;
+        break;
     }
-  };
-});
-
-Mustache.registerHelper("fadeout", function (delay, prop, options) {
-  switch(arguments.length) {
-    case 1:
-    options = delay;
-    delay = 500;
-    break;
-    case 2:
-    options = prop;
-    prop = null;
-    break;
-  }
-  if (resolve_computed(prop)) {
+    resolve_computed(prop);
     return function (el) {
       var $el = $(el);
-      setTimeout(function () {
-        $el.fadeOut({
-          duration : (options.hash && options.hash.duration) || 500
-          , complete : function () {
-            return typeof prop === "function" && prop(null);
-          }
-        });
-      }, delay);
+      $el.css("display", "none");
+      if (!prop || resolve_computed(prop)) {
+        setTimeout(function () {
+          $el.fadeIn({
+            duration: (options.hash && options.hash.duration) || 500
+            , complete: function () {
+              return typeof prop === "function" && prop(true);
+            }
+          });
+        }, delay);
+      }
     };
-  }
-});
+  });
 
-Mustache.registerHelper("with_mapping_count", function (instance, mapping_names, options) {
-  var args = can.makeArray(arguments)
-    , options = args[args.length-1]  // FIXME duplicate declaration
-    , mapping_name
-    ;
-
-  mapping_names = args.slice(1, args.length - 1);
-
-  instance = Mustache.resolve(instance);
-
-  // Find the most appropriate mapping
-  for (var i = 0; i < mapping_names.length; i++) {
-    mapping_name = Mustache.resolve(mapping_names[i]);
-    if (instance.get_binding(mapping_name)) {
-      break;
+  Mustache.registerHelper("fadeout", function (delay, prop, options) {
+    switch (arguments.length) {
+      case 1:
+        options = delay;
+        delay = 500;
+        break;
+      case 2:
+        options = prop;
+        prop = null;
+        break;
     }
-  }
+    if (resolve_computed(prop)) {
+      return function (el) {
+        var $el = $(el);
+        setTimeout(function () {
+          $el.fadeOut({
+            duration: (options.hash && options.hash.duration) || 500
+            , complete: function () {
+              return typeof prop === "function" && prop(null);
+            }
+          });
+        }, delay);
+      };
+    }
+  });
 
-  var finish = function (count) {
-    return options.fn(options.contexts.add({ count: count }));
-  };
+  Mustache.registerHelper("with_mapping_count", function (instance, mapping_names, options) {
+    var args = can.makeArray(arguments)
+      , options = args[args.length - 1]  // FIXME duplicate declaration
+      , mapping_name
+      ;
 
-  var progress = function () {
-    return options.inverse(options.contexts);
-  };
+    mapping_names = args.slice(1, args.length - 1);
 
-  return defer_render(
-    "span",
-    { done: finish, progress: progress },
-    instance.get_list_counter(mapping_name)
-  );
-});
+    instance = Mustache.resolve(instance);
 
-Mustache.registerHelper("is_overdue", function (_date, status, options) {
-  options = arguments.length === 2 ? arguments[1] : options;
-  status = arguments.length === 2 ? "" : resolve_computed(status);
-  var date = moment(resolve_computed(_date));
-  if (status !== 'Verified' && date && date.isBefore(new Date())) {
-    return options.fn(options.contexts);
-  }
-  else {
-    return options.inverse(options.contexts);
-  }
-});
-
-Mustache.registerHelper("with_mappable_instances_as", function (name, list, options) {
-  var ctx = new can.Observe()
-    , page_inst = GGRC.page_instance()
-    , page_context = page_inst.context ? page_inst.context.id : null
-    ;
-
-  list = Mustache.resolve(list);
-
-  if (list) {
-    list.attr("length"); //setup live.
-    list = can.map(list, function (item, key) {
-      var inst = item.instance || item;
-      var jds = GGRC.Mappings.join_model_name_for (page_inst.constructor.shortName, inst.constructor.shortName);
-      if (inst !== page_inst
-         && jds
-         && Permission.is_allowed("create", jds, page_context)
-      ) {
-        return inst;
+    // Find the most appropriate mapping
+    for (var i = 0; i < mapping_names.length; i++) {
+      mapping_name = Mustache.resolve(mapping_names[i]);
+      if (instance.get_binding(mapping_name)) {
+        break;
       }
-    });
-  }
+    }
 
-  ctx.attr(name, list);
+    var finish = function (count) {
+      return options.fn(options.contexts.add({count: count}));
+    };
 
-  return options.fn(options.contexts.add(ctx));
-});
+    var progress = function () {
+      return options.inverse(options.contexts);
+    };
 
-Mustache.registerHelper("with_subtracted_list_as", function (name, haystack, needles, options) {
-  var ctx = new can.Observe();
+    return defer_render(
+      "span",
+      {done: finish, progress: progress},
+      instance.get_list_counter(mapping_name)
+    );
+  });
 
-  haystack = Mustache.resolve(haystack);
-  needles = Mustache.resolve(needles);
+  Mustache.registerHelper("is_overdue", function (_date, status, options) {
+    options = arguments.length === 2 ? arguments[1] : options;
+    status = arguments.length === 2 ? "" : resolve_computed(status);
+    var date = moment(resolve_computed(_date));
+    if (status !== 'Verified' && date && date.isBefore(new Date())) {
+      return options.fn(options.contexts);
+    }
+    else {
+      return options.inverse(options.contexts);
+    }
+  });
 
-  if (haystack) {
-    haystack.attr("length"); //setup live.
-    needles.attr("length");
-    haystack = can.map(haystack, function (item, key) {
-      return ~can.inArray(item, needles) ? undefined : item;
-    });
-  }
+  Mustache.registerHelper("with_mappable_instances_as", function (name, list, options) {
+    var ctx = new can.Observe()
+      , page_inst = GGRC.page_instance()
+      , page_context = page_inst.context ? page_inst.context.id : null
+      ;
 
-  ctx.attr(name, haystack);
+    list = Mustache.resolve(list);
 
-  return options.fn(options.contexts.add(ctx));
-});
+    if (list) {
+      list.attr("length"); //setup live.
+      list = can.map(list, function (item, key) {
+        var inst = item.instance || item;
+        var jds = GGRC.Mappings.join_model_name_for(page_inst.constructor.shortName, inst.constructor.shortName);
+        if (inst !== page_inst
+          && jds
+          && Permission.is_allowed("create", jds, page_context)
+        ) {
+          return inst;
+        }
+      });
+    }
 
-Mustache.registerHelper("with_mapping_instances_as", function (name, mappings, options) {
-  var ctx = new can.Observe();
+    ctx.attr(name, list);
 
-  mappings = Mustache.resolve(mappings);
+    return options.fn(options.contexts.add(ctx));
+  });
 
-  if (!(mappings instanceof can.List || can.isArray(mappings))) {
-    mappings = [mappings];
-  }
+  Mustache.registerHelper("with_subtracted_list_as", function (name, haystack, needles, options) {
+    var ctx = new can.Observe();
 
-  if (mappings) {
-    //  Setup decoy for live binding
-    mappings.attr && mappings.attr("length");
-    mappings = can.map(mappings, function (item, key) {
-      return item.instance;
-    });
-  }
-  ctx.attr(name, mappings);
+    haystack = Mustache.resolve(haystack);
+    needles = Mustache.resolve(needles);
 
-  return options.fn(options.contexts.add(ctx));
-});
+    if (haystack) {
+      haystack.attr("length"); //setup live.
+      needles.attr("length");
+      haystack = can.map(haystack, function (item, key) {
+        return ~can.inArray(item, needles) ? undefined : item;
+      });
+    }
+
+    ctx.attr(name, haystack);
+
+    return options.fn(options.contexts.add(ctx));
+  });
+
+  Mustache.registerHelper("with_mapping_instances_as", function (name, mappings, options) {
+    var ctx = new can.Observe();
+
+    mappings = Mustache.resolve(mappings);
+
+    if (!(mappings instanceof can.List || can.isArray(mappings))) {
+      mappings = [mappings];
+    }
+
+    if (mappings) {
+      //  Setup decoy for live binding
+      mappings.attr && mappings.attr("length");
+      mappings = can.map(mappings, function (item, key) {
+        return item.instance;
+      });
+    }
+    ctx.attr(name, mappings);
+
+    return options.fn(options.contexts.add(ctx));
+  });
 
 
-Mustache.registerHelper("with_allowed_as", function (name, action, mappings, options) {
-  var ctx = new can.Observe();
+  Mustache.registerHelper("with_allowed_as", function (name, action, mappings, options) {
+    var ctx = new can.Observe();
 
-  mappings = Mustache.resolve(mappings);
+    mappings = Mustache.resolve(mappings);
 
-  if (!(mappings instanceof can.List || can.isArray(mappings))) {
-    mappings = [mappings];
-  }
+    if (!(mappings instanceof can.List || can.isArray(mappings))) {
+      mappings = [mappings];
+    }
 
-  if (mappings) {
-    //  Setup decoy for live binding
-    mappings.attr && mappings.attr("length");
-    mappings = can.map(mappings, function (item, key) {
-      var mp = item.get_mappings()[0]
-        , context_id = mp.context ? mp.context.id : null
-        ;
-      if (Permission.is_allowed(action, mp.constructor.shortName, context_id)) {
-        return item;
+    if (mappings) {
+      //  Setup decoy for live binding
+      mappings.attr && mappings.attr("length");
+      mappings = can.map(mappings, function (item, key) {
+        var mp = item.get_mappings()[0]
+          , context_id = mp.context ? mp.context.id : null
+          ;
+        if (Permission.is_allowed(action, mp.constructor.shortName, context_id)) {
+          return item;
+        }
+      });
+    }
+    ctx.attr(name, mappings);
+
+    return options.fn(options.contexts.add(ctx));
+  });
+
+  Mustache.registerHelper("log", function (obj) {
+    console.log(resolve_computed(obj));
+  });
+
+  Mustache.registerHelper("autocomplete_select", function (options) {
+    var cls;
+    if (options.hash && options.hash.controller) {
+      cls = Mustache.resolve(cls);
+      if (typeof cls === "string") {
+        cls = can.getObject(cls);
       }
-    });
-  }
-  ctx.attr(name, mappings);
-
-  return options.fn(options.contexts.add(ctx));
-});
-
-Mustache.registerHelper("log", function (obj) {
-  console.log(resolve_computed(obj));
-});
-
-Mustache.registerHelper("autocomplete_select", function (options) {
-  var cls;
-  if (options.hash && options.hash.controller) {
-    cls = Mustache.resolve(cls);
-    if (typeof cls === "string") {
-      cls = can.getObject(cls);
-    }
-  }
-  return function (el) {
-    $(el).bind("inserted", function () {
-      var $ctl = $(this).parents(":data(controls)");
-      $(this).ggrc_autocomplete($.extend({}, options.hash, {
-        controller : cls ? $ctl.control(cls) : $ctl.control()
-      }));
-    });
-  };
-});
-
-Mustache.registerHelper("find_template", function (base_name, instance, options) {
-  var tmpl;
-
-  base_name = Mustache.resolve(base_name);
-  if (!options) {
-    options = instance;
-    instance = options.context;
-  }
-  instance = Mustache.resolve(instance);
-  if (instance.instance) {
-    //binding result case
-    instance = instance.instance;
-  }
-
-  if (GGRC.Templates[instance.constructor.table_plural + "/" + base_name]) {
-    tmpl = "/static/mustache/" + instance.constructor.table_plural + "/" + base_name + ".mustache";
-  } else if (GGRC.Templates["base_objects/" + base_name]) {
-    tmpl = "/static/mustache/base_objects/" + base_name + ".mustache";
-  } else {
-    tmpl = null;
-  }
-
-  if (tmpl) {
-    return options.fn(options.contexts.add({ template : tmpl }));
-  } else {
-    return options.inverse(options.contexts);
-  }
-});
-
-// Append string to source if the string isn't already present,
-//   remove the string from source if it is present.
-Mustache.registerHelper("toggle_string", function (source, str) {
-  source = Mustache.resolve(source);
-  str = Mustache.resolve(str);
-  var re = new RegExp('.*' + str);
-  if (re.test(source)) {
-    return source.replace(str, '');
-  }
-
-  return source + str;
-});
-
-Mustache.registerHelper("grdive_msg_to_id", function (message) {
-  var msg = Mustache.resolve(message).split(' ');
-  return msg[msg.length-1];
-});
-
-Mustache.registerHelper("disable_if_errors", function(instance){
-  var ins,
-      res;
-  ins = Mustache.resolve(instance);
-  res = ins.computed_unsuppressed_errors();
-  if (res == null ) {
-    return "";
-  }
-  else {
-    return "disabled" ;
-  }
-});
-
-/*
-  toggle mustache helper
-
-  An extended "if" that sets up a "toggle_button" trigger, which can
-  be applied to any button rendered within the section bounded by the
-  toggle call.  toggle_buttons set the value of the toggle value to its
-  boolean opposite.  Note that external forces can also set this value
-  and thereby flip the toggle -- this helper is friendly to those cases.
-
-  @helper_type section -- use outside of element tags.
-
-  @param compute some computed value to flip between true and false
-*/
-Mustache.registerHelper("toggle", function (compute, options) {
-  function toggle(trigger) {
-    if (typeof trigger === "function") {
-      trigger = Mustache.resolve(trigger);
-    }
-    if (typeof trigger !== "string") {
-      trigger = "click";
     }
     return function (el) {
-      $(el).bind(trigger, function () {
-        compute(compute() ? false : true);
+      $(el).bind("inserted", function () {
+        var $ctl = $(this).parents(":data(controls)");
+        $(this).ggrc_autocomplete($.extend({}, options.hash, {
+          controller: cls ? $ctl.control(cls) : $ctl.control()
+        }));
       });
     };
-  }
+  });
 
-  if (compute()) {
-    return options.fn(
-      options.contexts, { helpers: { toggle_button: toggle }});
-  } else {
-    return options.inverse(
-      options.contexts, { helpers: { toggle_button: toggle }});
-  }
-});
+  Mustache.registerHelper("find_template", function (base_name, instance, options) {
+    var tmpl;
 
-can.each({
-  "has_pending_addition": "add",
-  "has_pending_removal": "remove"
-}, function (how, fname) {
-  Mustache.registerHelper(fname, function (object, option_instance, options) {
+    base_name = Mustache.resolve(base_name);
     if (!options) {
-      options = option_instance;
-      option_instance = object;
-      object = options.context;
+      options = instance;
+      instance = options.context;
     }
-    option_instance = Mustache.resolve(option_instance);
-    object = Mustache.resolve(object);
+    instance = Mustache.resolve(instance);
+    if (instance.instance) {
+      //binding result case
+      instance = instance.instance;
+    }
 
-    if (object._pending_joins && can.map(
-      object._pending_joins,
-      function (pj) {
-        return pj.how === how && pj.what === option_instance ? option_instance : undefined;
-      }).length > 0) {
-      return options.fn(options.contexts);
+    if (GGRC.Templates[instance.constructor.table_plural + "/" + base_name]) {
+      tmpl = "/static/mustache/" + instance.constructor.table_plural + "/" + base_name + ".mustache";
+    } else if (GGRC.Templates["base_objects/" + base_name]) {
+      tmpl = "/static/mustache/base_objects/" + base_name + ".mustache";
+    } else {
+      tmpl = null;
+    }
+
+    if (tmpl) {
+      return options.fn(options.contexts.add({template: tmpl}));
     } else {
       return options.inverse(options.contexts);
     }
   });
-});
 
-Mustache.registerHelper("iterate_by_two", function (list, options) {
-  var i, arr, output = [];
-  list = Mustache.resolve(list);
-
-  for (i = 0; i < list.length; i+=2) {
-    if ((i + 1) === list.length) {
-      arr = [list[i]];
-    } else {
-      arr = [list[i], list[i+1]];
+// Append string to source if the string isn't already present,
+//   remove the string from source if it is present.
+  Mustache.registerHelper("toggle_string", function (source, str) {
+    source = Mustache.resolve(source);
+    str = Mustache.resolve(str);
+    var re = new RegExp('.*' + str);
+    if (re.test(source)) {
+      return source.replace(str, '');
     }
-    output.push(options.fn(
-      options.contexts.add({list: arr})));
-  }
-  return output.join("");
-});
 
-/*
-  This helper should be called from widget/tree_view where parent_instance is expected.
-  Purpose: don't show the object icon in the first level tree, as the tab has the icon already.
+    return source + str;
+  });
 
-  Get the current type of object.
-  If the object-type == widget shown, draw = false (First level tree)
-*/
-Mustache.registerHelper("if_draw_icon", function(instance, options) {
-  var draw = true,
-    ins,
-    type,
-    uri,
-    regex;
+  Mustache.registerHelper("grdive_msg_to_id", function (message) {
+    var msg = Mustache.resolve(message).split(' ');
+    return msg[msg.length - 1];
+  });
 
-  ins = Mustache.resolve(instance);
-  type = ins.type;
+  Mustache.registerHelper("disable_if_errors", function (instance) {
+    var ins,
+      res;
+    ins = Mustache.resolve(instance);
+    res = ins.computed_unsuppressed_errors();
+    if (res == null) {
+      return "";
+    }
+    else {
+      return "disabled";
+    }
+  });
 
-  switch (type) {
-    case "OrgGroup":
-      type = "org_group";
-      break;
-    case "DataAsset":
-      type = "data_asset";
-      break;
-    default:
-      break;
-  }
+  /*
+   toggle mustache helper
 
-  if (type){
-    uri = type.slice(1) + "_widget";
-    regex = new RegExp(uri);
+   An extended "if" that sets up a "toggle_button" trigger, which can
+   be applied to any button rendered within the section bounded by the
+   toggle call.  toggle_buttons set the value of the toggle value to its
+   boolean opposite.  Note that external forces can also set this value
+   and thereby flip the toggle -- this helper is friendly to those cases.
+
+   @helper_type section -- use outside of element tags.
+
+   @param compute some computed value to flip between true and false
+   */
+  Mustache.registerHelper("toggle", function (compute, options) {
+    function toggle(trigger) {
+      if (typeof trigger === "function") {
+        trigger = Mustache.resolve(trigger);
+      }
+      if (typeof trigger !== "string") {
+        trigger = "click";
+      }
+      return function (el) {
+        $(el).bind(trigger, function () {
+          compute(compute() ? false : true);
+        });
+      };
+    }
+
+    if (compute()) {
+      return options.fn(
+        options.contexts, {helpers: {toggle_button: toggle}});
+    } else {
+      return options.inverse(
+        options.contexts, {helpers: {toggle_button: toggle}});
+    }
+  });
+
+  can.each({
+    "has_pending_addition": "add",
+    "has_pending_removal": "remove"
+  }, function (how, fname) {
+    Mustache.registerHelper(fname, function (object, option_instance, options) {
+      if (!options) {
+        options = option_instance;
+        option_instance = object;
+        object = options.context;
+      }
+      option_instance = Mustache.resolve(option_instance);
+      object = Mustache.resolve(object);
+
+      if (object._pending_joins && can.map(
+          object._pending_joins,
+          function (pj) {
+            return pj.how === how && pj.what === option_instance ? option_instance : undefined;
+          }).length > 0) {
+        return options.fn(options.contexts);
+      } else {
+        return options.inverse(options.contexts);
+      }
+    });
+  });
+
+  Mustache.registerHelper("iterate_by_two", function (list, options) {
+    var i, arr, output = [];
+    list = Mustache.resolve(list);
+
+    for (i = 0; i < list.length; i += 2) {
+      if ((i + 1) === list.length) {
+        arr = [list[i]];
+      } else {
+        arr = [list[i], list[i + 1]];
+      }
+      output.push(options.fn(
+        options.contexts.add({list: arr})));
+    }
+    return output.join("");
+  });
+
+  /*
+   This helper should be called from widget/tree_view where parent_instance is expected.
+   Purpose: don't show the object icon in the first level tree, as the tab has the icon already.
+
+   Get the current type of object.
+   If the object-type == widget shown, draw = false (First level tree)
+   */
+  Mustache.registerHelper("if_draw_icon", function (instance, options) {
+    var draw = true,
+      ins,
+      type,
+      uri,
+      regex;
+
+    ins = Mustache.resolve(instance);
+    type = ins.type;
+
+    switch (type) {
+      case "OrgGroup":
+        type = "org_group";
+        break;
+      case "DataAsset":
+        type = "data_asset";
+        break;
+      default:
+        break;
+    }
+
+    if (type) {
+      uri = type.slice(1) + "_widget";
+      regex = new RegExp(uri);
       if (regex.test(window.location))
         draw = false;
-  }
+    }
 
-  if (draw)
+    if (draw)
+      return options.fn(options.contexts);
+    else
+      return options.inverse(options.contexts);
+  });
+
+  Mustache.registerHelper("debugger", function (options) {
+    // This just gives you a helper that you can wrap around some code in a
+    // template to see what's in the context. Set a breakpoint in dev tools
+    // on the return statement on the line below to debug.
+    debugger;
     return options.fn(options.contexts);
-  else
-    return options.inverse(options.contexts);
-});
+  });
 
-Mustache.registerHelper("debugger", function(options) {
-  // This just gives you a helper that you can wrap around some code in a
-  // template to see what's in the context. Set a breakpoint in dev tools
-  // on the return statement on the line below to debug.
-  debugger;
-  return options.fn(options.contexts);
-});
+  Mustache.registerHelper("update_link", function (instance, options) {
 
-Mustache.registerHelper("update_link", function(instance, options) {
+    instance = Mustache.resolve(instance);
+    if (instance.viewLink) {
+      var link = window.location.host + instance.viewLink;
+      instance.attr('link', link);
+    }
+    return options.fn(options.contexts);
+  });
 
-  instance = Mustache.resolve(instance);
-  if (instance.viewLink) {
-    var link = window.location.host + instance.viewLink;
-    instance.attr('link', link);
-  }
-  return options.fn(options.contexts);
-});
+  Mustache.registerHelper("with_most_recent_declining_task_entry", function (review_task, options) {
+    var entries = review_task.get_mapping("declining_cycle_task_entries");
+    var most_recent_entry;
+
+    if(entries) {
+      for (var i = entries.length - 1; i >= 0; i--) {
+        var entry = entries[i];
+        if ('undefined' !== typeof most_recent_entry) {
+          if (moment(most_recent_entry.created_at).isBefore(moment(entry.created_at))) {
+            most_recent_entry = entry;
+          }
+        } else {
+          most_recent_entry = entry;
+        }
+      }
+    }
+
+    if(most_recent_entry) {
+      return options.fn(options.contexts.add({'most_recent_declining_task_entry': most_recent_entry}));
+    }
+    return options.fn(options.contexts.add({'most_recent_declining_task_entry': {}}));
+  });
 
 })(this, jQuery, can);
