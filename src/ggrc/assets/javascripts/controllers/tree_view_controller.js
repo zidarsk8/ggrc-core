@@ -26,28 +26,18 @@ function _display_tree_subpath(el, path) {
     , selector = "[data-object-type=" + type + "][data-object-id=" + id + "]"
     , $node
     , $next_node
-    , node_controller;
+    , node_controller
+    , scroll_delay = 0;
     ;
 
   rest = rest.join("/");
 
   if (type || id) {
     $node = el.find(selector);
-    //  Try to scroll the element into view by scrolling the *next* element in,
-    //  then possibly backing up to scro
-    //  Find nearest next element,
-    $next_node = $node.closest(':has(+)').next();
-
-    if ($next_node[0] && $next_node[0].scrollIntoView) {
-      $next_node[0].scrollIntoView();
-    }
-
-    if ($node[0] && $node[0].scrollIntoView) {
-      $node[0].scrollIntoView();
-
-      if (!rest.length) {
-        $node.find(".select").click();
-      }
+   
+    if (!rest.length) {
+      $node.find(".select").click();
+      scroll_delay = 750;
     }
 
     node_controller = $node.control();
