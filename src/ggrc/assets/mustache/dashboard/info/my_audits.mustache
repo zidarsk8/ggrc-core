@@ -16,7 +16,7 @@
       			<div class="item-data">
           		<div class="row-fluid">
 								<div class="span6">
-                  <span class="status-label status-{{to_class instance.status '_'}}"></span>
+                  <span class="status-label status-{{to_class instance.status '_'}} {{^if_equals instance.status "Verified" }} {{ instance.overdue }} {{/if}}"></span>
 		              <div class="tree-title-area w-status">
 		                <a href="{{instance.viewLink}}">{{instance.title}}</a>
 		                <ul class="item-util">
