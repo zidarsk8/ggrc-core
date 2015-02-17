@@ -2209,17 +2209,18 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
 can.each({
   "if_can_edit_request": {
     assignee_states: ["Requested", "Amended Request"],
+    auditor_states: ["Draft", "Responded", "Updated Response"],
     program_editor_states: ["Requested", "Amended Request"],
     predicate: function(options) {
       return options.admin
           || options.can_assignee_edit
           || options.can_program_editor_edit
+          || options.can_auditor_edit
           || (!options.accepted
               && (options.update
                   || options.map
                   || options.create
-                  || options.program_owner
-                  || options.auditor));
+                  || options.program_owner));
     }
   },
   "if_can_reassign_request": {
