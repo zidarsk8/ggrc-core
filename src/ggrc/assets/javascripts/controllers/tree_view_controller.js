@@ -44,7 +44,10 @@ function _display_tree_subpath(el, path) {
 
     if ($node[0] && $node[0].scrollIntoView) {
       $node[0].scrollIntoView();
-      $node.click();
+
+      if (!rest.length) {
+        $node.find(".select").click();
+      }
     }
 
     node_controller = $node.control();
@@ -140,11 +143,15 @@ can.Control("CMS.Controllers.TreeLoader", {
     return this._prepare_deferred;
   }
 
-  , show_info_pin: function(){
+  , show_info_pin: function(element){
     if (this.element){
       var children = this.element.children();
       children && children.first().find('.select').click();
     }
+  }
+
+  , _will_navigate: function () {
+    return !!window.location.hash.match(/#.+(\/.+)+/);
   }
 
   , display: function() {
@@ -154,7 +161,9 @@ can.Control("CMS.Controllers.TreeLoader", {
         ;
 
       if (this._display_deferred) {
-        this.show_info_pin();
+        if (!this._will_navigate()) {
+          this.show_info_pin();
+        }
         return this._display_deferred;
       }
 
@@ -166,7 +175,9 @@ can.Control("CMS.Controllers.TreeLoader", {
       })).done(tracker_stop);
 
       this._display_deferred.then(function(e){
-        this.show_info_pin();
+        if (!this._will_navigate()) {
+          this.show_info_pin();
+        }
       }.bind(this));
 
       return this._display_deferred;
