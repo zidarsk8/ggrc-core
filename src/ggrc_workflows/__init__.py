@@ -507,18 +507,6 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):
 
   ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
 
-def set_internal_object_state(task_group_object, object_state, status):
-  if status is not None:
-    task_group_object.status = status
-  if object_state == "Approved":
-    task_group_object.os_approved_on = datetime.now()
-  task_group_object.os_state = object_state
-  task_group_object.os_last_modified = datetime.now()
-  task_group_object.os_last_updated_by_user_id = get_current_user_id()
-  task_group_object.skip_os_state_update()
-
-  db.session.add(task_group_object)
-
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
     sender, obj=None, src=None, service=None):
@@ -535,20 +523,11 @@ def handle_cycle_task_group_object_task_put(
   # Doing this regardless of status.history.has_changes() is important in order
   # to update objects that have been declined. It updates the os_last_updated
   # date and last_updated_by via the call to set_internal_object_state.
-  if obj.task_group_task.object_approval:
-    os_state = None
-    status = None
-    if obj.status == 'Verified':
-      os_state = "Approved"
-      status = "Final"
-    elif obj.status == 'Declined':
-      os_state = "Declined"
-    elif obj.status == 'InProgress':
-      os_state = "UnderReview"
+  if obj.task_group_task.object_approval and obj.status == 'Verified':
 
     for tgobj in obj.task_group_task.task_group.objects:
       old_status = tgobj.status
-      set_internal_object_state(tgobj, os_state, status)
+      tgobj.status = 'Final'
       status_change.send(
           tgobj.__class__,
           obj=tgobj,

@@ -16,9 +16,8 @@ from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
 from .reflection import PublishOnly
-from .track_object_state import HasObjectState, track_state_for_class
 
-class SectionBase(HasObjectState,
+class SectionBase(
     Hierarchical, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
     db.Model):
   _table_plural = 'section_bases'
@@ -105,8 +104,6 @@ class SectionBase(HasObjectState,
         orm.subqueryload('section_objectives'),
         orm.subqueryload('directive_sections'),
         orm.subqueryload('object_sections'))
-
-track_state_for_class(SectionBase)
 
 class Section(CustomAttributable, Documentable, Personable, Ownable, SectionBase):
   __mapper_args__ = {
