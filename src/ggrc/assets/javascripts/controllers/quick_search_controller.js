@@ -230,7 +230,7 @@ can.Control("CMS.Controllers.LHN", {
 
   , "input.widgetsearch keypress": function(el, ev) {
       var value;
-      if(ev.which === 13) {
+      if (ev.which === 13) {
         value = $(ev.target).val();
         this.do_search(value);
       }
@@ -244,11 +244,7 @@ can.Control("CMS.Controllers.LHN", {
   }
 
   , ".widgetsearch keyup": function(el, ev) {
-      if(el.val().trim() !== "") {
-        el.addClass("active");
-      } else {
-        el.removeClass("active");
-      }
+      el.toggleClass("active", el.val().trim().length);
     }
 
   , "a[data-name='work_type'] click": function(el, ev) {
@@ -480,11 +476,11 @@ can.Control("CMS.Controllers.LHN", {
   , "{window} resize" : function(el, ev) {
     this.resize_lhn(null, true); // takes care of height and min/max width
   }
-  , "{window} click": function (el, event) {
+  , "{window} mousedown": function (el, event) {
     var x = event.pageX,
         y = event.pageY;
 
-    if (typeof x === "undefined" || typeof y === "undefined") {
+    if (!x || !y) {
       return;
     }
 
