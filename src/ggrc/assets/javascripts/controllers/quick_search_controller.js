@@ -484,6 +484,10 @@ can.Control("CMS.Controllers.LHN", {
     var x = event.pageX,
         y = event.pageY;
 
+    if (typeof x === "undefined" || typeof y === "undefined") {
+      return;
+    }
+
     var on_lhn = [".lhn-trigger:visible", ".lhn-type:visible", ".lhs-holder:visible"]
             .reduce(function (yes, selector) {
                 var $selector = $(selector),

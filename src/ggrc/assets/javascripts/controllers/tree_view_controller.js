@@ -571,9 +571,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , "{original_list} remove" : function(list, ev, oldVals, index) {
-    var that = this
-      , remove_marker = {} // Empty object used as unique marker
-      ;
+    var remove_marker = {}; // Empty object used as unique marker
 
     //  FIXME: This assumes we're replacing the entire list, and corrects for
     //    instances being removed and immediately re-added.  This should be
@@ -589,14 +587,16 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //   after the *last* removal (e.g. for a series of removals)
     this._remove_marker = remove_marker;
     setTimeout(this._ifNotRemoved(function() {
-      if (that._remove_marker === remove_marker) {
-        can.each(that.oldList, function(v) {
-          that.element.trigger("removeChild", v);
-        });
-        delete that.oldList;
-        delete that._remove_marker;
+      if (this._remove_marker === remove_marker) {
+        can.each(this.oldList, function(v) {
+          this.element.trigger("removeChild", v);
+        }.bind(this));
+        delete this.oldList;
+        delete this._remove_marker;
+        $(".cms_controllers_info_pin").control().unsetInstance();
+        this.show_info_pin();
       }
-    }), 200);
+    }.bind(this)), 200);
   }
 
   , ".tree-structure subtree_loaded" : function(el, ev) {

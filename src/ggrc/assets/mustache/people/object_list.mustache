@@ -11,10 +11,7 @@
     <li class="tree-item role" data-model="true" {{data 'model'}}>
       <div class="item-main">
         <div class="item-wrap">
-          <div class="openclose">
-            <span class="status-label status-{{to_class instance.status '_'}}"></span>
-            <i class="grcicon-arrow-right"></i>
-          </div>
+          {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
           <div class="select">
             <div class="item-data">
               <div class="row-fluid">

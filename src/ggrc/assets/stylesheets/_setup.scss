@@ -380,14 +380,17 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 // progress bar placeholder colors
+%bar-finish {
+  background: $lightBlue;
+}
 %bar-verify {
   background: $lightGreen;
 }
 %bar-progress {
-  background: $lightBlue;
+  background: $orange;
 }
 %bar-pending {
-  background: $orange;
+  background: $gray;
 }
 %bar-warning {
   background: $red;

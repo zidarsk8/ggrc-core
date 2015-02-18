@@ -8,7 +8,7 @@
 
 <ul class="tree-structure new-tree dashboard-tree task-tree">
   {{#each filtered_list}}
-    <li class="tree-item item-list" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}} data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}> 
+    <li class="tree-item item-list" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}} data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="item-main" {{data 'model'}}>
         <div class="openclose">
           <div class="item-wrap">
@@ -18,7 +18,7 @@
                   <li> <!-- number of comment count -->
                     {{#with_mapping_count instance 'cycle_task_entries'}}
                     <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of comments">
-                      <i class="grcicon-object-black"></i>
+                      <i class="grcicon-comment"></i>
                       <strong class="error">{{count}}</strong>
                     </span>
                     {{/with_mapping_count}}
@@ -113,7 +113,7 @@
             </ul>
           </div>
           <div class="tier-content">
-            
+
             <div class="row-fluid wrap-row">
               <div class="span12">
                 {{#if_helpers '\
@@ -175,65 +175,17 @@
               </div>
             </div><!-- row-fluid end -->
 
-            <!--  this is the child option which is true all the time -->
-            {{#using entries=instance.cycle_task_entries}}
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                <h6>Comments ({{entries.length}})</h6>
-                <ul class="entry-list">
-                  {{#each entries}}
-                  {{#using comment=this}}
-                    <li>
-                      <span class="status-label status-draft"></span>
-                      <div class="w-status">
-                        {{{comment.description}}}
-                        <!-- May be we should add upload to g-drive golder-->
-                        <span class="entry-author">Modified by {{#using person=comment.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date comment.created_at}}</span>
-                      </div>
-                      <div class="entry-actions pull-right">
-                        <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-                        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                          {{^if_equals instance.status 'Verified'}}
-                          <li>
-                            <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="CycleTaskEntry" data-object-plural="{{comment.class.table_plural}}" data-object-id="{{comment.id}}">
-                              <i class="grcicon-edit"></i>
-                              Edit Comment
-                            </a>
-                          </li>
-                          {{/if_equals}}
-                        </ul>
-                      </div><!-- entry-actions end -->
-                    </li>
-                  {{/using}}
-                  {{/each}}
-                </ul>
-                <ul class="entry-list">
-                  {{^if_equals instance.status 'Verified'}}
-                  {{#using cycle=instance.cycle}}
-                  {{#if cycle.is_current}}
-                  <li>
-                    <a href="javascript://"
-                      class="btn btn-primary btn-mini section-create"
-                      data-object-singular-override="Comment"
-                      data-toggle="modal-ajax-form"
-                      data-modal-reset="reset"
-                      data-dirty="#regulations, #combo"
-                      data-route="regulations"
-                      data-modal-class="modal-wide"
-                      data-object-singular="CycleTaskEntry"
-                      data-object-plural="cycle_task_entries"
-                      data-object-params='{ "cycle_task_group_object_task": {{instance.id}}, "cycle": {{instance.cycle.id}}, "context": {{instance.context.id}} }'>
-                      Add Comment
-                    </a>
-                  </li>
-                  {{/if}}
-                  {{/using}}
-                  {{/if_equals}}
+            {{#instance.class.tree_view_options.child_options.0}}
+            {{#inject_parent_instance instance}}
+              <div class="row-fluid wrap-row">
+                {{#with_mapping_count instance "cycle_task_entries"}}
+                <h6>Comments ({{count}})</h6>
+                {{/with_mapping_count}}
+                <ul class="entry-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
                 </ul>
               </div>
-            </div><!-- row-fluid end -->
-            {{/using}}
-
+            {{/inject_parent_instance}}
+            {{/instance}}
           </div><!-- tier-content end -->
         </div><!-- tier-2-info-content end -->
       </div><!-- tier-2-info end -->
