@@ -20,12 +20,13 @@
     {{else}}
       {{#if owners.length}}
         {{#using contacts=owners}}
-        {{#each contacts}}
-          {{^if_equals @index 0}}
-            <br>
-          {{/if_equals}}
-          {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-        {{/each}}
+        <ul class="inner-count-list">
+          {{#each contacts}}
+            <li>
+              {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+            </li>
+          {{/each}}
+        </ul>
         {{/using}}
       {{else}}
         <span class="error">

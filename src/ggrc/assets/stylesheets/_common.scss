@@ -110,6 +110,10 @@ u {
   text-decoration: underline;
 }
 
+select {
+  padding: 0;
+}
+
 .about-link {
   font-size: 12px;
   text-decoration: underline;
@@ -373,7 +377,7 @@ small {
     height: 20px;
     @include box-shadow(none);
     float: left;
-    margin-right: 1px;
+    margin-right: 0px;
   }
 
   @each $bar_color in verify, progress, pending, warning {
@@ -1154,6 +1158,7 @@ p {
 
 .overdue {
   color: $red;
+  background: $red;
   font-weight: bold;
 }
 
@@ -1281,7 +1286,6 @@ p {
 .inner-count-list {
   @include reset-list();
   li {
-    margin-left: -2px;
     margin-bottom: 6px;
     [class^="grcicon-"] {
       margin-top: 0 !important;

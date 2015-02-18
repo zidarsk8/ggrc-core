@@ -38,7 +38,7 @@ can.Control("GGRC.Controllers.RecentlyViewed", {
       }
 
       can.view(that.options.list_view, {list : instance_list}, function(frag) {
-        that.element.find(".top-level").html(frag);
+        that.element.find(".top-level.recent").html(frag);
       });
     });
   }

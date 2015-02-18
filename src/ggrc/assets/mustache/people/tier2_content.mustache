@@ -1,6 +1,6 @@
 {{#if_helpers "\
    #is_allowed" "view_object_page" instance "\
-   or " options.allowed_mapping}}
+   or #if" options.allowed_mapping}}
 <div class="details-wrap">
   <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
   <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">

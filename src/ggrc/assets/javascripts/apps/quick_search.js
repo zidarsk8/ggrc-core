@@ -148,4 +148,8 @@ $(function() {
 
 });
 
+$(function(){
+  $(document.body).ggrc_controllers_recently_viewed();
+});
+
 })(this, jQuery);

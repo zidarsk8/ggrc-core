@@ -16,7 +16,7 @@
     @include clearfix();
     float: right;
     li {
-      display: inline-block;
+      float: left;
       margin-left: 10px;
       line-height: 24px;
       .item-data {
@@ -531,6 +531,14 @@
       border:none;
       background:none;
       line-height: 18px;
+    }
+    i {
+      @include opacity(.25);
+      @include transition(opacity 0.2s ease);
+      cursor: pointer;
+      &:hover {
+        @include opacity(1);
+      }
     }
     p {
       line-height:18px;

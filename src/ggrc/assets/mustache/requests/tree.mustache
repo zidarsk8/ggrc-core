@@ -7,10 +7,7 @@
 <li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "rq-" instance.status}}>
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <div class="item-wrap">
-      <div class="openclose">
-        <span class="status-label status-{{to_class instance.status '_'}}"></span>
-        <i class="grcicon-arrow-right"></i>
-      </div>
+      {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
       <div class="select">
         <div class="item-data">
           <div class="row-fluid">
@@ -22,7 +19,7 @@
                 <span>{{strip_html_tags instance.description}}</span>
               </div>
             </div>
-            <div class="span3">
+            <div class="span2">
               <div class="row-fluid">
                 <div class="span6">
                   <div class="tree-title-area">
@@ -56,13 +53,18 @@
                 </div>
               </div>
             </div>
-            <div class="span1">
-              <div class="gray tree-title-area">
-                {{#if instance.due_on}}
-                  {{localize_date instance.due_on}}
-                {{/if}}
+            {{#instance}}
+              <div class="span1">
+                <div class="gray tree-title-area">
+                  {{#if due_on}}
+                    {{localize_date due_on}}
+                  {{/if}}
+                </div>
               </div>
-            </div>
+              <div class="span1">
+                <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+              </div>
+            {{/instance}}
             <div class="span1">
               <div class="counter-wrap">
                 <i rel="tooltip" data-placement="right" {{#if_equals instance.request_type "documentation"}}data-original-title="# of attached documents" class="grcicon-directive-black"{{else}}data-original-title="# of attached meetings" class="grcicon-interview"{{/if_equals}}></i>

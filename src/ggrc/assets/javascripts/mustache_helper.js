@@ -2297,28 +2297,29 @@
     }
   });
 
-  can.each({
-    "if_can_edit_request": {
-      assignee_states: ["Requested", "Amended Request"],
-      program_editor_states: ["Requested", "Amended Request"],
-      predicate: function (options) {
-        return options.admin
+can.each({
+  "if_can_edit_request": {
+    assignee_states: ["Requested", "Amended Request"],
+    auditor_states: ["Draft", "Responded", "Updated Response"],
+    program_editor_states: ["Requested", "Amended Request"],
+    predicate: function(options) {
+      return options.admin
           || options.can_assignee_edit
           || options.can_program_editor_edit
+          || options.can_auditor_edit
           || (!options.accepted
-          && (options.update
-          || options.map
-          || options.create
-          || options.program_owner
-          || options.auditor));
-      }
-    },
-    "if_can_reassign_request": {
-      auditor_states: ["Responded", "Updated Response"],
-      assignee_states: ["Requested", "Amended Request", "Responded", "Updated Response"],
-      program_editor_states: ["Requested", "Amended Request"],
-      predicate: function (options) {
-        return options.admin
+              && (options.update
+                  || options.map
+                  || options.create
+                  || options.program_owner));
+    }
+  },
+  "if_can_reassign_request": {
+    auditor_states: ["Responded", "Updated Response"],
+    assignee_states: ["Requested", "Amended Request", "Responded", "Updated Response"],
+    program_editor_states: ["Requested", "Amended Request"],
+    predicate: function(options) {
+      return options.admin
           || options.can_auditor_edit
           || options.can_assignee_edit
           || options.can_program_editor_edit
@@ -2923,5 +2924,8 @@
     }
     return options.fn(options.contexts.add({'most_recent_declining_task_entry': {}}));
   });
+Mustache.registerHelper("inject_parent_instance", function(instance, options) {
+  return options.fn(options.contexts.add($.extend({parent_instance: Mustache.resolve(instance)}, options.contexts._context)));
+});
 
 })(this, jQuery, can);
