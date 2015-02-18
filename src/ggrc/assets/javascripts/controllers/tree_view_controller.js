@@ -26,24 +26,18 @@ function _display_tree_subpath(el, path) {
     , selector = "[data-object-type=" + type + "][data-object-id=" + id + "]"
     , $node
     , $next_node
-    , node_controller;
+    , node_controller
+    , scroll_delay = 0;
     ;
 
   rest = rest.join("/");
 
   if (type || id) {
     $node = el.find(selector);
-    //  Try to scroll the element into view by scrolling the *next* element in,
-    //  then possibly backing up to scro
-    //  Find nearest next element,
-    $next_node = $node.closest(':has(+)').next();
-
-    if ($next_node[0] && $next_node[0].scrollIntoView) {
-      $next_node[0].scrollIntoView();
-    }
-
-    if ($node[0] && $node[0].scrollIntoView) {
-      $node[0].scrollIntoView();
+   
+    if (!rest.length) {
+      $node.find(".select").click();
+      scroll_delay = 750;
     }
 
     node_controller = $node.control();
@@ -139,11 +133,15 @@ can.Control("CMS.Controllers.TreeLoader", {
     return this._prepare_deferred;
   }
 
-  , show_info_pin: function(){
+  , show_info_pin: function(element){
     if (this.element){
       var children = this.element.children();
       children && children.first().find('.select').click();
     }
+  }
+
+  , _will_navigate: function () {
+    return !!window.location.hash.match(/#.+(\/.+)+/);
   }
 
   , display: function() {
@@ -153,7 +151,9 @@ can.Control("CMS.Controllers.TreeLoader", {
         ;
 
       if (this._display_deferred) {
-        this.show_info_pin();
+        if (!this._will_navigate()) {
+          this.show_info_pin();
+        }
         return this._display_deferred;
       }
 
@@ -165,7 +165,9 @@ can.Control("CMS.Controllers.TreeLoader", {
       })).done(tracker_stop);
 
       this._display_deferred.then(function(e){
-        this.show_info_pin();
+        if (!this._will_navigate()) {
+          this.show_info_pin();
+        }
       }.bind(this));
 
       return this._display_deferred;
@@ -510,10 +512,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , display_path: function(path) {
-      var that = this;
       return this.display().then(this._ifNotRemoved(function() {
-        return _display_tree_subpath(that.element, path);
-      }));
+        return _display_tree_subpath(this.element, path);
+      }.bind(this)));
     }
 
   , prepare_child_options: function(v) {
@@ -958,10 +959,9 @@ can.Control("CMS.Controllers.TreeViewNode", {
     }
 
   , display_path: function(path) {
-      var that = this;
       return this.display().then(this._ifNotRemoved(function() {
-        return _display_tree_subpath(that.element, path);
-      }));
+        return _display_tree_subpath(this.element, path);
+      }.bind(this)));
     }
 
   , display_subtrees: function() {
