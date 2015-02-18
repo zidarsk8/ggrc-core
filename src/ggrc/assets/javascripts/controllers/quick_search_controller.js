@@ -231,6 +231,8 @@ can.Control("CMS.Controllers.LHN", {
   , "input.widgetsearch keypress": function(el, ev) {
       var value;
       if (ev.which === 13) {
+        ev.preventDefault();
+
         value = $(ev.target).val();
         this.do_search(value);
       }
@@ -258,10 +260,11 @@ can.Control("CMS.Controllers.LHN", {
       this.set_active_tab(checked);
     }
 
-  , animate_lhn: function () {
+  , animate_lhn: function (ev) {
+      ev && ev.preventDefault();
       var is_open = this.is_lhn_open();
 
-      if(is_open) {
+      if (is_open) {
           this.close_lhn();
       } else {
           this.open_lhn();
@@ -416,8 +419,13 @@ can.Control("CMS.Controllers.LHN", {
     }
 
   , do_search: function (value) {
+    value = $.trim(value);
+    if (this.__value === value || !value) {
+      return;
+    }
     this.obs.attr("value", value);
     this.options.display_prefs.setLHNState("search_text", value);
+    this.__value = value;
   }
 
   , mousedown : false
@@ -480,7 +488,7 @@ can.Control("CMS.Controllers.LHN", {
     var x = event.pageX,
         y = event.pageY;
 
-    if (!x || !y) {
+    if (x === undefined || y === undefined) {
       return;
     }
 
