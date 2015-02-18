@@ -351,9 +351,9 @@ can.Control("GGRC.Controllers.InfoWidget", {
       return 0;
     }
 
-    GGRC.Models.Search.search_for_types('', ['Audit'], {contact_id: GGRC.current_user.id})
+    GGRC.page_instance().get_binding("open_audit_requests").refresh_count()
       .then(function(result) {
-        self.options.context.attr('audit_count', result.entries.length);
+        self.options.context.attr('audit_count', result());
     });
     return 0;
   }
@@ -367,8 +367,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
         loader;
 
     //Get the audits only for the current person
-    loader = GGRC.page_instance().get_binding("extended_related_audits_via_search");
-
+    loader = GGRC.page_instance().get_binding("open_audit_requests");
     if (loader) {
       loader.refresh_instances().then(function(audits) {
         self.options.context.attr('audit_count', audits.length);
