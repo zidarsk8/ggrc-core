@@ -420,12 +420,12 @@ can.Control("CMS.Controllers.LHN", {
 
   , do_search: function (value) {
     value = $.trim(value);
-    if (this.__value === value || !value) {
+    if (this._value === value) {
       return;
     }
     this.obs.attr("value", value);
     this.options.display_prefs.setLHNState("search_text", value);
-    this.__value = value;
+    this._value = value;
   }
 
   , mousedown : false
