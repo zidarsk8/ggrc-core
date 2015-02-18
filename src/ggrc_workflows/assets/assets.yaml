@@ -36,6 +36,7 @@ dashboard-js-template-files:
   - dashboard/lhn_workflows.mustache
   - dashboard/widgets.mustache
   - dashboard/object_nav_actions.mustache
+  - dashboard/info/workflow_progress.mustache
   - tasks/modal_content.mustache
   - tasks/tree_footer.mustache
   - tasks/info.mustache

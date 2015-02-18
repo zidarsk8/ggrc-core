@@ -1,0 +1,36 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita
+    Maintained By: sasmita
+}}
+
+
+  {{#if_equals error_msg ''}}
+  {{else}}
+  <div class="alert warning">
+    <a href="#" class="close" data-dismiss="alert">x</a>
+    <span>
+      <i class="grcicon-warning"></i>
+      <!--This is global messaging letting you know that something is over due! -->
+      {{error_msg}}
+    </span>
+  </div>
+  {{/if_equals}}
+
+  <div class="row-fluid">
+    <!-- Left side Get started column -->
+    <div class="span3 side-wrap">
+      <div class="inner-content">
+        <section class="widget bare">
+          <header class="header">
+            <h2>Get Started</h2>
+          </header>
+          <section class="content">
+            {{> /static/mustache/dashboard/info/get_started.mustache}}
+          </section><!-- Widget content end -->
+        </section><!-- Widget end -->
+      </div><!-- inner-content end -->
+    </div>
+    {{{render_hooks 'Dashboard.Widgets'}}}
+  </div>
