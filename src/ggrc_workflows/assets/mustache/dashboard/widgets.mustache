@@ -1,0 +1,52 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+<!-- Right side workflow and task trees area -->
+<dashboard-widgets class="span9 content-wrap">
+    <div class="inner-content">
+      {{#if workflow_view}}
+        <section class="widget small-margin">
+          <header class="header">
+            <h2>My Workflows({{workflow_count}})</h2>
+          </header>
+          {{{ renderLive workflow_view }}}
+          {{#workflow_count}}
+          <a href="javascript://" class="workflow-trigger show-all">Show all my workflows</a>
+          {{/workflow_count}}
+        </section>
+      {{/if}}
+
+      <section class="widget dashboard small-margin">
+        <header class="header widget-nav">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul>
+                <li class="active task-tab">
+                  <a href="javascript://">
+                    My Tasks ({{task_count}})
+                  </a>
+                </li>
+                <li class="audit-tab">
+                  <a href="javascript://">
+                    Audit Requests ({{audit_count}})
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </header>
+        <section class="content">
+          {{#tasks_loaded}}
+            {{> /static/mustache/dashboard/info/task_filters.mustache}}
+          {{/tasks_loaded}}
+          {{{ renderLive task_view }}}
+          {{{ renderLive audit_view }}}
+        </section>
+      </section><!-- Widget end -->
+
+    </div><!-- inner-content end -->
+</dashboard-widgets>
