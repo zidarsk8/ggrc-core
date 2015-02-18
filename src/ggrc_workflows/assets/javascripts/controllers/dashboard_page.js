@@ -182,8 +182,6 @@
       audit_requests_view: GGRC.mustache_path + "/dashboard/info/my_audit_requests.mustache",
       audit_requests_data: {},
       audit_requests_count: 0,
-      error_msg: '',
-      error: true,
       task_filter: {
         status: '',     //initialy any task should be displayed
         object: '',     // not filtered by any object, object = empty string
@@ -382,7 +380,7 @@
             else {
               if (end_date.getTime() < today.getTime()) {
                 over_due++;
-                self.scope.attr('error_msg', 'Some tasks are overdue!');
+                $('dashboard-errors').control().scope.attr('error_msg', 'Some tasks are overdue!');
               }
               else if (data.status === 'Finished')
                 finished++;
@@ -456,6 +454,14 @@
         return (a.task_data.first_end_dateD.getTime() - b.task_data.first_end_dateD.getTime());
     }
 
+  });
+
+  can.Component.extend({
+    tag: "dashboard-errors",
+    template: "<content/>",
+    scope: {
+      error_msg: '',
+    }
   });
 
 })(this.CMS, this.GGRC, this.can, this.can.$);

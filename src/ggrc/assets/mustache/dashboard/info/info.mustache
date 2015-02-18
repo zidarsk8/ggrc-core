@@ -5,18 +5,7 @@
     Maintained By: sasmita
 }}
 
-
-  {{#if_equals error_msg ''}}
-  {{else}}
-  <div class="alert warning">
-    <a href="#" class="close" data-dismiss="alert">x</a>
-    <span>
-      <i class="grcicon-warning"></i>
-      <!--This is global messaging letting you know that something is over due! -->
-      {{error_msg}}
-    </span>
-  </div>
-  {{/if_equals}}
+  {{{render_hooks 'Dashboard.Errors'}}}
 
   <div class="row-fluid">
     <!-- Left side Get started column -->
