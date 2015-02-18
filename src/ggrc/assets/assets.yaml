@@ -145,8 +145,6 @@ dashboard-js-template-files:
   - dashboard/internav_list.mustache
   - dashboard/info/info.mustache
   - dashboard/info/get_started.mustache
-
-  - dashboard/info/task_filters.mustache
   - dashboard/info/wf_owner.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache
