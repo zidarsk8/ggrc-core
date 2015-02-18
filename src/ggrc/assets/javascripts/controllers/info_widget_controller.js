@@ -49,12 +49,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
     // If dashboard then load workflow, tasks and audit-count,
     // audits will be loaded when audit tab is clicked
     if (/dashboard/.test(window.location)){
-      this.options.initial_wf_size = 5;
-
-      // this.load_my_workflows();
       // this.initialize_task_filter();
-      // this.load_my_tasks();
-      // this.options.show_audit = false;
       // this.load_audit_count();
     }
   }
@@ -132,35 +127,6 @@ can.Control("GGRC.Controllers.InfoWidget", {
       this.options.task_filter = filter;
       //this.options.context.attr('task_filters', task_filters);
     }
-  }
-
-  , display_tasks: function(loader) {
-    var self = this,
-        my_view = this.options.context.task_view,
-        task_data = {},
-        component_class = 'ul.task-tree',
-        prepend = true;
-
-      loader.refresh_instances().then(function(tasks) {
-        self.options.context.attr('task_count', tasks.length);
-        task_data.list = tasks;
-        task_data.filtered_list = tasks;
-        self.options.task_data = task_data;
-        self.options.context.attr('task_data', task_data);
-        self.element.find(component_class).empty();
-        self.insert_options(task_data, my_view, component_class, prepend);
-        self.options.context.attr('tasks_loaded', true);
-      })
-      return 0;
-  }
-
-  , load_my_tasks: function(){
-    //To get the tasks only for the current person/current cycle
-    var loader = GGRC.page_instance().get_binding("assigned_tasks");
-    if(loader) {
-      this.display_tasks(loader);
-    }
-    return 0;
   }
 
   , load_task_with_history: function() {

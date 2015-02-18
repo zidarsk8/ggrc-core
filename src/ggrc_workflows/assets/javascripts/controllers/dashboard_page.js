@@ -49,6 +49,7 @@
     },
     init: function() {
       this.init_my_workflows();
+      this.init_my_tasks();
     },
     init_my_workflows: function() {
       var self = this,
@@ -99,6 +100,27 @@
         }
       });
 
+      return 0;
+    },
+    init_my_tasks: function() {
+      //To get the tasks only for the current person/current cycle
+      var loader = GGRC.page_instance().get_binding("assigned_tasks");
+      if(loader) {
+        this.display_tasks(loader);
+      }
+      return 0;
+    },
+    display_tasks: function(loader) {
+      var self = this,
+          task_data = {};
+
+      loader.refresh_instances().then(function(tasks) {
+        self.scope.attr('task_count', tasks.length);
+        task_data.list = tasks;
+        task_data.filtered_list = tasks;
+        self.scope.attr('task_data', task_data);
+        self.scope.attr('tasks_loaded', true);
+      });
       return 0;
     },
     update_tasks_for_workflow: function(workflow){
