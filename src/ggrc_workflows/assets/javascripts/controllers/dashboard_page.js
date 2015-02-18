@@ -18,11 +18,24 @@
       task_view : GGRC.mustache_path + "/dashboard/info/my_tasks.mustache",
       task_data: {},
       task_count : 0,
-      audit_view : GGRC.mustache_path + "/dashboard/info/my_audits.mustache",
-      audit_data:{},
-      audit_count : 0,
+      audit_requests_view : GGRC.mustache_path + "/dashboard/info/my_audit_requests.mustache",
+      audit_requests_data:{},
+      audit_requests_count : 0,
       error_msg : '',
-      error : true
+      error : true,
+      load_my_audit_requests: function() {
+        var self = this,
+            loader;
+
+        //Get the audits only for the current person
+        loader = GGRC.page_instance().get_binding("open_audit_requests");
+        if (loader) {
+          loader.refresh_instances().then(function(audits) {
+            self.attr('audit_requests_count', audits.length);
+            self.attr('audit_requests_data', {list: audits});
+          });
+        }
+      },
     },
     events: {
       // Click action to show all workflows
@@ -35,7 +48,6 @@
 
         ev.stopPropagation();
       },
-
       //Show onlt top 5 workflows
       "a.workflow-trigger.show-5 click" : function(el, ev) {
         this.scope.workflow_data.attr('list', this.scope.workflow_data.cur_wfs5);
@@ -46,10 +58,36 @@
 
         ev.stopPropagation();
       },
+      "li.audit-tab click" : function(el, ev) {
+        this.element.find('li.task-tab').removeClass('active');
+        this.element.find('ul.inline-task-filter').hide();
+        this.element.find('ul.task-tree').hide();
+
+        el.addClass('active');
+
+        if (!this.scope.show_audit) {
+          this.scope.attr('show_audit', true);
+          this.scope.load_my_audit_requests();
+        } else {
+          this.element.find('ul.audit-tree').show();
+        }
+        ev.stopPropagation();
+      },
+      // Show tasks
+      "li.task-tab click" : function(el, ev) {
+        this.element.find('li.audit-tab').removeClass('active');
+        this.element.find('ul.audit-tree').hide();
+
+        el.addClass('active');
+        this.element.find('ul.inline-task-filter').show();
+        this.element.find('ul.task-tree').show();
+        ev.stopPropagation();
+      }
     },
     init: function() {
       this.init_my_workflows();
       this.init_my_tasks();
+      this.init_audit_requests_count();
     },
     init_my_workflows: function() {
       var self = this,
@@ -108,6 +146,19 @@
       if(loader) {
         this.display_tasks(loader);
       }
+      return 0;
+    },
+    init_audit_requests_count: function() {
+      var self = this;
+
+      if (!GGRC.current_user) {
+        return 0;
+      }
+
+      GGRC.page_instance().get_binding("open_audit_requests").refresh_count()
+        .then(function(result) {
+          self.scope.attr('audit_requests_count', result());
+      });
       return 0;
     },
     display_tasks: function(loader) {

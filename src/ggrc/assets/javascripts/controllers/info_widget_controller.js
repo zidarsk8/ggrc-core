@@ -45,13 +45,6 @@ can.Control("GGRC.Controllers.InfoWidget", {
     can.view(this.get_widget_view(this.element), this.options.context, function(frag) {
       that.element.html(frag);
     });
-
-    // If dashboard then load workflow, tasks and audit-count,
-    // audits will be loaded when audit tab is clicked
-    if (/dashboard/.test(window.location)){
-      // this.initialize_task_filter();
-      // this.load_audit_count();
-    }
   }
 
   , get_widget_view: function(el) {
@@ -100,22 +93,6 @@ can.Control("GGRC.Controllers.InfoWidget", {
     }
   }
 
-  , insert_options: function(options, my_view, component_class, prepend){
-    var self = this,
-        dfd = $.Deferred();
-
-        can.view(my_view, new can.Map(options), function(frag) {
-          if (self.element) {
-            if (prepend)
-              self.element.find(component_class).prepend(frag);
-            else
-              self.element.find(component_class).append(frag);
-          }
-          dfd.resolve();
-        });
-        return dfd;
-  }
-
   , initialize_task_filter: function(){
     var filter = {
       status: '',     //initialy any task should be displayed
@@ -137,45 +114,6 @@ can.Control("GGRC.Controllers.InfoWidget", {
     }
     return 0;
   }
-
-  , load_audit_count:function() {
-    var self = this;
-
-    if (!GGRC.current_user) {
-      return 0;
-    }
-
-    GGRC.page_instance().get_binding("open_audit_requests").refresh_count()
-      .then(function(result) {
-        self.options.context.attr('audit_count', result());
-    });
-    return 0;
-  }
-
-  , load_my_audits: function() {
-    var self = this,
-        my_view = this.options.context.audit_view,
-        audit_data = {},
-        component_class = 'ul.audit-tree',
-        prepend = true,
-        loader;
-
-    //Get the audits only for the current person
-    loader = GGRC.page_instance().get_binding("open_audit_requests");
-    if (loader) {
-      loader.refresh_instances().then(function(audits) {
-        self.options.context.attr('audit_count', audits.length);
-        audit_data.list = audits;
-        //task_data.filtered_list = tasks;
-        self.options.audit_data = audit_data;
-        self.options.context.attr('audit_data', audit_data);
-        self.element.find(component_class).empty();
-        self.insert_options(audit_data, my_view, component_class, prepend);
-      })
-    }
-    return 0;
-  }
-
   ////button actions
   , "input[data-lookup] focus" : function(el, ev) {
     this.autocomplete(el);
@@ -333,35 +271,6 @@ can.Control("GGRC.Controllers.InfoWidget", {
     }
     ev.stopPropagation();
   }
-
-  //Show audits
-  , "li.audit-tab click" : function(el, ev) {
-    this.element.find('li.task-tab').removeClass('active');
-    this.element.find('ul.inline-task-filter').hide();
-    this.element.find('ul.task-tree').hide();
-
-    el.addClass('active');
-
-    if (!this.options.show_audit) {
-      this.options.show_audit = true;
-      this.load_my_audits();
-    } else {
-      this.element.find('ul.audit-tree').show();
-    }
-    ev.stopPropagation();
-  }
-
-  // Show tasks
-  , "li.task-tab click" : function(el, ev) {
-    this.element.find('li.audit-tab').removeClass('active');
-    this.element.find('ul.audit-tree').hide();
-
-    el.addClass('active');
-    this.element.find('ul.inline-task-filter').show();
-    this.element.find('ul.task-tree').show();
-    ev.stopPropagation();
-  }
-
 });
 
 })(this.can, this.can.$);

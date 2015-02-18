@@ -38,6 +38,7 @@ dashboard-js-template-files:
   - dashboard/object_nav_actions.mustache
   - dashboard/info/workflow_progress.mustache
   - dashboard/info/my_tasks.mustache
+  - dashboard/info/my_audit_requests.mustache
   - tasks/modal_content.mustache
   - tasks/tree_footer.mustache
   - tasks/info.mustache

@@ -32,7 +32,7 @@
                 </li>
                 <li class="audit-tab">
                   <a href="javascript://">
-                    Audit Requests ({{audit_count}})
+                    Audit Requests ({{audit_requests_count}})
                   </a>
                 </li>
               </ul>
@@ -44,7 +44,7 @@
             {{> /static/mustache/dashboard/info/task_filters.mustache}}
           {{/tasks_loaded}}
           {{{ renderLive task_view }}}
-          {{{ renderLive audit_view }}}
+          {{{ renderLive audit_requests_view }}}
         </section>
       </section><!-- Widget end -->
 
