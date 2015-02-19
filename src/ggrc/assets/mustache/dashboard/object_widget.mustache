@@ -49,6 +49,8 @@
   {{^if_equals widget_id "info"}}
   {{^if_equals widget_id "people_list"}}
   {{^if_equals widget_id "roles_list"}}
+  {{^if_equals widget_id "custom_attribute"}}
+  {{^if_equals widget_id "events_list"}}
   <div class="filter-holder" {{#filter_is_hidden}}style="height: 0px"{{/filter_is_hidden}} data-height="42">
     <div class="sticky-filter inner-filter-sticky">
       <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
@@ -84,6 +86,8 @@
       </div>
     </div>
   </div>
+  {{/if_equals}}
+  {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}
