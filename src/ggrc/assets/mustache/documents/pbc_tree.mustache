@@ -13,22 +13,7 @@
           <div class="item-data">
             <div class="tree-title-area">
               <i class="grcicon-document-color"></i>
-                <span data-placement="top" data-popover-trigger="sticky-hover" data-sticky-popover="true">
-                  {{#scriptwrap attr_class="popover-data-title"}}
-                   <div class='row-fluid'>
-                     <div class='span12'>
-                       <h3>
-                         <i class='grcicon-link'></i> Viewing <a href='{{schemed_url instance.link}}'>{{firstnonempty instance.title instance.link}}</a>
-                       </h3>
-                     </div>
-                   </div>
-                  {{/scriptwrap}}
-                  {{#scriptwrap attr_class="popover-data-content"}}
-                    {{{render '/static/mustache/pbc/iframe_tooltip.mustache' url=instance.link}}}
-                  {{/scriptwrap}}
-                  <a href='{{schemed_url instance.link}}'>{{firstnonempty instance.title instance.link}}</a>
-                </span>
-                {{{!render_hooks 'Document.tree_view_info'}}}
+                <a href='{{schemed_url instance.link}}'>{{firstnonempty instance.title instance.link}}</a>
             </div>
           </div>
         </div>
