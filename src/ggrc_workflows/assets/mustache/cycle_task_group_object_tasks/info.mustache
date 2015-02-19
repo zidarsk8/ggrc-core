@@ -92,9 +92,9 @@
       {{#is_dashboard}}
         {{#using instance=instance.cycle_task_group_object}}
           {{#using object=instance.object}}
-            {{#if object.viewLink}}
             <div class="row-fluid wrap-row">
               <div class="span9">
+                {{#if object.viewLink}}
                 <h6>Task to be performed on object</h6>
                 <p>
                   <i class="grcicon-{{instance.object.reify.class.table_singular}}-color smallmargin"></i>
@@ -108,6 +108,9 @@
                     {{firstnonempty object.title instance.title}}
                   {{/is_allowed}}
                 </p>
+                {{else}}
+                  <h6>No object assigned</h6>
+                {{/if}}
               </div>
               <div class="span3">
                 <h6>Start/End dates</h6>
@@ -118,7 +121,6 @@
                 </p>
               </div>
             </div>
-            {{/if}}
           {{/using}}
         {{/using}}
       {{/is_dashboard}}
