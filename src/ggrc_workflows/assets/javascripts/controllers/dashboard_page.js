@@ -176,6 +176,7 @@
       workflow_view: GGRC.mustache_path + "/dashboard/info/workflow_progress.mustache",
       workflow_data: {},
       workflow_count: 0,
+      workflow_show_all: false,
       task_view: GGRC.mustache_path + "/dashboard/info/my_tasks.mustache",
       task_data: {},
       task_count: 0,
@@ -319,9 +320,10 @@
 
           if (cur_wfs.length > self.scope.initial_wf_size) {
             cur_wfs5 = cur_wfs.slice(0, self.scope.initial_wf_size);
+            self.scope.attr('workflow_show_all', true);
           } else {
             cur_wfs5 = cur_wfs;
-            self.element.find('a.workflow-trigger').hide();
+            self.scope.attr('workflow_show_all', false);
           }
 
           workflow_data.cur_wfs5 = cur_wfs5;
