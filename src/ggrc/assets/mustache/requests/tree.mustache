@@ -54,15 +54,21 @@
               </div>
             </div>
             {{#instance}}
-              <div class="span1">
-                <div class="gray tree-title-area">
-                  {{#if due_on}}
-                    {{localize_date due_on}}
-                  {{/if}}
+              <div class="span2">
+                <div class="row-fluid">
+                  <div class="span5">
+                    <div class="gray tree-title-area">
+                      {{#if due_on}}
+                        {{localize_date due_on}}
+                      {{/if}}
+                    </div>
+                  </div>
+                  <div class="span7">
+                    <div class="oneline">
+                      <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="span1">
-                <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
               </div>
             {{/instance}}
             <div class="span1">

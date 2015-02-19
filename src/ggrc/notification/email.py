@@ -317,7 +317,7 @@ class EmailDigestNotification(EmailNotification):
               content[key][notif_pri]="<p>Other tasks<ul>"
           content[key][notif_pri]="{} <li>{}</li>".format(
             content[key][notif_pri],
-            notify_recipient.content
+            notify_recipient.content.encode('utf-8')
             )
 
       for recipient_id, items in content.items():

@@ -149,6 +149,15 @@ def load_permissions_for(user):
   default_permissions = {
       "read": [
         "Help",
+        "CustomAttributeDefinition",
+        {
+          "type": "CustomAttributeValue",
+          "terms": {
+              "list_property": "owners",
+              "value": "$current_user"
+          },
+          "condition": "contains"
+        },
         {
           "type": "NotificationConfig",
           "terms": {
@@ -393,11 +402,11 @@ def handle_relationship_delete(sender, obj=None, src=None, service=None):
      and isinstance(obj.destination, Program) \
      and obj.destination.private:
 
-    #figure out if any other responses in this audit are still mapped to the same prog    
+    #figure out if any other responses in this audit are still mapped to the same prog
     responses = [r for req in obj.source.request.audit.requests for r in req.responses]
     relationships = [rel for resp in responses for rel in resp.related_destinations
                      if rel != obj.destination]
-    matching_programs = [p.destination for p in relationships 
+    matching_programs = [p.destination for p in relationships
                          if p.destination == obj.destination]
 
     #Delete the audit -> program implication for the Program removed from the Response

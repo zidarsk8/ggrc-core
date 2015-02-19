@@ -41,14 +41,6 @@
     {{/if_can_create_response}}
     {{/if}}
     <div class="tier-content">
-      <div class="row-fluid wrap-row">
-        <div class="span6">
-          <h6>Assignee</h6>
-          {{#using contact=instance.contact}}
-            {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-          {{/using}}
-        </div>
-      </div>
 
       {{! The parent is Audit on My Work/Profile pages }}
       {{#if_instance_of options.parent_instance "Audit"}}

@@ -230,7 +230,9 @@ can.Control("CMS.Controllers.LHN", {
 
   , "input.widgetsearch keypress": function(el, ev) {
       var value;
-      if(ev.which === 13) {
+      if (ev.which === 13) {
+        ev.preventDefault();
+
         value = $(ev.target).val();
         this.do_search(value);
       }
@@ -244,11 +246,7 @@ can.Control("CMS.Controllers.LHN", {
   }
 
   , ".widgetsearch keyup": function(el, ev) {
-      if(el.val().trim() !== "") {
-        el.addClass("active");
-      } else {
-        el.removeClass("active");
-      }
+      el.toggleClass("active", el.val().trim().length);
     }
 
   , "a[data-name='work_type'] click": function(el, ev) {
@@ -262,10 +260,11 @@ can.Control("CMS.Controllers.LHN", {
       this.set_active_tab(checked);
     }
 
-  , animate_lhn: function () {
+  , animate_lhn: function (ev) {
+      ev && ev.preventDefault();
       var is_open = this.is_lhn_open();
 
-      if(is_open) {
+      if (is_open) {
           this.close_lhn();
       } else {
           this.open_lhn();
@@ -420,8 +419,13 @@ can.Control("CMS.Controllers.LHN", {
     }
 
   , do_search: function (value) {
+    value = $.trim(value);
+    if (this._value === value) {
+      return;
+    }
     this.obs.attr("value", value);
     this.options.display_prefs.setLHNState("search_text", value);
+    this._value = value;
   }
 
   , mousedown : false
@@ -480,11 +484,11 @@ can.Control("CMS.Controllers.LHN", {
   , "{window} resize" : function(el, ev) {
     this.resize_lhn(null, true); // takes care of height and min/max width
   }
-  , "{window} click": function (el, event) {
+  , "{window} mousedown": function (el, event) {
     var x = event.pageX,
         y = event.pageY;
 
-    if (typeof x === "undefined" || typeof y === "undefined") {
+    if (x === undefined || y === undefined) {
       return;
     }
 

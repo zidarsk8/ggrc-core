@@ -281,7 +281,7 @@ $(function() {
     "Section" : ["Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Objective" : ["Program", "Regulation", "Contract", "Policy",
                    "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
-    "Control" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System",
+    "Control" : ["Request", "Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System",
                   "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
     "Person" : ["Program", "Regulation", "Contract", "Policy", "Standard",
                 "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Audit"],
@@ -396,7 +396,7 @@ $(function() {
           },
           Request: {
             widget_id: "Request",
-            widget_name: "Open requests"
+            widget_name: "Open Requests"
           },
           history: {
             widget_id: "history",
@@ -407,6 +407,12 @@ $(function() {
             widget_id: "program",
             widget_name: "Program",
             widget_icon: "program"
+          }
+        }
+        , Control : {
+          Request: {
+            widget_id: "Request",
+            widget_name: "Audit Requests"
           }
         }
       }
@@ -605,6 +611,7 @@ $(function() {
           }
         }
 
+
         , directive: {
               _mixins: [
                   "objectives"
@@ -641,6 +648,17 @@ $(function() {
             }
           }
 
+        , open_requests: {
+            Request: {
+              mapping: "open_requests"
+              , allow_mapping : false
+              , allow_creating : false
+              , draw_children : true
+              , show_view : GGRC.mustache_path + "/requests/tree.mustache"
+              , footer_view : null
+            }
+          }
+
         , Clause: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
@@ -651,7 +669,7 @@ $(function() {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Control: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "open_requests"]
           }
         , DataAsset: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]

@@ -4,16 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 
-import ggrc.models
+from ggrc.models.all_models import register_model
 from .risk_assessment import RiskAssessment
 
-
-ggrc.models.all_models.RiskAssessment = RiskAssessment
-
-ggrc.models.all_models.all_models += [
-    RiskAssessment,
-    ]
-
-ggrc.models.all_models.__all__ += [
-    RiskAssessment.__name__,
-    ]
+register_model(RiskAssessment)
