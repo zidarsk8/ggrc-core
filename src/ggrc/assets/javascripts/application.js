@@ -1291,7 +1291,12 @@ jQuery(function($){
               ;
 
           if(ui.item) {
-            return ctl.autocomplete_select($(this), ev, ui);
+            if (ctl.scope) {
+              return ctl.scope.autocomplete_select($(this), ev, ui);
+            } else {
+              return ctl.autocomplete_select($(this), ev, ui);
+            }
+
           } else {
             original_event = ev;
             $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {

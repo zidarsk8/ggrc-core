@@ -779,6 +779,14 @@
       , extended_related_projects_via_search:    TypeFilter("related_objects_via_search", "Project")
       , extended_related_systems_via_search:     TypeFilter("related_objects_via_search", "System")
       , extended_related_audits_via_search:      TypeFilter("related_objects_via_search", "Audit")
+      , audit_requests: Search(function(binding) {
+          return CMS.Models.Request.findAll({
+            'assignee_id': binding.instance.id
+          });
+        })
+      , open_audit_requests: CustomFilter('audit_requests', function(result) {
+        return result.instance.status !== 'Accepted';
+      })
     }
 
     , Context: {
