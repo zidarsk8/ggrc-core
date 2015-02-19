@@ -25,7 +25,6 @@
               {{/with_most_recent_declining_task_entry}}
             {{/if_equals}}
             <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
-              <span class="setup-link">Approval applies only to this object and not to mapped objects.</span>
               <button class="btn btn-mini btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Approve</button>
               <a href="javascript://"
                 class="undoable btn btn-mini btn-danger change-task-status {{instance._disabled}}"
@@ -47,6 +46,7 @@
                 data-value="Declined"
                 data-also-undo="description"
               >Decline</a>
+              <em>Approval applies only to this object and not to mapped objects.</em>
             </div>
           {{else}}
             {{#if_helpers '\

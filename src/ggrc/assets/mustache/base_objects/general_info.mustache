@@ -11,15 +11,16 @@
       </p>
       {{/if}}
     </div>
-    <div class="span3">
+    <div class="span6">
       <h6>State</h6>
       <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
     </div>
-    <div class="span3">
+    <div class="span12" style="margin-left:0">
+      <h6>Object Review</h6>
       <!-- Forgive the inline style. Not sure what the correct class would be
            for this. I'll just put this in here for now and let Vlad put in
            the correct selector later on. -->
-      <ul style="list-style-type: none">
+      <ul style="list-style-type: none; margin: 0">
         {{#if class}}
           {{{render_hooks instance.class.shortName 'info_widget_actions'}}}
         {{/if}}
