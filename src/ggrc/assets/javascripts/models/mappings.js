@@ -261,7 +261,8 @@
     , Control: {
         _mixins: ["personable", "ownable"] //controllable
       , _canonical : {
-        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System"],
+        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
+          "Project", "System", "DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"],
         "programs" : "Program",
         "objectives" : "Objective",
         "implemented_controls" : "Control",
@@ -296,6 +297,9 @@
                                                 , "related_population_sample_responses"
                                                 ])
       , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
+      , audits: Proxy(
+          "Audit", "audit", "AuditObject", "auditable", "audit_objects")
+      , open_requests: Cross("audits", "active_requests")
       , programs: Proxy(
           "Program", "program", "ProgramControl", "control", "program_controls")
       , controls: Multi(["implemented_controls", "implementing_controls"])

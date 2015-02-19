@@ -107,6 +107,17 @@ class Control(
   secondary_assessor = db.relationship(
       'Person', uselist=False, foreign_keys='Control.secondary_assessor_id')
 
+  @declared_attr
+  def audit_objects(cls):
+
+    joinstr = 'and_(foreign(AuditObject.auditable_id) == {type}.id, '\
+              'foreign(AuditObject.auditable_type) == "{type}")'
+    joinstr = joinstr.format(type=cls.__name__)
+    return db.relationship(
+        'AuditObject',
+        primaryjoin=joinstr,
+    )
+
   kind = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Control.kind_id) == Option.id, '\
@@ -184,6 +195,7 @@ class Control(
       'version',
       'principal_assessor',
       'secondary_assessor',
+      PublishOnly('audit_objects'),
       PublishOnly('control_controls'),
       PublishOnly('control_sections'),
       PublishOnly('objective_controls'),
