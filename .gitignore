@@ -1,4 +1,6 @@
 .*.swp
+.*.swo
+*.sql
 cookbooks
 .vagrant
 vagrant_ansible_inventory_*
