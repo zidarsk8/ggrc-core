@@ -41,7 +41,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , tree_view_options : {
     draw_children : true
-    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , child_options : [{
       model : "Request"
       , mapping: "requests"
@@ -264,7 +263,6 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
-    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
     , draw_children : true
     , child_options : [{
@@ -513,7 +511,6 @@ can.Model.Cacheable("CMS.Models.Response", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/responses/tree.mustache"
-    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/responses/tree_footer.mustache"
     , draw_children : true
     , child_options : [{
