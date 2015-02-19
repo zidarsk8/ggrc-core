@@ -11,6 +11,7 @@
     <div class="item-main">
       <div class="item-wrap">
         <div class="openclose">
+          <span class="status-label status-{{to_class instance.status '_'}}"></span>
           <i class="grcicon-arrow-right"></i>
         </div>
         <div class="select">
@@ -52,7 +53,27 @@
     {{! #if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
-        {{{renderLive '/static/mustache/people/tier2_content.mustache' is_in_selector=true}}}
+        {{#find_template 'tier2_content' instance}}
+          {{{renderLive template is_in_selector=true}}}
+        {{else}}
+          <div class="tier-content">
+            <div class="row-fluid wrap-row">
+            {{#instance}}
+              <h6>Email</h6>
+              <span class="person-holder">
+                <a href="/people/{{id}}"><span class="person-tooltip-trigger" data-placement="top">
+                  {{firstnonempty email}}
+                </span></a>
+                {{^if is_enabled}}
+                  <span class="user-disabled">
+                    (Disabled)
+                  </span>
+                {{/if}}
+              </span>
+            {{/instance}}
+            </div>
+          </div>
+        {{/if}}
       </div>
     </div>
     {{!/if}}
