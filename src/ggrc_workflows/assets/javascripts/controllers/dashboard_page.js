@@ -287,8 +287,6 @@
     init_my_workflows: function() {
       var self = this,
           my_view = this.scope.workflow_view,
-          component_class = 'ul.workflow-tree',
-          prepend = true,
           workflow_data = {},
           wfs,              // list of all workflows
           cur_wfs,          // list of workflows with current cycles
@@ -329,8 +327,6 @@
           workflow_data.cur_wfs5 = cur_wfs5;
           workflow_data.list = cur_wfs5;
           self.scope.attr('workflow_data', workflow_data);
-          //self.element.find(component_class).empty();
-          //self.insert_options(workflow_data, my_view, component_class, prepend);
         }
       });
 
