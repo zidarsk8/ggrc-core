@@ -1291,9 +1291,9 @@ jQuery(function($){
               ;
 
           if(ui.item) {
-            if (ctl.scope) {
+            if (ctl.scope && ctl.scope.autocomplete_select) {
               return ctl.scope.autocomplete_select($(this), ev, ui);
-            } else {
+            } else if (ctl.autocomplete_select) {
               return ctl.autocomplete_select($(this), ev, ui);
             }
 
