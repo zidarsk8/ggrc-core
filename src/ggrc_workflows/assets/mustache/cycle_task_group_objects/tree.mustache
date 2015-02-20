@@ -16,8 +16,12 @@
             <div class="span4">
               <div class="title tree-title-area">
                 {{#using object=instance.object}}
-                  <i class="grcicon-{{object.class.table_singular}}-black"></i>
-                  {{object.title}}
+                  {{#if object}}
+                    <i class="grcicon-{{object.class.table_singular}}-black"></i>
+                    {{object.title}}
+                  {{else}}
+                    <span class="gray">[deleted]</span> {{instance.title}}
+                  {{/if}}
                 {{/using}}
               </div>
             </div>

@@ -62,23 +62,6 @@
       }
     }
   }
-  .show-details {
-    float: right;
-    padding-right: 4px;
-    margin-left: 10px;
-    a {
-      .grcicon-to-right {
-        margin-top: 6px;
-        @include opacity(0.25);
-        @include transition(opacity 0.2s ease);
-      }
-      &:hover {
-        .grcicon-to-right {
-          @include opacity(1);
-        }
-      }
-    }
-  }
   .header {
     height: 30px;
     background: none;

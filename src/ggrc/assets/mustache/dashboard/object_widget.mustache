@@ -48,6 +48,9 @@
 
   {{^if_equals widget_id "info"}}
   {{^if_equals widget_id "people_list"}}
+  {{^if_equals widget_id "roles_list"}}
+  {{^if_equals widget_id "custom_attribute"}}
+  {{^if_equals widget_id "events_list"}}
   <div class="filter-holder" {{#filter_is_hidden}}style="height: 0px"{{/filter_is_hidden}} data-height="42">
     <div class="sticky-filter inner-filter-sticky">
       <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
@@ -83,6 +86,9 @@
       </div>
     </div>
   </div>
+  {{/if_equals}}
+  {{/if_equals}}
+  {{/if_equals}}
   {{/if_equals}}
   {{/if_equals}}
 
@@ -793,7 +799,7 @@
         <div class="span4">
           <ul class="tree-action-list">
             <li class="filter-trigger">
-              <a href="#" class="active">
+              <a href="javascript://" class="active">
                   <i class="grcicon-search" rel="tooltip" data-placement="left" title=""
                      data-original-title="Hide Filter"></i>
               </a>

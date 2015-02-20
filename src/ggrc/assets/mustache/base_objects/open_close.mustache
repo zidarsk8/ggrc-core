@@ -5,6 +5,6 @@
     Maintained By: urban@reciprocitylabs.com
 }}
 <div class="openclose">
-  <span class="status-label status-{{to_class instance.status '_'}} {{^if_equals instance.status "Verified" }} {{ instance.overdue }} {{/if}}"></span>
+  <span class="status-label status-{{to_class instance.status '_'}}{{^if_equals instance.status "Verified" }}{{#instance.overdue}} status-{{ instance.overdue }}{{/instance.overdue}}{{/if}}"></span>
   <i class="grcicon-arrow-right"></i>
 </div>

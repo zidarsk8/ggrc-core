@@ -95,7 +95,6 @@ CMS.Models.Directive("CMS.Models.Standard", {
   }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
-    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , is_custom_attributable: true
@@ -127,7 +126,6 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
-    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , is_custom_attributable: true
@@ -159,7 +157,6 @@ CMS.Models.Directive("CMS.Models.Policy", {
     }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
-    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , is_custom_attributable: true
@@ -191,7 +188,6 @@ CMS.Models.Directive("CMS.Models.Contract", {
   }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
-    , header_view : GGRC.mustache_path + "/base_objects/tree_view_filters.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , is_custom_attributable: true
