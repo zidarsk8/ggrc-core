@@ -511,11 +511,7 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):
 def set_internal_object_state(task_group_object, object_state, status):
   if status is not None:
     task_group_object.status = status
-  if object_state == "Approved":
-    task_group_object.os_approved_on = datetime.now()
   task_group_object.os_state = object_state
-  task_group_object.os_last_modified = datetime.now()
-  task_group_object.os_last_updated_by_user_id = get_current_user_id()
   task_group_object.skip_os_state_update()
 
   db.session.add(task_group_object)
@@ -628,7 +624,8 @@ def handle_cycle_task_entry_post(
     sender, obj=None, src=None, service=None):
   if src['is_declining_review'] == '1':
     obj.cycle_task_group_object_task.status = 'Declined'
-    obj.cycle_task_group_object_task.cycle_task_group_object.status = 'Declined'
+    obj.cycle_task_group_object_task.cycle_task_group_object.object.os_state = 'Declined'
+    obj.cycle_task_group_object_task.cycle_task_group_object.object.skip_os_state_update()
     db.session.add(obj)
   else:
     src['is_declining_review'] = 0
