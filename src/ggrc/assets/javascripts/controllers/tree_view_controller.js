@@ -307,6 +307,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     model : null
     , header_view : null
     , show_view : null
+    , show_header : false
     , footer_view : null
     , parent : null
     , list : null
@@ -406,7 +407,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         , dfds = []
         ;
 
-      if(this.options.header_view) {
+      if(this.options.header_view && this.options.show_header) {
         dfds.push(
           can.view(this.options.header_view, $.when(this.options)).then(
             this._ifNotRemoved(function(frag) {
