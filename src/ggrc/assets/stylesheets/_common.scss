@@ -375,6 +375,10 @@ small {
   }
 }
 
+.status-overdue {
+  background: $red !important;
+}
+
 // progress bar
 .progress {
   background: $lightGray;
@@ -1167,7 +1171,6 @@ p {
 
 .overdue {
   color: $red;
-  background: $red;
   font-weight: bold;
 }
 
