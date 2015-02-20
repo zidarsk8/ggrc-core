@@ -76,23 +76,28 @@
           </div>
         {{/using}}
       {{/if_instance_of}}
-    </div>
-    <div class="inner-tree">
-      {{#if_equals instance.response_type 'documentation'}}
-        {{#options.child_options.1}}
-          <ul class="tree-structure new-tree generated-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
-          </ul>
-        {{/options.child_options.1}}
-        <div class="doc-folder">
-          {{{render_hooks 'DocumentationResponse.tree_evidence'}}}
-        </div>
-      {{/if_equals}}
+    <div class="row-fluid wrap-row">
+      <div class="span12">
+        <div class="inner-tree">
+          {{#if_equals instance.response_type 'documentation'}}
+            <h6>Documents</h6>
+            {{#options.child_options.1}}
+              <ul class="tree-structure new-tree generated-tree" data-no-pin="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
+              </ul>
+            {{/options.child_options.1}}
+            <div class="doc-folder">
+              {{{render_hooks 'DocumentationResponse.tree_evidence'}}}
+            </div>
+          {{/if_equals}}
 
-      {{#if_equals instance.response_type 'interview'}}
-        {{#options.child_options.3}}
-          <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}></ul>
-        {{/options.child_options.3}}
-      {{/if_equals}}
+          {{#if_equals instance.response_type 'interview'}}
+          <h6>Interviews</h6>
+            {{#options.child_options.3}}
+              <ul class="tree-structure new-tree" data-no-pin="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}></ul>
+            {{/options.child_options.3}}
+          {{/if_equals}}
+        </div>
+      </div>
     </div>
   </section>
 
