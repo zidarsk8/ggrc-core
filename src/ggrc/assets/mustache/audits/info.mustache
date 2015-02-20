@@ -182,8 +182,11 @@
       {{/instance.url}}
 
     </div>
-
-    {{{render_hooks 'Audit.tree_view_info'}}}
+    <div class="row-fluid wrap-row">
+      <div class="span12">
+        {{{render_hooks 'Audit.tree_view_info'}}}
+      </div>
+    </div>
     {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
   </section>
 
