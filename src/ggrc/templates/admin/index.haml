@@ -15,9 +15,18 @@
   .row-fluid
     .span8
       %h1
-        %i.grciconlarge-dashboard
-        Admin Dashboard
+        %span.title-prev
+          %a.title-trigger{'href': '/dashboard'}
+            %i.grciconlarge-dashboard-new{'rel': 'tooltip', 'data-original-title': 'My Work'}
+
+        %span.title-slide
+          %i.grciconlarge-dashboard
+          Admin Dashboard
+
     .span4
+      %a.nav-trigger.active{'href': 'javascript://'}
+        %i.grciconlarge-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Hide menu'}
+
       %ul.actions.pull-right
         %li.btn-group
           %a.dropdown-toggle{ 'href': '#', 'data-toggle': 'dropdown' }
