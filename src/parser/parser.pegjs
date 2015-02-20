@@ -170,6 +170,10 @@ simple_exp
         right: right,
         keys: [left],
         evaluate: function(values){
+          if (op.name != "~" && op.name != "!~" &&
+              moment(right).isValid()){
+            right = moment(right).format("YYYY-MM-DD");
+          }
           return op.evaluate(values[left], right);
         }
       };
