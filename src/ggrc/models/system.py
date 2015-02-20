@@ -15,8 +15,10 @@ from .object_person import Personable
 from .object_section import Sectionable
 from .relationship import Relatable
 from .utils import validate_option
+from .track_object_state import HasObjectState, track_state_for_class
 
-class SystemOrProcess(
+
+class SystemOrProcess(HasObjectState,
     Timeboxed, BusinessObject, db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'
@@ -73,6 +75,8 @@ class SystemOrProcess(
         db.Index(
           'ix_{}_is_biz_process'.format(cls.__tablename__), 'is_biz_process'),
         )
+
+track_state_for_class(SystemOrProcess)
 
 class System(
     CustomAttributable, Documentable, Personable, Objectiveable, Controllable,

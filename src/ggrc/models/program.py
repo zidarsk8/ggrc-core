@@ -13,8 +13,9 @@ from .object_person import Personable
 from .reflection import PublishOnly
 from .relationship import Relatable
 from .context import HasOwnContext
+from .track_object_state import HasObjectState, track_state_for_class
 
-class Program(
+class Program(HasObjectState,
     CustomAttributable, Documentable, Personable, Objectiveable, Relatable,
     HasOwnContext, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'programs'
@@ -65,3 +66,5 @@ class Program(
         orm.subqueryload('program_directives').joinedload('directive'),
         orm.subqueryload('program_controls'),
         orm.subqueryload('audits'))
+
+track_state_for_class(Program)

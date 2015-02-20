@@ -5,15 +5,16 @@
 
 from ggrc import db
 from .associationproxy import association_proxy
-from .mixins import BusinessObject, CustomAttributable
+from .mixins import deferred, BusinessObject, CustomAttributable
 from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
 from .object_objective import Objectiveable
 from .audit_object import Auditable
 from .reflection import PublishOnly
+from .track_object_state import HasObjectState, track_state_for_class
 
-class Objective(
+class Objective(HasObjectState,
     CustomAttributable, Auditable, Objectiveable, Documentable, Personable,
     Ownable, BusinessObject, db.Model):
   __tablename__ = 'objectives'
@@ -53,3 +54,5 @@ class Objective(
         orm.subqueryload('section_objectives').joinedload('section'),
         orm.subqueryload('objective_controls'),
         orm.subqueryload('objective_objects'))
+
+track_state_for_class(Objective)
