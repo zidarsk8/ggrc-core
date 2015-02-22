@@ -51,6 +51,7 @@ dashboard-js-template-files:
   - task_groups/modal_content.mustache
   - task_groups/tree.mustache
   - task_groups/tree_footer.mustache
+  - task_groups/tree_header.mustache
   - task_group_tasks/modal_content.mustache
   - task_group_tasks/task_group_subtree_footer.mustache
   - task_group_tasks/task_group_subtree.mustache
