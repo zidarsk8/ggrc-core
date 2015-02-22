@@ -305,7 +305,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   //static properties
   defaults : {
     model : null
-    , header_view : null
+    , header_view : GGRC.mustache_path + "/base_objects/tree_header.mustache"
     , show_view : null
     , show_header : false
     , footer_view : null
