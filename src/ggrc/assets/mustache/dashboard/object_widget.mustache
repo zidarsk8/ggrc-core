@@ -201,66 +201,6 @@
 
 
 
-  {{#if_equals widget_id "task_group"}}
-    <header class="header tree-header">
-      <div class="row-fluid">
-        <div class="span6">
-          <div class="title-heading oneline">
-            Task Group
-          </div>
-        </div>
-        <div class="span2">
-          <div class="oneline">
-            Assignee
-          </div>
-        </div>
-        <div class="span4">
-          <ul class="tree-action-list">
-            <li class="filter-trigger">
-              <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
-                <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
-              </a>
-            </li>
-            <!-- Temporary hidden. Do not remove this.
-            <li>
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-              <div class="dropdown-menu dropdown-menu-form">
-                <h5>Set visible fields</h5>
-                <ul class="attr-list">
-                  <li class="disabled">
-                    <label class="checkbox-inline">
-                      <input type="checkbox" checked="" disabled="">
-                      Name
-                    </label>
-                  </li>
-                  <li class=" disabled">
-                    <label class="checkbox-inline">
-                      <input type="checkbox" checked="" disabled="">
-                      Email
-                    </label>
-                  </li>
-                  <li>
-                    <label class="checkbox-inline">
-                      <input type="checkbox" checked="">
-                      Authorizations
-                    </label>
-                  </li>
-                  <li>
-                    <label class="checkbox-inline">
-                      <input type="checkbox">
-                      Company
-                    </label>
-                  </li>
-                </ul>
-                <button class="btn btn-small btn-info">Set fields</button>
-              </div>
-            </li>
-            -->
-          </ul>
-        </div>
-      </div>
-    </header>
-  {{/if_equals}}
 
   {{#if_equals widget_id "Request"}}
     <header class="header tree-header">
