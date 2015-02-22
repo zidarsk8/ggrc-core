@@ -86,6 +86,9 @@
             <div class="span4">
               <ul class="tree-action-list" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
                 {{#if allow_creating}}
+                {{^if_equals instance.status "Accepted"}}
+                {{^if_equals instance.status "Responded"}}
+                {{^if_equals instance.status "Updated Response"}}
                 {{#if_can_create_response instance}}
                   {{#using audit=instance.audit}}
                   <li>
@@ -95,6 +98,9 @@
                   </li>
                   {{/using}}
                 {{/if_can_create_response}}}
+                {{/if_equals}}
+                {{/if_equals}}
+                {{/if_equals}}
                 {{/if}}
                 {{#using audit=instance.audit}}
                 {{#with_mapping "authorizations" audit}}
@@ -111,7 +117,13 @@
                     <li>
                       {{#if_can_edit_request instance}}
                         {{^if_auditor instance include_admin=false}}
-                        <button data-name="status" data-value="Responded" class="btn btn-mini btn-info {{instance._disabled}} {{^instance.responses.length}}disabled{{/instance.responses.length}}">Submit responses</button>
+                          {{#with_mapping_count instance "responses"}}
+                            {{#if count}}
+                              <button data-name="status" data-value="Responded" class="btn btn-mini btn-info {{instance._disabled}}">Submit responses</button>
+                            {{else}}
+                              <button data-name="status" data-value="Responded" class="btn btn-mini btn-info disabled">Submit responses</button>
+                            {{/count}}
+                          {{/with_mapping_count}}
                         {{/if_auditor}}
                       {{else}}
                         <small class="gray"><em>{{instance.status}}</em></small>
@@ -122,7 +134,13 @@
                     <li>
                       {{#if_can_edit_request instance}}
                         {{^if_auditor instance include_admin=false}}
-                          <button data-name="status" data-value="Updated Response" class="btn btn-mini btn-info {{instance._disabled}}">Submit responses</button>
+                          {{#with_mapping_count instance "responses"}}
+                            {{#if count}}
+                              <button data-name="status" data-value="Updated Response" class="btn btn-mini btn-info {{instance._disabled}}">Submit responses</button>
+                            {{else}}
+                              <button data-name="status" data-value="Updated Response" class="btn btn-mini btn-info disabled">Submit responses</button>
+                            {{/count}}
+                          {{/with_mapping_count}}
                         {{/if_auditor}}
                       {{else}}
                         <small class="gray"><em>Amended</em></small>

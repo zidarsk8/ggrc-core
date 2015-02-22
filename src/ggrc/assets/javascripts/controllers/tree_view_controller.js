@@ -34,7 +34,7 @@ function _display_tree_subpath(el, path) {
 
   if (type || id) {
     $node = el.find(selector);
-   
+
     if (!rest.length) {
       $node.find(".select").click();
       scroll_delay = 750;
@@ -133,8 +133,8 @@ can.Control("CMS.Controllers.TreeLoader", {
     return this._prepare_deferred;
   }
 
-  , show_info_pin: function(element){
-    if (this.element){
+  , show_info_pin: function(element) {
+    if (this.element && !this.element.data('no-pin')) {
       var children = this.element.children();
       children && children.first().find('.select').click();
     }

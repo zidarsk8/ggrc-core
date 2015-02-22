@@ -287,14 +287,19 @@ can.Model.Cacheable("CMS.Models.Request", {
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
-    function setAssigneeFromAudit() {
-      if(!this.selfLink && !this.assignee && this.audit) {
-        this.attr("assignee", this.audit.reify().contact || {id : null});
+    function setFieldsFromAudit() {
+      if(!this.selfLink && this.audit) {
+        var audit = this.audit.reify();
+        if (!this.assignee) {
+          this.attr("assignee", audit.contact || {id : null});
+        }
+        if (!this.due_on) {
+          this.attr("due_on", audit.end_date || "");
+        }
       }
     }
-    setAssigneeFromAudit.call(this);
-
-    this.bind("audit", setAssigneeFromAudit);
+    setFieldsFromAudit.call(this);
+    this.bind("audit", setFieldsFromAudit);
     this.attr("response_model_class", can.compute(function() {
       return can.capitalize(this.attr("request_type")
           .replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); }))
