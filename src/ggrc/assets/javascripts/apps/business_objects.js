@@ -570,6 +570,7 @@ $(function() {
               , allow_mapping : true
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
+              , header_view : GGRC.mustache_path + "/audits/tree_header.mustache"
               , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
             }
             , Person : {
