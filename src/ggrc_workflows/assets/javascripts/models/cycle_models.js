@@ -56,7 +56,7 @@
 
     tree_view_options: {
       show_view: _mustache_path + "/tree.mustache",
-      //footer_view: _mustache_path + "/tree_footer.mustache",
+      header_view : _mustache_path + "/tree_header.mustache",
       draw_children: true,
       child_options: [
         {
