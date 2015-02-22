@@ -164,17 +164,18 @@ and_exp
 simple_exp
   = left:word op:OP right:word
     {
+      var lleft = left.toLowerCase();
       return {
-        left:left.toLowerCase(),
+        left: lleft,
         op: op,
         right: right,
-        keys: [this.left],
+        keys: [lleft],
         evaluate: function(values){
           if (op.name != "~" && op.name != "!~" &&
               moment(right).isValid()){
             right = moment(right).format("YYYY-MM-DD");
           }
-          return op.evaluate(values[this.left], right);
+          return op.evaluate(values[lleft], right);
         }
       };
     }
