@@ -249,6 +249,7 @@ dashboard-js-template-files:
   - requests/tree.mustache
   - requests/info.mustache
   - requests/tree_footer.mustache
+  - requests/tree_header.mustache
   - requests/modal_content.mustache
   - objectives/autocomplete_result.mustache
   - responses/confirm_delete_evidence.mustache
