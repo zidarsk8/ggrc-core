@@ -18,12 +18,12 @@
   </h2>
 </div>
 
-<div class="modal-body choose-object-wrap">  
+<div class="modal-body choose-object-wrap">
 
   <div class="action-bar">
     <ul class="change-links">
       <li>
-        <a 
+        <a
            href="javascript://"
            data-toggle="modal-ajax-form"
            data-modal-class="modal-wide"
@@ -34,14 +34,14 @@
           {{#if_equals new_object_title 'Person'}}
             Add New
           {{else}}
-            Create New 
+            Create New
           {{/#if_equals}}
           {{ new_object_title }}
         </a>
       </li>
     </ul>
   </div>
-  
+
   <div class="row-fluid">
     <div class="span8">
       {{> "/static/mustache/base_objects/filters/filter_by_text.mustache"}}
@@ -52,7 +52,7 @@
   </div>
 
   {{> "/static/mustache/base_objects/filters/filter_by_relevance.mustache"}}
-  
+
   {{> "/static/mustache/base_objects/filters/modal_filter_actions.mustache"}}
 
 </div>
@@ -85,8 +85,17 @@
                 <div class="span3">
                   <div class="object-check all-check">
                     <label>
-                      Select all
-                      <input type="checkbox" value="1" class="object-check-all" id='objectAll'>
+                      {{#if_less options.length 100}}
+                        <label>
+                          Select all
+                          <input type="checkbox" value="1" class="object-check-all" id='objectAll'>
+                        </label>
+                      {{else}}
+                        <label rel="tooltip" data-placement="right" data-original-title="Only 100 items can be mapped at a time. Please refine your search criteria.">
+                          Select all
+                          <input type="checkbox" value="1" class="object-check-all" id='objectAll' disabled="disabled">
+                        </label>
+                      {{/if_less}}
                     </label>
                   </div>
                 </div>

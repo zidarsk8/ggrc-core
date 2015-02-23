@@ -2803,4 +2803,15 @@ Mustache.registerHelper("inject_parent_instance", function(instance, options) {
   return options.fn(options.contexts.add($.extend({parent_instance: Mustache.resolve(instance)}, options.contexts._context)));
 });
 
+Mustache.registerHelper("if_less", function (a, b, options) {
+  a = Mustache.resolve(a);
+  b = Mustache.resolve(b);
+
+  if (a < b) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
+});
+
 })(this, jQuery, can);
