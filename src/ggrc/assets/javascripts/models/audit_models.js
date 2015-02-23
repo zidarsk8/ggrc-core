@@ -224,16 +224,17 @@ can.Model.Cacheable("CMS.Models.Audit", {
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
         mappings = jQuery.extend({}, this.class.filter_mappings, {
           'code': 'slug',
+          'audit lead': 'assignee',
           'state': 'status'
         }),
         keys = this.class.filter_keys.concat([
-          'state', 'code'
+          'state', 'code', 'audit lead'
         ]),
         vals = filter_vals.apply(this, [keys, mappings]);
 
     try {
-      if (this.assignee){
-        vals['assignee'] = filter_vals.apply(this.assignee.reify(), []);
+      if (this.contact){
+        vals['assignee'] = filter_vals.apply(this.contact.reify(), []);
       }
     } catch (e) {}
 
