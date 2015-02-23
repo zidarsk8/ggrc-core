@@ -1040,8 +1040,8 @@ can.Model("can.Model.Cacheable", {
     var values = {},
         long_title = this.type.toLowerCase() + " title";
 
-    if (mappings[long_title]){
-      (mappings[long_title] = "title");
+    if (!mappings[long_title]){
+      mappings[long_title] = "title";
     }
     keys.push(long_title);
 

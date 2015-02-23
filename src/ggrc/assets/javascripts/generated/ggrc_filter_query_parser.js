@@ -196,7 +196,8 @@ GGRC.query_parser = {
                 keys: [lleft],
                 evaluate: function(values){
                   if (op.name != "~" && op.name != "!~" &&
-                      moment(right).isValid()){
+                      (moment(right, "M/D/YYYY", true).isValid() ||
+                      moment(right, "YYYY-M-D", true).isValid())) {
                     right = moment(right).format("YYYY-MM-DD");
                   }
                   return op.evaluate(values[lleft], right);
