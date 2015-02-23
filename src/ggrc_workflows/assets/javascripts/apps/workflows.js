@@ -369,6 +369,7 @@
             parent_instance: page_instance,
             model: CMS.Models.CycleTaskGroupObjectTask,
             show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
+            header_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree_header.mustache",
             footer_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree_footer.mustache",
             sort_property: null,
             sort_function: _task_sort_function,
