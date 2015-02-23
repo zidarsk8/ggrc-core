@@ -219,7 +219,27 @@ can.Model.Cacheable("CMS.Models.Audit", {
         });
       });
     }
+  },
+  get_filter_vals: function(){
+    var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
+        mappings = jQuery.extend({}, this.class.filter_mappings, {
+          'code': 'slug',
+          'state': 'status'
+        }),
+        keys = this.class.filter_keys.concat([
+          'state', 'code'
+        ]),
+        vals = filter_vals.apply(this, [keys, mappings]);
+
+    try {
+      if (this.assignee){
+        vals['assignee'] = filter_vals.apply(this.assignee.reify(), []);
+      }
+    } catch (e) {}
+
+    return vals;
   }
+
 });
 
 can.Model.Mixin("requestorable", {
@@ -402,17 +422,20 @@ can.Model.Cacheable("CMS.Models.Request", {
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
         mappings = jQuery.extend({}, this.class.filter_mappings, {
           'title': 'description',
+          'state': 'status',
           'due date': 'due_on',
           'due': 'due_on'
         }),
-        vals = filter_vals.apply(this, [this.class.filter_keys, mappings]);
+        keys = this.class.filter_keys.concat([
+          'state'
+        ]),
+        vals = filter_vals.apply(this, [keys, mappings]);
 
     try {
       if (this.assignee){
         vals['assignee'] = filter_vals.apply(this.assignee.reify(), []);
       }
-      var control = this.audit_object.reify().auditable.reify();
-      vals['control'] = filter_vals.apply(control, [['title']]).title;
+      vals['control'] = this.audit_object.reify().auditable.reify().title;
     } catch (e) {}
 
     return vals;
