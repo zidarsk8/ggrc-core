@@ -188,13 +188,18 @@ GGRC.query_parser = {
               };
             },
         peg$c26 = function(left, op, right) {
+              var lleft = left.toLowerCase();
               return {
-                left:left,
+                left: lleft,
                 op: op,
                 right: right,
-                keys: [left],
+                keys: [lleft],
                 evaluate: function(values){
-                  return op.evaluate(values[left], right);
+                  if (op.name != "~" && op.name != "!~" &&
+                      moment(right).isValid()){
+                    right = moment(right).format("YYYY-MM-DD");
+                  }
+                  return op.evaluate(values[lleft], right);
                 }
               };
             },

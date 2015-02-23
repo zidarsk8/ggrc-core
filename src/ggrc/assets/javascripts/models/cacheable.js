@@ -111,7 +111,6 @@ can.Model("can.Model.Cacheable", {
     //'search term', 'actual value in the object'
     'owner' : 'owners',
     'due date' : 'end_date',
-    'requested on' : 'end_date'
   }
   , root_collection : ""
   , model_singular : ""
@@ -1031,15 +1030,24 @@ can.Model("can.Model.Cacheable", {
     return RefreshQueue.refresh_all(this, props, true);
   },
   get_filter_vals: function(keys, mappings){
-    typeof keys === 'undefined' && (keys = this.class.filter_keys);
-    typeof mappings === 'undefined' && (mappings = this.class.filter_mappings);
-    var values = {};
-    $.map(keys, function(key){
+    keys = keys || this.class.filter_keys;
+    mappings = mappings || this.class.filter_mappings;
+
+    var values = {},
+        long_title = this.type.toLowerCase() + " title";
+
+    if (mappings[long_title]){
+      (mappings[long_title] = "title");
+    }
+    keys.push(long_title);
+
+    $.each(keys, function(index, key){
       var val = mappings[key] ?
         this[mappings[key]] :
         this[key];
 
-      if (typeof val !== 'undefined' && val !== null){
+      
+      if (val !== undefined && val !== null){
         if (key == 'owner' || key == 'owners'){
           values[key] = [];
           val.forEach(function(owner_stub){
@@ -1049,10 +1057,11 @@ can.Model("can.Model.Cacheable", {
               email: owner.email
             });
           });
+        } else if ($.type(val) == 'date') {
+          values[key] = moment(val).format("YYYY-MM-DD");
         } else {
           values[key] = val;
         }
-
       }
     }.bind(this));
 
