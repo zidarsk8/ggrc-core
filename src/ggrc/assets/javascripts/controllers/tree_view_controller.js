@@ -398,6 +398,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       if (this.element && this.element.closest('body').length) {
         this._attached_deferred.resolve();
       }
+
     }.bind(this));
   }
 
@@ -644,9 +645,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       queue_window(list_window);
     final_dfd = $.when.apply($, all_draw_items_dfds);
     final_dfd.done(this._ifNotRemoved(function() {
-      //  Trigger update for sticky headers and footers
-      that.element.trigger("updateSticky");
-    }));
+      this.element.find(".sticky").Stickyfill();
+    }.bind(this)));
     return final_dfd;
   }
 
@@ -761,7 +761,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       , "[data-object-type=" + instance.constructor.table_singular + "]"
       ].join("")
     ).remove();
-    that.element.trigger("updateSticky");
     ev.stopPropagation();
   }
 
