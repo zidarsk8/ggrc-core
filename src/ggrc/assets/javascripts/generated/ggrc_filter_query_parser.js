@@ -244,8 +244,8 @@ GGRC.query_parser = {
             },
         peg$c32 = "\"",
         peg$c33 = { type: "literal", value: "\"", description: "\"\\\"\"" },
-        peg$c34 = /^[a-zA-Z0-9_\-.]/,
-        peg$c35 = { type: "class", value: "[a-zA-Z0-9_\\-.]", description: "[a-zA-Z0-9_\\-.]" },
+        peg$c34 = /^[a-zA-Z0-9_\-.\/]/,
+        peg$c35 = { type: "class", value: "[a-zA-Z0-9_\\-.\\/]", description: "[a-zA-Z0-9_\\-.\\/]" },
         peg$c36 = "\\\"",
         peg$c37 = { type: "literal", value: "\\\"", description: "\"\\\\\\\"\"" },
         peg$c38 = function() {

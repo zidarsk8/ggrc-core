@@ -241,7 +241,7 @@ quoted_word
       return word.join('');
     }
 
-unqoted_char = [a-zA-Z0-9_\-.]
+unqoted_char = [a-zA-Z0-9_\-./]
 
 
 quoted_char
