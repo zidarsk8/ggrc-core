@@ -106,6 +106,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         this.options.content_controller_options.init();
       }
 
+      this.options.content_controller_options.show_header = true;
       this.content_controller = new this.options.content_controller(
           controller_content
         , this.options.content_controller_options

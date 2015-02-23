@@ -33,7 +33,7 @@
 
     tree_view_options: {
       sort_property: 'sort_index',
-      //show_view: GGRC.mustache_path + "/task_groups/tree.mustache",
+      header_view: GGRC.mustache_path + "/task_groups/tree_header.mustache",
       footer_view: GGRC.mustache_path + "/task_groups/tree_footer.mustache"
     },
 

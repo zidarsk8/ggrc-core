@@ -1,22 +1,27 @@
 {{!
-    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: anze@reciprocitylabs.com
-    Maintained By: anze@reciprocitylabs.com
+    Created By: miha@reciprocitylabs.com
+    Maintained By: miha@reciprocitylabs.com
 }}
 
 {{{render "/static/mustache/base_objects/tree_view_filter.mustache"}}}
 
 <header class="header tree-header">
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span4">
       <div class="title-heading oneline">
-        Title
+        {{model.title_singular}} Name
       </div>
     </div>
     <div class="span2">
       <div class="oneline">
-        End Date
+        Email
+      </div>
+    </div>
+    <div class="span2">
+      <div class="oneline">
+        Authorizations
       </div>
     </div>
     <div class="span4">
@@ -66,21 +71,3 @@
   </div>
 </header>
 <div class="clearfix"></div>
-
-{{^if_equals mapping 'previous_cycles'}}
-  {{#using workflow=parent_instance}}
-  {{^if_equals workflow.frequency 'one_time'}}
-  {{#if_equals workflow.status 'Active'}}
-    <div class="filters">
-      <div class="alert" style="border-radius: 0px; margin-bottom: 0px;">
-        <button type="button" class="close" data-dismiss="alert">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <strong>Note:</strong> Next cycle of this recurring workflow is scheduled to be activated on <strong>{{localize_date workflow.next_cycle_start_date}}</strong>.
-      </div>
-    </div>
-  {{/if_equals workflow.status 'Active'}}
-  {{/if_equals}}
-  {{/using}}
-{{/if_equals}}
-

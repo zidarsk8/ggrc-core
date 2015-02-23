@@ -305,8 +305,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   //static properties
   defaults : {
     model : null
-    , header_view : null
+    , header_view : GGRC.mustache_path + "/base_objects/tree_header.mustache"
     , show_view : null
+    , show_header : false
     , footer_view : null
     , parent : null
     , list : null
@@ -406,7 +407,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         , dfds = []
         ;
 
-      if(this.options.header_view) {
+      if(this.options.header_view && this.options.show_header) {
         dfds.push(
           can.view(this.options.header_view, $.when(this.options)).then(
             this._ifNotRemoved(function(frag) {

@@ -40,7 +40,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
     show_all_tabs: true,
   }
   , tree_view_options : {
-    draw_children : true
+    header_view : GGRC.mustache_path + "/audits/tree_header.mustache"
+    , draw_children : true
     , child_options : [{
       model : "Request"
       , mapping: "requests"
@@ -263,6 +264,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
+    , header_view : GGRC.mustache_path + "/requests/tree_header.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
     , draw_children : true
     , child_options : [{
