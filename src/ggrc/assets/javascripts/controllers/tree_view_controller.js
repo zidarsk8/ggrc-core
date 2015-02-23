@@ -133,10 +133,10 @@ can.Control("CMS.Controllers.TreeLoader", {
     return this._prepare_deferred;
   }
 
-  , show_info_pin: function(element) {
+  , show_info_pin: function() {
     if (this.element && !this.element.data('no-pin')) {
       var children = this.element.children();
-      children && children.first().find('.select').click();
+      children && children.find('.select').first().click();
     }
   }
 
