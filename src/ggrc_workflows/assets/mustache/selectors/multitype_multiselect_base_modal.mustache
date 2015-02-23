@@ -85,7 +85,7 @@
                 <div class="span3">
                   <div class="object-check all-check">
                     <label>
-                      {{#if_lower options.length 100}}
+                      {{#if_less options.length 100}}
                         <label>
                           Select all
                           <input type="checkbox" value="1" class="object-check-all" id='objectAll'>
@@ -95,7 +95,7 @@
                           Select all
                           <input type="checkbox" value="1" class="object-check-all" id='objectAll' disabled="disabled">
                         </label>
-                      {{/can_select_all}}
+                      {{/if_less}}
                     </label>
                   </div>
                 </div>

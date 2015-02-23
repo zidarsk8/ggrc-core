@@ -2803,7 +2803,7 @@ Mustache.registerHelper("inject_parent_instance", function(instance, options) {
   return options.fn(options.contexts.add($.extend({parent_instance: Mustache.resolve(instance)}, options.contexts._context)));
 });
 
-Mustache.registerHelper("if_lower", function (a, b, options) {
+Mustache.registerHelper("if_less", function (a, b, options) {
   a = Mustache.resolve(a);
   b = Mustache.resolve(b);
 
