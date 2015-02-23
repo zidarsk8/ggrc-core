@@ -359,6 +359,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
   , init : function(el, opts) {
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
+      this.display_prefs = display_prefs;
+      this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
+
       this.element.uniqueId();
 
       if('parent_instance' in opts && 'status' in opts.parent_instance){
@@ -797,6 +800,43 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options.events[event_name].apply(this, arguments);
     }
   },
+
+
+  ".filter-trigger > a click": function (element, event) {
+      if (element.hasClass("active")) {
+        this.hide_filter();
+      }else{
+        this.show_filter();
+      }
+    }
+
+  , hide_filter: function () {
+      var $filter = this.element.find(".filter-holder");
+
+      $filter
+          .data("height", $filter.height())
+          .animate({height: 0},
+                   {duration: 800,
+                    easing: 'easeOutExpo'});
+      this.element.find(".filter-trigger > a").removeClass("active");
+
+      this.display_prefs.setFilterHidden(true);
+      this.display_prefs.save();
+    }
+
+  , show_filter: function () {
+      var $filter = this.element.find(".filter-holder");
+
+      $filter
+          .animate({height: $filter.data("height")},
+                   {duration: 800,
+                    easing: 'easeOutExpo'});
+
+      this.element.find(".filter-trigger > a").addClass("active");
+
+      this.display_prefs.setFilterHidden(false);
+      this.display_prefs.save();
+    }
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
