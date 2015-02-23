@@ -105,12 +105,16 @@ can.Model("can.Model.Cacheable", {
 
   root_object : ""
   , filter_keys : ["assignee", "code", "company", "contact", "description",
-                   "email", "kind", "name", "notes", "owner", "owners",
-                   "reference_url", "status", "test", "title"]
+                   "email", "end_date", "end date", "kind", "name", "notes",
+                   "owner", "owners", "reference_url", "status", "start_date",
+                   "start date", "test", "title"]
   , filter_mappings: {
     //'search term', 'actual value in the object'
     'owner' : 'owners',
+    'workflow' : 'workflows',
     'due date' : 'end_date',
+    'end date' : 'end_date',
+    'start date' : 'start_date'
   }
   , root_collection : ""
   , model_singular : ""
@@ -1046,7 +1050,6 @@ can.Model("can.Model.Cacheable", {
         this[mappings[key]] :
         this[key];
 
-      
       if (val !== undefined && val !== null){
         if (key == 'owner' || key == 'owners'){
           values[key] = [];
@@ -1057,8 +1060,6 @@ can.Model("can.Model.Cacheable", {
               email: owner.email
             });
           });
-        } else if ($.type(val) == 'date') {
-          values[key] = moment(val).format("YYYY-MM-DD");
         } else {
           values[key] = val;
         }
