@@ -190,7 +190,7 @@ text_exp
         op: 'text_search',
         keys: [],
         evaluate: function(values, keys){
-          typeof keys === 'undefined' && (keys = []);
+           keys = keys || Object.keys(values);
 
           function comparator(a, b){
             return a.toUpperCase().indexOf(b.toUpperCase()) > -1
@@ -204,10 +204,10 @@ text_exp
                 return comparator(value, this.text);
               } else if (jQuery.type(value) === "array") {
                 return value.reduce(function(result, val){
-                  return result || this.evaluate(val,keys);
+                  return result || this.evaluate(val);
                 }.bind(this), false);
               } else if (jQuery.type(value) === "object"){
-                return this.evaluate(value, keys, false);
+                return this.evaluate(value);
               }
             }
             return result;
