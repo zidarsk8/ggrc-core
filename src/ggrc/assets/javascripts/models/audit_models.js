@@ -433,6 +433,8 @@ can.Model.Cacheable("CMS.Models.Request", {
         vals = filter_vals.apply(this, [keys, mappings]);
 
     try {
+      vals['due'] = moment(vals['due']).format("YYYY-MM-DD");
+      vals['due date'] = vals['due'];
       if (this.assignee){
         vals['assignee'] = filter_vals.apply(this.assignee.reify(), []);
       }
