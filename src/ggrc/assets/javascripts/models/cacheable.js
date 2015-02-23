@@ -1030,13 +1030,15 @@ can.Model("can.Model.Cacheable", {
     return RefreshQueue.refresh_all(this, props, true);
   },
   get_filter_vals: function(keys, mappings){
-    keys === undefined && (keys = this.class.filter_keys);
-    mappings === undefined && (mappings = this.class.filter_mappings);
+    keys = keys || this.class.filter_keys;
+    mappings = mappings || this.class.filter_mappings;
 
     var values = {},
         long_title = this.type.toLowerCase() + " title";
 
-    mappings[long_title] || (mappings[long_title] = "title");
+    if (mappings[long_title]){
+      (mappings[long_title] = "title");
+    }
     keys.push(long_title);
 
     $.each(keys, function(index, key){
