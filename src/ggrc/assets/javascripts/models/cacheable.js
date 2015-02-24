@@ -105,13 +105,16 @@ can.Model("can.Model.Cacheable", {
 
   root_object : ""
   , filter_keys : ["assignee", "code", "company", "contact", "description",
-                   "email", "kind", "name", "notes", "owner", "owners",
-                   "reference_url", "status", "test", "title"]
+                   "email", "end_date", "end date", "kind", "name", "notes",
+                   "owner", "owners", "reference_url", "status", "start_date",
+                   "start date", "test", "title"]
   , filter_mappings: {
     //'search term', 'actual value in the object'
     'owner' : 'owners',
+    'workflow' : 'workflows',
     'due date' : 'end_date',
-    'requested on' : 'end_date'
+    'end date' : 'end_date',
+    'start date' : 'start_date'
   }
   , root_collection : ""
   , model_singular : ""
@@ -1031,15 +1034,23 @@ can.Model("can.Model.Cacheable", {
     return RefreshQueue.refresh_all(this, props, true);
   },
   get_filter_vals: function(keys, mappings){
-    typeof keys === 'undefined' && (keys = this.class.filter_keys);
-    typeof mappings === 'undefined' && (mappings = this.class.filter_mappings);
-    var values = {};
-    $.map(keys, function(key){
+    keys = keys || this.class.filter_keys;
+    mappings = mappings || this.class.filter_mappings;
+
+    var values = {},
+        long_title = this.type.toLowerCase() + " title";
+
+    if (!mappings[long_title]){
+      mappings[long_title] = "title";
+    }
+    keys.push(long_title);
+
+    $.each(keys, function(index, key){
       var val = mappings[key] ?
         this[mappings[key]] :
         this[key];
 
-      if (typeof val !== 'undefined' && val !== null){
+      if (val !== undefined && val !== null){
         if (key == 'owner' || key == 'owners'){
           values[key] = [];
           val.forEach(function(owner_stub){
@@ -1052,7 +1063,6 @@ can.Model("can.Model.Cacheable", {
         } else {
           values[key] = val;
         }
-
       }
     }.bind(this));
 

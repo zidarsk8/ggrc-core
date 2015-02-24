@@ -105,7 +105,7 @@
     <p>
       <small>
         <em>
-          Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
+          Created at {{date created_at}}
           &nbsp;&nbsp;&nbsp;&nbsp;
           Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
         </em>

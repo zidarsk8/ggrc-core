@@ -24,6 +24,7 @@
     }
     , tree_view_options: {
       show_view: _mustache_path + "/tree.mustache",
+      header_view: _mustache_path + "/tree_header.mustache",
       footer_view: _mustache_path + "/tree_footer.mustache",
       child_options: [{
         //0: Documents

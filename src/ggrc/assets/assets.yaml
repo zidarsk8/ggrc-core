@@ -116,6 +116,8 @@ dashboard-js-template-files:
   - base_objects/tree.mustache
   - base_objects/tree_footer_no_access.mustache
   - base_objects/tree_footer_zero.mustache
+  - base_objects/tree_header.mustache
+  - base_objects/tree_view_filter.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pin.mustache
@@ -183,19 +185,24 @@ dashboard-js-template-files:
   - vendors/modal_content.mustache
   - pbc/iframe_tooltip.mustache
   - people/active_column.mustache
+  - people/autocomplete_result.mustache
   - people/filters.mustache
   - people/info.mustache
   - people/list.mustache
-  - people/owners_modal_connector.mustache
   - people/modal_content.mustache
   - people/multitype_option_detail.mustache
   - people/multitype_option_items.mustache
   - people/object_list.mustache
   - people/option_column.mustache
   - people/option_detail.mustache
+  - people/owners_modal_connector.mustache
   - people/page_header.mustache
   - people/popover.mustache
+  - people/tier2_content.mustache
   - people/tree.mustache
+  - people/tree_footer.mustache
+  - people/tree_header.mustache
+  - people/search_result.mustache
   - policies/info.mustache
   - policies/modal_content.mustache
   - processes/info.mustache
@@ -233,19 +240,19 @@ dashboard-js-template-files:
   - directives/tree_footer.mustache
   - objectives/tree_footer.mustache
   - sections/tree_footer.mustache
-  - people/tree_footer.mustache
   - documents/tree_footer.mustache
   - audits/modal_content.mustache
   - audits/tree.mustache
   - audits/info.mustache
   - audits/tree_footer.mustache
+  - audits/tree_header.mustache
   - audits/search_result.mustache
   - audits/extended_info.mustache
   - requests/tree.mustache
   - requests/info.mustache
   - requests/tree_footer.mustache
+  - requests/tree_header.mustache
   - requests/modal_content.mustache
-  - people/autocomplete_result.mustache
   - objectives/autocomplete_result.mustache
   - responses/confirm_delete_evidence.mustache
   - responses/tree.mustache
@@ -267,8 +274,6 @@ dashboard-js-template-files:
   - directives/tier2_content.mustache
   - documents/tier2_content.mustache
   - objectives/tier2_content.mustache
-  - people/tier2_content.mustache
-  - people/search_result.mustache
   - programs/tier2_content.mustache
   - programs/search_result.mustache
   - sections/tier2_content.mustache

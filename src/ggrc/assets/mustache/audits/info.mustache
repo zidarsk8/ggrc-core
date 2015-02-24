@@ -25,27 +25,23 @@
             </a>
           </li>
           {{/is_info_pin}}
-          {{#if_helpers '\
-            #is_page_instance' instance.program '\
-            or #is_profile'}}
-            {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
-              <li>
-              {{! FIXME: Better way to get the Audit link }}
-                <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}">
-                  <i class="grcicon-imp-exp"></i>
-                  Import Requests
-                </a>
-              </li>
-            {{/is_allowed}}
-            {{#is_allowed 'read' 'Request' context=instance.context.id}}
-              <li>
-                <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}">
-                  <i class="grcicon-export"></i>
-                  Export Requests
-                </a>
-              </li>
-            {{/is_allowed}}
-          {{/if_helpers}}
+          {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
+            <li>
+            {{! FIXME: Better way to get the Audit link }}
+              <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}">
+                <i class="grcicon-imp-exp"></i>
+                Import Requests
+              </a>
+            </li>
+          {{/is_allowed}}
+          {{#is_allowed 'read' 'Request' context=instance.context.id}}
+            <li>
+              <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}">
+                <i class="grcicon-export"></i>
+                Export Requests
+              </a>
+            </li>
+          {{/is_allowed}}
           {{#is_allowed 'update' instance context='for'}}
             <li>
               <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{{#options}}{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }{{/options}}'>
@@ -186,16 +182,19 @@
       {{/instance.url}}
 
     </div>
-
-    {{{render_hooks 'Audit.tree_view_info'}}}
-
+    <div class="row-fluid wrap-row">
+      <div class="span12">
+        {{{render_hooks 'Audit.tree_view_info'}}}
+      </div>
+    </div>
+    {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
   </section>
 
   <div class="info-widget-footer">
     <p>
       <small>
         <em>
-          Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
+          Created at {{date created_at}}
           &nbsp;&nbsp;&nbsp;&nbsp;
           Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
         </em>

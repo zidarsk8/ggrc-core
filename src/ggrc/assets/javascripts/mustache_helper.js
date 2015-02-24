@@ -1601,10 +1601,10 @@
       if (person) {
         init_state();
 
-        // Check for contact
-        if (instance.contact && instance.contact.id === person.id) {
-          state.attr('roles').push('Contact');
-        }
+      // Check for contact
+      if (instance.contact && instance.contact.id === person.id) {
+        state.attr('roles').push('Audit Lead');
+      }
 
         // Check for Audit roles
         if (instance instanceof CMS.Models.Audit) {
@@ -1612,23 +1612,9 @@
             , refresh_queue = new RefreshQueue()
             ;
 
-          refresh_queue.enqueue(requests.reify());
-          refresh_queue.trigger().then(function (requests) {
-            can.each(requests, function (request) {
-              var responses = request.responses || new can.Observe.List()
-                , refresh_queue = new RefreshQueue()
-                ;
-
-              refresh_queue.enqueue(responses.reify());
-              refresh_queue.trigger().then(function (responses) {
-                can.each(responses, function (response) {
-                  if (response.contact && response.contact.id === person.id
-                    && !~can.inArray('Response Contact', state.attr('roles'))) {
-                    state.attr('roles').push('Response Contact');
-                  }
-                });
-              });
-
+        refresh_queue.enqueue(requests.reify());
+        refresh_queue.trigger().then(function (requests) {
+          can.each(requests, function (request) {
               if (request.assignee && request.assignee.id === person.id
                 && !~can.inArray('Request Assignee', state.attr('roles'))) {
                 state.attr('roles').push('Request Assignee');
@@ -2926,6 +2912,17 @@ can.each({
   });
 Mustache.registerHelper("inject_parent_instance", function(instance, options) {
   return options.fn(options.contexts.add($.extend({parent_instance: Mustache.resolve(instance)}, options.contexts._context)));
+});
+
+Mustache.registerHelper("if_less", function (a, b, options) {
+  a = Mustache.resolve(a);
+  b = Mustache.resolve(b);
+
+  if (a < b) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
 });
 
 })(this, jQuery, can);

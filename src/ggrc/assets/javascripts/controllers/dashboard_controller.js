@@ -266,6 +266,7 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , make_tree_view_descriptor_from_model_descriptor: function(descriptor) {
+      // possibly never used
       return {
         content_controller: CMS.Controllers.TreeView,
         content_controller_options: descriptor,

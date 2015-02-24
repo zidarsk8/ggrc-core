@@ -5,64 +5,21 @@
     Maintained By: miha@reciprocitylabs.com
 }}
 
-<div class="inline-filtering sticky-filter search-filters">
-  <form class="form-search" onsubmit="return false" autocomplete="off">
-    <div class="row-fluid">
-      <div class="span3">
-        <div class="filter-title">
-          <h6>
-            Filter People
-          </h6>
-        </div>
-      </div>
-      <div class="span9">
-        <ul class="quick-filters">
-          <li>
-            <label>
-              By Name
-            </label>
-            <input name="search" type="text" value="" class="input-medium" value="{{search_query}}" placeholder="By name, email or company">
-          </li>
-          <li>
-            <label>
-              By Roles
-            </label>
-            <select name="user_role">
-              <option value="" selected>All Roles</option>
-              {{#roles}}
-                <option value="{{id}}">{{name}}</option>
-              {{/roles}}
-            </select>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </form>
-</div>
+{{{render "/static/mustache/base_objects/tree_view_filter.mustache"}}}
 
 <header class="header tree-header">
   <div class="row-fluid">
-    <div class="span4">
+    <div class="span6">
       <div class="title-heading oneline">
-        {{far_model.title_singular}} Name
+        Task Group
       </div>
     </div>
     <div class="span2">
       <div class="oneline">
-        Email
+        Assignee
       </div>
     </div>
-    <div class="span2">
-      <div class="oneline">
-        Authorizations
-      </div>
-    </div>
-    <div class="span2">
-      <div class="oneline">
-        Status
-      </div>
-    </div>
-    <div class="span2">
+    <div class="span4">
       <ul class="tree-action-list">
         <li class="filter-trigger">
           <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
@@ -108,4 +65,4 @@
     </div>
   </div>
 </header>
-<div style="clearfix"></div>
+<div class="clearfix"></div>

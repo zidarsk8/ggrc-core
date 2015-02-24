@@ -34,7 +34,7 @@ function _display_tree_subpath(el, path) {
 
   if (type || id) {
     $node = el.find(selector);
-   
+
     if (!rest.length) {
       $node.find(".select").click();
       scroll_delay = 750;
@@ -133,10 +133,10 @@ can.Control("CMS.Controllers.TreeLoader", {
     return this._prepare_deferred;
   }
 
-  , show_info_pin: function(element){
-    if (this.element){
+  , show_info_pin: function() {
+    if (this.element && !this.element.data('no-pin')) {
       var children = this.element.children();
-      children && children.first().find('.select').click();
+      children && children.find('.select').first().click();
     }
   }
 
@@ -305,8 +305,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   //static properties
   defaults : {
     model : null
-    , header_view : null
+    , header_view : GGRC.mustache_path + "/base_objects/tree_header.mustache"
     , show_view : null
+    , show_header : false
     , footer_view : null
     , parent : null
     , list : null
@@ -358,6 +359,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
   , init : function(el, opts) {
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
+      this.display_prefs = display_prefs;
+      this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
+
       this.element.uniqueId();
 
       if('parent_instance' in opts && 'status' in opts.parent_instance){
@@ -406,7 +410,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         , dfds = []
         ;
 
-      if(this.options.header_view) {
+      if(this.options.header_view && this.options.show_header) {
         dfds.push(
           can.view(this.options.header_view, $.when(this.options)).then(
             this._ifNotRemoved(function(frag) {
@@ -658,8 +662,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         ;
       options_list = can.makeArray(options_list);
       can.map(options_list, function(options) {
-        if ( !filter || filter.evaluate(options.instance.get_filter_vals(),
-              options.instance.class.filter_keys)) {
+        if (!filter || filter.evaluate(options.instance.get_filter_vals())) {
           var $li = $("<li />").cms_controllers_tree_view_node(options);
           draw_items_dfds.push($li.control()._draw_node_deferred);
           $items.push($li[0]);
@@ -782,6 +785,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     ev.stopPropagation();
   },
   reload_list: function() {
+    if (this.options.list === undefined){
+      return;
+    }
     this._draw_list_deferred = false;
     this.find_all_deferred = false;
     this.get_count_deferred = false;
@@ -796,6 +802,43 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options.events[event_name].apply(this, arguments);
     }
   },
+
+
+  ".filter-trigger > a click": function (element, event) {
+      if (element.hasClass("active")) {
+        this.hide_filter();
+      }else{
+        this.show_filter();
+      }
+    }
+
+  , hide_filter: function () {
+      var $filter = this.element.find(".filter-holder");
+
+      $filter
+          .data("height", $filter.height())
+          .animate({height: 0},
+                   {duration: 800,
+                    easing: 'easeOutExpo'});
+      this.element.find(".filter-trigger > a").removeClass("active");
+
+      this.display_prefs.setFilterHidden(true);
+      this.display_prefs.save();
+    }
+
+  , show_filter: function () {
+      var $filter = this.element.find(".filter-holder");
+
+      $filter
+          .animate({height: $filter.data("height")},
+                   {duration: 800,
+                    easing: 'easeOutExpo'});
+
+      this.element.find(".filter-trigger > a").addClass("active");
+
+      this.display_prefs.setFilterHidden(false);
+      this.display_prefs.save();
+    }
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {

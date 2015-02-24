@@ -56,7 +56,7 @@
 
     tree_view_options: {
       show_view: _mustache_path + "/tree.mustache",
-      //footer_view: _mustache_path + "/tree_footer.mustache",
+      header_view : _mustache_path + "/tree_header.mustache",
       draw_children: true,
       child_options: [
         {
@@ -360,7 +360,25 @@
       } else {
         return (this.attr("selected_response_options") || []).join(", ");
       }
-    })
+    }),
+
+    get_filter_vals: function(){
+      var filter_vals = can.Model.Cacheable.prototype.get_filter_vals;
+      var mappings = jQuery.extend({}, this.class.filter_mappings, {
+        'task title': 'title'
+      });
+
+      var vals = filter_vals.apply(this, [this.class.filter_keys, mappings]);
+
+      try {
+        vals['workflows'] = this.cycle.reify().workflow.reify().title;
+        if (this.cycle_task_group_object){
+          vals['mapped objects'] = this.cycle_task_group_object.reify().title;
+        }
+      } catch (e) {}
+
+      return vals;
+    }
 
   });
 

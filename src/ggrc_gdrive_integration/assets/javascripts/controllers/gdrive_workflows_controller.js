@@ -809,37 +809,8 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     subwin = window.open(cev.htmlLink, cev.summary);
     setTimeout(poll, 5000);
   }
-  , create_meeting : function(instance){
-
-    new CMS.Models.GCalEvent({
-      calendar : GGRC.config.DEFAULT_CALENDAR
-      , summary : instance.title
-      , start : instance.start_at
-      , end : instance.end_at
-      , attendees : can.map(instance.get_mapping("people"), function(m) { return m.instance; })
-    }).save().then(function(cev) {
-
-      new CMS.Models.ObjectEvent({
-        eventable : instance
-        , calendar : GGRC.config.DEFAULT_CALENDAR
-        , event : cev
-        , context : instance.context || { id : null }
-      }).save();
-    });
-  }
-  , "{CMS.Models.Meeting} created" : function(model, ev, instance) {
-    if(instance instanceof CMS.Models.Meeting) {
-      this.create_meeting(instance);
-    }
-  }
-
   , ".audit-status-head click": function(el, ev){
     $(ev.currentTarget.parentElement).find('ul.flash-expandable').toggle();
-  }
-
-  , "a.create-meeting click" : function(el, ev){
-    var instance = el.closest("[data-model], :data(model)").data("model");
-    this.create_meeting(instance);
   }
 });
 
@@ -1057,8 +1028,8 @@ can.Component.extend({
           files = data.files || [],
           scope = this.scope;
 
-      if(el.data("type") === "folders" 
-         && files.length 
+      if(el.data("type") === "folders"
+         && files.length
          && files[0].mimeType !== "application/vnd.google-apps.folder"
       ) {
         $(document.body).trigger("ajax:flash", {

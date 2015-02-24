@@ -164,13 +164,19 @@ and_exp
 simple_exp
   = left:word op:OP right:word
     {
+      var lleft = left.toLowerCase();
       return {
-        left:left,
+        left: lleft,
         op: op,
         right: right,
-        keys: [left],
+        keys: [lleft],
         evaluate: function(values){
-          return op.evaluate(values[left], right);
+          if (op.name != "~" && op.name != "!~" &&
+              (moment(right, "M/D/YYYY", true).isValid() ||
+              moment(right, "YYYY-M-D", true).isValid())) {
+            right = moment(right).format("YYYY-MM-DD");
+          }
+          return op.evaluate(values[lleft], right);
         }
       };
     }
@@ -185,7 +191,7 @@ text_exp
         op: 'text_search',
         keys: [],
         evaluate: function(values, keys){
-          typeof keys === 'undefined' && (keys = []);
+           keys = keys || Object.keys(values);
 
           function comparator(a, b){
             return a.toUpperCase().indexOf(b.toUpperCase()) > -1
@@ -199,10 +205,10 @@ text_exp
                 return comparator(value, this.text);
               } else if (jQuery.type(value) === "array") {
                 return value.reduce(function(result, val){
-                  return result || this.evaluate(val,keys);
+                  return result || this.evaluate(val);
                 }.bind(this), false);
               } else if (jQuery.type(value) === "object"){
-                return this.evaluate(value, keys, false);
+                return this.evaluate(value);
               }
             }
             return result;
@@ -236,7 +242,7 @@ quoted_word
       return word.join('');
     }
 
-unqoted_char = [a-zA-Z0-9_\-.]
+unqoted_char = [a-zA-Z0-9_\-./]
 
 
 quoted_char

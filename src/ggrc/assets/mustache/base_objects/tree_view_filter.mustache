@@ -1,0 +1,36 @@
+
+  <div class="filter-holder" {{#filter_is_hidden}}style="height: 0px"{{/filter_is_hidden}} data-height="42">
+    <div class="sticky-filter inner-filter-sticky">
+      <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
+        <div class="row-fluid">
+          <div class="span2">
+            <div class="filter-title">
+              <h6>
+                Filter
+                {{#instance}}
+                  {{far_model.title_plural}}
+                {{/instance}}
+              </h6>
+            </div>
+          </div>
+          <div class="span8">
+            <div class="filter-input">
+              <input name="filter_query" type="text" class="input-wide">
+              <span class="is-expression">
+                <i class="grcicon-expression-black"></i>
+              </span>
+            </div>
+          </div>
+          <div class="span2">
+            <div class="filter-button">
+              <a id="page-help" data-toggle="modal-ajax-helpform" href="javascript://" data-help-slug="filters" data-target="#ajax-modal-javascript:--">
+                <i class="grcicon-help-black" rel="tooltip" placeholder="left" data-original-title="Click for help with the filter"></i>
+              </a>
+              <input type="reset" class="btn btn-small btn-draft" name="" id="" value="Reset">
+              <input type="submit" class="btn btn-small btn-info" name="" id="" value="Filter">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

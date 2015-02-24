@@ -40,7 +40,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
     show_all_tabs: true,
   }
   , tree_view_options : {
-    draw_children : true
+    header_view : GGRC.mustache_path + "/audits/tree_header.mustache"
+    , draw_children : true
     , child_options : [{
       model : "Request"
       , mapping: "requests"
@@ -218,7 +219,28 @@ can.Model.Cacheable("CMS.Models.Audit", {
         });
       });
     }
+  },
+  get_filter_vals: function(){
+    var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
+        mappings = jQuery.extend({}, this.class.filter_mappings, {
+          'code': 'slug',
+          'audit lead': 'assignee',
+          'state': 'status'
+        }),
+        keys = this.class.filter_keys.concat([
+          'state', 'code', 'audit lead'
+        ]),
+        vals = filter_vals.apply(this, [keys, mappings]);
+
+    try {
+      if (this.contact){
+        vals['assignee'] = filter_vals.apply(this.contact.reify(), []);
+      }
+    } catch (e) {}
+
+    return vals;
   }
+
 });
 
 can.Model.Mixin("requestorable", {
@@ -263,6 +285,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
+    , header_view : GGRC.mustache_path + "/requests/tree_header.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
     , draw_children : true
     , child_options : [{
@@ -287,14 +310,19 @@ can.Model.Cacheable("CMS.Models.Request", {
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
-    function setAssigneeFromAudit() {
-      if(!this.selfLink && !this.assignee && this.audit) {
-        this.attr("assignee", this.audit.reify().contact || {id : null});
+    function setFieldsFromAudit() {
+      if(!this.selfLink && this.audit) {
+        var audit = this.audit.reify();
+        if (!this.assignee) {
+          this.attr("assignee", audit.contact || {id : null});
+        }
+        if (!this.due_on) {
+          this.attr("due_on", audit.end_date || "");
+        }
       }
     }
-    setAssigneeFromAudit.call(this);
-
-    this.bind("audit", setAssigneeFromAudit);
+    setFieldsFromAudit.call(this);
+    this.bind("audit", setFieldsFromAudit);
     this.attr("response_model_class", can.compute(function() {
       return can.capitalize(this.attr("request_type")
           .replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); }))
@@ -392,31 +420,25 @@ can.Model.Cacheable("CMS.Models.Request", {
     }
   }
   , get_filter_vals: function(){
-    var filter_vals = can.Model.Cacheable.prototype.get_filter_vals;
-    var mappings = jQuery.extend({}, this.class.filter_mappings, {
-      'title': 'description',
-      'due date': 'due_on',
-      'due': 'due_on'
-    });
-
-    var vals = filter_vals.apply(this, [this.class.filter_keys, mappings]);
+    var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
+        mappings = jQuery.extend({}, this.class.filter_mappings, {
+          'title': 'description',
+          'state': 'status',
+          'due date': 'due_on',
+          'due': 'due_on'
+        }),
+        keys = this.class.filter_keys.concat([
+          'state'
+        ]),
+        vals = filter_vals.apply(this, [keys, mappings]);
 
     try {
+      vals['due'] = moment(vals['due']).format("YYYY-MM-DD");
+      vals['due date'] = vals['due'];
       if (this.assignee){
-        vals.assignee = filter_vals.apply(this.assignee.reify(), []);
+        vals['assignee'] = filter_vals.apply(this.assignee.reify(), []);
       }
-      if ($.type(vals['due date'])){
-        // we need momentjs !
-        var y = vals['due date'].getFullYear().toString(),
-            m = (vals['due date'].getMonth() + 1).toString(),
-            d = vals['due date'].getDate().toString(),
-            date = y + '-' + (m[1]?m:"0"+m[0]) + '-' + (d[1]?d:"0"+d[0]);
-
-        vals['due date'] = date;
-        vals['due'] = date;
-      }
-      var control = this.audit_object.reify().auditable.reify();
-      vals.control = filter_vals.apply(control, [['title']]).title;
+      vals['control'] = this.audit_object.reify().auditable.reify().title;
     } catch (e) {}
 
     return vals;

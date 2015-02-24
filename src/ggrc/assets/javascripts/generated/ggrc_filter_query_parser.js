@@ -188,13 +188,19 @@ GGRC.query_parser = {
               };
             },
         peg$c26 = function(left, op, right) {
+              var lleft = left.toLowerCase();
               return {
-                left:left,
+                left: lleft,
                 op: op,
                 right: right,
-                keys: [left],
+                keys: [lleft],
                 evaluate: function(values){
-                  return op.evaluate(values[left], right);
+                  if (op.name != "~" && op.name != "!~" &&
+                      (moment(right, "M/D/YYYY", true).isValid() ||
+                      moment(right, "YYYY-M-D", true).isValid())) {
+                    right = moment(right).format("YYYY-MM-DD");
+                  }
+                  return op.evaluate(values[lleft], right);
                 }
               };
             },
@@ -206,7 +212,7 @@ GGRC.query_parser = {
                 op: 'text_search',
                 keys: [],
                 evaluate: function(values, keys){
-                  typeof keys === 'undefined' && (keys = []);
+                   keys = keys || Object.keys(values);
 
                   function comparator(a, b){
                     return a.toUpperCase().indexOf(b.toUpperCase()) > -1
@@ -220,10 +226,10 @@ GGRC.query_parser = {
                         return comparator(value, this.text);
                       } else if (jQuery.type(value) === "array") {
                         return value.reduce(function(result, val){
-                          return result || this.evaluate(val,keys);
+                          return result || this.evaluate(val);
                         }.bind(this), false);
                       } else if (jQuery.type(value) === "object"){
-                        return this.evaluate(value, keys, false);
+                        return this.evaluate(value);
                       }
                     }
                     return result;
@@ -239,8 +245,8 @@ GGRC.query_parser = {
             },
         peg$c32 = "\"",
         peg$c33 = { type: "literal", value: "\"", description: "\"\\\"\"" },
-        peg$c34 = /^[a-zA-Z0-9_\-.]/,
-        peg$c35 = { type: "class", value: "[a-zA-Z0-9_\\-.]", description: "[a-zA-Z0-9_\\-.]" },
+        peg$c34 = /^[a-zA-Z0-9_\-.\/]/,
+        peg$c35 = { type: "class", value: "[a-zA-Z0-9_\\-.\\/]", description: "[a-zA-Z0-9_\\-.\\/]" },
         peg$c36 = "\\\"",
         peg$c37 = { type: "literal", value: "\\\"", description: "\"\\\\\\\"\"" },
         peg$c38 = function() {

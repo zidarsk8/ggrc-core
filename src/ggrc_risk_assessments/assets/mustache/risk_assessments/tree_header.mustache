@@ -5,68 +5,35 @@
     Maintained By: miha@reciprocitylabs.com
 }}
 
-<div class="inline-filtering sticky-filter search-filters">
-  <form class="form-search" onsubmit="return false" autocomplete="off">
-    <div class="row-fluid">
-      <div class="span3">
-        <div class="filter-title">
-          <h6>
-            Filter People
-          </h6>
-        </div>
-      </div>
-      <div class="span9">
-        <ul class="quick-filters">
-          <li>
-            <label>
-              By Name
-            </label>
-            <input name="search" type="text" value="" class="input-medium" value="{{search_query}}" placeholder="By name, email or company">
-          </li>
-          <li>
-            <label>
-              By Roles
-            </label>
-            <select name="user_role">
-              <option value="" selected>All Roles</option>
-              {{#roles}}
-                <option value="{{id}}">{{name}}</option>
-              {{/roles}}
-            </select>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </form>
-</div>
+{{{render "/static/mustache/base_objects/tree_view_filter.mustache"}}}
 
 <header class="header tree-header">
   <div class="row-fluid">
     <div class="span4">
       <div class="title-heading oneline">
-        {{far_model.title_singular}} Name
+        {{model.title_singular}} Title
       </div>
     </div>
     <div class="span2">
       <div class="oneline">
-        Email
+        Start Date
       </div>
     </div>
     <div class="span2">
       <div class="oneline">
-        Authorizations
+        End Date
       </div>
     </div>
-    <div class="span2">
-      <div class="oneline">
-        Status
-      </div>
-    </div>
-    <div class="span2">
+    <div class="span4">
       <ul class="tree-action-list">
         <li class="filter-trigger">
           <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
             <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="grcicon-hide-relevant" rel="tooltip" data-placement="left" title="" data-original-title="Hide Irelevant"></i>
           </a>
         </li>
         <!-- Temporary hidden. Do not remove this.
@@ -78,25 +45,55 @@
               <li class="disabled">
                 <label class="checkbox-inline">
                   <input type="checkbox" checked="" disabled="">
-                  Name
+                  Title
                 </label>
               </li>
               <li class=" disabled">
                 <label class="checkbox-inline">
-                  <input type="checkbox" checked="" disabled="">
-                  Email
+                  <input type="checkbox" disabled="">
+                  Description
+                </label>
+              </li>
+              <li class=" disabled">
+                <label class="checkbox-inline">
+                  <input type="checkbox" disabled="">
+                  Notes
                 </label>
               </li>
               <li>
                 <label class="checkbox-inline">
                   <input type="checkbox" checked="">
-                  Authorizations
+                  Owner
                 </label>
               </li>
               <li>
                 <label class="checkbox-inline">
                   <input type="checkbox">
-                  Company
+                  Contact
+                </label>
+              </li>
+              <li>
+                <label class="checkbox-inline">
+                  <input type="checkbox" checked="">
+                  Code
+                </label>
+              </li>
+              <li>
+                <label class="checkbox-inline">
+                  <input type="checkbox" checked="">
+                  State
+                </label>
+              </li>
+              <li>
+                <label class="checkbox-inline">
+                  <input type="checkbox">
+                  Network Zone
+                </label>
+              </li>
+              <li>
+                <label class="checkbox-inline">
+                  <input type="checkbox">
+                  System url
                 </label>
               </li>
             </ul>
@@ -108,4 +105,4 @@
     </div>
   </div>
 </header>
-<div style="clearfix"></div>
+<div class="clearfix"></div>
