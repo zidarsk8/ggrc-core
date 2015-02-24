@@ -142,50 +142,46 @@ class WorkflowDateCalculator(object):
     if basedate is None:
       return None
 
-    basedate_day_of_week = basedate.isoweekday()
-    basedate_day_of_month = basedate.day
-    basedate_month_of_year = basedate.month
-
     if "one_time" == frequency:
       return date(year=basedate.year, month=relative_start_month, day=relative_start_day)
     elif "weekly" == frequency:
-      if relative_start_day == basedate_day_of_week:
+      if relative_start_day == basedate.isoweekday():
         return basedate
-      elif relative_start_day > basedate_day_of_week:
-        day_delta = relative_start_day - basedate_day_of_week
+      elif relative_start_day > basedate.isoweekday():
+        day_delta = relative_start_day - basedate.isoweekday()
         return basedate + timedelta(days=day_delta)
-      elif relative_start_day < basedate_day_of_week:
-        day_delta = basedate_day_of_week - relative_start_day
+      elif relative_start_day < basedate.isoweekday():
+        day_delta = basedate.isoweekday() - relative_start_day
         return basedate + timedelta(days=7 - day_delta)
     elif "monthly" == frequency:
-      if relative_start_day == basedate_day_of_month:
+      if relative_start_day == basedate.day:
         return basedate
-      elif relative_start_day > basedate_day_of_month:
-        day_delta = relative_start_day - basedate_day_of_month
+      elif relative_start_day > basedate.day:
+        day_delta = relative_start_day - basedate.day
         return basedate + timedelta(days=day_delta)
-      elif relative_start_day < basedate_day_of_month:
+      elif relative_start_day < basedate.day:
         start_date = basedate
         while start_date.day > relative_start_day:
           start_date = start_date + timedelta(days=-1)
         return start_date + monthdelta(1)
     elif "quarterly" == frequency:
-      base_quarter_month = basedate_month_of_year % 3
+      base_quarter_month = basedate.month % 3
       # We want 1-3 indexing instead of 0-2
       if base_quarter_month == 0:
         base_quarter_month = 3
       min_relative_start_quarter_month = relative_start_month
 
       if min_relative_start_quarter_month == base_quarter_month:
-        if relative_start_day == basedate_day_of_month:
+        if relative_start_day == basedate.day:
           return basedate  # Start today
-        elif relative_start_day < basedate_day_of_month:
+        elif relative_start_day < basedate.day:
           start_date = date(basedate.year, basedate.month, basedate.day)
           start_date = start_date + monthdelta(3)
-          day_delta = -1 * (basedate_day_of_month - relative_start_day)
+          day_delta = -1 * (basedate.day - relative_start_day)
           start_date = start_date + timedelta(days=day_delta)
           return start_date
         else:
-          return date(year=basedate.year, month=basedate_month_of_year, day=relative_start_day)
+          return date(year=basedate.year, month=basedate.month, day=relative_start_day)
       elif min_relative_start_quarter_month < base_quarter_month:
         start_date = date(
           year=basedate.year,
@@ -209,14 +205,14 @@ class WorkflowDateCalculator(object):
       else:  # min_relative_start_quarter_month > base_quarter_month: Walk forward to a valid month
         return basedate + monthdelta(min_relative_start_quarter_month) - base_quarter_month
     elif "annually" == frequency:
-      if basedate_month_of_year == relative_start_month:
-        if basedate_day_of_month == relative_start_day:
+      if basedate.month == relative_start_month:
+        if basedate.day == relative_start_day:
           return basedate
-        elif basedate_day_of_month > relative_start_day:
+        elif basedate.day > relative_start_day:
           return date(year=basedate.year, month=relative_start_month, day=relative_start_day) + monthdelta(12)
-        elif basedate_day_of_month < relative_start_day:
+        elif basedate.day < relative_start_day:
           return date(year=basedate.year, month=relative_start_month, day=relative_start_day)
-      elif basedate_month_of_year > relative_start_month:
+      elif basedate.month > relative_start_month:
         return date(year=basedate.year, month=relative_start_month, day=relative_start_day) + monthdelta(12)
       else:
         return date(year=basedate.year, month=relative_start_month, day=relative_start_day)
@@ -236,20 +232,18 @@ class WorkflowDateCalculator(object):
     if start_date is None:
       return None
 
-    start_date_day_of_week = start_date.isoweekday()
-
     if "one_time" == frequency:
       end_date = date(year=start_date.year, month=end_month, day=end_day)
       if end_date < start_date:
           raise ValueError("End date cannot be before start date.")
       return end_date
     elif "weekly" == frequency:
-      if end_day == start_date_day_of_week:
+      if end_day == start_date.isoweekday():
         return start_date
-      elif end_day < start_date_day_of_week:
-        return start_date + timedelta(days=end_day + (7 - start_date_day_of_week))
+      elif end_day < start_date.isoweekday():
+        return start_date + timedelta(days=end_day + (7 - start_date.isoweekday()))
       else:
-        return start_date + timedelta(days=(end_day - start_date_day_of_week))
+        return start_date + timedelta(days=(end_day - start_date.isoweekday()))
     elif "monthly" == frequency:
       if end_day == start_date.day:
         return start_date
