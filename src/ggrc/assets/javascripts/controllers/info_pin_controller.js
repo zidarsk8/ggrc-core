@@ -87,22 +87,27 @@ can.Control("CMS.Controllers.InfoPin", {
     }
   },
   ensureElementVisible: function (el) {
-      var $objectArea = $(".object-area"),
-          areaTop = $objectArea.scrollTop(),
-          areaBottom = areaTop + $objectArea.height();
+      var $objectArea = $(".object-area");
 
       var elTop = el.offset().top,
           elBottom = elTop + el.height();
 
-      var $header = $(".tree-header"),
+      var $header = $(".tree-header:visible"),
+          $filter = $(".filter-holder:visible"),
           headerTop = $header.offset().top,
-          headerBottom = headerTop + $header.height();
+          headerBottom = headerTop + $header.height(),
+          infoTop = this.element.offset().top;
 
-      areaTop += headerBottom;
-      areaBottom += headerBottom;
-
-      if (!(elBottom <= areaBottom && elTop >= areaTop)) {
+      if (elTop < headerBottom || elBottom > infoTop) {
         el[0].scrollIntoView(false);
+        if (elTop < headerBottom) {
+          el[0].scrollIntoView(true);
+          $objectArea.scrollTop($objectArea.scrollTop()
+                                -$header.height()
+                                -$filter.height());
+        }else{
+          el[0].scrollIntoView(false);
+        }
       }
   },
   '.pin-action a click': function(el) {
