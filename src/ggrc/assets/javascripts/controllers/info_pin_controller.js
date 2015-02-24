@@ -52,6 +52,8 @@ can.Control("CMS.Controllers.InfoPin", {
     });
   },
   unsetInstance: function() {
+    // Stop the animation and clear the queue:
+    this.element.stop(true);
     this.element.html('');
     this.element.height(0);
     $('.cms_controllers_tree_view_node').removeClass('active');
