@@ -53,7 +53,11 @@
       <div class="tier-2-info-content">
         {{!#pack instance=this}}
           {{#find_template 'tier2_content' instance}}
-            {{{renderLive template}}}
+            {{#if_equals instance.class.table_singular 'program'}}
+              {{{renderLive template}}}
+            {{else}}
+              {{{renderLive template}}}
+            {{/if_equals}}
           {{else}}
             <div class="show-description">
               <div class="row-fluid">
