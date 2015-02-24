@@ -68,9 +68,9 @@
             "Workflow", "task_groups", "workflow")
         },
 
-        TaskGroupObject: {
-          object: Direct('object')
-        },
+        //TaskGroupObject: {
+        //  object: Direct('object')
+        //},
 
         Workflow: {
           _canonical: {
