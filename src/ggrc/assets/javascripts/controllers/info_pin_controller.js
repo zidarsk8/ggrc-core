@@ -79,12 +79,31 @@ can.Control("CMS.Controllers.InfoPin", {
         easing: 'easeOutExpo',
         complete: function () {
           $(window).trigger('resize');
-          el[0].scrollIntoView(false);
-        }
+          this.ensureElementVisible(el);
+        }.bind(this)
       });
     }else{
-      el[0].scrollIntoView(false);
+      this.ensureElementVisible(el);
     }
+  },
+  ensureElementVisible: function (el) {
+      var $objectArea = $(".object-area"),
+          areaTop = $objectArea.scrollTop(),
+          areaBottom = areaTop + $objectArea.height();
+
+      var elTop = el.offset().top,
+          elBottom = elTop + el.height();
+
+      var $header = $(".tree-header"),
+          headerTop = $header.offset().top,
+          headerBottom = headerTop + $header.height();
+
+      areaTop += headerBottom;
+      areaBottom += headerBottom;
+
+      if (!(elBottom <= areaBottom && elTop >= areaTop)) {
+        el[0].scrollIntoView(false);
+      }
   },
   '.pin-action a click': function(el) {
     var options = {
