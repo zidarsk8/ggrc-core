@@ -92,7 +92,22 @@ class WorkflowDateCalculator(object):
     if date_ is None:
       return None
 
-    holidays = []
+    year = date.today().year
+    holidays = [
+        date(year=year, month=1, day=1),   # Jan 01 New Year's Day
+        date(year=year, month=1, day=19),  # Jan 19 Martin Luther King Day
+        date(year=year, month=2, day=16),  # Feb 16 President's Day
+        date(year=year, month=5, day=25),  # May 25 Memorial Day
+        date(year=year, month=7, day=2),   # Jul 02 Independence Day Holiday
+        date(year=year, month=7, day=3),   # Jul 03 Independence Day Eve
+        date(year=year, month=9, day=7),   # Sep 07 Labor Day
+        date(year=year, month=11, day=26), # Nov 26 Thanksgiving Day
+        date(year=year, month=11, day=27), # Nov 27 Thanksgiving Day 2
+        date(year=year, month=12, day=23), # Dec 23 Christmas Holiday
+        date(year=year, month=12, day=24), # Dec 24 Christmas Eve
+        date(year=year, month=12, day=25), # Dec 25 Christmas Day
+        date(year=year, month=12, day=31), # Dec 31 New Year's Eve
+    ]
     while date_.isoweekday() > 5 or date_ in holidays:
       date_ = date_ + timedelta(direction)
     return date_
