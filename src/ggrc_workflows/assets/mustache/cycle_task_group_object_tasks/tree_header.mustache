@@ -7,7 +7,7 @@
 
 {{{render "/static/mustache/base_objects/tree_view_filter.mustache"}}}
 
-<header class="header sticky tree-header">
+<header class="header sticky tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
   <div class="row-fluid">
     {{#is_dashboard}}
     <div class="span4">

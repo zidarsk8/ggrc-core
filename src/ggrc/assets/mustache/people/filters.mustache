@@ -5,7 +5,7 @@
     Maintained By: miha@reciprocitylabs.com
 }}
 
-<div class="inline-filtering sticky-filter search-filters">
+<div class="inline-filtering sticky-filter search-filters sticky">
   <form class="form-search" onsubmit="return false" autocomplete="off">
     <div class="row-fluid">
       <div class="span3">
@@ -40,8 +40,8 @@
   </form>
 </div>
 
-<header class="header tree-header">
-  <div class="row-fluid">
+<header class="header sticky tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+  <div class="row-flui.d">
     <div class="span4">
       <div class="title-heading oneline">
         {{far_model.title_singular}} Name
