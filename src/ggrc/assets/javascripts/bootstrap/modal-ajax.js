@@ -521,12 +521,6 @@
 
         option = $target.data('modal-help') ? 'toggle' : $.extend({}, $target.data(), $this.data());
 
-        var allow_propagation = $this.attr('data-allow-propagation');
-        if(!allow_propagation) {
-          e.preventDefault();
-          e.originalEvent && e.originalEvent.preventDefault();
-          e.stopPropagation();
-        }
         launch_fn.apply($target, [$target, $this, option]);
       });
     });
