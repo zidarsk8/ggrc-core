@@ -812,14 +812,18 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , hide_filter: function () {
-      var $filter = this.element.find(".filter-holder");
+      var $filter = this.element.find(".filter-holder"),
+          height = $filter.height();
 
       $filter
-          .data("height", $filter.height())
+          .data("height", height)
           .animate({height: 0},
                    {duration: 800,
                     easing: 'easeOutExpo'});
       this.element.find(".filter-trigger > a").removeClass("active");
+
+      this.element.find(".sticky.tree-header").addClass("no-filter");
+      Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(true);
       this.display_prefs.save();
@@ -834,6 +838,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
                     easing: 'easeOutExpo'});
 
       this.element.find(".filter-trigger > a").addClass("active");
+      this.element.find(".sticky.tree-header").removeClass("no-filter");
+      Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(false);
       this.display_prefs.save();

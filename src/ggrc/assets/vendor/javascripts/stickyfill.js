@@ -445,6 +445,8 @@
     function rebuild() {
         if (!initialized) return;
 
+        console.log("rebuilding!");
+
         deinitAll();
         
         for (var i = watchArray.length - 1; i >= 0; i--) {
