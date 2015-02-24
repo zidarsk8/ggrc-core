@@ -785,6 +785,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     ev.stopPropagation();
   },
   reload_list: function() {
+    if (this.options.list === undefined){
+      return;
+    }
     this._draw_list_deferred = false;
     this.find_all_deferred = false;
     this.get_count_deferred = false;
