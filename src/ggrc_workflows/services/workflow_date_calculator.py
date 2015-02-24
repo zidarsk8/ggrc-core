@@ -213,11 +213,11 @@ class WorkflowDateCalculator(object):
         if basedate_day_of_month == relative_start_day:
           return basedate
         elif basedate_day_of_month > relative_start_day:
-          return date(year=basedate.year + 1, month=relative_start_month, day=relative_start_day)
+          return date(year=basedate.year, month=relative_start_month, day=relative_start_day) + monthdelta(12)
         elif basedate_day_of_month < relative_start_day:
           return date(year=basedate.year, month=relative_start_month, day=relative_start_day)
       elif basedate_month_of_year > relative_start_month:
-        return date(year=basedate.year + 1, month=relative_start_month, day=relative_start_day)
+        return date(year=basedate.year, month=relative_start_month, day=relative_start_day) + monthdelta(12)
       else:
         return date(year=basedate.year, month=relative_start_month, day=relative_start_day)
     else:
@@ -311,11 +311,11 @@ class WorkflowDateCalculator(object):
         elif start_date.day < end_day:
           return date(year=start_date.year, month=start_date.month, day=end_day)
         else:
-          return date(year=start_date.year + 1, month=start_date.month, day=end_day)
+          return date(year=start_date.year, month=start_date.month, day=end_day) + monthdelta(12)
       elif start_date.month < end_month:
         return date(year=start_date.year, month=end_month, day=end_day)
       else:
-        return date(year=start_date.year + 1, month=end_month, day=end_day)
+        return date(year=start_date.year, month=end_month, day=end_day) + monthdelta(12)
     else:
       pass
 
