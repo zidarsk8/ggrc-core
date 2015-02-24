@@ -2,7 +2,7 @@ scope = "System Implied"
 description = """
   A user with Auditor role for a program audit will also have this role in the
   default object context so that the auditor will have access to the objects
-  required to perform the audit. 
+  required to perform the audit.
   """
 permissions = {
     "read": [
@@ -34,6 +34,7 @@ permissions = {
         "ObjectSection",
         "Option",
         "OrgGroup",
+        "Vendor",
         "PopulationSample",
         "Product",
         "ProgramControl",
