@@ -1566,19 +1566,17 @@ Mustache.registerHelper("infer_roles", function (instance, options) {
     if (person) {
       init_state();
 
-      // Check for contact for policy
-      if (instance instanceof CMS.Models.Policy) {
-        if (instance.contact && instance.contact.id === person.id) {
+      // Check whether current user is audit lead (for audits) or contact (for everything else)
+      if (instance.contact && instance.contact.id === person.id) {
+        if (instance instanceof CMS.Models.Audit) {
+          state.attr('roles').push('Audit Lead');
+        } else {
           state.attr('roles').push('Contact');
         }
       }
 
       // Check for Audit roles
       if (instance instanceof CMS.Models.Audit) {
-        if (instance.contact && instance.contact.id === person.id) {
-          state.attr('roles').push('Audit Lead');
-        }
-
         var requests = instance.requests || new can.Observe.List()
           , refresh_queue = new RefreshQueue()
           ;
