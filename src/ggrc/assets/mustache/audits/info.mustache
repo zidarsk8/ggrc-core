@@ -111,6 +111,11 @@
           {{#if instance.contact}}
             {{#using contact=instance.contact}}
               {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+              {{^if contact.is_enabled}}
+                <span class="user-disabled">
+                  (Disabled)
+                </span>
+              {{/if}}
             {{/using}}
           {{else}}
             Not defined

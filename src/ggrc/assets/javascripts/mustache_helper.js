@@ -1568,9 +1568,13 @@ Mustache.registerHelper("infer_roles", function (instance, options) {
     if (person) {
       init_state();
 
-      // Check for contact
+      // Check whether current user is audit lead (for audits) or contact (for everything else)
       if (instance.contact && instance.contact.id === person.id) {
-        state.attr('roles').push('Audit Lead');
+        if (instance instanceof CMS.Models.Audit) {
+          state.attr('roles').push('Audit Lead');
+        } else {
+          state.attr('roles').push('Contact');
+        }
       }
 
       // Check for Audit roles
