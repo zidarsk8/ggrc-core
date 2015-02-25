@@ -41,7 +41,6 @@
           {{/is_allowed}}
         {{/if}}
         {{#if list.length}}
-            {{log model.root_object}}
             {{#if_helpers '\
                #if_equals' model.shortName 'Control' '\
                and #if_instance_of' parent_instance 'Directive|Program' '\
