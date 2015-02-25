@@ -398,8 +398,8 @@ h4.pbc-title {
       }
     }
     .inner-element {
+      @extend %oneline;
       display: block;
-      @include oneline();
     }
   }
   .inline-editing {

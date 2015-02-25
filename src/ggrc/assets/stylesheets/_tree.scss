@@ -325,7 +325,7 @@ ul.new-tree {
           text-overflow: ellipsis !important;
           width:100% !important;
           .event-main-title {
-            @include oneline();
+            @extend %oneline;
             height: 31px;
             min-height: 31px;
             i {
@@ -369,7 +369,7 @@ ul.new-tree {
             }
           }
           .event-date {
-            @include oneline();
+            @extend %oneline;
             text-align: right;
           }
         }
@@ -382,7 +382,7 @@ ul.new-tree {
       }
       .events-content {
         p {
-          @include oneline();
+          @extend %oneline;
           .event-action {
             margin:0 20px;
           }
@@ -779,15 +779,15 @@ ul.new-tree {
     }
   }
   .tree-info {
-    @include oneline();
+    @extend %oneline;
     vertical-align: middle;
     a {
       &.reference {
         display: inline;
       }
       &.shrink-it {
+        @extend %oneline;
         display: inline-block;
-        @include oneline();
         line-height: 12px;
         width: 80% !important;
         margin-bottom: -2px;
@@ -930,7 +930,7 @@ ul.new-tree {
     li.tree-item {
       line-height: 28px;
       .generated-link {
-        @include oneline();
+        @extend %oneline;
       }
       .row-fluid {
         [class*="span"] {
@@ -1125,8 +1125,8 @@ ul.new-tree {
     }
   }
   .tree-title-area {
+    @extend %oneline;
     font-size: 12px;
-    @include oneline();
     &.w-status {
       float: left;
       width: 94%;

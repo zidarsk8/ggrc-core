@@ -233,17 +233,6 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
     list-style:none;
   }
   
-  @mixin outline-fix() {
-    outline:0;
-  }
-
-  @mixin oneline() {
-    overflow: hidden !important;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    width:100%;
-  }
-
   @mixin row-fluid-fix() {
     [class*="span"] {
       padding-bottom:0;
@@ -282,6 +271,27 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
 
 // Placeholders
+
+%outline-fix {
+  outline:0;
+}
+
+%oneline {
+  overflow: hidden !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width:100%;
+}
+
+// Temporary adding sticky until resolve if we are using it or not
+%sticky {
+  background: #fff;
+  border-left: none !important;
+  border-right: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  z-index:9999;
+}
 
 // Turn icons to black
 %black-icons {

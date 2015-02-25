@@ -265,7 +265,7 @@
       background: $white;
     }
     &:focus {
-      @include outline-fix();
+      @extend %outline-fix;
     }
     &.disabled {
       @include opacity(0.5);
@@ -463,9 +463,9 @@
 .breadcrumbs {
   @include clearfix();
   @include reset-list();
+  @extend %oneline;
   text-transform:uppercase;
   margin-top:4px;
-  @include oneline();
 	padding-left:20px;
   li {
     display: inline-block;

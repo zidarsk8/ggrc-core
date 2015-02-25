@@ -313,10 +313,10 @@
         padding-left: 28px;
         background:$white;
         span.lhs-item {
+          @extend %oneline;
           display:block;
           width: auto !important;
           margin-right: 60px;
-          @include oneline();
           &.lhs-item-long {
             margin-right: 10px;
           }
@@ -526,7 +526,7 @@
     @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
   }
   &:focus {
-    @include outline-fix();
+    @extend %outline-fix;
   }
   &.disabled {
     @include opacity(0.5);
@@ -796,7 +796,7 @@
     }
   }
   .extended-info-contact {
-    @include oneline();
+    @extend %oneline;
     p {
       font-size:12px;
       span {
@@ -806,7 +806,7 @@
     }
   }
   .code {
-    @include oneline();
+    @extend %oneline;
     font-size:11px;
     font-style:italic;
     color:#777;

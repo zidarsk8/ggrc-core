@@ -149,7 +149,7 @@
       padding:4px 12px 0 12px;
       color: $text;
       h3 {
-        @include oneline();
+        @extend %oneline;
         color: $subTitle;
         font-weight: normal;
         font-size:$f-regular;

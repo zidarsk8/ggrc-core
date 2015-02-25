@@ -18,7 +18,7 @@ h1 {
   height: 47px;
   font-family: $fontTitle;
   font-weight: normal;
-  @include oneline();
+  @extend %oneline;
   position: relative;
   .title-prev {
     position: absolute;
@@ -27,12 +27,12 @@ h1 {
     z-index: 1000;
   }
   .title-slide {
+    @extend %oneline;
     position: absolute;
     left: 39px;
     top: 0;
     z-index: 9999;
     background: $white;
-    @include oneline();
     width: 85%;
   }
 }
@@ -108,15 +108,6 @@ blockquote {
 
 u {
   text-decoration: underline;
-}
-
-.welcome {
-  background: $white;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  bottom: auto;
-  right: auto;
 }
 
 select {
@@ -343,6 +334,7 @@ small {
   z-index: 2000 !important;
 }
 
+// status
 .status-label {
   width: 8px;
   height: 8px;
@@ -467,7 +459,7 @@ small {
 .btn,
 .program-list {
   a {
-    @include outline-fix();
+    @extend %outline-fix;
   }
 }
 
@@ -479,10 +471,7 @@ small {
 
 // one line display of paragraphs
 .oneline {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  width:100%;
+  @extend %oneline;
   &.expandable {
     cursor:pointer;
   }
@@ -640,10 +629,6 @@ input.disabled.pending-ajax{
 }
 
 .widget .wysiwyg-area {
-  //border: 1px solid $widgetBorder;
-  //@include border-radius($default-border-radius);
-  //padding: 4px;
-  //background: $lightGray;
   margin-bottom: 10px;
   .double {
     height: 70px;
@@ -738,35 +723,6 @@ strong {
   margin-right:40px;
 }
 
-.flash {
-  position:absolute;
-  top:5px;
-  left:0;
-  width:50%;
-  margin-left:25%;
-  z-index:9000;
-  .notice {
-    p {
-      color:$green;
-      font-size:11px;
-      font-weight:bold;
-      text-align:center;
-      margin:0;
-      padding:0;
-      line-height:30px;
-      i {
-        margin-top:6px;
-      }
-    }
-  }
-}
-
-.modal-header {
-  .flash {
-    z-index:9999;
-  }
-}
-
 .coding {
   font-family: "Courier New", Courier, monospace;
   margin:0.5em 0 1.5em 0;
@@ -837,55 +793,17 @@ select.multiple-selector {
   margin: 0;
 }
 
-// Input file styling
-.input-file-main {
-  width: 400px;
-  margin-bottom: 15px;
-  .input-file-holder {
-    position: relative;
-    width: 400px;
-    input[type="file"] {
-      position: relative;
-      z-index: 2;
-      @include opacity(0);
-      width: 400px;
-      padding: 0;
-    }
-    .clone {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 400px;
-      padding: 0;
-      margin: 0;
-      z-index: 1;
-      input[type="text"] {
-        width: 300px;
-        float: left;
-      }
-      span {
-        float: left;
-        margin-left: 10px;
-      }
-    }
-  }
-}
 // Sticky headers
-.sticky {
-  background:#fff;
-  border-left: none !important;
-  border-right: none !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  z-index:9999;
-  &.sticky-header {
-    @include box-shadow(inset 0 0 3px 0 #bbb);
-    border-top: none !important;
-  }
-  &.sticky-footer {
-    @include box-shadow(inset 0 0 3px 0 #bbb);
-    border-bottom: none !important;
-  }
+.sticky-header {
+  @extend %sticky;
+  @include box-shadow(inset 0 0 3px 0 #bbb);
+  border-top: none !important;
+}
+
+.sticky-footer {
+  @extend %sticky;
+  @include box-shadow(inset 0 0 3px 0 #bbb);
+  border-bottom: none !important;
 }
 
 // Datepicker
@@ -1053,8 +971,13 @@ select.multiple-selector {
 }
 
 // Welcome page
-
 .welcome {
+  background: $white;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  bottom: auto;
+  right: auto;
   h1 {
     text-align: center;
     margin-top: 3em;  // allow space for flash messages
@@ -1227,7 +1150,7 @@ p {
   ul {
     @include reset-list();
     @include clearfix();
-    @include oneline();
+    @extend %oneline;
     li {
       display: inline-block;
       margin-left: 20px;
@@ -1299,6 +1222,7 @@ p {
   }
 }
 
+// State values
 .state-value {
   text-transform: uppercase;
   font-weight: bold;

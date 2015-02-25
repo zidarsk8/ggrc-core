@@ -71,7 +71,7 @@
       color: $black;
       margin-bottom: 0;
       font-weight: normal;
-      @include oneline();
+      @extend %oneline;
       font-family: $fontTitle;
       span {
         font-size: $f-small;
@@ -598,8 +598,8 @@
     }
   }
   .inner-element {
+    @extend %oneline;
     display: block;
-    @include oneline();
   }
   .import-help {
     display: inline-block;
@@ -662,8 +662,8 @@
     }
   }
   .url {
+    @extend %oneline;
     display: inline-block;
-    @include oneline();
   }
   .error {
     font-weight:normal;
@@ -738,7 +738,7 @@
   right:0;
   @include border-radius(4px 4px 0 0);
   &:focus {
-    @include outline-fix();
+    @extend %outline-fix;
   }
 
 }
@@ -1124,7 +1124,7 @@
   margin-bottom: 8px;
   .filter-title {
     h6 {
-      @include oneline();
+      @extend %oneline;
       font-weight: normal;
       text-transform: none;
       font-size: 16px;
