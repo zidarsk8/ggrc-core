@@ -32,6 +32,7 @@ permissions = {
         "ObjectSection",
         "Option",
         "OrgGroup",
+        "Vendor",
         "PopulationSample",
         "Product",
         "ProgramControl",
@@ -88,6 +89,7 @@ permissions = {
         "ObjectSection",
         "Option",
         "OrgGroup",
+        "Vendor",
         "PopulationSample",
         "Product",
         "ProgramControl",
@@ -227,6 +229,14 @@ permissions = {
         },
         {
             "type": "OrgGroup",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
+        {
+            "type": "Vendor",
             "terms": {
                 "list_property": "owners",
                 "value": "$current_user"
@@ -431,6 +441,14 @@ permissions = {
             },
             "condition": "contains"
         },
+        {
+            "type": "Vendor",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
         "PopulationSample",
         {
             "type": "Product",
@@ -504,4 +522,4 @@ permissions = {
         "SystemControl",
         "SystemSystem"
     ]
-} 
+}
