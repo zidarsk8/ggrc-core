@@ -18,7 +18,7 @@ class HasObjectState(object):
 
   @declared_attr
   def os_state(cls):
-    return deferred(db.Column(db.String, nullable=False), cls.__name__)
+    return deferred(db.Column(db.String, nullable=False, default=ObjectStates.DRAFT), cls.__name__)
 
   def skip_os_state_update(self):
     self._skip_os_state_update = True
