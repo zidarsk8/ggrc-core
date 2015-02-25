@@ -136,7 +136,7 @@ can.Control("CMS.Controllers.TreeLoader", {
   , show_info_pin: function() {
     if (this.element && !this.element.data('no-pin')) {
       var children = this.element.children();
-      children && children.find('.select').first().click();
+      children && children.find('.select:visible').first().click();
     }
   }
 
