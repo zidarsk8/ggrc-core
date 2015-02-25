@@ -16,10 +16,11 @@
     // This fixes an issue in Chrome on Mac Retina screens
     // sticky elements have to be forcefully redrawn,
     // otherwise they are there, but invisible
-    var colors = 'aqua, black, blue, fuchsia, gray, green, lime, maroon, navy, olive, orange, purple, red, silver, teal, white, yellow'.split(', ');
     function forceRedraw(el) {
         var display = el.node.style.display;
-        el.node.style.border = '0px solid '+colors[Math.floor(Math.random()*colors.length)];
+        el.node.style.display = 'none';
+        el.node.offsetHeight; // this is important
+        el.node.style.display = display;
     }
 
     //fallback to prefixed names in old webkit browsers
