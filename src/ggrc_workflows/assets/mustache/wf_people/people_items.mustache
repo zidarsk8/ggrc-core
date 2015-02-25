@@ -1,7 +1,7 @@
 {{!
     Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: Sasmita 
+    Created By: Sasmita
     Maintained By: Sasmita
 }}
 
@@ -54,7 +54,9 @@
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
         {{#find_template 'tier2_content' instance}}
-          {{{renderLive template is_in_selector=true}}}
+          {{#instance.class.table_singular}}
+            {{{renderLive template is_in_selector=true}}}
+          {{/instance}}
         {{else}}
           <div class="tier-content">
             <div class="row-fluid wrap-row">

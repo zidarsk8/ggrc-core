@@ -1,14 +1,14 @@
 {{!
     Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: Sasmita 
+    Created By: Sasmita
     Maintained By: Sasmita
 }}
 
 {{#each options}}
-<li class="tree-item task-item" 
+<li class="tree-item task-item"
   data-object-type="{{instance.class.table_singular}}"
-  {{#instance}}{{ data 'option' }}{{/instance}} 
+  {{#instance}}{{ data 'option' }}{{/instance}}
   data-id="{{ instance.id }}">
   <div class="item-main">
     <div class="item-wrap">
@@ -47,19 +47,21 @@
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
       {{#find_template 'tier2_content' instance}}
+        {{#instance.class.table_singular}}
           {{{renderLive template}}}
-        {{else}}
-          <div class="show-description">
-            <div class="row-fluid">
-              <div class="span12">
-                <div class="tree-description short">
-                  {{{instance.description}}}
-                </div>
-                {{{show_long}}}
+        {{/instance}}
+      {{else}}
+        <div class="show-description">
+          <div class="row-fluid">
+            <div class="span12">
+              <div class="tree-description short">
+                {{{instance.description}}}
               </div>
+              {{{show_long}}}
             </div>
           </div>
-        {{/find_template}}
+        </div>
+      {{/find_template}}
     </div>
   </div>
 </li>
