@@ -1499,7 +1499,7 @@
         // Calculate the total number of options
         var option_type_count = 0;
         if (this.options.option_type_menu) {
-          can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; })
+          can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; });
         }
 
         var display_selection = this.options.option_descriptors[this.options.default_option_descriptor].model.title_plural;

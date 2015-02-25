@@ -41,11 +41,22 @@
           {{/is_allowed}}
         {{/if}}
         {{#if list.length}}
-          <li>
-            <a href="{{parent_instance.viewLink}}/export_{{model.table_plural}}?ids={{instance_ids list}}" class="section-import" rel="tooltip" data-placement="left" title="" data-original-title="Export {{model.model_plural}}">
-              <i class="grcicon-export"></i>
-            </a>
-          </li>
+            {{log model.root_object}}
+            {{#if_helpers '\
+               #if_equals' model.shortName 'Control' '\
+               and #if_instance_of' parent_instance 'Directive|Program' '\
+               or #if_equals' model.shortName 'Objective' '\
+               and #if_instance_of' parent_instance 'Directive|Program|Regulation|Policy|Standard|Contract' '\
+               or #if_equals' model.shortName 'Section' '\
+               and #if_instance_of' parent_instance 'Directive' '\
+               or #if_equals' model.shortName 'System' '\
+               and #if_instance_of' parent_instance 'Program'}}
+                <li>
+                  <a href="{{parent_instance.viewLink}}/export_{{model.table_plural}}?ids={{instance_ids list}}" class="section-import" rel="tooltip" data-placement="left" title="" data-original-title="Export {{model.model_plural}}">
+                    <i class="grcicon-export"></i>
+                  </a>
+                </li>
+            {{/if_instance_of}}
         {{/if}}
 
         <li class="filter-trigger">

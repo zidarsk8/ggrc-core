@@ -8,24 +8,22 @@
 <!-- {{{renderLive '/static/mustache/base_objects/tree_footer_zero.mustache'}}} -->
 
 {{#is_allowed_to_map parent_instance model.shortName}}
-{{#if allow_mapping_or_creating}}
+{{#if allow_mapping}}
 <li class="tree-item tree-item-add tree-footer">
   <div class="row-fluid">
     <div class="span12">
-        <a
-          class="section-add btn btn-small btn-draft"
-          href="javascript://"
-          rel="tooltip"
-          data-placement="left"
-          data-toggle="multitype-multiselect-modal-selector"
-          data-join-mapping="{{mapping}}"
-          data-join-option-type="{{model.shortName}}"
-          data-join-object-id="{{parent_instance.id}}"
-          data-join-object-type="{{parent_instance.class.shortName}}"
-          data-exclude-option-types="{{exclude_option_types}}"
-          data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-            <i class="grcicon-add-black"></i>
-        </a>
+      <a href="javascript://"
+         class="section-create btn btn-small btn-draft"
+         data-toggle="modal-ajax-form"
+         data-modal-reset="reset"
+         data-dirty="#regulations, #combo"
+         data-route="regulations"
+         data-modal-class="modal-wide"
+         data-object-singular="Section"
+         data-object-plural="sections"
+         data-object-singular-override="{{#if_instance_of parent_instance 'Contract'}}Clause{{/if_instance_of}}" data-object-params='{ "directive": {{parent_instance.id}} }'>
+          <i class="grcicon-add-black"></i>
+      </a>
     </div>
   </div>
 </li>
