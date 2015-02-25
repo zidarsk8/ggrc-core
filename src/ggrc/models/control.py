@@ -18,6 +18,7 @@ from .object_person import Personable
 from .reflection import PublishOnly
 from .utils import validate_option
 
+from .track_object_state import HasObjectState, track_state_for_class
 
 class ControlCategory(CategoryBase):
   __mapper_args__ = {
@@ -81,7 +82,7 @@ class AssertionCategorized(Categorizable):
         )
 
 
-class Control(
+class Control(HasObjectState,
     CustomAttributable, Documentable, Personable, ControlCategorized, AssertionCategorized,
     Hierarchical, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'controls'
@@ -246,3 +247,5 @@ class Control(
     if self.directive:
       out_json["mapped_directive"] = self.directive.display_name
     return out_json
+
+track_state_for_class(Control)

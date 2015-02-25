@@ -23,7 +23,7 @@
 {{/if_helpers}}
 
 <div class="tier-content">
-  {{{renderLive '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
+  {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
   {{{renderLive '/static/mustache/base_objects/notes_and_code.mustache' instance=instance}}}
   {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
   {{^if_equals instance.class.table_singular 'person'}}

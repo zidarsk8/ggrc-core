@@ -109,17 +109,16 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
       }, 100);
     } else {
       ev.stopPropagation();
-
       that.options.instance.attr('_undo').unshift(old_value);
 
-      that.options.instance.attr('_disabled', 'disabled');
-      that.options.instance.refresh().then(function(instance){
-        that.set_value({ name: el.data('name'), value: el.data('value') });
-        return instance.save();
-      }).then(function(){
-        that.options.instance.attr('_disabled', '');
-      });
-    }
+    that.options.instance.attr('_disabled', 'disabled');
+    that.options.instance.refresh().then(function(instance){
+      that.set_value({ name: el.data('name'), value: el.data('value') });
+      return instance.save();
+    }).then(function(){
+      that.options.instance.attr('_disabled', '');
+    });
+  }
   }
 
 

@@ -3,12 +3,10 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-from ggrc import db
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
-from .associationproxy import association_proxy
+
+from ggrc import db
 from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
-from .categorization import Categorizable
 from .object_control import Controllable
 from .object_document import Documentable
 from .object_objective import Objectiveable
@@ -17,9 +15,10 @@ from .object_person import Personable
 from .object_section import Sectionable
 from .relationship import Relatable
 from .utils import validate_option
+from .track_object_state import HasObjectState, track_state_for_class
 
 
-class SystemOrProcess(
+class SystemOrProcess(HasObjectState,
     Timeboxed, BusinessObject, db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'
@@ -77,6 +76,7 @@ class SystemOrProcess(
           'ix_{}_is_biz_process'.format(cls.__tablename__), 'is_biz_process'),
         )
 
+track_state_for_class(SystemOrProcess)
 
 class System(
     CustomAttributable, Documentable, Personable, Objectiveable, Controllable,

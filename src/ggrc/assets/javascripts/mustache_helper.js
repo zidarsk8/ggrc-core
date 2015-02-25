@@ -1118,6 +1118,8 @@ Mustache.registerHelper("link_to_tree", function () {
 // Returns date formated like 01/28/2015 02:59:02am PST
 // To omit time pass in a second parameter {{date updated_at true}}
 Mustache.registerHelper("date", function (date) {
+    if (typeof date == 'undefined')
+      return '';
   var m = moment(new Date(date.isComputed ? date() : date))
     , dst = m.isDST()
     , no_time = arguments.length > 2
@@ -1686,7 +1688,6 @@ function get_observe_context(scope) {
   return get_observe_context(scope._parent);
 }
 
-
 // Uses search to find the counts for a model type
 Mustache.registerHelper("global_count", function (model_type, options) {
   model_type = resolve_computed(model_type);
@@ -1772,13 +1773,54 @@ Mustache.registerHelper("is_profile", function (parent_instance, options) {
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("person_owned", function (owner_id, options) {
-  owner_id = resolve_computed(owner_id);
-  var page_instance = GGRC.page_instance();
-  if (!(page_instance instanceof CMS.Models.Person) || (owner_id && page_instance.id === owner_id))
+Mustache.registerHelper("current_user_is_admin", function (options) {
+  if (Permission.is_allowed("__GGRC_ADMIN__")) {
+  return options.fn(options.contexts);
+  }
+  return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("owned_by_current_user", function (instance, options) {
+  var current_user_id = GGRC.current_user.id;
+  instance = Mustache.resolve(instance);
+  owners = instance.attr('owners');
+  if (owners) {
+    for (var i = 0; i < owners.length; i++) {
+      if (current_user_id == owners[i].id) {
+        return options.fn(options.contexts);
+      }
+    }
+  }
+  return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("current_user_is_contact", function (instance, options) {
+  var current_user_id = GGRC.current_user.id;
+  instance = Mustache.resolve(instance);
+  var contact = instance.contact;
+  if (current_user_id == contact.id) {
     return options.fn(options.contexts);
-  else
+  } else {
     return options.inverse(options.contexts);
+  }
+});
+
+Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
+  review_task = Mustache.resolve(review_task);
+  var current_user_id = GGRC.current_user.id;
+  var is_reviewer = review_task && current_user_id == review_task.contact.id;
+  return options.fn(options.contexts.add({is_reviewer: is_reviewer}));
+});
+
+Mustache.registerHelper("with_review_task", function (options) {
+  var tasks = options.contexts.attr('current_object_review_tasks');
+  tasks = Mustache.resolve(tasks);
+  if (tasks) {
+    for (i = 0; i < tasks.length; i++) {
+      return options.fn(options.contexts.add({review_task: tasks[i].instance}));
+    }
+  }
+  return options.fn(options.contexts.add({review_task: undefined}));
 });
 
 Mustache.registerHelper("default_audit_title", function (instance, options) {
@@ -2779,6 +2821,14 @@ Mustache.registerHelper("if_draw_icon", function(instance, options) {
     return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("debugger", function (options) {
+  // This just gives you a helper that you can wrap around some code in a
+  // template to see what's in the context. Set a breakpoint in dev tools
+  // on the return statement on the line below to debug.
+  debugger;
+  return options.fn(options.contexts);
+});
+
 Mustache.registerHelper("update_link", function(instance, options) {
 
   instance = Mustache.resolve(instance);
@@ -2789,6 +2839,28 @@ Mustache.registerHelper("update_link", function(instance, options) {
   return options.fn(options.contexts);
 });
 
+Mustache.registerHelper("with_most_recent_declining_task_entry", function (review_task, options) {
+  var entries = review_task.get_mapping("declining_cycle_task_entries");
+  var most_recent_entry;
+
+  if(entries) {
+    for (var i = entries.length - 1; i >= 0; i--) {
+      var entry = entries[i];
+      if ('undefined' !== typeof most_recent_entry) {
+        if (moment(most_recent_entry.created_at).isBefore(moment(entry.created_at))) {
+          most_recent_entry = entry;
+        }
+      } else {
+        most_recent_entry = entry;
+      }
+    }
+  }
+
+  if(most_recent_entry) {
+    return options.fn(options.contexts.add({'most_recent_declining_task_entry': most_recent_entry}));
+  }
+  return options.fn(options.contexts.add({'most_recent_declining_task_entry': {}}));
+});
 Mustache.registerHelper("inject_parent_instance", function(instance, options) {
   return options.fn(options.contexts.add($.extend({parent_instance: Mustache.resolve(instance)}, options.contexts._context)));
 });

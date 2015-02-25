@@ -8,7 +8,7 @@ from datetime import datetime, date
 from flask import Blueprint
 from sqlalchemy import inspect
 from ggrc import db
-from ggrc.login import get_current_user
+from ggrc.login import get_current_user, get_current_user_id
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
 from ggrc.rbac.permissions import is_allowed_update
@@ -47,7 +47,7 @@ blueprint = Blueprint(
 from ggrc.models import all_models
 
 _workflow_object_types = [
-    "Program",
+    "Program", "Vendor", "OrgGroup",
     "Regulation", "Standard", "Policy", "Contract",
     "Objective", "Control", "Section", "Clause",
     "System", "Process",
@@ -235,6 +235,9 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
     rem = task_group_task.relative_end_month
     red = task_group_task.relative_end_day
 
+  description = models.CycleTaskGroupObjectTask.default_description if \
+    task_group_task.object_approval else task_group_task.description
+
   start_date = WorkflowDateCalculator.\
     nearest_start_date_after_basedate_from_dates(base_date, frequency, rsm, rsd)
   start_date = WorkflowDateCalculator.adjust_start_date(frequency, start_date)
@@ -247,7 +250,7 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
       cycle_task_group=cycle_task_group,
       task_group_task=task_group_task,
       title=task_group_task.title,
-      description=task_group_task.description,
+      description=description,
       sort_index=task_group_task.sort_index,
       start_date=start_date,
       end_date=end_date,
@@ -506,6 +509,13 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):
 
   ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
 
+def set_internal_object_state(task_group_object, object_state, status):
+  if status is not None:
+    task_group_object.status = status
+  task_group_object.os_state = object_state
+  task_group_object.skip_os_state_update()
+
+  db.session.add(task_group_object)
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
@@ -520,19 +530,32 @@ def handle_cycle_task_group_object_task_put(
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_object_parent_state(obj)
 
-    if obj.cycle.workflow.object_approval \
-        and obj.cycle.status == 'Verified':
-      for tgobj in obj.task_group_task.task_group.objects:
-        old_status = tgobj.status
-        tgobj.status = 'Final'
-        status_change.send(
-            tgobj.__class__,
-            obj=tgobj,
-            new_status=tgobj.status,
-            old_status=old_status
-            )
-        db.session.add(tgobj)
-      db.session.flush()
+  # Doing this regardless of status.history.has_changes() is important in order
+  # to update objects that have been declined. It updates the os_last_updated
+  # date and last_updated_by via the call to set_internal_object_state.
+  if obj.task_group_task.object_approval:
+    os_state = None
+    status = None
+    if obj.status == 'Verified':
+      os_state = "Approved"
+      status = "Final"
+    elif obj.status == 'Declined':
+      os_state = "Declined"
+    elif obj.status == 'InProgress':
+      os_state = "UnderReview"
+
+    for tgobj in obj.task_group_task.task_group.objects:
+      old_status = tgobj.status
+      set_internal_object_state(tgobj, os_state, status)
+      status_change.send(
+          tgobj.__class__,
+          obj=tgobj,
+          new_status=tgobj.status,
+          old_status=old_status
+          )
+      db.session.add(tgobj)
+    db.session.flush()
+
 
 @Resource.model_put.connect_via(models.CycleTaskGroup)
 def handle_cycle_task_group_put(
@@ -596,6 +619,17 @@ def handle_cycle_put(
 def handle_workflow_put(
     sender, obj=None, src=None, service=None):
   update_workflow_state(obj)
+
+@Resource.model_posted.connect_via(models.CycleTaskEntry)
+def handle_cycle_task_entry_post(
+    sender, obj=None, src=None, service=None):
+  if src['is_declining_review'] == '1':
+    obj.cycle_task_group_object_task.status = 'Declined'
+    obj.cycle_task_group_object_task.cycle_task_group_object.object.os_state = 'Declined'
+    obj.cycle_task_group_object_task.cycle_task_group_object.object.skip_os_state_update()
+    db.session.add(obj)
+  else:
+    src['is_declining_review'] = 0
 
 # Check if workflow should be Inactive after cycle status change
 @status_change.connect_via(models.Cycle)

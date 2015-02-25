@@ -9,7 +9,7 @@
 (function($, CMS, GGRC) {
   var WorkflowExtension = {},
       _workflow_object_types = [
-        "Program",
+        "Program", "Vendor", "OrgGroup",
         "Regulation", "Standard", "Policy", "Contract",
         "Objective", "Control", "Section", "Clause",
         "System", "Process",
@@ -47,6 +47,7 @@
   WorkflowExtension.init_mappings = function init_mappings() {
     var Proxy = GGRC.MapperHelpers.Proxy,
         Direct = GGRC.MapperHelpers.Direct,
+        Indirect = GGRC.MapperHelpers.Indirect,
         Cross = GGRC.MapperHelpers.Cross,
         Multi = GGRC.MapperHelpers.Multi,
         CustomFilter = GGRC.MapperHelpers.CustomFilter,
@@ -55,44 +56,29 @@
 
     // Add mappings for basic workflow objects
     var mappings = {
-        /*Task: {
-          _canonical: {
-            subtasks: "Task",
-            task_groups: "TaskGroup"
-          },
-          task_groups: Proxy(
-            "TaskGroup", "task_group", "TaskGroupTask", "task", "task_group_tasks"),
-        },*/
-
         TaskGroup: {
           _canonical: {
-            //tasks: "Task",
-            //objects: _workflow_object_types
             objects: _workflow_object_types.concat(["Cacheable"])
           },
           task_group_tasks: Direct(
             "TaskGroupTask", "task_group", "task_group_tasks"),
-          //tasks: Proxy(
-          //  "Task", "task", "TaskGroupTask", "task_group", "task_group_tasks"),
           objects: Proxy(
             null, "object", "TaskGroupObject", "task_group", "task_group_objects"),
           workflow: Direct(
             "Workflow", "task_groups", "workflow")
         },
 
+        //TaskGroupObject: {
+        //  object: Direct('object')
+        //},
+
         Workflow: {
           _canonical: {
-            //objects: _workflow_object_types.concat(["Cacheable"]),
-            //tasks: "Task",
             task_groups: "TaskGroup",
             people: "Person",
             folders: "GDriveFolder",
             context: "Context"
           },
-          //objects: Proxy(
-          //  null, "object", "WorkflowObject", "workflow", "workflow_objects"),
-          //tasks: Proxy(
-          //  "Task", "task", "WorkflowTask", "workflow", "workflow_tasks"),
 
           task_groups: Direct(
             "TaskGroup", "workflow", "task_groups"),
@@ -148,8 +134,6 @@
         CycleTaskGroup: {
           cycle: Direct(
             "Cycle", "cycle_task_groups", "cycle"),
-          //task_group: Direct(
-          //  "TaskGroup", "cycle", "tasks"),
           cycle_task_group_objects: Direct(
             "CycleTaskGroupObject",
             "cycle_task_group",
@@ -176,8 +160,7 @@
           task_group_object: Direct(
             "TaskGroupObject", "task_group_objects", "task_group_object"
           ),
-          //task_group_object: Direct(
-          //  "TaskGroupObject", "cycle", "tasks")
+          _object: Direct(null, null, 'object'),
           cycle_task_group_object_tasks: Direct(
             "CycleTaskGroupObjectTask",
             "cycle_task_group_object",
@@ -195,12 +178,21 @@
             "CycleTaskGroup",
             "cycle_task_group_object_tasks",
             "cycle_task_group"),
-          //task_group_object: Direct(
-          //  "TaskGroupObject", "cycle", "tasks")
           cycle_task_entries: Direct(
             "CycleTaskEntry",
             "cycle_task_group_object_task",
-            "cycle_task_entries")
+            "cycle_task_entries"),
+          _object: Cross(
+            "cycle_task_group_object", '_object'
+          ),
+          // This code needs to be reworked to figure out how to return the single
+          // most recent task entry with is_declining_review = true.
+          declining_cycle_task_entries: Search(function(binding) {
+            return CMS.Models.CycleTaskEntry.findAll({
+              cycle_task_group_object_task_id: binding.instance.id,
+              is_declining_review: 1
+            });
+          })
         },
 
         CycleTaskEntry: {
@@ -219,42 +211,19 @@
 
         People: {
           _canonical: {
-            workflows: "Workflow",
+            workflows: "Workflow"
           },
           workflows: Proxy(
-            "Workflow", "workflow", "WorkflowPerson", "person", "workflow_people"),
+            "Workflow", "workflow", "WorkflowPerson", "person", "workflow_people"
+          )
 
-        },
-        OrgGroup: {
-          // Make sure OrgGroups don't have workflows
-          //   in orphaned objects:
-          orphaned_objects: Multi([
-            "related_objects",
-            "people",
-            "controls",
-            "objectives",
-            "sections",
-            "clauses",
-          ])
-        },
-        Vendor: {
-          // Make sure Vendors don't have workflows
-          //   in orphaned objects:
-          orphaned_objects: Multi([
-            "related_objects",
-            "people",
-            "controls",
-            "objectives",
-            "sections",
-            "clauses",
-          ])
         },
         Person: {
           assigned_tasks: Search(function(binding) {
             return CMS.Models.CycleTaskGroupObjectTask.findAll({
               contact_id: binding.instance.id,
               'cycle.is_current': true,
-              status__in: 'Assigned,InProgress,Finished,Declined',
+              status__in: 'Assigned,InProgress,Finished,Declined'
             });
           }),
           assigned_tasks_with_history: Search(function(binding) {
@@ -280,7 +249,7 @@
       mappings[type].object_tasks_with_history = Search(function(binding) {
         return CMS.Models.CycleTaskGroupObjectTask.findAll({
           'cycle_task_group_object.object_id': binding.instance.id,
-          'cycle_task_group_object.object_type': binding.instance.type,
+          'cycle_task_group_object.object_type': binding.instance.type
         });
       });
       mappings[type].workflows = Cross("task_groups", "workflow");
@@ -289,6 +258,19 @@
           return binding.instance.attr("object_approval");
         });
       mappings[type].current_approval_cycles = Cross("approval_workflows", "current_cycle");
+      mappings[type].current_object_review_tasks = CustomFilter(
+        "object_tasks", function(binding) {
+        var tgt_binding = binding.instance.attr("task_group_task");
+        if(!tgt_binding) {
+          return;
+        }
+        return new RefreshQueue().enqueue(tgt_binding.reify()).trigger().then(
+            function(data){
+              var tgt = data[0];
+              return tgt.attr("object_approval");
+            }
+          )
+        });
       mappings[type]._canonical = {
        "workflows": "Workflow",
        "task_groups": "TaskGroup"
@@ -311,6 +293,7 @@
         );
 
     });
+
     new GGRC.Mappings("ggrc_workflows", mappings);
   };
 
@@ -388,7 +371,7 @@
                 footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
                 draw_children: true,
                 allow_creating: true
-              },
+              }
             ]
           }
         }
@@ -407,11 +390,9 @@
         new_default_widgets = [
           "info", "person", "task_group", "current", "history"
         ],
-        objects_widget_descriptor,
         history_widget_descriptor,
         current_widget_descriptor,
-        object = GGRC.page_instance(),
-        object_descriptors = {};
+        object = GGRC.page_instance();
 
     can.each(GGRC.WidgetList.get_current_page_widgets(), function(descriptor, name) {
       if (~new_default_widgets.indexOf(name))
@@ -503,7 +484,7 @@
         draw_children: true,
         parent_instance: object,
         model: "Cycle",
-        mapping: "previous_cycles",
+        mapping: "previous_cycles"
       }
     };
     current_widget_descriptor = {
@@ -518,7 +499,7 @@
         parent_instance: object,
         model: "Cycle",
         mapping: "current_cycle",
-        header_view: GGRC.mustache_path + "/cycles/tree_header.mustache",
+        header_view: GGRC.mustache_path + "/cycles/tree_header.mustache"
       }
     };
     new_widget_descriptors.history = history_widget_descriptor;
@@ -570,7 +551,7 @@
               show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
               footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
               allow_creating: true
-            },
+            }
           ]
         }
       }

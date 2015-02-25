@@ -131,6 +131,10 @@ def set_ids_for_new_custom_attribute_values(objects, obj):
     if not isinstance(object, CustomAttributeValue):
       continue
     object.attributable_id = obj.id
+    # Disable state updating so that a newly create object doesn't go straight
+    # from Draft to Modified.
+    if hasattr(object, '_skip_os_state_update'):
+      object.skip_os_state_update()
     db.session.add(object)
   db.session.flush()
 

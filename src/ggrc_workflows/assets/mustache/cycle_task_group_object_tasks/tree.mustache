@@ -59,7 +59,7 @@
                 <li>
                   <div class="date">
                     <span rel="tooltip" data-placement="top" {{#is_overdue instance.end_date instance.status}}class="error"{{/is_overdue}} data-original-title="Due On">
-                      <i class="grcicon-history-{{#is_overdue instance.end_date instance.status}}red{{else}}color{{/if overdue_warning}}"></i> {{localize_date instance.end_date}}
+                      <i class="grcicon-history-{{#is_overdue instance.end_date instance.status}}red{{else}}color{{/is_overdue}}"></i> {{localize_date instance.end_date}}
                     </span>
                   </div>
                 </li>
@@ -79,35 +79,41 @@
                   </span>
                   {{/with_mapping_count}}
                 </li>
-                {{#using cycle=instance.cycle}}
-                  {{#if_equals cycle.is_current true}}
-                  <li>
-                    <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }); }}>
-                      {{#if_equals instance.status 'Assigned'}}
-                        <button class="btn btn-mini btn-info change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">Start</button>
-                      {{/status}}
-                      {{#if_equals instance.status 'InProgress'}}
-                        <button class="btn btn-mini btn-draft change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
-                      {{/if_equals}}
-                      {{#if_equals instance.status 'Declined'}}
-                        <button class="btn btn-mini btn-draft change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
-                      {{/if_equals}}
-                      {{#if_equals instance.status 'Finished'}}
-                        <button class="btn btn-mini btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
-                        <button class="btn btn-mini btn-success change-task-status {{instance._disabled}}" data-openclose="close" data-name="status" data-value="Verified">Verify</button>
-                      {{/status}}
-                      {{#if_equals instance.status 'Verified'}}
-                        <span class="task-done">
-                          <em>Verified</em>
-                        </span>
-                      {{/if_equals}}
-                      {{#instance._undo.0}}
-                        <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
-                      {{/instance._undo.0}}
-                    </div>
-                  </li>
-                  {{/if_equals}}
-                {{/using}}
+                {{#with_review_task}}
+                  {{#using cycle=instance.cycle}}
+                    {{#if_equals cycle.is_current true}}
+                      <li>
+                        <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }); }}>
+                          {{#if_equals instance.status 'Assigned'}}
+                            <button class="btn btn-mini btn-info change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">Start</button>
+                          {{/if_equals}}
+                          {{#if_equals instance.status 'InProgress'}}
+                            <button class="btn btn-mini btn-draft change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+                          {{/if_equals}}
+                          {{#if_equals instance.status 'Declined'}}
+                            {{#if review_task.object_review}}
+                              <button class="btn btn-mini btn-draft change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Finish</button>
+                            {{else}}
+                              <button class="btn btn-mini btn-draft change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+                            {{/if}}
+                          {{/if_equals}}
+                          {{#if_equals instance.status 'Finished'}}
+                              <button class="btn btn-mini btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
+                              <button class="btn btn-mini btn-success change-task-status {{instance._disabled}}" data-openclose="close" data-name="status" data-value="Verified">Verify</button>
+                          {{/if_equals}}
+                          {{#if_equals instance.status 'Verified'}}
+                            <span class="task-done">
+                              <em>Verified</em>
+                            </span>
+                          {{/if_equals}}
+                          {{#instance._undo.0}}
+                            <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
+                          {{/instance._undo.0}}
+                        </div>
+                      </li>
+                    {{/if_equals}}
+                  {{/using}}
+                {{/with_review_task}}
               </ul>
             </div>
           </div>
@@ -121,7 +127,7 @@
     <div class="tier-2-info-content">
       {{#if draw_children}}
         {{#child_options.1}}
-          <div class="inner-tree {{^if list.length}}hide{{/list}}">
+          <div class="inner-tree {{^if list.length}}hide{{/if}}">
             <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
           </div>
         {{/child_options.1}}
