@@ -1060,7 +1060,7 @@ can.Model("can.Model.Cacheable", {
               email: owner.email
             });
           });
-        } else {
+        } else if ($.type(val) === 'string'){
           values[key] = val;
         }
       }
