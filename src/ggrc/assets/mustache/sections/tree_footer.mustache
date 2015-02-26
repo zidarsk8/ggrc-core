@@ -9,6 +9,7 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping}}
+{{#if_equals model.shortName 'Section'}}
 <li class="tree-item tree-item-add tree-footer">
   <div class="row-fluid">
     <div class="span12">
@@ -23,6 +24,29 @@
          data-object-plural="sections"
          data-object-singular-override="{{#if_instance_of parent_instance 'Contract'}}Clause{{/if_instance_of}}" data-object-params='{ "directive": {{parent_instance.id}} }'>
           <i class="grcicon-add-black"></i>
+      </a>
+    </div>
+  </div>
+</li>
+{{else}}
+{{/if_equals}}
+<li class="tree-item tree-item-add tree-footer">
+  <div class="row-fluid">
+    <div class="span12">
+      <a
+        class="section-add btn btn-small btn-draft"
+        href="javascript://"
+        rel="tooltip"
+        data-placement="right"
+        data-toggle="multitype-object-modal-selector"
+        data-join-mapping="{{mapping}}"
+        data-join-object-id="{{parent_instance.id}}"
+        data-join-object-type="{{parent_instance.class.shortName}}"
+        data-exclude-option-types="{{exclude_option_types}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
+        data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{json_escape parent_instance.description}}" } }'
+        >
+        <i class="grcicon-add-black"></i>
       </a>
     </div>
   </div>
