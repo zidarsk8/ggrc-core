@@ -5,6 +5,10 @@
     Maintained By: urban@reciprocitylabs.com
 }}
 <div class="openclose">
-  <span class="status-label" {{addclass "status-" instance.status}} {{addclass "status-" instance.overdue}}></span>
+  {{#if instance.status}}
+    <span class="status-label" {{addclass "status-" instance.status}} {{addclass "status-" instance.overdue}}></span>
+  {{else}}
+    <span class="status-label"></span>
+  {{/instance}}
   <i class="grcicon-arrow-right"></i>
 </div>
