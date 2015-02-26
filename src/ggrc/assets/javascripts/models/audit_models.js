@@ -234,7 +234,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
 
     try {
       if (this.contact){
-        vals['assignee'] = filter_vals.apply(this.contact.reify(), []);
+        vals['assignee'] = filter_vals.apply(this.contact.reify(), [['email', 'name']]);
       }
     } catch (e) {}
 
