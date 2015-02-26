@@ -29,7 +29,7 @@
 
 .pin-action {
   @include clearfix();
-  @include reset-list();
+  @extend %reset-list;
   margin-bottom: 20px;
   li {
     float: left;

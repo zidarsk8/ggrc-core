@@ -435,7 +435,7 @@ h4.pbc-title {
     }
   }
   ul.items {
-    @include reset-list();
+    @extend %reset-list;
     margin-top:4px;
     .row-fluid {
       margin-bottom: 0;

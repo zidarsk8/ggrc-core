@@ -523,10 +523,7 @@ input.date {
 //Making input 100% width of his parent element
 input.input-block-level,
 select.input-block-level {
-  display: block;
-  width: 100%;
-  @include box-sizing(border-box);
-  min-height: 28px;
+  @extend %input-block-level;
 }
 
 //tree-structure no results
@@ -630,15 +627,15 @@ input.disabled.pending-ajax{
   margin-bottom: 10px;
   .double {
     height: 70px;
-    @include input-block-level();
+    @extend %input-block-level;
   }
   .triple {
     height: 120px;
-    @include input-block-level();
+    @extend %input-block-level;
   }
   .quadruple {
     height: 150px;
-    @include input-block-level();
+    @extend %input-block-level;
   }
   iframe {
     width: 97.5% !important;
@@ -1064,7 +1061,7 @@ p {
 }
 
 .item-util {
-  @include reset-list();
+  @extend %reset-list;
   @include clearfix();
   font-size: 11px;
   line-height: 16px;
@@ -1146,8 +1143,8 @@ p {
     max-width: 130px;
   }
   ul {
-    @include reset-list();
     @include clearfix();
+    @extend %reset-list;
     @extend %oneline;
     li {
       display: inline-block;
@@ -1201,7 +1198,7 @@ p {
       margin-bottom: 0;
     }
     ul {
-      @include reset-list();
+      @extend %reset-list;
     }
     li {
       margin-bottom: 20px;
@@ -1236,7 +1233,7 @@ p {
 }
 
 .inner-count-list {
-  @include reset-list();
+  @extend %reset-list;
   li {
     margin-bottom: 6px;
     [class^="grcicon-"] {

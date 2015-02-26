@@ -1,6 +1,6 @@
 
 .attachment-list {
-  @include reset-list();
+  @extend %reset-list;
   padding: 4px 0 0 0;
   li {
     margin-left: -6px;
@@ -180,7 +180,7 @@ ul.new-tree {
   padding-top: 6px;
 }
 .entry-list {
-  @include reset-list();
+  @extend %reset-list;
   margin-top: 4px;
   li {
     margin-bottom: 14px;
@@ -363,7 +363,7 @@ ul.new-tree {
 }
 
 .items-list {
-  @include reset-list();
+  @extend %reset-list;
   li {
     margin-bottom: 10px;
     input {

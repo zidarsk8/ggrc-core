@@ -145,7 +145,7 @@
   }
   padding:10px 0 0 0;
   ul {
-    @include reset-list();
+    @extend %reset-list;
     margin-bottom:14px;
     &.sub-actions {
       margin-bottom:14px;
@@ -537,8 +537,8 @@
 // TOP INNER NAV
 .top-inner-nav {
   ul.internav {
-    @include reset-list();
     @include clearfix();
+    @extend %reset-list;
     margin-left: 28px;
     li {
       position: relative;

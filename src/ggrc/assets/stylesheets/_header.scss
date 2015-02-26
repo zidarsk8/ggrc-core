@@ -57,7 +57,7 @@
   }
   .menu {
     @include clearfix();
-    @include reset-list();
+    @extend %reset-list;
     float:right;
     margin-right: 30px;
     li {
@@ -104,7 +104,7 @@
         }
       }
       .dropdown-menu {
-        @include reset-list();
+        @extend %reset-list;
         @include border-radius(0);
         min-width: 210px;
         float: none;
@@ -352,8 +352,8 @@
 
 .actions {
   @include clearfix();
-	@include reset-list();
-	padding-right:40px;
+  @extend %reset-list;
+  padding-right:40px;
   margin-top: 16px;
   li {
     li a {
@@ -462,7 +462,7 @@
 
 .breadcrumbs {
   @include clearfix();
-  @include reset-list();
+  @extend %reset-list;
   @extend %oneline;
   text-transform:uppercase;
   margin-top:4px;

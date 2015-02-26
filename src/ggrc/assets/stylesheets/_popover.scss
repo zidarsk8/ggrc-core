@@ -190,7 +190,7 @@
         overflow:auto;
         max-height:60px;
         ul {
-          @include reset-list();
+          @extend %reset-list;
           margin:8px 0 10px 25px;
           li {
             padding-bottom: 0;
@@ -199,7 +199,7 @@
         }
       }
       ul {
-        @include reset-list();
+        @extend %reset-list;
         li {
           padding-bottom: 4px;
         }

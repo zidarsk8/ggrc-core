@@ -6,7 +6,7 @@
  */
 
 ul.new-tree {
-  @include reset-list();
+  @extend %reset-list;
   margin-bottom: 40px;
   .openclose {
     cursor: pointer;
@@ -233,7 +233,7 @@ ul.new-tree {
         text-overflow: inherit;
         width: auto;
         ul {
-          @include reset-list();
+          @extend %reset-list;
           line-height: 18px;
           padding-top: 7px;
           padding-bottom: 5px;
@@ -795,7 +795,7 @@ ul.new-tree {
     }
     font-size:13px;
     .tree-info-list {
-      @include reset-list();
+      @extend %reset-list;
       margin: 6px 0 2px 0;
       li {
         padding-bottom: 4px;
@@ -1058,7 +1058,7 @@ ul.new-tree {
   }
 
   .info-audit {
-    @include reset-list();
+    @extend %reset-list;
     @include clearfix();
     margin: 10px 0 0;
     li {
@@ -1083,7 +1083,7 @@ ul.new-tree {
     }
   }
   .population-upload {
-    @include reset-list();
+    @extend %reset-list;
     margin-top: 20px;
     li {
       margin-bottom: 20px;
@@ -1297,7 +1297,7 @@ ul.new-tree {
     margin-top: 5px;
   }
   .dropdown-menu {
-    @include reset-list();
+    @extend %reset-list;
     @include border-radius(0);
     min-width: 210px;
     float: none;
