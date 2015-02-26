@@ -399,52 +399,52 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 // status label placeholder colors
 %status-draft {
-  background: $status-draft;
+  background: $status-draft !important;
 }
 %status-inactive {
-  background: $status-draft;
+  background: $status-draft !important;
 }
 %status-declined {
-  background: $status-draft;
+  background: $status-draft !important;
 }
 %status-planned {
-  background: $status-draft;
+  background: $status-draft !important;
 }
 %status-inprogress {
-  background: $orange;
+  background: $orange !important;
 }
 %status-overdue {
-  background: $red;
+  background: $red !important;
 }
 %status-active {
-  background: $orange;
+  background: $orange !important;
 }
 %status-verified {
-  background: $lightGreen;
+  background: $lightGreen !important;
 }
 %status-accepted {
-  background: $lightGreen;
+  background: $lightGreen !important;
 }
 %status-pending {
-  background: $status-draft;
+  background: $status-draft !important;
 }
 %status-finished {
-  background: $lightBlue;
+  background: $lightBlue !important;
 }
 %status-requested {
-  background: $orange;
+  background: $orange !important;
 }
 %status-responded {
-  background: $lightBlue;
+  background: $lightBlue !important;
 }
-%status-amended_request {
-  background: $purpleRed;
+%status-amended-request {
+  background: $purpleRed !important;
 }
-%status-updated_response {
-  background: $lightBlue;
+%status-updated-response {
+  background: $lightBlue !important;
 }
 %status-assigned {
-  background: $status-draft;
+  background: $status-draft !important;
 }
 
 // state label placeholder colors
