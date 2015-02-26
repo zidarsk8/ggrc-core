@@ -457,17 +457,15 @@
     }
 
     function rebuild() {
-        try{
-          if (!initialized) return;
+        if (!initialized) return;
 
-          deinitAll();
-          
-          for (var i = watchArray.length - 1; i >= 0; i--) {
-              watchArray[i] = getElementParams(watchArray[i].node);
-          }
+        deinitAll();
+        
+        for (var i = watchArray.length - 1; i >= 0; i--) {
+            watchArray[i] = getElementParams(watchArray[i].node);
+        }
 
-          initAll();
-        } catch(e){}
+        initAll();
     }
 
     function pause() {
