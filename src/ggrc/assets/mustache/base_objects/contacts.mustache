@@ -24,6 +24,11 @@
           {{#each contacts}}
             <li>
               {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+              {{^if is_enabled}}
+                <span class="user-disabled">
+                  (Disabled)
+                </span>
+              {{/if}}
             </li>
           {{/each}}
         </ul>
@@ -42,6 +47,11 @@
       <p class="oneline">
         {{#if person}}
           {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
+          {{^if person.is_enabled}}
+            <span class="user-disabled">
+              (Disabled)
+            </span>
+          {{/if}}
         {{else}}
           <span class="error">
             Not Assigned
@@ -55,6 +65,11 @@
       <p class="oneline">
         {{#if person}}
           {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
+          {{^if person.is_enabled}}
+            <span class="user-disabled">
+              (Disabled)
+            </span>
+          {{/if}}
         {{else}}
           <span class="error">
             Not Assigned

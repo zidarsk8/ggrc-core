@@ -7,7 +7,7 @@
 
 {{{render "/static/mustache/base_objects/tree_view_filter.mustache"}}}
 
-<header class="header tree-header">
+<header class="header sticky tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
   <div class="row-fluid">
     <div class="span6">
       <div class="title-heading oneline">
@@ -83,4 +83,3 @@
   {{/if_equals}}
   {{/using}}
 {{/if_equals}}
-

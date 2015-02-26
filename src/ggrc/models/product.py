@@ -14,8 +14,9 @@ from .object_person import Personable
 from .object_section import Sectionable
 from .relationship import Relatable
 from .utils import validate_option
+from .track_object_state import HasObjectState, track_state_for_class
 
-class Product(
+class Product(HasObjectState,
     CustomAttributable, Documentable, Personable, Objectiveable, Controllable,
     Sectionable, Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'products'
@@ -48,3 +49,5 @@ class Product(
 
     query = super(Product, cls).eager_query()
     return query.options(orm.joinedload('kind'))
+
+track_state_for_class(Product)

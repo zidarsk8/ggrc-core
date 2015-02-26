@@ -341,6 +341,7 @@ small {
   @include border-radius($default-border-radius);
   float: left;
   margin: 9px 10px 0 10px;
+  background: $status-draft;
   .entry-list & {
     margin: 5px 10px 0 4px !important;
   }
@@ -356,12 +357,9 @@ small {
   .dashboard-tree & {
     margin: 9px 10px 0 4px;
   }
-  &.status- {
-    background: $status-draft;
-  }
 }
 
-@each $status_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+@each $status_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended-request, updated-response, assigned {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
   }

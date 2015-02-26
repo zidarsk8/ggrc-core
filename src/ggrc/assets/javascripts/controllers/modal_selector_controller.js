@@ -851,7 +851,7 @@
 
     , insert_options: function(options, prepend) {
         var self = this
-          , option_results
+          , options_results
           , context = {}
           , dfd = $.Deferred()
           ;
@@ -915,7 +915,7 @@
               }
             }
           });
-        }
+        };
 
         pager(objects);
       }
@@ -1400,6 +1400,7 @@
           lookup = {
               governance: 0
             , business: 1
+            , entities: 2
           };
           if (!this.options.option_type_menu) {
             menu = [
@@ -1407,6 +1408,9 @@
                 , items: []
                 }
               , { category: "Assets/Business"
+                , items: []
+                }
+              , { category: "People/Groups"
                 , items: []
                 }
               ];
@@ -1419,8 +1423,7 @@
 
             can.each(this.options.option_descriptors, function(descriptor) {
               if (descriptor.model.category == "workflow" ||
-                  descriptor.model.category == "undefined" ||
-                  descriptor.model.category == "entities"){
+                  descriptor.model.category == "undefined"){
                 return;
               }
               else{
@@ -1499,7 +1502,7 @@
         // Calculate the total number of options
         var option_type_count = 0;
         if (this.options.option_type_menu) {
-          can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; })
+          can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; });
         }
 
         var display_selection = this.options.option_descriptors[this.options.default_option_descriptor].model.title_plural;

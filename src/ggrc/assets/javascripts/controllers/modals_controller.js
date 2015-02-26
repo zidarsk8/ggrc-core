@@ -783,10 +783,12 @@ can.Control("GGRC.Controllers.Modals", {
               name = obj.title ? obj.title : '',
               msg;
           if(instance_id === undefined) { //new element
-            if (name) {
-                msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
-            }else{
-                msg = "New " + type + " added successfully.";
+            if(obj.is_declining_review && obj.is_declining_review == '1') {
+              msg = "Review declined";
+            } else if (name) {
+              msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+            } else {
+              msg = "New " + type + " added successfully.";
             }
           } else {
             msg = "<span class='user-string'>" + name + "</span>" + " modified successfully.";

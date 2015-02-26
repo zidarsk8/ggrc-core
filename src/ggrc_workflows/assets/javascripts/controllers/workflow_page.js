@@ -241,7 +241,7 @@
     template: "<content/>",
     events: {
       click: function(el) {
-        var task_group, $target;
+        var $target;
 
         $target = $('<div class="modal hide"></div>').uniqueId();
         $target.modal_form({}, el);

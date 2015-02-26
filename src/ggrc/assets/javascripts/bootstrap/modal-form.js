@@ -243,7 +243,7 @@
   $(function() {
     // Default form complete handler
     $('body').on('ajax:complete', function(e, xhr, status) {
-      var data = null, data_k;
+      var data = null;
       try {
         data = JSON.parse(xhr.responseText);
       } catch (exc) {
@@ -305,9 +305,8 @@
     });
 
     $('body').on('ajax:flash', function(e, flash) {
-      var $target, $flash_holder// = this.$element.find('.flash')
-        , type, ucase_type
-        , messages, message, message_i
+      var $target, $flash_holder
+        , type, message_i
         , flash_class
         , flash_class_mappings = { notice: "success" }
         , html;
@@ -355,7 +354,5 @@
       $(this).find('.modal-body').html($frag);
     });
 
-    //$('body').on('ajax:json', function(e, data, xhr) {
-    //});
   });
 }(window.jQuery);

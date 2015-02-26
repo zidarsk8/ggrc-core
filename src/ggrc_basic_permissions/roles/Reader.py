@@ -33,6 +33,7 @@ permissions = {
         "ObjectSection",
         "Option",
         "OrgGroup",
+        "Vendor",
         "PopulationSample",
         "Product",
         "ProgramControl",
