@@ -407,16 +407,10 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 %status-declined {
   background: $status-draft;
 }
-%status-declined__ {
-  background: $status-draft;
-}
 %status-planned {
   background: $status-draft;
 }
 %status-inprogress {
-  background: $orange;
-}
-%status-inprogress__ {
   background: $orange;
 }
 %status-overdue {
@@ -435,9 +429,6 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   background: $status-draft;
 }
 %status-finished {
-  background: $lightBlue;
-}
-%status-finished__ {
   background: $lightBlue;
 }
 %status-requested {

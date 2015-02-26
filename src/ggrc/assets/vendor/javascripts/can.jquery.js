@@ -4267,8 +4267,8 @@
                     setAttrs(compute());
                 }
             },
-            attributePlaceholder: '__',
-            attributeReplace: /__/g,
+            attributePlaceholder: '__!!__',
+            attributeReplace: /__!!__/g,
             attribute: function(el, attributeName, compute) {
                 listen(el, compute, function(ev, newVal) {
                     elements.setAttr(el, attributeName, hook.render());
