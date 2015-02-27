@@ -30,43 +30,37 @@
       </div>
     </div>
     <div class="span4">
-      <ul class="tree-action-list">
-        {{#if allow_creating}}
-          {{#is_allowed 'create' model.shortName context=null}}
-              {{#if_helpers '\
-                 #if_equals' model.shortName 'Objective' '\
-                 or #if_equals' model.shortName 'Control' '\
-                 or #if_equals' model.shortName 'System' '\
-                 or #if_equals' model.shortname 'Process' '\
-                 or #if_equals' model.shortName 'Section' '\
-                 or #if_equals' model.shortName 'Clause'}}
-                  <li>
-                    <a href="{{parent_instance.viewLink}}/import_{{model.table_plural}}?return_to={{param_current_location}}" class="section-import" rel="tooltip" data-placement="left" title="" data-original-title="Import {{model.model_plural}}">
-                      <i class="grcicon-imp-exp"></i>
-                    </a>
-                  </li>
-              {{/if_helpers}}
-          {{/is_allowed}}
-        {{/if}}
-        {{#if list.length}}
-            {{#if_helpers '\
-               #if_equals' model.shortName 'Control' '\
-               and #if_instance_of' parent_instance 'Directive|Program' '\
-               or #if_equals' model.shortName 'Section' '\
-               and #if_instance_of' parent_instance 'Directive' '\
-               or #if_equals' model.shortName 'System' '\
-               and #if_instance_of' parent_instance 'Program' '\
-               or #if_equals' model.shortName 'Clause' '\
-               and #if_instance_of' parent_instance 'Directive' '\
-               or #if_equals' model.shortName 'Objective' '\
-               and #if_instance_of' parent_instance 'Directive|Program|Regulation|Policy|Standard|Contract'}}
+        <ul class="tree-action-list">
+        {{#if_helpers '\
+           #if_instance_of' parent_instance 'Regulation' '\
+           and #if_in' model.shortName 'Section, Control, Objective' '\
+           or #if_instance_of' parent_instance 'Contract' '\
+           and #if_in' model.shortName 'Clause, Control, Objective' '\
+           or #if_instance_of' parent_instance 'Policy' '\
+           and #if_in' model.shortName 'Clause, Control, Objective' '\
+           or #if_instance_of' parent_instance 'Standard' '\
+           and #if_in' model.shortName 'Section, Control, Objective' '\
+           or #if_instance_of' parent_instance 'Program' '\
+           and #if_in' model.shortName 'Control, Objective, System'}}
+            {{#if allow_creating}}
+              {{#is_allowed 'create' model.shortName context=null}}
                 <li>
-                  <a href="{{parent_instance.viewLink}}/export_{{model.table_plural}}?ids={{instance_ids list}}" class="section-import" rel="tooltip" data-placement="left" title="" data-original-title="Export {{model.model_plural}}">
-                    <i class="grcicon-export"></i>
+                  <a href="{{parent_instance.viewLink}}/import_{{model.table_plural}}?return_to={{param_current_location}}" class="section-import" rel="tooltip" data-placement="left" title="" data-original-title="Import {{model.model_plural}}">
+                      <i class="grcicon-imp-exp"></i>
                   </a>
                 </li>
-            {{/if_instance_of}}
-        {{/if}}
+
+              {{/is_allowed}}
+            {{/if}}
+
+            {{#if list.length}}
+              <li>
+                <a href="{{parent_instance.viewLink}}/export_{{model.table_plural}}?ids={{instance_ids list}}" class="section-import" rel="tooltip" data-placement="left" title="" data-original-title="Export {{model.model_plural}}">
+                    <i class="grcicon-export"></i>
+                </a>
+              </li>
+            {{/if}}
+        {{/if_helpers}}
 
         <li class="filter-trigger">
           <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
