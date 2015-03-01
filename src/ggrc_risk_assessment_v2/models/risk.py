@@ -11,12 +11,12 @@ from ggrc.models.object_owner import Ownable
 from ggrc.models.object_control import Controllable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_objective import Objectiveable
-from ggrc.models.mixins import Base, Described, Slugged, Titled, WithContact, deferred, Stateful, Timeboxed
+from ggrc.models.mixins import CustomAttributable, Base, Described, Slugged, Titled, WithContact, deferred, Stateful, Timeboxed
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 
 
-class Risk(Stateful, Relatable, Controllable, Objectiveable, Documentable, Described,
+class Risk(CustomAttributable, Stateful, Relatable, Controllable, Objectiveable, Documentable, Described,
     Ownable, WithContact, Titled, Timeboxed, Slugged, Base, db.Model):
   __tablename__ = 'risks'
 

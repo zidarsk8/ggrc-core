@@ -17,6 +17,7 @@
     update: "PUT /api/threat_actors/{id}",
     destroy: "DELETE /api/threat_actors/{id}",
     mixins: ["ownable", "contactable", "unique_title"],
+    is_custom_attributable: true,
     attributes: {
       context: "CMS.Models.Context.stub",
       contact: "CMS.Models.Person.stub",

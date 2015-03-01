@@ -18,6 +18,7 @@
     update: "PUT /api/risks/{id}",
     destroy: "DELETE /api/risks/{id}",
     mixins: ["ownable", "contactable", "unique_title"],
+    is_custom_attributable: true,
     attributes : {
       context : "CMS.Models.Context.stub",
       contact : "CMS.Models.Person.stub",

@@ -4,7 +4,7 @@
 # Maintained By: anze@reciprocitylabs.com
 
 from ggrc import db
-from ggrc.models.mixins import BusinessObject, Timeboxed
+from ggrc.models.mixins import CustomAttributable, BusinessObject, Timeboxed
 from ggrc.models.object_control import Controllable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_objective import Objectiveable
@@ -15,6 +15,6 @@ from ggrc.models.relationship import Relatable
 
 
 class ThreatActor(
-    Documentable, Personable, Objectiveable, Controllable, Sectionable,
-    Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
+    CustomAttributable, Documentable, Personable, Objectiveable, Controllable,
+    Sectionable, Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'threat_actors'
