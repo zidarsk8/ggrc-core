@@ -13,6 +13,7 @@ from .categorization import Categorization
 from .category import CategoryBase
 from .context import Context
 from .control import Control, ControlCategory, ControlAssertion
+from .control_assessment import ControlAssessment
 from .control_control import ControlControl
 from .control_section import ControlSection
 from .custom_attribute_definition import CustomAttributeDefinition
@@ -67,6 +68,7 @@ all_models = [
     ControlAssertion,
   Context,
   Control,
+  ControlAssessment,
   ControlControl,
   ControlSection,
   CustomAttributeDefinition,
