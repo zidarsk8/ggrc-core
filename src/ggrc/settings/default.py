@@ -30,7 +30,7 @@ COPYRIGHT = u"Confidential. Copyright " + u"\u00A9" # \u00A9 is the (c) symbol
 BUILD_NUMBER = "x"
 try:
   import build_number
-  BUILD_NUMBER = build_number.BUILD_NUMBER
+  BUILD_NUMBER = build_number.BUILD_NUMBER[:7]
 except (ImportError):
   pass
 
