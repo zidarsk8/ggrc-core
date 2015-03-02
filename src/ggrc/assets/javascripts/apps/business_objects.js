@@ -272,7 +272,7 @@ $(function() {
 
   var base_widgets_by_type = {
     "Program": ["Regulation", "Contract", "Policy", "Standard", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Audit": ["Request", "history", "Person", "program"],
+    "Audit": ["Request", "history", "Person", "program", "program_controls"],
     "Regulation" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Policy" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Standard" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
@@ -402,6 +402,11 @@ $(function() {
             widget_id: "history",
             widget_name: "Complete",
             widget_icon: "history"
+          },
+          program_controls: {
+            widget_id: "control",
+            widget_name: "Program Controls",
+            widget_icon: "control"
           },
           program: {
             widget_id: "program",
@@ -598,6 +603,16 @@ $(function() {
             , model: "Request"
             , show_view : GGRC.mustache_path + "/requests/tree.mustache"
             , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+            , allow_mapping: false
+            , allow_creating: false
+          },
+          program_controls: {
+            mapping: "program_controls"
+            , parent_instance: GGRC.page_instance()
+            , draw_children : true
+            , model: "Control"
+            , show_view : GGRC.mustache_path + "/controls/tree.mustache"
+            , footer_view : GGRC.mustache_path + "/controls/tree_footer.mustache"
             , allow_mapping: false
             , allow_creating: false
           },

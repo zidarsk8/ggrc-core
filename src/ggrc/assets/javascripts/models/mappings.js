@@ -825,6 +825,7 @@
         return result.instance.status === 'Accepted';
       })
       , _program: Direct("Program", "audits", "program")
+      , program_controls: Cross("_program", "controls")
       , objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects")
       , objectives: TypeFilter("objects", "Objective")
       , objectives_via_program : Cross("_program", "objectives")
