@@ -367,6 +367,13 @@ def audit_people_ui():
   """
   return render_template("/mockups/dashboard-ui/audit-people.html")
 
+@app.route("/mockups/audit-revamp/info.html")
+@login_required
+def audit_info_revamp():
+  """Audit info revamp mockup
+  """
+  return render_template("/mockups/audit-revamp/info.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():

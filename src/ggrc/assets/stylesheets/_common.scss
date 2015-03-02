@@ -12,14 +12,15 @@ body {
 
 // typography
 h1 {
+  @include oneline();
   color: $headerTitle;
   font-size: 24px;
   line-height: 48px;
   height: 47px;
   font-family: $fontTitle;
   font-weight: normal;
-  @include oneline();
   position: relative;
+  width: 1305px; // this needs to be removed once audit revamp is merged
   .title-prev {
     position: absolute;
     left: 0;
@@ -34,6 +35,12 @@ h1 {
     background: $white;
     @include oneline();
     width: 85%;
+  }
+  .right-side {
+    position: absolute;
+    right: 104px;
+    top: 0;
+    text-align: right;
   }
 }
 
