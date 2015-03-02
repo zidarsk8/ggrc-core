@@ -9,8 +9,8 @@ from ggrc.models import Control
 from tests.ggrc import TestCase
 from .factories import ControlCategoryFactory, ControlFactory
 from nose.plugins.skip import SkipTest
+from nose.tools import assert_in
 
-@SkipTest
 class TestControl(TestCase):
   def test_simple_categorization(self):
     category = ControlCategoryFactory(scope_id=100)

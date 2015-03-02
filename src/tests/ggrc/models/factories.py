@@ -19,10 +19,6 @@ class ModelFactory(factory.Factory):
 
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
-    print "HELLO WORLD"
-    print args
-    print kwargs
-    print target_class
     instance = target_class(*args, **kwargs)
     db.session.add(instance)
     db.session.commit()
@@ -36,22 +32,21 @@ class DirectiveFactory(ModelFactory):
   class Meta:
     model = Directive
 
-  title = 'directive_title'
+  title = factory.LazyAttribute(lambda m: random_string('title'))
 
-class ControlFactory(ModelFactory):
+class ControlFactory(ModelFactory, SlugFactory):
   class Meta:
     model = Control
 
-  title = factory.LazyAttribute(lambda m: random_string('title'))
-  # directive = factory.SubFactory(DirectiveFactory)
-  # kind_id = None
-  # version = None
-  # documentation_description = None
-  # verify_frequency_id = None
-  # fraud_related = None
-  # key_control = None
-  # active = None
-  # notes = None
+  directive = factory.SubFactory(DirectiveFactory)
+  kind_id = None
+  version = None
+  documentation_description = None
+  verify_frequency_id = None
+  fraud_related = None
+  key_control = None
+  active = None
+  notes = None
 
 class ControlCategoryFactory(ModelFactory):
   class Meta:
