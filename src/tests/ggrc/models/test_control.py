@@ -9,7 +9,7 @@ from ggrc.models import Control
 from tests.ggrc import TestCase
 from .factories import ControlCategoryFactory, ControlFactory
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_in
+from nose.tools import assert_in, eq_
 
 class TestControl(TestCase):
   def test_simple_categorization(self):
@@ -21,3 +21,10 @@ class TestControl(TestCase):
     # be really really sure
     control = db.session.query(Control).get(control.id)
     self.assertIn(category, control.categories)
+
+  def test_has_test_plan(self):
+    control = ControlFactory(test_plan="This is a test text")
+    db.session.commit()
+
+    control = db.session.query(Control).get(control.id)
+    eq_(control.test_plan, "This is a test text")
