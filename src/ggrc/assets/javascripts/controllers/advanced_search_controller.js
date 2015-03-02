@@ -67,7 +67,6 @@
             all_models.push(descriptor.model.shortName);
           }
         })
-
         this.options.option_type_menu = menu;
       }
       this.options.all_models = all_models;
@@ -172,7 +171,7 @@
           var models = this.options.all_models;
           return GGRC.Models.Search.search_for_types(current_search_term || '', models, permission_parms)
             .then(function (search_result){
-              var options = [], op1, temp ; 
+              var options = [], op1, temp ;
               if (active_fn()) {
                 for(var i = 0; i < models.length; i++){
                   op1 = search_result.getResultsForType(models[i]);
@@ -225,7 +224,7 @@
 
     , triggerSearch: function(){
       this.element.find('.advancedSearchButton').attr('disabled','disabled');
-      
+
       // Remove Search Criteria text
       this.element.find('.results-wrap span.info').hide();
       var ctx = this.context;
@@ -304,7 +303,7 @@
                 });
             }).attach(ctx.owner || {}));
         }
-        
+
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
         this.reset_selection_count();
@@ -365,7 +364,6 @@
   };
 
   function get_search_multitype_option_set(data, column_view, item_view) {
-
     var join_descriptors = null,
         object_model_name = data.join_object_type,
         option_model_name = data.join_option_type,
@@ -446,7 +444,6 @@
       options = get_search_multitype_option_set(data_set, column_view, item_view);
 
       e.preventDefault();
-
       GGRC.Controllers.AdvancedSearchSelector.launch($this, options);
     });
   });

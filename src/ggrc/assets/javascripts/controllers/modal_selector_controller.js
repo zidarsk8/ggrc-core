@@ -709,7 +709,6 @@
   }, {
       init: function() {
         var self = this;
-
         this.object_list = new can.Observe.List();
         this.option_list = new can.Observe.List();
         this.options.join_list = new can.Observe.List();
@@ -739,7 +738,7 @@
           this.set_option_descriptor(this.options.default_option_descriptor);
         this.init_bindings();
         this.init_view();
-        this.init_data()
+        this.init_data();
       }
 
     , init_menu: function() {
@@ -1421,7 +1420,7 @@
               model_display:"All Objects"
             });
 
-            can.each(this.options.option_descriptors, function(descriptor) {
+            can.each(this.options.option_descriptors, function(descriptor, name) {
               if (descriptor.model.category == "workflow" ||
                   descriptor.model.category == "undefined"){
                 return;
@@ -2140,7 +2139,6 @@
       join_descriptors = {};
       join_descriptors[option_model_name] = GGRC.Mappings.get_canonical_mapping(object_model_name, option_model_name);
     }
-
     can.each(join_descriptors, function(descriptor, far_model_name) {
       //  If the resource type doesn't exist, short-circuit
       if (!CMS.Models[far_model_name]) {

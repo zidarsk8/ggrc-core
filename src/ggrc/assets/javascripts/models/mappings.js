@@ -170,7 +170,7 @@
       var created_mappings, that = this;
       this.constructor.modules[name] = this;
       this._canonical_mappings = {};
-      if(this.groups) {
+      if (this.groups) {
         can.each(this.groups, function(group, name) {
           if(typeof group === "function") {
             that.groups[name] = $.proxy(group, that.groups);
@@ -178,9 +178,8 @@
         });
       }
       created_mappings = this.create_mappings(opts);
-
       can.each(created_mappings, function(mappings, object_type) {
-        if(mappings._canonical) {
+        if (mappings._canonical) {
           if(!that._canonical_mappings[object_type]) {
             that._canonical_mappings[object_type] = {};
           }
@@ -240,15 +239,13 @@
 
     // create mappings for definitions -- this function should not be called directly/
     create_mappings : function(definitions) {
-      var that = this,
-        mappings = {};
+      var mappings = {};
 
       can.each(definitions, function(definition, name) {
         // Only output the mappings if it's a model, e.g., uppercase first letter
         if (name[0] === name[0].toUpperCase())
-          mappings[name] = that.reify_mixins(definition, definitions);
-      });
-
+          mappings[name] = this.reify_mixins(definition, definitions);
+      }, this);
       return mappings;
     }
   });
