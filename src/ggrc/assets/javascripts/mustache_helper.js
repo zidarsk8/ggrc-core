@@ -1773,6 +1773,22 @@ Mustache.registerHelper("is_profile", function (parent_instance, options) {
     return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("is_parent_of_type", function (type_options, options) {
+  /*
+  Determines if parent instance is of specified type.
+  Input:   type_options = 'TypeA,TypeB,TypeC'
+  Returns: Boolean
+  */
+  var types = type_options.split(","),
+      parent = GGRC.page_instance(),
+      parent_type = parent.type;
+
+  if ($.inArray(parent_type, types) !== -1) {
+    return options.fn(options.contexts);
+  }
+  return options.inverse(options.contexts);
+});
+
 Mustache.registerHelper("current_user_is_admin", function (options) {
   if (Permission.is_allowed("__GGRC_ADMIN__")) {
   return options.fn(options.contexts);
