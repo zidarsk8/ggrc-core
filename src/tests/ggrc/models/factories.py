@@ -15,40 +15,48 @@ def random_string(prefix=''):
       )
 
 class ModelFactory(factory.Factory):
-  ABSTRACT_FACTORY = True
-  modified_by_id = 1
+  #modified_by_id = 1
 
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
+    print "HELLO WORLD"
+    print args
+    print kwargs
+    print target_class
     instance = target_class(*args, **kwargs)
     db.session.add(instance)
     db.session.commit()
     return instance
 
 class SlugFactory(factory.Factory):
-  ABSTRACT_FACTORY = True
   slug = factory.LazyAttribute(lambda m: random_string('slug'))
   title = factory.LazyAttribute(lambda m: random_string('title'))
 
 class DirectiveFactory(ModelFactory):
-  FACTORY_FOR = Directive
-  title = 'directive_title'
-  slug = 'directive_slug'
+  class Meta:
+    model = Directive
 
-class ControlFactory(ModelFactory, SlugFactory):
-  FACTORY_FOR = Control
-  directive = factory.SubFactory(DirectiveFactory)
-  kind_id = None
-  version = None
-  documentation_description = None
-  verify_frequency_id = None
-  fraud_related = None
-  key_control = None
-  active = None
-  notes = None
+  title = 'directive_title'
+
+class ControlFactory(ModelFactory):
+  class Meta:
+    model = Control
+
+  title = factory.LazyAttribute(lambda m: random_string('title'))
+  # directive = factory.SubFactory(DirectiveFactory)
+  # kind_id = None
+  # version = None
+  # documentation_description = None
+  # verify_frequency_id = None
+  # fraud_related = None
+  # key_control = None
+  # active = None
+  # notes = None
 
 class ControlCategoryFactory(ModelFactory):
-  FACTORY_FOR = ControlCategory
+  class Meta:
+    model = ControlCategory
+
   name = factory.LazyAttribute(lambda m: random_string('name'))
   lft = None
   rgt = None
@@ -57,7 +65,9 @@ class ControlCategoryFactory(ModelFactory):
   required = None
 
 class CategorizationFactory(ModelFactory):
-  FACTORY_FOR = Categorization
+  class Meta:
+    model = Categorization
+
   category = None
   categorizable = None
   category_id = None
@@ -65,6 +75,8 @@ class CategorizationFactory(ModelFactory):
   categorizable_type = None
 
 class ProgramFactory(ModelFactory):
-  FACTORY_FOR = Program
+  class Meta:
+    model = Program
+
   title = 'program_title'
   slug = 'program_slug'
