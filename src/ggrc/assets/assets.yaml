@@ -101,6 +101,7 @@ dashboard-js-template-files:
   - base_objects/contacts.mustache
   - base_objects/general_info.mustache
   - base_objects/description.mustache
+  - base_objects/test_plan.mustache
   - base_objects/extended_info.mustache
   - base_objects/urls.mustache
   - base_objects/notes.mustache
