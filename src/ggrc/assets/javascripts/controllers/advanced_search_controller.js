@@ -31,8 +31,8 @@
       var menu, all_models = [],
           lookup = {
             governance: 0
-          , business: 1
-          , entities: 2
+          , entities: 1
+          , business: 2
           };
 
       if (!this.options.option_type_menu) {
@@ -40,18 +40,18 @@
             { category: "Governance"
             , items: []
             }
-          , { category: "Assets/Business"
+          , { category: "People/Groups"
             , items: []
             }
-          , { category: "People/Groups"
+          , { category: "Assets/Business"
             , items: []
             }
           ];
 
         //Add All Objects at the top of the list
         menu[0].items.push({
-          model_name:"AllObjects",
-          model_display:"All Objects"
+          model_name: "AllObjects",
+          model_display: "All Objects"
         });
 
         can.each(this.options.option_descriptors, function(descriptor) {
