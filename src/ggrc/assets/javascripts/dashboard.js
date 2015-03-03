@@ -37,6 +37,17 @@ jQuery(function($) {
       $(this).datepicker({changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy'});
   });
 
+  // On-demand creation of datepicker() objects, initial date today or later
+  $('body').on('focus', '[data-toggle="datepicker_today_or_later"]', function(e) {
+    var $this = $(this),
+        today = new Date(),
+        start_date = (today.getMonth()+1) + '/' + today.getDate() + '/' + today.getFullYear();
+
+    if (!$this.data('datepicker')) {
+      $(this).datepicker({changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy'}).datepicker('option', 'minDate', start_date);;
+    }
+  });
+
   // Turn the arrow when tree node content is shown
   $('body').on('click', '[data-toggle="collapse"]', function(e) {
     var $this = $(this)
