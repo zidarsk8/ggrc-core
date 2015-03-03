@@ -1182,6 +1182,54 @@ p {
   }
 }
 
+.pos-wrap {
+  position: relative;
+  .dropdown-menu {
+    @include reset-list();
+    @include border-radius(0);
+    min-width: 210px;
+    float: none;
+    padding: 5px 0;
+    margin-top: 6px;
+    text-transform: none;
+    top: 100%;
+    right: 0;
+    left: auto;
+    z-index: 9999;
+    li {
+      float:none;
+      clear: both;
+      text-transform: none;
+      a {
+        display: block;
+        line-height: 30px;
+        padding: 0 10px;
+        background: none;
+        text-shadow: none;
+        color: $gray;
+        @include transition(background 0.2s ease, color 0.2s ease);
+        i {
+          margin: 7px 4px 0 0;
+          @include opacity(0.4);
+          @include transition(opacity 0.2s ease);
+        }
+        &:hover {
+          background: $headerBgnd;
+          color: $black;
+          i {
+            @include opacity(1);
+          }
+        }
+      }
+      &.border {
+        border-top: 1px solid $headerBgnd;
+        padding-top: 5px;
+        margin-top: 5px;
+      }
+    }
+  }
+}
+
 .overdue {
   color: $red;
   font-weight: bold;
