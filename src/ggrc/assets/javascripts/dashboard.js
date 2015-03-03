@@ -48,7 +48,8 @@ jQuery(function($) {
         .datepicker({changeMonth: true,
                     changeYear: true,
                     dateFormat: 'mm/dd/yy'
-        }).datepicker('option', 'minDate', start_date);
+        })
+        .datepicker('option', 'minDate', start_date);
     }
   });
 
