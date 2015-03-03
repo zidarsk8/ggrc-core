@@ -44,7 +44,11 @@ jQuery(function($) {
         start_date = (today.getMonth()+1) + '/' + today.getDate() + '/' + today.getFullYear();
 
     if (!$this.data('datepicker')) {
-      $(this).datepicker({changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy'}).datepicker('option', 'minDate', start_date);;
+      $(this)
+        .datepicker({changeMonth: true,
+                    changeYear: true,
+                    dateFormat: 'mm/dd/yy'
+        }).datepicker('option', 'minDate', start_date);
     }
   });
 
