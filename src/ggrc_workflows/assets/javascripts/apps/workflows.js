@@ -8,13 +8,12 @@
 
 (function($, CMS, GGRC) {
   var WorkflowExtension = {},
-      _workflow_object_types = [
-        "Program", "OrgGroup", "Vendor",
-        "Regulation", "Standard", "Policy", "Contract",
-        "Objective", "Control", "Section", "Clause",
-        "System", "Process",
-        "DataAsset", "Facility", "Market", "Product", "Project"
-      ],
+      _workflow_object_types = Array.prototype.concat.call([],
+        "Regulation Policy Standard Contract Clause Section Program".split(' '),
+        "Control Objective".split(' '),
+        "OrgGroup Vendor".split(' '),
+        "System Process DataAsset Product Project Facility Market".split(' ')
+      ),
       _task_sort_function = function(a, b){
         var date_a = +new Date(a.end_date),
             date_b = +new Date(b.end_date);
