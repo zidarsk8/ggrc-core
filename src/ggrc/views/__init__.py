@@ -381,6 +381,13 @@ def cs_revamp():
   """
   return render_template("/mockups/audit-revamp/control-assessment.html")
 
+@app.route("/mockups/audit-revamp/controls.html")
+@login_required
+def audit_control_revamp():
+  """Audit Control revamp mockup
+  """
+  return render_template("/mockups/audit-revamp/control.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():
