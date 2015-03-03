@@ -709,7 +709,6 @@
   }, {
       init: function() {
         var self = this;
-
         this.object_list = new can.Observe.List();
         this.option_list = new can.Observe.List();
         this.options.join_list = new can.Observe.List();
@@ -739,7 +738,7 @@
           this.set_option_descriptor(this.options.default_option_descriptor);
         this.init_bindings();
         this.init_view();
-        this.init_data()
+        this.init_data();
       }
 
     , init_menu: function() {
@@ -755,10 +754,10 @@
               { category: "Governance"
               , items: []
               }
-            , { category: "Assets/Business"
+            , { category: "People/Groups"
               , items: []
               }
-            , { category: "People/Groups"
+            , { category: "Assets/Business"
               , items: []
               }
             ];
@@ -1399,29 +1398,29 @@
         if (selected_object === "TaskGroup") { //workflow/TaskGroup don't have People/Groups sub category
           lookup = {
               governance: 0
-            , business: 1
-            , entities: 2
+            , entities: 1
+            , business: 2
           };
           if (!this.options.option_type_menu) {
             menu = [
                 { category: "Governance"
                 , items: []
                 }
-              , { category: "Assets/Business"
+              , { category: "People/Groups"
                 , items: []
                 }
-              , { category: "People/Groups"
+              , { category: "Assets/Business"
                 , items: []
                 }
               ];
 
             //Add All Objects at the top of the list
             menu[0].items.push({
-              model_name:"AllObjects",
-              model_display:"All Objects"
+              model_name: "AllObjects",
+              model_display: "All Objects"
             });
 
-            can.each(this.options.option_descriptors, function(descriptor) {
+            can.each(this.options.option_descriptors, function(descriptor, name) {
               if (descriptor.model.category == "workflow" ||
                   descriptor.model.category == "undefined"){
                 return;
@@ -1443,8 +1442,8 @@
         else {
           lookup = {
               governance: 0
-            , business: 1
-            , entities: 2
+            , entities: 1
+            , business: 2
           };
 
           if (!this.options.option_type_menu) {
@@ -1452,10 +1451,10 @@
                 { category: "Governance"
                 , items: []
                 }
-              , { category: "Assets/Business"
+              , { category: "People/Groups"
                 , items: []
                 }
-              , { category: "People/Groups"
+              , { category: "Assets/Business"
                 , items: []
                 }
               ];
@@ -2140,7 +2139,6 @@
       join_descriptors = {};
       join_descriptors[option_model_name] = GGRC.Mappings.get_canonical_mapping(object_model_name, option_model_name);
     }
-
     can.each(join_descriptors, function(descriptor, far_model_name) {
       //  If the resource type doesn't exist, short-circuit
       if (!CMS.Models[far_model_name]) {
