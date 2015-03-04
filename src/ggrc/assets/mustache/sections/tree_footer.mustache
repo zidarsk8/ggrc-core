@@ -31,12 +31,18 @@
     {{else}}
     <a href="javascript://"
        class="section-add btn btn-small btn-draft"
-       data-toggle="modal-ajax-form" data-modal-reset="reset"
-       data-dirty="#regulations, #combo" data-route="regulations"
-       data-modal-class="modal-wide" data-object-singular="Section"
+       rel="tooltip"
+       data-placement="right"
+       data-toggle="modal-ajax-form"
+       data-modal-reset="reset"
+       data-dirty="#regulations, #combo"
+       data-route="regulations"
+       data-modal-class="modal-wide"
+       data-object-singular="Section"
        data-object-plural="sections"
        data-object-singular-override="{{#if_instance_of parent_instance 'Contract'}}Clause{{/if_instance_of}}"
-       data-object-params='{ "directive": {{parent_instance.id}} }'>
+       data-object-params='{ "directive": {{parent_instance.id}} }'
+       data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
       <i class="grcicon-add-black"></i>
     </a>
     {{/if_instance_of}}
