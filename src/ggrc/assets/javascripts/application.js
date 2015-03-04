@@ -943,7 +943,6 @@ jQuery(function($) {
   $.fn.openclose = openclose;
 
 });
-
 $(window).load(function(){
   // affix setup
   $(window).scroll(function(){
@@ -1100,12 +1099,12 @@ $(window).load(function(){
         win = $(window),
         win_width = win.width();
 
-    if(win_width - offset.left < 322) {
+    if (win_width - offset.left < 322) {
       $dropdown.addClass("right-pos");
     } else {
       $dropdown.removeClass("right-pos");
     }
-    if($menu_item.length === 1) {
+    if ($menu_item.length === 1) {
       $dropdown.addClass("one-item");
     } else {
       $dropdown.removeClass("one-item");
@@ -1114,30 +1113,30 @@ $(window).load(function(){
   $(".dropdown-toggle").on("click", dropdownPosition);
 });
 
-jQuery(function($){
+jQuery(function ($) {
   $.fn.cms_wysihtml5 = function() {
-
-    if ($(this).data('_wysihtml5_initialized'))
+    if ($(this).data('_wysihtml5_initialized')) {
       return;
+    }
 
     $(this).data('_wysihtml5_initialized', true);
     this.wysihtml5({
-        link: true,
-        image: false,
-        html: true,
-        'font-styles': false,
-        parserRules: wysihtml5ParserRules });
+      link: true,
+      image: false,
+      html: true,
+      'font-styles': false,
+      parserRules: wysihtml5ParserRules
+    });
+    this.each(function () {
+      var $that = $(this),
+        editor = $that.data("wysihtml5").editor,
+        $textarea = $(editor.textarea.element);
 
-    this.each(function() {
-      var $that = $(this)
-      , editor = $that.data("wysihtml5").editor
-      , $textarea = $(editor.textarea.element);
-
-      if($that.data("cms_events_bound"))
+      if ($that.data("cms_events_bound")) {
         return;
-
-      editor.on("change", function(data) {
-        $that.html(this.getValue()).trigger("change");
+      }
+      editor.on('beforeinteraction:composer', function () {
+        $that.val(this.getValue()).trigger('change');
       });
 
       var $wysiarea = $that.closest(".wysiwyg-area").resizable({
@@ -1508,17 +1507,15 @@ jQuery(function($) {
     }
 
 // a few core CanJS extensions below.
-
 // Core validation for fields not being "blank", i.e.
-//  having no content when outside spaces are trimmed away.
+// having no content when outside spaces are trimmed away.
 can.Model.validationMessages.non_blank = can.Map.validationMessages.non_blank = "cannot be blank";
-
-can.Model.validateNonBlank = can.Map.validateNonBlank = function(attrNames, options) {
-    can.Map.validate.call(this, attrNames, options, function(value) {
-        if (typeof value === 'undefined' || value === null || typeof value.trim === "function" && value.trim() === '') {
-            return this.constructor.validationMessages.non_blank;
-        }
-    });
+can.Model.validateNonBlank = can.Map.validateNonBlank = function (attrNames, options) {
+  can.Map.validate.call(this, attrNames, options, function (value) {
+      if (value === undefined || value === null || typeof value.trim === "function" && value.trim() === '') {
+          return this.constructor.validationMessages.non_blank;
+      }
+  });
 };
 
 // Adding reduce, a generally useful array comprehension.
