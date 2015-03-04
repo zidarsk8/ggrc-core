@@ -180,21 +180,25 @@
                     </ul>
                   </div>
                 </li>
-                <li class="programs accordion-group workflow-group">
-                  <a class="programs" href="javascript://">
+                <li class="workflow accordion-group workflow-group">
+                  <a class="workflow oneline list-toggle" href="javascript://">
                     <i class="grcicon-arrow-right"></i>
                     <i class="grcicon-workflow-color"></i>
                     Workflows
                     <small>(<span class="item-count">1</span>)</small>
                   </a>
                   <div class="content">
-                    <ul class="sub-level custom">
-                      <li class="programs" data-model="true">
+                    <ul class="sub-level custom with-filters">
+                      <li class="filters">
+                        <a href="#" class="wf-trigger wf-active active">Active (1)</a>
+                        <a href="#" class="wf-trigger wf-draft">Draft (0)</a>
+                        <a href="#" class="wf-trigger wf-inactive">Inactive (0)</a>
+                      </li>
+                      <li class="workflow Active" data-model="true">
                         <a href="/mockups/v1.0/assessment.html" class="show-extended" can-click="select">
                           <div class="row-fluid">
                             <div class="span8 lhs-main-title">
                               <span class="lhs-item">
-                                <span class="status-label status-draft"></span>
                                 Google Fiber Workflow
                               </span>
                             </div>
@@ -246,6 +250,55 @@
                     </ul>
                   </div>
                 </li>
+                <li class="workflow accordion-group">
+                  <a class="issue oneline list-toggle" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-issue-color"></i>
+                    Issues
+                    <small>(<span class="item-count">2</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level custom with-filters">
+                      <li class="filters">
+                        <a href="#" class="wf-trigger wf-active active">Active (2)</a>
+                        <a href="#" class="wf-trigger wf-inactive">Resolved (0)</a>
+                      </li>
+                      <li class="workflow Active" data-model="true">
+                        <a href="/mockups/v1.0/assessment.html" class="show-extended" can-click="select">
+                          <div class="row-fluid">
+                            <div class="span8 lhs-main-title">
+                              <span class="lhs-item">
+                                There is a typo in paragraph 2
+                              </span>
+                            </div>
+                            <div class="span1 lhs-private"></div>
+                            <div class="span1 lhs-people"></div>
+                          </div>
+                        </a>
+                      </li>
+                      <li class="workflow Active" data-model="true">
+                        <a href="/mockups/v1.0/assessment.html" class="show-extended" can-click="select">
+                          <div class="row-fluid">
+                            <div class="span8 lhs-main-title">
+                              <span class="lhs-item">
+                                Why is temperature set in Cs instead of Fs?
+                              </span>
+                            </div>
+                            <div class="span1 lhs-private"></div>
+                            <div class="span1 lhs-people"></div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions custom">
+                      <li class="add-new">
+                        <a data-modal-class="modal-wide" class="show-workflow-modal" id="newWorkflow" href="#editAssessmentStandAlone" data-new="true" data-toggle="modal">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
               </ul>
             </div>
 
@@ -257,7 +310,7 @@
                 <li class="governance accordion-group">
                   <a class="governance" href="#">
                     <i class="grcicon-arrow-right"></i>
-                    Governance
+                    Directives
                   </a>
                   <div class="content">
                     <ul class="sub-level">
@@ -545,6 +598,16 @@
                         </div>
 
                       </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="governance accordion-group">
+                  <a class="governance oneline" href="#">
+                    <i class="grcicon-arrow-right"></i>
+                    Controls/Assessments/Objectives
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
                       <li class="governance inner-accordion-group">
                         <a class="governance" href="#">
                           <i class="grcicon-arrow-right-small"></i>
@@ -943,6 +1006,78 @@
                                   <div class="span1 lhs-people">
                                     <i class="grcicon-people-warning"></i>
                                   </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="lhn-items-list-actions">
+                            <li class="add-new" data-ui-autocomplete-item="">
+                              <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+
+                      </li>
+                      <li class="governance inner-accordion-group">
+                        <a class="governance" href="#">
+                          <i class="grcicon-arrow-right-small"></i>
+                          Control Assessments
+                          <small>(<span class="item-count">4</span>)</small>
+                        </a>
+
+                        <div class="content">
+                          <ul class="lhn-items-list">
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div class="row-fluid">
+                                  <div class="span8 lhs-main-title">
+                                    <span class="lhs-item">
+                                      Control Assessment of PCI DSS v2 - Test Procedures 11.5.b (1850)
+                                    </span>
+                                  </div>
+                                  <div class="span1 lhs-private"></div>
+                                  <div class="span1 lhs-people"></div>
+                                </div>
+                              </a>
+                            </li>
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div class="row-fluid">
+                                  <div class="span8 lhs-main-title">
+                                    <span class="lhs-item">
+                                      ISO Login Access
+                                    </span>
+                                  </div>
+                                  <div class="span1 lhs-private"></div>
+                                  <div class="span1 lhs-people"></div>
+                                </div>
+                              </a>
+                            </li>
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div class="row-fluid">
+                                  <div class="span8 lhs-main-title">
+                                    <span class="lhs-item">
+                                      Food preps
+                                    </span>
+                                  </div>
+                                  <div class="span1 lhs-private"></div>
+                                  <div class="span1 lhs-people"></div>
+                                </div>
+                              </a>
+                            </li>
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div class="row-fluid">
+                                  <div class="span8 lhs-main-title">
+                                    <span class="lhs-item">
+                                      PCI DSS v2 - Test Procedures 3331
+                                    </span>
+                                  </div>
+                                  <div class="span1 lhs-private"></div>
+                                  <div class="span1 lhs-people"></div>
                                 </div>
                               </a>
                             </li>
