@@ -48,8 +48,7 @@
       </li>
       {{#with_program_roles_as "roles" result}}
         {{#if_helpers '\
-          and #if' allow_mapping '\
-          and #if_equals' roles.length 1 '\
+          #if_equals' roles.length 1 '\
           and #if_equals' roles.0.role.permission_summary "Mapped" '\
           and #if' result.mappings '\
           and #is_allowed_all' 'delete' result.mappings}}
@@ -62,6 +61,7 @@
           </li>
         {{/if_helpers}}
       {{/with_program_roles_as}}
+
       {{#is_allowed 'create' 'delete' 'UserRole' context=options.parent_instance.context.id}}
       {{#is_info_pin}}
       {{#if_equals options.mapping "mapped_and_or_authorized_people"}}
