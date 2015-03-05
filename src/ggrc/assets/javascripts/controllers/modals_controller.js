@@ -322,8 +322,8 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "input:not([data-lookup], isolate-form *), textarea keyup" : function (el, ev) {
-      if (el.prop('value').length === 0 ||
-          (typeof el.attr('value') !== 'undefined' && !el.attr('value').length)) {
+      if (el.attr('value').length ||
+          (typeof el.attr('value') !== 'undefined' && el.val().length)) {
         this.set_value_from_element(el);
       }
   }

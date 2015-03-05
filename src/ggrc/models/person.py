@@ -15,7 +15,6 @@ import re
 class Person(CustomAttributable, HasOwnContext, Base, db.Model):
 
   __tablename__ = 'people'
-  EMAIL_RE_STRING = "\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])\Z"
 
   email = deferred(db.Column(db.String), 'Person')
   name = deferred(db.Column(db.String), 'Person')
@@ -87,10 +86,21 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
 
   @validates('email')
   def validate_email(self, key, email):
-    if re.match(Person.EMAIL_RE_STRING, email, re.IGNORECASE) is None:
+    if not Person.is_valid_email(email):
       message = "Must provide a valid email address"
       raise ValidationError(message)
     return email
+
+  @staticmethod
+  def is_valid_email(val):
+    # Borrowed from Django
+    email_re = re.compile(
+      r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
+      # quoted-string, see also http://tools.ietf.org/html/rfc2822#section-3.2.5
+      r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"'
+      r')@((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)$)'  # domain
+      r'|\[(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\]$', re.IGNORECASE)  # literal form, ipv4 address (SMTP 4.1.3)
+    return email_re.match(val) if val else False
 
   @classmethod
   def eager_query(cls):
