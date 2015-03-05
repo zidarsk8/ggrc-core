@@ -313,17 +313,17 @@ can.Control("GGRC.Controllers.Modals", {
   , "input:not(isolate-form input), textarea:not(isolate-form textarea), select:not(isolate-form select) change" : function(el, ev) {
       this.options.instance.removeAttr("_suppress_errors");
       // Set the value if it isn't a search field
-      if(!el.hasClass("search-icon")
-        || el.is("[null-if-empty]")
-           && (!el.val() || el.val().length === 0)
+      if (!el.hasClass("search-icon") ||
+          el.is("[null-if-empty]") &&
+          (!el.val() || !el.val().length)
       ) {
         this.set_value_from_element(el);
       }
   }
 
-  , "input:not([data-lookup], isolate-form *), textarea keyup" : function(el, ev) {
+  , "input:not([data-lookup], isolate-form *), textarea keyup" : function (el, ev) {
       if (el.prop('value').length === 0 ||
-        (typeof el.attr('value') !== 'undefined' && el.attr('value').length === 0)) {
+          (typeof el.attr('value') !== 'undefined' && !el.attr('value').length)) {
         this.set_value_from_element(el);
       }
   }
@@ -336,25 +336,25 @@ can.Control("GGRC.Controllers.Modals", {
       can.each($elements.toArray(), this.proxy("set_value_from_element"));
     }
 
-  , set_value_from_element : function(el) {
-      var $el = $(el)
+  , set_value_from_element : function (el) {
+      var $el = el instanceof jQuery ? el : $(el)
         , name = $el.attr('name')
         , value = $el.val()
-        , that = this
         ;
-
       // If no model is specified, short circuit setting values
       // Used to support ad-hoc form elements in confirmation dialogs
-      if (!this.options.model)
+      if (!this.options.model) {
         return;
+      }
 
-      if (name)
+      if (name) {
         this.set_value({ name: name, value: value });
+      }
 
       if($el.is("[data-also-set]")) {
         can.each($el.data("also-set").split(","), function(oname) {
-          that.set_value({ name : oname, value : value});
-        });
+          this.set_value({ name : oname, value : value});
+        }, this);
       }
     }
 
