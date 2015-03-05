@@ -272,7 +272,7 @@ $(function() {
 
   var base_widgets_by_type = {
     "Program": ["Regulation", "Contract", "Policy", "Standard", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Audit": ["Request", "history", "Person", "program", "program_controls"],
+    "Audit": ["Request", "history", "Person", "program", "program_controls", "ControlAssessment"],
     "Regulation" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Policy" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
     "Standard" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
@@ -412,6 +412,11 @@ $(function() {
             widget_id: "program",
             widget_name: "Program",
             widget_icon: "program"
+          },
+          ControlAssessment: {
+            widget_id: "ControlAssessment",
+            widget_name: "Control Assessments",
+            widget_icon: "control"
           }
         }
         , Control : {
