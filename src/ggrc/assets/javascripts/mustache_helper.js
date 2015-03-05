@@ -2080,6 +2080,17 @@ Mustache.registerHelper("if_in_map", function (list, path, value, options) {
   return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("if_in", function (needle, haystack, options) {
+  needle = resolve_computed(needle);
+  haystack = resolve_computed(haystack).split(",");
+
+  var found = haystack.some(function (h) {
+    return h.trim() === needle;
+  });
+
+  return options[found ? "fn" : "inverse"](options.contexts);
+});
+
 Mustache.registerHelper("with_auditors", function (instance, options) {
   var auditors, auditors_dfd
     , decoy
