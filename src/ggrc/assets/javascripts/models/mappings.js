@@ -826,6 +826,7 @@
       })
       , _program: Direct("Program", "audits", "program")
       , program_controls: Cross("_program", "controls")
+      , control_assessments: Proxy("ControlAssessment", "control_assessment", "control_assessments")
       , objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects")
       , objectives: TypeFilter("objects", "Objective")
       , objectives_via_program : Cross("_program", "objectives")

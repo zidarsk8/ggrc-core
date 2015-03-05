@@ -755,9 +755,6 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
       start_date: "date",
       end_date: "date"
   },
-  tree_view_options : {
-    header_view : GGRC.mustache_path + "/audits/tree_header.mustache"
-  },
   init : function() {
     this._super && this._super.apply(this, arguments);
   }
