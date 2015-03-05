@@ -732,10 +732,11 @@
 
         this.init_menu();
         this.init_context();
-        if (this.options.option_descriptors[this.constructor.last_selected_option_type])
+        if (this.options.option_descriptors[this.constructor.last_selected_option_type]) {
           this.set_option_descriptor(this.constructor.last_selected_option_type);
-        else
+        } else {
           this.set_option_descriptor(this.options.default_option_descriptor);
+        }
         this.init_bindings();
         this.init_view();
         this.init_data();
@@ -1184,7 +1185,7 @@
 
   });
 
-  ModalOptionDescriptor = can.Construct({
+  var ModalOptionDescriptor = can.Construct({
       model : null
     , model_display : "Objects"
     , join_model : null
@@ -1416,10 +1417,9 @@
 
             //Add All Objects at the top of the list
             menu[0].items.push({
-              model_name: "AllObjects",
-              model_display: "All Objects"
+              model_name: 'AllObjects'
+            , model_display: 'All Objects'
             });
-
             can.each(this.options.option_descriptors, function(descriptor, name) {
               if (descriptor.model.category == "workflow" ||
                   descriptor.model.category == "undefined"){
@@ -1486,14 +1486,9 @@
         this.options.all_models = all_models;
         //hard code some of the submenu
         //this.options.option_type_menu_2 = this.options.option_type_menu;
-        this.options.option_type_menu_2 = can.map([
-              "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
-              "Person", "System", "Process", "DataAsset", "Product", "Project", "Facility" , "Market"
-              ],
-              function(key) {
-                return CMS.Models[key];
-              }
-            );
+        this.options.option_type_menu_2 = can.map('Program Regulation Policy Standard Contract Clause Section Objective Control Person System Process DataAsset Product Project Facility Market'.split(' '), function(key) {
+            return CMS.Models[key];
+        });
     }
 
     , init_context: function() {
@@ -1922,8 +1917,8 @@
 
     , set_option_descriptor: function(option_type) {
       //Set option descriptor for all objects
-      if(option_type === "AllObjects") {
-        var all_descriptor = {
+      if (option_type === "AllObjects") {
+        this.options.option_descriptors["AllObjects"] = {
           column_view : "/static/mustache/selectors/multitype_multiselect_option_column.mustache",
           detail_view: "/static/mustache/selectors/multitype_option_detail.mustache",
           related_table_plural: "AllObjects",
@@ -1933,7 +1928,6 @@
           items_view: "/static/mustache/selectors/multitype_multiselect_option_items.mustache",
           model: "AllObject"
         };
-        this.options.option_descriptors["AllObjects"] = all_descriptor;
       }
 
       var self = this
@@ -2160,10 +2154,11 @@
           || !(descriptor instanceof GGRC.ListLoaders.ProxyListLoader))
         return;
 
-      if (!option_set.default_option_descriptor)
+      if (!option_set.default_option_descriptor) {
         option_set.default_option_descriptor = option_model_name;
+      }
 
-      if (!extra_options){
+      if (!extra_options) {
         extra_options = {
             column_view : column_view
           , items_view  : item_view
