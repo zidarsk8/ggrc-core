@@ -510,7 +510,10 @@ can.Control("CMS.Controllers.LHN", {
                     && y <= bounds.bottom;
             }, false);
 
-    if (!on_lhn && this.options.display_prefs && !this.options.display_prefs.getLHNState().is_pinned) {
+    // #extended-info - makes sure that menu doesn't close if tooltip is open and user has clicked inside
+    // We should handle this form some manager, and avoid having God object
+    if (!on_lhn && this.options.display_prefs && !this.options.display_prefs.getLHNState().is_pinned &&
+        !$('#extended-info').hasClass('in')) {
       this.close_lhn();
     }
   }
