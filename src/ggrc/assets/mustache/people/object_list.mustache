@@ -152,11 +152,23 @@
                 <h6>Authorizations</h6>
                 <p>
                   {{#person_roles this "System|Admin"}}
-                    {{#roles}}
-                      <span class="role">
-                        {{permission_summary}}
-                      </span>
-                    {{/roles}}
+                    {{#if roles.length}}
+                      {{#roles}}
+                        <span class="role">
+                          {{permission_summary}}
+                        </span>
+                      {{/roles}}
+                    {{else}}
+                      <li>
+                        <div class="item-data">
+                          <div class="tree-title-area">
+                            <span class="no-role">
+                              No Access
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    {{/if}}
                   {{/person_roles}}
                 </p>
               </div>
