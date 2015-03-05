@@ -82,7 +82,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
         { model_name: 'OrgGroup', model_lowercase: 'org_group', model_plural: 'org_groups', display_name: 'Org Groups'},
         { model_name: 'Vendor', model_lowercase: 'vendor', model_plural: 'vendors', display_name: 'Vendors'},
         { model_name: 'System', model_lowercase: 'system', model_plural: 'systems', display_name: 'Systems'},
-        { model_name: 'Process', model_lowercase: 'process', model_plural: 'processs', display_name: 'Processes'},
+        { model_name: 'Process', model_lowercase: 'process', model_plural: 'processes', display_name: 'Processes'},
         { model_name: 'DataAsset', model_lowercase: 'data_asset', model_plural: 'data_assets', display_name: 'Data Assets'},
         { model_name: 'Product', model_lowercase: 'product', model_plural: 'products', display_name: 'Products'},
         { model_name: 'Project', model_lowercase: 'project', model_plural: 'projects', display_name: 'Projects'},
