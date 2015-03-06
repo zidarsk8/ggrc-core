@@ -6,10 +6,21 @@
             <div class="span1">
               <i class="grcicon-{{instance.class.table_singular}}-color"></i>
             </div>
-            <div class="span11">
+            <div class="span10">
               <span class="inline-data-content oneline" rel="tooltip" title="{{instance.title}}">
                 {{instance.title}}
               </span>
+            </div>
+            <div class="span1">
+              {{#if_helpers '\
+                #if_equals' instance.type "Program" '\
+                and #if' instance.private}}
+                <span class="private">
+                  <i class="grcicon-private"></i>
+                </span>
+              {{else}}
+                &nbsp;
+              {{/if_helpers}}
             </div>
           </div>
         </div>

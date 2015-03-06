@@ -17,8 +17,21 @@
               <div class="title tree-title-area">
                 {{#using object=instance.object}}
                   {{#if object}}
-                    <i class="grcicon-{{object.class.table_singular}}-black"></i>
-                    {{object.title}}
+                    <div class="span11">
+                      <i class="grcicon-{{object.class.table_singular}}-black"></i>
+                      {{object.title}}
+                    </div>
+                    <div class="span1">
+                      {{#if_helpers '\
+                        #if_equals' object.type "Program" '\
+                        and #if' object.private}}
+                        <span class="private">
+                          <i class="grcicon-private"></i>
+                        </span>
+                      {{else}}
+                        &nbsp;
+                      {{/if_helpers}}
+                    </div>
                   {{else}}
                     <span class="gray">[deleted]</span> {{instance.title}}
                   {{/if}}
