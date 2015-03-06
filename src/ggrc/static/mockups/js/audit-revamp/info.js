@@ -36,6 +36,18 @@ $(document).ready(function() {
   });
   $(".object-wrap-ca").html(can.view("/static/mockups/mustache/audit-revamp/control-assessments.mustache",{}));
 
+  can.Component.extend({
+    tag: "people",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-people").html(can.view("/static/mockups/mustache/audit-revamp/people.mustache",{}));
+
   function innerNavTrigger() {
     var $this = $(this),
         $allList = $this.closest(".nav").children("li"),
@@ -55,6 +67,7 @@ $(document).ready(function() {
   $("#autoGenerateCA").on("click", function() {
     $("#ca .content").find(".tree-structure").find(".tree-item").show();
     $("#ca .content").find(".tree-structure").find(".zero-state").hide();
+    $("#CACounter").html("4");
   });
 
 });
