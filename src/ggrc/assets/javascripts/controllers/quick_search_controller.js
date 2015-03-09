@@ -272,6 +272,10 @@ can.Control("CMS.Controllers.LHN", {
   }
 
   , close_lhn: function () {
+      if (this.options.display_prefs.getLHNState().is_pinned) {
+        return;
+      }
+
       // not nested
       $(".lhn-trigger").removeClass("active");
 
