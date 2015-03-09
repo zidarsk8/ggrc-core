@@ -874,6 +874,11 @@
           }
         }
       }
+      &.third-part {
+        li {
+          width: 33.33%;
+        }
+      }
     }
   }
   .modal-info {

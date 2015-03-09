@@ -48,6 +48,54 @@ $(document).ready(function() {
   });
   $(".object-wrap-people").html(can.view("/static/mockups/mustache/audit-revamp/people.mustache",{}));
 
+  can.Component.extend({
+    tag: "program",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-program").html(can.view("/static/mockups/mustache/audit-revamp/program.mustache",{}));
+
+  can.Component.extend({
+    tag: "requests",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-requests").html(can.view("/static/mockups/mustache/audit-revamp/requests.mustache",{}));
+
+  can.Component.extend({
+    tag: "complete",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-complete").html(can.view("/static/mockups/mustache/audit-revamp/complete.mustache",{}));
+
+  can.Component.extend({
+    tag: "issues",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-issues").html(can.view("/static/mockups/mustache/audit-revamp/issues.mustache",{}));
+
   function innerNavTrigger() {
     var $this = $(this),
         $allList = $this.closest(".nav").children("li"),
@@ -62,12 +110,22 @@ $(document).ready(function() {
     $(".object-wrap"+aId).show();
   }
 
-  $(".top-inner-nav a").on("click", innerNavTrigger);
+  function personRole() {
+    $('#PersonRole').modal('hide');
+    $('#personAuth').html('Audit member');
+    $('#personAuth2').html('Audit member');
+  }
 
-  $("#autoGenerateCA").on("click", function() {
+  function generateCA() {
     $("#ca .content").find(".tree-structure").find(".tree-item").show();
     $("#ca .content").find(".tree-structure").find(".zero-state").hide();
     $("#CACounter").html("4");
-  });
+  }
+
+  $(".top-inner-nav a").on("click", innerNavTrigger);
+
+  $("#autoGenerateCA").on("click", generateCA);
+
+  $("#auditRoleSave").on('click', personRole);
 
 });
