@@ -762,8 +762,10 @@ can.Control("GGRC.Controllers.Modals", {
           if(that.options.add_more) {
             that.new_instance();
           }
-          else
+          else {
+            debugger;
             that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
+          }
         }
 
         // If this was an Objective created directly from a Section, create a join

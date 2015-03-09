@@ -915,9 +915,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
     var that = this
       , original_child_options = this.options.child_options
       , new_child_options = [];
-    this.options.attr("child_options", new can.Observe.List())
-    if (original_child_options.length == null)
-      original_child_options = [original_child_options]
+
+    this.options.attr("child_options", new can.Observe.List());
+
+    if (original_child_options.length == null) {
+      original_child_options = [original_child_options];
+    }
 
     if(this.should_draw_children()) {
       can.each(original_child_options, function(data, i) {
@@ -925,16 +928,17 @@ can.Control("CMS.Controllers.TreeViewNode", {
         data.each(function(v, k) {
           options.attr(k, v);
         });
-        that.add_child_list(that.options, options);
+        this.add_child_list(this.options, options);
         options.attr({
-            "options_property": that.options.options_property
+            "options_property": this.options.options_property
           , "single_object": false
-          //, "parent": that.options
-          , "parent_instance": that.options.instance
+          , "parent": this
+          , "parent_instance": this.options.instance
         });
         new_child_options.push(options);
-      });
-      that.options.attr("child_options", new_child_options);
+      }.bind(this));
+
+      this.options.attr("child_options", new_child_options);
     }
   }
 
@@ -1083,4 +1087,16 @@ can.Control("CMS.Controllers.TreeViewNode", {
         $expand_el.trigger("click");
       return this.expand();
     }
+
+  , hash_fragment: function () {
+    var parent_fragment = "";
+
+    if (this.options.parent) {
+      parent_fragment = this.options.parent.hash_fragment();
+    }
+
+    return [parent_fragment,
+            this.options.instance.type.toLowerCase(),
+            this.options.instance.id].join("/");
+  }
 });
