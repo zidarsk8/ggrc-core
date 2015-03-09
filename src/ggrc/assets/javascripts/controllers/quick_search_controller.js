@@ -304,7 +304,7 @@ can.Control("CMS.Controllers.LHN", {
       this.set_active_tab();
 
       // not nested
-      $(".lhn-trigger").addClass("active");
+      $(".lhn-trigger").removeClass('hide').addClass("active");
 
       this.element.find(".lhs-holder")
           .css("left", "")
@@ -418,6 +418,7 @@ can.Control("CMS.Controllers.LHN", {
       $area.css("margin-left", 0);
       $bar.hide();
       $lhnTrigger.hide();
+      $lhnTrigger.addClass('hide')
 
       window.resize_areas();
     }

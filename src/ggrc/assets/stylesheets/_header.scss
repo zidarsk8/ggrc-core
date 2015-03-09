@@ -16,6 +16,10 @@
   top: 0px;
   left: 0;
   right: 0;
+
+  .hide + .logo {
+    margin-left: 40px;
+  }
   &.demo-header-bar {
     background: darken($orange, 15%);
     .menu {
@@ -147,7 +151,7 @@
           }
           &.layout-wrap {
             @include clearfix();
-            padding: 5px 0; 
+            padding: 5px 0;
             a {
               float: left;
               clear: none;
@@ -273,7 +277,6 @@
     }
   }
 }
-
 .header-content {
   background: $white;
   z-index:3;
