@@ -15,8 +15,7 @@ def random_string(prefix=''):
       )
 
 class ModelFactory(factory.Factory):
-  ABSTRACT_FACTORY = True
-  modified_by_id = 1
+  #modified_by_id = 1
 
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
@@ -26,17 +25,19 @@ class ModelFactory(factory.Factory):
     return instance
 
 class SlugFactory(factory.Factory):
-  ABSTRACT_FACTORY = True
   slug = factory.LazyAttribute(lambda m: random_string('slug'))
   title = factory.LazyAttribute(lambda m: random_string('title'))
 
 class DirectiveFactory(ModelFactory):
-  FACTORY_FOR = Directive
-  title = 'directive_title'
-  slug = 'directive_slug'
+  class Meta:
+    model = Directive
+
+  title = factory.LazyAttribute(lambda m: random_string('title'))
 
 class ControlFactory(ModelFactory, SlugFactory):
-  FACTORY_FOR = Control
+  class Meta:
+    model = Control
+
   directive = factory.SubFactory(DirectiveFactory)
   kind_id = None
   version = None
@@ -48,7 +49,9 @@ class ControlFactory(ModelFactory, SlugFactory):
   notes = None
 
 class ControlCategoryFactory(ModelFactory):
-  FACTORY_FOR = ControlCategory
+  class Meta:
+    model = ControlCategory
+
   name = factory.LazyAttribute(lambda m: random_string('name'))
   lft = None
   rgt = None
@@ -57,7 +60,9 @@ class ControlCategoryFactory(ModelFactory):
   required = None
 
 class CategorizationFactory(ModelFactory):
-  FACTORY_FOR = Categorization
+  class Meta:
+    model = Categorization
+
   category = None
   categorizable = None
   category_id = None
@@ -65,6 +70,8 @@ class CategorizationFactory(ModelFactory):
   categorizable_type = None
 
 class ProgramFactory(ModelFactory):
-  FACTORY_FOR = Program
+  class Meta:
+    model = Program
+
   title = 'program_title'
   slug = 'program_slug'

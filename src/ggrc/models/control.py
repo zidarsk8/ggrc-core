@@ -10,7 +10,7 @@ from .associationproxy import association_proxy
 from .category import CategoryBase
 from .categorization import Categorizable
 from .mixins import (
-    deferred, BusinessObject, Hierarchical, Timeboxed, CustomAttributable
+    deferred, BusinessObject, Hierarchical, Timeboxed, CustomAttributable, TestPlanned
     )
 from .object_document import Documentable
 from .object_owner import Ownable
@@ -84,7 +84,7 @@ class AssertionCategorized(Categorizable):
 
 class Control(HasObjectState,
     CustomAttributable, Documentable, Personable, ControlCategorized, AssertionCategorized,
-    Hierarchical, Timeboxed, Ownable, BusinessObject, db.Model):
+    Hierarchical, Timeboxed, Ownable, BusinessObject, TestPlanned, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
