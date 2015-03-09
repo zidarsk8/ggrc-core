@@ -110,10 +110,17 @@
       if (["Control", "Section", "Objective"].indexOf(type) > -1) {
         mappings[type] = {
           _canonical: {
-            "related_objects": ['Risk', 'ThreatActor']
+            "related_objects": ['Risk', 'RiskObject', 'ThreatActor']
           },
-          related_risks: TypeFilter("related_objects", "Risk"),
-          related_threat_actors: TypeFilter("related_objects", "ThreatActor"),
+          related_risks:            TypeFilter("related_objects", "Risk"),
+          related_threat_actors:    TypeFilter("related_objects", "ThreatActor"),
+          risks:                    TypeFilter("related_objects", "Risk"),
+          risk_objects:             TypeFilter("related_objects", "RiskObject"),
+          related_and_able_objects: Multi([
+              "objectives", "implemented_controls", "related_business_objects",
+              "people", "joined_directives", "programs", "sections", "clauses",
+              "risks"
+          ])
         };
       } else {
         mappings[type] = {
