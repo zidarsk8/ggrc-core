@@ -9,6 +9,7 @@
 
   <div class="row-fluid">
     <!-- Left side Get started column -->
+    {{#current_user_is_admin}}
     <div class="span3 side-wrap">
       <div class="inner-content">
         <section class="widget bare">
@@ -21,5 +22,6 @@
         </section><!-- Widget end -->
       </div><!-- inner-content end -->
     </div>
+    {{/current_user_is_admin}}
     {{{render_hooks 'Dashboard.Widgets'}}}
   </div>

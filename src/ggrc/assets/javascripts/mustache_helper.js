@@ -943,7 +943,6 @@ Mustache.registerHelper("person_roles", function (person, scope, options) {
             name: "Superuser"
           });
         }
-
         roles_deferred.resolve(roles);
       });
     });
