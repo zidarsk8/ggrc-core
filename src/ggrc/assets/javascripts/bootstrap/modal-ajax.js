@@ -217,7 +217,6 @@
     },
 
     'form': function($target, $trigger, option) {
-      debugger;
       var form_target = $trigger.data('form-target')
       , object_params = $trigger.attr('data-object-params')
       , model = CMS.Models[$trigger.attr("data-object-singular")] || CMS.ModelHelpers[$trigger.attr("data-object-singular")]
@@ -258,6 +257,7 @@
         , modal_title : object_params.modal_title || modal_title
         , content_view : content_view
         , mapping : mapping
+        , $trigger: $trigger
       });
 
       $target.on('modal:success', function(e, data, xhr) {

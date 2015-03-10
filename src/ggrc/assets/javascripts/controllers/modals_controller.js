@@ -762,9 +762,9 @@ can.Control("GGRC.Controllers.Modals", {
           if(that.options.add_more) {
             that.new_instance();
           }
-          else {
-            debugger;
+          else { 
             that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
+            that.update_hash_fragment();
           }
         }
 
@@ -865,6 +865,19 @@ can.Control("GGRC.Controllers.Modals", {
     if(this.options.instance && this.options.instance._transient) {
       this.options.instance.removeAttr("_transient");
     }
+  }
+
+  , update_hash_fragment: function () {
+    var hash = window.location.hash.split('/')[0],
+        tree_controller = this.options
+            .$trigger
+            .closest(".cms_controllers_tree_view_node")
+            .control();
+
+    hash += [tree_controller.hash_fragment(),
+             this.options.instance.hash_fragment()].join('/');
+
+    window.location.hash = hash;
   }
 });
 
