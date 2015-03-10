@@ -2050,14 +2050,14 @@ Mustache.registerHelper("if_multi_owner", function (instance, modal_title, optio
 
   if (resolve_computed(modal_title).indexOf('New ') === 0) {
     return options.inverse(options.contexts);
-  } else {
-    var loader = resolve_computed(instance).get_binding('authorizations');
-    can.each(loader.list, function(binding){
-      if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
-        owner_count += 1;
-      }
-    });
   }
+
+  var loader = resolve_computed(instance).get_binding('authorizations');
+  can.each(loader.list, function(binding){
+    if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+      owner_count += 1;
+    }
+  });
 
   if (owner_count > 1) {
     return options.fn(options.contexts);
