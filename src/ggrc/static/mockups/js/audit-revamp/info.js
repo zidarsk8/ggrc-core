@@ -156,6 +156,30 @@ $(document).ready(function() {
   });
   $(".object-wrap-issue-program").html(can.view("/static/mockups/mustache/audit-revamp/issue-program.mustache",{}));
 
+  can.Component.extend({
+    tag: "issue-workflow",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-issue-workflow").html(can.view("/static/mockups/mustache/audit-revamp/issue-workflow.mustache",{}));
+
+  can.Component.extend({
+    tag: "issue-workflow-tasks",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-issue-workflow-tasks").html(can.view("/static/mockups/mustache/audit-revamp/issue-workflow-tasks.mustache",{}));
+
   function innerNavTrigger() {
     var $this = $(this),
         $allList = $this.closest(".nav").children("li"),
@@ -182,10 +206,22 @@ $(document).ready(function() {
     $("#CACounter").html("4");
   }
 
+  function reviewWorkflow() {
+    $("#issueWorkflow").modal("hide");
+    $("#workflowWrap").show();
+    $(".nav li").removeClass("active");
+    $("#workflowTaskWrap").show().addClass("active");
+    window.location.href = '#issue-workflow-tasks';
+    $(".object-wrap").hide();
+    $(".object-wrap-issue-workflow-tasks").show();
+  }
+
   $(".top-inner-nav a").on("click", innerNavTrigger);
 
   $("#autoGenerateCA").on("click", generateCA);
 
   $("#auditRoleSave").on('click', personRole);
+
+  $("#startReviewWorkflow").on("click", reviewWorkflow);
 
 });

@@ -118,6 +118,10 @@
 .object-wrap-issue-ca,
 .object-wrap-issue-audit,
 .object-wrap-issue-controls,
-.object-wrap-issue-program {
+.object-wrap-issue-program,
+.object-wrap-issue-workflow,
+.object-wrap-issue-workflow-tasks,
+#workflowWrap,
+#workflowTaskWrap {
   display: none;
 }

@@ -526,7 +526,7 @@ small {
 // Date input field - To see date icon just add class .date to input field
 input.date {
   padding-left: 26px;
-  @include background-size(368px 416px);
+  @include background-size(368px 440px);
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
   background-position: -340px -364px;
