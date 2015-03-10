@@ -874,7 +874,9 @@ can.Control("GGRC.Controllers.Modals", {
             .closest(".cms_controllers_tree_view_node")
             .control();
 
-    hash += [tree_controller.hash_fragment(),
+    hash += [tree_controller 
+             ? tree_controller.hash_fragment()
+             : "",
              this.options.instance.hash_fragment()].join('/');
 
     window.location.hash = hash;

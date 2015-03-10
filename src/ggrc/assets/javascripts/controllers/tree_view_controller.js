@@ -19,7 +19,9 @@ function _firstElementChild(el) {
 }
 
 
-function _display_tree_subpath(el, path) {
+function _display_tree_subpath(el, path, attempt_counter) {
+  attempt_counter || (attempt_counter = 0);
+
   var rest = path.split("/")
     , type = rest.shift()
     , id = rest.shift()
@@ -34,6 +36,13 @@ function _display_tree_subpath(el, path) {
 
   if (type || id) {
     $node = el.find(selector);
+
+    // sometimes nodes haven't loaded yet, wait for them
+    if (!$node.size() && attempt_counter < 20) {
+      setTimeout(function () {
+        _display_tree_subpath(el, path, attempt_counter+1);
+      }, 100);
+    }
 
     if (!rest.length) {
       $node.find(".select").click();
