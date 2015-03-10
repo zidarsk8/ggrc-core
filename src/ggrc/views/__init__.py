@@ -374,6 +374,13 @@ def audit_info_revamp():
   """
   return render_template("/mockups/audit-revamp/info.html")
 
+@app.route("/mockups/audit-revamp/issues.html")
+@login_required
+def audit_info_issues_revamp():
+  """Audit info issues revamp mockup
+  """
+  return render_template("/mockups/audit-revamp/issues.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():

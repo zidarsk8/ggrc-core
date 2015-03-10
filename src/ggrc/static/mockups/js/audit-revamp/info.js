@@ -96,6 +96,66 @@ $(document).ready(function() {
   });
   $(".object-wrap-issues").html(can.view("/static/mockups/mustache/audit-revamp/issues.mustache",{}));
 
+  can.Component.extend({
+    tag: "issue-info",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-issue-info").html(can.view("/static/mockups/mustache/audit-revamp/issue-info.mustache",{}));
+
+  can.Component.extend({
+    tag: "issue-ca",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-issue-ca").html(can.view("/static/mockups/mustache/audit-revamp/issue-ca.mustache",{}));
+
+  can.Component.extend({
+    tag: "issue-audit",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-issue-audit").html(can.view("/static/mockups/mustache/audit-revamp/issue-audit.mustache",{}));
+
+  can.Component.extend({
+    tag: "issue-controls",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-issue-controls").html(can.view("/static/mockups/mustache/audit-revamp/issue-controls.mustache",{}));
+
+  can.Component.extend({
+    tag: "issue-program",
+    scope: {
+    },
+    template: "<content/>",
+    helpers: {
+    },
+    events: {
+    }
+  });
+  $(".object-wrap-issue-program").html(can.view("/static/mockups/mustache/audit-revamp/issue-program.mustache",{}));
+
   function innerNavTrigger() {
     var $this = $(this),
         $allList = $this.closest(".nav").children("li"),
