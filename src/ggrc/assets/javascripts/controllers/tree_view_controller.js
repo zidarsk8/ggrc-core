@@ -42,21 +42,20 @@ function _display_tree_subpath(el, path, attempt_counter) {
       setTimeout(function () {
         _display_tree_subpath(el, path, attempt_counter+1);
       }, 100);
+      return;
     }
 
     if (!rest.length) {
       $node.find(".select").click();
       scroll_delay = 750;
+    }else{
+      node_controller = $node.control();
+      if (node_controller && node_controller.display_path) {
+         return node_controller.display_path(rest);
+      }
     }
 
-    node_controller = $node.control();
-    if (node_controller && node_controller.display_path) {
-      return node_controller.display_path(rest);
-    }
-    else {
-      //  TODO: `resolve` or `reject` if path isn't found?
-      return new $.Deferred().resolve();
-    }
+    return new $.Deferred().resolve();
   }
   else {
     return new $.Deferred().resolve();
@@ -1109,10 +1108,10 @@ can.Control("CMS.Controllers.TreeViewNode", {
             this.options.instance.id].join("/");
   }
 
-  , update_hash_fragment: function () { 
+  , update_hash_fragment: function () {
     var hash = window.location.hash.split("/")[0];
 
     window.location.hash = [hash,
-                            this.hash_fragment()].join("/");
+                            this.hash_fragment()].join('');
   }
 });
