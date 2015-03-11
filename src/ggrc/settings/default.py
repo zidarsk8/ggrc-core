@@ -8,6 +8,7 @@ import os
 DEBUG = False
 TESTING = False
 PRODUCTION = False
+GOOGLE_INTERNAL = False
 
 # Flask-SQLAlchemy fix to be less than `wait_time` in /etc/mysql/my.cnf
 SQLALCHEMY_POOL_RECYCLE = 120
