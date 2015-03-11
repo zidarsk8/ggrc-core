@@ -1,7 +1,7 @@
-Type,Program Code,,,,,,,,,,,,,
-Systems,{{program_slug}},,,,,,,,,,,,,
+Type,Program Code,,,,,,,,,,,,,,
+Systems,{{program_slug}},,,,,,,,,,,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type is very important.  
-For Systems import, Type should be ""Systems"". (in cell A2)",,,,,,,,,,,,,
+For Systems import, Type should be ""Systems"". (in cell A2)",,,,,,,,,,,,,,
 "*Required
 
 If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.
@@ -25,7 +25,13 @@ You can map a person to be the Owner/Person of Contact for the System by enterin
 Example:
 
 jeff@reciprocitylabs.com
-","*Optional.  
+","*Optional.
+
+You can link Vendors to Systems on import by specifying the Vendor code.  Use <option><return> to delineate between Vendor Codes.
+Example:
+
+VENDOR-1
+VENDOR-2","*Optional.
 
 You can link Controls to Systems on import by specifying the Control code.  Use <option><return> to delineate between Control Codes.
 Example:
@@ -54,4 +60,4 @@ Can be ""Yes"", ""True"", or ""1"" to result in the System being labeled as ""In
 
 Can be ""No"", ""False"", ""0"" to result in System being labeled as ""Not Infrastructure""","*Optional.
 Can be ""Draft"", ""Final"", ""Effective"", ""Ineffective"", ""Launched"", ""Not Launched"", ""In Scope"", or ""Not in Scope"""
-System Code,Title,Description,Effective Date,URL,Reference URL,Notes,Map:Person of Contact,Map:Controls,Map:System,Map:Process,Map:Org Group,Network Zone,Infrastructure,State
+System Code,Title,Description,Effective Date,URL,Reference URL,Notes,Map:Person of Contact,Map:Vendor,Map:Controls,Map:System,Map:Process,Map:Org Group,Network Zone,Infrastructure,State
