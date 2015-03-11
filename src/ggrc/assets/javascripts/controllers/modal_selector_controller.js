@@ -1104,25 +1104,29 @@
           }
         });
       }
+ 
+   , should_update_hash_fragment: function () {
+      var $trigger = this.options.$trigger;
+      return !($trigger.closest(".modal").size()
+               || $trigger.closest(".cms_controllers_info_pin").size());
+   }
 
    , update_hash_fragment: function (join_instance) {
+     if (!this.should_update_hash_fragment()) return;
+
+     debugger;
+
      // using join_instance gives the wrong ID
      var hash = window.location.hash.split('/')[0],
          tree_controller = this.options
              .$trigger
              .closest(".cms_controllers_tree_view_node")
-             .control(),
-         in_pin = this.options
-             .$trigger
-             .closest(".cms_controllers_info_pin")
-             .size() > 0;
+             .control();
        
-     if (!in_pin) { 
-       hash += [tree_controller 
-                ? tree_controller.hash_fragment()
-                : "",
-                join_instance[0].hash_fragment()].join('/');
-     }
+     hash += [tree_controller 
+              ? tree_controller.hash_fragment()
+              : "",
+              join_instance[0].hash_fragment()].join('/');
        
      window.location.hash = hash;
    }

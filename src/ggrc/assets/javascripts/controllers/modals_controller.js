@@ -867,7 +867,15 @@ can.Control("GGRC.Controllers.Modals", {
     }
   }
 
+  , should_update_hash_fragment: function () {
+    var $trigger = this.options.$trigger;
+    return !($trigger.closest(".modal").size()
+          || $trigger.closest(".cms_controllers_info_pin").size());
+  }
+
   , update_hash_fragment: function () {
+    if (!this.should_update_hash_fragment()) return;
+
     var hash = window.location.hash.split('/')[0],
         tree_controller = this.options
             .$trigger
