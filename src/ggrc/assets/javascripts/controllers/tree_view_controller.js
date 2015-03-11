@@ -1077,11 +1077,11 @@ can.Control("CMS.Controllers.TreeViewNode", {
       this.expand();
   }
   , ".select:not(.disabled) click": function(el, ev) {
-
     var tree = el.closest('.cms_controllers_tree_view_node'),
         node = tree.control();
     tree.closest('section').find('.cms_controllers_tree_view_node').removeClass('active');
     tree.addClass('active');
+    node.update_hash_fragment();
     $('.pin-content').control().setInstance(node.options.instance, el);
   }
 
@@ -1107,5 +1107,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
     return [parent_fragment,
             this.options.instance.type.toLowerCase(),
             this.options.instance.id].join("/");
+  }
+
+  , update_hash_fragment: function () { 
+    var hash = window.location.hash.split("/")[0];
+
+    window.location.hash = [hash,
+                            this.hash_fragment()].join("/");
   }
 });
