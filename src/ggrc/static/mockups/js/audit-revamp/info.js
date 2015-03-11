@@ -216,6 +216,35 @@ $(document).ready(function() {
     $(".object-wrap-issue-workflow-tasks").show();
   }
 
+  function startTask() {
+    $("#startTask").hide();
+    $("#finishTask").show();
+    $("#undoTask").show();
+    $("#taskStatus").removeClass("status-assigned");
+    $("#taskStatus").addClass("status-inprogress");
+    $("#issueStatus").addClass("status-inprogress");
+    $("#taskStatusMessage")
+      .removeClass("state-assigned")
+      .addClass("state-inprogress")
+      .html("In progress");
+    $("#issueStatusMessage").html("In progress");
+  }
+
+  function finishTask() {
+    $("#finishTask").hide();
+    $("#approveTask").show();
+    $("#declineTask").show();
+    $("#taskStatus").removeClass("status-inprogress");
+    $("#taskStatus").addClass("status-finished");
+    $("#issueStatus").removeClass("status-inprogress");
+    $("#issueStatus").addClass("status-finished");
+    $("#taskStatusMessage")
+      .removeClass("state-inprogress")
+      .addClass("state-finished")
+      .html("Finished");
+    $("#issueStatusMessage").html("Finished");
+  }
+
   $(".top-inner-nav a").on("click", innerNavTrigger);
 
   $("#autoGenerateCA").on("click", generateCA);
@@ -223,5 +252,9 @@ $(document).ready(function() {
   $("#auditRoleSave").on('click', personRole);
 
   $("#startReviewWorkflow").on("click", reviewWorkflow);
+
+  $("#startTask").on("click", startTask);
+
+  $("#finishTask").on("click", finishTask);
 
 });

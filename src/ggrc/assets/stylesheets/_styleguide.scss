@@ -122,6 +122,10 @@
 .object-wrap-issue-workflow,
 .object-wrap-issue-workflow-tasks,
 #workflowWrap,
-#workflowTaskWrap {
+#workflowTaskWrap,
+#undoTask,
+#finishTask,
+#approveTask,
+#declineTask {
   display: none;
 }

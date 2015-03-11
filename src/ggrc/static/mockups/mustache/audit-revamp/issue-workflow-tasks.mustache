@@ -34,7 +34,7 @@
                           <div class="item-main">
                             <div class="item-wrap">
                               <div class="openclose">
-                                <span class="status-label status-assigned"></span>
+                                <span id="taskStatus" class="status-label status-assigned"></span>
                                 <i class="grcicon-arrow-right"></i>
                               </div>
                               <div class="select">
@@ -67,7 +67,11 @@
                                         </li>
                                         <li>
                                           <div class="request-control">
-                                            <button class="btn btn-mini btn-info change-task-status " data-openclose="open" data-name="status" data-value="InProgress">Start</button>
+                                            <button id="startTask" class="btn btn-mini btn-info change-task-status">Start</button>
+                                            <button id="finishTask" class="btn btn-mini btn-draft change-task-status">Finish</button>
+                                            <button id="approveTask" class="btn btn-mini btn-success change-task-status">Approve</button>
+                                            <button id="declineTask" class="btn btn-mini btn-danger change-task-status">Decline</button>
+                                            <a id="undoTask" href="javascript://" data-undo="true" class="undo">Undo</a>
                                           </div>
                                         </li>
                                       </ul>
@@ -85,7 +89,7 @@
                                     <div class="item-main">
                                       <div class="item-wrap">
                                         <div class="openclose">
-                                          <span class="status-label"></span>
+                                          <span id="issueStatus" class="status-label"></span>
                                           <i class="grcicon-arrow-right"></i>
                                         </div>
                                         <div class="select">
@@ -100,7 +104,7 @@
                                               <div class="span4">
                                                 <ul class="tree-action-list">
                                                   <li>
-                                                    <span class="gray"><em>Assigned</em></span>
+                                                    <span class="gray"><em id="issueStatusMessage">Assigned</em></span>
                                                   </li>
                                                 </ul>
                                               </div>
@@ -148,7 +152,7 @@
                 </div>
                 <div class="span6">
                   <h6>State</h6>
-                  <span class="state-value state-assigned">Assigned</span>
+                  <span id="taskStatusMessage" class="state-value state-assigned">Assigned</span>
                 </div>
               </div>
             </div>
