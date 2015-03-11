@@ -6,7 +6,7 @@
 }}
 
 <ul class="quick-list">
-  {{#is_allowed 'create'}}
+  {{#is_allowed 'create' model.shortName context=null}}
     {{#start_menu}}
       <li>
         <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide"
