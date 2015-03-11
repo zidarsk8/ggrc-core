@@ -238,11 +238,38 @@ $(document).ready(function() {
     $("#taskStatus").addClass("status-finished");
     $("#issueStatus").removeClass("status-inprogress");
     $("#issueStatus").addClass("status-finished");
+    $("#undoTask").hide();
     $("#taskStatusMessage")
       .removeClass("state-inprogress")
       .addClass("state-finished")
       .html("Finished");
     $("#issueStatusMessage").html("Finished");
+    $("#reviewTrigger").hide();
+    $("#reviewChoice").show();
+  }
+
+  function approveReview() {
+    $("#approveTask").hide();
+    $("#declineTask").hide();
+    $("#taskStatus").removeClass("status-finished");
+    $("#taskStatus").addClass("status-verified");
+    $("#issueStatus").removeClass("status-finished");
+    $("#issueStatus").addClass("status-verified");
+    $("#taskStatusMessage")
+      .removeClass("state-finished")
+      .addClass("state-verified")
+      .html("Verified");
+    $("#issueStatusMessage")
+      .closest("span")
+      .removeClass("gray")
+      .addClass("task-done")
+      .html("<em>Verified</em>");
+    $("#taskDone").show();
+    $("#reviewChoice").hide();
+    $("#issueStatusInfo")
+      .removeClass("state-draft")
+      .addClass("state-verified")
+      .html("Closed");
   }
 
   $(".top-inner-nav a").on("click", innerNavTrigger);
@@ -257,4 +284,5 @@ $(document).ready(function() {
 
   $("#finishTask").on("click", finishTask);
 
+  $("#approveReview, #approveTask").on("click", approveReview);
 });
