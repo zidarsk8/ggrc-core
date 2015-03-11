@@ -2240,29 +2240,30 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
   instance = Mustache.resolve(instance);
   instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
 
-  if (!instance)
-    return "";
+  if (!instance) {
+    return '';
+  }
 
   audit = instance instanceof CMS.Models.Request ? instance.attr("audit") : instance;
 
-  if (!audit)
-    return "";  //take no action until audit is available
+  if (!audit) {
+    return '';  // take no action until audit is available
+  }
 
   audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
   auditors = audit.findAuditors(true); // immediate-mode findAuditors
 
-  if ((include_admin && admin)
-     || can.map(
+  if ((include_admin && admin) ||
+      can.map(
           auditors,
           function (auditor) {
             if (auditor.person.id === GGRC.current_user.id) {
               return auditor;
             }
-        }).length > 0) {
+        }).length) {
     return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
   }
+  return options.inverse(options.contexts);
 });
 
 can.each({
