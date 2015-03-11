@@ -157,7 +157,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     ).then(update_program_authorizations);
     GGRC.delay_leaving_page_until(dfd);
   },
-  findAuditors : function(return_list){
+  findAuditors : function(return_list) {
     // If return_list is true, use findAuditors in the
     //  classical way, where the exact state of the list
     //  isn't needed immeidately (as in a Mustache helper);
@@ -169,11 +169,12 @@ can.Model.Cacheable("CMS.Models.Audit", {
       dfds = []
       ;
 
-    if(return_list) {
+    if (return_list) {
       $.map(loader.list, function(binding) {
         // FIXME: This works for now, but is sad.
-        if (!binding.instance.selfLink)
+        if (!binding.instance.selfLink) {
           return;
+        }
         var role = binding.instance.role.reify();
         function checkRole() {
           if (role.attr('name') === 'Auditor') {
@@ -183,50 +184,46 @@ can.Model.Cacheable("CMS.Models.Audit", {
             });
           }
         }
-        if(role.selfLink) {
+        if (role.selfLink) {
           checkRole();
         } else {
           role.refresh().then(checkRole);
         }
       });
       return auditors_list;
-    } else {
-      return loader.refresh_instances().then(function() {
-        $.map(loader.list, function(binding) {
-          // FIXME: This works for now, but is sad.
-
-          dfds.push(new $.Deferred(function(dfd) {
-
-            if (!binding.instance.selfLink) {
-              binding.instance.refresh().then(function() {
-                dfd.resolve(binding.instance);
-              });
-            } else {
-              dfd.resolve(binding.instance);
-            }
-          }).then(function(instance) {
-
-            var role = instance.role.reify();
-            function checkRole() {
-              if (role.attr('name') === 'Auditor') {
-                auditors_list.push({
-                  person: instance.person.reify()
-                  , binding: instance
-                });
-              }
-            }
-            if(role.selfLink) {
-              checkRole();
-            } else {
-              return role.refresh().then(checkRole);
-            }
-          }));
-        });
-        return $.when.apply($, dfds).then(function() {
-          return auditors_list;
-        });
-      });
     }
+    return loader.refresh_instances().then(function() {
+      $.map(loader.list, function (binding) {
+        // FIXME: This works for now, but is sad.
+        dfds.push(new $.Deferred(function(dfd) {
+          if (!binding.instance.selfLink) {
+            binding.instance.refresh().then(function() {
+              dfd.resolve(binding.instance);
+            });
+          } else {
+            dfd.resolve(binding.instance);
+          }
+        }).then(function(instance) {
+          var role = instance.role.reify();
+          function checkRole() {
+            if (role.attr('name') === 'Auditor') {
+              auditors_list.push({
+                person: instance.person.reify()
+                , binding: instance
+              });
+            }
+          }
+          if (role.selfLink) {
+            checkRole();
+          } else {
+            return role.refresh().then(checkRole);
+          }
+        }));
+      });
+      return $.when.apply($, dfds).then(function() {
+        return auditors_list;
+      });
+    });
   },
   get_filter_vals: function(){
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
