@@ -806,8 +806,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   ".filter-trigger > a click": function (element, event) {
       if (element.hasClass("active")) {
         this.hide_filter();
+        element.find("i").attr("data-original-title", "Show filter");
       }else{
         this.show_filter();
+        element.find("i").attr("data-original-title", "Hide filter");
       }
     }
 
