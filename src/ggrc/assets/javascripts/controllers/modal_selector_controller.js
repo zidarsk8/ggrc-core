@@ -1114,19 +1114,22 @@
    , update_hash_fragment: function (join_instance) {
      if (!this.should_update_hash_fragment()) return;
 
-     debugger;
-
-     // using join_instance gives the wrong ID
      var hash = window.location.hash.split('/')[0],
          tree_controller = this.options
              .$trigger
              .closest(".cms_controllers_tree_view_node")
-             .control();
-       
+             .control(),
+         mapped = join_instance[0].destination
+             || join_instance[0][can
+                                 .spaceCamelCase(join_instance[0].type)
+                                 .split(" ")[1]
+                                 .toLowerCase()];
+
      hash += [tree_controller 
               ? tree_controller.hash_fragment()
               : "",
-              join_instance[0].hash_fragment()].join('/');
+              mapped.type.toLowerCase(), 
+              mapped.id].join('/');
        
      window.location.hash = hash;
    }
