@@ -1050,6 +1050,7 @@
               $(document.body).trigger('ajax:flash',
                   { success: that.context.selected_option.constructor.shortName + " mapped successfully."});
               $(that.element).modal_form('hide');
+              that.update_hash_fragment(join_instance);
             })
             .fail(function(xhr) {
               // Currently, the only error we encounter here is uniqueness
@@ -1103,6 +1104,28 @@
           }
         });
       }
+
+   , update_hash_fragment: function (join_instance) {
+     // using join_instance gives the wrong ID
+     var hash = window.location.hash.split('/')[0],
+         tree_controller = this.options
+             .$trigger
+             .closest(".cms_controllers_tree_view_node")
+             .control(),
+         in_pin = this.options
+             .$trigger
+             .closest(".cms_controllers_info_pin")
+             .size() > 0;
+       
+     if (!in_pin) { 
+       hash += [tree_controller 
+                ? tree_controller.hash_fragment()
+                : "",
+                join_instance[0].hash_fragment()].join('/');
+     }
+       
+     window.location.hash = hash;
+   }
 
     , move_option_to_top_and_select: function(option) {
 
@@ -1992,6 +2015,7 @@
             if (!modalSelector.options.deferred) {
               $(document.body).trigger('ajax:flash',
                 { success: modalSelector.context.selected_options[0].constructor.shortName + " mapped successfully."});
+              this.update_hash_fragment(join_instance);
             }
             obj_arr.push(obj);
           }
@@ -2018,13 +2042,13 @@
           if (modalSelector.options.deferred) {
             join_instance = modalSelector.sync_selected_options();
             its = join_instance.length;
-            can.each(join_instance, map_post_process);
+            can.each(join_instance, map_post_process.bind(this));
           } else {
             join_instance = this.create_join();
             its = join_instance.length;
             for(var i = 0; i < its; i++){
             //We have multiple join_instances
-              ajd = join_instance[i].save().done(map_post_process)
+              ajd = join_instance[i].save().done(map_post_process.bind(this))
               .fail(function (xhr) {
                   // Currently, the only error we encounter here is uniqueness
                   // constraint violations.  Let's use a nicer message!
