@@ -46,7 +46,10 @@ function _display_tree_subpath(el, path, attempt_counter) {
     }
 
     if (!rest.length) {
-      $node.control().select();
+      $node
+            .closest(".cms_controllers_tree_view_node")
+            .control()
+            .select();
       scroll_delay = 750;
     }else{
       node_controller = $node.control();
@@ -1115,8 +1118,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
     }
 
     return [parent_fragment,
-            this.options.instance.type.toLowerCase(),
-            this.options.instance.id].join("/");
+            this.options.instance.hash_fragment()].join("/");
   }
 
   , update_hash_fragment: function () {
