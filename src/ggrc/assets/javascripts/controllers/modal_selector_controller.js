@@ -1111,6 +1111,29 @@
                || $trigger.closest(".cms_controllers_info_pin").size());
    }
 
+   // if we have join.destination, return that
+   // otherwise return the other side of the join 
+   // than the one that triggered the modal
+   , _get_mapped: function (join_instance) {
+       var instance = join_instance[0];
+
+       if (instance.destination) {
+         return instance.destination;
+       }else{
+         var types = can.spaceCamelCase(join_instance[0].type).split(" "),
+             parent_type = this.options.binding.instance.type,
+             mapped_type;
+
+         if (types[0] == parent_type) {
+           mapped_type = types[1];
+         }else{
+           mapped_type = types[0];
+         }
+
+         return instance[mapped_type.toLowerCase()];
+       }
+   }
+
    , update_hash_fragment: function (join_instance) {
      if (!this.should_update_hash_fragment()) return;
 
@@ -1119,11 +1142,7 @@
              .$trigger
              .closest(".cms_controllers_tree_view_node")
              .control(),
-         mapped = join_instance[0].destination
-             || join_instance[0][can
-                                 .spaceCamelCase(join_instance[0].type)
-                                 .split(" ")[1]
-                                 .toLowerCase()];
+         mapped = this._get_mapped(join_instance);
 
      hash += [tree_controller 
               ? tree_controller.hash_fragment()
