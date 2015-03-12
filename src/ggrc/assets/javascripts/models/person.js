@@ -71,7 +71,7 @@ can.Model.Cacheable("CMS.Models.Person", {
   , findInCacheByEmail : function(email) {
     var result = null, that = this;
     can.each(Object.keys(this.cache || {}), function(k) {
-      if(that.cache[k].email === email) {
+      if (that.cache[k].email === email) {
         result = that.cache[k];
         return false;
       }
@@ -87,7 +87,6 @@ can.Model.Cacheable("CMS.Models.Person", {
       find_params: { "__sort": "name,email" }
     }
   , init : function() {
-    // Email validation form http://stackoverflow.com/questions/4320574/why-is-jquerys-email-validation-regex-so-simple
     var rEmail = /^[-!#$%&\'*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$/i;
     this._super.apply(this, arguments);
 
