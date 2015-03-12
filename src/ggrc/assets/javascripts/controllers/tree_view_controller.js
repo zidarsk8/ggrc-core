@@ -315,6 +315,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , find_params : {}
     , sort_property : null
     , sort_function : null
+    , sortable : true
     , filter : null
     , start_expanded : false //true
     , draw_children : true
@@ -670,7 +671,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       });
 
       if (sort_prop || sort_function) {
-         $items.each(function(i, item) {
+        $items.each(function(i, item) {
             var j, $item = $(item), compare;
             for(j = $existing.length - 1; j >= 0; j--) {
               var old_item = $existing.eq(j).control().options.instance,
@@ -698,7 +699,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               $item.appendTo(this.element);
             }
             $existing.splice(0, 0, item);
-         });
+        });
+        if (this.options.sortable) {
+          $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
+        }
       } else {
         if($footer.length) {
           $items.insertBefore($footer);
