@@ -46,11 +46,14 @@ function _display_tree_subpath(el, path, attempt_counter) {
     }
 
     if (!rest.length) {
-      $node
-            .closest(".cms_controllers_tree_view_node")
-            .control()
-            .select();
-      scroll_delay = 750;
+      var controller = $node
+              .closest(".cms_controllers_tree_view_node")
+              .control();
+
+      if (controller) {
+        controller.select();
+        scroll_delay = 750;
+      }
     }else{
       node_controller = $node.control();
       if (node_controller && node_controller.display_path) {
@@ -146,12 +149,15 @@ can.Control("CMS.Controllers.TreeLoader", {
 
   , show_info_pin: function() {
     if (this.element && !this.element.data('no-pin')) {
-      var children = this.element.children();
-      children && children.find('.select:visible')
-            .first()
-            .closest(".cms_controllers_tree_view_node")
-            .control()
-            .select();
+      var children = this.element.children(),
+          controller = children && children.find('.select:visible')
+              .first()
+              .closest(".cms_controllers_tree_view_node")
+              .control();
+      
+      if (controller) {
+        controller.select();
+      }
     }
   }
 
