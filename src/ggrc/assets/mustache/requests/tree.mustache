@@ -14,7 +14,11 @@
             <div class="span3">
               <div class="title tree-title-area">
                 {{#if_draw_icon instance}}
-                  <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                  {{#if_equals instance.request_type "documentation"}}
+                    <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                  {{else}}
+                    <i class="grcicon-interview"></i>
+                  {{/if_equals}}
                 {{/if_draw_icon}}
                 <span>{{strip_html_tags instance.description}}</span>
               </div>
