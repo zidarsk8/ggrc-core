@@ -145,14 +145,11 @@ class BaseRowConverter(object):
       current_user = Person.query.get(current_user_id)
       if current_user and current_user not in self.obj.owners:
         # then create an ObjectOwner connector, add to session
-        try:
-          db_session.add(ObjectOwner(
-              person_id=current_user_id,
-              ownable=self.obj,
-              modified_by_id=current_user_id
-          ))
-        except ValidationError as e:
-          pass
+        db_session.add(ObjectOwner(
+            person_id=current_user_id,
+            ownable=self.obj,
+            modified_by_id=current_user_id
+        ))
 
     # This atomically deletes all existing custom attribute values for this object
     # and sets all imported values. This will delete all custom attributes that
