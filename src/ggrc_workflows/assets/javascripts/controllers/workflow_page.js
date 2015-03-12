@@ -113,7 +113,6 @@
           this.attr('waiting', false);
       },
       _activate: function() {
-        console.log("new activate")
         var workflow = GGRC.page_instance(),
             scope = this,
             restore_button = scope._restore_button.bind(scope),
