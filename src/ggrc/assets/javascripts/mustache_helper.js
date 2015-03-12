@@ -2059,6 +2059,28 @@ Mustache.registerHelper("private_program_owner", function (instance, modal_title
   }
 });
 
+// Verify if the Program has multiple owners
+// Usage: {{#if_multi_owner instance modal_title}}
+Mustache.registerHelper("if_multi_owner", function (instance, modal_title, options) {
+  var owner_count = 0;
+
+  if (resolve_computed(modal_title).indexOf('New ') === 0) {
+    return options.inverse(options.contexts);
+  }
+
+  var loader = resolve_computed(instance).get_binding('authorizations');
+  can.each(loader.list, function(binding){
+    if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+      owner_count += 1;
+    }
+  });
+
+  if (owner_count > 1) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
+});
 
 // Determines whether the value matches one in the $.map'd list
 // {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
