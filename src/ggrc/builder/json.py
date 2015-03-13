@@ -223,6 +223,7 @@ class UpdateAttrHandler(object):
       # The value is a collection of links, resolve the collection of objects
       value = json_obj.get(attr_name)
       rel_ids = [o[u'id'] for o in value] if value else []
+
       if rel_ids:
         return db.session.query(rel_class).filter(
             rel_class.id.in_(rel_ids)).all()
