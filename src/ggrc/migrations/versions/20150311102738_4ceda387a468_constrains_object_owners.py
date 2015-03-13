@@ -16,7 +16,7 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.execute('set session old_alter_table=1; ALTER IGNORE TABLE object_owners ADD UNIQUE INDEX(person_id, ownable_id, ownable_type);')
+    op.execute('delete from object_owners where id in (select id from (select id, count(id) as count from object_owners group by person_id, ownable_id, ownable_type having count > 1) as c );')
     op.create_unique_constraint('uq_id_owners', 'object_owners', ['person_id', 'ownable_id', 'ownable_type'])
 
 
