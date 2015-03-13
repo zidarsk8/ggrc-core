@@ -416,7 +416,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         dfds.push(
           can.view(this.options.header_view, $.when(this.options)).then(
             this._ifNotRemoved(function(frag) {
-              that.element.prepend(frag);
+              that.element.before(frag);
             })
           ));
       }
@@ -818,7 +818,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , hide_filter: function () {
-      var $filter = this.element.find(".filter-holder"),
+      var $filter = this.element.parent().find(".filter-holder"),
           height = $filter.height();
 
       $filter
@@ -826,9 +826,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           .animate({height: 0},
                    {duration: 800,
                     easing: 'easeOutExpo'});
-      this.element.find(".filter-trigger > a").removeClass("active");
-
-      this.element.find(".sticky.tree-header").addClass("no-filter");
+      this.element.parent().find(".filter-trigger > a").removeClass("active");
+      this.element.parent().find(".sticky.tree-header").addClass("no-filter");
       Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(true);
@@ -836,15 +835,15 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , show_filter: function () {
-      var $filter = this.element.find(".filter-holder");
+      var $filter = this.element.parent().find(".filter-holder");
 
       $filter
           .animate({height: $filter.data("height")},
                    {duration: 800,
                     easing: 'easeOutExpo'});
 
-      this.element.find(".filter-trigger > a").addClass("active");
-      this.element.find(".sticky.tree-header").removeClass("no-filter");
+      this.element.parent().find(".filter-trigger > a").addClass("active");
+      this.element.parent().find(".sticky.tree-header").removeClass("no-filter");
       Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(false);
