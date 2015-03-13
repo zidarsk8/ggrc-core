@@ -26,6 +26,7 @@ def all_cache_entries():
     resource('control_assertions', 'ControlAssertion'),
     resource('contexts', 'Context'),
     resource('controls', 'Control'),
+    resource('control_assessments', 'ControlAssessments'),
     resource('control_controls', 'ControlControl'),
     resource('control_sections', 'ControlSection'),
     resource('data_assets', 'DataAsset'),

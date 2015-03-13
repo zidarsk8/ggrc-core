@@ -631,14 +631,11 @@ $(function() {
             , allow_creating: false
           },
           ControlAssessment: {
-            mapping: "control_assessments"
+            mapping: "related_control_assessments"
             , parent_instance: GGRC.page_instance()
             , draw_children: true
             , model: "ControlAssessment"
-            //, show_view: GGRC.mustache_path + "/controls/tree.mustache"
-            //, footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
-            //, allow_mapping: false
-            //, allow_creating: false 
+            , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
           }
   
         }
