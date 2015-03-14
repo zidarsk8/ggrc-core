@@ -5,7 +5,7 @@
 
 from .base import *
 
-from ggrc.models import Directive, DirectiveSection, Section, Clause
+from ggrc.models import Directive, DirectiveSection, Section, Clause, SectionBase
 from .base_row import *
 from collections import OrderedDict
 
@@ -32,6 +32,7 @@ class SectionRowConverter(BaseRowConverter):
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('controls', LinkControlsHandler)
     self.handle_title('title', is_required=True)
+    self.handle('status', StatusColumnHandler, valid_states=SectionBase.VALID_STATES, default_value='Draft')
 
   def save_object(self, db_session, **options):
     directive_id = options.get('directive_id')
@@ -95,7 +96,8 @@ class SectionsConverter(BaseConverter):
     ('Map:Person of Contact', 'contact'),
     ('Controls', 'controls'),
     ('Created', 'created_at'),
-    ('Updated', 'updated_at')
+    ('Updated', 'updated_at'),
+    ('Status', 'status')
   ])
 
   row_converter = SectionRowConverter

@@ -10,7 +10,7 @@ from .associationproxy import association_proxy
 from .exceptions import ValidationError
 from .mixins import (
     deferred, Hierarchical, Noted, Described, Hyperlinked, WithContact,
-    Titled, Slugged, CustomAttributable
+    Titled, Slugged, CustomAttributable, Stateful
     )
 from .object_document import Documentable
 from .object_owner import Ownable
@@ -20,7 +20,18 @@ from .track_object_state import HasObjectState, track_state_for_class
 
 class SectionBase(HasObjectState,
     Hierarchical, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
-    db.Model):
+    Stateful, db.Model):
+  VALID_STATES = [
+      'Draft',
+      'Final',
+      'Effective',
+      'Ineffective',
+      'Launched',
+      'Not Launched',
+      'In Scope',
+      'Not in Scope',
+      'Deprecated',
+      ]
   _table_plural = 'section_bases'
   __tablename__ = 'sections'
   _title_uniqueness = False
