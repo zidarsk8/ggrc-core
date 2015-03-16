@@ -19,8 +19,8 @@ def upgrade():
     op.create_table(
         'control_assessments',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('design', sa.Boolean(), nullable=True),
-        sa.Column('operational', sa.Boolean(), nullable=True),
+        sa.Column('design', sa.String(length=250), nullable=True),
+        sa.Column('operationally', sa.String(length=250), nullable=True),
         sa.Column('os_state', sa.String(length=250), nullable=False),
         sa.Column('test_plan', sa.Text(), nullable=True),
         sa.Column('end_date', sa.Date(), nullable=True),

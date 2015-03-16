@@ -19,13 +19,13 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documen
                         BusinessObject, db.Model):
   __tablename__ = 'control_assessments'
 
-  design = deferred(db.Column(db.Boolean), 'ControlAssessment')
-  operational = deferred(db.Column(db.Boolean), 'ControlAssessment')
+  design = deferred(db.Column(db.String), 'ControlAssessment')
+  operationally = deferred(db.Column(db.String), 'ControlAssessment')
 
   # REST properties
   _publish_attrs = [
       'design',
-      'operational'
+      'operationally'
   ]
 
 track_state_for_class(ControlAssessment)
