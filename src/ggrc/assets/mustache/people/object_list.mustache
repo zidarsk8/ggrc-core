@@ -72,13 +72,12 @@
                 </div>
 
               </div>
-            </div>
-          </div><!-- item-data end -->
-        </div><!-- select end -->
-      </div><!-- item-wrap end -->
-    </div><!-- item-main end -->
+            </div><!-- item-data end -->
+          </div><!-- select end -->
+        </div><!-- item-wrap end -->
+      </div><!-- item-main end -->
 
-      <div class="tier-2-info item-content">
+      <div class="tier-2-info item-content info">
         <div class="tier-2-info-content">
 
           <div class="details-wrap">
@@ -135,7 +134,6 @@
                 </div>
               {{/email}}
             {{/if}}
-
             {{#if_match company '\\\\S'}}
               {{#company}}
                 <div class="row-fluid wrap-row">
@@ -146,25 +144,36 @@
                 </div>
               {{/company}}
             {{/if_match}}
-
             <div class="row-fluid wrap-row">
               <div class="span12">
                 <h6>Authorizations</h6>
                 <p>
                   {{#person_roles this "System|Admin"}}
-                    {{#roles}}
-                      <span class="role">
-                        {{permission_summary}}
-                      </span>
-                    {{/roles}}
+                    {{#if roles.length}}
+                      {{#roles}}
+                        <span class="role">
+                          {{permission_summary}}
+                        </span>
+                      {{/roles}}
+                    {{else}}
+                      <li>
+                        <div class="item-data">
+                          <div class="tree-title-area">
+                            <span class="no-role">
+                              No Access
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    {{/if}}
                   {{/person_roles}}
                 </p>
               </div>
             </div>
           </div>
-
+          {{{render '/static/mustache/custom_attributes/info.mustache' instance=this}}}
         </div>
-      </div>
+      </div><!-- tier 2 end -->
     </li>
   {{/each}}
 

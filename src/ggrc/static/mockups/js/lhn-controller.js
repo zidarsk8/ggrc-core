@@ -204,7 +204,7 @@ var LHN = can.Control({
     if(!this.mousedown) return;
 
     this.mousedown = false;
-    if(!this.dragged && !this.objnav){
+    if (!this.dragged && !this.objnav) {
       this.toggle_lhs();
       return;
     }

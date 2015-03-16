@@ -8,7 +8,7 @@
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
       <div class="item-wrap">
         <div class="openclose">
-          <span class="status-label status-{{to_class parent_instance.status '_'}}"></span>
+          <span class="status-label"></span>
           <i class="grcicon-arrow-right"></i>
         </div>
         <div class="select {{^if_equals parent_instance.task_groups.length 1}}ordered-item-data{{/if}}">

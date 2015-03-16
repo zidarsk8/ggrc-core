@@ -111,18 +111,10 @@
       },
       _restore_button: function () {
           this.attr('waiting', false);
-      }
-    },
-    events: {
-      "{can.Model.Cacheable} created": function(model) {
-        this.scope._handle_refresh(model);
       },
-      "{can.Model.Cacheable} destroyed": function(model) {
-        this.scope._handle_refresh(model);
-      },
-      "button click": function() {
+      _activate: function() {
         var workflow = GGRC.page_instance(),
-            scope = this.scope,
+            scope = this,
             restore_button = scope._restore_button.bind(scope),
             cycle;
         scope.attr('waiting', true);
@@ -147,6 +139,17 @@
             return workflow.attr('status', "Active").save();
           }, restore_button).then(restore_button);
         }
+      }
+    },
+    events: {
+      "{can.Model.Cacheable} created": function(model) {
+        this.scope._handle_refresh(model);
+      },
+      "{can.Model.Cacheable} destroyed": function(model) {
+        this.scope._handle_refresh(model);
+      },
+      "button click": function() {
+        this.scope._activate();
       }
     }
   });

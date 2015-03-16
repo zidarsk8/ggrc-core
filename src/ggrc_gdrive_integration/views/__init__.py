@@ -31,7 +31,7 @@ def sandbox_gcal():
 
 def post_import_requests():
   count = unicode(len(json.loads(request.args.get('ids', '[]'))))
-  flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
+  flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'alert alert-success')
   return_to = unicode(request.args.get('return_to', u'/dashboard'))
   return redirect(return_to)
 
