@@ -357,7 +357,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {}).attr(opts);
     }
   }
-
   , init : function(el, opts) {
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       this.display_prefs = display_prefs;
@@ -365,7 +364,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       this.element.uniqueId();
 
-      if('parent_instance' in opts && 'status' in opts.parent_instance){
+      if ('parent_instance' in opts && 'status' in opts.parent_instance){
         var setAllowMapping = function(){
           var is_accepted = opts.parent_instance.attr('status') === 'Accepted'
             , admin = Permission.is_allowed("__GGRC_ADMIN__")
@@ -399,14 +398,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       if (this.element && this.element.closest('body').length) {
         this._attached_deferred.resolve();
       }
-
     }.bind(this));
   }
 
   , " inserted": function() {
       this._attached_deferred.resolve();
     }
-
   , init_view : function() {
       var that = this
         , dfds = []
@@ -417,8 +414,18 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           can.view(this.options.header_view, $.when(this.options)).then(
             this._ifNotRemoved(function(frag) {
               that.element.before(frag);
-            })
-          ));
+              // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
+              can.bind.call(that.element.parent().find('.filter-trigger > a'), 'click', function (evnt) {
+                var el = $(evnt.currentTarget);
+                if (el.hasClass("active")) {
+                  that.hide_filter();
+                  el.find("i").attr("data-original-title", "Show filter");
+                } else {
+                  that.show_filter();
+                  el.find("i").attr("data-original-title", "Hide filter");
+                }
+              });
+        })));
       }
 
       // Init the spinner if items need to be loaded:
@@ -426,10 +433,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         if (!that.element) {
           return;
         }
-        if (count())
+        if (count()) {
           that._loading_started();
-        else
+        } else {
           that.element.trigger("loaded");
+        }
       }));
 
       if(this.options.footer_view) {
@@ -804,19 +812,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if(this.options.events && typeof this.options.events[event_name] === "function") {
       this.options.events[event_name].apply(this, arguments);
     }
-  },
-
-
-  ".filter-trigger > a click": function (element, event) {
-      if (element.hasClass("active")) {
-        this.hide_filter();
-        element.find("i").attr("data-original-title", "Show filter");
-      }else{
-        this.show_filter();
-        element.find("i").attr("data-original-title", "Hide filter");
-      }
-    }
-
+  }
   , hide_filter: function () {
       var $filter = this.element.parent().find(".filter-holder"),
           height = $filter.height();
