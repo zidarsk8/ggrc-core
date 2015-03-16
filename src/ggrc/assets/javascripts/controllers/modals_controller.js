@@ -941,22 +941,23 @@ can.Component.extend({
       var that = this,
           changes = this.scope.changes;
 
-      if(changes.length > 0) {
-        this.scope.attr("instance", this.scope.attr("parent_instance").attr(this.scope.instance_attr).reify());
-        can.each(
-          changes,
-          function(item) {
-            var mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, item.what.constructor.shortName);
-
-            if(item.how === "add") {
-              that.scope.instance.mark_for_addition(mapping, item.what, item.extra);
-            } else {
-              that.scope.instance.mark_for_deletion(mapping, item.what);
-            }
-          }
-        );
-        return that.scope.instance.constructor.resolve_deferred_bindings(that.scope.instance);
+      if (changes.length) {
+        return;
       }
+      this.scope.attr("instance", this.scope.attr("parent_instance").attr(this.scope.instance_attr).reify());
+      can.each(
+        changes,
+        function(item) {
+          var mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, item.what.constructor.shortName);
+
+          if (item.how === "add") {
+            that.scope.instance.mark_for_addition(mapping, item.what, item.extra);
+          } else {
+            that.scope.instance.mark_for_deletion(mapping, item.what);
+          }
+        }
+      );
+      return that.scope.instance.constructor.resolve_deferred_bindings(that.scope.instance);
     },
     "{parent_instance} updated": "deferred_update",
     "{parent_instance} created": "deferred_update",
