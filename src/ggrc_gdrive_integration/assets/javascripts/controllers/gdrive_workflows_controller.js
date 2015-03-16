@@ -1170,71 +1170,78 @@ can.Component.extend({
                         function(file) {
                           return CMS.Models.GDriveFile.model(file);
                         }),
-              doc_dfds = [];
-          can.each(files, function(file) {
-            //Since we can re-use existing file references from the picker, check for that case.
-            var dfd = CMS.Models.Document.findAll({link : file.alternateLink }).then(function(d) {
-              var doc_dfd, object_doc, object_file;
-
-              if(d.length < 1) {
-                d.push(
-                  new CMS.Models.Document({
-                    context : that.instance.context || {id : null}
-                    , title : file.title
-                    , link : file.alternateLink
-                  })
-                );
-              }
-              if(that.deferred || !d[0].isNew()) {
-                doc_dfd = $.when(d[0]);
-              } else {
-                doc_dfd = d[0].save();
-              }
-
-              doc_dfd = doc_dfd.then(function(doc) {
-                if(that.deferred) {
-                  that.instance.mark_for_addition("documents", doc, {
-                    context : that.instance.context || {id : null}
-                  });
-                } else {
-                  object_doc = new CMS.Models.ObjectDocument({
-                      context : that.instance.context || {id : null}
-                      , documentable : that.instance
-                      , document : doc
-                    }).save();
-                }
-
-                return $.when(
-                  CMS.Models.ObjectFile.findAll({ file_id : file.id, fileable_id : d[0].id }),
-                  object_doc
-                ).then(function(ofs) {
-                  if(ofs.length < 1) {
-                    if(that.deferred) {
-                      doc.mark_for_addition("files", file, {
-                        context : that.instance.context || {id : null}
-                      });
-                    } else {
-                      return new CMS.Models.ObjectFile({
-                        context : that.instance.context || {id : null}
-                        , file : file
-                        , fileable : doc
-                      }).save();
-                    }
-                }})
-                .then(function() {
-                  return doc;
-                });
-              });
-              return doc_dfd;
-            });
-            doc_dfds.push(dfd);
-          });
+          doc_dfds = that.handle_file_upload(files);
           $.when.apply($, doc_dfds).then(function() {
             el.trigger("modal:success", { arr: can.makeArray(arguments) });
             that.attr('pending', false);
           });
         });
       });
+    },
+
+    handle_file_upload: function(files){
+      var that = this,
+          doc_dfds = [];
+
+      can.each(files, function(file) {
+        //Since we can re-use existing file references from the picker, check for that case.
+        var dfd = CMS.Models.Document.findAll({link : file.alternateLink }).then(function(d) {
+          var doc_dfd, object_doc, object_file;
+
+          if(d.length < 1) {
+            d.push(
+              new CMS.Models.Document({
+                context : that.instance.context || {id : null}
+                , title : file.title
+                , link : file.alternateLink
+              })
+            );
+          }
+          if(that.deferred || !d[0].isNew()) {
+            doc_dfd = $.when(d[0]);
+          } else {
+            doc_dfd = d[0].save();
+          }
+
+          doc_dfd = doc_dfd.then(function(doc) {
+            if(that.deferred) {
+              that.instance.mark_for_addition("documents", doc, {
+                context : that.instance.context || {id : null}
+              });
+            } else {
+              object_doc = new CMS.Models.ObjectDocument({
+                  context : that.instance.context || {id : null}
+                  , documentable : that.instance
+                  , document : doc
+                }).save();
+            }
+
+            return $.when(
+              CMS.Models.ObjectFile.findAll({ file_id : file.id, fileable_id : d[0].id }),
+              object_doc
+            ).then(function(ofs) {
+              if(ofs.length < 1) {
+                if(that.deferred) {
+                  doc.mark_for_addition("files", file, {
+                    context : that.instance.context || {id : null}
+                  });
+                } else {
+                  return new CMS.Models.ObjectFile({
+                    context : that.instance.context || {id : null}
+                    , file : file
+                    , fileable : doc
+                  }).save();
+                }
+            }})
+            .then(function() {
+              return doc;
+            });
+          });
+          return doc_dfd;
+        });
+        doc_dfds.push(dfd);
+      });
+      return doc_dfds;
     }
   },
   events: {
