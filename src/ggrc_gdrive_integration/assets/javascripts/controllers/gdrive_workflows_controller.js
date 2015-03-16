@@ -1095,15 +1095,10 @@ can.Component.extend({
     }
   }
 });
-});
 
 can.Component.extend({
   tag: "ggrc-gdrive-picker-launcher",
-  template: '<a href="javascript://" class="{{link_class}} btn-small btn-draft" '
-            + 'data-object-source="true" data-toggle="evidence-gdrive-picker" '
-            + 'can-click="trigger_upload">{{firstexist link_text "Upload Files to GDrive"}}</a>'
-            + '{{#pending}}<span {{attach_spinner \'{ "radius": 3, "length": 2.5, "width": 2 }\' '
-            + '\'display:inline-block; top: -5px; left: 12px;\' }}></span>{{/pending}}',
+  template: can.view(GGRC.mustache_path + "/gdrive/gdrive_file.mustache"),
   scope: {
     instance: null,
     deferred: "@",
@@ -1250,9 +1245,6 @@ can.Component.extend({
 });
 
 
-
-
-$(function() {
   $(document.body).ggrc_controllers_g_drive_workflow();
 });
 
