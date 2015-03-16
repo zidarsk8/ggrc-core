@@ -842,13 +842,16 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           .data("height", height)
           .animate({height: 0},
                    {duration: 800,
-                    easing: 'easeOutExpo'});
+                    easing: 'easeOutExpo',
+                    complete: function () {
       this.element.parent().find(".filter-trigger > a").removeClass("active");
       this.element.parent().find(".sticky.tree-header").addClass("no-filter");
       Stickyfill.rebuild();
 
+
       this.display_prefs.setFilterHidden(true);
       this.display_prefs.save();
+                    }.bind(this)});
     }
 
   , show_filter: function () {
@@ -857,14 +860,18 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       $filter
           .animate({height: $filter.data("height")},
                    {duration: 800,
-                    easing: 'easeOutExpo'});
-
+                    easing: 'easeOutExpo',
+                    start: function () {
       this.element.parent().find(".filter-trigger > a").addClass("active");
       this.element.parent().find(".sticky.tree-header").removeClass("no-filter");
+                    }.bind(this),
+                    complete: function () {
+      
       Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(false);
       this.display_prefs.save();
+                    }.bind(this)});
     }
 });
 
