@@ -654,7 +654,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       queue_window(list_window);
     final_dfd = $.when.apply($, all_draw_items_dfds);
     final_dfd.done(this._ifNotRemoved(function() {
-      this.element.find(".sticky").Stickyfill();
+      this.element.parent().find(".sticky").Stickyfill();
     }.bind(this)));
     return final_dfd;
   }
