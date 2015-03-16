@@ -106,15 +106,17 @@ can.Model("can.Model.Cacheable", {
   root_object : ""
   , filter_keys : ["assignee", "code", "company", "contact", "description",
                    "email", "end_date", "end date", "kind", "name", "notes",
-                   "owner", "owners", "reference_url", "status", "start_date",
-                   "start date", "test", "title"]
+                   "owner", "owners", "reference_url", "slug", "state",
+                   "status", "start_date", "start date", "test", "title"]
   , filter_mappings: {
     //'search term', 'actual value in the object'
     'owner' : 'owners',
     'workflow' : 'workflows',
     'due date' : 'end_date',
     'end date' : 'end_date',
-    'start date' : 'start_date'
+    'start date' : 'start_date',
+    'code' : 'slug',
+    'state': 'status'
   }
   , root_collection : ""
   , model_singular : ""
