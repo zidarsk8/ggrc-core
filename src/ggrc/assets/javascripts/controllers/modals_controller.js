@@ -141,8 +141,6 @@ can.Control("GGRC.Controllers.Modals", {
       }
       else {
         path = path.join(".");
-
-
         setTimeout(function(){
           el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
         }, 0);
@@ -175,9 +173,6 @@ can.Control("GGRC.Controllers.Modals", {
   }
   , "input[data-lookup][data-drop] paste" : "immediate_find_or_create"
   , "input[data-lookup][data-drop] drop" : "immediate_find_or_create"
-
-
-
   , fetch_templates : function(dfd) {
     var that = this;
     dfd = dfd ? dfd.then(function() { return that.options; }) : $.when(this.options);
@@ -741,8 +736,7 @@ can.Control("GGRC.Controllers.Modals", {
         ajd,
         instance_id = instance.id;
 
-
-      if(instance.errors()) {
+      if (instance.errors()) {
         instance.removeAttr("_suppress_errors");
         return;
       }
@@ -970,7 +964,6 @@ can.Component.extend({
     //  descendant class objects.
     autocomplete_select : function(el, event, ui) {
       var mapping,
-          that = this,
           extra_attrs = can.reduce(
                           this.element
                           .find("input:not([data-mapping], [data-lookup])")
@@ -979,14 +972,27 @@ can.Component.extend({
                             attrs[$(el).attr("name")] = $(el).val();
                             return attrs;
                           }, {});
-      if (that.scope.deferred) {
-        that.scope.changes.push({ what: ui.item, how: "add", extra: extra_attrs });
+      if (this.scope.deferred) {
+        this.scope.changes.push({ what: ui.item, how: "add", extra: extra_attrs });
       } else {
-        mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, ui.item.constructor.shortName);
-        that.scope.instance.mark_for_addition(mapping, ui.item, extra_attrs);
+        mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, ui.item.constructor.shortName);
+        this.scope.instance.mark_for_addition(mapping, ui.item, extra_attrs);
       }
-      that.scope.list.push(ui.item);
-      that.scope.attr("show_new_object_form", false);
+
+      function doesExist(arr, owner) {
+        if (!arr || !arr.length) {
+          return false;
+        }
+        return !!~can.inArray(owner.id, $.map(arr, function (item) {
+          return item.id;
+        }));
+      }
+
+      // If it's owners and user isn't pre-added
+      if (!(~['owners'].indexOf(this.scope.mapping) && doesExist(this.scope.instance.owners, ui.item))) {
+        this.scope.list.push(ui.item);
+      }
+      this.scope.attr("show_new_object_form", false);
     },
     "[data-toggle=unmap] click" : function(el, ev) {
       var i, that = this;
