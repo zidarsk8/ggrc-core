@@ -158,7 +158,7 @@ can.Control("GGRC.Controllers.Modals", {
       params[prop] = el.val();
       el.prop("disabled", true);
       model.findAll(params).then(function(list) {
-        if(list.length) {
+        if (list.length) {
           that.autocomplete_select(el, ev, { item : list[0] });
         } else {
           new model(params).save().then(function(d) {
@@ -904,7 +904,6 @@ can.Component.extend({
       if (!this.scope.source_mapping_source) {
         this.scope.source_mapping_source = 'instance';
       }
-
       if (this.scope[this.scope.source_mapping_source]) {
         this.scope[this.scope.source_mapping_source]
         .get_binding(this.scope.source_mapping)
@@ -922,7 +921,7 @@ can.Component.extend({
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
         key = this.scope.instance_attr + "_" + (this.scope.mapping || this.scope.source_mapping);
-        if(!this.scope.parent_instance._transient[key]) {
+        if (!this.scope.parent_instance._transient[key]) {
           this.scope.attr("list", []);
           this.scope.parent_instance.attr(
             "_transient." + key,
@@ -931,6 +930,13 @@ can.Component.extend({
         } else {
           this.scope.attr("list", this.scope.parent_instance._transient[key]);
         }
+      }
+      // Workaround so we render pre-defined users.
+      if (this.scope.instance.owners && this.scope.instance.owners.length &&
+          this.scope.list && !this.scope.list.length) {
+        this.scope.instance.owners.forEach(function (item) {
+          this.scope.list.push(CMS.Models.Person.findInCacheById(item.id));
+        }.bind(this));
       }
       this.options.parent_instance = this.scope.parent_instance;
       this.options.instance = this.scope.instance;

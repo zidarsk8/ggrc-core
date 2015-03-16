@@ -93,12 +93,12 @@ can.Construct("can.Model.Mixin", {
 });
 
 can.Model.Mixin("ownable", {
-  "after:init" : function() {
+  "after:init": function() {
     if (!this.owners) {
       this.attr("owners", []);
     }
   }
-  , before_create : function() {
+  , before_create: function() {
     if (!this.owners || !this.owners.length) {
       this.attr('owners', [{ id: GGRC.current_user.id, type : "Person", automatic: true }]);
     }
