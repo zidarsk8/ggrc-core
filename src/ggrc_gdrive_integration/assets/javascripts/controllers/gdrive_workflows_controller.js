@@ -1104,7 +1104,9 @@ can.Component.extend({
     deferred: "@",
     link_text: "@",
     link_class: "@",
-    trigger_upload : function(scope, el, ev) {
+    click_event: "@",
+    trigger_upload_parent: function(scope, el, ev) {
+      // upload files with a parent folder (audits and workflows)
       var that = this,
           parent_folder_dfd;
 
