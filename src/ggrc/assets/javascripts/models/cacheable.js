@@ -1071,7 +1071,7 @@ can.Model("can.Model.Cacheable", {
   hash_fragment: function () {
     var type = can.spaceCamelCase(this.type)
             .toLowerCase()
-            .replace(' ', '_');
+            .replace(/ /g, '_');
 
     return [type,
             this.id].join('/');
