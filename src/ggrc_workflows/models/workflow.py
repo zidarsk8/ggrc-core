@@ -70,6 +70,10 @@ class Workflow(
   next_cycle_start_date = deferred(
       db.Column(db.Date, nullable=True), 'Workflow')
 
+  @computed_property
+  def workflow_state(self):
+    return WorkflowState.get_state(self.cycles)
+
   _sanitize_html = [
       'notify_custom_message',
       ]
@@ -85,6 +89,7 @@ class Workflow(
       'object_approval',
       'recurrences',
       PublishOnly('next_cycle_start_date'),
+      PublishOnly('workflow_state'),
       ]
 
   def copy(self, _other=None, **kwargs):

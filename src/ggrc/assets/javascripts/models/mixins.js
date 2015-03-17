@@ -47,11 +47,11 @@ can.Construct("can.Model.Mixin", {
         if(fn !== can.Model.Mixin[key] && !~can.inArray(key, blockedKeys)) {
           var oldfn = obj[key];
           // TODO support other ways of adding functions.
-          //  E.g. "override" (doesn't call super fn at all) 
+          //  E.g. "override" (doesn't call super fn at all)
           //       "sub" (sets this._super for mixin function)
           //       "chain" (pushes result of oldfn onto args)
           //       "before"/"after" (overridden function)
-          // TODO support extension for objects.  
+          // TODO support extension for objects.
           //   Necessary for "attributes"/"serialize"/"convert"
           // Defaults will always be "after" for functions
           //  and "override" for non-function values
@@ -94,20 +94,25 @@ can.Construct("can.Model.Mixin", {
 
 can.Model.Mixin("ownable", {
   "after:init" : function() {
-    if(!this.owners) {
+    if (!this.owners) {
       this.attr("owners", []);
     }
   }
   , before_create : function() {
-    if(!this.owners || this.owners.length === 0) {
-      this.attr('owners', [{ id: GGRC.current_user.id, type : "Person" }]);
+    if (!this.owners || !this.owners.length) {
+      this.attr('owners', [{ id: GGRC.current_user.id, type : "Person", automatic: true }]);
+    }
+    if (this.owners.length > 2) {
+      this.attr('owners', can.map(function (owner) {
+        if (!owner.automatic) {
+          return owner;
+        }
+      }));
     }
   }
   , form_preload : function(new_object_form) {
-    if(new_object_form) {
-      if(!this.owners || this.owners.length === 0) {
-        this.attr('owners', [{ id: GGRC.current_user.id, type : "Person" }]);
-      }
+    if (new_object_form && (!this.owners || !this.owners.length)) {
+      this.attr('owners', [{ id: GGRC.current_user.id, type : "Person", automatic: true }]);
     }
   }
 });
@@ -115,7 +120,7 @@ can.Model.Mixin("ownable", {
 can.Model.Mixin("contactable", {
   // NB : Because the attributes object
   //  isn't automatically cloned into subclasses by CanJS (this is an intentional
-  //  exception), when subclassing a class that uses this mixin, be sure to pull in the 
+  //  exception), when subclassing a class that uses this mixin, be sure to pull in the
   //  parent class's attributes using `can.extend(this.attributes, <parent_class>.attributes);`
   //  in the child class's static init function.
   "extend:attributes" : {
@@ -155,7 +160,7 @@ can.Model.Mixin("unique_title", {
   }
   , after_save : function() {
     // Currently we do not have a way of searching for similarly
-    //  titled objects through the search API or the declarative 
+    //  titled objects through the search API or the declarative
     //  model layer, but it's recommended that we show users when
     //  a name for an object is too similar to ones already in the
     //  system.  --BM 5/2/2014
