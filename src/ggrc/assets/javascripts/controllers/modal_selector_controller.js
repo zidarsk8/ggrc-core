@@ -1049,6 +1049,7 @@
               $(document.body).trigger('ajax:flash',
                   { success: that.context.selected_option.constructor.shortName + " mapped successfully."});
               $(that.element).modal_form('hide');
+              that.update_hash_fragment(join_instance);
             })
             .fail(function(xhr) {
               // Currently, the only error we encounter here is uniqueness
@@ -1102,6 +1103,54 @@
           }
         });
       }
+ 
+   , should_update_hash_fragment: function () {
+      var $trigger = this.options.$trigger;
+      return !($trigger.closest(".modal").size()
+               || $trigger.closest(".cms_controllers_info_pin").size());
+   }
+
+   // if we have join.destination, return that
+   // otherwise return the other side of the join 
+   // than the one that triggered the modal
+   , _get_mapped: function (join_instance) {
+       var instance = join_instance[0];
+
+       if (instance.destination) {
+         return instance.destination;
+       }else{
+         var types = can.spaceCamelCase(join_instance[0].type).split(" "),
+             parent_type = this.options.binding.instance.type,
+             mapped_type;
+
+         if (types[0] == parent_type) {
+           mapped_type = types[1];
+         }else{
+           mapped_type = types[0];
+         }
+
+         return instance[mapped_type.toLowerCase()];
+       }
+   }
+
+   , update_hash_fragment: function (join_instance) {
+     if (!this.should_update_hash_fragment()) return;
+
+     var hash = window.location.hash.split('/')[0],
+         tree_controller = this.options
+             .$trigger
+             .closest(".cms_controllers_tree_view_node")
+             .control(),
+         mapped = this._get_mapped(join_instance);
+
+     hash += [tree_controller 
+              ? tree_controller.hash_fragment()
+              : "",
+              mapped.type.toLowerCase(), 
+              mapped.id].join('/');
+       
+     window.location.hash = hash;
+   }
 
     , move_option_to_top_and_select: function(option) {
 
@@ -1991,6 +2040,7 @@
             if (!modalSelector.options.deferred) {
               $(document.body).trigger('ajax:flash',
                 { success: modalSelector.context.selected_options[0].constructor.shortName + " mapped successfully."});
+              this.update_hash_fragment(join_instance);
             }
             obj_arr.push(obj);
           }
@@ -2017,13 +2067,13 @@
           if (modalSelector.options.deferred) {
             join_instance = modalSelector.sync_selected_options();
             its = join_instance.length;
-            can.each(join_instance, map_post_process);
+            can.each(join_instance, map_post_process.bind(this));
           } else {
             join_instance = this.create_join();
             its = join_instance.length;
             for(var i = 0; i < its; i++){
             //We have multiple join_instances
-              ajd = join_instance[i].save().done(map_post_process)
+              ajd = join_instance[i].save().done(map_post_process.bind(this))
               .fail(function (xhr) {
                   // Currently, the only error we encounter here is uniqueness
                   // constraint violations.  Let's use a nicer message!

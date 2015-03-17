@@ -245,7 +245,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
 
     return vals;
   }
-
 });
 
 can.Model.Mixin("requestorable", {
@@ -589,15 +588,6 @@ can.Model.Cacheable("CMS.Models.Response", {
             this.attr('contact', this.request.reify().assignee);
         };
     }
-  }
-  , after_create: function () {
-    var hash = window.location.hash.split("/")[0];
-
-    window.location.hash = [hash,
-                            "request",
-                            this.request.id,
-                            this.response_type+"_response",
-                            this.id].join("/");
   }
 
 });
