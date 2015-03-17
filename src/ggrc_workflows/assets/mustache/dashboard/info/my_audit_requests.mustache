@@ -138,9 +138,13 @@
     </li>
   {{/list}}
   {{/audit_requests_data}}
-  <li>
-    <div class="zero-state">
-      <h2>You currently have no active requests assigned to you</h2>
-    </div>
-  </li>
+  {{#if_equals audit_requests_count 0}}
+    {{#if_equals show_audit true}}
+      <li>
+        <div class="zero-state">
+          <h2>You currently have no active requests assigned to you.</h2>
+        </div>
+      </li>
+    {{/if_equals}}
+  {{/if_equals}}
 </ul>
