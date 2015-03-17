@@ -21,7 +21,7 @@
   background-image: image-url("grcicons/icons.png");
   background-position: -2000px -2000px; // blank default state
   background-repeat: no-repeat;
-  @include background-size(368px 416px);
+  @include background-size(368px 440px);
   &.process-icon {
     margin-top:2px;
     @include opacity(0.5);
@@ -263,6 +263,8 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-manual { background-position: -318px -296px; }
 .grcicon-archive { background-position: -318px -272px; }
 .grcicon-my-work { background-position: -294px -224px; }
+.grcicon-done { background-position: -30px -416px; }
+.grcicon-not-done  { background-position: -54px -416px; }
 
 // Large icons
 .grciconlarge-dashboard { background-position:-8px -8px; }
@@ -301,6 +303,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grciconlarge-clause { background-position: -40px -200px; }
 .grciconlarge-standard { background-position: -72px -200px; }
 .grciconlarge-import { background-position: -104px -200px; }
+.grciconlarge-issue { background-position: -136px -200px; }
 
 .showhide {
   background-position:-198px -56px;
@@ -609,6 +612,12 @@ i.short {
   &.disabled {
     // turns icons to black
     @extend %black-icons;
+  }
+  .control-yes {
+    .grcicon-control-color { background-position: -6px -416px; }
+  }
+  .control-no {
+    .grcicon-control-color { background-position: -150px -224px; }
   }
 }
 

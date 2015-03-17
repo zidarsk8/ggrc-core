@@ -163,6 +163,9 @@
         padding-left: 10px;
       }
     }
+    &.left-space {
+      padding-left: 10px;
+    }
     &.default-left-space {
       padding: 0 12px 0 10px;
     }
@@ -1088,6 +1091,20 @@
     .alert {
       line-height:18px;
     }
+  }
+}
+
+.zero-state {
+  background: $lightGray;
+  border-bottom: 1px solid $infoMessageBorder;
+  padding-bottom: 40px;
+  h2 {
+    line-height: 36px;
+    font-size: 24px;
+    padding: 40px 40px 0 40px;
+    font-weight: normal;
+    text-align: center;
+    color: $infoMessageText;
   }
 }
 
