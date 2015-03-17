@@ -836,14 +836,15 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
   , hide_filter: function () {
       var $filter = this.element.parent().find(".filter-holder"),
-          height = $filter.height();
+          height = $filter.height(),
+          margin = $filter.css("margin-bottom").replace("px", "");
 
       $filter
           .data("height", height)
-          .animate({height: 0},
-                   {duration: 800,
-                    easing: 'easeOutExpo',
-                    complete: function () {
+          .data("margin-bottom", margin)
+          .height(0)
+          .css("margin-bottom", 0);
+
       this.element.parent().find(".filter-trigger > a").removeClass("active");
       this.element.parent().find(".sticky.tree-header").addClass("no-filter");
       Stickyfill.rebuild();
@@ -851,27 +852,22 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       this.display_prefs.setFilterHidden(true);
       this.display_prefs.save();
-                    }.bind(this)});
     }
 
   , show_filter: function () {
       var $filter = this.element.parent().find(".filter-holder");
 
       $filter
-          .animate({height: $filter.data("height")},
-                   {duration: 800,
-                    easing: 'easeOutExpo',
-                    start: function () {
+          .height($filter.data("height"))
+          .css("margin-bottom", $filter.data("margin-bottom"));
+
       this.element.parent().find(".filter-trigger > a").addClass("active");
       this.element.parent().find(".sticky.tree-header").removeClass("no-filter");
-                    }.bind(this),
-                    complete: function () {
       
       Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(false);
       this.display_prefs.save();
-                    }.bind(this)});
     }
 });
 
