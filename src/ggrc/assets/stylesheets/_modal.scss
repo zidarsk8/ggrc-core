@@ -856,7 +856,7 @@
         .role-description {
           padding-right: 20px;
         }
-        h4 {
+        label {
           @extend .role-description;
           font-weight: normal;
           font-size: 16px;
@@ -869,9 +869,14 @@
           font-size: 12px;
         }
         &.selected {
-          h4 {
+          label {
             font-weight: bold;
           }
+        }
+      }
+      &.third-part {
+        li {
+          width: 33.33%;
         }
       }
     }

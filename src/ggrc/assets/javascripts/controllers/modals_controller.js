@@ -141,8 +141,6 @@ can.Control("GGRC.Controllers.Modals", {
       }
       else {
         path = path.join(".");
-
-
         setTimeout(function(){
           el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
         }, 0);
@@ -175,9 +173,6 @@ can.Control("GGRC.Controllers.Modals", {
   }
   , "input[data-lookup][data-drop] paste" : "immediate_find_or_create"
   , "input[data-lookup][data-drop] drop" : "immediate_find_or_create"
-
-
-
   , fetch_templates : function(dfd) {
     var that = this;
     dfd = dfd ? dfd.then(function() { return that.options; }) : $.when(this.options);
@@ -313,17 +308,17 @@ can.Control("GGRC.Controllers.Modals", {
   , "input:not(isolate-form input), textarea:not(isolate-form textarea), select:not(isolate-form select) change" : function(el, ev) {
       this.options.instance.removeAttr("_suppress_errors");
       // Set the value if it isn't a search field
-      if(!el.hasClass("search-icon")
-        || el.is("[null-if-empty]")
-           && (!el.val() || el.val().length === 0)
+      if (!el.hasClass("search-icon") ||
+          el.is("[null-if-empty]") &&
+          (!el.val() || !el.val().length)
       ) {
         this.set_value_from_element(el);
       }
   }
 
-  , "input:not([data-lookup], isolate-form *), textarea keyup" : function(el, ev) {
+  , "input:not([data-lookup], isolate-form *), textarea keyup" : function (el, ev) {
       if (el.prop('value').length === 0 ||
-        (typeof el.attr('value') !== 'undefined' && el.attr('value').length === 0)) {
+          (typeof el.attr('value') !== 'undefined' && !el.attr('value').length)) {
         this.set_value_from_element(el);
       }
   }
@@ -336,25 +331,25 @@ can.Control("GGRC.Controllers.Modals", {
       can.each($elements.toArray(), this.proxy("set_value_from_element"));
     }
 
-  , set_value_from_element : function(el) {
-      var $el = $(el)
+  , set_value_from_element : function (el) {
+      var $el = el instanceof jQuery ? el : $(el)
         , name = $el.attr('name')
         , value = $el.val()
-        , that = this
         ;
-
       // If no model is specified, short circuit setting values
       // Used to support ad-hoc form elements in confirmation dialogs
-      if (!this.options.model)
+      if (!this.options.model) {
         return;
+      }
 
-      if (name)
+      if (name) {
         this.set_value({ name: name, value: value });
+      }
 
       if($el.is("[data-also-set]")) {
         can.each($el.data("also-set").split(","), function(oname) {
-          that.set_value({ name : oname, value : value});
-        });
+          this.set_value({ name : oname, value : value});
+        }, this);
       }
     }
 
@@ -741,8 +736,7 @@ can.Control("GGRC.Controllers.Modals", {
         ajd,
         instance_id = instance.id;
 
-
-      if(instance.errors()) {
+      if (instance.errors()) {
         instance.removeAttr("_suppress_errors");
         return;
       }
@@ -762,8 +756,10 @@ can.Control("GGRC.Controllers.Modals", {
           if(that.options.add_more) {
             that.new_instance();
           }
-          else
+          else { 
             that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
+            that.update_hash_fragment();
+          }
         }
 
         // If this was an Objective created directly from a Section, create a join
@@ -863,6 +859,29 @@ can.Control("GGRC.Controllers.Modals", {
     if(this.options.instance && this.options.instance._transient) {
       this.options.instance.removeAttr("_transient");
     }
+  }
+
+  , should_update_hash_fragment: function () {
+    var $trigger = this.options.$trigger;
+    return !($trigger.closest(".modal").size()
+          || $trigger.closest(".cms_controllers_info_pin").size());
+  }
+
+  , update_hash_fragment: function () {
+    if (!this.should_update_hash_fragment()) return;
+
+    var hash = window.location.hash.split('/')[0],
+        tree_controller = this.options
+            .$trigger
+            .closest(".cms_controllers_tree_view_node")
+            .control();
+
+    hash += [tree_controller 
+             ? tree_controller.hash_fragment()
+             : "",
+             this.options.instance.hash_fragment()].join('/');
+
+    window.location.hash = hash;
   }
 });
 
@@ -970,7 +989,6 @@ can.Component.extend({
     //  descendant class objects.
     autocomplete_select : function(el, event, ui) {
       var mapping,
-          that = this,
           extra_attrs = can.reduce(
                           this.element
                           .find("input:not([data-mapping], [data-lookup])")
@@ -979,14 +997,27 @@ can.Component.extend({
                             attrs[$(el).attr("name")] = $(el).val();
                             return attrs;
                           }, {});
-      if (that.scope.deferred) {
-        that.scope.changes.push({ what: ui.item, how: "add", extra: extra_attrs });
+      if (this.scope.deferred) {
+        this.scope.changes.push({ what: ui.item, how: "add", extra: extra_attrs });
       } else {
-        mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, ui.item.constructor.shortName);
-        that.scope.instance.mark_for_addition(mapping, ui.item, extra_attrs);
+        mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, ui.item.constructor.shortName);
+        this.scope.instance.mark_for_addition(mapping, ui.item, extra_attrs);
       }
-      that.scope.list.push(ui.item);
-      that.scope.attr("show_new_object_form", false);
+
+      function doesExist(arr, owner) {
+        if (!arr || !arr.length) {
+          return false;
+        }
+        return !!~can.inArray(owner.id, $.map(arr, function (item) {
+          return item.id;
+        }));
+      }
+
+      // If it's owners and user isn't pre-added
+      if (!(~['owners'].indexOf(this.scope.mapping) && doesExist(this.scope.instance.owners, ui.item))) {
+        this.scope.list.push(ui.item);
+      }
+      this.scope.attr("show_new_object_form", false);
     },
     "[data-toggle=unmap] click" : function(el, ev) {
       var i, that = this;

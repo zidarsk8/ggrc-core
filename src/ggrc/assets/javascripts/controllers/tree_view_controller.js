@@ -19,7 +19,9 @@ function _firstElementChild(el) {
 }
 
 
-function _display_tree_subpath(el, path) {
+function _display_tree_subpath(el, path, attempt_counter) {
+  attempt_counter || (attempt_counter = 0);
+
   var rest = path.split("/")
     , type = rest.shift()
     , id = rest.shift()
@@ -35,19 +37,31 @@ function _display_tree_subpath(el, path) {
   if (type || id) {
     $node = el.find(selector);
 
-    if (!rest.length) {
-      $node.find(".select").click();
-      scroll_delay = 750;
+    // sometimes nodes haven't loaded yet, wait for them
+    if (!$node.size() && attempt_counter < 5) {
+      setTimeout(function () {
+        _display_tree_subpath(el, path, attempt_counter+1);
+      }, 100);
+      return;
     }
 
-    node_controller = $node.control();
-    if (node_controller && node_controller.display_path) {
-      return node_controller.display_path(rest);
+    if (!rest.length) {
+      var controller = $node
+              .closest(".cms_controllers_tree_view_node")
+              .control();
+
+      if (controller) {
+        controller.select();
+        scroll_delay = 750;
+      }
+    }else{
+      node_controller = $node.control();
+      if (node_controller && node_controller.display_path) {
+         return node_controller.display_path(rest);
+      }
     }
-    else {
-      //  TODO: `resolve` or `reject` if path isn't found?
-      return new $.Deferred().resolve();
-    }
+
+    return new $.Deferred().resolve();
   }
   else {
     return new $.Deferred().resolve();
@@ -135,8 +149,15 @@ can.Control("CMS.Controllers.TreeLoader", {
 
   , show_info_pin: function() {
     if (this.element && !this.element.data('no-pin')) {
-      var children = this.element.children();
-      children && children.find('.select:visible').first().click();
+      var children = this.element.children(),
+          controller = children && children.find('.select:visible')
+              .first()
+              .closest(".cms_controllers_tree_view_node")
+              .control();
+      
+      if (controller) {
+        controller.select();
+      }
     }
   }
 
@@ -315,6 +336,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , find_params : {}
     , sort_property : null
     , sort_function : null
+    , sortable : true
     , filter : null
     , start_expanded : false //true
     , draw_children : true
@@ -356,7 +378,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {}).attr(opts);
     }
   }
-
   , init : function(el, opts) {
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       this.display_prefs = display_prefs;
@@ -364,7 +385,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       this.element.uniqueId();
 
-      if('parent_instance' in opts && 'status' in opts.parent_instance){
+      if ('parent_instance' in opts && 'status' in opts.parent_instance){
         var setAllowMapping = function(){
           var is_accepted = opts.parent_instance.attr('status') === 'Accepted'
             , admin = Permission.is_allowed("__GGRC_ADMIN__")
@@ -398,14 +419,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       if (this.element && this.element.closest('body').length) {
         this._attached_deferred.resolve();
       }
-
     }.bind(this));
   }
 
   , " inserted": function() {
       this._attached_deferred.resolve();
     }
-
   , init_view : function() {
       var that = this
         , dfds = []
@@ -415,9 +434,19 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         dfds.push(
           can.view(this.options.header_view, $.when(this.options)).then(
             this._ifNotRemoved(function(frag) {
-              that.element.prepend(frag);
-            })
-          ));
+              that.element.before(frag);
+              // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
+              can.bind.call(that.element.parent().find('.filter-trigger > a'), 'click', function (evnt) {
+                var el = $(evnt.currentTarget);
+                if (el.hasClass("active")) {
+                  that.hide_filter();
+                  el.find("i").attr("data-original-title", "Show filter");
+                } else {
+                  that.show_filter();
+                  el.find("i").attr("data-original-title", "Hide filter");
+                }
+              });
+        })));
       }
 
       // Init the spinner if items need to be loaded:
@@ -425,10 +454,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         if (!that.element) {
           return;
         }
-        if (count())
+        if (count()) {
           that._loading_started();
-        else
+        } else {
           that.element.trigger("loaded");
+        }
       }));
 
       if(this.options.footer_view) {
@@ -645,7 +675,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       queue_window(list_window);
     final_dfd = $.when.apply($, all_draw_items_dfds);
     final_dfd.done(this._ifNotRemoved(function() {
-      this.element.find(".sticky").Stickyfill();
+      this.element.parent().find(".sticky").Stickyfill();
     }.bind(this)));
     return final_dfd;
   }
@@ -670,7 +700,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       });
 
       if (sort_prop || sort_function) {
-         $items.each(function(i, item) {
+        $items.each(function(i, item) {
             var j, $item = $(item), compare;
             for(j = $existing.length - 1; j >= 0; j--) {
               var old_item = $existing.eq(j).control().options.instance,
@@ -698,7 +728,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               $item.appendTo(this.element);
             }
             $existing.splice(0, 0, item);
-         });
+        });
+        if (this.options.sortable) {
+          $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
+        }
       } else {
         if($footer.length) {
           $items.insertBefore($footer);
@@ -800,19 +833,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if(this.options.events && typeof this.options.events[event_name] === "function") {
       this.options.events[event_name].apply(this, arguments);
     }
-  },
-
-
-  ".filter-trigger > a click": function (element, event) {
-      if (element.hasClass("active")) {
-        this.hide_filter();
-      }else{
-        this.show_filter();
-      }
-    }
-
+  }
   , hide_filter: function () {
-      var $filter = this.element.find(".filter-holder"),
+      var $filter = this.element.parent().find(".filter-holder"),
           height = $filter.height();
 
       $filter
@@ -820,9 +843,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           .animate({height: 0},
                    {duration: 800,
                     easing: 'easeOutExpo'});
-      this.element.find(".filter-trigger > a").removeClass("active");
-
-      this.element.find(".sticky.tree-header").addClass("no-filter");
+      this.element.parent().find(".filter-trigger > a").removeClass("active");
+      this.element.parent().find(".sticky.tree-header").addClass("no-filter");
       Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(true);
@@ -830,15 +852,15 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , show_filter: function () {
-      var $filter = this.element.find(".filter-holder");
+      var $filter = this.element.parent().find(".filter-holder");
 
       $filter
           .animate({height: $filter.data("height")},
                    {duration: 800,
                     easing: 'easeOutExpo'});
 
-      this.element.find(".filter-trigger > a").addClass("active");
-      this.element.find(".sticky.tree-header").removeClass("no-filter");
+      this.element.parent().find(".filter-trigger > a").addClass("active");
+      this.element.parent().find(".sticky.tree-header").removeClass("no-filter");
       Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(false);
@@ -915,9 +937,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
     var that = this
       , original_child_options = this.options.child_options
       , new_child_options = [];
-    this.options.attr("child_options", new can.Observe.List())
-    if (original_child_options.length == null)
-      original_child_options = [original_child_options]
+
+    this.options.attr("child_options", new can.Observe.List());
+
+    if (original_child_options.length == null) {
+      original_child_options = [original_child_options];
+    }
 
     if(this.should_draw_children()) {
       can.each(original_child_options, function(data, i) {
@@ -925,16 +950,17 @@ can.Control("CMS.Controllers.TreeViewNode", {
         data.each(function(v, k) {
           options.attr(k, v);
         });
-        that.add_child_list(that.options, options);
+        this.add_child_list(this.options, options);
         options.attr({
-            "options_property": that.options.options_property
+            "options_property": this.options.options_property
           , "single_object": false
-          //, "parent": that.options
-          , "parent_instance": that.options.instance
+          , "parent": this
+          , "parent_instance": this.options.instance
         });
         new_child_options.push(options);
-      });
-      that.options.attr("child_options", new_child_options);
+      }.bind(this));
+
+      this.options.attr("child_options", new_child_options);
     }
   }
 
@@ -1064,12 +1090,19 @@ can.Control("CMS.Controllers.TreeViewNode", {
       this.expand();
   }
   , ".select:not(.disabled) click": function(el, ev) {
-
     var tree = el.closest('.cms_controllers_tree_view_node'),
         node = tree.control();
-    tree.closest('section').find('.cms_controllers_tree_view_node').removeClass('active');
-    tree.addClass('active');
-    $('.pin-content').control().setInstance(node.options.instance, el);
+    
+    node.select();
+  }
+  , select: function () {
+    var $tree = this.element;
+      
+    $tree.closest('section').find('.cms_controllers_tree_view_node').removeClass('active');
+    $tree.addClass('active');
+
+    this.update_hash_fragment();
+    $('.pin-content').control().setInstance(this.options.instance, $tree);
   }
 
   , "input,select click" : function(el, ev) {
@@ -1083,4 +1116,22 @@ can.Control("CMS.Controllers.TreeViewNode", {
         $expand_el.trigger("click");
       return this.expand();
     }
+
+  , hash_fragment: function () {
+    var parent_fragment = "";
+
+    if (this.options.parent) {
+      parent_fragment = this.options.parent.hash_fragment();
+    }
+
+    return [parent_fragment,
+            this.options.instance.hash_fragment()].join("/");
+  }
+
+  , update_hash_fragment: function () {
+    var hash = window.location.hash.split("/")[0];
+
+    window.location.hash = [hash,
+                            this.hash_fragment()].join('');
+  }
 });

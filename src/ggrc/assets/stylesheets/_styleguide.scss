@@ -105,3 +105,29 @@
 #auditMeetingPin {
   display: none;
 }
+
+// Mockups Audit revamp 2.1
+.object-wrap-control,
+.object-wrap-ca,
+#ca .content > .tree-structure > .tree-item,
+.object-wrap-people,
+.object-wrap-program,
+.object-wrap-requests,
+.object-wrap-complete,
+.object-wrap-issues,
+.object-wrap-issue-ca,
+.object-wrap-issue-audit,
+.object-wrap-issue-controls,
+.object-wrap-issue-program,
+.object-wrap-issue-workflow,
+.object-wrap-issue-workflow-tasks,
+#workflowWrap,
+#workflowTaskWrap,
+#undoTask,
+#finishTask,
+#approveTask,
+#declineTask,
+#reviewChoice,
+#taskDone {
+  display: none;
+}

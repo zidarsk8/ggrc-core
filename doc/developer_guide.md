@@ -302,6 +302,15 @@ The client-side of GGRC is initially constructed from templates and/or views def
 
 Once the Controls are rendered, they take control of generating the remainder of the UI and attaching all relevant logic and user interaction handlers.
 
+There are two main objects that are useful in managing the data model:
+
+* `GGRC`
+* `CMS`
+
+For example, `GGRC.page_instance()` returns the current page instance, and `GGRC.page_object` is the object rendered by the current page (e.g. a Program), as it was received from the server (mapped objects are stubs).
+
+`CMS.Models.<MODEL>.cache` stores the loaded objects. For example, `CMS.Models.Program.cache` will have an array of all the loaded programs.
+
 ### Client-side File Manifests
 
 JavaScript code as well as all Mustache templates need to be referenced from a manifest file in order for it to be usable in constructing the UI.
@@ -320,19 +329,25 @@ These manifest files live in [`src/<module>/assets/assets.yaml`](/src/ggrc/asset
 
 View logic is defined within the control (as functions on the control itself).
 
+### Widgets (tabs)
+
+Which widgets (or tabs) are shown on the object page is defined in [`business_objects.js`](/src/ggrc/assets/javascripts/apps/business_objects.js). This is where we state which controller should be used for each tab (InfoWidget/TreeView/ListView). TreeViews are used almost everywhere, except on the Admin Dashboard, where we are using ListViews. ListViews have pagination.
+
+Almost every TreeView controller instance has a `parent_instance` variable that can be used to access the parent. 
+You can't get the parent of an object without a TreeView, because an object can have multiple parents (think of it as a graph). Our TreeViews are trees inside this graph so that's why we can have parent instances in this context.
+
+Filtering a TreeView is done in the TreeFilter, which simply hides the elements from the DOM.
+
 ### QuickFormController
 
-This controller derives from the Modals controller in that it takes form input, converts it into properties on model instances, and
-saves the changes back to the server.  A primary difference in QuickForm is that any update to the instance triggered by QuickForm
-results in an immediate save().  Also, QuickForm was created with the expectation that the instance already exists on the server;
-attempts to work with new model instances before first save may result in unexpected behavior.
+This controller derives from the Modals controller in that it takes form input, converts it into properties on model instances, and saves the changes back to the server.  A primary difference in QuickForm is that any update to the instance triggered by QuickForm results in an immediate save().  Also, QuickForm was created with the expectation that the instance already exists on the server; attempts to work with new model instances before first save may result in unexpected behavior.
 
 * How do controllers interact with controls?
 * How do controllers interact with the backend?
 
 ### Model
 
-View models (defined in JavaScript) are in [/src/<module>/assets/javascripts/models/](/src/ggrc/assets/javascripts/models)
+View models (defined in JavaScript) are in [`/src/<module>/assets/javascripts/models/`](/src/ggrc/assets/javascripts/models)
 
 The models define:
 
@@ -580,13 +595,14 @@ return a rejected deferred when an error happens.
 
 ### Mappings
 
-Mappings are best thought of as **links**. (“Mapping” [often means](http://www.merriam-webster.com/dictionary/mapping) a 1-to-1 correspondence, and for historical reasons is the term adopted by GGRC users; but in actuality; we have links between objects - e.g. a Directive is **linked** to a Section, or a Programs **references** zero or more Controls.) “Mappings” are a way to relate any model instance to another model instance in a way that is flexible, and doesn't require modifying the relational structure in the underlying data store used for persistence (database).
+Mappings are best thought of as **links**. (“Mapping” [often means](http://www.merriam-webster.com/dictionary/mapping) a 1-to-1 correspondence, and for historical reasons is the term adopted by GGRC users; but in actuality; we have links between objects - e.g. a Directive is **linked** to a Section, or a Programs **references** zero or more Controls.) “Mappings” are a way to relate any model instance to another model instance in a way that is flexible, and doesn't require modifying the relational structure in the underlying data store used for persistence (database).  They're essentially just an abstraction over our database, so that you don't have to care about which tables the relationships are stored in.
 
 Mappings essentially turn the entire system into a [property graph](https://github.com/tinkerpop/gremlin/wiki/Defining-a-Property-Graph).
 
 Mappings are defined in [`/src/ggrc/assets/javascripts/models/mappings.js`](/src/ggrc/assets/javascripts/models/mappings.js).
 
-
+We don't have a function that gets all the objects mapped to a given object. 
+You can get the mappings of an instance by calling `instance.get_mappings('_mapping_')` if the mappings are already loaded, or by calling `instance.get_binding('_mapping_').refresh_list()` if they are not.
 
 #### Types of Mappings
 

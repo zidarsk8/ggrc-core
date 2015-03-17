@@ -1087,7 +1087,7 @@ function resize_areas() {
   objectWidthActive = winWidth - lhsWidth - barWidth;
   objectWidth = winWidth;
   //headerWidth = winWidth - lhsWidth - barWidth - 20;
-  headerWidth = winWidth - 20;
+  headerWidth = winWidth - 40;
   lhnType_width = lhsWidth + 6;
 
   $lhsHolder

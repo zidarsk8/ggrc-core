@@ -24,14 +24,14 @@ $(function() {
         , mappings = result && result.get_mappings()
         , i
         ;
-      
+
       function notify(instance){
         $(document.body).trigger(
             "ajax:flash"
             , {"success" : "Unmap successful."}
           );
       }
-      
+
       can.each(mappings, function(mapping) {
         mapping.refresh().done(function() {
           if (mapping instanceof CMS.Models.Control) {
@@ -84,7 +84,7 @@ $(function() {
     function triggerFlash(type) {
       $target.trigger(
         "ajax:flash"
-        , type === "error" 
+        , type === "error"
           ? {
             error : [
               "Failed to map"

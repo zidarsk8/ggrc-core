@@ -271,38 +271,26 @@ $(function() {
   });
 
   var base_widgets_by_type = {
-    "Program": ["Regulation", "Contract", "Policy", "Standard", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Audit": ["Request", "history", "Person", "program", "program_controls", "ControlAssessment"],
-    "Regulation" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
-    "Policy" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
-    "Standard" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
-    "Contract" : ["Program", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
-    "Clause" : ["Contract", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
-    "Section" : ["Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
-    "Objective" : ["Program", "Regulation", "Contract", "Policy",
-                   "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person"],
-    "Control" : ["Request", "Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System",
-                  "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Person" : ["Program", "Regulation", "Contract", "Policy", "Standard",
-                "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Audit"],
-    "OrgGroup" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control",
-                  "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Vendor" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
-                "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "System" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
-                "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Process" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
-                 "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "DataAsset" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
-                   "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Product" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
-                 "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Project" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
-                  "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Facility" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
-                  "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"],
-    "Market" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause",
-                  "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Vendor", "Person", "Audit"]
+    "Program": "Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' '),
+    "Audit": "Request history Person program program_controls ControlAssessment".split(' '),
+    "Regulation" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person".split(' '),
+    "Policy" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person".split(' '),
+    "Standard" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person".split(' '),
+    "Contract" : "Program Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person".split(' '),
+    "Clause" : "Contract Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person".split(' '),
+    "Section" : "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person".split(' '),
+    "Objective" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person".split(' '),
+    "Control" : "Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' '),
+    "Person" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit".split(' '),
+    "OrgGroup" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' '),
+    "Vendor" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' '),
+    "System" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' '),
+    "Process" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' '),
+    "DataAsset" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' '),
+    "Product" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' '),
+    "Project" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' '),
+    "Facility" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' '),
+    "Market" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit".split(' ')
   };
 
   function sort_sections(sections) {
@@ -412,11 +400,6 @@ $(function() {
             widget_id: "program",
             widget_name: "Program",
             widget_icon: "program"
-          },
-          ControlAssessment: {
-            widget_id: "ControlAssessment",
-            widget_name: "Control Assessments",
-            widget_icon: "control"
           }
         }
         , Control : {
@@ -629,15 +612,7 @@ $(function() {
             , show_view : GGRC.mustache_path + "/programs/tree.mustache"
             , allow_mapping: false
             , allow_creating: false
-          },
-          ControlAssessment: {
-            mapping: "related_control_assessments"
-            , parent_instance: GGRC.page_instance()
-            , draw_children: true
-            , model: "ControlAssessment"
-            , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
           }
-  
         }
 
 

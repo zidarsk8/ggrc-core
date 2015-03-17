@@ -8,6 +8,7 @@ import os
 DEBUG = False
 TESTING = False
 PRODUCTION = False
+GOOGLE_INTERNAL = False
 
 # Flask-SQLAlchemy fix to be less than `wait_time` in /etc/mysql/my.cnf
 SQLALCHEMY_POOL_RECYCLE = 120
@@ -30,7 +31,7 @@ COPYRIGHT = u"Confidential. Copyright " + u"\u00A9" # \u00A9 is the (c) symbol
 BUILD_NUMBER = "x"
 try:
   import build_number
-  BUILD_NUMBER = build_number.BUILD_NUMBER
+  BUILD_NUMBER = build_number.BUILD_NUMBER[:7]
 except (ImportError):
   pass
 
