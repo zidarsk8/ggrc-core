@@ -9,7 +9,7 @@ Create Date: 2015-02-27 14:32:59.757944
 
 # revision identifiers, used by Alembic.
 revision = '1f7d8208aff2'
-down_revision = '5254f4f31427'
+down_revision = '4ceda387a468'
 
 from alembic import op
 import sqlalchemy as sa
@@ -19,8 +19,8 @@ def upgrade():
     op.create_table(
         'control_assessments',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('design', sa.Boolean(), nullable=True),
-        sa.Column('operational', sa.Boolean(), nullable=True),
+        sa.Column('design', sa.String(length=250), nullable=True),
+        sa.Column('operationally', sa.String(length=250), nullable=True),
         sa.Column('os_state', sa.String(length=250), nullable=False),
         sa.Column('test_plan', sa.Text(), nullable=True),
         sa.Column('end_date', sa.Date(), nullable=True),
