@@ -400,6 +400,11 @@ $(function() {
             widget_id: "program",
             widget_name: "Program",
             widget_icon: "program"
+          },
+          ControlAssessment: {
+            widget_id: "ControlAssessment",
+            widget_name: "Control Assessments",
+            widget_icon: "control"
           }
         }
         , Control : {
@@ -612,6 +617,13 @@ $(function() {
             , show_view : GGRC.mustache_path + "/programs/tree.mustache"
             , allow_mapping: false
             , allow_creating: false
+          },
+          ControlAssessment: {
+            mapping: "related_control_assessments"
+            , parent_instance: GGRC.page_instance()
+            , draw_children: true
+            , model: "ControlAssessment"
+            , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
           }
         }
 
