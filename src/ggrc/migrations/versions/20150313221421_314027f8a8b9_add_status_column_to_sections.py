@@ -13,7 +13,6 @@ down_revision = '5254f4f31427'
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.sql import table, column
 
 
 def upgrade():
@@ -21,11 +20,6 @@ def upgrade():
     	'sections', 
     	sa.Column('status', sa.String(length=250), nullable=True)
     	)
-    sections_table = table('sections',
-      column('status', sa.String(length=250))
-      )
-    op.execute(sections_table.update().values(status='Draft'))
-
 
 def downgrade():
     op.drop_column('sections', 'status')
