@@ -97,22 +97,6 @@ can.Model.Mixin("ownable", {
     if (!this.owners) {
       this.attr("owners", []);
     }
-  },
-  before_create: function () {
-    if (!this.owners || !this.owners.length) {
-      this.attr('owners', [{ id: GGRC.current_user.id, type : "Person", automatic: true }]);
-    } else {
-      this.attr('owners', can.map(function (owner) {
-        if (!owner.automatic) {
-          return owner;
-        }
-      }));
-    }
-  },
-  form_preload: function (new_object_form) {
-    if (new_object_form && (!this.owners || !this.owners.length)) {
-      this.attr('owners', [{ id: GGRC.current_user.id, type : "Person", automatic: true }]);
-    }
   }
 });
 

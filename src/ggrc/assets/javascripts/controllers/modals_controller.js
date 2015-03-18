@@ -932,16 +932,15 @@ can.Component.extend({
 
       this.options.parent_instance = this.scope.parent_instance;
       this.options.instance = this.scope.instance;
-      setTimeout(this.deffered_owners_list.bind(this), 0);
+      setTimeout(this.set_user_as_owner.bind(this), 0);
       this.on();
     },
-    deffered_owners_list: function () {
+    set_user_as_owner: function () {
       // Workaround so we render pre-defined users.
-      if (this.scope.instance.owners && this.scope.instance.owners.length &&
-          this.scope.list && !this.scope.list.length) {
-        this.scope.instance.owners.forEach(function (item) {
-          this.scope.list.push(CMS.Models.Person.findInCacheById(item.id));
-        }.bind(this));
+      if (~['owners'].indexOf(this.scope.mapping) && this.scope.list && !this.scope.list.length) {
+        var person = CMS.Models.Person.findInCacheById(GGRC.current_user.id);
+        this.scope.instance.mark_for_addition(this.scope.mapping, person, {});
+        this.scope.list.push(person);
       }
     },
     deferred_update: function () {
