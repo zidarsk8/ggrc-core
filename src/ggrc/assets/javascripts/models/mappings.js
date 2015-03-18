@@ -908,7 +908,8 @@
       _mixins: [
         "related_object", "personable", "objectiveable", "ownable"
       ]
-      , related_audits: TypeFilter("related_objects", "Audit")
+      , related_audits:   TypeFilter("related_objects", "Audit")
+      , related_controls: TypeFilter("related_objects", "Control")
     }
     , Request : {
         _canonical : {

@@ -724,7 +724,7 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
   update : "PUT /api/control_assessments/{id}",
   destroy : "DELETE /api/control_assessments/{id}",
   create : "POST /api/control_assessments",
-  mixins : ["contactable"],
+  mixins : ["ownable", "contactable"],
   is_custom_attributable: true,
   attributes : {
       context : "CMS.Models.Context.stub",
