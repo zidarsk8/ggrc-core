@@ -927,6 +927,13 @@ can.Component.extend({
           this.scope.attr("list", this.scope.parent_instance._transient[key]);
         }
       }
+
+      this.options.parent_instance = this.scope.parent_instance;
+      this.options.instance = this.scope.instance;
+      setTimeout(this.deffered_owners_list.bind(this), 0);
+      this.on();
+    },
+    deffered_owners_list: function () {
       // Workaround so we render pre-defined users.
       if (this.scope.instance.owners && this.scope.instance.owners.length &&
           this.scope.list && !this.scope.list.length) {
@@ -934,12 +941,8 @@ can.Component.extend({
           this.scope.list.push(CMS.Models.Person.findInCacheById(item.id));
         }.bind(this));
       }
-      this.options.parent_instance = this.scope.parent_instance;
-      this.options.instance = this.scope.instance;
-      this.on();
     },
-
-    "deferred_update": function() {
+    deferred_update: function () {
       var that = this,
           changes = this.scope.changes;
 
@@ -989,7 +992,7 @@ can.Component.extend({
       }
 
       // If it's owners and user isn't pre-added
-      if (!(~['owners'].indexOf(this.scope.mapping) && doesExist(this.scope.instance.owners, ui.item))) {
+      if (!(~['owners'].indexOf(this.scope.mapping) && doesExist(this.scope.list, ui.item))) {
         this.scope.list.push(ui.item);
       }
       this.scope.attr("show_new_object_form", false);
