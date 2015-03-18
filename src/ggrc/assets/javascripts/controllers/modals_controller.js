@@ -89,13 +89,13 @@ can.Control("GGRC.Controllers.Modals", {
       .then(this.proxy("autocomplete"));
   }
 
-  , apply_object_params : function() {
-    var self = this;
-
-    if (this.options.object_params)
-      this.options.object_params.each(function(value, key) {
-        self.set_value({ name: key, value: value });
-      });
+  , apply_object_params: function () {
+    if (!this.options.object_params) {
+      return;
+    }
+    this.options.object_params.each(function(value, key) {
+      this.set_value({ name: key, value: value });
+    }, this);
   }
 
   , "input[data-lookup] focus" : function(el, ev) {
@@ -690,9 +690,8 @@ can.Control("GGRC.Controllers.Modals", {
     }
   }
 
-  , new_instance: function(data){
-    var that = this,
-      params = this.find_params(),
+  , new_instance: function (data) {
+    var params = this.find_params(),
       new_instance = new this.options.model(params)
         .attr("_suppress_errors", true)
         .attr('custom_attribute_definitions', this.options.instance.custom_attribute_definitions)
@@ -700,7 +699,7 @@ can.Control("GGRC.Controllers.Modals", {
 
     // Reset custom attribute values manually
     can.each(new_instance.custom_attribute_definitions, function(definition) {
-      var element = that.element.find('[name="custom_attributes.' + definition.id + '"]');
+      var element = this.element.find('[name="custom_attributes.' + definition.id + '"]');
       if (definition.attribute_type === 'Checkbox') {
         element.attr('checked', false);
       } else if (definition.attribute_type === 'Rich Text') {
@@ -708,24 +707,24 @@ can.Control("GGRC.Controllers.Modals", {
       } else {
         element.val('');
       }
-    });
+    }, this);
 
     $.when(this.options.attr('instance', new_instance))
       .done (function() {
         // If the modal is closed early, the element no longer exists
-        if (that.element) {
-          var $form = $(that.element).find('form');
+        if (this.element) {
+          var $form = $(this.element).find('form');
           $form.trigger('reset');
           // This is to trigger `focus_first_element` in modal_ajax handling
-          that.element.trigger("loaded");
+          this.element.trigger("loaded");
         }
 
-        that.options.instance._transient || that.options.instance.attr("_transient", new can.Observe({}));
-        that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
-      })
+        this.options.instance._transient || this.options.instance.attr("_transient", new can.Observe({}));
+        this.options.instance.form_preload && this.options.instance.form_preload(this.options.new_object_form);
+      }.bind(this))
       .then(this.proxy("apply_object_params"))
       .then(this.proxy("serialize_form"))
-      .then(that.proxy("autocomplete"));
+      .then(this.proxy("autocomplete"));
 
     this.restore_ui_status();
   }
@@ -753,11 +752,11 @@ can.Control("GGRC.Controllers.Modals", {
       ajd = instance.save().done(function(obj) {
         function finish() {
           delete that.disable_hide;
-          if(that.options.add_more) {
+          if (that.options.add_more) {
             that.new_instance();
-          }
-          else
+          } else {
             that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
+          }
         }
 
         // If this was an Objective created directly from a Section, create a join
@@ -889,7 +888,9 @@ can.Component.extend({
   },
   events: {
     init: function() {
-      var key, that = this;
+      var that = this,
+        key;
+
       this.scope.attr("controller", this);
 
       if (!this.scope.instance) {
@@ -908,15 +909,10 @@ can.Component.extend({
         this.scope[this.scope.source_mapping_source]
         .get_binding(this.scope.source_mapping)
         .refresh_instances()
-        .then(function(list) {
-          that.scope.attr(
-            "list",
-            can.map(
-              list,
-              function(binding) {
+        .then(function (list) {
+          that.scope.attr("list", can.map(list, function (binding) {
                 return binding.instance;
-              })
-          );
+              }));
         });
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
@@ -968,17 +964,14 @@ can.Component.extend({
     "{parent_instance} updated": "deferred_update",
     "{parent_instance} created": "deferred_update",
     // this works like autocomplete_select on all modal forms and
-    //  descendant class objects.
+    // descendant class objects.
     autocomplete_select : function(el, event, ui) {
-      var mapping,
-          extra_attrs = can.reduce(
-                          this.element
-                          .find("input:not([data-mapping], [data-lookup])")
-                          .get(),
-                          function(attrs, el) {
-                            attrs[$(el).attr("name")] = $(el).val();
-                            return attrs;
-                          }, {});
+      var mapping, extra_attrs;
+
+      extra_attrs = can.reduce(this.element.find("input:not([data-mapping], [data-lookup])").get(), function(attrs, el) {
+        attrs[$(el).attr("name")] = $(el).val();
+        return attrs;
+      }, {});
       if (this.scope.deferred) {
         this.scope.changes.push({ what: ui.item, how: "add", extra: extra_attrs });
       } else {
