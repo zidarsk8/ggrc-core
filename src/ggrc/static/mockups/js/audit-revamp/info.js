@@ -272,6 +272,18 @@ $(document).ready(function() {
       .html("Closed");
   }
 
+  function visualRadio() {
+    var $this = $(this),
+        $eachEl = $this.closest(".visual-radio").find("a");
+
+    if($this.hasClass("active")) {
+      $eachEl.removeClass("active");
+    } else {
+      $eachEl.removeClass("active");
+      $this.addClass("active");
+    }
+  }
+
   $(".top-inner-nav a").on("click", innerNavTrigger);
 
   $("#autoGenerateCA").on("click", generateCA);
@@ -285,4 +297,7 @@ $(document).ready(function() {
   $("#finishTask").on("click", finishTask);
 
   $("#approveReview, #approveTask").on("click", approveReview);
+
+  $(".visual-radio a").on("click", visualRadio);
+
 });
