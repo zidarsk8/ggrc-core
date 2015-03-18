@@ -25,7 +25,12 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documen
   # REST properties
   _publish_attrs = [
       'design',
-      'operationally'
+      'operationally',
+  ]
+
+  _relationship_attrs = [
+      'audit',
+      'control',
   ]
 
 track_state_for_class(ControlAssessment)
