@@ -623,7 +623,7 @@ $(function() {
             , parent_instance: GGRC.page_instance()
             , draw_children: true
             , model: "ControlAssessment"
-            , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+            , footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache"
           }
         }
 

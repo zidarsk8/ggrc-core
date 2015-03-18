@@ -142,6 +142,7 @@ dashboard-js-template-files:
   - controls/object_list.mustache
   - controls/tree.mustache
   - control_assessments/modal_content.mustache
+  - control_assessments/tree_footer.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
