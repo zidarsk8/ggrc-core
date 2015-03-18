@@ -107,7 +107,20 @@
         </label>
         <input data-id="code_txtbx" tabindex="8" id="section-code" class="input-block-level" name="slug" placeholder="SECTION-XXX" type="text" value="{{slug}}">
       </div>
-    </div>
+      <div data-id="state_hidden" class="span6 hidable">
+        <label>
+          State
+          <i class="grcicon-help-black" rel="tooltip" title="Indicates the status of this object."></i>
+          <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        </label>
+        <select data-id="state_dd" class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="9">
+          <option value="Draft" {{#if_equals status ""}}selected{{/if_equals}}>Draft</option>
+          {{#iterate 'Final', 'Effective', 'Ineffective', 'Launched', 'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'}}
+            <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+          {{/iterate}}
+        </select>
+      </div>
+    </div>   
   </div>
 </form>
 {{/instance}}
