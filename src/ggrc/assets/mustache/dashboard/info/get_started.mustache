@@ -20,8 +20,7 @@
     </li>
     {{/is_allowed}}
   {{/start_menu}}
-
-  {{#is_allowed 'create' model_name context=null}}
+  {{#any_allowed 'create' object_menu context=null}}
     <li class="top-space hidden-widgets-list">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown">
         <span class="icon-wrap">
@@ -31,6 +30,7 @@
       </a>
       <div class="dropdown-menu" role="menu">
         {{#object_menu}}
+          {{#is_allowed 'create' model_name context=null}}
           <div class="inner-nav-item">
             <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide"
             data-object-singular="{{model_name}}" data-object-plural="{{model_plural}}"
@@ -41,10 +41,11 @@
               </div>
             </a>
           </div>
+          {{/is_allowed}}
         {{/object_menu}}
       </div>
     </li>
-  {{/is_allowed}}
+  {{/any_allowed}}
 
   <li class="top-space">
     <a href="javascript://" data-toggle="multitype-search-modal-selector" data-original-title="search items" data-join-object-type="MultitypeSearch">

@@ -1217,6 +1217,29 @@ Mustache.registerHelper("is_allowed", function () {
     ;
 });
 
+Mustache.registerHelper('any_allowed', function (action, data, options) {
+  var passed = [],
+      hasPassed;
+  data = resolve_computed(data);
+
+  function filter(arr, fn) {
+    var results = [];
+    arr.forEach(function (val, index, list) {
+      if (fn(val, index, list)) {
+        results.push(val);
+      }
+    });
+    return results;
+  }
+
+  data.forEach(function (item) {
+    passed.push(Permission.is_allowed_any(action, item.model_name));
+  });
+  hasPassed = filter(passed, function (val) { return val; }).length;
+
+  return options[hasPassed ? 'fn' : 'inverse'](options.contexts || this);
+});
+
 Mustache.registerHelper("is_allowed_all", function (action, instances, options) {
   var passed = true;
 
@@ -2670,7 +2693,7 @@ Mustache.registerHelper("with_allowed_as", function (name, action, mappings, opt
 });
 
 Mustache.registerHelper("log", function (obj) {
-  console.log(resolve_computed(obj));
+  console.log('Mustache log', resolve_computed(obj));
 });
 
 Mustache.registerHelper("autocomplete_select", function (options) {
