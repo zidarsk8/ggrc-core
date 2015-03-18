@@ -12,13 +12,13 @@ body {
 
 // typography
 h1 {
+  @extend %oneline;
   color: $headerTitle;
   font-size: 24px;
   line-height: 48px;
   height: 47px;
   font-family: $fontTitle;
   font-weight: normal;
-  @extend %oneline;
   position: relative;
   .title-prev {
     position: absolute;
@@ -318,9 +318,9 @@ small {
 
 .objective-selector {
   .search-icon {
+    @include background-size(21px 16px);
     background-image: image-url("magnifying-glass.png");
     background-repeat: no-repeat;
-    @include background-size(21px 16px);
     background-position: right center;
     padding-right: 28px;
   }
@@ -336,9 +336,9 @@ small {
 
 // status
 .status-label {
+  @include border-radius($default-border-radius);
   width: 8px;
   height: 8px;
-  @include border-radius($default-border-radius);
   float: left;
   margin: 9px 10px 0 10px;
   background: $status-draft;
@@ -346,9 +346,9 @@ small {
     margin: 5px 10px 0 4px !important;
   }
   .lhn-items-list & {
+    @include border-radius(2px);
     width: 4px;
     height: 4px;
-    @include border-radius(2px);
     margin: 10px 8px 0 1px;
   }
   .inner-tree & {
@@ -371,14 +371,14 @@ small {
 
 // progress bar
 .progress {
-  background: $lightGray;
-  height: 20px;
   @include box-shadow(none);
   @include border-radius($default-border-radius);
+  background: $lightGray;
+  height: 20px;
   margin: 4px 0 0 0;
   .bar {
-    height: 20px;
     @include box-shadow(none);
+    height: 20px;
     float: left;
     margin-right: 0px;
   }
@@ -422,9 +422,9 @@ small {
     padding-right: 3px;
   }
   &.pending-ajax {
+    @include box-shadow(none);
     cursor: default;
     background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 6px;
-    @include box-shadow(none);
     border: 1px solid $ajaxBtnDisabled;
     color: $ajaxGray;
     text-shadow: none;
@@ -433,9 +433,9 @@ small {
       color: $ajaxGray;
     }
     &:active {
+      @include box-shadow(none);
       background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 5px;
       border: 1px solid $ajaxBtnDisabled;
-      @include box-shadow(none);
     }
   }
 }
@@ -507,11 +507,11 @@ small {
 
 // Date input field - To see date icon just add class .date to input field
 input.date {
-  padding-left: 26px;
   @include background-size(368px 416px);
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
   background-position: -340px -364px;
+  padding-left: 26px;
   &.short-field {
     height: 16px !important;
     line-height: 16px !important;
@@ -542,15 +542,15 @@ select.input-block-level {
 // resizible widget functionality
 .widget {
   .ui-resizable-handle {
+    @include background-size(30px 2px);
+    @include opacity(0.6);
     height:8px;
     background-color:#fff;
     border-top:1px solid #aaa;
     border-bottom:1px solid #aaa;
     background-image: image-url("bgnds/drag-h.png");
-    @include background-size(30px 2px);
     background-repeat:no-repeat;
     background-position:50% 1px;
-    @include opacity(0.6);
     &:hover {
       @include opacity(1);
     }
@@ -594,8 +594,8 @@ select.input-block-level {
 // input error
 .field-failure {
   input {
-    border: 1px solid $red;
     @include placeholder($lightRed);
+    border: 1px solid $red;
   }
   label {
     color: $red;
@@ -626,16 +626,16 @@ input.disabled.pending-ajax{
 .widget .wysiwyg-area {
   margin-bottom: 10px;
   .double {
-    height: 70px;
     @extend %input-block-level;
+    height: 70px;
   }
   .triple {
-    height: 120px;
     @extend %input-block-level;
+    height: 120px;
   }
   .quadruple {
-    height: 150px;
     @extend %input-block-level;
+    height: 150px;
   }
   iframe {
     width: 97.5% !important;
@@ -656,9 +656,9 @@ input.disabled.pending-ajax{
   }
   // smaller buttons in wysiwyg editor
   .btn {
+    @include opacity(0.5);
     padding:0px 5px 2px 5px;
     font-size:$f-small;
-    @include opacity(0.5);
     &:hover {
       @include opacity(1);
     }
@@ -719,10 +719,10 @@ strong {
 }
 
 .coding {
+  @include border-radius();
   font-family: "Courier New", Courier, monospace;
   margin:0.5em 0 1.5em 0;
   border:1px solid $lightGray;
-  @include border-radius();
   padding:1em;
   &.good {
     border-color:$green;
@@ -757,7 +757,6 @@ span.no-data {
 }
 
 // container-fluid reset
-
 .container-fluid {
   padding:0;
 }
@@ -807,14 +806,14 @@ select.multiple-selector {
   .ui-datepicker-next {
     top: 4px !important;
     .ui-icon {
+      @include background-size(368px 416px);
+      background-image: image-url("grcicons/icons.png");
+      background-position: -2000px -2000px;
+      background-repeat: no-repeat;
       width: 20px;
       height: 16px;
       line-height: 16px;
       vertical-align: top;
-      background-image: image-url("grcicons/icons.png");
-      background-position: -2000px -2000px;
-      background-repeat: no-repeat;
-      @include background-size(368px 416px);
       margin-top: -7px;
     }
   }
@@ -1005,10 +1004,10 @@ select.multiple-selector {
 }
 
 .inline-warning {
+  @include border-radius();
   background:lighten($lightRed,10%);
   border:1px solid $lightRed;
   color:$red;
-  @include border-radius();
   padding:6px;
   font-size:12px;
   line-height:16px;
@@ -1093,9 +1092,9 @@ p {
   margin-left: 10px;
   a {
     .grcicon-to-right {
-      margin-top: 6px;
       @include opacity(0.25);
       @include transition(opacity 0.2s ease);
+      margin-top: 6px;
     }
     &:hover {
       .grcicon-to-right {
@@ -1143,9 +1142,9 @@ p {
     max-width: 130px;
   }
   ul {
-    @include clearfix();
     @extend %reset-list;
     @extend %oneline;
+    @include clearfix();
     li {
       display: inline-block;
       margin-left: 20px;
@@ -1163,8 +1162,8 @@ p {
 
 .hidden-widgets-list {
   .dropdown-menu {
-    width: 320px;
     @include clearfix();
+    width: 320px;
     .inner-nav-item {
       float: left;
       width: 160px;

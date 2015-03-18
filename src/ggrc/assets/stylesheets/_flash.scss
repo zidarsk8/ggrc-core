@@ -28,9 +28,7 @@
     }
   }
   .message {
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    border-radius: 0;
+    @include border-radius(0);
     text-align:center;
     margin: 0 auto 15px;
     font-size:11px;
@@ -87,8 +85,8 @@
 }
 
 .alert {
-  margin-bottom: 20px;
   @include border-radius(0);
+  margin-bottom: 20px;
   p {
     margin-bottom: 0;
   }

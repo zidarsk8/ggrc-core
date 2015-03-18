@@ -56,8 +56,8 @@
     }
   }
   .menu {
-    @include clearfix();
     @extend %reset-list;
+    @include clearfix();
     float:right;
     margin-right: 30px;
     li {
@@ -66,21 +66,21 @@
       line-height: 48px;
       font-size: 14px;
       .count {
+        @include border-radius(8px);
         font-size: 12px;
         font-weight: bold;
         line-height: 16px;
         text-align: center;
         width: 16px;
         height: 16px;
-        @include border-radius(8px);
       }
       a {
+        @include transition(background 0.2s ease);
         display: block;
         color: $black;
         line-height: 48px;
         padding: 0 10px;
         background: $headerBgnd;
-        @include transition(background 0.2s ease);
         i {
           margin: 16px 2px 0 0;
           &.grcicon-carot-white {
@@ -134,8 +134,8 @@
               text-shadow: none;
             }
             i {
-              margin: 7px 2px 0 0;
               @include opacity(0.6);
+              margin: 7px 2px 0 0;
             }
           }
           &.show-role {
@@ -226,6 +226,7 @@
     }
   }
   .lhn-trigger {
+    @include transition-duration(0.3s);
     display: block;
     height: 15px;
     width: 16px;
@@ -233,7 +234,6 @@
     padding: 0;
     border: none;
     background: none;
-    @include transition-duration(0.3s);
     .icon-bar {
       display: block;
       margin-bottom: 3px;
@@ -343,7 +343,7 @@
     margin-top: 27px;
   }
   .dashboard-title {
-		padding-left:20px;
+    padding-left:20px;
     i {
       margin-top: 6px;
     }
@@ -351,8 +351,8 @@
 }
 
 .actions {
-  @include clearfix();
   @extend %reset-list;
+  @include clearfix();
   padding-right:40px;
   margin-top: 16px;
   li {
@@ -396,16 +396,16 @@
           }
         }
         a {
+          @include transition(none);
           color: $black;
           text-align: left;
           font-weight: normal;
           margin: 0;
           text-transform: none;
           display: block;
-          @include transition(none);
           &:hover {
-            color: $white;
             @include transition(none);
+            color: $white;
           }
         }
       }
@@ -419,12 +419,12 @@
       }
     }
     a {
+      @include transition(color 0.3s ease);
       color: $text;
       font-size: $f-small;
       line-height: 16px;
       font-weight: bold;
       text-transform: uppercase;
-      @include transition(color 0.3s ease);
       i {
         @include opacity(0.4);
         @include transition(opacity 0.3s ease);
@@ -441,8 +441,8 @@
       }
       .caret {
         @include opacity(0.4);
-        margin-top: 6px;
         @include transition(opacity 0.3s ease);
+        margin-top: 6px;
       }
       &.disabled {
         color:#ccc;
@@ -461,9 +461,9 @@
 }
 
 .breadcrumbs {
-  @include clearfix();
   @extend %reset-list;
   @extend %oneline;
+  @include clearfix();
   text-transform:uppercase;
   margin-top:4px;
 	padding-left:20px;
@@ -501,8 +501,8 @@
     line-height:30px;
     padding: 0 10px;
     i {
-      margin: 7px 6px 0 0;
       @include opacity(0.6);
+      margin: 7px 6px 0 0;
     }
   }
   .inner-list {
@@ -525,8 +525,8 @@
 
 small {
   &.count {
-    background: $error;
     @include border-radius(4px);
+    background: $error;
     text-align: center;
     text-shadow: none;
     color: $white;

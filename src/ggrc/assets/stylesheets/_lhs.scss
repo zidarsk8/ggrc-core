@@ -6,9 +6,9 @@
  */
 
 .lhs-holder {
-  overflow-x: hidden;
   @include transition-property(left);
   @include transition-duration(.8s);
+  overflow-x: hidden;
   left: -240px;
   &.active {
     left: 0px;
@@ -20,13 +20,13 @@
   padding-left: 10px;
   padding-right: 4px;
   .lhs-bg {
+    @include opacity(0.6);
     margin-top:5px;
     display:none;
     float:right;
     width:40px;
     height:70px;
     background:transparent image-url('bgnds/lhs-closed.png') no-repeat 0 0;
-    @include opacity(0.6);
   }
   &.lhs-closed {
     margin-left:-200px;
@@ -44,37 +44,37 @@
     }
   }
   .lhs-search {
-    padding:10px 20px 10px 10px;
     @include clearfix();
+    padding:10px 20px 10px 10px;
     .widgetsearch {
-      margin-bottom: 0;
-      font-size: 12px;
       @include border-radius(0);
-      border: 1px solid $lightGray;
-      float: left;
       @include box-shadow(none);
-      color: $black;
-      font-weight: bold;
-      width: calc(100% - 61px);
       @include input-placeholder {
         font-weight: normal;
       }
+      margin-bottom: 0;
+      font-size: 12px;
+      border: 1px solid $lightGray;
+      float: left;
+      color: $black;
+      font-weight: bold;
+      width: calc(100% - 61px);
       &.active {
         border: 1px solid $searchBlue;
       }
     }
     .widgetsearch-submit {
+      @include border-radius(0 4px 4px 0);
+      @include background-size(368px 416px);
+      background-image: image-url("grcicons/icons.png");
+      background-repeat: no-repeat;
+      background-position: -334px -314px;
       float: left;
       background: $lightGray;
       line-height: 28px;
       width: 36px;
       border: none;
       padding: 0;
-      @include border-radius(0 4px 4px 0);
-      background-image: image-url("grcicons/icons.png");
-      background-repeat: no-repeat;
-      @include background-size(368px 416px);
-      background-position: -334px -314px;
       &.active {
         background-position: -238px -74px;
         background-color: $searchBlue;
@@ -94,11 +94,11 @@
 }
 
 .lhn-pin {
+  @include opacity(0.25);
+  @include transition(opacity 0.2s ease);
   position: absolute;
   top: 5px;
   right: 0;
-  @include opacity(0.25);
-  @include transition(opacity 0.2s ease);
   z-index: 9999;
   &:hover {
     @include opacity(1);
@@ -364,6 +364,8 @@
         position: absolute;
         width:100%;
         a.wf-trigger {
+          @include border-radius(4px);
+          @include transition(background 0.2s ease, color 0.2s ease);
           display: inline-block;
           background-color:#eee;
           color:#666;
@@ -372,8 +374,6 @@
           text-transform:lowercase;
           padding:0 4px;
           line-height:16px;
-          @include border-radius(4px);
-          @include transition(background 0.2s ease, color 0.2s ease);
           &.active {
             &.wf-active {
             background:$green;
@@ -439,31 +439,6 @@
     }
   }
 
-  // ul.lhn-items-list,
-  // ul.lhn-items-list-actions {
-  //   li {
-  //     a {
-  //       padding-left: 48px;
-  //       &:hover {
-  //         background: $lightGray;
-  //         text-decoration: none;
-  //       }
-  //     }
-  //   }
-  // }
-
-  // ul.lhn-items-list {
-  //   margin-bottom: 0;
-  // }
-
-  // ul.lhn-items-list-actions {
-  //   li {
-  //     a {
-  //       font-weight: bold;
-  //     }
-  //   }
-  // }
-
   ul.with-filters {
     margin-top: 24px;
   }
@@ -502,6 +477,11 @@
 .bar-v {
   @include transition-property(left);
   @include transition-duration(.8s);
+  @include background-size(2px 30px);
+  background-color: $white;
+  background-image: image-url("bgnds/drag-v.png");
+  background-repeat: no-repeat;
+  background-position: 2px 50%;
   position: absolute;
   top: 0;
   right: 0;
@@ -510,15 +490,7 @@
   width: 6px;
   padding: 0;
   border: none;
-  background-color: $white;
-  background-image: image-url("bgnds/drag-v.png");
-  @include background-size(2px 30px);
-  background-repeat: no-repeat;
-  background-position: 2px 50%;
   cursor: ew-resize;
-  // &:hover {
-  //   background-color: $white;
-  // }
   &.objnav {
     z-index: 1;  // Show object nav bar-v below title
   }
@@ -537,13 +509,13 @@
 // TOP INNER NAV
 .top-inner-nav {
   ul.internav {
-    @include clearfix();
     @extend %reset-list;
+    @include clearfix();
     margin-left: 28px;
     li {
+      @include background-size(368px 416px);
       position: relative;
       float: left;
-      @include background-size(368px 416px);
       &.inner-nav-button {
         text-align: center;
         padding: 1px 40px 0 10px;
@@ -574,25 +546,20 @@
           }
         }
       }
-      &.hidden-widgets-list {
-        .dropdown-toggle {
-          //color: lighten($blue, 35%);
-          &:hover {
-            //background: none;
-            //color: $blue;
-          }
-        }
-      }
     }
     a {
+      @include transition(color 0.2s ease);
       padding: 0 14px 0 10px;
       display: block;
       line-height: 29px;
       font-size: 13px;
       color: $gray;
-      @include transition(color 0.2s ease);
       position: relative;
       .closed {
+        @include background-size(368px 416px);
+        background-image: image-url("grcicons/icons.png");
+        background-position: -347px -179px;
+        background-repeat: no-repeat;
         display: none;
         position: absolute;
         top: 2px;
@@ -600,10 +567,6 @@
         width: 10px;
         height: 10px;
         line-height: 10px;
-        background-image: image-url("grcicons/icons.png");
-        background-position: -347px -179px;
-        background-repeat: no-repeat;
-        @include background-size(368px 416px);
         cursor: pointer;
       }
       &:hover {
@@ -621,6 +584,10 @@
         }
       }
       .closed {
+        @include background-size(368px 416px);
+        background-image: image-url("grcicons/icons.png");
+        background-position: -347px -179px;
+        background-repeat: no-repeat;
         display: none;
         position: absolute;
         top: 2px;
@@ -628,11 +595,6 @@
         width: 10px;
         height: 10px;
         line-height: 10px;
-        //background-image: url('/static/images/grcicons/icons.png');
-        background-image: image-url("grcicons/icons.png");
-        background-position: -347px -179px;
-        background-repeat: no-repeat;
-        @include background-size(368px 416px);
         cursor: pointer;
         &.red {
           top: -4px;
@@ -642,8 +604,8 @@
       }
     }
     i {
-      margin-top: 6px;
       @include opacity(0.4);
+      margin-top: 6px;
     }
     li.hidden-widgets-list {
       a.dropdown-toggle {
@@ -747,11 +709,11 @@
   background:#fff;
   border:1px solid #ddd;
   &.fade {
-    display : none;
+    display: none;
   }
   &.in {
-    display : block;
     @include opacity(1);
+    display: block;
   }
   span.error {
     font-size:12px;
@@ -838,8 +800,8 @@
         line-height: 26px;
         color: #999;
         i {
-          margin-top: 4px;
           @include opacity(0.45);
+          margin-top: 4px;
         }
       }
     }
@@ -877,7 +839,6 @@
   margin-bottom:0;
 }
 
-
 .accordion-group-inner {
   .sub-level {
     display: none;
@@ -885,19 +846,16 @@
 }
 
 // advanced search
-
 .advanced-search {
   a {
     margin-top:-8px;
-  	text-align:center;
-  	font-size:12px;
-  	text-decoration:underline;
-  	display:block;
-  	line-height:16px;
+    text-align:center;
+    font-size:12px;
+    text-decoration:underline;
+    display:block;
+    line-height:16px;
   }
 }
-
-//
 
 label {
   &.my-work-label {

@@ -221,9 +221,9 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 %input-block-level {
+  @include box-sizing(border-box);
   display: block;
   width: 100%;
-  @include box-sizing(border-box);
   min-height: 28px;
 }
 

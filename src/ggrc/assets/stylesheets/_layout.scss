@@ -46,24 +46,14 @@
   width:100%;
   border-bottom: 1px solid $headerBorder;
 }
-/* Inner nav dont exist anymore. It is moved up to top-inner-nav
-.inner-nav {
-  width:200px;
-  height:445px;
-  position:fixed;
-  top:80px;
-  overflow-y:auto;
-  overflow-x:hidden;
-}
-*/
 .top-inner-nav {
+  @include box-shadow(inset 1px 4px 9px -6px rgba(0,0,0,0.4));
   width: 100%;
   height: 29px;
   position: fixed;
   z-index: 1;
   top: 96px;
   background: $tabBgnd;
-  @include box-shadow(inset 1px 4px 9px -6px rgba(0,0,0,0.4));
 }
 .object-area {
   position:fixed;

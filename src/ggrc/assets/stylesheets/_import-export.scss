@@ -113,11 +113,11 @@ form.import {
   text-align: right;
   font-weight: bold;
   a {
+    @include opacity(0.4);
+    @include transition(opacity 0.2s ease);
     font-size: 11px;
     color: $widgetTitle;
     text-transform: uppercase;
-    @include opacity(0.4);
-    @include transition(opacity 0.2s ease);
     text-decoration: none;
     i {
       margin-top: 2px;
