@@ -655,6 +655,7 @@ can.Control("GGRC.Controllers.Modals", {
         save_close_btn = this.element.find("a.btn[data-toggle=modal-submit]"),
         save_addmore_btn = this.element.find("a.btn[data-toggle=modal-submit-addmore]"),
         modal_backdrop = this.element.data("modal_form").$backdrop;
+
     // Normal saving process
     if (el.is(':not(.disabled)')) {
       ajd = this.save_instance(el, ev);
@@ -745,8 +746,9 @@ can.Control("GGRC.Controllers.Modals", {
       // Special case to handle context outside the form itself
       // - this avoids duplicated change events, and the API requires
       //   `context` to be present even if `null`, unlike other attributes
-      if (!instance.context)
+      if (!instance.context) {
         instance.attr('context', { id: null });
+      }
 
       this.disable_hide = true;
       ajd = instance.save().done(function(obj) {
@@ -981,7 +983,6 @@ can.Component.extend({
         mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, ui.item.constructor.shortName);
         this.scope.instance.mark_for_addition(mapping, ui.item, extra_attrs);
       }
-
       function doesExist(arr, owner) {
         if (!arr || !arr.length) {
           return false;
@@ -995,28 +996,27 @@ can.Component.extend({
       if (!(~['owners'].indexOf(this.scope.mapping) && doesExist(this.scope.list, ui.item))) {
         this.scope.list.push(ui.item);
       }
-      this.scope.attr("show_new_object_form", false);
+      this.scope.attr('show_new_object_form', false);
     },
-    "[data-toggle=unmap] click" : function(el, ev) {
-      var i, that = this;
+    '[data-toggle=unmap] click': function (el, ev) {
       ev.stopPropagation();
-      can.map(
-        el.find('.result'),
-        function(result_el) {
-          var mapping,
-              obj = $(result_el).data("result");
-          if (that.scope.deferred) {
-            that.scope.changes.push({ what: obj, how: "remove" });
-          } else {
-            mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);
-            that.scope.instance.mark_for_deletion(mapping, obj);
+      can.map(el.find('.result'), function (result_el) {
+        var obj = $(result_el).data('result'),
+            len = this.scope.list.length,
+            mapping;
+
+        if (this.scope.deferred) {
+          this.scope.changes.push({ what: obj, how: "remove" });
+        } else {
+          mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, obj.constructor.shortName);
+          this.scope.instance.mark_for_deletion(mapping, obj);
+        }
+        for (; len >= 0; len--) {
+          if (this.scope.list[len] === obj) {
+            this.scope.list.splice(len, 1);
           }
-          for(i = that.scope.list.length; i >= 0; i--) {
-            if(that.scope.list[i] === obj) {
-              that.scope.list.splice(i, 1);
-            }
-          }
-        });
+        }
+      }.bind(this));
     },
     "input[null-if-empty] change" : function(el) {
       if (!el.val()) {
