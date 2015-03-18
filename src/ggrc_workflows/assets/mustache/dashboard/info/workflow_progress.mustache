@@ -6,8 +6,8 @@
 }}
 
 <section class="content">
-{{#workflow_data}}
 <ul class="new-tree tree-one dashboard-tree workflow-tree">
+  {{#workflow_data}}
   {{#list}}
   {{#using ins=this}}
     <li class="tree-item">
@@ -73,6 +73,13 @@
     </li>
   {{/using}}
   {{/list}}
+  {{/workflow_data}}
+  {{#if_equals workflow_count 0}}
+    <li>
+      <div class="zero-state">
+        <h2>You don't have any workflows in progress</h2>
+      </div>
+    </li>
+  {{/if_equals}}
 </ul><!-- tree-structure end -->
-{{/workflow_data}}
 </section><!-- Widget content end -->

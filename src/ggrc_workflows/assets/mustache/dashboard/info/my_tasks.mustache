@@ -193,4 +193,11 @@
     </li>
   {{/filtered_list}}
   {{/task_data}}
+  {{#if_equals task_count 0}}
+    <li>
+      <div class="zero-state">
+        <h2>You dont' have any tasks assigned</h2>
+      </div>
+    </li>
+  {{/if_equals}}
 </ul><!-- tree-structure end -->

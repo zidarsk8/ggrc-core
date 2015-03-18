@@ -315,6 +315,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , find_params : {}
     , sort_property : null
     , sort_function : null
+    , sortable : true
     , filter : null
     , start_expanded : false //true
     , draw_children : true
@@ -356,7 +357,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {}).attr(opts);
     }
   }
-
   , init : function(el, opts) {
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       this.display_prefs = display_prefs;
@@ -364,7 +364,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       this.element.uniqueId();
 
-      if('parent_instance' in opts && 'status' in opts.parent_instance){
+      if ('parent_instance' in opts && 'status' in opts.parent_instance){
         var setAllowMapping = function(){
           var is_accepted = opts.parent_instance.attr('status') === 'Accepted'
             , admin = Permission.is_allowed("__GGRC_ADMIN__")
@@ -398,14 +398,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       if (this.element && this.element.closest('body').length) {
         this._attached_deferred.resolve();
       }
-
     }.bind(this));
   }
 
   , " inserted": function() {
       this._attached_deferred.resolve();
     }
-
   , init_view : function() {
       var that = this
         , dfds = []
@@ -415,9 +413,19 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         dfds.push(
           can.view(this.options.header_view, $.when(this.options)).then(
             this._ifNotRemoved(function(frag) {
-              that.element.prepend(frag);
-            })
-          ));
+              that.element.before(frag);
+              // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
+              can.bind.call(that.element.parent().find('.filter-trigger > a'), 'click', function (evnt) {
+                var el = $(evnt.currentTarget);
+                if (el.hasClass("active")) {
+                  that.hide_filter();
+                  el.find("i").attr("data-original-title", "Show filter");
+                } else {
+                  that.show_filter();
+                  el.find("i").attr("data-original-title", "Hide filter");
+                }
+              });
+        })));
       }
 
       // Init the spinner if items need to be loaded:
@@ -425,10 +433,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         if (!that.element) {
           return;
         }
-        if (count())
+        if (count()) {
           that._loading_started();
-        else
+        } else {
           that.element.trigger("loaded");
+        }
       }));
 
       if(this.options.footer_view) {
@@ -645,7 +654,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       queue_window(list_window);
     final_dfd = $.when.apply($, all_draw_items_dfds);
     final_dfd.done(this._ifNotRemoved(function() {
-      this.element.find(".sticky").Stickyfill();
+      this.element.parent().find(".sticky").Stickyfill();
     }.bind(this)));
     return final_dfd;
   }
@@ -670,7 +679,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       });
 
       if (sort_prop || sort_function) {
-         $items.each(function(i, item) {
+        $items.each(function(i, item) {
             var j, $item = $(item), compare;
             for(j = $existing.length - 1; j >= 0; j--) {
               var old_item = $existing.eq(j).control().options.instance,
@@ -698,7 +707,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               $item.appendTo(this.element);
             }
             $existing.splice(0, 0, item);
-         });
+        });
+        if (this.options.sortable) {
+          $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
+        }
       } else {
         if($footer.length) {
           $items.insertBefore($footer);
@@ -800,21 +812,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if(this.options.events && typeof this.options.events[event_name] === "function") {
       this.options.events[event_name].apply(this, arguments);
     }
-  },
-
-
-  ".filter-trigger > a click": function (element, event) {
-      if (element.hasClass("active")) {
-        this.hide_filter();
-        element.find("i").attr("data-original-title", "Show filter");
-      }else{
-        this.show_filter();
-        element.find("i").attr("data-original-title", "Hide filter");
-      }
-    }
-
+  }
   , hide_filter: function () {
-      var $filter = this.element.find(".filter-holder"),
+      var $filter = this.element.parent().find(".filter-holder"),
           height = $filter.height();
 
       $filter
@@ -822,9 +822,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           .animate({height: 0},
                    {duration: 800,
                     easing: 'easeOutExpo'});
-      this.element.find(".filter-trigger > a").removeClass("active");
-
-      this.element.find(".sticky.tree-header").addClass("no-filter");
+      this.element.parent().find(".filter-trigger > a").removeClass("active");
+      this.element.parent().find(".sticky.tree-header").addClass("no-filter");
       Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(true);
@@ -832,15 +831,15 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , show_filter: function () {
-      var $filter = this.element.find(".filter-holder");
+      var $filter = this.element.parent().find(".filter-holder");
 
       $filter
           .animate({height: $filter.data("height")},
                    {duration: 800,
                     easing: 'easeOutExpo'});
 
-      this.element.find(".filter-trigger > a").addClass("active");
-      this.element.find(".sticky.tree-header").removeClass("no-filter");
+      this.element.parent().find(".filter-trigger > a").addClass("active");
+      this.element.parent().find(".sticky.tree-header").removeClass("no-filter");
       Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(false);

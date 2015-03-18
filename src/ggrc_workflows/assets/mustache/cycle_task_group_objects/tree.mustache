@@ -19,9 +19,6 @@
                   {{#if object}}
                     <div class="span11">
                       <i class="grcicon-{{object.class.table_singular}}-black"></i>
-                      {{object.title}}
-                    </div>
-                    <div class="span1">
                       {{#if_helpers '\
                         #if_equals' object.type "Program" '\
                         and #if' object.private}}
@@ -29,6 +26,7 @@
                           <i class="grcicon-private"></i>
                         </span>
                       {{/if_helpers}}
+                      {{object.title}}
                     </div>
                   {{else}}
                     <span class="gray">[deleted]</span> {{instance.title}}
