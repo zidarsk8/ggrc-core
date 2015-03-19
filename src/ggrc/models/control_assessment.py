@@ -12,6 +12,7 @@ from .object_owner import Ownable
 from .object_person import Personable
 from .relationship import Relatable
 from .track_object_state import HasObjectState, track_state_for_class
+from ggrc.models.reflection import PublishOnly
 
 
 class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documentable,
@@ -22,10 +23,15 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documen
   design = deferred(db.Column(db.String), 'ControlAssessment')
   operationally = deferred(db.Column(db.String), 'ControlAssessment')
 
+  control = {}
+  audit = {}
+
   # REST properties
   _publish_attrs = [
       'design',
       'operationally',
+      PublishOnly('audit'),
+      PublishOnly('control')
   ]
 
   _relationship_attrs = [

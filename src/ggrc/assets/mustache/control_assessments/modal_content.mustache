@@ -21,6 +21,7 @@
       <input data-id="title_txtbx" tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
       {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
     </div>
+    {{#if new_object_form}}
     <div class="span3">
         <label>
           Control
@@ -37,6 +38,35 @@
         </label>
         <input tabindex="2" class="input-block-level" name="audit.title" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" value="{{firstexist audit.title ''}}" />
     </div>
+    {{else}}
+      {{#with_mapping "related_controls" instance}}
+        {{#related_controls.0.instance}}
+          {{log .}}
+          <div class="span3">
+            <label>
+              Control
+              <span class="required">*</span>
+              <i class="grcicon-help-black" rel="tooltip" title="Control for this Control Assessment"></i>
+            </label>
+            <input tabindex="2" class="input-block-level" name="control" readonly="readonly" value="{{firstexist title ''}}" />
+          </div>
+        {{/related_audits}}
+      {{/with_mapping}}
+
+
+      {{#with_mapping "related_audits" instance}}
+        {{#related_audits.0.instance}}
+          <div class="span3">
+            <label>
+              Audit
+              <span class="required">*</span>
+              <i class="grcicon-help-black" rel="tooltip" title="Audit for this Control Assessment"></i>
+            </label>
+            <input tabindex="2" class="input-block-level" name="audit" readonly="readonly" type="text" value="{{firstexist title ''}}" />
+          </div>
+        {{/related_audits}}
+      {{/with_mapping}}
+    {{/if}}
   </div>
 
   <div class="row-fluid">

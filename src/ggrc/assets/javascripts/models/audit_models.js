@@ -735,6 +735,9 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
   },
   init : function() {
     this._super && this._super.apply(this, arguments);
+    this.validatePresenceOf("control");
+    this.validatePresenceOf("audit");
+    this.validateNonBlank("title");
   }
 }, {
   object_model: can.compute(function() {
