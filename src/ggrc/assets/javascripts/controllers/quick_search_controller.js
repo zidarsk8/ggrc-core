@@ -394,21 +394,27 @@ can.Control("CMS.Controllers.LHN", {
     );
   }
   // this uses polling to make sure LHN is there
+  // requestAnimationFrame takes browser render optimizations into account
   // it ain't pretty, but it works
   , initial_lhn_render: function (try_count) {
       try_count || (try_count = 0);
 
+      var max_retries = window.requestAnimationFrame ? 5 : 100,
+          retry = function () {
+              this.initial_lhn_render(try_count+1);
+          }.bind(this);
+
       if (!$(".lhs-holder").size()) {          
-          if (try_count < 10) {
-              setTimeout(function () {
-                  this.initial_lhn_render(try_count+1);
-              }.bind(this), 200);
-          }
-          console.log(try_count);
-          return;
+        if (try_count < max_retries) {
+          if (window.requestAnimationFrame) {
+            window.requestAnimationFrame(retry);
+          }else{
+            setTimeout(retry, 200);
+          }   
+        }
+        return;
       }
       
-      console.log("boop", try_count);
       this.resize_lhn();
       
       if (this.options.display_prefs.getLHNState().is_pinned) {
