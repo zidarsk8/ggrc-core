@@ -1,5 +1,6 @@
 // Pin content
 .pin-content {
+  @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   position: fixed;
   bottom: 40px;
   left: 32px;
@@ -7,10 +8,9 @@
   background: $white;
   z-index: 0;
   overflow: auto;
-  @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   .info {
-    padding: 15px 20px 20px 20px;
     @include box-shadow(none);
+    padding: 15px 20px 20px 20px;
     .small-info {
       i {
         @include opacity(.25);
@@ -28,8 +28,8 @@
 }
 
 .pin-action {
-  @include clearfix();
   @extend %reset-list;
+  @include clearfix();
   margin-bottom: 20px;
   li {
     float: left;

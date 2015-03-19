@@ -6,6 +6,8 @@
  */
 
 .quick-search-results {
+  @include border-radius(5px);
+  @include box-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
   display: none;
   position: absolute;
   top: 25px;
@@ -13,8 +15,6 @@
   width: 300%;
   background: $white;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  @include border-radius(5px);
-  @include box-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
   color:$black;
   text-shadow: none;
   text-transform: none;
@@ -28,16 +28,16 @@
   ul.single-row-tabs {
     li {
       .item-title {
-        margin-left: 0;
         @extend %oneline;
+        margin-left: 0;
       }
       a {
         padding: 0;
         border: none;
         color: $black;
         &:hover {
-          background: none;
           @include border-radius(0);
+          background: none;
           border: none;
         }
       }
@@ -87,14 +87,14 @@
       font-size:$f-subTitle;
       font-weight: normal;
       a {
-        color: $text;
         @include transition(color 0.3s ease);
+        color: $text;
         margin-right: 0;
         min-width: 100px;
         i {
           @include opacity(0.3);
-          margin-right: 7px;
           @include transition(opacity 0.3s ease);
+          margin-right: 7px;
         }
         &:hover {
           color: $black;
@@ -150,18 +150,18 @@
     }
   }
   .quick-find-add {
+    @include border-radius(0 0 5px 5px);
     background: $lightGray;
     height: 34px;
     font-size:$f-subTitle;
-    @include border-radius(0 0 5px 5px);
     line-height: 34px;
     padding: 0 10px 0 16px;
     color: $text;
     text-align: right;
     a {
+      @include transition(color 0.3s ease);
       color: $black;
       margin-top: 4px;
-      @include transition(color 0.3s ease);
       i {
         @include opacity(0.7);
         @include transition(opacity 0.3s ease);

@@ -95,17 +95,17 @@
       }
       .tree-action-list {
         [class^="grcicon-"] {
-          margin-top: 1px;
           @include opacity(0.25);
           @include transition(opacity 0.2s ease);
+          margin-top: 1px;
         }
         li {
           position: relative;
           .dropdown-menu {
+            @include border-radius(0);
             right: -12px;
             left: auto;
             top: 20px;
-            @include border-radius(0);
             padding: 14px 30px 20px 30px;
             min-width: 340px;
             h5 {
@@ -180,11 +180,11 @@
           font-family: $fontTitle;
         }
         a {
+          @include transition(background 0.2s ease, color 0.2s ease);
           padding: 5px 10px;
           display: block;
           line-height: 30px;
           color: $black;
-          @include transition(background 0.2s ease, color 0.2s ease);
           &:hover {
             background: $tabHoverBgnd;
             color: $white;
@@ -195,8 +195,8 @@
           }
         }
         i {
-          margin-top: 6px;
           @include opacity(0.55);
+          margin-top: 6px;
         }
         li.active {
           a {
@@ -318,16 +318,16 @@
       white-space: nowrap;
       li {
         a {
-          color: $text;
           @include transition(color 0.3s ease);
+          color: $text;
           min-width: 105px;
           .item-count {
             font-size:$f-small;
           }
           i {
             @include opacity(0.3);
-            margin-right: 7px;
             @include transition(opacity 0.3s ease);
+            margin-right: 7px;
           }
           &:hover {
             color: $black;
@@ -364,9 +364,9 @@
     padding:3px 2px;
     background: $filterBgnd;
     a.secondary-link {
+      @include opacity(0.5);
       margin-top:4px;
       margin-right:2px;
-      @include opacity(0.5);
       &:hover {
         @include opacity(1);
       }
@@ -384,12 +384,12 @@
       margin-bottom: 0;
     }
     input {
-      margin-bottom: 0;
-      border: 1px solid $popOverBorder;
+      @include background-size(368px 416px);
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
-      @include background-size(368px 416px);
       background-position:-259px -195px;
+      margin-bottom: 0;
+      border: 1px solid $popOverBorder;
       padding-left: 40px;
     }
     .btn {
@@ -438,6 +438,8 @@
       font-size:$f-regular;
     }
     li.main {
+      @extend %default-border-bottom;
+      padding:10px 0;
       h4 {
         font-size: $f-regular;
         color:$text;
@@ -446,8 +448,6 @@
         color: $headerTitle;
         text-decoration: none;
       }
-      padding:10px 0;
-      @extend %default-border-bottom;
       .progress {
         margin: 0;
       }
@@ -537,11 +537,11 @@
   }
   .risk-content {
     h3 {
+      @extend %default-border-bottom;
       font-weight: normal;
       padding-bottom: 5px;
       margin-top:10px;
       color: $headerTitle;
-      @extend %default-border-bottom;
     }
     h4 {
       padding-top: 10px;
@@ -554,10 +554,10 @@
       font-size:$f-regular;
     }
     .risk-level {
+      @include border-radius();
       float: right;
       font-size: $f-subTitle;
       border:1px solid $lightGray;
-      @include border-radius();
       padding:0 6px;
       color: $red;
       cursor:pointer;
@@ -594,8 +594,8 @@
         padding: 0;
         border: none;
         &:hover {
-          background: none;
           @include border-radius(0);
+          background: none;
           border: none;
         }
       }
@@ -627,10 +627,10 @@
 }
 
 .info {
+  @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
   background: $white;
   padding: 25px 30px 20px 30px;
   font-size: 13px;
-  @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
   .wrap-row {
     p {
       padding-top: 0;
@@ -648,8 +648,8 @@
     line-height: 23px;
     font-weight: normal;
     i {
-      cursor: pointer;
       @include opacity(0.2);
+      cursor: pointer;
       margin-top: 5px;
       &:hover {
         @include opacity(0.7);
@@ -724,9 +724,9 @@
     float: right;
   }
   label {
+    @include text-shadow(0 1px 1px $white);
     text-transform:uppercase;
     color:$text;
-    @include text-shadow(0 1px 1px $white);
     display: block;
     &.label-title {
       margin-right:30px;
@@ -737,10 +737,10 @@
 }
 
 .filter-trigger {
+  @include border-radius(4px 4px 0 0);
   position:absolute;
   bottom:0;
   right:0;
-  @include border-radius(4px 4px 0 0);
   &:focus {
     @extend %outline-fix;
   }
@@ -756,23 +756,23 @@
   .btn-group {
     display: inline-block;
     .btn {
-      color: $black;
       @include transition(color 0.3s ease);
       @include box-shadow(none);
+      @include opacity(0.4);
+      @include transition(opacity 0.3s ease);
+      color: $black;
       font-weight: bold;
       padding: 0;
       display: inline-block;
       padding: 10px;
       position: relative;
-      @include opacity(0.4);
-      @include transition(opacity 0.3s ease);
       &:active {
         @include opacity(1);
         &:hover {
+          @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
           background-image: none;
           background-color: $btnActive;
           outline: 0;
-          @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
         }
       }
       i {
@@ -790,10 +790,10 @@
       &:hover {
         @include opacity(1);
       }
-      color: $blue;
-      text-decoration: none;
       @include opacity(0.7);
       @include gradient-vertical($white, #e6e6e6);
+      color: $blue;
+      text-decoration: none;
       background-position: 0 0;
       i {
         @include opacity(0.7);
@@ -803,16 +803,16 @@
   .open {
     .btn {
       @include opacity(1);
+      @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
       background-image: none;
       background-color: $btnActive;
       outline: 0;
-      @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
       color: $blue;
       &:hover {
+        @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
         background-image: none;
         background-color: $btnActive;
         outline: 0;
-        @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
       }
     }
   }
@@ -879,9 +879,9 @@
             }
           }
           i {
-            margin-top: 4px;
             @include opacity(0.3);
             @include transition(opacity 0.2s ease-in-out);
+            margin-top: 4px;
           }
           &:hover {
             i {
@@ -1010,9 +1010,7 @@
   }
 }
 
-
 // new action bar
-
 .action-bar {
   @include clearfix();
   padding-top:5px;
@@ -1139,17 +1137,17 @@
   .filter-input {
     position: relative;
     .is-expression {
+      @include opacity(0.25);
       position: absolute;
       right: 6px;
       top: 6px;
-      @include opacity(0.25);
     }
     &.expression {
       .is-expression {
+        @include opacity(1);
         i {
           background-position: -246px -176px;
         }
-        @include opacity(1);
       }
     }
   }
@@ -1165,11 +1163,11 @@
       font-weight: normal;
     }
     i {
+      @include opacity(0.25);
+      @include transition(opacity 0.2s ease);
       float: right;
       margin-top: 12px !important;
       margin-left: 10px;
-      @include opacity(0.25);
-      @include transition(opacity 0.2s ease);
       &:hover {
         @include opacity(1);
       }
@@ -1265,14 +1263,14 @@
       margin: 0;
     }
     a {
+      @include transition(color 0.2s ease);
       display: inline-block;
       line-height: 28px;
       color: $gray;
-      @include transition(color 0.2s ease);
       i {
-        margin: 7px 4px 0 0;
         @include opacity(0.4);
         @include transition(opacity 0.2s ease);
+        margin: 7px 4px 0 0;
       }
       &:hover {
         color: $black;
@@ -1359,13 +1357,13 @@ ul.attr-list {
 }
 
 .attribute-trigger {
+  @include border-radius($default-border-radius);
   float: right;
   line-height: 26px;
   height: 26px;
   width: 12%;
   text-align: center;
   border: 1px solid $infoMessageText;
-  @include border-radius($default-border-radius);
   i {
     margin-top: 5px;
   }
@@ -1520,13 +1518,13 @@ ul.attr-list {
     margin: 6px 0 0 0;
   }
   a {
+    @include box-shadow(0 2px 2px -1px rgba(0,0,0, 0.3));
+    @include transition (background 0.2s ease, color 0.2s ease);
     font-size: 16px;
     line-height: 35px;
     height: 35px;
     display: block;
     background: $white;
-    @include box-shadow(0 2px 2px -1px rgba(0,0,0, 0.3));
-    @include transition (background 0.2s ease, color 0.2s ease);
     &:hover {
       text-decoration: none;
       background: $blue;
@@ -1547,16 +1545,16 @@ ul.attr-list {
   }
   .dropdown-menu {
     a {
+      @include transition(color 0.2s ease);
+      @include border-radius(0);
+      @include box-shadow(none);
       padding: 0 14px 0 10px;
       display: block;
       line-height: 29px;
       font-size: 13px;
       color: $gray;
-      @include transition(color 0.2s ease);
       text-transform: none;
       background: $white;
-      @include border-radius(0);
-      @include box-shadow(none);
       i {
         @include opacity(0.4);
       }
@@ -1586,8 +1584,8 @@ ul.attr-list {
     font-weight: bold;
     line-height: 20px;
     i {
-      margin-top: 2px;
       @include opacity(0.25);
+      margin-top: 2px;
     }
     &:hover {
       text-decoration:none;
@@ -1599,10 +1597,10 @@ ul.attr-list {
     }
   }
   .in, .out.active, .active .out {
-    display : none;
+    display: none;
   };
   .in.active, .active .in, .out {
-    display : inline;
+    display: inline;
   }
   .show-hidden-fields {
     &.active {
@@ -1623,8 +1621,8 @@ ul.attr-list {
       color:$gray;
     }
     i {
-      margin-top: 2px;
       @include opacity(0.25);
+      margin-top: 2px;
     }
     &:hover {
       text-decoration:none;
