@@ -1222,22 +1222,18 @@ Mustache.registerHelper('any_allowed', function (action, data, options) {
       hasPassed;
   data = resolve_computed(data);
 
-  function filter(arr, fn) {
-    var results = [];
-    arr.forEach(function (val, index, list) {
-      if (fn(val, index, list)) {
-        results.push(val);
-      }
-    });
-    return results;
-  }
-
   data.forEach(function (item) {
     passed.push(Permission.is_allowed_any(action, item.model_name));
   });
-  hasPassed = filter(passed, function (val) { return val; }).length;
-
+  hasPassed = passed.some(function (val) {
+    return val;
+  });
   return options[hasPassed ? 'fn' : 'inverse'](options.contexts || this);
+});
+
+Mustache.registerHelper('system_role', function (role, options) {
+  var isValid = role.toLowerCase() === GGRC.current_user.system_wide_role.toLowerCase();
+  return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
 });
 
 Mustache.registerHelper("is_allowed_all", function (action, instances, options) {
