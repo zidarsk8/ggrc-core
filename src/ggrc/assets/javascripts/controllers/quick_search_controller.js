@@ -384,18 +384,7 @@ can.Control("CMS.Controllers.LHN", {
           }
         }.bind(this));
 
-        // give everything a bit of time to render
-        $(document).ready(function wait () {
-          console.log("count", $("#lhs:visible").size());
-          debugger;
-          this.resize_lhn();
-          if (this.options.display_prefs.getLHNState().is_pinned) {
-            this.open_lhn();
-          }else{
-            this.close_lhn();
-          }
-          console.log("TRIGGERED YO");
-        }.bind(this));
+        this.initial_lhn_render();
       }.bind(this));
     }
   , initial_scroll: function () {
@@ -403,6 +392,30 @@ can.Control("CMS.Controllers.LHN", {
         this.options.display_prefs.getLHNState().panel_scroll
         || 0
     );
+  }
+  // this uses polling to make sure LHN is there
+  // it ain't pretty, but it works
+  , initial_lhn_render: function (try_count) {
+      try_count || (try_count = 0);
+
+      if (!$(".lhs-holder").size()) {          
+          if (try_count < 10) {
+              setTimeout(function () {
+                  this.initial_lhn_render(try_count+1);
+              }.bind(this), 200);
+          }
+          console.log(try_count);
+          return;
+      }
+      
+      console.log("boop", try_count);
+      this.resize_lhn();
+      
+      if (this.options.display_prefs.getLHNState().is_pinned) {
+          this.open_lhn();
+      }else{
+          this.close_lhn();
+      }
   }
   , lhn_width : function(){
       return $(".lhs-holder").width()+8;
