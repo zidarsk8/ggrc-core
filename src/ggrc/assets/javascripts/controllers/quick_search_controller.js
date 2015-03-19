@@ -385,14 +385,17 @@ can.Control("CMS.Controllers.LHN", {
         }.bind(this));
 
         // give everything a bit of time to render
-        setTimeout(function () {
+        $(document).ready(function wait () {
+          console.log("count", $("#lhs:visible").size());
+          debugger;
           this.resize_lhn();
           if (this.options.display_prefs.getLHNState().is_pinned) {
             this.open_lhn();
           }else{
             this.close_lhn();
           }
-        }.bind(this), 1000);
+          console.log("TRIGGERED YO");
+        }.bind(this));
       }.bind(this));
     }
   , initial_scroll: function () {
@@ -438,14 +441,7 @@ can.Control("CMS.Controllers.LHN", {
   , resize_lhn : function(resize, no_trigger){
     resize || (resize = this.options.display_prefs && this.options.display_prefs.getLHNavSize(null, null).lhs);
 
-    var $lhs = $("#lhs"),
-        $lhsHolder = $(".lhs-holder"),
-        $area = $(".area"),
-        $bar = $("#lhn>.bar-v"),
-        $search = $('.widgetsearch'),
-        $lhs_label_right = $(".lhs-search .my-work-right"),
-        $lhs_label = $(".lhs-search .my-work-label"),
-        max_width = window.innerWidth*.75,
+    var max_width = window.innerWidth*.75,
         default_size = 240;
 
     if (resize < default_size) {
