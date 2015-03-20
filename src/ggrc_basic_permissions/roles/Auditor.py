@@ -7,6 +7,7 @@ permissions = {
     "read": [
         "Audit",
         "Request",
+        "ControlAssessment",
         {
             "terms": {
                 "property_name": "status",
@@ -57,15 +58,17 @@ permissions = {
     ],
     "create": [
         "Request",
+        "ControlAssessment",
     ],
     "view_object_page": [
         "__GGRC_ALL__"
     ],
     "update": [
         "Request",
-         "DocumentationResponse",
-         "InterviewResponse",
-         "PopulationSampleResponse"
+        "ControlAssessment",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse"
     ],
     "delete": [
         "Request",

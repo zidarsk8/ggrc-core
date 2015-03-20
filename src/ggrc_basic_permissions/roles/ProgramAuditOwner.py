@@ -6,6 +6,7 @@ description = """
 permissions = {
     "read": [
         "Request",
+        "ControlAssessment",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -25,6 +26,7 @@ permissions = {
     ],
     "create": [
         "Request",
+        "ControlAssessment",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -47,6 +49,7 @@ permissions = {
     ],
     "update": [
         "Request",
+        "ControlAssessment",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -65,6 +68,7 @@ permissions = {
     ],
     "delete": [
         "UserRole",
+        "ControlAssessment",
         "ObjectControl",
         "ObjectDocument",
         "ObjectObjective",

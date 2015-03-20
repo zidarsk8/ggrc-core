@@ -272,7 +272,7 @@ $(function() {
 
   var base_widgets_by_type = {
     "Program": "Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Audit": "Request history Person program program_controls",
+    "Audit": "Request history Person program program_controls ControlAssessment",
     "Regulation" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Policy" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Standard" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
@@ -292,7 +292,6 @@ $(function() {
     "Facility" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Market" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit"
   };
-
   base_widgets_by_type = _.mapValues(base_widgets_by_type,
                                      function (conf) {
                                        return conf.split(' ');
@@ -405,6 +404,11 @@ $(function() {
             widget_id: "program",
             widget_name: "Program",
             widget_icon: "program"
+          },
+          ControlAssessment: {
+            widget_id: "ControlAssessment",
+            widget_name: "Control Assessments",
+            widget_icon: "control"
           }
         }
         , Control : {
@@ -617,6 +621,13 @@ $(function() {
             , show_view : GGRC.mustache_path + "/programs/tree.mustache"
             , allow_mapping: false
             , allow_creating: false
+          },
+          ControlAssessment: {
+            mapping: "related_control_assessments"
+            , parent_instance: GGRC.page_instance()
+            , draw_children: true
+            , model: "ControlAssessment"
+            , footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache"
           }
         }
 

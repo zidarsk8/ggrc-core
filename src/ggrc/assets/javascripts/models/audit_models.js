@@ -717,4 +717,33 @@ can.Model.Cacheable("CMS.Models.Meeting", {
 
 });
 
+can.Model.Cacheable("CMS.Models.ControlAssessment", {
+  root_object : "control_assessment",
+  root_collection : "control_assessments",
+  findOne : "GET /api/control_assessments/{id}",
+  update : "PUT /api/control_assessments/{id}",
+  destroy : "DELETE /api/control_assessments/{id}",
+  create : "POST /api/control_assessments",
+  mixins : ["ownable", "contactable"],
+  is_custom_attributable: true,
+  attributes : {
+    context : "CMS.Models.Context.stub",
+    modified_by : "CMS.Models.Person.stub",
+    custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
+    start_date: "date",
+    end_date: "date"
+  },
+  init : function() {
+    this._super && this._super.apply(this, arguments);
+    this.validatePresenceOf("control");
+    this.validatePresenceOf("audit");
+    this.validateNonBlank("title");
+  }
+}, {
+  object_model: can.compute(function() {
+    return CMS.Models[this.attr("object_type")];
+  })
+});
+
+
 })(this.can);

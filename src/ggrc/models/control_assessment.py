@@ -10,21 +10,33 @@ from .mixins import (
 from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
+from .relationship import Relatable
 from .track_object_state import HasObjectState, track_state_for_class
+from ggrc.models.reflection import PublishOnly
 
 
 class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documentable,
-                        Personable, Timeboxed, Ownable,
+                        Personable, Timeboxed, Ownable, Relatable,
                         BusinessObject, db.Model):
   __tablename__ = 'control_assessments'
 
-  design = deferred(db.Column(db.Boolean), 'ControlAssessment')
-  operational = deferred(db.Column(db.Boolean), 'ControlAssessment')
+  design = deferred(db.Column(db.String), 'ControlAssessment')
+  operationally = deferred(db.Column(db.String), 'ControlAssessment')
+
+  control = {}
+  audit = {}
 
   # REST properties
   _publish_attrs = [
       'design',
-      'operational'
+      'operationally',
+      PublishOnly('audit'),
+      PublishOnly('control')
+  ]
+
+  _relationship_attrs = [
+      'audit',
+      'control',
   ]
 
 track_state_for_class(ControlAssessment)

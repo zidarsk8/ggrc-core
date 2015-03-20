@@ -813,6 +813,7 @@
             "requests" : "Request"
           , "_program" : "Program"
           , "context" : "Context"
+          , "related_objects_as_source" : ["ControlAssessment"]
         }
       , requests: Direct("Request", "audit", "requests")
       , active_requests: CustomFilter('requests', function(result) {
@@ -896,6 +897,19 @@
                                       , "related_mapped_population_sample_responses"
                                       ])
       , extended_related_objects: Cross("requests", "extended_related_objects")
+      , related_objects_as_source: Proxy(
+          null, "destination", "Relationship", "source", "related_destinations")
+      , related_objects_as_destination: Proxy(
+          null, "source", "Relationship", "destination", "related_sources")
+      , related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"])
+      , related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment")
+    }
+    , ControlAssessment : {
+      _mixins: [
+        "related_object", "personable", "objectiveable", "ownable"
+      ]
+      , related_audits:   TypeFilter("related_objects", "Audit")
+      , related_controls: TypeFilter("related_objects", "Control")
     }
     , Request : {
         _canonical : {
