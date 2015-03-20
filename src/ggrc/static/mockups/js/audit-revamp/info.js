@@ -274,13 +274,21 @@ $(document).ready(function() {
 
   function visualRadio() {
     var $this = $(this),
-        $eachEl = $this.closest(".visual-radio").find("a");
+        $eachEl = $this.closest(".visual-radio").find("a"),
+        $respective = $this.attr("href").slice(1),
+        $that = $(".show-in-tree").find("#" + $respective + ""),
+        $thatAll = $that.closest(".show-in-tree").find(".visual-choice");
 
     if($this.hasClass("active")) {
       $eachEl.removeClass("active");
+      $thatAll.css('display', 'none');
+      $that.closest(".show-in-tree").find(".gray").show();
     } else {
       $eachEl.removeClass("active");
       $this.addClass("active");
+      $thatAll.css('display', 'none');
+      $that.css('display', 'inline-block');
+      $that.closest(".show-in-tree").find(".gray").hide();
     }
   }
 
