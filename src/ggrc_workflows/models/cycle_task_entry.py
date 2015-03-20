@@ -7,12 +7,12 @@
 from ggrc import db
 from ggrc.models.mixins import Base, Described
 from ggrc.models.object_document import Documentable
-
+from sqlalchemy.ext.hybrid import hybrid_property
 
 class CycleTaskEntry(Described, Documentable, Base, db.Model):
   __tablename__ = 'cycle_task_entries'
 
-  is_declining_review = db.Column(db.Boolean, nullable=True)
+  _is_declining_review = db.Column(db.Boolean, nullable=True)
 
   cycle_id = db.Column(
       db.Integer, db.ForeignKey('cycles.id'), nullable=False)
@@ -32,3 +32,12 @@ class CycleTaskEntry(Described, Documentable, Base, db.Model):
       'cycle_task_group_object_task',
       'is_declining_review'
       ]
+
+
+  @hybrid_property
+  def is_declining_review(self):
+    return self._is_declining_review
+
+  @is_declining_review.setter
+  def is_declining_review(self, value):
+    self._is_declining_review = bool(value)

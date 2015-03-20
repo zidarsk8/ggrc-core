@@ -5,7 +5,7 @@
     Maintained By: miha@reciprocitylabs.com
 }}
 
-{{{render "/static/mustache/base_objects/tree_view_filter.mustache"}}}
+{{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
 
 <header class="header sticky tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
   <div class="row-fluid">
@@ -32,7 +32,7 @@
           </a>
         </li>
         <li>
-          <a href="#">
+          <a href="javascript://">
             <i class="grcicon-hide-relevant" rel="tooltip" data-placement="left" title="" data-original-title="Hide Irelevant"></i>
           </a>
         </li>

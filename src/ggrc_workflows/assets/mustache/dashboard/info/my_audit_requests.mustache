@@ -138,4 +138,13 @@
     </li>
   {{/list}}
   {{/audit_requests_data}}
+  {{#if_equals audit_requests_count 0}}
+    {{#if_equals show_audit true}}
+      <li>
+        <div class="zero-state">
+          <h2>You dont' have any requests assigned</h2>
+        </div>
+      </li>
+    {{/if_equals}}
+  {{/if_equals}}
 </ul>

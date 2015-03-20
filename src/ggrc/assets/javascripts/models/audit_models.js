@@ -7,6 +7,51 @@
 
 ;(function(can) {
 
+function update_program_authorizations(programs, person) {
+  return $.when(
+    programs[0],
+    programs[0].get_binding("program_authorized_people").refresh_instances(),
+    programs[0].get_binding("program_authorizations").refresh_instances(),
+    CMS.Models.Role.findAll({ name : "ProgramReader" }),
+    CMS.Models.Role.findAll({ name : "ProgramEditor" })
+  ).then(function(program, people_bindings, auth_bindings, reader_roles, editor_roles) {
+    // ignore readers.  Give users an editor role
+    var reader_authorizations = [],
+        delete_dfds,
+        authorized_people = can.map(people_bindings, function(pb) {
+          return pb.instance;
+        }),
+        editor_authorized_people = can.map(auth_bindings, function(ab) {
+          if(~can.inArray(ab.instance.role.reify(), reader_roles)) {
+            reader_authorizations.push(ab.instance);
+          } else {
+            return ab.instance.person.reify();
+          }
+        });
+
+    if(Permission.is_allowed("create", "UserRole", program.context.id)
+      && !~can.inArray(
+        person.reify(),
+        editor_authorized_people
+    )) {
+      delete_dfds = can.map(reader_authorizations, function(ra) {
+        if(ra.person.reify() === person.reify()) {
+          return ra.refresh().then(function() {
+            return ra.destroy();
+          });
+        }
+      });
+      return $.when.apply($, delete_dfds).then(function() {
+        return new CMS.Models.UserRole({
+          person: person,
+          role: editor_roles[0].stub(),
+          context: program.context
+        }).save();
+      });
+    }
+  });
+}
+
 can.Model.Cacheable("CMS.Models.Audit", {
   root_object : "audit"
   , root_collection : "audits"
@@ -104,52 +149,15 @@ can.Model.Cacheable("CMS.Models.Audit", {
     return this._super.apply(this, arguments);
   },
   after_save: function() {
-    var that = this,
-        dfd;
+    var dfd;
 
-    dfd = new RefreshQueue().enqueue(this.program.reify()).trigger()
-    .then(function(programs) {
-      return $.when(
-        programs[0],
-        programs[0].get_binding("program_authorized_people").refresh_instances(),
-        programs[0].get_binding("program_authorizations").refresh_instances(),
-        CMS.Models.Role.findAll({ name : "ProgramReader" }),
-        CMS.Models.Role.findAll({ name : "ProgramEditor" })
-        );
-    }).then(function(program, people_bindings, auth_bindings, reader_roles, editor_roles) {
-      // ignore readers.  Give users an editor role
-      var reader_authorizations = [],
-          authorized_people = can.map(people_bindings, function(pb) {
-            return pb.instance;
-          }),
-          editor_authorized_people = can.map(auth_bindings, function(ab) {
-            if(~can.inArray(ab.instance.role.reify(), reader_roles)) {
-              reader_authorizations.push(ab.instance);
-            } else {
-              return ab.instance.person.reify();
-            }
-          });
-
-      if(Permission.is_allowed("create", "UserRole", program.context)
-        && !~can.inArray(
-          that.contact.reify(),
-          editor_authorized_people
-      )) {
-        can.each(reader_authorizations, function(ra) {
-          if(ra.person.reify() === that.contact.reify()) {
-            ra.destroy();
-          }
-        });
-        return new CMS.Models.UserRole({
-          person: that.contact,
-          role: editor_roles[0].stub(),
-          context: program.context
-        }).save();
-      }
-    });
+    dfd = $.when(
+      new RefreshQueue().enqueue(this.program.reify()).trigger(),
+      this.contact
+    ).then(update_program_authorizations);
     GGRC.delay_leaving_page_until(dfd);
   },
-  findAuditors : function(return_list){
+  findAuditors : function(return_list) {
     // If return_list is true, use findAuditors in the
     //  classical way, where the exact state of the list
     //  isn't needed immeidately (as in a Mustache helper);
@@ -161,11 +169,12 @@ can.Model.Cacheable("CMS.Models.Audit", {
       dfds = []
       ;
 
-    if(return_list) {
+    if (return_list) {
       $.map(loader.list, function(binding) {
         // FIXME: This works for now, but is sad.
-        if (!binding.instance.selfLink)
+        if (!binding.instance.selfLink) {
           return;
+        }
         var role = binding.instance.role.reify();
         function checkRole() {
           if (role.attr('name') === 'Auditor') {
@@ -175,50 +184,46 @@ can.Model.Cacheable("CMS.Models.Audit", {
             });
           }
         }
-        if(role.selfLink) {
+        if (role.selfLink) {
           checkRole();
         } else {
           role.refresh().then(checkRole);
         }
       });
       return auditors_list;
-    } else {
-      return loader.refresh_instances().then(function() {
-        $.map(loader.list, function(binding) {
-          // FIXME: This works for now, but is sad.
-
-          dfds.push(new $.Deferred(function(dfd) {
-
-            if (!binding.instance.selfLink) {
-              binding.instance.refresh().then(function() {
-                dfd.resolve(binding.instance);
-              });
-            } else {
-              dfd.resolve(binding.instance);
-            }
-          }).then(function(instance) {
-
-            var role = instance.role.reify();
-            function checkRole() {
-              if (role.attr('name') === 'Auditor') {
-                auditors_list.push({
-                  person: instance.person.reify()
-                  , binding: instance
-                });
-              }
-            }
-            if(role.selfLink) {
-              checkRole();
-            } else {
-              return role.refresh().then(checkRole);
-            }
-          }));
-        });
-        return $.when.apply($, dfds).then(function() {
-          return auditors_list;
-        });
-      });
     }
+    return loader.refresh_instances().then(function() {
+      $.map(loader.list, function (binding) {
+        // FIXME: This works for now, but is sad.
+        dfds.push(new $.Deferred(function(dfd) {
+          if (!binding.instance.selfLink) {
+            binding.instance.refresh().then(function() {
+              dfd.resolve(binding.instance);
+            });
+          } else {
+            dfd.resolve(binding.instance);
+          }
+        }).then(function(instance) {
+          var role = instance.role.reify();
+          function checkRole() {
+            if (role.attr('name') === 'Auditor') {
+              auditors_list.push({
+                person: instance.person.reify()
+                , binding: instance
+              });
+            }
+          }
+          if (role.selfLink) {
+            checkRole();
+          } else {
+            return role.refresh().then(checkRole);
+          }
+        }));
+      });
+      return $.when.apply($, dfds).then(function() {
+        return auditors_list;
+      });
+    });
   },
   get_filter_vals: function(){
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
@@ -234,7 +239,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
 
     try {
       if (this.contact){
-        vals['assignee'] = filter_vals.apply(this.contact.reify(), []);
+        vals['assignee'] = filter_vals.apply(this.contact.reify(), [['email', 'name']]);
       }
     } catch (e) {}
 
@@ -351,33 +356,16 @@ can.Model.Cacheable("CMS.Models.Request", {
     }
   }
   , after_save: function() {
-    var that = this,
+    var program_dfd,
         dfd;
 
-    dfd = new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
+    program_dfd = new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
       return new RefreshQueue().enqueue(audits[0].program).trigger();
-    }).then(function(programs) {
-      return $.when(
-        programs[0],
-        programs[0].get_binding("program_authorized_people").refresh_instances(),
-        CMS.Models.Role.findAll({ name : "ProgramReader" }));
-    }).then(function(program, people_bindings, reader_roles) {
-      var authorized_people = can.map(people_bindings, function(pb) {
-        return pb.instance;
-      });
-
-      if(Permission.is_allowed("create", "UserRole", program.context)
-        && !~can.inArray(
-          that.assignee.reify(),
-          authorized_people
-      )) {
-        return new CMS.Models.UserRole({
-          person: that.assignee,
-          role: reader_roles[0].stub(),
-          context: program.context
-        }).save();
-      }
     });
+    dfd = $.when(
+      program_dfd,
+      this.assignee
+    ).then(update_program_authorizations);
     GGRC.delay_leaving_page_until(dfd);
   },
   before_save: function(notifier) {
