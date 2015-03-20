@@ -70,33 +70,6 @@ h6 {
   font-weight: bold;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  &.programs {
-    color:$programs;
-  }
-  &.governance {
-    color:$governance;
-  }
-  &.business {
-    color:$business;
-  }
-  &.risk {
-    color:$risk;
-  }
-  &.objectives {
-    color:$objectives;
-  }
-  &.controls {
-    color:$controls;
-  }
-  &.entities {
-    color:$black;
-  }
-  &.workflow {
-    color:$programs;
-  }
-}
-
 span.error {
   color:$error;
   font-weight:bold;
@@ -153,21 +126,6 @@ a {
   text-align: right;
 }
 
-.no-results {
-  margin-top:20px;
-  h3, p {
-    color:$subTitle;
-    margin-bottom:6px;
-  }
-}
-.widget-status {
-  text-align: right;
-  display: block;
-  padding-right: 20px;
-  font-style: italic;
-  color: $black;
-}
-
 .bottom-spacing {
   margin-bottom: 16px;
 }
@@ -181,10 +139,6 @@ small {
 
 .inline {
   display:inline;
-}
-
-.button-space {
-  margin-right: 4px;
 }
 
 .spacing {
@@ -225,11 +179,6 @@ small {
 
 .assignee-dark {
   color: $subTitle;
-}
-
-.tab-position {
-  position: relative;
-  overflow: visible;
 }
 
 .cancel-text {
