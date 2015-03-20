@@ -82,7 +82,6 @@ def get_current_user_json():
   current_user = get_current_user()
   person = Person.eager_query().filter_by(id=current_user.id).one()
   result = filter_resource(publish_representation(publish(person, (), inclusion_filter)))
-  result['system_wide_role'] = person.system_wide_role
   return as_json(result)
 
 @app.context_processor

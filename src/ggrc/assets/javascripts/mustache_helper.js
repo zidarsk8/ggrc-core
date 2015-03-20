@@ -1232,7 +1232,10 @@ Mustache.registerHelper('any_allowed', function (action, data, options) {
 });
 
 Mustache.registerHelper('system_role', function (role, options) {
-  var isValid = role.toLowerCase() === GGRC.current_user.system_wide_role.toLowerCase();
+  var isValid = false;
+  if (GGRC.current_user) {
+    isValid = role.toLowerCase() === GGRC.current_user.system_wide_role.toLowerCase();
+  }
   return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
 });
 
