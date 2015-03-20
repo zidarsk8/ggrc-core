@@ -593,7 +593,9 @@
 
   }, {
     before_update: function() {
-      this.status && this.attr("status", "Draft");
+      if (this.status && this.os_state === "Approved") {
+        this.attr("status", "Draft");
+      }
     }
   });
   can.each(_workflow_object_types, function(model_name) {
