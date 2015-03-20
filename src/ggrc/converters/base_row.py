@@ -15,6 +15,7 @@ from ggrc.models.all_models import (
 )
 from ggrc.models.exceptions import ValidationError
 from ggrc.app import app
+from ggrc import db
 
 def unpack_list(vals):
   result = []
