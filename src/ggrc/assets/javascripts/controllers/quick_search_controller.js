@@ -397,21 +397,21 @@ can.Control("CMS.Controllers.LHN", {
   // requestAnimationFrame takes browser render optimizations into account
   // it ain't pretty, but it works
   , initial_lhn_render: function (try_count) {
-      if (!$(".lhs-holder").size()) {
-        window.requestAnimationFrame(this.initial_lhn_render.bind(this));
-        return;
-      }
+    if (!$(".lhs-holder").size()) {
+      window.requestAnimationFrame(this.initial_lhn_render.bind(this));
+      return;
+    }
       
-      this.resize_lhn();
+    this.resize_lhn();
       
-      if (this.options.display_prefs.getLHNState().is_pinned) {
-          this.open_lhn();
-      }else{
-          this.close_lhn();
-      }
+    if (this.options.display_prefs.getLHNState().is_pinned) {
+      this.open_lhn();
+    }else{
+      this.close_lhn();
+    }
   }
   , lhn_width : function(){
-      return $(".lhs-holder").width()+8;
+    return $(".lhs-holder").width()+8;
   }
   , hide_lhn: function() {
     //UI-revamp
