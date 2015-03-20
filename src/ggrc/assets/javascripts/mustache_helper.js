@@ -1232,10 +1232,11 @@ Mustache.registerHelper('any_allowed', function (action, data, options) {
 });
 
 Mustache.registerHelper('system_role', function (role, options) {
-  var isValid = false;
-  if (GGRC.current_user) {
-    isValid = role.toLowerCase() === GGRC.current_user.system_wide_role.toLowerCase();
-  }
+  role = role.toLowerCase();
+  // If there is no user, it's same as No Access
+  var user_role = (GGRC.current_user ? GGRC.current_user.system_wide_role : 'no access').toLowerCase();
+      isValid = role === user_role;
+
   return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
 });
 
