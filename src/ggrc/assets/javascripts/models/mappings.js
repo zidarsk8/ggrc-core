@@ -112,7 +112,6 @@
       var mappings = {};
       can.each(this.modules, function(mod, name) {
         if (mod._canonical_mappings && mod._canonical_mappings[object]) {
-          console.log(name, mod._canonical_mappings[object]);
           can.each(mod._canonical_mappings[object], function(mapping_name, option) {
             mappings[option] = CMS.Models[object].get_mapper(mapping_name);
           });
