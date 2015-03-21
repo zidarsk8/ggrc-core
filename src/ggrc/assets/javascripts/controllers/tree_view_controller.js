@@ -439,10 +439,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               can.bind.call(that.element.parent().find('.filter-trigger > a'), 'click', function (evnt) {
                 if (that.display_prefs.getFilterHidden()) {
                   that.show_filter();
-                  el.find("i").attr("data-original-title", "Hide filter");
                 } else {
                   that.hide_filter();
-                  el.find("i").attr("data-original-title", "Show filter");
                 }
               });
         })));
@@ -844,7 +842,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           .height(0)
           .css("margin-bottom", 0);
 
-      this.element.parent().find(".filter-trigger > a").removeClass("active");
+      this.element.parent().find(".filter-trigger > a")
+          .removeClass("active")
+          .find("i")
+          .attr("data-original-title", "Show filter");
+
       this.element.parent().find(".sticky.tree-header").addClass("no-filter");
       Stickyfill.rebuild();
 
@@ -860,12 +862,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           .height($filter.data("height"))
           .css("margin-bottom", $filter.data("margin-bottom"));
 
-      console.log($filter.data("height"), $filter.data("margin-bottom"));
-      debugger;
+      this.element.parent().find(".filter-trigger > a")
+          .addClass("active")
+          .find("i")
+          .attr("data-original-title", "Hide filter");
 
-      this.element.parent().find(".filter-trigger > a").addClass("active");
       this.element.parent().find(".sticky.tree-header").removeClass("no-filter");
-      
       Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(false);
