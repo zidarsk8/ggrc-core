@@ -437,13 +437,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               that.element.before(frag);
               // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
               can.bind.call(that.element.parent().find('.filter-trigger > a'), 'click', function (evnt) {
-                var el = $(evnt.currentTarget);
-                if (el.hasClass("active")) {
-                  that.hide_filter();
-                  el.find("i").attr("data-original-title", "Show filter");
-                } else {
+                if (that.display_prefs.getFilterHidden()) {
                   that.show_filter();
                   el.find("i").attr("data-original-title", "Hide filter");
+                } else {
+                  that.hide_filter();
+                  el.find("i").attr("data-original-title", "Show filter");
                 }
               });
         })));
@@ -860,6 +859,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       $filter
           .height($filter.data("height"))
           .css("margin-bottom", $filter.data("margin-bottom"));
+
+      console.log($filter.data("height"), $filter.data("margin-bottom"));
+      debugger;
 
       this.element.parent().find(".filter-trigger > a").addClass("active");
       this.element.parent().find(".sticky.tree-header").removeClass("no-filter");
