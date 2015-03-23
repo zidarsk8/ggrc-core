@@ -202,6 +202,7 @@ $(document).ready(function() {
 
   function generateCA() {
     $("#ca .content").find(".tree-structure").find(".tree-item").show();
+    $("#CaAdded").hide();
     $("#ca .content").find(".tree-structure").find(".zero-state").hide();
     $("#CACounter").html("4");
   }
@@ -274,14 +275,37 @@ $(document).ready(function() {
 
   function visualRadio() {
     var $this = $(this),
-        $eachEl = $this.closest(".visual-radio").find("a");
+        $eachEl = $this.closest(".visual-radio").find("a"),
+        $respective = $this.attr("href").slice(1),
+        $that = $(".show-in-tree").find("#" + $respective + ""),
+        $thatAll = $that.closest(".show-in-tree").find(".visual-choice");
 
     if($this.hasClass("active")) {
       $eachEl.removeClass("active");
+      $thatAll.css('display', 'none');
+      $that.closest(".show-in-tree").find(".gray").show();
     } else {
       $eachEl.removeClass("active");
       $this.addClass("active");
+      $thatAll.css('display', 'none');
+      $that.css('display', 'inline-block');
+      $that.closest(".show-in-tree").find(".gray").hide();
     }
+  }
+
+  function AddCA() {
+    $("#CaModal").modal("hide");
+    $("#CaAdded").show();
+  }
+
+  function newIssue() {
+    $("#issueModal").modal("hide");
+    $("#newIssue").show();
+    $(".nav li").removeClass("active");
+    $("#issuesNavItem").closest("li").addClass("active");
+    window.location.href = '#issues';
+    $(".object-wrap").hide();
+    $(".object-wrap-issues").show();
   }
 
   $(".top-inner-nav a").on("click", innerNavTrigger);
@@ -299,5 +323,9 @@ $(document).ready(function() {
   $("#approveReview, #approveTask").on("click", approveReview);
 
   $(".visual-radio a").on("click", visualRadio);
+
+  $("#CASave").on("click", AddCA);
+
+  $("#issueSave").on("click", newIssue);
 
 });

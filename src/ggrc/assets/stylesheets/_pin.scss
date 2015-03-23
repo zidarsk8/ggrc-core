@@ -77,3 +77,15 @@
     }
   }
 }
+
+.repeated-utility {
+  @include reset-list();
+  @include clearfix();
+  li {
+    float: left;
+    margin-right: 10px;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
