@@ -742,7 +742,17 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
 }, {
   object_model: can.compute(function() {
     return CMS.Models[this.attr("object_type")];
-  })
+  }),
+  after_save: function() {
+    // TODO: I will make this a feature in cacheable when I'll be implementing
+    //       Issue objects
+    var audit = this.audit.reify(),
+        binding = audit.get_binding('related_control_assessments');
+
+    binding.list.push(
+      new GGRC.ListLoaders.MappingResult(this, binding)
+    );
+  }
 });
 
 
