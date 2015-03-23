@@ -1123,7 +1123,7 @@
              parent_type = this.options.binding.instance.type,
              mapped_type;
 
-         if (types[0] == parent_type) {
+         if (types[0] == "Object" || types[0] == parent_type) {
            mapped_type = types[1];
          }else{
            mapped_type = types[0];

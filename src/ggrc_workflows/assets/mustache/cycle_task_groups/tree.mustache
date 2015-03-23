@@ -6,7 +6,7 @@
 }}
 
 
-<li class="tree-item task-item t-assigned" data-object-id="{{instance.id}}" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}}>
+<li class="tree-item task-item t-assigned" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}}>
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
     <div class="item-wrap">
       {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
