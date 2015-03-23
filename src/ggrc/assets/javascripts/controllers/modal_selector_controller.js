@@ -1103,7 +1103,7 @@
           }
         });
       }
- 
+
    , should_update_hash_fragment: function () {
       var $trigger = this.options.$trigger;
       return !($trigger.closest(".modal").size()
@@ -1111,7 +1111,7 @@
    }
 
    // if we have join.destination, return that
-   // otherwise return the other side of the join 
+   // otherwise return the other side of the join
    // than the one that triggered the modal
    , _get_mapped: function (join_instance) {
        var instance = join_instance[0];
@@ -1143,12 +1143,12 @@
              .control(),
          mapped = this._get_mapped(join_instance);
 
-     hash += [tree_controller 
+     hash += [tree_controller
               ? tree_controller.hash_fragment()
               : "",
-              mapped.type.toLowerCase(), 
+              mapped.type.toLowerCase(),
               mapped.id].join('/');
-       
+
      window.location.hash = hash;
    }
 
@@ -2016,14 +2016,12 @@
     }
 
     , on_map: $.debounce(500, true, function mapSelectedObjects(el, ev) {
-        var modalSelector = this, ajd;
+        var modalSelector = this, ajd, join_instance, its, pass = 0,
+            obj_arr = [], dfds = [];
 
         if(el.hasClass('disabled')){
           return;
         }
-        var join_instance, its;
-        var pass = 0;
-        var obj_arr = [];
 
         function map_post_process(obj) {
           // FIXME: Extension isolation violation
@@ -2088,8 +2086,9 @@
                     }
                   }
                 });
-              this.bindXHRToButton(ajd, el, "Saving, please wait...");
+              dfds.push(ajd);
             }
+            this.bindXHRToButton($.when.apply($, dfds), el, "Saving, please wait...");
           }
         } //End else
 

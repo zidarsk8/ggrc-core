@@ -272,7 +272,7 @@ $(function() {
 
   var base_widgets_by_type = {
     "Program": "Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Audit": "Request history Person program program_controls ControlAssessment",
+    "Audit": "ControlAssessment Request history Person program program_controls",
     "Regulation" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Policy" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Standard" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
@@ -397,7 +397,7 @@ $(function() {
           },
           program_controls: {
             widget_id: "control",
-            widget_name: "Program Controls",
+            widget_name: "In Scope Controls",
             widget_icon: "control"
           },
           program: {
@@ -607,7 +607,7 @@ $(function() {
             mapping: "program_controls"
             , parent_instance: GGRC.page_instance()
             , draw_children : true
-            , model: "Control"
+            , model: CMS.Models.Control
             , show_view : GGRC.mustache_path + "/controls/tree.mustache"
             , footer_view : GGRC.mustache_path + "/controls/tree_footer.mustache"
             , allow_mapping: false
@@ -626,7 +626,7 @@ $(function() {
             mapping: "related_control_assessments"
             , parent_instance: GGRC.page_instance()
             , draw_children: true
-            , model: "ControlAssessment"
+            , model: CMS.Models.ControlAssessment
             , footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache"
           }
         }
