@@ -443,6 +443,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
                   that.hide_filter();
                 }
               });
+
+              can.bind.call(that.element.parent().find('.generate-control-assessments > a'), 'click', function (ev) {
+                that.generate_control_assessments();
+              });
         })));
       }
 
@@ -830,6 +834,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if(this.options.events && typeof this.options.events[event_name] === "function") {
       this.options.events[event_name].apply(this, arguments);
     }
+  },
+  ".generate-control-assessments click": function (el, ev) {
+      console.log("hello there click");
   }
   , hide_filter: function () {
       var $filter = this.element.parent().find(".filter-holder"),
@@ -873,6 +880,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.display_prefs.setFilterHidden(false);
       this.display_prefs.save();
     }
+
+  , generate_control_assessments: function () {
+    console.log("HELLO THERE");
+    debugger;
+  }
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
