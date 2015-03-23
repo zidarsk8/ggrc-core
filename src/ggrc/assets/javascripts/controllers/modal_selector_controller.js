@@ -2016,14 +2016,12 @@
     }
 
     , on_map: $.debounce(500, true, function mapSelectedObjects(el, ev) {
-        var modalSelector = this, ajd;
+        var modalSelector = this, ajd, join_instance, its, pass = 0,
+            obj_arr = [], dfds = [];
 
         if(el.hasClass('disabled')){
           return;
         }
-        var join_instance, its;
-        var pass = 0;
-        var obj_arr = [];
 
         function map_post_process(obj) {
           // FIXME: Extension isolation violation
@@ -2088,8 +2086,9 @@
                     }
                   }
                 });
-              this.bindXHRToButton(ajd, el, "Saving, please wait...");
+              dfds.push(ajd);
             }
+            this.bindXHRToButton($.when.apply($, dfds), el, "Saving, please wait...");
           }
         } //End else
 
