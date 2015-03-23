@@ -259,45 +259,6 @@
               }
             }
           }
-          &.text-compliance,
-          &.text-system,
-          &.text-process,
-          &.text-businessprocess,
-          &.text-control {
-            a {
-              color:$governance;
-            }
-          }
-          &.text-risk,
-          &.text-attribute {
-            a {
-              color:$risk;
-            }
-          }
-          &.text-business,
-          &.text-dataasset,
-          &.text-project,
-          &.text-facility,
-          &.text-market,
-          &.text-product,
-          &.text-orggroup {
-            a {
-              color:$business;
-            }
-          }
-          &.text-governance,
-          &.text-program,
-          &.text-section,
-          &.text-clause,
-          &.text-policy,
-          &.text-directive,
-          &.text-contract,
-          &.text-regulation,
-          &.text-standard {
-            a {
-              color:$governance;
-            }
-          }
         }
       }
     }

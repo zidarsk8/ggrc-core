@@ -181,13 +181,6 @@ small {
   color: $subTitle;
 }
 
-.cancel-text {
-  color: $black;
-  &:hover {
-    color: $black;
-  }
-}
-
 .checkbox-inline {
   input[type="checkbox"] {
     margin: -1px 0 0 0;
@@ -364,12 +357,6 @@ small {
   &.btn-footer {
     margin-top: 4px;
   }
-  .population-upload & {
-    width: 100%;
-    box-sizing: border-box;
-    padding-left: 1px;
-    padding-right: 3px;
-  }
   &.pending-ajax {
     @include box-shadow(none);
     cursor: default;
@@ -403,8 +390,7 @@ small {
 // removing outline on anchor element
 .nav-tabs,
 .menu,
-.btn,
-.program-list {
+.btn {
   a {
     @extend %outline-fix;
   }
@@ -425,10 +411,6 @@ small {
   &.expand-on-hover {
     cursor:pointer;
   }
-}
-
-.inhover {
-  cursor:pointer;
 }
 
 // RTF
@@ -473,19 +455,6 @@ input.date {
 input.input-block-level,
 select.input-block-level {
   @extend %input-block-level;
-}
-
-//tree-structure no results
-.no-result {
-  text-align: center;
-  font-weight: bold;
-  color: $darkGray;
-  line-height: 20px;
-  font-size: $f-small;
-  &.object-no-result {
-    font-size: $f-regular;
-    padding-top: 8px;
-  }
 }
 
 // resizible widget functionality
@@ -627,32 +596,8 @@ input.disabled.pending-ajax{
 }
 
 // backdrop
-
 .modal-backdrop, .modal-backdrop.fade.in {
   @include opacity(0.6);
-}
-
-// additional styles
-
-li.text-governance,
-span.text-governance,
-strong.text-governance {
-  color:$governance;
-  a {
-    color:$governance !important;
-  }
-}
-
-
-span,
-strong {
-  &.text-risk {
-    color:$risk;
-  }
-  &.text-business {
-    color:$business;
-  }
-
 }
 
 .description {
@@ -661,10 +606,6 @@ strong {
       font-size: $f-small;
     }
   }
-}
-
-.key-p {
-  margin-right:40px;
 }
 
 .coding {
@@ -798,34 +739,10 @@ select.multiple-selector {
   }
 }
 
-// Saved Message
-.saved {
-  position: relative;
-  input,
-  select,
-  textarea {
-    border: 1px solid $green;
-    margin-bottom: 3px;
-  }
-  .saved-message {
-    position: absolute;
-    right: 0;
-    font-size: 10px;
-    color: $green;
-    font-weight: bold;
-  }
-}
-
 .rtf-block {
   word-wrap: break-word;
   margin-bottom:10px;
   line-height:18px;
-}
-
-.top-align-label {
-  input {
-    margin-bottom: 0;
-  }
 }
 
 .drag {
@@ -906,11 +823,6 @@ select.multiple-selector {
       }
     }
   }
-}
-
-.top-separator {
-  border-top:1px dotted #ccc;
-  padding-top:20px;
 }
 
 // Welcome page

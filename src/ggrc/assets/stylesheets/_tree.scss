@@ -1082,35 +1082,6 @@ ul.new-tree {
       margin-top: 2px;
     }
   }
-  .population-upload {
-    @extend %reset-list;
-    margin-top: 20px;
-    li {
-      margin-bottom: 20px;
-      label {
-        margin-bottom: 3px;
-      }
-      [class^="grcicon-"] {
-        margin-top: 0;
-      }
-      .choose {
-        margin: 6px 0 0 0;
-        display: inline-block;
-      }
-      .evidence {
-        padding-top: 0;
-        .row-fluid {
-          margin-bottom: 0 !important;
-        }
-      }
-      input {
-        margin-bottom: 0;
-      }
-      .span2 {
-        margin-left: 0;
-      }
-    }
-  }
 }
 
 .item-data {
