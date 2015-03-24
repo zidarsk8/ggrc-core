@@ -22,7 +22,7 @@
     {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
     <a href="javascript://" class="unmap" data-toggle="unmap">
       <span class="result" {{data 'result'}}></span>
-      <i class="grcicon-deleted" tabindex="11"></i>
+      {{^if_equals list.length 1}}<i class="grcicon-deleted" tabindex="11"></i>{{/if_equals}}
     </a>
   </div>
   {{/each}}

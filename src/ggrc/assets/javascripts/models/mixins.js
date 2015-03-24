@@ -93,26 +93,9 @@ can.Construct("can.Model.Mixin", {
 });
 
 can.Model.Mixin("ownable", {
-  "after:init" : function() {
+  "after:init": function () {
     if (!this.owners) {
       this.attr("owners", []);
-    }
-  }
-  , before_create : function() {
-    if (!this.owners || !this.owners.length) {
-      this.attr('owners', [{ id: GGRC.current_user.id, type : "Person", automatic: true }]);
-    }
-    if (this.owners.length > 2) {
-      this.attr('owners', can.map(function (owner) {
-        if (!owner.automatic) {
-          return owner;
-        }
-      }));
-    }
-  }
-  , form_preload : function(new_object_form) {
-    if (new_object_form && (!this.owners || !this.owners.length)) {
-      this.attr('owners', [{ id: GGRC.current_user.id, type : "Person", automatic: true }]);
     }
   }
 });

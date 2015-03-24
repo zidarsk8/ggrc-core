@@ -81,9 +81,8 @@ def get_current_user_json():
   from ggrc.models.person import Person
   current_user = get_current_user()
   person = Person.eager_query().filter_by(id=current_user.id).one()
-  return as_json(
-      filter_resource(
-        publish_representation(publish(person, (), inclusion_filter))))
+  result = filter_resource(publish_representation(publish(person, (), inclusion_filter)))
+  return as_json(result)
 
 @app.context_processor
 def base_context():
