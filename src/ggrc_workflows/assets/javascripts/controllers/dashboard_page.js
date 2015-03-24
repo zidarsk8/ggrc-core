@@ -394,17 +394,17 @@
           if (task_count > 0) {
             task_data.task_count = task_count;
             task_data.finished = finished;
-            task_data.finished_percentage = Math.floor((finished * 100) / task_count); //ignore the decimal part
+            task_data.finished_percentage = ((finished * 100) / task_count).toFixed(2); //precision up tp 2 decimal points
             task_data.in_progress = in_progress;
-            task_data.in_progress_percentage = Math.floor((in_progress * 100) / task_count);
+            task_data.in_progress_percentage = ((in_progress * 100) / task_count).toFixed(2);
             task_data.verified = verified;
-            task_data.verified_percentage = Math.floor((verified * 100) / task_count);
+            task_data.verified_percentage = ((verified * 100) / task_count).toFixed(2);
             task_data.declined = declined;
-            task_data.declined_percentage = Math.floor((declined * 100) / task_count);
+            task_data.declined_percentage = ((declined * 100) / task_count).toFixed(2);
             task_data.over_due = over_due;
-            task_data.over_due_percentage = Math.floor((over_due * 100) / task_count);
+            task_data.over_due_percentage = ((over_due * 100) / task_count).toFixed(2);
             task_data.assigned = assigned;
-            task_data.assigned_percentage = Math.floor((assigned * 100) / task_count);
+            task_data.assigned_percentage = ((assigned * 100) / task_count).toFixed(2);
             task_data.first_end_dateD = first_end_date;
             task_data.first_end_date = first_end_date.toLocaleDateString();
             //calculate days left for first_end_date
