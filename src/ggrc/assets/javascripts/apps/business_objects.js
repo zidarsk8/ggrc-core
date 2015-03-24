@@ -657,17 +657,6 @@ $(function() {
             , Clause: clause_child_options
             }
 
-        , extended_audits: {
-            Audit: {
-              mapping: "related_audits_via_related_responses"
-              , allow_mapping : false
-              , allow_creating : false
-              , draw_children : true
-              , show_view : GGRC.mustache_path + "/audits/tree.mustache"
-              , footer_view : null
-            }
-          }
-
         , open_requests: {
             Request: {
               mapping: "open_requests"
@@ -680,50 +669,49 @@ $(function() {
           }
 
         , Clause: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , Section: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , Objective: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , Control: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits", "open_requests"]
+            _mixins: ["governance_objects", "business_objects", "open_requests"]
           }
         , DataAsset: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , Facility: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , Market: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , OrgGroup: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , Vendor: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , Process: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , Product: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , Project: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , System: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
         , Document: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects"]
           }
 
         , Person : {
-            // _mixins: ["extended_audits"]
              Program : {
                 mapping: "extended_related_programs_via_search"
               , fetch_post_process: sort_sections

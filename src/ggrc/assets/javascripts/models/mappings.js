@@ -286,14 +286,6 @@
           "objectives", "implemented_controls", "related_business_objects",
           "people", "joined_directives", "programs", "sections", "clauses"
           ])
-      , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
-      , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
-      , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")
-      , related_responses:                      Multi(["related_documentation_responses"
-                                                , "related_interview_responses"
-                                                , "related_population_sample_responses"
-                                                ])
-      , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
       , audits: Proxy(
           "Audit", "audit", "AuditObject", "auditable", "audit_objects")
       , open_requests: Cross("audits", "active_requests")
@@ -511,17 +503,7 @@
       , policies: TypeFilter("related_objects", "Policy")
       , standards: TypeFilter("related_objects", "Standard")
       , programs: TypeFilter("related_objects", "Program")
-
-      , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
-      , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
-      , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")
-      , related_responses:                      Multi(["related_documentation_responses"
-                                                , "related_interview_responses"
-                                                , "related_population_sample_responses"
-                                                ])
-      , related_requests_via_related_responses: Cross("related_responses", "_request")
-      , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
-      }
+    }
 
     // Program
     , Program: {
