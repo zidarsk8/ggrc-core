@@ -394,7 +394,7 @@
           if (task_count > 0) {
             task_data.task_count = task_count;
             task_data.finished = finished;
-            task_data.finished_percentage = ((finished * 100) / task_count).toFixed(2); //precision up tp 2 decimal points
+            task_data.finished_percentage = ((finished * 100) / task_count).toFixed(2); //precision up to 2 decimal points
             task_data.in_progress = in_progress;
             task_data.in_progress_percentage = ((in_progress * 100) / task_count).toFixed(2);
             task_data.verified = verified;
