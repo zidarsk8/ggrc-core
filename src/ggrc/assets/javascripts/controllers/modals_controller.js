@@ -758,6 +758,7 @@ can.Control("GGRC.Controllers.Modals", {
             that.new_instance();
           } else {
             that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
+            that.update_hash_fragment();
           }
         }
 
@@ -859,6 +860,29 @@ can.Control("GGRC.Controllers.Modals", {
       this.options.instance.removeAttr("_transient");
     }
   }
+
+  , should_update_hash_fragment: function () {
+    var $trigger = this.options.$trigger;
+    return !($trigger.closest(".modal").size()
+          || $trigger.closest(".cms_controllers_info_pin").size());
+  }
+
+  , update_hash_fragment: function () {
+    if (!this.should_update_hash_fragment()) return;
+
+    var hash = window.location.hash.split('/')[0],
+        tree_controller = this.options
+            .$trigger
+            .closest(".cms_controllers_tree_view_node")
+            .control();
+
+    hash += [tree_controller 
+             ? tree_controller.hash_fragment()
+             : "",
+             this.options.instance.hash_fragment()].join('/');
+
+    window.location.hash = hash;
+  }
 });
 
 
@@ -891,7 +915,7 @@ can.Component.extend({
   events: {
     init: function() {
       var that = this,
-        key;
+          key;
 
       this.scope.attr("controller", this);
 

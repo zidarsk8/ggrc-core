@@ -13,8 +13,9 @@ class HasObjectState(object):
     PublishOnly('os_state'),
   ]
 
-  def __init__(self):
+  def __init__(self, *args, **kwargs):
     self._skip_os_state_update = False;
+    super(HasObjectState, self).__init__(*args, **kwargs)
 
   @declared_attr
   def os_state(cls):

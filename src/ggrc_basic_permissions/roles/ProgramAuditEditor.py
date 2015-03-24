@@ -6,6 +6,7 @@ description = """
 permissions = {
     "read": [
         "Request",
+        "ControlAssessment",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -25,6 +26,7 @@ permissions = {
     ],
     "create": [
         "Request",
+        "ControlAssessment",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -63,6 +65,7 @@ permissions = {
             "type": "Request",
             "condition": "is"
         },
+        "ControlAssessment",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",

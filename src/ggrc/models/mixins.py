@@ -549,3 +549,14 @@ class CustomAttributable(object):
     #     joinstr = 'foreign(CustomAttributeDefinition.definition_type) == "{name}"'
     #     joinstr = joinstr.format(name=cls.__name__)
     #     return db.relationship("CustomAttributeDefinition",primaryjoin=joinstr)
+
+
+class TestPlanned(object):
+  @declared_attr
+  def test_plan(cls):
+    return deferred(db.Column(db.Text), cls.__name__)
+
+  # REST properties
+  _publish_attrs = ['test_plan']
+  _fulltext_attrs = ['test_plan']
+  _sanitize_html = ['test_plan']

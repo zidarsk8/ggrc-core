@@ -654,7 +654,6 @@ can.Model("can.Model.Cacheable", {
         return mapper;
       }
     }
-
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
@@ -1069,6 +1068,15 @@ can.Model("can.Model.Cacheable", {
     }.bind(this));
 
     return values;
+  }, 
+
+  hash_fragment: function () {
+    var type = can.spaceCamelCase(this.type)
+            .toLowerCase()
+            .replace(/ /g, '_');
+
+    return [type,
+            this.id].join('/');
   }
 });
 

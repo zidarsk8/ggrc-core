@@ -7,6 +7,7 @@ dashboard-js-files:
   - tracker.js
   - jquery.js
   - rails.js
+  - lodash.js
   - jquery-ui.js
   - jquery.ba-throttle-debounce.js
   - bootstrap-alert.js
@@ -101,6 +102,7 @@ dashboard-js-template-files:
   - base_objects/create_objective_dropdown_option.mustache
   - base_objects/general_info.mustache
   - base_objects/description.mustache
+  - base_objects/test_plan.mustache
   - base_objects/extended_info.mustache
   - base_objects/urls.mustache
   - base_objects/notes.mustache
@@ -119,6 +121,7 @@ dashboard-js-template-files:
   - base_objects/tree_footer_zero.mustache
   - base_objects/tree_header.mustache
   - base_objects/tree_view_filter.mustache
+  - base_objects/filter_trigger.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pin.mustache
@@ -139,6 +142,8 @@ dashboard-js-template-files:
   - controls/modal_content.mustache
   - controls/object_list.mustache
   - controls/tree.mustache
+  - control_assessments/modal_content.mustache
+  - control_assessments/tree_footer.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
