@@ -259,7 +259,7 @@
         _mixins: ["personable", "ownable"] //controllable
       , _canonical : {
         "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
-          "Project", "System", "DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"],
+          "Project", "System"],
         "programs" : "Program",
         "objectives" : "Objective",
         "implemented_controls" : "Control",
