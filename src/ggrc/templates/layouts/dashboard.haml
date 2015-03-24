@@ -142,12 +142,8 @@
     %section.footer
       .row-fluid
         .span12
-          %ul.bottom-nav.pull-left
           %p
-            -#FIXME: Copyright footer
-            -#=CMS_CONFIG['COMPANY']
             =config.get('COPYRIGHT')
-            -#=Time.now.year
             =config.get('COMPANY')
             Version
             =config.get('VERSION')

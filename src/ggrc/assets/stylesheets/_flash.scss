@@ -14,6 +14,9 @@
   margin-left:25%;
   z-index:9000;
   .notice {
+    border: 1px solid #1FDF00;
+    background-color: #BBFFB6;
+    font-size:11px;
     p {
       color:$green;
       font-size:11px;
@@ -37,30 +40,16 @@
       font-weight:bold;
       font-size:11px;
     }
-
-
-    // TO-DO: check this. It's weird structure
-    .flash {
-      .error {
-        border: 1px solid #e00;
-        background-color: #fdd;
-        font-size:11px;
-      }
-    }
+  }
+  .error {
+    border: 1px solid #e00;
+    background-color: #fdd;
+    font-size:11px;
   }
   .warning {
     border: 1px solid #fffaaa;
     background-color: #ffffcc;
     font-size:11px;
-  }
-
-  // TO-DO: check this. It's weird structure
-  .flash {
-    .notice {
-      border: 1px solid #1FDF00;
-      background-color: #BBFFB6;
-      font-size:11px;
-    }
   }
   .alert {
     .close {
