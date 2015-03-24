@@ -943,7 +943,6 @@ Mustache.registerHelper("person_roles", function (person, scope, options) {
             name: "Superuser"
           });
         }
-
         roles_deferred.resolve(roles);
       });
     });
@@ -1216,6 +1215,29 @@ Mustache.registerHelper("is_allowed", function () {
     ? options.fn(options.contexts || this)
     : options.inverse(options.contexts || this)
     ;
+});
+
+Mustache.registerHelper('any_allowed', function (action, data, options) {
+  var passed = [],
+      hasPassed;
+  data = resolve_computed(data);
+
+  data.forEach(function (item) {
+    passed.push(Permission.is_allowed_any(action, item.model_name));
+  });
+  hasPassed = passed.some(function (val) {
+    return val;
+  });
+  return options[hasPassed ? 'fn' : 'inverse'](options.contexts || this);
+});
+
+Mustache.registerHelper('system_role', function (role, options) {
+  role = role.toLowerCase();
+  // If there is no user, it's same as No Access
+  var user_role = (GGRC.current_user ? GGRC.current_user.system_wide_role : 'no access').toLowerCase();
+      isValid = role === user_role;
+
+  return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
 });
 
 Mustache.registerHelper("is_allowed_all", function (action, instances, options) {
@@ -2671,7 +2693,7 @@ Mustache.registerHelper("with_allowed_as", function (name, action, mappings, opt
 });
 
 Mustache.registerHelper("log", function (obj) {
-  console.log(resolve_computed(obj));
+  console.log('Mustache log', resolve_computed(obj));
 });
 
 Mustache.registerHelper("autocomplete_select", function (options) {

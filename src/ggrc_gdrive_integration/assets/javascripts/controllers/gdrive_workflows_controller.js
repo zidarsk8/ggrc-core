@@ -1095,21 +1095,85 @@ can.Component.extend({
     }
   }
 });
-});
 
 can.Component.extend({
   tag: "ggrc-gdrive-picker-launcher",
-  template: '<a href="javascript://" class="{{link_class}} btn-small btn-draft" '
-            + 'data-object-source="true" data-toggle="evidence-gdrive-picker" '
-            + 'can-click="trigger_upload">{{firstexist link_text "Upload Files to GDrive"}}</a>'
-            + '{{#pending}}<span {{attach_spinner \'{ "radius": 3, "length": 2.5, "width": 2 }\' '
-            + '\'display:inline-block; top: -5px; left: 12px;\' }}></span>{{/pending}}',
+  template: can.view(GGRC.mustache_path + "/gdrive/gdrive_file.mustache"),
   scope: {
     instance: null,
     deferred: "@",
     link_text: "@",
     link_class: "@",
-    trigger_upload : function(scope, el, ev) {
+    click_event: "@",
+
+    trigger_upload: function(scope, el, ev){
+      // upload files without a parent folder (risk assesment)
+      var that = this,
+          dfd = GGRC.Controllers.GAPI.authorize(["https://www.googleapis.com/auth/drive"]),
+          folder_id = el.data("folder-id");
+
+      dfd.then(function(){
+        gapi.load('picker', {'callback': createPicker});
+
+        // Create and render a Picker object for searching images.
+        function createPicker() {
+          window.oauth_dfd.done(function(token, oauth_user) {
+            var picker = new google.picker.PickerBuilder()
+              .setOAuthToken(gapi.auth.getToken().access_token)
+              .setDeveloperKey(GGRC.config.GAPI_KEY)
+              .setCallback(pickerCallback);
+
+            if(el.data('type') === 'folders'){
+              var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+                .setIncludeFolders(true)
+                .setSelectFolderEnabled(true);
+              picker.addView(view);
+            }
+            else{
+              var docsUploadView = new google.picker.DocsUploadView()
+                    .setParent(folder_id),
+                  docsView = new google.picker.DocsView()
+                    .setParent(folder_id);
+
+              picker.addView(docsUploadView)
+                .addView(docsView)
+                .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
+            }
+            picker = picker.build();
+            picker.setVisible(true);
+            picker.A.style.zIndex = 2001; // our modals start with 1050
+          });
+        }
+
+        function pickerCallback(data) {
+
+          var files, models,
+              PICKED = google.picker.Action.PICKED,
+              ACTION = google.picker.Response.ACTION,
+              DOCUMENTS = google.picker.Response.DOCUMENTS,
+              CANCEL = google.picker.Action.CANCEL;
+
+          if (data[ACTION] == PICKED) {
+            files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
+            that.attr("pending", true);
+            return new RefreshQueue().enqueue(files).trigger().then(function(files){
+              doc_dfds = that.handle_file_upload(files);
+              $.when.apply($, doc_dfds).then(function() {
+                el.trigger("modal:success", { arr: can.makeArray(arguments) });
+                that.attr('pending', false);
+              });
+            });
+          }
+          else if (data[ACTION] == CANCEL) {
+            //TODO: hadle canceled uplads
+            el.trigger('rejected');
+          }
+        }
+      });
+    },
+
+    trigger_upload_parent: function(scope, el, ev) {
+      // upload files with a parent folder (audits and workflows)
       var that = this,
           parent_folder_dfd;
 
@@ -1173,71 +1237,78 @@ can.Component.extend({
                         function(file) {
                           return CMS.Models.GDriveFile.model(file);
                         }),
-              doc_dfds = [];
-          can.each(files, function(file) {
-            //Since we can re-use existing file references from the picker, check for that case.
-            var dfd = CMS.Models.Document.findAll({link : file.alternateLink }).then(function(d) {
-              var doc_dfd, object_doc, object_file;
-
-              if(d.length < 1) {
-                d.push(
-                  new CMS.Models.Document({
-                    context : that.instance.context || {id : null}
-                    , title : file.title
-                    , link : file.alternateLink
-                  })
-                );
-              }
-              if(that.deferred || !d[0].isNew()) {
-                doc_dfd = $.when(d[0]);
-              } else {
-                doc_dfd = d[0].save();
-              }
-
-              doc_dfd = doc_dfd.then(function(doc) {
-                if(that.deferred) {
-                  that.instance.mark_for_addition("documents", doc, {
-                    context : that.instance.context || {id : null}
-                  });
-                } else {
-                  object_doc = new CMS.Models.ObjectDocument({
-                      context : that.instance.context || {id : null}
-                      , documentable : that.instance
-                      , document : doc
-                    }).save();
-                }
-
-                return $.when(
-                  CMS.Models.ObjectFile.findAll({ file_id : file.id, fileable_id : d[0].id }),
-                  object_doc
-                ).then(function(ofs) {
-                  if(ofs.length < 1) {
-                    if(that.deferred) {
-                      doc.mark_for_addition("files", file, {
-                        context : that.instance.context || {id : null}
-                      });
-                    } else {
-                      return new CMS.Models.ObjectFile({
-                        context : that.instance.context || {id : null}
-                        , file : file
-                        , fileable : doc
-                      }).save();
-                    }
-                }})
-                .then(function() {
-                  return doc;
-                });
-              });
-              return doc_dfd;
-            });
-            doc_dfds.push(dfd);
-          });
+          doc_dfds = that.handle_file_upload(files);
           $.when.apply($, doc_dfds).then(function() {
             el.trigger("modal:success", { arr: can.makeArray(arguments) });
             that.attr('pending', false);
           });
         });
       });
+    },
+
+    handle_file_upload: function(files){
+      var that = this,
+          doc_dfds = [];
+
+      can.each(files, function(file) {
+        //Since we can re-use existing file references from the picker, check for that case.
+        var dfd = CMS.Models.Document.findAll({link : file.alternateLink }).then(function(d) {
+          var doc_dfd, object_doc, object_file;
+
+          if(d.length < 1) {
+            d.push(
+              new CMS.Models.Document({
+                context : that.instance.context || {id : null}
+                , title : file.title
+                , link : file.alternateLink
+              })
+            );
+          }
+          if(that.deferred || !d[0].isNew()) {
+            doc_dfd = $.when(d[0]);
+          } else {
+            doc_dfd = d[0].save();
+          }
+
+          doc_dfd = doc_dfd.then(function(doc) {
+            if(that.deferred) {
+              that.instance.mark_for_addition("documents", doc, {
+                context : that.instance.context || {id : null}
+              });
+            } else {
+              object_doc = new CMS.Models.ObjectDocument({
+                  context : that.instance.context || {id : null}
+                  , documentable : that.instance
+                  , document : doc
+                }).save();
+            }
+
+            return $.when(
+              CMS.Models.ObjectFile.findAll({ file_id : file.id, fileable_id : d[0].id }),
+              object_doc
+            ).then(function(ofs) {
+              if(ofs.length < 1) {
+                if(that.deferred) {
+                  doc.mark_for_addition("files", file, {
+                    context : that.instance.context || {id : null}
+                  });
+                } else {
+                  return new CMS.Models.ObjectFile({
+                    context : that.instance.context || {id : null}
+                    , file : file
+                    , fileable : doc
+                  }).save();
+                }
+            }})
+            .then(function() {
+              return doc;
+            });
+          });
+          return doc_dfd;
+        });
+        doc_dfds.push(dfd);
+      });
+      return doc_dfds;
     }
   },
   events: {
@@ -1250,9 +1321,6 @@ can.Component.extend({
 });
 
 
-
-
-$(function() {
   $(document.body).ggrc_controllers_g_drive_workflow();
 });
 

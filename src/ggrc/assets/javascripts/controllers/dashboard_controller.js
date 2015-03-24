@@ -81,11 +81,11 @@ can.Control("CMS.Controllers.Dashboard", {
 
   , init_inner_nav: function() {
       var $internav = this.element.find('.internav');
-      if ($internav.length > 0) {
+      if ($internav.length) {
         this.inner_nav_controller = new CMS.Controllers.InnerNav(
-            this.element.find('.internav'), {
-                dashboard_controller: this
-            });
+          this.element.find('.internav'), {
+              dashboard_controller: this
+          });
       }
 
       if (this.display_prefs.getTopNavHidden()) {
@@ -358,7 +358,6 @@ can.Control("CMS.Controllers.InnerNav", {
         }
 
         this.options.instance = GGRC.page_instance();
-
         if (!(this.options.contexts instanceof can.Observe)) {
          this.options.contexts = new can.Observe(this.options.contexts);
         }
