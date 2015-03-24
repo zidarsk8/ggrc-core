@@ -141,29 +141,29 @@
   }, {
     init : function() {
       this._super && this._super.apply(this, arguments);
-      this.bind("task_group", function(ev, newVal) {
-        var that = this;
-        if(!newVal)
+      this.bind('task_group', function (ev, newVal) {
+        if (!newVal) {
           return;
-
+        }
         newVal = newVal.reify();
+        var that = this,
+            queue = new RefreshQueue();
 
-        new RefreshQueue().enqueue(newVal).trigger().then(function() {
+        queue.enqueue(newVal).trigger().then(function (taskgroup) {
           var tgt,
-              tgts = newVal.task_group_tasks.slice(0);
+              tgts = taskgroup[0].task_group_tasks.slice(0);
 
           do {
-            tgt = tgts.splice(tgts.length - 1, 1)[0];
+            tgt = tgts.splice(-1)[0];
             tgt = tgt && tgt.reify();
           } while (tgt === that);
 
-          if(!tgt)
+          if (!tgt) {
             return new $.Deferred().reject("no existing task group task");
-          else
-            return new RefreshQueue().enqueue(tgt).trigger();
-        }).then(function(tgts) {
+          }
+          return new RefreshQueue().enqueue(tgt).trigger();
+        }).then(function (tgts) {
           var tgt = tgts[0];
-
           can.each(
             ["relative_start_day",
              "relative_start_month",
@@ -172,7 +172,7 @@
              "start_date",
              "end_date"],
             function(prop) {
-              if(tgt[prop] && !that[prop]) {
+              if (tgt[prop] && !that[prop]) {
                 that.attr(prop, tgt.attr(prop) instanceof Date ? new Date(tgt[prop]) : tgt[prop]);
               }
             }
