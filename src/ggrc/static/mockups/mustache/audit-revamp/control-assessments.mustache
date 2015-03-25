@@ -86,14 +86,20 @@
                                     <div class="span2 centered">
                                       <div class="row-fluid">
                                         <div class="span6 show-in-tree">
-                                          <i class="grcicon-done visual-choice" id="DdoneIcon"></i>
-                                          <i class="grcicon-not-done visual-choice" id="DnotDoneIcon"></i>
-                                          <span class="gray" id="DNA">N/A</span>
+                                          <span class="gray" id="d-choose">undefined</span>
+                                          <span class="gray" id="d-effective">Effective</span>
+                                          <span class="gray" id="d-material-weakness">Material weakness</span>
+                                          <span class="gray" id="d-needs-improvement">Needs improvement</span>
+                                          <span class="gray" id="d-significant-deficiency">Significant deficiency</span>
+                                          <span class="gray" id="d-not-applicable">Not Applicable</span>
                                         </div>
                                         <div class="span6 show-in-tree">
-                                          <i class="grcicon-done visual-choice" id="OdoneIcon"></i>
-                                          <i class="grcicon-not-done visual-choice" id="OnotDoneIcon"></i>
-                                          <span class="gray" id="ONA">N/A</span>
+                                          <span class="gray" id="o-choose">undefined</span>
+                                          <span class="gray" id="o-effective">Effective</span>
+                                          <span class="gray" id="o-material-weakness">Material weakness</span>
+                                          <span class="gray" id="o-needs-improvement">Needs improvement</span>
+                                          <span class="gray" id="o-significant-deficiency">Significant deficiency</span>
+                                          <span class="gray" id="o-not-applicable">Not Applicable</span>
                                         </div>
                                       </div>
                                     </div>
@@ -667,34 +673,26 @@
               <div class="span2">
                 <h6>Design effectiveness</h6>
                 <p><small><em>Is this control design effective?</em></small></p>
-                <ul class="visual-radio">
-                  <li>
-                    <a href="#DdoneIcon" rel="tooltip" data-original-title="Yes">
-                      <i class="grcicon-done"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#DnotDoneIcon" rel="tooltip" data-original-title="No">
-                      <i class="grcicon-not-done"></i>
-                    </a>
-                  </li>
-                </ul>
+                <select class="input-medium visual-selector">
+                  <option value="d-choose">-- Choose --</option>
+                  <option value="d-effective">Effective</option>
+                  <option value="d-material-weakness">Material weakness</option>
+                  <option value="d-needs-improvement">Needs improvement</option>
+                  <option value="d-significant-deficiency">Significant deficiency</option>
+                  <option value="d-not-applicable">Not Applicable</option>
+                </select>
               </div>
               <div class="span3">
                 <h6>Operational effectiveness</h6>
                 <p><small><em>Is this control operationally effective?</em></small></p>
-                <ul class="visual-radio">
-                  <li>
-                    <a href="#OdoneIcon" rel="tooltip" data-original-title="Yes">
-                      <i class="grcicon-done"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#OnotDoneIcon" rel="tooltip" data-original-title="No">
-                      <i class="grcicon-not-done"></i>
-                    </a>
-                  </li>
-                </ul>
+                <select class="input-medium visual-selector">
+                  <option value="o-choose">-- Choose --</option>
+                  <option value="o-effective">Effective</option>
+                  <option value="o-material-weakness">Material weakness</option>
+                  <option value="o-needs-improvement">Needs improvement</option>
+                  <option value="o-significant-deficiency">Significant deficiency</option>
+                  <option value="o-not-applicable">Not Applicable</option>
+                </select>
               </div>
             </div>
 
