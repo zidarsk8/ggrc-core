@@ -262,9 +262,7 @@ can.Construct("RefreshQueue", {
           self.deferred.reject.apply(self.deferred, arguments);
         });
       } else {
-        setTimeout(function () {
-          this.deferred.resolve(this.objects);
-        }.bind(this), 1);
+        return this.deferred.resolve(this.objects);
       }
 
       return this.deferred;
