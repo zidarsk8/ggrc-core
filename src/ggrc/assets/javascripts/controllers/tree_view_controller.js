@@ -834,9 +834,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if(this.options.events && typeof this.options.events[event_name] === "function") {
       this.options.events[event_name].apply(this, arguments);
     }
-  },
-  ".generate-control-assessments click": function (el, ev) {
-      console.log("hello there click");
   }
   , hide_filter: function () {
       var $filter = this.element.parent().find(".filter-holder"),
@@ -882,8 +879,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , generate_control_assessments: function () {
-    console.log("HELLO THERE");
-    debugger;
+    var audit = this.options.parent_instance;
+
+    can.each(this.options.list, function (control) {
+      var assessment = new CMS.Models.ControlAssessment();
+      console.log(assessment);
+    });
   }
 });
 
@@ -1154,3 +1155,4 @@ can.Control("CMS.Controllers.TreeViewNode", {
                             this.hash_fragment()].join('');
   }
 });
+
