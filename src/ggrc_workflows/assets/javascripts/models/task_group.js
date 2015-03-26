@@ -112,7 +112,7 @@
               && that.end_date && 0 < that.end_date.length;
         }
 
-        if(!dates_are_valid) {
+        if (!dates_are_valid) {
           return "Start and/or end date is invalid";
         }
       });
