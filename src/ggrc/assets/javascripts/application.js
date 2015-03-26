@@ -78,6 +78,7 @@ GGRC.extensions.push({
       , "system" : CMS.Models.System
       , "process" : CMS.Models.Process
       , "control" : CMS.Models.Control
+      , "control_assessment" : CMS.Models.ControlAssessment
       , "objective" : CMS.Models.Objective
       , "section" : CMS.Models.Section
       , "clause" : CMS.Models.Clause

@@ -273,6 +273,7 @@ $(function() {
   var base_widgets_by_type = {
     "Program": "Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Audit": "ControlAssessment Request history Person program program_controls",
+    "ControlAssessment": "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Regulation" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Policy" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Standard" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
@@ -665,6 +666,9 @@ $(function() {
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
               , footer_view : null
+            },
+            ControlAssessment: {
+              mapping: "related_control_assessment"
             }
           }
 
@@ -690,6 +694,35 @@ $(function() {
           }
         , Control: {
             _mixins: ["governance_objects", "business_objects", "extended_audits", "open_requests"]
+          }
+        , ControlAssessment: {
+            _mixins: ["governance_objects", "business_objects"]
+            , Control: {
+                mapping: "related_controls"
+              , draw_children: true
+              , allow_creating: false
+              , allow_mapping: false
+              , show_view: GGRC.mustache_path + "/controls/tree.mustache"
+              }
+            , Audit: {
+                mapping: "related_audits"
+              , draw_children: true
+              , allow_creating: false
+              , allow_mapping: false
+              , show_view: GGRC.mustache_path + "/audits/tree.mustache"
+            }
+            , Section: {
+                _mixins: ["directive"]
+              , mapping: "related_sections"
+              , child_options: [section_child_options]
+              , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+            }
+            , Clause: {
+                _mixins: ["directive"]
+              , mapping: "related_clauses"
+              , child_options: [clause_child_options]
+              , footer_view: GGRC.mustache_path + "/clauses/tree_footer.mustache"
+            }
           }
         , DataAsset: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
