@@ -135,49 +135,28 @@
   }, {
     init : function() {
       this._super && this._super.apply(this, arguments);
-      this.bind('task_group', function (ev, newVal) {
-        if (!newVal) {
+      this.bind('task_group', function (ev, newTask) {
+        if (!newTask) {
           return;
         }
-        newVal = newVal.reify();
-        var that = this,
-            queue = new RefreshQueue(),
-            dfd = new $.Deferred();
+        newTask = newTask.reify();
+        var task,
+            taskGroup = newTask.get_mapping('task_group_tasks').slice(0);
 
-        function defer(time) {
-          var timeout = new $.Deferred();
-          return function () {
-            var args = Array.prototype.slice.call(arguments);
-            setTimeout(function () {
-              timeout.resolve.apply(timeout, args);
-            }, time || 0);
-            return timeout;
-          };
-        }
-        function processTasks(taskGroup) {
-          newVal.task_group_tasks
-          var tgt,
-              tgts = taskGroup[0].task_group_tasks.slice(0);
+        do {
+          task = taskGroup.splice(-1)[0];
+          task = task && task.instance;
+        } while (task === this);
 
-          do {
-            tgt = tgts.splice(-1)[0];
-            tgt = tgt && tgt.reify();
-          } while (tgt === that);
-          if (!tgt) {
-            return new $.Deferred().reject("no existing task group task");
-          }
-          return new RefreshQueue().enqueue(tgt).trigger();
+        if (!task) {
+          return;
         }
-        function setNewTask(tgts) {
-          var tgt = tgts[0];
-          can.each('relative_start_day relative_start_month relative_end_day relative_end_month start_date end_date'.split(' '),
-            function(prop) {
-              if (tgt[prop] && !that[prop]) {
-                that.attr(prop, tgt.attr(prop) instanceof Date ? new Date(tgt[prop]) : tgt[prop]);
-              }
-            });
-        }
-        queue.enqueue(newVal).trigger().then(defer(1)).then(processTasks).then(setNewTask);
+        can.each('relative_start_day relative_start_month relative_end_day relative_end_month start_date end_date'.split(' '),
+          function (prop) {
+            if (task[prop] && !this[prop]) {
+              this.attr(prop, task.attr(prop) instanceof Date ? new Date(task[prop]) : task[prop]);
+            }
+        }, this);
       });
     },
 
