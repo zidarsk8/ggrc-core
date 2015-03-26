@@ -882,8 +882,21 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var audit = this.options.parent_instance;
 
     can.each(this.options.list, function (control) {
-      var assessment = new CMS.Models.ControlAssessment();
-      console.log(assessment);
+      (function retry (count) {
+        var assessment = new CMS.Models.ControlAssessment(
+            {audit: audit,
+             control: control.instance,
+             context: audit.context,
+             title: control.instance.title+" assessment"+(count ? " "+count : "")});
+
+        assessment.save()
+              .fail(function (error, type, code) {
+                if (code === "FORBIDDEN" 
+                    && error.responseText.match(/title values must be unique/)) {
+                    retry(count+1);
+                }
+              });
+      })(0);
     });
   }
 });
