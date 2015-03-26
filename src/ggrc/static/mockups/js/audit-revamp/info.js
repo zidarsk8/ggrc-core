@@ -275,26 +275,12 @@ $(document).ready(function() {
 
   function visualSelector() {
     $(this).find("option:selected").each(function() {
-      var $that = $(this).text();
-      console.log($that);
+      var $respective = $(this).val(),
+          $particular = $(".show-in-tree").find("#" + $respective + "").closest(".show-in-tree");
 
+      $particular.children("span").css("display", "none");
+      $(".show-in-tree").find("#" + $respective + "").css("display", "block");
     });
-        // $respective = $this.attr("href").slice(1),
-        // $that = $(".show-in-tree").find("#" + $respective + ""),
-        // $thatAll = $that.closest(".show-in-tree").find(".visual-choice");
-
-
-    // if($this.hasClass("active")) {
-    //   $eachEl.removeClass("active");
-    //   $thatAll.css('display', 'none');
-    //   $that.closest(".show-in-tree").find(".gray").show();
-    // } else {
-    //   $eachEl.removeClass("active");
-    //   $this.addClass("active");
-    //   $thatAll.css('display', 'none');
-    //   $that.css('display', 'inline-block');
-    //   $that.closest(".show-in-tree").find(".gray").hide();
-    // }
   }
 
   function AddCA() {
