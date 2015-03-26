@@ -24,10 +24,10 @@
     {{#if selected_object.is_enabled}}
       {{#options}}
       <li {{ data 'option' }} data-id="{{ id }}">
-        <h4>
+        <label>
           <input type="radio" name="map" rel="tooltip" title="map">
           {{name}}
-        </h4>
+        </label>
         <div class="role-description">
           <p>{{{description}}}</p>
           {{{render_hooks 'Role.option_detail'}}}

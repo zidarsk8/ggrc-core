@@ -36,5 +36,5 @@ def upgrade():
     op.alter_column(table_name, 'os_state',existing_type=sa.String(length=16),nullable=False)
 
 def downgrade():
-  for table_name in ObjectStateTables:
+  for table_name in ObjectStateTables.table_names:
     op.drop_column(table_name, 'os_state')

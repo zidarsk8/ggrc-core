@@ -117,7 +117,6 @@
           <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <select data-id="state_dd" class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="11">
-          <option value="" {{#if_equals status ""}}selected{{/if_equals}}>---</option>
           {{#iterate 'Draft', 'Final', 'Effective', 'Ineffective', 'Launched', 'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'}}
             <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
           {{/iterate}}

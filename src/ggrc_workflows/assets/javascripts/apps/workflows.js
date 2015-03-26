@@ -442,6 +442,7 @@
             parent_instance: object,
             model: CMS.Models.TaskGroup,
             show_view: GGRC.mustache_path + "/task_groups/tree.mustache",
+            sortable: true,
             sort_property: "sort_index",
             mapping: "task_groups",
             draw_children: true,
@@ -592,7 +593,9 @@
 
   }, {
     before_update: function() {
-      this.status && this.attr("status", "Draft");
+      if (this.status && this.os_state === "Approved") {
+        this.attr("status", "Draft");
+      }
     }
   });
   can.each(_workflow_object_types, function(model_name) {

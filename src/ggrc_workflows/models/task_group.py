@@ -49,7 +49,7 @@ class TaskGroup(
 
   def copy(self, _other=None, **kwargs):
     columns = [
-        'title', 'description', 'workflow', 'sort_index', 'modified_by'
+        'title', 'description', 'workflow', 'sort_index', 'modified_by', 'context'
         ]
 
     if(kwargs.get('clone_people', False)):

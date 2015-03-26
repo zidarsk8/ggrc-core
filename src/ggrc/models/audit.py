@@ -8,13 +8,14 @@ from .mixins import (
     deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact,
     Titled, Slugged, CustomAttributable
     )
+from .relationship import Relatable
 from .object_person import Personable
 from .context import HasOwnContext
 from .reflection import PublishOnly
 
 
 class Audit(
-    CustomAttributable, Personable, HasOwnContext,
+    CustomAttributable, Personable, HasOwnContext, Relatable,
     Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
     db.Model):
   __tablename__ = 'audits'

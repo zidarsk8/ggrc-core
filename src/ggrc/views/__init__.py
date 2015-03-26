@@ -81,9 +81,8 @@ def get_current_user_json():
   from ggrc.models.person import Person
   current_user = get_current_user()
   person = Person.eager_query().filter_by(id=current_user.id).one()
-  return as_json(
-      filter_resource(
-        publish_representation(publish(person, (), inclusion_filter))))
+  result = filter_resource(publish_representation(publish(person, (), inclusion_filter)))
+  return as_json(result)
 
 @app.context_processor
 def base_context():
@@ -107,8 +106,9 @@ def index():
   """
   from ggrc import settings
   if not settings.PRODUCTION:
+    contact = ' For any questions, please contact eng-compliance@google.com.' if settings.GOOGLE_INTERNAL else ""
     flash(u'WARNING - This is not the production instance of the GGRC application.', 'alert alert-warning')
-    flash(u'Company confidential, sensitive or personally identifiable information *MUST NOT* be entered or stored here. For any questions, please contact eng-compliance@google.com.', 'alert alert-warning')
+    flash(u'Company confidential, sensitive or personally identifiable information *MUST NOT* be entered or stored here.%s' % (contact), 'alert alert-warning')
   return render_template("welcome/index.haml")
 
 from ggrc.login import login_required
@@ -366,6 +366,20 @@ def audit_people_ui():
   """Audit people UI UX mockup
   """
   return render_template("/mockups/dashboard-ui/audit-people.html")
+
+@app.route("/mockups/audit-revamp/info.html")
+@login_required
+def audit_info_revamp():
+  """Audit info revamp mockup
+  """
+  return render_template("/mockups/audit-revamp/info.html")
+
+@app.route("/mockups/audit-revamp/issues.html")
+@login_required
+def audit_info_issues_revamp():
+  """Audit info issues revamp mockup
+  """
+  return render_template("/mockups/audit-revamp/issues.html")
 
 @app.route("/permissions")
 @login_required
