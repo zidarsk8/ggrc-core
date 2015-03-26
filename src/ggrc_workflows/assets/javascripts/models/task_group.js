@@ -99,14 +99,8 @@
       var that = this;
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank("title");
-      this.validate([
-        "start_date",
-        "end_date",
-        "relative_end_month",
-        "relative_end_day",
-        "relative_start_month",
-        "relative_start_day"
-      ], function(newVal, prop){
+      this.validate('relative_start_day relative_start_month relative_end_day relative_end_month start_date end_date'.split(' '),
+        function (newVal, prop) {
         var that = this,
          workflow = GGRC.page_instance(),
          dates_are_valid = true;
