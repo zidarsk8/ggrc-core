@@ -906,10 +906,17 @@
     }
     , ControlAssessment : {
       _mixins: [
-        "related_object", "personable", "objectiveable", "ownable"
-      ]
+        "related_object", "personable", "ownable"
+      ],
+      _canonical: {
+       "related_objects" : [
+          "Control", "Section", "Clause", "Audit"
+        ],
+      }
       , related_audits:   TypeFilter("related_objects", "Audit")
       , related_controls: TypeFilter("related_objects", "Control")
+      , related_sections: TypeFilter("related_objects", "Section")
+      , related_clauses:  TypeFilter("related_objects", "Clause")
     }
     , Request : {
         _canonical : {
