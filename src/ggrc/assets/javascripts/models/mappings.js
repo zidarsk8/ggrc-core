@@ -918,6 +918,20 @@
       , related_sections: TypeFilter("related_objects", "Section")
       , related_clauses:  TypeFilter("related_objects", "Clause")
     }
+    , Issue : {
+      _mixins: [
+        "related_object", "personable", "ownable"
+      ],
+      _canonical: {
+       "related_objects" : [
+          "Program", "ControlAssessment", "Control", "Audit"
+        ],
+      }
+      , related_audits:   TypeFilter("related_objects", "Audit")
+      , related_controls: TypeFilter("related_objects", "Control")
+      , related_control_assessments: TypeFilter("related_objects", "ControlAssessment")
+      , related_programs:  TypeFilter("related_objects", "Program")
+    }
     , Request : {
         _canonical : {
             "responses" : ["DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"]

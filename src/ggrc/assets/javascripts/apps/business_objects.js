@@ -273,6 +273,7 @@ $(function() {
   var base_widgets_by_type = {
     "Program": "Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Audit": "ControlAssessment Request history Person program program_controls",
+    "Issue": "ControlAssessment Control Program Audit",
     "ControlAssessment": "Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Regulation" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Policy" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
@@ -722,6 +723,35 @@ $(function() {
               , mapping: "related_clauses"
               , child_options: [clause_child_options]
               , footer_view: GGRC.mustache_path + "/clauses/tree_footer.mustache"
+            }
+          }
+        , Issue: {
+            Control: {
+                mapping: "related_controls"
+              , draw_children: true
+              , allow_creating: false
+              , allow_mapping: false
+              , show_view: GGRC.mustache_path + "/controls/tree.mustache"
+              }
+            , Audit: {
+                mapping: "related_audits"
+              , draw_children: true
+              , allow_creating: false
+              , allow_mapping: false
+              , show_view: GGRC.mustache_path + "/audits/tree.mustache"
+            }
+            , Program: {
+                mapping: "related_programs"
+              , draw_children: true
+              , allow_creating: false
+              , allow_mapping: false
+              , show_view: GGRC.mustache_path + "/programs/tree.mustache"
+            }
+            , ControlAssessment: {
+                mapping: "related_control_assessments"
+              , draw_children: true
+              , allow_creating: false
+              , allow_mapping: false
             }
           }
         , DataAsset: {
