@@ -231,7 +231,6 @@ can.Control("GGRC.Controllers.Modals", {
       });
     }
     return dfd.done(function() {
-
       // If the modal is closed early, the element no longer exists
       if (that.element) {
         // Make sure custom attr validations/values are set
@@ -359,7 +358,7 @@ can.Control("GGRC.Controllers.Modals", {
       return;
     var instance = this.options.instance
       , that = this;
-    if(!(instance instanceof this.options.model)) {
+    if (!(instance instanceof this.options.model)) {
       instance = this.options.instance
                = new this.options.model(instance && instance.serialize ? instance.serialize() : instance);
     }
@@ -408,7 +407,7 @@ can.Control("GGRC.Controllers.Modals", {
       }
     }
 
-    if(name.length > 1) {
+    if (name.length > 1) {
       if(can.isArray(value)) {
         value = new can.Observe.List(can.map(value, function(v) { return new can.Observe({}).attr(name.slice(1).join("."), v); }));
       } else {
@@ -693,8 +692,9 @@ can.Control("GGRC.Controllers.Modals", {
 
   , new_instance: function (data) {
     var params = this.find_params(),
-      new_instance = new this.options.model(params)
-        .attr("_suppress_errors", true)
+        new_instance;
+    new_instance = new this.options.model(params);
+    new_instance.attr('_suppress_errors', true)
         .attr('custom_attribute_definitions', this.options.instance.custom_attribute_definitions)
         .attr('custom_attributes', new can.Map());
 
@@ -719,7 +719,6 @@ can.Control("GGRC.Controllers.Modals", {
           // This is to trigger `focus_first_element` in modal_ajax handling
           this.element.trigger("loaded");
         }
-
         this.options.instance._transient || this.options.instance.attr("_transient", new can.Observe({}));
         this.options.instance.form_preload && this.options.instance.form_preload(this.options.new_object_form);
       }.bind(this))

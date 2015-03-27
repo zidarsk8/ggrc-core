@@ -1741,7 +1741,7 @@
       }
 
     , "input[null-if-empty] change" : function(el, ev) {
-      if(el.val() === "") {
+      if (el.val() === "") {
         this.context.attr(el.attr("name"), null);
       }
     }
