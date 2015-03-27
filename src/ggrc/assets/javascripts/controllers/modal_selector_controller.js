@@ -1105,9 +1105,14 @@
       }
 
    , should_update_hash_fragment: function () {
-      var $trigger = this.options.$trigger;
-      return !($trigger.closest(".modal").size()
-               || $trigger.closest(".cms_controllers_info_pin").size());
+      var $trigger = this.options.$trigger,
+          shouldUpdate;
+
+      if (!$trigger) {
+        return false;
+      }
+      shouldUpdate = $trigger.closest(".modal").length || $trigger.closest(".cms_controllers_info_pin").length;
+      return !shouldUpdate;
    }
 
    // if we have join.destination, return that
