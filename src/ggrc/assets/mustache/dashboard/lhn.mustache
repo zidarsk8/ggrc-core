@@ -33,7 +33,7 @@
           {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Program" li_class="programs" tooltip_view='/programs/extended_info.mustache'  template_view='/static/mustache/programs/search_result.mustache'}}}
           {{{render_hooks 'LHN.Sections_workflow'}}}
           {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Audit" li_class="programs" tooltip_view='/audits/extended_info.mustache' template_view='/static/mustache/audits/search_result.mustache'}}}
-          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Issue" li_class="programs"}}}
+          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="ControlAssessment" li_class="programs"}}}
         </ul>
       </div>
 
@@ -61,15 +61,14 @@
           </li>
 
           <li class="governance accordion-group">
-            <a class="governance list-toggle top oneline" href="#">
+            <a class="governance list-toggle top" href="#">
               <i class="grcicon-arrow-right"></i>
-              Controls/Assessments/Objectives
+              Controls/Objectives
             </a>
             <div class="content">
               <ul class="mid-level">
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Objective" li_class="objectives"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Control" li_class="controls"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="ControlAssessment" li_class="controls"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Objective" li_class="objectives"}}}
               </ul>
             </div>
           </li>
