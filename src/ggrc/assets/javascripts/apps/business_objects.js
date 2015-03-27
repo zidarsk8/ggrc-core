@@ -409,7 +409,7 @@ $(function() {
           ControlAssessment: {
             widget_id: "ControlAssessment",
             widget_name: "Control Assessments",
-            widget_icon: "control"
+            widget_icon: "control_assessment"
           }
         }
         , Control : {
