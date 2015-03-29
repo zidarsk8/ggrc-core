@@ -64,4 +64,4 @@
         this.list_empty_cbs.splice(idx, 1);
     }
   });
-})(Can);
+})(can);

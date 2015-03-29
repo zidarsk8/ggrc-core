@@ -307,4 +307,4 @@
           || $(document.body).data("page-type")
           || window.location.pathname.substring(1, (window.location.pathname + "/").indexOf("/", 1));
   };
-})(window, GGRC, jQuery, Can);
+})(window, GGRC, jQuery, can);

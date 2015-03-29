@@ -21,9 +21,9 @@
   //  Bitovi decided against including it in core CanJS, but
   //  adding it here for easy universal use across can.List
   //  as well as arrays.
-  can.reduce ||
-    (can.reduce = function(a, f, i) { if(a==null) return null; return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]) });
-  })(window.jQuery);
+  if (!can.reduce) {
+    can.reduce = function(a, f, i) { if(a==null) return null; return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]) };
+  }
 
 
   // Turn camelSpace strings into Camel Space strings
@@ -33,4 +33,4 @@
           .map(can.capitalize)
           .join(" ");
   };
-})(jQuery, Can);
+})(jQuery, can);

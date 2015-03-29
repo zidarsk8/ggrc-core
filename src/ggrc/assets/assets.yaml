@@ -34,8 +34,8 @@ dashboard-js-files:
   - bootstrap/wysihtml5.js
   - moment.js
   - permission.js
-  - ggrc_base.js
   - plugins/persistent_notifier.js
+  - ggrc_base.js
   - plugins/wysiwyg.js
   - plugins/autocomplete.js
   - plugins/ajax_extensions.js

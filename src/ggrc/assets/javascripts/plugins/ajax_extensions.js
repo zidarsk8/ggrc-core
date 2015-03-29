@@ -107,4 +107,4 @@
     setup(_ajax);
     return _ajax;
   };
-})(jQuery, Can);
+})(jQuery, can);
