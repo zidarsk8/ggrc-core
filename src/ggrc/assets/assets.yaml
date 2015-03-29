@@ -36,6 +36,8 @@ dashboard-js-files:
   - permission.js
   - plugins/wysiwyg.js
   - plugins/autocomplete.js
+  - plugins/ajax_extensions.js
+  - plugins/canjs_extensions.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js
