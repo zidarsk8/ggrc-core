@@ -39,6 +39,7 @@ dashboard-js-files:
   - plugins/ajax_extensions.js
   - plugins/canjs_extensions.js
   - plugins/tooltip.js
+  - plugins/popover.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js
