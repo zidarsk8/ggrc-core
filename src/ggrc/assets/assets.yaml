@@ -38,6 +38,7 @@ dashboard-js-files:
   - plugins/autocomplete.js
   - plugins/ajax_extensions.js
   - plugins/canjs_extensions.js
+  - plugins/tooltip.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js
