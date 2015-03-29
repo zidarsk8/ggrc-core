@@ -35,6 +35,7 @@ dashboard-js-files:
   - moment.js
   - permission.js
   - plugins/wysiwyg.js
+  - plugins/autocomplete.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js
