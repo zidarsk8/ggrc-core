@@ -675,11 +675,10 @@ jQuery(function($) {
 
 });
 
-(function($) {
 
-  window.getPageToken = function getPageToken() {
-      return $(document.body).data("page-subtype")
-            || $(document.body).data("page-type")
-            || window.location.pathname.substring(1, (window.location.pathname + "/").indexOf("/", 1));
-    }
+window.getPageToken = function getPageToken() {
+  return $(document.body).data("page-subtype")
+        || $(document.body).data("page-type")
+        || window.location.pathname.substring(1, (window.location.pathname + "/").indexOf("/", 1));
+}
 
