@@ -23,7 +23,8 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documen
   design = deferred(db.Column(db.String), 'ControlAssessment')
   operationally = deferred(db.Column(db.String), 'ControlAssessment')
 
-  control = {}
+  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
+  control = db.relationship('Control', foreign_keys=[control_id])
   audit = {}
 
   # REST properties
@@ -31,7 +32,7 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documen
       'design',
       'operationally',
       PublishOnly('audit'),
-      PublishOnly('control')
+      'control'
   ]
 
   _relationship_attrs = [

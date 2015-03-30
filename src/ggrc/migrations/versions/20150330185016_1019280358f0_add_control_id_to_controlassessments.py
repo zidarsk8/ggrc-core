@@ -16,8 +16,9 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('control_assessments', sa.Column('control_id', sa.Integer(), nullable=False))
-
+    op.add_column('control_assessments', sa.Column('control_id', sa.Integer(), nullable=True))
+    op.create_foreign_key('fk_control_control_assessment', 'control_assessments', 'controls', ['control_id'], ['id'])
 
 def downgrade():
-    op.remove_column('control_assessments', 'control_id')
+    op.drop_column('control_assessments', 'control_id')
+    op.drop_constraint('fk_control_control_assessment', 'control_assessments', 'controls')
