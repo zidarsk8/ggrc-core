@@ -346,4 +346,4 @@
     }
 
   });
-})(jQuery, window.GGRC || {});
+})(jQuery, window.GGRC = window.GGRC || {});
