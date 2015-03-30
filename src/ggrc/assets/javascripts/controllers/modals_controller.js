@@ -862,13 +862,13 @@ can.Control("GGRC.Controllers.Modals", {
 
   , should_update_hash_fragment: function () {
     var $trigger = this.options.$trigger,
-        shouldUpdate;
+        hasClosest;
 
     if (!$trigger) {
       return false;
     }
-    shouldUpdate = $trigger.closest(".modal").length || $trigger.closest(".cms_controllers_info_pin").length;
-    return !shouldUpdate;
+    hasClosest = $trigger.closest(".modal").length || $trigger.closest(".cms_controllers_info_pin").length;
+    return !hasClosest;
   }
 
   , update_hash_fragment: function () {
