@@ -4,12 +4,12 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 */
-(function ($, can) {
+(function($, can) {
 
-// Set up all PUT requests to the server to respect ETags, to ensure that
-// we are not overwriting more recent data than was viewed by the user.
+  // Set up all PUT requests to the server to respect ETags, to ensure that
+  // we are not overwriting more recent data than was viewed by the user.
   var etags = {};
-  $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+  $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
     var data = originalOptions.data;
 
     function attach_provisional_id(prop) {
@@ -18,34 +18,34 @@
       });
     }
 
-    if ( /^\/api\//.test(options.url) && /PUT|POST|DELETE/.test(options.type.toUpperCase())) {
+    if (/^\/api\//.test(options.url) && /PUT|POST|DELETE/.test(options.type.toUpperCase())) {
       options.dataType = "json";
       options.contentType = "application/json";
       jqXHR.setRequestHeader("If-Match", (etags[originalOptions.url] || [])[0]);
       jqXHR.setRequestHeader("If-Unmodified-Since", (etags[originalOptions.url] || [])[1]);
       options.data = options.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(data);
-      for(var i in data) {
-        if(data.hasOwnProperty(i) && data[i] && data[i].provisional_id) {
+      for (var i in data) {
+        if (data.hasOwnProperty(i) && data[i] && data[i].provisional_id) {
           attach_provisional_id(i);
         }
       }
     }
-    if( /^\/api\//.test(options.url) && (options.type.toUpperCase() === "GET")) {
+    if (/^\/api\//.test(options.url) && (options.type.toUpperCase() === "GET")) {
       options.cache = false;
     }
-    if( /^\/api\/\w+/.test(options.url)) {
+    if (/^\/api\/\w+/.test(options.url)) {
       jqXHR.setRequestHeader("X-Requested-By", "gGRC");
       jqXHR.done(function(data, status, xhr) {
-        if(!/^\/api\/\w+\/\d+/.test(options.url) && options.type.toUpperCase() === "GET")
+        if (!/^\/api\/\w+\/\d+/.test(options.url) && options.type.toUpperCase() === "GET")
           return;
-        switch(options.type.toUpperCase()) {
+        switch (options.type.toUpperCase()) {
           case "GET":
           case "PUT":
             etags[originalOptions.url] = [xhr.getResponseHeader("ETag"), xhr.getResponseHeader("Last-Modified")];
             break;
           case "POST":
-            for(var d in data) {
-              if(data.hasOwnProperty(d) && data[d].selfLink) {
+            for (var d in data) {
+              if (data.hasOwnProperty(d) && data[d].selfLink) {
                 etags[data[d].selfLink] = [xhr.getResponseHeader("ETag"), xhr.getResponseHeader("Last-Modified")];
               }
             }
@@ -62,9 +62,9 @@
   var _old_ajax = $.ajax;
 
   var statusmsgs = {
-    401 : "The server says you are not authorized.  Are you logged in?"
-    , 409 : "There was a conflict in the object you were trying to update.  The version on the server is newer."
-    , 412 : "One of the form fields isn't right.  Check the form for any highlighted fields."
+    401: "The server says you are not authorized.  Are you logged in?",
+    409: "There was a conflict in the object you were trying to update.  The version on the server is newer.",
+    412: "One of the form fields isn't right.  Check the form for any highlighted fields."
   };
 
 
@@ -83,9 +83,9 @@
       _old_ajax && (_new_ajax.hasFailCallback = _old_ajax.hasFailCallback);
       _new_ajax.then = function() {
         var _new_ajax = _old_then.apply(this, arguments);
-        if(arguments.length > 1) {
+        if (arguments.length > 1) {
           this.hasFailCallback = true;
-          if(_old_ajax)
+          if (_old_ajax)
             _old_ajax.fail(function() {});
         }
         setup(_new_ajax, this);
@@ -93,7 +93,7 @@
       };
       _new_ajax.fail = function() {
         this.hasFailCallback = true;
-        if(_old_ajax)
+        if (_old_ajax)
           _old_ajax.fail(function() {});
         return _old_fail.apply(this, arguments);
       };

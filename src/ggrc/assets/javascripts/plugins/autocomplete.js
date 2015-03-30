@@ -4,7 +4,7 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 */
-(function ($) {
+(function($) {
   var MAX_RESULTS = 20;
   $.widget(
     "ggrc.autocomplete",
@@ -13,7 +13,7 @@
       options: {
         // Ensure that the input.change event still occurs
         change: function(event, ui) {
-          if(!$(event.target).parents(document.body).length)
+          if (!$(event.target).parents(document.body).length)
             console.warn("autocomplete menu change event is coming from detached nodes");
           $(event.target).trigger("change");
         },
@@ -23,16 +23,16 @@
         source: function(request, response) {
           // Search based on the term
           var query = request.term || '',
-              queue = new RefreshQueue(),
-              that = this,
-              is_next_page = request.start != null,
-              dfd;
+            queue = new RefreshQueue(),
+            that = this,
+            is_next_page = request.start != null,
+            dfd;
 
           if (query.indexOf('@') > -1)
             query = '"' + query + '"';
 
           this.last_request = request;
-          if(is_next_page) {
+          if (is_next_page) {
             dfd = $.when(this.last_stubs);
           } else {
             request.start = 0;
@@ -42,26 +42,30 @@
           this.options.controller.bindXHRToButton(
             // Retrieve full people data
 
-          dfd.then(function(objects) {
-            that.last_stubs = objects;
-            can.each(objects.slice(request.start, request.start + MAX_RESULTS), function(object) {
-              queue.enqueue(object);
-            });
-            queue.trigger().then(function(objs) {
-              objs = that.options.apply_filter.call(that, objs, request);
-              if(objs.length || is_next_page) {
-                // Envelope the object to not break model instance due to
-                // shallow copy done by jQuery in `response()`
-                objs = can.map(objs, function(obj) { return { item: obj }; });
-                response(objs);
-              } else {
-                // show the no-results option iff no results come through here,
-                //  and not merely showing paging.
-                that._suggest( [] );
-                that._trigger( "open" );
-              }
-            });
-          }), $(this.element), null, false);
+            dfd.then(function(objects) {
+              that.last_stubs = objects;
+              can.each(objects.slice(request.start, request.start + MAX_RESULTS), function(object) {
+                queue.enqueue(object);
+              });
+              queue.trigger().then(function(objs) {
+                objs = that.options.apply_filter.call(that, objs, request);
+                if (objs.length || is_next_page) {
+                  // Envelope the object to not break model instance due to
+                  // shallow copy done by jQuery in `response()`
+                  objs = can.map(objs, function(obj) {
+                    return {
+                      item: obj
+                    };
+                  });
+                  response(objs);
+                } else {
+                  // show the no-results option iff no results come through here,
+                  //  and not merely showing paging.
+                  that._suggest([]);
+                  that._trigger("open");
+                }
+              });
+            }), $(this.element), null, false);
         },
 
         apply_filter: function(objects) {
@@ -79,7 +83,7 @@
                   return;
                 }
                 var search_attr = item.title || "",
-                    term = request.term.toLowerCase();
+                  term = request.term.toLowerCase();
 
                 // Filter out duplicates:
                 if (filtered_list.indexOf(item._cid) > -1) {
@@ -115,11 +119,11 @@
 
         select: function(ev, ui) {
           var original_event,
-              that = this,
-              ctl = $(this).data($(this).data("autocomplete-widget-name")).options.controller
-              ;
+            that = this,
+            ctl = $(this).data($(this).data("autocomplete-widget-name")).options.controller
+          ;
 
-          if(ui.item) {
+          if (ui.item) {
             if (ctl.scope && ctl.scope.autocomplete_select) {
               return ctl.scope.autocomplete_select($(this), ev, ui);
             } else if (ctl.autocomplete_select) {
@@ -129,15 +133,17 @@
           } else {
             original_event = ev;
             $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
-              ctl.autocomplete_select($(that), original_event, { item : new_obj });
+              ctl.autocomplete_select($(that), original_event, {
+                item: new_obj
+              });
               $(that).trigger("modal:success", new_obj);
             }).one("hidden", function() {
               setTimeout(function() {
                 $(this).off(".autocomplete");
               }, 100);
             });
-            while(original_event = original_event.originalEvent) {
-              if(original_event.type === "keydown") {
+            while (original_event = original_event.originalEvent) {
+              if (original_event.type === "keydown") {
                 //This selection event was generated from a keydown, so click the add new link.
                 var widget_name = el.data("autocompleteWidgetName");
                 el.data(widget_name).menu.active.find("a").click();
@@ -156,14 +162,16 @@
 
       _create: function() {
         var that = this,
-            $that = $(this.element),
-            base_search = $that.data("lookup"),
-            from_list = $that.data("from-list"),
-            search_params = $that.data("params"),
-            searchtypes;
+          $that = $(this.element),
+          base_search = $that.data("lookup"),
+          from_list = $that.data("from-list"),
+          search_params = $that.data("params"),
+          searchtypes;
 
         this._super.apply(this, arguments);
-        this.options.search_params = {extra_params: search_params};
+        this.options.search_params = {
+          extra_params: search_params
+        };
 
         $that.data("autocomplete-widget-name", this.widgetFullName);
 
@@ -181,7 +189,7 @@
           if (base_search.indexOf("__mappable") === 0 || base_search.indexOf("__all") === 0) {
             searchtypes = GGRC.Mappings.get_canonical_mappings_for(
               this.options.parent_instance.constructor.shortName
-              );
+            );
             if (base_search.indexOf("__mappable") === 0) {
               searchtypes = can.map(searchtypes, function(mapping) {
                 return mapping instanceof GGRC.ListLoaders.ProxyListLoader ? mapping : undefined;
@@ -203,19 +211,21 @@
         }
       },
 
-      _setup_menu_context : function(items) {
-          var model_class = this.element.data("lookup")
+      _setup_menu_context: function(items) {
+        var model_class = this.element.data("lookup"),
 
-            , model = CMS.Models[model_class || this.element.data("model")]
-                      || GGRC.Models[model_class || this.element.data("model")]
-            ;
+          model = CMS.Models[model_class || this.element.data("model")]
+            || GGRC.Models[model_class || this.element.data("model")]
+        ;
 
-          return {
-            model_class: model_class,
-            model : model,
-            // Reverse the enveloping we did 25 lines up
-            items: can.map(items, function(item) { return item.item; }),
-          };
+        return {
+          model_class: model_class,
+          model: model,
+          // Reverse the enveloping we did 25 lines up
+          items: can.map(items, function(item) {
+            return item.item;
+          }),
+        };
       },
 
       _renderMenu: function(ul, items) {
@@ -224,10 +234,10 @@
           model = context.model,
           that = this,
           $ul = $(ul)
-          ;
+        ;
 
         if (!template) {
-          if(model && GGRC.Templates[model.table_plural + "/autocomplete_result"]) {
+          if (model && GGRC.Templates[model.table_plural + "/autocomplete_result"]) {
             template = '/' + model.table_plural + '/autocomplete_result.mustache';
           } else {
             template = '/base_objects/autocomplete_result.mustache';
@@ -235,23 +245,25 @@
         }
 
         $ul.unbind("scrollNext")
-        .bind("scrollNext", function(ev, data) {
-          if(that.scroll_op_in_progress) {
-            return;
-          }
-          that.scroll_op_in_progress = true;
-          that.last_request = that.last_request || {};
-          that.last_request.start = that.last_request.start || 0;
-          that.last_request.start += MAX_RESULTS;
-          context.attr("items_loading", true);
-          that.source(that.last_request, function(items) {
-            context.items.push.apply(context.items, can.map(items, function(item) { return item.item; }));
-            context.removeAttr("items_loading");
-            setTimeout(function() {
-              delete that.scroll_op_in_progress;
-            }, 10);
+          .bind("scrollNext", function(ev, data) {
+            if (that.scroll_op_in_progress) {
+              return;
+            }
+            that.scroll_op_in_progress = true;
+            that.last_request = that.last_request || {};
+            that.last_request.start = that.last_request.start || 0;
+            that.last_request.start += MAX_RESULTS;
+            context.attr("items_loading", true);
+            that.source(that.last_request, function(items) {
+              context.items.push.apply(context.items, can.map(items, function(item) {
+                return item.item;
+              }));
+              context.removeAttr("items_loading");
+              setTimeout(function() {
+                delete that.scroll_op_in_progress;
+              }, 10);
+            });
           });
-        });
 
         can.view.render(
           GGRC.mustache_path + template,
@@ -262,7 +274,7 @@
             can.view.hookup(ul);
           });
       }
-  });
+    });
   $.widget.bridge("ggrc_autocomplete", $.ggrc.autocomplete);
 
   $.widget("ggrc.mapping_autocomplete", $.ggrc.autocomplete, {
@@ -290,11 +302,11 @@
         });
       }
     },
-      _setup_menu_context : function(items) {
-        return $.extend(this._super(items), {
-          mapping : this.options.mapping == null ? this.element.data("mapping") : this.options.mapping
-        });
-      }
+    _setup_menu_context: function(items) {
+      return $.extend(this._super(items), {
+        mapping: this.options.mapping == null ? this.element.data("mapping") : this.options.mapping
+      });
+    }
   });
   $.widget.bridge("ggrc_mapping_autocomplete", $.ggrc.mapping_autocomplete);
 
@@ -302,7 +314,9 @@
     var ctl = this;
     // Add autocomplete to the owner field
     ($(el) || this.element.find('input[data-lookup]'))
-    .filter("[name][name!='']")
-    .ggrc_autocomplete({ controller: ctl });
+      .filter("[name][name!='']")
+      .ggrc_autocomplete({
+        controller: ctl
+      });
   };
 })(jQuery);

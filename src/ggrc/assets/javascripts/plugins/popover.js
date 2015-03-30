@@ -4,9 +4,12 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 */
-(function ($) {
+(function($) {
   var defaults = {
-    delay: {show : 500, hide : 100},
+    delay: {
+      show: 500,
+      hide: 100
+    },
     placement: 'left',
     content: function(trigger) {
       var $trigger = $(trigger);
@@ -17,8 +20,8 @@
         height: '100px',
         left: '50px',
         top: '50px',
-        zIndex : calculate_spinner_z_index
-       });
+        zIndex: calculate_spinner_z_index
+      });
       return $el[0];
     }
   };
@@ -30,16 +33,15 @@
     if (!$(e.currentTarget).data('sticky_popover')) {
       $(e.currentTarget)
         .sticky_popover($.extend({}, defaults, {
-          trigger: 'sticky-hover'
-          , placement : function() {
-            var $el = this.$element
-              , spaceLeft = $(document).width() - ($el.offset().left + $el.width())
-              , spaceRight = $el.offset().left
-              , popover_size = 620;
+          trigger: 'sticky-hover',
+          placement: function() {
+            var $el = this.$element,
+              spaceLeft = $(document).width() - ($el.offset().left + $el.width()),
+              spaceRight = $el.offset().left,
+              popover_size = 620;
             // Display on right if there is enough space
-            if($el.closest(".widget-area:first-child").length && spaceLeft > popover_size)
-              return "right";
-            else if(spaceRight > popover_size){
+            if ($el.closest(".widget-area:first-child").length && spaceLeft > popover_size)
+              return "right";else if (spaceRight > popover_size) {
               return "left";
             }
             return "top";
@@ -54,7 +56,9 @@
     e.preventDefault();
     if (!$(e.currentTarget).data('sticky_popover')) {
       $(e.currentTarget)
-        .sticky_popover($.extend({}, defaults, { trigger: 'click' }))
+        .sticky_popover($.extend({}, defaults, {
+          trigger: 'click'
+        }))
         .triggerHandler(e);
     }
   });
@@ -62,18 +66,18 @@
   function showhide(upsel, downsel) {
     return function(command) {
       $(this).each(function() {
-        var $this = $(this)
-            , $content = $this.closest(upsel).find(downsel)
-            , cmd = command;
+        var $this = $(this),
+          $content = $this.closest(upsel).find(downsel),
+          cmd = command;
 
-        if(typeof cmd !== "string" || cmd === "toggle") {
+        if (typeof cmd !== "string" || cmd === "toggle") {
           cmd = $this.hasClass("active") ? "hide" : "show";
         }
 
-        if(cmd === "hide") {
+        if (cmd === "hide") {
           $content.slideUp();
           $this.removeClass("active");
-        } else if(cmd === "show") {
+        } else if (cmd === "show") {
           $content.slideDown();
           $this.addClass("active");
         }
@@ -98,27 +102,27 @@
 
   function oneline(command) {
     $(this).each(function() {
-      var $this = $(this)
-        , $leaf = $this.closest('[class*=span]').parent().children("[class*=span]:first")
-        , $title = $leaf.find('.oneline')
-        , $description = $leaf.find('.description')
-        , $view = $leaf.closest('.row-fluid').find('.view-more')
-        , cmd = command
-        ;
+      var $this = $(this),
+        $leaf = $this.closest('[class*=span]').parent().children("[class*=span]:first"),
+        $title = $leaf.find('.oneline'),
+        $description = $leaf.find('.description'),
+        $view = $leaf.closest('.row-fluid').find('.view-more'),
+        cmd = command
+      ;
 
       if ($description.length > 0) {
-        if(typeof cmd !== "string") {
+        if (typeof cmd !== "string") {
           cmd = $description.hasClass("in") ? "hide" : "view";
         }
 
-        if(cmd === "view") {
+        if (cmd === "view") {
           $description.addClass('in');
           $title.find('.description-inline').addClass('out');
           if ($title.is('.description-only')) {
             $title.addClass('out');
           }
           $view.text('hide');
-        } else if(cmd === "hide") {
+        } else if (cmd === "hide") {
           $description.removeClass('in');
           $title.find('.description-inline').removeClass('out');
           if ($title.is('.description-only')) {
