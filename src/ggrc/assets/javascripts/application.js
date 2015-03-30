@@ -7,9 +7,12 @@
 
 
 (function (root, GGRC, $, can) {
-  var $win = $(root),
-      $doc = $(root.document),
-      $body = $(root.body);
+  var doc = root.document,
+      body = doc.body,
+      $win = $(root),
+      $doc = $(doc),
+      $body = $(body);
+
 
   $win.on('hashchange', function() {
     GGRC.current_url_compute(window.location);
@@ -66,7 +69,6 @@
     }
   });
 
-  // dismiss non-expandable success flash messages
   $doc.ready(function() {
     // monitor target, where flash messages are added
     var target = $('section.content div.flash')[0];
@@ -117,12 +119,11 @@
       }
 
     });
-   $body.on("change", ".rotate_control_assessment", function(ev) {
+    $body.on("change", ".rotate_control_assessment", function(ev) {
       ev.currentTarget.click(function() {
         ev.currentTarget.toggle();
       });
     });
-
     setTimeout(function() {
       GGRC.queue_event(
         can.map(GGRC.Templates, function(template, id) {
@@ -146,7 +147,10 @@
         $('.header-content').next('.content').removeClass('affixed');
       }
     });
-
+    $body.on('click', 'ul.tree-structure .item-main .grcobject, ul.tree-structure .item-main .openclose', function (evnt) {
+      evnt.stopPropagation();
+      $(this).openclose();
+    });
     // Google Circle CTA Button
     $body.on('mouseenter', '.square-trigger', function() {
       var $this = $(this),
