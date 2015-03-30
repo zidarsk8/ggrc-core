@@ -296,7 +296,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grciconlarge-contract { background-position: -104px -104px; }
 .grciconlarge-program { background-position: -136px -104px; }
 .grciconlarge-org_group { background-position: -168px -104px; }
-.grciconlarge-control { background-position: -200px -104px; }
+.grciconlarge-control {background-position: -200px -104px; }
 .grciconlarge-vendor { background-position: -232px -104px; }
 .grciconlarge-system { background-position: -264px -104px; }
 .grciconlarge-process { background-position: -296px -104px; }
@@ -306,6 +306,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grciconlarge-standard { background-position: -72px -200px; }
 .grciconlarge-import { background-position: -104px -200px; }
 .grciconlarge-issue { background-position: -136px -200px; }
+.grciconlarge-control_assessment { background-position: -168px -200px; }
 
 .showhide {
   background-position:-198px -56px;
@@ -467,13 +468,14 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-businessprocess-danger, .grcicon-business_process-danger { background-position:-174px -320px }
 .grcicon-control { background-position:-150px -248px }
 .grcicon-control-black { background-position:-150px -224px; }
-.grcicon-control-color { background-position:-30px -320px; }
+.grcicon-control-color, { background-position:-30px -320px; }
 .grcicon-systemcontrol-color { background-position:-30px -320px; }
 .grcicon-control-danger { background-position:-150px -320px }
 .grcicon-company_controls { background-position:-150px -248px }
 .grcicon-company_controls-black { background-position:-150px -224px; }
 .grcicon-company_controls-color { background-position:-30px -320px; }
-.grcicon-company_controls-danger { background-position:-150px -320px }
+.grcicon-company_controls-danger { background-position:-150px -320px; }
+.grcicon-control_assessment-color { background-position: -150px -416px; }
 // risk
 .grcicon-risk { background-position:-198px -248px }
 .grcicon-risk-black { background-position:-198px -224px; }
