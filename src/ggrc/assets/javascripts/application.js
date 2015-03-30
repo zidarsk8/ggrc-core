@@ -716,8 +716,17 @@ jQuery(document).ready(function($) {
 
 // Setup for Popovers
 jQuery(document).ready(function($) {
-  $('body').on('mouseover', '[data-toggle="popover"]', function (evnt) {
-    $(this).popover();
+  $('body').on('mouseover', '.help-popover', function (evnt) {
+    $(this).popover({
+      placement: 'bottom',
+      html: true,
+      title: function() {
+        return $(".filter-help-title").html();
+      },
+      content: function() {
+        return $(".filter-help-content").html();
+      }
+    });
   });
   var defaults = {
     delay: {show : 500, hide : 100},

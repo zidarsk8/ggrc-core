@@ -1173,6 +1173,11 @@
   }
   .filter-button {
     @include clearfix();
+    a {
+      float: right;
+      margin-top: 12px !important;
+      margin-left: 10px;
+    }
     input[type="submit"] {
       margin-top: 7px;
       float: right;
@@ -1183,9 +1188,6 @@
       font-weight: normal;
     }
     i {
-      float: right;
-      margin-top: 12px !important;
-      margin-left: 10px;
       @include opacity(0.25);
       @include transition(opacity 0.2s ease);
       &:hover {
