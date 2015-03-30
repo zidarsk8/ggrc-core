@@ -861,9 +861,14 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , should_update_hash_fragment: function () {
-    var $trigger = this.options.$trigger;
-    return !($trigger.closest(".modal").size()
-          || $trigger.closest(".cms_controllers_info_pin").size());
+    var $trigger = this.options.$trigger,
+        hasClosest;
+
+    if (!$trigger) {
+      return false;
+    }
+    hasClosest = $trigger.closest(".modal").length || $trigger.closest(".cms_controllers_info_pin").length;
+    return !hasClosest;
   }
 
   , update_hash_fragment: function () {
@@ -875,7 +880,7 @@ can.Control("GGRC.Controllers.Modals", {
             .closest(".cms_controllers_tree_view_node")
             .control();
 
-    hash += [tree_controller 
+    hash += [tree_controller
              ? tree_controller.hash_fragment()
              : "",
              this.options.instance.hash_fragment()].join('/');
