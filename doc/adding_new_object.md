@@ -30,9 +30,9 @@ Consider the generated migration file a template that you need to manually updat
 
 ### Add new Object to appropriate services
 
-1. `ggrc/cache/cache.py` # configure memcache
-2. `ggrc/services/__init__.py` or use `init_extra_services()` # init REST APIs for NewObject
-3. `ggrc/views/__init__.py` or use `init_extra_views()` # init object view page
+1. `ggrc/cache/cache.py` configure memcache
+2. `ggrc/services/__init__.py` or use `init_extra_services()` to init REST APIs for NewObject
+3. `ggrc/views/__init__.py` or use `init_extra_views()` to init object view page
 
 ### Add permissions for NewObject
 
@@ -64,21 +64,49 @@ can.Model.Cacheable("CMS.Models.NewObject", {
     this.validateNonBlank("title");
   }
 }, {
-  object_model: can.compute(function() {
-    return CMS.Models[this.attr("object_type")];
-  }),
-  after_save: function() {
-  }
+
 });
 ```
 
-### Add new_object to `object_type_decision_tree` in assets/javascripts/application.js
+1. Add new_object to `object_type_decision_tree` in assets/javascripts/ggrc-base.js or extended it in your module (see below).
+2. Add new_object to `business_object.js`
 
-### Add new_object to `business_object.js`
+    `base_widgets_by_type` is where you define the attributes shown in widgets
+    `extra_descriptor_options` is where you define special parameters for some of the widgets ie. their content controller, icon, widget name etc.
+    `extra_content_controller_options` is where you define parameters for the content_controller ie can view children, mapping, model, footer view etc.
 
-`base_widgets_by_type` is where you define the attributes shown in widgets
+3. Add new_object to `mappings.js`
 
-### Add NewObject to `mappings.js`
+    Add the object to the list of mappings: `GGRC.Mappings("ggrc_core", {base:{}, NewObject: {...}}`.
+
+### Extending
+
+Create a ModuleExtension object:
+
+```
+var ModuleExtension = {
+  name: "module",
+  object_type_decision_tree: function() {
+    return {
+      NewModel: CMS.Models.NewModel
+    }
+  },
+  init_widgets: function() {
+
+  },
+  init_admin_widgets: function() {
+
+  },
+}
+GGRC.extensions.push(ModuleExtension);
+
+// Add mappings:
+
+var mappings = {
+  // your mappings
+}
+new GGRC.Mappings("ggrc_new_module", mappings);
+```
 
 ### Add NewObject to the LHN
 
@@ -86,6 +114,15 @@ In `src/ggrc/assets/mustache/dashboard/lhn.mustache` add the line:
 
 ```{{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="NewObject" li_class="class"}}}```
 
+If you are inside a module, you have to create a hook:
+
+```{{{render_hooks 'LHN.Sections_new_object'}}}```
+
+And then init the hook inside your module:
+
+```GGRC.register_hook(
+    "LHN.Sections_new_object", GGRC.mustache_path + "/dashboard/lhn_new_object");```
+
 ## Create mustache files
 
-## Mappings
+`new_object/modal_content.mustache` is the only mandatory mustache file that needs to be created. Creating all the other mustache files is optional. If the mustache file is not found in `new_object` it will be taken from `base_objects`.
