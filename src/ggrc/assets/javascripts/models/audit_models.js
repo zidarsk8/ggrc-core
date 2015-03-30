@@ -727,6 +727,7 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
   mixins : ["ownable", "contactable"],
   is_custom_attributable: true,
   attributes : {
+    control : "CMS.Models.Control.stub",
     context : "CMS.Models.Context.stub",
     modified_by : "CMS.Models.Person.stub",
     custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",

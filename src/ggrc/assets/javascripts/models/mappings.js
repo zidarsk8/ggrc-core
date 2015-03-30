@@ -920,12 +920,14 @@
         "related_object", "personable", "ownable"
       ],
       _canonical: {
+       "control": "Control",
        "related_objects" : [
-          "Control", "Section", "Clause", "Audit"
+          "Section", "Clause", "Audit"
         ],
       }
+      , control: Direct("Control", "control_assessments", "control")
       , related_audits:   TypeFilter("related_objects", "Audit")
-      , related_controls: TypeFilter("related_objects", "Control")
+      //, related_controls: TypeFilter("related_objects", "Control")
       , related_sections: TypeFilter("related_objects", "Section")
       , related_clauses:  TypeFilter("related_objects", "Clause")
       , related_issues: TypeFilter("related_objects", "Issue")
