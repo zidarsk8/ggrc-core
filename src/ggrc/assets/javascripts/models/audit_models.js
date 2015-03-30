@@ -783,9 +783,6 @@ can.Model.Cacheable("CMS.Models.Issue", {
   object_model: can.compute(function() {
     return CMS.Models[this.attr("object_type")];
   }),
-  after_save: function() {
-
-  }
 });
 
 
