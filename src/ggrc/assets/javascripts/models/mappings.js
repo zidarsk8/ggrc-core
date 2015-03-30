@@ -925,7 +925,7 @@
           "Section", "Clause", "Audit"
         ],
       }
-      , control: Direct("Control", "control", "control_assessments")
+      , control: Direct("Control", "controls", "control_assessment")
       , related_audits:   TypeFilter("related_objects", "Audit")
       //, related_controls: TypeFilter("related_objects", "Control")
       , related_sections: TypeFilter("related_objects", "Section")

@@ -879,25 +879,42 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , generate_control_assessments: function () {
-    var audit = this.options.parent_instance;
+    var audit = this.options.parent_instance,
+        // promise map pattern found on http://stackoverflow.com/questions/20688803/jquery-deferred-in-each-loop
+        refresh_assessments = $.when.apply($, can.map(audit.get_binding("related_control_assessments").list, function (control_assessment) {
+            var def = new $.Deferred();
+            control_assessment.instance.refresh().then(function (control_assessment) {
+              def.resolve(control_assessment);
+            });
+            return def;
+        })).promise();
 
-    can.each(this.options.list, function (control) {
-      (function retry (count) {
-        var assessment = new CMS.Models.ControlAssessment(
-            {audit: audit,
-             control: control.instance,
-             context: audit.context,
-             title: control.instance.title+" assessment"+(count ? " "+count : "")});
+      refresh_assessments.then(function () {
+        var control_assessments = arguments,
+            ignore_controls = _.map(control_assessments, function (ca) {
+              return ca.control.id;
+            });
 
-        assessment.save()
-              .fail(function (error, type, code) {
-                if (code === "FORBIDDEN" 
-                    && error.responseText.match(/title values must be unique/)) {
-                    retry(count+1);
-                }
-              });
-      })(0);
-    });
+        can.each(this.options.list, function (control) {
+          if (!_.includes(ignore_controls, control.instance.id)) {
+            (function retry (count) {
+                var assessment = new CMS.Models.ControlAssessment(
+                    {audit: audit,
+                     control: control.instance,
+                     context: audit.context,
+                     title: control.instance.title+" assessment"+(count ? " "+count : "")});
+
+                assessment.save()
+                    .fail(function (error, type, code) {
+                        if (code === "FORBIDDEN" 
+                            && error.responseText.match(/title values must be unique/)) {
+                            retry(count+1);
+                        }
+                    });
+            })(0);
+          }
+        });
+      }.bind(this));
   }
 });
 
