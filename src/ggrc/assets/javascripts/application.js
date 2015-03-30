@@ -716,6 +716,9 @@ jQuery(document).ready(function($) {
 
 // Setup for Popovers
 jQuery(document).ready(function($) {
+  $('body').on('mouseover', '[data-toggle="popover"]', function (evnt) {
+    $(this).popover();
+  });
   var defaults = {
     delay: {show : 500, hide : 100},
     placement: 'left',
