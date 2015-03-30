@@ -58,9 +58,4 @@
     return this;
   }
   $.fn.openclose = openclose;
-
-  $('body').on('click', 'ul.tree-structure .item-main .grcobject, ul.tree-structure .item-main .openclose', function(e) {
-    openclose.call(this);
-    e.stopPropagation();
-  });
 })(jQuery);
