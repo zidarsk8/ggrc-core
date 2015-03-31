@@ -290,8 +290,44 @@
     }
     .content-wrap {
       padding: 12px;
-      max-height: 160px;
+      max-height: 300px;
       overflow-y: auto;
+      .code {
+        font-family: "Courier New", Courier, monospace;
+        margin-right: 0;
+        font-size: 100%;
+        color: $darkText;
+      }
+      p {
+        margin-bottom: 15px;
+      }
+      h3 {
+        margin-bottom: 6px;
+      }
+      ul {
+        margin-left: 30px;
+        li {
+          list-style: disc;
+          padding-bottom: 4px;
+        }
+      }
+      .table-bordered {
+        @include border-radius(0);
+      }
+      .table {
+        tr {
+          td {
+            &:first-child {
+              text-align: center;
+            }
+          }
+          th {
+            &:first-child {
+              text-align: center;
+            }
+          }
+        }
+      }
     }
     .footer-wrap {
       border-top: 1px solid $warmGray;
