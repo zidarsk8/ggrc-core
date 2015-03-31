@@ -443,10 +443,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
                   that.hide_filter();
                 }
               });
-
-              can.bind.call(that.element.parent().find('.generate-control-assessments > a'), 'click', function (ev) {
-                that.generate_control_assessments();
-              });
         })));
       }
 
@@ -877,19 +873,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.display_prefs.setFilterHidden(false);
       this.display_prefs.save();
     }
-
-  , generate_control_assessments: function () {
-    var audit = this.options.parent_instance,
-        generator = new CMS.Controllers.AssessmentGenerator({}, {
-          audit: this.options.parent_instance
-        });
-    
-    if (this.options.model.shortName == "ControlAssessment") {
-      generator.generate_control_assessments(audit.get_binding("program_controls").list);
-    }else{
-      generator.generate_control_assessments(this.options.list);
-    }
-  }
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
