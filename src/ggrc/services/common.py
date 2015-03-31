@@ -730,12 +730,12 @@ class Resource(ModelView):
 
   def validate_headers_for_put_or_delete(self, obj):
     # rfc 6585 defines a new status code for missing required headers
-    if 'If-Match' not in self.request.headers:
+    required_headers = set(['If-Match', 'If-Unmodified-Since'])
+    missing_headers = required_headers.difference(set(self.request.headers.keys()))
+    if missing_headers:
       return current_app.make_response((
-        'If-Match is required.', 428, [('Content-Type', 'text/plain')]))
-    if 'If-Unmodified-Since' not in self.request.headers:
-      return current_app.make_response((
-        'If-Unmodified-Since is required.', 428, [('Content-Type', 'text/plain')]))
+        'required headers: ' + ', '.join(missing_headers),
+        428, [('Content-Type', 'text/plain')]))
 
     if request.headers['If-Match'] != self.etag(self.object_for_json(obj)) or \
         request.headers['If-Unmodified-Since'] != \
