@@ -143,32 +143,6 @@
   });
 
   $win.load(function() {
-    // Popover setup
-    $('body').on('mouseover', '.help-popover', function (evnt) {
-      $(this).popover({
-        placement: function(context, src) {
-          $(context).addClass('popover-help-wrap');
-          return 'bottom';
-        },
-        trigger: 'click',
-        html: true,
-        title: function() {
-          return $(".filter-help-title").html();
-        },
-        content: function() {
-          return $(".filter-help-content").html();
-        }
-      });
-      var hidePopover = function() {
-        $('.help-popover').each(function() {
-          $(this).popover('hide');
-        });
-      }
-      $(".footer-wrap a").on("click", function() {
-        hidePopover();
-      });
-    });
-
     // affix setup
     $win.scroll(function() {
       if ($('.header-content').hasClass('affix')) {
