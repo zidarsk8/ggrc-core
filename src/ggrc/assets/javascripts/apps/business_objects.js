@@ -271,10 +271,10 @@ $(function() {
   });
 
   var base_widgets_by_type = {
-    "Program": "Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Audit": "ControlAssessment Request history Person program program_controls",
+    "Program": "Issue Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Audit": "Issue ControlAssessment Request history Person program program_controls",
     "Issue": "ControlAssessment Control Program Audit",
-    "ControlAssessment": "Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "ControlAssessment": "Issue Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Regulation" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Policy" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Standard" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
@@ -282,7 +282,7 @@ $(function() {
     "Clause" : "Contract Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Section" : "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Objective" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-    "Control" : "Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Control" : "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Person" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",
     "OrgGroup" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Vendor" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
@@ -513,7 +513,11 @@ $(function() {
                   mapping: "programs"
                 }
             }
-
+        , issues: {
+          Issue: {
+              mapping: "related_issues"
+          }
+        }
         , governance_objects: {
               Regulation: {
                   mapping: "regulations"
@@ -567,6 +571,7 @@ $(function() {
                 , "objectives"
                 , "controls"
                 , "business_objects"
+                , "issues"
                 ]
 
             , Audit: {
@@ -589,6 +594,7 @@ $(function() {
             }
           }
         , Audit: {
+          _mixins: ["issues"],
           Request: {
             mapping: "active_requests"
             , draw_children : true
@@ -694,10 +700,17 @@ $(function() {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Control: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits", "open_requests"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "open_requests", "issues"],
+            ControlAssessment: {
+              mapping: "related_control_assessments"
+              , parent_instance: GGRC.page_instance()
+              , draw_children: true
+              , model: CMS.Models.ControlAssessment
+              , footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache"
+            }
           }
         , ControlAssessment: {
-            _mixins: ["governance_objects", "business_objects"]
+            _mixins: ["governance_objects", "business_objects", "issues"]
             , Control: {
                 mapping: "related_controls"
               , draw_children: true
