@@ -154,7 +154,7 @@ can.Control("CMS.Controllers.TreeLoader", {
               .first()
               .closest(".cms_controllers_tree_view_node")
               .control();
-      
+
       if (controller) {
         controller.select();
       }
@@ -1035,8 +1035,8 @@ can.Control("CMS.Controllers.TreeViewNode", {
     if (!this.element)
       return;
 
-    $el = $(el)
-    old_data = $.extend({}, old_el.data())
+    $el = $(el);
+    old_data = $.extend({}, old_el.data());
 
     firstchild = $(_firstElementChild(el));
 
@@ -1112,12 +1112,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , ".select:not(.disabled) click": function(el, ev) {
     var tree = el.closest('.cms_controllers_tree_view_node'),
         node = tree.control();
-    
+
     node.select();
   }
   , select: function () {
     var $tree = this.element;
-      
+
     $tree.closest('section').find('.cms_controllers_tree_view_node').removeClass('active');
     $tree.addClass('active');
 
@@ -1143,7 +1143,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
     if (this.options.parent) {
       parent_fragment = this.options.parent.hash_fragment();
     }
-
     return [parent_fragment,
             this.options.instance.hash_fragment()].join("/");
   }
