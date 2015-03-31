@@ -82,7 +82,6 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
   _notify: function () {
     var assessments = arguments,
         count = _.filter(assessments, function (assessment) {
-          console.log(assessment);
           return !_.isError(assessment);
         }).length,
         errors = _.filter(assessments, function (assessment) {
@@ -91,11 +90,7 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
         msg;
 
     if (errors < 1) {
-      if (count == 0) {
-        msg = {success: "Every Control already had a Control Assessment!"};
-      }else{
-        msg = {success: "<span class='user-string'>"+count+"</span> Control Assessments successfully created."};
-      }
+      msg = {success: "<span class='user-string'>"+count+"</span> Control Assessments successfully created."};
     }else{
       msg = {error: "An error occured when creating <span class='user-string'>"+errors+"</span> out of "+(errors+count)+" Control Assessments."};
     }

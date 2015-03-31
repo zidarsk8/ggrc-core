@@ -617,7 +617,6 @@ $(function() {
             , draw_children : true
             , model: CMS.Models.Control
             , show_view : GGRC.mustache_path + "/controls/tree.mustache"
-            , header_view : GGRC.mustache_path + "/program_controls/tree_header.mustache"
             , footer_view : GGRC.mustache_path + "/controls/tree_footer.mustache"
             , allow_mapping: false
             , allow_creating: false

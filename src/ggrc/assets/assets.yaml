@@ -132,6 +132,7 @@ dashboard-js-template-files:
   - base_objects/tree_header.mustache
   - base_objects/tree_view_filter.mustache
   - base_objects/filter_trigger.mustache
+  - base_objects/generate_assessments_button.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pin.mustache
@@ -152,7 +153,6 @@ dashboard-js-template-files:
   - controls/modal_content.mustache
   - controls/object_list.mustache
   - controls/tree.mustache
-  - program_controls/tree_header.mustache
   - control_assessments/modal_content.mustache
   - control_assessments/tree_footer.mustache
   - issues/modal_content.mustache
