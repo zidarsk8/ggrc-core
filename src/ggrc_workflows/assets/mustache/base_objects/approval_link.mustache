@@ -1,8 +1,14 @@
 <div data-object-id="{{instance.id}}"
     data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}>
+  {{log instance}}
+  {{#with_mapping 'current_object_review_tasks' instance}}
+    {{log .}}
+  {{/with_mapping}}
   {{#if_equals instance.status 'Final'}}
     <i class="grcicon-review-color"></i>
-    <span class="object-approved">Reviewed and approved</span>
+    <span class="object-approved">
+      Reviewed on {{instance.updated_at}} <br />
+      and approved by</span>
   {{else}}
     {{#with_mapping 'current_object_review_tasks' instance}}
       {{#with_review_task}}

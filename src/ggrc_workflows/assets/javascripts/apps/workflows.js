@@ -234,47 +234,43 @@
       };
 
     // Insert `workflows` mappings to all business object types
-    can.each(_workflow_object_types, function(type) {
-      mappings[type] = {};
-      mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
-        "TaskGroupObject", "object", "task_group", "task_group_objects", null);
-      mappings[type].object_tasks = Search(function(binding) {
-        return CMS.Models.CycleTaskGroupObjectTask.findAll({
-          'cycle_task_group_object.object_id': binding.instance.id,
-          'cycle_task_group_object.object_type': binding.instance.type,
-          'cycle.is_current': true
-        });
-      });
-      mappings[type].object_tasks_with_history = Search(function(binding) {
-        return CMS.Models.CycleTaskGroupObjectTask.findAll({
-          'cycle_task_group_object.object_id': binding.instance.id,
-          'cycle_task_group_object.object_type': binding.instance.type
-        });
-      });
-      mappings[type].workflows = Cross("task_groups", "workflow");
-      mappings[type].approval_workflows = CustomFilter(
-        "workflows", function(binding) {
-          return binding.instance.attr("object_approval");
-        });
-      mappings[type].current_approval_cycles = Cross("approval_workflows", "current_cycle");
-      mappings[type].current_object_review_tasks = CustomFilter(
-        "object_tasks", function(binding) {
-        var tgt_binding = binding.instance.attr("task_group_task");
-        if(!tgt_binding) {
-          return;
+    can.each(_workflow_object_types, function (type) {
+      mappings[type] = {
+        task_groups: new GGRC.ListLoaders.ProxyListLoader('TaskGroupObject', 'object', 'task_group', 'task_group_objects', null),
+        object_tasks: Search(function (binding) {
+          return CMS.Models.CycleTaskGroupObjectTask.findAll({
+            'cycle_task_group_object.object_id': binding.instance.id,
+            'cycle_task_group_object.object_type': binding.instance.type,
+            'cycle.is_current': true
+          });
+        }),
+        approval_tasks: Search(function (binding) {
+          return CMS.Models.CycleTaskGroupObjectTask.findAll({
+            'cycle_task_group_object.object_id': binding.instance.id,
+            'cycle_task_group_object.object_type': binding.instance.type,
+            'cycle.workflow.object_approval': true
+          });
+        }),
+        object_tasks_with_history: Search(function (binding) {
+          return CMS.Models.CycleTaskGroupObjectTask.findAll({
+            'cycle_task_group_object.object_id': binding.instance.id,
+            'cycle_task_group_object.object_type': binding.instance.type
+          });
+        }),
+        workflows: Cross('task_groups', 'workflow'),
+        approval_workflows: CustomFilter('workflows', function (binding) {
+          return binding.instance.attr('object_approval');
+        }),
+        current_approval_cycles: Cross('approval_workflows', 'current_cycle'),
+        current_object_review_tasks: CustomFilter('approval_tasks', function (binding) {
+          console.log('Current object review tasks', binding);
+          return binding.instance.attr('task_group_task');
+        }),
+        _canonical: {
+         'workflows': 'Workflow',
+         'task_groups': 'TaskGroup'
         }
-        return new RefreshQueue().enqueue(tgt_binding.reify()).trigger().then(
-            function(data){
-              var tgt = data[0];
-              return tgt.attr("object_approval");
-            }
-          )
-        });
-      mappings[type]._canonical = {
-       "workflows": "Workflow",
-       "task_groups": "TaskGroup"
       };
-
       mappings[type].orphaned_objects = Multi([
         GGRC.Mappings.get_mappings_for(type).orphaned_objects,
         mappings[type].workflows
@@ -282,17 +278,16 @@
 
       //CMS.Models[type].attributes.workflow_objects =
       //  "CMS.Models.WorkflowObject.stubs";
-      CMS.Models[type].attributes.task_group_objects =
-        "CMS.Models.TaskGroupObject.stubs";
+      CMS.Models[type].attributes.task_group_objects = 'CMS.Models.TaskGroupObject.stubs';
 
       // Also register a render hook for object approval
       GGRC.register_hook(
-        type + ".info_widget_actions",
-        GGRC.mustache_path + "/base_objects/approval_link.mustache"
+        type + '.info_widget_actions',
+        GGRC.mustache_path + '/base_objects/approval_link.mustache'
         );
 
     });
-    new GGRC.Mappings("ggrc_workflows", mappings);
+    new GGRC.Mappings('ggrc_workflows', mappings);
   };
 
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
