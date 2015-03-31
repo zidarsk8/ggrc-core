@@ -33,7 +33,7 @@ describe("GDrive Workflows Controller", function() {
 
     it("creates permission object for user by email address", function() {
       var person = "foo@example.com";
-      
+
       spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions").and.callFake(function() { return $.when([]); });
 
       ctl.update_permission_for(item, person, permissionId, role);
@@ -67,7 +67,7 @@ describe("GDrive Workflows Controller", function() {
 
     it("creates writer permission for users who currently have reader", function() {
       var person = "foo@example.com";
-      
+
       spyOn(CMS.Models.GDriveFolder.prototype, "findPermissions")
       .and.callFake(function() {
         return $.when([{

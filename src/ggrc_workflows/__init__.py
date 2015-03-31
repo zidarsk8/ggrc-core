@@ -807,8 +807,8 @@ def start_recurring_cycles():
 
     # Update the workflow next_cycle_start_date to push it ahead based on the frequency.
     calculator = WorkflowDateCalculator(workflow)
-    workflow.next_cycle_start_date = \
-      calculator.nearest_work_day(calculator.nearest_start_date_after_basedate(date.today()), 1)
+    workflow.next_cycle_start_date = calculator.nearest_work_day(
+        calculator.nearest_start_date_after_basedate(date.today()), 1, workflow.frequency)
     db.session.add(workflow)
 
   db.session.commit()

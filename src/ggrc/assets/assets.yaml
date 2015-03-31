@@ -34,6 +34,15 @@ dashboard-js-files:
   - bootstrap/wysihtml5.js
   - moment.js
   - permission.js
+  - plugins/persistent_notifier.js
+  - ggrc_base.js
+  - plugins/wysiwyg.js
+  - plugins/autocomplete.js
+  - plugins/ajax_extensions.js
+  - plugins/canjs_extensions.js
+  - plugins/openclose.js
+  - plugins/tooltip.js
+  - plugins/popover.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js
@@ -144,6 +153,7 @@ dashboard-js-template-files:
   - controls/tree.mustache
   - control_assessments/modal_content.mustache
   - control_assessments/tree_footer.mustache
+  - issues/modal_content.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
