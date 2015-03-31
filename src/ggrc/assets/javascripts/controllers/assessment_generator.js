@@ -42,7 +42,7 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
           return def;
         }.bind(this))).promise();
 
-        done.then(this._notify());
+        done.then(this._notify);
       }.bind(this));
   },
 
@@ -64,7 +64,8 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
         {audit: this.audit,
          control: control.instance,
          context: this.audit.context,
-         title: control.instance.title+" assessment"+(count ? " "+count : "")});
+         title: control.instance.title+" assessment"+(count ? " "+count : ""),
+         test_plan: control.instance.test_plan});
 
     return assessment
           .save()
@@ -81,6 +82,7 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
   _notify: function () {
     var assessments = arguments,
         count = _.filter(assessments, function (assessment) {
+          console.log(assessment);
           return !_.isError(assessment);
         }).length,
         errors = _.filter(assessments, function (assessment) {
@@ -92,10 +94,10 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
       if (count == 0) {
         msg = {success: "Every Control already had a Control Assessment!"};
       }else{
-        msg = {success: "<strong>"+count+"</strong> Control Assessments successfully created."};
+        msg = {success: "<span class='user-string'>"+count+"</span> Control Assessments successfully created."};
       }
     }else{
-      msg = {error: "An error occured when creating <strong>"+errors+"</strong> out of "+(errors+count)+" Control Assessments."};
+      msg = {error: "An error occured when creating <span class='user-string'>"+errors+"</span> out of "+(errors+count)+" Control Assessments."};
     }
 
     $(document.body).trigger("ajax:flash", msg);
