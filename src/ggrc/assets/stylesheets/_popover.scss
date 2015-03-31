@@ -272,6 +272,37 @@
       top: 0;
     }
   }
+  &.popover-help-wrap {
+    @include box-shadow(0 0 5px rgba(0,0,0, .3));
+    width: 60%;
+    border: 1px solid $warmGray;
+    .popover-inner {
+      width: auto;
+      .popover-title {
+        background: $white;
+        padding-bottom: 4px;
+        border-bottom: 1px solid $warmGray;
+        color: $black;
+      }
+    }
+    .popover-content {
+      @include border-radius(0);
+    }
+    .content-wrap {
+      padding: 12px;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    .footer-wrap {
+      border-top: 1px solid $warmGray;
+      padding: 12px;
+    }
+    &.bottom {
+      .arrow {
+        display: none;
+      }
+    }
+  }
 }
 /* slowing down fade-in only.  Fade-out remains 0.15s */
 .tooltip.fade.in, .popover.fade.in {

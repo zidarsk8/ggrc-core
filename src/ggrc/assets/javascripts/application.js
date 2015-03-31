@@ -718,7 +718,11 @@ jQuery(document).ready(function($) {
 jQuery(document).ready(function($) {
   $('body').on('mouseover', '.help-popover', function (evnt) {
     $(this).popover({
-      placement: 'bottom',
+      placement: function(context, src) {
+        $(context).addClass('popover-help-wrap');
+        return 'bottom';
+      },
+      trigger: 'click',
       html: true,
       title: function() {
         return $(".filter-help-title").html();
@@ -726,6 +730,14 @@ jQuery(document).ready(function($) {
       content: function() {
         return $(".filter-help-content").html();
       }
+    });
+    var hidePopover = function() {
+      $('.help-popover').each(function() {
+        $(this).popover('hide');
+      });
+    }
+    $(".footer-wrap a").on("click", function() {
+      hidePopover();
     });
   });
   var defaults = {
