@@ -26,11 +26,23 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
               return ca.control.id;
             });
 
-        can.each(controls, function (control) {
+        var done = $.when.apply($, can.each(controls, function (control) {
+          var def = new $.Deferred();
+
           if (!_.includes(ignore_controls, control.instance.id)) {
-            this._generate(control);
+            this._generate(control)
+                  .done(function (control_assessment) {
+                    def.resolve(control_assessment);
+                  })
+                  .fail(function () {
+                    def.resolve(new Error());
+                  });
           }
-        }.bind(this));
+
+          return def;
+        }.bind(this))).promise();
+
+        done.then(this._notify());
       }.bind(this));
   },
 
@@ -60,7 +72,32 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
             if (code === "FORBIDDEN" 
                 && error.responseText.match(/title values must be unique/)) {
                 this.generate(control, count+1);
+            }else{
+              return assessment;
             }
           });
+  },
+
+  _notify: function () {
+    var assessments = arguments,
+        count = _.filter(assessments, function (assessment) {
+          return !_.isError(assessment);
+        }).length,
+        errors = _.filter(assessments, function (assessment) {
+          return _.isError(assessment);
+        }).length,
+        msg;
+
+    if (errors < 1) {
+      if (count == 0) {
+        msg = {success: "Every Control already had a Control Assessment!"};
+      }else{
+        msg = {success: "<strong>"+count+"</strong> Control Assessments successfully created."};
+      }
+    }else{
+      msg = {error: "An error occured when creating <strong>"+errors+"</strong> out of "+(errors+count)+" Control Assessments."};
+    }
+
+    $(document.body).trigger("ajax:flash", msg);
   }
 });
