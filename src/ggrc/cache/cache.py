@@ -74,6 +74,7 @@ def all_cache_entries():
     resource('systems_or_processes', 'SystemOrProcess'),
     resource('systems', 'System'),
     resource('processes', 'Process'),
+    resource('issues', 'Issue'),
 
     # ggrc notification models
     resource('notification_configs', 'NotificationConfig'),

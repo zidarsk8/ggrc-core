@@ -320,6 +320,15 @@
       , policies: TypeFilter("directives", "Policy")
       , standards: TypeFilter("directives", "Standard")
       , regulations: TypeFilter("directives", "Regulation")
+
+      , related_objects_as_source: Proxy(
+          null, "destination", "Relationship", "source", "related_destinations")
+      , related_objects_as_destination: Proxy(
+          null, "source", "Relationship", "destination", "related_sources")
+      , related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"])
+      , related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment")
+      , related_issues: TypeFilter("related_objects_via_relationship", "Issue")
+
       , orphaned_objects: Multi([
           "related_objects"
         , "sections"
@@ -534,6 +543,7 @@
         , "audits" : "Audit"
         , "context" : "Context"
       }
+      , related_issues: TypeFilter("related_objects", "Issue")
       , controls: Proxy(
           "Control", "control", "ProgramControl", "program", "program_controls")
       /*, objectives: Proxy(
@@ -903,6 +913,7 @@
           null, "source", "Relationship", "destination", "related_sources")
       , related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"])
       , related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment")
+      , related_issues: TypeFilter("related_objects_via_relationship", "Issue")
     }
     , ControlAssessment : {
       _mixins: [
@@ -917,6 +928,21 @@
       , related_controls: TypeFilter("related_objects", "Control")
       , related_sections: TypeFilter("related_objects", "Section")
       , related_clauses:  TypeFilter("related_objects", "Clause")
+      , related_issues: TypeFilter("related_objects", "Issue")
+    }
+    , Issue : {
+      _mixins: [
+        "related_object", "personable", "ownable"
+      ],
+      _canonical: {
+       "related_objects" : [
+          "Program", "ControlAssessment", "Control", "Audit"
+        ],
+      }
+      , related_audits:   TypeFilter("related_objects", "Audit")
+      , related_controls: TypeFilter("related_objects", "Control")
+      , related_control_assessments: TypeFilter("related_objects", "ControlAssessment")
+      , related_programs:  TypeFilter("related_objects", "Program")
     }
     , Request : {
         _canonical : {
