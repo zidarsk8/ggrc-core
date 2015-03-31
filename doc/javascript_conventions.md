@@ -165,8 +165,26 @@ if (!instance) {
 }
 ```
 
-Multiline conditions should include
+Statements should never be obfuscated by expressions, because it hide non-local effects. E.g. (from Google style guide).
 
+```javascript
+// Okay
+if (node) {
+  if (node.kids) {
+    if (node.kids[index]) {
+      foo(node.kids[index]);
+    }
+  }
+}
+
+// Better
+if (node && node.kids && node.kids[index]) {
+  foo(node.kids[index]);
+}
+
+// Bad
+node && node.kids && node.kids[index] && foo(node.kids[index]);
+```
 
 Cleverness
 -----
