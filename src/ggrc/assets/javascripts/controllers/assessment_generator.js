@@ -26,7 +26,7 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
               return ca.control.id;
             });
 
-        var done = $.when.apply($, can.each(controls, function (control) {
+        var done = $.when.apply($, can.map(controls, function (control) {
           var def = new $.Deferred();
 
           if (!_.includes(ignore_controls, control.instance.id)) {
@@ -46,7 +46,7 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
                   });
           }else{
             // this doesn't do anything
-            def.resolve("bloop");
+            def.resolve(null);
           }
 
           return def;
@@ -92,17 +92,19 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
   _notify: function () {
     var assessments = arguments,
         count = _.filter(assessments, function (assessment) {
-          return !_.isError(assessment);
+          return !_.isError(assessment) && !_.isNull(assessment);
         }).length,
         errors = _.filter(assessments, function (assessment) {
           return _.isError(assessment);
         }).length,
         msg;
 
-    console.log(arguments);
-
     if (errors < 1) {
-      msg = {success: "<span class='user-string'>"+count+"</span> Control Assessments successfully created."};
+      if (count == 0) {
+        msg = {success: "Every Control already has a Control Assessment!"};
+      }else{
+        msg = {success: "<span class='user-string'>"+count+"</span> Control Assessments successfully created."};
+      }
     }else{
       msg = {error: "An error occured when creating <span class='user-string'>"+errors+"</span> out of "+(errors+count)+" Control Assessments."};
     }
