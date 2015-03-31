@@ -1498,8 +1498,12 @@
         this.options.default_option_descriptor = 'AllObjects';
         // hard code some of the submenu
         // this.options.option_type_menu_2 = this.options.option_type_menu;
-        this.options.option_type_menu_2 = can.map('Program Regulation Policy Standard Contract Clause Section Objective Control Person System Process DataAsset Product Project Facility Market'.split(' '), function (key) {
-            return CMS.Models[key];
+        this.options.option_type_menu_2 = can.map(
+            Array.prototype.concat.call([],
+              'Program Regulation Policy Standard Contract Clause Section Objective Control'.split(' '),
+              'Person System Process DataAsset Product Project Facility Market'.split(' ')
+            ), function (key) {
+              return CMS.Models[key];
         });
     }
     , init_context: function() {
