@@ -30,10 +30,17 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
           var def = new $.Deferred();
 
           if (!_.includes(ignore_controls, control.instance.id)) {
-            this._generate(control)
-                  .done(function (control_assessment) {
-                    def.resolve(control_assessment);
-                  })
+            control.instance
+                  .refresh()
+                  .then(function (control) {
+                    this._generate(control)
+                          .done(function (control_assessment) {
+                            def.resolve(control_assessment);
+                          })
+                          .fail(function () {
+                            def.resolve(new Error());
+                          });
+                  }.bind(this))
                   .fail(function () {
                     def.resolve(new Error());
                   });
@@ -62,10 +69,10 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
 
     var assessment = new CMS.Models.ControlAssessment(
         {audit: this.audit,
-         control: control.instance,
+         control: control,
          context: this.audit.context,
-         title: control.instance.title+" assessment"+(count ? " "+count : ""),
-         test_plan: control.instance.test_plan});
+         title: control.title+" assessment"+(count ? " "+count : ""),
+         test_plan: control.test_plan});
 
     return assessment
           .save()

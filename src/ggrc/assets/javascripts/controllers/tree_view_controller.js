@@ -879,11 +879,16 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , generate_control_assessments: function () {
-    var generator = new CMS.Controllers.AssessmentGenerator({}, {
-        audit: this.options.parent_instance
-    });
-
-    generator.generate_control_assessments(this.options.list);
+    var audit = this.options.parent_instance,
+        generator = new CMS.Controllers.AssessmentGenerator({}, {
+          audit: this.options.parent_instance
+        });
+    
+    if (this.options.model.shortName == "ControlAssessment") {
+      generator.generate_control_assessments(audit.get_binding("program_controls").list);
+    }else{
+      generator.generate_control_assessments(this.options.list);
+    }
   }
 });
 
