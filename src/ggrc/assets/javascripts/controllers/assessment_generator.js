@@ -46,7 +46,6 @@ can.Component.extend({
                       def.resolve(new Error());
                     });
             }else{
-              // this doesn't do anything
               def.resolve(null);
             }
   
@@ -70,7 +69,7 @@ can.Component.extend({
   
     _generate: function (control, count) {
       count = typeof count == undefined ? 0 : count;
-  
+
       var assessment = new CMS.Models.ControlAssessment(
           {audit: this.scope.audit,
            control: control,
