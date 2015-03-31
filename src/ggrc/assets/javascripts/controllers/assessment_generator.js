@@ -44,6 +44,9 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
                   .fail(function () {
                     def.resolve(new Error());
                   });
+          }else{
+            // this doesn't do anything
+            def.resolve("bloop");
           }
 
           return def;
@@ -95,6 +98,8 @@ can.Control("CMS.Controllers.AssessmentGenerator", {
           return _.isError(assessment);
         }).length,
         msg;
+
+    console.log(arguments);
 
     if (errors < 1) {
       msg = {success: "<span class='user-string'>"+count+"</span> Control Assessments successfully created."};
