@@ -1106,8 +1106,11 @@
 
    , should_update_hash_fragment: function () {
       var $trigger = this.options.$trigger;
-      return !($trigger.closest(".modal").size()
-               || $trigger.closest(".cms_controllers_info_pin").size());
+
+      if (!$trigger) {
+        return false;
+      }
+      return !$trigger.closest('.modal, .cms_controllers_info_pin').length;
    }
 
    // if we have join.destination, return that

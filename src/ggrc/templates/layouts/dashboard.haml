@@ -14,143 +14,141 @@
   dashboard
 
 -block body
-  %body
-
-    %header.header.main
-      .header-bar
-        .container-fluid
-          .row-fluid
-            .span12
-              %button{ 'class': 'lhn-trigger pull-left', 'href': 'javascript://'}
-                %span.icon-bar
-                %span.icon-bar
-                %span.icon-bar
-              .logo.pull-left
-                %h2
-                  %a{ 'class': 'to-my-work', 'href': '/dashboard' }
-                    -set logo_url = config.get("COMPANY_LOGO")
-                    -set logo_text = config.get("COMPANY_LOGO_TEXT")
-                    -if logo_url
-                      %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
-                    -elif logo_text != None
-                      =logo_text
-                    -else
-                      Google GRC
-              %ul.menu
-                %li
-                  %a{ 'href': 'javascript://', 'data-toggle': 'multitype-search-modal-selector', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
-                    %i.grcicon-search
-                    %span
-                      Search
-                %li
-                  %a#page-help{ 'href': "/dashboard#task_widget" }
-                    %i.grcicon-task-black
-                    %span
-                      My Tasks
-                      %span.task-count
-                %li.user.dropdown
-                  %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
-                    %i.grcicon-user-black
-                    %span
-                      =current_user.email
-                    %i.grcicon-carot
-                  %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
-                    %li
-                      %a{'href': "/dashboard"}
-                        %i.grcicon-my-work
-                        My Work ({{current_user.system_wide_role}})
-                    -if permissions.is_allowed_read('/admin', 1)
-                      %li
-                        %a{'href': "/admin#people_list_widget"}
-                          %i.grcicon-dashboard-black
-                          Admin Dashboard
-                    %li.notify-wrap
-                      %span
-                        %i.grcicon-alarm-black
-                        Notifications
-                      %div.inner-list
-                        %label
-                          %input{
-                            'type': 'checkbox',
-                            'name': 'notifications',
-                            'value': 'Email_Now'
-                          }
-                          Real-time email updates
-                        %label
-                          %input{
-                            'type': 'checkbox',
-                            'name': 'notifications',
-                            'value': 'Email_Digest'
-                          }
-                          Daily email digest
-                    %li
-                      %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
-                        %i.grcicon-logout-black
-                        Logout
-                %li
-                  %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
-                    %i.grcicon-help-black
-                    %span
-                      Help
-    .area{ 'class': '={ model_display_class }' }
-      .header-content
+  %header.header.main
+    .header-bar
+      .container-fluid
         .row-fluid
-          #page-header.span12
-            -block header
-          -# .span3
-            -block subheader_extras
-
-      .top-inner-nav
-        .object-nav
-          %ul.nav{ 'class': "internav" }
-
-      %section.content
-        .flash
-          -with messages = get_flashed_messages(with_categories=True)
-            -if messages
-              -for category, message in messages
-                %div{ 'class': "{{category}}" }
-                  %a.close{'href': "#", 'data-dismiss': "alert" }
-                    x
-                  %p
-                    {{message}}
-          -#FIXME: Flash messages
-          -#flash.each do |type, value|
-            -value = [value] unless value.is_a?(Array)
-            -value = value.map(:presence).compact
-            -if value.size > 0
-              %div{ 'class': type }
-                %a.close{'href': "#{}", :'data-dismiss': "alert"}
-                  &times;
-                -value.each do |message|
-                  %p=message
-        -block main
-          .clearfix
-            //.objnav.bar-v
-            //.inner-nav
-              .object-nav
-                %ul.nav{ 'class': "internav ={ model_display_class }" }
-            .object-area
-              #show_columns.column-set{ 'data-resize': "true" }
-                #middle_column
-                  .row-fluid
-                    .span12.full-width
-                      .inner-content.widget-area
-                        -block widget_area
-            .pin-content
-
-    %section.footer
+          .span12
+            %button{ 'class': 'lhn-trigger pull-left', 'href': 'javascript://'}
+              %span.icon-bar
+              %span.icon-bar
+              %span.icon-bar
+            .logo.pull-left
+              %h2
+                %a{ 'class': 'to-my-work', 'href': '/dashboard' }
+                  -set logo_url = config.get("COMPANY_LOGO")
+                  -set logo_text = config.get("COMPANY_LOGO_TEXT")
+                  -if logo_url
+                    %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
+                  -elif logo_text != None
+                    =logo_text
+                  -else
+                    Google GRC
+            %ul.menu
+              %li
+                %a{ 'href': 'javascript://', 'data-toggle': 'multitype-search-modal-selector', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
+                  %i.grcicon-search
+                  %span
+                    Search
+              %li
+                %a#page-help{ 'href': "/dashboard#task_widget" }
+                  %i.grcicon-task-black
+                  %span
+                    My Tasks
+                    %span.task-count
+              %li.user.dropdown
+                %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
+                  %i.grcicon-user-black
+                  %span
+                    =current_user.email
+                  %i.grcicon-carot
+                %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
+                  %li
+                    %a{'href': "/dashboard"}
+                      %i.grcicon-my-work
+                      My Work ({{current_user.system_wide_role}})
+                  -if permissions.is_allowed_read('/admin', 1)
+                    %li
+                      %a{'href': "/admin#people_list_widget"}
+                        %i.grcicon-dashboard-black
+                        Admin Dashboard
+                  %li.notify-wrap
+                    %span
+                      %i.grcicon-alarm-black
+                      Notifications
+                    %div.inner-list
+                      %label
+                        %input{
+                          'type': 'checkbox',
+                          'name': 'notifications',
+                          'value': 'Email_Now'
+                        }
+                        Real-time email updates
+                      %label
+                        %input{
+                          'type': 'checkbox',
+                          'name': 'notifications',
+                          'value': 'Email_Digest'
+                        }
+                        Daily email digest
+                  %li
+                    %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
+                      %i.grcicon-logout-black
+                      Logout
+              %li
+                %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
+                  %i.grcicon-help-black
+                  %span
+                    Help
+  .area{ 'class': '={ model_display_class }' }
+    .header-content
       .row-fluid
-        .span12
-          %ul.bottom-nav.pull-left
-          %p
-            -#FIXME: Copyright footer
-            -#=CMS_CONFIG['COMPANY']
-            =config.get('COPYRIGHT')
-            -#=Time.now.year
-            =config.get('COMPANY')
-            Version
-            =config.get('VERSION')
+        #page-header.span12
+          -block header
+        -# .span3
+          -block subheader_extras
 
-    #lhn
-      #lhs.lhs.accordion{ 'data-template': '/dashboard/lhn.mustache' }
+    .top-inner-nav
+      .object-nav
+        %ul.nav{ 'class': "internav" }
+
+    %section.content
+      .flash
+        -with messages = get_flashed_messages(with_categories=True)
+          -if messages
+            -for category, message in messages
+              %div{ 'class': "{{category}}" }
+                %a.close{'href': "#", 'data-dismiss': "alert" }
+                  x
+                %p
+                  {{message}}
+        -#FIXME: Flash messages
+        -#flash.each do |type, value|
+          -value = [value] unless value.is_a?(Array)
+          -value = value.map(:presence).compact
+          -if value.size > 0
+            %div{ 'class': type }
+              %a.close{'href': "#{}", :'data-dismiss': "alert"}
+                &times;
+              -value.each do |message|
+                %p=message
+      -block main
+        .clearfix
+          //.objnav.bar-v
+          //.inner-nav
+            .object-nav
+              %ul.nav{ 'class': "internav ={ model_display_class }" }
+          .object-area
+            #show_columns.column-set{ 'data-resize': "true" }
+              #middle_column
+                .row-fluid
+                  .span12.full-width
+                    .inner-content.widget-area
+                      -block widget_area
+          .pin-content
+
+  %section.footer
+    .row-fluid
+      .span12
+        %ul.bottom-nav.pull-left
+        %p
+          -#FIXME: Copyright footer
+          -#=CMS_CONFIG['COMPANY']
+          =config.get('COPYRIGHT')
+          -#=Time.now.year
+          =config.get('COMPANY')
+          Version
+          =config.get('VERSION')
+
+  #lhn
+    #lhs.lhs.accordion{ 'data-template': '/dashboard/lhn.mustache' }
