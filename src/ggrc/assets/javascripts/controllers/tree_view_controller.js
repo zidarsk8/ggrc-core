@@ -1142,3 +1142,4 @@ can.Control("CMS.Controllers.TreeViewNode", {
                             this.hash_fragment()].join('');
   }
 });
+
