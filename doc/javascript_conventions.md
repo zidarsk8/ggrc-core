@@ -31,10 +31,14 @@ Use full/descriptive words.  `query` instead of `q`, `word_list` instead of `wl`
 
 Use `$` as a prefix always and only for jQuery-valued variables.
 
-Use `_` prefix for "private" variables.  (This is less important, but I think we should start using `_this` instead of `that` or `self`.)
+Use `_` prefix for "private" variables.
 
 `camelCase` or `underscore_case`?  The more-common Javascript convention is camelCase.  Our codebase is primarily underscore_case, except "classes" and interactions with other libraries.  I see this difference as positive, since it makes clearer what is our code vs. external code.  Thoughts?
 
+this, that & self
+----
+
+Try to avoid using `var that = this` or `var self = this;` as much as possible. The preferred way is to call bind with this: `function () {}.bind(this)`.
 
 Comma first/last
 ----
