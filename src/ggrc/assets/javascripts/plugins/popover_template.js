@@ -7,17 +7,10 @@
 (function(root, $, GGRC) {
   'use strict';
 
-      // var hidePopover = function() {
-      //   $('.help-popover').each(function() {
-      //     $(this).popover('hide');
-      //   });
-      // }
-      // $(".footer-wrap a").on("click", function() {
-      //   hidePopover();
-      // });
   function Popover(element) {
     this.el = element;
     this.$el = $(element);
+    this.$body = $('body');
     this.file = this.$el.data('get-template');
     this.template = $(this.get_template());
     this._isShown = false;
@@ -33,11 +26,28 @@
   };
   Popover.prototype.bindEvents = function () {
     this.$el.on('click', $.proxy(this.displayToggle, this));
+    this.$body.on('click', $.proxy(this.clickOutside, this));
   };
   Popover.prototype.close = function (evnt) {
-    evnt.preventDefault();
+    if (evnt) {
+      evnt.preventDefault();
+    }
     this.popover.hide();
     this._isShown = false;
+  };
+  Popover.prototype.inElement = function (target, elements) {
+    return $.map(elements, function (element) {
+        return target.closest(element).length || target.is(element);
+      }).some(function (val) {
+        return val;
+      });
+  };
+  Popover.prototype.clickOutside = function (evnt) {
+    var $target = $(evnt.target);
+
+    if (!this.inElement($target, [this.popover.tip(), this.$el])) {
+      this.close();
+    }
   };
   Popover.prototype.displayToggle = function (evnt) {
     evnt.preventDefault();
