@@ -77,6 +77,7 @@ def contributed_services():
       service('systems', models.System),
       service('processes', models.Process),
     service('notification_config', models.NotificationConfig),
+    service('issues', models.Issue),
     ]
 
 

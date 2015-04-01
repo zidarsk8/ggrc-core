@@ -7,6 +7,7 @@ permissions = {
     "read": [
         "Request",
         "ControlAssessment",
+        "Issues",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -27,6 +28,7 @@ permissions = {
     "create": [
         "Request",
         "ControlAssessment",
+        "Issues",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -66,6 +68,7 @@ permissions = {
             "condition": "is"
         },
         "ControlAssessment",
+        "Issues",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",

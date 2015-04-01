@@ -21,6 +21,9 @@
       %link{ rel:'stylesheet', type:'text/css', href:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 
+  %body
+    -block body
+
     %script
       GGRC = window.GGRC || {};
       -include "scripts/tracker-prefix.js"
@@ -87,4 +90,3 @@
 
     -#%link{ 'href': "http://fonts.googleapis.com/css?family=PT+Sans", :rel => "stylesheet", :type => "text/css" }
 
-  -block body
