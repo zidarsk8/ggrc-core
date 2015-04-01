@@ -885,8 +885,7 @@ Mustache.registerHelper("using", function (options) {
 });
 
 Mustache.registerHelper("with_mapping", function (binding, options) {
-  var refresh_queue = new RefreshQueue()
-    , context = arguments.length > 2 ? resolve_computed(options) : this
+  var context = arguments.length > 2 ? resolve_computed(options) : this
     , frame = new can.Observe()
     , loader
     , stack;
@@ -1859,6 +1858,35 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
     return options.inverse(options.contexts);
   }
 });
+Mustache.registerHelper('get_persons', function (id, prop, options) {
+  return CMS.Models.Person.findInCacheById(resolve_computed(id)).attr(prop);
+});
+
+Mustache.registerHelper('last_approved', function (instance, options) {
+  var loader = instance.get_binding('approval_tasks'),
+      frame = new can.Observe();
+
+  frame.attr(instance, loader.list);
+  function finish(list) {
+    var item;
+    list = list.serialize();
+    if (list.length > 1) {
+      var biggest = Math.max.apply(Math, list.map(function (item) {
+            return item.instance.id;
+          }));
+      item = list.filter(function (item) {
+        return item.instance.id === biggest;
+      });
+    }
+    item = item ? item[0] : list[0];
+    return options.fn(options.contexts.add(item));
+  }
+  function fail(error) {
+    return options.inverse(options.contexts.add({error: error}));
+  }
+
+  return defer_render('span', { done : finish, fail : fail }, loader.refresh_instances());
+});
 
 Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
   review_task = Mustache.resolve(review_task);
@@ -1868,7 +1896,7 @@ Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
 });
 
 Mustache.registerHelper("with_review_task", function (options) {
-  var tasks = options.contexts.attr('current_object_review_tasks');
+  var tasks = options.contexts.attr('approval_tasks');
   tasks = Mustache.resolve(tasks);
   if (tasks) {
     for (i = 0; i < tasks.length; i++) {
