@@ -13,12 +13,18 @@ can.Component.extend({
   },
   events: {
     'a click': function() {
+      if (this.scope.loading) {
+        return;
+      }
+
       this.generate_control_assessments(
         this.scope.audit.get_binding("program_controls").list
       );
     },
 
     generate_control_assessments: function(controls) {
+      this._enter_loading_state();
+
       var refresh_assessments = this._refresh_assessments();
 
       refresh_assessments.then(function() {
@@ -52,7 +58,7 @@ can.Component.extend({
           return def;
         }.bind(this))).promise();
 
-        done.then(this._notify);
+        done.then(this._notify.bind(this));
       }.bind(this));
     },
 
@@ -92,6 +98,8 @@ can.Component.extend({
     },
 
     _notify: function() {
+      this._exit_loading_state();
+
       var assessments = arguments,
         count = _.filter(assessments, function(assessment) {
           return !_.isError(assessment) && !_.isNull(assessment);
@@ -118,6 +126,25 @@ can.Component.extend({
       }
 
       $(document.body).trigger("ajax:flash", msg);
+    },
+
+    _enter_loading_state: function () {
+      var $i = this.element.find("a > i"),
+          icon = $i.attr("class");
+      
+      $i.attr("class", "grcicon-loading");
+      $(document.body).trigger("ajax:flash", 
+                               {warning: "Generating Control Assessments"});
+
+      this.scope.icon = icon;
+      this.scope.loading = true;
+    },
+
+    _exit_loading_state: function () {
+      this.element.find("a > i")
+            .attr("class", this.scope.icon);
+
+      this.scope.loading = false;
     }
   }
 });
