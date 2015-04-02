@@ -55,7 +55,7 @@ kept around after they are released.
 
 Changes made to release are periodically merged back into develop. Release
 branch should never be ahead of develop.
- 
+
 Release branches are never deleted.
 
 
@@ -77,7 +77,7 @@ The base for a hotfix branch is always the current release branch:
 One branch per epic. These branches allow large work items to be developed in
 isolation over multiple sprints without putting either the main or release
 branch in an inconsistent and intermediate state.
-  
+
 The difference between epic and feature branches is that epic branches have
 their own appengine instance while feature branches do not. Having their own
 App Engine instance allows acceptance testing on the epic while the work
@@ -90,9 +90,9 @@ instance.**
 
 
 ## Tagging
-  
+
 We tag release branches after QA is finished and we are ready to deploy to
 production. The name of the tag should include the full version number (e.g.
 `v0.9.0.6591`).
 
-![branch diagram](branch_management.png)
+![branch diagram](res/branch_management.png)

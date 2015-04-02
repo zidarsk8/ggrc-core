@@ -759,11 +759,28 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
 });
 
 Mustache.registerHelper("schemed_url", function (url) {
-  if (url) {
-    url = url.isComputed? url(): url;
-    if (url && !url.match(/^[a-zA-Z]+:/)) {
-      return (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
-    }
+  var domain, max_label, url_split;
+
+  url = Mustache.resolve(url);
+  if (!url) {
+    return;
+  }
+
+  if (!url.match(/^[a-zA-Z]+:/)) {
+    url = (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
+  }
+
+  // Make sure we can find the domain part of the url:
+  url_split = url.split('/');
+  if (url_split.length < 3) {
+    return 'javascript://';
+  }
+
+  domain = url_split[2];
+  max_label = _.max(domain.split('.').map(function(u) { return u.length; }));
+  if (max_label > 63 || domain.length > 253) {
+    // The url is invalid and might crash user's chrome tab
+    return "javascript://";
   }
   return url;
 });

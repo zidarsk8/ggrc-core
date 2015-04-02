@@ -148,9 +148,11 @@ def admin():
     raise Forbidden()
   return render_template("admin/index.haml")
 
+
 @app.route("/background_task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
   return make_task_response(id_task)
+
 
 def contributed_object_views():
   from ggrc import models
@@ -168,6 +170,7 @@ def contributed_object_views():
       object_view(models.Clause),
       object_view(models.Section),
       object_view(models.Control),
+      object_view(models.ControlAssessment),
       object_view(models.Objective),
       object_view(models.System),
       object_view(models.Process),
@@ -180,7 +183,8 @@ def contributed_object_views():
       object_view(models.DataAsset),
       object_view(models.Person),
       object_view(models.Vendor),
-      ]
+      object_view(models.Issue),
+  ]
 
 
 def all_object_views():

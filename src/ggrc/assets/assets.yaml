@@ -34,6 +34,15 @@ dashboard-js-files:
   - bootstrap/wysihtml5.js
   - moment.js
   - permission.js
+  - plugins/persistent_notifier.js
+  - ggrc_base.js
+  - plugins/wysiwyg.js
+  - plugins/autocomplete.js
+  - plugins/ajax_extensions.js
+  - plugins/canjs_extensions.js
+  - plugins/openclose.js
+  - plugins/tooltip.js
+  - plugins/popover.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js
@@ -70,6 +79,7 @@ dashboard-js-files:
   - controllers/unmap_modal_controller.js
   - controllers/mapping_count_controller.js
   - controllers/info_pin_controller.js
+  - controllers/assessment_generator.js
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
@@ -122,6 +132,7 @@ dashboard-js-template-files:
   - base_objects/tree_header.mustache
   - base_objects/tree_view_filter.mustache
   - base_objects/filter_trigger.mustache
+  - base_objects/generate_assessments_button.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pin.mustache
@@ -144,6 +155,7 @@ dashboard-js-template-files:
   - controls/tree.mustache
   - control_assessments/modal_content.mustache
   - control_assessments/tree_footer.mustache
+  - issues/modal_content.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache

@@ -727,6 +727,7 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
   mixins : ["ownable", "contactable"],
   is_custom_attributable: true,
   attributes : {
+    control : "CMS.Models.Control.stub",
     context : "CMS.Models.Context.stub",
     modified_by : "CMS.Models.Person.stub",
     custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
@@ -753,6 +754,36 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
       new GGRC.ListLoaders.MappingResult(this, binding)
     );
   }
+});
+
+can.Model.Cacheable("CMS.Models.Issue", {
+  root_object : "issue",
+  root_collection : "issues",
+  findOne : "GET /api/issues/{id}",
+  update : "PUT /api/issues/{id}",
+  destroy : "DELETE /api/issues/{id}",
+  create : "POST /api/issues",
+  mixins : ["ownable", "contactable"],
+  is_custom_attributable: true,
+  attributes : {
+    context : "CMS.Models.Context.stub",
+    modified_by : "CMS.Models.Person.stub",
+    custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
+    start_date: "date",
+    end_date: "date"
+  },
+  init : function() {
+    this._super && this._super.apply(this, arguments);
+    this.validatePresenceOf("control");
+    this.validatePresenceOf("audit");
+    this.validatePresenceOf("program");
+    this.validatePresenceOf("control_assessment");
+    this.validateNonBlank("title");
+  }
+}, {
+  object_model: can.compute(function() {
+    return CMS.Models[this.attr("object_type")];
+  }),
 });
 
 

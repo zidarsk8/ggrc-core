@@ -23,7 +23,6 @@ can.Observe("CMS.ModelHelpers.CycleTask", {
         type: owner.type,
       };
     });
-
     return new CMS.Models.TaskGroupTask({
       task_group: that.task_group,
       title: that.title,

@@ -99,14 +99,8 @@
       var that = this;
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank("title");
-      this.validate([
-        "start_date",
-        "end_date",
-        "relative_end_month",
-        "relative_end_day",
-        "relative_start_month",
-        "relative_start_day"
-      ], function(newVal, prop){
+      this.validate('relative_start_day relative_start_month relative_end_day relative_end_month start_date end_date'.split(' '),
+        function (newVal, prop) {
         var that = this,
          workflow = GGRC.page_instance(),
          dates_are_valid = true;
@@ -118,7 +112,7 @@
               && that.end_date && 0 < that.end_date.length;
         }
 
-        if(!dates_are_valid) {
+        if (!dates_are_valid) {
           return "Start and/or end date is invalid";
         }
       });
@@ -141,43 +135,28 @@
   }, {
     init : function() {
       this._super && this._super.apply(this, arguments);
-      this.bind("task_group", function(ev, newVal) {
-        var that = this;
-        if(!newVal)
+      this.bind('task_group', function (ev, newTask) {
+        if (!newTask) {
           return;
+        }
+        newTask = newTask.reify();
+        var task,
+            taskGroup = newTask.get_mapping('task_group_tasks').slice(0);
 
-        newVal = newVal.reify();
+        do {
+          task = taskGroup.splice(-1)[0];
+          task = task && task.instance;
+        } while (task === this);
 
-        new RefreshQueue().enqueue(newVal).trigger().then(function() {
-          var tgt,
-              tgts = newVal.task_group_tasks.slice(0);
-
-          do {
-            tgt = tgts.splice(tgts.length - 1, 1)[0];
-            tgt = tgt && tgt.reify();
-          } while (tgt === that);
-
-          if(!tgt)
-            return new $.Deferred().reject("no existing task group task");
-          else
-            return new RefreshQueue().enqueue(tgt).trigger();
-        }).then(function(tgts) {
-          var tgt = tgts[0];
-
-          can.each(
-            ["relative_start_day",
-             "relative_start_month",
-             "relative_end_day",
-             "relative_end_month",
-             "start_date",
-             "end_date"],
-            function(prop) {
-              if(tgt[prop] && !that[prop]) {
-                that.attr(prop, tgt.attr(prop) instanceof Date ? new Date(tgt[prop]) : tgt[prop]);
-              }
+        if (!task) {
+          return;
+        }
+        can.each('relative_start_day relative_start_month relative_end_day relative_end_month start_date end_date'.split(' '),
+          function (prop) {
+            if (task[prop] && !this[prop]) {
+              this.attr(prop, task.attr(prop) instanceof Date ? new Date(task[prop]) : task[prop]);
             }
-          );
-        });
+        }, this);
       });
     },
 
