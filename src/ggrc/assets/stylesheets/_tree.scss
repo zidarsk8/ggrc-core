@@ -1396,3 +1396,20 @@ ul.new-tree {
     color:$error;
   }
 }
+
+.show-in-tree {
+  font-size: 11px;
+  span {
+    @include oneline();
+    display: block;
+  }
+  .red {
+    color: $red;
+  }
+  .green {
+    color: $green;
+  }
+  .dark-gray {
+    color: $textGray;
+  }
+}
