@@ -130,7 +130,9 @@ can.Control("CMS.Controllers.InfoPin", {
 
     if (type === 'deselect') {
       // TODO: Make some direct communication between the components
-      return $('.widget-active .cms_controllers_tree_view').control().deselect();
+      //       and make sure only one widget has "widget-active" class
+      el.find('[rel=tooltip]').data('tooltip').hide();
+      return $('.widget-area .widget:visible').find('.cms_controllers_tree_view').control().deselect();
     }
     this.element.find('.pin-action i').css({'opacity': 0.25});
 
