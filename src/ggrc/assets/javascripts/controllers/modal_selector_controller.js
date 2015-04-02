@@ -1495,7 +1495,10 @@
         this.options.all_models = all_models;
 
         // We want All objects to be default - CORE-723
-        this.options.default_option_descriptor = 'AllObjects';
+        // But only if we actually have mutliple options - CORE-1581
+        if (all_models.length > 1) {
+          this.options.default_option_descriptor = 'AllObjects';
+        }
         // hard code some of the submenu
         // this.options.option_type_menu_2 = this.options.option_type_menu;
         this.options.option_type_menu_2 = can.map(
