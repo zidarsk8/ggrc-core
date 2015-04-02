@@ -83,14 +83,14 @@
     }
   });
   var confirmleaving = function confirmleaving() {
-      return window.confirm("There are operations in progress.  Are you sure you want to leave the page?");
+      return "There are operations in progress. Are you sure you want to leave the page?";
     },
     notifier = new PersistentNotifier({
       while_queue_has_elements: function() {
-        $(window).on("unload", confirmleaving);
+        $(window).on("beforeunload", confirmleaving);
       },
       when_queue_empties: function() {
-        $(window).off("unload", confirmleaving);
+        $(window).off("beforeunload", confirmleaving);
       },
       name: "GGRC/window"
     });
