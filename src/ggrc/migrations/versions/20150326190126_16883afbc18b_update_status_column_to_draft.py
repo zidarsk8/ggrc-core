@@ -3,15 +3,15 @@
 
 """Update status column to draft
 
-Revision ID: 16883afbc18b
-Revises: 56bda17c92ee
-Create Date: 2015-03-26 19:01:26.702662
+Revision ID: 5180ce718082
+Revises: 1019280358f0
+Create Date: 2015-04-02 15:56:09.861162
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '16883afbc18b'
-down_revision = '56bda17c92ee'
+revision = '5180ce718082'
+down_revision = '1019280358f0'
 
 from alembic import op
 import sqlalchemy as sa
