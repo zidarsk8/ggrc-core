@@ -1858,9 +1858,6 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
     return options.inverse(options.contexts);
   }
 });
-Mustache.registerHelper('get_persons', function (id, prop, options) {
-  return CMS.Models.Person.findInCacheById(resolve_computed(id)).attr(prop);
-});
 
 Mustache.registerHelper('last_approved', function (instance, options) {
   var loader = instance.get_binding('approval_tasks'),
