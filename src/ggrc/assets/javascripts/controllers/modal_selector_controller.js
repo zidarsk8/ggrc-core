@@ -1237,7 +1237,7 @@
 
   });
 
-  var ModalOptionDescriptor = can.Construct({
+  GGRC.ModalOptionDescriptor = can.Construct({
       model : null
     , model_display : "Objects"
     , join_model : null
@@ -1349,7 +1349,7 @@
         }
 
       option_descriptors[option_model_name] =
-        ModalOptionDescriptor.from_join_model(
+        GGRC.ModalOptionDescriptor.from_join_model(
             descriptor.model_name
           , descriptor.option_attr
           , option_model_name
@@ -2170,7 +2170,7 @@
       }
 
       option_descriptors[option_model_name] =
-        ModalOptionDescriptor.from_join_model(
+        GGRC.ModalOptionDescriptor.from_join_model(
             descriptor.model_name
           , descriptor.option_attr
           , option_model_name
