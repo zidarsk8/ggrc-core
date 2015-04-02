@@ -1371,3 +1371,23 @@ p {
   display: inline-block;
   margin-top: 6px;
 }
+
+.custom-attr-table {
+  .table {
+    td.centered,
+    th.centered {
+      text-align: center;
+    }
+    .checkbox-wrap {
+      input {
+        margin-top: 3px;
+        margin-bottom: 0;
+      }
+    }
+    tbody {
+      td {
+        vertical-align: top;
+      }
+    }
+  }
+}
