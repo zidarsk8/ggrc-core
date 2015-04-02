@@ -7,6 +7,7 @@ permissions = {
     "read": [
         "Request",
         "ControlAssessment",
+        "Issues",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -27,6 +28,7 @@ permissions = {
     "create": [
         "Request",
         "ControlAssessment",
+        "Issues",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -50,6 +52,7 @@ permissions = {
     "update": [
         "Request",
         "ControlAssessment",
+        "Issues",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -69,6 +72,7 @@ permissions = {
     "delete": [
         "UserRole",
         "ControlAssessment",
+        "Issues",
         "ObjectControl",
         "ObjectDocument",
         "ObjectObjective",

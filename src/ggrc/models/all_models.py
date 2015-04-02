@@ -50,6 +50,7 @@ from .meeting import Meeting
 from .background_task import BackgroundTask
 from .notification import NotificationConfig, Notification, NotificationObject, NotificationRecipient
 from .notification import CalendarEntry
+from .issue import Issue
 
 #TODO: This isn't currently used
 #from .relationship_type import RelationshipType
@@ -125,7 +126,8 @@ all_models = [
   NotificationRecipient,
   NotificationObject,
   CalendarEntry,
-  ]
+  Issue
+]
 
 __all__ = [model.__name__ for model in all_models]
 
