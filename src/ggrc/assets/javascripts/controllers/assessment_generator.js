@@ -22,8 +22,9 @@ can.Component.extend({
       );
     },
 
-    generate_control_assessments: function(controls) {
-      this._enter_loading_state();
+    generate_control_assessments: function(controls) {      
+      var def = new $.Deferred();
+      this._enter_loading_state(def);
 
       var refresh_assessments = this._refresh_assessments();
 
@@ -34,8 +35,6 @@ can.Component.extend({
           });
 
         var done = $.when.apply($, can.map(controls, function(control) {
-          var def = new $.Deferred();
-
           if (!_.includes(ignore_controls, control.instance.id)) {
             control.instance
               .refresh()
@@ -128,7 +127,7 @@ can.Component.extend({
       $(document.body).trigger("ajax:flash", msg);
     },
 
-    _enter_loading_state: function () {
+    _enter_loading_state: function (deferred) {
       var $i = this.element.find("a > i"),
           icon = $i.attr("class");
       
@@ -138,6 +137,7 @@ can.Component.extend({
 
       this.scope.icon = icon;
       this.scope.loading = true;
+      GGRC.delay_leaving_page_until(deferred);
     },
 
     _exit_loading_state: function () {
