@@ -15,29 +15,30 @@ from .track_object_state import HasObjectState, track_state_for_class
 from ggrc.models.reflection import PublishOnly
 
 
-class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documentable,
-                        Personable, Timeboxed, Ownable, Relatable,
-                        BusinessObject, db.Model):
-  __tablename__ = 'control_assessments'
+class Issue(HasObjectState, TestPlanned, CustomAttributable, Documentable,
+            Personable, Timeboxed, Ownable, Relatable,
+            BusinessObject, db.Model):
 
-  design = deferred(db.Column(db.String), 'ControlAssessment')
-  operationally = deferred(db.Column(db.String), 'ControlAssessment')
+  __tablename__ = 'issues'
 
-  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
-  control = db.relationship('Control', foreign_keys=[control_id])
+  control = {}
   audit = {}
+  program = {}
+  control_assessment = {}
 
   # REST properties
   _publish_attrs = [
-      'design',
-      'operationally',
       PublishOnly('audit'),
-      'control'
+      PublishOnly('control'),
+      PublishOnly('program'),
+      PublishOnly('control_assessment')
   ]
 
   _relationship_attrs = [
       'audit',
       'control',
+      'program',
+      'control_assessment',
   ]
 
-track_state_for_class(ControlAssessment)
+track_state_for_class(Issue)

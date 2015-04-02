@@ -732,10 +732,11 @@
 
         this.init_menu();
         this.init_context();
-        if (this.options.option_descriptors[this.constructor.last_selected_option_type])
+        if (this.options.option_descriptors[this.constructor.last_selected_option_type]) {
           this.set_option_descriptor(this.constructor.last_selected_option_type);
-        else
+        } else {
           this.set_option_descriptor(this.options.default_option_descriptor);
+        }
         this.init_bindings();
         this.init_view();
         this.init_data();
@@ -1236,7 +1237,7 @@
 
   });
 
-  ModalOptionDescriptor = can.Construct({
+  GGRC.ModalOptionDescriptor = can.Construct({
       model : null
     , model_display : "Objects"
     , join_model : null
@@ -1348,7 +1349,7 @@
         }
 
       option_descriptors[option_model_name] =
-        ModalOptionDescriptor.from_join_model(
+        GGRC.ModalOptionDescriptor.from_join_model(
             descriptor.model_name
           , descriptor.option_attr
           , option_model_name
@@ -1443,111 +1444,71 @@
 
     , init_menu: function() {
         var menu,
-          all_models = [],
-          lookup,
-          selected_object =  this.options.selected_object.type;
-
-        if (selected_object === "TaskGroup") { //workflow/TaskGroup don't have People/Groups sub category
-          lookup = {
+            all_models = [],
+            lookup = {
               governance: 0
             , entities: 1
             , business: 2
-          };
-          if (!this.options.option_type_menu) {
+            },
             menu = [
-                { category: "Governance"
-                , items: []
-                }
-              , { category: "People/Groups"
-                , items: []
-                }
-              , { category: "Assets/Business"
-                , items: []
-                }
-              ];
+              { category: 'Governance', items: [] }
+            , { category: 'People/Groups', items: [] }
+            , { category: 'Assets/Business', items: [] }
+            ],
+            all_objects = {
+              model_name: 'AllObjects'
+            , model_display: 'All Objects'
+            },
+            descriptor_all_objects = {
+              column_view: '/static/mustache/selectors/multitype_multiselect_option_column.mustache'
+            , detail_view: '/static/mustache/selectors/multitype_option_detail.mustache'
+            , related_table_plural: 'AllObjects'
+            , related_table_singular: 'AllObject'
+            , related_model_singular: 'AllObject'
+            , new_object_title: 'AllObject'
+            , items_view: '/static/mustache/selectors/multitype_multiselect_option_items.mustache'
+            , model: 'AllObject'
+            },
+            selected_object =  this.options.selected_object.type;
 
-            //Add All Objects at the top of the list
-            menu[0].items.push({
-              model_name: "AllObjects",
-              model_display: "All Objects"
+        if (!this.options.option_type_menu) {
+          //Add All Objects at the top of the list
+          menu[0].items.push(all_objects);
+
+          can.each(this.options.option_descriptors, function (descriptor, name) {
+            var model = descriptor.model,
+                category = model.category;
+
+            if (category === 'workflow' || category === 'undefined') {
+              return;
+            }
+            menu[lookup[category] || 0].items.push({
+              model_name: model.shortName
+            , model_display: model.title_plural
             });
-
-            can.each(this.options.option_descriptors, function(descriptor, name) {
-              if (descriptor.model.category == "workflow" ||
-                  descriptor.model.category == "undefined"){
-                return;
-              }
-              else{
-                menu[lookup[descriptor.model.category] || 0].items.push({
-                    model_name: descriptor.model.shortName
-                  , model_display: descriptor.model.title_plural
-                });
-                //Save the model names for All Object search
-                all_models.push(descriptor.model.shortName);
-              }
-            });
-
-            this.options.option_type_menu = menu;
-          }
-
+            // Save the model names for All Object search
+            all_models.push(model.shortName);
+          });
+          this.options.option_type_menu = menu;
         }
-        else {
-          lookup = {
-              governance: 0
-            , entities: 1
-            , business: 2
-          };
-
-          if (!this.options.option_type_menu) {
-            menu = [
-                { category: "Governance"
-                , items: []
-                }
-              , { category: "People/Groups"
-                , items: []
-                }
-              , { category: "Assets/Business"
-                , items: []
-                }
-              ];
-
-            //Add All Objects at the top of the list
-            menu[0].items.push({
-              model_name:"AllObjects",
-              model_display:"All Objects"
-            });
-
-            can.each(this.options.option_descriptors, function(descriptor) {
-              if (descriptor.model.category == "workflow" || descriptor.model.category == "undefined"){
-                return;
-              }
-              else{
-                menu[lookup[descriptor.model.category] || 0].items.push({
-                    model_name: descriptor.model.shortName
-                  , model_display: descriptor.model.title_plural
-                });
-                //Save the model names for All Object search
-                all_models.push(descriptor.model.shortName);
-              }
-            });
-
-            this.options.option_type_menu = menu;
-          }
-        }
-
+        this.options.option_descriptors['AllObjects'] = descriptor_all_objects;
         this.options.all_models = all_models;
-        //hard code some of the submenu
-        //this.options.option_type_menu_2 = this.options.option_type_menu;
-        this.options.option_type_menu_2 = can.map([
-              "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
-              "Person", "System", "Process", "DataAsset", "Product", "Project", "Facility" , "Market"
-              ],
-              function(key) {
-                return CMS.Models[key];
-              }
-            );
-    }
 
+        // We want All objects to be default - CORE-723
+        // But only if we actually have mutliple options - CORE-1581
+        if (all_models.length > 1) {
+          this.options.default_option_descriptor = 'AllObjects';
+        }
+        // hard code some of the submenu
+        // this.options.option_type_menu_2 = this.options.option_type_menu;
+        this.options.option_type_menu_2 = can.map(
+            Array.prototype.concat.call([],
+              'Program Regulation Policy Standard Contract Clause Section Objective Control'.split(' '),
+              'Person System Process DataAsset Product Project Facility Market'.split(' ')
+            ), function (key) {
+              return CMS.Models[key];
+        });
+    }
     , init_context: function() {
       if (!this.context) {
         // Calculate the total number of options
@@ -1904,7 +1865,7 @@
         // For All Objects, make sure to load only those objects in the list of all_models
         // Multilist loader might load objects like g-drive folder and context
         // The Search list loader will filter those objects
-        if(selected === "AllObjects") {
+        if (selected === "AllObjects") {
             filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
               return GGRC.Models.Search.search_for_types(
                 term,
@@ -1915,7 +1876,7 @@
                 });
             }).attach(ctx.owner || {}));
         }
-        else if(ctx.owner || term){
+        else if (ctx.owner || term) {
           filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
               return GGRC.Models.Search.search_for_types(
                 term,
@@ -1973,21 +1934,6 @@
     }
 
     , set_option_descriptor: function(option_type) {
-      //Set option descriptor for all objects
-      if(option_type === "AllObjects") {
-        var all_descriptor = {
-          column_view : "/static/mustache/selectors/multitype_multiselect_option_column.mustache",
-          detail_view: "/static/mustache/selectors/multitype_option_detail.mustache",
-          related_table_plural: "AllObjects",
-          related_table_singular: "AllObject",
-          related_model_singular: "AllObject",
-          new_object_title: "AllObject",
-          items_view: "/static/mustache/selectors/multitype_multiselect_option_items.mustache",
-          model: "AllObject"
-        };
-        this.options.option_descriptors["AllObjects"] = all_descriptor;
-      }
-
       var self = this
         , descriptor = this.options.option_descriptors[option_type]
         ;
@@ -2212,10 +2158,11 @@
           || !(descriptor instanceof GGRC.ListLoaders.ProxyListLoader))
         return;
 
-      if (!option_set.default_option_descriptor)
+      if (!option_set.default_option_descriptor) {
         option_set.default_option_descriptor = option_model_name;
+      }
 
-      if (!extra_options){
+      if (!extra_options) {
         extra_options = {
             column_view : column_view
           , items_view  : item_view
@@ -2223,7 +2170,7 @@
       }
 
       option_descriptors[option_model_name] =
-        ModalOptionDescriptor.from_join_model(
+        GGRC.ModalOptionDescriptor.from_join_model(
             descriptor.model_name
           , descriptor.option_attr
           , option_model_name
