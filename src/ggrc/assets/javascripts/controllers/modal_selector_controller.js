@@ -1237,7 +1237,7 @@
 
   });
 
-  var ModalOptionDescriptor = can.Construct({
+  GGRC.ModalOptionDescriptor = can.Construct({
       model : null
     , model_display : "Objects"
     , join_model : null
@@ -1349,7 +1349,7 @@
         }
 
       option_descriptors[option_model_name] =
-        ModalOptionDescriptor.from_join_model(
+        GGRC.ModalOptionDescriptor.from_join_model(
             descriptor.model_name
           , descriptor.option_attr
           , option_model_name
@@ -1495,7 +1495,10 @@
         this.options.all_models = all_models;
 
         // We want All objects to be default - CORE-723
-        this.options.default_option_descriptor = 'AllObjects';
+        // But only if we actually have mutliple options - CORE-1581
+        if (all_models.length > 1) {
+          this.options.default_option_descriptor = 'AllObjects';
+        }
         // hard code some of the submenu
         // this.options.option_type_menu_2 = this.options.option_type_menu;
         this.options.option_type_menu_2 = can.map(
@@ -2167,7 +2170,7 @@
       }
 
       option_descriptors[option_model_name] =
-        ModalOptionDescriptor.from_join_model(
+        GGRC.ModalOptionDescriptor.from_join_model(
             descriptor.model_name
           , descriptor.option_attr
           , option_model_name
