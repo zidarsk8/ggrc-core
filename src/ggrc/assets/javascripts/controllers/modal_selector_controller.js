@@ -1122,8 +1122,16 @@
 
        if (instance.destination) {
          return instance.destination;
+       }else if (!instance.type) {
+         // this happens when mapping directives to programs, for instance, sometimes
+         if (instance.directive) {
+           return instance.directive;
+         }else{
+           // without a type, there's nothing we can do
+           return null;
+         }
        }else{
-         var types = can.spaceCamelCase(join_instance[0].type).split(" "),
+         var types = can.spaceCamelCase(instance.type).split(" "),
              parent_type = this.options.binding.instance.type,
              mapped_type;
 
@@ -1146,6 +1154,10 @@
              .closest(".cms_controllers_tree_view_node")
              .control(),
          mapped = this._get_mapped(join_instance);
+
+     if (!mapped) {
+       return;
+     }
 
      hash += [tree_controller
               ? tree_controller.hash_fragment()
@@ -1237,7 +1249,7 @@
 
   });
 
-  var ModalOptionDescriptor = can.Construct({
+  GGRC.ModalOptionDescriptor = can.Construct({
       model : null
     , model_display : "Objects"
     , join_model : null
@@ -1349,7 +1361,7 @@
         }
 
       option_descriptors[option_model_name] =
-        ModalOptionDescriptor.from_join_model(
+        GGRC.ModalOptionDescriptor.from_join_model(
             descriptor.model_name
           , descriptor.option_attr
           , option_model_name
@@ -1495,7 +1507,10 @@
         this.options.all_models = all_models;
 
         // We want All objects to be default - CORE-723
-        this.options.default_option_descriptor = 'AllObjects';
+        // But only if we actually have mutliple options - CORE-1581
+        if (all_models.length > 1) {
+          this.options.default_option_descriptor = 'AllObjects';
+        }
         // hard code some of the submenu
         // this.options.option_type_menu_2 = this.options.option_type_menu;
         this.options.option_type_menu_2 = can.map(
@@ -2167,7 +2182,7 @@
       }
 
       option_descriptors[option_model_name] =
-        ModalOptionDescriptor.from_join_model(
+        GGRC.ModalOptionDescriptor.from_join_model(
             descriptor.model_name
           , descriptor.option_attr
           , option_model_name
