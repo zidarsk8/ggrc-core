@@ -5,5 +5,4 @@
 
 
 from .email import *
-from .calendar import *
 

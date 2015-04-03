@@ -48,8 +48,7 @@ from .request import Request
 from .response import Response, DocumentationResponse, InterviewResponse, PopulationSampleResponse
 from .meeting import Meeting
 from .background_task import BackgroundTask
-from .notification import NotificationConfig, Notification, NotificationObject, NotificationRecipient
-from .notification import CalendarEntry
+from .notification import NotificationConfig
 from .issue import Issue
 
 #TODO: This isn't currently used
@@ -122,10 +121,6 @@ all_models = [
   Event,
   BackgroundTask,
   NotificationConfig,
-  Notification,
-  NotificationRecipient,
-  NotificationObject,
-  CalendarEntry,
   Issue
 ]
 

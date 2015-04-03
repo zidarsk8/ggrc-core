@@ -872,4 +872,3 @@ ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
 ROLE_DECLARATIONS = WorkflowRoleDeclarations()
 ROLE_IMPLICATIONS = WorkflowRoleImplications()
 
-from ggrc_workflows.notification import notify_email_digest, notify_email_deferred
