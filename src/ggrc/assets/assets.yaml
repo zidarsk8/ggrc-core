@@ -64,6 +64,7 @@ dashboard-js-files:
   - models/recently_viewed_object.js
   - models/search.js
   - models/audit_models.js
+  - models/issue.js
   - models/notification_config.js
   - controllers/filterable_controller.js
   - controllers/dashboard_widgets_controller.js

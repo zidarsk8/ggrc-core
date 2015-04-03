@@ -155,12 +155,15 @@ def create_mappings(obj, src):
   # TODO: Handle multiple mapping types (owners), only relationships mapping supported at this point
   for attr in obj._relationship_attrs:
     dest = src[attr]
+    if dest is None:
+      continue
     r = Relationship()
     r.source_id = obj.id
     r.source_type = obj.type
     r.destination_id = dest['id']
     r.destination_type = dest['type']
     db.session.add(r)
+
 
 def update_memcache_before_commit(context, modified_objects, expiry_time):
   """
