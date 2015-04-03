@@ -16,84 +16,61 @@ can.Component.extend({
       if (this.scope.loading) {
         return;
       }
-
-      this.generate_control_assessments(
-        this.scope.audit.get_binding("program_controls").list
-      );
+      this._generate_control_assessments();
     },
 
-    generate_control_assessments: function(controls) {      
-      var def = new $.Deferred();
-      this._enter_loading_state(def);
+    _generate_control_assessments: function(controls) {
+      var assessments_list = this.scope.audit.get_binding("related_control_assessments").list,
+          controls_list = this.scope.audit.get_binding("program_controls").list,
+          assessments_dfd = this._refresh(assessments_list),
+          controls_dfd = this._refresh(controls_list),
+          ignore_controls, dfd;
 
-      var refresh_assessments = this._refresh_assessments();
-
-      refresh_assessments.then(function() {
-        var control_assessments = arguments,
-          ignore_controls = _.map(control_assessments, function(ca) {
-            return ca.control.id;
-          });
-
-        var done = $.when.apply($, can.map(controls, function(control) {
-          if (!_.includes(ignore_controls, control.instance.id)) {
-            control.instance
-              .refresh()
-              .then(function(control) {
-                this._generate(control)
-                  .done(function(control_assessment) {
-                    def.resolve(control_assessment);
-                  })
-                  .fail(function() {
-                    def.resolve(new Error());
-                  });
-              }.bind(this))
-              .fail(function() {
-                def.resolve(new Error());
-              });
-          } else {
-            def.resolve(null);
-          }
-
-          return def;
-        }.bind(this))).promise();
-
-        done.then(this._notify.bind(this));
-      }.bind(this));
-    },
-
-    // promise map pattern found on http://stackoverflow.com/questions/20688803/jquery-deferred-in-each-loop
-    _refresh_assessments: function() {
-      return $.when.apply($, can.map(this.scope.audit.get_binding("related_control_assessments").list, function(control_assessment) {
-        var def = new $.Deferred();
-        control_assessment.instance.refresh().then(function(control_assessment) {
-          def.resolve(control_assessment);
+      dfd = $.when(assessments_dfd, controls_dfd).then(function (assessments, controls) {
+        ignore_controls = _.map(assessments, function(ca) {
+          return ca.control.id;
         });
-        return def;
-      })).promise();
+        return $.when.apply($, can.map(controls, function(control) {
+          if (_.includes(ignore_controls, control.id)) {
+            return;
+          }
+          return this._generate(control);
+        }.bind(this)));
+      }.bind(this));
+      this._enter_loading_state(dfd);
+      dfd.always(this._notify.bind(this));
     },
 
-    _generate: function(control, count) {
-      count = typeof count === undefined ? 0 : count;
+    _refresh: function (bindings) {
+      var refresh_queue = new RefreshQueue();
+      can.each(bindings, function(binding) {
+          refresh_queue.enqueue(binding.instance);
+      });
+      return refresh_queue.trigger();
+    },
 
-      var assessment = new CMS.Models.ControlAssessment(
-        {
+    _generate: function(control, count, dfd) {
+      count = count || 0;
+      dfd = dfd || new $.Deferred();
+
+      var assessment = new CMS.Models.ControlAssessment({
           audit: this.scope.audit,
-          control: control,
+          control: control.stub(),
           context: this.scope.audit.context,
           title: control.title + " assessment" + (count ? " " + count : ""),
           test_plan: control.test_plan
-        });
-
-      return assessment
-        .save()
-        .fail(function(error, type, code) {
-          if (code === "FORBIDDEN"
-            && error.responseText.match(/title values must be unique/)) {
-            this.generate(control, count + 1);
-          } else {
-            return assessment;
-          }
-        });
+      });
+      assessment.save().done(function () {
+        dfd.resolve(assessment);
+      }).fail(function (error, type, code) {
+        if (code === "FORBIDDEN"
+          && error.responseText.match(/(title values must be unique)|(Duplicate entry)/)) {
+          this._generate(control, count + 1, dfd);
+        } else {
+          return dfd.reject(error);
+        }
+      }.bind(this));
+      return dfd;
     },
 
     _notify: function() {
@@ -101,10 +78,10 @@ can.Component.extend({
 
       var assessments = arguments,
         count = _.filter(assessments, function(assessment) {
-          return !_.isError(assessment) && !_.isNull(assessment);
+          return  !_.isNull(assessment) && !(assessment.state && assessment.state() === "rejected");
         }).length,
         errors = _.filter(assessments, function(assessment) {
-          return _.isError(assessment);
+          return assessment.state && assessment.state() === "rejected";
         }).length,
         msg;
 
@@ -120,7 +97,7 @@ can.Component.extend({
         }
       } else {
         msg = {
-          error: "An error occured when creating <span class='user-string'>" + errors + "</span> out of " + (errors + count) + " Control Assessments."
+          error: "An error occured when creating Control Assessments."
         };
       }
 
@@ -130,9 +107,9 @@ can.Component.extend({
     _enter_loading_state: function (deferred) {
       var $i = this.element.find("a > i"),
           icon = $i.attr("class");
-      
+
       $i.attr("class", "grcicon-loading");
-      $(document.body).trigger("ajax:flash", 
+      $(document.body).trigger("ajax:flash",
                                {warning: "Generating Control Assessments"});
 
       this.scope.icon = icon;
