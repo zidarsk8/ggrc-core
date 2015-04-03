@@ -96,7 +96,6 @@ dashboard-js-files:
   - apps/business_objects.js
   - apps/dashboard.js
   - apps/custom_attributes.js
-  - roles/roles_modal_controller.js
   - dashboard.js
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
@@ -234,7 +233,6 @@ dashboard-js-template-files:
   - programs/tree.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
-  - roles/modal_content.mustache
   - roles/object_list.mustache
   - sections/info.mustache
   - sections/modal_content.mustache
