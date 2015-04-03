@@ -314,9 +314,11 @@ can.Control("GGRC.Controllers.Modals", {
       }
   }
   , "input:not([data-lookup], isolate-form *), textarea keyup": function (el, ev) {
-    if (el.attr('value').length ||
-      (typeof el.attr('value') !== 'undefined' && el.val().length)) {
-
+    // TODO: If statement doesn't work properly. This is the right one:
+    //       if (el.attr('value').length ||
+    //          (typeof el.attr('value') !== 'undefined' && el.val().length)) {
+    if (el.prop('value').length === 0 ||
+       (typeof el.attr('value') !== 'undefined' && !el.attr('value').length)) {
       this.set_value_from_element(el);
     }
   }
