@@ -759,11 +759,28 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
 });
 
 Mustache.registerHelper("schemed_url", function (url) {
-  if (url) {
-    url = url.isComputed? url(): url;
-    if (url && !url.match(/^[a-zA-Z]+:/)) {
-      return (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
-    }
+  var domain, max_label, url_split;
+
+  url = Mustache.resolve(url);
+  if (!url) {
+    return;
+  }
+
+  if (!url.match(/^[a-zA-Z]+:/)) {
+    url = (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
+  }
+
+  // Make sure we can find the domain part of the url:
+  url_split = url.split('/');
+  if (url_split.length < 3) {
+    return 'javascript://';
+  }
+
+  domain = url_split[2];
+  max_label = _.max(domain.split('.').map(function(u) { return u.length; }));
+  if (max_label > 63 || domain.length > 253) {
+    // The url is invalid and might crash user's chrome tab
+    return "javascript://";
   }
   return url;
 });
@@ -943,7 +960,6 @@ Mustache.registerHelper("person_roles", function (person, scope, options) {
             name: "Superuser"
           });
         }
-
         roles_deferred.resolve(roles);
       });
     });
@@ -1216,6 +1232,29 @@ Mustache.registerHelper("is_allowed", function () {
     ? options.fn(options.contexts || this)
     : options.inverse(options.contexts || this)
     ;
+});
+
+Mustache.registerHelper('any_allowed', function (action, data, options) {
+  var passed = [],
+      hasPassed;
+  data = resolve_computed(data);
+
+  data.forEach(function (item) {
+    passed.push(Permission.is_allowed_any(action, item.model_name));
+  });
+  hasPassed = passed.some(function (val) {
+    return val;
+  });
+  return options[hasPassed ? 'fn' : 'inverse'](options.contexts || this);
+});
+
+Mustache.registerHelper('system_role', function (role, options) {
+  role = role.toLowerCase();
+  // If there is no user, it's same as No Access
+  var user_role = (GGRC.current_user ? GGRC.current_user.system_wide_role : 'no access').toLowerCase();
+      isValid = role === user_role;
+
+  return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
 });
 
 Mustache.registerHelper("is_allowed_all", function (action, instances, options) {
@@ -2262,29 +2301,30 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
   instance = Mustache.resolve(instance);
   instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
 
-  if (!instance)
-    return "";
+  if (!instance) {
+    return '';
+  }
 
   audit = instance instanceof CMS.Models.Request ? instance.attr("audit") : instance;
 
-  if (!audit)
-    return "";  //take no action until audit is available
+  if (!audit) {
+    return '';  // take no action until audit is available
+  }
 
   audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
   auditors = audit.findAuditors(true); // immediate-mode findAuditors
 
-  if ((include_admin && admin)
-     || can.map(
+  if ((include_admin && admin) ||
+      can.map(
           auditors,
           function (auditor) {
             if (auditor.person.id === GGRC.current_user.id) {
               return auditor;
             }
-        }).length > 0) {
+        }).length) {
     return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
   }
+  return options.inverse(options.contexts);
 });
 
 can.each({
@@ -2670,7 +2710,7 @@ Mustache.registerHelper("with_allowed_as", function (name, action, mappings, opt
 });
 
 Mustache.registerHelper("log", function (obj) {
-  console.log(resolve_computed(obj));
+  console.log('Mustache log', resolve_computed(obj));
 });
 
 Mustache.registerHelper("autocomplete_select", function (options) {

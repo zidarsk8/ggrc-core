@@ -1293,7 +1293,7 @@ ul.new-tree {
   }
   &.pin {
     margin-left: 10px;
-    width: 70px;
+    width: 95px;
     margin-top: 5px;
   }
   .dropdown-menu {
@@ -1394,5 +1394,22 @@ ul.new-tree {
 .unmap {
   &:hover {
     color:$error;
+  }
+}
+
+.show-in-tree {
+  font-size: 11px;
+  span {
+    @include oneline();
+    display: block;
+  }
+  .red {
+    color: $red;
+  }
+  .green {
+    color: $green;
+  }
+  .dark-gray {
+    color: $textGray;
   }
 }

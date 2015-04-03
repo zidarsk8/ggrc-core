@@ -24,29 +24,28 @@ can.Construct("ModelRefreshQueue", {
     }
 
   , enqueue: function(id) {
-      if (this.triggered)
+      if (this.triggered) {
         return null;
-      else {
-        if (this.ids.indexOf(id) === -1) {
-          this.ids.push(id);
-          this.updated_at = Date.now();
-        }
-        return this;
       }
+      if (this.ids.indexOf(id) === -1) {
+        this.ids.push(id);
+        this.updated_at = Date.now();
+      }
+      return this;
     }
 
-  , trigger: function() {
+  , trigger: function () {
       var self = this;
       if (!this.triggered) {
         this.triggered = true;
-        if (this.ids.length > 0)
-          this.model.findAll({ id__in: this.ids.join(",") }).then(function() {
+        if (this.ids.length) {
+          this.model.findAll({ id__in: this.ids.join(",") }).then(function () {
             self.completed = true;
             self.deferred.resolve();
-          }, function() {
+          }, function () {
             self.deferred.reject.apply(self.deferred, arguments);
           });
-        else {
+        } else {
           this.completed = true;
           this.deferred.resolve();
         }
@@ -58,10 +57,11 @@ can.Construct("ModelRefreshQueue", {
       var ms_to_wait = (delay || 0) + this.updated_at - Date.now();
 
       if (!this.triggered) {
-        if (ms_to_wait < 0 && (!manager || manager.triggered_queues().length < 6))
+        if (ms_to_wait < 0 && (!manager || manager.triggered_queues().length < 6)) {
           this.trigger();
-        else
-          setTimeout(this.proxy("trigger_with_debounce", delay, manager), ms_to_wait);
+        } else {
+          setTimeout(this.proxy('trigger_with_debounce', delay, manager), ms_to_wait);
+        }
       }
 
       return this.deferred;
@@ -212,18 +212,21 @@ can.Construct("RefreshQueue", {
       this.deferred = new $.Deferred();
       this.triggered = false;
       this.completed = false;
+
+      return this;
     }
 
-  , enqueue: function(obj, force) {
-      var that = this;
-      if (!obj)
+  , enqueue: function (obj, force) {
+      if (!obj) {
         return;
-      if (this.triggered)
+      }
+      if (this.triggered) {
         return null;
+      }
       if (obj.push) {
-        can.each(obj, function(o) {
-          that.enqueue(o, force);
-        });
+        can.each(obj, function (o) {
+          this.enqueue(o, force);
+        }, this);
         return this;
       }
 
@@ -236,30 +239,31 @@ can.Construct("RefreshQueue", {
       return this;
     }
 
-  , trigger: function(delay) {
+  , trigger: function (delay) {
       var self = this
         , deferreds = []
         ;
 
-      if (!delay)
+      if (!delay) {
         delay = 50;
+      }
 
       this.triggered = true;
       can.each(this.queues, function(queue) {
-        deferreds.push(queue.trigger_with_debounce(
-            50, self.constructor.refresh_queue_manager));
+        deferreds.push(queue.trigger_with_debounce(delay, self.constructor.refresh_queue_manager));
       });
 
-      if (deferreds.length > 0)
-        $.when.apply($, deferreds).then(function() {
-          self.deferred.resolve(can.map(self.objects, function(obj) {
+      if (deferreds.length) {
+        $.when.apply($, deferreds).then(function () {
+          self.deferred.resolve(can.map(self.objects, function (obj) {
             return obj.reify();
           }));
-        }, function() {
+        }, function () {
           self.deferred.reject.apply(self.deferred, arguments);
         });
-      else
+      } else {
         return this.deferred.resolve(this.objects);
+      }
 
       return this.deferred;
     }

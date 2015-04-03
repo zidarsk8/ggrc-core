@@ -48,13 +48,12 @@
             }
           ];
 
-        //Add All Objects at the top of the list
+        // Add All Objects at the top of the list
         menu[0].items.push({
-          model_name: "AllObjects",
-          model_display: "All Objects"
+          model_name: 'AllObjects'
+        , model_display: 'All Objects'
         });
-
-        can.each(this.options.option_descriptors, function(descriptor) {
+        can.each(this.options.option_descriptors, function (descriptor) {
           if ( descriptor.model.category === undefined ) {
             ;//do nothing
           }
@@ -66,25 +65,22 @@
             //Save the model names for All Object search
             all_models.push(descriptor.model.shortName);
           }
-        })
+        });
         this.options.option_type_menu = menu;
       }
       this.options.all_models = all_models;
       //hard code some of the submenu
-      this.options.option_type_menu_2 = can.map([
-            "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
-            "Person", "System", "Process", "DataAsset", "Product", "Project", "Facility" , "Market"
-            ],
-            function(key) {
+      this.options.option_type_menu_2 = can.map(Array.prototype.concat.call([],
+              'Program Regulation Policy Standard Contract Clause Section Objective Control'.split(' '),
+              'Person System Process DataAsset Product Project Facility Market'.split(' ')
+            ), function (key) {
               return CMS.Models[key];
-            }
-      );
+      });
   }
-
   , set_option_descriptor: function(option_type) {
       //Set option descriptor for all objects
-      if(option_type === "AllObjects") {
-        var all_descriptor = {
+      if (option_type === "AllObjects") {
+        this.options.option_descriptors["AllObjects"] = {
           column_view : "/static/mustache/search/advanced_search_option_column.mustache",
           detail_view: "/static/mustache/selectors/multitype_option_detail.mustache",
           related_table_plural: "AllObjects",
@@ -94,7 +90,6 @@
           items_view: "/static/mustache/search/advanced_search_option_items.mustache",
           model: "AllObject"
         };
-        this.options.option_descriptors["AllObjects"] = all_descriptor;
       }
       var self = this
         , descriptor = this.options.option_descriptors[option_type]
@@ -411,7 +406,7 @@
       }
 
       option_descriptors[option_model_name] =
-        ModalOptionDescriptor.from_join_model(
+        GGRC.ModalOptionDescriptor.from_join_model(
             descriptor.model_name
           , descriptor.option_attr
           , option_model_name

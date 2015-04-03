@@ -125,7 +125,7 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
       model: CMS.Models.CustomAttributable,
-      widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree colored-list" data-no-pin="true"></ul>',
       content_controller_options: admin_list_descriptors["custom_attributes"]
     }
   }

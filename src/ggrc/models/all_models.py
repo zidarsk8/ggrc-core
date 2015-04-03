@@ -13,6 +13,7 @@ from .categorization import Categorization
 from .category import CategoryBase
 from .context import Context
 from .control import Control, ControlCategory, ControlAssertion
+from .control_assessment import ControlAssessment
 from .control_control import ControlControl
 from .control_section import ControlSection
 from .custom_attribute_definition import CustomAttributeDefinition
@@ -49,6 +50,7 @@ from .meeting import Meeting
 from .background_task import BackgroundTask
 from .notification import NotificationConfig, Notification, NotificationObject, NotificationRecipient
 from .notification import CalendarEntry
+from .issue import Issue
 
 #TODO: This isn't currently used
 #from .relationship_type import RelationshipType
@@ -67,6 +69,7 @@ all_models = [
     ControlAssertion,
   Context,
   Control,
+  ControlAssessment,
   ControlControl,
   ControlSection,
   CustomAttributeDefinition,
@@ -123,7 +126,8 @@ all_models = [
   NotificationRecipient,
   NotificationObject,
   CalendarEntry,
-  ]
+  Issue
+]
 
 __all__ = [model.__name__ for model in all_models]
 

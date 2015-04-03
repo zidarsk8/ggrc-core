@@ -4,12 +4,15 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc.app import app, db
+from ggrc.models.computed_property import computed_property
+
 from sqlalchemy.orm import validates
 from .mixins import deferred, Base, CustomAttributable
 from .reflection import PublishOnly
 from .utils import validate_option
 from .exceptions import ValidationError
 from .context import HasOwnContext
+
 import re
 
 class Person(CustomAttributable, HasOwnContext, Base, db.Model):
@@ -58,6 +61,7 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
       'name',
       'is_enabled',
       PublishOnly('object_people'),
+      PublishOnly('system_wide_role'),
       ]
   _sanitize_html = [
       'company',
@@ -112,7 +116,7 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
   def _display_name(self):
     return self.email
 
-  @property
+  @computed_property
   def system_wide_role(self):
     """For choosing the role string to show to the user; of all the roles in
     the system-wide context, it shows the highest ranked one (if there are

@@ -655,7 +655,7 @@
           background-color: lighten($lightGray,5%);
           background-repeat:no-repeat;
           background-image: image-url("grcicons/icons.png");
-          @include background-size(368px 416px);
+          @include background-size(368px 440px);
           background-position:50% -157px;
           @include opacity(0.8);
         }
@@ -872,6 +872,11 @@
           label {
             font-weight: bold;
           }
+        }
+      }
+      &.third-part {
+        li {
+          width: 33.33%;
         }
       }
     }

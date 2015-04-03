@@ -259,7 +259,7 @@
         _mixins: ["personable", "ownable"] //controllable
       , _canonical : {
         "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
-          "Project", "System", "DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"],
+          "Project", "System"],
         "programs" : "Program",
         "objectives" : "Objective",
         "implemented_controls" : "Control",
@@ -320,6 +320,15 @@
       , policies: TypeFilter("directives", "Policy")
       , standards: TypeFilter("directives", "Standard")
       , regulations: TypeFilter("directives", "Regulation")
+
+      , related_objects_as_source: Proxy(
+          null, "destination", "Relationship", "source", "related_destinations")
+      , related_objects_as_destination: Proxy(
+          null, "source", "Relationship", "destination", "related_sources")
+      , related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"])
+      , related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment")
+      , related_issues: TypeFilter("related_objects_via_relationship", "Issue")
+
       , orphaned_objects: Multi([
           "related_objects"
         , "sections"
@@ -488,7 +497,7 @@
         "related_objects_as_source" : [
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
-          "Program", "DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"
+          "Program"
           ]
       }
       , related_objects_as_source: Proxy(
@@ -534,6 +543,7 @@
         , "audits" : "Audit"
         , "context" : "Context"
       }
+      , related_issues: TypeFilter("related_objects", "Issue")
       , controls: Proxy(
           "Control", "control", "ProgramControl", "program", "program_controls")
       /*, objectives: Proxy(
@@ -813,6 +823,7 @@
             "requests" : "Request"
           , "_program" : "Program"
           , "context" : "Context"
+          , "related_objects_as_source" : ["ControlAssessment"]
         }
       , requests: Direct("Request", "audit", "requests")
       , active_requests: CustomFilter('requests', function(result) {
@@ -822,6 +833,7 @@
         return result.instance.status === 'Accepted';
       })
       , _program: Direct("Program", "audits", "program")
+      , program_controls: Cross("_program", "controls")
       , objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects")
       , objectives: TypeFilter("objects", "Objective")
       , objectives_via_program : Cross("_program", "objectives")
@@ -895,6 +907,44 @@
                                       , "related_mapped_population_sample_responses"
                                       ])
       , extended_related_objects: Cross("requests", "extended_related_objects")
+      , related_objects_as_source: Proxy(
+          null, "destination", "Relationship", "source", "related_destinations")
+      , related_objects_as_destination: Proxy(
+          null, "source", "Relationship", "destination", "related_sources")
+      , related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"])
+      , related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment")
+      , related_issues: TypeFilter("related_objects_via_relationship", "Issue")
+    }
+    , ControlAssessment : {
+      _mixins: [
+        "related_object", "personable", "ownable"
+      ],
+      _canonical: {
+       "control": "Control",
+       "related_objects" : [
+          "Section", "Clause", "Audit"
+        ],
+      }
+      , control: Direct("Control", "controls", "control_assessment")
+      , related_audits:   TypeFilter("related_objects", "Audit")
+      //, related_controls: TypeFilter("related_objects", "Control")
+      , related_sections: TypeFilter("related_objects", "Section")
+      , related_clauses:  TypeFilter("related_objects", "Clause")
+      , related_issues: TypeFilter("related_objects", "Issue")
+    }
+    , Issue : {
+      _mixins: [
+        "related_object", "personable", "ownable"
+      ],
+      _canonical: {
+       "related_objects" : [
+          "Program", "ControlAssessment", "Control", "Audit"
+        ],
+      }
+      , related_audits:   TypeFilter("related_objects", "Audit")
+      , related_controls: TypeFilter("related_objects", "Control")
+      , related_control_assessments: TypeFilter("related_objects", "ControlAssessment")
+      , related_programs:  TypeFilter("related_objects", "Program")
     }
     , Request : {
         _canonical : {

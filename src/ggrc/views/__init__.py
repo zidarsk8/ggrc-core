@@ -81,9 +81,8 @@ def get_current_user_json():
   from ggrc.models.person import Person
   current_user = get_current_user()
   person = Person.eager_query().filter_by(id=current_user.id).one()
-  return as_json(
-      filter_resource(
-        publish_representation(publish(person, (), inclusion_filter))))
+  result = filter_resource(publish_representation(publish(person, (), inclusion_filter)))
+  return as_json(result)
 
 @app.context_processor
 def base_context():
@@ -149,9 +148,11 @@ def admin():
     raise Forbidden()
   return render_template("admin/index.haml")
 
+
 @app.route("/background_task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
   return make_task_response(id_task)
+
 
 def contributed_object_views():
   from ggrc import models
@@ -169,6 +170,7 @@ def contributed_object_views():
       object_view(models.Clause),
       object_view(models.Section),
       object_view(models.Control),
+      object_view(models.ControlAssessment),
       object_view(models.Objective),
       object_view(models.System),
       object_view(models.Process),
@@ -181,7 +183,8 @@ def contributed_object_views():
       object_view(models.DataAsset),
       object_view(models.Person),
       object_view(models.Vendor),
-      ]
+      object_view(models.Issue),
+  ]
 
 
 def all_object_views():
@@ -367,6 +370,20 @@ def audit_people_ui():
   """Audit people UI UX mockup
   """
   return render_template("/mockups/dashboard-ui/audit-people.html")
+
+@app.route("/mockups/audit-revamp/info.html")
+@login_required
+def audit_info_revamp():
+  """Audit info revamp mockup
+  """
+  return render_template("/mockups/audit-revamp/info.html")
+
+@app.route("/mockups/audit-revamp/issues.html")
+@login_required
+def audit_info_issues_revamp():
+  """Audit info issues revamp mockup
+  """
+  return render_template("/mockups/audit-revamp/issues.html")
 
 @app.route("/permissions")
 @login_required

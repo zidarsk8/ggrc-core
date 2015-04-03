@@ -6,7 +6,7 @@
 }}
 
 <!-- Right side workflow and task trees area -->
-<dashboard-widgets class="span9 content-wrap">
+<dashboard-widgets class="span{{#system_role 'No Access'}}12{{/system_role}}{{^system_role 'No Access'}}9{{/system_role}} content-wrap">
     <div class="inner-content">
       {{#if workflow_view}}
         <section class="widget small-margin">

@@ -6,6 +6,8 @@ description = """
 permissions = {
     "read": [
         "Request",
+        "ControlAssessment",
+        "Issues",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -33,7 +35,7 @@ permissions = {
         "ObjectPerson",
         "ObjectSection",
         "Relationship",
-        "Document"     
+        "Document"
     ],
     "view_object_page": [
         "__GGRC_ALL__"

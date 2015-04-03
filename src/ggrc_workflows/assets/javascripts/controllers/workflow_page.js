@@ -93,7 +93,8 @@
           workflow.refresh_all('task_groups', 'task_group_tasks')
         ).then(function() {
           var task_groups = workflow.task_groups.reify(),
-              can_activate = task_groups.length > 0;
+              can_activate = task_groups.length;
+
           task_groups.each(function(task_group) {
             if (!task_group.task_group_tasks.length) {
               can_activate = false;
@@ -103,7 +104,7 @@
           self.attr('waiting', false);
         });
       },
-      _handle_refresh: function(model) {
+      _handle_refresh: function (model) {
         var models = ['TaskGroup', 'TaskGroupTask', 'TaskGroupObject'];
         if (models.indexOf(model.shortName) > -1) {
           this._can_activate_def();
@@ -111,18 +112,10 @@
       },
       _restore_button: function () {
           this.attr('waiting', false);
-      }
-    },
-    events: {
-      "{can.Model.Cacheable} created": function(model) {
-        this.scope._handle_refresh(model);
       },
-      "{can.Model.Cacheable} destroyed": function(model) {
-        this.scope._handle_refresh(model);
-      },
-      "button click": function() {
+      _activate: function() {
         var workflow = GGRC.page_instance(),
-            scope = this.scope,
+            scope = this,
             restore_button = scope._restore_button.bind(scope),
             cycle;
         scope.attr('waiting', true);
@@ -147,6 +140,17 @@
             return workflow.attr('status', "Active").save();
           }, restore_button).then(restore_button);
         }
+      }
+    },
+    events: {
+      "{can.Model.Cacheable} created": function(model) {
+        this.scope._handle_refresh(model);
+      },
+      "{can.Model.Cacheable} destroyed": function(model) {
+        this.scope._handle_refresh(model);
+      },
+      "button click": function() {
+        this.scope._activate();
       }
     }
   });

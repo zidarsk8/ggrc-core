@@ -157,7 +157,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     ).then(update_program_authorizations);
     GGRC.delay_leaving_page_until(dfd);
   },
-  findAuditors : function(return_list){
+  findAuditors : function(return_list) {
     // If return_list is true, use findAuditors in the
     //  classical way, where the exact state of the list
     //  isn't needed immeidately (as in a Mustache helper);
@@ -169,11 +169,12 @@ can.Model.Cacheable("CMS.Models.Audit", {
       dfds = []
       ;
 
-    if(return_list) {
+    if (return_list) {
       $.map(loader.list, function(binding) {
         // FIXME: This works for now, but is sad.
-        if (!binding.instance.selfLink)
+        if (!binding.instance.selfLink) {
           return;
+        }
         var role = binding.instance.role.reify();
         function checkRole() {
           if (role.attr('name') === 'Auditor') {
@@ -183,50 +184,46 @@ can.Model.Cacheable("CMS.Models.Audit", {
             });
           }
         }
-        if(role.selfLink) {
+        if (role.selfLink) {
           checkRole();
         } else {
           role.refresh().then(checkRole);
         }
       });
       return auditors_list;
-    } else {
-      return loader.refresh_instances().then(function() {
-        $.map(loader.list, function(binding) {
-          // FIXME: This works for now, but is sad.
-
-          dfds.push(new $.Deferred(function(dfd) {
-
-            if (!binding.instance.selfLink) {
-              binding.instance.refresh().then(function() {
-                dfd.resolve(binding.instance);
-              });
-            } else {
-              dfd.resolve(binding.instance);
-            }
-          }).then(function(instance) {
-
-            var role = instance.role.reify();
-            function checkRole() {
-              if (role.attr('name') === 'Auditor') {
-                auditors_list.push({
-                  person: instance.person.reify()
-                  , binding: instance
-                });
-              }
-            }
-            if(role.selfLink) {
-              checkRole();
-            } else {
-              return role.refresh().then(checkRole);
-            }
-          }));
-        });
-        return $.when.apply($, dfds).then(function() {
-          return auditors_list;
-        });
-      });
     }
+    return loader.refresh_instances().then(function() {
+      $.map(loader.list, function (binding) {
+        // FIXME: This works for now, but is sad.
+        dfds.push(new $.Deferred(function(dfd) {
+          if (!binding.instance.selfLink) {
+            binding.instance.refresh().then(function() {
+              dfd.resolve(binding.instance);
+            });
+          } else {
+            dfd.resolve(binding.instance);
+          }
+        }).then(function(instance) {
+          var role = instance.role.reify();
+          function checkRole() {
+            if (role.attr('name') === 'Auditor') {
+              auditors_list.push({
+                person: instance.person.reify()
+                , binding: instance
+              });
+            }
+          }
+          if (role.selfLink) {
+            checkRole();
+          } else {
+            return role.refresh().then(checkRole);
+          }
+        }));
+      });
+      return $.when.apply($, dfds).then(function() {
+        return auditors_list;
+      });
+    });
   },
   get_filter_vals: function(){
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
@@ -248,7 +245,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
 
     return vals;
   }
-
 });
 
 can.Model.Mixin("requestorable", {
@@ -593,15 +589,6 @@ can.Model.Cacheable("CMS.Models.Response", {
         };
     }
   }
-  , after_create: function () {
-    var hash = window.location.hash.split("/")[0];
-
-    window.location.hash = [hash,
-                            "request",
-                            this.request.id,
-                            this.response_type+"_response",
-                            this.id].join("/");
-  }
 
 });
 
@@ -729,5 +716,75 @@ can.Model.Cacheable("CMS.Models.Meeting", {
   }
 
 });
+
+can.Model.Cacheable("CMS.Models.ControlAssessment", {
+  root_object : "control_assessment",
+  root_collection : "control_assessments",
+  findOne : "GET /api/control_assessments/{id}",
+  update : "PUT /api/control_assessments/{id}",
+  destroy : "DELETE /api/control_assessments/{id}",
+  create : "POST /api/control_assessments",
+  mixins : ["ownable", "contactable"],
+  is_custom_attributable: true,
+  attributes : {
+    control : "CMS.Models.Control.stub",
+    context : "CMS.Models.Context.stub",
+    modified_by : "CMS.Models.Person.stub",
+    custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
+    start_date: "date",
+    end_date: "date"
+  },
+  init : function() {
+    this._super && this._super.apply(this, arguments);
+    this.validatePresenceOf("control");
+    this.validatePresenceOf("audit");
+    this.validateNonBlank("title");
+  }
+}, {
+  object_model: can.compute(function() {
+    return CMS.Models[this.attr("object_type")];
+  }),
+  after_save: function() {
+    // TODO: I will make this a feature in cacheable when I'll be implementing
+    //       Issue objects
+    var audit = this.audit.reify(),
+        binding = audit.get_binding('related_control_assessments');
+
+    binding.list.push(
+      new GGRC.ListLoaders.MappingResult(this, binding)
+    );
+  }
+});
+
+can.Model.Cacheable("CMS.Models.Issue", {
+  root_object : "issue",
+  root_collection : "issues",
+  findOne : "GET /api/issues/{id}",
+  update : "PUT /api/issues/{id}",
+  destroy : "DELETE /api/issues/{id}",
+  create : "POST /api/issues",
+  mixins : ["ownable", "contactable"],
+  is_custom_attributable: true,
+  attributes : {
+    context : "CMS.Models.Context.stub",
+    modified_by : "CMS.Models.Person.stub",
+    custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
+    start_date: "date",
+    end_date: "date"
+  },
+  init : function() {
+    this._super && this._super.apply(this, arguments);
+    this.validatePresenceOf("control");
+    this.validatePresenceOf("audit");
+    this.validatePresenceOf("program");
+    this.validatePresenceOf("control_assessment");
+    this.validateNonBlank("title");
+  }
+}, {
+  object_model: can.compute(function() {
+    return CMS.Models[this.attr("object_type")];
+  }),
+});
+
 
 })(this.can);

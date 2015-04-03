@@ -36,10 +36,14 @@
           {{#if instance.recurrences}}
           <li>
             <workflow-start-cycle workflow="instance">
-              <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
-                <i class="grcicon-manual"></i>
-                Manually Start a Cycle
-              </a>
+              <workflow-activate workflow="instance" deferredData="can_activate">
+                {{#can_activate}}
+                  <a href="#workflowStart" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+                    <i class="grcicon-manual"></i>
+                    Manually Start a Cycle
+                  </a>
+                {{/can_activate}}
+              </workflow-activate>
             </workflow-start-cycle>
           </li>
           <li>

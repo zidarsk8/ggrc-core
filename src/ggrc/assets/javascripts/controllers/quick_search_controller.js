@@ -304,7 +304,7 @@ can.Control("CMS.Controllers.LHN", {
       this.set_active_tab();
 
       // not nested
-      $(".lhn-trigger").addClass("active");
+      $(".lhn-trigger").removeClass('hide').addClass("active");
 
       this.element.find(".lhs-holder")
           .css("left", "")
@@ -384,15 +384,7 @@ can.Control("CMS.Controllers.LHN", {
           }
         }.bind(this));
 
-        // give everything a bit of time to render
-        setTimeout(function () {
-          this.resize_lhn();
-          if (this.options.display_prefs.getLHNState().is_pinned) {
-            this.open_lhn();
-          }else{
-            this.close_lhn();
-          }
-        }.bind(this), 1000);
+        this.initial_lhn_render();
       }.bind(this));
     }
   , initial_scroll: function () {
@@ -401,8 +393,25 @@ can.Control("CMS.Controllers.LHN", {
         || 0
     );
   }
+  // this uses polling to make sure LHN is there
+  // requestAnimationFrame takes browser render optimizations into account
+  // it ain't pretty, but it works
+  , initial_lhn_render: function (try_count) {
+    if (!$(".lhs-holder").size()) {
+      window.requestAnimationFrame(this.initial_lhn_render.bind(this));
+      return;
+    }
+      
+    this.resize_lhn();
+      
+    if (this.options.display_prefs.getLHNState().is_pinned) {
+      this.open_lhn();
+    }else{
+      this.close_lhn();
+    }
+  }
   , lhn_width : function(){
-      return $(".lhs-holder").width()+8;
+    return $(".lhs-holder").width()+8;
   }
   , hide_lhn: function() {
     //UI-revamp
@@ -418,6 +427,7 @@ can.Control("CMS.Controllers.LHN", {
       $area.css("margin-left", 0);
       $bar.hide();
       $lhnTrigger.hide();
+      $lhnTrigger.addClass('hide')
 
       window.resize_areas();
     }
@@ -437,14 +447,7 @@ can.Control("CMS.Controllers.LHN", {
   , resize_lhn : function(resize, no_trigger){
     resize || (resize = this.options.display_prefs && this.options.display_prefs.getLHNavSize(null, null).lhs);
 
-    var $lhs = $("#lhs"),
-        $lhsHolder = $(".lhs-holder"),
-        $area = $(".area"),
-        $bar = $("#lhn>.bar-v"),
-        $search = $('.widgetsearch'),
-        $lhs_label_right = $(".lhs-search .my-work-right"),
-        $lhs_label = $(".lhs-search .my-work-label"),
-        max_width = window.innerWidth*.75,
+    var max_width = window.innerWidth*.75,
         default_size = 240;
 
     if (resize < default_size) {

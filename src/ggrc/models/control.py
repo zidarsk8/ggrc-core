@@ -10,13 +10,14 @@ from .associationproxy import association_proxy
 from .category import CategoryBase
 from .categorization import Categorizable
 from .mixins import (
-    deferred, BusinessObject, Hierarchical, Timeboxed, CustomAttributable
+    deferred, BusinessObject, Hierarchical, Timeboxed, CustomAttributable, TestPlanned
     )
 from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
 from .reflection import PublishOnly
 from .utils import validate_option
+from .relationship import Relatable
 
 from .track_object_state import HasObjectState, track_state_for_class
 
@@ -82,9 +83,9 @@ class AssertionCategorized(Categorizable):
         )
 
 
-class Control(HasObjectState,
+class Control(HasObjectState, Relatable,
     CustomAttributable, Documentable, Personable, ControlCategorized, AssertionCategorized,
-    Hierarchical, Timeboxed, Ownable, BusinessObject, db.Model):
+    Hierarchical, Timeboxed, Ownable, BusinessObject, TestPlanned, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')

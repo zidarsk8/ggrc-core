@@ -15,6 +15,7 @@ from ggrc.models.all_models import (
 )
 from ggrc.models.exceptions import ValidationError
 from ggrc.app import app
+from ggrc import db
 
 def unpack_list(vals):
   result = []
@@ -150,6 +151,7 @@ class BaseRowConverter(object):
             ownable=self.obj,
             modified_by_id=current_user_id
         ))
+
     # This atomically deletes all existing custom attribute values for this object
     # and sets all imported values. This will delete all custom attributes that
     # were set on the object prior to import and not included in the import.
