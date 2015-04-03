@@ -62,14 +62,13 @@ can.Control("GGRC.Controllers.Modals", {
       this.options = new can.Observe(this.options);
     }
 
-    if(!this.element.find(".modal-body").length) {
+    if (!this.element.find(".modal-body").length) {
       can.view(this.options.preload_view, {}, this.proxy("after_preload"));
     } else {
-      this.after_preload()
+      this.after_preload();
     }
     //this.options.attr("mapping", !!this.options.mapping);
   }
-
   , after_preload : function(content) {
     var that = this;
     if (content) {
@@ -84,7 +83,7 @@ can.Control("GGRC.Controllers.Modals", {
       .then(this.proxy("serialize_form"))
       .then(function() {
         // If the modal is closed early, the element no longer exists
-        that.element && that.element.trigger('preload')
+        that.element && that.element.trigger('preload');
       })
       .then(this.proxy("autocomplete"));
   }
@@ -289,7 +288,7 @@ can.Control("GGRC.Controllers.Modals", {
     }
     //ui_array index is used as the tab_order, Add extra space for skipped numbers
     var storable_ui = hidable_tabs + 10;
-    for(var i = 0; i < storable_ui; i++) {
+    for (var i = 0; i < storable_ui; i++) {
       //When we start, all the ui elements are visible
       this.options.ui_array.push(0);
     }
@@ -314,14 +313,15 @@ can.Control("GGRC.Controllers.Modals", {
         this.set_value_from_element(el);
       }
   }
-
-  , "input:not([data-lookup], isolate-form *), textarea keyup" : function (el, ev) {
-      if (el.prop('value').length === 0 ||
-          (typeof el.attr('value') !== 'undefined' && !el.attr('value').length)) {
-        this.set_value_from_element(el);
-      }
+  , "input:not([data-lookup], isolate-form *), textarea keyup": function (el, ev) {
+    // TODO: If statement doesn't work properly. This is the right one:
+    //       if (el.attr('value').length ||
+    //          (typeof el.attr('value') !== 'undefined' && el.val().length)) {
+    if (el.prop('value').length === 0 ||
+       (typeof el.attr('value') !== 'undefined' && !el.attr('value').length)) {
+      this.set_value_from_element(el);
+    }
   }
-
   , serialize_form : function() {
       var $form = this.options.$content.find("form")
         , $elements = $form.find(":input:not(isolate-form *)")
@@ -345,17 +345,19 @@ can.Control("GGRC.Controllers.Modals", {
         this.set_value({ name: name, value: value });
       }
 
-      if($el.is("[data-also-set]")) {
+      if ($el.is("[data-also-set]")) {
         can.each($el.data("also-set").split(","), function(oname) {
           this.set_value({ name : oname, value : value});
         }, this);
       }
     }
 
-  , set_value: function(item) {
+  , set_value: function (item) {
     // Don't set `_wysihtml5_mode` on the instances
-    if (item.name === '_wysihtml5_mode')
+    if (item.name === '_wysihtml5_mode') {
       return;
+    }
+
     var instance = this.options.instance
       , that = this;
     if (!(instance instanceof this.options.model)) {
@@ -368,39 +370,40 @@ can.Control("GGRC.Controllers.Modals", {
     model = $elem.attr("model");
 
     if (model) {
-      if (item.value instanceof Array)
+      if (item.value instanceof Array) {
         value = can.map(item.value, function(id) {
           return CMS.Models.get_instance(model, id);
         });
-      else
+      } else {
         value = CMS.Models.get_instance(model, item.value);
+      }
     } else if ($elem.is("[type=checkbox]")) {
       value = $elem.is(":checked");
     } else {
       value = item.value;
     }
 
-    if ($elem.is("[null-if-empty]") && (!value || value.length === 0))
+    if ($elem.is("[null-if-empty]") && (!value || value.length)) {
       value = null;
+    }
 
-    if($elem.is("[data-binding]") && $elem.is("[type=checkbox]")){
+    if ($elem.is("[data-binding]") && $elem.is("[type=checkbox]")) {
       can.map($elem, function(el){
-        if(el.value != value.id)
+        if(el.value != value.id) {
           return;
-        if($(el).is(":checked")){
-          instance.mark_for_addition($elem.data("binding"), value);
         }
-        else{
+        if ($(el).is(":checked")) {
+          instance.mark_for_addition($elem.data("binding"), value);
+        } else {
           instance.mark_for_deletion($elem.data("binding"), value);
         }
       });
       return;
-    }
-    else if($elem.is("[data-binding]")) {
+    } else if($elem.is("[data-binding]")) {
       can.each(can.makeArray($elem[0].options), function(opt) {
         instance.mark_for_deletion($elem.data("binding"), CMS.Models.get_instance(model, opt.value));
       });
-      if(value.push) {
+      if (value.push) {
         can.each(value, $.proxy(instance, "mark_for_addition", $elem.data("binding")));
       } else {
         instance.mark_for_addition($elem.data("binding"), value);
@@ -408,7 +411,7 @@ can.Control("GGRC.Controllers.Modals", {
     }
 
     if (name.length > 1) {
-      if(can.isArray(value)) {
+      if (can.isArray(value)) {
         value = new can.Observe.List(can.map(value, function(v) { return new can.Observe({}).attr(name.slice(1).join("."), v); }));
       } else {
         if($elem.is("[data-lookup]")) {
@@ -418,7 +421,7 @@ can.Control("GGRC.Controllers.Modals", {
             // Setting a "lookup field is handled in the autocomplete() method"
             return;
           }
-        } else if(name[name.length - 1] === "date") {
+        } else if (name[name.length - 1] === "date") {
           name.pop(); //date is a pseudoproperty of datetime objects
           if(!value) {
             value = null;
@@ -429,7 +432,7 @@ can.Control("GGRC.Controllers.Modals", {
               value = moment(value).add(parseInt($other.val(), 10)).toDate();
             }
           }
-        } else if(name[name.length - 1] === "time") {
+        } else if (name[name.length - 1] === "time") {
           name.pop(); //time is a pseudoproperty of datetime objects
           value = moment(this.options.instance.attr(name.join("."))).startOf("day").add(parseInt(value, 10)).toDate();
         } else {
@@ -456,7 +459,7 @@ can.Control("GGRC.Controllers.Modals", {
         instance.attr(name[0], value);
       }
     }
-    this.setup_wysihtml5(); //in case the changes in values caused a new wysi box to appear.
+    this.setup_wysihtml5(); // in case the changes in values caused a new wysi box to appear.
   }
 
   , "[data-before], [data-after] change" : function(el, ev) {

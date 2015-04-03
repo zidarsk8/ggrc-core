@@ -1082,11 +1082,12 @@ can.Model("can.Model.Cacheable", {
 
 _old_attr = can.Observe.prototype.attr;
 can.Observe.prototype.attr = function(key, val) {
-  if(key instanceof can.Observe) {
-    if(arguments[0] === this)
+  if (key instanceof can.Observe) {
+    if (arguments[0] === this) {
       return this;
-    else
+    } else {
       return _old_attr.apply(this, [key.serialize()]);
+    }
   } else {
     return _old_attr.apply(this, arguments);
   }

@@ -376,7 +376,7 @@ class ContactEmailHandler(ColumnHandler):
       self.add_error("A valid email address is required")
     elif person_must_exist:
       value = self.find_contact(value, is_required=is_required)
-    elif value and not re.match(Person.EMAIL_RE_STRING, value, re.IGNORECASE):
+    elif value and not Person.email_re(value):
       message = u"{} is not a valid email. \
                 Please use following format: user@example.com".format(value)
       self.add_error(message) if is_required else self.add_warning(message)
@@ -957,7 +957,7 @@ class LinkPeopleHandler(LinksHandler):
       data = { 'email' : value }
 
     if data:
-      if data.get('email') and not re.match(Person.EMAIL_RE_STRING, data['email'], re.IGNORECASE):
+      if data.get('email') and not Person.is_valid_email(data['email']):
         self.add_link_warning(u"This email address is invalid and will not be mapped")
       else:
         return data
