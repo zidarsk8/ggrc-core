@@ -61,7 +61,7 @@
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       {{/is_info_pin}}
 
-      <div class="row-fluid wrap-row">
+      <div class="row-fluid wrap-row" {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true" data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
         <div class="span6">
           <h6>Test plan</h6>
           <div class="rtf-block">
@@ -71,25 +71,21 @@
         <div class="span3">
           <h6>Conclusion: Design</h6>
           <p><small><em>Is this control design effective?</em></small></p>
-          <select class="input-medium visual-selector">
-            <option value="d-choose">-- Choose --</option>
-            <option value="d-effective">Effective</option>
-            <option value="d-material-weakness">Material weakness</option>
-            <option value="d-needs-improvement">Needs improvement</option>
-            <option value="d-significant-deficiency">Significant deficiency</option>
-            <option value="d-not-applicable">Not Applicable</option>
+          <select class="input-medium visual-selector" name="design">
+            <option value="" {{#if_equals design ""}}selected{{/if_equals}}>---</option>
+            {{#iterate 'Effective' 'Material weakness' 'Needs improvement' 'Significant deficiency' 'Not Applicable'}}
+              <option {{#if_equals iterator design}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
           </select>
         </div>
         <div class="span3">
           <h6>Conclusion: Operational</h6>
           <p><small><em>Is this control operationally effective?</em></small></p>
-          <select class="input-medium visual-selector">
-            <option value="o-choose">-- Choose --</option>
-            <option value="o-effective">Effective</option>
-            <option value="o-material-weakness">Material weakness</option>
-            <option value="o-needs-improvement">Needs improvement</option>
-            <option value="o-significant-deficiency">Significant deficiency</option>
-            <option value="o-not-applicable">Not Applicable</option>
+          <select class="input-medium visual-selector" name="operationally">
+            <option value="" {{#if_equals operationally ""}}selected{{/if_equals}}>---</option>
+            {{#iterate 'Effective' 'Material weakness' 'Needs improvement' 'Significant deficiency' 'Not Applicable'}}
+              <option {{#if_equals iterator operationally}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
           </select>
         </div>
       </div>

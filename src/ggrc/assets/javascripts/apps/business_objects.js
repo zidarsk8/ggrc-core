@@ -516,7 +516,7 @@ $(function() {
         , issues: {
           Issue: {
               mapping: "related_issues"
-              , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
           }
         }
         , governance_objects: {
@@ -636,6 +636,8 @@ $(function() {
             , parent_instance: GGRC.page_instance()
             , draw_children: true
             , model: CMS.Models.ControlAssessment
+            , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
+            , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
             , footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache"
           }
         }
@@ -677,6 +679,8 @@ $(function() {
             },
             ControlAssessment: {
               mapping: "related_control_assessment"
+              , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
+              , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
             }
           }
 
@@ -707,6 +711,8 @@ $(function() {
               , parent_instance: GGRC.page_instance()
               , draw_children: true
               , model: CMS.Models.ControlAssessment
+              , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
+              , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
               , footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache"
             }
           }
@@ -760,6 +766,8 @@ $(function() {
               , draw_children: true
               , allow_creating: false
               , allow_mapping: false
+              , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
+              , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
             }
           }
         , DataAsset: {
