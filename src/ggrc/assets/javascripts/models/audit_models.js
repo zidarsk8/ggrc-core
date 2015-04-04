@@ -747,8 +747,14 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
   after_save: function() {
     // TODO: I will make this a feature in cacheable when I'll be implementing
     //       Issue objects
-    var audit = this.audit.reify(),
-        binding = audit.get_binding('related_control_assessments');
+    var audit = this.audit.id && this.audit.reify(),
+        binding;
+
+    if (!audit) {
+      return;
+    }
+
+    binding = audit.get_binding('related_control_assessments');
 
     binding.list.push(
       new GGRC.ListLoaders.MappingResult(this, binding)
