@@ -13,10 +13,11 @@ from .object_person import Personable
 from .relationship import Relatable
 from .track_object_state import HasObjectState, track_state_for_class
 from ggrc.models.reflection import PublishOnly
+from .object_objective import Objectiveable
 
 
 class Issue(HasObjectState, TestPlanned, CustomAttributable, Documentable,
-            Personable, Timeboxed, Ownable, Relatable,
+            Personable, Timeboxed, Ownable, Relatable, Objectiveable,
             BusinessObject, db.Model):
 
   __tablename__ = 'issues'
