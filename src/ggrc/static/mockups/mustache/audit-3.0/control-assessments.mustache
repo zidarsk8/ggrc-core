@@ -678,15 +678,47 @@
                     <h6>Current Assignee</h6>
                     <ul class="inner-count-list">
                       <li>
-                        <a href="javascript://">
-                          Martin L. K.
-                        </a>
+                        <div class="show-me">
+                          <a href="javascript://">
+                            Martin L. K.
+                          </a>
+                          <a class="toggle-show-hide" href="javascript://"><i class="grcicon-edit"></i></a>
+                        </div>
+                        <div class="objective-selector field-wrap hide-me">
+                          <input type="text" name="instance" data-lookup="Person" data-params="Person:is_enabled=1" null-if-empty="true" class="search-icon" placeholder="Current Assignee" value="">
+                          <a href="javascript://" class="btn btn-small btn-success no-float save-person" data-toggle="submit">Add</a>
+                        </div>
                       </li>
                     </ul>
                   </div>
                   <div class="span6">
                     <h6>Current Status</h6>
-                    <span class="state-value state-inprogress">In progress</span>
+                    <div class="details-wrap status-wrap">
+                      <span class="state-value state-inprogress">In progress</span>
+                      <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-edit"></i></a>
+                      <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+                        <li>
+                          <a href="#">
+                            Stop progress
+                          </a>
+                        </li>
+                        <li class="border">
+                          <a href="#">
+                            Completed (Notify)
+                          </a>
+                        </li>
+                        <li class="border">
+                          <a href="#">
+                            Needs work
+                          </a>
+                        </li>
+                        <li class="border">
+                          <a href="#">
+                            Verified
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
                 <div class="row-fluid">
@@ -694,9 +726,16 @@
                     <h6>Assessors</h6>
                     <ul class="inner-count-list">
                       <li>
-                        <a href="javascript://">
-                          Martin L. K.
-                        </a>
+                        <div class="show-me">
+                          <a href="javascript://">
+                            Martin L. K.
+                          </a>
+                          <a class="toggle-show-hide" href="javascript://"><i class="grcicon-edit"></i></a>
+                        </div>
+                        <div class="objective-selector field-wrap hide-me">
+                          <input type="text" name="instance" data-lookup="Person" data-params="Person:is_enabled=1" null-if-empty="true" class="search-icon" placeholder="Assessors" value="">
+                          <a href="javascript://" class="btn btn-small btn-success no-float save-person" data-toggle="submit">Add</a>
+                        </div>
                       </li>
                     </ul>
                     <a href="#" class="btn btn-small btn-draft">Add assessor</a>
@@ -705,14 +744,28 @@
                     <h6>Verifiers</h6>
                     <ul class="inner-count-list">
                       <li>
-                        <a href="javascript://">
-                          Prasanna V.
-                        </a>
+                        <div class="show-me">
+                          <a href="javascript://">
+                            Prasanna V.
+                          </a>
+                          <a class="toggle-show-hide" href="javascript://"><i class="grcicon-edit"></i></a>
+                        </div>
+                        <div class="objective-selector field-wrap hide-me">
+                          <input type="text" name="instance" data-lookup="Person" data-params="Person:is_enabled=1" null-if-empty="true" class="search-icon" placeholder="Verifiers" value="">
+                          <a href="javascript://" class="btn btn-small btn-success no-float save-person" data-toggle="submit">Add</a>
+                        </div>
                       </li>
                       <li>
-                        <a href="javascript://">
-                          Josh Smith
-                        </a>
+                        <div class="show-me">
+                          <a href="javascript://">
+                            Josh Smith
+                          </a>
+                          <a class="toggle-show-hide" href="javascript://"><i class="grcicon-edit"></i></a>
+                        </div>
+                        <div class="objective-selector field-wrap hide-me">
+                          <input type="text" name="instance" data-lookup="Person" data-params="Person:is_enabled=1" null-if-empty="true" class="search-icon" placeholder="Verifiers" value="">
+                          <a href="javascript://" class="btn btn-small btn-success no-float save-person" data-toggle="submit">Add</a>
+                        </div>
                       </li>
                     </ul>
                     <a href="#" class="btn btn-small btn-draft">Add verifier</a>
@@ -808,11 +861,11 @@
                     <a class="show-hidden-fields info-show-hide" href="javascript://">
                       <span class="out">
                         <i class="grcicon-arrow-right"></i>
-                        Notes and attachments
+                        Comments and attachments
                       </span>
                       <span class="in">
                         <i class="grcicon-arrow-bottom"></i>
-                        Notes and attachments
+                        Comments and attachments
                       </span>
                     </a>
                   </div>

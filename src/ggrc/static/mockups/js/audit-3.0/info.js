@@ -327,6 +327,28 @@ $(document).ready(function() {
     });
   }
 
+  function caEditPerson() {
+    var $this = $(this),
+        $currentPerson = $this.closest(".show-me"),
+        $featurePerson = $this.closest(".show-me").next(".hide-me"),
+        $save = $featurePerson.find(".save-person");
+
+    if($this.hasClass("activated")) {
+      $this.removeClass("activated");
+      $currentPerson.show();
+      $featurePerson.hide();
+    } else {
+      $this.addClass("activated");
+      $currentPerson.hide();
+      $featurePerson.show();
+    }
+
+    $save.on("click", function() {
+      $currentPerson.show();
+      $featurePerson.hide();
+    });
+  }
+
   $(".top-inner-nav a").on("click", innerNavTrigger);
 
   $("#autoGenerateCA").on("click", generateCA);
@@ -350,5 +372,7 @@ $(document).ready(function() {
   $("#assessorDefault").on("change", defaultAssessor);
 
   $("#underAssessment").on("change", underAssessment);
+
+  $(".toggle-show-hide").on("click", caEditPerson);
 
 });
