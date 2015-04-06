@@ -250,7 +250,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       }
 
       // change inner tree title span4 into span8 class
-      $(".inner-tree > .tree-structure > .tree-item > .item-main").find(".row-fluid").find("[class*=span]:first").attr("class", "span8");
+      $(".inner-tree > .tree-structure > .tree-item > .item-main").find(".row-fluid").find("[class*=span]:last").attr("class", "span8");
 
     }
 
@@ -1154,4 +1154,3 @@ can.Control("CMS.Controllers.TreeViewNode", {
                             this.hash_fragment()].join('');
   }
 });
-
