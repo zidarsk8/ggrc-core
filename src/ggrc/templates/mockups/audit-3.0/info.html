@@ -2733,39 +2733,68 @@
       <form action="javascript://">
 
         <div class="row-fluid">
-          <div class="span12">
-            <div class="pull-right reset-form">
-              <p>
-                <small><em>Fields are only temporarily hidden</em></small>
-                <a id="formHide" tabindex="26" class="btn btn-small btn-draft" href="javascript://">Hide all optional fields</a>
-                <a id="formRestore" tabindex="26" class="btn btn-small btn-draft" href="javascript://" style="display:none;">Show all optional fields</a>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="row-fluid">
           <div class="span6">
             <label>
               Audit
             </label>
-            2014 Imagine all the people
+            <strong>2014 Imagine all the people</strong>
           </div>
         </div>
         <br>
 
-        <div class="row-fluid">
+        <div class="row-fluid choose-object">
           <div class="span12">
             <label>
               Objects under assessment
             </label>
-            <select class="input-medium pull-left">
-              <option>Controls</option>
-              <option>Audits</option>
-              <option>People</option>
+            <select class="input-medium pull-left" id="underAssessment">
+              <optgroup label="Governance">
+                <option value="Regulation" label="Regulations">
+                </option>
+                <option value="Contract" label="Contracts">
+                </option>
+                <option value="Policy" label="Policies">
+                </option>
+                <option value="Standard" label="Standards">
+                </option>
+                <option value="Program" label="Programs">
+                </option>
+                <option value="Objective" label="Objectives">
+                </option>
+                <option value="Control" label="Controls">
+                </option>
+                <option value="Section" label="Sections">
+                </option>
+                <option value="Clause" label="Clauses">
+                </option>
+              </optgroup>
+              <optgroup label="People/Groups">
+                <option value="Person" label="People">
+                </option>
+                <option value="OrgGroup" label="Org Groups">
+                </option>
+                <option value="Vendor" label="Vendors">
+                </option>
+              </optgroup>
+              <optgroup label="Assets/Business">
+                <option value="DataAsset" label="Data Assets">
+                </option>
+                <option value="Facility" label="Facilities">
+                </option>
+                <option value="Market" label="Markets">
+                </option>
+                <option value="Process" label="Processes">
+                </option>
+                <option value="Product" label="Products">
+                </option>
+                <option value="Project" label="Projects">
+                </option>
+                <option value="System" label="Systems">
+                </option>
+              </optgroup>
             </select>
-            <label class="inline-check pull-left">
-              <input type="checkbox">
+            <label class="inline-check pull-left disabled">
+              <input type="checkbox" disabled>
               Use control test plans as procedures
             </label>
           </div>
@@ -2783,29 +2812,31 @@
             </div>
           </div>
           <div class="span6">
-            <div class="row-fluid">
+            <div class="row-fluid choose-from-select">
               <div class="span6 bottom-spacing">
                 <label>
                   Default Assessors
+                  <span class="required">*</span>
                 </label>
-                <select class="input-block-level">
+                <select class="input-block-level" id="assessorDefault">
                   <option>Object Owner</option>
                   <option>Audit Lead</option>
                   <option>Object contact</option>
                   <option>Primary assessor</option>
                   <option>Secondary assessors</option>
-                  <option>Other...</option>
+                  <option value="other">Other...</option>
                 </select>
               </div>
               <div class="span6">
                 <label>&nbsp;</label>
-                <input type="text" class="input-block-level" placeholder="Choose person">
+                <input type="text" class="input-block-level choose-input" placeholder="Choose person" disabled>
               </div>
             </div>
             <div class="row-fluid">
               <div class="span6 bottom-spacing">
                 <label>
                   Default verifier
+                  <span class="required">*</span>
                 </label>
                 <input type="text" class="input-block-level" placeholder="Choose person">
               </div>

@@ -1391,3 +1391,7 @@ p {
     }
   }
 }
+
+label.disabled {
+  color: $gray !important;
+}
