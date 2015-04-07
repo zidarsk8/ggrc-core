@@ -582,7 +582,9 @@ can.Model.Cacheable("CMS.Models.Response", {
     if(new_object_form && !this.contact) {
       if (!this.request) {
         this.bind("request", function (ev, request) {
-          this.attr('contact', request.reify().assignee);
+          if (request && request.reify) {
+            this.attr('contact', request.reify().assignee);
+          }
         });
       } else {
         this.attr('contact', this.request.reify().assignee);
