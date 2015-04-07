@@ -369,10 +369,11 @@
             mapping_attr = found_result.mappings;
             // Since we're adding the result as its own mapping, use
             // new_result as the mapping instead of new_result.mappings?
+
             can.each(new_result.mappings, function(mapping) {
               // TODO: Examine when this will be false -- is it a sign of
               //   duplicate work?
-              if (mapping_attr.indexOf(mapping) === -1) {
+              if (mapping_attr.indexOf && mapping_attr.indexOf(mapping) === -1) {
                 found_result.insert_mapping(mapping);
                 instances_to_refresh.push(new_result.instance);
               }

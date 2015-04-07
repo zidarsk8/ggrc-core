@@ -11,7 +11,31 @@
 can.Control("GGRC.Controllers.PbcWorkflows", {
 
 }, {
+  "{CMS.Models.ControlAssessment} created": function(model, ev, instance) {
 
+    if(!(instance instanceof CMS.Models.ControlAssessment)) {
+      return;
+    }
+
+    var audit_dfd, control_dfd;
+
+    audit_dfd = this._create_relationship(instance, instance.audit);
+    control_dfd = this._create_relationship(instance, instance.control);
+    instance.delay_resolving_save_until($.when(audit_dfd, control_dfd));
+
+  },
+  _create_relationship: function(source, destination) {
+
+    if (!destination) {
+      return $.Deferred().resolve();
+    }
+
+    return new CMS.Models.Relationship({
+      source: source.stub(),
+      destination: destination,
+      context: source.context,
+    }).save();
+  }
 });
 
 $(function() {
