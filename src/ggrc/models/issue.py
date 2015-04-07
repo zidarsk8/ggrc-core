@@ -22,24 +22,8 @@ class Issue(HasObjectState, TestPlanned, CustomAttributable, Documentable,
 
   __tablename__ = 'issues'
 
-  control = {}
-  audit = {}
-  program = {}
-  control_assessment = {}
-
   # REST properties
   _publish_attrs = [
-      PublishOnly('audit'),
-      PublishOnly('control'),
-      PublishOnly('program'),
-      PublishOnly('control_assessment')
-  ]
-
-  _relationship_attrs = [
-      'audit',
-      'control',
-      'program',
-      'control_assessment',
   ]
 
 track_state_for_class(Issue)

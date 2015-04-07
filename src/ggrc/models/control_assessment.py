@@ -25,13 +25,11 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documen
 
   control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
   control = db.relationship('Control', foreign_keys=[control_id])
-  audit = {}
 
   # REST properties
   _publish_attrs = [
       'design',
       'operationally',
-      PublishOnly('audit'),
       'control'
   ]
 
