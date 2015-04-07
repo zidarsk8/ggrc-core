@@ -2799,7 +2799,13 @@ Mustache.registerHelper("toggle_string", function (source, str) {
 });
 
 Mustache.registerHelper("grdive_msg_to_id", function (message) {
-  var msg = Mustache.resolve(message).split(' ');
+  var msg = Mustache.resolve(message);
+
+  if (!msg) {
+    return;
+  }
+
+  msg = msg.split(' ');
   return msg[msg.length-1];
 });
 
