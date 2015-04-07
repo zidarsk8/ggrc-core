@@ -11,6 +11,7 @@ from .relationship import Relatable
 from .object_document import Documentable
 from .object_person import Personable
 from .object_control import Controllable
+from .object_objective import Objectiveable
 
 class Response(
     Noted, Described, Hyperlinked, WithContact, Titled, Slugged, db.Model):
@@ -90,7 +91,7 @@ class Response(
         orm.joinedload('request'))
 
 class DocumentationResponse(
-    Relatable, Documentable, Personable, Controllable, Response):
+    Relatable, Documentable, Personable, Controllable, Objectiveable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'documentation'

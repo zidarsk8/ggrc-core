@@ -154,7 +154,7 @@ can.Control("CMS.Controllers.TreeLoader", {
               .first()
               .closest(".cms_controllers_tree_view_node")
               .control();
-      
+
       if (controller) {
         controller.select();
       }
@@ -377,6 +377,19 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         opts.model = CMS.Models[opts.model];
       this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {}).attr(opts);
     }
+  },
+  deselect: function () {
+    var active = this.element.find('.cms_controllers_tree_view_node.active');
+    active.removeClass('active');
+    this.update_hash_fragment(active.length);
+  },
+  update_hash_fragment: function (status) {
+    if (!status) {
+      return;
+    }
+    var hash = window.location.hash.split('/');
+    hash.pop();
+    window.location.hash = hash.join('/');
   }
   , init : function(el, opts) {
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
@@ -1022,8 +1035,8 @@ can.Control("CMS.Controllers.TreeViewNode", {
     if (!this.element)
       return;
 
-    $el = $(el)
-    old_data = $.extend({}, old_el.data())
+    $el = $(el);
+    old_data = $.extend({}, old_el.data());
 
     firstchild = $(_firstElementChild(el));
 
@@ -1099,12 +1112,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , ".select:not(.disabled) click": function(el, ev) {
     var tree = el.closest('.cms_controllers_tree_view_node'),
         node = tree.control();
-    
+
     node.select();
   }
   , select: function () {
     var $tree = this.element;
-      
+
     $tree.closest('section').find('.cms_controllers_tree_view_node').removeClass('active');
     $tree.addClass('active');
 
@@ -1130,7 +1143,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
     if (this.options.parent) {
       parent_fragment = this.options.parent.hash_fragment();
     }
-
     return [parent_fragment,
             this.options.instance.hash_fragment()].join("/");
   }
@@ -1142,3 +1154,4 @@ can.Control("CMS.Controllers.TreeViewNode", {
                             this.hash_fragment()].join('');
   }
 });
+

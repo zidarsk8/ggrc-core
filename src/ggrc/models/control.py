@@ -17,6 +17,7 @@ from .object_owner import Ownable
 from .object_person import Personable
 from .reflection import PublishOnly
 from .utils import validate_option
+from .relationship import Relatable
 
 from .track_object_state import HasObjectState, track_state_for_class
 
@@ -82,7 +83,7 @@ class AssertionCategorized(Categorizable):
         )
 
 
-class Control(HasObjectState,
+class Control(HasObjectState, Relatable,
     CustomAttributable, Documentable, Personable, ControlCategorized, AssertionCategorized,
     Hierarchical, Timeboxed, Ownable, BusinessObject, TestPlanned, db.Model):
   __tablename__ = 'controls'

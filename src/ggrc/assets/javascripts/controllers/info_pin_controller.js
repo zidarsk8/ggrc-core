@@ -112,36 +112,41 @@ can.Control("CMS.Controllers.InfoPin", {
         }
       }
   },
-  '.pin-action a click': function(el) {
-    var options = {
-        duration: 800,
-        easing: 'easeOutExpo'
-      },
-      $info = this.element.find('.info'),
-      win_height = $(window).height(),
-      target_height;
+  '.pin-action a click': function (el) {
+    var $win = $(window),
+        win_height = $win.height(),
+        options = {
+          duration: 800,
+          easing: 'easeOutExpo'
+        },
+        target_height =  {
+          min: 75,
+          normal: (win_height / 3),
+          max: (win_height * 3 / 4)
+        },
+        $info = this.element.find('.info'),
+        type = el.data('size'),
+        size = target_height[type];
 
+    if (type === 'deselect') {
+      // TODO: Make some direct communication between the components
+      //       and make sure only one widget has "widget-active" class
+      el.find('[rel=tooltip]').data('tooltip').hide();
+      return $('.widget-area .widget:visible').find('.cms_controllers_tree_view').control().deselect();
+    }
     this.element.find('.pin-action i').css({'opacity': 0.25});
 
-    if (el.hasClass('min')) {
-      target_height = 75;
-    } else if (el.hasClass('max')) {
-      target_height = win_height * 3 / 4;
-    } else {
-      target_height = win_height / 3;
-    }
-
-    if (target_height < $info.height()) {
+    if (size < $info.height()) {
       options.start = function () {
-        $(window).trigger("resize", target_height);
+        $win.trigger("resize", size);
       };
-    }else{
+    } else {
       options.complete = function () {
-        $(window).trigger("resize");
+        $win.trigger("resize");
       };
     }
 
-    this.element.animate({height: target_height}, options);
-    el.find('i').css({'opacity':1});
+    this.element.animate({height: size}, options);
+    el.find('i').css({'opacity': 1});
   }
 });

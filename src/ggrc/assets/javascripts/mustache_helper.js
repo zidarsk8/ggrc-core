@@ -759,11 +759,28 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
 });
 
 Mustache.registerHelper("schemed_url", function (url) {
-  if (url) {
-    url = url.isComputed? url(): url;
-    if (url && !url.match(/^[a-zA-Z]+:/)) {
-      return (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
-    }
+  var domain, max_label, url_split;
+
+  url = Mustache.resolve(url);
+  if (!url) {
+    return;
+  }
+
+  if (!url.match(/^[a-zA-Z]+:/)) {
+    url = (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
+  }
+
+  // Make sure we can find the domain part of the url:
+  url_split = url.split('/');
+  if (url_split.length < 3) {
+    return 'javascript://';
+  }
+
+  domain = url_split[2];
+  max_label = _.max(domain.split('.').map(function(u) { return u.length; }));
+  if (max_label > 63 || domain.length > 253) {
+    // The url is invalid and might crash user's chrome tab
+    return "javascript://";
   }
   return url;
 });
@@ -868,8 +885,7 @@ Mustache.registerHelper("using", function (options) {
 });
 
 Mustache.registerHelper("with_mapping", function (binding, options) {
-  var refresh_queue = new RefreshQueue()
-    , context = arguments.length > 2 ? resolve_computed(options) : this
+  var context = arguments.length > 2 ? resolve_computed(options) : this
     , frame = new can.Observe()
     , loader
     , stack;
@@ -1843,6 +1859,32 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
   }
 });
 
+Mustache.registerHelper('last_approved', function (instance, options) {
+  var loader = instance.get_binding('approval_tasks'),
+      frame = new can.Observe();
+
+  frame.attr(instance, loader.list);
+  function finish(list) {
+    var item;
+    list = list.serialize();
+    if (list.length > 1) {
+      var biggest = Math.max.apply(Math, list.map(function (item) {
+            return item.instance.id;
+          }));
+      item = list.filter(function (item) {
+        return item.instance.id === biggest;
+      });
+    }
+    item = item ? item[0] : list[0];
+    return options.fn(options.contexts.add(item));
+  }
+  function fail(error) {
+    return options.inverse(options.contexts.add({error: error}));
+  }
+
+  return defer_render('span', { done : finish, fail : fail }, loader.refresh_instances());
+});
+
 Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
   review_task = Mustache.resolve(review_task);
   var current_user_id = GGRC.current_user.id;
@@ -1851,7 +1893,7 @@ Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
 });
 
 Mustache.registerHelper("with_review_task", function (options) {
-  var tasks = options.contexts.attr('current_object_review_tasks');
+  var tasks = options.contexts.attr('approval_tasks');
   tasks = Mustache.resolve(tasks);
   if (tasks) {
     for (i = 0; i < tasks.length; i++) {
@@ -2757,7 +2799,13 @@ Mustache.registerHelper("toggle_string", function (source, str) {
 });
 
 Mustache.registerHelper("grdive_msg_to_id", function (message) {
-  var msg = Mustache.resolve(message).split(' ');
+  var msg = Mustache.resolve(message);
+
+  if (!msg) {
+    return;
+  }
+
+  msg = msg.split(' ');
   return msg[msg.length-1];
 });
 
