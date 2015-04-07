@@ -8,7 +8,7 @@
 (function($, CMS, GGRC) {
   var WorkflowExtension = {},
       _workflow_object_types = Array.prototype.concat.call([],
-        'Regulation Policy Standard Contract Clause Section Program'.split(' '),
+        'Program Regulation Policy Standard Contract Clause Section'.split(' '),
         'Control Objective'.split(' '),
         'OrgGroup Vendor'.split(' '),
         'System Process DataAsset Product Project Facility Market'.split(' ')
