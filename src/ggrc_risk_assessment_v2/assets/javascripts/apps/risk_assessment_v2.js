@@ -108,6 +108,7 @@
 
     can.each(_risk_object_types, function (type) {
       if (["Control", "Section", "Objective"].indexOf(type) > -1) {
+        var related_and_able_objects = GGRC.Mappings.modules.ggrc_core[type].related_and_able_objects.sources;
         mappings[type] = {
           _canonical: {
             "related_objects": ['Risk', 'RiskObject', 'ThreatActor']
@@ -116,10 +117,7 @@
           related_threat_actors:    TypeFilter("related_objects", "ThreatActor"),
           risks:                    TypeFilter("related_objects", "Risk"),
           risk_objects:             TypeFilter("related_objects", "RiskObject"),
-          related_and_able_objects: Multi(
-            $.merge(GGRC.Mappings.modules.ggrc_core[type].related_and_able_objects.sources,
-                    ["risks"])
-          ),
+          related_and_able_objects: Multi(related_and_able_objects.concat(["risks"])),
         };
       } else {
         mappings[type] = {
