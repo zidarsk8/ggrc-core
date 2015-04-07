@@ -977,7 +977,7 @@
     }
     , DocumentationResponse : {
       _mixins : ["response"]
-      , business_objects : Multi(["related_objects", "controls", "people", "sections", "clauses"])
+      , business_objects : Multi(["related_objects", "controls", "objectives", "people", "sections", "clauses"])
     }
     , InterviewResponse : {
         _canonical : {

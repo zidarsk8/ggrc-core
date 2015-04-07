@@ -512,6 +512,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
     , object_controls : "CMS.Models.ObjectControl.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , controls : "CMS.Models.Control.stubs"
     , contact : "CMS.Models.Person.stub"
   }
