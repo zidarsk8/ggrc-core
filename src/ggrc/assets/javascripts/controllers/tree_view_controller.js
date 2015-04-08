@@ -396,7 +396,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
         //Program, Regulation
         program_attr_list = [
-          {attr_title: 'Primary Contact', attr_name: 'primary_contact', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Primary Contact', attr_name: 'contact', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
           {attr_title: 'Secondary Contact', attr_name: 'secondary_contact', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'URL', attr_name: 'url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
@@ -412,7 +412,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
 
 
-    if(!this.options.select_attr_list){
+    if(!this.options.select_attr_list) {
       can.each(basic_attr_list, function(item){
         select_attr_list.push(item);
       })
@@ -440,7 +440,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options.attr('select_attr_list', this.options.select_attr_list);
     }
 
-    if(!this.options.display_attr_list){
+    if(!this.options.display_attr_list) {
       can.each(select_attr_list, function(item){
         if (item.attr_title !== 'Title' && item.display_status === 'true') {
           display_attr_list.push(item);
@@ -448,6 +448,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       })
       this.options.display_attr_list = display_attr_list;
       this.options.attr('display_attr_list', this.options.display_attr_list);
+    }
+    //console.log("display-attrlist: " + this.options.display_attr_list.length);
+    if(!this.options.display_attr_width) {
+      var width = Math.floor(12/this.options.display_attr_list.length);
+      this.options.attr('display_attr_width', width);
     }
   }
   , init : function(el, opts) {
@@ -959,7 +964,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //console.log("set tree-attr");
     //1: find checked items
     //2. update
-    var i, ch_val, that = this,
+    var i, ch_val, that = this, attr_width,
         $check = $(this.element).parent().find(".attr-checkbox"),
         selected = $.grep($check, function(e){ return (e.checked == true);}),
         selected_items = selected.length;
@@ -987,7 +992,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
     })
     this.options.attr('display_attr_list', this.options.display_attr_list);
-
+    attr_width = Math.floor(12/this.options.display_attr_list.length);
+    this.options.attr('display_attr_width', attr_width);
     //this.options.attr('original_list', []);
     //this.options.attr('original_list', this.options.list);
     this.reload_list();

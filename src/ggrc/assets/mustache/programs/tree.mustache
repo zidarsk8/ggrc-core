@@ -33,7 +33,7 @@
                 {{#display_attr_list}}
                 {{!#instance}}
                 {{!log "sasmita each attr val"}}{{!log this}}
-                <div class="span3">
+                <div class="span{{display_attr_width}}">
                   <div class="owner tree-title-area">
                     {{#switch attr_name}}
                       {{#case 'owner'}}
@@ -57,8 +57,19 @@
                       {{#case 'status'}}
                         {{instance.status}}
                       {{/case}}
-                      {{#case 'primary_contact'}}
-                        {{instance.primary_contact}}
+                      {{#case 'contact'}}
+                        <span>
+                          {{#using contact=instance.contact}}
+                            {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                          {{/using}}
+                        </span>
+                      {{/case}}
+                      {{#case 'secondary_contact'}}
+                        <span>
+                          {{#using contact=instance.secondary_contact}}
+                            {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                          {{/using}}
+                        </span>
                       {{/case}}
                       {{#case 'url'}}
                         {{instance.url}}
