@@ -828,7 +828,7 @@
             "requests" : "Request"
           , "_program" : "Program"
           , "context" : "Context"
-          , "related_objects_as_source" : ["ControlAssessment"]
+          , "related_objects_as_source" : ["ControlAssessment", "Issue"]
         }
       , requests: Direct("Request", "audit", "requests")
       , active_requests: CustomFilter('requests', function(result) {
