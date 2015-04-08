@@ -43,6 +43,7 @@ dashboard-js-files:
   - plugins/openclose.js
   - plugins/tooltip.js
   - plugins/popover.js
+  - plugins/popover_template.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js
@@ -184,6 +185,7 @@ dashboard-js-template-files:
   - facilities/modal_content.mustache
   - help/help_modal_content.mustache
   - help/help_modal_header.mustache
+  - help/filters_helper_content.mustache
   - markets/modal_content.mustache
   - modals/close_buttons.mustache
   - modals/confirm.mustache
