@@ -938,11 +938,11 @@
     }
     , Issue : {
       _mixins: [
-        "related_object", "personable", "ownable", "business_object"
+        "related_object", "personable", "ownable", "objectiveable"
       ],
       _canonical: {
-       "related_objects" : [
-          "Program", "ControlAssessment", "Control", "Audit"
+       "related_objects_as_source" : [
+          "Program", "ControlAssessment", "Audit", "Control"
         ],
       }
       , related_audits:   TypeFilter("related_objects", "Audit")

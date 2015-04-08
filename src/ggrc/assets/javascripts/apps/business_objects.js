@@ -750,24 +750,23 @@ $(function() {
             , Control: {
                 mapping: "related_controls"
               , draw_children: true
-              , allow_creating: false
-              , allow_mapping: false
               , show_view: GGRC.mustache_path + "/controls/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
               }
             , Audit: {
                 mapping: "related_audits"
               , draw_children: true
-              , allow_creating: false
-              , allow_mapping: false
               , show_view: GGRC.mustache_path + "/audits/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
             }
             , ControlAssessment: {
                 mapping: "related_control_assessments"
               , draw_children: true
-              , allow_creating: false
-              , allow_mapping: false
+              , allow_creating: true
+              , allow_mapping: true
               , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
               , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
             }
           }
         , DataAsset: {
