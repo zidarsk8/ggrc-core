@@ -14,9 +14,11 @@
   .tree-action-list {
     @include reset-list();
     @include clearfix();
-    float: right;
+    text-align: right;
+    height: 28px;
     li {
-      float: left;
+      display: inline-block;
+      overflow: hidden;
       margin-left: 10px;
       line-height: 24px;
       .item-data {
