@@ -4,7 +4,7 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
-
+  {{!log "sasmita-- tree view li"}} {{!log .}}
 
   <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
@@ -26,38 +26,66 @@
                   {{/instance.title}}
                 </div>
               </div>
-              {{#instance}}
-                <div class="span2">
+
+
+              <div class="span4">
+              <div class="row-fluid">
+                {{#display_attr_list}}
+                {{!#instance}}
+                {{!log "sasmita each attr val"}}{{!log this}}
+                <div class="span3">
                   <div class="owner tree-title-area">
-                    {{#with_mapping 'authorizations' instance}}
-                      {{#each authorizations}}
-                        <span>
-                          {{#using role=instance.role}}
-                            {{#if_equals role.name 'ProgramOwner'}}
-                              {{#using contact=instance.person}}
-                                {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                    {{#switch attr_name}}
+                      {{#case 'owner'}}
+                        {{#with_mapping 'authorizations' instance}}
+                          {{#each authorizations}}
+                            <span>
+                              {{#using role=instance.role}}
+                                {{#if_equals role.name 'ProgramOwner'}}
+                                  {{#using contact=instance.person}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                                  {{/using}}
+                                {{/if_equals}}
                               {{/using}}
-                            {{/if_equals}}
-                          {{/using}}
-                        </span>
-                      {{/each}}
-                    {{/with_mapping}}
+                            </span>
+                          {{/each}}
+                        {{/with_mapping}}
+                      {{/case}}
+                      {{#case 'slug'}}
+                        {{instance.slug}}
+                      {{/case}}
+                      {{#case 'status'}}
+                        {{instance.status}}
+                      {{/case}}
+                      {{#case 'primary_contact'}}
+                        {{instance.primary_contact}}
+                      {{/case}}
+                      {{#case 'url'}}
+                        {{instance.url}}
+                      {{/case}}
+                      {{#case 'reference_url'}}
+                        {{instance.reference_url}}
+                      {{/case}}
+                      {{#case 'start_date'}}
+                        {{instance.start_date}}
+                      {{/case}}
+                      {{#case 'end_date'}}
+                        {{instance.end_date}}
+                      {{/case}}
+                    {{/switch}}
                   </div>
+                  <!-- the below lines should be used for custom attributes -->
+                  <!--div class="code tree-title-area">
+                    {{get_attr_data this instance}}
+                  </div-->
                 </div>
 
-                <div class="span1">
-                  <div class="code tree-title-area">
-                    {{slug}}
-                  </div>
-                </div>
+                {{!/instance}}
+                {{/display_attr_list}}
+              </div>
+              </div>
 
-                <div class="span1">
-                  <div class="state-value state-{{to_class status '_'}} tree-title-area">
-                    {{status}}
-                  </div>
-                </div>
 
-              {{/instance}}
               <div class="span4">
 
                 <div class="show-details">

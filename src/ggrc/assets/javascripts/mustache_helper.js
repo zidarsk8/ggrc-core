@@ -2965,4 +2965,21 @@ Mustache.registerHelper("if_less", function (a, b, options) {
   }
 });
 
+/*
+  Used to get the string value for custom attributes CORE-1546
+*/
+Mustache.registerHelper("get_attr_data", function(attr_info, instance){
+  var ins, atr, attr_name;
+
+  ins = Mustache.resolve(instance);
+  atr = Mustache.resolve(attr_info);
+  attr_name = atr.attr_name;
+
+  if (ins[attr_name])
+    return ins[attr_name];
+  else
+    return '';
+
+});
+
 })(this, jQuery, can);

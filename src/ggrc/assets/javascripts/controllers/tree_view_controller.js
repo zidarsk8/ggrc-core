@@ -378,7 +378,82 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {}).attr(opts);
     }
   }
+
+  //initialize the attribute list CORE-1546
+  //default attribute for each model type and custon attributes
+  , init_display_options: function(opts) {
+    //Fixme: Now only some default attributes like, title, definition, slug,  owner etc
+
+    var select_attr_list = [],
+        display_attr_list = [],
+
+        basic_attr_list = [
+          {attr_title: 'Title', attr_name: 'title', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Owner', attr_name: 'owner', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Code', attr_name: 'slug', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
+          {attr_title: 'State', attr_name: 'status', attr_datatype: 'string', display_status: 'true', attr_type: 'default'}
+        ],
+
+        //Program, Regulation
+        program_attr_list = [
+          {attr_title: 'Primary Contact', attr_name: 'primary_contact', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Secondary Contact', attr_name: 'secondary_contact', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'URL', attr_name: 'url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Effective Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Stop Date', attr_name: 'end_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          //{attr_title: 'Network Zone', attr_name: 'network', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          //{attr_title: 'System Url', attr_name: 'system_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+        ],
+        //Policy
+        policy_attr_list = [
+          {attr_title: 'Policy Type', attr_name: 'type', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+        ];
+
+
+
+    if(!this.options.select_attr_list){
+      can.each(basic_attr_list, function(item){
+        select_attr_list.push(item);
+      })
+      var model_name = opts.model.model_singular;
+      switch (model_name) {
+        case 'Program':
+        case 'Regulation':
+          can.each(program_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          break;
+        case 'Policy':
+          can.each(program_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          can.each(policy_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          break;
+        default:
+          break;
+      }
+
+      this.options.select_attr_list = select_attr_list;
+      this.options.attr('select_attr_list', this.options.select_attr_list);
+    }
+
+    if(!this.options.display_attr_list){
+      can.each(select_attr_list, function(item){
+        if (item.attr_title !== 'Title' && item.display_status === 'true') {
+          display_attr_list.push(item);
+        }
+      })
+      this.options.display_attr_list = display_attr_list;
+      this.options.attr('display_attr_list', this.options.display_attr_list);
+    }
+  }
   , init : function(el, opts) {
+    this.init_display_options(opts);
+    //console.log("sasmita init tree-view-controller---------------- init called---");
+    //console.log('SAsmita--- extra=' + extra);
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       this.display_prefs = display_prefs;
       this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
@@ -442,6 +517,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
                 } else {
                   that.hide_filter();
                 }
+              });
+              can.bind.call(that.element.parent().find('.set-tree-attrs'), 'click', function (evnt) {
+                that.set_tree_attrs();
               });
         })));
       }
@@ -873,6 +951,49 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.display_prefs.setFilterHidden(false);
       this.display_prefs.save();
     }
+
+  /* Update the tree attributes as selected by the user CORE-1546
+  */
+  , set_tree_attrs : function() {
+    //update the display attrbute list and re-draw
+    //console.log("set tree-attr");
+    //1: find checked items
+    //2. update
+    var i, ch_val, that = this,
+        $check = $(this.element).parent().find(".attr-checkbox"),
+        selected = $.grep($check, function(e){ return (e.checked == true);}),
+        selected_items = selected.length;
+
+    can.each(this.options.select_attr_list, function(item) {
+      item.display_status = false;
+    });
+
+
+    for(i = 0; i < selected_items; i++) {
+      ch_val = $(selected[i]).val();
+      for(j = 0; j < this.options.select_attr_list.length; j++) {
+        var obj = this.options.select_attr_list[j];
+        if(ch_val === obj.attr_name)
+          obj.display_status = true;
+      }
+    }
+    this.options.attr('select_attr_list', this.options.select_attr_list);
+
+    this.options.display_attr_list = [];
+
+    can.each(this.options.select_attr_list, function(item){
+      if (item.attr_title !== 'Title' && item.display_status === true) {
+        that.options.display_attr_list.push(item);
+      }
+    })
+    this.options.attr('display_attr_list', this.options.display_attr_list);
+
+    //this.options.attr('original_list', []);
+    //this.options.attr('original_list', this.options.list);
+    this.reload_list();
+    //set user preferences for next time
+
+  }
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
