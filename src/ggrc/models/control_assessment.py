@@ -33,8 +33,4 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documen
       'control'
   ]
 
-  _relationship_attrs = [
-
-  ]
-
 track_state_for_class(ControlAssessment)
