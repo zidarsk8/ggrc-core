@@ -44,6 +44,11 @@ a.remove_filter i[class^="grcicon-"] {
   vertical-align: text-bottom !important;
 }
 
+.grcicon-loading {
+  background: image-url("ajax-loader.gif") no-repeat center center;
+  background-size: 100%;
+}
+
 .grcicon-add {
   background-position:-222px -32px;
   .active & {
