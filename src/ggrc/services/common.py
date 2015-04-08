@@ -140,28 +140,6 @@ def set_ids_for_new_custom_attribute_values(objects, obj):
   db.session.flush()
 
 
-def create_mappings(obj, src):
-  """
-  Uses '_relationship_attrs' object property to create a mapping
-
-  Example: _relationship_attrs = ['audit', 'control'] will search for audit and control
-  stubs in json and create a mapping based on that. The json attr should contain a
-  an id and a type.
-  """
-  if not hasattr(obj, '_relationship_attrs'):
-    return
-
-  # TODO: Gather relationship_attrs from mixins
-  # TODO: Handle multiple mapping types (owners), only relationships mapping supported at this point
-  for attr in obj._relationship_attrs:
-    dest = src[attr]
-    r = Relationship()
-    r.source_id = obj.id
-    r.source_type = obj.type
-    r.destination_id = dest['id']
-    r.destination_type = dest['type']
-    db.session.add(r)
-
 def update_memcache_before_commit(context, modified_objects, expiry_time):
   """
   Preparing the memccache entries to be updated before DB commit
@@ -1042,7 +1020,6 @@ class Resource(ModelView):
     db.session.add(obj)
     modified_objects = get_modified_objects(db.session)
     set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
-    create_mappings(obj, src)
     log_event(db.session, obj)
     with benchmark("Update memcache before commit for resource collection POST"):
       update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)

@@ -13,32 +13,17 @@ from .object_person import Personable
 from .relationship import Relatable
 from .track_object_state import HasObjectState, track_state_for_class
 from ggrc.models.reflection import PublishOnly
+from .object_objective import Objectiveable
 
 
 class Issue(HasObjectState, TestPlanned, CustomAttributable, Documentable,
-            Personable, Timeboxed, Ownable, Relatable,
+            Personable, Timeboxed, Ownable, Relatable, Objectiveable,
             BusinessObject, db.Model):
 
   __tablename__ = 'issues'
 
-  control = {}
-  audit = {}
-  program = {}
-  control_assessment = {}
-
   # REST properties
   _publish_attrs = [
-      PublishOnly('audit'),
-      PublishOnly('control'),
-      PublishOnly('program'),
-      PublishOnly('control_assessment')
-  ]
-
-  _relationship_attrs = [
-      'audit',
-      'control',
-      'program',
-      'control_assessment',
   ]
 
 track_state_for_class(Issue)

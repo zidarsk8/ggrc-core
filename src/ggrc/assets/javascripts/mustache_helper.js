@@ -2996,4 +2996,29 @@ Mustache.registerHelper("if_less", function (a, b, options) {
   }
 });
 
+Mustache.registerHelper("with_create_issue_json", function (instance, options) {
+  instance = Mustache.resolve(instance);
+
+  var audits = instance.get_mapping("related_audits"),
+      audit, programs, program, control, json;
+
+  if (!audits.length) {
+    return "{}";
+  }
+
+  audit = audits[0].instance.reify();
+  programs = audit.get_mapping("_program");
+  program = programs[0].instance.reify();
+  control = instance.control.reify();
+
+  json = {
+    audit: {title: audit.title, id: audit.id, type: audit.type},
+    program: {title: program.title, id: program.id, type: program.type},
+    control: {title: control.title, id: control.id, type: control.type},
+    control_assessment: {title: instance.title, id: instance.id, type: instance.type},
+  };
+
+  return options.fn(options.contexts.add({'create_issue_json': JSON.stringify(json)}));
+});
+
 })(this, jQuery, can);

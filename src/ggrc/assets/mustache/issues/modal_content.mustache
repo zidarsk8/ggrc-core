@@ -24,93 +24,42 @@
   </div>
 
   <div class="row-fluid">
-    {{#if new_object_form}}
+    {{#control}}
     <div class="span3">
         <label>
           Control
-          <span class="required">*</span>
           <i class="grcicon-help-black" rel="tooltip" title="Control for this Issue"></i>
         </label>
-        <input tabindex="2" class="input-block-level" name="control.title" data-lookup="Control" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Control" type="text" value="{{firstexist control.title ''}}" />
+        <input tabindex="999" readonly="readonly" class="input-block-level" type="text" value="{{firstexist title ''}}" />
     </div>
+    {{/control}}
+    {{#audit}}
     <div class="span3">
         <label>
           Audit
-          <span class="required">*</span>
           <i class="grcicon-help-black" rel="tooltip" title="Audit for this Issue"></i>
         </label>
-        <input tabindex="2" class="input-block-level" name="audit.title" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" value="{{firstexist audit.title ''}}" />
+        <input tabindex="999" readonly="readonly" class="input-block-level" placeholder="Choose Audit" type="text" value="{{firstexist title ''}}" />
     </div>
+    {{/audit}}
+    {{#program}}
     <div class="span3">
         <label>
           Program
-          <span class="required">*</span>
           <i class="grcicon-help-black" rel="tooltip" title="Program for this Issue"></i>
         </label>
-        <input tabindex="2" class="input-block-level" name="program.title" data-lookup="Program" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Program" type="text" value="{{firstexist program.title ''}}" />
+        <input tabindex="999" readonly="readonly" class="input-block-level" type="text" value="{{firstexist title ''}}" />
     </div>
+    {{/program}}
+    {{#control_assessment}}
     <div class="span3">
         <label>
           Control Assessment
-          <span class="required">*</span>
           <i class="grcicon-help-black" rel="tooltip" title="Control Assessment for this Issue"></i>
         </label>
-        <input tabindex="2" class="input-block-level" name="control_assessment.title" data-lookup="ControlAssessment" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Control Assessment" type="text" value="{{firstexist control_assessment.title ''}}" />
+        <input tabindex="999" readonly="readonly" class="input-block-level" data-lookup="ControlAssessment" type="text" value="{{firstexist title ''}}" />
     </div>
-    {{else}}
-      {{#with_mapping "related_controls" instance}}
-        {{#related_controls.0.instance}}
-          <div class="span2">
-            <label>
-              Control
-              <span class="required">*</span>
-              <i class="grcicon-help-black" rel="tooltip" title="Control for this Issue"></i>
-            </label>
-            <input tabindex="2" class="input-block-level" name="control" readonly="readonly" value="{{firstexist title ''}}" />
-          </div>
-        {{/related_controls}}
-      {{/with_mapping}}
-
-
-      {{#with_mapping "related_audits" instance}}
-        {{#related_audits.0.instance}}
-          <div class="span2">
-            <label>
-              Audit
-              <span class="required">*</span>
-              <i class="grcicon-help-black" rel="tooltip" title="Audit for this Issue"></i>
-            </label>
-            <input tabindex="2" class="input-block-level" name="audit" readonly="readonly" type="text" value="{{firstexist title ''}}" />
-          </div>
-        {{/related_audits}}
-      {{/with_mapping}}
-
-      {{#with_mapping "related_programs" instance}}
-        {{#related_programs.0.instance}}
-          <div class="span2">
-            <label>
-              Program
-              <span class="required">*</span>
-              <i class="grcicon-help-black" rel="tooltip" title="Program for this Issue"></i>
-            </label>
-            <input tabindex="2" class="input-block-level" name="program" readonly="readonly" type="text" value="{{firstexist title ''}}" />
-          </div>
-        {{/related_programs}}
-      {{/with_mapping}}
-
-      {{#with_mapping "related_control_assessments" instance}}
-        {{#related_control_assessments.0.instance}}
-          <div class="span2">
-            <label>
-              Control Assessment
-              <span class="required">*</span>
-              <i class="grcicon-help-black" rel="tooltip" title="Control Assessment for this Issue"></i>
-            </label>
-            <input tabindex="2" class="input-block-level" name="control_assessment" readonly="readonly" value="{{firstexist title ''}}" />
-          </div>
-        {{/related_control_assessments}}
-      {{/with_mapping}}
-    {{/if}}
+    {{/control_assessment}}
   </div>
 
   <div class="row-fluid">

@@ -150,13 +150,13 @@
     <div class="row-fluid">
       <div class="span6 hidable">
         <label>
-          Design
-          <i class="grcicon-help-black" rel="tooltip" title="Indicates the design effectiveness of this Control Assessment."></i>
+          Conclusion: Design
+          <i class="grcicon-help-black" rel="tooltip" title="Is this control design effective?"></i>
           <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <select class="input-block-level" name="design" null-if-empty="null-if-empty" tabindex="7">
           <option value="" {{#if_equals design ""}}selected{{/if_equals}}>---</option>
-          {{#iterate 'Effective', 'Ineffective'}}
+          {{#iterate 'Effective' 'Material weakness' 'Needs improvement' 'Significant deficiency' 'Not Applicable'}}
             <option {{#if_equals iterator design}}selected="true"{{/if_equals}}>{{iterator}}</option>
           {{/iterate}}
         </select>
@@ -164,13 +164,13 @@
 
       <div class="span6 hidable">
         <label>
-          Operationally
-          <i class="grcicon-help-black" rel="tooltip" title="Indicates the operational effectivness of this Control Assessment."></i>
+          Conclusion: Operational
+          <i class="grcicon-help-black" rel="tooltip" title="Is this control operationally effective?"></i>
           <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <select class="input-block-level" name="operationally" null-if-empty="null-if-empty" tabindex="8">
           <option value="" {{#if_equals operationally ""}}selected{{/if_equals}}>---</option>
-          {{#iterate 'Effective', 'Ineffective'}}
+          {{#iterate 'Effective' 'Material weakness' 'Needs improvement' 'Significant deficiency' 'Not Applicable'}}
             <option {{#if_equals iterator operationally}}selected="true"{{/if_equals}}>{{iterator}}</option>
           {{/iterate}}
         </select>

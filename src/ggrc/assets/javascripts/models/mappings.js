@@ -260,6 +260,7 @@
       , _canonical : {
         "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System"],
+        "related_objects_as_source": ["Issue"],
         "programs" : "Program",
         "objectives" : "Objective",
         "implemented_controls" : "Control",
@@ -346,7 +347,7 @@
         _mixins: ["personable", "ownable"] //objectiveable
       , _canonical : {
           "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System",
-                               "Regulation", "Contract", "Policy", "Standard", "Program"]
+                               "Regulation", "Contract", "Policy", "Standard", "Program", "Issue"]
         , "objectives" : "Objective"
         , "controls" : "Control"
         , "_sections_base" : ["Section", "Clause"]
@@ -365,6 +366,7 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_issues:     TypeFilter("related_objects", "Issue")
 
       , regulations: TypeFilter("related_objects", "Regulation")
       , contracts: TypeFilter("related_objects", "Contract")
@@ -397,7 +399,7 @@
     , section_base: {
         _mixins: ["personable", "ownable"] //sectionable
       , _canonical : {
-        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System"],
+        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue"],
         "objectives" : "Objective",
         "controls" : "Control"
       }
@@ -414,6 +416,7 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_issues:     TypeFilter("related_objects", "Issue")
       //, sections: Proxy(
       //    "Section", "section", "ObjectSection", "sectionable", "object_sections")
       , objectives: Proxy(
@@ -497,7 +500,7 @@
         "related_objects_as_source" : [
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
-          "Program"
+          "Program", "Issue"
           ]
       }
       , related_objects_as_source: Proxy(
@@ -514,6 +517,7 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_issues:      TypeFilter("related_objects", "Issue")
 
       , regulations: TypeFilter("related_objects", "Regulation")
       , contracts: TypeFilter("related_objects", "Contract")
@@ -690,7 +694,7 @@
           "related_objects" : [
             "Program", "Regulation", "Contract", "Policy",  "Standard",
             "Objective", "Control", "Section", "Clause", "DataAsset", "Facility", "Market",
-            "OrgGroup", "Vendor", "Process", "Product", "Project", "System"
+            "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue"
             ],
           "authorizations" : "UserRole"
         }
@@ -720,7 +724,7 @@
       , related_regulations: TypeFilter("related_objects", "Regulation")
       , related_contracts:   TypeFilter("related_objects", "Contract")
       , related_policies:    TypeFilter("related_objects", "Policy")
-      , related_standards:    TypeFilter("related_objects", "Standard")
+      , related_standards:   TypeFilter("related_objects", "Standard")
       , related_objectives:  TypeFilter("related_objects", "Objective")
       , related_controls:    TypeFilter("related_objects", "Control")
       , related_sections:    TypeFilter("related_objects", "Section")
@@ -734,6 +738,7 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_issues:      TypeFilter("related_objects", "Issue")
 
       , authorizations: Direct("UserRole", "person", "user_roles")
       , programs_via_authorizations: Cross("authorizations", "program_via_context")
@@ -823,7 +828,7 @@
             "requests" : "Request"
           , "_program" : "Program"
           , "context" : "Context"
-          , "related_objects_as_source" : ["ControlAssessment"]
+          , "related_objects_as_source" : ["ControlAssessment", "Issue"]
         }
       , requests: Direct("Request", "audit", "requests")
       , active_requests: CustomFilter('requests', function(result) {
@@ -927,24 +932,22 @@
       }
       , control: Direct("Control", "controls", "control_assessment")
       , related_audits:   TypeFilter("related_objects", "Audit")
-      //, related_controls: TypeFilter("related_objects", "Control")
+      , related_controls: TypeFilter("related_objects", "Control")
       , related_sections: TypeFilter("related_objects", "Section")
       , related_clauses:  TypeFilter("related_objects", "Clause")
-      , related_issues: TypeFilter("related_objects", "Issue")
     }
     , Issue : {
       _mixins: [
-        "related_object", "personable", "ownable"
+        "related_object", "personable", "ownable", "objectiveable"
       ],
       _canonical: {
-       "related_objects" : [
-          "Program", "ControlAssessment", "Control", "Audit"
+       "related_objects_as_source" : [
+          "Program", "ControlAssessment", "Audit", "Control"
         ],
       }
       , related_audits:   TypeFilter("related_objects", "Audit")
       , related_controls: TypeFilter("related_objects", "Control")
       , related_control_assessments: TypeFilter("related_objects", "ControlAssessment")
-      , related_programs:  TypeFilter("related_objects", "Program")
     }
     , Request : {
         _canonical : {
