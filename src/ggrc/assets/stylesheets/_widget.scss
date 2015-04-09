@@ -617,11 +617,6 @@
   }
   .custom-attr-wrap {
     border-top: 1px solid $itemBorder;
-    .hidden-fields-area,
-    .hidden-fields-area-custom {
-      margin-top: 15px;
-      border-bottom: 1px solid $itemBorder;
-    }
   }
   .info-widget-footer {
     padding-top: 3px;
@@ -630,6 +625,13 @@
       color: $textGray;
     }
   }
+}
+
+.hidden-fields-area,
+.hidden-fields-area-custom {
+  padding-top: 15px;
+  padding-left: 28px;
+  border-bottom: 1px solid $itemBorder;
 }
 
 .info {
