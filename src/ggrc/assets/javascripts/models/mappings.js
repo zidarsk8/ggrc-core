@@ -774,7 +774,7 @@
             ).pipe(function(mappings) {
               return mappings.entries;
             });
-        })
+        }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,Product,Project,Facility,Market,OrgGroup,Vendor,Audit")
 
       , extended_related_programs_via_search:    TypeFilter("related_objects_via_search", "Program")
       , extended_related_regulations_via_search: TypeFilter("related_objects_via_search", "Regulation")
@@ -799,7 +799,7 @@
           return CMS.Models.Request.findAll({
             'assignee_id': binding.instance.id
           });
-        })
+        }, 'Request')
       , open_audit_requests: CustomFilter('audit_requests', function(result) {
         return result.instance.status !== 'Accepted';
       })
@@ -1023,7 +1023,7 @@
         return CMS.Models.CustomAttributeDefinition.findAll({
           definition_type: binding.instance.root_object
         });
-      })
+      }, 'CustomAttributeDefinition')
     }
   });
 })(GGRC, can);
