@@ -4,7 +4,6 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
-  {{!log "sasmita-- tree view li"}} {{!log .}}
 
   <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
@@ -82,6 +81,9 @@
                       {{/case}}
                       {{#case 'end_date'}}
                         {{instance.end_date}}
+                      {{/case}}
+                      {{#case 'updated_at'}}
+                        {{instance.updated_at}}
                       {{/case}}
                     {{/switch}}
                   </div>

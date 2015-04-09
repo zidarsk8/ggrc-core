@@ -383,32 +383,68 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   //default attribute for each model type and custon attributes
   , init_display_options: function(opts) {
     //Fixme: Now only some default attributes like, title, definition, slug,  owner etc
+    //Ex: custom attrs:
+    //CMS.Models.CustomAttributeDefinition.findAll({definition_type: 'program'}).then(function(de){defs = de;})
+    //name = title and attr_datatype = attribute_type
+    //We shold get the display_attr_list from user preference object for the current user
 
-    var select_attr_list = [],
+    var model_name,
+        select_attr_list = [],
         display_attr_list = [],
 
         basic_attr_list = [
           {attr_title: 'Title', attr_name: 'title', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
           {attr_title: 'Owner', attr_name: 'owner', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Code', attr_name: 'slug', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
-          {attr_title: 'State', attr_name: 'status', attr_datatype: 'string', display_status: 'true', attr_type: 'default'}
+          {attr_title: 'Code', attr_name: 'slug', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'State', attr_name: 'status', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Primary Contact', attr_name: 'contact', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Secondary Contact', attr_name: 'secondary_contact', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Last Updated', attr_name: 'updated_at', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
         ],
 
-        //Program, Regulation
+        //Program, Regulation, Standard, Contract, Org Group, Vender, Data Asset, Project, Facility, Market
         program_attr_list = [
-          {attr_title: 'Primary Contact', attr_name: 'contact', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Secondary Contact', attr_name: 'secondary_contact', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'URL', attr_name: 'url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Effective Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Stop Date', attr_name: 'end_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
-          //{attr_title: 'Network Zone', attr_name: 'network', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          //{attr_title: 'System Url', attr_name: 'system_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
         ],
-        //Policy
+        //Policy, Product,  in addition to program_attr_list
         policy_attr_list = [
-          {attr_title: 'Policy Type', attr_name: 'type', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          {attr_title: 'Type', attr_name: 'type', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+        ],
+        //System, Processes,  in addition to program_attr_list
+        system_attr_list = [
+          {attr_title: 'Network Zone', attr_name: 'network', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+        ]
+        //Clause
+        clause_attr_list = [
+          {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Effective Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Stop Date', attr_name: 'end_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+        ],
+        //Section, Objective
+        section_attr_list = [
+          {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Effective Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+        ],
+        //Control
+        control_attr_list = [
+          {attr_title: 'URL', attr_name: 'url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Effective Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Stop Date', attr_name: 'end_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Kind/Nature', attr_name: 'find', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Fraud Related ', attr_name: 'fraud_related', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Significance', attr_name: 'significance', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Type/Means', attr_name: 'type', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Frequency', attr_name: 'frequency', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Assertions', attr_name: 'assertions', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Categories', attr_name: 'categories', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Principal Assessor', attr_name: 'principal_assessor', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Secondary Assessor', attr_name: 'secondary_assessor', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
         ];
+
 
 
 
@@ -416,15 +452,24 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       can.each(basic_attr_list, function(item){
         select_attr_list.push(item);
       })
-      var model_name = opts.model.model_singular;
+      model_name = opts.model.model_singular;
       switch (model_name) {
         case 'Program':
         case 'Regulation':
+        case 'Standard':
+        case 'Contract':
+        case 'OrgGroup':
+        case 'Vendor':
+        case 'DataAsset':
+        case 'Project':
+        case 'Facility':
+        case 'Market':
           can.each(program_attr_list, function(item){
             select_attr_list.push(item);
           });
           break;
         case 'Policy':
+        case 'Product':
           can.each(program_attr_list, function(item){
             select_attr_list.push(item);
           });
@@ -432,6 +477,30 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             select_attr_list.push(item);
           });
           break;
+        case 'System':
+        case 'Process':
+          can.each(program_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          can.each(system_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          break;
+        case 'Clause':
+          can.each(clause_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          break;
+        case 'Section':
+        case 'Objective':
+          can.each(section_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          break;
+        case 'Control':
+          can.each(control_attr_list, function(item){
+            select_attr_list.push(item);
+          });
         default:
           break;
       }
@@ -458,7 +527,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   , init : function(el, opts) {
     this.init_display_options(opts);
     //console.log("sasmita init tree-view-controller---------------- init called---");
-    //console.log('SAsmita--- extra=' + extra);
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       this.display_prefs = display_prefs;
       this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
@@ -994,8 +1062,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.options.attr('display_attr_list', this.options.display_attr_list);
     attr_width = Math.floor(12/this.options.display_attr_list.length);
     this.options.attr('display_attr_width', attr_width);
-    //this.options.attr('original_list', []);
-    //this.options.attr('original_list', this.options.list);
+
     this.reload_list();
     //set user preferences for next time
 
