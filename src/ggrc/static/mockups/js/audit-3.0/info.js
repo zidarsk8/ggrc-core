@@ -204,6 +204,7 @@ $(document).ready(function() {
     $("#ca .content").find(".tree-structure").find(".tree-item").show();
     $("#CaAdded").hide();
     $("#ca .content").find(".tree-structure").find(".zero-state").hide();
+    $("#CaModalMapping").modal("hide");
     $("#CACounter").html("4");
   }
 
