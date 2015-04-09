@@ -2977,8 +2977,8 @@ Mustache.registerHelper("get_attr_data", function(attr_info, instance){
 
   if (ins[attr_name])
     return ins[attr_name];
-  else
-    return '';
+
+  return '';
 
 });
 

@@ -434,10 +434,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Effective Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Stop Date', attr_name: 'end_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Kind/Nature', attr_name: 'find', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Kind/Nature', attr_name: 'kind', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Fraud Related ', attr_name: 'fraud_related', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Significance', attr_name: 'significance', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Type/Means', attr_name: 'type', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Type/Means', attr_name: 'means', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Frequency', attr_name: 'frequency', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Assertions', attr_name: 'assertions', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Categories', attr_name: 'categories', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
@@ -451,7 +451,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if(!this.options.select_attr_list) {
       can.each(basic_attr_list, function(item){
         select_attr_list.push(item);
-      })
+      });
       model_name = opts.model.model_singular;
       switch (model_name) {
         case 'Program':
@@ -514,7 +514,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         if (item.attr_title !== 'Title' && item.display_status === 'true') {
           display_attr_list.push(item);
         }
-      })
+      });
       this.options.display_attr_list = display_attr_list;
       this.options.attr('display_attr_list', this.options.display_attr_list);
     }
@@ -1032,9 +1032,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //console.log("set tree-attr");
     //1: find checked items
     //2. update
-    var i, ch_val, that = this, attr_width,
-        $check = $(this.element).parent().find(".attr-checkbox"),
-        selected = $.grep($check, function(e){ return (e.checked == true);}),
+    var i, j, ch_val, attr_width,
+        $check = this.element.parent().find(".attr-checkbox"),
+        selected = $.grep($check, function(e){ return (e.checked === true);}),
         selected_items = selected.length;
 
     can.each(this.options.select_attr_list, function(item) {
@@ -1046,8 +1046,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       ch_val = $(selected[i]).val();
       for(j = 0; j < this.options.select_attr_list.length; j++) {
         var obj = this.options.select_attr_list[j];
-        if(ch_val === obj.attr_name)
+        if(ch_val === obj.attr_name) {
           obj.display_status = true;
+        }
       }
     }
     this.options.attr('select_attr_list', this.options.select_attr_list);
@@ -1056,9 +1057,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     can.each(this.options.select_attr_list, function(item){
       if (item.attr_title !== 'Title' && item.display_status === true) {
-        that.options.display_attr_list.push(item);
+        this.options.display_attr_list.push(item);
       }
-    })
+    }, this);
     this.options.attr('display_attr_list', this.options.display_attr_list);
     attr_width = Math.floor(12/this.options.display_attr_list.length);
     this.options.attr('display_attr_width', attr_width);
