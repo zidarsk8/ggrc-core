@@ -21,32 +21,124 @@
                   {{instance.title}}
                 </div>
               </div>
-              {{#instance}}
-                <div class="span2">
-                  <div class="owner tree-title-area">
-                    {{#if owners.length}}
-                      {{#using contacts=owners}}
-                      {{#contacts}}
-                        {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-                      {{/contacts}}
-                      {{/using}}
-                    {{/if}}
-                  </div>
-                </div>
 
-                <div class="span1">
-                  <div class="code tree-title-area">
-                    {{slug}}
-                  </div>
+              <div class="span4">
+                <div class="row-fluid">
+                  {{#display_attr_list}}
+                    <div class="span{{display_attr_width}}">
+                      <div class="owner tree-title-area">
+                        {{#switch attr_name}}
+                        {{#case 'owner'}}
+                          {{#if owners.length}}
+                            {{#using contacts=owners}}
+                            {{#contacts}}
+                              {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+                            {{/contacts}}
+                            {{/using}}
+                          {{/if}}
+                        {{/case}}
+                        {{#case 'slug'}}
+                          {{instance.slug}}
+                        {{/case}}
+                        {{#case 'status'}}
+                          {{instance.status}}
+                        {{/case}}
+                        {{#case 'contact'}}
+                          <span>
+                            {{#using contact=instance.contact}}
+                              {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                            {{/using}}
+                          </span>
+                        {{/case}}
+                        {{#case 'secondary_contact'}}
+                          <span>
+                            {{#using contact=instance.secondary_contact}}
+                              {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                            {{/using}}
+                          </span>
+                        {{/case}}
+                        {{#case 'url'}}
+                          {{instance.url}}
+                        {{/case}}
+                        {{#case 'reference_url'}}
+                          {{instance.reference_url}}
+                        {{/case}}
+                        {{#case 'start_date'}}
+                          {{instance.start_date}}
+                        {{/case}}
+                        {{#case 'end_date'}}
+                          {{instance.end_date}}
+                        {{/case}}
+                        {{#case 'updated_at'}}
+                          {{!instance.updated_at}}
+                          {{localize_date instance.updated_at}}
+                        {{/case}}
+                        {{#case 'kind'}}
+                          {{#using kind=instance.kind}}
+                            {{kind.title}}
+                          {{/using}}
+                        {{/case}}
+                        {{#case 'fraud_related'}}
+                          {{#if_equals instance.fraud_related "0"}}
+                            No
+                          {{/if}}
+                          {{#if_equals instance.fraud_related "1"}}
+                            Yes
+                          {{/if}}
+                        {{/case}}
+                        {{#case 'significance'}}
+                          {{#if_equals instance.key_control "1"}}
+                            Key
+                          {{/if}}
+                          {{#if_equals instance.key_control "0"}}
+                            Non-Key
+                          {{/if}}
+                        {{/case}}
+                        {{#case 'means'}}
+                          {{#using means=instance.means}}
+                            {{means.title}}
+                          {{/using}}
+                        {{/case}}
+                        {{#case 'frequency'}}
+                          {{#using verify_frequency=instance.verify_frequency}}
+                            {{verify_frequency.title}}
+                          {{/using}}
+                        {{/case}}
+                        {{#case 'assertions'}}
+                          {{#using items=instance.assertions}}
+                            {{#items}}
+                              {{name}} &nbsp;
+                            {{/items}}
+                          {{/using}}
+                        {{/case}}
+                        {{#case 'categories'}}
+                          {{#using items=instance.categories}}
+                            {{#items}}
+                              {{name}} &nbsp;
+                            {{/items}}
+                          {{/using}}
+                        {{/case}}
+                        {{#case 'principal_assessor'}}
+                          <span>
+                            {{#using contact=instance.principal_assessor}}
+                              {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                            {{/using}}
+                          </span>
+                        {{/case}}
+                        {{#case 'secondary_assessor'}}
+                          <span>
+                            {{#using contact=instance.secondary_assessor}}
+                              {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                            {{/using}}
+                          </span>
+                        {{/case}}
+                      {{/switch attr_name}}
+                      </div>
+                    </div>
+                  {{/display_attr_list}}
                 </div>
+              </div>
 
-                <div class="span1">
-                  <div class="state-value state-{{to_class status '_'}} tree-title-area">
-                    {{status}}
-                  </div>
-                </div>
-
-              {{/instance}}
               <div class="span4">
 
                 <div class="show-details">

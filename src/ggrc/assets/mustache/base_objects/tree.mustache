@@ -64,13 +64,13 @@
                             {{instance.reference_url}}
                           {{/case}}
                           {{#case 'start_date'}}
-                            {{instance.start_date}}
+                            {{localize_date instance.start_date}}
                           {{/case}}
                           {{#case 'end_date'}}
-                            {{instance.end_date}}
+                            {{localize_date instance.end_date}}
                           {{/case}}
                           {{#case 'updated_at'}}
-                            {{instance.updated_at}}
+                            {{localize_date instance.updated_at}}
                           {{/case}}
                         {{/switch attr_name}}
                       </div>

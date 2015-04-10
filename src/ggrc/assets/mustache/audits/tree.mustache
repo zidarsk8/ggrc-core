@@ -22,29 +22,57 @@
                 {{instance.title}}
               </div>
             </div>
-            {{#instance}}
-              <div class="span2">
-                <div class="owner tree-title-area">
-                  {{#if instance.contact}}
-                    {{#using contact=instance.contact}}
-                      {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                    {{/using}}
-                  {{else}}
-                    Not defined
-                  {{/if}}
-                </div>
-              </div>
 
-              <div class="span1">
-                <div class="code tree-title-area">
-                  {{slug}}
-                </div>
-              </div>
-            {{/instance}}
-
-            <div class="span1">
-              <div class="state-value state-{{to_class instance.status '_'}} tree-title-area">
-                {{instance.status}}
+            <div class="span4">
+              <div class="row-fluid">
+                {{#display_attr_list}}
+                  <div class="span{{display_attr_width}}">
+                    <div class="owner tree-title-area">
+                      {{#switch attr_name}}
+                        {{#case 'audit_lead'}}
+                          {{#if instance.contact}}
+                            {{#using contact=instance.contact}}
+                              {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                            {{/using}}
+                          {{/if}}
+                        {{/case}}
+                        {{#case 'slug'}}
+                          {{instance.slug}}
+                        {{/case}}
+                        {{#case 'status'}}
+                          {{instance.status}}
+                        {{/case}}
+                        {{#case 'start_date'}}
+                          {{localize_date instance.start_date}}
+                        {{/case}}
+                        {{#case 'end_date'}}
+                          {{localize_date instance.end_date}}
+                        {{/case}}
+                        {{#case 'updated_at'}}
+                          {{localize_date instance.updated_at}}
+                        {{/case}}
+                        {{#case 'report_period'}}
+                          {{#if instance.report_start_date}}
+                            {{#if instance.report_end_date}}
+                              {{localize_date instance.report_start_date}} - {{localize_date instance.report_end_date}}
+                            {{else}}
+                              Starts {{localize_date instance.report_start_date}}
+                            {{/if}}
+                          {{else}}
+                            {{#if instance.report_end_date}}
+                              Ends {{localize_date instance.report_end_date}}
+                            {{/if}}
+                          {{/if}}
+                        {{/case}}
+                        {{#case 'audit_firm'}}
+                          {{#using firm=instance.audit_firm}}
+                            {{{firstnonempty firm.title 'None'}}}
+                          {{/using}}
+                        {{/case}}
+                      {{/switch attr_name}}
+                    </div>
+                  </div>
+                {{/display_attr_list}}
               </div>
             </div>
 

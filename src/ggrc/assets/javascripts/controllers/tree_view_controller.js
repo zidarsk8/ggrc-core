@@ -443,68 +443,88 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           {attr_title: 'Categories', attr_name: 'categories', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Principal Assessor', attr_name: 'principal_assessor', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
           {attr_title: 'Secondary Assessor', attr_name: 'secondary_assessor', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
-        ];
+        ],
+        //Audit
+        audit_attr_list = [
+          {attr_title: 'Title', attr_name: 'title', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Audit Lead', attr_name: 'audit_lead', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Code', attr_name: 'slug', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Status', attr_name: 'status', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Last Updated', attr_name: 'updated_at', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Start Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'End Date', attr_name: 'end_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Report Period', attr_name: 'report_period', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Audit Firm', attr_name: 'audit_firm', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+        ]
+        ;
 
 
 
 
     if(!this.options.select_attr_list) {
-      can.each(basic_attr_list, function(item){
-        select_attr_list.push(item);
-      });
       model_name = opts.model.model_singular;
-      switch (model_name) {
-        case 'Program':
-        case 'Regulation':
-        case 'Standard':
-        case 'Contract':
-        case 'OrgGroup':
-        case 'Vendor':
-        case 'DataAsset':
-        case 'Project':
-        case 'Facility':
-        case 'Market':
-          can.each(program_attr_list, function(item){
-            select_attr_list.push(item);
-          });
-          break;
-        case 'Policy':
-        case 'Product':
-          can.each(program_attr_list, function(item){
-            select_attr_list.push(item);
-          });
-          can.each(policy_attr_list, function(item){
-            select_attr_list.push(item);
-          });
-          break;
-        case 'System':
-        case 'Process':
-          can.each(program_attr_list, function(item){
-            select_attr_list.push(item);
-          });
-          can.each(system_attr_list, function(item){
-            select_attr_list.push(item);
-          });
-          break;
-        case 'Clause':
-          can.each(clause_attr_list, function(item){
-            select_attr_list.push(item);
-          });
-          break;
-        case 'Section':
-        case 'Objective':
-          can.each(section_attr_list, function(item){
-            select_attr_list.push(item);
-          });
-          break;
-        case 'Control':
-          can.each(control_attr_list, function(item){
-            select_attr_list.push(item);
-          });
-        default:
-          break;
-      }
 
+      if(model_name === 'Audit') {
+        can.each(audit_attr_list, function(item){
+          select_attr_list.push(item);
+        });
+      }
+      else {
+        can.each(basic_attr_list, function(item){
+          select_attr_list.push(item);
+        });
+        switch (model_name) {
+          case 'Program':
+          case 'Regulation':
+          case 'Standard':
+          case 'Contract':
+          case 'OrgGroup':
+          case 'Vendor':
+          case 'DataAsset':
+          case 'Project':
+          case 'Facility':
+          case 'Market':
+            can.each(program_attr_list, function(item){
+              select_attr_list.push(item);
+            });
+            break;
+          case 'Policy':
+          case 'Product':
+            can.each(program_attr_list, function(item){
+              select_attr_list.push(item);
+            });
+            can.each(policy_attr_list, function(item){
+              select_attr_list.push(item);
+            });
+            break;
+          case 'System':
+          case 'Process':
+            can.each(program_attr_list, function(item){
+              select_attr_list.push(item);
+            });
+            can.each(system_attr_list, function(item){
+              select_attr_list.push(item);
+            });
+            break;
+          case 'Clause':
+            can.each(clause_attr_list, function(item){
+              select_attr_list.push(item);
+            });
+            break;
+          case 'Section':
+          case 'Objective':
+            can.each(section_attr_list, function(item){
+              select_attr_list.push(item);
+            });
+            break;
+          case 'Control':
+            can.each(control_attr_list, function(item){
+              select_attr_list.push(item);
+            });
+          default:
+            break;
+        }
+      }
       this.options.select_attr_list = select_attr_list;
       this.options.attr('select_attr_list', this.options.select_attr_list);
     }

@@ -14,21 +14,21 @@
         {{model.title_singular}} Title
       </div>
     </div>
-    <div class="span2">
-      <div class="oneline">
-          Assignee
+
+
+    <div class="span4">
+      <div class="row-fluid">
+        {{#display_attr_list}}
+          <div class="span{{display_attr_width}}">
+            <div class="oneline">
+              {{attr_title}}
+            </div>
+          </div>
+        {{/display_attr_list}}
       </div>
     </div>
-    <div class="span1">
-      <div class="oneline">
-          Code
-      </div>
-    </div>
-    <div class="span1">
-      <div class="oneline">
-          State
-      </div>
-    </div>
+
+
     <div class="span4">
       <ul class="tree-action-list">
         {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
@@ -38,71 +38,31 @@
                  data-original-title="Hide Irelevant"></i>
           </a>
         </li>
-        <!-- Temporarily hidden via copy/pasting and adapting Vladan's code where he made that request. He asked not to remove the comment. I haven't touched it, even though it makes no sense for Audits. -- dandv
+
         <li>
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
           <div class="dropdown-menu dropdown-menu-form">
-            <h5>Set visible fields</h5>
+            <h5>Set visible fields for {{model.title_singular}}</h5>
             <ul class="attr-list">
-              <li class="disabled">
+              {{#select_attr_list}}
+              <li class="a-disabled">
                 <label class="checkbox-inline">
-                  <input type="checkbox" checked="" disabled="">
-                  Title
+                  <input type="checkbox"
+                    {{#if_equals display_status 'true'}}checked="checked"{{/if_equals}}
+                    {{#if_equals attr_title 'Title'}}disabled=""{{/if_equals}}
+                    value="{{attr_name}}"
+                    class="notify-wrap attr-checkbox"
+                  >
+                  {{attr_title}}
                 </label>
               </li>
-              <li class=" disabled">
-                <label class="checkbox-inline">
-                  <input type="checkbox" disabled="">
-                  Description
-                </label>
-              </li>
-              <li class=" disabled">
-                <label class="checkbox-inline">
-                  <input type="checkbox" disabled="">
-                  Notes
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox" checked="">
-                  Owner
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox">
-                  Contact
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox" checked="">
-                  Code
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox" checked="">
-                  State
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox">
-                  Network Zone
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox">
-                  System url
-                </label>
-              </li>
+              {{/select_attr_list}}
             </ul>
-            <button class="btn btn-small btn-info">Set fields</button>
+            <button class="btn btn-small btn-info set-tree-attrs">Set fields</button>
+            <button class="btn btn-small btn-info">Close</button>
           </div>
         </li>
-        -->
+
       </ul>
     </div>
   </div>
