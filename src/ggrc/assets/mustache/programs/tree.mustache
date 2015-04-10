@@ -30,8 +30,6 @@
               <div class="span4">
               <div class="row-fluid">
                 {{#display_attr_list}}
-                {{!#instance}}
-                {{!log "sasmita each attr val"}}{{!log this}}
                 <div class="span{{display_attr_width}}">
                   <div class="owner tree-title-area">
                     {{#switch attr_name}}
@@ -92,8 +90,6 @@
                     {{get_attr_data this instance}}
                   </div-->
                 </div>
-
-                {{!/instance}}
                 {{/display_attr_list}}
               </div>
               </div>

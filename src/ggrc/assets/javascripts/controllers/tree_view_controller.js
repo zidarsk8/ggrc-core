@@ -546,7 +546,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
   , init : function(el, opts) {
     this.init_display_options(opts);
-    //console.log("sasmita init tree-view-controller---------------- init called---");
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       this.display_prefs = display_prefs;
       this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
