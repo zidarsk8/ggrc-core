@@ -425,8 +425,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         ],
         //Section, Objective
         section_attr_list = [
-          {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Effective Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          {attr_title: 'URL', attr_name: 'url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
         ],
         //Control
         control_attr_list = [
