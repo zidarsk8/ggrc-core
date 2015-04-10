@@ -299,6 +299,57 @@ $(document).ready(function() {
     $(".object-wrap-issues").show();
   }
 
+  function defaultAssessor() {
+    $(this).find("option:selected").each(function() {
+      var $value = $(this).val(),
+          $input = $(this).closest(".choose-from-select").find(".choose-input");
+
+      if($value === "other") {
+        $input.prop("disabled", false);
+      } else {
+        $input.prop("disabled", true);
+      }
+    });
+  }
+
+  function underAssessment() {
+    $(this).find("option:selected").each(function() {
+      var $value = $(this).val(),
+          $label = $(this).closest(".choose-object").find(".inline-check"),
+          $input = $label.find('input');
+
+      if($value === "Control") {
+        $input.prop("disabled", false);
+        $label.removeClass("disabled");
+      } else {
+        $input.prop("disabled", true);
+        $label.addClass("disabled");
+      }
+    });
+  }
+
+  function caEditPerson() {
+    var $this = $(this),
+        $currentPerson = $this.closest(".show-me"),
+        $featurePerson = $this.closest(".show-me").next(".hide-me"),
+        $save = $featurePerson.find(".save-person");
+
+    if($this.hasClass("activated")) {
+      $this.removeClass("activated");
+      $currentPerson.show();
+      $featurePerson.hide();
+    } else {
+      $this.addClass("activated");
+      $currentPerson.hide();
+      $featurePerson.show();
+    }
+
+    $save.on("click", function() {
+      $currentPerson.show();
+      $featurePerson.hide();
+    });
+  }
+
   $(".top-inner-nav a").on("click", innerNavTrigger);
 
   $("#autoGenerateCA").on("click", generateCA);
@@ -318,5 +369,11 @@ $(document).ready(function() {
   $("#CASave").on("click", AddCA);
 
   $("#issueSave").on("click", newIssue);
+
+  $("#assessorDefault").on("change", defaultAssessor);
+
+  $("#underAssessment").on("change", underAssessment);
+
+  $(".toggle-show-hide").on("click", caEditPerson);
 
 });
