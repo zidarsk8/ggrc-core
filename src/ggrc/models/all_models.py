@@ -32,6 +32,7 @@ from .object_objective import ObjectObjective
 from .object_owner import ObjectOwner
 from .object_person import ObjectPerson
 from .object_section import ObjectSection
+from .object_type import ObjectType
 from .objective import Objective
 from .objective_control import ObjectiveControl
 from .option import Option
@@ -51,7 +52,7 @@ from .response import (
 )
 from .meeting import Meeting
 from .background_task import BackgroundTask
-from .notification import NotificationConfig
+from .notification import NotificationConfig, NotificationType, Notification
 from .issue import Issue
 
 # TODO: This isn't currently used
@@ -97,6 +98,7 @@ all_models = [
     ObjectOwner,
     ObjectPerson,
     ObjectSection,
+    ObjectType,
     Option,
     OrgGroup,
     Vendor,
@@ -124,6 +126,8 @@ all_models = [
     Event,
     BackgroundTask,
     NotificationConfig,
+    NotificationType,
+    Notification,
     Issue
 ]
 
