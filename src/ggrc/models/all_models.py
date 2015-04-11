@@ -6,7 +6,7 @@
 """All gGRC model classes grouped together for convenience."""
 
 # TODO: Implement with Authentication
-#from .account import Account
+# from .account import Account
 from .audit import Audit
 from .audit_object import AuditObject
 from .categorization import Categorization
@@ -45,14 +45,17 @@ from .program_directive import ProgramDirective
 from .project import Project
 from .relationship import Relationship, RelationshipType
 from .request import Request
-from .response import Response, DocumentationResponse, InterviewResponse, PopulationSampleResponse
+from .response import (
+    Response, DocumentationResponse, InterviewResponse,
+    PopulationSampleResponse
+)
 from .meeting import Meeting
 from .background_task import BackgroundTask
 from .notification import NotificationConfig
 from .issue import Issue
 
-#TODO: This isn't currently used
-#from .relationship_type import RelationshipType
+# TODO: This isn't currently used
+# from .relationship_type import RelationshipType
 from .section import SectionBase, Section, Clause
 from .section_objective import SectionObjective
 from .system import SystemOrProcess, System, Process
@@ -60,68 +63,68 @@ from .system import SystemOrProcess, System, Process
 from .revision import Revision
 from .event import Event
 all_models = [
-  Audit,
-  AuditObject,
-  Categorization,
-  CategoryBase,
+    Audit,
+    AuditObject,
+    Categorization,
+    CategoryBase,
     ControlCategory,
     ControlAssertion,
-  Context,
-  Control,
-  ControlAssessment,
-  ControlControl,
-  ControlSection,
-  CustomAttributeDefinition,
-  CustomAttributeValue,
-  DataAsset,
-  Directive,
+    Context,
+    Control,
+    ControlAssessment,
+    ControlControl,
+    ControlSection,
+    CustomAttributeDefinition,
+    CustomAttributeValue,
+    DataAsset,
+    Directive,
     Contract,
     Policy,
     Regulation,
     Standard,
-  DirectiveControl,
-  DirectiveSection,
-  Document,
-  Facility,
-  Help,
-  Market,
-  Meeting,
-  Objective,
-  ObjectiveControl,
-  ObjectControl,
-  ObjectDocument,
-  ObjectObjective,
-  ObjectOwner,
-  ObjectPerson,
-  ObjectSection,
-  Option,
-  OrgGroup,
-  Vendor,
-  Person,
-  Product,
-  Program,
-  ProgramControl,
-  ProgramDirective,
-  Project,
-  Relationship,
-  RelationshipType,
-  Request,
-  Response,
+    DirectiveControl,
+    DirectiveSection,
+    Document,
+    Facility,
+    Help,
+    Market,
+    Meeting,
+    Objective,
+    ObjectiveControl,
+    ObjectControl,
+    ObjectDocument,
+    ObjectObjective,
+    ObjectOwner,
+    ObjectPerson,
+    ObjectSection,
+    Option,
+    OrgGroup,
+    Vendor,
+    Person,
+    Product,
+    Program,
+    ProgramControl,
+    ProgramDirective,
+    Project,
+    Relationship,
+    RelationshipType,
+    Request,
+    Response,
     DocumentationResponse,
     InterviewResponse,
     PopulationSampleResponse,
-  SectionBase,
+    SectionBase,
     Section,
     Clause,
-  SectionObjective,
-  SystemOrProcess,
+    SectionObjective,
+    SystemOrProcess,
     System,
     Process,
-  Revision,
-  Event,
-  BackgroundTask,
-  NotificationConfig,
-  Issue
+    Revision,
+    Event,
+    BackgroundTask,
+    NotificationConfig,
+    Issue
 ]
 
 __all__ = [model.__name__ for model in all_models]
