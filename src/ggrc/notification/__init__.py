@@ -10,9 +10,6 @@ from ggrc.models import Notification
 from ggrc import db
 
 
-services = NotificationServices()
-
-
 class NotificationServices():
 
   def __init__(self):
@@ -37,6 +34,9 @@ class NotificationServices():
   def call_service(self, name, pn):
     service = self.get_service_function(name)
     return service(pn)
+
+
+services = NotificationServices()
 
 
 def merge_dict(destination, source, path=None):
@@ -72,7 +72,7 @@ def get_notification_data(notifications):
 
 def get_pending_notifications():
   notifications = db.session.query(Notification).filter(
-      Notification.sent_at is None).all()
+      Notification.sent_at == None).all()  # noqa
   return get_notification_data(notifications)
 
 

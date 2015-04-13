@@ -1,33 +1,35 @@
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
 from datetime import datetime, date
-
+from blinker import Namespace
 from flask import Blueprint
 from sqlalchemy import inspect, and_
+
 from ggrc import db
 from ggrc.login import get_current_user
+from ggrc.models import all_models
+from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import Resource
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
-from ggrc.rbac.permissions import is_allowed_update
-from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
-from ggrc.models import all_models
-import ggrc_workflows.models as models
-from ggrc_workflows.services.workflow_date_calculator import\
-    WorkflowDateCalculator
 
-from ggrc_basic_permissions.contributed_roles import (
-    RoleContributions, RoleDeclarations, DeclarativeRoleImplications
+from ggrc_workflows import models, notification
+from ggrc_workflows.services.workflow_date_calculator import (
+    WorkflowDateCalculator
 )
 from ggrc_workflows.roles import (
     WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader
 )
 
+from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
+from ggrc_basic_permissions.contributed_roles import (
+    RoleContributions, RoleDeclarations, DeclarativeRoleImplications
+)
+
 # Initialize signal handler for status changes
-from blinker import Namespace
 
 signals = Namespace()
 status_change = signals.signal(
@@ -908,3 +910,6 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
 ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
 ROLE_DECLARATIONS = WorkflowRoleDeclarations()
 ROLE_IMPLICATIONS = WorkflowRoleImplications()
+
+notification.register_listeners()
+contributed_notifications = notification.contributed_notifications
