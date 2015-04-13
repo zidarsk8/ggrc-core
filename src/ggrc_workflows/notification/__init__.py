@@ -113,10 +113,7 @@ def get_cycle_created_task_data(notification):
   # import ipdb; ipdb.set_trace()
   workflow_owner_email = get_workflow_owner(cycle.context_id).email
   task = {
-      cycle_task.id: {
-          "title": cycle_task.title,
-          "object_title": cycle_task.cycle_task_group_object.object.title
-      }
+      cycle_task.id: get_cycle_task_dict(cycle_task)
   }
 
   return {
@@ -146,13 +143,14 @@ def get_cycle_created_task_data(notification):
   }
 
 
-def get_cycle_task_due_in(notification):
+def get_cycle_task_due(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  notification_name = notification.notification_type.name
+  due = "due_in" if notification_name == "cycle_task_due_in" else "due_today"
   return {
       cycle_task.contact.email: {
-          cycle_task.id: {
-              "title": cycle_task.title,
-              "object_title": cycle_task.cycle_task_group_object.object.title,
+          due: {
+              cycle_task.id: get_cycle_task_dict(cycle_task)
           }
       }
   }
@@ -162,8 +160,8 @@ def get_cycle_task_group_object_task_data(notification):
   notification_name = notification.notification_type.name
   if notification_name == "manual_cycle_created":
     return get_cycle_created_task_data(notification)
-  elif notification_name == "cycle_task_due_in":
-    return get_cycle_task_due_in(notification)
+  elif notification_name in ["cycle_task_due_today", "cycle_task_due_in"]:
+    return get_cycle_task_due(notification)
 
 
 def get_task_group_task_data(notification):
@@ -291,16 +289,16 @@ def handle_cycle_task_group_object_task_put(obj, start_notif_type=None):
         notification_type=due_in_notif_type,
         send_on=obj.end_date - timedelta(due_in_notif_type.advance_notice)
     )
-    end_notif_type = get_notification_type("cycle_task_due_today")
-    end_notification = Notification(
+    due_today_notif_type = get_notification_type("cycle_task_due_today")
+    due_today_notification = Notification(
         object_id=obj.id,
         object_type=get_object_type(obj),
-        notification_type=due_in_notif_type,
-        send_on=obj.end_date - timedelta(end_notif_type.advance_notice)
+        notification_type=due_today_notif_type,
+        send_on=obj.end_date - timedelta(due_today_notif_type.advance_notice)
     )
     db.session.add(start_notification)
     db.session.add(due_in_notification)
-    db.session.add(end_notification)
+    db.session.add(due_today_notification)
 
   else:
     # handle task finished, reassigned and other stuff
@@ -377,6 +375,14 @@ def get_workflow_owner(context_id):
   return db.session.query(UserRole).join(Role).filter(
       and_(UserRole.context_id == context_id,
            Role.name == "WorkflowOwner")).one().person
+
+
+def get_cycle_task_dict(cycle_task):
+  return {
+      "title": cycle_task.title,
+      "object_title": cycle_task.cycle_task_group_object.object.title if
+      cycle_task.cycle_task_group_object else "",
+  }
 
 
 def get_notification(obj):
