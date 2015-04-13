@@ -4,22 +4,18 @@
 # Maintained By: dan@reciprocitylabs.com
 
 
-from datetime import timedelta
-from datetime import datetime, date
-from math import floor
-from collections import defaultdict
+from datetime import date, timedelta
 
-from flask import current_app, request
-from sqlalchemy import inspect, and_
+from sqlalchemy import and_
 
-from ggrc_workflows.models import Workflow, Cycle, CycleTaskGroupObjectTask, TaskGroupTask
+from ggrc_workflows.models import (
+    Workflow, Cycle, CycleTaskGroupObjectTask, TaskGroupTask
+)
 from ggrc.services.common import Resource
 from ggrc.models import (
-    Notification, NotificationType, NotificationConfig, ObjectType)
+    Notification, NotificationType, ObjectType)
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
-from ggrc import settings
-from ggrc.login import get_current_user
 
 """
 All notifications handle the following structure:
@@ -91,15 +87,15 @@ All notifications handle the following structure:
   """
 
 
-
 def get_cycle_data(notification):
   cycle = get_object(Cycle, notification.object_id)
+  manual = notification.notification_type.name == "manual_cycle_created"
   result = {}
   for person in cycle.workflow.people:
     result[person.email] = {
         "cycle_started": {
             cycle.id: {
-                "manually": notification.notification_type.name == "manual_cycle_created",
+                "manually": manual,
                 "custom_message": cycle.workflow.notify_custom_message,
             }
         }
@@ -119,7 +115,7 @@ def get_cycle_created_task_data(notification):
   task = {
       cycle_task.id: {
           "title": cycle_task.title,
-          "object_title": cycle_task.cycle_task_group_object.object.title,
+          "object_title": cycle_task.cycle_task_group_object.object.title
       }
   }
 
@@ -163,7 +159,6 @@ def get_cycle_task_due_in(notification):
 
 
 def get_cycle_task_group_object_task_data(notification):
-  #import ipdb; ipdb.set_trace()
   notification_name = notification.notification_type.name
   if notification_name == "manual_cycle_created":
     return get_cycle_created_task_data(notification)
@@ -312,14 +307,16 @@ def handle_cycle_task_group_object_task_put(obj, start_notif_type=None):
     pass
 
 
-def handle_cycle_created(sender, obj=None, src=None, service=None, manually=False):
-  notification_name = "manual_cycle_created" if manually else "cycle_created"
+def handle_cycle_created(sender, obj=None, src=None, service=None,
+                         manually=False):
 
   notification = get_notification(obj)
 
   if not notification:
     db.session.flush()
-    notification_type = get_notification_type(notification_name)
+    notification_type = get_notification_type(
+        "manual_cycle_created" if manually else "cycle_created"
+    )
     notification = Notification(
         object_id=obj.id,
         object_type=get_object_type(obj),
@@ -329,9 +326,8 @@ def handle_cycle_created(sender, obj=None, src=None, service=None, manually=Fals
     db.session.add(notification)
 
   for cycle_task_group in obj.cycle_task_groups:
-    for cycle_task_group_object_task in cycle_task_group.cycle_task_group_tasks:
-      handle_cycle_task_group_object_task_put(
-          cycle_task_group_object_task, notification_type)
+    for task in cycle_task_group.cycle_task_group_tasks:
+      handle_cycle_task_group_object_task_put(task, notification_type)
 
 
 def contributed_notifications():
@@ -352,7 +348,8 @@ def register_listeners():
     handle_workflow_modify(sender, obj, src, service)
 
   @Resource.model_put.connect_via(CycleTaskGroupObjectTask)
-  def cycle_task_group_object_task_put_listener(sender, obj=None, src=None, service=None):
+  def cycle_task_group_object_task_put_listener(
+          sender, obj=None, src=None, service=None):
     handle_cycle_task_group_object_task_put(sender, obj, src, service, True)
 
   @Resource.model_posted.connect_via(Cycle)
@@ -391,4 +388,3 @@ def get_notification(obj):
     return result.one()
   else:
     return result.all()
-
