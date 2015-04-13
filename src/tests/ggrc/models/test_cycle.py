@@ -12,7 +12,6 @@ from nose.plugins.skip import SkipTest
 
 @SkipTest
 class TestCycle(TestCase):
-  SQLALCHEMY_DATABASE_URI = "sqlite://"
 
   def setUp(self):
     pass

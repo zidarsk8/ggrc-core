@@ -4,17 +4,17 @@
 # Maintained By: david@reciprocitylabs.com
 
 from flask.ext.testing import TestCase as BaseTestCase
-import sys, os
+import os
 from ggrc import db
 from ggrc.app import app
-from ggrc.models import create_db, drop_db
-from ggrc import settings
+from ggrc.models import create_db
 
 if os.environ.get('TRAVIS', False):
-    db.engine.execute("DROP DATABASE IF EXISTS ggrcdevtest;")
-    db.engine.execute("CREATE DATABASE ggrcdevtest; USE ggrcdevtest;")
+  db.engine.execute("DROP DATABASE IF EXISTS ggrcdevtest;")
+  db.engine.execute("CREATE DATABASE ggrcdevtest; USE ggrcdevtest;")
 
-    create_db(use_migrations=True, quiet=True)
+  create_db(use_migrations=True, quiet=True)
+
 
 class TestCase(BaseTestCase):
   def setUp(self):
@@ -39,6 +39,7 @@ class TestCase(BaseTestCase):
     #   self.testbed.deactivate()
 
   def create_app(self):
+    app.config["SERVER_NAME"] = "localhost"
     app.testing = True
     app.debug = False
     return app
