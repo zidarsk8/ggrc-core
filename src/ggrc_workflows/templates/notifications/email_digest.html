@@ -1,0 +1,43 @@
+{% extends "notifications/base.html" %} 
+
+{% block body %}
+  {% import 'notifications/style.html' as style %}
+  <table class="body-wrap" style="width: 100%;">
+    <tr>
+      <td></td>
+      <td class="header container" {{ style.block() }}>
+        <div class="content" {{ style.td_div() }} >
+          <table style="width: 100%;">
+            <tr>
+              <td>
+                <h1 {{ style.h1() }}> Hi, Prasanna V. </h1>
+
+                <p {{ style.p() }}>
+                  Here is what was happening yesterday:
+                </p>
+
+                <h2 {{ style.h2() }} > Following tasks have been assigned to you </h2>
+
+                <h2 {{ style.h2() }} > Following tasks you did, got declined </h2>
+
+                <h2 {{ style.h2() }} > X tasks are due very soon </h2>
+
+                <h2 {{ style.h2() }} > Upcoming workflows </h2>
+
+                <ul {{ style.ul() }} >
+                  <li {{ style.li() }} >consectetur adipiscing elit</li>
+                  <li {{ style.li() }} >non accumsan orci mollis vitae sed mattis consectetur</li>
+                  <li {{ style.li() }} >vitae condimentum magna scelerisque</li>
+                  <li {{ style.li() }} >tristique senectus et netus et</li>
+                  <li {{ style.li() }} >arcu nulla ullamcorper lacus</li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+      <td></td>
+    </tr>
+  </table>
+
+{% endblock %}
