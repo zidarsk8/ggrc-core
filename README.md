@@ -1,7 +1,7 @@
 gGRC-Core
 =========
 
-[![Travis status](https://travis-ci.org/reciprocity/ggrc-core.svg)](https://travis-ci.org/reciprocity/ggrc-core)
+[![Travis status](https://travis-ci.org/google/ggrc-core.svg)](https://travis-ci.org/google/ggrc-core)
 
 Google Governance, Risk and Compliance. Migrated from [Google](https://code.google.com/p/compliance-management/)
 [Code](https://code.google.com/p/ggrc-core).
