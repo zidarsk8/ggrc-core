@@ -5,7 +5,7 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-  {{log .}}
+
   <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="item-wrap">
@@ -33,7 +33,7 @@
                 {{#display_attr_list}}
                 <div class="span{{display_attr_width}}">
                   {{#if_equals attr_type 'custom'}}
-                    <div class="code tree-title-area">
+                    <div class="custom tree-title-area">
                       {{get_custom_attr_value this instance}}
                     </div>
                   {{else}}

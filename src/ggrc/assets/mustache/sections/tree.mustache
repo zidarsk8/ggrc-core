@@ -22,53 +22,58 @@
               <div class="span4">
                 <div class="row-fluid">
                   {{#display_attr_list}}
-                  {{#instance}}
                     <div class="span{{display_attr_width}}">
-                      <div class="owner tree-title-area">
-                        {{#switch attr_name}}
-                          {{#case 'owner'}}
-                            {{#if owners.length}}
-                              {{#using contacts=owners}}
-                              {{#contacts}}
-                                {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-                              {{/contacts}}
-                              {{/using}}
-                            {{/if}}
-                          {{/case}}
-                          {{#case 'slug'}}
-                            {{instance.slug}}
-                          {{/case}}
-                          {{#case 'status'}}
-                            {{instance.status}}
-                          {{/case}}
-                          {{#case 'contact'}}
-                            <span>
-                              {{#using contact=instance.contact}}
-                                {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                              {{/using}}
-                            </span>
-                          {{/case}}
-                          {{#case 'secondary_contact'}}
-                            <span>
-                              {{#using contact=instance.secondary_contact}}
-                                {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                              {{/using}}
-                            </span>
-                          {{/case}}
-                          {{#case 'url'}}
-                            {{instance.url}}
-                          {{/case}}
-                          {{#case 'reference_url'}}
-                            {{instance.reference_url}}
-                          {{/case}}
-                          {{#case 'updated_at'}}
-                            {{localize_date instance.updated_at}}
-                          {{/case}}
-                        {{/switch attr_name}}
-                      </div>
+                      {{#if_equals attr_type 'custom'}}
+                        <div class="custom tree-title-area">
+                          {{get_custom_attr_value this instance}}
+                        </div>
+                      {{else}}
+                        <div class="owner tree-title-area">
+                          {{#instance}}
+                            {{#switch attr_name}}
+                              {{#case 'owner'}}
+                                {{#if owners.length}}
+                                  {{#using contacts=owners}}
+                                  {{#contacts}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+                                  {{/contacts}}
+                                  {{/using}}
+                                {{/if}}
+                              {{/case}}
+                              {{#case 'slug'}}
+                                {{instance.slug}}
+                              {{/case}}
+                              {{#case 'status'}}
+                                {{instance.status}}
+                              {{/case}}
+                              {{#case 'contact'}}
+                                <span>
+                                  {{#using contact=instance.contact}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                                  {{/using}}
+                                </span>
+                              {{/case}}
+                              {{#case 'secondary_contact'}}
+                                <span>
+                                  {{#using contact=instance.secondary_contact}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                                  {{/using}}
+                                </span>
+                              {{/case}}
+                              {{#case 'url'}}
+                                {{instance.url}}
+                              {{/case}}
+                              {{#case 'reference_url'}}
+                                {{instance.reference_url}}
+                              {{/case}}
+                              {{#case 'updated_at'}}
+                                {{localize_date instance.updated_at}}
+                              {{/case}}
+                            {{/switch attr_name}}
+                          {{/instance}}
+                        </div>
+                      {{/if}}
                     </div>
-
-                  {{/instance}}
                   {{/display_attr_list}}
                 </div>
               </div>
