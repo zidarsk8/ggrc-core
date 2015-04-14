@@ -61,6 +61,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/programs/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+    , add_item_view : GGRC.mustache_path + "/base_objects/tree_add-item.mustache"
     }
   , links_to : {
     "Regulation" : "ProgramDirective"
@@ -145,6 +146,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/objectives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/objectives/tree_footer.mustache"
+    , add_item_view : GGRC.mustache_path + "/objectives/tree_add-item.mustache"
     , create_link : true
     //, draw_children : true
     , start_expanded : false
@@ -152,6 +154,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
         model : can.Model.Cacheable
       , mapping : "related_and_able_objects"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add-item.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
     }]

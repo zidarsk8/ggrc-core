@@ -160,6 +160,7 @@ dashboard-js-template-files:
   - control_assessments/tree.mustache
   - control_assessments/tree_header.mustache
   - control_assessments/tree_footer.mustache
+  - control_assessments/tree_add-item.mustache
   - control_assessments/info.mustache
   - issues/modal_content.mustache
   - custom_attributes/modal_content.mustache
@@ -226,6 +227,7 @@ dashboard-js-template-files:
   - people/tier2_content.mustache
   - people/tree.mustache
   - people/tree_footer.mustache
+  - people/tree_add-item.mustache
   - people/tree_header.mustache
   - people/search_result.mustache
   - policies/info.mustache
@@ -259,22 +261,31 @@ dashboard-js-template-files:
   - systems/info.mustache
   - systems/modal_content.mustache
   - systems/tree_footer.mustache
+  - systems/tree_add-item.mustache
   - base_objects/tree_footer.mustache
+  - base_objects/tree_add-item.mustache
   - controls/tree_footer.mustache
+  - controls/tree_add-item.mustache
   - directives/tree_footer.mustache
+  - directives/tree_add-item.mustache
   - objectives/tree_footer.mustache
+  - objectives/tree_add-item.mustache
   - sections/tree_footer.mustache
+  - sections/tree_add-item.mustache
   - documents/tree_footer.mustache
+  - documents/tree_add-item.mustache
   - audits/modal_content.mustache
   - audits/tree.mustache
   - audits/info.mustache
   - audits/tree_footer.mustache
+  - audits/tree_add-item.mustache
   - audits/tree_header.mustache
   - audits/search_result.mustache
   - audits/extended_info.mustache
   - requests/tree.mustache
   - requests/info.mustache
   - requests/tree_footer.mustache
+  - requests/tree_add-item.mustache
   - requests/tree_header.mustache
   - requests/modal_content.mustache
   - objectives/autocomplete_result.mustache
@@ -282,9 +293,11 @@ dashboard-js-template-files:
   - responses/tree.mustache
   - responses/info.mustache
   - responses/tree_footer.mustache
+  - responses/tree_add-item.mustache
   - responses/modal_content.mustache
   - meetings/modal_content.mustache
   - meetings/tree_footer.mustache
+  - meetings/tree_add-item.mustache
   - meetings/tree.mustache
   - documents/autocomplete_result.mustache
   - documents/pbc_tree.mustache

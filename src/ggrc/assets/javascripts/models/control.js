@@ -70,11 +70,13 @@ can.Model.Cacheable("CMS.Models.Control", {
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/controls/tree.mustache"
     , footer_view : GGRC.mustache_path + "/controls/tree_footer.mustache"
+    , add_item_view : GGRC.mustache_path + "/controls/tree_add-item.mustache"
     , draw_children : true
     , child_options : [{
         model : can.Model.Cacheable
       , mapping : "related_and_able_objects"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add-item.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
     }]
