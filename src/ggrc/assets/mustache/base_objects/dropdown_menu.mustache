@@ -6,6 +6,18 @@
 }}
 
 {{> /static/mustache/base_objects/edit_object_link.mustache}}
+<li>
+  <a href="javascript://">
+    <i class="icon-share"></i>
+    Get permalink
+  </a>
+</li>
+<li>
+  <a href="javascript://" class="active">
+    <i class="icon-share"></i>
+    Get permalink
+  </a>
+</li>
 {{#is_info_pin}}
   {{^options.is_in_selector}}
     {{> /static/mustache/base_objects/unmap.mustache}}
@@ -14,8 +26,8 @@
     {{#is_allowed "view_object_page" instance}}
       <li>
         <a href="{{instance.viewLink}}">
-          View {{instance.class.title_singular}}
           <i class="grcicon-goto"></i>
+          View {{instance.class.title_singular}}
         </a>
       </li>
     {{/is_allowed}}
