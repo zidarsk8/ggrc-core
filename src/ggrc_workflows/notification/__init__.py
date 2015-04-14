@@ -22,6 +22,7 @@ All notifications handle the following structure:
 
   notifications = {
       "some@email.com": {
+          "user": { user_info },
 
           "cycle_starts_in": {
               workflow.id: {
@@ -93,6 +94,7 @@ def get_cycle_data(notification):
   result = {}
   for person in cycle.workflow.people:
     result[person.email] = {
+        "user" : get_person_dict(person),
         "cycle_started": {
             cycle.id: {
                 "manually": manual,
@@ -108,24 +110,25 @@ def get_cycle_created_task_data(notification):
   cycle_task_group = cycle_task.cycle_task_group
   cycle = cycle_task_group.cycle
 
-  task_assignee_email = cycle_task.contact.email
-  task_group_assignee_email = cycle_task_group.contact.email
-  # import ipdb; ipdb.set_trace()
-  workflow_owner_email = get_workflow_owner(cycle.context_id).email
+  task_assignee = get_person_dict(cycle_task.contact)
+  task_group_assignee = get_person_dict(cycle_task_group.contact)
+  workflow_owner = get_person_dict(get_workflow_owner(cycle.context_id))
   task = {
       cycle_task.id: get_cycle_task_dict(cycle_task)
   }
 
   return {
-      task_assignee_email: {
-          "cycle_starts_in": {
+      task_assignee['email']: {
+          "user" : task_assignee,
+          "cycle_started": {
               cycle.id: {
                   "my_tasks": task
               }
           }
       },
-      task_group_assignee_email: {
-          "cycle_starts_in": {
+      task_group_assignee['email']: {
+          "user" : task_group_assignee,
+          "cycle_started": {
               cycle.id: {
                   "my_task_groups": {
                       cycle_task_group.id: task
@@ -133,8 +136,9 @@ def get_cycle_created_task_data(notification):
               }
           }
       },
-      workflow_owner_email: {
-          "cycle_starts_in": {
+      workflow_owner['email']: {
+          "user": workflow_owner,
+          "cycle_started": {
               cycle.id: {
                   "workflow_tasks": task
               }
@@ -149,6 +153,7 @@ def get_cycle_task_due(notification):
   due = "due_in" if notification_name == "cycle_task_due_in" else "due_today"
   return {
       cycle_task.contact.email: {
+          "user": get_person_dict(cycle_task.contact),
           due: {
               cycle_task.id: get_cycle_task_dict(cycle_task)
           }
@@ -171,9 +176,9 @@ def get_task_group_task_data(notification):
 
   tasks = {}
 
-  task_assignee_email = task_group_task.contact.email
-  task_group_assignee_email = task_group.contact.email
-  workflow_owner_email = get_workflow_owner(workflow.context_id).email
+  task_assignee = get_person_dict(task_group_task.contact)
+  task_group_assignee = get_person_dict(task_group.contact)
+  workflow_owner = get_person_dict(get_workflow_owner(workflow.context_id))
 
   for task_group_object in task_group.task_group_objects:
     tasks[task_group_task.id, task_group_object.id] = {
@@ -182,14 +187,16 @@ def get_task_group_task_data(notification):
     }
 
   return {
-      task_assignee_email: {
+      task_assignee['email']: {
+          "user" : task_assignee,
           "cycle_starts_in": {
               workflow.id: {
                   "my_tasks": tasks
               }
           }
       },
-      task_group_assignee_email: {
+      task_group_assignee['email']: {
+          "user" : task_group_assignee,
           "cycle_starts_in": {
               workflow.id: {
                   "my_task_groups": {
@@ -198,7 +205,8 @@ def get_task_group_task_data(notification):
               }
           }
       },
-      workflow_owner_email: {
+      workflow_owner['email']: {
+          "user": workflow_owner,
           "cycle_starts_in": {
               workflow.id: {
                   "workflow_tasks": tasks
@@ -220,6 +228,7 @@ def get_workflow_data(notification):
 
   for person in workflow.workflow_people:
     result[person.email] = {
+        "user": get_person_dict(person),
         "cycle_starts_in": {
             workflow.id: {
                 "custom_message": workflow.notify_custom_message
@@ -382,6 +391,13 @@ def get_cycle_task_dict(cycle_task):
       "title": cycle_task.title,
       "object_title": cycle_task.cycle_task_group_object.object.title if
       cycle_task.cycle_task_group_object else "",
+  }
+
+def get_person_dict(person):
+  return {
+    "email": person.email,
+    "name": person.name,
+    "id": person.id,
   }
 
 
