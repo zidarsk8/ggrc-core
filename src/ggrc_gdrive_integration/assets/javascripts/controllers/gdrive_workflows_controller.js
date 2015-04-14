@@ -993,7 +993,19 @@ can.Component.extend({
             // this is the "mask" displayed behind the dialog box div
             $('div.picker-dialog-bg').css('zIndex', 2000);  // there are multiple divs of that sort
             // and this is the dialog box modal div, which we must display on top of our modal, if any
-            picker.A.style.zIndex = 2001; // our modals start with 1050
+            var dialog = _.find(
+                _.values(picker),
+                function (v) {
+                  if (v instanceof Node) {
+                    return v.className.match(/picker\-dialog/);
+                  }else{
+                    return false;
+                  }
+                });
+
+            if (dialog) {
+              dialog.style.zIndex = 2001; // our modals start with 1050
+            }
           });
         }
 
