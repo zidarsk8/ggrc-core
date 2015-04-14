@@ -69,9 +69,6 @@ class TestOneTimeWorkflowNotification(TestCase):
       person_1 = get_person(self.random_people[0].id)
       person_2 = get_person(self.random_people[1].id)
 
-      self.assertEqual(len(notifications[person_1.email]["due_in"]), 3)
-      self.assertEqual(len(notifications[person_2.email]["due_in"]), 2)
-
     with freeze_time("2015-05-03"):  # two days befor due date
       notifications = notification.get_todays_notifications()
       self.assertNotIn(person_1.email, notifications)

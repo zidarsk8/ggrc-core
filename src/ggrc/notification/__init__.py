@@ -4,6 +4,7 @@
 # Maintained By: miha@reciprocitylabs.com
 
 
+from collections import defaultdict
 from datetime import date
 from ggrc.extensions import get_extension_modules
 from ggrc.models import Notification
@@ -73,7 +74,14 @@ def get_notification_data(notifications):
 def get_pending_notifications():
   notifications = db.session.query(Notification).filter(
       Notification.sent_at == None).all()  # noqa
-  return get_notification_data(notifications)
+
+  notif_by_day = defaultdict(list)
+  for notification in notifications:
+    notif_by_day[notification.send_on].append(notification)
+
+  result = {d: get_notification_data(n) for d,n in notif_by_day.iteritems()}
+
+  return result
 
 
 def get_todays_notifications():
@@ -81,6 +89,9 @@ def get_todays_notifications():
       Notification.send_on == date.today()).all()
   return get_notification_data(notifications)
 
+def get_notifications(day=None):
+  if not day:
+    day = date.today()
 
 def generate_notification_email(data):
   pass
