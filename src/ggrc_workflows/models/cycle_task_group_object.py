@@ -80,8 +80,8 @@ class CycleTaskGroupable(object):
     cls.cycle_task_group_objects = make_cycle_task_group_objects(cls)
 
   _publish_attrs = [
-      #'cycle_task_group_objects',
-      ]
+      'cycle_task_group_objects',
+  ]
 
   @classmethod
   def eager_query(cls):

@@ -239,15 +239,11 @@
 
     // Insert `workflows` mappings to all business object types
     can.each(_workflow_object_types, function (type) {
+      CMS.Models[type].attributes.cycle_objects = 'CMS.Models.CycleTaskGroupObject.stubs';
       mappings[type] = {
         task_groups: new GGRC.ListLoaders.ProxyListLoader('TaskGroupObject', 'object', 'task_group', 'task_group_objects', null),
-        object_tasks: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            'cycle_task_group_object.object_id': binding.instance.id,
-            'cycle_task_group_object.object_type': binding.instance.type,
-            'cycle.is_current': true
-          });
-        }, "Cycle"),
+        cycle_objects: Direct('CycleTaskGroupObject', 'object', 'cycle_task_group_objects'),
+        object_tasks: Cross('cycle_objects', 'cycle_task_group_object_tasks'),
         approval_tasks: Search(function (binding) {
           return CMS.Models.CycleTaskGroupObjectTask.findAll({
             'cycle_task_group_object.object_id': binding.instance.id,
