@@ -2968,18 +2968,34 @@ Mustache.registerHelper("if_less", function (a, b, options) {
 /*
   Used to get the string value for custom attributes CORE-1546
 */
-Mustache.registerHelper("get_attr_data", function(attr_info, instance){
-  var ins, atr, attr_name;
+Mustache.registerHelper("get_custom_attr_value", function(attr_info, instance){
+  var ins, atr, attr_name, value = '';
 
   ins = Mustache.resolve(instance);
   atr = Mustache.resolve(attr_info);
   attr_name = atr.attr_name;
 
-  if (ins[attr_name])
-    return ins[attr_name];
+  if(ins.custom_attribute_definitions && ins.custom_attribute_definitions.length) {
+    var current_id = 0;
+    //find the id for the attr_name
+    can.each(ins.custom_attribute_definitions, function(def) {
+      if(def.title === attr_name) {
+        current_id = def.id;
+        return;
+      }
+    });
+    //go to the ins.custom_attribute_values, if id == id then return the value
+    if(current_id) {
+      can.each(ins.custom_attribute_values, function(item) {
+        item = item.reify();
+        if (item.custom_attribute_id === current_id) {
+          value = item.attribute_value;
+        }
+      });
+    }
+  }
 
-  return '';
-
+  return value;
 });
 
 })(this, jQuery, can);

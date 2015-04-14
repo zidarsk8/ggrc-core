@@ -7,6 +7,85 @@
 
 //= require can.jquery-all
 
+//Save, needed for refactoring
+/*(function(can, $) {
+  var basic_attr_list = [
+      {attr_title: 'Title', attr_name: 'title',  display_status: 'true', attr_type: 'default'},
+      {attr_title: 'Owner', attr_name: 'owner',  display_status: 'true', attr_type: 'default'},
+      {attr_title: 'Code', attr_name: 'slug',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'State', attr_name: 'status',  display_status: 'true', attr_type: 'default'},
+      {attr_title: 'Primary Contact', attr_name: 'contact',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Secondary Contact', attr_name: 'secondary_contact',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Last Updated', attr_name: 'updated_at',  display_status: 'false', attr_type: 'default'}
+    ],
+
+    //Program, Regulation, Standard, Contract, Org Group, Vender, Data Asset, Project, Facility, Market
+    program_attr_list = [
+      {attr_title: 'URL', attr_name: 'url',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Effective Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Stop Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'}
+    ],
+    //Policy, Product,  in addition to program_attr_list
+    policy_attr_list = [
+      {attr_title: 'Type', attr_name: 'type',  display_status: 'false', attr_type: 'default'}
+    ],
+    //System, Processes,  in addition to program_attr_list
+    system_attr_list = [
+      {attr_title: 'Network Zone', attr_name: 'network',  display_status: 'false', attr_type: 'default'}
+    ]
+    //Clause
+    clause_attr_list = [
+      {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Effective Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Stop Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'}
+    ],
+    //Section, Objective
+    section_attr_list = [
+      {attr_title: 'URL', attr_name: 'url',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'}
+    ],
+    //Control
+    control_attr_list = [
+      {attr_title: 'URL', attr_name: 'url',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Effective Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Stop Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Kind/Nature', attr_name: 'kind',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Fraud Related ', attr_name: 'fraud_related',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Significance', attr_name: 'significance',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Type/Means', attr_name: 'means',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Frequency', attr_name: 'frequency',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Assertions', attr_name: 'assertions',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Categories', attr_name: 'categories',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Principal Assessor', attr_name: 'principal_assessor',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Secondary Assessor', attr_name: 'secondary_assessor',  display_status: 'false', attr_type: 'default'}
+    ],
+    //Audit
+    audit_attr_list = [
+      {attr_title: 'Title', attr_name: 'title',  display_status: 'true', attr_type: 'default'},
+      {attr_title: 'Audit Lead', attr_name: 'audit_lead',  display_status: 'true', attr_type: 'default'},
+      {attr_title: 'Code', attr_name: 'slug',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Status', attr_name: 'status',  display_status: 'true', attr_type: 'default'},
+      {attr_title: 'Last Updated', attr_name: 'updated_at',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Start Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'End Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Report Period', attr_name: 'report_period',  display_status: 'false', attr_type: 'default'},
+      {attr_title: 'Audit Firm', attr_name: 'audit_firm',  display_status: 'false', attr_type: 'default'}
+    ];
+
+  GGRC.TreeView = {};
+  GGRC.TreeView.basic_attr_list = basic_attr_list;
+  GGRC.TreeView.program_attr_list = program_attr_list;
+  GGRC.TreeView.policy_attr_list = policy_attr_list;
+  GGRC.TreeView.system_attr_list = system_attr_list;
+  GGRC.TreeView.clause_attr_list = clause_attr_list;
+  GGRC.TreeView.section_attr_list = section_attr_list;
+  GGRC.TreeView.control_attr_list = control_attr_list;
+  GGRC.TreeView.audit_attr_list = audit_attr_list;
+
+})(window.can, window.can.$);*/
+
 function _firstElementChild(el) {
   if (el.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
     for (i=0; i<el.childNodes.length; i++) {
@@ -393,68 +472,68 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         display_attr_list = [],
 
         basic_attr_list = [
-          {attr_title: 'Title', attr_name: 'title', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Owner', attr_name: 'owner', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Code', attr_name: 'slug', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'State', attr_name: 'status', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Primary Contact', attr_name: 'contact', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Secondary Contact', attr_name: 'secondary_contact', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Last Updated', attr_name: 'updated_at', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          {attr_title: 'Title', attr_name: 'title',  display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Owner', attr_name: 'owner',  display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Code', attr_name: 'slug',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'State', attr_name: 'status',  display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Primary Contact', attr_name: 'contact',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Secondary Contact', attr_name: 'secondary_contact',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Last Updated', attr_name: 'updated_at',  display_status: 'false', attr_type: 'default'}
         ],
 
         //Program, Regulation, Standard, Contract, Org Group, Vender, Data Asset, Project, Facility, Market
         program_attr_list = [
-          {attr_title: 'URL', attr_name: 'url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Effective Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Stop Date', attr_name: 'end_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          {attr_title: 'URL', attr_name: 'url',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Effective Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Stop Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'}
         ],
         //Policy, Product,  in addition to program_attr_list
         policy_attr_list = [
-          {attr_title: 'Type', attr_name: 'type', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          {attr_title: 'Type', attr_name: 'type',  display_status: 'false', attr_type: 'default'}
         ],
         //System, Processes,  in addition to program_attr_list
         system_attr_list = [
-          {attr_title: 'Network Zone', attr_name: 'network', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          {attr_title: 'Network Zone', attr_name: 'network',  display_status: 'false', attr_type: 'default'}
         ]
         //Clause
         clause_attr_list = [
-          {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Effective Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Stop Date', attr_name: 'end_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Effective Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Stop Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'}
         ],
         //Section, Objective
         section_attr_list = [
-          {attr_title: 'URL', attr_name: 'url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          {attr_title: 'URL', attr_name: 'url',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'}
         ],
         //Control
         control_attr_list = [
-          {attr_title: 'URL', attr_name: 'url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Reference URL', attr_name: 'reference_url', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Effective Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Stop Date', attr_name: 'end_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Kind/Nature', attr_name: 'kind', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Fraud Related ', attr_name: 'fraud_related', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Significance', attr_name: 'significance', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Type/Means', attr_name: 'means', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Frequency', attr_name: 'frequency', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Assertions', attr_name: 'assertions', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Categories', attr_name: 'categories', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Principal Assessor', attr_name: 'principal_assessor', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Secondary Assessor', attr_name: 'secondary_assessor', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          {attr_title: 'URL', attr_name: 'url',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Effective Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Stop Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Kind/Nature', attr_name: 'kind',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Fraud Related ', attr_name: 'fraud_related',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Significance', attr_name: 'significance',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Type/Means', attr_name: 'means',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Frequency', attr_name: 'frequency',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Assertions', attr_name: 'assertions',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Categories', attr_name: 'categories',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Principal Assessor', attr_name: 'principal_assessor',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Secondary Assessor', attr_name: 'secondary_assessor',  display_status: 'false', attr_type: 'default'}
         ],
         //Audit
         audit_attr_list = [
-          {attr_title: 'Title', attr_name: 'title', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Audit Lead', attr_name: 'audit_lead', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Code', attr_name: 'slug', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Status', attr_name: 'status', attr_datatype: 'string', display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Last Updated', attr_name: 'updated_at', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Start Date', attr_name: 'start_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'End Date', attr_name: 'end_date', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Report Period', attr_name: 'report_period', attr_datatype: 'string', display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Audit Firm', attr_name: 'audit_firm', attr_datatype: 'string', display_status: 'false', attr_type: 'default'}
+          {attr_title: 'Title', attr_name: 'title',  display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Audit Lead', attr_name: 'audit_lead',  display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Code', attr_name: 'slug',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Status', attr_name: 'status',  display_status: 'true', attr_type: 'default'},
+          {attr_title: 'Last Updated', attr_name: 'updated_at',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Start Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'End Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Report Period', attr_name: 'report_period',  display_status: 'false', attr_type: 'default'},
+          {attr_title: 'Audit Firm', attr_name: 'audit_firm',  display_status: 'false', attr_type: 'default'}
         ]
         ;
 
@@ -527,6 +606,34 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       this.options.select_attr_list = select_attr_list;
       this.options.attr('select_attr_list', this.options.select_attr_list);
+
+      //Get custom attributes
+      //CMS.Models.CustomAttributeDefinition.findAll({definition_type: 'program'}).then(function(de){defs = de;})
+      var custom_attr_list = [], dfd = $.Deferred(), that = this;
+      CMS.Models.CustomAttributeDefinition.findAll({definition_type: model_name})
+        .then(function(defs) {
+          if(defs.length > 0) {
+            //create custom_attr_list
+            var i;
+            for (i = 0; i < defs.length; i++){
+              if(defs[i].attribute_type !== 'Rich Text') {
+                var obj = {};
+                obj.attr_title = defs[i].title;
+                obj.attr_name = defs[i].title;
+                obj.display_status = 'false';
+                obj.attr_type = 'custom';
+                custom_attr_list.push(obj);
+              }
+            }
+            //update this.options.select_attr_list
+            can.each(custom_attr_list, function(item){
+              that.options.select_attr_list.push(item);
+            });
+            that.options.attr('select_attr_list', that.options.select_attr_list);
+          }
+          dfd.resolve();
+        })
+
     }
 
     if(!this.options.display_attr_list) {
@@ -538,7 +645,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options.display_attr_list = display_attr_list;
       this.options.attr('display_attr_list', this.options.display_attr_list);
     }
-    //console.log("display-attrlist: " + this.options.display_attr_list.length);
+
     if(!this.options.display_attr_width) {
       var width = Math.floor(12/this.options.display_attr_list.length);
       this.options.attr('display_attr_width', width);
@@ -1048,7 +1155,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   */
   , set_tree_attrs : function() {
     //update the display attrbute list and re-draw
-    //console.log("set tree-attr");
     //1: find checked items
     //2. update
     var i, j, ch_val, attr_width,
