@@ -54,7 +54,7 @@ function _display_tree_subpath(el, path, attempt_counter) {
         controller.select();
         scroll_delay = 750;
       }
-    }else{
+    } else {
       node_controller = $node.control();
       if (node_controller && node_controller.display_path) {
          return node_controller.display_path(rest);
@@ -330,6 +330,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , show_view : null
     , show_header : false
     , footer_view : null
+    , add_item_view : null
     , parent : null
     , list : null
     , single_object : false
@@ -349,11 +350,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //example child option :
     // { property : "controls", model : CMS.Models.Control, }
     // { parent_find_param : "system_id" ... }
-  }
-  , do_not_propagate : [
-        "header_view", "footer_view", "list", "original_list", "single_object"
-      , "find_function", "find_all_deferred"
-      ]
+  },
+  do_not_propagate : [
+    'header_view', 'footer_view', 'add_item_view', 'list', 'original_list', 'single_object', 'find_function',
+    'find_all_deferred'
+  ]
 }, {
   //prototype properties
   setup : function(el, opts) {
@@ -471,7 +472,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         }
       }));
 
-      if(this.options.footer_view) {
+      if (this.options.footer_view) {
         dfds.push(
           can.view(this.options.footer_view, this.options,
             this._ifNotRemoved(function(frag) {
@@ -708,7 +709,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           $items.push($li[0]);
         }
       });
-
       if (sort_prop || sort_function) {
         $items.each(function(i, item) {
             var j, $item = $(item), compare;

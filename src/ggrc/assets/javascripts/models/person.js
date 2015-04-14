@@ -82,6 +82,7 @@ can.Model.Cacheable("CMS.Models.Person", {
       show_view: GGRC.mustache_path + "/people/tree.mustache"
     , header_view : GGRC.mustache_path + "/people/tree_header.mustache"
     , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
+    , add_item_view : GGRC.mustache_path + "/people/tree_add-item.mustache"
     }
   , list_view_options: {
       find_params: { "__sort": "name,email" }
