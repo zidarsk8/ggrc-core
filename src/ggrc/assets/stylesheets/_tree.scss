@@ -1343,6 +1343,13 @@ ul.new-tree {
             @include opacity(1);
           }
         }
+        &.active {
+          color: $black;
+          .icon-share {
+            @include opacity(1);
+            background-position: -270px -416px;
+          }
+        }
       }
       &.border {
         border-top: 1px solid $headerBgnd;
