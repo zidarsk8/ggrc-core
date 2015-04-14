@@ -49,6 +49,11 @@
             </div>
 
             <div class="span4">
+              {{#child_options}}
+                  {{#if add_item_view}}
+                    {{{renderLive add_item_view}}}
+                  {{/if}}
+              {{/child_options}}
               <div class="show-details">
                 {{#if instance.viewLink}}
                   {{#is_allowed "view_object_page" instance}}

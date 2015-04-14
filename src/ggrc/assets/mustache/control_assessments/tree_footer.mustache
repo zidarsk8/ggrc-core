@@ -4,30 +4,3 @@
     Created By: anze@reciprocitylabs.com
     Maintained By: anze@reciprocitylabs.com
 }}
-
-{{#is_allowed_to_map parent_instance model.shortName}}
-{{#if allow_mapping_or_creating}}
-<li class="tree-item tree-item-add tree-footer">
-  <div class="row-fluid">
-    <div class="span12">
-        <a
-          class="section-add btn btn-small btn-draft"
-          href="javascript://"
-          rel="tooltip"
-          data-placement="right"
-          data-toggle="modal-ajax-form"
-          data-modal-class="modal-wide"
-          data-object-singular="ControlAssessment"
-          data-object-plural="control_assessments"
-          data-object-singular-override=""
-          data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "type": "{{parent_instance.type}}", "title" : "{{parent_instance.title}}" }, "context": { "id" : {{firstexist parent_instance.context.id "null"}}, "href" : "{{parent_instance.context.href}}", "type" : "{{parent_instance.context.type}}" } }'
-          data-original-title="Map Control Assessment to this Audit"
-          data-target="#ajax-modal-javascript:--"
-          >
-          <i class="grcicon-add-black"></i>
-        </a>
-    </div>
-  </div>
-</li>
-{{/if}}
-{{/is_allowed_to_map}}
