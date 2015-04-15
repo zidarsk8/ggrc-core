@@ -67,14 +67,23 @@
                 {% endif %}
 
 
-                {% if digest['due_in'] %}
+                {% if digest['due_in'] or digest['due_today'] %}
                   <h2 {{ style.h2() }} > X tasks are due very soon </h2>
                   <ul {{ style.ul() }} >
-                  {% for task in digest['due_in'].values() %}
-                    <li {{ style.li() }} >
-                      {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
-                    </li>
-                  {% endfor %}
+                  {% if digest['due_today'] %}
+                    {% for task in digest['due_today'].values() %}
+                      <li {{ style.li() }} >
+                        {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
+                      </li>
+                    {% endfor %}
+                  {% endif %}
+                  {% if digest['due_in'] %}
+                    {% for task in digest['due_in'].values() %}
+                      <li {{ style.li() }} >
+                        {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
+                      </li>
+                    {% endfor %}
+                  {% endif %}
                   </ul>
 
                 {% endif %}
