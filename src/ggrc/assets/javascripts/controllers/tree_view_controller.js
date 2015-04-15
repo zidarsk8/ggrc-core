@@ -8,7 +8,7 @@
 //= require can.jquery-all
 
 //Save, needed for refactoring
-/*(function(can, $) {
+(function(can, $) {
   var basic_attr_list = [
       {attr_title: 'Title', attr_name: 'title',  display_status: 'true', attr_type: 'default'},
       {attr_title: 'Owner', attr_name: 'owner',  display_status: 'true', attr_type: 'default'},
@@ -84,7 +84,7 @@
   GGRC.TreeView.control_attr_list = control_attr_list;
   GGRC.TreeView.audit_attr_list = audit_attr_list;
 
-})(window.can, window.can.$);*/
+})(window.can, window.can.$);
 
 function _firstElementChild(el) {
   if (el.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
@@ -458,199 +458,144 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
   }
 
-  //initialize the attribute list CORE-1546
-  //default attribute for each model type and custon attributes
+  //Update the default attribute list for tree-view drop-down menu for a specific model
+  , update_default_attr_list: function(model_name) {
+    var select_attr_list = [],
+        basic_attr_list = GGRC.TreeView.basic_attr_list,
+        program_attr_list = GGRC.TreeView.program_attr_list,
+        policy_attr_list = GGRC.TreeView.policy_attr_list,
+        system_attr_list = GGRC.TreeView.system_attr_list,
+        clause_attr_list = GGRC.TreeView.clause_attr_list,
+        section_attr_list = GGRC.TreeView.section_attr_list,
+        control_attr_list = GGRC.TreeView.control_attr_list,
+        audit_attr_list = GGRC.TreeView.audit_attr_list;
+
+    if(model_name === 'Audit') {
+      can.each(audit_attr_list, function(item){
+        select_attr_list.push(item);
+      });
+    }
+    else {
+      can.each(basic_attr_list, function(item){
+        select_attr_list.push(item);
+      });
+      switch (model_name) {
+        case 'Program':
+        case 'Regulation':
+        case 'Standard':
+        case 'Contract':
+        case 'OrgGroup':
+        case 'Vendor':
+        case 'DataAsset':
+        case 'Project':
+        case 'Facility':
+        case 'Market':
+          can.each(program_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          break;
+        case 'Policy':
+        case 'Product':
+          can.each(program_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          can.each(policy_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          break;
+        case 'System':
+        case 'Process':
+          can.each(program_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          can.each(system_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          break;
+        case 'Clause':
+          can.each(clause_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          break;
+        case 'Section':
+        case 'Objective':
+          can.each(section_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+          break;
+        case 'Control':
+          can.each(control_attr_list, function(item){
+            select_attr_list.push(item);
+          });
+        default:
+          break;
+      }
+    }
+    this.options.select_attr_list = select_attr_list;
+    this.options.attr('select_attr_list', this.options.select_attr_list);
+
+  }
+
+  //Get the custom attribute list from the server and add the list to
+  //select attribute list
+  , update_custom_attr_list: function(model_name) {
+    var custom_attr_list = [], dfd = $.Deferred(), that = this;
+    CMS.Models.CustomAttributeDefinition.findAll({definition_type: model_name})
+      .then(function(defs) {
+        if(defs.length > 0) {
+          //create custom_attr_list
+          var i;
+          for (i = 0; i < defs.length; i++){
+            if(defs[i].attribute_type !== 'Rich Text') {
+              var obj = {};
+              obj.attr_title = defs[i].title;
+              obj.attr_name = defs[i].title;
+              obj.display_status = 'false';
+              obj.attr_type = 'custom';
+              custom_attr_list.push(obj);
+            }
+          }
+          //update this.options.select_attr_list
+          can.each(custom_attr_list, function(item){
+            that.options.select_attr_list.push(item);
+          });
+          that.options.attr('select_attr_list', that.options.select_attr_list);
+        }
+        dfd.resolve();
+      })
+      return dfd;
+  }
+
+  //Displays attribute list for tree-header, Select attribute list drop down
+  //Gets default and custom attribute list for each model, and sets upthe display-list
   , init_display_options: function(opts) {
-    //Fixme: Now only some default attributes like, title, definition, slug,  owner etc
-    //Ex: custom attrs:
-    //CMS.Models.CustomAttributeDefinition.findAll({definition_type: 'program'}).then(function(de){defs = de;})
-    //name = title and attr_datatype = attribute_type
     //We shold get the display_attr_list from user preference object for the current user
-
-    var model_name,
-        select_attr_list = [],
-        display_attr_list = [],
-
-        basic_attr_list = [
-          {attr_title: 'Title', attr_name: 'title',  display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Owner', attr_name: 'owner',  display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Code', attr_name: 'slug',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'State', attr_name: 'status',  display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Primary Contact', attr_name: 'contact',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Secondary Contact', attr_name: 'secondary_contact',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Last Updated', attr_name: 'updated_at',  display_status: 'false', attr_type: 'default'}
-        ],
-
-        //Program, Regulation, Standard, Contract, Org Group, Vender, Data Asset, Project, Facility, Market
-        program_attr_list = [
-          {attr_title: 'URL', attr_name: 'url',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Effective Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Stop Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'}
-        ],
-        //Policy, Product,  in addition to program_attr_list
-        policy_attr_list = [
-          {attr_title: 'Type', attr_name: 'type',  display_status: 'false', attr_type: 'default'}
-        ],
-        //System, Processes,  in addition to program_attr_list
-        system_attr_list = [
-          {attr_title: 'Network Zone', attr_name: 'network',  display_status: 'false', attr_type: 'default'}
-        ]
-        //Clause
-        clause_attr_list = [
-          {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Effective Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Stop Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'}
-        ],
-        //Section, Objective
-        section_attr_list = [
-          {attr_title: 'URL', attr_name: 'url',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'}
-        ],
-        //Control
-        control_attr_list = [
-          {attr_title: 'URL', attr_name: 'url',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Reference URL', attr_name: 'reference_url',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Effective Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Stop Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Kind/Nature', attr_name: 'kind',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Fraud Related ', attr_name: 'fraud_related',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Significance', attr_name: 'significance',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Type/Means', attr_name: 'means',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Frequency', attr_name: 'frequency',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Assertions', attr_name: 'assertions',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Categories', attr_name: 'categories',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Principal Assessor', attr_name: 'principal_assessor',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Secondary Assessor', attr_name: 'secondary_assessor',  display_status: 'false', attr_type: 'default'}
-        ],
-        //Audit
-        audit_attr_list = [
-          {attr_title: 'Title', attr_name: 'title',  display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Audit Lead', attr_name: 'audit_lead',  display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Code', attr_name: 'slug',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Status', attr_name: 'status',  display_status: 'true', attr_type: 'default'},
-          {attr_title: 'Last Updated', attr_name: 'updated_at',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Start Date', attr_name: 'start_date',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'End Date', attr_name: 'end_date',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Report Period', attr_name: 'report_period',  display_status: 'false', attr_type: 'default'},
-          {attr_title: 'Audit Firm', attr_name: 'audit_firm',  display_status: 'false', attr_type: 'default'}
-        ]
-        ;
-
-
-
+    var model_name, display_attr_list = [], that = this;
 
     if(!this.options.select_attr_list) {
       model_name = opts.model.model_singular;
-
-      if(model_name === 'Audit') {
-        can.each(audit_attr_list, function(item){
-          select_attr_list.push(item);
-        });
-      }
-      else {
-        can.each(basic_attr_list, function(item){
-          select_attr_list.push(item);
-        });
-        switch (model_name) {
-          case 'Program':
-          case 'Regulation':
-          case 'Standard':
-          case 'Contract':
-          case 'OrgGroup':
-          case 'Vendor':
-          case 'DataAsset':
-          case 'Project':
-          case 'Facility':
-          case 'Market':
-            can.each(program_attr_list, function(item){
-              select_attr_list.push(item);
-            });
-            break;
-          case 'Policy':
-          case 'Product':
-            can.each(program_attr_list, function(item){
-              select_attr_list.push(item);
-            });
-            can.each(policy_attr_list, function(item){
-              select_attr_list.push(item);
-            });
-            break;
-          case 'System':
-          case 'Process':
-            can.each(program_attr_list, function(item){
-              select_attr_list.push(item);
-            });
-            can.each(system_attr_list, function(item){
-              select_attr_list.push(item);
-            });
-            break;
-          case 'Clause':
-            can.each(clause_attr_list, function(item){
-              select_attr_list.push(item);
-            });
-            break;
-          case 'Section':
-          case 'Objective':
-            can.each(section_attr_list, function(item){
-              select_attr_list.push(item);
-            });
-            break;
-          case 'Control':
-            can.each(control_attr_list, function(item){
-              select_attr_list.push(item);
-            });
-          default:
-            break;
-        }
-      }
-      this.options.select_attr_list = select_attr_list;
-      this.options.attr('select_attr_list', this.options.select_attr_list);
-
-      //Get custom attributes
-      //CMS.Models.CustomAttributeDefinition.findAll({definition_type: 'program'}).then(function(de){defs = de;})
-      var custom_attr_list = [], dfd = $.Deferred(), that = this;
-      CMS.Models.CustomAttributeDefinition.findAll({definition_type: model_name})
-        .then(function(defs) {
-          if(defs.length > 0) {
-            //create custom_attr_list
-            var i;
-            for (i = 0; i < defs.length; i++){
-              if(defs[i].attribute_type !== 'Rich Text') {
-                var obj = {};
-                obj.attr_title = defs[i].title;
-                obj.attr_name = defs[i].title;
-                obj.display_status = 'false';
-                obj.attr_type = 'custom';
-                custom_attr_list.push(obj);
-              }
+      $.when(
+        this.update_default_attr_list(model_name),
+        this.update_custom_attr_list(model_name)
+      ).then(function() {
+        if(!that.options.display_attr_list) {
+          can.each(that.options.select_attr_list, function(item){
+            if (item.attr_title !== 'Title' && item.display_status === 'true') {
+              display_attr_list.push(item);
             }
-            //update this.options.select_attr_list
-            can.each(custom_attr_list, function(item){
-              that.options.select_attr_list.push(item);
-            });
-            that.options.attr('select_attr_list', that.options.select_attr_list);
-          }
-          dfd.resolve();
-        })
+          });
+          that.options.display_attr_list = display_attr_list;
+          that.options.attr('display_attr_list', that.options.display_attr_list);
+        }
 
-    }
-
-    if(!this.options.display_attr_list) {
-      can.each(select_attr_list, function(item){
-        if (item.attr_title !== 'Title' && item.display_status === 'true') {
-          display_attr_list.push(item);
+        if(!that.options.display_attr_width) {
+          var width = Math.floor(12/that.options.display_attr_list.length);
+          that.options.attr('display_attr_width', width);
         }
       });
-      this.options.display_attr_list = display_attr_list;
-      this.options.attr('display_attr_list', this.options.display_attr_list);
-    }
-
-    if(!this.options.display_attr_width) {
-      var width = Math.floor(12/this.options.display_attr_list.length);
-      this.options.attr('display_attr_width', width);
     }
   }
+
   , init : function(el, opts) {
     this.init_display_options(opts);
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
