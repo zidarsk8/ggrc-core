@@ -383,7 +383,7 @@ can.Control("GGRC.Controllers.Modals", {
       value = item.value;
     }
 
-    if ($elem.is("[null-if-empty]") && (!value || value.length)) {
+    if ($elem.is("[null-if-empty]") && (!value || !value.length)) {
       value = null;
     }
 
@@ -976,7 +976,7 @@ can.Component.extend({
       var that = this,
           changes = this.scope.changes;
 
-      if (changes.length) {
+      if (!changes.length) {
         return;
       }
       this.scope.attr("instance", this.scope.attr("parent_instance").attr(this.scope.instance_attr).reify());
