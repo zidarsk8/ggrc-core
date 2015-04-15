@@ -35,10 +35,11 @@ def send_pending_notifications():
     for user_email, data in day_notif.iteritems():
       email_body = digest_template.render(digest=data)
       email.send_email(user_email, "test", email_body)
+  return "Ok"
 
 
 def send_todays_digest_notifications():
-  pass
+  return "Not Implemented"
 
 
 def init_extra_views(app):
