@@ -109,6 +109,37 @@ class TestBasicWorkflowActions(TestCase):
 
 
   def create_test_cases(self):
+
+    self.quarterly_wf_1 = {
+      "title": "quarterly wf 1",
+      "description": "",
+      "frequency": "quarterly",
+      "task_groups": [{
+          "title": "tg_1",
+          "task_group_tasks": [{
+              "description": self.generator.random_str(100),
+              "relative_start_day": 5,
+              "relative_start_month": 1,
+              "relative_end_day": 25,
+              "relative_end_month": 2,
+            }, {
+              "description": self.generator.random_str(100),
+              "relative_start_day": 15,
+              "relative_start_month": 2,
+              "relative_end_day": 28,
+              "relative_end_month": 2,
+            }, {
+              "description": self.generator.random_str(100),
+              "relative_start_day": 1,
+              "relative_start_month": 1,
+              "relative_end_day": 1,
+              "relative_end_month": 1,
+            },
+          ],
+        },
+      ]
+    }
+
     self.weekly_wf_1 = {
       "title": "weekly thingy",
       "description": "start this many a time",
