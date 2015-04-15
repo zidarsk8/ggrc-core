@@ -1446,9 +1446,9 @@
 
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.SearchListLoader", {
   }, {
-      init: function(query_function) {
+      init: function(query_function, observe_types) {
         this._super();
-
+        this.observe_types = observe_types && observe_types.split(',');
         this.query_function = query_function;
       }
 
@@ -1459,7 +1459,9 @@
 
         model.bind("created", function(ev, mapping) {
           if (mapping instanceof model) {
-            that._refresh_stubs(binding);
+            if (_.includes(that.observe_types, mapping.type)) {
+              that._refresh_stubs(binding);
+            }
           }
         });
 
@@ -1643,8 +1645,8 @@
       instance_model_name, option_join_attr);
   }
 
-  GGRC.MapperHelpers.Search = function Search(query_function) {
-    return new GGRC.ListLoaders.SearchListLoader(query_function);
+  GGRC.MapperHelpers.Search = function Search(query_function, observe_types) {
+    return new GGRC.ListLoaders.SearchListLoader(query_function, observe_types);
   }
 
   GGRC.MapperHelpers.Multi = function Multi(sources) {

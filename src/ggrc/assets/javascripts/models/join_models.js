@@ -17,8 +17,7 @@ can.Model.Cacheable("can.Model.Join", {
     function reinit(ev, instance) {
       if (instance instanceof can.Model.Join) {
         instance.reinit();
-      //can.proxy(this, "reinit"));
-
+        var refresh_queue = new RefreshQueue();
         can.each(instance.constructor.join_keys, function(cls, key) {
           var obj;
           if (instance[key]) {
@@ -29,9 +28,11 @@ can.Model.Cacheable("can.Model.Join", {
             }
           }
           if (obj) {
-            obj.refresh();
+            refresh_queue.enqueue(obj);
+
           }
         });
+        refresh_queue.trigger();
       }
     }
     if (this === can.Model.Join) {

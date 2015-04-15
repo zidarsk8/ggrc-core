@@ -270,7 +270,6 @@
       this.context.attr('selected_option', data);
       this.element.find(".tree-item[data-id=" + data.id + "] input[type=checkbox]").click();
     },
-
     // HELPERS
 
     find_join: function(option_id) {
@@ -2326,7 +2325,17 @@
     });
   });
 
-
-
+  can.Component.extend({
+    tag: "lazy-openclose",
+    scope: {
+      show: false,
+    },
+    content: "<content/>",
+    init: function() {
+      this._control.element.closest('.tree-item').find('.openclose').bind('click', function() {
+        this.scope.attr('show', true);
+      }.bind(this));
+    }
+  });
 
 })(window.can, window.can.$);

@@ -126,7 +126,7 @@ can.Construct("RefreshQueueManager", {
       if (!found_queue) {
         can.each(this.queues, function(queue) {
           if (!found_queue && queue.model === model
-              && !queue.triggered && queue.ids.length < 50) {
+              && !queue.triggered && queue.ids.length < 150) {
             found_queue = queue.enqueue(id);
             return false;
           }
@@ -245,7 +245,7 @@ can.Construct("RefreshQueue", {
         ;
 
       if (!delay) {
-        delay = 50;
+        delay = 150;
       }
 
       this.triggered = true;

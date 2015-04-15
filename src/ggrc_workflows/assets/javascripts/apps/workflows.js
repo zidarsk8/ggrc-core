@@ -195,7 +195,7 @@
               cycle_task_group_object_task_id: binding.instance.id,
               is_declining_review: 1
             });
-          })
+          }, "Cycle")
         },
 
         CycleTaskEntry: {
@@ -228,39 +228,35 @@
               'cycle.is_current': true,
               status__in: 'Assigned,InProgress,Finished,Declined'
             });
-          }),
+          }, "Cycle"),
           assigned_tasks_with_history: Search(function(binding) {
             return CMS.Models.CycleTaskGroupObjectTask.findAll({
               contact_id: binding.instance.id
             });
-          })
+          }, "Cycle")
         }
       };
 
     // Insert `workflows` mappings to all business object types
     can.each(_workflow_object_types, function (type) {
+      CMS.Models[type].attributes.cycle_objects = 'CMS.Models.CycleTaskGroupObject.stubs';
       mappings[type] = {
         task_groups: new GGRC.ListLoaders.ProxyListLoader('TaskGroupObject', 'object', 'task_group', 'task_group_objects', null),
-        object_tasks: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            'cycle_task_group_object.object_id': binding.instance.id,
-            'cycle_task_group_object.object_type': binding.instance.type,
-            'cycle.is_current': true
-          });
-        }),
+        cycle_objects: Direct('CycleTaskGroupObject', 'object', 'cycle_task_group_objects'),
+        object_tasks: Cross('cycle_objects', 'cycle_task_group_object_tasks'),
         approval_tasks: Search(function (binding) {
           return CMS.Models.CycleTaskGroupObjectTask.findAll({
             'cycle_task_group_object.object_id': binding.instance.id,
             'cycle_task_group_object.object_type': binding.instance.type,
             'cycle.workflow.object_approval': true
           });
-        }),
+        }, "Cycle"),
         object_tasks_with_history: Search(function (binding) {
           return CMS.Models.CycleTaskGroupObjectTask.findAll({
             'cycle_task_group_object.object_id': binding.instance.id,
             'cycle_task_group_object.object_type': binding.instance.type
           });
-        }),
+        }, "Cycle"),
         workflows: Cross('task_groups', 'workflow'),
         approval_workflows: CustomFilter('workflows', function (binding) {
           return binding.instance.attr('object_approval');
