@@ -391,6 +391,7 @@ def get_cycle_task_dict(cycle_task):
       "title": cycle_task.title,
       "object_title": cycle_task.cycle_task_group_object.object.title if
       cycle_task.cycle_task_group_object else "",
+      "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
   }
 
 def get_person_dict(person):
