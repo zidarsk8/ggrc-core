@@ -1,8 +1,7 @@
 {% extends "notifications/base.html" %}
 
-{% import 'notifications/style.html' as style %}
 {% block body %}
+  {% import 'notifications/style.html' as style %}
 
   {% include 'notifications/email_digest_body.html' %}
-
 {% endblock %}

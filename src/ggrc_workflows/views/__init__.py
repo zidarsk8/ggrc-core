@@ -7,6 +7,7 @@ from ggrc_workflows import start_recurring_cycles
 from ggrc import notification
 from ggrc.notification import email
 from jinja2 import Environment, PackageLoader
+from datetime import date
 
 env = Environment(loader=PackageLoader('ggrc_workflows', 'templates'))
 
@@ -31,15 +32,26 @@ def show_todays_digest_notifications():
 def send_pending_notifications():
   digest_template = env.get_template("notifications/email_digest.html")
   notifications = notification.get_pending_notifications()
-  for day_notif in notifications.iteritems():
+  sent_emails = []
+  for day, day_notif in notifications.iteritems():
+    subject = "gGRC daily digest for {}".format(day.strftime("%b %d"))
     for user_email, data in day_notif.iteritems():
       email_body = digest_template.render(digest=data)
-      email.send_email(user_email, "test", email_body)
-  return "Ok"
+      email.send_email(user_email, subject, email_body)
+      sent_emails.append(user_email)
+  return "emails sent to: <br> {}".format("", "<br>".join(sent_emails))
 
 
 def send_todays_digest_notifications():
-  return "Not Implemented"
+  digest_template = env.get_template("notifications/email_digest.html")
+  notifications = notification.get_todays_notifications()
+  sent_emails = []
+  subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
+  for user_email, data in notifications.iteritems():
+    email_body = digest_template.render(digest=data)
+    email.send_email(user_email, subject, email_body)
+    sent_emails.append(user_email)
+  return "emails sent to: <br> {}".format("", "<br>".join(sent_emails))
 
 
 def init_extra_views(app):
