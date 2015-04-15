@@ -82,7 +82,7 @@ def upgrade():
            "template": "monthly_workflow_starts_in",
            "advance_notice": 3,
            },
-          {"name": "quaterly_workflow_starts_in",
+          {"name": "quarterly_workflow_starts_in",
            "description": "Advanced notification for a reccuring workflow.",
            "template": "quaterly_workflow_starts_in",
            "advance_notice": 7,
