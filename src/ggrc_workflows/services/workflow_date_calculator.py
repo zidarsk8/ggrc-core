@@ -204,7 +204,13 @@ class WorkflowDateCalculator(object):
             tmp_quarter_month = 3
         return tmp_start_date
       else:  # min_relative_start_quarter_month > base_quarter_month: Walk forward to a valid month
-        return basedate + monthdelta(min_relative_start_quarter_month) - base_quarter_month
+        delta = abs(relative_start_month - base_quarter_month)
+        start_date = basedate + monthdelta(int(delta))  # int cast because delta is a long
+        return date(
+            year=start_date.year,
+            month=start_date.month,
+            day=relative_start_day  # we are hoping the user didn't enter an invalid start_date (this pattern is used throughout this file)
+        )
     elif "annually" == frequency:
       if basedate.month == relative_start_month:
         if basedate.day == relative_start_day:
