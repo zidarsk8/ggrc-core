@@ -44,29 +44,25 @@ class TestBasicWorkflowActions(TestCase):
     self.assertEqual(len(task_groups),
                      len(self.one_time_workflow_1["task_groups"]))
 
-  def test_weekly_workflows(self):
-    wf_dict = copy.deepcopy(self.weekly_wf_1)
-    _, wf = self.generator.generate_workflow(wf_dict)
-    self.assertIsInstance(wf, Workflow)
+  def test_workflows(self):
+    for workflow in self.all_workflows:
+      wf_dict = copy.deepcopy(workflow)
+      _, wf = self.generator.generate_workflow(wf_dict)
+      self.assertIsInstance(wf, Workflow)
 
-    task_groups = db.session.query(TaskGroup)\
-        .filter(TaskGroup.workflow_id == wf.id).all()
+      task_groups = db.session.query(TaskGroup)\
+          .filter(TaskGroup.workflow_id == wf.id).all()
 
-    self.assertEqual(len(task_groups),
-                     len(self.weekly_wf_1["task_groups"]))
+      self.assertEqual(len(task_groups),
+                       len(workflow["task_groups"]))
 
-  def test_activate_one_time_wf(self):
-    wf_dict = copy.deepcopy(self.one_time_workflow_1)
-    _, wf = self.generator.generate_workflow(wf_dict)
-    self.assertIsInstance(wf, Workflow)
-    task_groups = db.session.query(TaskGroup)\
-        .filter(TaskGroup.workflow_id == wf.id).all()
-    self.assertEqual(len(task_groups),
-                     len(self.one_time_workflow_1["task_groups"]))
+  def test_activate_wf(self):
+    for workflow in self.all_workflows:
+      wf_dict = copy.deepcopy(workflow)
+      _, wf = self.generator.generate_workflow(wf_dict)
+      response, wf = self.generator.activate_workflow(wf)
 
-    response, wf = self.generator.activate_workflow(wf)
-
-    self.assert200(response)
+      self.assert200(response)
 
   def test_one_time_workflow_edits(self):
     wf_dict = copy.deepcopy(self.one_time_workflow_1)
@@ -262,4 +258,10 @@ class TestBasicWorkflowActions(TestCase):
          },
       ]
     }
-
+    self.all_workflows = [
+      self.one_time_workflow_1,
+      self.one_time_workflow_2,
+      self.weekly_wf_1,
+      self.monthly_workflow_1,
+      self.quarterly_wf_1,
+    ]
