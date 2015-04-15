@@ -1876,7 +1876,10 @@ Mustache.registerHelper('last_approved', function (instance, options) {
       });
     }
     item = item ? item[0] : list[0];
-    return options.fn(options.contexts.add(item));
+    if (item) {
+      options.contexts.add(item);
+    }
+    return options.fn(options.contexts);
   }
   function fail(error) {
     return options.inverse(options.contexts.add({error: error}));
