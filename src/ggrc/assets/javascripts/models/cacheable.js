@@ -1099,6 +1099,40 @@ can.Model("can.Model.Cacheable", {
 
     return [type,
             this.id].join('/');
+  },
+
+  // easier accessor for deep properties
+  // owners.0.name -> this.owners[0].reify().name
+  // owners.0.name|email -> 
+  //  firstnonempty this.owners[0].reify().name this.owners[0].reify().email
+  get_deep_property: function get_deep_property (descriptor, val) {
+    val = typeof val === "undefined" ? this : val;
+    
+    if (!descriptor || !descriptor.length) {
+      return undefined;
+    }else if (val[descriptor]) {
+      return val[descriptor];
+    }else{
+      var d = descriptor.split('.'),
+          keys = d.shift().split('|'),
+          rest = d.join('.');
+
+      return _.reduce(keys, function (res, key) {
+        if (res && res.length) return res;
+
+        if (typeof val[key] === "undefined") {
+          return undefined;
+        }else{
+          if (typeof val[key].reify === "function") {
+            val[key] = val[key].reify();
+          }
+          
+          return rest.length
+                ? get_deep_property(rest, val[key])
+                : val[key];
+        }
+      }, "");
+    }
   }
 });
 
