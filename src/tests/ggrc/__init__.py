@@ -19,7 +19,7 @@ if os.environ.get('TRAVIS', False):
 class TestCase(BaseTestCase):
   def setUp(self):
     for table in reversed(db.metadata.sorted_tables):
-      if not table.name == "test_model":
+      if table.name not in ("test_model", "roles", "notification_types", "object_types"):
         db.engine.execute(table.delete())
     db.session.commit()
 
