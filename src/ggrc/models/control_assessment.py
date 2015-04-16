@@ -26,11 +26,14 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
   control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
   control = db.relationship('Control', foreign_keys=[control_id])
 
+  audit = {}  # we add this for the sake of client side error checking
+
   # REST properties
   _publish_attrs = [
       'design',
       'operationally',
-      'control'
+      'control',
+      PublishOnly('audit')
   ]
 
 track_state_for_class(ControlAssessment)
