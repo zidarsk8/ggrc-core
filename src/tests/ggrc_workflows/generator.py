@@ -10,6 +10,7 @@ from ggrc_workflows.models import (Workflow, TaskGroup, TaskGroupTask,
                                    TaskGroupObject, Cycle)
 from tests.ggrc.generator import Generator
 import random
+import copy
 
 
 class WorkflowsGenerator(Generator):
@@ -19,6 +20,7 @@ class WorkflowsGenerator(Generator):
     return: wf if it was created, or response otherwise
     """
     obj_name = "workflow"
+    data = copy.deepcopy(data)
 
     tgs = data.pop("task_groups", [])
 
@@ -36,6 +38,7 @@ class WorkflowsGenerator(Generator):
   def generate_task_group(self, workflow=None, data={}):
     if not workflow:
       _, workflow = self.generate_workflow()
+    data = copy.deepcopy(data)
 
     tgts = data.pop("task_group_tasks", [])
     tgos = data.pop("task_group_objects", [])
@@ -107,7 +110,7 @@ class WorkflowsGenerator(Generator):
 
     return self.generate(TaskGroupObject, obj_name, obj_dict)
 
-  def generate_cycle(self, workflow=None, data={}):
+  def generate_cycle(self, workflow=None):
     if not workflow:
       _, workflow = self.generate_workflow()
 

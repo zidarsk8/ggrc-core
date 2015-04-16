@@ -34,8 +34,7 @@ class TestBasicWorkflowActions(TestCase):
     pass
 
   def test_create_workflows(self):
-    wf_dict = copy.deepcopy(self.one_time_workflow_1)
-    _, wf = self.generator.generate_workflow(wf_dict)
+    _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
     self.assertIsInstance(wf, Workflow)
 
     task_groups = db.session.query(TaskGroup)\
@@ -46,8 +45,7 @@ class TestBasicWorkflowActions(TestCase):
 
   def test_workflows(self):
     for workflow in self.all_workflows:
-      wf_dict = copy.deepcopy(workflow)
-      _, wf = self.generator.generate_workflow(wf_dict)
+      _, wf = self.generator.generate_workflow(workflow)
       self.assertIsInstance(wf, Workflow)
 
       task_groups = db.session.query(TaskGroup)\
@@ -58,15 +56,13 @@ class TestBasicWorkflowActions(TestCase):
 
   def test_activate_wf(self):
     for workflow in self.all_workflows:
-      wf_dict = copy.deepcopy(workflow)
-      _, wf = self.generator.generate_workflow(wf_dict)
+      _, wf = self.generator.generate_workflow(workflow)
       response, wf = self.generator.activate_workflow(wf)
 
       self.assert200(response)
 
   def test_one_time_workflow_edits(self):
-    wf_dict = copy.deepcopy(self.one_time_workflow_1)
-    _, wf = self.generator.generate_workflow(wf_dict)
+    _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
 
     wf_dict = {"title": "modified one time wf"}
     self.generator.modify_workflow(wf, data=wf_dict)
@@ -75,8 +71,7 @@ class TestBasicWorkflowActions(TestCase):
     self.assertEqual(wf_dict["title"], modified_wf.title)
 
   def test_one_time_wf_activate(self):
-    wf_dict = copy.deepcopy(self.one_time_workflow_1)
-    _, wf = self.generator.generate_workflow(wf_dict)
+    _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
     self.generator.generate_cycle(wf)
     self.generator.activate_workflow(wf)
 

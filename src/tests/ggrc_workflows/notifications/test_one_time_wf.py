@@ -58,8 +58,7 @@ class TestOneTimeWorkflowNotification(TestCase):
       return db.session.query(Person).filter(Person.id == person_id).one()
 
     with freeze_time("2015-04-10"):
-      wf_dict = copy.deepcopy(self.one_time_workflow_1)
-      _, wf = self.wf_generator.generate_workflow(wf_dict)
+      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
 
       _, cycle = self.wf_generator.generate_cycle(wf)
       self.wf_generator.activate_workflow(wf)
