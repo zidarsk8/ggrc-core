@@ -60,6 +60,7 @@ can.Component.extend({
             audit: this.scope.audit,
             control: control.stub(),
             context: this.scope.audit.context,
+            owners: [CMS.Models.Person.findInCacheById(GGRC.current_user.id)],
             test_plan: control.test_plan
           };
 
