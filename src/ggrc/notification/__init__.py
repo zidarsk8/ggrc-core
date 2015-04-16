@@ -80,9 +80,9 @@ def get_pending_notifications():
   for notification in notifications:
     notif_by_day[notification.send_on].append(notification)
 
-  result = {d: get_notification_data(n) for d, n in notif_by_day.iteritems()}
+  data = {d: get_notification_data(n) for d, n in notif_by_day.iteritems()}
 
-  return result
+  return notifications, data
 
 
 def get_todays_notifications():
@@ -90,7 +90,7 @@ def get_todays_notifications():
       and_(Notification.send_on <= date.today(),
            Notification.sent_at == None  # noqa
            )).all()
-  return get_notification_data(notifications)
+  return notifications, get_notification_data(notifications)
 
 
 def generate_notification_email(data):

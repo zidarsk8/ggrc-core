@@ -11,6 +11,8 @@ from datetime import date
 
 env = Environment(loader=PackageLoader('ggrc_workflows', 'templates'))
 
+# TODO: move these views to ggrc_views and all the functions to notifications
+# module.
 
 def do_start_recurring_cycles():
   start_recurring_cycles()
@@ -18,22 +20,22 @@ def do_start_recurring_cycles():
 
 
 def show_pending_notifications():
-  notifications = notification.get_pending_notifications()
+  _, notif_data = notification.get_pending_notifications()
   pending = env.get_template("notifications/pending_digest_notifitaitons.html")
-  return pending.render(data=sorted(notifications.iteritems()))
+  return pending.render(data=sorted(notif_data.iteritems()))
 
 
 def show_todays_digest_notifications():
-  notifications = notification.get_todays_notifications()
+  _, notif_data = notification.get_todays_notifications()
   todays = env.get_template("notifications/todays_digest_notifications.html")
-  return todays.render(data=notifications)
+  return todays.render(data=notif_data)
 
 
 def send_pending_notifications():
   digest_template = env.get_template("notifications/email_digest.html")
-  notifications = notification.get_pending_notifications()
+  notifications, notif_data = notification.get_pending_notifications()
   sent_emails = []
-  for day, day_notif in notifications.iteritems():
+  for day, day_notif in notif_data.iteritems():
     subject = "gGRC daily digest for {}".format(day.strftime("%b %d"))
     for user_email, data in day_notif.iteritems():
       email_body = digest_template.render(digest=data)
@@ -44,10 +46,10 @@ def send_pending_notifications():
 
 def send_todays_digest_notifications():
   digest_template = env.get_template("notifications/email_digest.html")
-  notifications = notification.get_todays_notifications()
+  notifications, notif_data = notification.get_todays_notifications()
   sent_emails = []
   subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
-  for user_email, data in notifications.iteritems():
+  for user_email, data in notif_data.iteritems():
     email_body = digest_template.render(digest=data)
     email.send_email(user_email, subject, email_body)
     sent_emails.append(user_email)

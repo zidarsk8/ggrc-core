@@ -42,16 +42,16 @@ class TestBasicWorkflowActions(TestCase):
       assignee = Person.query.get(self.assignee.id)
 
     with freeze_time("2015-01-01"):
-      notifications = notification.get_todays_notifications()
-      self.assertNotIn(assignee.email, notifications)
+      _, notif_data = notification.get_todays_notifications()
+      self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-01-29"):
-      notifications = notification.get_todays_notifications()
-      self.assertIn(assignee.email, notifications)
+      _, notif_data = notification.get_todays_notifications()
+      self.assertIn(assignee.email, notif_data)
 
     with freeze_time("2015-02-01"):
-      notifications = notification.get_todays_notifications()
-      self.assertIn(assignee.email, notifications)
+      _, notif_data = notification.get_todays_notifications()
+      self.assertIn(assignee.email, notif_data)
 
   def create_test_cases(self):
     _, self.assignee = self.ggrc_generator.generate_person(

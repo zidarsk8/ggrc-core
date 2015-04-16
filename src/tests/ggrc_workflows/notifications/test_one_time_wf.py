@@ -63,24 +63,22 @@ class TestOneTimeWorkflowNotification(TestCase):
       _, cycle = self.wf_generator.generate_cycle(wf)
       self.wf_generator.activate_workflow(wf)
 
-      notifications = notification.get_pending_notifications()
-
       person_1 = get_person(self.random_people[0].id)
       person_2 = get_person(self.random_people[1].id)
 
     with freeze_time("2015-05-03"):  # two days befor due date
-      notifications = notification.get_todays_notifications()
-      self.assertIn(person_1.email, notifications)
-      self.assertNotIn("due_in", notifications[person_1.email])
-      self.assertNotIn("due_today", notifications[person_1.email])
+      _, notif_data = notification.get_todays_notifications()
+      self.assertIn(person_1.email, notif_data)
+      self.assertNotIn("due_in", notif_data[person_1.email])
+      self.assertNotIn("due_today", notif_data[person_1.email])
 
     with freeze_time("2015-05-04"):  # one day befor due date
-      notifications = notification.get_todays_notifications()
-      self.assertEqual(len(notifications[person_1.email]["due_in"]), 2)
+      _, notif_data = notification.get_todays_notifications()
+      self.assertEqual(len(notif_data[person_1.email]["due_in"]), 2)
 
     with freeze_time("2015-05-05"):  # due date
-      notifications = notification.get_todays_notifications()
-      self.assertEqual(len(notifications[person_1.email]["due_today"]), 2)
+      _, notif_data = notification.get_todays_notifications()
+      self.assertEqual(len(notif_data[person_1.email]["due_today"]), 2)
 
   def create_test_cases(self):
     def person_dict(person_id):
