@@ -1141,7 +1141,7 @@ can.Component.extend({
             }
             picker = picker.build();
             picker.setVisible(true);
-            picker.A.style.zIndex = 2001; // our modals start with 1050
+            picker.Ab.style.zIndex = 2001; // our modals start with 1050
           });
         }
 

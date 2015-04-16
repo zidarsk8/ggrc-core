@@ -233,7 +233,7 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
 CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
 
   findAll : gdrive_findAll({ mimeType : "application/vnd.google-apps.folder"})
-  
+
   , create : function(params) {
     if(!params.parents) {
       params.parents = [{ id : 'root'}];
@@ -300,9 +300,9 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
           .setDeveloperKey(GGRC.config.GAPI_KEY)
           .setCallback(pickerCallback)
           .build();
-          
+
           picker.setVisible(true);
-          picker.A.style.zIndex = 2001; // our modals start with 1050
+          picker.Ab.style.zIndex = 2001; // our modals start with 1050
         });
       }
 
