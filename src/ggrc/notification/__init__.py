@@ -9,6 +9,7 @@ from datetime import date
 from ggrc.extensions import get_extension_modules
 from ggrc.models import Notification
 from ggrc import db
+from sqlalchemy import and_
 
 
 class NotificationServices():
@@ -79,19 +80,18 @@ def get_pending_notifications():
   for notification in notifications:
     notif_by_day[notification.send_on].append(notification)
 
-  result = {d: get_notification_data(n) for d,n in notif_by_day.iteritems()}
+  result = {d: get_notification_data(n) for d, n in notif_by_day.iteritems()}
 
   return result
 
 
 def get_todays_notifications():
   notifications = db.session.query(Notification).filter(
-      Notification.send_on == date.today()).all()
+      and_(Notification.send_on <= date.today(),
+           Notification.sent_at == None  # noqa
+           )).all()
   return get_notification_data(notifications)
 
-def get_notifications(day=None):
-  if not day:
-    day = date.today()
 
 def generate_notification_email(data):
   pass

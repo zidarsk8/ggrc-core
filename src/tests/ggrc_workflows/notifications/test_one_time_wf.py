@@ -70,13 +70,13 @@ class TestOneTimeWorkflowNotification(TestCase):
 
     with freeze_time("2015-05-03"):  # two days befor due date
       notifications = notification.get_todays_notifications()
-      self.assertNotIn(person_1.email, notifications)
-      self.assertNotIn(person_2.email, notifications)
+      self.assertIn(person_1.email, notifications)
+      self.assertNotIn("due_in", notifications[person_1.email])
+      self.assertNotIn("due_today", notifications[person_1.email])
 
     with freeze_time("2015-05-04"):  # one day befor due date
       notifications = notification.get_todays_notifications()
       self.assertEqual(len(notifications[person_1.email]["due_in"]), 2)
-      self.assertNotIn(person_2.email, notifications)
 
     with freeze_time("2015-05-05"):  # due date
       notifications = notification.get_todays_notifications()

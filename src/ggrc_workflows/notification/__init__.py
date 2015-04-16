@@ -395,11 +395,14 @@ def get_cycle_task_dict(cycle_task):
   }
 
 def get_person_dict(person):
-  return {
-    "email": person.email,
-    "name": person.name,
-    "id": person.id,
-  }
+  if person:
+    return {
+      "email": person.email,
+      "name": person.name,
+      "id": person.id,
+    }
+
+  return {"email": "", "name": "", "id": -1}
 
 
 def get_notification(obj):
