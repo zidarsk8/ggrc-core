@@ -12,23 +12,29 @@
 
 from google.appengine.api import mail
 from ggrc import settings
+from flask import current_app
 
 
 def getAppEngineEmail():
   email = getattr(settings, 'APPENGINE_EMAIL')
-  if email is not None and email != '' and email != " ":
-    return email
-  else:
-    return None
+  return email if mail.is_email_valid(email) else None
 
 
 def send_email(user_email, subject, body):
   sender = getAppEngineEmail()
-  if mail.is_email_valid(user_email) and mail.is_email_valid(sender):
-    message = mail.EmailMessage(sender=sender, subject=subject)
+  if not mail.is_email_valid(user_email):
+    current_app.logger.error("Invalid email: {}".format(user_email))
+    return False
+  if not sender:
+    current_app.logger.error("APPENGINE_EMAIL setting is invalid.")
+    return False
 
-    message.to = user_email
-    message.body = "TODO: add email in text mode."
-    message.html = body
+  message = mail.EmailMessage(sender=sender, subject=subject)
 
-    message.send()
+  message.to = user_email
+  message.body = "TODO: add email in text mode."
+  message.html = body
+
+  message.send()
+  return True
+
