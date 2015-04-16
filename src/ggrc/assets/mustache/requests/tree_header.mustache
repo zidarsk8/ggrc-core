@@ -44,9 +44,6 @@
     </div>
     <div class="span1">&nbsp;</div>
     <div class="span4">
-      {{#if add_item_view}}
-        {{{renderLive add_item_view}}}
-      {{/if}}
       <ul class="tree-action-list">
         {{#is_allowed 'create' 'update' 'Request' context=parent_instance.context.id}}
           <li>
@@ -103,6 +100,11 @@
           </div>
         </li>
         -->
+        {{#if add_item_view}}
+          <li>
+            {{{renderLive add_item_view}}}
+          </li>
+        {{/if}}
       </ul>
     </div>
   </div>

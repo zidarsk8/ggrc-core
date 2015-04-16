@@ -7,13 +7,12 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
-<div class="tree-item-add">
   {{#if model.root_object}}
   <a
-    class="section-add btn btn-small btn-draft"
+    class="section-add"
     href="javascript://"
     rel="tooltip"
-    data-placement="right"
+    data-placement="left"
     data-toggle="multitype-multiselect-modal-selector"
     data-join-mapping="{{mapping}}"
     data-join-option-type="{{model.shortName}}"
@@ -25,7 +24,7 @@
   </a>
   {{#if null}}
   <span class="section-expander">
-    <a href="javascript://" rel="tooltip" data-placement="right" data-original-title="Create Object" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{parent_instance.class.model_singular}}" data-object-plural="{{parent_instance.class.table_plural}}" >
+    <a href="javascript://" rel="tooltip" data-placement="left" data-original-title="Create Object" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{parent_instance.class.model_singular}}" data-object-plural="{{parent_instance.class.table_plural}}" >
       <i class="grcicon-add-black"></i>
     </a>
   </span>
@@ -33,10 +32,10 @@
   {{else}}
   {{#if_instance_of parent_instance "Section"}}
   <a
-    class="section-add btn btn-small btn-draft"
+    class="section-add"
     href="javascript://"
     rel="tooltip"
-    data-placement="right"
+    data-placement="left"
     data-toggle="multitype-object-modal-selector"
     data-join-mapping="{{mapping}}"
     data-join-object-id="{{parent_instance.id}}"
@@ -49,10 +48,10 @@
   </a>
   {{else}}
   <a
-    class="section-add btn btn-small btn-draft"
+    class="section-add"
     href="javascript://"
     rel="tooltip"
-    data-placement="right"
+    data-placement="left"
     data-toggle="multitype-object-modal-selector"
     data-join-mapping="{{mapping}}"
     data-join-object-id="{{parent_instance.id}}"
@@ -64,6 +63,5 @@
   </a>
   {{/if_instance_of}}
   {{/if}}
-</div>
 {{/if}}
 {{/is_allowed_to_map}}

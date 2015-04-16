@@ -25,9 +25,6 @@
       </div>
     </div>
     <div class="span4">
-      {{#if add_item_view}}
-        {{{renderLive add_item_view}}}
-      {{/if}}
       <ul class="tree-action-list">
         <li class="filter-trigger">
           <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
@@ -104,6 +101,11 @@
           </div>
         </li>
         -->
+        {{#if add_item_view}}
+          <li>
+            {{{renderLive add_item_view}}}
+          </li>
+        {{/if}}
       </ul>
     </div>
   </div>
