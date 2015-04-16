@@ -3,11 +3,12 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from ggrc import db
 from ggrc_workflows import start_recurring_cycles
 from ggrc import notification
 from ggrc.notification import email
 from jinja2 import Environment, PackageLoader
-from datetime import date
+from datetime import date, datetime
 
 env = Environment(loader=PackageLoader('ggrc_workflows', 'templates'))
 
@@ -31,6 +32,12 @@ def show_todays_digest_notifications():
   return todays.render(data=notif_data)
 
 
+def set_notification_sent_time(notifications):
+  for notification in notifications:
+    notification.sent_at = datetime.now()
+  db.session.commit()
+
+
 def send_pending_notifications():
   digest_template = env.get_template("notifications/email_digest.html")
   notifications, notif_data = notification.get_pending_notifications()
@@ -41,6 +48,7 @@ def send_pending_notifications():
       email_body = digest_template.render(digest=data)
       email.send_email(user_email, subject, email_body)
       sent_emails.append(user_email)
+  set_notification_sent_time(notifications)
   return "emails sent to: <br> {}".format("", "<br>".join(sent_emails))
 
 
@@ -53,6 +61,7 @@ def send_todays_digest_notifications():
     email_body = digest_template.render(digest=data)
     email.send_email(user_email, subject, email_body)
     sent_emails.append(user_email)
+  set_notification_sent_time(notifications)
   return "emails sent to: <br> {}".format("", "<br>".join(sent_emails))
 
 

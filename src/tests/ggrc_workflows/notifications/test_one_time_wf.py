@@ -4,7 +4,6 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import random
-import copy
 from tests.ggrc import TestCase
 from freezegun import freeze_time
 from datetime import date, datetime

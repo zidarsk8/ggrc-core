@@ -8,23 +8,29 @@ from tests.ggrc import TestCase
 from freezegun import freeze_time
 
 import os
+from mock import patch
+
 from ggrc import notification
 from ggrc.models import Person
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
 from tests.ggrc.generator import GgrcGenerator
+from ggrc_workflows import views
 
 
 if os.environ.get('TRAVIS', False):
   random.seed(1)  # so we can reproduce the tests if needed
 
 
-class TestBasicWorkflowActions(TestCase):
+class TestRecurringCycleNotifications(TestCase):
 
   def setUp(self):
     self.api = Api()
     self.generator = WorkflowsGenerator()
     self.ggrc_generator = GgrcGenerator()
+
+    _, self.assignee = self.ggrc_generator.generate_person(
+        user_role="gGRC Admin")
 
     self.create_test_cases()
 
@@ -53,10 +59,35 @@ class TestBasicWorkflowActions(TestCase):
       _, notif_data = notification.get_todays_notifications()
       self.assertIn(assignee.email, notif_data)
 
+  # TODO: this should mock google email api.
+  @patch("ggrc.notification.email.send_email")
+  def test_marking_sent_notifications(self, mail_mock):
+    mail_mock.return_value = True
+
+    with freeze_time("2015-02-01"):
+      _, wf = self.generator.generate_workflow(self.quarterly_wf_1)
+      response, wf = self.generator.activate_workflow(wf)
+
+      self.assert200(response)
+
+      assignee = Person.query.get(self.assignee.id)
+
+    with freeze_time("2015-01-01"):
+      _, notif_data = notification.get_todays_notifications()
+      self.assertNotIn(assignee.email, notif_data)
+
+    with freeze_time("2015-01-29"):
+      views.send_todays_digest_notifications()
+      _, notif_data = notification.get_todays_notifications()
+      self.assertNotIn(assignee.email, notif_data)
+
+    with freeze_time("2015-02-01"):
+      _, notif_data = notification.get_todays_notifications()
+      self.assertNotIn(assignee.email, notif_data)
+
+    pass
+
   def create_test_cases(self):
-    _, self.assignee = self.ggrc_generator.generate_person(
-      data={"name": "hello world", "email": "hello@world.com"},
-      user_role="gGRC Admin")
 
     self.quarterly_wf_1 = {
         "title": "quarterly wf 1",
