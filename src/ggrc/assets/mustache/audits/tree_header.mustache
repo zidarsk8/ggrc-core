@@ -30,9 +30,6 @@
       </div>
     </div>
     <div class="span4">
-      {{#if add_item_view}}
-        {{{renderLive add_item_view}}}
-      {{/if}}
       <ul class="tree-action-list">
         {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
         <li>
@@ -41,7 +38,7 @@
                  data-original-title="Hide Irelevant"></i>
           </a>
         </li>
-        <!-- Temporarily hidden via copy/pasting and adapting Vladan's code where he made that request. He asked not to remove the comment. I haven't touched it, even though it makes no sense for Audits. -- dandv
+        <!-- Temporarily hidden via copy/pasting and adapting Vladan's code where he made that request. He asked not to remove the comment. I haven't touched it, even though it makes no sense for Audits.
         <li>
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
           <div class="dropdown-menu dropdown-menu-form">
@@ -106,6 +103,11 @@
           </div>
         </li>
         -->
+        {{#if add_item_view}}
+          <li>
+            {{{renderLive add_item_view}}}
+          </li>
+        {{/if}}
       </ul>
     </div>
   </div>

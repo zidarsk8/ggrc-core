@@ -39,9 +39,6 @@
       </div>
     </div>
     <div class="span4">
-        {{#if add_item_view}}
-          {{{renderLive add_item_view}}}
-        {{/if}}
         <ul class="tree-action-list">
         {{#if_helpers '\
            #if_instance_of' parent_instance 'Regulation' '\
@@ -148,6 +145,11 @@
           </div>
         </li>
         -->
+        {{#if add_item_view}}
+          <li>
+            {{{renderLive add_item_view}}}
+          </li>
+        {{/if}}
       </ul>
     </div>
   </div>
