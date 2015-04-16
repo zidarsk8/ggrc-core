@@ -10,13 +10,12 @@
 {{#if allow_creating}}
 {{#is_allowed 'create' model.shortName context=null}}
 {{#if_instance_of parent_instance 'Contract|Standard|Policy|Regulation'}}
-  <div class="tree-item-add">
     {{#if_instance_of parent_instance 'Contract'}}
     <a
       href="javascript://"
       rel="tooltip"
-      class="section-add btn btn-small btn-draft"
-      data-placement="right"
+      class="section-add"
+      data-placement="left"
       data-toggle="multitype-multiselect-modal-selector"
       data-join-mapping="{{mapping}}"
       data-join-option-type="{{model.shortName}}"
@@ -27,9 +26,9 @@
     </a>
     {{else}}
     <a href="javascript://"
-       class="section-add btn btn-small btn-draft"
+       class="section-add"
        rel="tooltip"
-       data-placement="right"
+       data-placement="left"
        data-toggle="modal-ajax-form"
        data-modal-reset="reset"
        data-dirty="#regulations, #combo"
@@ -43,7 +42,6 @@
       <i class="grcicon-add-black"></i>
     </a>
     {{/if_instance_of}}
-  </div>
 {{/if_match}}
 {{/is_allowed}}
 {{/if}}
@@ -52,12 +50,11 @@
 
 {{#if allow_mapping}}
 {{#is_allowed_to_map parent_instance model.shortName}}
-<div class="tree-item-add">
   <a
-    class="section-add btn btn-small btn-draft"
+    class="section-add"
     href="javascript://"
     rel="tooltip"
-    data-placement="right"
+    data-placement="left"
     data-toggle="multitype-multiselect-modal-selector"
     data-join-mapping="{{mapping}}"
     data-join-option-type="{{model.shortName}}"
@@ -66,7 +63,6 @@
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
     <i class="grcicon-add-black"></i>
   </a>
-</div>
 {{/is_allowed_to_map}}
 {{/if}}
 {{/if_instance_of}}

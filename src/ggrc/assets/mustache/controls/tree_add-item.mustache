@@ -7,12 +7,11 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
-<div class="tree-item-add">
     <a
-      class="section-add btn btn-small btn-draft"
+      class="section-add"
       href="javascript://"
       rel="tooltip"
-      data-placement="right"
+      data-placement="left"
       data-toggle="multitype-multiselect-modal-selector"
       data-join-mapping="{{mapping}}"
       data-join-option-type="{{model.shortName}}"
@@ -22,6 +21,5 @@
       data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
         <i class="grcicon-add-black"></i>
     </a>
-</div>
 {{/if}}
 {{/is_allowed_to_map}}
