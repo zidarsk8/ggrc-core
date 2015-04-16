@@ -33,6 +33,7 @@ dashboard-js-files:
   - bootstrap/wysihtml5.js
   - moment.js
   - permission.js
+  - plugins/ggrc_utils.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js
