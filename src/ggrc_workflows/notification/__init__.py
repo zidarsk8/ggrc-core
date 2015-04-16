@@ -226,9 +226,9 @@ def get_workflow_data(notification):
 
   result = {}
 
-  for person in workflow.workflow_people:
-    result[person.email] = {
-        "user": get_person_dict(person),
+  for wf_person in workflow.workflow_people:
+    result[wf_person.person.email] = {
+        "user": get_person_dict(wf_person.person),
         "cycle_starts_in": {
             workflow.id: {
                 "custom_message": workflow.notify_custom_message
