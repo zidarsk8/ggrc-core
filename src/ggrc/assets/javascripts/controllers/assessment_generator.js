@@ -49,28 +49,34 @@ can.Component.extend({
       return refresh_queue.trigger();
     },
 
-    _generate: function(control, count, dfd) {
+    _generate: function (control, count, dfd) {
       count = count || 0;
       dfd = dfd || new $.Deferred();
 
-      var assessment = new CMS.Models.ControlAssessment({
-          audit: this.scope.audit,
-          control: control.stub(),
-          context: this.scope.audit.context,
-          title: control.title + " assessment" + (count ? " " + count : ""),
-          test_plan: control.test_plan
-      });
-      assessment.save().done(function () {
-        dfd.resolve(assessment);
-      }).fail(function (error, type, code) {
-        if (code === "FORBIDDEN"
-          && error.responseText.match(/(title values must be unique)|(Duplicate entry)/)) {
-          this._generate(control, count + 1, dfd);
-        } else {
-          return dfd.reject(error);
-        }
-      }.bind(this));
-      return dfd;
+      var assessment,
+          index,
+          title = control.title + ' assessment',
+          data = {
+            audit: this.scope.audit,
+            control: control.stub(),
+            context: this.scope.audit.context,
+            test_plan: control.test_plan
+          };
+
+      GGRC.Models.Search.counts_for_types(title, ['ControlAssessment'])
+        .then(function (result) {
+          index = result.getCountFor('Audit') + 1;
+          data.title = title + ' ' + index;
+          assessment = new CMS.Models.ControlAssessment(data);
+        })
+        .then(function () {
+          assessment.save().done(function () {
+            dfd.resolve(assessment);
+          }).fail(function (error, type, code) {
+            return dfd.reject(error);
+          }.bind(this));
+        }.bind(this));
+      return dfd.promise();
     },
 
     _notify: function() {
