@@ -76,41 +76,31 @@ can.Control("CMS.Controllers.InfoPin", {
 
     // Make sure pin is visible
     if (!this.element.height()) {
-      this.element.animate({ height: $(window).height() / 3 }, {
-        duration: 800,
-        easing: 'easeOutExpo',
-        complete: function () {
-          $(window).trigger('resize');
-          this.ensureElementVisible(el);
-        }.bind(this)
-      });
-    }else{
-      this.ensureElementVisible(el);
+      this.element.height($(window).height() / 3);
     }
+    this.ensureElementVisible(el);
   },
   ensureElementVisible: function (el) {
-      var $objectArea = $(".object-area");
+    var $objectArea = $('.object-area');
 
-      var elTop = el.offset().top,
-          elBottom = elTop + el.height();
+    var elTop = el.offset().top,
+        elBottom = elTop + el.height();
 
-      var $header = $(".tree-header:visible"),
-          $filter = $(".filter-holder:visible"),
-          headerTop = $header.offset().top,
-          headerBottom = headerTop + $header.height(),
-          infoTop = this.element.offset().top;
+    var $header = $('.tree-header:visible'),
+        $filter = $('.filter-holder:visible'),
+        headerTop = $header.offset().top,
+        headerBottom = headerTop + $header.height(),
+        infoTop = this.element.offset().top;
 
-      if (elTop < headerBottom || elBottom > infoTop) {
+    if (elTop < headerBottom || elBottom > infoTop) {
+      el[0].scrollIntoView(false);
+      if (elTop < headerBottom) {
+        el[0].scrollIntoView(true);
+        $objectArea.scrollTop($objectArea.scrollTop() - $header.height() - $filter.height());
+      } else {
         el[0].scrollIntoView(false);
-        if (elTop < headerBottom) {
-          el[0].scrollIntoView(true);
-          $objectArea.scrollTop($objectArea.scrollTop()
-                                -$header.height()
-                                -$filter.height());
-        }else{
-          el[0].scrollIntoView(false);
-        }
       }
+    }
   },
   '.pin-action a click': function (el) {
     var $win = $(window),
