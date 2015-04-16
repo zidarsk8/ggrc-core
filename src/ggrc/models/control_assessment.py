@@ -15,9 +15,9 @@ from .track_object_state import HasObjectState, track_state_for_class
 from ggrc.models.reflection import PublishOnly
 
 
-class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documentable,
-                        Personable, Timeboxed, Ownable, Relatable,
-                        BusinessObject, db.Model):
+class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
+                        Documentable, Personable, Timeboxed, Ownable,
+                        Relatable, BusinessObject, db.Model):
   __tablename__ = 'control_assessments'
 
   design = deferred(db.Column(db.String), 'ControlAssessment')
