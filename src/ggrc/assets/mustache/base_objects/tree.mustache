@@ -77,6 +77,11 @@
                               {{#case 'updated_at'}}
                                 {{localize_date instance.updated_at}}
                               {{/case}}
+                              {{#case 'network_zone'}}
+                                {{#using network_zone=instance.network_zone}}
+                                  {{network_zone.title}}
+                                {{/using}}
+                              {{/case}}
                             {{/switch attr_name}}
                           {{/instance}}
                         </div>
