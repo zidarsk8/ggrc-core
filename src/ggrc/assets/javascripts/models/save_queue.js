@@ -28,21 +28,26 @@
        clearTimeout(this._timeout);
      }
      this._timeout = setTimeout(function () {
-       this._resolve();
+       new GGRC.SaveQueue(this._queue.splice(0, this._queue.length));
      }.bind(this), this.DELAY);
+    },
+  }, {
+    init: function (queue) {
+      this._queue = queue;
+      this._resolve();
     },
     _resolve: function() {
       if (!this._queue.length) {
         // Finished
         return;
       }
-      var objs = this._queue.splice(0, this.BATCH), ret;
+      var objs = this._queue.splice(0, this.constructor.BATCH), ret;
       $.when.apply($, objs.map(function (obj) {
         return obj.o._save.apply(obj.o, obj.a);
       })).always(function () {
         this._resolve(); // Move on to the next one
       }.bind(this));
     }
-  }, {});
+  });
 
 })(window.can, window.can.$);
