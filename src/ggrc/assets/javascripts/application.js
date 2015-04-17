@@ -19,6 +19,9 @@
   });
   $.migrateMute = true; //turn off console warnings for jQuery-migrate
 
+  // Init ZeroConfig
+  ZeroClipboard.config({swfPath: '/static/flash/ZeroClipboard.swf'});
+
   function ModelError(message, data) {
     this.name = "ModelError";
     this.message = message || "Invalid Model encountered";
