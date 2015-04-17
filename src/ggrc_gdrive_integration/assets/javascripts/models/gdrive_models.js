@@ -292,17 +292,18 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
       // Create and render a Picker object for searching images.
       function createPicker() {
         window.oauth_dfd.done(function(token, oauth_user) {
-          var picker = new google.picker.PickerBuilder()
-          .addView(new google.picker.DocsUploadView().setParent(that.id))
-          .addView(google.picker.ViewId.DOCS)
-          .setOAuthToken(gapi.auth.getToken().access_token)
-          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-          .setDeveloperKey(GGRC.config.GAPI_KEY)
-          .setCallback(pickerCallback)
-          .build();
+          var dialog,
+              picker = new google.picker.PickerBuilder()
+                .addView(new google.picker.DocsUploadView().setParent(that.id))
+                .addView(google.picker.ViewId.DOCS)
+                .setOAuthToken(gapi.auth.getToken().access_token)
+                .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+                .setDeveloperKey(GGRC.config.GAPI_KEY)
+                .setCallback(pickerCallback)
+                .build();
 
           picker.setVisible(true);
-          var dialog = GGRC.Utils.getPickerElement(picker);
+          dialog = GGRC.Utils.getPickerElement(picker);
           if (dialog) {
             dialog.style.zIndex = 2001; // our modals start with 1050
           }
