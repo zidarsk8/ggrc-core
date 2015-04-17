@@ -61,7 +61,8 @@ can.Control("CMS.Controllers.InfoPin", {
   },
   setInstance: function(instance, el) {
     var options = this.findOptions(el),
-        view = this.findView(instance);
+        view = this.findView(instance),
+        $win = $(window);
 
     this.element.html(can.view(view, {
       instance: instance,
@@ -76,18 +77,17 @@ can.Control("CMS.Controllers.InfoPin", {
 
     // Make sure pin is visible
     if (!this.element.height()) {
-      this.element.height($(window).height() / 3);
+      this.element.height($win.height() / 3);
     }
+    $win.trigger('resize');
     this.ensureElementVisible(el);
   },
   ensureElementVisible: function (el) {
-    var $objectArea = $('.object-area');
-
-    var elTop = el.offset().top,
-        elBottom = elTop + el.height();
-
-    var $header = $('.tree-header:visible'),
+    var $objectArea = $('.object-area'),
+        $header = $('.tree-header:visible'),
         $filter = $('.filter-holder:visible'),
+        elTop = el.offset().top,
+        elBottom = elTop + el.height(),
         headerTop = $header.offset().top,
         headerBottom = headerTop + $header.height(),
         infoTop = this.element.offset().top;
