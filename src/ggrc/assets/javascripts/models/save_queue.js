@@ -41,12 +41,10 @@
         // Finished
         return;
       }
-      var objs = this._queue.splice(0, this.constructor.BATCH), ret;
+      var ret, objs = this._queue.splice(0, this.constructor.BATCH);
       $.when.apply($, objs.map(function (obj) {
         return obj.o._save.apply(obj.o, obj.a);
-      })).always(function () {
-        this._resolve(); // Move on to the next one
-      }.bind(this));
+      })).always(this._resolve.bind(this)); // Move on to the next one
     }
   });
 
