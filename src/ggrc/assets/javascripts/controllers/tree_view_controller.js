@@ -379,101 +379,55 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
   }
 
-  //Update the default attribute list for tree-view drop-down menu for a specific model
-  , update_default_attr_list: function(model_name) {
-    var select_attr_list = [], i;
+  //Displays attribute list for tree-header, Select attribute list drop down
+  //Gets default and custom attribute list for each model, and sets upthe display-list
+  , init_display_options: function (opts) {
+    var i, display_width = 12, //total width of display = span12
+        select_attr_list = [], display_attr_list = [],
+        model = opts.model, model_name = model.model_singular;
 
-    var model = CMS.Models[model_name] ;
-
-    if (model.tree_view_options.attr_list) {
-      can.each(model.tree_view_options.attr_list, function (item) {
+    //Get default attr list
+    can.each(model.tree_view_options.attr_list || can.Model.Cacheable.attr_list, function (item) {
         select_attr_list.push(item);
-      });
-    }
-    else {
-      can.each(can.Model.Cacheable.attr_list, function (item) {
-        select_attr_list.push(item);
-      });
-    }
-
-    //Initialize the display status for title, owner, status to be true
-    for (i = 0; i < select_attr_list.length; i++) {
-      var obj = select_attr_list[i];
-      if (obj.attr_name === 'title' || obj.attr_name === 'owner' || obj.attr_name === 'status') {
-        obj.display_status = 'true';
-      }
-      else {
-        obj.display_status = 'false';
-      }
-    }
-
-    this.options.select_attr_list = select_attr_list;
-    this.options.attr('select_attr_list', this.options.select_attr_list);
-
-  }
-
-  //Get the custom attribute list from the server and add the list to
-  //select attribute list
-  , update_custom_attr_list: function(model_name) {
-    var custom_attr_list = [], dfd = $.Deferred(), that = this;
+    });
+    //Get custom attr_list
     CMS.Models.CustomAttributeDefinition.findAll({definition_type: model_name})
       .then(function (defs) {
         if (defs.length) {
-          //create custom_attr_list
-          var i;
+          //create custom_attr_list objects
           for (i = 0; i < defs.length; i++) {
             if (defs[i].attribute_type !== 'Rich Text') {
               var obj = {};
               obj.attr_title = defs[i].title;
               obj.attr_name = defs[i].title;
-              obj.display_status = 'false';
+              obj.display_status = false;
               obj.attr_type = 'custom';
-              custom_attr_list.push(obj);
+              select_attr_list.push(obj);
             }
           }
-          //update this.options.select_attr_list
-          can.each(custom_attr_list, function (item) {
-            that.options.select_attr_list.push(item);
-          });
-          that.options.attr('select_attr_list', that.options.select_attr_list);
         }
-        dfd.resolve();
-      })
-      return dfd;
-  }
+        //Initialize the display status for title, owner, status to be true
+        for (i = 0; i < select_attr_list.length; i++) {
+          var obj = select_attr_list[i];
+          obj.display_status = ['title', 'owner', 'status'].indexOf(obj.attr_name) !== -1;
+        }
 
-  //Displays attribute list for tree-header, Select attribute list drop down
-  //Gets default and custom attribute list for each model, and sets upthe display-list
-  , init_display_options: function (opts) {
-    //We shold get the display_attr_list from user preference object for the current user
-    var model_name, display_attr_list = [], that = this;
-
-    if (!this.options.select_attr_list) {
-      model_name = opts.model.model_singular;
-      $.when(
-        this.update_default_attr_list(model_name),
-        this.update_custom_attr_list(model_name)
-      ).then(function () {
-        if (!that.options.display_attr_list) {
-          can.each(that.options.select_attr_list, function (item) {
-            if (item.attr_title !== 'Title' && item.display_status === 'true') {
+        //Create display list
+        can.each(select_attr_list, function (item) {
+          if (item.attr_title !== 'Title' && item.display_status) {
               display_attr_list.push(item);
-            }
-          });
-          that.options.display_attr_list = display_attr_list;
-          that.options.attr('display_attr_list', that.options.display_attr_list);
-        }
+          }
+        });
 
-        if (!that.options.display_attr_width) {
-          var width = Math.floor(12/that.options.display_attr_list.length);
-          that.options.attr('display_attr_width', width);
-        }
-      });
-    }
+        this.options.attr('select_attr_list', select_attr_list);
+        this.options.attr('display_attr_list', display_attr_list);
+        this.options.attr('display_attr_width',
+          Math.floor(display_width/display_attr_list.length));
+
+      }.bind(this));
   }
 
   , init : function(el, opts) {
-    this.init_display_options(opts);
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       this.display_prefs = display_prefs;
       this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
@@ -515,6 +469,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         this._attached_deferred.resolve();
       }
     }.bind(this));
+    this.init_display_options(opts);
   }
 
   , " inserted": function() {
@@ -978,8 +933,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //update the display attrbute list and re-draw
     //1: find checked items
     //2. update
-    var i, j, ch_val, attr_width,
-        $check = this.element.parent().find(".attr-checkbox"),
+    var i, j, ch_val, display_width = 12,
+        $check = this.element.parent().find('.attr-checkbox'),
         selected = $.grep($check, function (e) { return (e.checked === true);}),
         selected_items = selected.length;
 
@@ -1001,14 +956,14 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     this.options.display_attr_list = [];
 
-    can.each(this.options.select_attr_list, function(item){
-      if (item.attr_title !== 'Title' && item.display_status === true) {
+    can.each(this.options.select_attr_list, function (item) {
+      if (item.attr_title !== 'Title' && item.display_status) {
         this.options.display_attr_list.push(item);
       }
     }, this);
     this.options.attr('display_attr_list', this.options.display_attr_list);
-    attr_width = Math.floor(12/this.options.display_attr_list.length);
-    this.options.attr('display_attr_width', attr_width);
+    this.options.attr('display_attr_width',
+      Math.floor(display_width/this.options.display_attr_list.length));
 
     this.reload_list();
     //set user preferences for next time

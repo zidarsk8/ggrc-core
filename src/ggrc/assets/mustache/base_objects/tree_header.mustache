@@ -76,7 +76,7 @@
               <li class="a-disabled">
                 <label class="checkbox-inline">
                   <input type="checkbox"
-                    {{#if_equals display_status 'true'}}checked="checked"{{/if_equals}}
+                    {{#if display_status}}checked="checked"{{/if}}
                     {{#if_equals attr_title 'Title'}}disabled=""{{/if_equals}}
                     value="{{attr_name}}"
                     class="notify-wrap attr-checkbox"
