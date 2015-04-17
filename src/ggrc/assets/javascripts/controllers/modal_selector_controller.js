@@ -737,7 +737,7 @@
           this.set_option_descriptor(this.options.default_option_descriptor);
         }
         this.init_bindings();
-        this.init_view();
+        this._view_dfd = this.init_view();
         this.init_data();
       }
 
@@ -1428,7 +1428,10 @@
   }, {
     init: function(){
       GGRC.Controllers.MultitypeModalSelector.prototype.init.apply(this, arguments);
-      this.refresh_option_list();
+      this._load_dfd = this.refresh_option_list();
+      this._view_dfd.then(function(){
+        this.bindXHRToButton(this._load_dfd, this.element.find('.modalSearchButton'));
+      }.bind(this))
     }
 
     , init_spinner: function(){
