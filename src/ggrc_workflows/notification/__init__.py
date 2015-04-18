@@ -5,6 +5,7 @@
 
 
 from datetime import date, timedelta
+from babel.dates import format_timedelta
 
 from sqlalchemy import and_
 
@@ -16,6 +17,7 @@ from ggrc.models import (
     Notification, NotificationType, ObjectType)
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
+
 
 """
 All notifications handle the following structure:
@@ -52,37 +54,47 @@ All notifications handle the following structure:
                   "custom_message": ""
 
                   "my_tasks" : # list of all tasks assigned to the user
-                      { task.id: { task_info }, ...}
+                      { cycle_task.id: { task_info }, ...}
 
                   # list of all task groups assigned to the user, including
                   # tasks
                   "my_task_groups" :
                       { task_group.id:
-                          { task.id: { task_info }, ... }, ...
+                          { cycle_task.id: { task_info }, ... }, ...
                       }
 
                   "cycle_tasks" : # list of all tasks in the workflow
-                      { task.id: { task_info }, ...}
+                      { cycle_task.id: { task_info }, ...}
 
               }
               , ...
           }
 
           "task_declined":
-              { task.id: { task_info }, ...}
+              { cycle_task.id: { task_info }, ...}
 
           "task_reassigned":
-              { task.id: { task_info }, ...}
+              { cycle_task.id: { task_info }, ...}
 
           "due_in": # tasks due in X days (x depends on notification type)
-              { task.id: { task_info }, ...}
+              { cycle_task.id: { task_info }, ...}
 
           "due_today":
-              { task.id: { task_info }, ...}
+              { cycle_task.id: { task_info }, ...}
 
           "all_tasks_completed": # only workflow owner gets this
               { workflow.id: { workflow_info }, ... }
       }
+  }
+
+
+Task and cycle_task have the following structure:
+
+  task = {
+      "title": title,
+      "object_title": object title or "",
+      "end_date": end date in MM/DD/YYYY format
+      "fuzzy_due_in": "today" or "in 1 day"... "in 5 days", "in 1 week" etc.,
   }
 
   """
@@ -387,11 +399,21 @@ def get_workflow_owner(context_id):
 
 
 def get_cycle_task_dict(cycle_task):
+
+  delta = date.today() - cycle_task.end_date
+  fuzzy_due_in = "in {}".format(format_timedelta(delta, locale='en_US'))
+  if delta.days == 0:
+    fuzzy_due_in = "today"
+
+  object_title = ""
+  if cycle_task.cycle_task_group_object:
+    object_title = cycle_task.cycle_task_group_object.object.title
+
   return {
       "title": cycle_task.title,
-      "object_title": cycle_task.cycle_task_group_object.object.title if
-      cycle_task.cycle_task_group_object else "",
+      "object_title": object_title,
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
+      "fuzzy_due_in": fuzzy_due_in,
   }
 
 def get_person_dict(person):
