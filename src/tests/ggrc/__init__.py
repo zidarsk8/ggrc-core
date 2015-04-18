@@ -22,9 +22,11 @@ logging.disable(logging.CRITICAL)
 
 class TestCase(BaseTestCase):
   def setUp(self):
+    db.engine.execute("SET FOREIGN_KEY_CHECKS=0")
     for table in reversed(db.metadata.sorted_tables):
       if table.name not in ("test_model", "roles", "notification_types", "object_types"):
         db.engine.execute(table.delete())
+    db.engine.execute("SET FOREIGN_KEY_CHECKS=1")
     db.session.commit()
 
     # if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
