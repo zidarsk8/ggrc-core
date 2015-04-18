@@ -24,7 +24,6 @@ class TestWorkflowsApiPost(TestCase):
   def tearDown(self):
     pass
 
-  @SkipTest
   def test_send_invalid_data(self):
     data = self.get_workflow_dict()
     del data["workflow"]["title"]
@@ -76,6 +75,7 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(TaskGroup, data)
     self.assertEqual(response.status_code, 201)
 
+  # TODO: Api should be able to handle invalid data
   @SkipTest
   def test_create_task_group_invalid_workflow_data(self):
     wf = {"id": -1, "context": {"id": -1}}

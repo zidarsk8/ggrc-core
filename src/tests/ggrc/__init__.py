@@ -3,8 +3,9 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-from flask.ext.testing import TestCase as BaseTestCase
 import os
+import logging
+from flask.ext.testing import TestCase as BaseTestCase
 from ggrc import db
 from ggrc.app import app
 from ggrc.models import create_db
@@ -15,6 +16,9 @@ if os.environ.get('TRAVIS', False):
 
   create_db(use_migrations=True, quiet=True)
 
+# Hide errors during testing. Errors are still displayed after all tests are
+# done. This is for the bad request error messages while testing the api calls.
+logging.disable(logging.CRITICAL)
 
 class TestCase(BaseTestCase):
   def setUp(self):
