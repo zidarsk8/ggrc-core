@@ -71,19 +71,19 @@ can.Model.Cacheable("CMS.Models.Control", {
       show_view : GGRC.mustache_path + "/controls/tree.mustache"
     , footer_view : GGRC.mustache_path + "/controls/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_type: 'default'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_type: 'default'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_type: 'default'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_type: 'default'},
-      {attr_title: 'Kind/Nature', attr_name: 'kind', attr_type: 'default'},
-      {attr_title: 'Fraud Related ', attr_name: 'fraud_related', attr_type: 'default'},
-      {attr_title: 'Significance', attr_name: 'significance', attr_type: 'default'},
-      {attr_title: 'Type/Means', attr_name: 'means', attr_type: 'default'},
-      {attr_title: 'Frequency', attr_name: 'frequency', attr_type: 'default'},
-      {attr_title: 'Assertions', attr_name: 'assertions', attr_type: 'default'},
-      {attr_title: 'Categories', attr_name: 'categories', attr_type: 'default'},
-      {attr_title: 'Principal Assessor', attr_name: 'principal_assessor', attr_type: 'default'},
-      {attr_title: 'Secondary Assessor', attr_name: 'secondary_assessor', attr_type: 'default'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'},
+      {attr_title: 'Kind/Nature', attr_name: 'kind'},
+      {attr_title: 'Fraud Related ', attr_name: 'fraud_related'},
+      {attr_title: 'Significance', attr_name: 'significance'},
+      {attr_title: 'Type/Means', attr_name: 'means'},
+      {attr_title: 'Frequency', attr_name: 'frequency'},
+      {attr_title: 'Assertions', attr_name: 'assertions'},
+      {attr_title: 'Categories', attr_name: 'categories'},
+      {attr_title: 'Principal Assessor', attr_name: 'principal_assessor'},
+      {attr_title: 'Secondary Assessor', attr_name: 'secondary_assessor'}
     ])
     , draw_children : true
     , child_options : [{

@@ -93,8 +93,8 @@ CMS.Models.SectionBase("CMS.Models.Section", {
       show_view : "/static/mustache/sections/tree.mustache"
     , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_type: 'default'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_type: 'default'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
     , child_options : [{
         model : can.Model.Cacheable
@@ -147,7 +147,7 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
       show_view: "/static/mustache/sections/tree.mustache"
     , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_type: 'default'}
+      {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
     , child_options: [{
         model: can.Model.Cacheable
