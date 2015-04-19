@@ -29,6 +29,10 @@ All notifications handle the following structure:
           "cycle_starts_in": {
               workflow.id: {
                   "custom_message": ""
+                  "title": ""
+                  "workflow_owner": workflow_owner,
+                  "start_date": MM/DD/YYYY
+                  "fuzzy_start_date": "in X days/weeks ..."
 
                   "my_tasks" : # list of all tasks assigned to the user
                       { (task.id, object.id): { task_info, obj_info}, ... }
@@ -52,6 +56,8 @@ All notifications handle the following structure:
                   "manually": False
 
                   "custom_message": ""
+
+                  "cycle_title": ""
 
                   "my_tasks" : # list of all tasks assigned to the user
                       { cycle_task.id: { task_info }, ...}
@@ -111,6 +117,7 @@ def get_cycle_data(notification):
             cycle.id: {
                 "manually": manual,
                 "custom_message": cycle.workflow.notify_custom_message,
+                "cycle_title": cycle.title,
             }
         }
     }
@@ -238,12 +245,18 @@ def get_workflow_data(notification):
 
   result = {}
 
+  workflow_owner = get_person_dict(get_workflow_owner(workflow.context_id))
+
   for wf_person in workflow.workflow_people:
     result[wf_person.person.email] = {
         "user": get_person_dict(wf_person.person),
         "cycle_starts_in": {
             workflow.id: {
-                "custom_message": workflow.notify_custom_message
+                "workflow_owner": workflow_owner,
+                "start_date": workflow.next_cycle_start_date,
+                "fuzzy_start_date": get_fuzzy_date(workflow.next_cycle_start_date),
+                "custom_message": workflow.notify_custom_message,
+                "title": workflow.title,
             }
         }
     }
@@ -397,13 +410,13 @@ def get_workflow_owner(context_id):
       and_(UserRole.context_id == context_id,
            Role.name == "WorkflowOwner")).one().person
 
+def get_fuzzy_date(end_date):
+  delta = date.today() - end_date
+  if delta.days == 0:
+    return "today"
+  return "in {}".format(format_timedelta(delta, locale='en_US'))
 
 def get_cycle_task_dict(cycle_task):
-
-  delta = date.today() - cycle_task.end_date
-  fuzzy_due_in = "in {}".format(format_timedelta(delta, locale='en_US'))
-  if delta.days == 0:
-    fuzzy_due_in = "today"
 
   object_title = ""
   if cycle_task.cycle_task_group_object:
@@ -413,7 +426,7 @@ def get_cycle_task_dict(cycle_task):
       "title": cycle_task.title,
       "object_title": object_title,
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
-      "fuzzy_due_in": fuzzy_due_in,
+      "fuzzy_due_in": get_fuzzy_date(cycle_task.end_date),
   }
 
 def get_person_dict(person):
