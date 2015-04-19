@@ -7,7 +7,7 @@
 from datetime import date, timedelta
 from babel.dates import format_timedelta
 
-from sqlalchemy import and_
+from sqlalchemy import and_, or_, inspect
 
 from ggrc_workflows.models import (
     Workflow, Cycle, CycleTaskGroupObjectTask, TaskGroupTask
@@ -56,8 +56,8 @@ All notifications handle the following structure:
                   "manually": False
 
                   "custom_message": ""
-
                   "cycle_title": ""
+                  "workflow_owner": workflow_owner,
 
                   "my_tasks" : # list of all tasks assigned to the user
                       { cycle_task.id: { task_info }, ...}
@@ -110,14 +110,18 @@ def get_cycle_data(notification):
   cycle = get_object(Cycle, notification.object_id)
   manual = notification.notification_type.name == "manual_cycle_created"
   result = {}
+
+  workflow_owner = get_person_dict(get_workflow_owner(cycle.context_id))
+
   for person in cycle.workflow.people:
     result[person.email] = {
-        "user" : get_person_dict(person),
+        "user": get_person_dict(person),
         "cycle_started": {
             cycle.id: {
                 "manually": manual,
                 "custom_message": cycle.workflow.notify_custom_message,
                 "cycle_title": cycle.title,
+                "workflow_owner": workflow_owner,
             }
         }
     }
@@ -138,7 +142,7 @@ def get_cycle_created_task_data(notification):
 
   return {
       task_assignee['email']: {
-          "user" : task_assignee,
+          "user": task_assignee,
           "cycle_started": {
               cycle.id: {
                   "my_tasks": task
@@ -146,7 +150,7 @@ def get_cycle_created_task_data(notification):
           }
       },
       task_group_assignee['email']: {
-          "user" : task_group_assignee,
+          "user": task_group_assignee,
           "cycle_started": {
               cycle.id: {
                   "my_task_groups": {
@@ -207,7 +211,7 @@ def get_task_group_task_data(notification):
 
   return {
       task_assignee['email']: {
-          "user" : task_assignee,
+          "user": task_assignee,
           "cycle_starts_in": {
               workflow.id: {
                   "my_tasks": tasks
@@ -215,7 +219,7 @@ def get_task_group_task_data(notification):
           }
       },
       task_group_assignee['email']: {
-          "user" : task_group_assignee,
+          "user": task_group_assignee,
           "cycle_starts_in": {
               workflow.id: {
                   "my_task_groups": {
@@ -254,7 +258,8 @@ def get_workflow_data(notification):
             workflow.id: {
                 "workflow_owner": workflow_owner,
                 "start_date": workflow.next_cycle_start_date,
-                "fuzzy_start_date": get_fuzzy_date(workflow.next_cycle_start_date),
+                "fuzzy_start_date": get_fuzzy_date(
+                    workflow.next_cycle_start_date),
                 "custom_message": workflow.notify_custom_message,
                 "title": workflow.title,
             }
@@ -307,36 +312,67 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
       handle_task_group_task(task_group_task, notification_type)
 
 
+def add_new_cycle_task_notifications(obj, src=None, service=None,
+                                     start_notif_type=None):
+  start_notification = Notification(
+      object_id=obj.id,
+      object_type=get_object_type(obj),
+      notification_type=start_notif_type,
+      send_on=date.today(),
+  )
+  due_in_notif_type = get_notification_type("cycle_task_due_in")
+  due_in_notification = Notification(
+      object_id=obj.id,
+      object_type=get_object_type(obj),
+      notification_type=due_in_notif_type,
+      send_on=obj.end_date - timedelta(due_in_notif_type.advance_notice)
+  )
+  due_today_notif_type = get_notification_type("cycle_task_due_today")
+  due_today_notification = Notification(
+      object_id=obj.id,
+      object_type=get_object_type(obj),
+      notification_type=due_today_notif_type,
+      send_on=obj.end_date - timedelta(due_today_notif_type.advance_notice)
+  )
+  db.session.add(start_notification)
+  db.session.add(due_in_notification)
+  db.session.add(due_today_notification)
+
+
+def add_cycle_task_reassigned_notification(
+        obj, src=None, service=None, start_notif_type=None):
+
+  # check if the current assignee allready got the first notification
+  result = db.session.query(Notification)\
+      .join(ObjectType)\
+      .join(NotificationType)\
+      .filter(and_(Notification.object_id == obj.id,  # noqa
+                   ObjectType.name == obj.__class__.__name__,
+                   Notification.sent_at != None,
+                   or_(NotificationType.name == "cycle_task_reassigned",
+                       NotificationType.name == "cycle_created",
+                       NotificationType.name == "manual_cycle_created",
+                       )))
+
+  if result.count() == 0:
+    return
+
+  notification_type = get_notification_type("cycle_task_reassigned"),
+  reassign_notification = Notification(
+      object_id=obj.id,
+      object_type=get_object_type(obj),
+      send_on=date.today(),
+      notification_type=notification_type)
+  db.session.add(reassign_notification)
+
+
 def handle_cycle_task_group_object_task_put(obj, start_notif_type=None):
   notification = get_notification(obj)
   if not notification and start_notif_type:
-    start_notification = Notification(
-        object_id=obj.id,
-        object_type=get_object_type(obj),
-        notification_type=start_notif_type,
-        send_on=date.today(),
-    )
-    due_in_notif_type = get_notification_type("cycle_task_due_in")
-    due_in_notification = Notification(
-        object_id=obj.id,
-        object_type=get_object_type(obj),
-        notification_type=due_in_notif_type,
-        send_on=obj.end_date - timedelta(due_in_notif_type.advance_notice)
-    )
-    due_today_notif_type = get_notification_type("cycle_task_due_today")
-    due_today_notification = Notification(
-        object_id=obj.id,
-        object_type=get_object_type(obj),
-        notification_type=due_today_notif_type,
-        send_on=obj.end_date - timedelta(due_today_notif_type.advance_notice)
-    )
-    db.session.add(start_notification)
-    db.session.add(due_in_notification)
-    db.session.add(due_today_notification)
-
-  else:
-    # handle task finished, reassigned and other stuff
-    pass
+    add_new_cycle_task_notifications(obj, start_notif_type=start_notif_type)
+  elif inspect(obj).attrs.contact.history.has_changes():
+    add_cycle_task_reassigned_notification(
+        obj, start_notif_type=start_notif_type)
 
 
 def handle_cycle_created(sender, obj=None, src=None, service=None,
@@ -382,7 +418,7 @@ def register_listeners():
   @Resource.model_put.connect_via(CycleTaskGroupObjectTask)
   def cycle_task_group_object_task_put_listener(
           sender, obj=None, src=None, service=None):
-    handle_cycle_task_group_object_task_put(sender, obj, src, service, True)
+    handle_cycle_task_group_object_task_put(obj)
 
   @Resource.model_posted.connect_via(Cycle)
   def cycle_post_listener(sender, obj=None, src=None, service=None):
@@ -396,13 +432,13 @@ def get_object(obj_class, obj_id):
 
 
 def get_object_type(obj):
-  return db.session.query(ObjectType)\
-      .filter(ObjectType.name == obj.__class__.__name__).one()
+  return db.session.query(ObjectType).filter(
+      ObjectType.name == obj.__class__.__name__).one()
 
 
 def get_notification_type(name):
-  return db.session.query(NotificationType)\
-      .filter(NotificationType.name == name).one()
+  return db.session.query(NotificationType).filter(
+      NotificationType.name == name).one()
 
 
 def get_workflow_owner(context_id):
@@ -410,11 +446,13 @@ def get_workflow_owner(context_id):
       and_(UserRole.context_id == context_id,
            Role.name == "WorkflowOwner")).one().person
 
+
 def get_fuzzy_date(end_date):
   delta = date.today() - end_date
   if delta.days == 0:
     return "today"
   return "in {}".format(format_timedelta(delta, locale='en_US'))
+
 
 def get_cycle_task_dict(cycle_task):
 
@@ -429,12 +467,13 @@ def get_cycle_task_dict(cycle_task):
       "fuzzy_due_in": get_fuzzy_date(cycle_task.end_date),
   }
 
+
 def get_person_dict(person):
   if person:
     return {
-      "email": person.email,
-      "name": person.name,
-      "id": person.id,
+        "email": person.email,
+        "name": person.name,
+        "id": person.id,
     }
 
   return {"email": "", "name": "", "id": -1}
@@ -443,8 +482,8 @@ def get_person_dict(person):
 def get_notification(obj):
   # maybe we shouldn't return different thigs here.
   result = db.session.query(Notification).join(ObjectType).filter(
-      Notification.object_id == obj.id,
-      ObjectType.name == obj.__class__.__name__)
+      and_(Notification.object_id == obj.id,
+           ObjectType.name == obj.__class__.__name__))
   if result.count() == 1:
     return result.one()
   else:
