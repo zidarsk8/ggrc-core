@@ -13,12 +13,15 @@
 
 </head>
 
-<body bgcolor="#f1f1f1" {{ style.body() }} >
-  {% include 'notifications/email_header.html' %}
+<body {{ style.body_style() }} >
 
-  {% block body %}{% endblock %}
+  {% block body %}
+    {% include 'notifications/email_header.html' %}
+      {% block content %}
+      {% endblock %}
+    {% include 'notifications/email_footer.html' %}
+  {% endblock %}
 
-  {% include 'notifications/email_footer.html' %}
 </body>
 </html>
 

@@ -1,30 +1,29 @@
-  <table class="body-wrap" style="width: 100%;">
+  {% import 'notifications/style.html' as style %}
+  <table {{ style.body_wrap() }} >
     <tr>
-      <td></td>
-      <td class="header container" bgcolor="#fff" {{ style.block() }}>
-        <div class="content" {{ style.td_div() }} >
-          <table style="width: 100%;">
+      <td {{ style.container() }} >
+        <div {{ style.content() }} >
+          <table {{ style.table_full() }} >
             <tr>
               <td>
-                <h1 {{ style.h1() }}> 
+                <h1 {{ style.main_title() }} >
                   Hi, {{ digest['user']['name'] if digest['user']['name'] 
                          else digest['user']['email']}}.
                 </h1>
-
-                <p {{ style.p() }}>
+                <p {{ style.text_paragraph() }} >
                   Here is what was happening yesterday:
                 </p>
 
                 {% if digest['cycle_started'] %}
-                  <h2 {{ style.h2() }} > Following tasks have been assigned to you </h2>
-                  <ul {{ style.ul() }} >
+                  <h2 {{ style.sub_title() }} >Following tasks are assigned to you</h2>
+                  <ul {{ style.list_wrap() }} >
                   {% for cycle in digest['cycle_started'].values() %}
                     
                     {% for cycle in digest['cycle_started'].values() %}
                     
                       {% if cycle['my_tasks'] %}
                         {% for task in cycle['my_tasks'].values() %}
-                          <li {{ style.li() }} >
+                          <li {{ style.list_item() }} >
                             {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
                           </li>
                         {% endfor %}
@@ -33,7 +32,7 @@
                       {% if cycle['my_task_groups'] %}
                         {% for task_group in cycle['my_task_groups'].values() %}
                           {% for task in task_group.values() %}
-                            <li {{ style.li() }} >
+                            <li {{ style.list_item() }} >
                               {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
                             </li>
                           {% endfor %}
@@ -42,7 +41,7 @@
                     
                       {% if cycle['cycle_tasks'] %}
                         {% for task in cycle['cycle_tasks'].values() %}
-                          <li {{ style.li() }} >
+                          <li {{ style.list_item() }} >
                             {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
                           </li>
                         {% endfor %}
@@ -55,10 +54,10 @@
                 {% endif %}
 
                 {% if digest['task_declined'] %}
-                  <h2 {{ style.h2() }} > Following tasks you did, got declined </h2>
-                  <ul {{ style.ul() }} >
+                  <h2 {{ style.sub_title() }} > Following tasks you did, got declined </h2>
+                  <ul {{ style.list_wrap() }} >
                   {% for task in digest['task_declined'].values() %}
-                    <li {{ style.li() }} >
+                    <li {{ style.list_item() }} >
                       {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
                     </li>
                   {% endfor %}
@@ -68,18 +67,18 @@
 
 
                 {% if digest['due_in'] or digest['due_today'] %}
-                  <h2 {{ style.h2() }} > X tasks are due very soon </h2>
-                  <ul {{ style.ul() }} >
+                  <h2 {{ style.sub_title() }} > X tasks are due very soon </h2>
+                  <ul {{ style.list_wrap() }} >
                   {% if digest['due_today'] %}
                     {% for task in digest['due_today'].values() %}
-                      <li {{ style.li() }} >
+                      <li {{ style.list_item() }} >
                         {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
                       </li>
                     {% endfor %}
                   {% endif %}
                   {% if digest['due_in'] %}
                     {% for task in digest['due_in'].values() %}
-                      <li {{ style.li() }} >
+                      <li {{ style.list_item() }} >
                         {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
                       </li>
                     {% endfor %}
@@ -88,11 +87,38 @@
 
                 {% endif %}
 
+                
+                {% if digest['task_declined'] %}
+                  <h2 c{{ style.sub_title() }} >New workflow cycle(s) started</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for task in digest['task_declined'].values() %}
+                    <li {{ style.list_item() }} >
+                      {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                
+                {% if digest['cycle_starts_in'] %}
+                  <h2 {{ style.sub_title() }} >Upcoming workflows</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for task in digest['task_declined'].values() %}
+                    <li {{ style.list_item() }} >
+                      {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                <p {{ style.text_paragraph() }} >
+                  Thanks,<br>
+                  gGRC team
+                </p>
               </td>
             </tr>
           </table>
         </div>
       </td>
-      <td></td>
     </tr>
   </table>

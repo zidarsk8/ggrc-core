@@ -1,15 +1,14 @@
-  <table class="head-wrap" style="width: 100%;">
+  {% import 'notifications/style.html' as style %}
+  <table {{ style.head_wrap() }} >
     <tr>
-      <td></td>
-      <td class="header container" {{ style.block() }}>
-        <div class="content" {{ style.td_div() }} >
-          <table style="width: 100%;">
+      <td {{ style.header_container() }} >
+        <div {{ style.content() }} >
+          <table {{ style.table_full() }} >
             <tr>
-              <td style="color: #999;">Google GRC</td>
+              <td {{ style.header_color() }} >Google GRC</td>
             </tr>
           </table>
         </div>
       </td>
-      <td></td>
     </tr>
   </table>

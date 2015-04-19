@@ -1,21 +1,20 @@
-  <table class="footer-wrap" style="width: 100%; clear: both !important;">
+  {% import 'notifications/style.html' as style %}
+  <table {{ style.footer_wrap() }} >
     <tr>
-      <td></td>
-      <td class="header container" {{ style.block() }}>
-        <div class="content" {{ style.td_div() }} >
-          <table style="width: 100%;">
+      <td {{ style.footer_container() }} >
+        <div {{ style.content() }} >
+          <table {{ style.table_full() }} >
             <tr>
               <td align="center">
-                <p style="margin-bottom: 15px; font-weight: normal; font-size: 14px; line-height: 1.6;">
-                  <a href="#" style="color: #2ba6cb;">Terms</a> |
-                  <a href="#" style="color: #2ba6cb;">Privacy</a> |
-                  <a href="#" style="color: #2ba6cb;"><unsubscribe>Unsubscribe</unsubscribe></a>
+                <p {{ style.footer_text() }} >
+                <a href="#" {{ style.link_text() }} >Terms</a> |
+                <a href="#" {{ style.link_text() }} >Privacy</a> |
+                <a href="#" {{ style.link_text() }} >Unsubscribe</a>
                 </p>
               </td>
             </tr>
           </table>
         </div>
       </td>
-      <td></td>
     </tr>
   </table>
