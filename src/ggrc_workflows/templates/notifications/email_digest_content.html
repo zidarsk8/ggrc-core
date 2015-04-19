@@ -87,7 +87,6 @@
 
                 {% endif %}
 
-                
                 {% if digest['task_declined'] %}
                   <h2 c{{ style.sub_title() }} >New workflow cycle(s) started</h2>
                   <ul {{ style.list_wrap() }} >
@@ -99,13 +98,23 @@
                   </ul>
                 {% endif %}
 
-                
+                {% if digest['cycle_started'] %}
+                  <h2 {{ style.sub_title() }} >New workflow cycle(s) started</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for cycle_id, cycle in digest['cycle_started'].items() %}
+                    <li {{ style.list_item() }} >
+                      New cycle of {{ cycle['cycle_title'] }},
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
                 {% if digest['cycle_starts_in'] %}
                   <h2 {{ style.sub_title() }} >Upcoming workflows</h2>
                   <ul {{ style.list_wrap() }} >
-                  {% for task in digest['task_declined'].values() %}
+                  {% for workflow_id, workflow in digest['cycle_starts_in'].items() %}
                     <li {{ style.list_item() }} >
-                      {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
+                      New cycle of {{ workflow['title'] }} starts {{ workflow['fuzzy_start_date'] }}
                     </li>
                   {% endfor %}
                   </ul>
