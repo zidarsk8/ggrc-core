@@ -22,13 +22,13 @@ def do_start_recurring_cycles():
 
 def show_pending_notifications():
   _, notif_data = notification.get_pending_notifications()
-  pending = env.get_template("notifications/pending_digest_notifitaitons.html")
+  pending = env.get_template("notifications/view_pending_digest.html")
   return pending.render(data=sorted(notif_data.iteritems()))
 
 
 def show_todays_digest_notifications():
   _, notif_data = notification.get_todays_notifications()
-  todays = env.get_template("notifications/todays_digest_notifications.html")
+  todays = env.get_template("notifications/view_todays_digest.html")
   return todays.render(data=notif_data)
 
 

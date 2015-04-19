@@ -4,7 +4,7 @@
 
   {% import 'notifications/style.html' as style %}
 
-  <h1 {{ style.h1() }}>List of pending notifications by date</h1>
+  <h1 {{ style.main_title() }}>List of pending notifications by date</h1>
 
   {% for day, user_notifications in data %}
   <hr>
@@ -13,7 +13,7 @@
     {% for user, digest in user_notifications.items() %}
       <hr>
       {% include 'notifications/email_header.html' %}
-      {% include 'notifications/email_digest_body.html' %}
+      {% include 'notifications/email_digest_content.html' %}
       {% include 'notifications/email_footer.html' %}
     {% endfor %}
 

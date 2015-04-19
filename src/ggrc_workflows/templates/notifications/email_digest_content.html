@@ -1,4 +1,5 @@
   {% import 'notifications/style.html' as style %}
+  {% import 'notifications/macros.html' as macro %}
   <table {{ style.body_wrap() }} >
     <tr>
       <td {{ style.container() }} >
@@ -7,8 +8,7 @@
             <tr>
               <td>
                 <h1 {{ style.main_title() }} >
-                  Hi, {{ digest['user']['name'] if digest['user']['name'] 
-                         else digest['user']['email']}}.
+                  Hi, {{ macro.user_name(digest['user']) }}.
                 </h1>
                 <p {{ style.text_paragraph() }} >
                   Here is what was happening yesterday:
@@ -104,6 +104,7 @@
                   {% for cycle_id, cycle in digest['cycle_started'].items() %}
                     <li {{ style.list_item() }} >
                       New cycle of {{ cycle['cycle_title'] }},
+                      by {{ macro.user_name(cycle['workflow_owner']) }}.
                     </li>
                   {% endfor %}
                   </ul>
@@ -114,7 +115,8 @@
                   <ul {{ style.list_wrap() }} >
                   {% for workflow_id, workflow in digest['cycle_starts_in'].items() %}
                     <li {{ style.list_item() }} >
-                      New cycle of {{ workflow['title'] }} starts {{ workflow['fuzzy_start_date'] }}
+                      New cycle of {{ workflow['title'] }} starts {{ workflow['fuzzy_start_date'] }}, 
+                      by {{ macro.user_name(workflow['workflow_owner']) }}.
                     </li>
                   {% endfor %}
                   </ul>
