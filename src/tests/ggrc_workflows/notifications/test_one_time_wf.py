@@ -65,6 +65,11 @@ class TestOneTimeWorkflowNotification(TestCase):
       person_1 = get_person(self.random_people[0].id)
       person_2 = get_person(self.random_people[1].id)
 
+
+    with freeze_time("2015-04-11"):
+      _, notif_data = notification.get_todays_notifications()
+      self.assertIn("cycle_started", notif_data[person_1.email])
+
     with freeze_time("2015-05-03"):  # two days befor due date
       _, notif_data = notification.get_todays_notifications()
       self.assertIn(person_1.email, notif_data)
