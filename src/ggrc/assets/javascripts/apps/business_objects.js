@@ -273,7 +273,7 @@ $(function() {
   var base_widgets_by_type = {
     "Program": "Issue Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Audit": "Issue ControlAssessment Request history Person program program_controls",
-    "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",
     "ControlAssessment": "Issue Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Regulation" : "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Policy" : "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
@@ -752,6 +752,10 @@ $(function() {
               , draw_children: true
               , show_view: GGRC.mustache_path + "/controls/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              }
+            , Issue: {
+                  mapping: "related_issues"
+                  , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
               }
             , Audit: {
                 mapping: "related_audits"
