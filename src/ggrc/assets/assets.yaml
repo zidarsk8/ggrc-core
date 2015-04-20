@@ -37,6 +37,7 @@ dashboard-js-files:
   - permission.js
   - plugins/persistent_notifier.js
   - ggrc_base.js
+  - plugins/ggrc_utils.js
   - plugins/wysiwyg.js
   - plugins/autocomplete.js
   - plugins/ajax_extensions.js
@@ -94,6 +95,7 @@ dashboard-js-files:
   - pbc/workflow_controller.js
   - models/category.js
   - models/refresh_queue.js
+  - models/save_queue.js
   - models/custom_attributes.js
   - apps/quick_search.js
   - apps/business_objects.js

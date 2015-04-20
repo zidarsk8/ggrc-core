@@ -10,7 +10,7 @@
     {{#is_info_pin}}
     <div class="clearfix">
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content">
+      <div class="tier-content pin">
         <div class="row-fluid wrap-row">
           <div class="span12">
             <h6>Response</h6>
@@ -23,7 +23,7 @@
     {{#if options.allow_mapping_or_creating}}
     {{! NB: Creating and editing responses have the same rules. }}
     {{#if_can_create_response options.parent_instance}}
-    <div class="details-wrap">
+    <div class="details-wrap no-top">
       <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
       <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
         <li>
