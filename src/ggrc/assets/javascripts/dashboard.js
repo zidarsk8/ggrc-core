@@ -402,7 +402,6 @@ function resize_areas(event, target_info_pin_height) {
   ,   $lhsHolder
   ,   $area
   ,   $header
-  ,   $headerBar
   ,   $footer
   ,   $topNav
   ,   $innerNav
@@ -426,7 +425,6 @@ function resize_areas(event, target_info_pin_height) {
   $lhsHolder = $(".lhs-holder");
   $footer = $(".footer");
   $header = $(".header-content");
-  $headerBar = $(".header-bar");
   $innerNav = $(".inner-nav");
   $objectArea = $(".object-area");
   $topNav = $(".top-inner-nav");
@@ -462,7 +460,7 @@ function resize_areas(event, target_info_pin_height) {
               ? Number($topNav.css("top").replace("px", ""))
               : 0;
 
-      if (nav_pos < $header.height()+$headerBar.height()) {
+      if (nav_pos < $header.height()) {
           height -= $topNav.height();
       }
 
@@ -484,7 +482,7 @@ function resize_areas(event, target_info_pin_height) {
 
           // the 5 gives user peace of mind they've reached bottom
           UIHeight = [$topNav.height(), $header.height(),
-                      $headerBar.height(), $footer.height(),
+                      $footer.height(),
                       margins, pin_height, 5]
               .reduce(function (m, h) { return m+h; }, 0);
 
