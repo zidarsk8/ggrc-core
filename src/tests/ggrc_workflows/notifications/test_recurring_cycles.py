@@ -88,19 +88,23 @@ class TestRecurringCycleNotifications(TestCase):
     pass
 
   def create_test_cases(self):
+    def person_dict(person_id):
+      return {
+          "href": "/api/people/%d" % person_id,
+          "id": person_id,
+          "type": "Person"
+      }
 
     self.quarterly_wf_1 = {
         "title": "quarterly wf 1",
         "description": "",
+        "owners": [person_dict(self.assignee.id)],
         "frequency": "quarterly",
         "task_groups": [{
             "title": "tg_1",
+            "contact": person_dict(self.assignee.id),
             "task_group_tasks": [{
-                "contact": {
-                    "href": "/api/people/%d" % self.assignee.id,
-                    "id": self.assignee.id,
-                    "type": "Person"
-                },
+                "contact": person_dict(self.assignee.id),
                 "description": self.generator.random_str(100),
                 "relative_start_day": 5,
                 "relative_start_month": 2,

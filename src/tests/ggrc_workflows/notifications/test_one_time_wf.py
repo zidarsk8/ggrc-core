@@ -28,6 +28,7 @@ class TestOneTimeWorkflowNotification(TestCase):
   """
 
   def setUp(self):
+    TestCase.setUp(self)
     self.api = Api()
     self.wf_generator = WorkflowsGenerator()
     self.ggrc_generator = GgrcGenerator()
@@ -38,8 +39,6 @@ class TestOneTimeWorkflowNotification(TestCase):
     )
     self.create_test_cases()
 
-    db.session.query(Notification).delete()
-
     def init_decorator(init):
       def new_init(self, *args, **kwargs):
         init(self, *args, **kwargs)
@@ -48,9 +47,6 @@ class TestOneTimeWorkflowNotification(TestCase):
       return new_init
 
     Notification.__init__ = init_decorator(Notification.__init__)
-
-  def tearDown(self):
-    db.session.query(Notification).delete()
 
   def test_one_time_wf_activate(self):
     def get_person(person_id):
