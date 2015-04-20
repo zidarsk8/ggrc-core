@@ -59,6 +59,8 @@ def merge_dict(destination, source, path=None):
 
 
 def get_notification_data(notifications):
+  if not notifications:
+    return {}
   aggregate_data = {}
 
   def merge_into(destination, source):

@@ -186,10 +186,11 @@ def get_cycle_task_due(notification):
 
 def get_cycle_task_group_object_task_data(notification):
   notification_name = notification.notification_type.name
-  if notification_name == "manual_cycle_created":
+  if notification_name in ["manual_cycle_created", "cycle_created"]:
     return get_cycle_created_task_data(notification)
   elif notification_name in ["cycle_task_due_today", "cycle_task_due_in"]:
     return get_cycle_task_due(notification)
+  return {}
 
 
 def get_task_group_task_data(notification):
@@ -483,7 +484,8 @@ def get_notification(obj):
   # maybe we shouldn't return different thigs here.
   result = db.session.query(Notification).join(ObjectType).filter(
       and_(Notification.object_id == obj.id,
-           ObjectType.name == obj.__class__.__name__))
+           ObjectType.name == obj.__class__.__name__,
+           Notification.sent_at == None))  # noqa
   if result.count() == 1:
     return result.one()
   else:
