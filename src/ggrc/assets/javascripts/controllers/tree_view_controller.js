@@ -1267,16 +1267,11 @@ can.Control("CMS.Controllers.TreeViewNode", {
       },
 
       'input.attr-checkbox click' : function (el, ev) {
-        var MAX_ATTR = 5, $mandatory, $selected, $not_selected,
-            $check = this.element.find('.attr-checkbox');
-
-        $mandatory = $check.filter('.mandatory');
-        $selected = $check.filter(function (item) {
-          return item.checked;
-        });
-        $not_selected = $check.filter(function (item) {
-          return !item.checked;
-        });
+        var MAX_ATTR = 5,
+            $check = this.element.find('.attr-checkbox')
+            $mandatory = $check.filter('.mandatory'),
+            $selected = $check.filter(':checked'),
+            $not_selected = $check.not(':checked');
 
         if ($selected.length === MAX_ATTR) {
           $not_selected.prop('disabled', true).
