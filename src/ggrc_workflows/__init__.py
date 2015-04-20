@@ -853,6 +853,9 @@ def start_recurring_cycles():
             date.today()), 1, workflow.frequency)
     db.session.add(workflow)
 
+    notification.handle_workflow_modify(None, workflow)
+    notification.handle_cycle_created(None, obj=cycle)
+
   db.session.commit()
   db.session.flush()
 
