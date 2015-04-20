@@ -942,7 +942,8 @@
       ],
       _canonical: {
        "related_objects_as_source" : [
-          "Program", "ControlAssessment", "Audit", "Control"
+          "Program", "ControlAssessment", "Audit", "Control", 
+          "DataAsset", "Facility", "OrgGroup", "Market"
         ],
       }
       , related_audits:   TypeFilter("related_objects", "Audit")

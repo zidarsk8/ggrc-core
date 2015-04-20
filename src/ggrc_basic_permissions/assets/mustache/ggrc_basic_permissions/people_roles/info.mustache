@@ -9,7 +9,7 @@
   {{#is_info_pin}}
   <div class="clearfix">
     {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-    <div class="tier-content">
+    <div class="tier-content pin">
       <div class="row-fluid wrap-row">
         {{#if_match instance.name '\\\\S'}}
           {{#instance.name}}
@@ -37,7 +37,7 @@
   </div>
   {{/is_info_pin}}
 
-  <div class="details-wrap">
+  <div class="details-wrap no-top">
     <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
     <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
       <li>
