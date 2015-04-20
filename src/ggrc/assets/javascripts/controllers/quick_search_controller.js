@@ -209,9 +209,6 @@ can.Control("CMS.Controllers.LHN", {
         self.options.display_prefs.setLHNState({ "panel_scroll" : this.scrollTop });
       });
       this.element.find(".lhs-holder").on("scroll", self.lhs_holder_onscroll);
-
-      // this is ugly, but the trigger doesn't nest inside our top element
-      $(".lhn-trigger").on("click", this.animate_lhn.bind(this));
     }
 
   , should_show_lhn: function() {
@@ -260,7 +257,7 @@ can.Control("CMS.Controllers.LHN", {
       this.set_active_tab(checked);
     }
 
-  , animate_lhn: function (ev) {
+  , toggle_lhn: function (ev) {
       ev && ev.preventDefault();
       var is_open = this.is_lhn_open();
 
@@ -397,10 +394,13 @@ can.Control("CMS.Controllers.LHN", {
   // requestAnimationFrame takes browser render optimizations into account
   // it ain't pretty, but it works
   , initial_lhn_render: function (try_count) {
-    if (!$(".lhs-holder").size()) {
+    if (!$(".lhs-holder").size() || !$(".lhn-trigger").size()) {
       window.requestAnimationFrame(this.initial_lhn_render.bind(this));
       return;
     }
+
+    // this is ugly, but the trigger doesn't nest inside our top element
+    $(".lhn-trigger").on("click", this.toggle_lhn.bind(this));
 
     this.resize_lhn();
 
