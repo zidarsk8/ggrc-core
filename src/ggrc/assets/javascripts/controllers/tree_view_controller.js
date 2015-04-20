@@ -616,18 +616,19 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.enqueue_items(real_add);
   }
 
-  , "{original_list} remove" : function(list, ev, oldVals, index) {
+  , "{original_list} remove" : function (list, ev, oldVals, index) {
     var remove_marker = {}; // Empty object used as unique marker
 
     //  FIXME: This assumes we're replacing the entire list, and corrects for
     //    instances being removed and immediately re-added.  This should be
     //    changed to support exact mirroring of the order of
     //    `this.options.list`.
-    if (!this.oldList)
+    if (!this.oldList) {
       this.oldList = [];
+    }
     this.oldList.push.apply(
         this.oldList,
-        can.map(oldVals, function(v) { return v.instance ? v.instance : v; }));
+        can.map(oldVals, function (v) { return v.instance ? v.instance : v; }));
 
     // `remove_marker` is to ensure that removals are not attempted until 20ms
     //   after the *last* removal (e.g. for a series of removals)
@@ -637,8 +638,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         can.each(this.oldList, function(v) {
           this.element.trigger("removeChild", v);
         }.bind(this));
-        delete this.oldList;
-        delete this._remove_marker;
+        this.oldList = null;
+        this._remove_marker = null;
         $(".cms_controllers_info_pin").control().unsetInstance();
         this.show_info_pin();
       }

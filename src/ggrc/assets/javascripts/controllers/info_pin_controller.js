@@ -11,11 +11,11 @@ can.Control("CMS.Controllers.InfoPin", {
     view: GGRC.mustache_path + "/base_objects/info.mustache"
   }
 }, {
-  init: function(el, options) {
+  init: function (el, options) {
     var instance = GGRC.page_instance();
     this.element.height(0);
   },
-  findView: function(instance) {
+  findView: function (instance) {
     var view = instance.class.table_plural + "/info";
 
     if (instance instanceof CMS.Models.Person) {
@@ -29,40 +29,42 @@ can.Control("CMS.Controllers.InfoPin", {
     }
     return view;
   },
-  findOptions: function(el) {
-    var tree_node = el.closest('.cms_controllers_tree_view_node').control();
+  findOptions: function (el) {
+    var tree_node = el.closest(".cms_controllers_tree_view_node").control();
     return tree_node.options;
   },
   loadChildTrees: function() {
-    var child_tree_dfds = []
-      , that = this
-      ;
+    var child_tree_dfds = [],
+        that = this;
 
-    this.element.find('.' + CMS.Controllers.TreeView._fullName).each(function(_, el) {
-      var $el = $(el)
-        , child_tree_control
-        ;
+    this.element.find("." + CMS.Controllers.TreeView._fullName).each(function (_, el) {
+      var $el = $(el),
+          child_tree_control;
 
       //  Ensure this targets only direct child trees, not sub-tree trees
-      if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
+      if ($el.closest("." + that.constructor._fullName).is(that.element)) {
         child_tree_control = $el.control();
         if (child_tree_control)
           child_tree_dfds.push(child_tree_control.display());
       }
     });
   },
-  unsetInstance: function() {
+  unsetInstance: function () {
     // Stop the animation and clear the queue:
     this.element.stop(true);
-    this.element.html('');
-    this.element.height(0);
-    $('.cms_controllers_tree_view_node').removeClass('active');
-    $(window).trigger('resize');
+    this.element.html("");
+    this.element.animate({
+        height: 0
+      }, {
+        duation: 800
+      });
+    $(".cms_controllers_tree_view_node").removeClass("active");
+    $(window).trigger("resize");
   },
-  setInstance: function(instance, el) {
+  setInstance: function (instance, el) {
     var options = this.findOptions(el),
         view = this.findView(instance),
-        $win = $(window);
+        panelHeight = $(window).height() / 3;
 
     this.element.html(can.view(view, {
       instance: instance,
@@ -77,15 +79,24 @@ can.Control("CMS.Controllers.InfoPin", {
 
     // Make sure pin is visible
     if (!this.element.height()) {
-      this.element.height($win.height() / 3);
+      this.element.animate({
+        height: panelHeight
+      }, {
+        duration: 800,
+        easing: "easeOutExpo",
+        complete: function () {
+          this.ensureElementVisible(el);
+        }.bind(this)
+      });
+    } else {
+      this.ensureElementVisible(el);
     }
-    $win.trigger('resize');
-    this.ensureElementVisible(el);
   },
   ensureElementVisible: function (el) {
-    var $objectArea = $('.object-area'),
-        $header = $('.tree-header:visible'),
-        $filter = $('.filter-holder:visible'),
+    $(window).trigger("resize");
+    var $objectArea = $(".object-area"),
+        $header = $(".tree-header:visible"),
+        $filter = $(".filter-holder:visible"),
         elTop = el.offset().top,
         elBottom = elTop + el.height(),
         headerTop = $header.offset().top,
@@ -102,29 +113,31 @@ can.Control("CMS.Controllers.InfoPin", {
       }
     }
   },
-  '.pin-action a click': function (el) {
+  ".pin-action a click": function (el) {
     var $win = $(window),
         win_height = $win.height(),
         options = {
           duration: 800,
-          easing: 'easeOutExpo'
+          easing: "easeOutExpo"
         },
         target_height =  {
           min: 75,
           normal: (win_height / 3),
           max: (win_height * 3 / 4)
         },
-        $info = this.element.find('.info'),
-        type = el.data('size'),
+        $info = this.element.find(".info"),
+        type = el.data("size"),
         size = target_height[type];
 
-    if (type === 'deselect') {
+    if (type === "deselect") {
       // TODO: Make some direct communication between the components
       //       and make sure only one widget has "widget-active" class
-      el.find('[rel=tooltip]').data('tooltip').hide();
-      return $('.widget-area .widget:visible').find('.cms_controllers_tree_view').control().deselect();
+      el.find("[rel=tooltip]").data("tooltip").hide();
+      $(".widget-area .widget:visible").find(".cms_controllers_tree_view").control().deselect();
+      this.unsetInstance();
+      return;
     }
-    this.element.find('.pin-action i').css({'opacity': 0.25});
+    this.element.find(".pin-action i").css({"opacity": 0.25});
 
     if (size < $info.height()) {
       options.start = function () {
@@ -137,6 +150,7 @@ can.Control("CMS.Controllers.InfoPin", {
     }
 
     this.element.animate({height: size}, options);
-    el.find('i').css({'opacity': 1});
+    el.find("i").css({"opacity": 1});
   }
 });
+
