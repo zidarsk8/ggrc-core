@@ -14,13 +14,13 @@
 	    <h5>Set visible fields for {{model.title_singular}}</h5>
 	    <ul class="attr-list">
 	      {{#select_attr_list}}
-	      <li class="{{#if_equals attr_title 'Title'}}disabled{{/if_equals}}">
+	      <li class="{{#if mandatory}}disabled{{/if_equals}}">
 	        <label class="checkbox-inline">
 	          <input type="checkbox"
 	            {{#if display_status}}checked="checked"{{/if}}
-	            {{#if_equals attr_title 'Title'}}disabled{{/if_equals}}
+	            {{#if mandatory}}disabled{{/if_equals}}
 	            value="{{attr_name}}"
-	            class="notify-wrap attr-checkbox"
+	            class="notify-wrap attr-checkbox {{#if mandatory}}mandatory{{/if_equals}}"
 	          >
 	          {{attr_title}}
 	        </label>

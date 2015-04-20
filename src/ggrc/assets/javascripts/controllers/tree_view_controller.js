@@ -414,6 +414,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           } else {
             obj.display_status = ['title', 'owner', 'status'].indexOf(obj.attr_name) !== -1;
           }
+          //Make title the mandatory attribute
+          obj.mandatory = ['title'].indexOf(obj.attr_name) !== -1;
         }
 
 
@@ -1265,22 +1267,26 @@ can.Control("CMS.Controllers.TreeViewNode", {
       },
 
       'input.attr-checkbox click' : function (el, ev) {
-        var MAX_ATTR = 5,
-            $check = this.element.find('.attr-checkbox'),
-            title = $.grep($check, function (e) { return (e.value === 'title'); }),
-            selected = $.grep($check, function (e) { return (e.checked === true); }),
-            not_selected = $.grep($check, function (e) { return (e.checked === false); });
+        var MAX_ATTR = 5, $mandatory, $selected, $not_selected,
+            $check = this.element.find('.attr-checkbox');
 
-        if (selected.length === MAX_ATTR) {
-          //disable the unselected checkboxes, so user can't check more
-          $(not_selected).prop('disabled', true);
-          $(not_selected).closest('li').addClass('disabled');
+        $mandatory = $check.filter('.mandatory');
+        $selected = $check.filter(function (item) {
+          return item.checked;
+        });
+        $not_selected = $check.filter(function (item) {
+          return !item.checked;
+        });
+
+        if ($selected.length === MAX_ATTR) {
+          $not_selected.prop('disabled', true).
+            closest('li').addClass('disabled');
         } else {
-          $check.prop('disabled', false);
-          $check.closest('li').removeClass('disabled');
-          //Make sure title is always disabled
-          $(title).prop('disabled', true);
-          $(title).closest('li').addClass('disabled');
+          $check.prop('disabled', false)
+            .closest('li').removeClass('disabled');
+          //Make sure mandatory items are always disabled
+          $mandatory.prop('disabled', true)
+            .closest('li').addClass('disabled');
         }
         ev.stopPropagation();
       }
