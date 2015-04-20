@@ -5,7 +5,6 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-
 <li class="tree-item item-list" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}}
   data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}"
   {{#instance}}{{data 'model'}}{{/instance}}
@@ -29,28 +28,50 @@
             </div>
 
             {{#is_dashboard}}
-              <div class="span2">
-                {{#using instance=instance.cycle_task_group_object}}
-                  {{#using object=instance.object}}
-                      <div class="tree-title-area">
-                        <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
-                        <span class="tiny-data">
-                          {{firstnonempty object.title ''}}
-                        </span>
+              <div class="span4">
+                <div class="row-fluid">
+                  {{#display_attr_list}}
+                    <div class="span{{display_attr_width}}">
+                      <div class="owner tree-title-area">
+                        {{#instance}}
+                          {{#switch attr_name}}
+                            {{#case 'mapped_object'}}
+                              {{#using instance=instance.cycle_task_group_object}}
+                                {{#using object=instance.object}}
+                                    <div class="tree-title-area">
+                                      <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
+                                      <span class="tiny-data">
+                                        {{firstnonempty object.title ''}}
+                                      </span>
+                                    </div>
+                                {{/using}}
+                              {{/using}}
+                            {{/case}}
+                            {{#case 'workflow'}}
+                              {{#using cycle=instance.cycle}}
+                                {{#using workflow=cycle.workflow}}
+                                    <div class="tree-title-area">
+                                      <span class="tiny-data" rel="tooltip" title="Workflow title">
+                                        {{workflow.title}}
+                                      </span>
+                                    </div>
+                                {{/using}}
+                              {{/using}}
+                            {{/case}}
+                            {{#case 'assignee'}}
+                              {{#using contact=instance.contact}}
+                                <div>{{firstnonempty contact.name contact.email ''}}</div>
+                              {{/using}}
+                            {{/case}}
+                            {{#default}}
+                              {{get_default_attr_value attr_name instance}}
+                            {{/default}}
+                          {{/switch}}
+                        {{/instance}}
                       </div>
-                  {{/using}}
-                {{/using}}
-              </div>
-              <div class="span2">
-                {{#using cycle=instance.cycle}}
-                  {{#using workflow=cycle.workflow}}
-                      <div class="tree-title-area">
-                        <span class="tiny-data" rel="tooltip" title="Workflow title">
-                          {{workflow.title}}
-                        </span>
-                      </div>
-                  {{/using}}
-                {{/using}}
+                    </div>
+                  {{/display_attr_list}}
+                </div>
               </div>
             {{/is_dashboard}}
 

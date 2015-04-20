@@ -409,8 +409,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         //Initialize the display status for title, owner, status to be true
         for (i = 0; i < select_attr_list.length; i++) {
           var obj = select_attr_list[i];
-          obj.display_status = ['title', 'owner', 'status'].indexOf(obj.attr_name) !== -1;
+          if (model_name === 'CycleTaskGroupObjectTask') {
+            obj.display_status = ['title', 'mapped_object', 'workflow'].indexOf(obj.attr_name) !== -1;
+          } else {
+            obj.display_status = ['title', 'owner', 'status'].indexOf(obj.attr_name) !== -1;
+          }
         }
+
 
         //Create display list
         can.each(select_attr_list, function (item) {
@@ -1238,4 +1243,48 @@ can.Control("CMS.Controllers.TreeViewNode", {
                             this.hash_fragment()].join('');
   }
 });
+
+
+
+
+
+(function (can, $) {
+    can.Component.extend ({
+    tag: 'tree-header-selector',
+    // <content> in a component template will be replaced with whatever is contained
+    //  within the component tag.  Since the views for the original uses of these components
+    //  were already created with content, we just used <content> instead of making
+    //  new view template files.
+    template: '<content/>',
+    scope: {
+      instance: null
+    },
+    events: {
+      init: function () {
+        this.scope.attr('controller', this);
+      },
+
+      'input.attr-checkbox click' : function (el, ev) {
+        var MAX_ATTR = 5,
+            $check = this.element.find('.attr-checkbox'),
+            title = $.grep($check, function (e) { return (e.value === 'title'); }),
+            selected = $.grep($check, function (e) { return (e.checked === true); }),
+            not_selected = $.grep($check, function (e) { return (e.checked === false); });
+
+        if (selected.length === MAX_ATTR) {
+          //disable the unselected checkboxes, so user can't check more
+          $(not_selected).prop('disabled', true);
+          $(not_selected).closest('li').addClass('disabled');
+        } else {
+          $check.prop('disabled', false);
+          $check.closest('li').removeClass('disabled');
+          //Make sure title is always disabled
+          $(title).prop('disabled', true);
+          $(title).closest('li').addClass('disabled');
+        }
+        ev.stopPropagation();
+      }
+    }
+  });
+})(this.can, this.can.$);
 

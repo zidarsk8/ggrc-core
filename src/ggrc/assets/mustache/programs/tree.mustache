@@ -27,7 +27,6 @@
                 </div>
               </div>
 
-
               <div class="span4">
               <div class="row-fluid">
                 {{#display_attr_list}}
@@ -54,12 +53,6 @@
                             {{/each}}
                           {{/with_mapping}}
                         {{/case}}
-                        {{#case 'slug'}}
-                          {{instance.slug}}
-                        {{/case}}
-                        {{#case 'status'}}
-                          {{instance.status}}
-                        {{/case}}
                         {{#case 'contact'}}
                           <span>
                             {{#using contact=instance.contact}}
@@ -74,21 +67,10 @@
                             {{/using}}
                           </span>
                         {{/case}}
-                        {{#case 'url'}}
-                          {{instance.url}}
-                        {{/case}}
-                        {{#case 'reference_url'}}
-                          {{instance.reference_url}}
-                        {{/case}}
-                        {{#case 'start_date'}}
-                          {{instance.start_date}}
-                        {{/case}}
-                        {{#case 'end_date'}}
-                          {{instance.end_date}}
-                        {{/case}}
-                        {{#case 'updated_at'}}
-                          {{instance.updated_at}}
-                        {{/case}}
+
+                        {{#default}}
+                          {{get_default_attr_value attr_name instance}}
+                        {{/default}}
                       {{/switch}}
                     </div>
                   {{/if}}
@@ -96,7 +78,6 @@
                 {{/display_attr_list}}
               </div>
               </div>
-
 
               <div class="span4">
 

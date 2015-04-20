@@ -15,19 +15,7 @@
       </div>
     </div>
 
-
-    <div class="span4">
-      <div class="row-fluid">
-        {{#display_attr_list}}
-          <div class="span{{display_attr_width}}">
-            <div class="oneline">
-              {{attr_title}}
-            </div>
-          </div>
-        {{/display_attr_list}}
-      </div>
-    </div>
-
+    {{{> "/static/mustache/base_objects/tree_column_names.mustache"}}}
 
     <div class="span4">
       <ul class="tree-action-list">
@@ -39,29 +27,7 @@
           </a>
         </li>
 
-        <li>
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-          <div class="dropdown-menu dropdown-menu-form">
-            <h5>Set visible fields for {{model.title_singular}}</h5>
-            <ul class="attr-list">
-              {{#select_attr_list}}
-              <li class="a-disabled">
-                <label class="checkbox-inline">
-                  <input type="checkbox"
-                    {{#if display_status }}checked="checked"{{/if}}
-                    {{#if_equals attr_title 'Title'}}disabled=""{{/if_equals}}
-                    value="{{attr_name}}"
-                    class="notify-wrap attr-checkbox"
-                  >
-                  {{attr_title}}
-                </label>
-              </li>
-              {{/select_attr_list}}
-            </ul>
-            <button class="btn btn-small btn-info set-tree-attrs">Set fields</button>
-            <button class="btn btn-small btn-info">Close</button>
-          </div>
-        </li>
+        {{{> "/static/mustache/base_objects/tree_column_selector.mustache"}}}
 
       </ul>
     </div>

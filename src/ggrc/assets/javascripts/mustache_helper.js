@@ -2965,6 +2965,27 @@ Mustache.registerHelper("if_less", function (a, b, options) {
   }
 });
 
+
+/*
+  Used to get the string value for default attributes
+  This doesn't work for nested object reference
+*/
+Mustache.registerHelper("get_default_attr_value", function (attr_name, instance) {
+  instance = Mustache.resolve(instance);
+  attr_name = Mustache.resolve(attr_name);
+
+  if (instance[attr_name]) {
+    if (['slug', 'status', 'url', 'reference_url', 'kind'].indexOf(attr_name) !== -1) {
+      return instance[attr_name];
+    }
+    if (['start_date', 'end_date', 'updated_at'].indexOf(attr_name) !== -1) {
+      //convert to localize date
+      return moment(instance[attr_name]).format('MM/DD/YYYY');
+    }
+  }
+
+  return '';
+});
 /*
   Used to get the string value for custom attributes
 */
