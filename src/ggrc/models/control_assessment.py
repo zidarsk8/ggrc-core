@@ -36,4 +36,12 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
       PublishOnly('audit')
   ]
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ControlAssessment, cls).eager_query()
+    return query.options(
+        orm.subqueryload('control'))
+
 track_state_for_class(ControlAssessment)
