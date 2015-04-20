@@ -49,10 +49,7 @@ can.Component.extend({
       return refresh_queue.trigger();
     },
 
-    _generate: function (control, count, dfd) {
-      count = count || 0;
-      dfd = dfd || new $.Deferred();
-
+    _generate: function (control) {
       var assessment,
           index,
           title = control.title + ' assessment',
@@ -62,22 +59,14 @@ can.Component.extend({
             context: this.scope.audit.context,
             owners: [CMS.Models.Person.findInCacheById(GGRC.current_user.id)],
             test_plan: control.test_plan
-          };
+          },
+          dfd = GGRC.Models.Search.counts_for_types(title, ['ControlAssessment']);
 
-      GGRC.Models.Search.counts_for_types(title, ['ControlAssessment'])
-        .then(function (result) {
-          index = result.getCountFor('Audit') + 1;
-          data.title = title + ' ' + index;
-          assessment = new CMS.Models.ControlAssessment(data);
-        })
-        .then(function () {
-          assessment.save().done(function () {
-            dfd.resolve(assessment);
-          }).fail(function (error, type, code) {
-            return dfd.reject(error);
-          }.bind(this));
-        }.bind(this));
-      return dfd.promise();
+      return dfd.then(function (result) {
+        index = result.getCountFor('ControlAssessment') + 1;
+        data.title = title + ' ' + index;
+        return new CMS.Models.ControlAssessment(data).save();
+      }.bind(this));
     },
 
     _notify: function() {
