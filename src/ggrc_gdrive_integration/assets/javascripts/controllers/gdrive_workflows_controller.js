@@ -965,10 +965,11 @@ can.Component.extend({
         // Create and render a Picker object for searching images.
         function createPicker() {
           window.oauth_dfd.done(function(token, oauth_user) {
-            var picker = new google.picker.PickerBuilder()
-              .setOAuthToken(gapi.auth.getToken().access_token)
-              .setDeveloperKey(GGRC.config.GAPI_KEY)
-              .setCallback(pickerCallback);
+            var dialog,
+                picker = new google.picker.PickerBuilder()
+                  .setOAuthToken(gapi.auth.getToken().access_token)
+                  .setDeveloperKey(GGRC.config.GAPI_KEY)
+                  .setCallback(pickerCallback);
 
             if(el.data('type') === 'folders'){
               var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
@@ -993,16 +994,8 @@ can.Component.extend({
             // this is the "mask" displayed behind the dialog box div
             $('div.picker-dialog-bg').css('zIndex', 2000);  // there are multiple divs of that sort
             // and this is the dialog box modal div, which we must display on top of our modal, if any
-            var dialog = _.find(
-                _.values(picker),
-                function (v) {
-                  if (v instanceof Node) {
-                    return v.className.match(/picker\-dialog/);
-                  }else{
-                    return false;
-                  }
-                });
 
+            dialog = GGRC.Utils.getPickerElement(picker);
             if (dialog) {
               dialog.style.zIndex = 2001; // our modals start with 1050
             }
@@ -1130,10 +1123,11 @@ can.Component.extend({
         // Create and render a Picker object for searching images.
         function createPicker() {
           window.oauth_dfd.done(function(token, oauth_user) {
-            var picker = new google.picker.PickerBuilder()
-              .setOAuthToken(gapi.auth.getToken().access_token)
-              .setDeveloperKey(GGRC.config.GAPI_KEY)
-              .setCallback(pickerCallback);
+            var dialog,
+                picker = new google.picker.PickerBuilder()
+                  .setOAuthToken(gapi.auth.getToken().access_token)
+                  .setDeveloperKey(GGRC.config.GAPI_KEY)
+                  .setCallback(pickerCallback);
 
             if(el.data('type') === 'folders'){
               var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
@@ -1153,7 +1147,11 @@ can.Component.extend({
             }
             picker = picker.build();
             picker.setVisible(true);
-            picker.A.style.zIndex = 2001; // our modals start with 1050
+
+            dialog = GGRC.Utils.getPickerElement(picker);
+            if (dialog) {
+              dialog.style.zIndex = 2001; // our modals start with 1050
+            }
           });
         }
 
