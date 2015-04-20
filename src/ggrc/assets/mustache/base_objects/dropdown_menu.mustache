@@ -6,19 +6,10 @@
 }}
 
 {{> /static/mustache/base_objects/edit_object_link.mustache}}
-<li>
-  <a href="javascript://">
-    <i class="icon-share"></i>
-    Get permalink
-  </a>
-</li>
-<li>
-  <a href="javascript://" class="active">
-    <i class="icon-share"></i>
-    Get permalink
-  </a>
-</li>
 {{#is_info_pin}}
+  <li>
+    <clipboard_link />
+  </li>
   {{^options.is_in_selector}}
     {{> /static/mustache/base_objects/unmap.mustache}}
   {{/options}}
@@ -33,6 +24,3 @@
     {{/is_allowed}}
   {{/if}}
 {{/is_info_pin}}
-<li>
-  <a href="#">Get permalink</a>
-</li>
