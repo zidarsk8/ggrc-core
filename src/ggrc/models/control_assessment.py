@@ -15,9 +15,9 @@ from .track_object_state import HasObjectState, track_state_for_class
 from ggrc.models.reflection import PublishOnly
 
 
-class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documentable,
-                        Personable, Timeboxed, Ownable, Relatable,
-                        BusinessObject, db.Model):
+class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
+                        Documentable, Personable, Timeboxed, Ownable,
+                        Relatable, BusinessObject, db.Model):
   __tablename__ = 'control_assessments'
 
   design = deferred(db.Column(db.String), 'ControlAssessment')
@@ -26,11 +26,22 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable, Documen
   control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
   control = db.relationship('Control', foreign_keys=[control_id])
 
+  audit = {}  # we add this for the sake of client side error checking
+
   # REST properties
   _publish_attrs = [
       'design',
       'operationally',
-      'control'
+      'control',
+      PublishOnly('audit')
   ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ControlAssessment, cls).eager_query()
+    return query.options(
+        orm.subqueryload('control'))
 
 track_state_for_class(ControlAssessment)
