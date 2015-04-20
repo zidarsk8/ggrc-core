@@ -4,7 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from babel.dates import format_timedelta
 
 from sqlalchemy import and_, or_, inspect
@@ -367,6 +367,47 @@ def add_cycle_task_reassigned_notification(
   db.session.add(reassign_notification)
 
 
+def modify_cycle_task_notification(obj, notification_name):
+  notif = db.session.query(Notification)\
+      .join(ObjectType)\
+      .join(NotificationType)\
+      .filter(and_(Notification.object_id == obj.id,
+                   ObjectType.name == obj.__class__.__name__,
+                   Notification.sent_at == None,  # noqa
+                   NotificationType.name == notification_name,
+                   ))
+  notif_type = get_notification_type(notification_name)
+  send_on = obj.end_date - timedelta(
+      notif_type.advance_notice)
+
+  if send_on >= datetime.now():
+      # when cycle date is moved in the future, we update the current
+      # notification or add a new one.
+    if notif.count() == 1:
+      notif = notif.one()
+      notif.send_on = obj.end_date - timedelta(
+          notif.notification_type.advance_notice)
+      db.session.add(notif)
+    else:
+      notif = Notification(
+          object_id=obj.id,
+          object_type=get_object_type(obj),
+          notification_type=notif_type,
+          send_on=send_on,
+      )
+      db.session.add(notif)
+  else:
+    # this should not be allowed, but if a cycle task is changed to a past
+    # date, we remove the current pending notification if it exists
+    for notif in notif.all():
+      db.session.delete(notif)
+
+
+def modify_cycle_task_end_date(obj):
+  modify_cycle_task_notification(obj, "cycle_task_due_in")
+  modify_cycle_task_notification(obj, "cycle_task_due_today")
+
+
 def handle_cycle_task_group_object_task_put(obj, start_notif_type=None):
   notification = get_notification(obj)
   if not notification and start_notif_type:
@@ -374,6 +415,8 @@ def handle_cycle_task_group_object_task_put(obj, start_notif_type=None):
   elif inspect(obj).attrs.contact.history.has_changes():
     add_cycle_task_reassigned_notification(
         obj, start_notif_type=start_notif_type)
+  elif inspect(obj).attrs.end_date.history.has_changes():
+    modify_cycle_task_end_date(obj)
 
 
 def handle_cycle_created(sender, obj=None, src=None, service=None,
@@ -397,6 +440,14 @@ def handle_cycle_created(sender, obj=None, src=None, service=None,
   for cycle_task_group in obj.cycle_task_groups:
     for task in cycle_task_group.cycle_task_group_tasks:
       handle_cycle_task_group_object_task_put(task, notification_type)
+
+
+def handle_task_group_object_task_put(obj, start_notif_type=None):
+  workflow = obj.task_group.workflow
+  if workflow.state != "Active":
+    return
+  notification = get_notification(obj)
+  return notification
 
 
 def contributed_notifications():
