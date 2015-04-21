@@ -940,31 +940,24 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //update the display attrbute list and re-draw
     //1: find checked items
     //2. update
-    var i, j, ch_val, display_width = 12,
+    var display_width = 12,
         $check = this.element.parent().find('.attr-checkbox'),
-        selected = $.grep($check, function (e) { return (e.checked === true);}),
-        selected_items = selected.length;
+        $selected = $check.filter(':checked'),
+        selected_items=[];
 
-    can.each(this.options.select_attr_list, function (item) {
-      item.display_status = false;
+    $selected.each( function(index) {
+      selected_items.push(this.value);
     });
 
+    can.each(this.options.select_attr_list, function (item) {
+      item.display_status = selected_items.indexOf(item.attr_name) !== -1;
+    });
 
-    for (i = 0; i < selected_items; i++) {
-      ch_val = $(selected[i]).val();
-      for (j = 0; j < this.options.select_attr_list.length; j++) {
-        var obj = this.options.select_attr_list[j];
-        if (ch_val === obj.attr_name) {
-          obj.display_status = true;
-        }
-      }
-    }
     this.options.attr('select_attr_list', this.options.select_attr_list);
-
     this.options.display_attr_list = [];
 
     can.each(this.options.select_attr_list, function (item) {
-      if (item.attr_title !== 'Title' && item.display_status) {
+      if (!item.mandatory && item.display_status) {
         this.options.display_attr_list.push(item);
       }
     }, this);
