@@ -48,7 +48,7 @@ can.Model.Cacheable("CMS.Models.Document", {
   , tree_view_options: {
     show_view: GGRC.mustache_path + "/documents/tree.mustache"
     , footer_view : GGRC.mustache_path + "/documents/tree_footer.mustache"
-    , add_item_view : GGRC.mustache_path + "/documents/tree_add-item.mustache"
+    , add_item_view : GGRC.mustache_path + "/documents/tree_add_item.mustache"
 
   }
   , init : function() {

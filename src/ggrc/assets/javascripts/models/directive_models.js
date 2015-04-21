@@ -96,7 +96,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
-    , add_item_view : GGRC.mustache_path + "/directives/tree_add-item.mustache"
+    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
   , attributes : {}
@@ -128,7 +128,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
-    , add_item_view : GGRC.mustache_path + "/directives/tree_add-item.mustache"
+    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
   , attributes : {}
@@ -160,7 +160,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
-    , add_item_view : GGRC.mustache_path + "/directives/tree_add-item.mustache"
+    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
   , attributes : {}
@@ -192,7 +192,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
-    , add_item_view : GGRC.mustache_path + "/directives/tree_add-item.mustache"
+    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
   , attributes : {

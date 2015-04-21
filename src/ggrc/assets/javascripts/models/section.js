@@ -92,7 +92,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
   , tree_view_options : {
       show_view : "/static/mustache/sections/tree.mustache"
     , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
-    , add_item_view : GGRC.mustache_path + "/sections/tree_add-item.mustache"
+    , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
     , child_options : [{
         model : can.Model.Cacheable
       , mapping : "related_and_able_objects"
@@ -101,14 +101,14 @@ CMS.Models.SectionBase("CMS.Models.Section", {
           return this.instance.type === "Objective";
         }
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add-item.mustache"
+      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , child_options : [{
             model: CMS.Models.Control
           , title_plural: "Controls"
           , mapping: "controls"
           , draw_children: false
           , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
-          , add_item_view : GGRC.mustache_path + "/controls/tree_add-item.mustache"
+          , add_item_view : GGRC.mustache_path + "/controls/tree_add_item.mustache"
           }]
       }]
     }
@@ -145,7 +145,7 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
   , tree_view_options: {
       show_view: "/static/mustache/sections/tree.mustache"
     , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
-    , add_item_view : GGRC.mustache_path + "/sections/tree_add-item.mustache"
+    , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
     , child_options: [{
         model: can.Model.Cacheable
       , mapping: "related_and_able_objects"
@@ -154,14 +154,14 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
           return this.instance.type === "Objective";
         }
       , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add-item.mustache"
+      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , child_options: [{
             model: CMS.Models.Control
           , title_plural: "Controls"
           , mapping: "controls"
           , draw_children: false
           , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
-          , add_item_view : GGRC.mustache_path + "/controls/tree_add-item.mustache"
+          , add_item_view : GGRC.mustache_path + "/controls/tree_add_item.mustache"
           }]
       }]
     }
