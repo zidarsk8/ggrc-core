@@ -52,14 +52,16 @@ can.Control("CMS.Controllers.InfoPin", {
   unsetInstance: function () {
     // Stop the animation and clear the queue:
     this.element.stop(true);
-    this.element.html("");
     this.element.animate({
         height: 0
       }, {
-        duation: 800
+        duation: 800,
+        complete: function () {
+          this.element.html("");
+          $(".cms_controllers_tree_view_node").removeClass("active");
+          $(window).trigger("resize");
+        }.bind(this)
       });
-    $(".cms_controllers_tree_view_node").removeClass("active");
-    $(window).trigger("resize");
   },
   setInstance: function (instance, el) {
     var options = this.findOptions(el),
