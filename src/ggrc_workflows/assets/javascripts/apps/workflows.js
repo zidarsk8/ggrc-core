@@ -454,13 +454,13 @@
                 mapping: "objects",
                 show_view: GGRC.mustache_path + "/base_objects/task_group_subtree.mustache",
                 footer_view: GGRC.mustache_path + "/base_objects/task_group_subtree_footer.mustache",
-                // add_item_view: GGRC.mustache_path + "/base_objects/task_group_subtree_add_item.mustache"
+                add_item_view: GGRC.mustache_path + "/base_objects/task_group_subtree_add_item.mustache"
               }, {
                 model: CMS.Models.TaskGroupTask,
                 mapping: "task_group_tasks",
                 show_view: GGRC.mustache_path + "/task_group_tasks/task_group_subtree.mustache",
                 footer_view: GGRC.mustache_path + "/task_group_tasks/task_group_subtree_footer.mustache",
-                // add_item_view: GGRC.mustache_path + "/task_group_tasks/task_group_subtree_add_item.mustache",
+                add_item_view: GGRC.mustache_path + "/task_group_tasks/task_group_subtree_add_item.mustache",
                 sort_property: 'sort_index',
                 allow_creating: true
               }
