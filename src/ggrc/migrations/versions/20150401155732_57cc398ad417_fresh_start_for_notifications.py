@@ -28,6 +28,7 @@ def upgrade():
       sa.Column('description', sa.String(length=250), nullable=True),
       sa.Column('advance_notice', sa.Integer(), nullable=True),
       sa.Column('template', sa.String(length=250), nullable=False),
+      sa.Column('instant', sa.Boolean(), nullable=False, default=False),
       sa.Column('created_at', sa.DateTime(), nullable=True),
       sa.Column('modified_by_id', sa.Integer(), nullable=True),
       sa.Column('updated_at', sa.DateTime(), nullable=True),

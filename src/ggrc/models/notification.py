@@ -44,6 +44,7 @@ class NotificationType(Base, db.Model):
   description = db.Column(db.String, nullable=True)
   advance_notice= db.Column(db.DateTime, nullable=True)
   template = db.Column(db.String, nullable=True)
+  instant = db.Column(db.Boolean, nullable=False, default=False)
 
 
 class Notification(Base, db.Model):
