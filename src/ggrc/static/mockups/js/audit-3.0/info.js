@@ -206,6 +206,8 @@ $(document).ready(function() {
     $("#ca .content").find(".tree-structure").find(".zero-state").hide();
     $("#CaModalMapping").modal("hide");
     $("#CACounter").html("4");
+    $("#assessmentTitle").html("Control assessments");
+    $("#controlTitle").html("In scope Controls");
   }
 
   function reviewWorkflow() {
@@ -350,6 +352,19 @@ $(document).ready(function() {
     });
   }
 
+  $(".add-trigger").find(".disable")
+    .attr("data-toggle", "")
+    .attr("href", "#");
+
+  function AssessmentTemplateDefined() {
+    $("#CAModalTemplate").modal("hide");
+    $("#assessmentWarning").remove();
+    $(".add-trigger").find(".disable")
+      .attr("data-toggle", "modal")
+      .attr("href", "#CAModal")
+      .removeClass("disable");
+  }
+
   $(".top-inner-nav a").on("click", innerNavTrigger);
 
   $("#autoGenerateCA").on("click", generateCA);
@@ -375,5 +390,7 @@ $(document).ready(function() {
   $("#underAssessment").on("change", underAssessment);
 
   $(".toggle-show-hide").on("click", caEditPerson);
+
+  $("#templateDefined").on("click", AssessmentTemplateDefined);
 
 });

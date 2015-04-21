@@ -152,8 +152,8 @@
           <li>
             <a href="#ca" rel="tooltip" data-placement="bottom" title="Control assessments">
               <div class="oneline">
-                <i class="grcicon-control-color"></i>
-                Control assessments (<span id="CACounter">0</span>)
+                <i class="grcicon-control_assessment-color"></i>
+                <span id="assessmentTitle">Assessments</span> (<span id="CACounter">0</span>)
               </div>
             </a>
           </li>
@@ -201,7 +201,7 @@
             <a href="#controls" rel="tooltip" data-placement="bottom" title="Controls">
               <div class="oneline">
                 <i class="grcicon-control-color"></i>
-                In scope Controls (4)
+                <span id="controlTitle">Controls</span> (4)
               </div>
             </a>
           </li>
@@ -2928,7 +2928,7 @@
         </div>
         <div class="span6">
           <div class="confirm-buttons">
-            <a class="btn btn-small btn-success preventdoubleclick " xdata-toggle="modal-submit" data-dismiss="modal" href="javascript://">
+            <a id="templateDefined" class="btn btn-small btn-success preventdoubleclick " xdata-toggle="modal-submit" data-dismiss="modal" href="javascript://">
               Save
             </a>
           </div>
