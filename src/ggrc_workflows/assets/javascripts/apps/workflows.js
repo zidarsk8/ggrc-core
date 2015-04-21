@@ -425,7 +425,7 @@
             mapping: "mapped_and_or_authorized_people",
             show_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache",
             footer_view: GGRC.mustache_path + "/wf_people/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/wf_people/tree_add-item.mustache"
+            add_item_view: GGRC.mustache_path + "/wf_people/tree_add_item.mustache"
           }
         },
         task_group: {
@@ -454,13 +454,13 @@
                 mapping: "objects",
                 show_view: GGRC.mustache_path + "/base_objects/task_group_subtree.mustache",
                 footer_view: GGRC.mustache_path + "/base_objects/task_group_subtree_footer.mustache",
-                // add_item_view: GGRC.mustache_path + "/base_objects/task_group_subtree_add-item.mustache"
+                // add_item_view: GGRC.mustache_path + "/base_objects/task_group_subtree_add_item.mustache"
               }, {
                 model: CMS.Models.TaskGroupTask,
                 mapping: "task_group_tasks",
                 show_view: GGRC.mustache_path + "/task_group_tasks/task_group_subtree.mustache",
                 footer_view: GGRC.mustache_path + "/task_group_tasks/task_group_subtree_footer.mustache",
-                // add_item_view: GGRC.mustache_path + "/task_group_tasks/task_group_subtree_add-item.mustache",
+                // add_item_view: GGRC.mustache_path + "/task_group_tasks/task_group_subtree_add_item.mustache",
                 sort_property: 'sort_index',
                 allow_creating: true
               }
@@ -533,7 +533,7 @@
           show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
           header_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree_header.mustache",
           footer_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree_footer.mustache",
-          add_item_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree_add-item.mustache",
+          add_item_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree_add_item.mustache",
           mapping: "assigned_tasks",
           sort_property: null,
           sort_function: _task_sort_function,
@@ -550,7 +550,7 @@
               mapping: "cycle_task_entries",
               show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
               footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
-              add_item_view: GGRC.mustache_path + "/cycle_task_entries/tree_add-item.mustache",
+              add_item_view: GGRC.mustache_path + "/cycle_task_entries/tree_add_item.mustache",
               allow_creating: true
             }
           ]
