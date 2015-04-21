@@ -28,6 +28,9 @@
               </a>
             </li>
           {{/is_allowed}}
+          <li>
+            <clipboard_link title="Get permalink" text="{{get_permalink}}" />
+          </li>
           {{#is_allowed 'update' instance context='for'}}
             <li class="border">
               {{#with_mapping 'related_audits' instance}}
