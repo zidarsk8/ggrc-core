@@ -57,17 +57,11 @@
                 {{/if}}
               </div>
               <ul class="tree-action-list">
-                {{#infer_roles instance}}
+                {{#if infer_roles}}
                   <li>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        <span class="role">
-                          {{.}}
-                        </span>
-                      </div>
-                    </div>
+                    <i class="grcicon-person-black" rel="tooltip" data-placement="left" data-original-title="{{#infer_roles instance}}{{.}} {{/infer_roles}}"></i>
                   </li>
-                {{/infer_roles}}
+                {{/if}}
                 {{#with_page_object_as 'page_object'}}
                   {{#if_instance_of page_object 'Person'}}
 
