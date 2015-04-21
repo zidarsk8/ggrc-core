@@ -11,6 +11,14 @@ from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
 
 
+"""
+exposed functions
+    get_cycle_data,
+    get_workflow_data,
+    get_task_group_task_data,
+    get_cycle_task_data,
+"""
+
 def get_cycle_created_task_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   cycle_task_group = cycle_task.cycle_task_group
@@ -56,7 +64,7 @@ def get_cycle_created_task_data(notification):
 def get_cycle_task_due(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   notification_name = notification.notification_type.name
-  due = "due_in" if notification_name == "cycle_task_due_in" else "due_today"
+  due = "due_today" if notification_name == "cycle_task_due_today" else "due_in"
   return {
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
@@ -94,9 +102,7 @@ def get_cycle_task_data(notification):
   notification_name = notification.notification_type.name
   if notification_name in ["manual_cycle_created", "cycle_created"]:
     return get_cycle_created_task_data(notification)
-  elif notification_name in ["cycle_task_due_today", "cycle_task_due_in"]:
-    return get_cycle_task_due(notification)
-  return {}
+  return get_cycle_task_due(notification)
 
 
 def get_task_group_task_data(notification):

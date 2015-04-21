@@ -8,6 +8,14 @@ from ggrc.models import (
 from ggrc import db
 
 
+"""
+exposed functions
+    handle_workflow_modify,
+    handle_cycle_task_group_object_task_put,
+    handle_cycle_created,
+"""
+
+
 def handle_task_group_task(obj, notification_type=None):
   if not notification_type:
     return
@@ -36,7 +44,7 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
 
   if not notification:
     notification_type = get_notification_type(
-        "%s_workflow_starts_in" % obj.frequency)
+        "{}_workflow_starts_in".format(obj.frequency))
     notification = Notification(
         object_id=obj.id,
         object_type=get_object_type(obj),
@@ -60,7 +68,10 @@ def add_new_cycle_task_notifications(obj, src=None, service=None,
       notification_type=start_notif_type,
       send_on=date.today(),
   )
-  due_in_notif_type = get_notification_type("cycle_task_due_in")
+
+  due_in_notif_type = get_notification_type("{}_cycle_task_due_in".format(
+      obj.cycle_task_group.cycle.workflow.frequency))
+
   due_in_notification = Notification(
       object_id=obj.id,
       object_type=get_object_type(obj),
@@ -143,7 +154,8 @@ def modify_cycle_task_notification(obj, notification_name):
 
 
 def modify_cycle_task_end_date(obj):
-  modify_cycle_task_notification(obj, "cycle_task_due_in")
+  modify_cycle_task_notification(obj, "{}_cycle_task_due_in".format(
+      obj.cycle_task_group.cycle.workflow.frequency))
   modify_cycle_task_notification(obj, "cycle_task_due_today")
 
 
