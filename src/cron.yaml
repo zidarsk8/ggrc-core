@@ -1,13 +1,13 @@
-# # Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+# # Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: mouli@meics.org
-# Maintained By: dan@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 #
 # See https://developers.google.com/appengine/docs/python/config/appconfig
 
 cron:
 - description: gGRC daily notification email digests
-  url: /notify_emaildigest
+  url: /_notifications/send_todays_digest
   schedule: every day 01:00
   timezone: US/Pacific
 
