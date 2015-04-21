@@ -11,26 +11,27 @@
   can.Component.extend({
     tag: "clipboard_link",
     scope: {
-      clipboard_text: null,
+      text: "@",
+      title: "@",
       isActive: false,
-      timeout: 10000
+      timeout: "@"
     },
-    template: ["<a data-clipboard-text=\"{{clipboard_text}}\" {{#isActive}}class=\"active\"{{/isActive}} href=\"#\">",
-               "<i class=\"icon-share\"></i> Get permalink",
+    template: ["<a data-clipboard-text=\"{{text}}\" {{#isActive}}class=\"active\"{{/isActive}} href=\"#\">",
+               "<i class=\"icon-share\"></i> {{title}}",
                "</a>"].join(""),
     events: {
       "a click": function (el, evnt) {
         evnt.preventDefault();
       },
       "inserted": function (el, evnt) {
+        var timeout = this.scope.attr("timeout") || 10000;
         this._clip = new Clipboard(el.find("a"));
-        this.scope.attr("clipboard_text", window.location.href);
 
         this._clip.on("aftercopy", function () {
           this.scope.attr("isActive", true);
           setTimeout(function () {
             this.scope.attr("isActive", false);
-          }.bind(this), this.scope.attr("timeout"));
+          }.bind(this), timeout);
         }.bind(this));
       }
     }
