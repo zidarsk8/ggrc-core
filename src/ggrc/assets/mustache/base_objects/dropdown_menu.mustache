@@ -6,10 +6,10 @@
 }}
 
 {{> /static/mustache/base_objects/edit_object_link.mustache}}
+<li>
+  <clipboard_link title="Get permalink" text="{{get_permalink}}" />
+</li>
 {{#is_info_pin}}
-  <li>
-    <clipboard_link title="Get permalink" text="{{get_permalink}}" />
-  </li>
   {{^options.is_in_selector}}
     {{> /static/mustache/base_objects/unmap.mustache}}
   {{/options}}

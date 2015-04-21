@@ -38,6 +38,9 @@
                 </a>
               </li>
             {{/is_allowed}}
+            <li>
+              <clipboard_link title="Get permalink" text="{{get_permalink}}" />
+            </li>
             {{#if object.viewLink}}
               {{#is_allowed "view_object_page" object}}
                 <li>
