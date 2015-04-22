@@ -6,14 +6,19 @@
 from ggrc import db
 from ggrc_workflows import start_recurring_cycles
 from ggrc import notification
+from ggrc.login import login_required
 from ggrc.notification import email
 from jinja2 import Environment, PackageLoader
 from datetime import date, datetime
+from ggrc.rbac import permissions
+from werkzeug.exceptions import Forbidden
+
 
 env = Environment(loader=PackageLoader('ggrc_workflows', 'templates'))
 
 # TODO: move these views to ggrc_views and all the functions to notifications
 # module.
+
 
 def do_start_recurring_cycles():
   start_recurring_cycles()
@@ -21,20 +26,24 @@ def do_start_recurring_cycles():
 
 
 def show_pending_notifications():
+  if not permissions.is_admin():
+    raise Forbidden()
   _, notif_data = notification.get_pending_notifications()
   pending = env.get_template("notifications/view_pending_digest.html")
   return pending.render(data=sorted(notif_data.iteritems()))
 
 
 def show_todays_digest_notifications():
+  if not permissions.is_admin():
+    raise Forbidden()
   _, notif_data = notification.get_todays_notifications()
   todays = env.get_template("notifications/view_todays_digest.html")
   return todays.render(data=notif_data)
 
 
 def set_notification_sent_time(notifications):
-  for notification in notifications:
-    notification.sent_at = datetime.now()
+  for notif in notifications:
+    notif.sent_at = datetime.now()
   db.session.commit()
 
 
@@ -72,15 +81,15 @@ def init_extra_views(app):
 
   app.add_url_rule(
       "/_notifications/show_pending", "show_pending_notifications",
-      view_func=show_pending_notifications)
+      view_func=login_required(show_pending_notifications))
 
   app.add_url_rule(
       "/_notifications/show_todays_digest", "show_todays_digest_notifications",
-      view_func=show_todays_digest_notifications)
+      view_func=login_required(show_todays_digest_notifications))
 
   app.add_url_rule(
       "/_notifications/send_pending", "send_pending_notifications",
-      view_func=send_pending_notifications)
+      view_func=login_required(send_pending_notifications))
 
   app.add_url_rule(
       "/_notifications/send_todays_digest", "send_todays_digest_notifications",
