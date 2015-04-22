@@ -17,6 +17,7 @@ exposed functions
     handle_workflow_modify,
     handle_cycle_task_group_object_task_put,
     handle_cycle_created,
+    handle_cycle_task_status_change,
 """
 
 
@@ -64,8 +65,7 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
       handle_task_group_task(task_group_task, notification_type)
 
 
-def add_new_cycle_task_notifications(obj, src=None, service=None,
-                                     start_notif_type=None):
+def add_new_cycle_task_notifications(obj, start_notif_type=None):
   start_notification = Notification(
       object_id=obj.id,
       object_type=get_object_type(obj),
@@ -94,8 +94,7 @@ def add_new_cycle_task_notifications(obj, src=None, service=None,
   db.session.add(due_today_notification)
 
 
-def add_cycle_task_reassigned_notification(
-        obj, src=None, service=None, start_notif_type=None):
+def add_cycle_task_reassigned_notification(obj):
 
   # check if the current assignee allready got the first notification
   result = db.session.query(Notification)\
@@ -163,14 +162,32 @@ def modify_cycle_task_end_date(obj):
   modify_cycle_task_notification(obj, "cycle_task_due_today")
 
 
-def handle_cycle_task_group_object_task_put(obj, start_notif_type=None):
-  notification = get_notification(obj)
-  if not notification and start_notif_type:
-    add_new_cycle_task_notifications(obj, start_notif_type=start_notif_type)
-  elif inspect(obj).attrs.contact.history.has_changes():
-    add_cycle_task_reassigned_notification(
-        obj, start_notif_type=start_notif_type)
-  elif inspect(obj).attrs.end_date.history.has_changes():
+def check_all_cycle_tasks_finished(cycle):
+  statuses = set([task.status for task in cycle.cycle_task_group_object_tasks])
+  acceptable_statuses = set(['Verified'])
+  return statuses.issubset(acceptable_statuses)
+
+
+def handle_cycle_task_status_change(obj, new_status, old_status):
+  if obj.status == "Declined":
+    notif_type = get_notification_type("cycle_task_declined")
+    add_notif(obj, notif_type)
+
+  elif obj.status == "Verified":
+    for notif in get_notification(obj):
+      db.session.delete(notif)
+
+    cycle = obj.cycle_task_group.cycle
+    if check_all_cycle_tasks_finished(cycle):
+      notif_type = get_notification_type("all_cycle_tasks_completed")
+      add_notif(cycle, notif_type)
+    db.session.flush()
+
+
+def handle_cycle_task_group_object_task_put(obj):
+  if inspect(obj).attrs.contact.history.has_changes():
+    add_cycle_task_reassigned_notification(obj)
+  if inspect(obj).attrs.end_date.history.has_changes():
     modify_cycle_task_end_date(obj)
 
 
@@ -194,15 +211,7 @@ def handle_cycle_created(sender, obj=None, src=None, service=None,
 
   for cycle_task_group in obj.cycle_task_groups:
     for task in cycle_task_group.cycle_task_group_tasks:
-      handle_cycle_task_group_object_task_put(task, notification_type)
-
-
-def handle_task_group_object_task_put(obj, start_notif_type=None):
-  workflow = obj.task_group.workflow
-  if workflow.state != "Active":
-    return
-  notification = get_notification(obj)
-  return notification
+      add_new_cycle_task_notifications(task, notification_type)
 
 
 def get_notification(obj):
@@ -211,10 +220,7 @@ def get_notification(obj):
       and_(Notification.object_id == obj.id,
            ObjectType.name == obj.__class__.__name__,
            Notification.sent_at == None))  # noqa
-  if result.count() == 1:
-    return result.one()
-  else:
-    return result.all()
+  return result.all()
 
 
 def get_object_type(obj):
@@ -225,3 +231,31 @@ def get_object_type(obj):
 def get_notification_type(name):
   return db.session.query(NotificationType).filter(
       NotificationType.name == name).one()
+
+
+def add_notif(obj, notif_type, send_on=None):
+  if not send_on:
+    send_on = date.today()
+  notif = Notification(
+      object_id=obj.id,
+      object_type=get_object_type(obj),
+      notification_type=notif_type,
+      send_on=send_on,
+  )
+  db.session.add(notif)
+
+
+def is_instant(workflow, person):
+  def is_enabled(notif_type):
+    return NotificationConfig.query.filter(
+        and_(NotificationConfig.person_id == person.id,
+             NotificationConfig.enable_flag == True,  # noqa
+             NotificationConfig.notif_type == notif_type)).count() > 0
+
+  if workflow.notify_on_change and is_enabled("Email_Now"):
+    return "instant"
+
+  if is_enabled("Email_Digest"):
+    return "digest"
+
+  return None

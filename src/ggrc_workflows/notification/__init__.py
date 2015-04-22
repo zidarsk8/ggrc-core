@@ -8,6 +8,7 @@ from ggrc.services.common import Resource
 from ggrc_workflows.models import (
     Workflow, Cycle, CycleTaskGroupObjectTask
 )
+from ggrc_workflows.services.common import Signals
 
 from .data_handler import (
     get_cycle_data,
@@ -20,6 +21,7 @@ from .notification_handler import (
     handle_workflow_modify,
     handle_cycle_task_group_object_task_put,
     handle_cycle_created,
+    handle_cycle_task_status_change,
 )
 
 
@@ -48,6 +50,11 @@ def register_listeners():
   @Resource.model_posted.connect_via(Cycle)
   def cycle_post_listener(sender, obj=None, src=None, service=None):
     handle_cycle_created(sender, obj, src, service, True)
+
+  @Signals.status_change.connect_via(CycleTaskGroupObjectTask)
+  def cycle_task_status_change_listener(
+          sender, obj=None, new_status=None, old_status=None):
+    handle_cycle_task_status_change(obj, new_status, old_status)
 
 """
 All notifications handle the following structure:

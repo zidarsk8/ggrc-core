@@ -80,33 +80,60 @@ def get_cycle_task_due(notification):
   }
 
 
-def get_cycle_data(notification):
-  cycle = get_object(Cycle, notification.object_id)
+def get_all_cycle_tasks_completed_data(notification, cycle):
+  workflow_owner = get_person_dict(get_workflow_owner(cycle.context_id))
+  return {
+      workflow_owner['email']: {
+          "user": workflow_owner,
+          "all_tasks_completed": {
+              cycle.id: get_cycle_dict(cycle)
+          }
+      }
+  }
+
+
+def get_cycle_created_data(notification, cycle):
+
   manual = notification.notification_type.name == "manual_cycle_created"
   result = {}
-
-  workflow_owner = get_person_dict(get_workflow_owner(cycle.context_id))
 
   for person in cycle.workflow.people:
     result[person.email] = {
         "user": get_person_dict(person),
         "cycle_started": {
-            cycle.id: {
-                "manually": manual,
-                "custom_message": cycle.workflow.notify_custom_message,
-                "cycle_title": cycle.title,
-                "workflow_owner": workflow_owner,
-            }
+            cycle.id: get_cycle_dict(cycle, manual)
         }
     }
   return result
+
+
+def get_cycle_data(notification):
+  cycle = get_object(Cycle, notification.object_id)
+  notification_name = notification.notification_type.name
+  if notification_name in ["manual_cycle_created", "cycle_created"]:
+    return get_cycle_created_data(notification, cycle)
+  elif notification_name == "all_cycle_tasks_completed":
+    return get_all_cycle_tasks_completed_data(notification, cycle)
+
+  return {}
 
 
 def get_cycle_task_data(notification):
   notification_name = notification.notification_type.name
   if notification_name in ["manual_cycle_created", "cycle_created"]:
     return get_cycle_created_task_data(notification)
-  return get_cycle_task_due(notification)
+  elif notification_name == "cycle_task_declined":
+    return {}
+  elif notification_name in ["cycle_task_due_in",
+                             "one_time_cycle_task_due_in",
+                             "weekly_cycle_task_due_in",
+                             "monthly_cycle_task_due_in",
+                             "quarterly_cycle_task_due_in",
+                             "annually_cycle_task_due_in",
+                             "cycle_task_due_today"]:
+    return get_cycle_task_due(notification)
+
+  return {}
 
 
 def get_task_group_task_data(notification):
@@ -189,6 +216,14 @@ def get_object(obj_class, obj_id):
   return db.session.query(obj_class).filter(obj_class.id == obj_id).one()
 
 
+def get_fuzzy_date(end_date):
+  delta = date.today() - end_date
+  if delta.days == 0:
+    return "today"
+  # TODO: use format_timedelta from babel package.
+  return "in {} days".format(delta.days)
+
+
 def get_workflow_owner(context_id):
   return db.session.query(UserRole).join(Role).filter(
       and_(UserRole.context_id == context_id,
@@ -209,14 +244,6 @@ def get_cycle_task_dict(cycle_task):
   }
 
 
-def get_fuzzy_date(end_date):
-  delta = date.today() - end_date
-  if delta.days == 0:
-    return "today"
-  # TODO: use format_timedelta from babel package.
-  return "in {} days".format(delta.days)
-
-
 def get_person_dict(person):
   if person:
     return {
@@ -226,3 +253,13 @@ def get_person_dict(person):
     }
 
   return {"email": "", "name": "", "id": -1}
+
+
+def get_cycle_dict(cycle, manual=False):
+  workflow_owner = get_person_dict(get_workflow_owner(cycle.context_id))
+  return {
+      "manually": manual,
+      "custom_message": cycle.workflow.notify_custom_message,
+      "cycle_title": cycle.title,
+      "workflow_owner": workflow_owner,
+  }
