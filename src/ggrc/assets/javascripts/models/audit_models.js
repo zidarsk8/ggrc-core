@@ -291,7 +291,6 @@ can.Model.Cacheable("CMS.Models.Request", {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
     , header_view : GGRC.mustache_path + "/requests/tree_header.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
-    , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
     , draw_children : true
     , child_options : [{
       model : "Response"
@@ -523,7 +522,6 @@ can.Model.Cacheable("CMS.Models.Response", {
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/responses/tree.mustache"
     , footer_view : GGRC.mustache_path + "/responses/tree_footer.mustache"
-    , add_item_view : GGRC.mustache_path + "/responses/tree_add_item.mustache"
     , draw_children : true
     , child_options : [{
       //0: mapped objects
@@ -531,7 +529,6 @@ can.Model.Cacheable("CMS.Models.Response", {
       , model : can.Model.Cacheable
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , allow_mapping : false
       , allow_creating: false
       , exclude_option_types : function() {
@@ -554,7 +551,6 @@ can.Model.Cacheable("CMS.Models.Response", {
       , mapping : "people"
       , show_view : GGRC.mustache_path + "/people/tree.mustache"
       , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
-      , add_item_view : GGRC.mustache_path + "/people/tree_add_item.mustache"
       , allow_mapping: false
       , allow_creating: false
     }, {
@@ -563,7 +559,6 @@ can.Model.Cacheable("CMS.Models.Response", {
       , mapping : "meetings"
       , show_view : GGRC.mustache_path + "/meetings/tree.mustache"
       , footer_view : GGRC.mustache_path + "/meetings/tree_footer.mustache"
-      , add_item_view : GGRC.mustache_path + "/meeting/tree_add_item.mustache"
       , allow_mapping: false
       , allow_creating: false
     }]
