@@ -25,8 +25,14 @@
           {{#has_count}}{{count}}{{#spinner}}...{{/spinner}}{{/has_count}}
         {{/if}}
         {{^count}}{{#has_count}}
-          <span class="closed"></span>
+          {{^instance.constructor.obj_nav_options.show_all_tabs}}
+            <span class="closed"></span>
+          {{/instance.constructor.obj_nav_options.show_all_tabs}}
         {{/has_count}}{{/count}}
+
+        <!-- {{^count}}{{#has_count}} -->
+        <!--   <span class="closed"></span> -->
+        <!-- {{/has_count}}{{/count}} -->
       </div>
     </a>
     {{/if_helpers}}
