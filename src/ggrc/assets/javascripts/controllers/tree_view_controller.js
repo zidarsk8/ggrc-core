@@ -1253,3 +1253,50 @@ can.Control("CMS.Controllers.TreeViewNode", {
                             this.hash_fragment()].join('');
   }
 });
+
+(function (can, $) {
+    can.Component.extend ({
+    tag: 'tree-header-selector',
+    // <content> in a component template will be replaced with whatever is contained
+    //  within the component tag.  Since the views for the original uses of these components
+    //  were already created with content, we just used <content> instead of making
+    //  new view template files.
+    template: '<content/>',
+    scope: {
+      instance: null
+    },
+    events: {
+      init: function () {
+        this.scope.attr('controller', this);
+      },
+
+      'input.attr-checkbox click' : function (el, ev) {
+        var MAX_ATTR = 5,
+            $check = this.element.find('.attr-checkbox'),
+            $mandatory = $check.filter('.mandatory'),
+            $selected = $check.filter(':checked'),
+            $not_selected = $check.not(':checked');
+
+        if ($selected.length === MAX_ATTR) {
+          $not_selected.prop('disabled', true).
+            closest('li').addClass('disabled');
+        } else {
+          $check.prop('disabled', false)
+            .closest('li').removeClass('disabled');
+          //Make sure mandatory items are always disabled
+          $mandatory.prop('disabled', true)
+            .closest('li').addClass('disabled');
+        }
+        ev.stopPropagation();
+      },
+
+      '.dropdown-menu-form click' : function (el, ev) {
+        ev.stopPropagation();
+      },
+
+      '.set-tree-attrs,.close-dropdown click' : function(el, ev) {
+        this.element.find('.dropdown-menu').closest('li').removeClass('open');
+      }
+    }
+  });
+})(this.can, this.can.$);
