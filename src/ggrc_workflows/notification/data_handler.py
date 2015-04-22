@@ -1,6 +1,6 @@
 
 from datetime import date
-from babel.dates import format_timedelta
+# from babel.dates import format_timedelta
 
 from sqlalchemy import and_
 
@@ -208,7 +208,8 @@ def get_fuzzy_date(end_date):
   delta = date.today() - end_date
   if delta.days == 0:
     return "today"
-  return "in {}".format(format_timedelta(delta, locale='en_US'))
+  # TODO: use format_timedelta from babel package.
+  return "in {} days".format(delta.days)
 
 
 def get_person_dict(person):
