@@ -73,7 +73,8 @@
   .menu {
     @include clearfix();
     @include reset-list();
-    float: right;
+    position: absolute;
+    right: 0px;
     margin-right: 40px;
     li {
       float:left;
