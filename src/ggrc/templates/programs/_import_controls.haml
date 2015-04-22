@@ -30,15 +30,15 @@
           .download-template
             -if import_kind == "Controls"
               %a.section-import{"href": 'import_controls_template'}
-                %i.grcicon-imp-exp
+                %i.grcicon-download
                 Download Import Controls template
             -elif import_kind == "Clauses"
               %a.section-import{"href": 'import_clauses_template'}
-                %i.grcicon-imp-exp
+                %i.grcicon-download
                 Download Import Clauses template
             -else
               %a.section-import{"href": 'import_sections_template'}
-                %i.grcicon-imp-exp
+                %i.grcicon-download
                 Download Import Sections template
       .row-fluid.wrap-row
         .span12

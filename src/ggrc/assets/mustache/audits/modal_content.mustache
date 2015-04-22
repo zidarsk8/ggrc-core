@@ -68,22 +68,6 @@
       </div>
     </div>
 
-    {{#new_object_form}}
-    <div class="row-fluid">
-      <div class="span12 hidable">
-        <label class="spacing">
-          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-          <input data-id="auto_generate_chkbx" type="checkbox" name="auto_generate" value="checked" tabindex="5">
-          Auto-Generate Requests based on Controls
-          <span class="small">
-            <a href="javascript://">({{#using program=instance.program}}{{#with_mapping 'controls' program}}{{controls.length}}{{/with_mapping}}{{/using}} Controls Found)
-            </a>
-          </span>
-        </label>
-      </div>
-    </div>
-    {{/new_object_form}}
-
     <div class="row-fluid">
       <div data-id="planned_start_date_hidden" class="span3 hidable">
         <label>

@@ -2,9 +2,17 @@
     data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}>
   {{#if_equals instance.status 'Final'}}
     <i class="grcicon-review-color"></i>
-    <span class="object-approved">Reviewed and approved</span>
+    <span class="object-approved">
+      {{#last_approved instance}}
+        Reviewed on {{instance.updated_at}} <br />
+        and approved by
+        {{#using person=instance.modified_by}}
+          {{{> '/static/mustache/people/popover.mustache'}}}
+        {{/using}}
+      </span>
+      {{/last_approved}}
   {{else}}
-    {{#with_mapping 'current_object_review_tasks' instance}}
+    {{#with_mapping 'approval_tasks' instance}}
       {{#with_review_task}}
         {{#with_is_reviewer review_task}}
           {{#if_helpers '\

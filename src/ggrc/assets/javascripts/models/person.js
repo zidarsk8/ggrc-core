@@ -43,7 +43,7 @@ can.Model.Cacheable("CMS.Models.Person", {
     , language : "CMS.Models.Option.stub"
     , user_roles : "CMS.Models.UserRole.stubs"
     , name : "trimmed"
-    , email : "trimmed"
+    , email : "trimmedLower"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
@@ -53,19 +53,25 @@ can.Model.Cacheable("CMS.Models.Person", {
     , owners : null
   }
   , convert : {
-    "trimmed" : function(val) {
+    trimmed : function (val) {
       return (val && val.trim) ? val.trim() : val;
+    },
+    trimmedLower : function (val) {
+      return ((val && val.trim) ? val.trim() : val).toLowerCase();
     }
   }
   , serialize : {
-    "trimmed" : function(val) {
+    trimmed : function (val) {
       return (val && val.trim) ? val.trim() : val;
+    },
+    trimmedLower : function (val) {
+      return ((val && val.trim) ? val.trim() : val).toLowerCase();
     }
   }
   , findInCacheByEmail : function(email) {
     var result = null, that = this;
     can.each(Object.keys(this.cache || {}), function(k) {
-      if(that.cache[k].email === email) {
+      if (that.cache[k].email === email) {
         result = that.cache[k];
         return false;
       }
@@ -76,15 +82,17 @@ can.Model.Cacheable("CMS.Models.Person", {
       show_view: GGRC.mustache_path + "/people/tree.mustache"
     , header_view : GGRC.mustache_path + "/people/tree_header.mustache"
     , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
+    , add_item_view : GGRC.mustache_path + "/people/tree_add_item.mustache"
     }
   , list_view_options: {
       find_params: { "__sort": "name,email" }
     }
   , init : function() {
+    var rEmail = /^[-!#$%&\'*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$/i;
     this._super.apply(this, arguments);
-    //H/T to Sebastian Porto for the email validation regex
-    this.validateNonBlank("email");
-    this.validateFormatOf("email", /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])$/);
+
+    this.validateNonBlank('email');
+    this.validateFormatOf('email', rEmail);
   }
 }, {
   display_name : function() {

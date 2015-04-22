@@ -15,7 +15,6 @@
             <div class="item-data">
               <div class="row-fluid">
                 <div class="span12">
-
                   <ul class="tree-action-list">
                     {{#scope}}
                       <li>
@@ -28,23 +27,12 @@
                         </div>
                       </li>
                     {{/scope}}
-                    {{^if_match scope 'System|Admin|Workflow'}}
-                      <li>
-                        <div class="counter">
-                          <a data-object-plural="roles" data-object-singular="Role" data-object-id="{{id}}" data-modal-class="modal-wide" data-placement="left" data-toggle="role-modal" href="javascript://" rel="tooltip" title="Edit">
-                            <i class="grcicon-edit"></i>
-                          </a>
-                        </div>
-                      </li>
-                    {{/if_match}}
                   </ul>
-
                   <div class="item-data">
                     <div class="tree-title-area">
                       {{name}}
                     </div>
                   </div>
-
                 </div>
               </div>
             </div><!-- item-data end -->
@@ -53,15 +41,4 @@
       </div><!-- item-main end -->
     </li>
   {{/list}}
-  {{#if false}}
-  <li class="tree-item tree-item-add">
-    <div class="row-fluid">
-      <div class="span12">
-        <a class="btn-add" data-object-plural="roles" data-modal-class="modal-wide" href="javascript://" data-object-singular="Role" data-toggle="role-modal" data-modal-reset="reset">
-          Create Role
-        </a>
-      </div>
-    </div>
-  </li>
-  {{/if}}
 </ul>
