@@ -1,16 +1,8 @@
-{{!
-    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: ivan@reciprocitylabs.com
-    Maintained By: ivan@reciprocitylabs.com
-}}
-
-
 {{#is_allowed 'create' 'TaskGroupObject' context=parent_instance.context}}
 {{#if_task_group_assignee_privileges parent_instance}}
 {{#using workflow=parent_instance.workflow}}
 {{^if_equals workflow.status 'Inactive'}}
-<div class="tree-item-add">
+<li class="tree-item-add no-left-space">
   <a
     class="btn btn-small btn-draft"
     rel="tooltip"
@@ -26,7 +18,7 @@
     data-exclude-option-types="">
     <i class="grcicon-add-black"></i>
   </a>
-</div>
+</li>
 {{/if_equals}}
 {{/using}}
 {{/if}}
