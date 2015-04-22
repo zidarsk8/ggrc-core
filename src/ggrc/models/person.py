@@ -18,7 +18,6 @@ import re
 class Person(CustomAttributable, HasOwnContext, Base, db.Model):
 
   __tablename__ = 'people'
-  EMAIL_RE_STRING = "\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])\Z"
 
   email = deferred(db.Column(db.String), 'Person')
   name = deferred(db.Column(db.String), 'Person')
@@ -91,10 +90,16 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
 
   @validates('email')
   def validate_email(self, key, email):
-    if re.match(Person.EMAIL_RE_STRING, email, re.IGNORECASE) is None:
+    if not Person.is_valid_email(email):
       message = "Must provide a valid email address"
       raise ValidationError(message)
     return email
+
+  @staticmethod
+  def is_valid_email(val):
+    # Borrowed from Django
+    email_re = re.compile('^[-!#$%&\'*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$', re.IGNORECASE)  # literal form, ipv4 address (SMTP 4.1.3)
+    return email_re.match(val) if val else False
 
   @classmethod
   def eager_query(cls):

@@ -7,11 +7,10 @@
 from ggrc import db
 from ggrc.models.mixins import (
     Base, Titled, Described, Timeboxed, Stateful, WithContact
-    )
+)
 
-
-class CycleTaskGroupObject(
-    WithContact, Stateful, Timeboxed, Described, Titled, Base, db.Model):
+class CycleTaskGroupObject(WithContact, Stateful,
+                           Timeboxed, Described, Titled, Base, db.Model):
   __tablename__ = 'cycle_task_group_objects'
   _title_uniqueness = False
 
@@ -24,14 +23,14 @@ class CycleTaskGroupObject(
   task_group_object_id = db.Column(
       db.Integer, db.ForeignKey('task_group_objects.id'), nullable=False)
   task_group_object = db.relationship(
-    "TaskGroupObject",
-    foreign_keys="CycleTaskGroupObject.task_group_object_id"
-    )
+      "TaskGroupObject",
+      foreign_keys="CycleTaskGroupObject.task_group_object_id"
+  )
   cycle_task_group_object_tasks = db.relationship(
       'CycleTaskGroupObjectTask',
       backref='cycle_task_group_object',
       cascade='all, delete-orphan'
-      )
+  )
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
   next_due_date = db.Column(db.Date)
@@ -43,7 +42,7 @@ class CycleTaskGroupObject(
       'cycle_task_group_object_tasks',
       'object',
       'next_due_date',
-      ]
+  ]
 
   @property
   def object_attr(self):
@@ -60,12 +59,6 @@ class CycleTaskGroupObject(
         else None
     return setattr(self, self.object_attr, value)
 
-  @staticmethod
-  def _extra_table_args(cls):
-    return (
-        #db.UniqueConstraint('cycle_task_group_id', 'object_id', 'object_type'),
-        )
-
   def _display_name(self):
     return \
         self.object.display_name + '<->' + self.cycle_task_group.display_name
@@ -76,19 +69,19 @@ class CycleTaskGroupable(object):
   def late_init_cycle_task_groupable(cls):
     def make_cycle_task_group_objects(cls):
       joinstr = 'and_(foreign(CycleTaskGroupObject.object_id) == {type}.id, '\
-                     'foreign(CycleTaskGroupObject.object_type) == "{type}")'
+                'foreign(CycleTaskGroupObject.object_type) == "{type}")'
       joinstr = joinstr.format(type=cls.__name__)
       return db.relationship(
           'CycleTaskGroupObject',
           primaryjoin=joinstr,
           backref='{0}_object'.format(cls.__name__),
-          #post_update=True
-          )
+      )
+
     cls.cycle_task_group_objects = make_cycle_task_group_objects(cls)
 
   _publish_attrs = [
-      #'cycle_task_group_objects',
-      ]
+      'cycle_task_group_objects',
+  ]
 
   @classmethod
   def eager_query(cls):
@@ -97,4 +90,4 @@ class CycleTaskGroupable(object):
     query = super(CycleTaskGroupable, cls).eager_query()
     return query.options(
         orm.subqueryload('cycle_task_group_objects'),
-        )
+    )

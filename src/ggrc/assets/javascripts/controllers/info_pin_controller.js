@@ -11,11 +11,11 @@ can.Control("CMS.Controllers.InfoPin", {
     view: GGRC.mustache_path + "/base_objects/info.mustache"
   }
 }, {
-  init: function(el, options) {
+  init: function (el, options) {
     var instance = GGRC.page_instance();
     this.element.height(0);
   },
-  findView: function(instance) {
+  findView: function (instance) {
     var view = instance.class.table_plural + "/info";
 
     if (instance instanceof CMS.Models.Person) {
@@ -29,39 +29,44 @@ can.Control("CMS.Controllers.InfoPin", {
     }
     return view;
   },
-  findOptions: function(el) {
-    var tree_node = el.closest('.cms_controllers_tree_view_node').control();
+  findOptions: function (el) {
+    var tree_node = el.closest(".cms_controllers_tree_view_node").control();
     return tree_node.options;
   },
   loadChildTrees: function() {
-    var child_tree_dfds = []
-      , that = this
-      ;
+    var child_tree_dfds = [],
+        that = this;
 
-    this.element.find('.' + CMS.Controllers.TreeView._fullName).each(function(_, el) {
-      var $el = $(el)
-        , child_tree_control
-        ;
+    this.element.find("." + CMS.Controllers.TreeView._fullName).each(function (_, el) {
+      var $el = $(el),
+          child_tree_control;
 
       //  Ensure this targets only direct child trees, not sub-tree trees
-      if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
+      if ($el.closest("." + that.constructor._fullName).is(that.element)) {
         child_tree_control = $el.control();
         if (child_tree_control)
           child_tree_dfds.push(child_tree_control.display());
       }
     });
   },
-  unsetInstance: function() {
+  unsetInstance: function () {
     // Stop the animation and clear the queue:
     this.element.stop(true);
-    this.element.html('');
-    this.element.height(0);
-    $('.cms_controllers_tree_view_node').removeClass('active');
-    $(window).trigger('resize');
+    this.element.animate({
+        height: 0
+      }, {
+        duation: 800,
+        complete: function () {
+          this.element.html("");
+          $(".cms_controllers_tree_view_node").removeClass("active");
+          $(window).trigger("resize");
+        }.bind(this)
+      });
   },
-  setInstance: function(instance, el) {
+  setInstance: function (instance, el) {
     var options = this.findOptions(el),
-        view = this.findView(instance);
+        view = this.findView(instance),
+        panelHeight = $(window).height() / 3;
 
     this.element.html(can.view(view, {
       instance: instance,
@@ -76,72 +81,78 @@ can.Control("CMS.Controllers.InfoPin", {
 
     // Make sure pin is visible
     if (!this.element.height()) {
-      this.element.animate({ height: $(window).height() / 3 }, {
+      this.element.animate({
+        height: panelHeight
+      }, {
         duration: 800,
-        easing: 'easeOutExpo',
+        easing: "easeOutExpo",
         complete: function () {
-          $(window).trigger('resize');
           this.ensureElementVisible(el);
         }.bind(this)
       });
-    }else{
+    } else {
       this.ensureElementVisible(el);
     }
   },
   ensureElementVisible: function (el) {
-      var $objectArea = $(".object-area");
+    $(window).trigger("resize");
+    var $objectArea = $(".object-area"),
+        $header = $(".tree-header:visible"),
+        $filter = $(".filter-holder:visible"),
+        elTop = el.offset().top,
+        elBottom = elTop + el.height(),
+        headerTop = $header.offset().top,
+        headerBottom = headerTop + $header.height(),
+        infoTop = this.element.offset().top;
 
-      var elTop = el.offset().top,
-          elBottom = elTop + el.height();
-
-      var $header = $(".tree-header:visible"),
-          $filter = $(".filter-holder:visible"),
-          headerTop = $header.offset().top,
-          headerBottom = headerTop + $header.height(),
-          infoTop = this.element.offset().top;
-
-      if (elTop < headerBottom || elBottom > infoTop) {
+    if (elTop < headerBottom || elBottom > infoTop) {
+      el[0].scrollIntoView(false);
+      if (elTop < headerBottom) {
+        el[0].scrollIntoView(true);
+        $objectArea.scrollTop($objectArea.scrollTop() - $header.height() - $filter.height());
+      } else {
         el[0].scrollIntoView(false);
-        if (elTop < headerBottom) {
-          el[0].scrollIntoView(true);
-          $objectArea.scrollTop($objectArea.scrollTop()
-                                -$header.height()
-                                -$filter.height());
-        }else{
-          el[0].scrollIntoView(false);
-        }
       }
+    }
   },
-  '.pin-action a click': function(el) {
-    var options = {
-        duration: 800,
-        easing: 'easeOutExpo'
-      },
-      $info = this.element.find('.info'),
-      win_height = $(window).height(),
-      target_height;
+  ".pin-action a click": function (el) {
+    var $win = $(window),
+        win_height = $win.height(),
+        options = {
+          duration: 800,
+          easing: "easeOutExpo"
+        },
+        target_height =  {
+          min: 75,
+          normal: (win_height / 3),
+          max: (win_height * 3 / 4)
+        },
+        $info = this.element.find(".info"),
+        type = el.data("size"),
+        size = target_height[type];
 
-    this.element.find('.pin-action i').css({'opacity': 0.25});
-
-    if (el.hasClass('min')) {
-      target_height = 75;
-    } else if (el.hasClass('max')) {
-      target_height = win_height * 3 / 4;
-    } else {
-      target_height = win_height / 3;
+    if (type === "deselect") {
+      // TODO: Make some direct communication between the components
+      //       and make sure only one widget has "widget-active" class
+      el.find("[rel=tooltip]").data("tooltip").hide();
+      $(".widget-area .widget:visible").find(".cms_controllers_tree_view").control().deselect();
+      this.unsetInstance();
+      return;
     }
+    this.element.find(".pin-action i").css({"opacity": 0.25});
 
-    if (target_height < $info.height()) {
+    if (size < $info.height()) {
       options.start = function () {
-        $(window).trigger("resize", target_height);
+        $win.trigger("resize", size);
       };
-    }else{
+    } else {
       options.complete = function () {
-        $(window).trigger("resize");
+        $win.trigger("resize");
       };
     }
 
-    this.element.animate({height: target_height}, options);
-    el.find('i').css({'opacity':1});
+    this.element.animate({height: size}, options);
+    el.find("i").css({"opacity": 1});
   }
 });
+

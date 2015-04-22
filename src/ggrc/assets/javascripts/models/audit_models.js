@@ -512,6 +512,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
     , object_controls : "CMS.Models.ObjectControl.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , controls : "CMS.Models.Control.stubs"
     , contact : "CMS.Models.Person.stub"
   }
@@ -580,13 +581,15 @@ can.Model.Cacheable("CMS.Models.Response", {
   }
   , form_preload : function(new_object_form) {
     if(new_object_form && !this.contact) {
-        if (!this.request) {
-            this.bind("request", function (ev, request) {
-                this.attr('contact', request.reify().assignee);
-            });
-        }else{
-            this.attr('contact', this.request.reify().assignee);
-        };
+      if (!this.request) {
+        this.bind("request", function (ev, request) {
+          if (request && request.reify) {
+            this.attr('contact', request.reify().assignee);
+          }
+        });
+      } else {
+        this.attr('contact', this.request.reify().assignee);
+      }
     }
   }
 
@@ -744,47 +747,6 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
   object_model: can.compute(function() {
     return CMS.Models[this.attr("object_type")];
   }),
-  after_save: function() {
-    // TODO: I will make this a feature in cacheable when I'll be implementing
-    //       Issue objects
-    var audit = this.audit.reify(),
-        binding = audit.get_binding('related_control_assessments');
-
-    binding.list.push(
-      new GGRC.ListLoaders.MappingResult(this, binding)
-    );
-  }
 });
-
-can.Model.Cacheable("CMS.Models.Issue", {
-  root_object : "issue",
-  root_collection : "issues",
-  findOne : "GET /api/issues/{id}",
-  update : "PUT /api/issues/{id}",
-  destroy : "DELETE /api/issues/{id}",
-  create : "POST /api/issues",
-  mixins : ["ownable", "contactable"],
-  is_custom_attributable: true,
-  attributes : {
-    context : "CMS.Models.Context.stub",
-    modified_by : "CMS.Models.Person.stub",
-    custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
-    start_date: "date",
-    end_date: "date"
-  },
-  init : function() {
-    this._super && this._super.apply(this, arguments);
-    this.validatePresenceOf("control");
-    this.validatePresenceOf("audit");
-    this.validatePresenceOf("program");
-    this.validatePresenceOf("control_assessment");
-    this.validateNonBlank("title");
-  }
-}, {
-  object_model: can.compute(function() {
-    return CMS.Models[this.attr("object_type")];
-  }),
-});
-
 
 })(this.can);

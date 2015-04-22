@@ -10,6 +10,10 @@ version: 1
 runtime: python27
 api_version: 1
 threadsafe: true
+instance_class: {INSTANCE_CLASS}
+basic_scaling:
+  max_instances: {MAX_INSTANCES}
+  idle_timeout: 10m
 
 handlers:
   - url: /login
@@ -84,4 +88,3 @@ env_variables:
   GGRC_BOOTSTRAP_ADMIN_USERS: "{BOOTSTRAP_ADMIN_USERS}"
   GGRC_RISK_ASSESSMENT_URL: "{RISK_ASSESSMENT_URL}"
   APPENGINE_EMAIL: "{APPENGINE_EMAIL}"
-

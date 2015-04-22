@@ -10,7 +10,7 @@
     {{#is_info_pin}}
     <div class="clearfix">
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content">
+      <div class="tier-content pin">
         {{#instance}}
           <div class="row-fluid wrap-row">
             <div class="span6">
@@ -29,7 +29,7 @@
     </div>
     {{/is_info_pin}}
 
-    <div class="details-wrap">
+    <div class="details-wrap no-top">
       {{#if_can_edit_request instance}}
       <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
       <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">

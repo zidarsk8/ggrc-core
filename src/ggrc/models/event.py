@@ -9,7 +9,7 @@ from .mixins import Base, created_at_args
 class Event(Base, db.Model):
   __tablename__ = 'events'
 
-  action = db.Column(db.Enum(u'POST', u'PUT', u'DELETE', u'IMPORT'), nullable = False)
+  action = db.Column(db.Enum(u'POST', u'PUT', u'DELETE', u'IMPORT', u'GET'), nullable = False)
   resource_id = db.Column(db.Integer)
   resource_type = db.Column(db.String)
 

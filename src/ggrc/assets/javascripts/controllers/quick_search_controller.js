@@ -401,9 +401,9 @@ can.Control("CMS.Controllers.LHN", {
       window.requestAnimationFrame(this.initial_lhn_render.bind(this));
       return;
     }
-      
+
     this.resize_lhn();
-      
+
     if (this.options.display_prefs.getLHNState().is_pinned) {
       this.open_lhn();
     }else{
@@ -699,6 +699,12 @@ can.Control("CMS.Controllers.LHN_Search", {
       this.init_list_views();
 
       can.Model.Cacheable.bind("created", function(ev, instance) {
+
+        if (instance instanceof can.Model.Join) {
+          // Don't refresh LHN counts when joins are created
+          return;
+        }
+
         var visible_model_names =
               can.map(self.get_visible_lists(), self.proxy("get_list_model"))
           , model_name = instance.constructor.shortName
