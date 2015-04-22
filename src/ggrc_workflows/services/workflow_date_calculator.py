@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: laran@reciprocitylabs.com
-# Maintained By: laran@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
 from datetime import date, timedelta
 from monthdelta import monthdelta

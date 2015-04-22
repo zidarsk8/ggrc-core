@@ -1,3 +1,7 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
 from datetime import date
 # from babel.dates import format_timedelta
@@ -18,6 +22,7 @@ exposed functions
     get_task_group_task_data,
     get_cycle_task_data,
 """
+
 
 def get_cycle_created_task_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
@@ -63,8 +68,8 @@ def get_cycle_created_task_data(notification):
 
 def get_cycle_task_due(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
-  notification_name = notification.notification_type.name
-  due = "due_today" if notification_name == "cycle_task_due_today" else "due_in"
+  notif_name = notification.notification_type.name
+  due = "due_today" if notif_name == "cycle_task_due_today" else "due_in"
   return {
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
@@ -73,7 +78,6 @@ def get_cycle_task_due(notification):
           }
       }
   }
-
 
 
 def get_cycle_data(notification):
@@ -203,6 +207,7 @@ def get_cycle_task_dict(cycle_task):
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
       "fuzzy_due_in": get_fuzzy_date(cycle_task.end_date),
   }
+
 
 def get_fuzzy_date(end_date):
   delta = date.today() - end_date

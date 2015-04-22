@@ -1,10 +1,14 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
 
 from sqlalchemy import and_, or_, inspect
 from datetime import timedelta, datetime, date
 
 from ggrc.models import (
-    Notification, NotificationType, ObjectType)
+    Notification, NotificationType, NotificationConfig, ObjectType)
 from ggrc import db
 
 

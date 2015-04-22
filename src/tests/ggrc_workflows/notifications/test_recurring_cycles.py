@@ -85,8 +85,6 @@ class TestRecurringCycleNotifications(TestCase):
       _, notif_data = notification.get_todays_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
-    pass
-
   def create_test_cases(self):
     def person_dict(person_id):
       return {
