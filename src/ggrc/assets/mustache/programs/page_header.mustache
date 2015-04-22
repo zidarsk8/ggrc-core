@@ -49,22 +49,24 @@
   <li class="user dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
       <i class="grcicon-user-black"></i>
-      <span>user@example.com</span>
+      <span>{{current_user.email}}</span>
       <i class="grcicon-carot"></i>
     </a>
     <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
       <li>
         <a href="/dashboard">
           <i class="grcicon-my-work"></i>
-          My Work (Superuser)
+          My Work ({{current_user.system_wide_role}})
         </a>
       </li>
+      {{#current_user_is_admin}}
       <li>
         <a href="/admin#people_list_widget">
           <i class="grcicon-dashboard-black"></i>
           Admin Dashboard
         </a>
       </li>
+      {{/current_user_is_admin}}
       <li class="notify-wrap">
         <span>
           <i class="grcicon-alarm-black"></i>

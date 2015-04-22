@@ -183,6 +183,7 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
         , page_help: function(controller) {
             return controller.options.instance.constructor.table_singular;
           }
+        , current_user: GGRC.current_user
         }, extra_page_options[model_name]));
     } else if (/^\/admin\/?$/.test(window.location.pathname)) {
 
