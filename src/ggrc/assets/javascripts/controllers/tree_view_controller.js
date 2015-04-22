@@ -1277,6 +1277,14 @@ can.Control("CMS.Controllers.TreeViewNode", {
             .closest('li').addClass('disabled');
         }
         ev.stopPropagation();
+      },
+
+      '.dropdown-menu-form click' : function (el, ev) {
+        ev.stopPropagation();
+      },
+
+      '.set-tree-attrs,.close-dropdown click' : function(el, ev) {
+        this.element.find('.dropdown-menu').closest('li').removeClass('open');
       }
     }
   });
