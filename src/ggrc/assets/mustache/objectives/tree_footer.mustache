@@ -4,32 +4,3 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
-
-
-<!-- {{{renderLive '/static/mustache/base_objects/tree_footer_zero.mustache'}}} -->
-
-
-{{#is_allowed_to_map parent_instance model.shortName}}
-{{#if allow_mapping_or_creating}}
-<li class="tree-item tree-item-add tree-footer">
-  <div class="row-fluid">
-    <div class="span12">
-        <a
-          class="section-add btn btn-small btn-draft"
-          href="javascript://"
-          rel="tooltip"
-          data-placement="right"
-          data-toggle="multitype-multiselect-modal-selector"
-          data-join-mapping="{{mapping}}"
-          data-join-option-type="{{model.shortName}}"
-          data-join-object-id="{{parent_instance.id}}"
-          data-join-object-type="{{parent_instance.class.shortName}}"
-          data-exclude-option-types="{{exclude_option_types}}"
-          data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-            <i class="grcicon-add-black"></i>
-        </a>
-    </div>
-  </div>
-</li>
-{{/if}}
-{{/is_allowed_to_map}}

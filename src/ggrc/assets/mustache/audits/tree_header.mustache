@@ -28,7 +28,11 @@
         </li>
 
         {{{> "/static/mustache/base_objects/tree_column_selector.mustache"}}}
-
+        {{#if add_item_view}}
+          <li>
+            {{{renderLive add_item_view}}}
+          </li>
+        {{/if}}
       </ul>
     </div>
   </div>

@@ -9,7 +9,7 @@
   {{#is_info_pin}}
     <div class="clearfix">
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content">
+      <div class="tier-content pin">
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       </div>
     </div>
@@ -29,7 +29,7 @@
               </a>
             </li>
           {{!/is_allowed}}
-        {{/if}}        
+        {{/if}}
       </ul>
     </div>
   {{/using}}

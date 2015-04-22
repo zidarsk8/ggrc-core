@@ -270,7 +270,6 @@
       this.context.attr('selected_option', data);
       this.element.find(".tree-item[data-id=" + data.id + "] input[type=checkbox]").click();
     },
-
     // HELPERS
 
     find_join: function(option_id) {
@@ -738,7 +737,7 @@
           this.set_option_descriptor(this.options.default_option_descriptor);
         }
         this.init_bindings();
-        this.init_view();
+        this._view_dfd = this.init_view();
         this.init_data();
       }
 
@@ -1122,8 +1121,16 @@
 
        if (instance.destination) {
          return instance.destination;
+       }else if (!instance.type) {
+         // this happens when mapping directives to programs, for instance, sometimes
+         if (instance.directive) {
+           return instance.directive;
+         }else{
+           // without a type, there's nothing we can do
+           return null;
+         }
        }else{
-         var types = can.spaceCamelCase(join_instance[0].type).split(" "),
+         var types = can.spaceCamelCase(instance.type).split(" "),
              parent_type = this.options.binding.instance.type,
              mapped_type;
 
@@ -1146,6 +1153,10 @@
              .closest(".cms_controllers_tree_view_node")
              .control(),
          mapped = this._get_mapped(join_instance);
+
+     if (!mapped) {
+       return;
+     }
 
      hash += [tree_controller
               ? tree_controller.hash_fragment()
@@ -1417,7 +1428,10 @@
   }, {
     init: function(){
       GGRC.Controllers.MultitypeModalSelector.prototype.init.apply(this, arguments);
-      this.refresh_option_list();
+      this._load_dfd = this.refresh_option_list();
+      this._view_dfd.then(function(){
+        this.bindXHRToButton(this._load_dfd, this.element.find('.modalSearchButton'));
+      }.bind(this))
     }
 
     , init_spinner: function(){
@@ -2314,7 +2328,17 @@
     });
   });
 
-
-
+  can.Component.extend({
+    tag: "lazy-openclose",
+    scope: {
+      show: false,
+    },
+    content: "<content/>",
+    init: function() {
+      this._control.element.closest('.tree-item').find('.openclose').bind('click', function() {
+        this.scope.attr('show', true);
+      }.bind(this));
+    }
+  });
 
 })(window.can, window.can.$);

@@ -43,6 +43,8 @@ Create or update the deployment settings file (e.g. `deploy_settings_ggrc_prod.s
     RISK_ASSESSMENT_URL='https://ggrc-risk-dev.googleplex.com'
     SECRET_KEY='--CHANGE-TO-SOMETHING-SECRET--'
     APPENGINE_EMAIL='prasannav@google.com'
+    INSTANCE_CLASS='B4'
+    MAX_INSTANCES='4'
 
 The line `SETTINGS_MODULE` specifies what `.py` files from `settings` subdirectories should be included. For example,
 
@@ -65,6 +67,8 @@ Remember to update the required values (the `GAPI_KEY` and `GAPI_CLIENT_ID` will
 | GAPI_CLIENT_SECRET | The “OAuth Client Secret” from Step 3
 | GAPI_ADMIN_GROUP   | The group which is granted permissions to all files and folders in GDrive
 | APPENGINE_EMAIL    | The email address to use as the “From” address in outgoing emails
+| INSTANCE_CLASS     | The instance class that should be used on appengine
+| MAX_INSTANCES      | The maximum number of instances to be used on appengine
 
 There may also be a customized `src/ggrc/settings/<something>.py` file, for example, [`src/ggrc/settings/app_engine_ggrc_test.py`](../src/ggrc/settings/app_engine_ggrc_test.py).  (This file should also not be included in the repository, though examples can be found at [`src/ggrc/settings`](../src/ggrc/settings).) This file can contain additional configuration variables, including:
 

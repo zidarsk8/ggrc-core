@@ -102,6 +102,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
+    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
   , attributes : {}
@@ -139,6 +140,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
+    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
   , attributes : {}
@@ -175,6 +177,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
+    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
   , attributes : {}
@@ -212,6 +215,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
+    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
   , attributes : {

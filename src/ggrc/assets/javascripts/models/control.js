@@ -85,11 +85,13 @@ can.Model.Cacheable("CMS.Models.Control", {
       {attr_title: 'Principal Assessor', attr_name: 'principal_assessor'},
       {attr_title: 'Secondary Assessor', attr_name: 'secondary_assessor'}
     ])
+    , add_item_view : GGRC.mustache_path + "/controls/tree_add_item.mustache"
     , draw_children : true
     , child_options : [{
         model : can.Model.Cacheable
       , mapping : "related_and_able_objects"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
     }]

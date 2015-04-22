@@ -73,6 +73,9 @@
       this.bind("destroyed", function(ev, inst) {
         if(inst instanceof that) {
           can.each(inst.cycle_task_groups, function(cycle_task_group) {
+            if (!cycle_task_group) {
+              return;
+            }
             cycle_task_group = cycle_task_group.reify();
             can.trigger(cycle_task_group, "destroyed");
             can.trigger(cycle_task_group.constructor, "destroyed", cycle_task_group);

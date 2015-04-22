@@ -1,0 +1,123 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+<header class="popup__title">
+  Filter Help
+</header>
+<div class="popup__content">
+  <div class="content-wrap">
+    <h3>Basic filter</h3>
+    <div class="images-wrap">
+      <img src="/static/images/filter-on.jpg">
+      <img src="/static/images/filter-off.jpg">
+    </div>
+    <p>Type any word or phrase in the text search and you’ll get results based on conducted search on all visible object fields. For example:</p>
+    <p>
+      <span class="code">
+        login access<br>
+        john doe
+      </span>
+    </p>
+    <p>
+      you will get all objects that contain this phrase in all visible fields (and <em>code, description, notes,</em> ...) Indicator on the right of search box will remain grey if you are in <em>basic search</em> mode. If it turns green, that means you’ve created a valid advanced filter expression.
+    </p>
+    <h3>Advanced filter functions</h3>
+    <p>You can construct more thorough filter expressions by using some special keywords and tree column titles</p>
+    <table class="table table-bordered">
+      <col style="width: 12%;">
+      <col style="width: 16%;">
+      <col style="width: 36%;">
+      <col style="width: 36%;">
+      <thead>
+        <tr>
+          <th>Keyword</th>
+          <th>Meaning</th>
+          <th>Examples</th>
+          <th>Filter results</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code">~</span></td>
+          <td><strong>contains</strong></td>
+          <td><span class="code">~ “login access”</span></td>
+          <td>All objects containing phrase <em>login access</em> anywhere in object attributes</td>
+        </tr>
+        <tr>
+          <td><span class="code"></span></td>
+          <td><strong></strong></td>
+          <td><span class="code">~ something</span></td>
+          <td>All objects containing word something</td>
+        </tr>
+        <tr>
+          <td><span class="code"></span></td>
+          <td><strong></strong></td>
+          <td><span class="code">owner ~ john</span></td>
+          <td>All objects that have <em>john</em> as part of the owner name</td>
+        </tr>
+        <tr>
+          <td><span class="code">=</span></td>
+          <td><strong>equals</strong></td>
+          <td><span class="code">owner = “john doe”</span></td>
+          <td>All objects that have <em>john doe</em> as an owner</td>
+        </tr>
+        <tr>
+          <td><span class="code">!~</span></td>
+          <td><strong>does not contain</strong></td>
+          <td><span class="code">title !~ PCI</span></td>
+          <td>All objects that do not contain <em>PCI</em> in their title</td>
+        </tr>
+        <tr>
+          <td><span class="code">!=</span></td>
+          <td><strong>is not equal</strong></td>
+          <td><span class="code">state !~ draft</span></td>
+          <td>All objects that are in different state than <em>draft</em></td>
+        </tr>
+        <tr>
+          <td><span class="code">&lt;, &gt;</span></td>
+          <td><strong>lesser than greater than</strong></td>
+          <td><span class="code">“modified date” &lt; 03/03/2015</span></td>
+          <td>All objects last time modified before March 3rd, 2015</td>
+        </tr>
+        <tr>
+          <td><span class="code">AND</span></td>
+          <td><strong>logical AND</strong></td>
+          <td><span class="code">title ~ PCI AND owner = “john doe”</span></td>
+          <td>All objects that contain word <em>PCI</em> in title and are owned by <em>john doe</em></td>
+        </tr>
+        <tr>
+          <td><span class="code">OR</span></td>
+          <td><strong>logical OR</strong></td>
+          <td><span class="code">code ~ 111 OR “modified date &gt; 03/03/2015</span></td>
+          <td>All objects that have <em>111</em> in code or are modified after March 3rd, 2015</td>
+        </tr>
+        <tr>
+          <td><span class="code">ORDER BY ASC/DESC</span></td>
+          <td><strong>sort by</strong></td>
+          <td><span class="code">title ~ PCI order by owner asc</span></td>
+          <td>All objects that contain <em>PCI</em> in the title, in ascending order by owner</td>
+        </tr>
+        <tr>
+          <td><span class="code"></span></td>
+          <td><strong></strong></td>
+          <td><span class="code">title ~ PCI order by title desc</span></td>
+          <td>All objects that contain <em>PCI</em> in the title in descending order</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>Gotcha’s</h3>
+    <ul>
+      <li>You can also use parentheses to create more complex searches like here: <span class="code">(title ~ PCI OR title ~ ISO) AND description ~ “needs to be”</span></li>
+      <li>Filters are case insensitive (example: <em>title</em> is the same as <em>Title</em> or <em>TITLE</em>)</li>
+      <li><span class="code">AND</span> has precedence over <span class="code">OR</span></li>
+      <li>Every time space (“ “) character is part of search phrase or filter expression you need to use quotes (<span class="code">“modified date” &gt; 03/03/2015 AND “control title” ~ PCI</span>)</li>
+      <li>Compatible date formats are <span class="code">MM/DD/YYYY</span> and <span class="code">YYYY-MM-DD</span></li>
+    </ul>
+  </div>
+  <div class="footer-wrap">
+    <a href="#" class="btn btn-small btn-success">OK, got it!</a>
+  </div>
+</div>

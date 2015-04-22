@@ -273,26 +273,26 @@ $(function() {
   var base_widgets_by_type = {
     "Program": "Issue Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
     "Audit": "Issue ControlAssessment Request history Person program program_controls",
-    "Issue": "ControlAssessment Control Program Audit",
+    "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",
     "ControlAssessment": "Issue Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Regulation" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-    "Policy" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-    "Standard" : "Program Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-    "Contract" : "Program Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Regulation" : "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Policy" : "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Standard" : "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Contract" : "Program Issue Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Clause" : "Contract Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Section" : "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-    "Objective" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Objective" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
     "Control" : "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Person" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",
-    "OrgGroup" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Vendor" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "System" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Process" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "DataAsset" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Product" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Project" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Facility" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-    "Market" : "Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit"
+    "Person" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",
+    "OrgGroup" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Vendor" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "System" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Process" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "DataAsset" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Product" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Project" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Facility" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Market" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit"
   };
   base_widgets_by_type = _.mapValues(base_widgets_by_type,
                                      function (conf) {
@@ -447,6 +447,7 @@ $(function() {
         , mapping : "sections"
         , show_view : GGRC.mustache_path + "/sections/tree.mustache"
         , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
+        , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
         , draw_children : true
       }
 
@@ -455,6 +456,7 @@ $(function() {
         , mapping: "clauses"
         , show_view: GGRC.mustache_path + "/sections/tree.mustache"
         , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+        , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
         , draw_children: true
         }
 
@@ -465,6 +467,7 @@ $(function() {
                 , draw_children: true
                 , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/objectives/tree_add_item.mustache"
                 }
             }
         , controls: {
@@ -473,6 +476,7 @@ $(function() {
                 , draw_children: true
                 , show_view: GGRC.mustache_path + "/controls/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/controls/tree_add_item.mustache"
                 }
             }
         , business_objects: {
@@ -516,6 +520,8 @@ $(function() {
         , issues: {
           Issue: {
               mapping: "related_issues"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
           }
         }
         , governance_objects: {
@@ -526,6 +532,7 @@ $(function() {
                 , fetch_post_process: sort_sections
                 , show_view: GGRC.mustache_path + "/directives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
                 }
             , Contract: {
                   mapping: "contracts"
@@ -534,6 +541,7 @@ $(function() {
                 , fetch_post_process: sort_sections
                 , show_view: GGRC.mustache_path + "/directives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
                 }
             , Policy: {
                   mapping: "policies"
@@ -542,6 +550,7 @@ $(function() {
                 , fetch_post_process: sort_sections
                 , show_view: GGRC.mustache_path + "/directives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
                 }
             , Standard: {
                   mapping: "standards"
@@ -550,6 +559,7 @@ $(function() {
                 , fetch_post_process: sort_sections
                 , show_view: GGRC.mustache_path + "/directives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
                 }
             , Control: {
                   mapping: "controls"
@@ -581,6 +591,7 @@ $(function() {
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
               , header_view : GGRC.mustache_path + "/audits/tree_header.mustache"
               , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/audits/tree_add_item.mustache"
             }
             , Person : {
                 show_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache"
@@ -600,6 +611,7 @@ $(function() {
             , draw_children : true
             , show_view : GGRC.mustache_path + "/requests/tree.mustache"
             , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+            , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
           },
           history: {
             mapping: "history"
@@ -608,6 +620,7 @@ $(function() {
             , model: "Request"
             , show_view : GGRC.mustache_path + "/requests/tree.mustache"
             , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+            , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
             , allow_mapping: false
             , allow_creating: false
           },
@@ -618,6 +631,7 @@ $(function() {
             , model: CMS.Models.Control
             , show_view : GGRC.mustache_path + "/controls/tree.mustache"
             , footer_view : GGRC.mustache_path + "/controls/tree_footer.mustache"
+            , add_item_view : GGRC.mustache_path + "/controls/tree_add_item.mustache"
             , allow_mapping: false
             , allow_creating: false
           },
@@ -635,7 +649,10 @@ $(function() {
             , parent_instance: GGRC.page_instance()
             , draw_children: true
             , model: CMS.Models.ControlAssessment
+            , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
+            , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
             , footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache"
+            , add_item_view : GGRC.mustache_path + "/control_assessments/tree_add_item.mustache"
           }
         }
 
@@ -649,19 +666,19 @@ $(function() {
             }
 
         , Regulation: {
-              _mixins: ["directive"]
+              _mixins: ["directive", "issues"]
             , Section: section_child_options
             }
         , Standard: {
-              _mixins: ["directive"]
+              _mixins: ["directive", "issues"]
             , Section: section_child_options
             }
         , Policy: {
-              _mixins: ["directive"]
+              _mixins: ["directive", "issues"]
             , Section: section_child_options
             }
         , Contract: {
-              _mixins: ["directive"]
+              _mixins: ["directive", "issues"]
             , Clause: clause_child_options
             }
 
@@ -676,6 +693,8 @@ $(function() {
             },
             ControlAssessment: {
               mapping: "related_control_assessment"
+              , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
+              , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
             }
           }
 
@@ -691,13 +710,13 @@ $(function() {
           }
 
         , Clause: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , Section: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , Objective: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , Control: {
             _mixins: ["governance_objects", "business_objects", "extended_audits", "open_requests", "issues"],
@@ -706,7 +725,10 @@ $(function() {
               , parent_instance: GGRC.page_instance()
               , draw_children: true
               , model: CMS.Models.ControlAssessment
+              , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
+              , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
               , footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/control_assessments/tree_add_item.mustache"
             }
           }
         , ControlAssessment: {
@@ -736,71 +758,74 @@ $(function() {
               , mapping: "related_clauses"
               , child_options: [clause_child_options]
               , footer_view: GGRC.mustache_path + "/clauses/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/clauses/tree_add_item.mustache"
             }
           }
         , Issue: {
-            Control: {
+            _mixins: ["governance_objects", "business_objects"]
+            , Control: {
                 mapping: "related_controls"
               , draw_children: true
-              , allow_creating: false
-              , allow_mapping: false
               , show_view: GGRC.mustache_path + "/controls/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
+              }
+            , Issue: {
+                  mapping: "related_issues"
+                  , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
               }
             , Audit: {
                 mapping: "related_audits"
               , draw_children: true
-              , allow_creating: false
-              , allow_mapping: false
               , show_view: GGRC.mustache_path + "/audits/tree.mustache"
-            }
-            , Program: {
-                mapping: "related_programs"
-              , draw_children: true
-              , allow_creating: false
-              , allow_mapping: false
-              , show_view: GGRC.mustache_path + "/programs/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
             }
             , ControlAssessment: {
                 mapping: "related_control_assessments"
               , draw_children: true
-              , allow_creating: false
-              , allow_mapping: false
+              , allow_creating: true
+              , allow_mapping: true
+              , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
+              , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
             }
           }
         , DataAsset: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , Facility: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , Market: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , OrgGroup: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , Vendor: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , Process: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , Product: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , Project: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , System: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
         , Document: {
-            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
           }
 
         , Person : {
-            // _mixins: ["extended_audits"]
-             Program : {
+             _mixins: ["issues"]
+            , Program : {
                 mapping: "extended_related_programs_via_search"
               , fetch_post_process: sort_sections
               }
@@ -842,6 +867,7 @@ $(function() {
               , mapping : "extended_related_sections_via_search"
               , show_view : GGRC.mustache_path + "/sections/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
               , draw_children : true
               }
             , Clause : {
@@ -849,6 +875,7 @@ $(function() {
               , mapping : "extended_related_clauses_via_search"
               , show_view : GGRC.mustache_path + "/sections/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
               , draw_children : true
               }
             , Objective: {
@@ -856,12 +883,14 @@ $(function() {
               , draw_children: true
               , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
               }
             , Control: {
                 mapping: "extended_related_controls_via_search"
               , draw_children: true
               , show_view: GGRC.mustache_path + "/controls/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
               }
             , DataAsset: {
                 mapping: "extended_related_data_assets_via_search"

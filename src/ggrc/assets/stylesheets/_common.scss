@@ -895,7 +895,7 @@ select.multiple-selector {
       background-image: image-url("grcicons/icons.png");
       background-position: -2000px -2000px;
       background-repeat: no-repeat;
-      @include background-size(368px 416px);
+      @include background-size(368px 440px);
       margin-top: -7px;
     }
   }
@@ -1168,13 +1168,18 @@ p {
   padding-right: 4px;
   margin-left: 10px;
   a {
-    .grcicon-to-right {
-      margin-top: 6px;
+    display: inline-block;
+    line-height: 16px;
+    i {
       @include opacity(0.25);
       @include transition(opacity 0.2s ease);
+      ul.new-tree & {
+        margin-top: 0;
+      }
     }
     &:hover {
-      .grcicon-to-right {
+      text-decoration: none;
+      i {
         @include opacity(1);
       }
     }
@@ -1387,24 +1392,4 @@ p {
   float: right;
   display: inline-block;
   margin-top: 6px;
-}
-
-.custom-attr-table {
-  .table {
-    td.centered,
-    th.centered {
-      text-align: center;
-    }
-    .checkbox-wrap {
-      input {
-        margin-top: 3px;
-        margin-bottom: 0;
-      }
-    }
-    tbody {
-      td {
-        vertical-align: top;
-      }
-    }
-  }
 }

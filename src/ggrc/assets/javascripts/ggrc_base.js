@@ -82,17 +82,22 @@
       };
     }
   });
-  var confirmleaving = function confirmleaving() {
-      return window.confirm("There are operations in progress.  Are you sure you want to leave the page?");
+  var onbeforeunload = function (evnt) {
+      evnt = evnt || window.event;
+      var message = 'There are operations in progress. Are you sure you want to leave the page?';
+      if (evnt) {
+        evnt.returnValue = message;
+      }
+      return message;
     },
     notifier = new PersistentNotifier({
       while_queue_has_elements: function() {
-        $(window).on("unload", confirmleaving);
+        window.onbeforeunload = onbeforeunload;
       },
       when_queue_empties: function() {
-        $(window).off("unload", confirmleaving);
+        window.onbeforeunload = $.noop;
       },
-      name: "GGRC/window"
+      name: 'GGRC/window'
     });
 
   $.extend(GGRC, {

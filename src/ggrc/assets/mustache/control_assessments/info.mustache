@@ -1,0 +1,223 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+{{#instance}}
+  <section class="info">
+    {{#is_info_pin}}
+    <div class="clearfix">
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      <div class="tier-content pin">
+        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      </div>
+    </div>
+    {{/is_info_pin}}
+
+    {{#is_allowed 'update' instance context='for'}}
+      <div class="details-wrap">
+        <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+          {{#is_allowed 'update' instance context='for'}}
+            <li>
+              <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+                <i class="grcicon-edit"></i>
+                Edit {{instance.class.title_singular}}
+              </a>
+            </li>
+          {{/is_allowed}}
+          {{#is_allowed 'update' instance context='for'}}
+            <li class="border">
+              {{#with_mapping 'related_audits' instance}}
+              {{#using control=control}}
+              {{#with_create_issue_json instance}}
+                <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="Issue" data-object-plural="issues" data-object-params='{{create_issue_json}}'>
+                  <i class="grcicon-add-black"></i>
+                  Create Issue
+                </a>
+              {{/with_create_issue_json}}
+              {{/using}}
+              {{/with_mapping}}
+            </li>
+          {{/is_allowed}}
+          {{#if instance.viewLink}}
+            {{#is_allowed "view_object_page" instance}}
+              <li class="border">
+                <a href="{{instance.viewLink}}">
+                  View {{instance.class.title_singular}}
+                  <i class="grcicon-goto"></i>
+                </a>
+              </li>
+            {{/is_allowed}}
+          {{/if}}
+        </ul>
+      </div>
+    {{/is_allowed}}
+
+    <div class="tier-content">
+      {{^is_info_pin}}
+        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      {{/is_info_pin}}
+
+      <div class="row-fluid wrap-row" {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true" data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+        <div class="span6">
+          <h6>Test plan</h6>
+          <div class="rtf-block">
+            {{{firstnonempty test_plan '<h4 class="no-data">No description</h4>'}}}
+          </div>
+        </div>
+        <div class="span3">
+          <h6>Conclusion: Design</h6>
+          <p><small><em>Is this control design effective?</em></small></p>
+          <select class="input-medium visual-selector" name="design">
+            <option value="" {{#if_equals design ""}}selected{{/if_equals}}>---</option>
+            {{#iterate 'Effective' 'Material weakness' 'Needs improvement' 'Significant deficiency' 'Not Applicable'}}
+              <option {{#if_equals iterator design}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
+          </select>
+        </div>
+        <div class="span3">
+          <h6>Conclusion: Operational</h6>
+          <p><small><em>Is this control operationally effective?</em></small></p>
+          <select class="input-medium visual-selector" name="operationally">
+            <option value="" {{#if_equals operationally ""}}selected{{/if_equals}}>---</option>
+            {{#iterate 'Effective' 'Material weakness' 'Needs improvement' 'Significant deficiency' 'Not Applicable'}}
+              <option {{#if_equals iterator operationally}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
+          </select>
+        </div>
+      </div>
+
+      <div class="row-fluid wrap-row">
+        <div class="span6">
+          {{#using person=contact}}
+          <h6>Primary Contact</h6>
+          <p class="oneline">
+            {{#if person}}
+              {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
+              {{^if person.is_enabled}}
+                <span class="user-disabled">
+                  (Disabled)
+                </span>
+              {{/if}}
+            {{else}}
+              <span class="error">
+                Not Assigned
+              </span>
+            {{/if}}
+          </p>
+          {{/using}}
+          {{#using person=secondary_contact}}
+          {{#if person}}
+          <h6>Secondary Contact</h6>
+          <p class="oneline">
+            {{#if person}}
+              {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
+              {{^if person.is_enabled}}
+                <span class="user-disabled">
+                  (Disabled)
+                </span>
+              {{/if}}
+            {{else}}
+              <span class="error">
+                Not Assigned
+              </span>
+            {{/if}}
+          </p>
+          {{/if}}
+          {{/using}}
+        </div>
+        <div class="span6">
+          <ul class="repeated-utility">
+            <!--
+            <li>
+              <a class="btn btn-small btn-info" href="#">
+                Create Request
+              </a>
+            </li>
+            -->
+            <li>
+              {{#with_mapping 'related_audits' instance}}
+              {{#using control=control}}
+              {{#with_create_issue_json instance}}
+                <a class="btn btn-small btn-info" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="Issue" data-object-plural="issues" data-object-params='{{create_issue_json}}'>
+                  Create Issue
+                </a>
+              {{/with_create_issue_json}}
+              {{/using}}
+              {{/with_mapping}}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+
+      <div class="custom-attr-wrap">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="info-expand">
+              <a class="show-hidden-fields info-show-hide" href="javascript://">
+                <span class="out">
+                  <i class="grcicon-arrow-right"></i>
+                  Show
+                </span>
+                <span class="in">
+                  <i class="grcicon-arrow-bottom"></i>
+                  Hide
+                </span>
+                Advanced
+              </a>
+            </div>
+          </div>
+        </div><!-- row-fluid end -->
+        <div class="hidden-fields-area" style="display:none;">
+          <div class="row-fluid wrap-row">
+            <div class="span4">
+              <h6>Code</h6>
+              <p>
+                {{slug}}
+              </p>
+            </div>
+            <div class="span4">
+              <h6>Effective Date</h6>
+              <p>
+                {{localize_date start_date}}
+              </p>
+            </div>
+            <div class="span4">
+              <h6>Stop Date</h6>
+              <p>
+              {{localize_date end_date}}
+              </p>
+            </div>
+          </div><!-- row-fluid end -->
+          <div class="row-fluid wrap-row">
+            <div class="span4">
+              <h6>State</h6>
+              <p>
+                {{status}}
+              </p>
+            </div>
+          </div><!-- row-fluid end -->
+        </div><!-- hidden-fields-area end -->
+      </div><!-- custom-attr-wrap end -->
+    </div><!-- tier-content end -->
+
+  {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+
+  </section>
+
+  <div class="info-widget-footer">
+    <p>
+      <small>
+        <em>
+          Created at {{date created_at}}
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+        </em>
+      </small>
+    </p>
+  </div>
+{{/instance}}

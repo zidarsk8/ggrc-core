@@ -44,6 +44,11 @@ a.remove_filter i[class^="grcicon-"] {
   vertical-align: text-bottom !important;
 }
 
+.grcicon-loading {
+  background: image-url("ajax-loader.gif") no-repeat center center;
+  background-size: 100%;
+}
+
 .grcicon-add {
   background-position:-222px -32px;
   .active & {
@@ -188,6 +193,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-objectperson-color, .grcicon-person-color, .grcicon-person-black { background-position:-6px -8px; }
 .grcicon-audit-white { background-position:-270px -32px; }
 .grcicon-audit-color { background-position:-270px -8px; }
+.grcicon-download { background-position: -294px -416px; }
 .grcicon-imp-exp { background-position:-54px -56px; }
 .grcicon-export { background-position:-6px -104px; }
 .grcicon-export-white { background-position:-6px -128px; }

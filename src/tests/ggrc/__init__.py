@@ -18,7 +18,10 @@ if os.environ.get('TRAVIS', False):
 
 class TestCase(BaseTestCase):
   def setUp(self):
-    pass
+    for table in reversed(db.metadata.sorted_tables):
+      if not table.name == "test_model":
+        db.engine.execute(table.delete())
+    db.session.commit()
 
     # if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
     #   from google.appengine.api import memcache
