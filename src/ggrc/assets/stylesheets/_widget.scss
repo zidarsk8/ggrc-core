@@ -959,13 +959,17 @@
 // Custom popover content
 .custom-popover-content {
   display: none;
-  .task-title {
-    width: 40%;
-  }
-  .task-status {
-    width: 40%;
-  }
 }
+
+.task-title {
+  width: 50%;
+}
+
+.task-status {
+  width: 40%;
+  text-align: right;
+}
+
 .preview-container {
   &.person-preview {
     overflow: visible;
