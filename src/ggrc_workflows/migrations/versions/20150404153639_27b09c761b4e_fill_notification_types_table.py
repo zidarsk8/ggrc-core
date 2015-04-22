@@ -123,6 +123,16 @@ def upgrade():
            "instant": True,
            },
 
+          # all cycle tasks finished
+          {"name": "all_cycle_tasks_completed",
+           "description": ("Notify workflow owner when all cycle tasks in one"
+                           " cycle have been completed and verified"),
+           "template": "weekly_workflow_starts_in",
+           "advance_notice": 1,
+           "instant": True,
+           },
+
+
           # workflow starts in notifications
           {"name": "weekly_workflow_starts_in",
            "description": "Advanced notification for a reccuring workflow.",
