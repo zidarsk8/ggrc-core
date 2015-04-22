@@ -96,6 +96,12 @@ CMS.Models.Directive("CMS.Models.Standard", {
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
+    , attr_list : can.Model.Cacheable.attr_list.concat([
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
+    ])
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
@@ -128,6 +134,12 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
+    , attr_list : can.Model.Cacheable.attr_list.concat([
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
+    ])
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
@@ -160,6 +172,11 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
+    , attr_list : can.Model.Cacheable.attr_list.concat([
+      {attr_title: 'Type', attr_name: 'kind'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
+    ])
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
@@ -192,6 +209,12 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
+    , attr_list : can.Model.Cacheable.attr_list.concat([
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
+    ])
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true

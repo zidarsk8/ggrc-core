@@ -14,21 +14,9 @@
         {{model.title_singular}} Title
       </div>
     </div>
-    <div class="span2">
-      <div class="oneline">
-          Assignee
-      </div>
-    </div>
-    <div class="span1">
-      <div class="oneline">
-          Code
-      </div>
-    </div>
-    <div class="span1">
-      <div class="oneline">
-          State
-      </div>
-    </div>
+
+    {{{> "/static/mustache/base_objects/tree_column_names.mustache"}}}
+
     <div class="span4">
       <ul class="tree-action-list">
         {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
@@ -38,71 +26,8 @@
                  data-original-title="Hide Irelevant"></i>
           </a>
         </li>
-        <!-- Temporarily hidden via copy/pasting and adapting Vladan's code where he made that request. He asked not to remove the comment. I haven't touched it, even though it makes no sense for Audits.
-        <li>
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-          <div class="dropdown-menu dropdown-menu-form">
-            <h5>Set visible fields</h5>
-            <ul class="attr-list">
-              <li class="disabled">
-                <label class="checkbox-inline">
-                  <input type="checkbox" checked="" disabled="">
-                  Title
-                </label>
-              </li>
-              <li class=" disabled">
-                <label class="checkbox-inline">
-                  <input type="checkbox" disabled="">
-                  Description
-                </label>
-              </li>
-              <li class=" disabled">
-                <label class="checkbox-inline">
-                  <input type="checkbox" disabled="">
-                  Notes
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox" checked="">
-                  Owner
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox">
-                  Contact
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox" checked="">
-                  Code
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox" checked="">
-                  State
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox">
-                  Network Zone
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox">
-                  System url
-                </label>
-              </li>
-            </ul>
-            <button class="btn btn-small btn-info">Set fields</button>
-          </div>
-        </li>
-        -->
+
+        {{{> "/static/mustache/base_objects/tree_column_selector.mustache"}}}
         {{#if add_item_view}}
           <li>
             {{{renderLive add_item_view}}}

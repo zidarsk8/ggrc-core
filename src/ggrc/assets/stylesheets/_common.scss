@@ -1333,6 +1333,23 @@ p {
       margin-bottom: 20px;
     }
   }
+  .btn {
+    display: inline-block;
+    text-transform: none;
+    color: $white;
+    font-weight: bold;
+  }
+  .close-dropdown {
+    padding: 0;
+    margin-right: -10px;
+    @include opacity(.3);
+    @include transition(opacity 0.2s ease);
+    cursor: pointer;
+    &:hover {
+      text-decoration: none;
+      @include opacity(1);
+    }
+  }
 }
 
 .user-string {
