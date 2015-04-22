@@ -4,7 +4,6 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from datetime import datetime, date
-from blinker import Namespace
 from flask import Blueprint
 from sqlalchemy import inspect, and_
 
@@ -526,6 +525,7 @@ def set_internal_object_state(task_group_object, object_state, status):
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
         sender, obj=None, src=None, service=None):
+
   if inspect(obj).attrs.contact.history.has_changes():
     ensure_assignee_is_workflow_member(obj.cycle.workflow, obj.contact)
 
@@ -534,6 +534,15 @@ def handle_cycle_task_group_object_task_put(
     update_cycle_dates(obj.cycle)
 
   if inspect(obj).attrs.status.history.has_changes():
+    # TODO: check why update_cycle_object_parent_state destroys object history
+    # when accepting the only task in a cycle. The listener below is a
+    # workaround because of that.
+    Signals.status_change.send(
+        obj.__class__,
+        obj=obj,
+        new_status=obj.status,
+        old_status=inspect(obj).attrs.status.history.deleted.pop(),
+    )
     update_cycle_object_parent_state(obj)
 
   # Doing this regardless of status.history.has_changes() is important in order
