@@ -13,8 +13,10 @@
     scope: {
       text: "@",
       title: "@",
+      notify: "@",
       isActive: false,
-      timeout: "@"
+      timeout: "@",
+      notifyText: "Link has been copied to your clipboard."
     },
     template: ["<a data-clipboard-text=\"{{text}}\" {{#isActive}}class=\"active\"{{/isActive}} href=\"#\">",
                "<i class=\"icon-share\"></i> {{title}}",
@@ -28,6 +30,9 @@
         this._clip = new Clipboard(el.find("a"));
 
         this._clip.on("aftercopy", function () {
+          if (this.scope.attr("notify")) {
+            $("body").trigger("ajax:flash", {"success": this.scope.attr("notifyText")});
+          }
           this.scope.attr("isActive", true);
           setTimeout(function () {
             this.scope.attr("isActive", false);
