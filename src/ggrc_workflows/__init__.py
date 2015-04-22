@@ -17,6 +17,7 @@ from ggrc.services.registry import service
 from ggrc.views.registry import object_view
 
 from ggrc_workflows import models, notification
+from ggrc_workflows.services.common import Signals
 from ggrc_workflows.services.workflow_date_calculator import (
     WorkflowDateCalculator
 )
@@ -29,22 +30,6 @@ from ggrc_basic_permissions.contributed_roles import (
     RoleContributions, RoleDeclarations, DeclarativeRoleImplications
 )
 
-# Initialize signal handler for status changes
-
-signals = Namespace()
-status_change = signals.signal(
-    'Status Changed',
-    """
-  This is used to signal any listeners of any changes in model object status
-  attribute
-  """)
-
-workflow_cycle_start = signals.signal(
-    'Workflow Cycle Started ',
-    """
-  This is used to signal any listeners of any workflow cycle start
-  attribute
-  """)
 
 # Initialize Flask Blueprint for extension
 blueprint = Blueprint(
@@ -347,7 +332,7 @@ def build_cycle(cycle, current_user=None, base_date=date.today()):
 
   update_cycle_dates(cycle)
 
-  workflow_cycle_start.send(
+  Signals.workflow_cycle_start.send(
       cycle.__class__,
       obj=cycle,
       new_status=cycle.status,
@@ -386,7 +371,7 @@ def update_cycle_object_child_state(obj):
             old_status = child.status
             child.status = status
             db.session.add(child)
-            status_change.send(
+            Signals.status_change.send(
                 child.__class__,
                 obj=child,
                 new_status=child.status,
@@ -412,7 +397,7 @@ def update_cycle_object_parent_state(obj):
           old_status = parent.status
           parent.status = 'InProgress'
           db.session.add(parent)
-          status_change.send(
+          Signals.status_change.send(
               parent.__class__,
               obj=parent,
               new_status=parent.status,
@@ -436,7 +421,7 @@ def update_cycle_object_parent_state(obj):
             if is_allowed_update(parent.__class__.__name__, parent.context.id):
               old_status = parent.status
               parent.status = 'Verified'
-              status_change.send(
+              Signals.status_change.send(
                   parent.__class__,
                   obj=parent,
                   new_status=parent.status,
@@ -447,7 +432,7 @@ def update_cycle_object_parent_state(obj):
             if is_allowed_update(parent.__class__.__name__, parent.context.id):
               old_status = parent.status
               parent.status = 'Finished'
-              status_change.send(
+              Signals.status_change.send(
                   parent.__class__,
                   obj=parent,
                   new_status=parent.status,
@@ -568,7 +553,7 @@ def handle_cycle_task_group_object_task_put(
     for tgobj in obj.task_group_task.task_group.objects:
       old_status = tgobj.status
       set_internal_object_state(tgobj, os_state, status)
-      status_change.send(
+      Signals.status_change.send(
           tgobj.__class__,
           obj=tgobj,
           new_status=tgobj.status,
@@ -664,7 +649,7 @@ def handle_cycle_task_entry_post(
 # Check if workflow should be Inactive after cycle status change
 
 
-@status_change.connect_via(models.Cycle)
+@Signals.status_change.connect_via(models.Cycle)
 def handle_cycle_status_change(sender, obj=None, new_status=None,
                                old_status=None):
   if inspect(obj).attrs.status.history.has_changes():
