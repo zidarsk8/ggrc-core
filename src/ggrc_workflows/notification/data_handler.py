@@ -5,6 +5,7 @@
 
 from datetime import date
 # from babel.dates import format_timedelta
+from flask import request
 
 from sqlalchemy import and_
 
@@ -236,6 +237,18 @@ def get_workflow_owner(context_id):
            Role.name == "WorkflowOwner")).one().person
 
 
+def get_cycle_task_url(cycle_task):
+  return ("{base}workflows/{workflow_id}#current_widget/cicle/{cycle_id}"
+          "/cycle_task_group/{cycle_task_group_id}/"
+          "/cycle_task_group_object_task/{cycle_task_id}").format(
+      base=request.url_root,
+      workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
+      cycle_id=cycle_task.cycle_task_group.cycle.id,
+      cycle_task_group_id=cycle_task.cycle_task_group.id,
+      cycle_task_id=cycle_task.id,
+  )
+
+
 def get_cycle_task_dict(cycle_task):
 
   object_title = ""
@@ -247,6 +260,7 @@ def get_cycle_task_dict(cycle_task):
       "object_title": object_title,
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
       "fuzzy_due_in": get_fuzzy_date(cycle_task.end_date),
+      "cycle_task_url": get_cycle_task_url(cycle_task),
   }
 
 
@@ -261,6 +275,14 @@ def get_person_dict(person):
   return {"email": "", "name": "", "id": -1}
 
 
+def get_cycle_url(cycle):
+  return "{base}workflows/{workflow_id}#current_widget/cicle/{cycle_id}".format(
+      base=request.url_root,
+      workflow_id=cycle.workflow.id,
+      cycle_id=cycle.id,
+  )
+
+
 def get_cycle_dict(cycle, manual=False):
   workflow_owner = get_person_dict(get_workflow_owner(cycle.context_id))
   return {
@@ -268,4 +290,5 @@ def get_cycle_dict(cycle, manual=False):
       "custom_message": cycle.workflow.notify_custom_message,
       "cycle_title": cycle.title,
       "workflow_owner": workflow_owner,
+      "cycle_url": get_cycle_url(cycle),
   }

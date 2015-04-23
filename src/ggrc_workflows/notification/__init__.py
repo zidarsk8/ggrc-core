@@ -94,6 +94,7 @@ All notifications handle the following structure:
 
                   "custom_message": ""
                   "cycle_title": ""
+                  "cycle_url": ""
                   "workflow_owner": workflow_owner,
 
                   "my_tasks" : # list of all tasks assigned to the user
@@ -138,6 +139,7 @@ Task and cycle_task have the following structure:
       "object_title": object title or "",
       "end_date": end date in MM/DD/YYYY format
       "fuzzy_due_in": "today" or "in 1 day"... "in 5 days", "in 1 week" etc.,
+      "cycle_task_url" ""
   }
 
   """

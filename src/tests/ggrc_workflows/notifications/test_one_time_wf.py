@@ -99,6 +99,7 @@ class TestOneTimeWorkflowNotification(TestCase):
       self.assertIn("my_tasks", notif_data[user]["cycle_started"][cycle.id])
       self.assertIn("cycle_tasks", notif_data[user]["cycle_started"][cycle.id])
       self.assertIn("my_task_groups", notif_data[user]["cycle_started"][cycle.id])
+      self.assertIn("cycle_url", notif_data[user]["cycle_started"][cycle.id])
 
       cycle = Cycle.query.get(cycle.id)
       cycle_data = notif_data[user]["cycle_started"][cycle.id]
@@ -107,6 +108,7 @@ class TestOneTimeWorkflowNotification(TestCase):
         self.assertIn(task.id, cycle_data["cycle_tasks"])
         self.assertIn("title", cycle_data["my_tasks"][task.id])
         self.assertIn("title", cycle_data["cycle_tasks"][task.id])
+        self.assertIn("cycle_task_url", cycle_data["cycle_tasks"][task.id])
 
     with freeze_time("2015-05-03"):  # two days befor due date
       _, notif_data = notification.get_todays_notifications()
