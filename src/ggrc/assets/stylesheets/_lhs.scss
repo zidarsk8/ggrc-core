@@ -66,11 +66,11 @@
     .widgetsearch-submit {
       @include border-radius(0 4px 4px 0);
       @include background-size(368px 440px);
+      background-color: $lightGray;
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
       background-position: -334px -314px;
       float: left;
-      background: $lightGray;
       line-height: 28px;
       width: 36px;
       border: none;
