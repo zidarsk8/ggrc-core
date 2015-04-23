@@ -79,7 +79,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , defaults : {
     status : "Draft",
-    object_type: "Control"
+    object_type: "ControlAssessment"
   }
   , obj_nav_options: {
     show_all_tabs: true,
@@ -373,7 +373,7 @@ can.Model.Cacheable("CMS.Models.Request", {
         matching_objs;
     if(that.audit_object
        && (!that.audit_object_object
-           || that.audit_object.reify().auditable.id !== that.audit_object_object.id
+           || that.audit_object.reify().auditable.id === that.audit_object_object.id
     )) {
       return;
     }
@@ -744,9 +744,14 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
     this.validateNonBlank("title");
   }
 }, {
-  object_model: can.compute(function() {
-    return CMS.Models[this.attr("object_type")];
-  }),
+  form_preload : function(new_object_form) {
+    var page_instance = GGRC.page_instance();
+    if(new_object_form && page_instance && page_instance.type === 'Audit') {
+      if (!this.audit) {
+        this.attr('audit', page_instance);
+      }
+    }
+  }
 });
 
 })(this.can);
