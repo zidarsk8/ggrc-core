@@ -20,21 +20,15 @@ Maintained By: miha@reciprocitylabs.com
                   Here is what was happening yesterday:
                 </p>
 
-                {% if digest['cycle_started'] %}
-                  {% for cycle in digest['cycle_started'].values() %}
-
-                    <h2 {{ style.sub_title() }} >Following tasks are assigned to you</h2>
-                    <ul {{ style.list_wrap() }} >
-
-                    {% if cycle['my_tasks'] %}
-                      {% for task in cycle['my_tasks'].values() %}
-                        <li {{ style.list_item() }} >
-                          {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
-                        </li>
-                      {% endfor %}
-                    {% endif %}
-
-                    </ul>
+                {% if digest['cycle_started_tasks'] %}
+                  <h2 {{ style.sub_title() }} >Following 
+                    {{ "tasks are" if digest['cycle_started_tasks']|length > 1 else "task is" }}
+                    assigned to you</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for task in digest['cycle_started_tasks'].values() %}
+                    <li {{ style.list_item() }} >
+                      {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }}, due on {{ task['end_date'] }}
+                    </li>
                   {% endfor %}
                 {% endif %}
 

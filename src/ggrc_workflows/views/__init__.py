@@ -31,7 +31,16 @@ def modify_data(data):
     data["due_soon"].update(data["due_in"])
   if "due_today" in data:
     data["due_soon"].update(data["due_today"])
+
+  # combine "my_tasks" from multiple cycles
+  data["cycle_started_tasks"] = {}
+  if "cycle_started" in data:
+    for cycle in data["cycle_started"].values():
+      if "my_tasks" in cycle:
+        data["cycle_started_tasks"].update(cycle["my_tasks"])
+
   return data
+
 
 def do_start_recurring_cycles():
   start_recurring_cycles()
@@ -53,9 +62,9 @@ def show_pending_notifications():
 def show_todays_digest_notifications():
   if not permissions.is_admin():
     raise Forbidden()
+  _, notif_data = notification.get_todays_notifications()
   for user_email, data in notif_data.iteritems():
     data = modify_data(data)
-  _, notif_data = notification.get_todays_notifications()
   todays = env.get_template("notifications/view_todays_digest.html")
   return todays.render(data=notif_data)
 
