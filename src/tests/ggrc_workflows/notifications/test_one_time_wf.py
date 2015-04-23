@@ -12,6 +12,7 @@ import os
 from ggrc import db
 from ggrc.models import Notification, Person
 from ggrc import notification
+from ggrc_workflows.models import Cycle
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
 from tests.ggrc.generator import GgrcGenerator
@@ -59,12 +60,13 @@ class TestOneTimeWorkflowNotification(TestCase):
       self.wf_generator.activate_workflow(wf)
 
       person_1 = get_person(self.random_people[0].id)
-      person_2 = get_person(self.random_people[1].id)
-
 
     with freeze_time("2015-04-11"):
       _, notif_data = notification.get_todays_notifications()
       self.assertIn("cycle_started", notif_data[person_1.email])
+      self.assertIn(cycle.id, notif_data[person_1.email]["cycle_started"])
+      self.assertIn("my_tasks",
+                    notif_data[person_1.email]["cycle_started"][cycle.id])
 
     with freeze_time("2015-05-03"):  # two days befor due date
       _, notif_data = notification.get_todays_notifications()
@@ -80,6 +82,46 @@ class TestOneTimeWorkflowNotification(TestCase):
       _, notif_data = notification.get_todays_notifications()
       self.assertEqual(len(notif_data[person_1.email]["due_today"]), 2)
 
+  def test_one_time_wf_activate_single_person(self):
+
+    with freeze_time("2015-04-10"):
+      user = "user@example.com"
+      _, wf = self.wf_generator.generate_workflow(
+        self.one_time_workflow_single_person)
+
+      _, cycle = self.wf_generator.generate_cycle(wf)
+      self.wf_generator.activate_workflow(wf)
+
+    with freeze_time("2015-04-11"):
+      _, notif_data = notification.get_todays_notifications()
+      self.assertIn("cycle_started", notif_data[user])
+      self.assertIn(cycle.id, notif_data[user]["cycle_started"])
+      self.assertIn("my_tasks", notif_data[user]["cycle_started"][cycle.id])
+      self.assertIn("cycle_tasks", notif_data[user]["cycle_started"][cycle.id])
+      self.assertIn("my_task_groups", notif_data[user]["cycle_started"][cycle.id])
+
+      cycle = Cycle.query.get(cycle.id)
+      cycle_data = notif_data[user]["cycle_started"][cycle.id]
+      for task in cycle.cycle_task_group_object_tasks:
+        self.assertIn(task.id, cycle_data["my_tasks"])
+        self.assertIn(task.id, cycle_data["cycle_tasks"])
+        self.assertIn("title", cycle_data["my_tasks"][task.id])
+        self.assertIn("title", cycle_data["cycle_tasks"][task.id])
+
+    with freeze_time("2015-05-03"):  # two days befor due date
+      _, notif_data = notification.get_todays_notifications()
+      self.assertIn(user, notif_data)
+      self.assertNotIn("due_in", notif_data[user])
+      self.assertNotIn("due_today", notif_data[user])
+
+    with freeze_time("2015-05-04"):  # one day befor due date
+      _, notif_data = notification.get_todays_notifications()
+      self.assertEqual(len(notif_data[user]["due_in"]), 3)
+
+    with freeze_time("2015-05-05"):  # due date
+      _, notif_data = notification.get_todays_notifications()
+      self.assertEqual(len(notif_data[user]["due_today"]), 3)
+
   def create_test_cases(self):
     def person_dict(person_id):
       return {
@@ -94,6 +136,7 @@ class TestOneTimeWorkflowNotification(TestCase):
         "owners": [person_dict(self.random_people[3].id)],
         "task_groups": [{
             "title": "one time task group",
+            "contact": person_dict(self.random_people[2].id),
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
@@ -110,6 +153,7 @@ class TestOneTimeWorkflowNotification(TestCase):
             "task_group_objects": self.random_objects[:2]
         }, {
             "title": "another one time task group",
+            "contact": person_dict(self.random_people[2].id),
             "task_group_tasks": [{
                 "title": "task 1 in tg 2",
                 "description": "some task",
@@ -120,6 +164,49 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "title": "task 2 in tg 2",
                 "description": "some task",
                 "contact": person_dict(self.random_people[2].id),
+                "start_date": date(2015, 5, 1),  # friday
+                "end_date": date(2015, 5, 5),
+            }],
+            "task_group_objects": []
+        }]
+    }
+
+    user = Person.query.filter(Person.email == "user@example.com").one().id
+
+    self.one_time_workflow_single_person = {
+        "title": "one time test workflow",
+        "description": "some test workflow",
+        "owners": [person_dict(user)],
+        "task_groups": [{
+            "title": "one time task group",
+            "contact": person_dict(user),
+            "task_group_tasks": [{
+                "title": "task 1",
+                "description": "some task",
+                "contact": person_dict(user),
+                "start_date": date(2015, 5, 1),  # friday
+                "end_date": date(2015, 5, 5),
+            }, {
+                "title": "task 2",
+                "description": "some task",
+                "contact": person_dict(user),
+                "start_date": date(2015, 5, 4),
+                "end_date": date(2015, 5, 7),
+            }],
+            "task_group_objects": self.random_objects[:2]
+        }, {
+            "title": "another one time task group",
+            "contact": person_dict(user),
+            "task_group_tasks": [{
+                "title": "task 1 in tg 2",
+                "description": "some task",
+                "contact": person_dict(user),
+                "start_date": date(2015, 5, 8),  # friday
+                "end_date": date(2015, 5, 12),
+            }, {
+                "title": "task 2 in tg 2",
+                "description": "some task",
+                "contact": person_dict(user),
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }],
