@@ -1,8 +1,8 @@
 {{!
     Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: anze@reciprocitylabs.com
-    Maintained By: anze@reciprocitylabs.com
+    Created By: swizec@reciprocitylabs.com
+    Maintained By: swizec@reciprocitylabs.com
 }}
 
 {{#if_helpers '\
@@ -39,6 +39,9 @@
       {{/if}}
     {{/is_info_pin}}
 
+    {{#is_parent_of_type 'Policy,Regulation,Standard'}}
+      {{> /static/mustache/base_objects/create_objective_dropdown_option.mustache}}
+    {{/is_parent_of_type}}
   </ul>
 </div>
 {{/if_helpers}}
