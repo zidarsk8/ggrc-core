@@ -245,6 +245,7 @@ dashboard-js-template-files:
   - sections/info.mustache
   - sections/modal_content.mustache
   - sections/tree.mustache
+  - sections/dropdown_menu.mustache
   - selectors/active_column.mustache
   - selectors/base_modal.mustache
   - selectors/multitype_base_modal.mustache
