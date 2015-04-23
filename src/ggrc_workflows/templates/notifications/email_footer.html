@@ -1,0 +1,26 @@
+{#
+Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+Created By: miha@reciprocitylabs.com
+Maintained By: miha@reciprocitylabs.com
+#}
+  {% import 'notifications/style.html' as style %}
+  <table {{ style.footer_wrap() }} >
+    <tr>
+      <td {{ style.footer_container() }} >
+        <div {{ style.content() }} >
+          <table {{ style.table_full() }} >
+            <tr>
+              <td align="center">
+                <p {{ style.footer_text() }} >
+                <a href="#" {{ style.link_text() }} >Terms</a> |
+                <a href="#" {{ style.link_text() }} >Privacy</a> |
+                <a href="#" {{ style.link_text() }} >Unsubscribe</a>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>

@@ -1,0 +1,106 @@
+{#
+Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+Created By: miha@reciprocitylabs.com
+Maintained By: miha@reciprocitylabs.com
+#}
+  {% import 'notifications/style.html' as style %}
+  {% import 'notifications/macros.html' as macro %}
+  <table {{ style.body_wrap() }} >
+    <tr>
+      <td {{ style.container() }} >
+        <div {{ style.content() }} >
+          <table {{ style.table_full() }} >
+            <tr>
+              <td>
+                <h1 {{ style.main_title() }} >
+                  Hi, {{ macro.user_name(digest['user']) }}.
+                </h1>
+                <p {{ style.text_paragraph() }} >
+                  Here is what was happening yesterday:
+                </p>
+
+                {% if digest['cycle_started_tasks'] %}
+                  <h2 {{ style.sub_title() }} >Following
+                    {{ "tasks are" if digest['cycle_started_tasks']|length > 1 else "task is" }}
+                    assigned to you</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for task in digest['cycle_started_tasks'].values() %}
+                    <li {{ style.list_item() }} >
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
+                        {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }},
+                      due on {{ task['end_date'] }}
+                    </li>
+                  {% endfor %}
+                {% endif %}
+
+                {% if digest['task_declined'] %}
+                  <h2 {{ style.sub_title() }} > Following tasks you did, got declined </h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for task in digest['task_declined'].values() %}
+                    <li {{ style.list_item() }} >
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
+                      {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }}
+                    </li>
+                  {% endfor %}
+                  </ul>
+
+                {% endif %}
+
+
+                {% if digest['due_soon'] %}
+                  <h2 {{ style.sub_title() }} >
+                  {% if digest['due_soon']|length == 1 %}
+                    1 task is
+                  {% else %}
+                    {{ digest['due_soon']|length }} tasks are
+                  {% endif %}
+                  due very soon
+                  </h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for task in digest['due_soon'].values() %}
+                    <li {{ style.list_item() }} >
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
+                      {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }},
+                    due {{ task['fuzzy_due_in'] }}
+                    </li>
+                  {% endfor %}
+                  </ul>
+
+                {% endif %}
+
+                {% if digest['cycle_started'] %}
+                  <h2 {{ style.sub_title() }} >New workflow cycle(s) started</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for cycle_id, cycle in digest['cycle_started'].items() %}
+                    <li {{ style.list_item() }} >
+                      New cycle of {{ cycle['cycle_title'] }},
+                      by {{ macro.user_name(cycle['workflow_owner']) }}.
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest['cycle_starts_in'] %}
+                  <h2 {{ style.sub_title() }} >Upcoming workflows</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for workflow_id, workflow in digest['cycle_starts_in'].items() %}
+                    <li {{ style.list_item() }} >
+                      New cycle of {{ workflow['title'] }} starts {{ workflow['fuzzy_start_date'] }},
+                      by {{ macro.user_name(workflow['workflow_owner']) }}.
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                <p {{ style.text_paragraph() }} >
+                  Thanks,<br>
+                  gGRC team
+                </p>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
