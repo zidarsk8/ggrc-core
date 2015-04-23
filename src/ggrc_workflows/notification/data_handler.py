@@ -217,11 +217,11 @@ def get_object(obj_class, obj_id):
 
 
 def get_fuzzy_date(end_date):
-  delta = date.today() - end_date
+  delta = end_date - date.today()
   if delta.days == 0:
     return "today"
   # TODO: use format_timedelta from babel package.
-  return "in {} days".format(delta.days)
+  return "in {} day{}".format(delta.days, "s" if delta.days > 1 else "")
 
 
 def get_workflow_owner(context_id):
