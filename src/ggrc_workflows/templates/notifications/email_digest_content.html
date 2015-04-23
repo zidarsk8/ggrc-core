@@ -21,42 +21,21 @@ Maintained By: miha@reciprocitylabs.com
                 </p>
 
                 {% if digest['cycle_started'] %}
-                  <h2 {{ style.sub_title() }} >Following tasks are assigned to you</h2>
-                  <ul {{ style.list_wrap() }} >
                   {% for cycle in digest['cycle_started'].values() %}
-                    
-                    {% for cycle in digest['cycle_started'].values() %}
-                    
-                      {% if cycle['my_tasks'] %}
-                        {% for task in cycle['my_tasks'].values() %}
-                          <li {{ style.list_item() }} >
-                            {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
-                          </li>
-                        {% endfor %}
-                      {% endif %}
-                    
-                      {% if cycle['my_task_groups'] %}
-                        {% for task_group in cycle['my_task_groups'].values() %}
-                          {% for task in task_group.values() %}
-                            <li {{ style.list_item() }} >
-                              {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
-                            </li>
-                          {% endfor %}
-                        {% endfor %}
-                      {% endif %}
-                    
-                      {% if cycle['cycle_tasks'] %}
-                        {% for task in cycle['cycle_tasks'].values() %}
-                          <li {{ style.list_item() }} >
-                            {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
-                          </li>
-                        {% endfor %}
-                      {% endif %}
 
-                    {% endfor %}
+                    <h2 {{ style.sub_title() }} >Following tasks are assigned to you</h2>
+                    <ul {{ style.list_wrap() }} >
+
+                    {% if cycle['my_tasks'] %}
+                      {% for task in cycle['my_tasks'].values() %}
+                        <li {{ style.list_item() }} >
+                          {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
+                        </li>
+                      {% endfor %}
+                    {% endif %}
+
+                    </ul>
                   {% endfor %}
-                  </ul>
-
                 {% endif %}
 
                 {% if digest['task_declined'] %}
@@ -72,23 +51,21 @@ Maintained By: miha@reciprocitylabs.com
                 {% endif %}
 
 
-                {% if digest['due_in'] or digest['due_today'] %}
-                  <h2 {{ style.sub_title() }} > X tasks are due very soon </h2>
+                {% if digest['due_soon'] %}
+                  <h2 {{ style.sub_title() }} >
+                  {% if digest['due_soon']|length == 1 %}
+                    1 task is
+                  {% else %}
+                    {{ digest['due_soon']|length }} tasks are
+                  {% endif %}
+                  due very soon
+                  </h2>
                   <ul {{ style.list_wrap() }} >
-                  {% if digest['due_today'] %}
-                    {% for task in digest['due_today'].values() %}
-                      <li {{ style.list_item() }} >
-                        {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
-                      </li>
-                    {% endfor %}
-                  {% endif %}
-                  {% if digest['due_in'] %}
-                    {% for task in digest['due_in'].values() %}
-                      <li {{ style.list_item() }} >
-                        {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }},
-                      </li>
-                    {% endfor %}
-                  {% endif %}
+                  {% for task in digest['due_soon'].values() %}
+                    <li {{ style.list_item() }} >
+                      {{ task['title'] }}{{ " - %s" % task['object_title'] if task['object_title'] }}, due {{ task['fuzzy_due_in'] }}
+                    </li>
+                  {% endfor %}
                   </ul>
 
                 {% endif %}
