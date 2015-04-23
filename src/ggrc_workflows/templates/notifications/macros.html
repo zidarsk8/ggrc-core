@@ -5,5 +5,5 @@ Created By: miha@reciprocitylabs.com
 Maintained By: miha@reciprocitylabs.com
 #}
 {% macro user_name(user) -%}
-  {{ user['name'] if user['name'] else user['email']}}.
+  {{ user['name'] if user['name'] else user['email']}}
 {%- endmacro %}
