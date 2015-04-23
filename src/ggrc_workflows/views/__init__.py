@@ -20,6 +20,19 @@ env = Environment(loader=PackageLoader('ggrc_workflows', 'templates'))
 # module.
 
 
+def modify_data(data):
+  """
+  for easyer use in templates, it joins the due_in and due today fields
+  together
+  """
+
+  data["due_soon"] = {}
+  if "due_in" in data:
+    data["due_soon"].update(data["due_in"])
+  if "due_today" in data:
+    data["due_soon"].update(data["due_today"])
+  return data
+
 def do_start_recurring_cycles():
   start_recurring_cycles()
   return 'Ok'
@@ -29,6 +42,10 @@ def show_pending_notifications():
   if not permissions.is_admin():
     raise Forbidden()
   _, notif_data = notification.get_pending_notifications()
+
+  for day, day_notif in notif_data.iteritems():
+    for user_email, data in day_notif.iteritems():
+      data = modify_data(data)
   pending = env.get_template("notifications/view_pending_digest.html")
   return pending.render(data=sorted(notif_data.iteritems()))
 
@@ -36,6 +53,8 @@ def show_pending_notifications():
 def show_todays_digest_notifications():
   if not permissions.is_admin():
     raise Forbidden()
+  for user_email, data in notif_data.iteritems():
+    data = modify_data(data)
   _, notif_data = notification.get_todays_notifications()
   todays = env.get_template("notifications/view_todays_digest.html")
   return todays.render(data=notif_data)
@@ -54,6 +73,7 @@ def send_pending_notifications():
   for day, day_notif in notif_data.iteritems():
     subject = "gGRC daily digest for {}".format(day.strftime("%b %d"))
     for user_email, data in day_notif.iteritems():
+      data = modify_data(data)
       email_body = digest_template.render(digest=data)
       email.send_email(user_email, subject, email_body)
       sent_emails.append(user_email)
@@ -67,6 +87,7 @@ def send_todays_digest_notifications():
   sent_emails = []
   subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
   for user_email, data in notif_data.iteritems():
+    data = modify_data(data)
     email_body = digest_template.render(digest=data)
     email.send_email(user_email, subject, email_body)
     sent_emails.append(user_email)
