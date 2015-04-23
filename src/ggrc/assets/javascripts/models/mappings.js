@@ -259,7 +259,8 @@
         _mixins: ["personable", "ownable"] //controllable
       , _canonical : {
         "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
-          "Project", "System", "DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"],
+          "Project", "System"],
+        "related_objects_as_source": ["Issue"],
         "programs" : "Program",
         "objectives" : "Objective",
         "implemented_controls" : "Control",
@@ -320,6 +321,15 @@
       , policies: TypeFilter("directives", "Policy")
       , standards: TypeFilter("directives", "Standard")
       , regulations: TypeFilter("directives", "Regulation")
+
+      , related_objects_as_source: Proxy(
+          null, "destination", "Relationship", "source", "related_destinations")
+      , related_objects_as_destination: Proxy(
+          null, "source", "Relationship", "destination", "related_sources")
+      , related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"])
+      , related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment")
+      , related_issues: TypeFilter("related_objects_via_relationship", "Issue")
+
       , orphaned_objects: Multi([
           "related_objects"
         , "sections"
@@ -337,7 +347,7 @@
         _mixins: ["personable", "ownable"] //objectiveable
       , _canonical : {
           "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System",
-                               "Regulation", "Contract", "Policy", "Standard", "Program"]
+                               "Regulation", "Contract", "Policy", "Standard", "Program", "Issue"]
         , "objectives" : "Objective"
         , "controls" : "Control"
         , "_sections_base" : ["Section", "Clause"]
@@ -356,6 +366,7 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_issues:     TypeFilter("related_objects", "Issue")
 
       , regulations: TypeFilter("related_objects", "Regulation")
       , contracts: TypeFilter("related_objects", "Contract")
@@ -388,7 +399,7 @@
     , section_base: {
         _mixins: ["personable", "ownable"] //sectionable
       , _canonical : {
-        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System"],
+        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue"],
         "objectives" : "Objective",
         "controls" : "Control"
       }
@@ -405,6 +416,7 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_issues:     TypeFilter("related_objects", "Issue")
       //, sections: Proxy(
       //    "Section", "section", "ObjectSection", "sectionable", "object_sections")
       , objectives: Proxy(
@@ -488,7 +500,7 @@
         "related_objects_as_source" : [
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
-          "Program", "DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"
+          "Program", "Issue"
           ]
       }
       , related_objects_as_source: Proxy(
@@ -505,6 +517,7 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_issues:      TypeFilter("related_objects", "Issue")
 
       , regulations: TypeFilter("related_objects", "Regulation")
       , contracts: TypeFilter("related_objects", "Contract")
@@ -534,6 +547,7 @@
         , "audits" : "Audit"
         , "context" : "Context"
       }
+      , related_issues: TypeFilter("related_objects", "Issue")
       , controls: Proxy(
           "Control", "control", "ProgramControl", "program", "program_controls")
       /*, objectives: Proxy(
@@ -680,7 +694,7 @@
           "related_objects" : [
             "Program", "Regulation", "Contract", "Policy",  "Standard",
             "Objective", "Control", "Section", "Clause", "DataAsset", "Facility", "Market",
-            "OrgGroup", "Vendor", "Process", "Product", "Project", "System"
+            "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue"
             ],
           "authorizations" : "UserRole"
         }
@@ -710,7 +724,7 @@
       , related_regulations: TypeFilter("related_objects", "Regulation")
       , related_contracts:   TypeFilter("related_objects", "Contract")
       , related_policies:    TypeFilter("related_objects", "Policy")
-      , related_standards:    TypeFilter("related_objects", "Standard")
+      , related_standards:   TypeFilter("related_objects", "Standard")
       , related_objectives:  TypeFilter("related_objects", "Objective")
       , related_controls:    TypeFilter("related_objects", "Control")
       , related_sections:    TypeFilter("related_objects", "Section")
@@ -724,6 +738,7 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_issues:      TypeFilter("related_objects", "Issue")
 
       , authorizations: Direct("UserRole", "person", "user_roles")
       , programs_via_authorizations: Cross("authorizations", "program_via_context")
@@ -759,7 +774,7 @@
             ).pipe(function(mappings) {
               return mappings.entries;
             });
-        })
+        }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,Product,Project,Facility,Market,OrgGroup,Vendor,Audit")
 
       , extended_related_programs_via_search:    TypeFilter("related_objects_via_search", "Program")
       , extended_related_regulations_via_search: TypeFilter("related_objects_via_search", "Regulation")
@@ -784,7 +799,7 @@
           return CMS.Models.Request.findAll({
             'assignee_id': binding.instance.id
           });
-        })
+        }, 'Request')
       , open_audit_requests: CustomFilter('audit_requests', function(result) {
         return result.instance.status !== 'Accepted';
       })
@@ -813,6 +828,7 @@
             "requests" : "Request"
           , "_program" : "Program"
           , "context" : "Context"
+          , "related_objects_as_source" : ["ControlAssessment", "Issue"]
         }
       , requests: Direct("Request", "audit", "requests")
       , active_requests: CustomFilter('requests', function(result) {
@@ -822,6 +838,7 @@
         return result.instance.status === 'Accepted';
       })
       , _program: Direct("Program", "audits", "program")
+      , program_controls: Cross("_program", "controls")
       , objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects")
       , objectives: TypeFilter("objects", "Objective")
       , objectives_via_program : Cross("_program", "objectives")
@@ -895,6 +912,43 @@
                                       , "related_mapped_population_sample_responses"
                                       ])
       , extended_related_objects: Cross("requests", "extended_related_objects")
+      , related_objects_as_source: Proxy(
+          null, "destination", "Relationship", "source", "related_destinations")
+      , related_objects_as_destination: Proxy(
+          null, "source", "Relationship", "destination", "related_sources")
+      , related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"])
+      , related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment")
+      , related_issues: TypeFilter("related_objects_via_relationship", "Issue")
+    }
+    , ControlAssessment : {
+      _mixins: [
+        "related_object", "personable", "ownable"
+      ],
+      _canonical: {
+       "control": "Control",
+       "related_objects" : [
+          "Section", "Clause", "Audit"
+        ],
+      }
+      , control: Direct("Control", "controls", "control_assessment")
+      , related_audits:   TypeFilter("related_objects", "Audit")
+      , related_controls: TypeFilter("related_objects", "Control")
+      , related_sections: TypeFilter("related_objects", "Section")
+      , related_clauses:  TypeFilter("related_objects", "Clause")
+    }
+    , Issue : {
+      _mixins: [
+        "related_object", "personable", "ownable", "objectiveable"
+      ],
+      _canonical: {
+       "related_objects_as_source" : [
+          "Program", "ControlAssessment", "Audit", "Control", 
+          "DataAsset", "Facility", "OrgGroup", "Market"
+        ],
+      }
+      , related_audits:   TypeFilter("related_objects", "Audit")
+      , related_controls: TypeFilter("related_objects", "Control")
+      , related_control_assessments: TypeFilter("related_objects", "ControlAssessment")
     }
     , Request : {
         _canonical : {
@@ -927,7 +981,7 @@
     }
     , DocumentationResponse : {
       _mixins : ["response"]
-      , business_objects : Multi(["related_objects", "controls", "people", "sections", "clauses"])
+      , business_objects : Multi(["related_objects", "controls", "objectives", "people", "sections", "clauses"])
     }
     , InterviewResponse : {
         _canonical : {
@@ -970,7 +1024,7 @@
         return CMS.Models.CustomAttributeDefinition.findAll({
           definition_type: binding.instance.root_object
         });
-      })
+      }, 'CustomAttributeDefinition')
     }
   });
 })(GGRC, can);

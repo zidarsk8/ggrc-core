@@ -35,6 +35,7 @@ from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
+from ggrc.models.relationship import Relationship
 from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.rbac import permissions, context_query_filter
 from .attribute_query import AttributeQueryBuilder
@@ -137,6 +138,7 @@ def set_ids_for_new_custom_attribute_values(objects, obj):
       object.skip_os_state_update()
     db.session.add(object)
   db.session.flush()
+
 
 def update_memcache_before_commit(context, modified_objects, expiry_time):
   """
@@ -705,15 +707,14 @@ class Resource(ModelView):
         object_for_json, self.modified_at(obj))
 
   def validate_headers_for_put_or_delete(self, obj):
-    missing_headers = []
-    if 'If-Match' not in self.request.headers:
-      missing_headers.append('If-Match')
-    if 'If-Unmodified-Since' not in self.request.headers:
-      missing_headers.append('If-Unmodified-Since')
+    # rfc 6585 defines a new status code for missing required headers
+    required_headers = set(['If-Match', 'If-Unmodified-Since'])
+    missing_headers = required_headers.difference(set(self.request.headers.keys()))
     if missing_headers:
-      # rfc 6585 defines a new status code for missing required headers
       return current_app.make_response((
-        'If-Match is required.', 428, [('Content-Type', 'text/plain')]))
+        'required headers: ' + ', '.join(missing_headers),
+        428, [('Content-Type', 'text/plain')]))
+
     if request.headers['If-Match'] != self.etag(self.object_for_json(obj)) or \
         request.headers['If-Unmodified-Since'] != \
           self.http_timestamp(self.modified_at(obj)):

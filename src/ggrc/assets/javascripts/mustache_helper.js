@@ -759,11 +759,28 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
 });
 
 Mustache.registerHelper("schemed_url", function (url) {
-  if (url) {
-    url = url.isComputed? url(): url;
-    if (url && !url.match(/^[a-zA-Z]+:/)) {
-      return (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
-    }
+  var domain, max_label, url_split;
+
+  url = Mustache.resolve(url);
+  if (!url) {
+    return;
+  }
+
+  if (!url.match(/^[a-zA-Z]+:/)) {
+    url = (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
+  }
+
+  // Make sure we can find the domain part of the url:
+  url_split = url.split('/');
+  if (url_split.length < 3) {
+    return 'javascript://';
+  }
+
+  domain = url_split[2];
+  max_label = _.max(domain.split('.').map(function(u) { return u.length; }));
+  if (max_label > 63 || domain.length > 253) {
+    // The url is invalid and might crash user's chrome tab
+    return "javascript://";
   }
   return url;
 });
@@ -868,8 +885,7 @@ Mustache.registerHelper("using", function (options) {
 });
 
 Mustache.registerHelper("with_mapping", function (binding, options) {
-  var refresh_queue = new RefreshQueue()
-    , context = arguments.length > 2 ? resolve_computed(options) : this
+  var context = arguments.length > 2 ? resolve_computed(options) : this
     , frame = new can.Observe()
     , loader
     , stack;
@@ -1222,22 +1238,22 @@ Mustache.registerHelper('any_allowed', function (action, data, options) {
       hasPassed;
   data = resolve_computed(data);
 
-  function filter(arr, fn) {
-    var results = [];
-    arr.forEach(function (val, index, list) {
-      if (fn(val, index, list)) {
-        results.push(val);
-      }
-    });
-    return results;
-  }
-
   data.forEach(function (item) {
     passed.push(Permission.is_allowed_any(action, item.model_name));
   });
-  hasPassed = filter(passed, function (val) { return val; }).length;
-
+  hasPassed = passed.some(function (val) {
+    return val;
+  });
   return options[hasPassed ? 'fn' : 'inverse'](options.contexts || this);
+});
+
+Mustache.registerHelper('system_role', function (role, options) {
+  role = role.toLowerCase();
+  // If there is no user, it's same as No Access
+  var user_role = (GGRC.current_user ? GGRC.current_user.system_wide_role : 'no access').toLowerCase();
+      isValid = role === user_role;
+
+  return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
 });
 
 Mustache.registerHelper("is_allowed_all", function (action, instances, options) {
@@ -1843,6 +1859,35 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
   }
 });
 
+Mustache.registerHelper('last_approved', function (instance, options) {
+  var loader = instance.get_binding('approval_tasks'),
+      frame = new can.Observe();
+
+  frame.attr(instance, loader.list);
+  function finish(list) {
+    var item;
+    list = list.serialize();
+    if (list.length > 1) {
+      var biggest = Math.max.apply(Math, list.map(function (item) {
+            return item.instance.id;
+          }));
+      item = list.filter(function (item) {
+        return item.instance.id === biggest;
+      });
+    }
+    item = item ? item[0] : list[0];
+    if (item) {
+      options.contexts.add(item);
+    }
+    return options.fn(options.contexts);
+  }
+  function fail(error) {
+    return options.inverse(options.contexts.add({error: error}));
+  }
+
+  return defer_render('span', { done : finish, fail : fail }, loader.refresh_instances());
+});
+
 Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
   review_task = Mustache.resolve(review_task);
   var current_user_id = GGRC.current_user.id;
@@ -1851,7 +1896,7 @@ Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
 });
 
 Mustache.registerHelper("with_review_task", function (options) {
-  var tasks = options.contexts.attr('current_object_review_tasks');
+  var tasks = options.contexts.attr('approval_tasks');
   tasks = Mustache.resolve(tasks);
   if (tasks) {
     for (i = 0; i < tasks.length; i++) {
@@ -1861,23 +1906,25 @@ Mustache.registerHelper("with_review_task", function (options) {
   return options.fn(options.contexts.add({review_task: undefined}));
 });
 
-Mustache.registerHelper("default_audit_title", function (instance, options) {
-  var program, default_title, current_title
-    , index = 1
-    ;
+Mustache.registerHelper('default_audit_title', function (instance, options) {
+  var index,
+      program,
+      default_title,
+      current_title,
+      title;
 
-    instance = Mustache.resolve(instance);
-    program = instance.attr("program");
+  instance = Mustache.resolve(instance);
+  program = instance.attr('program');
 
   if (!instance._transient) {
-    instance.attr("_transient", { default_title : "" });
+    instance.attr('_transient', {default_title: ''});
   }
 
   if (program == null) {
     // Mark the title to be populated when computed_program is defined,
     // returning an empty string here would disable the save button.
-    instance.attr("title", "");
-    instance.attr("_transient.default_title", instance.title);
+    instance.attr('title', '');
+    instance.attr('_transient.default_title', instance.title);
     return;
   }
   if (instance._transient.default_title !== instance.title) {
@@ -1885,19 +1932,17 @@ Mustache.registerHelper("default_audit_title", function (instance, options) {
   }
 
   program = program.reify();
-
   new RefreshQueue().enqueue(program).trigger().then(function () {
+    title = (new Date()).getFullYear() + ': ' + program.title + ' - Audit';
+    default_title = title;
 
-    default_title = new Date().getFullYear() + ": " + program.title + " - Audit";
-
-    // Count the current number of audits with default_title
-    $.map(CMS.Models['Audit'].cache, function (audit) {
-      if (audit.title && audit.title.indexOf(default_title) === 0) {
-        index += 1;
-      }
+    GGRC.Models.Search.counts_for_types(title, ['Audit']).then(function (result) {
+      // Next audit index should be bigger by one than previous, we have unique name policy
+      index = result.getCountFor('Audit') + 1;
+      title = title + ' ' + index;
+      instance.attr('title', title);
+      instance.attr('_transient.default_title', instance.title);
     });
-    instance.attr("title", new Date().getFullYear() + ": " + program.title + " - Audit " + index);
-    instance.attr("_transient.default_title", instance.title);
   });
 });
 
@@ -2757,7 +2802,13 @@ Mustache.registerHelper("toggle_string", function (source, str) {
 });
 
 Mustache.registerHelper("grdive_msg_to_id", function (message) {
-  var msg = Mustache.resolve(message).split(' ');
+  var msg = Mustache.resolve(message);
+
+  if (!msg) {
+    return;
+  }
+
+  msg = msg.split(' ');
   return msg[msg.length-1];
 });
 
@@ -2946,6 +2997,31 @@ Mustache.registerHelper("if_less", function (a, b, options) {
   } else {
     return options.inverse(options.contexts);
   }
+});
+
+Mustache.registerHelper("with_create_issue_json", function (instance, options) {
+  instance = Mustache.resolve(instance);
+
+  var audits = instance.get_mapping("related_audits"),
+      audit, programs, program, control, json;
+
+  if (!audits.length) {
+    return "{}";
+  }
+
+  audit = audits[0].instance.reify();
+  programs = audit.get_mapping("_program");
+  program = programs[0].instance.reify();
+  control = instance.control.reify();
+
+  json = {
+    audit: {title: audit.title, id: audit.id, type: audit.type},
+    program: {title: program.title, id: program.id, type: program.type},
+    control: {title: control.title, id: control.id, type: control.type},
+    control_assessment: {title: instance.title, id: instance.id, type: instance.type},
+  };
+
+  return options.fn(options.contexts.add({'create_issue_json': JSON.stringify(json)}));
 });
 
 })(this, jQuery, can);

@@ -1251,6 +1251,12 @@ ul.new-tree {
 .tier-content {
   overflow: hidden;
   zoom: 1;
+  .pin-content & {
+    margin-right: 80px;
+  }
+  &.pin {
+    margin-right: 0;
+  }
 }
 
 .details-wrap {
@@ -1258,13 +1264,19 @@ ul.new-tree {
   margin-left: 20px;
   width: 60px;
   margin-top: -4px;
+  .pin-content & {
+    margin-top: -54px;
+  }
   position: relative;
   a {
     display: block;
   }
+  &.no-top {
+    margin-top: -4px;
+  }
   &.pin {
     margin-left: 10px;
-    width: 70px;
+    width: 95px;
     margin-top: 5px;
   }
   .dropdown-menu {
@@ -1365,5 +1377,22 @@ ul.new-tree {
 .unmap {
   &:hover {
     color:$error;
+  }
+}
+
+.show-in-tree {
+  font-size: 11px;
+  span {
+    @extend %oneline;
+    display: block;
+  }
+  .red {
+    color: $red;
+  }
+  .green {
+    color: $green;
+  }
+  .dark-gray {
+    color: $textGray;
   }
 }

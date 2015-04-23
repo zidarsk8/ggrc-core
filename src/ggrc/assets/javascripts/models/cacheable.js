@@ -654,7 +654,6 @@ can.Model("can.Model.Cacheable", {
         return mapper;
       }
     }
-
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
@@ -979,18 +978,17 @@ can.Model("can.Model.Cacheable", {
   , delay_resolving_save_until : function(dfd) {
     return this.notifier.queue(dfd);
   }
-
-  , save : function() {
+  , _save: function() {
     var that = this,
-        _super = this._super,
+        _super = Array.prototype.pop.call(arguments),
         isNew = this.isNew(),
         xhr,
-        dfd = new $.Deferred(),
+        dfd = this._dfd,
         pre_save_notifier = new PersistentNotifier({ name : this.constructor.model_singular + " (pre-save)" })
         ;
 
     this.before_save && this.before_save(pre_save_notifier);
-    if(isNew) {
+    if (isNew) {
       this.attr("provisional_id", "provisional_" + Math.floor(Math.random() * 10000000));
       can.getObject("provisional_cache", can.Model.Cacheable, true)[this.provisional_id] = this;
       this.before_create && this.before_create(pre_save_notifier);
@@ -1001,7 +999,7 @@ can.Model("can.Model.Cacheable", {
     pre_save_notifier.on_empty(function() {
 
       xhr = _super.apply(that, arguments).then(function(result) {
-        if(isNew) {
+        if (isNew) {
           that.after_create && that.after_create();
         } else {
           that.after_update && that.after_update();
@@ -1015,7 +1013,7 @@ can.Model("can.Model.Cacheable", {
 
       xhr.always(function() {
         that.notifier.on_empty(function() {
-          dfd.resolve();
+          dfd.resolve(that);
         });
       });
 
@@ -1023,7 +1021,13 @@ can.Model("can.Model.Cacheable", {
       GGRC.delay_leaving_page_until(dfd);
 
     });
-    return dfd.then(function() { return xhr; });
+    return dfd;
+  }
+  , save: function() {
+    Array.prototype.push.call(arguments, this._super);
+    this._dfd = new $.Deferred();
+    GGRC.SaveQueue.enqueue(this, arguments);
+    return this._dfd;
   },
   refresh_all: function() {
     var props = Array.prototype.slice.call(arguments, 0);
@@ -1069,16 +1073,26 @@ can.Model("can.Model.Cacheable", {
     }.bind(this));
 
     return values;
+  },
+
+  hash_fragment: function () {
+    var type = can.spaceCamelCase(this.type)
+            .toLowerCase()
+            .replace(/ /g, '_');
+
+    return [type,
+            this.id].join('/');
   }
 });
 
 _old_attr = can.Observe.prototype.attr;
 can.Observe.prototype.attr = function(key, val) {
-  if(key instanceof can.Observe) {
-    if(arguments[0] === this)
+  if (key instanceof can.Observe) {
+    if (arguments[0] === this) {
       return this;
-    else
+    } else {
       return _old_attr.apply(this, [key.serialize()]);
+    }
   } else {
     return _old_attr.apply(this, arguments);
   }

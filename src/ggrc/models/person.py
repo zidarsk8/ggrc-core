@@ -4,18 +4,20 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc.app import app, db
+from ggrc.models.computed_property import computed_property
+
 from sqlalchemy.orm import validates
 from .mixins import deferred, Base, CustomAttributable
 from .reflection import PublishOnly
 from .utils import validate_option
 from .exceptions import ValidationError
 from .context import HasOwnContext
+
 import re
 
 class Person(CustomAttributable, HasOwnContext, Base, db.Model):
 
   __tablename__ = 'people'
-  EMAIL_RE_STRING = "\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])\Z"
 
   email = deferred(db.Column(db.String), 'Person')
   name = deferred(db.Column(db.String), 'Person')
@@ -59,6 +61,7 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
       'name',
       'is_enabled',
       PublishOnly('object_people'),
+      PublishOnly('system_wide_role'),
       ]
   _sanitize_html = [
       'company',
@@ -87,10 +90,16 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
 
   @validates('email')
   def validate_email(self, key, email):
-    if re.match(Person.EMAIL_RE_STRING, email, re.IGNORECASE) is None:
+    if not Person.is_valid_email(email):
       message = "Must provide a valid email address"
       raise ValidationError(message)
     return email
+
+  @staticmethod
+  def is_valid_email(val):
+    # Borrowed from Django
+    email_re = re.compile('^[-!#$%&\'*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$', re.IGNORECASE)  # literal form, ipv4 address (SMTP 4.1.3)
+    return email_re.match(val) if val else False
 
   @classmethod
   def eager_query(cls):
@@ -107,7 +116,7 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
   def _display_name(self):
     return self.email
 
-  @property
+  @computed_property
   def system_wide_role(self):
     """For choosing the role string to show to the user; of all the roles in
     the system-wide context, it shows the highest ranked one (if there are

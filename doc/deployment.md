@@ -1,4 +1,4 @@
-# GGRC Deployment and Update Steps 
+# GGRC Deployment and Update Steps
 
 ## Upgrading a GGRC deployment
 
@@ -31,7 +31,7 @@ By convention, this file will be called `deploy_settings_<something>.sh` where `
 Create or update the deployment settings file (e.g. `deploy_settings_ggrc_prod.sh`).  If this is an upgrade, this file will likely be almost complete, but check for changes.  It should look similar to the following:
 
     #!/usr/bin/env bash
-    
+
     APPENGINE_INSTANCE=google.com:ggrc-prod
     SETTINGS_MODULE='app_engine_ggrc_prod ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development'
     DATABASE_URI='mysql+gaerdbms:///ggrc_prod_db?instance=google.com:ggrc-prod:ggrc-prod-db'
@@ -43,6 +43,8 @@ Create or update the deployment settings file (e.g. `deploy_settings_ggrc_prod.s
     RISK_ASSESSMENT_URL='https://ggrc-risk-dev.googleplex.com'
     SECRET_KEY='--CHANGE-TO-SOMETHING-SECRET--'
     APPENGINE_EMAIL='prasannav@google.com'
+    INSTANCE_CLASS='B4'
+    MAX_INSTANCES='4'
 
 The line `SETTINGS_MODULE` specifies what `.py` files from `settings` subdirectories should be included. For example,
 
@@ -65,6 +67,8 @@ Remember to update the required values (the `GAPI_KEY` and `GAPI_CLIENT_ID` will
 | GAPI_CLIENT_SECRET | The “OAuth Client Secret” from Step 3
 | GAPI_ADMIN_GROUP   | The group which is granted permissions to all files and folders in GDrive
 | APPENGINE_EMAIL    | The email address to use as the “From” address in outgoing emails
+| INSTANCE_CLASS     | The instance class that should be used on appengine
+| MAX_INSTANCES      | The maximum number of instances to be used on appengine
 
 There may also be a customized `src/ggrc/settings/<something>.py` file, for example, [`src/ggrc/settings/app_engine_ggrc_test.py`](../src/ggrc/settings/app_engine_ggrc_test.py).  (This file should also not be included in the repository, though examples can be found at [`src/ggrc/settings`](../src/ggrc/settings).) This file can contain additional configuration variables, including:
 
@@ -94,7 +98,7 @@ Note: This step only needs to be done once, but required APIs might change, so d
 
    Your screen should now look like the following:
 
-   ![Enable APIs](deployment1.png)
+   ![Enable APIs](res/deployment1.png)
 
 3. Select “Credentials” in the left-hand column, and click “CREATE NEW CLIENT ID”.
 
@@ -104,19 +108,19 @@ Note: This step only needs to be done once, but required APIs might change, so d
 
    Your screen should look like the following:
 
-   ![Create Client ID](deployment2.png)
+   ![Create Client ID](res/deployment2.png)
 
    * Click “Create Client ID”
 
    * Now click “CREATE NEW KEY”, and then “BROWSER KEY”:
-   
-   ![Create a new key](deployment3.png)
+
+   ![Create a new key](res/deployment3.png)
 
    * If the text box in the modal contains text, delete it.
 
    * Click “Create”.
-   
-   ![Create a browser key](deployment4.png)
+
+   ![Create a browser key](res/deployment4.png)
 
    * Your screen should now look something like this:
 
@@ -125,21 +129,21 @@ Note: This step only needs to be done once, but required APIs might change, so d
 
    > The “Client Secret” should never be revealed to untrusted parties.  GGRC doesn’t currently use it, but may at some time in the future.  If other parties have the “Client secret” value, they may be able to impersonate the GGRC deployment.
 
-   ![Credentials](deployment5-credentials.png)
+   ![Credentials](res/deployment5-credentials.png)
 
    * Copy two of these values into the `deploy_settings_ggrc_prod.sh` file from above:
 
       * First, copy the “Client ID”, and paste it in place of the “YYY” on the line beginning with `GAPI_CLIENT_ID`:
 
-        ![Credentials Client ID](deployment5-credentials-selected_client_ID.png)
+        ![Credentials Client ID](res/deployment5-credentials-selected_client_ID.png)
 
       * Second, copy the “API key”, and paste it in place of the “XXX” on the line beginning with `GAPI_KEY`:
-      
-        ![Credentials API Key](deployment5-credentials-selected_API_key.png)
+
+        ![Credentials API Key](res/deployment5-credentials-selected_API_key.png)
 
 4. Click “Consent Screen” in the left-hand column, assign the email address, and fill in at least the “PRODUCT NAME” box:
 
-![Consent screen](deployment6-consent_screen.png)
+![Consent screen](res/deployment6-consent_screen.png)
 
 Now we’re done setting up the Google APIs, so let’s deploy.
 

@@ -323,7 +323,7 @@ These manifest files live in [`src/<module>/assets/assets.yaml`](/src/ggrc/asset
 
 **TODO**: Show and talk about diagram with Title, LHN, Dashboard, Dashboard Widget, Info Widget, TreeView & TreeNode.
 
-![Page structure](page_structure.png)
+![Page structure](res/page_structure.png)
 
 #### View Logic
 
@@ -333,7 +333,7 @@ View logic is defined within the control (as functions on the control itself).
 
 Which widgets (or tabs) are shown on the object page is defined in [`business_objects.js`](/src/ggrc/assets/javascripts/apps/business_objects.js). This is where we state which controller should be used for each tab (InfoWidget/TreeView/ListView). TreeViews are used almost everywhere, except on the Admin Dashboard, where we are using ListViews. ListViews have pagination.
 
-Almost every TreeView controller instance has a `parent_instance` variable that can be used to access the parent. 
+Almost every TreeView controller instance has a `parent_instance` variable that can be used to access the parent.
 You can't get the parent of an object without a TreeView, because an object can have multiple parents (think of it as a graph). Our TreeViews are trees inside this graph so that's why we can have parent instances in this context.
 
 Filtering a TreeView is done in the TreeFilter, which simply hides the elements from the DOM.
@@ -373,15 +373,15 @@ A stub can be converted into a full-form instance by calling `reify()` on the st
 #### Lifecycle of a Model
 
 * Primary Operations
-  * Saving 
-  
+  * Saving
+
   Saving is either done as an update or create operation.  See Updating and Creating below.
   * Updating
- 
+
   Updating happens when an instance is known to exist on the server (the determinant is whether the id property is set on the instance)
 and `save()` is called on the instance. The update is executed with a PUT request to the object endpoint.
   * Creating
-  
+
   Creating happens when an instance is known not to exist on the server (id property is not set) and `save()` is called on the instance.
 The create is executed with a POST request to the collection endpoint.
   * Deleting
@@ -401,7 +401,7 @@ task completes.
  * \_pending_joins() / "deferred bindings"
 
  Model instances can be joined to other objects as part of their regular update cycles.  After an update completes successfully, any
- deferred binding operations contained in `<instance>._pending_joins` are resolved by adding or removing join objects.  These 
+ deferred binding operations contained in `<instance>._pending_joins` are resolved by adding or removing join objects.  These
  deferred bindings are usually created by using `<instance>.mark_for_addition()` and `<instance>.mark_for_deletion()`
  * other modal-based ops
 
@@ -419,7 +419,7 @@ Are they cached?
     * can.Model.Cacheable
         * Once a model is retrieved to the browser, it is stored in `CMS.Models.<model_name>.cache[<id>]`.  Once present, it is only requested again via the `<instance>.refresh()` method.
         * A model can be conditionally pulled from the server (if it only exists on the client in stub form) by enqueueing it into a
-        RefreshQueue, and then subsequently triggering the RefreshQueue.  If an enqueued model has already been synched (i.e. if 
+        RefreshQueue, and then subsequently triggering the RefreshQueue.  If an enqueued model has already been synched (i.e. if
         the selfLink property exists on the instance), it will not be re-fetched by the RefreshQueue.
 
 How/when are they validated?
@@ -462,15 +462,15 @@ View helpers are defined using the Mustache [helper mechanism provided by CanJS]
 
 ### Extensions
 
-An extension is a bundle of code and assets packaged into a folder hierarchy similar to ggrc-core.  Extensions have at minimum a 
+An extension is a bundle of code and assets packaged into a folder hierarchy similar to ggrc-core.  Extensions have at minimum a
 startup script at &lt;extension-folder&gt;/\_\_init\_\_.py and a settings file in &lt;extension-folder&gt;/settings
 
 The extensions which are used in any GGRC instance are determined by the GGRC\_SETTINGS\_MODULE shell variable. To add an extension to
-a GGRC deployment, append a space separator and the Python path to the settings file (e.g. 
+a GGRC deployment, append a space separator and the Python path to the settings file (e.g.
 " ggrc\_some\_extension.settings.development") to this shell variable, and restart or redeploy the GGRC server.
 
 The minimum that the extension settings file must contain is `EXTENSIONS = ['<name_of_extension>']`.  Additionally, global settings
-can be provided; any variable set at the top level in this file will be added to the `ggrc.settings` object and later accessible 
+can be provided; any variable set at the top level in this file will be added to the `ggrc.settings` object and later accessible
 through `from ggrc import settings`.  Setting `exports =` to an array of key names in the extension settings file will make those keys
 and their values available to the client side through the `GGRC.config` object.
 
@@ -490,10 +490,10 @@ blueprint = Blueprint(
 
 This will set up an extension to be recognized by Flask.
 
-Asset hierarchies in extensions should follow the ggrc-core model: assets.yaml should define the bundles for dasboard-js, 
-dashboard-templates, and dashboard-js-specs; The folder naming convension for these bundles (`assets/javascripts`, `assets/mustache`, 
-and `assets/js_specs`, respectively) should be followed for each extension.  An important caveat is that the assets bundler can only 
-bundle one asset with a given path over all base folders, so you should avoid re-using paths known to exist in ggrc-core or other 
+Asset hierarchies in extensions should follow the ggrc-core model: assets.yaml should define the bundles for dasboard-js,
+dashboard-templates, and dashboard-js-specs; The folder naming convension for these bundles (`assets/javascripts`, `assets/mustache`,
+and `assets/js_specs`, respectively) should be followed for each extension.  An important caveat is that the assets bundler can only
+bundle one asset with a given path over all base folders, so you should avoid re-using paths known to exist in ggrc-core or other
 extenions (e.g. "mustache_helper.js" and "models/mixins.js" already exist in ggrc-core, so don't name your files the same as these).
 
 DB migrations should be set up in `migrations/versions` as in ggrc-core.  Once the extension is created and the settings path added to
@@ -504,7 +504,7 @@ GGRC\_SETTINGS\_MODULE, db_migrate should pick up any migrations automatically. 
 
 * Models
 
- Define models in your `<extension_name>/models/` folder, and use the same patterns for implementing them as ggrc-core does (derive from ggrc.db.Model, use provided mixins, make association proxy tables and models, etc.).  Be sure to import all files from models 
+ Define models in your `<extension_name>/models/` folder, and use the same patterns for implementing them as ggrc-core does (derive from ggrc.db.Model, use provided mixins, make association proxy tables and models, etc.).  Be sure to import all files from models
  as part of the extension's \_\_init\_\_.py
 
 * Services
@@ -515,7 +515,7 @@ GGRC\_SETTINGS\_MODULE, db_migrate should pick up any migrations automatically. 
  ```python
  from . import models
  from ggrc.services.registry import service
-  
+
  def contributed_services():
   return [
     service(m.__table__.name, m)
@@ -526,9 +526,9 @@ GGRC\_SETTINGS\_MODULE, db_migrate should pick up any migrations automatically. 
  ```
 
 * Views
- * Any special templates should be placed under &lt;extension\_module\_name&gt;/templates/ and called as normal. 
+ * Any special templates should be placed under &lt;extension\_module\_name&gt;/templates/ and called as normal.
  * To set up an object page for one of the contributed model classes, declare a function similar to this (this function will work as long as your module hierarchy is flat with all models at the first level and you want all of your objects to have pages):
- 
+
  ```python
  from ggrc.views.registry import object_view
  from . import models
@@ -576,11 +576,11 @@ the exception back to Tracker.  For maximum coverage, the script that defines th
 AJAX failures that happen while a modal is active are reported back to a flash handler at the modal level (so that the flash messages
 are not covered by modals or overlays).
 
-Because the error handler at the window level handles most of our needs, try/catch blocks are rare in GGRC.  However, it is worth 
-noting that errors in Deferred callbacks may not fire the onerror handler, *and* "break the chain" inasmuch as the state of the 
+Because the error handler at the window level handles most of our needs, try/catch blocks are rare in GGRC.  However, it is worth
+noting that errors in Deferred callbacks may not fire the onerror handler, *and* "break the chain" inasmuch as the state of the
 deferred never changes from "pending" after that, and other deferreds waiting for the result of that deferred will never run.  This
 is a failure of the jQuery Deferred object to sensibly handle uncaught errors (they should reject the deferred instead). In the case
-where it's possible that a callback will throw an error, it is recommended to wrap the content of the callback in `try/catch` and 
+where it's possible that a callback will throw an error, it is recommended to wrap the content of the callback in `try/catch` and
 return a rejected deferred when an error happens.
 
 ### Problem Areas
@@ -601,7 +601,7 @@ Mappings essentially turn the entire system into a [property graph](https://gith
 
 Mappings are defined in [`/src/ggrc/assets/javascripts/models/mappings.js`](/src/ggrc/assets/javascripts/models/mappings.js).
 
-We don't have a function that gets all the objects mapped to a given object. 
+We don't have a function that gets all the objects mapped to a given object.
 You can get the mappings of an instance by calling `instance.get_mappings('_mapping_')` if the mappings are already loaded, or by calling `instance.get_binding('_mapping_').refresh_list()` if they are not.
 
 #### Types of Mappings
@@ -622,7 +622,7 @@ sparingly in the system if it makes a number of large AJAX calls.
 
 * **Multi**: Constructs a mapping which is the union of zero or more other mappings.  Specifically, the set of `result.instance` values is the union of `result.instance` from the contributing mappings.
 
-* **TypeFilter**: A TypeFiltered mapping takes the result of another mapping and returns only the results which are instances of a 
+* **TypeFilter**: A TypeFiltered mapping takes the result of another mapping and returns only the results which are instances of a
 specified type.  This is useful for filtering polymorphic proxies.
 
 * **CustomFilter**: A custom filtered mapping runs a filter function on every result coming from a source mapping and returns all

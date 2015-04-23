@@ -28,11 +28,11 @@
         .span4
           .download-template
             %a.section-import{"href": '/help/import_template'}
-              %i.grcicon-imp-exp
+              %i.grcicon-download
               Download Import {{import_kind}} template
       .row-fluid.wrap-row
         .span12
-          %input{ 'name': 'file', 'value': 'choose file' , 'type': 'file' }
+          %input{ 'name': 'file', 'value': 'choose file' , 'type': 'file', 'accept': '.csv' }
           .import-buttons
             %input{ 'value': 'Upload and Review', 'class': 'btn btn-large btn-info', 'type': 'submit' }
 

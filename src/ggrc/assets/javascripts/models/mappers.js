@@ -369,10 +369,11 @@
             mapping_attr = found_result.mappings;
             // Since we're adding the result as its own mapping, use
             // new_result as the mapping instead of new_result.mappings?
+
             can.each(new_result.mappings, function(mapping) {
               // TODO: Examine when this will be false -- is it a sign of
               //   duplicate work?
-              if (mapping_attr.indexOf(mapping) === -1) {
+              if (mapping_attr.indexOf && mapping_attr.indexOf(mapping) === -1) {
                 found_result.insert_mapping(mapping);
                 instances_to_refresh.push(new_result.instance);
               }
@@ -1445,9 +1446,9 @@
 
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.SearchListLoader", {
   }, {
-      init: function(query_function) {
+      init: function(query_function, observe_types) {
         this._super();
-
+        this.observe_types = observe_types && observe_types.split(',');
         this.query_function = query_function;
       }
 
@@ -1458,7 +1459,9 @@
 
         model.bind("created", function(ev, mapping) {
           if (mapping instanceof model) {
-            that._refresh_stubs(binding);
+            if (_.includes(that.observe_types, mapping.type)) {
+              that._refresh_stubs(binding);
+            }
           }
         });
 
@@ -1642,8 +1645,8 @@
       instance_model_name, option_join_attr);
   }
 
-  GGRC.MapperHelpers.Search = function Search(query_function) {
-    return new GGRC.ListLoaders.SearchListLoader(query_function);
+  GGRC.MapperHelpers.Search = function Search(query_function, observe_types) {
+    return new GGRC.ListLoaders.SearchListLoader(query_function, observe_types);
   }
 
   GGRC.MapperHelpers.Multi = function Multi(sources) {

@@ -5,6 +5,7 @@
 
 from datetime import date, timedelta
 from monthdelta import monthdelta
+from calendar import monthrange
 
 '''
 All dates are calculated raw. They are not adjusted for holidays or workdays.
@@ -221,6 +222,7 @@ class WorkflowDateCalculator(object):
 
   def nearest_end_date_after_start_date(self, start_date):
     frequency = self.workflow.frequency
+    #TODO: fix the entire logic here. months and days can't be calculated separately
     max_relative_end_day = self._max_relative_end_day_from_tasks()
     max_relative_end_month = self._max_relative_end_month_from_tasks()
     return WorkflowDateCalculator.nearest_end_date_after_start_date_from_dates(
@@ -232,7 +234,9 @@ class WorkflowDateCalculator(object):
     if start_date is None:
       return None
 
+
     if "one_time" == frequency:
+      end_day = min(monthrange(start_date.year, end_month)[1], end_day)
       end_date = date(year=start_date.year, month=end_month, day=end_day)
       if end_date < start_date:
           raise ValueError("End date cannot be before start date.")

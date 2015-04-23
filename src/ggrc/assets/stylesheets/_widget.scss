@@ -14,9 +14,11 @@
   .tree-action-list {
     @extend %reset-list;
     @include clearfix();
-    float: right;
+    text-align: right;
+    height: 28px;
     li {
-      float: left;
+      display: inline-block;
+      overflow: hidden;
       margin-left: 10px;
       line-height: 24px;
       .item-data {
@@ -95,7 +97,8 @@
       }
       .tree-action-list {
         [class^="grcicon-"] {
-          @include opacity(0.25);
+          margin-top: 1px;
+          @include opacity(0.5);
           @include transition(opacity 0.2s ease);
           margin-top: 1px;
         }
@@ -162,6 +165,9 @@
       &.no-left-space {
         padding-left: 10px;
       }
+    }
+    &.left-space {
+      padding-left: 10px;
     }
     &.default-left-space {
       padding: 0 12px 0 10px;
@@ -572,11 +578,6 @@
   }
   .custom-attr-wrap {
     border-top: 1px solid $itemBorder;
-    .hidden-fields-area,
-    .hidden-fields-area-custom {
-      margin-top: 15px;
-      border-bottom: 1px solid $itemBorder;
-    }
   }
   .info-widget-footer {
     padding-top: 3px;
@@ -585,6 +586,13 @@
       color: $textGray;
     }
   }
+}
+
+.hidden-fields-area,
+.hidden-fields-area-custom {
+  padding-top: 15px;
+  padding-left: 28px;
+  border-bottom: 1px solid $itemBorder;
 }
 
 .info {
@@ -1128,6 +1136,11 @@
   }
   .filter-button {
     @include clearfix();
+    a {
+      float: right;
+      margin-top: 12px !important;
+      margin-left: 10px;
+    }
     input[type="submit"] {
       margin-top: 7px;
       float: right;
@@ -1140,9 +1153,6 @@
     i {
       @include opacity(0.25);
       @include transition(opacity 0.2s ease);
-      float: right;
-      margin-top: 12px !important;
-      margin-left: 10px;
       &:hover {
         @include opacity(1);
       }

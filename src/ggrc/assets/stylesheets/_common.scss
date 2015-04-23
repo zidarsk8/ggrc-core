@@ -35,6 +35,12 @@ h1 {
     background: $white;
     width: 85%;
   }
+  .right-side {
+    position: absolute;
+    right: 104px;
+    top: 0;
+    text-align: right;
+  }
 }
 
 h2 {
@@ -438,7 +444,7 @@ small {
 
 // Date input field - To see date icon just add class .date to input field
 input.date {
-  @include background-size(368px 416px);
+  @include background-size(368px 440px);
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
   background-position: -340px -364px;
@@ -696,7 +702,7 @@ select.multiple-selector {
   .ui-datepicker-next {
     top: 4px !important;
     .ui-icon {
-      @include background-size(368px 416px);
+      @include background-size(368px 440px);
       background-image: image-url("grcicons/icons.png");
       background-position: -2000px -2000px;
       background-repeat: no-repeat;
@@ -960,6 +966,54 @@ p {
     &:hover {
       .grcicon-to-right {
         @include opacity(1);
+      }
+    }
+  }
+}
+
+.pos-wrap {
+  position: relative;
+  .dropdown-menu {
+    @extend %reset-list;
+    @include border-radius(0);
+    min-width: 210px;
+    float: none;
+    padding: 5px 0;
+    margin-top: 6px;
+    text-transform: none;
+    top: 100%;
+    right: 0;
+    left: auto;
+    z-index: 9999;
+    li {
+      float:none;
+      clear: both;
+      text-transform: none;
+      a {
+        display: block;
+        line-height: 30px;
+        padding: 0 10px;
+        background: none;
+        text-shadow: none;
+        color: $gray;
+        @include transition(background 0.2s ease, color 0.2s ease);
+        i {
+          margin: 7px 4px 0 0;
+          @include opacity(0.4);
+          @include transition(opacity 0.2s ease);
+        }
+        &:hover {
+          background: $headerBgnd;
+          color: $black;
+          i {
+            @include opacity(1);
+          }
+        }
+      }
+      &.border {
+        border-top: 1px solid $headerBgnd;
+        padding-top: 5px;
+        margin-top: 5px;
       }
     }
   }

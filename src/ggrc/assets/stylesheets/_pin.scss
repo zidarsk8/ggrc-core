@@ -36,8 +36,8 @@
     margin-left: 5px;
     a {
       i {
-        @include opacity(0.25);
-        @include transition(opacity 0.2s ease);
+        @include opacity(.25);
+        @include transition(opacity .2s ease);
       }
       &:hover {
         i {
@@ -47,6 +47,45 @@
     }
     &:first-child {
       margin-left: 0;
+    }
+  }
+}
+
+.visual-radio {
+  @extend %reset-list;
+  @include clearfix();
+  li {
+    float: left;
+    margin-right: 5px;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  a {
+    display: block;
+  }
+  i {
+    @include opacity(.25);
+  }
+  .grcicon-done { background-position: -78px -416px; }
+  .grcicon-not-done { background-position: -102px -416px; }
+  .active {
+    .grcicon-done { background-position: -30px -416px; }
+    .grcicon-not-done { background-position: -54px -416px; }
+    i {
+      @include opacity(1);
+    }
+  }
+}
+
+.repeated-utility {
+  @extend %reset-list;
+  @include clearfix();
+  li {
+    float: left;
+    margin-right: 10px;
+    &:last-child {
+      margin-right: 0;
     }
   }
 }

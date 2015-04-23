@@ -257,6 +257,7 @@
         , modal_title : object_params.modal_title || modal_title
         , content_view : content_view
         , mapping : mapping
+        , $trigger: $trigger
       });
 
       $target.on('modal:success', function(e, data, xhr) {

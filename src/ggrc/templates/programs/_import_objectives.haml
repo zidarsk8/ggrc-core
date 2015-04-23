@@ -30,19 +30,19 @@
           .download-template
             -if import_kind == "Objectives"
               %a.section-import{"href": 'import_objectives_template'}
-                %i.grcicon-imp-exp
+                %i.grcicon-download
                 Download Import Objectives template
             -elif import_kind == "Clauses"
               %a.section-import{"href": 'import_clauses_template'}
-                %i.grcicon-imp-exp
+                %i.grcicon-download
                 Download Import Clauses template
             -else
               %a.section-import{"href": 'import_sections_template'}
-                %i.grcicon-imp-exp
+                %i.grcicon-download
                 Download Import Sections template
       .row-fluid.wrap-row
         .span12
-          %input{ 'name': 'file', 'value': 'choose file' , 'type': 'file' }
+          %input{ 'name': 'file', 'value': 'choose file' , 'type': 'file', 'accept': '.csv' }
           .import-buttons
             %input{ 'value': 'Upload and Review', 'class': 'btn btn-large btn-info', 'type': 'submit' }
 

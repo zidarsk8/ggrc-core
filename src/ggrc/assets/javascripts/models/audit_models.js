@@ -245,7 +245,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
 
     return vals;
   }
-
 });
 
 can.Model.Mixin("requestorable", {
@@ -513,6 +512,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
     , object_controls : "CMS.Models.ObjectControl.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , controls : "CMS.Models.Control.stubs"
     , contact : "CMS.Models.Person.stub"
   }
@@ -581,23 +581,16 @@ can.Model.Cacheable("CMS.Models.Response", {
   }
   , form_preload : function(new_object_form) {
     if(new_object_form && !this.contact) {
-        if (!this.request) {
-            this.bind("request", function (ev, request) {
-                this.attr('contact', request.reify().assignee);
-            });
-        }else{
-            this.attr('contact', this.request.reify().assignee);
-        };
+      if (!this.request) {
+        this.bind("request", function (ev, request) {
+          if (request && request.reify) {
+            this.attr('contact', request.reify().assignee);
+          }
+        });
+      } else {
+        this.attr('contact', this.request.reify().assignee);
+      }
     }
-  }
-  , after_create: function () {
-    var hash = window.location.hash.split("/")[0];
-
-    window.location.hash = [hash,
-                            "request",
-                            this.request.id,
-                            this.response_type+"_response",
-                            this.id].join("/");
   }
 
 });
@@ -725,6 +718,35 @@ can.Model.Cacheable("CMS.Models.Meeting", {
         });
   }
 
+});
+
+can.Model.Cacheable("CMS.Models.ControlAssessment", {
+  root_object : "control_assessment",
+  root_collection : "control_assessments",
+  findOne : "GET /api/control_assessments/{id}",
+  update : "PUT /api/control_assessments/{id}",
+  destroy : "DELETE /api/control_assessments/{id}",
+  create : "POST /api/control_assessments",
+  mixins : ["ownable", "contactable"],
+  is_custom_attributable: true,
+  attributes : {
+    control : "CMS.Models.Control.stub",
+    context : "CMS.Models.Context.stub",
+    modified_by : "CMS.Models.Person.stub",
+    custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
+    start_date: "date",
+    end_date: "date"
+  },
+  init : function() {
+    this._super && this._super.apply(this, arguments);
+    this.validatePresenceOf("control");
+    this.validatePresenceOf("audit");
+    this.validateNonBlank("title");
+  }
+}, {
+  object_model: can.compute(function() {
+    return CMS.Models[this.attr("object_type")];
+  }),
 });
 
 })(this.can);
