@@ -5,11 +5,17 @@
     Maintained By: anze@reciprocitylabs.com
 }}
 
-{{> /static/mustache/base_objects/edit_object_link.mustache}}
+{{#is_allowed_update instance context='for'}}
+    {{> /static/mustache/base_objects/edit_object_link.mustache}}
+{{/is_allowed_update}}
+
 {{#is_info_pin}}
-  {{^options.is_in_selector}}
-    {{> /static/mustache/base_objects/unmap.mustache}}
-  {{/options}}
+  {{#is_allowed_to_map page_instance instance}}
+      {{^options.is_in_selector}}
+          {{> /static/mustache/base_objects/unmap.mustache}}
+
+      {{/options}}
+  {{/is_allowed_to_map}}
   {{#if instance.viewLink}}
     {{#is_allowed "view_object_page" instance}}
       <li>
