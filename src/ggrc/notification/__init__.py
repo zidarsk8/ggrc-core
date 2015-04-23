@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from datetime import date
 from ggrc.extensions import get_extension_modules
 from ggrc.models import Notification
+from ggrc.utils import merge_dict
 from ggrc import db
 from sqlalchemy import and_
 
@@ -40,23 +41,6 @@ class NotificationServices():
 
 
 services = NotificationServices()
-
-
-def merge_dict(destination, source, path=None):
-  """merges source into destination"""
-  if path is None:
-    path = []
-  for key in source:
-    if key in destination:
-      if isinstance(destination[key], dict) and isinstance(source[key], dict):
-        merge_dict(destination[key], source[key], path + [str(key)])
-      elif destination[key] == source[key]:
-        pass  # same leaf value
-      else:
-        raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
-    else:
-      destination[key] = source[key]
-  return destination
 
 
 def get_notification_data(notifications):
