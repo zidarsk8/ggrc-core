@@ -13,6 +13,7 @@ from ggrc_workflows.models import (
 )
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
+from ggrc.utils import merge_dicts
 
 
 """
@@ -36,7 +37,7 @@ def get_cycle_created_task_data(notification):
       cycle_task.id: get_cycle_task_dict(cycle_task)
   }
 
-  return {
+  assignee_data = {
       task_assignee['email']: {
           "user": task_assignee,
           "cycle_started": {
@@ -44,7 +45,9 @@ def get_cycle_created_task_data(notification):
                   "my_tasks": task
               }
           }
-      },
+      }
+  }
+  tg_assignee_data = {
       task_group_assignee['email']: {
           "user": task_group_assignee,
           "cycle_started": {
@@ -54,16 +57,19 @@ def get_cycle_created_task_data(notification):
                   }
               }
           }
-      },
+      }
+  }
+  wf_owner_data = {
       workflow_owner['email']: {
           "user": workflow_owner,
           "cycle_started": {
               cycle.id: {
-                  "workflow_tasks": task
+                  "cycle_tasks": task
               }
           }
-      },
+      }
   }
+  return merge_dicts(assignee_data, tg_assignee_data, wf_owner_data)
 
 
 def get_cycle_task_due(notification):
