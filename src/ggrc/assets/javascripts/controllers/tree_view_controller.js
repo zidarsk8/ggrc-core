@@ -640,7 +640,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         }.bind(this));
         this.oldList = null;
         this._remove_marker = null;
-        $(".cms_controllers_info_pin").control().unsetInstance();
+
+        // TODO: This is a workaround. We need to update communication between
+        //       info-pin and tree views through Observer
+        if (!this.element.closest(".cms_controllers_info_pin").length) {
+          $(".cms_controllers_info_pin").control().unsetInstance();
+        }
         this.show_info_pin();
       }
     }.bind(this)), 200);
