@@ -5,6 +5,7 @@
 
 
 from collections import defaultdict
+from freezegun import freeze_time
 from datetime import date
 from ggrc.extensions import get_extension_modules
 from ggrc.models import Notification
@@ -82,7 +83,10 @@ def get_pending_notifications():
   for notification in notifications:
     notif_by_day[notification.send_on].append(notification)
 
-  data = {d: get_notification_data(n) for d, n in notif_by_day.iteritems()}
+  data = {}
+  for day, notif in notif_by_day.iteritems():
+    with freeze_time(day):
+      data[day] = get_notification_data(notif)
 
   return notifications, data
 
