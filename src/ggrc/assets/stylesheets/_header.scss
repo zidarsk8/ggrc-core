@@ -90,21 +90,20 @@
         height: 16px;
         @include border-radius(8px);
       }
-      &:last-child {
-        a {
-          padding-right: 0;
-        }
-      }
       a {
         display: block;
         color: $black;
-        line-height: 48px;
+        line-height: 47px;
         padding: 0 10px;
         i {
           margin: 16px 2px 0 0;
           &.grcicon-carot-white {
             margin-right: 0;
           }
+        }
+        &:hover {
+          background: $headerBgnd;
+          text-decoration: none;
         }
       }
       .dropdown-menu {
@@ -149,6 +148,11 @@
         .dropdown-menu {
           left: auto;
           right: 0;
+        }
+        &.open {
+          > a {
+            background: $headerBgnd;
+          }
         }
       }
       &.active {
