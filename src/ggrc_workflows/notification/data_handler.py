@@ -208,6 +208,7 @@ def get_workflow_data(notification):
         "cycle_starts_in": {
             workflow.id: {
                 "workflow_owner": workflow_owner,
+                "workflow_url": get_workflow_url(workflow),
                 "start_date": workflow.next_cycle_start_date,
                 "fuzzy_start_date": get_fuzzy_date(
                     workflow.next_cycle_start_date),
@@ -297,3 +298,9 @@ def get_cycle_dict(cycle, manual=False):
       "workflow_owner": workflow_owner,
       "cycle_url": get_cycle_url(cycle),
   }
+
+def get_workflow_url(workflow):
+  return "{base}workflows/{workflow_id}#current_widget".format(
+          base=request.url_root,
+          workflow_id=workflow.id,
+      )
