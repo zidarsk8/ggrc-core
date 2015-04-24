@@ -266,7 +266,10 @@ can.Model.Cacheable("CMS.Models.Request", {
   root_object : "request"
   , filter_keys : ["assignee", "code", "company", "control",
                    "due date", "due", "name", "notes", "request",
-                   "requested on", "status", "test", "title"]
+                   "requested on", "status", "test", "title", "request_type", "type"],
+  filter_mappings: {
+    "type": "request_type"
+  }
   , root_collection : "requests"
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
