@@ -259,6 +259,14 @@ can.Control("CMS.Controllers.LHN", {
       $off.toggleClass("active", got_filter);
   }
 
+  , ".filter-off a click": function (el, ev) {
+    ev.preventDefault();
+
+    this.element.find('.widgetsearch').val('');
+    this.toggle_filter_active();
+    this.do_search('');
+  }
+
   , "a[data-name='work_type'] click": function(el, ev) {
       var target = $(ev.target),
           checked;
