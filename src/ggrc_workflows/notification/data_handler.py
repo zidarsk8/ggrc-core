@@ -238,7 +238,7 @@ def get_workflow_owner(context_id):
 
 
 def get_cycle_task_url(cycle_task):
-  return ("{base}workflows/{workflow_id}#current_widget/cicle/{cycle_id}"
+  return ("{base}workflows/{workflow_id}#current_widget/cycle/{cycle_id}"
           "/cycle_task_group/{cycle_task_group_id}/"
           "/cycle_task_group_object_task/{cycle_task_id}").format(
       base=request.url_root,
@@ -253,7 +253,11 @@ def get_cycle_task_dict(cycle_task):
 
   object_title = ""
   if cycle_task.cycle_task_group_object:
-    object_title = cycle_task.cycle_task_group_object.object.title
+    if cycle_task.cycle_task_group_object.object:
+      object_title = cycle_task.cycle_task_group_object.object.title
+    else:
+      object_title = "{} [deleted]".format(
+        cycle_task.cycle_task_group_object.title)
 
   return {
       "title": cycle_task.title,
@@ -276,11 +280,12 @@ def get_person_dict(person):
 
 
 def get_cycle_url(cycle):
-  return "{base}workflows/{workflow_id}#current_widget/cicle/{cycle_id}".format(
-      base=request.url_root,
-      workflow_id=cycle.workflow.id,
-      cycle_id=cycle.id,
-  )
+  return "{base}workflows/{workflow_id}#current_widget/cycle/{cycle_id}"\
+      .format(
+          base=request.url_root,
+          workflow_id=cycle.workflow.id,
+          cycle_id=cycle.id,
+      )
 
 
 def get_cycle_dict(cycle, manual=False):
