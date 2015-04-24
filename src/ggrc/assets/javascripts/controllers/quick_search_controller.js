@@ -246,8 +246,18 @@ can.Control("CMS.Controllers.LHN", {
   }
 
   , ".widgetsearch keyup": function(el, ev) {
-      el.toggleClass("active", el.val().trim().length);
+      this.toggle_filter_active();
     }
+
+  , toggle_filter_active: function () {
+      // Set active state to search field if the input is not empty:
+      var $filter = this.element.find('.widgetsearch'),
+          $off = this.element.find('.filter-off'),
+          got_filter = !!$filter.val().trim().length;
+
+      $filter.toggleClass("active", got_filter);
+      $off.toggleClass("active", got_filter);
+  }
 
   , "a[data-name='work_type'] click": function(el, ev) {
       var target = $(ev.target),
@@ -374,10 +384,8 @@ can.Control("CMS.Controllers.LHN", {
           } else {
             this.initial_scroll();
           }
-          // Set active state to search field if the input is not empty:
-          this.element.find('.widgetsearch').filter(function() {
-            return this.value;
-          }).addClass('active');
+          
+          this.toggle_filter_active();
 
           if (this.options.display_prefs.getLHNState().is_pinned) {
             this.pin();
