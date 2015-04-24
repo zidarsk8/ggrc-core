@@ -98,7 +98,7 @@
       .tree-action-list {
         [class^="grcicon-"] {
           margin-top: 1px;
-          @include opacity(0.25);
+          @include opacity(0.5);
           @include transition(opacity 0.2s ease);
         }
         li {

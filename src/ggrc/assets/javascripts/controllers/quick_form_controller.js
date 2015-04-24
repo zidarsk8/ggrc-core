@@ -391,7 +391,8 @@ can.Component.extend({
     //  mapping to a parent instance.  The mapping_autocomplete helper defined below is
     //  generally for these.
     "input:not([data-mapping]), select change" : function(el) {
-      if(el.is("[type=checkbox][multiple]")) {
+      var isCheckbox = el.is("[type=checkbox][multiple]");
+      if (isCheckbox) {
         if(!this.scope.instance[el.attr("name")]) {
           this.scope.instance.attr(el.attr("name"), new can.List());
         }
@@ -405,10 +406,15 @@ can.Component.extend({
             }
           )
         );
+        this.element.find("input:checkbox").prop("disabled", true);
       } else {
         this.scope.instance.attr(el.attr("name"), el.val());
       }
-      this.scope.instance.save();
+      this.scope.instance.save().then(function () {
+        if (isCheckbox) {
+          this.element.find("input:checkbox").prop("disabled", false);
+        }
+      }.bind(this));
     },
   },
   helpers: {

@@ -61,7 +61,7 @@
                   {{/using}}
                 </ul>
                 <div class="item-data">
-                  <span class="status-label status-draft"></span>
+                  <span class="status-label {{addclass "status-" instance.status}} {{addclass "status-" instance.overdue}}"></span>
                   <div class="tree-title-area w-status">
                     <a href="#">{{instance.title}}</a>
                     <ul class="item-util">

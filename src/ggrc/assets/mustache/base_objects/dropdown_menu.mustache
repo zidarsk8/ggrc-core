@@ -5,19 +5,40 @@
     Maintained By: anze@reciprocitylabs.com
 }}
 
-{{> /static/mustache/base_objects/edit_object_link.mustache}}
-{{#is_info_pin}}
-  {{^options.is_in_selector}}
-    {{> /static/mustache/base_objects/unmap.mustache}}
-  {{/options}}
-  {{#if instance.viewLink}}
-    {{#is_allowed "view_object_page" instance}}
-      <li>
-        <a href="{{instance.viewLink}}">
-          View {{instance.class.title_singular}}
-          <i class="grcicon-goto"></i>
-        </a>
-      </li>
+{{#if_helpers '\
+   #if' is_info_pin '\
+   and #is_allowed_to_map' page_instance instance '\
+   or #if' is_info_pin '\
+   and #if' instance.viewLink '\
+   or #is_allowed' 'update' instance '\
+   ' context='for'}}
+<div class="details-wrap">
+  <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+  <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+
+    {{#is_allowed 'update' instance context='for'}}
+      {{> /static/mustache/base_objects/edit_object_link.mustache}}
     {{/is_allowed}}
-  {{/if}}
-{{/is_info_pin}}
+
+    {{#is_info_pin}}
+      {{#is_allowed_to_map page_instance instance}}
+        {{^options.is_in_selector}}
+          {{> /static/mustache/base_objects/unmap.mustache}}
+
+        {{/options}}
+      {{/is_allowed_to_map}}
+      {{#if instance.viewLink}}
+        {{#is_allowed "view_object_page" instance}}
+          <li>
+            <a href="{{instance.viewLink}}">
+              View {{instance.class.title_singular}}
+              <i class="grcicon-goto"></i>
+            </a>
+          </li>
+        {{/is_allowed}}
+      {{/if}}
+    {{/is_info_pin}}
+
+  </ul>
+</div>
+{{/if_helpers}}

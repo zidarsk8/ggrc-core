@@ -432,18 +432,15 @@ can.Control("CMS.Controllers.InnerNav", {
       }
     }
 
-  , set_active_widget : function(widget) {
+  , set_active_widget: function (widget) {
     var active_widget = widget,
         info_pin = $(this.options.pin_view).control();
 
-    if (info_pin) {
-      info_pin.unsetInstance();
-    }
-    if (typeof widget === 'string') {
+    if (typeof widget === "string") {
       active_widget = this.widget_by_selector(widget);
     }
 
-    active_widget.attr('force_show', true);
+    active_widget.attr("force_show", true);
     this.update_add_more_link();
     this.options.contexts.attr("active_widget", active_widget);
     this.show_active_widget();

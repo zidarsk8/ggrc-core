@@ -49,28 +49,24 @@ can.Component.extend({
       return refresh_queue.trigger();
     },
 
-    _generate: function(control, count, dfd) {
-      count = count || 0;
-      dfd = dfd || new $.Deferred();
+    _generate: function (control) {
+      var assessment,
+          index,
+          title = control.title + ' assessment',
+          data = {
+            audit: this.scope.audit,
+            control: control.stub(),
+            context: this.scope.audit.context,
+            owners: [CMS.Models.Person.findInCacheById(GGRC.current_user.id)],
+            test_plan: control.test_plan
+          },
+          dfd = GGRC.Models.Search.counts_for_types(title, ['ControlAssessment']);
 
-      var assessment = new CMS.Models.ControlAssessment({
-          audit: this.scope.audit,
-          control: control.stub(),
-          context: this.scope.audit.context,
-          title: control.title + " assessment" + (count ? " " + count : ""),
-          test_plan: control.test_plan
-      });
-      assessment.save().done(function () {
-        dfd.resolve(assessment);
-      }).fail(function (error, type, code) {
-        if (code === "FORBIDDEN"
-          && error.responseText.match(/(title values must be unique)|(Duplicate entry)/)) {
-          this._generate(control, count + 1, dfd);
-        } else {
-          return dfd.reject(error);
-        }
+      return dfd.then(function (result) {
+        index = result.getCountFor('ControlAssessment') + 1;
+        data.title = title + ' ' + index;
+        return new CMS.Models.ControlAssessment(data).save();
       }.bind(this));
-      return dfd;
     },
 
     _notify: function() {
