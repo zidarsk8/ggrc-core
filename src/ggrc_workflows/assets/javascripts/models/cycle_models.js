@@ -310,6 +310,16 @@
     tree_view_options: {
       sort_property: 'sort_index',
       show_view: _mustache_path + "/tree.mustache",
+      attr_list : [
+        {attr_title: 'Title', attr_name: 'title'},
+        {attr_title: 'Mapped Object', attr_name: 'mapped_object'},
+        {attr_title: 'Workflow', attr_name: 'workflow'},
+        {attr_title: 'State', attr_name: 'status'},
+        {attr_title: 'Assignee', attr_name: 'assignee'},
+        {attr_title: 'Start Date', attr_name: 'start_date'},
+        {attr_title: 'End Date', attr_name: 'end_date'},
+        {attr_title: 'Last Updated', attr_name: 'updated_at'}
+      ],
       draw_children: true,
       child_options: [
         {

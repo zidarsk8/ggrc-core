@@ -134,6 +134,8 @@ dashboard-js-template-files:
   - base_objects/tree_footer_zero.mustache
   - base_objects/tree_header.mustache
   - base_objects/tree_view_filter.mustache
+  - base_objects/tree_column_selector.mustache
+  - base_objects/tree_column_names.mustache
   - base_objects/filter_trigger.mustache
   - base_objects/generate_assessments_button.mustache
   - base_objects/states.mustache
@@ -160,6 +162,7 @@ dashboard-js-template-files:
   - control_assessments/tree.mustache
   - control_assessments/tree_header.mustache
   - control_assessments/tree_footer.mustache
+  - control_assessments/tree_add_item.mustache
   - control_assessments/info.mustache
   - issues/modal_content.mustache
   - custom_attributes/modal_content.mustache
@@ -226,6 +229,7 @@ dashboard-js-template-files:
   - people/tier2_content.mustache
   - people/tree.mustache
   - people/tree_footer.mustache
+  - people/tree_add_item.mustache
   - people/tree_header.mustache
   - people/search_result.mustache
   - policies/info.mustache
@@ -260,22 +264,31 @@ dashboard-js-template-files:
   - systems/info.mustache
   - systems/modal_content.mustache
   - systems/tree_footer.mustache
+  - systems/tree_add_item.mustache
   - base_objects/tree_footer.mustache
+  - base_objects/tree_add_item.mustache
   - controls/tree_footer.mustache
+  - controls/tree_add_item.mustache
   - directives/tree_footer.mustache
+  - directives/tree_add_item.mustache
   - objectives/tree_footer.mustache
+  - objectives/tree_add_item.mustache
   - sections/tree_footer.mustache
+  - sections/tree_add_item.mustache
   - documents/tree_footer.mustache
+  - documents/tree_add_item.mustache
   - audits/modal_content.mustache
   - audits/tree.mustache
   - audits/info.mustache
   - audits/tree_footer.mustache
+  - audits/tree_add_item.mustache
   - audits/tree_header.mustache
   - audits/search_result.mustache
   - audits/extended_info.mustache
   - requests/tree.mustache
   - requests/info.mustache
   - requests/tree_footer.mustache
+  - requests/tree_add_item.mustache
   - requests/tree_header.mustache
   - requests/modal_content.mustache
   - objectives/autocomplete_result.mustache
@@ -283,9 +296,11 @@ dashboard-js-template-files:
   - responses/tree.mustache
   - responses/info.mustache
   - responses/tree_footer.mustache
+  - responses/tree_add_item.mustache
   - responses/modal_content.mustache
   - meetings/modal_content.mustache
   - meetings/tree_footer.mustache
+  - meetings/tree_add_item.mustache
   - meetings/tree.mustache
   - documents/autocomplete_result.mustache
   - documents/pbc_tree.mustache
