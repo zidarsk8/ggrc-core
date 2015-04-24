@@ -36,6 +36,7 @@
       {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>
         Assignee
+        <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="This is the default assignee for this task."></i>
       </label>
       {{#if_cycle_assignee_privileges instance}}

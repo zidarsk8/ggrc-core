@@ -41,6 +41,7 @@
       var that = this;
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank("title");
+      this.validateNonBlank("contact");
       this.validate(["_transient.contact", "contact"], function(newVal, prop) {
         var contact_exists = this.contact ? true : false;
         var reified_contact = contact_exists ? this.contact.reify() : false;
@@ -99,6 +100,19 @@
       var that = this;
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank("title");
+      this.validateNonBlank("contact");
+      this.validate(["_transient.contact", "contact"], function(newVal, prop) {
+        var contact_exists = this.contact ? true : false;
+        var reified_contact = contact_exists ? this.contact.reify() : false;
+        var contact_has_email_address = reified_contact ? reified_contact.email : false;
+
+        // This check will not work until the bug introduced with commit 8a5f600c65b7b45fd34bf8a7631961a6d5a19638
+        // is resolved.
+        if(!contact_has_email_address) {
+          return "No valid contact selected for assignee";
+        }
+      });
+
       this.validate('relative_start_day relative_start_month relative_end_day relative_end_month start_date end_date'.split(' '),
         function (newVal, prop) {
         var that = this,
