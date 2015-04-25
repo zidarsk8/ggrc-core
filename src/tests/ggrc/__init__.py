@@ -20,13 +20,27 @@ if os.environ.get('TRAVIS', False):
 # done. This is for the bad request error messages while testing the api calls.
 logging.disable(logging.CRITICAL)
 
+
 class TestCase(BaseTestCase):
+
   def setUp(self):
-    db.engine.execute("SET FOREIGN_KEY_CHECKS=0")
-    for table in reversed(db.metadata.sorted_tables):
-      if table.name not in ("test_model", "roles", "notification_types", "object_types"):
-        db.engine.execute(table.delete())
-    db.engine.execute("SET FOREIGN_KEY_CHECKS=1")
+    # this is a horrible hack because db.metadata.sorted_tables does not sort
+    # by dependencies. Events table is before Person table - reversed is bad.
+    ignore_tables = (
+        "test_model", "roles", "notification_types", "object_types"
+    )
+    tables = set(db.metadata.tables).difference(ignore_tables)
+    for _ in range(len(tables)):
+      if len(tables) == 0:
+        break  # stop the loop once all tables have been deleted
+      for table in reversed(db.metadata.sorted_tables):
+        if table.name not in ignore_tables:
+          try:
+            db.engine.execute(table.delete())
+            tables.remove(table.name)
+          except:
+            pass
+
     db.session.commit()
 
     # if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
