@@ -21,6 +21,7 @@ var COLLAPSE = "collapse"
 , LHN_STATE = "lhn_state"
 , TOP_NAV = "top_nav"
 , FILTER_WIDGET = "filter_widget"
+, TREE_VIEW_HEADERS = "tree_view_headers"
 , path = window.location.pathname.replace(/\./g, "/");
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
@@ -182,6 +183,34 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     }
 
     return value.is_hidden;
+  }
+
+  , setTreeViewHeaders : function (model_name, display_list) {
+    var hdr = this.getObject(path, TREE_VIEW_HEADERS);
+    if (typeof hdr === 'undefined') {
+      hdr = this.makeObject(path, TREE_VIEW_HEADERS);
+    }
+
+    var obj = {};
+    obj.display_list = display_list;
+    hdr.attr(model_name, obj);
+
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getTreeViewHeaders : function (model_name) {
+    var value = this.getObject(path, TREE_VIEW_HEADERS);
+
+    if (typeof value === 'undefined') {
+      return [];
+    }
+
+    if (typeof value[model_name] === 'undefined') {
+      return [];
+    }
+
+    return value[model_name].display_list;
   }
 
   , setLHNavSize : function(page_id, widget_id, size) {

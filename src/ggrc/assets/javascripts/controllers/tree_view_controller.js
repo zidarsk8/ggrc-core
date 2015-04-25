@@ -396,7 +396,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   //Displays attribute list for tree-header, Select attribute list drop down
   //Gets default and custom attribute list for each model, and sets upthe display-list
   , init_display_options: function (opts) {
-    var i, display_width = 12, //total width of display = span12
+    var i, d_list, display_width = 12, //total width of display = span12
         select_attr_list = [], display_attr_list = [],
         model = opts.model, model_name = model.model_singular;
 
@@ -420,22 +420,34 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             }
           }
         }
-        //Initialize the display status for title, owner, status to be true
-        for (i = 0; i < select_attr_list.length; i++) {
-          var obj = select_attr_list[i];
-          if (model_name === 'CycleTaskGroupObjectTask') {
-            obj.display_status = ['title', 'mapped_object', 'workflow'].indexOf(obj.attr_name) !== -1;
-          } else {
-            obj.display_status = ['title', 'owner', 'status'].indexOf(obj.attr_name) !== -1;
-          }
-          //Make title the mandatory attribute
-          obj.mandatory = ['title'].indexOf(obj.attr_name) !== -1;
-        }
 
+        //Get the display attr_list from local storage
+        d_list = this.display_prefs.getTreeViewHeaders(model_name);
+
+        if (d_list.length === 0) {
+          //Initialize the display status for title, owner, status to be true
+          for (i = 0; i < select_attr_list.length; i++) {
+            var obj = select_attr_list[i];
+            if (model_name === 'CycleTaskGroupObjectTask') {
+              obj.display_status = ['title', 'mapped_object', 'workflow'].indexOf(obj.attr_name) !== -1;
+            } else {
+              obj.display_status = ['title', 'owner', 'status'].indexOf(obj.attr_name) !== -1;
+            }
+            //Make title the mandatory attribute
+            obj.mandatory = ['title'].indexOf(obj.attr_name) !== -1;
+          }
+        } else {
+          d_list.push('title');
+          for (i = 0; i < select_attr_list.length; i++) {
+            var obj = select_attr_list[i];
+            obj.display_status = d_list.indexOf(obj.attr_name) !== -1;
+            obj.mandatory = ['title'].indexOf(obj.attr_name) !== -1;
+          }
+        }
 
         //Create display list
         can.each(select_attr_list, function (item) {
-          if (item.attr_title !== 'Title' && item.display_status) {
+          if (!item.mandatory && item.display_status) {
               display_attr_list.push(item);
           }
         });
@@ -960,7 +972,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //update the display attrbute list and re-draw
     //1: find checked items
     //2. update
-    var display_width = 12,
+    var display_width = 12, d_list = [],
         $check = this.element.parent().find('.attr-checkbox'),
         $selected = $check.filter(':checked'),
         selected_items=[];
@@ -987,6 +999,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     this.reload_list();
     //set user preferences for next time
+    can.each(this.options.display_attr_list, function (item) {
+      d_list.push(item.attr_name);
+    });
+    this.display_prefs.setTreeViewHeaders(this.options.model.model_singular, d_list);
+    this.display_prefs.save();
 
   }
 });
@@ -1275,7 +1292,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
         this.scope.attr('controller', this);
       },
 
-      'input.attr-checkbox click' : function (el, ev) {
+      disable_attrs: function (el, ev) {
         var MAX_ATTR = 5,
             $check = this.element.find('.attr-checkbox'),
             $mandatory = $check.filter('.mandatory'),
@@ -1292,11 +1309,19 @@ can.Control("CMS.Controllers.TreeViewNode", {
           $mandatory.prop('disabled', true)
             .closest('li').addClass('disabled');
         }
+      },
+
+      'input.attr-checkbox click' : function (el, ev) {
+        this.disable_attrs(el, ev);
         ev.stopPropagation();
       },
 
       '.dropdown-menu-form click' : function (el, ev) {
         ev.stopPropagation();
+      },
+
+      '.tview-dropdown-toggle click' : function (el, ev) {
+        this.disable_attrs(el, ev);
       },
 
       '.set-tree-attrs,.close-dropdown click' : function(el, ev) {
