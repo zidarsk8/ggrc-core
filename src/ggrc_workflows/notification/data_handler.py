@@ -125,12 +125,24 @@ def get_cycle_data(notification):
   return {}
 
 
+def get_cycle_task_declined_data(notification):
+  cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  return {
+      cycle_task.contact.email: {
+          "user": get_person_dict(cycle_task.contact),
+          "task_declined": {
+              cycle_task.id: get_cycle_task_dict(cycle_task)
+          }
+      }
+  }
+
+
 def get_cycle_task_data(notification):
   notification_name = notification.notification_type.name
   if notification_name in ["manual_cycle_created", "cycle_created"]:
     return get_cycle_created_task_data(notification)
   elif notification_name == "cycle_task_declined":
-    return {}
+    return get_cycle_task_declined_data(notification)
   elif notification_name in ["cycle_task_due_in",
                              "one_time_cycle_task_due_in",
                              "weekly_cycle_task_due_in",
