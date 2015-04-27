@@ -15,19 +15,16 @@
           %i.grciconlarge-dashboard-new{'rel': 'tooltip', 'data-original-title': 'My Work'}
 
       -# Swizec TO-DO: Add if statement so, if admin dashboard page show admin dashboard, if import page show import. It's commented right now, but remove comment.
-      -#%span.title-slide
-        -if model.table_singular.dashboard
+      %span.title-slide
+        -if request.path == '/admin'
           %i.grciconlarge-dashboard
           Admin Dashboard
 
-        -if model.table_singular.import
-          %i.grciconlarge-import
-          Import {{import_kind}}
+        -#if model.table_singular.import
+         # %i.grciconlarge-import
+         # Import {{import_kind}}
 
       -# Swizec TO-DO: That is just example, remove this once if statement above start working.
-      %span.title-slide
-        %i.grciconlarge-dashboard
-        Admin Dashboard
 
     %ul.menu
       %li
