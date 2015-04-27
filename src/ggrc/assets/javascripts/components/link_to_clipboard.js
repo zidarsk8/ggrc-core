@@ -9,7 +9,7 @@
   "use strict";
 
   can.Component.extend({
-    tag: "clipboard_link",
+    tag: "clipboard-link",
     scope: {
       text: "@",
       title: "@",
