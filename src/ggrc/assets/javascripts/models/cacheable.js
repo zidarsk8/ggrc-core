@@ -103,20 +103,25 @@ function makeDateSerializer(type, key) {
 
 can.Model("can.Model.Cacheable", {
 
-  root_object : ""
-  , filter_keys : ["assignee", "code", "company", "contact", "description",
-                   "email", "end_date", "end date", "kind", "name", "notes",
-                   "owner", "owners", "reference_url", "slug", "state",
-                   "status", "start_date", "start date", "test", "title"]
-  , filter_mappings: {
+  root_object : "",
+  filter_keys: ["assignee", "company", "contact", "description",
+                "email", "end_date", "kind", "name", "notes",
+                "owners", "reference_url", "slug", "status",
+                "start_date", "test", "title", "updated_at", "created_at",
+  ],
+  filter_mappings: {
     //'search term', 'actual value in the object'
-    'owner' : 'owners',
-    'workflow' : 'workflows',
-    'due date' : 'end_date',
-    'end date' : 'end_date',
-    'start date' : 'start_date',
-    'code' : 'slug',
-    'state': 'status'
+    "owner": "owners",
+    "workflow": "workflows",
+    "due date": "end_date",
+    "end date": "end_date",
+    "stop date": "end_date",
+    "effective date": "start_date",
+    "start date": "start_date",
+    "created date": "created_at",
+    "updated date": "updated_at",
+    "code": "slug",
+    "state": "status"
   }
   , root_collection : ""
   , model_singular : ""
@@ -1039,7 +1044,7 @@ can.Model("can.Model.Cacheable", {
 
     return RefreshQueue.refresh_all(this, props, true);
   },
-  get_filter_vals: function(keys, mappings){
+  get_filter_vals: function (keys, mappings) {
     keys = keys || this.class.filter_keys;
     mappings = mappings || this.class.filter_mappings;
 
@@ -1050,8 +1055,9 @@ can.Model("can.Model.Cacheable", {
       mappings[long_title] = "title";
     }
     keys.push(long_title);
+    keys.concat(mappings.keys());
 
-    $.each(keys, function(index, key){
+    $.each(keys, function(index, key) {
       var val = mappings[key] ?
         this[mappings[key]] :
         this[key];
