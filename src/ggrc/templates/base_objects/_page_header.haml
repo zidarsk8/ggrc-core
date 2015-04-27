@@ -83,12 +83,12 @@
               %i.grcicon-logout-black
               Logout
 
-      -# Swizec TO-DO: Fix this page_help part. You will see the error. It's commented right now, but remove comment.
-      -#%li
-        %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
-          %i.grcicon-help-black
-          %span
-            Help
+      -if self.page_help
+        %li
+          %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
+            %i.grcicon-help-black
+              %span
+                Help
 
       -if request.path.startswith('/admin')
         %li.user.dropdown
