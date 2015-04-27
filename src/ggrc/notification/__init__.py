@@ -67,12 +67,13 @@ def get_pending_notifications():
   for notification in notifications:
     notif_by_day[notification.send_on].append(notification)
 
-  data = {}
+  data = defaultdict(dict)
   today = datetime.combine(date.today(), datetime.min.time())
   for day, notif in notif_by_day.iteritems():
     current_day = max(day, today)
     with freeze_time(current_day):
-      data[current_day] = get_notification_data(notif)
+      data[current_day] = merge_dict(data[current_day],
+                                     get_notification_data(notif))
 
   return notifications, data
 
