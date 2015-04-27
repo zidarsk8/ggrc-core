@@ -104,11 +104,10 @@ function makeDateSerializer(type, key) {
 can.Model("can.Model.Cacheable", {
 
   root_object : "",
-  filter_keys: ["assignee", "code", "company", "contact", "description",
-                "email", "end_date", "end date", "kind", "name", "notes",
-                "owner", "owners", "reference_url", "slug", "state", "status",
-                "start_date", "start date", "test", "title", "updated_at", "created_at",
-                "effective date", "created date", "updated date"
+  filter_keys: ["assignee", "company", "contact", "description",
+                "email", "end_date", "kind", "name", "notes",
+                "owners", "reference_url", "slug", "status",
+                "start_date", "test", "title", "updated_at", "created_at",
   ],
   filter_mappings: {
     //'search term', 'actual value in the object'
@@ -1056,6 +1055,7 @@ can.Model("can.Model.Cacheable", {
       mappings[long_title] = "title";
     }
     keys.push(long_title);
+    keys.concat(mappings.keys())
 
     $.each(keys, function(index, key) {
       var val = mappings[key] ?
