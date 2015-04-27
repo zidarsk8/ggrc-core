@@ -1,12 +1,12 @@
-# Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: david@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
 """All gGRC model classes grouped together for convenience."""
 
 # TODO: Implement with Authentication
-#from .account import Account
+# from .account import Account
 from .audit import Audit
 from .audit_object import AuditObject
 from .categorization import Categorization
@@ -32,6 +32,7 @@ from .object_objective import ObjectObjective
 from .object_owner import ObjectOwner
 from .object_person import ObjectPerson
 from .object_section import ObjectSection
+from .object_type import ObjectType
 from .objective import Objective
 from .objective_control import ObjectiveControl
 from .option import Option
@@ -45,15 +46,17 @@ from .program_directive import ProgramDirective
 from .project import Project
 from .relationship import Relationship, RelationshipType
 from .request import Request
-from .response import Response, DocumentationResponse, InterviewResponse, PopulationSampleResponse
+from .response import (
+    Response, DocumentationResponse, InterviewResponse,
+    PopulationSampleResponse
+)
 from .meeting import Meeting
 from .background_task import BackgroundTask
-from .notification import NotificationConfig, Notification, NotificationObject, NotificationRecipient
-from .notification import CalendarEntry
+from .notification import NotificationConfig, NotificationType, Notification
 from .issue import Issue
 
-#TODO: This isn't currently used
-#from .relationship_type import RelationshipType
+# TODO: This isn't currently used
+# from .relationship_type import RelationshipType
 from .section import SectionBase, Section, Clause
 from .section_objective import SectionObjective
 from .system import SystemOrProcess, System, Process
@@ -61,72 +64,71 @@ from .system import SystemOrProcess, System, Process
 from .revision import Revision
 from .event import Event
 all_models = [
-  Audit,
-  AuditObject,
-  Categorization,
-  CategoryBase,
+    Audit,
+    AuditObject,
+    Categorization,
+    CategoryBase,
     ControlCategory,
     ControlAssertion,
-  Context,
-  Control,
-  ControlAssessment,
-  ControlControl,
-  ControlSection,
-  CustomAttributeDefinition,
-  CustomAttributeValue,
-  DataAsset,
-  Directive,
+    Context,
+    Control,
+    ControlAssessment,
+    ControlControl,
+    ControlSection,
+    CustomAttributeDefinition,
+    CustomAttributeValue,
+    DataAsset,
+    Directive,
     Contract,
     Policy,
     Regulation,
     Standard,
-  DirectiveControl,
-  DirectiveSection,
-  Document,
-  Facility,
-  Help,
-  Market,
-  Meeting,
-  Objective,
-  ObjectiveControl,
-  ObjectControl,
-  ObjectDocument,
-  ObjectObjective,
-  ObjectOwner,
-  ObjectPerson,
-  ObjectSection,
-  Option,
-  OrgGroup,
-  Vendor,
-  Person,
-  Product,
-  Program,
-  ProgramControl,
-  ProgramDirective,
-  Project,
-  Relationship,
-  RelationshipType,
-  Request,
-  Response,
+    DirectiveControl,
+    DirectiveSection,
+    Document,
+    Facility,
+    Help,
+    Market,
+    Meeting,
+    Objective,
+    ObjectiveControl,
+    ObjectControl,
+    ObjectDocument,
+    ObjectObjective,
+    ObjectOwner,
+    ObjectPerson,
+    ObjectSection,
+    ObjectType,
+    Option,
+    OrgGroup,
+    Vendor,
+    Person,
+    Product,
+    Program,
+    ProgramControl,
+    ProgramDirective,
+    Project,
+    Relationship,
+    RelationshipType,
+    Request,
+    Response,
     DocumentationResponse,
     InterviewResponse,
     PopulationSampleResponse,
-  SectionBase,
+    SectionBase,
     Section,
     Clause,
-  SectionObjective,
-  SystemOrProcess,
+    SectionObjective,
+    SystemOrProcess,
     System,
     Process,
-  Revision,
-  Event,
-  BackgroundTask,
-  NotificationConfig,
-  Notification,
-  NotificationRecipient,
-  NotificationObject,
-  CalendarEntry,
-  Issue
+    Revision,
+    Event,
+    BackgroundTask,
+    NotificationConfig,
+    NotificationType,
+    Notification,
+    Issue
 ]
 
 __all__ = [model.__name__ for model in all_models]

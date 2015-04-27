@@ -9,8 +9,8 @@ from ggrc_workflows.services.workflow_date_calculator import WorkflowDateCalcula
 from ggrc_workflows.models import *
 from ggrc.models import *
 
+
 class BaseWorkflowDateCalculator(TestCase):
-  SQLALCHEMY_DATABASE_URI = "sqlite://"
 
   def setUp(self):
     pass
@@ -205,7 +205,6 @@ class BaseWorkflowDateCalculator(TestCase):
   def day_next_year(self, month, day):
     return date(date.today().year+1, month, day)
 
-
 class TestOneTimeWorkflow(BaseWorkflowDateCalculator):
   def test_start_date_sets_properly(self):
     workflow = self._create_one_time_workflow()
@@ -291,7 +290,6 @@ class TestOneTimeWorkflow(BaseWorkflowDateCalculator):
     with self.assertRaises(ValueError):
         calc.nearest_end_date_after_start_date(week_ago)
 
-
 class TestWeeklyWorkflow(BaseWorkflowDateCalculator):
   def test_calc_end_date_weekly_workflow_start_before_end(self):
     workflow = self._create_weekly_workflow()
@@ -374,7 +372,6 @@ class TestWeeklyWorkflow(BaseWorkflowDateCalculator):
     end_date = calc.nearest_end_date_after_start_date(start_date)
     self.assertEqual(start_date, tuesday)
     self.assertEqual(end_date, start_date)
-
 
 class TestMonthlyWorkflow(BaseWorkflowDateCalculator):
   def test_monthly_workflow_calc_start_and_end_date_after_basedate(self):

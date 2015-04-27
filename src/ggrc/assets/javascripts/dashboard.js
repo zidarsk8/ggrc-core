@@ -434,7 +434,7 @@ function resize_areas(event, target_info_pin_height) {
 
   winHeight = $window.height();
   winWidth = $window.width();
-  lhsHeight = winHeight - 220; //new ui
+  lhsHeight = winHeight - 180; //new ui
   footerMargin = lhsHeight + 130; //new UI
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;

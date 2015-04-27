@@ -114,13 +114,15 @@ can.Control("CMS.Controllers.Dashboard", {
         $label = el.find("span"),
         $nav = el.closest("body").find(".top-inner-nav"),
         $lhn_nav = el.closest("body").find(".lhs-holder"),
+        $lhn_type = el.closest("body").find(".lhn-type"),
         $content = el.closest("body").find(".object-area"),
         $fake_merge = $content.add($lhn_nav);
 
     el.addClass("active");
     $label.text("Hide menu");
     $nav.animate({top: "48"}, options);
-    $fake_merge.animate({top: "88"}, options);
+    $lhn_type.animate({top: "94"}, options);
+    $fake_merge.animate({top: "128"}, options);
 
     this.display_prefs.setTopNavHidden("", false);
     $(window).trigger("resize");
@@ -135,13 +137,15 @@ can.Control("CMS.Controllers.Dashboard", {
         $label = el.find("span"),
         $nav = el.closest("body").find(".top-inner-nav"),
         $lhn_nav = el.closest("body").find(".lhs-holder"),
+        $lhn_type = el.closest("body").find(".lhn-type"),
         $content = el.closest("body").find(".object-area"),
         $fake_merge = $content.add($lhn_nav);
 
     el.removeClass("active");
     $label.text("Show menu");
     $nav.animate({top: "18"}, options);
-    $fake_merge.animate({top: "58"}, options);
+    $lhn_type.animate({top: "54"}, options);
+    $fake_merge.animate({top: "88"}, options);
 
     this.display_prefs.setTopNavHidden("", true);
     $(window).trigger("resize");
@@ -432,18 +436,15 @@ can.Control("CMS.Controllers.InnerNav", {
       }
     }
 
-  , set_active_widget : function(widget) {
+  , set_active_widget: function (widget) {
     var active_widget = widget,
         info_pin = $(this.options.pin_view).control();
 
-    if (info_pin) {
-      info_pin.unsetInstance();
-    }
-    if (typeof widget === 'string') {
+    if (typeof widget === "string") {
       active_widget = this.widget_by_selector(widget);
     }
 
-    active_widget.attr('force_show', true);
+    active_widget.attr("force_show", true);
     this.update_add_more_link();
     this.options.contexts.attr("active_widget", active_widget);
     this.show_active_widget();

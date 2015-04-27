@@ -12,12 +12,15 @@ backends
 import flask_login
 from ggrc.extensions import get_extension_module_for
 
+
 def get_login_module():
   return get_extension_module_for('LOGIN_MANAGER', False)
+
 
 def user_loader(id):
   from .common import find_user_by_id
   return find_user_by_id(id)
+
 
 def init_app(app):
   login_module = get_login_module()
@@ -28,7 +31,7 @@ def init_app(app):
   login_manager.init_app(app)
   login_manager.login_view = 'login'
   login_manager.login_message = None
-  #login_manager.session_protection = 'strong'
+  # login_manager.session_protection = 'strong'
 
   app.route('/login')(login_module.login)
   app.route('/logout')(login_module.logout)
@@ -36,13 +39,15 @@ def init_app(app):
   app.login_manager.user_loader(user_loader)
   if hasattr(login_module, 'before_request'):
     app.before_request(login_module.before_request)
-  #app.context_processor(login_module.session_context)
+  # app.context_processor(login_module.session_context)
+
 
 def get_current_user():
   if get_login_module():
     return flask_login.current_user
   else:
     return None
+
 
 def get_current_user_id():
   user = get_current_user()
@@ -51,9 +56,9 @@ def get_current_user_id():
   else:
     return None
 
+
 def login_required(func):
   if get_login_module():
     return flask_login.login_required(func)
   else:
     return func
-#login_required = flask_login.login_required

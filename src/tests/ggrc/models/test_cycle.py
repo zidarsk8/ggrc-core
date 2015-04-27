@@ -1,7 +1,7 @@
-# Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: brad@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
 from flask import Flask
 from datetime import date, timedelta
@@ -12,7 +12,6 @@ from nose.plugins.skip import SkipTest
 
 @SkipTest
 class TestCycle(TestCase):
-  SQLALCHEMY_DATABASE_URI = "sqlite://"
 
   def setUp(self):
     pass

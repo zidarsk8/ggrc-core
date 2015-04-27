@@ -221,7 +221,6 @@ dashboard-js-template-files:
   - people/option_column.mustache
   - people/option_detail.mustache
   - people/owners_modal_connector.mustache
-  - people/page_header.mustache
   - people/popover.mustache
   - people/tier2_content.mustache
   - people/tree.mustache
@@ -237,7 +236,6 @@ dashboard-js-template-files:
   - programs/extended_info.mustache
   - programs/info.mustache
   - programs/modal_content.mustache
-  - programs/page_header.mustache
   - programs/tree.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
@@ -245,6 +243,7 @@ dashboard-js-template-files:
   - sections/info.mustache
   - sections/modal_content.mustache
   - sections/tree.mustache
+  - sections/dropdown_menu.mustache
   - selectors/active_column.mustache
   - selectors/base_modal.mustache
   - selectors/multitype_base_modal.mustache
