@@ -1171,13 +1171,18 @@ p {
   padding-right: 4px;
   margin-left: 10px;
   a {
-    .grcicon-to-right {
-      margin-top: 6px;
+    display: inline-block;
+    line-height: 16px;
+    i {
       @include opacity(0.25);
       @include transition(opacity 0.2s ease);
+      ul.new-tree & {
+        margin-top: 0;
+      }
     }
     &:hover {
-      .grcicon-to-right {
+      text-decoration: none;
+      i {
         @include opacity(1);
       }
     }
@@ -1329,6 +1334,23 @@ p {
     }
     li {
       margin-bottom: 20px;
+    }
+  }
+  .btn {
+    display: inline-block;
+    text-transform: none;
+    color: $white;
+    font-weight: bold;
+  }
+  .close-dropdown {
+    padding: 0;
+    margin-right: -10px;
+    @include opacity(.3);
+    @include transition(opacity 0.2s ease);
+    cursor: pointer;
+    &:hover {
+      text-decoration: none;
+      @include opacity(1);
     }
   }
 }

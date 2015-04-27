@@ -69,7 +69,8 @@ var admin_list_descriptors = {
       model: CMS.Models.CustomAttributeDefinition,
       mapping: "custom_attribute_definitions",
       show_view: GGRC.mustache_path + "/custom_attribute_definitions/subtree.mustache",
-      footer_view: null
+      footer_view: null,
+      add_item_view: null
     }]
   }
 };

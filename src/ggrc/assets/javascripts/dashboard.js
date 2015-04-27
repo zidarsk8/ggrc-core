@@ -119,6 +119,10 @@ jQuery(function($) {
       file_select_elem = 'form.import input[type=file]';
 
   function onSubmitClick(ev){
+    if (typeof ev !== "object") {
+      // sometimes browser triggers submit, not the user -> ignore
+      return;
+    }
     if ($(this).hasClass('disabled') || $(file_select_elem).val() === "") {
       ev && ev.preventDefault();
     }

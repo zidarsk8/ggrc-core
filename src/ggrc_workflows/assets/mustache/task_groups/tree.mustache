@@ -33,6 +33,11 @@
                 </div>
               </div>
               <div class="span4">
+                {{#child_options}}
+                  {{#if add_item_view}}
+                    {{{renderLive add_item_view}}}
+                  {{/if}}
+                {{/child_options}}
                 <ul class="tree-action-list">
                   <li>
                     {{#with_mapping 'objects' instance}}
