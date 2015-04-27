@@ -66,6 +66,10 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
 
 
 def add_cycle_task_due_notifications(obj):
+  if obj.status == "Verified":
+    return
+  if not obj.cycle_task_group.cycle.is_current:
+    return
 
   notif_type = get_notification_type("{}_cycle_task_due_in".format(
       obj.cycle_task_group.cycle.workflow.frequency))
