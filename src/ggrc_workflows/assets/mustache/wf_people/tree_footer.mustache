@@ -7,29 +7,3 @@
 
 
 {{{renderLive '/static/mustache/base_objects/tree_footer_zero.mustache'}}}
-
-{{#if allow_mapping_or_creating}}
-{{#is_allowed_to_map parent_instance model.shortName}}
-<li class="tree-item tree-item-add">
-  <div class="row-fluid">
-    <div class="span12">
-
-      <a
-        href="javascript://"
-        class="btn btn-small btn-draft"
-        rel="tooltip"
-        data-placement="right"
-        data-toggle="multitype-multiselect-modal-selector"
-        data-join-mapping="{{mapping}}"
-        data-join-option-type="{{model.shortName}}"
-        data-join-object-id="{{parent_instance.id}}"
-        data-join-object-type="{{parent_instance.class.shortName}}"
-        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-        <i class="grcicon-add-black"></i>
-      </a>
-
-    </div>
-  </div>
-</li>
-{{/is_allowed_to_map}}
-{{/if}}

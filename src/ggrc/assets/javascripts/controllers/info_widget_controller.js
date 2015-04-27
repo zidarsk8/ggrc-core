@@ -87,7 +87,10 @@ can.Control("GGRC.Controllers.InfoWidget", {
         { model_name: 'Product', model_lowercase: 'product', model_plural: 'products', display_name: 'Products'},
         { model_name: 'Project', model_lowercase: 'project', model_plural: 'projects', display_name: 'Projects'},
         { model_name: 'Facility', model_lowercase: 'facility', model_plural: 'facilities', display_name: 'Facilities'},
-        { model_name: 'Market', model_lowercase: 'market', model_plural: 'markets', display_name: 'Markets'}
+        { model_name: 'Market', model_lowercase: 'market', model_plural: 'markets', display_name: 'Markets'},
+        { model_name: 'Issue', model_lowercase: 'issue', model_plural: 'issues', display_name: 'issues'},
+        { model_name: 'ControlAssessment', model_lowercase: 'control_assessment',
+            model_plural: 'control_assessments', display_name: 'Control Assessments'}
       ];
       this.options.object_menu = object_menu;
     }

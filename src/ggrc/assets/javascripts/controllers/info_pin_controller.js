@@ -73,7 +73,8 @@ can.Control("CMS.Controllers.InfoPin", {
       model: instance.class,
       is_info_pin: true,
       options: options,
-      result: options.result
+      result: options.result,
+      page_instance: GGRC.page_instance()
     }));
 
     // Load trees inside info pin

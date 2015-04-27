@@ -447,6 +447,7 @@ $(function() {
         , mapping : "sections"
         , show_view : GGRC.mustache_path + "/sections/tree.mustache"
         , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
+        , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
         , draw_children : true
       }
 
@@ -455,6 +456,7 @@ $(function() {
         , mapping: "clauses"
         , show_view: GGRC.mustache_path + "/sections/tree.mustache"
         , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+        , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
         , draw_children: true
         }
 
@@ -465,6 +467,7 @@ $(function() {
                 , draw_children: true
                 , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/objectives/tree_add_item.mustache"
                 }
             }
         , controls: {
@@ -473,6 +476,7 @@ $(function() {
                 , draw_children: true
                 , show_view: GGRC.mustache_path + "/controls/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/controls/tree_add_item.mustache"
                 }
             }
         , business_objects: {
@@ -517,6 +521,7 @@ $(function() {
           Issue: {
               mapping: "related_issues"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
           }
         }
         , governance_objects: {
@@ -527,6 +532,7 @@ $(function() {
                 , fetch_post_process: sort_sections
                 , show_view: GGRC.mustache_path + "/directives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
                 }
             , Contract: {
                   mapping: "contracts"
@@ -535,6 +541,7 @@ $(function() {
                 , fetch_post_process: sort_sections
                 , show_view: GGRC.mustache_path + "/directives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
                 }
             , Policy: {
                   mapping: "policies"
@@ -543,6 +550,7 @@ $(function() {
                 , fetch_post_process: sort_sections
                 , show_view: GGRC.mustache_path + "/directives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
                 }
             , Standard: {
                   mapping: "standards"
@@ -551,6 +559,7 @@ $(function() {
                 , fetch_post_process: sort_sections
                 , show_view: GGRC.mustache_path + "/directives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+                , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
                 }
             , Control: {
                   mapping: "controls"
@@ -582,6 +591,7 @@ $(function() {
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
               , header_view : GGRC.mustache_path + "/audits/tree_header.mustache"
               , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/audits/tree_add_item.mustache"
             }
             , Person : {
                 show_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache"
@@ -601,6 +611,7 @@ $(function() {
             , draw_children : true
             , show_view : GGRC.mustache_path + "/requests/tree.mustache"
             , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+            , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
           },
           history: {
             mapping: "history"
@@ -609,6 +620,7 @@ $(function() {
             , model: "Request"
             , show_view : GGRC.mustache_path + "/requests/tree.mustache"
             , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+            , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
             , allow_mapping: false
             , allow_creating: false
           },
@@ -619,6 +631,7 @@ $(function() {
             , model: CMS.Models.Control
             , show_view : GGRC.mustache_path + "/controls/tree.mustache"
             , footer_view : GGRC.mustache_path + "/controls/tree_footer.mustache"
+            , add_item_view : GGRC.mustache_path + "/controls/tree_add_item.mustache"
             , allow_mapping: false
             , allow_creating: false
           },
@@ -639,6 +652,7 @@ $(function() {
             , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
             , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
             , footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache"
+            , add_item_view : GGRC.mustache_path + "/control_assessments/tree_add_item.mustache"
           }
         }
 
@@ -714,6 +728,7 @@ $(function() {
               , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
               , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
               , footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/control_assessments/tree_add_item.mustache"
             }
           }
         , ControlAssessment: {
@@ -743,6 +758,7 @@ $(function() {
               , mapping: "related_clauses"
               , child_options: [clause_child_options]
               , footer_view: GGRC.mustache_path + "/clauses/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/clauses/tree_add_item.mustache"
             }
           }
         , Issue: {
@@ -752,6 +768,7 @@ $(function() {
               , draw_children: true
               , show_view: GGRC.mustache_path + "/controls/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
               }
             , Issue: {
                   mapping: "related_issues"
@@ -762,6 +779,7 @@ $(function() {
               , draw_children: true
               , show_view: GGRC.mustache_path + "/audits/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
             }
             , ControlAssessment: {
                 mapping: "related_control_assessments"
@@ -771,6 +789,7 @@ $(function() {
               , show_view: GGRC.mustache_path + "/control_assessments/tree.mustache"
               , header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
             }
           }
         , DataAsset: {
@@ -848,6 +867,7 @@ $(function() {
               , mapping : "extended_related_sections_via_search"
               , show_view : GGRC.mustache_path + "/sections/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
               , draw_children : true
               }
             , Clause : {
@@ -855,6 +875,7 @@ $(function() {
               , mapping : "extended_related_clauses_via_search"
               , show_view : GGRC.mustache_path + "/sections/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
               , draw_children : true
               }
             , Objective: {
@@ -862,12 +883,14 @@ $(function() {
               , draw_children: true
               , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
               }
             , Control: {
                 mapping: "extended_related_controls_via_search"
               , draw_children: true
               , show_view: GGRC.mustache_path + "/controls/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
               }
             , DataAsset: {
                 mapping: "extended_related_data_assets_via_search"

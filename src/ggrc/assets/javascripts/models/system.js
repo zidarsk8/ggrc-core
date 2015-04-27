@@ -53,6 +53,12 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , tree_view_options : {
       show_view : "/static/mustache/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+      , attr_list : can.Model.Cacheable.attr_list.concat([
+        {attr_title: 'Network Zone', attr_name: 'network_zone'},
+        {attr_title: 'Effective Date', attr_name: 'start_date'},
+        {attr_title: 'Stop Date', attr_name: 'end_date'}
+      ])
+      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , link_buttons : true
       , child_options : [{
         model : CMS.Models.Control
@@ -64,6 +70,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
         model : null ///filled in after init.
         , show_view : "/static/mustache/base_objects/tree.mustache"
         , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+        , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
         , parent_find_param : "super_system_systems.parent_id"
         , link_buttons: true
       }]
@@ -121,9 +128,13 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options, {
       // systems is a special case; can be imported to programs
       footer_view: GGRC.mustache_path +
-        (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program
-          ? "/systems/tree_footer.mustache"
-          : "/base_objects/tree_footer.mustache")
+          (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program ?
+            "/systems/tree_footer.mustache" :
+             "/base_objects/tree_footer.mustache"),
+        add_item_view: GGRC.mustache_path +
+            (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program ?
+              "/systems/tree_add_item.mustache"
+            : "/base_objects/tree_add_item.mustache")
     });
     this.tree_view_options.child_options[1].model = this;
     this.validateNonBlank("title");

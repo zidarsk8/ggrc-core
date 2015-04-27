@@ -3004,6 +3004,60 @@ Mustache.registerHelper("if_less", function (a, b, options) {
   }
 });
 
+
+/*
+  Used to get the string value for default attributes
+  This doesn't work for nested object reference
+*/
+Mustache.registerHelper("get_default_attr_value", function (attr_name, instance) {
+  instance = Mustache.resolve(instance);
+  attr_name = Mustache.resolve(attr_name);
+
+  if (instance[attr_name]) {
+    if (['slug', 'status', 'url', 'reference_url', 'kind'].indexOf(attr_name) !== -1) {
+      return instance[attr_name];
+    }
+    if (['start_date', 'end_date', 'updated_at'].indexOf(attr_name) !== -1) {
+      //convert to localize date
+      return moment(instance[attr_name]).format('MM/DD/YYYY');
+    }
+  }
+
+  return '';
+});
+/*
+  Used to get the string value for custom attributes
+*/
+Mustache.registerHelper('get_custom_attr_value', function (attr_info, instance) {
+  var ins, atr, attr_name, value = '';
+
+  ins = Mustache.resolve(instance);
+  atr = Mustache.resolve(attr_info);
+  attr_name = atr.attr_name;
+
+  if (ins.custom_attribute_definitions && ins.custom_attribute_definitions.length) {
+    var current_id = 0;
+    //find the id for the attr_name
+    can.each(ins.custom_attribute_definitions, function (def) {
+      if (def.title === attr_name) {
+        current_id = def.id;
+        return false;
+      }
+    });
+    //go to the ins.custom_attribute_values, if id == id then return the value
+    if (current_id) {
+      can.each(ins.custom_attribute_values, function (item) {
+        item = item.reify();
+        if (item.custom_attribute_id === current_id) {
+          value = item.attribute_value;
+        }
+      });
+    }
+  }
+
+  return value;
+});
+
 Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   instance = Mustache.resolve(instance);
 
@@ -3024,6 +3078,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
     program: {title: program.title, id: program.id, type: program.type},
     control: {title: control.title, id: control.id, type: control.type},
     control_assessment: {title: instance.title, id: instance.id, type: instance.type},
+    audit_object: {title: instance.title, id: instance.id, type: instance.type},
   };
 
   return options.fn(options.contexts.add({'create_issue_json': JSON.stringify(json)}));

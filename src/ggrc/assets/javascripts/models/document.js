@@ -26,10 +26,10 @@ can.Model.Cacheable("CMS.Models.Document", {
             , success : function(data) {
                 response($.map( data, function( item ) {
                   return can.extend({}, item.document, {
-                    label: item.document.title 
-                          ? item.document.title 
-                          + (item.document.link_url 
-                            ? " (" + item.document.link_url + ")" 
+                    label: item.document.title
+                          ? item.document.title
+                          + (item.document.link_url
+                            ? " (" + item.document.link_url + ")"
                             : "")
                           : item.document.link_url
                     , value: item.document.id
@@ -48,6 +48,7 @@ can.Model.Cacheable("CMS.Models.Document", {
   , tree_view_options: {
     show_view: GGRC.mustache_path + "/documents/tree.mustache"
     , footer_view : GGRC.mustache_path + "/documents/tree_footer.mustache"
+    , add_item_view : GGRC.mustache_path + "/documents/tree_add_item.mustache"
 
   }
   , init : function() {

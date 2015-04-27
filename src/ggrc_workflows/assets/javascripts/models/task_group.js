@@ -34,7 +34,8 @@
     tree_view_options: {
       sort_property: 'sort_index',
       header_view: GGRC.mustache_path + "/task_groups/tree_header.mustache",
-      footer_view: GGRC.mustache_path + "/task_groups/tree_footer.mustache"
+      footer_view: GGRC.mustache_path + "/task_groups/tree_footer.mustache",
+      add_item_view: GGRC.mustache_path + "/task_groups/tree_add_item.mustache"
     },
 
     init: function() {

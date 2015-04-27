@@ -118,6 +118,15 @@ can.Model("can.Model.Cacheable", {
     'code' : 'slug',
     'state': 'status'
   }
+  , attr_list : [
+    {attr_title: 'Title', attr_name: 'title'},
+    {attr_title: 'Owner', attr_name: 'owner'},
+    {attr_title: 'Code', attr_name: 'slug'},
+    {attr_title: 'State', attr_name: 'status'},
+    {attr_title: 'Primary Contact', attr_name: 'contact'},
+    {attr_title: 'Secondary Contact', attr_name: 'secondary_contact'},
+    {attr_title: 'Last Updated', attr_name: 'updated_at'}
+  ]
   , root_collection : ""
   , model_singular : ""
   , model_plural : ""
