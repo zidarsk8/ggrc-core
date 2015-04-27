@@ -29,7 +29,8 @@ def upgrade():
       CycleTaskGroupObjectTask.status != "Verified"
   )).all()
   for cycle_task in existing_tasks:
-    add_cycle_task_due_notifications(cycle_task)
+    if cycle_task.end_date >= date.today():
+      add_cycle_task_due_notifications(cycle_task)
 
   existing_wfs = Workflow.query.filter(and_(
       Workflow.frequency.in_(["weekly", "monthly", "quarterly", "annually"]),
