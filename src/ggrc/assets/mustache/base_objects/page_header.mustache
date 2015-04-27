@@ -6,18 +6,53 @@
 }}
 
 <h1 class="entities">
-  <span class="title-prev">
-    <button class="lhn-trigger pull-left">
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <a class="title-trigger" href="/dashboard"><i class="grciconlarge-dashboard-new" rel="tooltip" data-original-title="My Work" data-placement="bottom"></i></a>
-  </span>
-  <span class="title-slide">
-    <i class="grciconlarge-{{model.table_singular}}"></i>
-    {{instance.title}}
-  </span>
+  {{#if_equals model.table_singular 'person'}}
+    {{#is_dashboard}}
+      <button class="lhn-trigger pull-left">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <i class="grciconlarge-dashboard-new" rel="tooltip" data-original-title="My Work" data-placement="bottom"></i>
+      My Work
+    {{else}}
+      <span class="title-prev">
+        <button class="lhn-trigger pull-left">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="title-trigger" href="/dashboard"><i class="grciconlarge-dashboard-new"></i></a>
+        My Dashboard
+      </span>
+      <span class="title-slide">
+        <i class="grciconlarge-{{model.table_singular}}"></i>
+        {{firstnonempty instance.name instance.email}}
+      </span>
+    {{/is_dashboard}}
+  {{/if_equals}}
+
+  {{^if_equals model.table_singular 'person'}}
+    <span class="title-prev">
+      <button class="lhn-trigger pull-left">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="title-trigger" href="/dashboard"><i class="grciconlarge-dashboard-new" rel="tooltip" data-original-title="My Work" data-placement="bottom"></i></a>
+    </span>
+    <span class="title-slide">
+      <i class="grciconlarge-{{model.table_singular}}"></i>
+      {{instance.title}}
+      {{#if_equals model.table_singular 'program'}}
+        {{#if instance.private}}
+          <span class="private">
+            <i class="grcicon-private" rel="tooltip" title="Private"></i>
+          </span>
+        {{/if}}
+      {{/if_equals}}
+    </span>
+  {{/if_equals}}
 </h1>
 <ul class="menu">
   <li>
