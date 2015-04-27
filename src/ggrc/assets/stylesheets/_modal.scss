@@ -660,7 +660,7 @@
           @include opacity(0.8);
         }
       }
-      
+
       // smaller buttons in wysiwyg editor
       .btn {
         padding:0px 5px 2px 5px;
@@ -1157,6 +1157,9 @@ p.modal-value {
       .object-check {
         text-align: right;
         padding-right: 15px;
+      }
+      .url-link {
+        display: none;
       }
     }
     &.tree-open {
