@@ -7,6 +7,7 @@ dashboard-js-files:
   - tracker.js
   - jquery.js
   - rails.js
+  - lodash.js
   - jquery-ui.js
   - jquery.ba-throttle-debounce.js
   - bootstrap-alert.js
@@ -33,6 +34,7 @@ dashboard-js-files:
   - bootstrap/wysihtml5.js
   - moment.js
   - permission.js
+  - plugins/ggrc_utils.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js
