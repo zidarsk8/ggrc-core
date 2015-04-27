@@ -67,6 +67,7 @@ All notifications handle the following structure:
               workflow.id: {
                   "custom_message": ""
                   "title": ""
+                  "workflow_url": "",
                   "workflow_owner": workflow_owner,
                   "start_date": MM/DD/YYYY
                   "fuzzy_start_date": "in X days/weeks ..."
