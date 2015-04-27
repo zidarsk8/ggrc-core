@@ -263,11 +263,17 @@ can.Model.Mixin("requestorable", {
 });
 
 can.Model.Cacheable("CMS.Models.Request", {
-  root_object : "request"
-  , filter_keys : ["assignee", "code", "company", "control",
-                   "due date", "due", "name", "notes", "request",
-                   "requested on", "status", "test", "title"]
-  , root_collection : "requests"
+  root_object : "request",
+  filter_keys : ["assignee", "code", "company", "control",
+                 "due date", "due", "name", "notes", "request",
+                 "requested on", "status", "test", "title", "request_type",
+                 "type", "request type"
+  ],
+  filter_mappings: {
+    "type": "request_type",
+    "request type": "request_type"
+  },
+  root_collection : "requests"
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
