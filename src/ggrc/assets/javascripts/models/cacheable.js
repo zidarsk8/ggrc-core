@@ -1055,7 +1055,7 @@ can.Model("can.Model.Cacheable", {
       mappings[long_title] = "title";
     }
     keys.push(long_title);
-    keys.concat(mappings.keys())
+    keys.concat(mappings.keys());
 
     $.each(keys, function(index, key) {
       var val = mappings[key] ?
