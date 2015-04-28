@@ -13,23 +13,29 @@ This is all shamelessly based on [chris.beams.io](http://chris.beams.io/posts/gi
 A properly formed git commit subject line should always be able to complete the following sentence:
 
 **If applied, this commit will _your subject line here_**
+
 Good: If applied, this commit will **refactor subsystem X for readability**
 Bad: If applied, this commit will **fixes for broken stuff**
 
-## Bad
+Commit message should be summary line and description of what you have done in the imperative mode, that is as if you were commanding someone. Write "fix", "add", "change" instead of "fixed", "added", "changed".
 
-Fixed bug with Y
-Changing behavior of X
-more fixes for broken stuff
-sweet new API methods
+Examples:
+
+#### Bad
+1. Fixed bug with {something}.
+2. changing behavior of {something}
+3. more fixes for broken stuff
+4. sweet new API methods
+5. Removing stuff
+
+#### Good
+1. Fix {something} when {something_else} doesn't exist
+2. Refactor {something} for readability
+3. Resolve {something} in {something_else}
+4. Add {method_a}, {method_b} and {method_c} methods to API
+5. Remove unused {method_a}, {method_b}...
 
 
-## Good
-
-Refactor subsystem X for readability
-Update getting started documentation
-Remove deprecated methods
-Release version 1.0.0
 
 # Pull request titles
 
