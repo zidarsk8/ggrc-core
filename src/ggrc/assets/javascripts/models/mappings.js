@@ -504,11 +504,14 @@
         "related_object", "personable", "objectiveable"
       ],
       _canonical: {
+        "controls" : "Control",
         "directives": ["Regulation", "Policy", "Contract", "Standard"],
         "audits": "Audit",
         "context": "Context"
       },
       related_issues: TypeFilter("related_objects", "Issue"),
+      controls: Proxy(
+          "Control", "control", "ProgramControl", "program", "program_controls"),
       directives: Proxy(
         null, "directive", "ProgramDirective", "program", "program_directives"),
       contracts: TypeFilter("directives", "Contract"),
