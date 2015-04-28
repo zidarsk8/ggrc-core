@@ -166,7 +166,6 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.assertEqual(len(notif), 1, "notifications: {}".format(str(notif)))
 
-  @SkipTest
   @patch("ggrc.notification.email.send_email")
   def test_single_task_declined(self, mock_mail):
     """

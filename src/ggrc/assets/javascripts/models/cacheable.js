@@ -108,6 +108,7 @@ can.Model("can.Model.Cacheable", {
                 "email", "end_date", "kind", "name", "notes",
                 "owners", "reference_url", "slug", "status",
                 "start_date", "test", "title", "updated_at", "created_at",
+                "due_on"
   ],
   filter_mappings: {
     //'search term', 'actual value in the object'
@@ -1063,9 +1064,7 @@ can.Model("can.Model.Cacheable", {
     if (!mappings[long_title]){
       mappings[long_title] = "title";
     }
-    keys.push(long_title);
-    keys.concat(mappings.keys());
-
+    keys = _.union(keys, long_title, _.keys(mappings));
     $.each(keys, function(index, key) {
       var val = mappings[key] ?
         this[mappings[key]] :
