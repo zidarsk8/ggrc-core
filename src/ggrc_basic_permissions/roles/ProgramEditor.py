@@ -13,7 +13,6 @@ permissions = {
         "ObjectSection",
         "Program",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "UserRole",
         "Context",
@@ -24,7 +23,6 @@ permissions = {
         "ObjectPerson",
         "ObjectSection",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
     ],
     "view_object_page": [
@@ -37,7 +35,6 @@ permissions = {
         "ObjectSection",
         "Program",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship"
     ],
     "delete": [
@@ -46,7 +43,6 @@ permissions = {
         "ObjectPerson",
         "ObjectSection",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
     ]
 }

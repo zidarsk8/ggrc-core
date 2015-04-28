@@ -39,7 +39,6 @@ permissions = {
         "PopulationSample",
         "Product",
         "ProgramControl",
-        "ProgramDirective",
         "Project",
         "Relationship",
         "RelationshipType",
@@ -96,7 +95,6 @@ permissions = {
         "PopulationSample",
         "Product",
         "ProgramControl",
-        "ProgramDirective",
         "Project",
         "Relationship",
         "RelationshipType",
@@ -257,15 +255,6 @@ permissions = {
             "condition": "contains"
         },
         "ProgramControl",
-        "ProgramDirective",
-        {
-            "type": "Project",
-            "terms": {
-                "list_property": "owners",
-                "value": "$current_user"
-            },
-            "condition": "contains"
-        },
         "Relationship",
         "RelationshipType",
         {
@@ -464,15 +453,6 @@ permissions = {
             "condition": "contains"
         },
         "ProgramControl",
-        "ProgramDirective",
-        {
-            "type": "Project",
-            "terms": {
-                "list_property": "owners",
-                "value": "$current_user"
-            },
-            "condition": "contains"
-        },
         "Relationship",
         "RelationshipType",
         {

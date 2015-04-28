@@ -38,7 +38,6 @@ permissions = {
         "PopulationSample",
         "Product",
         "ProgramControl",
-        "ProgramDirective",
         "Project",
         "Relationship",
         "RelationshipType",

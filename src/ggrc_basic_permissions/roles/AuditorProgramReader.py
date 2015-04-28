@@ -12,7 +12,6 @@ permissions = {
         "ObjectSection",
         "Program",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "Context",
         "UserRole"
