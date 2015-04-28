@@ -26,22 +26,7 @@ def upgrade():
   FROM program_directives as pd JOIN directives as d ON pd.directive_id = d.id;
   """
   op.execute(sql)
-  op.drop_table('program_directives')
 
 
 def downgrade():
-  op.create_table('calendar_entries',
-  sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
-  sa.Column('name', mysql.VARCHAR(length=250), nullable=True),
-  sa.Column('calendar_id', mysql.VARCHAR(length=250), nullable=True),
-  sa.Column('created_at', mysql.DATETIME(), nullable=True),
-  sa.Column('modified_by_id', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
-  sa.Column('updated_at', mysql.DATETIME(), nullable=True),
-  sa.Column('context_id', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
-  sa.Column('owner_id', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
-  sa.ForeignKeyConstraint(['context_id'], [u'contexts.id'], name=u'calendar_entries_ibfk_1'),
-  sa.ForeignKeyConstraint(['owner_id'], [u'people.id'], name=u'calendar_entries_ibfk_2'),
-  sa.PrimaryKeyConstraint('id'),
-  mysql_default_charset=u'utf8',
-  mysql_engine=u'InnoDB'
-  )
+  pass
