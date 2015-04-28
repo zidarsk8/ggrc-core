@@ -15,6 +15,7 @@ from ggrc_workflows.models import (
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
 from ggrc.utils import merge_dicts
+from ggrc.models import NotificationConfig
 
 
 """
@@ -358,3 +359,62 @@ def get_workflow_url(workflow):
       base=request.url_root,
       workflow_id=workflow.id,
   )
+
+
+def should_recieve(notif, workflow, person, nightly_cron=True):
+  """
+  nigtly_cron - There are two types of cron jobs, nightly for email digest
+  and a 5 minute cron job for instant notifications. This field is true if
+  the current notification will be sent as part of the digest email, and false
+  otherwise.
+
+  send_on - In digest notifications this field is always set to a certain date.
+  In instant notifications it can be set to today, or NULL. If the field is
+  set, then the instant notification should be sent as part of the digest email
+  for users who don't have instant notificaitons enabled. If the field is not
+  set, the notification will be sent to users with instant notifications with
+  the 5 minute cron job.
+
+  """
+  def is_enabled(notif_type):
+    return NotificationConfig.query.filter(
+        and_(NotificationConfig.person_id == person.id,
+             NotificationConfig.enable_flag == True,  # noqa
+             NotificationConfig.notif_type == notif_type)).count() > 0
+
+  has_instant = is_enabled("Email_Now") or workflow.notify_on_change
+  has_digest = is_enabled("Email_Digest") or has_instant
+
+  if not nightly_cron and\
+          has_instant and\
+          notif.notification_type.instant and\
+          not notif.send_on:
+    return True
+
+  if nightly_cron and\
+          not has_instant and\
+          has_digest and\
+          notif.notification_type.instant and\
+          notif.send_on:
+    return True
+
+  if nightly_cron and\
+          not notif.notification_type.instant and\
+          has_digest:
+    return True
+
+  return False
+
+  # This if statetemt is equivalent to the tree statements above but
+  # harder to read
+  # if nightly_cron:
+  #   if notif.notification_type.instant:
+  #     return notif.send_on and\
+  #       person_digest and\
+  #       not has_instant
+  #   else:
+  #     return person_digest
+  # else:
+  #   return notif.notification_type.instant and\
+  #     not notif.send_on and\
+  #     has_instant

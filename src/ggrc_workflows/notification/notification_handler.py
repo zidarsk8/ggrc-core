@@ -206,19 +206,3 @@ def add_notif(obj, notif_type, send_on=None):
       send_on=send_on,
   )
   db.session.add(notif)
-
-
-def is_instant(workflow, person):
-  def is_enabled(notif_type):
-    return NotificationConfig.query.filter(
-        and_(NotificationConfig.person_id == person.id,
-             NotificationConfig.enable_flag == True,  # noqa
-             NotificationConfig.notif_type == notif_type)).count() > 0
-
-  if workflow.notify_on_change and is_enabled("Email_Now"):
-    return "instant"
-
-  if is_enabled("Email_Digest"):
-    return "digest"
-
-  return None
