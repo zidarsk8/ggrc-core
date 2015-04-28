@@ -200,25 +200,6 @@ can.Model.Join("CMS.Models.ObjectObjective", {
 }, {
 });
 
-can.Model.Join("CMS.Models.ProgramDirective", {
-  root_object : "program_directive"
-  , root_collection : "program_directives"
-  , join_keys : {
-      program : CMS.Models.Program
-    , directive : CMS.Models.Directive
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , program : "CMS.Models.Program.stub"
-    , directive : "CMS.Models.get_stub"
-  }
-  , findAll: "GET /api/program_directives"
-  , create: "POST /api/program_directives"
-  , destroy : "DELETE /api/program_directives/{id}"
-}, {
-});
-
 can.Model.Join("CMS.Models.ObjectiveControl", {
   root_object : "objective_control"
   , root_collection : "objective_controls"

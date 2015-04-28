@@ -505,19 +505,12 @@
       ],
       _canonical: {
         "controls" : "Control",
-        "directives": ["Regulation", "Policy", "Contract", "Standard"],
         "audits": "Audit",
         "context": "Context"
       },
       related_issues: TypeFilter("related_objects", "Issue"),
       controls: Proxy(
           "Control", "control", "ProgramControl", "program", "program_controls"),
-      directives: Proxy(
-        null, "directive", "ProgramDirective", "program", "program_directives"),
-      contracts: TypeFilter("directives", "Contract"),
-      policies: TypeFilter("directives", "Policy"),
-      standards: TypeFilter("directives", "Standard"),
-      regulations: TypeFilter("directives", "Regulation"),
       audits: Direct("Audit", "program", "audits"),
       related_people_via_audits: TypeFilter("related_objects_via_audits", "Person"),
       authorizations_via_audits: Cross("audits", "authorizations"),
@@ -553,7 +546,6 @@
         "sections": "Section",
         "clauses": "Clause",
         "joined_controls": "Control",
-        "programs": "Program"
       },
       sections: Direct("Section", "directive", "sections"),
       joined_sections: Proxy(
@@ -564,10 +556,8 @@
       joined_controls: Proxy(
         "Control", "control", "DirectiveControl", "directive", "directive_controls"),
       controls: Multi(["direct_controls", "joined_controls"]),
-      programs: Proxy(
-        "Program", "program", "ProgramDirective", "directive", "program_directives"),
       orphaned_objects: Multi([
-        "sections", "clauses", "people", "controls", "programs", "objectives", "related_objects"
+        "sections", "clauses", "people", "controls", "objectives", "related_objects"
       ])
     },
 
