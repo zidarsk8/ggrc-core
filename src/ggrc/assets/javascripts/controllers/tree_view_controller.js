@@ -396,14 +396,20 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   //Displays attribute list for tree-header, Select attribute list drop down
   //Gets default and custom attribute list for each model, and sets upthe display-list
   , init_display_options: function (opts) {
-    var i, d_list, display_width = 12, //total width of display = span12
+    var i, saved_attr_list, display_width = 12, //total width of display = span12
         select_attr_list = [], display_attr_list = [],
-        model = opts.model, model_name = model.model_singular;
+        model = opts.model, model_name = model.model_singular,
+        mandatory_attr_names, display_attr_names;
 
     //Get default attr list
     can.each(model.tree_view_options.attr_list || can.Model.Cacheable.attr_list, function (item) {
         select_attr_list.push(item);
     });
+    //Get mandatory_attr_names
+    mandatory_attr_names = model.tree_view_options.mandatory_attr_names ?
+      model.tree_view_options.mandatory_attr_names :
+        can.Model.Cacheable.tree_view_options.mandatory_attr_names;
+
     //Get custom attr_list
     CMS.Models.CustomAttributeDefinition.findAll({definition_type: model_name})
       .then(function (defs) {
@@ -422,26 +428,30 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         }
 
         //Get the display attr_list from local storage
-        d_list = this.display_prefs.getTreeViewHeaders(model_name);
+        saved_attr_list = this.display_prefs.getTreeViewHeaders(model_name);
 
-        if (d_list.length === 0) {
-          //Initialize the display status for title, owner, status to be true
+        if (!saved_attr_list.length) {
+          //Initialize the display status, Get display_attr_names for model
+          display_attr_names = model.tree_view_options.display_attr_names ?
+            model.tree_view_options.display_attr_names :
+              can.Model.Cacheable.tree_view_options.display_attr_names;
+
           for (i = 0; i < select_attr_list.length; i++) {
             var obj = select_attr_list[i];
-            if (model_name === 'CycleTaskGroupObjectTask') {
-              obj.display_status = ['title', 'mapped_object', 'workflow'].indexOf(obj.attr_name) !== -1;
-            } else {
-              obj.display_status = ['title', 'owner', 'status'].indexOf(obj.attr_name) !== -1;
-            }
-            //Make title the mandatory attribute
-            obj.mandatory = ['title'].indexOf(obj.attr_name) !== -1;
+
+            obj.display_status = display_attr_names.indexOf(obj.attr_name) !== -1;
+            obj.mandatory = mandatory_attr_names.indexOf(obj.attr_name) !== -1;
           }
         } else {
-          d_list.push('title');
+          //Mandatory attr should be always displayed in tree view
+          can.each(mandatory_attr_names, function (attr_name) {
+            saved_attr_list.push(attr_name);
+          });
+
           for (i = 0; i < select_attr_list.length; i++) {
             var obj = select_attr_list[i];
-            obj.display_status = d_list.indexOf(obj.attr_name) !== -1;
-            obj.mandatory = ['title'].indexOf(obj.attr_name) !== -1;
+            obj.display_status = saved_attr_list.indexOf(obj.attr_name) !== -1;
+            obj.mandatory = mandatory_attr_names.indexOf(obj.attr_name) !== -1;
           }
         }
 
@@ -972,7 +982,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //update the display attrbute list and re-draw
     //1: find checked items
     //2. update
-    var display_width = 12, d_list = [],
+    var display_width = 12, attr_to_save = [],
         $check = this.element.parent().find('.attr-checkbox'),
         $selected = $check.filter(':checked'),
         selected_items=[];
@@ -1000,9 +1010,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.reload_list();
     //set user preferences for next time
     can.each(this.options.display_attr_list, function (item) {
-      d_list.push(item.attr_name);
+      attr_to_save.push(item.attr_name);
     });
-    this.display_prefs.setTreeViewHeaders(this.options.model.model_singular, d_list);
+    this.display_prefs.setTreeViewHeaders(this.options.model.model_singular, attr_to_save);
     this.display_prefs.save();
 
   }

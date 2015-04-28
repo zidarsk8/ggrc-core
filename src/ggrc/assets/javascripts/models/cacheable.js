@@ -564,7 +564,10 @@ can.Model("can.Model.Cacheable", {
     , "date" : makeDateSerializer("date")
     , "packaged_datetime" : makeDateSerializer("datetime", "dateTime")
   }
-  , tree_view_options : {}
+  , tree_view_options : {
+    display_attr_names : ['title', 'owner', 'status'],
+    mandatory_attr_names : ['title']
+  }
   , obj_nav_options: {}
   , list_view_options : {}
   , getRootModelName: function() {

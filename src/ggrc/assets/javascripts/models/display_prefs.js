@@ -186,12 +186,11 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   }
 
   , setTreeViewHeaders : function (model_name, display_list) {
-    var hdr = this.getObject(path, TREE_VIEW_HEADERS);
-    if (typeof hdr === 'undefined') {
+    var hdr = this.getObject(path, TREE_VIEW_HEADERS), obj = {};
+    if (!hdr) {
       hdr = this.makeObject(path, TREE_VIEW_HEADERS);
     }
 
-    var obj = {};
     obj.display_list = display_list;
     hdr.attr(model_name, obj);
 
@@ -202,11 +201,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   , getTreeViewHeaders : function (model_name) {
     var value = this.getObject(path, TREE_VIEW_HEADERS);
 
-    if (typeof value === 'undefined') {
-      return [];
-    }
-
-    if (typeof value[model_name] === 'undefined') {
+    if (!value || !value[model_name]) {
       return [];
     }
 
