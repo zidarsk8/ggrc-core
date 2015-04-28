@@ -376,7 +376,7 @@ class ContactEmailHandler(ColumnHandler):
       self.add_error("A valid email address is required")
     elif person_must_exist:
       value = self.find_contact(value, is_required=is_required)
-    elif value and not Person.email_re(value):
+    elif value and not Person.is_valid_email(value):
       message = u"{} is not a valid email. \
                 Please use following format: user@example.com".format(value)
       self.add_error(message) if is_required else self.add_warning(message)
