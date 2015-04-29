@@ -107,7 +107,8 @@ def modify_cycle_task_notification(obj, notification_name):
   send_on = obj.end_date - timedelta(
       notif_type.advance_notice)
 
-  if send_on >= datetime.now():
+  today = datetime.combine(date.today(), datetime.min.time())
+  if send_on >= today:
       # when cycle date is moved in the future, we update the current
       # notification or add a new one.
     if notif.count() == 1:
