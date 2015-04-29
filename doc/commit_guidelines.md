@@ -41,6 +41,6 @@ Examples:
 
 ```
 CORE-9999 Fix performance issues on bulk operations
-QUICK-FIX Don't break tasks into multiple lines
+QUICK-FIX Prevent breaking tasks into multiple lines
 DOCS Add section that explains client side mappings
 ```
