@@ -31,17 +31,11 @@ class Program(HasObjectState,
   private = db.Column(db.Boolean, default=False, nullable=False)
   kind = deferred(db.Column(db.String), 'Program')
 
-  program_controls = db.relationship(
-      'ProgramControl', backref='program', cascade='all, delete-orphan')
-  controls = association_proxy(
-      'program_controls', 'control', 'ProgramControl')
   audits = db.relationship(
      'Audit', backref='program', cascade='all, delete-orphan')
 
   _publish_attrs = [
       'kind',
-      PublishOnly('program_controls'),
-      'controls',
       'audits',
       'private',
       ]
@@ -54,7 +48,6 @@ class Program(HasObjectState,
 
     query = super(Program, cls).eager_query()
     return cls.eager_inclusions(query, Program._include_links).options(
-        orm.subqueryload('program_controls'),
         orm.subqueryload('audits'))
 
 track_state_for_class(Program)

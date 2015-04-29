@@ -60,7 +60,6 @@ def contributed_services():
       service('products', models.Product),
       service('projects', models.Project),
       service('programs', models.Program),
-      service('program_controls', models.ProgramControl),
       service('relationships', models.Relationship),
       service('requests', models.Request),
       service('responses', models.Response),
