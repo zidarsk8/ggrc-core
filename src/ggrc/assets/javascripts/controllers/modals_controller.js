@@ -753,7 +753,9 @@ can.Control("GGRC.Controllers.Modals", {
       }
 
       this.disable_hide = true;
-      ajd = instance.save().done(function(obj) {
+      ajd = instance.save()
+      .fail(this.save_error.bind(this))
+      .done(function(obj) {
         function finish() {
           delete that.disable_hide;
           if (that.options.add_more) {
@@ -771,7 +773,9 @@ can.Control("GGRC.Controllers.Modals", {
             objective: obj
             , section: CMS.Models.Section.findInCacheById(params.section.id)
             , context: { id: null }
-          }).save().done(function(){
+          }).save()
+          .fail(that.save_error.bind(that))
+          .done(function(){
             $(document.body).trigger("ajax:flash",
                 { success : "Objective mapped successfully." });
             finish();
@@ -804,6 +808,7 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , " ajax:flash" : function(el, ev, mesg) {
+    //debugger;
     var that = this;
     this.options.$content.find(".flash").length || that.options.$content.prepend("<div class='flash'>");
 
@@ -820,6 +825,16 @@ can.Control("GGRC.Controllers.Modals", {
         that.options.$content.find(".flash").append(tmpl);
       }
     });
+  }
+
+  , save_error: function (_, error) {
+    // this works
+    this[" ajax:flash"](document.body, 
+                        {stopPropagation: function () {}}, 
+                        {error: error});
+    // this doesn't
+    //$(document.body).trigger("ajax:flash", {error: error});
+    delete this.disable_hide;
   }
 
   , "{instance} destroyed" : " hide"
