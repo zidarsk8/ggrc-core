@@ -66,12 +66,13 @@
       {{^is_info_pin}}
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       {{/is_info_pin}}
+      {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
 
       <div class="row-fluid wrap-row" {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true" data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
         <div class="span6">
           <h6>Test plan</h6>
           <div class="rtf-block">
-            {{{firstnonempty test_plan '<h4 class="no-data">No description</h4>'}}}
+            {{{firstnonempty test_plan '<em>No test plan</em>'}}}
           </div>
         </div>
         <div class="span3">
@@ -95,6 +96,8 @@
           </select>
         </div>
       </div>
+
+      {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
 
       <div class="row-fluid wrap-row">
         <div class="span6">
@@ -157,6 +160,7 @@
         </div>
       </div>
 
+      {{{render '/static/mustache/base_objects/urls.mustache' is_program=true instance=instance}}}
 
       <div class="custom-attr-wrap">
         <div class="row-fluid">
