@@ -7,10 +7,11 @@
   .span12
     %h1
       %span.title-prev
-        %button{ 'class': 'lhn-trigger pull-left', 'href': 'javascript://'}
-          %span.icon-bar
-          %span.icon-bar
-          %span.icon-bar
+        -if current_user.system_wide_role.lower() != 'no access'
+          %button{ 'class': 'lhn-trigger pull-left', 'href': 'javascript://'}
+            %span.icon-bar
+            %span.icon-bar
+            %span.icon-bar
         %a.title-trigger{'href': '/dashboard'}
           %i.grciconlarge-dashboard-new{'rel': 'tooltip', 'data-original-title': 'My Work'}
 
