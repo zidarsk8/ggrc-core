@@ -29,7 +29,12 @@ def upgrade():
   FROM program_directives as pd JOIN directives as d ON pd.directive_id = d.id;
   """
   op.execute(sql)
+  op.drop_constraint('fk_program_directives_contexts', 'program_directives', type_='foreignkey')
+  op.drop_constraint('program_directives_ibfk_1', 'program_directives', type_='foreignkey')
+  op.drop_constraint('program_directives_ibfk_2', 'program_directives', type_='foreignkey')
 
 
 def downgrade():
-  pass
+  op.create_foreign_key('fk_program_directives_contexts', 'program_directives', 'contexts', ['context_id'], ['id'])
+  op.create_foreign_key('program_directives_ibfk_1', 'program_directives', 'directives', ['directive_id'], ['id'])
+  op.create_foreign_key('program_directives_ibfk_2', 'program_directives', 'programs', ['program_id'], ['id'])
