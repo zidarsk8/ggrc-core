@@ -807,33 +807,8 @@ can.Control("GGRC.Controllers.Modals", {
       return ajd;
   }
 
-  , " ajax:flash" : function(el, ev, mesg) {
-    //debugger;
-    var that = this;
-    this.options.$content.find(".flash").length || that.options.$content.prepend("<div class='flash'>");
-
-    ev.stopPropagation();
-
-    can.each(["success", "warning", "error", "progress"], function(type) {
-      var tmpl;
-      if(mesg[type]) {
-        tmpl = '<div class="alert alert-'
-        + type
-        +'"><a href="#" class="close" data-dismiss="alert">&times;</a><span>'
-        + mesg[type]
-        + '</span></div>';
-        that.options.$content.find(".flash").append(tmpl);
-      }
-    });
-  }
-
   , save_error: function (_, error) {
-    // this works
-    this[" ajax:flash"](document.body, 
-                        {stopPropagation: function () {}}, 
-                        {error: error});
-    // this doesn't
-    //$(document.body).trigger("ajax:flash", {error: error});
+    $(document.body).trigger("ajax:flash", {error: error});
     delete this.disable_hide;
   }
 
