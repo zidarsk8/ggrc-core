@@ -46,9 +46,7 @@ class Program(HasObjectState,
       'private',
       ]
 
-  _include_links = [
-
-      ]
+  _include_links = []
 
   @classmethod
   def eager_query(cls):
