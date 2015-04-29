@@ -52,7 +52,6 @@ can.Model.Cacheable("CMS.Models.Program", {
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , directives : "CMS.Models.Directive.stubs"
-    , program_controls : "CMS.Models.ProgramControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , audits : "CMS.Models.Audit.stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"

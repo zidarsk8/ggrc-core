@@ -340,26 +340,6 @@ can.Model.Join("CMS.Models.DirectiveSection", {
 }, {
 });
 
-can.Model.Join("CMS.Models.ProgramControl", {
-  root_collection : "program_controls"
-  , root_object : "program_control"
-  , join_keys : {
-      program : CMS.Models.Program
-    , control : CMS.Models.Control
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , program : "CMS.Models.Program.stub"
-    , control : "CMS.Models.Control.stub"
-  }
-  , findAll : "GET /api/program_controls"
-  , create : "POST /api/program_controls"
-  , destroy : "DELETE /api/program_controls/{id}"
-}, {
-
-});
-
 can.Model.Join("CMS.Models.ControlControl", {
   root_collection : "control_controls"
   , root_object : "control_control"

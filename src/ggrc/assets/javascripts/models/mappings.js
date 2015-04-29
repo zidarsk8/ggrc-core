@@ -262,8 +262,7 @@
         "related_objects": ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System"
         ],
-        "related_objects_as_source": ["Issue"],
-        "programs": "Program",
+        "related_objects_as_source": ["Issue", "Program"],
         "objectives": "Objective",
         "implemented_controls": "Control",
         "_sections_base": ["Section", "Clause"],
@@ -297,8 +296,6 @@
       audits: Proxy(
         "Audit", "audit", "AuditObject", "auditable", "audit_objects"),
       open_requests: Cross("audits", "active_requests"),
-      programs: Proxy(
-        "Program", "program", "ProgramControl", "control", "program_controls"),
       controls: Multi(["implemented_controls", "implementing_controls"]),
       objectives: Proxy(
         "Objective", "objective", "ObjectiveControl", "control", "objective_controls"),
@@ -315,8 +312,7 @@
         //, direct_directives: ForeignKey("Directive", "directive", "controls")
       joined_directives: Proxy(
         null, "directive", "DirectiveControl", "control", "directive_controls"),
-      directives: Multi(["joined_directives"]) // "direct_directives"
-        ,
+      directives: Multi(["joined_directives"]), // "direct_directives"
       contracts: TypeFilter("directives", "Contract"),
       policies: TypeFilter("directives", "Policy"),
       standards: TypeFilter("directives", "Standard"),
@@ -328,6 +324,7 @@
       related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"]),
       related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment"),
       related_issues: TypeFilter("related_objects_via_relationship", "Issue"),
+      programs: TypeFilter("related_objects_via_relationship", "Program"),
       orphaned_objects: Multi([
         "related_objects", "sections", "clauses", "controls", "programs", "objectives", "implemented_controls", "implementing_controls", "joined_directives", "people"
       ])
@@ -468,7 +465,7 @@
         "related_objects_as_source": [
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
-          "Program", "Issue"
+          "Program", "Issue", "Control"
         ]
       },
       related_objects_as_source: Proxy(
@@ -491,6 +488,7 @@
       policies: TypeFilter("related_objects", "Policy"),
       standards: TypeFilter("related_objects", "Standard"),
       programs: TypeFilter("related_objects", "Program"),
+      controls: TypeFilter("related_objects", "Control"),
       related_documentation_responses: TypeFilter("related_objects", "DocumentationResponse"),
       related_interview_responses: TypeFilter("related_objects", "InterviewResponse"),
       related_population_sample_responses: TypeFilter("related_objects", "PopulationSampleResponse"),
@@ -504,13 +502,10 @@
         "related_object", "personable", "objectiveable"
       ],
       _canonical: {
-        "controls" : "Control",
         "audits": "Audit",
         "context": "Context"
       },
       related_issues: TypeFilter("related_objects", "Issue"),
-      controls: Proxy(
-          "Control", "control", "ProgramControl", "program", "program_controls"),
       audits: Direct("Audit", "program", "audits"),
       related_people_via_audits: TypeFilter("related_objects_via_audits", "Person"),
       authorizations_via_audits: Cross("audits", "authorizations"),
@@ -535,7 +530,7 @@
         "Person", "person", "ObjectOwner", "ownable", "object_owners"),
       owners: Multi(["program_owners", "owners_via_object_owners"]),
       orphaned_objects: Multi([
-        "related_objects", "controls", "directives", "people"
+        "related_objects", "people"
       ])
     },
     directive_object: {
