@@ -13,7 +13,9 @@ This is all shamelessly based on [chris.beams.io](http://chris.beams.io/posts/gi
 A properly formed git commit subject line should always be able to complete the following sentence:
 
 **If applied, this commit will _your subject line here_**
+
 Good: If applied, this commit will **refactor subsystem X for readability**
+
 Bad: If applied, this commit will **fixes for broken stuff**
 
 ## Bad
