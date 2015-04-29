@@ -118,7 +118,6 @@ from ggrc.login import login_required
 def dashboard():
   """The dashboard page
   """
-  current_user = get_current_user()
   return render_template("dashboard/index.haml")
 
 def generate_query_chunks(query):
