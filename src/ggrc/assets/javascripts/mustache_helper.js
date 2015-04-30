@@ -1924,7 +1924,7 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
     // Mark the title to be populated when computed_program is defined,
     // returning an empty string here would disable the save button.
     instance.attr('title', '');
-    instance.attr('_transient.default_title', instance.title);
+    instance.attr('_transient', {default_title: instance.title});
     return;
   }
   if (instance._transient.default_title !== instance.title) {
@@ -1941,7 +1941,7 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
       index = result.getCountFor('Audit') + 1;
       title = title + ' ' + index;
       instance.attr('title', title);
-      instance.attr('_transient.default_title', instance.title);
+      instance.attr('_transient', {default_title: instance.title});
     });
   });
 });
