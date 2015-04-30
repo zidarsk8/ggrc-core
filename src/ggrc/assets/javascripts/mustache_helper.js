@@ -758,6 +758,11 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
 
+Mustache.registerHelper("get_permalink", function () {
+  return window.location.href;
+});
+
+
 Mustache.registerHelper("schemed_url", function (url) {
   var domain, max_label, url_split;
 

@@ -46,6 +46,9 @@
           View Profile Page
         </a>
       </li>
+      <li>
+        <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+      </li>
       {{#with_program_roles_as "roles" result}}
         {{#if_helpers '\
           #if_equals' roles.length 1 '\
