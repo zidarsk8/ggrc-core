@@ -7,6 +7,16 @@
 
 (function(can, $) {
 
+function getCustomAttributes () {
+  var custom_attr_deferred = new $.Deferred();
+  CMS.Models.CustomAttributeDefinition.findAll({})
+    .then(function (defs) {
+      GGRC.custom_attr_defs = defs;
+      custom_attr_deferred.resolve();
+  });
+  return custom_attr_deferred;
+}
+
 can.Control("CMS.Controllers.Dashboard", {
     defaults: {
       widget_descriptors: null
@@ -154,12 +164,11 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , init_default_widgets: function() {
-      var that = this
-        ;
+      var that = this;
 
-      can.each(this.options.default_widgets, function(name) {
-        var descriptor = that.options.widget_descriptors[name]
-          ;
+      getCustomAttributes();
+      can.each(this.options.default_widgets, function (name) {
+        var descriptor = that.options.widget_descriptors[name];
 
         that.add_dashboard_widget_from_descriptor(descriptor);
       });
