@@ -98,11 +98,12 @@
       .tree-action-list {
         [class^="grcicon-"] {
           margin-top: 1px;
-          @include opacity(0.25);
+          @include opacity(0.5);
           @include transition(opacity 0.2s ease);
         }
         li {
           position: relative;
+          overflow: visible;
           .dropdown-menu {
             right: -12px;
             left: auto;
@@ -110,6 +111,7 @@
             @include border-radius(0);
             padding: 14px 30px 20px 30px;
             min-width: 340px;
+            text-align: left;
             h5 {
               font-size: 16px;
               font-weight: normal;
@@ -960,6 +962,16 @@
 .custom-popover-content {
   display: none;
 }
+
+.task-title {
+  width: 50%;
+}
+
+.task-status {
+  width: 40%;
+  text-align: right;
+}
+
 .preview-container {
   &.person-preview {
     overflow: visible;

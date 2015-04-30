@@ -18,37 +18,52 @@
                   {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
                 </div>
               </div>
-              {{#instance}}
-                <div class="span2">
-                  <div class="owner tree-title-area">
-                    {{#with_mapping 'authorizations' instance}}
-                      {{#each authorizations}}
-                        <span>
-                          {{#using role=instance.role}}
-                            {{#if_equals role.name 'WorkflowOwner'}}
-                              {{#using contact=instance.person}}
-                                {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                              {{/using}}
-                            {{/if_equals}}
-                          {{/using}}
-                        </span>
-                      {{/each}}
-                    {{/with_mapping}}
-                  </div>
-                </div>
 
-                <div class="span1">
-                  <div class="code tree-title-area">
-                    {{slug}}
-                  </div>
+              <div class="span4">
+                <div class="row-fluid">
+                  {{#display_attr_list}}
+                    <div class="span{{display_attr_width}}">
+                      {{#if_equals attr_type 'custom'}}
+                        <div class="custom tree-title-area">
+                          {{get_custom_attr_value this instance}}
+                        </div>
+                      {{else}}
+                        <div class="owner tree-title-area">
+                          {{#instance}}
+                            {{#switch attr_name}}
+                              {{#case 'owner'}}
+                                {{#with_mapping 'authorizations' instance}}
+                                  {{#each authorizations}}
+                                    <span>
+                                      {{#using role=instance.role}}
+                                        {{#if_equals role.name 'WorkflowOwner'}}
+                                          {{#using contact=instance.person}}
+                                            {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                                          {{/using}}
+                                        {{/if_equals}}
+                                      {{/using}}
+                                    </span>
+                                  {{/each}}
+                                {{/with_mapping}}
+                              {{/case}}
+                              {{#case 'frequency'}}
+                                {{#if_equals instance.frequency 'one_time'}}
+                                  One time
+                                {{else}}
+                                  {{instance.frequency}}
+                                {{/if_equals}}
+                              {{/case}}
+                              {{#default}}
+                                {{get_default_attr_value attr_name instance}}
+                              {{/default}}
+                            {{/switch}}
+                          {{/instance}}
+                        </div>
+                      {{/if}}
+                    </div>
+                  {{/display_attr_list}}
                 </div>
-
-                <div class="span1">
-                  <div class="state-value state-{{to_class status '_'}} tree-title-area">
-                    {{status}}
-                  </div>
-                </div>
-              {{/instance}}
+              </div>
 
               <div class="span4">
                 <div class="show-details">

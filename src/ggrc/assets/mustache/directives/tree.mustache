@@ -20,36 +20,61 @@
                   {{instance.title}}
                 </div>
               </div>
-              {{#instance}}
 
-                <div class="span2">
-                  <div class="owner tree-title-area">
-                    {{#if owners.length}}
-                      {{#using contacts=owners}}
-                      {{#contacts}}
-                        {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-                      {{/contacts}}
-                      {{/using}}
-                    {{/if}}
-                  </div>
+              <div class="span4">
+                <div class="row-fluid">
+                  {{#display_attr_list}}
+                    <div class="span{{display_attr_width}}">
+                      {{#if_equals attr_type 'custom'}}
+                        <div class="custom tree-title-area">
+                          {{get_custom_attr_value this instance}}
+                        </div>
+                      {{else}}
+                        <div class="owner tree-title-area">
+                          {{#instance}}
+                            {{#switch attr_name}}
+                              {{#case 'owner'}}
+                                {{#if owners.length}}
+                                  {{#using contacts=owners}}
+                                  {{#contacts}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+                                  {{/contacts}}
+                                  {{/using}}
+                                {{/if}}
+                              {{/case}}
+                              {{#case 'contact'}}
+                                <span>
+                                  {{#using contact=instance.contact}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                                  {{/using}}
+                                </span>
+                              {{/case}}
+                              {{#case 'secondary_contact'}}
+                                <span>
+                                  {{#using contact=instance.secondary_contact}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                                  {{/using}}
+                                </span>
+                              {{/case}}
+
+                              {{#default}}
+                                {{get_default_attr_value attr_name instance}}
+                              {{/default}}
+                            {{/switch}}
+                          {{/instance}}
+                        </div>
+                      {{/if}}
+                    </div>
+                  {{/display_attr_list}}
                 </div>
+              </div>
 
-                <div class="span1">
-                  <div class="code tree-title-area">
-                    {{slug}}
-                  </div>
-                </div>
-
-                <div class="span1">
-                  <div class="state-value state-{{to_class status '_'}} tree-title-area">
-                    {{status}}
-                  </div>
-                </div>
-
-              {{/instance}}
               <div class="span4">
 
                 <div class="show-details">
+                  {{#child_options}}
+                    {{{renderLive add_item_view}}}
+                  {{/child_options}}
                   {{#if instance.viewLink}}
                     {{#is_allowed "view_object_page" instance}}
                       <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>

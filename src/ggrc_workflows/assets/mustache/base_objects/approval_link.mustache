@@ -58,21 +58,21 @@
               <small><em>Approval applies only to this object and not to mapped objects.</em></small>
             </div>
           {{else}}
-            {{#if_helpers '\
-              #owned_by_current_user' instance '\
-              or #current_user_is_admin'}}
+            {{#is_allowed "read" "Workflow" context="any"}}
               {{#with_mapping_count instance 'current_approval_cycles'}}
                 {{#if_equals count 0}}
-                  <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{instance.class.model_singular}}" data-object-id="{{instance.id}}">
-                    <i class="grcicon-review"></i>
-                    Submit For Review
-                  </a>
+                  {{#is_allowed "create" "Workflow" context="any"}}
+                    <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{instance.class.model_singular}}" data-object-id="{{instance.id}}">
+                      <i class="grcicon-review"></i>
+                      Submit For Review
+                    </a>
+                  {{/is_allowed}}
                 {{else}}
                   <i class="grcicon-review"></i>
                   <span class="setup-link">Review in progress</span>
                 {{/if_equals}}
               {{/with_mapping_count}}
-            {{/if_helpers}}
+            {{/is_allowed}}
           {{/if}}
         {{/with_is_reviewer}}
       {{/with_review_task}}

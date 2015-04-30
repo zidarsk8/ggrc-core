@@ -21,35 +21,120 @@
                   {{instance.title}}
                 </div>
               </div>
-              {{#instance}}
-                <div class="span2">
-                  <div class="owner tree-title-area">
-                    {{#if owners.length}}
-                      {{#using contacts=owners}}
-                      {{#contacts}}
-                        {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-                      {{/contacts}}
-                      {{/using}}
-                    {{/if}}
-                  </div>
-                </div>
 
-                <div class="span1">
-                  <div class="code tree-title-area">
-                    {{slug}}
-                  </div>
-                </div>
+              <div class="span4">
+                <div class="row-fluid">
+                  {{#display_attr_list}}
+                    <div class="span{{display_attr_width}}">
+                      {{#if_equals attr_type 'custom'}}
+                        <div class="custom tree-title-area">
+                          {{get_custom_attr_value this instance}}
+                        </div>
+                      {{else}}
+                        <div class="owner tree-title-area">
+                          {{#instance}}
+                            {{#switch attr_name}}
+                              {{#case 'owner'}}
+                                {{#if owners.length}}
+                                  {{#using contacts=owners}}
+                                  {{#contacts}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+                                  {{/contacts}}
+                                  {{/using}}
+                                {{/if}}
+                              {{/case}}
+                              {{#case 'contact'}}
+                                <span>
+                                  {{#using contact=instance.contact}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                                  {{/using}}
+                                </span>
+                              {{/case}}
+                              {{#case 'secondary_contact'}}
+                                <span>
+                                  {{#using contact=instance.secondary_contact}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                                  {{/using}}
+                                </span>
+                              {{/case}}
+                              {{#case 'principal_assessor'}}
+                                <span>
+                                  {{#using contact=instance.principal_assessor}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                                  {{/using}}
+                                </span>
+                              {{/case}}
+                              {{#case 'secondary_assessor'}}
+                                <span>
+                                  {{#using contact=instance.secondary_assessor}}
+                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                                  {{/using}}
+                                </span>
+                              {{/case}}
+                              {{#case 'kind'}}
+                                {{#using kind=instance.kind}}
+                                  {{kind.title}}
+                                {{/using}}
+                              {{/case}}
+                              {{#case 'fraud_related'}}
+                                {{#if_equals instance.fraud_related "0"}}
+                                  No
+                                {{/if}}
+                                {{#if_equals instance.fraud_related "1"}}
+                                  Yes
+                                {{/if}}
+                              {{/case}}
+                              {{#case 'significance'}}
+                                {{#if_equals instance.key_control "1"}}
+                                  Key
+                                {{/if}}
+                                {{#if_equals instance.key_control "0"}}
+                                  Non-Key
+                                {{/if}}
+                              {{/case}}
+                              {{#case 'means'}}
+                                {{#using means=instance.means}}
+                                  {{means.title}}
+                                {{/using}}
+                              {{/case}}
+                              {{#case 'frequency'}}
+                                {{#using verify_frequency=instance.verify_frequency}}
+                                  {{verify_frequency.title}}
+                                {{/using}}
+                              {{/case}}
+                              {{#case 'assertions'}}
+                                {{#using items=instance.assertions}}
+                                  {{#items}}
+                                    {{name}} &nbsp;
+                                  {{/items}}
+                                {{/using}}
+                              {{/case}}
+                              {{#case 'categories'}}
+                                {{#using items=instance.categories}}
+                                  {{#items}}
+                                    {{name}} &nbsp;
+                                  {{/items}}
+                                {{/using}}
+                              {{/case}}
 
-                <div class="span1">
-                  <div class="state-value state-{{to_class status '_'}} tree-title-area">
-                    {{status}}
-                  </div>
+                              {{#default}}
+                                {{get_default_attr_value attr_name instance}}
+                              {{/default}}
+                            {{/switch}}
+                          {{/instance}}
+                        </div>
+                      {{/if}}
+                    </div>
+                  {{/display_attr_list}}
                 </div>
+              </div>
 
-              {{/instance}}
               <div class="span4">
 
                 <div class="show-details">
+                  {{#child_options}}
+                    {{{renderLive add_item_view}}}
+                  {{/child_options}}
                   {{#if instance.viewLink}}
                     {{#is_allowed "view_object_page" instance}}
                       <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>

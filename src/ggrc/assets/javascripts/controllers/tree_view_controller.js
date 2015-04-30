@@ -54,7 +54,7 @@ function _display_tree_subpath(el, path, attempt_counter) {
         controller.select();
         scroll_delay = 750;
       }
-    }else{
+    } else {
       node_controller = $node.control();
       if (node_controller && node_controller.display_path) {
          return node_controller.display_path(rest);
@@ -330,6 +330,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , show_view : null
     , show_header : false
     , footer_view : null
+    , add_item_view : null
     , parent : null
     , list : null
     , single_object : false
@@ -349,11 +350,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //example child option :
     // { property : "controls", model : CMS.Models.Control, }
     // { parent_find_param : "system_id" ... }
-  }
-  , do_not_propagate : [
-        "header_view", "footer_view", "list", "original_list", "single_object"
-      , "find_function", "find_all_deferred"
-      ]
+  },
+  do_not_propagate : [
+    'header_view', 'footer_view', 'add_item_view', 'list', 'original_list', 'single_object', 'find_function',
+    'find_all_deferred'
+  ]
 }, {
   //prototype properties
   setup : function(el, opts) {
@@ -391,6 +392,62 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     hash.pop();
     window.location.hash = hash.join('/');
   }
+
+  //Displays attribute list for tree-header, Select attribute list drop down
+  //Gets default and custom attribute list for each model, and sets upthe display-list
+  , init_display_options: function (opts) {
+    var i, display_width = 12, //total width of display = span12
+        select_attr_list = [], display_attr_list = [],
+        model = opts.model, model_name = model.model_singular;
+
+    //Get default attr list
+    can.each(model.tree_view_options.attr_list || can.Model.Cacheable.attr_list, function (item) {
+        select_attr_list.push(item);
+    });
+    //Get custom attr_list
+    CMS.Models.CustomAttributeDefinition.findAll({definition_type: model_name})
+      .then(function (defs) {
+        if (defs.length) {
+          //create custom_attr_list objects
+          for (i = 0; i < defs.length; i++) {
+            if (defs[i].attribute_type !== 'Rich Text') {
+              var obj = {};
+              obj.attr_title = defs[i].title;
+              obj.attr_name = defs[i].title;
+              obj.display_status = false;
+              obj.attr_type = 'custom';
+              select_attr_list.push(obj);
+            }
+          }
+        }
+        //Initialize the display status for title, owner, status to be true
+        for (i = 0; i < select_attr_list.length; i++) {
+          var obj = select_attr_list[i];
+          if (model_name === 'CycleTaskGroupObjectTask') {
+            obj.display_status = ['title', 'mapped_object', 'workflow'].indexOf(obj.attr_name) !== -1;
+          } else {
+            obj.display_status = ['title', 'owner', 'status'].indexOf(obj.attr_name) !== -1;
+          }
+          //Make title the mandatory attribute
+          obj.mandatory = ['title'].indexOf(obj.attr_name) !== -1;
+        }
+
+
+        //Create display list
+        can.each(select_attr_list, function (item) {
+          if (item.attr_title !== 'Title' && item.display_status) {
+              display_attr_list.push(item);
+          }
+        });
+
+        this.options.attr('select_attr_list', select_attr_list);
+        this.options.attr('display_attr_list', display_attr_list);
+        this.options.attr('display_attr_width',
+          Math.floor(display_width/display_attr_list.length));
+
+      }.bind(this));
+  }
+
   , init : function(el, opts) {
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       this.display_prefs = display_prefs;
@@ -433,6 +490,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         this._attached_deferred.resolve();
       }
     }.bind(this));
+    this.init_display_options(opts);
   }
 
   , " inserted": function() {
@@ -456,6 +514,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
                   that.hide_filter();
                 }
               });
+              can.bind.call(that.element.parent().find('.set-tree-attrs'), 'click', function (evnt) {
+                that.set_tree_attrs();
+              });
         })));
       }
 
@@ -471,7 +532,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         }
       }));
 
-      if(this.options.footer_view) {
+      if (this.options.footer_view) {
         dfds.push(
           can.view(this.options.footer_view, this.options,
             this._ifNotRemoved(function(frag) {
@@ -616,18 +677,19 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.enqueue_items(real_add);
   }
 
-  , "{original_list} remove" : function(list, ev, oldVals, index) {
+  , "{original_list} remove" : function (list, ev, oldVals, index) {
     var remove_marker = {}; // Empty object used as unique marker
 
     //  FIXME: This assumes we're replacing the entire list, and corrects for
     //    instances being removed and immediately re-added.  This should be
     //    changed to support exact mirroring of the order of
     //    `this.options.list`.
-    if (!this.oldList)
+    if (!this.oldList) {
       this.oldList = [];
+    }
     this.oldList.push.apply(
         this.oldList,
-        can.map(oldVals, function(v) { return v.instance ? v.instance : v; }));
+        can.map(oldVals, function (v) { return v.instance ? v.instance : v; }));
 
     // `remove_marker` is to ensure that removals are not attempted until 20ms
     //   after the *last* removal (e.g. for a series of removals)
@@ -637,9 +699,14 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         can.each(this.oldList, function(v) {
           this.element.trigger("removeChild", v);
         }.bind(this));
-        delete this.oldList;
-        delete this._remove_marker;
-        $(".cms_controllers_info_pin").control().unsetInstance();
+        this.oldList = null;
+        this._remove_marker = null;
+
+        // TODO: This is a workaround. We need to update communication between
+        //       info-pin and tree views through Observer
+        if (!this.element.closest(".cms_controllers_info_pin").length) {
+          $(".cms_controllers_info_pin").control().unsetInstance();
+        }
         this.show_info_pin();
       }
     }.bind(this)), 200);
@@ -886,6 +953,42 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.display_prefs.setFilterHidden(false);
       this.display_prefs.save();
     }
+
+  /* Update the tree attributes as selected by the user CORE-1546
+  */
+  , set_tree_attrs : function () {
+    //update the display attrbute list and re-draw
+    //1: find checked items
+    //2. update
+    var display_width = 12,
+        $check = this.element.parent().find('.attr-checkbox'),
+        $selected = $check.filter(':checked'),
+        selected_items=[];
+
+    $selected.each( function(index) {
+      selected_items.push(this.value);
+    });
+
+    can.each(this.options.select_attr_list, function (item) {
+      item.display_status = selected_items.indexOf(item.attr_name) !== -1;
+    });
+
+    this.options.attr('select_attr_list', this.options.select_attr_list);
+    this.options.display_attr_list = [];
+
+    can.each(this.options.select_attr_list, function (item) {
+      if (!item.mandatory && item.display_status) {
+        this.options.display_attr_list.push(item);
+      }
+    }, this);
+    this.options.attr('display_attr_list', this.options.display_attr_list);
+    this.options.attr('display_attr_width',
+      Math.floor(display_width/this.options.display_attr_list.length));
+
+    this.reload_list();
+    //set user preferences for next time
+
+  }
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
@@ -1143,6 +1246,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
     if (this.options.parent) {
       parent_fragment = this.options.parent.hash_fragment();
     }
+
     return [parent_fragment,
             this.options.instance.hash_fragment()].join("/");
   }
@@ -1154,3 +1258,50 @@ can.Control("CMS.Controllers.TreeViewNode", {
                             this.hash_fragment()].join('');
   }
 });
+
+(function (can, $) {
+    can.Component.extend ({
+    tag: 'tree-header-selector',
+    // <content> in a component template will be replaced with whatever is contained
+    //  within the component tag.  Since the views for the original uses of these components
+    //  were already created with content, we just used <content> instead of making
+    //  new view template files.
+    template: '<content/>',
+    scope: {
+      instance: null
+    },
+    events: {
+      init: function () {
+        this.scope.attr('controller', this);
+      },
+
+      'input.attr-checkbox click' : function (el, ev) {
+        var MAX_ATTR = 5,
+            $check = this.element.find('.attr-checkbox'),
+            $mandatory = $check.filter('.mandatory'),
+            $selected = $check.filter(':checked'),
+            $not_selected = $check.not(':checked');
+
+        if ($selected.length === MAX_ATTR) {
+          $not_selected.prop('disabled', true).
+            closest('li').addClass('disabled');
+        } else {
+          $check.prop('disabled', false)
+            .closest('li').removeClass('disabled');
+          //Make sure mandatory items are always disabled
+          $mandatory.prop('disabled', true)
+            .closest('li').addClass('disabled');
+        }
+        ev.stopPropagation();
+      },
+
+      '.dropdown-menu-form click' : function (el, ev) {
+        ev.stopPropagation();
+      },
+
+      '.set-tree-attrs,.close-dropdown click' : function(el, ev) {
+        this.element.find('.dropdown-menu').closest('li').removeClass('open');
+      }
+    }
+  });
+})(this.can, this.can.$);

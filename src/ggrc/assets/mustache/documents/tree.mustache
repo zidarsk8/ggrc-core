@@ -47,6 +47,9 @@
               <div class="span4">
 
                 <div class="show-details">
+                  {{#child_options}}
+                    {{{renderLive add_item_view}}}
+                  {{/child_options}}
                   {{#if instance.viewLink}}
                     {{#is_allowed "view_object_page" instance}}
                       <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
