@@ -1090,7 +1090,7 @@ can.Model("can.Model.Cacheable", {
   },
 
   hash_fragment: function () {
-    var type = can.spaceCamelCase(this.type)
+    var type = can.spaceCamelCase(this.type || "")
             .toLowerCase()
             .replace(/ /g, '_');
 
