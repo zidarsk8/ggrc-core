@@ -68,7 +68,8 @@ All notifications handle the following structure:
                   "custom_message": ""
                   "title": ""
                   "workflow_url": "",
-                  "workflow_owner": workflow_owner,
+                  "workflow_owners":
+                      { workflow_owner.id: workflow_owner_info, ...},
                   "start_date": MM/DD/YYYY
                   "fuzzy_start_date": "in X days/weeks ..."
 
@@ -96,7 +97,8 @@ All notifications handle the following structure:
                   "custom_message": ""
                   "cycle_title": ""
                   "cycle_url": ""
-                  "workflow_owner": workflow_owner,
+                  "workflow_owners":
+                      { workflow_owner.id: workflow_owner_info, ...},
 
                   "my_tasks" : # list of all tasks assigned to the user
                       { cycle_task.id: { task_info }, ...}
