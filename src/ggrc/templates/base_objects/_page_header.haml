@@ -36,11 +36,6 @@
           %span
             My Tasks
             %span.task-count
-      %li
-        %a.nav-trigger.active{'href': 'javascript://'}
-          %i.grcicon-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Hide menu'}
-          %span
-            Hide menu
       %li.user.dropdown
         %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
           %i.grcicon-user-black
@@ -80,7 +75,11 @@
             %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
               %i.grcicon-logout-black
               Logout
-
+      %li
+        %a.nav-trigger.active{'href': 'javascript://'}
+          %i.grcicon-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Hide menu'}
+          %span
+            Hide menu
       -if self.page_help
         %li
           %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
