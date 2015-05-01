@@ -2383,7 +2383,7 @@ can.each({
                        }).then(function(user_role_bindings) {
                           var rq = new RefreshQueue();
                           can.each(user_role_bindings, function(urb) {
-                            if(urb.instance.person.id === GGRC.current_user.id) {
+                            if(urb.instance.person && urb.instance.person.id === GGRC.current_user.id) {
                               rq.enqueue(urb.instance.role.reify());
                             }
                           });
