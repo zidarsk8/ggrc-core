@@ -309,7 +309,14 @@
         , type, message_i
         , flash_class
         , flash_class_mappings = { notice: "success" }
-        , html;
+        , html
+        , got_message = _.some(_.values(flash), 
+                               function (msg) { return !!msg; }); 
+
+      if (!got_message) {
+        // sometimes ajax:flash is triggered with bad data
+        return;
+      }
 
       // Find or create the flash-message holder
       $target = $(e.target);
@@ -329,12 +336,12 @@
           if (typeof(flash[type]) == "string")
             flash[type] = [flash[type]];
 
-          flash_class = flash_class_mappings[type] || type
+          flash_class = flash_class_mappings[type] || type;
 
           html =
             [ '<div class="alert alert-' + flash_class + '">'
             ,   '<a href="#" class="close" data-dismiss="alert">x</a>'
-            ]
+            ];
           for (message_i in flash[type]) {
             html.push('<span>' + flash[type][message_i] + '</span>');
           }
