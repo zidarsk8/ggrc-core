@@ -400,74 +400,68 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         select_attr_list = [], display_attr_list = [],
         model = opts.model, model_name = model.model_singular,
         model_definition = model().class.root_object,
-        mandatory_attr_names, display_attr_names, that = this;
+        mandatory_attr_names, display_attr_names;
 
-    setTimeout(function () {
-      if (GGRC.custom_attr_defs) {
-        //get standard attrs for each model
-        can.each(model.tree_view_options.attr_list || can.Model.Cacheable.attr_list, function (item) {
-            select_attr_list.push(item);
-        });
-        //Get mandatory_attr_names
-        mandatory_attr_names = model.tree_view_options.mandatory_attr_names ?
-          model.tree_view_options.mandatory_attr_names :
-            can.Model.Cacheable.tree_view_options.mandatory_attr_names;
+    //get standard attrs for each model
+    can.each(model.tree_view_options.attr_list || can.Model.Cacheable.attr_list, function (item) {
+        select_attr_list.push(item);
+    });
+    //Get mandatory_attr_names
+    mandatory_attr_names = model.tree_view_options.mandatory_attr_names ?
+      model.tree_view_options.mandatory_attr_names :
+        can.Model.Cacheable.tree_view_options.mandatory_attr_names;
 
-        //get custom attrs
-        can.each(GGRC.custom_attr_defs, function (def) {
-          if (def.definition_type === model_definition && def.attribute_type !== 'Rich Text') {
-            var obj = {};
-            obj.attr_title = obj.attr_name = def.title;
-            obj.display_status = false;
-            obj.attr_type = 'custom';
-            select_attr_list.push(obj);
-          }
-        });
-
-        //Get the display attr_list from local storage
-        saved_attr_list = that.display_prefs.getTreeViewHeaders(model_name);
-
-        if (!saved_attr_list.length) {
-          //Initialize the display status, Get display_attr_names for model
-          display_attr_names = model.tree_view_options.display_attr_names ?
-            model.tree_view_options.display_attr_names :
-              can.Model.Cacheable.tree_view_options.display_attr_names;
-
-          for (i = 0; i < select_attr_list.length; i++) {
-            var obj = select_attr_list[i];
-
-            obj.display_status = display_attr_names.indexOf(obj.attr_name) !== -1;
-            obj.mandatory = mandatory_attr_names.indexOf(obj.attr_name) !== -1;
-          }
-        } else {
-          //Mandatory attr should be always displayed in tree view
-          can.each(mandatory_attr_names, function (attr_name) {
-            saved_attr_list.push(attr_name);
-          });
-
-          for (i = 0; i < select_attr_list.length; i++) {
-            var obj = select_attr_list[i];
-            obj.display_status = saved_attr_list.indexOf(obj.attr_name) !== -1;
-            obj.mandatory = mandatory_attr_names.indexOf(obj.attr_name) !== -1;
-          }
-        }
-
-        //Create display list
-        can.each(select_attr_list, function (item) {
-          if (!item.mandatory && item.display_status) {
-              display_attr_list.push(item);
-          }
-        });
-
-        that.options.attr('select_attr_list', select_attr_list);
-        that.options.attr('display_attr_list', display_attr_list);
-        that.options.attr('display_attr_width',
-          Math.floor(display_width/display_attr_list.length));
-
-      } else {
-        that.init_display_options(opts);
+    //get custom attrs
+    can.each(GGRC.custom_attr_defs, function (def) {
+      if (def.definition_type === model_definition && def.attribute_type !== 'Rich Text') {
+        var obj = {};
+        obj.attr_title = obj.attr_name = def.title;
+        obj.display_status = false;
+        obj.attr_type = 'custom';
+        select_attr_list.push(obj);
       }
-    }, 20);
+    });
+
+    //Get the display attr_list from local storage
+    saved_attr_list = this.display_prefs.getTreeViewHeaders(model_name);
+
+    if (!saved_attr_list.length) {
+      //Initialize the display status, Get display_attr_names for model
+      display_attr_names = model.tree_view_options.display_attr_names ?
+        model.tree_view_options.display_attr_names :
+          can.Model.Cacheable.tree_view_options.display_attr_names;
+
+      for (i = 0; i < select_attr_list.length; i++) {
+        var obj = select_attr_list[i];
+
+        obj.display_status = display_attr_names.indexOf(obj.attr_name) !== -1;
+        obj.mandatory = mandatory_attr_names.indexOf(obj.attr_name) !== -1;
+      }
+    } else {
+      //Mandatory attr should be always displayed in tree view
+      can.each(mandatory_attr_names, function (attr_name) {
+        saved_attr_list.push(attr_name);
+      });
+
+      for (i = 0; i < select_attr_list.length; i++) {
+        var obj = select_attr_list[i];
+        obj.display_status = saved_attr_list.indexOf(obj.attr_name) !== -1;
+        obj.mandatory = mandatory_attr_names.indexOf(obj.attr_name) !== -1;
+      }
+    }
+
+    //Create display list
+    can.each(select_attr_list, function (item) {
+      if (!item.mandatory && item.display_status) {
+          display_attr_list.push(item);
+      }
+    });
+
+    this.options.attr('select_attr_list', select_attr_list);
+    this.options.attr('display_attr_list', display_attr_list);
+    this.options.attr('display_attr_width',
+      Math.floor(display_width/display_attr_list.length));
+
   },
 
   init : function(el, opts) {
@@ -511,8 +505,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       if (this.element && this.element.closest('body').length) {
         this._attached_deferred.resolve();
       }
+      this.init_display_options(opts);
     }.bind(this));
-    this.init_display_options(opts);
+
   }
 
   , " inserted": function() {
