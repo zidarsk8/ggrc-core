@@ -64,11 +64,11 @@
                   {{/if}}
                 </div>
                 <ul class="tree-action-list">
-                  {{#if infer_roles}}
+                  {{#infer_roles instance}}
                     <li>
                       <i class="grcicon-person-black" rel="tooltip" data-placement="left" data-original-title="{{#infer_roles instance}}{{.}} {{/infer_roles}}"></i>
                     </li>
-                  {{/if}}
+                  {{/infer_roles}}
                   <li>
                     {{#child_options}}
                       {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance multiple_mapping_case=true}}}

@@ -92,11 +92,11 @@
                   {{/if}}
                 </div>
                 <ul class="tree-action-list">
-                  {{#if infer_roles}}
+                  {{#infer_roles instance}}
                     <li>
                       <i class="grcicon-person-black" rel="tooltip" data-placement="left" data-original-title="{{#infer_roles instance}}{{.}} {{/infer_roles}}"></i>
                     </li>
-                  {{/if}}
+                  {{/infer_roles}}
                   {{#instance}}
                     {{#is_private}}
                       <li>
