@@ -47,10 +47,6 @@ def get_notification_data(notifications):
     return {}
   aggregate_data = {}
 
-  def merge_into(destination, source):
-    if destination is None:
-      return source
-
   for pn in notifications:
     data = services.call_service(pn.object_type.name, pn)
     aggregate_data = merge_dict(aggregate_data, data)
