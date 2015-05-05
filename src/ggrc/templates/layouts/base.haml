@@ -21,6 +21,7 @@
       %link{ rel:'stylesheet', type:'text/css', href:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 
+    %link{ 'href': '={ url_for("static", filename="favicon.ico") }', 'rel':'icon', 'type':'image/x-icon' }
   %body
     -block body
 
@@ -47,10 +48,6 @@
       $(function() {
         GGRC.Tracker.timing("dashboard", "exec_ready_handlers", Date.now() - st, "last document.ready handler fired");
       });
-
-    -#csrf_meta_tag
-
-    %link{ 'href': '={ url_for("static", filename="favicon.ico") }', 'rel':'icon', 'type':'image/x-icon' }
 
     -# Google Web Font(s)
     -#NOTE: This resource occasionally hangs and prevents page from rendering, so loaded after the fact via jquery
@@ -89,4 +86,3 @@
 
 
     -#%link{ 'href': "http://fonts.googleapis.com/css?family=PT+Sans", :rel => "stylesheet", :type => "text/css" }
-
