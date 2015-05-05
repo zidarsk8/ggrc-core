@@ -87,7 +87,7 @@ def send_pending_notifications():
       email.send_email(user_email, subject, email_body)
       sent_emails.append(user_email)
   set_notification_sent_time(notifications)
-  return "emails sent to: <br> {}".format("", "<br>".join(sent_emails))
+  return "emails sent to: <br> {}".format("<br>".join(sent_emails))
 
 
 def send_todays_digest_notifications():
@@ -101,7 +101,7 @@ def send_todays_digest_notifications():
     email.send_email(user_email, subject, email_body)
     sent_emails.append(user_email)
   set_notification_sent_time(notifications)
-  return "emails sent to: <br> {}".format("", "<br>".join(sent_emails))
+  return "emails sent to: <br> {}".format("<br>".join(sent_emails))
 
 
 def init_extra_views(app):
