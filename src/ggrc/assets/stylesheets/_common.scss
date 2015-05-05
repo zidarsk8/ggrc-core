@@ -15,10 +15,12 @@ h1 {
   @include oneline();
   color: $headerTitle;
   font-size: 24px;
-  line-height: 48px;
+  line-height: 47px;
   height: 47px;
   font-family: $fontTitle;
   font-weight: normal;
+  width: 40%;
+  float: left;
   position: relative;
   .title-prev {
     position: absolute;
@@ -28,7 +30,7 @@ h1 {
   }
   .title-slide {
     position: absolute;
-    left: 39px;
+    left: 90px;
     top: 0;
     z-index: 9999;
     background: $white;
@@ -1057,6 +1059,7 @@ select.multiple-selector {
     font-size: 44px;
     font-weight: normal;
     line-height: 1.5em;
+    width: 100%;
   }
   h2 {
     text-align:center;
