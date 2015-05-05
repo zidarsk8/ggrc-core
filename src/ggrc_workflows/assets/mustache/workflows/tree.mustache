@@ -13,16 +13,16 @@
         <div class="select">
           <div class="item-data">
             <div class="row-fluid">
-              <div class="span4">
-                <div class="title tree-title-area">
+              <div class="span{{display_options.title_width}}">
+                <div class="title tree-title-area" rel="tooltip" data-placement="left" title="" data-original-title="{{instance.title}}">
                   {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
                 </div>
               </div>
 
-              <div class="span4">
+              <div class="span{{display_options.selectable_width}}">
                 <div class="row-fluid">
                   {{#display_attr_list}}
-                    <div class="span{{display_attr_width}}">
+                    <div class="span{{display_options.selectable_attr_width}}">
                       {{#if_equals attr_type 'custom'}}
                         <div class="custom tree-title-area">
                           {{get_custom_attr_value this instance}}
@@ -54,7 +54,15 @@
                                 {{/if_equals}}
                               {{/case}}
                               {{#default}}
-                                {{get_default_attr_value attr_name instance}}
+                                {{#if_helpers '\
+                                  #if_equals' attr_name 'url' '\
+                                  or #if_equals' attr_name 'reference_url'}}
+                                    <a class="url" href="{{get_url_value attr_name instance}}" target="_blank">
+                                      {{get_default_attr_value attr_name instance}}
+                                    </a>
+                                {{else}}
+                                  {{get_default_attr_value attr_name instance}}
+                                {{/in_helpers}}
                               {{/default}}
                             {{/switch}}
                           {{/instance}}
@@ -65,7 +73,7 @@
                 </div>
               </div>
 
-              <div class="span4">
+              <div class="span{{display_options.action_width}}">
                 <div class="show-details">
                   {{#if instance.viewLink}}
                     {{#is_allowed "view_object_page" instance}}
