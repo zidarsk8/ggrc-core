@@ -95,7 +95,7 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , init_info_pin: function() {
-    new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
+    this.info_pin = new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
   }
 
   , ".nav-trigger click": function(el, ev) {
@@ -359,7 +359,7 @@ can.Control("CMS.Controllers.InnerNav", {
 
         this.options.instance = GGRC.page_instance();
         if (!(this.options.contexts instanceof can.Observe)) {
-         this.options.contexts = new can.Observe(this.options.contexts);
+          this.options.contexts = new can.Observe(this.options.contexts);
         }
 
         // FIXME: Initialize from `*_widget` hash when hash has no `#!`
@@ -393,14 +393,10 @@ can.Control("CMS.Controllers.InnerNav", {
 
       window.location.hash = path;
 
-      if (path.length > 0) {
-        this.display_path(path);
-      } else {
-        this.display_path('info_widget');
-      }
+      this.display_path(path.length ? path : "info_widget");
     }
 
-  , display_path: function(path) {
+  , display_path: function (path) {
       var step = path.split("/")[0],
           rest = path.substr(step.length + 1),
           widget_list = this.options.widget_list;
@@ -414,22 +410,19 @@ can.Control("CMS.Controllers.InnerNav", {
       if (widget) {
         this.set_active_widget(widget);
         return this.display_widget_path(rest);
-      } else {
-        return new $.Deferred().resolve();
       }
+      return new $.Deferred().resolve();
     }
 
-  , display_widget_path: function(path) {
-      var active_widget_selector = this.options.contexts.active_widget.selector
-        , $active_widget = $(active_widget_selector)
-        , widget_controller = $active_widget.control()
-        ;
+  , display_widget_path: function (path) {
+      var active_widget_selector = this.options.contexts.active_widget.selector,
+          $active_widget = $(active_widget_selector),
+          widget_controller = $active_widget.control();
+
       if (widget_controller && widget_controller.display_path) {
         return widget_controller.display_path(path);
       }
-      else {
-        return new $.Deferred().resolve();
-      }
+      return new $.Deferred().resolve();
     }
 
   , set_active_widget: function (widget) {
@@ -446,13 +439,16 @@ can.Control("CMS.Controllers.InnerNav", {
     this.show_active_widget();
   }
 
-  , show_active_widget : function(selector) {
-    var that = this
-      , widget = $(selector || this.options.contexts.attr('active_widget').selector);
+  , show_active_widget: function (selector) {
+    var panel_selector = selector || this.options.contexts.attr('active_widget').selector,
+        widget = $(panel_selector),
+        dashboard_controller = this.options.dashboard_controller;
+
     if (widget.length) {
-      this.options.dashboard_controller.show_widget_area();
+      dashboard_controller.info_pin.element.control().unsetInstance();
+      dashboard_controller.show_widget_area();
       widget.siblings(':visible').hide().end().show();
-      $('[href=' + (selector || that.options.contexts.attr('active_widget').selector) + ']')
+      $('[href=' + panel_selector + ']')
         .closest('li').addClass('active')
         .siblings().removeClass('active');
     }
