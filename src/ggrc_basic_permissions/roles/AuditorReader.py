@@ -37,7 +37,6 @@ permissions = {
         "Vendor",
         "PopulationSample",
         "Product",
-        "ProgramControl",
         "Project",
         "Relationship",
         "RelationshipType",

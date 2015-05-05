@@ -38,7 +38,6 @@ permissions = {
         "Vendor",
         "PopulationSample",
         "Product",
-        "ProgramControl",
         "Project",
         "Relationship",
         "RelationshipType",
@@ -94,7 +93,6 @@ permissions = {
         "Vendor",
         "PopulationSample",
         "Product",
-        "ProgramControl",
         "Project",
         "Relationship",
         "RelationshipType",
@@ -254,7 +252,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ProgramControl",
         "Relationship",
         "RelationshipType",
         {
@@ -452,7 +449,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ProgramControl",
         "Relationship",
         "RelationshipType",
         {

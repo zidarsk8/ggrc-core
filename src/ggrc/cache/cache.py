@@ -150,8 +150,6 @@ def all_mapping_entries():
     mapping('ObjectSection', 'sectionable', True),
     mapping('ObjectiveControl', 'objective'),
     mapping('ObjectiveControl', 'control'),
-    mapping('ProgramControl', 'program'),
-    mapping('ProgramControl', 'control'),
     mapping('SectionObjective', 'section'),
     mapping('SectionObjective', 'objective'),
     mapping('Section', 'directive'),
