@@ -127,6 +127,11 @@ a.remove_filter i[class^="grcicon-"] {
   .active & {
     background-position:-6px -32px;
   }
+  .tree-action-list & {
+    .active & {
+      background-position:-6px -8px;
+    }
+  }
 }
 .grcicon-search-circle {
   background-position:-246px -32px;
