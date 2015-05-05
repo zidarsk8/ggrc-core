@@ -74,7 +74,8 @@ Maintained By: miha@reciprocitylabs.com
                   <ul {{ style.list_wrap() }} >
                   {% for cycle_id, cycle in digest['cycle_started'].items() %}
                     <li {{ style.list_item() }} >
-                      New cycle of {{ cycle['cycle_title'] }}.
+                      New cycle of
+                      <a href="{{ cycle['cycle_url'] }}" {{ style.link_text() }} >{{ cycle['cycle_title'] }}</a>.
                       <!--by {# macro.user_name(cycle['workflow_owner']) #}.-->
                     </li>
                   {% endfor %}
