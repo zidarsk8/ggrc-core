@@ -35,6 +35,8 @@ def get_cycle_created_task_data(notification):
   cycle_task_group = cycle_task.cycle_task_group
   cycle = cycle_task_group.cycle
 
+  force = cycle.workflow.notify_on_change
+
   task_assignee = get_person_dict(cycle_task.contact)
   task_group_assignee = get_person_dict(cycle_task_group.contact)
   workflow_owners = get_workflow_owners_dict(cycle.context_id)
@@ -47,6 +49,7 @@ def get_cycle_created_task_data(notification):
   assignee_data = {
       task_assignee['email']: {
           "user": task_assignee,
+          "force_notifications": force,
           "cycle_started": {
               cycle.id: {
                   "my_tasks": task
@@ -57,6 +60,7 @@ def get_cycle_created_task_data(notification):
   tg_assignee_data = {
       task_group_assignee['email']: {
           "user": task_group_assignee,
+          "force_notifications": force,
           "cycle_started": {
               cycle.id: {
                   "my_task_groups": {
@@ -70,6 +74,7 @@ def get_cycle_created_task_data(notification):
     wf_owner_data = {
         workflow_owner['email']: {
             "user": workflow_owner,
+            "force_notifications": force,
             "cycle_started": {
                 cycle.id: {
                     "cycle_tasks": task
@@ -88,9 +93,11 @@ def get_cycle_task_due(notification):
 
   notif_name = notification.notification_type.name
   due = "due_today" if notif_name == "cycle_task_due_today" else "due_in"
+  force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
   return {
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
+          "force_notifications": force,
           due: {
               cycle_task.id: get_cycle_task_dict(cycle_task)
           }
@@ -100,11 +107,13 @@ def get_cycle_task_due(notification):
 
 def get_all_cycle_tasks_completed_data(notification, cycle):
   workflow_owners = get_workflow_owners_dict(cycle.context_id)
+  force = cycle.workflow.notify_on_change
   result = {}
   for workflow_owner in workflow_owners.itervalues():
     wf_data = {
         workflow_owner['email']: {
             "user": workflow_owner,
+            "force_notifications": force,
             "all_tasks_completed": {
                 cycle.id: get_cycle_dict(cycle)
             }
@@ -119,11 +128,13 @@ def get_cycle_created_data(notification, cycle):
     return {}
 
   manual = notification.notification_type.name == "manual_cycle_created"
+  force = cycle.workflow.notify_on_change
   result = {}
 
   for person in cycle.workflow.people:
     result[person.email] = {
         "user": get_person_dict(person),
+        "force_notifications": force,
         "cycle_started": {
             cycle.id: get_cycle_dict(cycle, manual)
         }
@@ -150,9 +161,11 @@ def get_cycle_task_declined_data(notification):
   if not cycle_task:
     return {}
 
+  force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
   return {
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
+          "force_notifications": force,
           "task_declined": {
               cycle_task.id: get_cycle_task_dict(cycle_task)
           }
@@ -185,6 +198,7 @@ def get_task_group_task_data(notification):
 
   task_group = task_group_task.task_group
   workflow = task_group.workflow
+  force = workflow.notify_on_change
 
   tasks = {}
 
@@ -202,6 +216,7 @@ def get_task_group_task_data(notification):
   assignee_data = {
       task_assignee['email']: {
           "user": task_assignee,
+          "force_notifications": force,
           "cycle_starts_in": {
               workflow.id: {
                   "my_tasks": tasks
@@ -212,6 +227,7 @@ def get_task_group_task_data(notification):
   tg_assignee_data = {
       task_group_assignee['email']: {
           "user": task_group_assignee,
+          "force_notifications": force,
           "cycle_starts_in": {
               workflow.id: {
                   "my_task_groups": {
@@ -225,6 +241,7 @@ def get_task_group_task_data(notification):
     wf_owner_data = {
         workflow_owner['email']: {
             "user": workflow_owner,
+            "force_notifications": force,
             "cycle_starts_in": {
                 workflow.id: {
                     "workflow_tasks": tasks
@@ -250,10 +267,12 @@ def get_workflow_data(notification):
   result = {}
 
   workflow_owners = get_workflow_owners_dict(workflow.context_id)
+  force = workflow.notify_on_change
 
   for wf_person in workflow.workflow_people:
     result[wf_person.person.email] = {
         "user": get_person_dict(wf_person.person),
+        "force_notifications": force,
         "cycle_starts_in": {
             workflow.id: {
                 "workflow_owners": workflow_owners,
@@ -359,62 +378,3 @@ def get_workflow_url(workflow):
       base=request.url_root,
       workflow_id=workflow.id,
   )
-
-
-def should_recieve(notif, workflow, person, nightly_cron=True):
-  """
-  nigtly_cron - There are two types of cron jobs, nightly for email digest
-  and a 5 minute cron job for instant notifications. This field is true if
-  the current notification will be sent as part of the digest email, and false
-  otherwise.
-
-  send_on - In digest notifications this field is always set to a certain date.
-  In instant notifications it can be set to today, or NULL. If the field is
-  set, then the instant notification should be sent as part of the digest email
-  for users who don't have instant notificaitons enabled. If the field is not
-  set, the notification will be sent to users with instant notifications with
-  the 5 minute cron job.
-
-  """
-  def is_enabled(notif_type):
-    return NotificationConfig.query.filter(
-        and_(NotificationConfig.person_id == person.id,
-             NotificationConfig.enable_flag == True,  # noqa
-             NotificationConfig.notif_type == notif_type)).count() > 0
-
-  has_instant = is_enabled("Email_Now") or workflow.notify_on_change
-  has_digest = is_enabled("Email_Digest") or has_instant
-
-  if not nightly_cron and\
-          has_instant and\
-          notif.notification_type.instant and\
-          not notif.send_on:
-    return True
-
-  if nightly_cron and\
-          not has_instant and\
-          has_digest and\
-          notif.notification_type.instant and\
-          notif.send_on:
-    return True
-
-  if nightly_cron and\
-          not notif.notification_type.instant and\
-          has_digest:
-    return True
-
-  return False
-
-  # This if statetemt is equivalent to the tree statements above but
-  # harder to read
-  # if nightly_cron:
-  #   if notif.notification_type.instant:
-  #     return notif.send_on and\
-  #       person_digest and\
-  #       not has_instant
-  #   else:
-  #     return person_digest
-  # else:
-  #   return notif.notification_type.instant and\
-  #     not notif.send_on and\
-  #     has_instant

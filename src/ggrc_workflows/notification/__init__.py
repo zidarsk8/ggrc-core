@@ -63,6 +63,9 @@ All notifications handle the following structure:
       "some@email.com": {
           "user": { user_info },
 
+          # if notifications are forced for the given workflow
+          "force_notifications": True/False
+
           "cycle_starts_in": {
               workflow.id: {
                   "custom_message": ""
