@@ -114,6 +114,8 @@ def get_all_cycle_tasks_completed_data(notification, cycle):
 
 
 def get_cycle_created_data(notification, cycle):
+  if not cycle.is_current:
+    return {}
 
   manual = notification.notification_type.name == "manual_cycle_created"
   result = {}
