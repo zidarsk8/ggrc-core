@@ -29,12 +29,11 @@ Examples:
 5. Removing stuff
 
 #### Good
-1. Fix {something} when {something_else} doesn't exist
-2. Refactor {something} for readability
-3. Resolve {something} in {something_else}
+1. Fix bug when {something_else} doesn't exist
+2. Change behavior of {something} to do {behavior_x}
+3. [don't do this, fix one specific thing in a commit]
 4. Add {method_a}, {method_b} and {method_c} methods to API
 5. Remove unused {method_a}, {method_b}...
-
 
 
 # Pull request titles
