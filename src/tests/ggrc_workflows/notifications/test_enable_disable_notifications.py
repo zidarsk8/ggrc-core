@@ -127,6 +127,44 @@ class TestEnableAndDisableNotifications(TestCase):
       _, notif_data = notification.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
+  @patch("ggrc.notification.email.send_email")
+  def test_force_one_wf_notifications(self, mock_mail):
+
+    with freeze_time("2015-02-01 13:39:20"):
+      _, wf_forced = self.wf_generator.generate_workflow(self.quarterly_wf_forced)
+      response, wf_forced = self.wf_generator.activate_workflow(wf_forced)
+      _, wf = self.wf_generator.generate_workflow(self.quarterly_wf)
+      response, wf = self.wf_generator.activate_workflow(wf)
+
+      self.assert200(response)
+
+      user = Person.query.get(self.user.id)
+
+    with freeze_time("2015-01-29 13:39:20"):
+      _, notif_data = notification.get_todays_notifications()
+      self.assertIn(user.email, notif_data)
+      self.assertIn("cycle_starts_in", notif_data[user.email])
+      self.assertIn(wf_forced.id, notif_data[user.email]["cycle_starts_in"])
+      self.assertNotIn(wf.id, notif_data[user.email]["cycle_starts_in"])
+
+      data = {
+          "notification_config": {
+              "person_id": user.id,
+              "notif_type": "Email_Digest",
+              "enable_flag": True,
+              "context": None,
+              "type": "NotificationConfig",
+          }
+      }
+      response = self.ggrc_generator.api.post(NotificationConfig, data)
+
+      user = Person.query.get(self.user.id)
+      _, notif_data = notification.get_todays_notifications()
+      self.assertIn(user.email, notif_data)
+      self.assertIn("cycle_starts_in", notif_data[user.email])
+      self.assertIn(wf_forced.id, notif_data[user.email]["cycle_starts_in"])
+      self.assertIn(wf.id, notif_data[user.email]["cycle_starts_in"])
+
   def create_test_cases(self):
     def person_dict(person_id):
       return {
