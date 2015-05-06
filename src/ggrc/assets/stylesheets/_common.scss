@@ -12,7 +12,7 @@ body {
 
 // typography
 h1 {
-  @include oneline();
+  @include clearfix();
   color: $headerTitle;
   font-size: 24px;
   line-height: 47px;
@@ -22,25 +22,22 @@ h1 {
   width: 40%;
   float: left;
   position: relative;
-  .title-prev {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 1000;
+  .lhn-trigger {
+    float: left;
   }
-  .title-slide {
-    position: absolute;
-    left: 90px;
-    top: 0;
-    z-index: 9999;
-    background: $white;
+  .title-content {
     @include oneline();
     width: 85%;
+    float: left;
   }
   .right-side {
     position: absolute;
     right: 104px;
     top: 0;
+    text-align: right;
+  }
+  .child-title-content {
+    float: right;
     text-align: right;
   }
 }
