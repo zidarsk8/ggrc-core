@@ -445,7 +445,7 @@ can.Control("CMS.Controllers.InnerNav", {
         dashboard_controller = this.options.dashboard_controller;
 
     if (widget.length) {
-      dashboard_controller.info_pin.element.control().unsetInstance();
+      dashboard_controller.info_pin.element.control().hideInstance();
       dashboard_controller.show_widget_area();
       widget.siblings(':visible').hide().end().show();
       $('[href=' + panel_selector + ']')
