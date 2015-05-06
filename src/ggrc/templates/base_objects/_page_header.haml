@@ -61,16 +61,16 @@
                 %input{
                   'type': 'checkbox',
                   'name': 'notifications',
-                  'value': 'Email_Now'
-                }
-                Real-time email updates
-              %label
-                %input{
-                  'type': 'checkbox',
-                  'name': 'notifications',
                   'value': 'Email_Digest'
                 }
                 Daily email digest
+              %label.inner
+                %input{
+                  'type': 'checkbox',
+                  'name': 'notifications',
+                  'value': 'Email_Now'
+                }
+                Real-time email updates
           %li
             %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
               %i.grcicon-logout-black

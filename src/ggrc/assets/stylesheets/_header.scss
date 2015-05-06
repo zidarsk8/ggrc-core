@@ -221,7 +221,7 @@
     margin-top: 27px;
   }
   .dashboard-title {
-		padding-left:20px;
+    padding-left:20px;
     i {
       margin-top: 6px;
     }
@@ -390,6 +390,12 @@
       font-size: 12px;
       input {
         margin: -2px 0 0 0;
+      }
+      &.inner {
+        margin-left: 15px;
+      }
+      &.disabled {
+        color: $gray;
       }
     }
   }
