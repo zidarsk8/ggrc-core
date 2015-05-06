@@ -15,7 +15,6 @@ from ggrc_workflows.models import (
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
 from ggrc.utils import merge_dicts
-from ggrc.models import NotificationConfig
 
 
 """
@@ -49,7 +48,9 @@ def get_cycle_created_task_data(notification):
   assignee_data = {
       task_assignee['email']: {
           "user": task_assignee,
-          "force_notifications": force,
+          "force_notifications": {
+            notification.id: force
+          },
           "cycle_started": {
               cycle.id: {
                   "my_tasks": task
@@ -60,7 +61,9 @@ def get_cycle_created_task_data(notification):
   tg_assignee_data = {
       task_group_assignee['email']: {
           "user": task_group_assignee,
-          "force_notifications": force,
+          "force_notifications": {
+            notification.id: force
+          },
           "cycle_started": {
               cycle.id: {
                   "my_task_groups": {
@@ -74,7 +77,9 @@ def get_cycle_created_task_data(notification):
     wf_owner_data = {
         workflow_owner['email']: {
             "user": workflow_owner,
-            "force_notifications": force,
+            "force_notifications": {
+              notification.id: force
+            },
             "cycle_started": {
                 cycle.id: {
                     "cycle_tasks": task
@@ -97,7 +102,9 @@ def get_cycle_task_due(notification):
   return {
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
-          "force_notifications": force,
+          "force_notifications": {
+            notification.id: force
+          },
           due: {
               cycle_task.id: get_cycle_task_dict(cycle_task)
           }
@@ -113,7 +120,9 @@ def get_all_cycle_tasks_completed_data(notification, cycle):
     wf_data = {
         workflow_owner['email']: {
             "user": workflow_owner,
-            "force_notifications": force,
+            "force_notifications": {
+              notification.id: force
+            },
             "all_tasks_completed": {
                 cycle.id: get_cycle_dict(cycle)
             }
@@ -134,7 +143,9 @@ def get_cycle_created_data(notification, cycle):
   for person in cycle.workflow.people:
     result[person.email] = {
         "user": get_person_dict(person),
-        "force_notifications": force,
+        "force_notifications": {
+          notification.id: force
+        },
         "cycle_started": {
             cycle.id: get_cycle_dict(cycle, manual)
         }
@@ -165,7 +176,9 @@ def get_cycle_task_declined_data(notification):
   return {
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
-          "force_notifications": force,
+          "force_notifications": {
+            notification.id: force
+          },
           "task_declined": {
               cycle_task.id: get_cycle_task_dict(cycle_task)
           }
@@ -216,7 +229,9 @@ def get_task_group_task_data(notification):
   assignee_data = {
       task_assignee['email']: {
           "user": task_assignee,
-          "force_notifications": force,
+          "force_notifications": {
+            notification.id: force
+          },
           "cycle_starts_in": {
               workflow.id: {
                   "my_tasks": tasks
@@ -227,7 +242,9 @@ def get_task_group_task_data(notification):
   tg_assignee_data = {
       task_group_assignee['email']: {
           "user": task_group_assignee,
-          "force_notifications": force,
+          "force_notifications": {
+            notification.id: force
+          },
           "cycle_starts_in": {
               workflow.id: {
                   "my_task_groups": {
@@ -241,7 +258,9 @@ def get_task_group_task_data(notification):
     wf_owner_data = {
         workflow_owner['email']: {
             "user": workflow_owner,
-            "force_notifications": force,
+            "force_notifications": {
+              notification.id: force
+            },
             "cycle_starts_in": {
                 workflow.id: {
                     "workflow_tasks": tasks
@@ -272,7 +291,9 @@ def get_workflow_data(notification):
   for wf_person in workflow.workflow_people:
     result[wf_person.person.email] = {
         "user": get_person_dict(wf_person.person),
-        "force_notifications": force,
+        "force_notifications": {
+          notification.id: force
+        },
         "cycle_starts_in": {
             workflow.id: {
                 "workflow_owners": workflow_owners,

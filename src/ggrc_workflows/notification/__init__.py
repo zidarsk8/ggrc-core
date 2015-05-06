@@ -64,7 +64,9 @@ All notifications handle the following structure:
           "user": { user_info },
 
           # if notifications are forced for the given workflow
-          "force_notifications": True/False
+          "force_notifications": {
+              notification.id :True/False
+          }
 
           "cycle_starts_in": {
               workflow.id: {

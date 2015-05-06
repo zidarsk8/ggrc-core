@@ -47,7 +47,7 @@ def get_filter_data(notification):
   data = services.call_service(notification.object_type.name, notification)
   for user, user_data in data.iteritems():
     if should_receive(notification,
-                      user_data["force_notifications"],
+                      user_data["force_notifications"][notification.id],
                       user_data["user"]["id"]):
       result[user] = user_data
   return result
