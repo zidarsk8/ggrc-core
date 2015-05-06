@@ -18,20 +18,24 @@ Good: If applied, this commit will **refactor subsystem X for readability**
 
 Bad: If applied, this commit will **fixes for broken stuff**
 
-## Bad
+Commit message should be summary line and description of what you have done in the imperative mode, that is as if you were commanding someone. Write "fix", "add", "change" instead of "fixed", "added", "changed".
 
-Fixed bug with Y
-Changing behavior of X
-more fixes for broken stuff
-sweet new API methods
+Examples:
 
+#### Bad
+1. Fixed bug with {something}.
+2. changing behavior of {something}
+3. more fixes for broken stuff
+4. sweet new API methods
+5. Removing stuff
 
-## Good
+#### Good
+1. Fix bug when {something_else} doesn't exist
+2. Change behavior of {something} to do {behavior_x}
+3. [don't do this, fix one specific thing in a commit]
+4. Add {method_a}, {method_b} and {method_c} methods to API
+5. Remove unused {method_a}, {method_b}...
 
-Refactor subsystem X for readability
-Update getting started documentation
-Remove deprecated methods
-Release version 1.0.0
 
 # Pull request titles
 
