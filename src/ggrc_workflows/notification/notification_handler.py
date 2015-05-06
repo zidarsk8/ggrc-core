@@ -21,21 +21,15 @@ exposed functions
 """
 
 
-def handle_task_group_task(obj, notification_type=None):
-  if not notification_type:
+def handle_task_group_task(obj, notif_type=None):
+  if not notif_type:
     return
 
   notification = get_notification(obj)
   if not notification:
-    notification = Notification(
-        object_id=obj.id,
-        object_type=get_object_type(obj),
-        notification_type=notification_type,
-        send_on=obj.task_group.workflow.next_cycle_start_date -
-        timedelta(notification_type.advance_notice),
-    )
-
-    db.session.add(notification)
+    start_date = obj.task_group.workflow.next_cycle_start_date
+    send_on = start_date - timedelta(notif_type.advance_notice)
+    add_notif(obj, notif_type, send_on)
 
 
 def handle_workflow_modify(sender, obj=None, src=None, service=None):
@@ -46,52 +40,37 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
     obj.next_cycle_start_date = date.today()
 
   notification = get_notification(obj)
+  notif_type = get_notification_type(
+      "{}_workflow_starts_in".format(obj.frequency))
 
   if not notification:
-    notification_type = get_notification_type(
-        "{}_workflow_starts_in".format(obj.frequency))
-    notification = Notification(
-        object_id=obj.id,
-        object_type=get_object_type(obj),
-        notification_type=notification_type,
-        send_on=obj.next_cycle_start_date -
-        timedelta(notification_type.advance_notice),
-    )
-
-  db.session.add(notification)
+    send_on = obj.next_cycle_start_date - timedelta(notif_type.advance_notice)
+    add_notif(obj, notif_type, send_on)
 
   for task_group in obj.task_groups:
     for task_group_task in task_group.task_group_tasks:
-      handle_task_group_task(task_group_task, notification_type)
+      handle_task_group_task(task_group_task, notif_type)
+
+
+def add_cycle_task_due_notifications(obj):
+  if obj.status == "Verified":
+    return
+  if not obj.cycle_task_group.cycle.is_current:
+    return
+
+  notif_type = get_notification_type("{}_cycle_task_due_in".format(
+      obj.cycle_task_group.cycle.workflow.frequency))
+  send_on = obj.end_date - timedelta(notif_type.advance_notice)
+  add_notif(obj, notif_type, send_on)
+
+  notif_type = get_notification_type("cycle_task_due_today")
+  send_on = obj.end_date - timedelta(notif_type.advance_notice)
+  add_notif(obj, notif_type, send_on)
 
 
 def add_new_cycle_task_notifications(obj, start_notif_type=None):
-  start_notification = Notification(
-      object_id=obj.id,
-      object_type=get_object_type(obj),
-      notification_type=start_notif_type,
-      send_on=date.today(),
-  )
-
-  due_in_notif_type = get_notification_type("{}_cycle_task_due_in".format(
-      obj.cycle_task_group.cycle.workflow.frequency))
-
-  due_in_notification = Notification(
-      object_id=obj.id,
-      object_type=get_object_type(obj),
-      notification_type=due_in_notif_type,
-      send_on=obj.end_date - timedelta(due_in_notif_type.advance_notice)
-  )
-  due_today_notif_type = get_notification_type("cycle_task_due_today")
-  due_today_notification = Notification(
-      object_id=obj.id,
-      object_type=get_object_type(obj),
-      notification_type=due_today_notif_type,
-      send_on=obj.end_date - timedelta(due_today_notif_type.advance_notice)
-  )
-  db.session.add(start_notification)
-  db.session.add(due_in_notification)
-  db.session.add(due_today_notification)
+  add_notif(obj, start_notif_type, date.today())
+  add_cycle_task_due_notifications(obj)
 
 
 def add_cycle_task_reassigned_notification(obj):
@@ -111,13 +90,8 @@ def add_cycle_task_reassigned_notification(obj):
   if result.count() == 0:
     return
 
-  notification_type = get_notification_type("cycle_task_reassigned"),
-  reassign_notification = Notification(
-      object_id=obj.id,
-      object_type=get_object_type(obj),
-      send_on=date.today(),
-      notification_type=notification_type)
-  db.session.add(reassign_notification)
+  notif_type = get_notification_type("cycle_task_reassigned"),
+  add_notif(obj, notif_type)
 
 
 def modify_cycle_task_notification(obj, notification_name):
@@ -142,13 +116,7 @@ def modify_cycle_task_notification(obj, notification_name):
           notif.notification_type.advance_notice)
       db.session.add(notif)
     else:
-      notif = Notification(
-          object_id=obj.id,
-          object_type=get_object_type(obj),
-          notification_type=notif_type,
-          send_on=send_on,
-      )
-      db.session.add(notif)
+      add_notif(obj, notif_type, send_on)
   else:
     # this should not be allowed, but if a cycle task is changed to a past
     # date, we remove the current pending notification if it exists
@@ -201,13 +169,7 @@ def handle_cycle_created(sender, obj=None, src=None, service=None,
     notification_type = get_notification_type(
         "manual_cycle_created" if manually else "cycle_created"
     )
-    notification = Notification(
-        object_id=obj.id,
-        object_type=get_object_type(obj),
-        notification_type=notification_type,
-        send_on=date.today(),
-    )
-    db.session.add(notification)
+    add_notif(obj, notification_type)
 
   for cycle_task_group in obj.cycle_task_groups:
     for task in cycle_task_group.cycle_task_group_tasks:

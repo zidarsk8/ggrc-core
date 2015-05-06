@@ -758,6 +758,11 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
 
+Mustache.registerHelper("get_permalink", function () {
+  return window.location.href;
+});
+
+
 Mustache.registerHelper("schemed_url", function (url) {
   var domain, max_label, url_split;
 
@@ -1859,8 +1864,8 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
   }
 });
 
-Mustache.registerHelper('last_approved', function (instance, options) {
-  var loader = instance.get_binding('approval_tasks'),
+Mustache.registerHelper("last_approved", function (instance, options) {
+  var loader = instance.get_binding("approval_tasks"),
       frame = new can.Observe();
 
   frame.attr(instance, loader.list);
@@ -1876,16 +1881,13 @@ Mustache.registerHelper('last_approved', function (instance, options) {
       });
     }
     item = item ? item[0] : list[0];
-    if (item) {
-      options.contexts.add(item);
-    }
-    return options.fn(options.contexts);
+    return options.fn(item ? item : options.contexts);
   }
   function fail(error) {
     return options.inverse(options.contexts.add({error: error}));
   }
 
-  return defer_render('span', { done : finish, fail : fail }, loader.refresh_instances());
+  return defer_render("span", {done: finish, fail: fail}, loader.refresh_instances());
 });
 
 Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
@@ -1924,7 +1926,7 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
     // Mark the title to be populated when computed_program is defined,
     // returning an empty string here would disable the save button.
     instance.attr('title', '');
-    instance.attr('_transient.default_title', instance.title);
+    instance.attr('_transient', {default_title: instance.title});
     return;
   }
   if (instance._transient.default_title !== instance.title) {
@@ -1941,7 +1943,7 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
       index = result.getCountFor('Audit') + 1;
       title = title + ' ' + index;
       instance.attr('title', title);
-      instance.attr('_transient.default_title', instance.title);
+      instance.attr('_transient', {default_title: instance.title});
     });
   });
 });

@@ -74,8 +74,8 @@ Maintained By: miha@reciprocitylabs.com
                   <ul {{ style.list_wrap() }} >
                   {% for cycle_id, cycle in digest['cycle_started'].items() %}
                     <li {{ style.list_item() }} >
-                      New cycle of {{ cycle['cycle_title'] }},
-                      by {{ macro.user_name(cycle['workflow_owner']) }}.
+                      New cycle of {{ cycle['cycle_title'] }}.
+                      <!--by {# macro.user_name(cycle['workflow_owner']) #}.-->
                     </li>
                   {% endfor %}
                   </ul>
@@ -86,8 +86,11 @@ Maintained By: miha@reciprocitylabs.com
                   <ul {{ style.list_wrap() }} >
                   {% for workflow_id, workflow in digest['cycle_starts_in'].items() %}
                     <li {{ style.list_item() }} >
-                      New cycle of {{ workflow['title'] }} starts {{ workflow['fuzzy_start_date'] }},
-                      by {{ macro.user_name(workflow['workflow_owner']) }}.
+                      New cycle of 
+                      <a href="{{ workflow['workflow_url'] }}" {{ style.link_text() }} >
+                        {{ workflow['title'] }}</a>
+                      starts {{ workflow['fuzzy_start_date'] }}.
+                      <!--by {# macro.user_name(cycle['workflow_owner']) #}.-->
                     </li>
                   {% endfor %}
                   </ul>

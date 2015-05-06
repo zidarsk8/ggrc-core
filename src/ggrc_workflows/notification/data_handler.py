@@ -33,10 +33,12 @@ def get_cycle_created_task_data(notification):
 
   task_assignee = get_person_dict(cycle_task.contact)
   task_group_assignee = get_person_dict(cycle_task_group.contact)
-  workflow_owner = get_person_dict(get_workflow_owner(cycle.context_id))
+  workflow_owners = get_workflow_owners_dict(cycle.context_id)
   task = {
       cycle_task.id: get_cycle_task_dict(cycle_task)
   }
+
+  result = {}
 
   assignee_data = {
       task_assignee['email']: {
@@ -60,17 +62,19 @@ def get_cycle_created_task_data(notification):
           }
       }
   }
-  wf_owner_data = {
-      workflow_owner['email']: {
-          "user": workflow_owner,
-          "cycle_started": {
-              cycle.id: {
-                  "cycle_tasks": task
-              }
-          }
-      }
-  }
-  return merge_dicts(assignee_data, tg_assignee_data, wf_owner_data)
+  for workflow_owner in workflow_owners.itervalues():
+    wf_owner_data = {
+        workflow_owner['email']: {
+            "user": workflow_owner,
+            "cycle_started": {
+                cycle.id: {
+                    "cycle_tasks": task
+                }
+            }
+        }
+    }
+    result = merge_dicts(result, wf_owner_data)
+  return merge_dicts(result, assignee_data, tg_assignee_data)
 
 
 def get_cycle_task_due(notification):
@@ -88,15 +92,19 @@ def get_cycle_task_due(notification):
 
 
 def get_all_cycle_tasks_completed_data(notification, cycle):
-  workflow_owner = get_person_dict(get_workflow_owner(cycle.context_id))
-  return {
-      workflow_owner['email']: {
-          "user": workflow_owner,
-          "all_tasks_completed": {
-              cycle.id: get_cycle_dict(cycle)
-          }
-      }
-  }
+  workflow_owners = get_workflow_owners_dict(cycle.context_id)
+  result = {}
+  for workflow_owner in workflow_owners.itervalues():
+    wf_data = {
+        workflow_owner['email']: {
+            "user": workflow_owner,
+            "all_tasks_completed": {
+                cycle.id: get_cycle_dict(cycle)
+            }
+        }
+    }
+    result = merge_dicts(result, wf_data)
+  return result
 
 
 def get_cycle_created_data(notification, cycle):
@@ -125,12 +133,24 @@ def get_cycle_data(notification):
   return {}
 
 
+def get_cycle_task_declined_data(notification):
+  cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  return {
+      cycle_task.contact.email: {
+          "user": get_person_dict(cycle_task.contact),
+          "task_declined": {
+              cycle_task.id: get_cycle_task_dict(cycle_task)
+          }
+      }
+  }
+
+
 def get_cycle_task_data(notification):
   notification_name = notification.notification_type.name
   if notification_name in ["manual_cycle_created", "cycle_created"]:
     return get_cycle_created_task_data(notification)
   elif notification_name == "cycle_task_declined":
-    return {}
+    return get_cycle_task_declined_data(notification)
   elif notification_name in ["cycle_task_due_in",
                              "one_time_cycle_task_due_in",
                              "weekly_cycle_task_due_in",
@@ -152,7 +172,7 @@ def get_task_group_task_data(notification):
 
   task_assignee = get_person_dict(task_group_task.contact)
   task_group_assignee = get_person_dict(task_group.contact)
-  workflow_owner = get_person_dict(get_workflow_owner(workflow.context_id))
+  workflow_owners = get_workflow_owners_dict(workflow.context_id)
 
   for task_group_object in task_group.task_group_objects:
     tasks[task_group_task.id, task_group_object.id] = {
@@ -160,7 +180,8 @@ def get_task_group_task_data(notification):
         "object_title": task_group_object.object.title,
     }
 
-  return {
+  result = {}
+  assignee_data = {
       task_assignee['email']: {
           "user": task_assignee,
           "cycle_starts_in": {
@@ -168,7 +189,9 @@ def get_task_group_task_data(notification):
                   "my_tasks": tasks
               }
           }
-      },
+      }
+  }
+  tg_assignee_data = {
       task_group_assignee['email']: {
           "user": task_group_assignee,
           "cycle_starts_in": {
@@ -178,16 +201,22 @@ def get_task_group_task_data(notification):
                   }
               }
           }
-      },
-      workflow_owner['email']: {
-          "user": workflow_owner,
-          "cycle_starts_in": {
-              workflow.id: {
-                  "workflow_tasks": tasks
-              }
-          }
-      },
+      }
   }
+  for workflow_owner in workflow_owners.itervalues():
+    wf_owner_data = {
+        workflow_owner['email']: {
+            "user": workflow_owner,
+            "cycle_starts_in": {
+                workflow.id: {
+                    "workflow_tasks": tasks
+                }
+            }
+        }
+    }
+    result = merge_dicts(result, wf_owner_data)
+
+  return merge_dicts(result, tg_assignee_data, assignee_data)
 
 
 def get_workflow_data(notification):
@@ -200,14 +229,15 @@ def get_workflow_data(notification):
 
   result = {}
 
-  workflow_owner = get_person_dict(get_workflow_owner(workflow.context_id))
+  workflow_owners = get_workflow_owners_dict(workflow.context_id)
 
   for wf_person in workflow.workflow_people:
     result[wf_person.person.email] = {
         "user": get_person_dict(wf_person.person),
         "cycle_starts_in": {
             workflow.id: {
-                "workflow_owner": workflow_owner,
+                "workflow_owners": workflow_owners,
+                "workflow_url": get_workflow_url(workflow),
                 "start_date": workflow.next_cycle_start_date,
                 "fuzzy_start_date": get_fuzzy_date(
                     workflow.next_cycle_start_date),
@@ -231,14 +261,16 @@ def get_fuzzy_date(end_date):
   return "in {} day{}".format(delta.days, "s" if delta.days > 1 else "")
 
 
-def get_workflow_owner(context_id):
-  return db.session.query(UserRole).join(Role).filter(
+def get_workflow_owners_dict(context_id):
+  owners = db.session.query(UserRole).join(Role).filter(
       and_(UserRole.context_id == context_id,
-           Role.name == "WorkflowOwner")).one().person
+           Role.name == "WorkflowOwner")).all()
+  return {user_role.person.id: get_person_dict(user_role.person)
+          for user_role in owners}
 
 
 def get_cycle_task_url(cycle_task):
-  return ("{base}workflows/{workflow_id}#current_widget/cicle/{cycle_id}"
+  return ("{base}workflows/{workflow_id}#current_widget/cycle/{cycle_id}"
           "/cycle_task_group/{cycle_task_group_id}/"
           "/cycle_task_group_object_task/{cycle_task_id}").format(
       base=request.url_root,
@@ -253,7 +285,11 @@ def get_cycle_task_dict(cycle_task):
 
   object_title = ""
   if cycle_task.cycle_task_group_object:
-    object_title = cycle_task.cycle_task_group_object.object.title
+    if cycle_task.cycle_task_group_object.object:
+      object_title = cycle_task.cycle_task_group_object.object.title
+    else:
+      object_title = "{} [deleted]".format(
+          cycle_task.cycle_task_group_object.title)
 
   return {
       "title": cycle_task.title,
@@ -276,19 +312,27 @@ def get_person_dict(person):
 
 
 def get_cycle_url(cycle):
-  return "{base}workflows/{workflow_id}#current_widget/cicle/{cycle_id}".format(
-      base=request.url_root,
-      workflow_id=cycle.workflow.id,
-      cycle_id=cycle.id,
-  )
+  return "{base}workflows/{workflow_id}#current_widget/cycle/{cycle_id}"\
+      .format(
+          base=request.url_root,
+          workflow_id=cycle.workflow.id,
+          cycle_id=cycle.id,
+      )
 
 
 def get_cycle_dict(cycle, manual=False):
-  workflow_owner = get_person_dict(get_workflow_owner(cycle.context_id))
+  workflow_owners = get_workflow_owners_dict(cycle.context_id)
   return {
       "manually": manual,
       "custom_message": cycle.workflow.notify_custom_message,
       "cycle_title": cycle.title,
-      "workflow_owner": workflow_owner,
+      "workflow_owners": workflow_owners,
       "cycle_url": get_cycle_url(cycle),
   }
+
+
+def get_workflow_url(workflow):
+  return "{base}workflows/{workflow_id}#current_widget".format(
+      base=request.url_root,
+      workflow_id=workflow.id,
+  )

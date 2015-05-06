@@ -8,6 +8,7 @@ import os
 DEBUG = True
 TESTING = True
 PRODUCTION = False
+FLASK_DEBUGTOOLBAR = False
 HOST = '0.0.0.0'
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root:root@127.0.0.1/ggrcdev?charset=utf8'
 FULLTEXT_INDEXER = 'ggrc.fulltext.mysql.MysqlIndexer'

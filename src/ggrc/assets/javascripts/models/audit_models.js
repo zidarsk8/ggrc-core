@@ -274,11 +274,17 @@ can.Model.Mixin("requestorable", {
 });
 
 can.Model.Cacheable("CMS.Models.Request", {
-  root_object : "request"
-  , filter_keys : ["assignee", "code", "company", "control",
-                   "due date", "due", "name", "notes", "request",
-                   "requested on", "status", "test", "title"]
-  , root_collection : "requests"
+  root_object : "request",
+  filter_keys : ["assignee", "code", "company", "control",
+                 "due date", "due", "name", "notes", "request",
+                 "requested on", "status", "test", "title", "request_type",
+                 "type", "request type", "due_on"
+  ],
+  filter_mappings: {
+    "type": "request_type",
+    "request type": "request_type"
+  },
+  root_collection : "requests"
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
@@ -418,28 +424,27 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
     }
   }
-  , get_filter_vals: function(){
+  , get_filter_vals: function () {
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
-        mappings = jQuery.extend({}, this.class.filter_mappings, {
-          'title': 'description',
-          'state': 'status',
-          'due date': 'due_on',
-          'due': 'due_on'
+        mappings = $.extend({}, this.class.filter_mappings, {
+          "title": "description",
+          "state": "status",
+          "due date": "due_on",
+          "due": "due_on"
         }),
-        keys = this.class.filter_keys.concat([
-          'state'
-        ]),
-        vals = filter_vals.apply(this, [keys, mappings]);
+        keys, vals;
+
+    keys = _.union(this.class.filter_keys, ["state"], _.keys(mappings));
+    vals = filter_vals.call(this, keys, mappings);
 
     try {
-      vals['due'] = moment(vals['due']).format("YYYY-MM-DD");
-      vals['due date'] = vals['due'];
+      vals["due_on"] = moment(this["due_on"]).format("YYYY-MM-DD");
+      vals["due"] = vals["due date"] = vals["due_on"];
       if (this.assignee){
-        vals['assignee'] = filter_vals.apply(this.assignee.reify(), []);
+        vals["assignee"] = filter_vals.apply(this.assignee.reify(), []);
       }
-      vals['control'] = this.audit_object.reify().auditable.reify().title;
+      vals["control"] = this.audit_object.reify().auditable.reify().title;
     } catch (e) {}
-
     return vals;
   }
 

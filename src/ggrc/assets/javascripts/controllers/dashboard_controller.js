@@ -121,16 +121,18 @@ can.Control("CMS.Controllers.Dashboard", {
         duration: 800,
         easing: 'easeOutExpo'
     },
-        $tooltip = el.find("i"),
+        $label = el.find("span"),
         $nav = el.closest("body").find(".top-inner-nav"),
         $lhn_nav = el.closest("body").find(".lhs-holder"),
-        $content = el.closest("body").find(".object-area"),
-        $fake_merge = $content.add($lhn_nav);
+        $lhn_type = el.closest("body").find(".lhn-type"),
+        $content = el.closest("body").find(".object-area");
 
     el.addClass("active");
-    $tooltip.attr("data-original-title", "Hide menu");
-    $nav.animate({top: "96"}, options);
-    $fake_merge.animate({top: "136"}, options);
+    $label.text("Hide menu");
+    $nav.animate({top: "48"}, options);
+    $lhn_type.animate({top: "94"}, options);
+    $lhn_nav.animate({top: "128"}, options);
+    $content.animate({top: "78"}, options);
 
     this.display_prefs.setTopNavHidden("", false);
     $(window).trigger("resize");
@@ -142,16 +144,18 @@ can.Control("CMS.Controllers.Dashboard", {
         duration: 800,
         easing: 'easeOutExpo'
     },
-        $tooltip = el.find("i"),
+        $label = el.find("span"),
         $nav = el.closest("body").find(".top-inner-nav"),
         $lhn_nav = el.closest("body").find(".lhs-holder"),
-        $content = el.closest("body").find(".object-area"),
-        $fake_merge = $content.add($lhn_nav);
+        $lhn_type = el.closest("body").find(".lhn-type"),
+        $content = el.closest("body").find(".object-area");
 
     el.removeClass("active");
-    $tooltip.attr("data-original-title", "Show menu");
-    $nav.animate({top: "66"}, options);
-    $fake_merge.animate({top: "106"}, options);
+    $label.text("Show menu");
+    $nav.animate({top: "18"}, options);
+    $lhn_type.animate({top: "65"}, options);
+    $lhn_nav.animate({top: "99"}, options);
+    $content.animate({top: "49"}, options);
 
     this.display_prefs.setTopNavHidden("", true);
     $(window).trigger("resize");
