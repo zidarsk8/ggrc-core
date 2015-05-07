@@ -6,14 +6,14 @@
 }}
 <custom-attributes instance="instance" load="true">
   {{#if loading}}
-	  <div class="row-fluid">
-	    <div class="span12">
-	      <span  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' 'display:inline-block; top: -6px; left: 20px;' }}></span>
-	    </div>
-	  </div>
+    <div class="row-fluid">
+      <div class="span12">
+        <span  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' 'display:inline-block; top: -6px; left: 20px;' }}></span>
+      </div>
+    </div>
   {{else}}
     {{#if instance.custom_attribute_definitions.length}}
-	  	{{get_custom_attr_value attr_info instance}}	
+      {{get_custom_attr_value attr_info instance}}
     {{/if}}
   {{/loading}}
 </custom-attributes>
