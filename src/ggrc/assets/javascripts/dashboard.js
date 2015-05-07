@@ -343,19 +343,32 @@ jQuery(function($) {
     ev.stopPropagation();
   });
 
-  $('body').on('click', 'input[name=notifications]', function(ev, el){
+  $('body').on('click', 'input[name=notifications]', function (ev, el) {
     var li = $(ev.target).closest('.notify-wrap'),
-        inputs = li.find('input'),
-        active = [];
+        inputs = li.find('input'), active = [],
+        email_now  = li.find('input[value="Email_Now"]'),
+        email_now_label = email_now.closest('label'),
+        email_digest =  li.find('input[value="Email_Digest"]');
+
+    if (email_digest[0].checked) {
+        email_now_label.removeClass('disabled');
+        email_now.prop('disabled', false);
+    } else if (!email_digest[0].checked) {//uncheck email_now
+        email_now.prop('checked', false);
+        email_now_label.addClass('disabled');
+    }
 
     inputs.prop('disabled', true);
-    active = $.map(inputs, function(input){
-      if(input.checked){
+    active = $.map(inputs, function (input) {
+      if (input.checked) {
         return input.value;
       }
     });
-    CMS.Models.NotificationConfig.setActive(active).always(function(response){
-      inputs.prop('disabled', false);
+    CMS.Models.NotificationConfig.setActive(active).always(function (response) {
+      email_digest.prop('disabled', false);
+      if (email_digest[0].checked) {
+        email_now.prop('disabled', false);
+      }
     });
   });
 

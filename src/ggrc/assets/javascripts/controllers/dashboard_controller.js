@@ -105,6 +105,18 @@ can.Control("CMS.Controllers.Dashboard", {
         this.open_nav(el);
       }
     }
+
+  , '.user-dropdown click': function (el, ev) {
+    var email_now = el.find('input[value="Email_Now"]'),
+        email_digest = el.find('input[value="Email_Digest"]'),
+        email_now_label = email_now.closest('label');
+
+    if (email_digest[0].checked) {
+      email_now_label.removeClass('disabled');
+      email_now.prop('disabled', false);
+    }
+  }
+
   , open_nav: function (el) {
     el || (el = $(".nav-trigger"));
     var options = {
