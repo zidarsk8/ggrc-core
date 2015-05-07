@@ -426,16 +426,13 @@ can.Control("CMS.Controllers.InnerNav", {
     }
 
   , set_active_widget: function (widget) {
-    var active_widget = widget,
-        info_pin = $(this.options.pin_view).control();
-
     if (typeof widget === "string") {
-      active_widget = this.widget_by_selector(widget);
+      widget = this.widget_by_selector(widget);
     }
 
-    active_widget.attr("force_show", true);
+    widget.attr("force_show", true);
     this.update_add_more_link();
-    this.options.contexts.attr("active_widget", active_widget);
+    this.options.contexts.attr("active_widget", widget);
     this.show_active_widget();
   }
 
