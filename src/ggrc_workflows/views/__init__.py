@@ -75,21 +75,6 @@ def set_notification_sent_time(notifications):
   db.session.commit()
 
 
-def send_pending_notifications():
-  digest_template = env.get_template("notifications/email_digest.html")
-  notifications, notif_data = notification.get_pending_notifications()
-  sent_emails = []
-  for day, day_notif in notif_data.iteritems():
-    subject = "gGRC daily digest for {}".format(day.strftime("%b %d"))
-    for user_email, data in day_notif.iteritems():
-      data = modify_data(data)
-      email_body = digest_template.render(digest=data)
-      email.send_email(user_email, subject, email_body)
-      sent_emails.append(user_email)
-  set_notification_sent_time(notifications)
-  return "emails sent to: <br> {}".format("<br>".join(sent_emails))
-
-
 def send_todays_digest_notifications():
   digest_template = env.get_template("notifications/email_digest.html")
   notifications, notif_data = notification.get_todays_notifications()
@@ -116,10 +101,6 @@ def init_extra_views(app):
   app.add_url_rule(
       "/_notifications/show_todays_digest", "show_todays_digest_notifications",
       view_func=login_required(show_todays_digest_notifications))
-
-  app.add_url_rule(
-      "/_notifications/send_pending", "send_pending_notifications",
-      view_func=login_required(send_pending_notifications))
 
   app.add_url_rule(
       "/_notifications/send_todays_digest", "send_todays_digest_notifications",
