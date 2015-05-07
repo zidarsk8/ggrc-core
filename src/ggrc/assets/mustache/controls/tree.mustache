@@ -28,7 +28,7 @@
                     <div class="span{{display_options.selectable_attr_width}}">
                       {{#if_equals attr_type 'custom'}}
                         <div class="custom tree-title-area">
-                          {{get_custom_attr_value this instance}}
+                          {{{render '/static/mustache/custom_attributes/tree_columns.mustache' instance=instance attr_info=this}}}
                         </div>
                       {{else}}
                         <div class="owner tree-title-area">
