@@ -444,13 +444,13 @@ can.Control("CMS.Controllers.InnerNav", {
         widget = $(panel_selector),
         dashboard_controller = this.options.dashboard_controller;
 
+    dashboard_controller.info_pin.element.control().hideInstance();
     if (widget.length) {
-      dashboard_controller.info_pin.element.control().hideInstance();
       dashboard_controller.show_widget_area();
       widget.siblings(':visible').hide().end().show();
-      $('[href=' + panel_selector + ']')
-        .closest('li').addClass('active')
-        .siblings().removeClass('active');
+      $("[href=" + panel_selector + "]")
+        .closest("li").addClass("active")
+        .siblings().removeClass("active");
     }
   }
 
