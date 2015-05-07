@@ -13,7 +13,7 @@
       <label>
         Summary
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+        <i class="grcicon-help-black" rel="tooltip" title=""></i>
       </label>
       <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
       <input id="context_id" name="context" type="hidden" model="Context" value="{{firstnonempty instance.context.id object_params.context}}">
@@ -24,7 +24,7 @@
         Assignee:
         <span class="required">*</span>
       </label>
-        {{#using assignee=instance.contact}}
+        {{#using assignee=instance.contact model_singular=model.model_singular}}
         <div class="objective-selector">
           <input id="task_group_assignee" tabindex="2" type="text" name="contact.email" class="span10 search-icon" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.email ''}}">
         </div>
@@ -58,7 +58,7 @@
         {{/using}}
       {{else}}
         <input id="workflow_id" name="workflow" type="hidden" model="Workflow" value="{{firstnonempty instance.workflow.id object_params.workflow}}">
-        <!--Workflow 
+        <!--Workflow
         {{#using workflow=instance.workflow}}
           <div>{{workflow.title}}</div>
         {{/using}}-->

@@ -95,12 +95,11 @@ can.Control("GGRC.Controllers.Modals", {
     this.options.object_params.each(function(value, key) {
       this.set_value({ name: key, value: value });
     }, this);
-  }
-
-  , "input[data-lookup] focus" : function(el, ev) {
+  },
+  "input[data-lookup] focus": function (el, ev) {
     this.autocomplete(el);
-  }
-  , "input[data-lookup] keyup" : function(el, ev) {
+  },
+  "input[data-lookup] keyup": function (el, ev) {
     // Set the transient field for validation
     var name = el.attr('name').split('.'),
         instance = this.options.instance,
@@ -108,11 +107,13 @@ can.Control("GGRC.Controllers.Modals", {
 
     name.pop(); //set the owner to null, not the email
     instance._transient || instance.attr("_transient", new can.Observe({}));
+
     can.reduce(name.slice(0, -1), function(current, next) {
       current = current + "." + next;
       instance.attr(current) || instance.attr(current, new can.Observe({}));
       return current;
     }, "_transient");
+
     instance.attr(["_transient"].concat(name).join("."), value);
   }
 
@@ -120,31 +121,29 @@ can.Control("GGRC.Controllers.Modals", {
     $.cms_autocomplete.call(this, el);
   }
 
-  , autocomplete_select : function(el, event, ui) {
-    var original_event,
-        that = this;
-
+  , autocomplete_select: function (el, event, ui) {
     $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
-      var path = el.attr("name").split(".")
-        , instance = this.options.instance
-        , index = 0
-        , prop = path.pop();
 
-      if (/^\d+$/.test(path[path.length - 1])) {
-        index = parseInt(path.pop(), 10);
-        path = path.join(".");
-        if (!this.options.instance.attr(path)) {
-          this.options.instance.attr(path, []);
-        }
-        this.options.instance.attr(path).splice(index, 1, ui.item.stub());
+    var path = el.attr("name").split(".")
+      , instance = this.options.instance
+      , index = 0
+      , prop = path.pop();
+
+    if (/^\d+$/.test(path[path.length - 1])) {
+      index = parseInt(path.pop(), 10);
+      path = path.join(".");
+      if (!this.options.instance.attr(path)) {
+        this.options.instance.attr(path, []);
       }
-      else {
-        path = path.join(".");
-        setTimeout(function(){
-          el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
-        }, 0);
-        this.options.instance.attr(path, ui.item);
-      }
+      this.options.instance.attr(path).splice(index, 1, ui.item.stub());
+    } else {
+      path = path.join(".");
+      setTimeout(function(){
+        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
+      }, 0);
+
+      this.options.instance.attr(path, ui.item);
+    }
   }
 
   , immediate_find_or_create : function(el, ev, data) {
@@ -1044,8 +1043,8 @@ can.Component.extend({
     "input keyup" : function(el, ev) {
       ev.stopPropagation();
     },
-    "input, textarea, select change" : function(el, ev) {
-        this.scope.attributes.attr(el.attr("name"), el.val());
+    "input, textarea, select change": function (el, ev) {
+      this.scope.attributes.attr(el.attr("name"), el.val());
     },
 
     "input:not([data-lookup], [data-mapping]), textarea keyup" : function(el, ev) {

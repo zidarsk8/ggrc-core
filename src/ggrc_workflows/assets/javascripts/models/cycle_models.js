@@ -204,6 +204,8 @@
       var that = this;
       this._super.apply(this, arguments);
 
+      this.validateNonBlank("contact");
+      this.validateContact(["_transient.contact", "contact"]);
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
           var dfd = instance.refresh_all_force('cycle', 'workflow');
@@ -328,6 +330,8 @@
     init: function() {
       var that = this;
       this._super.apply(this, arguments);
+      this.validateNonBlank("contact");
+      this.validateContact(["_transient.contact", "contact"]);
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {

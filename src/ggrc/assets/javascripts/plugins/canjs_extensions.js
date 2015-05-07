@@ -10,9 +10,21 @@
   // having no content when outside spaces are trimmed away.
   can.Model.validationMessages.non_blank = can.Map.validationMessages.non_blank = 'cannot be blank';
   can.Model.validateNonBlank = can.Map.validateNonBlank = function (attrNames, options) {
-    can.Map.validate.call(this, attrNames, options, function(value) {
+    can.Map.validate.call(this, attrNames, options, function (value) {
       if (value === undefined || value === null || typeof value.trim === "function" && value.trim() === '') {
         return this.constructor.validationMessages.non_blank;
+      }
+    });
+  };
+  can.Model.validateContact = can.Map.validateContact = function (attrNames, options) {
+    this.validate.call(this, attrNames, options, function (newVal, prop) {
+      var reified_contact = this.contact ? this.contact.reify() : false,
+          contact_has_email_address = reified_contact ? reified_contact.email : false;
+
+      // This check will not work until the bug introduced with commit 8a5f600c65b7b45fd34bf8a7631961a6d5a19638
+      // is resolved.
+      if (!contact_has_email_address) {
+        return "No valid contact selected for assignee";
       }
     });
   };
