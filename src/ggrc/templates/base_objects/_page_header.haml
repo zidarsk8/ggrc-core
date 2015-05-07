@@ -6,16 +6,13 @@
 .row-fluid
   .span12
     %h1
-      %span.title-prev
-        -if current_user.system_wide_role.lower() != 'no access'
-          %button{ 'class': 'lhn-trigger pull-left', 'href': 'javascript://'}
-            %span.icon-bar
-            %span.icon-bar
-            %span.icon-bar
-        %a.title-trigger{'href': '/dashboard'}
-          %i.grciconlarge-dashboard-new{'rel': 'tooltip', 'data-original-title': 'My Work'}
+      -if current_user.system_wide_role.lower() != 'no access'
+        %button{ 'class': 'lhn-trigger', 'href': 'javascript://'}
+          %span.icon-bar
+          %span.icon-bar
+          %span.icon-bar
 
-      %span.title-slide
+      %span.title-content
         -if request.path.startswith('/admin')
           %i.grciconlarge-dashboard
           Admin Dashboard
@@ -43,7 +40,7 @@
             =current_user.email
           %i.grcicon-carot
         %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
-          %li
+          %li.full-opacity
             %a{'href': "/dashboard"}
               %i.grcicon-my-work
               My Work ({{current_user.system_wide_role}})

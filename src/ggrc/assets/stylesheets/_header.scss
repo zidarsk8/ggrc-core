@@ -153,6 +153,13 @@
               @include opacity(0.6);
             }
           }
+          &.full-opacity {
+            a {
+              i {
+                @include opacity(1);
+              }
+            }
+          }
         }
       }
       &.user {
