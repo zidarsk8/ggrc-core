@@ -1938,7 +1938,8 @@ Mustache.registerHelper("default_audit_title", function (instance, options) {
       index = result.getCountFor("Audit") + 1;
       title = title + " " + index;
       instance.attr("title", title);
-      instance.attr("_transient.default_title", instance.title);
+      // this needs to be different than above, otherwise CanJS throws a strange error
+      instance.attr("_transient", {default_title: instance.title});
     });
   });
 });
