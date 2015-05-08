@@ -607,22 +607,30 @@ can.Control("CMS.Controllers.InnerNav", {
     "{window} resize" : function(el, ev) {
       this.show_hide_titles();
     },
-    show_hide_titles: function() {
+    show_hide_titles: _.debounce(function() {
       var $el = this.element,
-          $last = $el.children().not(':hidden,.inner-nav-button').last(),
-          widgets = this.options.widget_list,
-          last_pos = $last.position() || {},
+          widgets = this.options.widget_list;
 
-          are_shown = widgets.length && widgets[0].attr('show_title'),
-          num_visible = $el.children(':visible').length,
-
-          threshold = are_shown ? 180 : 180 + 70*num_visible,
-          do_show = $el.width() - last_pos.left > threshold;
-
+      // first expand all
       widgets.forEach(function(widget) {
-        widget.attr('show_title', do_show);
+        widget.attr('show_title', true);
       });
-    },
+
+      // see if too wide
+      var widths = _.map($el.children(':visible'),
+                         function (el) { 
+                           return $(el).width(); 
+                         }).reduce(function (m, w) {
+                           return m+w;
+                         }, 0);
+
+      // adjust
+      if (widths > $el.width()) {
+        widgets.forEach(function (widget) {
+          widget.attr('show_title', false);
+        });
+      }
+    }, 100),
     '.closed click' : function(el, ev) {
       var $link = el.closest('a'),
           widget = this.widget_by_selector($link.attr('href')),
