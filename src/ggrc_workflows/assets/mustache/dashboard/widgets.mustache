@@ -8,18 +8,6 @@
 <!-- Right side workflow and task trees area -->
 <dashboard-widgets class="span{{#system_role 'No Access'}}12{{/system_role}}{{^system_role 'No Access'}}9{{/system_role}} content-wrap">
     <div class="inner-content">
-      {{#if workflow_view}}
-        <section class="widget small-margin">
-          <header class="header">
-            <h2>My Workflows({{workflow_count}})</h2>
-          </header>
-          {{{ renderLive workflow_view }}}
-          {{#workflow_show_all}}
-          <a href="javascript://" class="workflow-trigger show-all">Show all my workflows</a>
-          {{/workflow_show_all}}
-        </section>
-      {{/if}}
-
       <section class="widget dashboard small-margin">
         <header class="header widget-nav">
           <div class="row-fluid">
@@ -35,6 +23,11 @@
                     Audit Requests ({{audit_requests_count}})
                   </a>
                 </li>
+                <li class="workflow-tab">
+                  <a href="javascript://">
+                    My Workflows ({{workflow_count}})
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
@@ -45,6 +38,14 @@
           {{/tasks_loaded}}
           {{{ renderLive task_view }}}
           {{{ renderLive audit_requests_view }}}
+          {{#if workflow_view}}
+            <div class="workflow-wrap-main">
+              {{{ renderLive workflow_view }}}
+              {{#workflow_show_all}}
+                <a href="javascript://" class="workflow-trigger show-all">Show all my workflows</a>
+              {{/workflow_show_all}}
+            </div>
+          {{/if}}
         </section>
       </section><!-- Widget end -->
 

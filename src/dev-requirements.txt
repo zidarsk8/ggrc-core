@@ -22,3 +22,4 @@ ipython
 MonthDelta==0.9.1
 webob
 names
+flask-debugtoolbar

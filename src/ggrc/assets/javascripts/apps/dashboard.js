@@ -142,14 +142,14 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
 
     extra_page_options = {
         Program: {
-            header_view: GGRC.mustache_path + "/programs/page_header.mustache"
+            header_view: GGRC.mustache_path + "/base_objects/page_header.mustache"
           , page_title: function(controller) {
               return "GRC Program: " + controller.options.instance.title;
             }
 
         }
       , Person: {
-            header_view: GGRC.mustache_path + "/people/page_header.mustache"
+            header_view: GGRC.mustache_path + "/base_objects/page_header.mustache"
           , page_title: function(controller) {
               var instance = controller.options.instance;
               return /dashboard/.test(window.location)
@@ -184,6 +184,7 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
         , page_help: function(controller) {
             return controller.options.instance.constructor.table_singular;
           }
+        , current_user: GGRC.current_user
         }, extra_page_options[model_name]));
     } else if (/^\/admin\/?$/.test(window.location.pathname)) {
 

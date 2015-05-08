@@ -19,6 +19,7 @@ dashboard-js-files:
   - bootstrap-popover.js
   - bootstrap/sticky-popover.js
   - bootstrap/modal-form.js
+  - zeroclipboard/ZeroClipboard.min.js
   - stickyfill.js
   - can.jquery.js
   - can.construct.super.js
@@ -103,6 +104,7 @@ dashboard-js-files:
   - dashboard.js
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
+  - components/link_to_clipboard.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -224,7 +226,6 @@ dashboard-js-template-files:
   - people/option_column.mustache
   - people/option_detail.mustache
   - people/owners_modal_connector.mustache
-  - people/page_header.mustache
   - people/popover.mustache
   - people/tier2_content.mustache
   - people/tree.mustache
@@ -241,7 +242,6 @@ dashboard-js-template-files:
   - programs/extended_info.mustache
   - programs/info.mustache
   - programs/modal_content.mustache
-  - programs/page_header.mustache
   - programs/tree.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache

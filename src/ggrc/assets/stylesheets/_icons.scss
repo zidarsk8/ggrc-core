@@ -127,6 +127,11 @@ a.remove_filter i[class^="grcicon-"] {
   .active & {
     background-position:-6px -32px;
   }
+  .tree-action-list & {
+    .active & {
+      background-position:-6px -8px;
+    }
+  }
 }
 .grcicon-search-circle {
   background-position:-246px -32px;
@@ -273,6 +278,8 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-not-done { background-position: -54px -416px; }
 .grcicon-done-black { background-position: -78px -416px; }
 .grcicon-not-done-black { background-position: -102px -416px; }
+.grcicon-nav-trigger { background-position: -318px -416px; }
+.grcicon-nav-trigger-active { background-position: -342px -416px; }
 
 // Large icons
 .grciconlarge-dashboard { background-position:-8px -8px; }

@@ -9,17 +9,7 @@
   Import/Export
 
 -block header
-  %h1.entities
-    %span.title-prev
-      %a.title-trigger{'href': '/dashboard' }
-        %i.grciconlarge-dashboard-new{'rel': 'tooltip', 'data-original-title': 'My Work'}
-
-    %span.title-slide
-      %i.grciconlarge-import
-      Import Requests
-
-    %a.nav-trigger.active{'href': 'javascript://'}
-      %i.grciconlarge-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Hide menu'}
+  -include 'base_objects/_page_header.haml'
 
 -block main
   .clearfix
