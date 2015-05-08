@@ -1903,7 +1903,7 @@ Mustache.registerHelper("with_review_task", function (options) {
   return options.fn(options.contexts.add({review_task: undefined}));
 });
 
-Mustache.registerHelper('default_audit_title', function (instance, options) {
+Mustache.registerHelper("default_audit_title", function (instance, options) {
   var index,
       program,
       default_title,
@@ -1911,17 +1911,17 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
       title;
 
   instance = Mustache.resolve(instance);
-  program = instance.attr('program');
+  program = instance.attr("program");
 
   if (!instance._transient) {
-    instance.attr('_transient', {default_title: ''});
+    instance.attr("_transient", new can.Observe({}));
   }
 
   if (program == null) {
     // Mark the title to be populated when computed_program is defined,
     // returning an empty string here would disable the save button.
-    instance.attr('title', '');
-    instance.attr('_transient.default_title', instance.title);
+    instance.attr("title", "");
+    instance.attr("_transient.default_title", instance.title);
     return;
   }
   if (instance._transient.default_title !== instance.title) {
@@ -1930,15 +1930,15 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
 
   program = program.reify();
   new RefreshQueue().enqueue(program).trigger().then(function () {
-    title = (new Date()).getFullYear() + ': ' + program.title + ' - Audit';
+    title = (new Date()).getFullYear() + ": " + program.title + " - Audit";
     default_title = title;
 
-    GGRC.Models.Search.counts_for_types(title, ['Audit']).then(function (result) {
+    GGRC.Models.Search.counts_for_types(title, ["Audit"]).then(function (result) {
       // Next audit index should be bigger by one than previous, we have unique name policy
-      index = result.getCountFor('Audit') + 1;
-      title = title + ' ' + index;
-      instance.attr('title', title);
-      instance.attr('_transient', {default_title: instance.title});
+      index = result.getCountFor("Audit") + 1;
+      title = title + " " + index;
+      instance.attr("title", title);
+      instance.attr("_transient.default_title", instance.title);
     });
   });
 });
