@@ -28,6 +28,9 @@ exposed functions
 
 def get_cycle_created_task_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  if not cycle_task:
+    return {}
+
   cycle_task_group = cycle_task.cycle_task_group
   cycle = cycle_task_group.cycle
 
@@ -79,6 +82,9 @@ def get_cycle_created_task_data(notification):
 
 def get_cycle_task_due(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  if not cycle_task:
+    return {}
+
   notif_name = notification.notification_type.name
   due = "due_today" if notif_name == "cycle_task_due_today" else "due_in"
   return {
@@ -108,6 +114,8 @@ def get_all_cycle_tasks_completed_data(notification, cycle):
 
 
 def get_cycle_created_data(notification, cycle):
+  if not cycle.is_current:
+    return {}
 
   manual = notification.notification_type.name == "manual_cycle_created"
   result = {}
@@ -124,6 +132,9 @@ def get_cycle_created_data(notification, cycle):
 
 def get_cycle_data(notification):
   cycle = get_object(Cycle, notification.object_id)
+  if not cycle:
+    return {}
+
   notification_name = notification.notification_type.name
   if notification_name in ["manual_cycle_created", "cycle_created"]:
     return get_cycle_created_data(notification, cycle)
@@ -135,6 +146,9 @@ def get_cycle_data(notification):
 
 def get_cycle_task_declined_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  if not cycle_task:
+    return {}
+
   return {
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
@@ -165,6 +179,9 @@ def get_cycle_task_data(notification):
 
 def get_task_group_task_data(notification):
   task_group_task = get_object(TaskGroupTask, notification.object_id)
+  if not task_group_task:
+    return {}
+
   task_group = task_group_task.task_group
   workflow = task_group.workflow
 
@@ -221,6 +238,8 @@ def get_task_group_task_data(notification):
 
 def get_workflow_data(notification):
   workflow = get_object(Workflow, notification.object_id)
+  if not workflow:
+    return {}
 
   if workflow.frequency == "one_time":
     # one time workflows get cycles manually created and that triggers
@@ -250,7 +269,10 @@ def get_workflow_data(notification):
 
 
 def get_object(obj_class, obj_id):
-  return db.session.query(obj_class).filter(obj_class.id == obj_id).one()
+  result = db.session.query(obj_class).filter(obj_class.id == obj_id)
+  if result.count() == 1:
+    return result.one()
+  return None
 
 
 def get_fuzzy_date(end_date):

@@ -1012,8 +1012,8 @@ can.Model("can.Model.Cacheable", {
     }
 
     pre_save_notifier.on_empty(function() {
-
-      xhr = _super.apply(that, arguments).then(function(result) {
+      xhr = _super.apply(that, arguments)
+      .then(function(result) {
         if (isNew) {
           that.after_create && that.after_create();
         } else {
@@ -1024,10 +1024,14 @@ can.Model("can.Model.Cacheable", {
       }, function(xhr, status, message) {
         that.save_error && that.save_error(xhr.responseText);
         return new $.Deferred().reject(xhr, status, message);
-      });
-
-      xhr.always(function() {
-        that.notifier.on_empty(function() {
+      })
+      .fail(function (response) {
+        that.notifier.on_empty(function () {
+          dfd.reject(that, response.responseText);
+        });
+      })
+      .done(function () {
+        that.notifier.on_empty(function () {
           dfd.resolve(that);
         });
       });
