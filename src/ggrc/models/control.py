@@ -15,6 +15,7 @@ from .mixins import (
 from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
+from .audit_object import Auditable
 from .reflection import PublishOnly
 from .utils import validate_option
 from .relationship import Relatable
@@ -85,7 +86,7 @@ class AssertionCategorized(Categorizable):
 
 class Control(HasObjectState, Relatable,
     CustomAttributable, Documentable, Personable, ControlCategorized, AssertionCategorized,
-    Hierarchical, Timeboxed, Ownable, BusinessObject, TestPlanned, db.Model):
+    Hierarchical, Timeboxed, Ownable, BusinessObject, Auditable, TestPlanned, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
@@ -109,16 +110,6 @@ class Control(HasObjectState, Relatable,
   secondary_assessor = db.relationship(
       'Person', uselist=False, foreign_keys='Control.secondary_assessor_id')
 
-  @declared_attr
-  def audit_objects(cls):
-
-    joinstr = 'and_(foreign(AuditObject.auditable_id) == {type}.id, '\
-              'foreign(AuditObject.auditable_type) == "{type}")'
-    joinstr = joinstr.format(type=cls.__name__)
-    return db.relationship(
-        'AuditObject',
-        primaryjoin=joinstr,
-    )
 
   kind = db.relationship(
       'Option',
@@ -197,7 +188,6 @@ class Control(HasObjectState, Relatable,
       'version',
       'principal_assessor',
       'secondary_assessor',
-      PublishOnly('audit_objects'),
       PublishOnly('control_controls'),
       PublishOnly('control_sections'),
       PublishOnly('objective_controls'),

@@ -84,7 +84,7 @@
           // remove the success message from non-expandable
           // flash success messages after five seconds
           setTimeout(function() {
-            $('.flash .alert-success').not(':has(ul.flash-expandable)').remove();
+            $('.flash .alert').not(':has(ul.flash-expandable)').remove();
           }, 5000);
         }
       });
