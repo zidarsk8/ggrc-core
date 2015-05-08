@@ -60,7 +60,7 @@ $(document).ready(function() {
 
         tabs[index].attr('title', el.val());
         this.element.find("#newReport .closed").show();
-        
+
         // Calculate tabs numbers
         tabs.forEach(function(tab) {
           if (tab.new_report) {
@@ -124,5 +124,5 @@ $(document).ready(function() {
     }
   });
 
-  $(".area").html(can.view("/static/mockups/mustache/reporting.mustache",{}));
+  $(".reporting-import").html(can.view("/static/mockups/mustache/reporting.mustache",{}));
 });

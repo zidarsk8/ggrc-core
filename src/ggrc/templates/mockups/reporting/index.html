@@ -13,77 +13,95 @@
 
 </head>
 <body>
+
   <header class="header main">
-    <div class="header-bar">
-      <div class="container-fluid">
+    <div class="area">
+      <div class="header-content">
         <div class="row-fluid">
-          <div class="span12">
-            <div class="logo pull-left">
-              <a href="#my-work-widget" class='to-my-work'>Company GRC</a>
-            </div>
+          <div id="page-header" class="span12">
+            <h1 class="entities">
+              <button class="lhn-trigger">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <span class="title-content">
+              </span>
+            </h1>
             <ul class="menu">
-              <li class="black-link">
-                <a id="page-help" href="javascript://" data-toggle="modal-ajax-helpform" data-help-slug="help">
-                  <i class="grcicon-help"></i>
-                  <span>Help</span>
+              <li>
+                <a href="javascript://" data-toggle="multitype-search-modal-selector" data-join-object-type="MultitypeSearch" data-original-title="search items">
+                  <i class="grcicon-search"></i>
+                  <span>Search</span>
                 </a>
               </li>
-              <li class="user dropdown dropdown-black black-link">
-                <a class="dropdown-toggle" href="#" data-toggle="dropdown" role="button">
-                  <i class="grcicon-user"></i>
+              <li>
+                <a href="/dashboard#task_widget" id="page-help">
+                  <i class="grcicon-task-black"></i>
+                  <span>
+                    My Tasks
+                    <span class="task-count ggrc_controllers_mapping_count">
+                      <small class="count">
+                        &nbsp;6&nbsp;
+                      </small>
+                    </span>
+                  </span>
+                </a>
+              </li>
+              <li class="user user-dropdown dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                  <i class="grcicon-user-black"></i>
                   <span>user@example.com</span>
-                  <i class="grcicon-carot-white"></i>
+                  <i class="grcicon-carot"></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                  <li>
-                    <a href="#my-work-widget" class="to-my-work">
-                      <i class="grcicon-dashboard"></i>
-                      My Work (gGRC Admin)
+                  <li class="full-opacity">
+                    <a href="/dashboard">
+                      <i class="grcicon-my-work"></i>
+                      My Work (Superuser)
                     </a>
                   </li>
                   <li>
-                    <a href="/admin">
-                      <i class="grcicon-admin"></i>
+                    <a href="/admin#people_list_widget">
+                      <i class="grcicon-dashboard-black"></i>
                       Admin Dashboard
                     </a>
                   </li>
                   <li class="notify-wrap">
                     <span>
-                      <i class="grcicon-alarm"></i>
+                      <i class="grcicon-alarm-black"></i>
                       Notifications
                     </span>
                     <div class="inner-list">
                       <label>
-                        <input type="checkbox" name="notify-digest">
-                        Email notifications
-                      </label>
-                      <label>
-                        <input type="checkbox" name="notify-digest" checked="checked">
+                        <input type="checkbox" name="notifications" value="Email_Digest">
                         Daily email digest
                       </label>
-                      <label>
-                        <input type="checkbox" name="notify-digest">
-                        Calendar notifications
+                      <label class="inner disabled">
+                        <input type="checkbox" name="notifications" value="Email_Now" disabled="">
+                        Real-time email updates
                       </label>
                     </div>
                   </li>
-                  <li class="layout-wrap">
-                    <a class="set-display-settings-default" href="#" tabindex="-1">
-                      <i class="grcicon-desktop"></i>
-                      Save Layout
-                    </a>
-                    <a class="clear-display-settings" href="#" tabindex="-1">
-                      <i class="grcicon-reset"></i>
-                      Reset Layout
-                    </a>
-                  </li>
-                  <li class="logout-wrap">
-                    <a href="#" tabindex="-1">
-                      <i class="grcicon-logout"></i>
+                  <li>
+                    <a href="/logout" tabindex="-1">
+                      <i class="grcicon-logout-black"></i>
                       Logout
                     </a>
                   </li>
                 </ul>
+              </li>
+              <li>
+                <a class="nav-trigger active" href="javascript://">
+                  <i class="grcicon-nav-trigger"></i>
+                  <span>Hide menu</span>
+                </a>
+              </li>
+              <li>
+                <a href="javascript://" id="#page-help" data-toggle="modal-ajax-helpform" data-help-slug="">
+                  <i class="grcicon-help-black"></i>
+                  <span>Help</span>
+                </a>
               </li>
             </ul>
           </div>
@@ -91,7 +109,7 @@
       </div>
     </div>
   </header>
-  <div class="area" style="margin-left: 48px;"></div>
+  <div class="reporting-import"></div>
 
 
   <section class="footer" style="z-index: 1000; position: fixed; right:0; bottom: 0; width: 100%;">
@@ -102,6 +120,802 @@
     </div>
   </section>
 
+  <div id="lhn">
+    <div id="lhs" class="lhs accordion">
+      <div class="lhn-type" style="left: -260px;">
+        <a href="javascript://" data-name="work_type" data-value="my_work">My objects</a>
+        <a href="javascript://" data-name="work_type" data-value="all">All objects</a>
+      </div>
+<div class="lhs-holder" style="left: -260px;">
+  <div class="affix-holder">
+    <div id="lhs" class="lhs accordion">
+      <button class="bar-v"></button>
+      <a href="javascript://" class="lhn-pin"><i class="grcicon-pin"></i></a>
+      <form class="form-search">
+        <div class="lhs-search">
+          <input class="widgetsearch" placeholder="Filter my objects..." type="text" can-value="search_text">
+          <input type="submit" class="widgetsearch-submit" value="">
+          <div class="filter-off">
+            <a href="#" rel="tooltip" data-title="Clear filters" data-original-title="" title=""><i class="grcicon-close-red"></i></a>
+          </div>
+        </div>
+      </form>
+      <div class="lhs-bg"></div>
+      <div class="lhs-nav emphesized">
+        <ul class="top-level">
+          <li class="programs accordion-group">
+            <a class="programs list-toggle oneline" href="javascript://">
+              <i class="grcicon-arrow-right"></i>
+              <i class="grcicon-program-color"></i>
+              Programs
+              <small>(<span class="item-count">1</span>)</small>
+            </a>
+            <div class="content">
+              <ul class="sub-level cms_controllers_infinite_scroll">
+                <li class="programs" data-model="true">
+                  <a href="#" class="show-extended">
+                    <div>
+                      <div class="lhs-main-title">
+                        <span class="lhs-item">
+                          Google Fiber
+                        </span>
+                      </div>
+                      <div class="lhs-private">
+                      </div>
+                      <div class="lhs-people">
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+              <ul class="sub-actions">
+                <li class="add-new oneline" data-ui-autocomplete-item="">
+                  <a data-object-plural="programs" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Program" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                    + Create New
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="workflow accordion-group">
+            <a class="workflow oneline list-toggle" href="javascript://">
+              <i class="grcicon-arrow-right"></i>
+              <i class="grcicon-workflow-color"></i>
+              Workflows
+              <small>(<span class="item-count">1</span>)</small>
+            </a>
+            <div class="content">
+              <ul class="sub-level with-filters">
+                <li class="filters">
+                  <a href="javascript://" class="wf-trigger wf-active " data-key="status" data-value="Active">
+                    Active(1)
+                  </a>
+                  <a href="javascript://" class="wf-trigger wf-draft " data-key="status" data-value="Draft">
+                    Draft(0)
+                  </a>
+                  <a href="javascript://" class="wf-trigger wf-inactive active" data-key="status" data-value="Inactive">
+                    Inactive(0)
+                  </a>
+                </li>
+                <li class="workflow Active" data-model="true">
+                  <a href="#" class="show-extended">
+                    <div class="lhs-main-title">
+                      <span class="lhs-item lhs-item-long">
+                        Google Fiber Workflow
+                      </span>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+              <ul class="sub-actions">
+                <li class="add-new oneline">
+                  <a data-object-plural="workflows" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Workflow" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                    + Create New
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="programs accordion-group">
+            <a class="programs list-toggle oneline" href="javascript://">
+              <i class="grcicon-arrow-right"></i>
+              <i class="grcicon-audit-color"></i>
+              Audits
+              <small>(<span class="item-count">1</span>)</small>
+            </a>
+            <div class="content">
+              <ul class="sub-level">
+                <li class="programs" data-model="true">
+                  <a href="#" class="show-extended">
+                    <div>
+                      <span class="lhs-item lhs-item-medium">
+                        2015: Google Fiber - Audit 1
+                      </span>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+              <ul class="sub-actions">
+                <li class="add-new oneline">
+                  <a data-object-plural="audits" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Audit" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                    + Create New
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="programs accordion-group">
+            <a class="programs list-toggle oneline" href="javascript://">
+              <i class="grcicon-arrow-right"></i>
+              <i class="grcicon-control_assessment-color"></i>
+              Control Assessments
+              <small>(<span class="item-count">1</span>)</small>
+            </a>
+            <div class="content">
+              <ul class="sub-level">
+                <li class="" data-model="true">
+                  <a href="#" class="show-extended">
+                    <div>
+                      <div class="lhs-main-title">
+                        <span class="lhs-item lhs-item-medium">
+                          Fiber control assessment
+                        </span>
+                      </div>
+                      <div class="lhs-people">
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+              <ul class="sub-actions">
+                <li class="add-new oneline">
+                  <a data-object-plural="control_assessments" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="ControlAssessment" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                    + Create New
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="programs accordion-group">
+            <a class="programs list-toggle oneline" href="javascript://">
+              <i class="grcicon-arrow-right"></i>
+              <i class="grcicon-issue-color"></i>
+              Issues
+              <small>(<span class="item-count">1</span>)</small>
+            </a>
+            <div class="content">
+              <ul class="sub-level">
+              </ul>
+              <ul class="sub-actions">
+                <li class="add-new oneline">
+                  <a data-object-plural="issues" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Issue" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                    + Create New
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="bar-h"></div>
+
+      <div class="lhs-nav">
+        <h2>Objects</h2>
+        <ul class="top-level">
+          <li class="governance accordion-group">
+            <a class="governance list-toggle top" href="#">
+              <i class="grcicon-arrow-right"></i>
+              Directives
+            </a>
+            <div class="content">
+              <ul class="mid-level">
+                <li class="governance accordion-group">
+                  <a class="governance list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-regulation-color"></i>
+                    Regulations
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="governance" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                Ovo je moj regulation
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="governance accordion-group">
+                  <a class="governance list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-policy-color"></i>
+                    Policies
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="governance" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                Nova Polisa
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="policies" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Policy" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="governance accordion-group">
+                  <a class="governance list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-standard-color"></i>
+                    Standards
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="governance" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                My new Standard
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="standards" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Standard" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="governance accordion-group">
+                  <a class="governance list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-contract-color"></i>
+                    Contracts
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="governance" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                My new Contract
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="contracts" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Contract" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="governance accordion-group">
+                  <a class="governance list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-clause-color"></i>
+                    Clauses
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="governance" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                My simple clause
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="clauses" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Clause" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="governance accordion-group">
+                  <a class="governance list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-section-color"></i>
+                    Sections
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="governance" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                My new section
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="sections" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Section" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="governance accordion-group">
+            <a class="governance list-toggle top" href="#">
+              <i class="grcicon-arrow-right"></i>
+              Controls/Objectives
+            </a>
+            <div class="content">
+              <ul class="mid-level">
+                <li class="controls accordion-group">
+                  <a class="controls list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-control-color"></i>
+                    Controls
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="governance" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                Moja nova kontrola
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="controls" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Control" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="objectives accordion-group">
+                  <a class="objectives list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-objective-color"></i>
+                    Objectives
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="objectives" data-model="true">
+                        <a href="/objectives/1276" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                11223300555hhhh
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="objectives" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Objective" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="entities accordion-group">
+            <a class="entities list-toggle top" href="#">
+              <i class="grcicon-arrow-right"></i>
+              People/Groups
+            </a>
+            <div class="content">
+              <ul class="mid-level">
+                <li class="entities accordion-group">
+                  <a class="entities list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-person-color"></i>
+                    People
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="entities" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-long">
+                                Vladan Mitevski
+                              </span>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="people" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Person" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="entities accordion-group">
+                  <a class="entities list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-org_group-color"></i>
+                    Org Groups
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="entities" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                Test Org Group
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="org_groups" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="OrgGroup" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="entities accordion-group">
+                  <a class="entities list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-vendor-color"></i>
+                    Vendors
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="entities" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                Test Vendor
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="vendors" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Vendor" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="business accordion-group">
+            <a class="business list-toggle top" href="#">
+              <i class="grcicon-arrow-right"></i>
+              Assets/Business
+            </a>
+            <div class="content">
+              <ul class="mid-level">
+                
+<li class="business accordion-group" data-tooltip-view="" data-template="" data-model-name="System">
+  <a class="business list-toggle oneline" href="javascript://" data-object-singular="System" data-parent=".top-level">
+    <i class="grcicon-arrow-right"></i>
+    <i class="grcicon-system-color"></i>
+    Systems
+    
+    <small>(<span class="item-count">1</span>)</small>
+  </a>
+  <div class="content">
+    <ul class="sub-level cms_controllers_infinite_scroll">
+
+  <li class="spinny">
+  <div class="spinner" role="progressbar" style="position: relative; width: 0px; z-index: 2000000000;;"><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-0-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(0deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-1-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(30deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-2-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(60deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-3-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(90deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-4-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(120deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-5-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(150deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-6-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(180deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-7-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(210deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-8-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(240deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-9-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(270deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-10-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(300deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-11-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(330deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div></div></li>
+</ul>
+    <ul class="sub-actions"><li class="add-new oneline" data-ui-autocomplete-item="">
+  <a data-object-plural="systems" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="System" data-toggle="modal-ajax-form" data-modal-reset="reset">
+    + Create New
+  </a>
+</li>
+</ul>
+  </div>
+</li>
+
+                
+<li class="business accordion-group" data-tooltip-view="" data-template="" data-model-name="Process">
+  <a class="business list-toggle oneline" href="javascript://" data-object-singular="Process" data-parent=".top-level">
+    <i class="grcicon-arrow-right"></i>
+    <i class="grcicon-process-color"></i>
+    Processes
+    
+    <small>(<span class="item-count">8</span>)</small>
+  </a>
+  <div class="content">
+    <ul class="sub-level cms_controllers_infinite_scroll">
+
+  <li class="spinny">
+  <div class="spinner" role="progressbar" style="position: relative; width: 0px; z-index: 2000000000;;"><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-0-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(0deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-1-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(30deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-2-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(60deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-3-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(90deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-4-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(120deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-5-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(150deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-6-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(180deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-7-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(210deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-8-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(240deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-9-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(270deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-10-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(300deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-11-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(330deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div></div></li>
+</ul>
+    <ul class="sub-actions"><li class="add-new oneline" data-ui-autocomplete-item="">
+  <a data-object-plural="processes" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Process" data-toggle="modal-ajax-form" data-modal-reset="reset">
+    + Create New
+  </a>
+</li>
+</ul>
+  </div>
+</li>
+
+                
+<li class="business accordion-group" data-tooltip-view="" data-template="" data-model-name="DataAsset">
+  <a class="business list-toggle oneline" href="javascript://" data-object-singular="DataAsset" data-parent=".top-level">
+    <i class="grcicon-arrow-right"></i>
+    <i class="grcicon-data_asset-color"></i>
+    Data Assets
+    
+    <small>(<span class="item-count">0</span>)</small>
+  </a>
+  <div class="content">
+    <ul class="sub-level cms_controllers_infinite_scroll">
+
+  <li class="spinny">
+  <div class="spinner" role="progressbar" style="position: relative; width: 0px; z-index: 2000000000;;"><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-0-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(0deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-1-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(30deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-2-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(60deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-3-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(90deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-4-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(120deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-5-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(150deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-6-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(180deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-7-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(210deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-8-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(240deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-9-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(270deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-10-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(300deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-11-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(330deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div></div></li>
+</ul>
+    <ul class="sub-actions"><li class="add-new oneline" data-ui-autocomplete-item="">
+  <a data-object-plural="data_assets" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="DataAsset" data-toggle="modal-ajax-form" data-modal-reset="reset">
+    + Create New
+  </a>
+</li>
+</ul>
+  </div>
+</li>
+
+                
+<li class="business accordion-group" data-tooltip-view="" data-template="" data-model-name="Product">
+  <a class="business list-toggle oneline" href="javascript://" data-object-singular="Product" data-parent=".top-level">
+    <i class="grcicon-arrow-right"></i>
+    <i class="grcicon-product-color"></i>
+    Products
+    
+    <small>(<span class="item-count">0</span>)</small>
+  </a>
+  <div class="content">
+    <ul class="sub-level cms_controllers_infinite_scroll">
+
+  <li class="spinny">
+  <div class="spinner" role="progressbar" style="position: relative; width: 0px; z-index: 2000000000;;"><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-0-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(0deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-1-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(30deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-2-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(60deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-3-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(90deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-4-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(120deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-5-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(150deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-6-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(180deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-7-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(210deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-8-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(240deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-9-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(270deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-10-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(300deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-11-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(330deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div></div></li>
+</ul>
+    <ul class="sub-actions"><li class="add-new oneline" data-ui-autocomplete-item="">
+  <a data-object-plural="products" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Product" data-toggle="modal-ajax-form" data-modal-reset="reset">
+    + Create New
+  </a>
+</li>
+</ul>
+  </div>
+</li>
+
+                
+<li class="business accordion-group" data-tooltip-view="" data-template="" data-model-name="Project">
+  <a class="business list-toggle oneline" href="javascript://" data-object-singular="Project" data-parent=".top-level">
+    <i class="grcicon-arrow-right"></i>
+    <i class="grcicon-project-color"></i>
+    Projects
+    
+    <small>(<span class="item-count">0</span>)</small>
+  </a>
+  <div class="content">
+    <ul class="sub-level cms_controllers_infinite_scroll">
+
+  <li class="spinny">
+  <div class="spinner" role="progressbar" style="position: relative; width: 0px; z-index: 2000000000;;"><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-0-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(0deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-1-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(30deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-2-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(60deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-3-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(90deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-4-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(120deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-5-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(150deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-6-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(180deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-7-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(210deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-8-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(240deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-9-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(270deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-10-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(300deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-11-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(330deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div></div></li>
+</ul>
+    <ul class="sub-actions"><li class="add-new oneline" data-ui-autocomplete-item="">
+  <a data-object-plural="projects" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Project" data-toggle="modal-ajax-form" data-modal-reset="reset">
+    + Create New
+  </a>
+</li>
+</ul>
+  </div>
+</li>
+
+                
+<li class="business accordion-group" data-tooltip-view="" data-template="" data-model-name="Facility">
+  <a class="business list-toggle oneline" href="javascript://" data-object-singular="Facility" data-parent=".top-level">
+    <i class="grcicon-arrow-right"></i>
+    <i class="grcicon-facility-color"></i>
+    Facilities
+    
+    <small>(<span class="item-count">0</span>)</small>
+  </a>
+  <div class="content">
+    <ul class="sub-level cms_controllers_infinite_scroll">
+
+  <li class="spinny">
+  <div class="spinner" role="progressbar" style="position: relative; width: 0px; z-index: 2000000000;;"><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-0-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(0deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-1-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(30deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-2-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(60deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-3-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(90deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-4-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(120deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-5-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(150deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-6-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(180deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-7-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(210deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-8-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(240deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-9-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(270deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-10-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(300deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-11-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(330deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div></div></li>
+</ul>
+    <ul class="sub-actions"><li class="add-new oneline" data-ui-autocomplete-item="">
+  <a data-object-plural="facilities" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Facility" data-toggle="modal-ajax-form" data-modal-reset="reset">
+    + Create New
+  </a>
+</li>
+</ul>
+  </div>
+</li>
+
+                
+<li class="business accordion-group" data-tooltip-view="" data-template="" data-model-name="Market">
+  <a class="business list-toggle oneline" href="javascript://" data-object-singular="Market" data-parent=".top-level">
+    <i class="grcicon-arrow-right"></i>
+    <i class="grcicon-market-color"></i>
+    Markets
+    
+    <small>(<span class="item-count">0</span>)</small>
+  </a>
+  <div class="content">
+    <ul class="sub-level cms_controllers_infinite_scroll">
+
+  <li class="spinny">
+  <div class="spinner" role="progressbar" style="position: relative; width: 0px; z-index: 2000000000;;"><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-0-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(0deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-1-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(30deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-2-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(60deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-3-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(90deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-4-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(120deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-5-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(150deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-6-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(180deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-7-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(210deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-8-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(240deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-9-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(270deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-10-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(300deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div><div style="position: absolute; top: -1px; opacity: 0.25; -webkit-animation: opacity-100-25-11-12 1s linear infinite; -webkit-animation-play-state: initial;"><div style="position: absolute; width: 9px; height: 2px; -webkit-box-shadow: rgba(0, 0, 0, 0.0980392) 0px 0px 1px; -webkit-transform-origin: left 50% 0px; -webkit-transform: rotate(330deg) translate(4px, 0px); border-radius: 1px; background: rgb(0, 0, 0);"></div></div></div></li>
+</ul>
+    <ul class="sub-actions"><li class="add-new oneline" data-ui-autocomplete-item="">
+  <a data-object-plural="markets" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Market" data-toggle="modal-ajax-form" data-modal-reset="reset">
+    + Create New
+  </a>
+</li>
+</ul>
+  </div>
+</li>
+
+              </ul>
+            </div>
+          </li>
+        </ul>
+        
+      </div>
+      <div class="bar-h"></div>
+      <div class="lhs-nav">
+        <h2>Recently Viewed</h2>
+        <ul class="top-level recent">
+<li class="" data-model="true">
+  <a href="/programs/3523" class="show-extended">
+    <div class="row-fluid">
+      <div class="span11">
+        <div class="oneline">
+          <i class="grcicon-program-color"></i>
+          a private program a private program a private program a private program a private program a private program a private program a private program a private program a private program a private program a private program a private program a private progra 
+        </div>
+      </div>
+    </div>
+  </a>
+</li>
+<li class="" data-model="true">
+  <a href="/people/323" class="show-extended">
+    <div class="row-fluid">
+      <div class="span11">
+        <div class="oneline">
+          <i class="grcicon-person-color"></i>
+          Example User 
+        </div>
+      </div>
+    </div>
+  </a>
+</li>
+<li class="" data-model="true">
+  <a href="/workflows/935" class="show-extended">
+    <div class="row-fluid">
+      <div class="span11">
+        <div class="oneline">
+          <i class="grcicon-workflow-color"></i>
+          Workflow 079349 
+        </div>
+      </div>
+    </div>
+  </a>
+</li>
+</ul>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+  <!-- OLD LHN
   <div id="lhn">
     <div class="bar-v" style="left: 40px;"></div>
     <div class="lhs-holder" style="width: 40px;">
@@ -2049,6 +2863,7 @@
       </div>
     </div>
   </div>
+  -->
 
   <div id="customAttribute" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="customAttributeLabel" aria-hidden="true">
     <div class="modal-header">
@@ -2250,6 +3065,7 @@
   <script type="text/javascript" src="/static/mockups/js/lhn-controller.js"></script>
   -->
   <script type="text/javascript" src="/static/mockups/js/reporting.js"></script>
+  <script type="text/javascript" src="/static/mockups/js/reporting-header.js"></script>
   <script type="text/javascript" src="/static/mockups/js/common.js"></script>
 
 </body>
