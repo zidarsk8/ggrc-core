@@ -67,7 +67,7 @@
       </span>
     </a>
   </li>
-  <li class="user dropdown">
+  <li class="user user-dropdown dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
       <i class="grcicon-user-black"></i>
       <span>{{current_user.email}}</span>
@@ -95,12 +95,12 @@
         </span>
         <div class="inner-list">
           <label>
-            <input type="checkbox" name="notifications" value="Email_Now">
-            Real-time email updates
-          </label>
-          <label>
             <input type="checkbox" name="notifications" value="Email_Digest">
             Daily email digest
+          </label>
+          <label class="inner disabled">
+            <input type="checkbox" name="notifications" value="Email_Now" disabled>
+            Real-time email updates
           </label>
         </div>
       </li>
