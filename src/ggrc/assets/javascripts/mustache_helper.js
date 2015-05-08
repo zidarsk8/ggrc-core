@@ -3063,30 +3063,27 @@ Mustache.registerHelper('get_default_attr_value', function (attr_name, instance)
   Used to get the string value for custom attributes
 */
 Mustache.registerHelper('get_custom_attr_value', function (attr_info, instance) {
-  var ins, atr, attr_name, value = '';
+  var ins, atr, ins_type, attr_name, value = '', custom_attr_id = 0,
+      custom_attr_defs = GGRC.custom_attr_defs;
 
   ins = Mustache.resolve(instance);
+  ins_type = ins.class.table_singular;
   atr = Mustache.resolve(attr_info);
   attr_name = atr.attr_name;
 
-  if (ins.custom_attribute_definitions && ins.custom_attribute_definitions.length) {
-    var current_id = 0;
-    //find the id for the attr_name
-    can.each(ins.custom_attribute_definitions, function (def) {
-      if (def.title === attr_name) {
-        current_id = def.id;
-        return false;
+  can.each(custom_attr_defs, function (item) {
+    if (item.definition_type === ins_type && item.title === attr_name) {
+      custom_attr_id = item.id;
+    }
+  });
+
+  if (custom_attr_id) {
+    can.each(ins.custom_attribute_values, function (item) {
+      item = item.reify();
+      if (item.custom_attribute_id === custom_attr_id) {
+        value = item.attribute_value;
       }
     });
-    //go to the ins.custom_attribute_values, if id == id then return the value
-    if (current_id) {
-      can.each(ins.custom_attribute_values, function (item) {
-        item = item.reify();
-        if (item.custom_attribute_id === current_id) {
-          value = item.attribute_value;
-        }
-      });
-    }
   }
 
   return value;

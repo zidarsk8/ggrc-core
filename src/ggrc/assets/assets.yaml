@@ -169,7 +169,6 @@ dashboard-js-template-files:
   - issues/modal_content.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
-  - custom_attributes/tree_columns.mustache
   - custom_attribute_definitions/modal_content.mustache
   - custom_attribute_definitions/tree.mustache
   - custom_attribute_definitions/subtree.mustache
