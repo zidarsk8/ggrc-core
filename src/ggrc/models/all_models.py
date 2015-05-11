@@ -14,7 +14,6 @@ from .category import CategoryBase
 from .context import Context
 from .control import Control, ControlCategory, ControlAssertion
 from .control_assessment import ControlAssessment
-from .control_section import ControlSection
 from .custom_attribute_definition import CustomAttributeDefinition
 from .custom_attribute_value import CustomAttributeValue
 from .data_asset import DataAsset
@@ -70,7 +69,6 @@ all_models = [
     Context,
     Control,
     ControlAssessment,
-    ControlSection,
     CustomAttributeDefinition,
     CustomAttributeValue,
     DataAsset,

@@ -126,10 +126,6 @@ class Control(HasObjectState, Relatable,
       primaryjoin='and_(foreign(Control.verify_frequency_id) == Option.id, '\
                   'Option.role == "verify_frequency")',
       uselist=False)
-  control_sections = db.relationship(
-      'ControlSection', backref='control', cascade='all, delete-orphan')
-  sections = association_proxy(
-      'control_sections', 'section', 'ControlSection')
   objective_controls = db.relationship(
       'ObjectiveControl', backref='control', cascade='all, delete-orphan')
   objectives = association_proxy(
@@ -155,13 +151,11 @@ class Control(HasObjectState, Relatable,
       'key_control',
       'kind',
       'means',
-      'sections',
       'objectives',
       'verify_frequency',
       'version',
       'principal_assessor',
       'secondary_assessor',
-      PublishOnly('control_sections'),
       PublishOnly('objective_controls'),
       PublishOnly('directive_controls'),
       'object_controls',
@@ -187,7 +181,6 @@ class Control(HasObjectState, Relatable,
         orm.joinedload('directive'),
         orm.joinedload('principal_assessor'),
         orm.joinedload('secondary_assessor'),
-        orm.subqueryload('control_sections'),
         orm.subqueryload('objective_controls'),
         orm.subqueryload('directive_controls').joinedload('directive'),
         orm.subqueryload('object_controls'),

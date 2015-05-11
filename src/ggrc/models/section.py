@@ -16,6 +16,7 @@ from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
 from .reflection import PublishOnly
+from .relationship import Relatable
 from .track_object_state import HasObjectState, track_state_for_class
 
 class SectionBase(HasObjectState,
@@ -43,11 +44,6 @@ class SectionBase(HasObjectState,
   na = deferred(db.Column(db.Boolean, default=False, nullable=False),
       'SectionBase')
   notes = deferred(db.Column(db.Text), 'SectionBase')
-
-  control_sections = db.relationship(
-      'ControlSection', backref='section', cascade='all, delete-orphan')
-  controls = association_proxy(
-      'control_sections', 'control', 'ControlSection')
   section_objectives = db.relationship(
       'SectionObjective', backref='section', cascade='all, delete-orphan')
   objectives = association_proxy(
@@ -67,8 +63,6 @@ class SectionBase(HasObjectState,
       'directive',
       'na',
       'notes',
-      PublishOnly('control_sections'),
-      'controls',
       PublishOnly('section_objectives'),
       'objectives',
       PublishOnly('directive_sections'),
@@ -88,7 +82,6 @@ class SectionBase(HasObjectState,
   #    ]
 
   _include_links = [
-      #'control_sections',
       #'section_objectives',
       #'object_sections',
       #'directive_sections',
@@ -112,14 +105,13 @@ class SectionBase(HasObjectState,
     query = super(SectionBase, cls).eager_query()
     return cls.eager_inclusions(query, SectionBase._include_links).options(
         orm.joinedload('directive'),
-        orm.subqueryload('control_sections'),
         orm.subqueryload('section_objectives'),
         orm.subqueryload('directive_sections'),
         orm.subqueryload('object_sections'))
 
 track_state_for_class(SectionBase)
 
-class Section(CustomAttributable, Documentable, Personable, Ownable, SectionBase):
+class Section(CustomAttributable, Documentable, Personable, Ownable, Relatable, SectionBase):
   __mapper_args__ = {
       'polymorphic_identity': 'Section'
       }
