@@ -12,7 +12,6 @@ permissions = {
         "ControlAssessment",
         "Issues",
         "ControlControl",
-        "ControlSection",
         "DataAsset",
         "Directive",
         "Contract",
@@ -68,7 +67,6 @@ permissions = {
         "Category",
         "Control",
         "ControlControl",
-        "ControlSection",
         "DataAsset",
         "Directive",
         "Contract",
@@ -129,7 +127,6 @@ permissions = {
             "condition": "contains"
         },
         "ControlControl",
-        "ControlSection",
         {
             "type": "DataAsset",
             "terms": {
@@ -326,7 +323,6 @@ permissions = {
             "condition": "contains"
         },
         "ControlControl",
-        "ControlSection",
         {
             "type": "DataAsset",
             "terms": {

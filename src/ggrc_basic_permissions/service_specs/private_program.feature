@@ -151,7 +151,6 @@ Feature: Private Programs
       #| ControlAssertion |
       #| ControlCategory  |
       | ControlControl   |
-      | ControlSection   |
       | DataAsset        |
       | Contract         |
       | Policy           |

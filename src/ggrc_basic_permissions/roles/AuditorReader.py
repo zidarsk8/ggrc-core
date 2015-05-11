@@ -12,7 +12,6 @@ permissions = {
         "ControlAssertion",
         "Control",
         "ControlControl",
-        "ControlSection",
         "DataAsset",
         "Directive",
         "Contract",
