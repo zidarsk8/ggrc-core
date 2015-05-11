@@ -718,27 +718,24 @@ $(document).ready(function(){
       $label.addClass("disabled");
     }
   });
+  
+  $(".attribute-trigger").each(function() {
+    $(this).popover({
+      html: true,
+      content: function(){
+        return $(this).next('.attr-wrap').html();
+      },
+      placement: "bottom",
+      template: '<div class="popover" role="tooltip"><div class="popover-content"></div></div>'
+    });
 
-  $(".attribute-trigger").popover({
-    container: "body",
-    html: true,
-    content: function(){
-      return $(this).next('.attr-wrap').html();
-    },
-    placement: "bottom",
-    template: '<div class="popover" role="tooltip"><div class="popover-content"></div></div>'
-  });
+    $(this).on('shown.bs.popover', function () {
+      $(this).addClass("active");
+    });
 
-  $('.attribute-trigger').on('shown.bs.popover', function () {
-    $(this).addClass("active");
-  });
-
-  $('.attribute-trigger.right').on('shown.bs.popover', function () {
-    $('.popover').css('left',parseInt($('.popover').css('left')) - 276 + 'px')
-  });
-
-  $('.attribute-trigger').on('hidden.bs.popover', function () {
-    $(this).removeClass("active");
+    $(this).on('hidden.bs.popover', function () {
+      $(this).removeClass("active");
+    });
   });
 
   // Dropdown menu form stop propagation
