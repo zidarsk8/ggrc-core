@@ -134,30 +134,10 @@ class Control(HasObjectState, Relatable,
       'ObjectiveControl', backref='control', cascade='all, delete-orphan')
   objectives = association_proxy(
       'objective_controls', 'objective', 'ObjectiveControl')
-  control_controls = db.relationship(
-      'ControlControl',
-      foreign_keys='ControlControl.control_id',
-      backref='control',
-      cascade='all, delete-orphan',
-      )
-  implemented_controls = association_proxy(
-      'control_controls', 'implemented_control', 'ControlControl')
-  implementing_control_controls = db.relationship(
-      'ControlControl',
-      foreign_keys='ControlControl.implemented_control_id',
-      backref='implemented_control',
-      cascade='all, delete-orphan',
-      )
-  implementing_controls = association_proxy(
-      'implementing_control_controls', 'control', 'ControlControl')
   object_controls = db.relationship(
       'ObjectControl', backref='control', cascade='all, delete-orphan')
   directive_controls = db.relationship(
       'DirectiveControl', backref='control', cascade='all, delete-orphan')
-  # Not needed for the client at this time
-  #mapped_directives = association_proxy(
-  #    'directive_controls', 'directive', 'DirectiveControl')
-
   @staticmethod
   def _extra_table_args(cls):
     return (
@@ -181,10 +161,8 @@ class Control(HasObjectState, Relatable,
       'version',
       'principal_assessor',
       'secondary_assessor',
-      PublishOnly('control_controls'),
       PublishOnly('control_sections'),
       PublishOnly('objective_controls'),
-      PublishOnly('implementing_control_controls'),
       PublishOnly('directive_controls'),
       'object_controls',
       ]
@@ -209,8 +187,6 @@ class Control(HasObjectState, Relatable,
         orm.joinedload('directive'),
         orm.joinedload('principal_assessor'),
         orm.joinedload('secondary_assessor'),
-        orm.subqueryload('control_controls'),
-        orm.subqueryload('implementing_control_controls'),
         orm.subqueryload('control_sections'),
         orm.subqueryload('objective_controls'),
         orm.subqueryload('directive_controls').joinedload('directive'),

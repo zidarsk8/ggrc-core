@@ -261,7 +261,6 @@ Feature: Resource caching
       | Audit                     | requests             | audit                | Request                   | status   | Requested | Responded |
       | Audit                     | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Control                   | control_controls     | control              | ControlControl            | status   | Draft  | Final  |
-      | Control                   | implementing_control_controls | implemented_control | ControlControl            | status   | Draft  | Final  |
       | Control                   | program_controls     | control              | ProgramControl            | status   | Draft  | Final  |
       | Control                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Control                   | objective_controls   | control              | ObjectiveControl          | status   | Draft  | Final  |
