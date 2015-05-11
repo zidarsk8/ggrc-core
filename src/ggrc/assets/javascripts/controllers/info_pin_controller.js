@@ -49,8 +49,12 @@ can.Control("CMS.Controllers.InfoPin", {
       }
     });
   },
+  hideInstance: function () {
+    this.element.stop(true);
+    this.element.height(0).html("");
+    $(window).trigger("resize");
+  },
   unsetInstance: function () {
-    // Stop the animation and clear the queue:
     this.element.stop(true);
     this.element.animate({
         height: 0

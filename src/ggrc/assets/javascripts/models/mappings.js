@@ -295,7 +295,15 @@
       related_audits_via_related_responses: Cross("related_responses", "audit_via_request"),
       audits: Proxy(
         "Audit", "audit", "AuditObject", "auditable", "audit_objects"),
-      open_requests: Cross("audits", "active_requests"),
+      potential_requests: Cross("audits", "active_requests"),
+      open_requests: CustomFilter("potential_requests", function(binding) {
+        var audit_object = binding.instance.audit_object && binding.instance.audit_object.reify(),
+            control = binding.binding.instance;
+        if (!audit_object) {
+          return;
+        }
+        return audit_object.auditable && audit_object.auditable.type === 'Control' && audit_object.auditable.id === control.id;
+      }),
       controls: Multi(["implemented_controls", "implementing_controls"]),
       objectives: Proxy(
         "Objective", "objective", "ObjectiveControl", "control", "objective_controls"),

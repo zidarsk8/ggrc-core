@@ -582,56 +582,6 @@ jQuery(function($) {
     $descField.removeClass('short');
   });
 
-  // activate widget from object nav
-
-  $('body').on('mouseenter', 'ul.internav li a', function(e) {
-    var $this = $(this)
-    ,   $widgetID = $this.attr("href")
-    ,   $targetWidget = $($widgetID)
-    ;
-
-    if( ! $targetWidget.hasClass("widget-active") ) {
-      $targetWidget.addClass("widget-active");
-    }
-  });
-
-  $('body').on('mouseleave', 'ul.internav li a', function(e) {
-    var $this = $(this)
-    ,   $widgetID = $this.attr("href")
-    ,   $targetWidget = $($widgetID)
-    ,   control
-    ;
-
-    if( $targetWidget.hasClass("widget-active")
-      && (control = $('.cms_controllers_inner_nav').control('inner_nav'))
-      && control.options.contexts.attr('active_widget.selector') !== $widgetID
-    ) {
-      $targetWidget.removeClass("widget-active");
-    }
-  });
-
-  $('body').on('mouseenter', '.widget', function(e) {
-    var $this = $(this)
-    ,   $navitem = $('[href=#' + $this.attr('id') + ']').closest('li')
-    ;
-    if( ! $this.hasClass("widget-active") ) {
-      $this.addClass("widget-active");
-      var inner_nav = $('.cms_controllers_inner_nav').control('inner_nav');
-      if (inner_nav) {
-        inner_nav.show_active_widget('#' + $this.attr('id'));
-      }
-    }
-  });
-
-  $('body').on('deactivate', '.widget', function(e) {
-    var $this = $(this)
-    ,   $navitem = $('[href=#' + $this.attr('id') + ']').closest('li')
-    ;
-    if( $this.hasClass("widget-active") ) {
-      $this.removeClass("widget-active");
-    }
-  });
-
   // show/hide audit lead and firm
   $('body').on('mouseover', '.ui-autocomplete li a', function(e) {
     var $this = $(this);

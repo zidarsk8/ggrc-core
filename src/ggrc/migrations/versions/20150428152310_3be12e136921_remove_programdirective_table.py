@@ -6,7 +6,7 @@
 """Remove ProgramDirective table
 
 Revision ID: 3be12e136921
-Revises: 57cc398ad417
+Revises: 41bd73114fd9
 Create Date: 2015-04-28 15:23:10.503624
 
 """
@@ -15,7 +15,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '3be12e136921'
-down_revision = '57cc398ad417'
+down_revision = '41bd73114fd9'
 
 
 def upgrade():

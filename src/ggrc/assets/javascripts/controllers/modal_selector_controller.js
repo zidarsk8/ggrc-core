@@ -1166,30 +1166,6 @@
       }
 
     , ".search-reset click" : "search_reset"
-
-  , " ajax:flash" : function(el, ev, mesg) {
-      var that = this
-        , $flash = this.options.$header.find(".flash")
-        ;
-
-      if (!$flash.length)
-        $flash = $('<div class="flash" />').prependTo(that.options.$header);
-
-      ev.stopPropagation();
-
-      can.each(["success", "warning", "error"], function(type) {
-        var tmpl;
-        if(mesg[type]) {
-          tmpl = '<div class="alert alert-'
-          + type
-          +'"><a href="#" class="close" data-dismiss="alert">&times;</a><span>'
-          + mesg[type]
-          + '</span></div>';
-          $flash.append(tmpl);
-        }
-      });
-    }
-
   });
 
   GGRC.ModalOptionDescriptor = can.Construct({

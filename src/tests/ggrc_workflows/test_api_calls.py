@@ -19,6 +19,7 @@ if os.environ.get('TRAVIS', False):
 class TestWorkflowsApiPost(TestCase):
 
   def setUp(self):
+    TestCase.setUp(self)
     self.api = Api()
 
   def tearDown(self):
