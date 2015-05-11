@@ -262,9 +262,8 @@
         "related_objects": ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System"
         ],
-        "related_objects_as_source": ["Issue", "Program"],
+        "related_objects_as_source": ["Issue", "Program", "Control"],
         "objectives": "Objective",
-        "implemented_controls": "Control",
         "_sections_base": ["Section", "Clause"],
         "joined_directives": ["Regulation", "Policy", "Contract", "Standard"]
       },
@@ -285,7 +284,7 @@
         "related_projects", "related_systems"
       ]),
       related_and_able_objects: Multi([
-        "objectives", "implemented_controls", "related_business_objects",
+        "objectives", "related_business_objects",
         "people", "joined_directives", "programs", "sections", "clauses"
       ]),
       related_documentation_responses: TypeFilter("related_objects", "DocumentationResponse"),
@@ -304,20 +303,12 @@
         }
         return audit_object.auditable && audit_object.auditable.type === 'Control' && audit_object.auditable.id === control.id;
       }),
-      controls: Multi(["implemented_controls", "implementing_controls"]),
       objectives: Proxy(
         "Objective", "objective", "ObjectiveControl", "control", "objective_controls"),
       _sections_base: Proxy(
         null, "section", "ControlSection", "control", "control_sections"),
       sections: TypeFilter("_sections_base", "Section"),
       clauses: TypeFilter("_sections_base", "Clause"),
-      implemented_controls: Proxy(
-        "Control", "implemented_control", "ControlControl", "control", "control_controls"),
-      implementing_controls: Proxy(
-          "Control", "control", "ControlControl", "implemented_control", "implementing_control_controls"),
-        //  FIXME: Cannot currently represent singular foreign-key references
-        //    with Mappers/ListLoaders
-        //, direct_directives: ForeignKey("Directive", "directive", "controls")
       joined_directives: Proxy(
         null, "directive", "DirectiveControl", "control", "directive_controls"),
       directives: Multi(["joined_directives"]), // "direct_directives"
@@ -333,8 +324,9 @@
       related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment"),
       related_issues: TypeFilter("related_objects_via_relationship", "Issue"),
       programs: TypeFilter("related_objects_via_relationship", "Program"),
+      controls: TypeFilter("related_objects_via_relationship", "Control"),
       orphaned_objects: Multi([
-        "related_objects", "sections", "clauses", "controls", "programs", "objectives", "implemented_controls", "implementing_controls", "joined_directives", "people"
+        "related_objects", "sections", "clauses", "controls", "programs", "objectives", "joined_directives", "people"
       ])
     },
     Objective: {

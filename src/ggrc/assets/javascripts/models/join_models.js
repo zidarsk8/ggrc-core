@@ -340,26 +340,6 @@ can.Model.Join("CMS.Models.DirectiveSection", {
 }, {
 });
 
-can.Model.Join("CMS.Models.ControlControl", {
-  root_collection : "control_controls"
-  , root_object : "control_control"
-  , join_keys : {
-      control : CMS.Models.Control
-    , implemented_control : CMS.Models.Control
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , control : "CMS.Models.Control.stub"
-    , implemented_control : "CMS.Models.Control.stub"
-  }
-  , findAll : "GET /api/control_controls"
-  , create : "POST /api/control_controls"
-  , destroy : "DELETE /api/control_controls/{id}"
-}, {
-
-});
-
 can.Model.Join("CMS.Models.ObjectPerson", {
   root_object : "object_person"
   , root_collection : "object_people"
