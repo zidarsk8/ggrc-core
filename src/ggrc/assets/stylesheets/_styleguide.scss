@@ -149,6 +149,26 @@
 #o-material-weakness,
 #o-needs-improvement,
 #o-significant-deficiency,
-#o-not-applicable {
+#o-not-applicable,
+.hide-me {
   display: none;
+}
+
+.widget {
+  .header {
+    &.tree-header {
+      .tree-action-list {
+        .add-trigger {
+          .disable {
+            cursor: not-allowed;
+            &:hover {
+              [class^="grcicon-"] {
+                @include opacity(.25);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
