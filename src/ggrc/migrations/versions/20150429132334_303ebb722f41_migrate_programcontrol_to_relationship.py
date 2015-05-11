@@ -3,7 +3,7 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
-"""Migrate ProgramControl to Relationship
+"""Migrate program_controls to relationships
 
 Revision ID: 303ebb722f41
 Revises: 3be12e136921
