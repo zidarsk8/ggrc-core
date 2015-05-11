@@ -291,7 +291,10 @@ can.Control("CMS.Controllers.TreeLoader", {
             that._pending_items = null;
             setTimeout(that._ifNotRemoved(function() {
               if (!that._pending_items) {
-                that._loading_finished();
+                $.when(that.fetch_custom_attr_values()).
+                  then(function () {
+                    that._loading_finished();
+                  });
               }
             }), 200);
           }
@@ -599,7 +602,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             })
           ));
       }
-
       return $.when.apply($.when, dfds);
     }
 
@@ -674,6 +676,16 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       return this.find_all_deferred;
     }
+  }
+
+  , fetch_custom_attr_values: function() {
+    var deferred = new $.Deferred();
+    CMS.Models.CustomAttributeValue.findAll({attributable_type: this.options.model.shortName})
+      .then(function (defs) {
+        deferred.resolve();
+    });
+    return deferred;
+
   }
 
   , display_path: function(path) {
