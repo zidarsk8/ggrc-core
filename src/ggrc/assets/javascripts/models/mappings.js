@@ -262,9 +262,8 @@
         "related_objects": ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System"
         ],
-        "related_objects_as_source": ["Issue", "Program", "Control"],
+        "related_objects_as_source": ["Issue", "Program", "Control", "Section", "Clause"],
         "objectives": "Objective",
-        "_sections_base": ["Section", "Clause"],
         "joined_directives": ["Regulation", "Policy", "Contract", "Standard"]
       },
       related_objects: Proxy(
@@ -285,7 +284,7 @@
       ]),
       related_and_able_objects: Multi([
         "objectives", "related_business_objects",
-        "people", "joined_directives", "programs", "sections", "clauses"
+        "people", "joined_directives", "programs", "clauses"
       ]),
       related_documentation_responses: TypeFilter("related_objects", "DocumentationResponse"),
       related_interview_responses: TypeFilter("related_objects", "InterviewResponse"),
@@ -305,10 +304,6 @@
       }),
       objectives: Proxy(
         "Objective", "objective", "ObjectiveControl", "control", "objective_controls"),
-      _sections_base: Proxy(
-        null, "section", "ControlSection", "control", "control_sections"),
-      sections: TypeFilter("_sections_base", "Section"),
-      clauses: TypeFilter("_sections_base", "Clause"),
       joined_directives: Proxy(
         null, "directive", "DirectiveControl", "control", "directive_controls"),
       directives: Multi(["joined_directives"]), // "direct_directives"
@@ -325,8 +320,10 @@
       related_issues: TypeFilter("related_objects_via_relationship", "Issue"),
       programs: TypeFilter("related_objects_via_relationship", "Program"),
       controls: TypeFilter("related_objects_via_relationship", "Control"),
+      sections: TypeFilter("related_objects_via_relationship", "Section"),
+      clauses: TypeFilter("related_objects_via_relationship", "Clause"),
       orphaned_objects: Multi([
-        "related_objects", "sections", "clauses", "controls", "programs", "objectives", "joined_directives", "people"
+        "related_objects", "clauses", "controls", "programs", "objectives", "joined_directives", "people"
       ])
     },
     Objective: {
@@ -338,6 +335,7 @@
         "objectives": "Objective",
         "controls": "Control",
         "_sections_base": ["Section", "Clause"]
+
       },
       related_objects: Proxy(
         null, "objectiveable", "ObjectObjective", "objective", "objective_objects"),
@@ -377,8 +375,14 @@
       _canonical: {
         "related_objects": ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue"],
         "objectives": "Objective",
-        "controls": "Control"
+        "related_objects_as_source": ["Control"],
       },
+      related_objects_as_source: Proxy(
+        null, "destination", "Relationship", "source", "related_destinations"),
+      related_objects_as_destination: Proxy(
+        null, "source", "Relationship", "destination", "related_sources"),
+      related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"]),
+      related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment"),
       related_objects: Proxy(
           null, "sectionable", "ObjectSection", "section", "object_sections"), //section_objects
       related_and_able_objects: Multi([
@@ -394,14 +398,11 @@
       related_projects: TypeFilter("related_objects", "Project"),
       related_systems: TypeFilter("related_objects", "System"),
       related_issues: TypeFilter("related_objects", "Issue"),
-        //, sections: Proxy(
-        //    "Section", "section", "ObjectSection", "sectionable", "object_sections")
+      controls: TypeFilter("related_objects_via_relationship", "Control"),
       objectives: Proxy(
         "Objective", "objective", "SectionObjective", "section", "section_objectives"),
-      controls: Proxy(
-        "Control", "control", "ControlSection", "section", "control_sections"),
       orphaned_objects: Multi([
-        "related_objects", "controls", "objectives", "people"
+        "related_objects", "objectives", "people"
       ])
     },
     Section: {

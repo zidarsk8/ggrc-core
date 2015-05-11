@@ -263,26 +263,6 @@ can.Model.Join("CMS.Models.UserRole", {
   }
 });
 
-
-can.Model.Join("CMS.Models.ControlSection", {
-  root_collection : "control_sections"
-  , root_object : "control_section"
-  , findAll : "GET /api/control_sections"
-  , create : "POST /api/control_sections"
-  , destroy : "DELETE /api/control_sections/{id}"
-  , join_keys : {
-      section : CMS.Models.SectionBase
-    , control : CMS.Models.Control
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , section : "CMS.Models.get_stub"
-    , control : "CMS.Models.Control.stub"
-  }
-}, {
-});
-
 can.Model.Join("CMS.Models.SectionObjective", {
   root_collection : "section_objectives"
   , root_object : "section_objective"

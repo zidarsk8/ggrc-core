@@ -467,34 +467,6 @@
 
         join_object: CMS.Models.Section.findInCacheById(data.join_object_id)
       }
-
-      , section_controls : {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: "Control",
-        modal_title: "Select Controls",
-
-        related_model_singular: "Control",
-        related_table_plural: "controls",
-        related_table_singular: "control",
-        related_title_singular: "Control",
-        related_title_plural: "Controls",
-
-        option_model: CMS.Models.Control,
-        join_model: CMS.Models.ControlSection,
-
-        option_attr: 'control',
-        join_attr: 'section',
-        option_id_field: 'control_id',
-        //option_type_field: 'control_type',
-        join_id_field: 'section_id',
-        join_type_field: null,
-
-        join_object_id: data.join_object_id,
-        join_object_type: data.join_object_type
-      }
     };
 
     // If no 'name' provided, return all

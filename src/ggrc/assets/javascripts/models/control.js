@@ -33,7 +33,6 @@ can.Model.Cacheable("CMS.Models.Control", {
     , objectives : "CMS.Models.Objective.stubs"
     , directive : "CMS.Models.Directive.stub"
     , audit_objects : "CMS.Models.AuditObject.stubs"
-    , control_sections : "CMS.Models.ControlSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , programs : "CMS.Models.Program.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
@@ -46,8 +45,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , links_to : {
-    "Section" : "ControlSection"
-    , "Regulation" : "DirectiveControl"
+    "Regulation" : "DirectiveControl"
     , "Policy" : "DirectiveControl"
     , "Standard" : "DirectiveControl"
     , "Contract" : "DirectiveControl"
