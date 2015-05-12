@@ -363,8 +363,13 @@
                           </div>
                         </div>
                         <div class="span4">
-                          <div class="modal-search objective-selector">
-                            <input class="search-by-owner input-block-level ui-autocomplete-input" placeholder="Find owner or contact" type="text" name="owner" value="">
+                          <div class="inline-filtering inline-filtering-transparent">
+                            <div class="filter-input">
+                              <input name="filter_query" type="text" class="input-wide">
+                              <span class="is-expression">
+                                <i class="grcicon-expression-black"></i>
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -393,7 +398,13 @@
                     </label>
                     <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
                     <button type="submit" class="btn btn-success btn-small report-trigger">Generate report</button>
-                    <button id="test" type="submit" class="btn btn-primary btn-small pull-right" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> <i class="grcicon-carot-white"></i></a>
+                    <div class="btn-group pull-right">
+                      <button type="submit" data-toggle="dropdown" class="btn btn-primary btn-small dropdown-toggle" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> <i class="grcicon-carot-white"></i></a></button>
+                      <ul class="dropdown-menu">
+                        <li><a href="#">Export to Sheets</a></li>
+                        <li><a href="#">Export to CSV</a></li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
 
@@ -407,7 +418,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -416,7 +427,7 @@
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <div class="people-autocomplete">
                                 <input type="text" class="dropdown-input autocomplete ui-autocomplete-input" placeholder="Search Owner" data-autocomplete-type="people" data-type="people">
-                                <button type="submit" class="btn btn-primary">Go</button>
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
                               </div>
                             </div>
                           </th>
@@ -425,7 +436,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -433,7 +444,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -441,7 +452,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -449,7 +460,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -457,7 +468,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -475,7 +486,7 @@
                                 <option>Not in Scope</option>
                                 <option>Deprecated</option>
                               </select>
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -483,7 +494,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -491,7 +502,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -499,7 +510,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -507,7 +518,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -515,7 +526,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -535,7 +546,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -555,7 +566,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -563,7 +574,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu right dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" placeholder="Filter" id="" name="">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                         {{/table_title}}
@@ -606,7 +617,13 @@
                     </label>
                     <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
                     <button type="submit" class="btn btn-success btn-small report-trigger">Generate report</button>
-                    <button type="submit" class="btn btn-primary btn-small pull-right" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
+                    <div class="btn-group pull-right">
+                      <button type="submit" data-toggle="dropdown" class="btn btn-primary btn-small dropdown-toggle" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> <i class="grcicon-carot-white"></i></a></button>
+                      <ul class="dropdown-menu">
+                        <li><a href="#">Export to Sheets</a></li>
+                        <li><a href="#">Export to CSV</a></li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
 

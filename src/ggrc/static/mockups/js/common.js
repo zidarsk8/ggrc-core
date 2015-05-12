@@ -718,9 +718,9 @@ $(document).ready(function(){
       $label.addClass("disabled");
     }
   });
-  
+
   $(".attribute-trigger").each(function() {
-    $(this).popover({
+    $(".attribute-trigger").popover({
       html: true,
       content: function(){
         return $(this).next('.attr-wrap').html();
@@ -741,7 +741,7 @@ $(document).ready(function(){
   // Dropdown menu form stop propagation
   $(".dropdown-menu").on("click", function(el) {
       var $this = $(this);
-    
+
     if($this.hasClass("dropdown-menu-form")) {
       el.stopPropagation();
     }
