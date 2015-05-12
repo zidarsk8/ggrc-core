@@ -200,25 +200,6 @@ can.Model.Join("CMS.Models.ObjectObjective", {
 }, {
 });
 
-can.Model.Join("CMS.Models.ProgramDirective", {
-  root_object : "program_directive"
-  , root_collection : "program_directives"
-  , join_keys : {
-      program : CMS.Models.Program
-    , directive : CMS.Models.Directive
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , program : "CMS.Models.Program.stub"
-    , directive : "CMS.Models.get_stub"
-  }
-  , findAll: "GET /api/program_directives"
-  , create: "POST /api/program_directives"
-  , destroy : "DELETE /api/program_directives/{id}"
-}, {
-});
-
 can.Model.Join("CMS.Models.ObjectiveControl", {
   root_object : "objective_control"
   , root_collection : "objective_controls"
@@ -357,26 +338,6 @@ can.Model.Join("CMS.Models.DirectiveSection", {
     , section : "CMS.Models.get_stub"
   }
 }, {
-});
-
-can.Model.Join("CMS.Models.ProgramControl", {
-  root_collection : "program_controls"
-  , root_object : "program_control"
-  , join_keys : {
-      program : CMS.Models.Program
-    , control : CMS.Models.Control
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , program : "CMS.Models.Program.stub"
-    , control : "CMS.Models.Control.stub"
-  }
-  , findAll : "GET /api/program_controls"
-  , create : "POST /api/program_controls"
-  , destroy : "DELETE /api/program_controls/{id}"
-}, {
-
 });
 
 can.Model.Join("CMS.Models.ControlControl", {

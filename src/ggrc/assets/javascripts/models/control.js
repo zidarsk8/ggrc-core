@@ -39,7 +39,6 @@ can.Model.Cacheable("CMS.Models.Control", {
     , audit_objects : "CMS.Models.AuditObject.stubs"
     , control_sections : "CMS.Models.ControlSection.stubs"
     , sections : "CMS.Models.get_stubs"
-    , program_controls : "CMS.Models.ProgramControl.stubs"
     , programs : "CMS.Models.Program.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , object_controls : "CMS.Models.ObjectControl.stubs"
@@ -56,7 +55,6 @@ can.Model.Cacheable("CMS.Models.Control", {
     , "Policy" : "DirectiveControl"
     , "Standard" : "DirectiveControl"
     , "Contract" : "DirectiveControl"
-    , "Program" : "ProgramControl"
   }
 
   , defaults : {

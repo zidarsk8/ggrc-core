@@ -42,9 +42,6 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'DirectiveSection', backref='directive', cascade='all, delete-orphan')
   joined_sections = association_proxy(
       'directive_sections', 'section', 'DirectiveSection')
-  program_directives = db.relationship('ProgramDirective', backref='directive', cascade='all, delete-orphan')
-  programs = association_proxy(
-      'program_directives', 'program', 'ProgramDirective')
   audit_frequency = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Directive.audit_frequency_id) == Option.id, '\
@@ -69,8 +66,6 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'controls',
       'kind',
       'organization',
-      'programs',
-      PublishOnly('program_directives'),
       PublishOnly('directive_controls'),
       PublishOnly('directive_sections'),
       'scope',
@@ -84,11 +79,7 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'version',
       ]
 
-  _include_links = [
-      #'program_directives',
-      #'directive_controls',
-      #'directive_sections',
-      ]
+  _include_links = []
 
   @validates('kind')
   def validate_kind(self, key, value):
@@ -113,7 +104,6 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
         orm.joinedload('audit_frequency'),
         orm.joinedload('audit_duration'),
         orm.subqueryload('controls'),
-        orm.subqueryload('program_directives'),
         orm.subqueryload('directive_controls'),
         orm.subqueryload('directive_sections'),
         orm.subqueryload('sections'))

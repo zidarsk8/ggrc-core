@@ -41,8 +41,6 @@ from .vendor import Vendor
 from .person import Person
 from .product import Product
 from .program import Program
-from .program_control import ProgramControl
-from .program_directive import ProgramDirective
 from .project import Project
 from .relationship import Relationship, RelationshipType
 from .request import Request
@@ -105,8 +103,6 @@ all_models = [
     Person,
     Product,
     Program,
-    ProgramControl,
-    ProgramDirective,
     Project,
     Relationship,
     RelationshipType,

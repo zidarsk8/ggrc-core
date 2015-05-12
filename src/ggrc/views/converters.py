@@ -183,7 +183,6 @@ def import_controls_to_program(program_id):
   from werkzeug import secure_filename
 
   program = Program.query.get(program_id)
-  ensure_create_permissions_for("ProgramControl", program.context_id)
 
   return_to = unicode(request.args.get('return_to') or '')
 
@@ -1079,7 +1078,6 @@ def export_controls_from_program(program_id):
 
   program = Program.query.filter_by(id=int(program_id)).first()
   ensure_read_permissions_for(program)
-  ensure_read_permissions_for("ProgramControl", program.context_id)
 
   options = {
       'export': True,
