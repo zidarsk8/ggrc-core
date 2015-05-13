@@ -1,15 +1,5 @@
 <reporting>
 
-  <div class="header-content">
-    <div class="row-fluid">
-      <div id="page-header" class="span12">
-        <h1 class="dashboard-title">
-          Custom reporting
-        </h1>
-      </div>
-    </div>
-  </div>
-
   <div class="top-inner-nav">
     <div class="object-nav">
       <ul class="nav internav  cms_controllers_inner_nav ui-sortable">
@@ -46,7 +36,7 @@
             <section class="widget sticky_header widget-active" style="display: block;">
               <section class="content ggrc_controllers_list_view">
                 <div class="choose-object-wrap parent">
-                  
+
                   <div class="row-fluid">
                     <div class="span4">
                       <h6>
@@ -160,15 +150,14 @@
                       </div>
                     </div>
                     <div class="span4">
-                      <h6>
-                        Matching terms
-                      </h6>
-                      <input id="pivot_search" class="input-block-level" placeholder="Type to search for program..." type="text">
-                    </div>
-                    <div class="span4">
-                      <h6>Filter by person</h6>
-                      <div class="modal-search objective-selector">
-                        <input id="search-by-owner" class="search-by-owner input-block-level ui-autocomplete-input" placeholder="Find owner or contact" type="text" name="owner" value="">
+                      <h6>Filter anchor objects</h6>
+                      <div class="inline-filtering inline-filtering-transparent">
+                        <div class="filter-input">
+                          <input name="filter_query" type="text" class="input-wide">
+                          <span class="is-expression">
+                            <i class="grcicon-expression-black"></i>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -201,7 +190,7 @@
                               <option value="Facility">Facility</option>
                               <option value="Market">Market</option>
                             </select>
-                            <input id="" class="input-large search-icon search-filter0 ui-autocomplete-input" placeholder="Type to search for object" type="text" name="" value="">
+                            <input class="input-large search-icon search-filter0 ui-autocomplete-input" placeholder="Type to search for object" type="text" name="" value="">
                           </div>
                         {{/filterRules}}
                         <div class="add-rule">
@@ -211,461 +200,182 @@
                     </div>
                   </div>
 
-                  <div class="row-fluid">
-                    <div class="span3">
-                      <h6>
-                        Relevant object group #1
-                      </h6>
-                      <div class="single-line-filter">
-                        <select class="input-xlarge relevant-set-choose">
-                          <option value="Program">Programs</option>
-                          <option value="Regulation">Regulations</option>
-                          <option value="Policy">Policies</option>
-                          <option value="Standard">Standards</option>
-                          <option value="Contract">Contracts</option>
-                          <option value="Clause">Clauses</option>
-                          <option value="Section">Sections</option>
-                          <option value="Objective">Objectives</option>
-                          <option value="Control" selected="selected">Controls</option>
-                          <option value="Person">People</option>
-                          <option value="System">Systems</option>
-                          <option value="Process">Processes</option>
-                          <option value="DataAsset">Data Assets</option>
-                          <option value="Product">Products</option>
-                          <option value="Project">Projects</option>
-                          <option value="Facility">Facilities</option>
-                          <option value="Market">Markets</option>
-                        </select>
-                        <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
-                        <div class="attr-wrap">
-                          <h3>Select control attributes to show in report</h3>
-                          <ul class="attr-list">
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="ctrl_title" checked="checked">
-                                Title
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Description
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Owner
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Contact
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Notes
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Control URL
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Reference URL
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Code
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Effective date
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Stop date
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                State
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Kind/Nature
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Fraud related
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Significance
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Type/Means
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Frequency
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Categories
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Assertions
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Principal assessor
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Secondary assessor
-                              </label>
-                            </li>
-                          </ul>
-                        </div>
+                  <div class="relevant-filter-group">
+                    <div class="row-fluid">
+                      <div class="span4">
+                        <h6>
+                          Relevant object groups
+                        </h6>
+                      </div>
+                      <div class="span4">
+                        <h6>Filter anchor objects</h6>
                       </div>
                     </div>
-                    <div class="span3">
-                      <h6>
-                        Relevant object group #2
-                      </h6>
-                      <div class="single-line-filter">
-                        <select class="input-xlarge relevant-set-choose sec-obj">
-                          <option value="">- Choose -</option>
-                          <option value="Program">Programs</option>
-                          <option value="Regulation">Regulations</option>
-                          <option value="Policy">Policies</option>
-                          <option value="Standard">Standards</option>
-                          <option value="Contract">Contracts</option>
-                          <option value="Clause">Clauses</option>
-                          <option value="Section">Sections</option>
-                          <option value="Objective">Objectives</option>
-                          <option value="Control">Controls</option>
-                          <option value="Person">People</option>
-                          <option value="System">Systems</option>
-                          <option value="Process">Processes</option>
-                          <option value="DataAsset">Data Assets</option>
-                          <option value="Product">Products</option>
-                          <option value="Project">Projects</option>
-                          <option value="Facility">Facilities</option>
-                          <option value="Market">Markets</option>
-                        </select>
-                        <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
-                        <div class="attr-wrap">
-                          <h3>Select system attributes to show in report</h3>
-                          <ul class="attr-list">
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Title
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Description
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Owner
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Contact
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Notes
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                System URL
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Reference URL
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Code
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Network Zone
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Effective date
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Stop date
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                State
-                              </label>
-                            </li>
-                          </ul>
+                    {{#relevantFilter}}
+                      <div class="row-fluid">
+                        <div class="span4">
+                          <div class="single-line-filter">
+                            <select class="input-xlarge relevant-set-choose">
+                              <option value="Program">Programs</option>
+                              <option value="Regulation">Regulations</option>
+                              <option value="Policy">Policies</option>
+                              <option value="Standard">Standards</option>
+                              <option value="Contract">Contracts</option>
+                              <option value="Clause">Clauses</option>
+                              <option value="Section">Sections</option>
+                              <option value="Objective">Objectives</option>
+                              <option value="Control" selected="selected">Controls</option>
+                              <option value="Person">People</option>
+                              <option value="System">Systems</option>
+                              <option value="Process">Processes</option>
+                              <option value="DataAsset">Data Assets</option>
+                              <option value="Product">Products</option>
+                              <option value="Project">Projects</option>
+                              <option value="Facility">Facilities</option>
+                              <option value="Market">Markets</option>
+                            </select>
+                            <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
+                            <div class="attr-wrap">
+                              <h3>Select control attributes to show in report</h3>
+                              <ul class="attr-list">
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="ctrl_title" checked="checked">
+                                    Title
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Description
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    Owner
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    Contact
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Notes
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    Control URL
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Reference URL
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    Code
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Effective date
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Stop date
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="" checked="checked">
+                                    State
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Kind/Nature
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Fraud related
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Significance
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Type/Means
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Frequency
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Categories
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Assertions
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Principal assessor
+                                  </label>
+                                </li>
+                                <li>
+                                  <label>
+                                    <input type="checkbox" name="" id="">
+                                    Secondary assessor
+                                  </label>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="span4">
+                          <div class="inline-filtering inline-filtering-transparent">
+                            <div class="filter-input">
+                              <input name="filter_query" type="text" class="input-wide">
+                              <span class="is-expression">
+                                <i class="grcicon-expression-black"></i>
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="span3">
-                      <h6>
-                        Relevant object group #3
-                      </h6>
-                      <div class="single-line-filter">
-                        <select class="input-xlarge relevant-set-choose">
-                          <option value="">- Choose -</option>
-                          <option value="Program">Programs</option>
-                          <option value="Regulation">Regulations</option>
-                          <option value="Policy">Policies</option>
-                          <option value="Standard">Standards</option>
-                          <option value="Contract">Contracts</option>
-                          <option value="Clause">Clauses</option>
-                          <option value="Section">Sections</option>
-                          <option value="Objective">Objectives</option>
-                          <option value="Control">Controls</option>
-                          <option value="Person">People</option>
-                          <option value="System">Systems</option>
-                          <option value="Process">Processes</option>
-                          <option value="DataAsset">Data Assets</option>
-                          <option value="Product">Products</option>
-                          <option value="Project">Projects</option>
-                          <option value="Facility">Facilities</option>
-                          <option value="Market">Markets</option>
-                        </select>
-                        <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
-                        <div class="attr-wrap">
-                          <h3>Select system attributes to show in report</h3>
-                          <ul class="attr-list">
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Title
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Description
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Owner
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Contact
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Notes
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                System URL
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Reference URL
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Code
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Effective date
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Stop date
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                State
-                              </label>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="span3">
-                      <h6>
-                        Relevant object group #4
-                      </h6>
-                      <div class="single-line-filter">
-                        <select class="input-xlarge relevant-set-choose">
-                          <option value="">- Choose -</option>
-                          <option value="Program">Programs</option>
-                          <option value="Regulation">Regulations</option>
-                          <option value="Policy">Policies</option>
-                          <option value="Standard">Standards</option>
-                          <option value="Contract">Contracts</option>
-                          <option value="Clause">Clauses</option>
-                          <option value="Section">Sections</option>
-                          <option value="Objective">Objectives</option>
-                          <option value="Control">Controls</option>
-                          <option value="Person">People</option>
-                          <option value="System">Systems</option>
-                          <option value="Process">Processes</option>
-                          <option value="DataAsset">Data Assets</option>
-                          <option value="Product">Products</option>
-                          <option value="Project">Projects</option>
-                          <option value="Facility">Facilities</option>
-                          <option value="Market">Markets</option>
-                        </select>
-                        <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
-                        <div class="attr-wrap">
-                          <h3>Select system attributes to show in report</h3>
-                          <ul class="attr-list">
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Title
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Description
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Owner
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Contact
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Notes
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                System URL
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Reference URL
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Code
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Effective date
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Stop date
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                State
-                              </label>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
+                    {{/relevantFilter}}
+                    <div class="add-rule">
+                      <a href="#" id="addRelevantFilterRule" class="addFilterRule">+ Add Relevant Object Group</a>
                     </div>
                   </div>
 
@@ -687,8 +397,14 @@
                       Save report as
                     </label>
                     <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
-                    <button type="submit" class="btn btn-primary report-trigger">Generate report</button>
-                    <button id="test" type="submit" class="btn btn-primary pull-right" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
+                    <button type="submit" class="btn btn-success btn-small report-trigger">Generate report</button>
+                    <div class="btn-group pull-right">
+                      <button type="submit" data-toggle="dropdown" class="btn btn-primary btn-small dropdown-toggle" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> <i class="grcicon-carot-white"></i></a></button>
+                      <ul class="dropdown-menu">
+                        <li><a href="#">Export to Sheets</a></li>
+                        <li><a href="#">Export to CSV</a></li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
 
@@ -702,7 +418,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -711,7 +427,7 @@
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <div class="people-autocomplete">
                                 <input type="text" class="dropdown-input autocomplete ui-autocomplete-input" placeholder="Search Owner" data-autocomplete-type="people" data-type="people">
-                                <button type="submit" class="btn btn-primary">Go</button>
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
                               </div>
                             </div>
                           </th>
@@ -720,7 +436,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -728,7 +444,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -736,7 +452,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -744,7 +460,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -752,7 +468,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -770,7 +486,7 @@
                                 <option>Not in Scope</option>
                                 <option>Deprecated</option>
                               </select>
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -778,7 +494,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -786,7 +502,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -794,7 +510,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -802,7 +518,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -810,7 +526,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -830,7 +546,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -850,7 +566,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                           <th>
@@ -858,7 +574,7 @@
                             <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
                             <div class="dropdown-menu right dropdown-menu-form" role="menu">
                               <input type="text" class="dropdown-input" placeholder="Filter" id="" name="">
-                              <button type="submit" class="btn btn-primary">Go</button>
+                              <button type="submit" class="btn btn-small btn-info">Go</button>
                             </div>
                           </th>
                         {{/table_title}}
@@ -900,8 +616,14 @@
                       Save report as
                     </label>
                     <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
-                    <button type="submit" class="btn btn-primary report-trigger">Generate report</button>
-                    <button type="submit" class="btn btn-primary pull-right" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> Export to CSV</a>
+                    <button type="submit" class="btn btn-success btn-small report-trigger">Generate report</button>
+                    <div class="btn-group pull-right">
+                      <button type="submit" data-toggle="dropdown" class="btn btn-primary btn-small dropdown-toggle" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> <i class="grcicon-carot-white"></i></a></button>
+                      <ul class="dropdown-menu">
+                        <li><a href="#">Export to Sheets</a></li>
+                        <li><a href="#">Export to CSV</a></li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
 

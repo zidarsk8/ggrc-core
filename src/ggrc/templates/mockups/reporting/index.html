@@ -13,77 +13,95 @@
 
 </head>
 <body>
+
   <header class="header main">
-    <div class="header-bar">
-      <div class="container-fluid">
+    <div class="area">
+      <div class="header-content">
         <div class="row-fluid">
-          <div class="span12">
-            <div class="logo pull-left">
-              <a href="#my-work-widget" class='to-my-work'>Company GRC</a>
-            </div>
+          <div id="page-header" class="span12">
+            <h1 class="entities">
+              <button class="lhn-trigger">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <span class="title-content">
+              </span>
+            </h1>
             <ul class="menu">
-              <li class="black-link">
-                <a id="page-help" href="javascript://" data-toggle="modal-ajax-helpform" data-help-slug="help">
-                  <i class="grcicon-help"></i>
-                  <span>Help</span>
+              <li>
+                <a href="javascript://" data-toggle="multitype-search-modal-selector" data-join-object-type="MultitypeSearch" data-original-title="search items">
+                  <i class="grcicon-search"></i>
+                  <span>Search</span>
                 </a>
               </li>
-              <li class="user dropdown dropdown-black black-link">
-                <a class="dropdown-toggle" href="#" data-toggle="dropdown" role="button">
-                  <i class="grcicon-user"></i>
+              <li>
+                <a href="/dashboard#task_widget" id="page-help">
+                  <i class="grcicon-task-black"></i>
+                  <span>
+                    My Tasks
+                    <span class="task-count ggrc_controllers_mapping_count">
+                      <small class="count">
+                        &nbsp;6&nbsp;
+                      </small>
+                    </span>
+                  </span>
+                </a>
+              </li>
+              <li class="user user-dropdown dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                  <i class="grcicon-user-black"></i>
                   <span>user@example.com</span>
-                  <i class="grcicon-carot-white"></i>
+                  <i class="grcicon-carot"></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                  <li>
-                    <a href="#my-work-widget" class="to-my-work">
-                      <i class="grcicon-dashboard"></i>
-                      My Work (gGRC Admin)
+                  <li class="full-opacity">
+                    <a href="/dashboard">
+                      <i class="grcicon-my-work"></i>
+                      My Work (Superuser)
                     </a>
                   </li>
                   <li>
-                    <a href="/admin">
-                      <i class="grcicon-admin"></i>
+                    <a href="/admin#people_list_widget">
+                      <i class="grcicon-dashboard-black"></i>
                       Admin Dashboard
                     </a>
                   </li>
                   <li class="notify-wrap">
                     <span>
-                      <i class="grcicon-alarm"></i>
+                      <i class="grcicon-alarm-black"></i>
                       Notifications
                     </span>
                     <div class="inner-list">
                       <label>
-                        <input type="checkbox" name="notify-digest">
-                        Email notifications
-                      </label>
-                      <label>
-                        <input type="checkbox" name="notify-digest" checked="checked">
+                        <input type="checkbox" name="notifications" value="Email_Digest">
                         Daily email digest
                       </label>
-                      <label>
-                        <input type="checkbox" name="notify-digest">
-                        Calendar notifications
+                      <label class="inner disabled">
+                        <input type="checkbox" name="notifications" value="Email_Now" disabled="">
+                        Real-time email updates
                       </label>
                     </div>
                   </li>
-                  <li class="layout-wrap">
-                    <a class="set-display-settings-default" href="#" tabindex="-1">
-                      <i class="grcicon-desktop"></i>
-                      Save Layout
-                    </a>
-                    <a class="clear-display-settings" href="#" tabindex="-1">
-                      <i class="grcicon-reset"></i>
-                      Reset Layout
-                    </a>
-                  </li>
-                  <li class="logout-wrap">
-                    <a href="#" tabindex="-1">
-                      <i class="grcicon-logout"></i>
+                  <li>
+                    <a href="/logout" tabindex="-1">
+                      <i class="grcicon-logout-black"></i>
                       Logout
                     </a>
                   </li>
                 </ul>
+              </li>
+              <li>
+                <a class="nav-trigger active" href="javascript://">
+                  <i class="grcicon-nav-trigger"></i>
+                  <span>Hide menu</span>
+                </a>
+              </li>
+              <li>
+                <a href="javascript://" id="#page-help" data-toggle="modal-ajax-helpform" data-help-slug="">
+                  <i class="grcicon-help-black"></i>
+                  <span>Help</span>
+                </a>
               </li>
             </ul>
           </div>
@@ -91,7 +109,7 @@
       </div>
     </div>
   </header>
-  <div class="area" style="margin-left: 48px;"></div>
+  <div class="reporting-import"></div>
 
 
   <section class="footer" style="z-index: 1000; position: fixed; right:0; bottom: 0; width: 100%;">
@@ -103,1948 +121,853 @@
   </section>
 
   <div id="lhn">
-    <div class="bar-v" style="left: 40px;"></div>
-    <div class="lhs-holder" style="width: 40px;">
-      <div class="affix-holder">
-        <div id="lhs" class="lhs accordion lhs-closed">
-
-          <form class="form-search" onsubmit="return false">
-            <div class="lhs-search">
-              <label class="checkbox my-work-label">
-                <input class="my-work" type="checkbox">
-                My work
-              </label>
-              <input class="widgetsearch" placeholder="Filter objects..." type="text" can-value="search_text" style="width: 90px;">
-            </div>
-          </form>
-
-          <div class="lhs-bg"></div>
-
-          <div class="lhs-nav emphesized">
-            <ul class="top-level">
-              <li class="programs accordion-group">
-                <a class="programs" href="javascript://">
-                  <i class="grcicon-program-color"></i>
-                  Programs
-                  <small>(<span class="item-count">1</span>)</small>
-                </a>
-                <div class="content">
-                  <ul class="sub-level" style="max-height:252px;">
-                    <li class="programs" data-model="true">
-                      <a href="javascript://" class="show-extended" can-click="select">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Google Fiber
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private">
-                            <i class="grcicon-private" rel="tooltip" data-original-title="Private"></i>
-                          </div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
+    <div id="lhs" class="lhs accordion">
+      <div class="lhn-type" style="left: -260px;">
+        <a href="javascript://" data-name="work_type" data-value="my_work">My objects</a>
+        <a href="javascript://" class="active" data-name="work_type" data-value="all">All objects</a>
+      </div>
+      <div class="lhs-holder" style="left: -260px;">
+        <div class="affix-holder">
+          <div id="lhs" class="lhs accordion">
+            <button class="bar-v"></button>
+            <a href="javascript://" class="lhn-pin"><i class="grcicon-pin"></i></a>
+            <form class="form-search">
+              <div class="lhs-search">
+                <input class="widgetsearch" placeholder="Filter my objects..." type="text" can-value="search_text">
+                <input type="submit" class="widgetsearch-submit" value="">
+                <div class="filter-off">
+                  <a href="#" rel="tooltip" data-title="Clear filters" data-original-title="" title=""><i class="grcicon-close-red"></i></a>
                 </div>
-              </li>
-              <li class="programs accordion-group workflow-group">
-                <a class="programs" href="javascript://">
-                  <i class="grcicon-workflow-color"></i>
-                  Workflows
-                  <small>(<span class="item-count">1</span>)</small>
-                </a>
-                <div class="content">
-                  <ul class="sub-level">
-                    <li class="programs" data-model="true">
-                      <a href="/mockups/v1.0/assessment.html" class="show-extended" can-click="select">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
+              </div>
+            </form>
+            <div class="lhs-bg"></div>
+            <div class="lhs-nav emphesized">
+              <ul class="top-level">
+                <li class="programs accordion-group">
+                  <a class="programs list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-program-color"></i>
+                    Programs
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level cms_controllers_infinite_scroll">
+                      <li class="programs" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item">
+                                Google Fiber
+                              </span>
+                            </div>
+                            <div class="lhs-private">
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline" data-ui-autocomplete-item="">
+                        <a data-object-plural="programs" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Program" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="workflow accordion-group">
+                  <a class="workflow oneline list-toggle" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-workflow-color"></i>
+                    Workflows
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level with-filters">
+                      <li class="filters">
+                        <a href="javascript://" class="wf-trigger wf-active " data-key="status" data-value="Active">
+                          Active(1)
+                        </a>
+                        <a href="javascript://" class="wf-trigger wf-draft " data-key="status" data-value="Draft">
+                          Draft(0)
+                        </a>
+                        <a href="javascript://" class="wf-trigger wf-inactive active" data-key="status" data-value="Inactive">
+                          Inactive(0)
+                        </a>
+                      </li>
+                      <li class="workflow Active" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div class="lhs-main-title">
+                            <span class="lhs-item lhs-item-long">
                               Google Fiber Workflow
                             </span>
                           </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new">
-                      <a data-modal-class="modal-wide" class="show-workflow-modal" id="newWorkflow" href="#editAssessmentStandAlone" data-new="true" data-toggle="modal">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              <li class="programs accordion-group">
-                <a class="programs" href="javascript://">
-                  <i class="grcicon-audit-color"></i>
-                  Audits
-                  <small>(<span class="item-count">1</span>)</small>
-                </a>
-                <div class="content">
-                  <ul class="sub-level" style="max-height:225px;">
-                    <li class="programs" data-model="true">
-                      <a href="javascript://" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              2013 Reciprocity Cloud Security Audit
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="workflows" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Workflow" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="programs accordion-group">
+                  <a class="programs list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-audit-color"></i>
+                    Audits
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="programs" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <span class="lhs-item lhs-item-medium">
+                              2015: Google Fiber - Audit 1
                             </span>
                           </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="audits" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Audit" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="programs accordion-group">
+                  <a class="programs list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-control_assessment-color"></i>
+                    Control Assessments
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                Fiber control assessment
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="control_assessments" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="ControlAssessment" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="programs accordion-group">
+                  <a class="programs list-toggle oneline" href="javascript://">
+                    <i class="grcicon-arrow-right"></i>
+                    <i class="grcicon-issue-color"></i>
+                    Issues
+                    <small>(<span class="item-count">1</span>)</small>
+                  </a>
+                  <div class="content">
+                    <ul class="sub-level">
+                      <li class="" data-model="true">
+                        <a href="#" class="show-extended">
+                          <div>
+                            <div class="lhs-main-title">
+                              <span class="lhs-item lhs-item-medium">
+                                Fiber control issue
+                              </span>
+                            </div>
+                            <div class="lhs-people">
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <ul class="sub-actions">
+                      <li class="add-new oneline">
+                        <a data-object-plural="issues" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Issue" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                          + Create New
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </div>
 
-          <div class="lhs-nav">
-            <h2 class="governance">Governance</h2>
-            <ul class="top-level">
-              <li class="governance accordion-group">
-                <a class="governance" href="#">
-                  <i class="grcicon-regulation-color"></i>
-                  Regulations
-                  <small>(<span class="item-count">6</span>)</small>
-                </a>
+            <div class="bar-h"></div>
 
-                <div class="content">
-                  <ul class="sub-level" style="max-height:150px;">
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ISO 27001 - Data Security Regulation
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
+            <div class="lhs-nav">
+              <h2>Objects</h2>
+              <ul class="top-level">
+                <li class="governance accordion-group">
+                  <a class="governance list-toggle top" href="#">
+                    <i class="grcicon-arrow-right"></i>
+                    Directives
+                  </a>
+                  <div class="content">
+                    <ul class="mid-level">
+                      <li class="governance accordion-group">
+                        <a class="governance list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-regulation-color"></i>
+                          Regulations
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      ISO 27001 - Data Security Regulation
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
                         </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ISO User ID and Authorization Regulation
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
+                      </li>
+                      <li class="governance accordion-group">
+                        <a class="governance list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-policy-color"></i>
+                          Policies
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Probationary Terms
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="policies" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Policy" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
                         </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ISO Asset Management
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
+                      </li>
+                      <li class="governance accordion-group">
+                        <a class="governance list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-standard-color"></i>
+                          Standards
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      ASHRAE 90.1
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="standards" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Standard" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
                         </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              HIPPA Privacy
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
+                      </li>
+                      <li class="governance accordion-group">
+                        <a class="governance list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-contract-color"></i>
+                          Contracts
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Master Service Agreement
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="contracts" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Contract" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
                         </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              SOX
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
+                      </li>
+                      <li class="governance accordion-group">
+                        <a class="governance list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-clause-color"></i>
+                          Clauses
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Update Terms of use
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="clauses" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Clause" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
                         </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              PCI DSS v2.0
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
+                      </li>
+                      <li class="governance accordion-group">
+                        <a class="governance list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-section-color"></i>
+                          Sections
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Area 16 Development
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="sections" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Section" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
                         </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
 
-              </li>
-              <li class="governance accordion-group">
-                <a class="governance" href="#">
-                  <i class="grcicon-policy-color"></i>
-                  Policies
-                  <small>(<span class="item-count">2</span>)</small>
-                </a>
+                <li class="governance accordion-group">
+                  <a class="governance list-toggle top" href="#">
+                    <i class="grcicon-arrow-right"></i>
+                    Controls/Objectives
+                  </a>
+                  <div class="content">
+                    <ul class="mid-level">
+                      <li class="controls accordion-group">
+                        <a class="controls list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-control-color"></i>
+                          Controls
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="governance" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Inventory List
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="controls" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Control" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                      <li class="objectives accordion-group">
+                        <a class="objectives list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-objective-color"></i>
+                          Objectives
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="objectives" data-model="true">
+                              <a href="/objectives/1276" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Get through this audit objective
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="objectives" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Objective" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
 
-                <div class="content">
-                  <ul class="sub-level">
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Probationary Terms
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
+                <li class="entities accordion-group">
+                  <a class="entities list-toggle top" href="#">
+                    <i class="grcicon-arrow-right"></i>
+                    People/Groups
+                  </a>
+                  <div class="content">
+                    <ul class="mid-level">
+                      <li class="entities accordion-group">
+                        <a class="entities list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-person-color"></i>
+                          People
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="entities" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-long">
+                                      Prasanna V.
+                                    </span>
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="people" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Person" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
                         </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Medical Leave
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
+                      </li>
+                      <li class="entities accordion-group">
+                        <a class="entities list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-org_group-color"></i>
+                          Org Groups
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="entities" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Legal Team
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="org_groups" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="OrgGroup" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
                         </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                      </li>
+                      <li class="entities accordion-group">
+                        <a class="entities list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-vendor-color"></i>
+                          Vendors
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="entities" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Online Store
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="vendors" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Vendor" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
 
-              </li>
-              <li class="governance accordion-group">
-                <a class="governance" href="#">
-                  <i class="grcicon-standard-color"></i>
-                  Standards
-                  <small>(<span class="item-count">1</span>)</small>
-                </a>
+                <li class="business accordion-group">
+                  <a class="business list-toggle top" href="#">
+                    <i class="grcicon-arrow-right"></i>
+                    Assets/Business
+                  </a>
+                  <div class="content">
+                    <ul class="mid-level">
+                      <li class="business accordion-group">
+                        <a class="business list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-system-color"></i>
+                          Systems
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="business" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Eco-System
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="systems" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="System" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                      <li class="business accordion-group">
+                        <a class="business list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-process-color"></i>
+                          Processes
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="business" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Provide LED lamps for office
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="processes" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Process" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                      <li class="business accordion-group">
+                        <a class="business list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-data_asset-color"></i>
+                          Data Assets
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="business" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Get the soda
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="data_assets" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="DataAsset" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                      <li class="business accordion-group">
+                        <a class="business list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-product-color"></i>
+                          Products
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="business" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Bubble gum
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="products" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Product" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                      <li class="business accordion-group">
+                        <a class="business list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-project-color"></i>
+                          Projects
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="business" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Blue Print Caffee
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="projects" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Project" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                      <li class="business accordion-group">
+                        <a class="business list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-facility-color"></i>
+                          Facilities
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="business" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Server Farm
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="facilities" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Facility" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                      <li class="business accordion-group">
+                        <a class="business list-toggle oneline" href="javascript://">
+                          <i class="grcicon-arrow-right"></i>
+                          <i class="grcicon-market-color"></i>
+                          Markets
+                          <small>(<span class="item-count">1</span>)</small>
+                        </a>
+                        <div class="content">
+                          <ul class="sub-level">
+                            <li class="business" data-model="true">
+                              <a href="#" class="show-extended">
+                                <div>
+                                  <div class="lhs-main-title">
+                                    <span class="lhs-item lhs-item-medium">
+                                      Wall-Mart
+                                    </span>
+                                  </div>
+                                  <div class="lhs-people">
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                          <ul class="sub-actions">
+                            <li class="add-new oneline">
+                              <a data-object-plural="markets" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Market" data-toggle="modal-ajax-form" data-modal-reset="reset">
+                                + Create New
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </div>
 
-                <div class="content">
-                  <ul class="sub-level">
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ASHRAE 90.1
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+            <div class="bar-h"></div>
 
-              </li>
-              <li class="governance accordion-group">
-                <a class="governance" href="#">
-                  <i class="grcicon-contract-color"></i>
-                  Contracts
-                  <small>(<span class="item-count">3</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level">
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Master Service Agreement
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
+            <div class="lhs-nav">
+              <h2>Recently Viewed</h2>
+              <ul class="top-level recent">
+                <li class="" data-model="true">
+                  <a href="#" class="show-extended">
+                    <div class="row-fluid">
+                      <div class="span11">
+                        <div class="oneline">
+                          <i class="grcicon-program-color"></i>
+                            Google Fiber
                         </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              SaaS Vendor Contract
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Company X Contract
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="governance accordion-group">
-                <a class="governance" href="#">
-                  <i class="grcicon-clause-color"></i>
-                  Clauses
-                  <small>(<span class="item-count">0</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="governance accordion-group">
-                <a class="governance" href="#">
-                  <i class="grcicon-section-color"></i>
-                  Sections
-                  <small>(<span class="item-count">0</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="governance accordion-group">
-                <a class="governance" href="#">
-                  <i class="grcicon-objective-color"></i>
-                  Objectives
-                  <small>(<span class="item-count">10</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level" style="max-height:290px;">
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Get through this audit objective
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              lock down the systems
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Security Standards for Health Information
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Password entry tries shall be logged appropriately
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              All assets shall be classified according to the asset classification guidelines of the company
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Identify and inventory all important assets
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              To achieve and maintain appropriate protection of organizational assets
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Establish a schedule for verifying correct identification and documentation. Identify a team lead for the objective.
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Generic request 4
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Generic request 1
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="governance accordion-group">
-                <a class="governance" href="#">
-                  <i class="grcicon-control-color"></i>
-                  Controls
-                  <small>(<span class="item-count">15</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level" style="max-height:400px;">
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended to-control">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item to-control">
-                              Inventory List
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item to-control">
-                              baseline security requirements established and applied to the design and implementation of applications, databases, systems and network infrastructure and information processing
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item to-control">
-                              A formal process for approving and testing all network connections
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Regular maintenance of private data assets
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ISO Asset Management
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Safety equipment control
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Check the avalanche website
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ISO Data Security Control
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              PCI.12.4
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Passwords
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ISO User ID and Authorization Policy
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              First Day Activities
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              PCI.12.1.3
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              PCI.12.5
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="governance" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              PCI.12.6
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-            </ul>
-
-            <h2 class="entities">People/Groups</h2>
-            <ul class="top-level">
-              <li class="entities accordion-group">
-                <a class="entities" href="#">
-                  <i class="grcicon-person-color"></i>
-                  People
-                  <small>(<span class="item-count">14</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level" style="max-height:378px;">
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              vladanmitevski
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              jeffrichm@google.com
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              dfring
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Vladan Mitevski
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Silas Barta
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              bmomberger@google.com
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              smartsheyam
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Predrag Kanazir
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              brad@reciprocitylabs.com
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              danring@google.com
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              liz@reciprocitylabs.com
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ken@reciprocitylabs.com
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              jeff@reciprocitylabs.com
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              dan@reciprocitylabs.com
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="entities accordion-group">
-                <a class="entities" href="#">
-                  <i class="grcicon-org_group-color"></i>
-                  Org Groups
-                  <small>(<span class="item-count">12</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level" style="max-height:306px">
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Legal Team
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Insurance Provider
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Marketing Team
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Maintenance/Operations
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Senior Sales Team
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              IT Department
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Risk Management Team
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Software Development Team
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Junior Sales Team
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Human Resources
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Product Development
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="entities" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Accounting
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-            </ul>
-
-            <h2 class="business">Assets/Business</h2>
-            <ul class="top-level">
-              <li class="business accordion-group">
-                <a class="business" href="#">
-                  <i class="grcicon-system-color"></i>
-                  Systems
-                  <small>(<span class="item-count">11</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level" style="max-height:310px;">
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ARTY
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              GitHub
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Asset Repository Management System
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              HIRE
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ACLS
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Authorization Roles and Permissions
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Workday Financial Management
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Salesforce CRM
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Web Application
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Oracle Financials
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Application Delivery System
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="business accordion-group">
-                <a class="business" href="#">
-                  <i class="grcicon-process-color"></i>
-                  Processes
-                  <small>(<span class="item-count">4</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level" style="max-height:228px;">
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              User Privacy Policy - Verification Process
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              New Hire Process
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Vulnerability Prevention Process
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Candidate Screening
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-modal-class="modal-wide" href="#newProcess" data-toggle="modal" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="business accordion-group">
-                <a class="business" href="#">
-                  <i class="grcicon-data_asset-color"></i>
-                  Data Assets
-                  <small>(<span class="item-count">6</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level" style="max-height:207px;">
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Employee Health Plan Participants
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Customer List by demographic
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Map Locations
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Jigsaw Vendor List
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Prospective Candidates
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Company Employee Listing
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="business accordion-group">
-                <a class="business" href="javascript://">
-                  <i class="grcicon-product-color"></i>
-                  Products
-                  <small>(<span class="item-count">7</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level" style="max-height:203px;">
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              gGRC
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Medical Records
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Salesforce Work.com
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Sales Cloud: Sales App
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Sales Force Chatter
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Service Cloud
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Marketing Cloud
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="business accordion-group">
-                <a class="business" href="#">
-                  <i class="grcicon-project-color"></i>
-                  Projects
-                  <small>(<span class="item-count">9</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level" style="max-height:232px;">
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Green
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Eclipse Data Tools Platform
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Tool Integration Project
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Lead Generation for North America
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Business Intelligence and Reporting Tools (BIRT)
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              ArtsMarket
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              MOON Project
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Special Project
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Internal HR Marketing
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="business accordion-group">
-                <a class="business" href="javascript://">
-                  <i class="grcicon-facility-color"></i>
-                  Facilities
-                  <small>(<span class="item-count">4</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level">
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              San Francisco Office
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people">
-                            <i class="grcicon-people-warning"></i>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              KEFLAVIK, ICELAND- SERVER FARM
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              MAIDEN, NORTH CAROLINA SERVER FARM
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              DALLES, OREGON- SERVER FARM
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-              <li class="business accordion-group">
-                <a class="business" href="javascript://">
-                  <i class="grcicon-market-color"></i>
-                  Markets
-                  <small>(<span class="item-count">3</span>)</small>
-                </a>
-
-                <div class="content">
-                  <ul class="sub-level">
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Pacific Rim Market
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              North America Market
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="business" data-model="true">
-                      <a href="#" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              Europe Market
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new" data-ui-autocomplete-item="">
-                      <a data-object-plural="regulations" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="Regulation" data-toggle="modal-ajax-form" data-modal-reset="reset">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </li>
-            </ul>
-          </div>
-
-          <div class="bar-h"></div>
-
-          <div class="lhs-nav recent">
-            <h2>Recently Viewed</h2>
-            <ul class="top-level">
-              <li class="programs">
-                <a href="/programs/3" class="show-extended">
-                  <div class="row-fluid">
-                    <div class="span11">
-                      <div class="oneline">
-                        <i class="grcicon-program-black"></i>
-                        Treci Program lorem ipsum dolor sit amet ipsum dolor sit amet lorem ipsum
                       </div>
                     </div>
-                  </div>
-                </a>
-              </li>
-              <li class="governance">
-                <a href="/contracts/4" class="show-extended">
-                  <div class="row-fluid">
-                    <div class="span11">
-                      <div class="oneline">
-                        <i class="grcicon-contract-black"></i>
-                        MAHH Contract
+                  </a>
+                </li>
+                <li class="" data-model="true">
+                  <a href="#" class="show-extended">
+                    <div class="row-fluid">
+                      <div class="span11">
+                        <div class="oneline">
+                          <i class="grcicon-person-color"></i>
+                          Prasanna V.
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </a>
-              </li>
-              <li class="governance">
-                <a href="/contracts/9" class="show-extended">
-                  <div class="row-fluid">
-                    <div class="span11">
-                      <div class="oneline">
-                        <i class="grcicon-contract-black"></i>
-                        Novi ugovor
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </li>
-            </ul>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -2250,6 +1173,7 @@
   <script type="text/javascript" src="/static/mockups/js/lhn-controller.js"></script>
   -->
   <script type="text/javascript" src="/static/mockups/js/reporting.js"></script>
+  <script type="text/javascript" src="/static/mockups/js/reporting-header.js"></script>
   <script type="text/javascript" src="/static/mockups/js/common.js"></script>
 
 </body>

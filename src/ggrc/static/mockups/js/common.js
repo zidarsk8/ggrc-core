@@ -719,32 +719,29 @@ $(document).ready(function(){
     }
   });
 
-  $(".attribute-trigger").popover({
-    container: "body",
-    html: true,
-    content: function(){
-      return $(this).next('.attr-wrap').html();
-    },
-    placement: "bottom",
-    template: '<div class="popover" role="tooltip"><div class="popover-content"></div></div>'
-  });
+  $(".attribute-trigger").each(function() {
+    $(".attribute-trigger").popover({
+      html: true,
+      content: function(){
+        return $(this).next('.attr-wrap').html();
+      },
+      placement: "bottom",
+      template: '<div class="popover" role="tooltip"><div class="popover-content"></div></div>'
+    });
 
-  $('.attribute-trigger').on('shown.bs.popover', function () {
-    $(this).addClass("active");
-  });
+    $(this).on('shown.bs.popover', function () {
+      $(this).addClass("active");
+    });
 
-  $('.attribute-trigger.right').on('shown.bs.popover', function () {
-    $('.popover').css('left',parseInt($('.popover').css('left')) - 276 + 'px')
-  });
-
-  $('.attribute-trigger').on('hidden.bs.popover', function () {
-    $(this).removeClass("active");
+    $(this).on('hidden.bs.popover', function () {
+      $(this).removeClass("active");
+    });
   });
 
   // Dropdown menu form stop propagation
   $(".dropdown-menu").on("click", function(el) {
       var $this = $(this);
-    
+
     if($this.hasClass("dropdown-menu-form")) {
       el.stopPropagation();
     }
@@ -753,7 +750,7 @@ $(document).ready(function(){
   // Top navigation show/hide
   function topNav() {
     var options = {
-          duration: 800,
+          duration: 100,
           easing: 'easeOutExpo'
         },
         $this = $(this),
@@ -779,7 +776,7 @@ $(document).ready(function(){
   // LHN show/hide
   function lhnAnimate() {
     var options = {
-          duration: 800,
+          duration: 100,
           easing: 'easeOutExpo'
         },
         $this = $(this),
@@ -791,15 +788,13 @@ $(document).ready(function(){
     if($this.hasClass("active")) {
       $this.removeClass("active");
       $lhn.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
-      $lhnType.removeClass("active").animate({left: "-246"}, options).css("width", "246px");
-      $lhn_bar.removeClass("active").animate({left: "-8"}, options);
+      $lhnType.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
       $lhs_search.removeClass("active").css("width", "196px");
       $lhs_search.find(".widgetsearch").css("width", "130px");
     } else {
       $this.addClass("active");
       $lhn.addClass("active").animate({left: "0"}, options);
       $lhnType.addClass("active").animate({left: "0"}, options);
-      $lhn_bar.addClass("active").animate({left: "240"}, options);
       $lhs_search.addClass("active");
     }
   }
@@ -1065,7 +1060,6 @@ function resize_areas() {
   $topNav = $(".top-inner-nav");
   $area = $(".area");
   $bar = $(".bar-v");
-  $barActive = $(".bar-v.active");
   $lhsSearch = $(".lhs-search");
   $lhsSearchActive = $(".lhs-search.active");
   $lhnType = $(".lhn-type");
@@ -1088,15 +1082,11 @@ function resize_areas() {
   objectWidth = winWidth;
   //headerWidth = winWidth - lhsWidth - barWidth - 20;
   headerWidth = winWidth - 40;
-  lhnType_width = lhsWidth + 6;
+  lhnType_width = lhsWidth;
 
-  $lhsHolder
-    .css("height",lhsHeight);
+  $lhsHolder.css("height",lhsHeight).css("width", lhsWidth);
   $lhsHolderActive.css("left", "0");
-  $bar
-    .css("height",lhsHeight)
-    .css("left","-8px");
-  $barActive.css("left", lhsWidth);
+  $bar.css("height",lhsHeight);
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);
