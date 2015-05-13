@@ -440,34 +440,6 @@
         join_object: get_page_object(),
         join_list: get_page_object().object_people
       }
-
-      , program_directives : {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: data.related_title_singular,
-        modal_title: "Select " + data.related_title_plural,
-
-        related_model_singular: data.child_meta_type,
-        related_table_plural: (CMS.Models[data.child_meta_type] || {}).table_plural,
-        related_table_singular: (CMS.Models[data.child_meta_type] || {}).table_singular,
-        related_title_singular: "System",
-        related_title_plural: "Systems",
-
-        option_model: CMS.Models[data.child_meta_type],
-        join_model: CMS.Models.ProgramDirective,
-
-        option_attr: 'directive',
-        join_attr: 'program',
-        option_id_field: 'directive_id',
-        option_type_field: 'directive_type',
-        join_id_field: 'program_id',
-        join_type_field: null,
-
-        join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
-      }
-
       , section_objectives : {
         option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
@@ -518,34 +490,6 @@
         option_id_field: 'control_id',
         //option_type_field: 'control_type',
         join_id_field: 'section_id',
-        join_type_field: null,
-
-        join_object_id: data.join_object_id,
-        join_object_type: data.join_object_type
-      }
-
-      , program_controls : {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: "Control",
-        modal_title: "Select Controls",
-
-        related_model_singular: "Control",
-        related_table_plural: "controls",
-        related_table_singular: "control",
-        related_title_singular: "Control",
-        related_title_plural: "Controls",
-
-        option_model: CMS.Models.Control,
-        join_model: CMS.Models.ProgramControl,
-
-        option_attr: 'control',
-        join_attr: 'program',
-        option_id_field: 'control_id',
-        //option_type_field: 'control_type',
-        join_id_field: 'program_id',
         join_type_field: null,
 
         join_object_id: data.join_object_id,

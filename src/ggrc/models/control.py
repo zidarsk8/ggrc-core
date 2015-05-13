@@ -126,10 +126,6 @@ class Control(HasObjectState, Relatable,
       primaryjoin='and_(foreign(Control.verify_frequency_id) == Option.id, '\
                   'Option.role == "verify_frequency")',
       uselist=False)
-  program_controls = db.relationship(
-      'ProgramControl', backref='control', cascade='all, delete-orphan')
-  programs = association_proxy(
-      'program_controls', 'program', 'ProgramControl')
   control_sections = db.relationship(
       'ControlSection', backref='control', cascade='all, delete-orphan')
   sections = association_proxy(
@@ -176,14 +172,11 @@ class Control(HasObjectState, Relatable,
       'directive',
       'documentation_description',
       'fraud_related',
-      #'implemented_controls',
-      #'implementing_controls',
       'key_control',
       'kind',
       'means',
       'sections',
       'objectives',
-      'programs',
       'verify_frequency',
       'version',
       'principal_assessor',
@@ -193,7 +186,6 @@ class Control(HasObjectState, Relatable,
       PublishOnly('objective_controls'),
       PublishOnly('implementing_control_controls'),
       PublishOnly('directive_controls'),
-      PublishOnly('program_controls'),
       'object_controls',
       ]
 
@@ -202,13 +194,7 @@ class Control(HasObjectState, Relatable,
       'version',
       ]
 
-  _include_links = [
-      #'control_sections',
-      #'objective_controls',
-      #'directive_controls',
-      #'program_controls',
-      #'object_controls',
-      ]
+  _include_links = []
 
   @validates('kind', 'means', 'verify_frequency')
   def validate_control_options(self, key, option):
@@ -228,7 +214,6 @@ class Control(HasObjectState, Relatable,
         orm.subqueryload('control_sections'),
         orm.subqueryload('objective_controls'),
         orm.subqueryload('directive_controls').joinedload('directive'),
-        orm.subqueryload('program_controls'),
         orm.subqueryload('object_controls'),
         )
 

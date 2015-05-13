@@ -1160,6 +1160,19 @@
   border-bottom: 3px solid $warmGray;
   padding: 0 16px 0 10px;
   margin-bottom: 8px;
+  &.inline-filtering-transparent {
+    line-height: 26px;
+    height: 26px;
+    background: none;
+    border-bottom: none;
+    padding: 0;
+    margin-bottom: 0;
+    .filter-input {
+      .is-expression {
+        top: 6px;
+      }
+    }
+  }
   .filter-title {
     h6 {
       @include oneline();
