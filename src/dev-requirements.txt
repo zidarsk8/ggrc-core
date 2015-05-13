@@ -21,3 +21,6 @@ ipdb
 ipython
 MonthDelta==0.9.1
 webob
+names
+flask-debugtoolbar
+freezegun==0.3.1

@@ -25,7 +25,10 @@ $(document).ready(function() {
         {tbl_data_1: "Program 1", tbl_data_2: "Predrag", tbl_data_3: "CTRL 5", tbl_data_4: "Carl Grove", tbl_data_5: "Julius Robert Oppenheimer", tbl_data_6: "http://google.com/control/manhattan-project", tbl_data_7: "CT-PR", tbl_data_8: "Effective", tbl_data_9: "", tbl_data_10: "", tbl_data_11: "", tbl_data_12: "", tbl_data_13: "", tbl_data_14: "", tbl_data_15: "", tbl_data_15: ""}
       ],
       filterRules: [
+      ],
+      relevantFilter: [
       ]
+
       /*
       attr_select: function() {
         $(".attribute-trigger").popover({
@@ -60,7 +63,7 @@ $(document).ready(function() {
 
         tabs[index].attr('title', el.val());
         this.element.find("#newReport .closed").show();
-        
+
         // Calculate tabs numbers
         tabs.forEach(function(tab) {
           if (tab.new_report) {
@@ -91,16 +94,6 @@ $(document).ready(function() {
         tabs.push({title: "New Report " + new_tabs, new_report: true});
         $ul.find('li').not('.hidden-widgets-list').last().addClass("active");
       },
-      // Trying to activate or deactivate popover when value in select is changed.
-      /*
-      ".sec-obj change": function(el, ev) {
-        var choose = el.val();
-        if(choose === "System") {
-          this.scope.attr('attr_selected', true);
-          this.scope.attr_select();
-        }
-      },
-      */
       "#addFilterRule click": function(el, ev) {
         var newRule = this.scope.filterRules,
             new_rules = 0;
@@ -109,11 +102,17 @@ $(document).ready(function() {
             new_rules++;
           }
         });
-        if (new_rules === 0) {
-          newRule.push({label: "Relevant to:", new_rule: true});
-        } else {
-          newRule.push({label: "AND Relevant to:", new_rule: true});
-        }
+        newRule.push({label: "Relevant to:", new_rule: true});
+      },
+      "#addRelevantFilterRule click": function(el, ev) {
+        var relevantGroup = this.scope.relevantFilter,
+            new_relevant = 0;
+        relevantGroup.forEach(function(relevant) {
+          if (relevant.new_relevant_group) {
+            new_relevant++;
+          }
+        });
+        relevantGroup.push({new_relevant_group: true});
       },
       ".remove_filter click": function(el) {
         var $item = el.closest(".single-line-filter"),
@@ -124,5 +123,5 @@ $(document).ready(function() {
     }
   });
 
-  $(".area").html(can.view("/static/mockups/mustache/reporting.mustache",{}));
+  $(".reporting-import").html(can.view("/static/mockups/mustache/reporting.mustache",{}));
 });

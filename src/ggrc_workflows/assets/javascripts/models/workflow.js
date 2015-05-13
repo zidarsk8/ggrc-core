@@ -43,7 +43,15 @@
       show_all_tabs: true,
     },
     tree_view_options: {
-      show_view: GGRC.mustache_path + "/workflows/tree.mustache"
+      show_view: GGRC.mustache_path + "/workflows/tree.mustache",
+      attr_list : [
+        {attr_title: 'Title', attr_name: 'title'},
+        {attr_title: 'Owner', attr_name: 'owner'},
+        {attr_title: 'Code', attr_name: 'slug'},
+        {attr_title: 'State', attr_name: 'status'},
+        {attr_title: 'Frequency', attr_name: 'frequency'},
+        {attr_title: 'Last Updated', attr_name: 'updated_at'}
+      ]
     },
 
     init: function() {

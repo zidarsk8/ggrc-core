@@ -15,6 +15,7 @@ from .mixins import (
 from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
+from .audit_object import Auditable
 from .reflection import PublishOnly
 from .utils import validate_option
 from .relationship import Relatable
@@ -85,7 +86,7 @@ class AssertionCategorized(Categorizable):
 
 class Control(HasObjectState, Relatable,
     CustomAttributable, Documentable, Personable, ControlCategorized, AssertionCategorized,
-    Hierarchical, Timeboxed, Ownable, BusinessObject, TestPlanned, db.Model):
+    Hierarchical, Timeboxed, Ownable, BusinessObject, Auditable, TestPlanned, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
@@ -109,16 +110,6 @@ class Control(HasObjectState, Relatable,
   secondary_assessor = db.relationship(
       'Person', uselist=False, foreign_keys='Control.secondary_assessor_id')
 
-  @declared_attr
-  def audit_objects(cls):
-
-    joinstr = 'and_(foreign(AuditObject.auditable_id) == {type}.id, '\
-              'foreign(AuditObject.auditable_type) == "{type}")'
-    joinstr = joinstr.format(type=cls.__name__)
-    return db.relationship(
-        'AuditObject',
-        primaryjoin=joinstr,
-    )
 
   kind = db.relationship(
       'Option',
@@ -135,10 +126,6 @@ class Control(HasObjectState, Relatable,
       primaryjoin='and_(foreign(Control.verify_frequency_id) == Option.id, '\
                   'Option.role == "verify_frequency")',
       uselist=False)
-  program_controls = db.relationship(
-      'ProgramControl', backref='control', cascade='all, delete-orphan')
-  programs = association_proxy(
-      'program_controls', 'program', 'ProgramControl')
   control_sections = db.relationship(
       'ControlSection', backref='control', cascade='all, delete-orphan')
   sections = association_proxy(
@@ -185,25 +172,20 @@ class Control(HasObjectState, Relatable,
       'directive',
       'documentation_description',
       'fraud_related',
-      #'implemented_controls',
-      #'implementing_controls',
       'key_control',
       'kind',
       'means',
       'sections',
       'objectives',
-      'programs',
       'verify_frequency',
       'version',
       'principal_assessor',
       'secondary_assessor',
-      PublishOnly('audit_objects'),
       PublishOnly('control_controls'),
       PublishOnly('control_sections'),
       PublishOnly('objective_controls'),
       PublishOnly('implementing_control_controls'),
       PublishOnly('directive_controls'),
-      PublishOnly('program_controls'),
       'object_controls',
       ]
 
@@ -212,13 +194,7 @@ class Control(HasObjectState, Relatable,
       'version',
       ]
 
-  _include_links = [
-      #'control_sections',
-      #'objective_controls',
-      #'directive_controls',
-      #'program_controls',
-      #'object_controls',
-      ]
+  _include_links = []
 
   @validates('kind', 'means', 'verify_frequency')
   def validate_control_options(self, key, option):
@@ -238,7 +214,6 @@ class Control(HasObjectState, Relatable,
         orm.subqueryload('control_sections'),
         orm.subqueryload('objective_controls'),
         orm.subqueryload('directive_controls').joinedload('directive'),
-        orm.subqueryload('program_controls'),
         orm.subqueryload('object_controls'),
         )
 

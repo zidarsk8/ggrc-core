@@ -6,15 +6,122 @@
 }}
 
 <h1 class="entities">
-  <span class="title-prev">
-    <a class="title-trigger" href="/dashboard"><i class="grciconlarge-dashboard-new" rel="tooltip" data-original-title="My Work"></i></a>
-  </span>
-  <span class="title-slide">
-    <i class="grciconlarge-{{model.table_singular}}"></i>
-    {{instance.title}}
-  </span>
-  <a class="nav-trigger active" href="javascript://">
-    <i class="grciconlarge-nav-trigger" rel="tooltip" data-placement="left" title="" data-original-title="Hide menu">
-    </i>
-  </a>
+  {{#if_equals model.table_singular 'person'}}
+    {{#is_dashboard}}
+      {{^system_role 'No Access'}}
+        <button class="lhn-trigger">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      {{/system_role}}
+      <i class="grciconlarge-dashboard-new" rel="tooltip" data-original-title="My Work" data-placement="bottom"></i>
+      My Work
+    {{else}}
+      {{^system_role 'No Access'}}
+        <button class="lhn-trigger pull-left">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      {{/system_role}}
+      <span class="title-content">
+        <i class="grciconlarge-{{model.table_singular}}"></i>
+        {{firstnonempty instance.name instance.email}}
+      </span>
+    {{/is_dashboard}}
+  {{/if_equals}}
+
+  {{^if_equals model.table_singular 'person'}}
+    <button class="lhn-trigger">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <span class="title-content">
+      <i class="grciconlarge-{{model.table_singular}}"></i>
+      {{instance.title}}
+      {{#if_equals model.table_singular 'program'}}
+        {{#if instance.private}}
+          <span class="private">
+            <i class="grcicon-private" rel="tooltip" title="Private"></i>
+          </span>
+        {{/if}}
+      {{/if_equals}}
+    </span>
+  {{/if_equals}}
 </h1>
+<ul class="menu">
+  <li>
+    <a href="javascript://" data-toggle="multitype-search-modal-selector" data-join-object-type="MultitypeSearch" data-original-title="search items">
+      <i class="grcicon-search"></i>
+      <span>Search</span>
+    </a>
+  </li>
+  <li>
+    <a href="/dashboard#task_widget" id="page-help">
+      <i class="grcicon-task-black"></i>
+      <span>
+        My Tasks
+        <span class="task-count"></span>
+      </span>
+    </a>
+  </li>
+  <li class="user user-dropdown dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+      <i class="grcicon-user-black"></i>
+      <span>{{current_user.email}}</span>
+      <i class="grcicon-carot"></i>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+      <li class="full-opacity">
+        <a href="/dashboard">
+          <i class="grcicon-my-work"></i>
+          My Work ({{current_user.system_wide_role}})
+        </a>
+      </li>
+      {{#current_user_is_admin}}
+      <li>
+        <a href="/admin#people_list_widget">
+          <i class="grcicon-dashboard-black"></i>
+          Admin Dashboard
+        </a>
+      </li>
+      {{/current_user_is_admin}}
+      <li class="notify-wrap">
+        <span>
+          <i class="grcicon-alarm-black"></i>
+          Notifications
+        </span>
+        <div class="inner-list">
+          <label>
+            <input type="checkbox" name="notifications" value="Email_Digest">
+            Daily email digest
+          </label>
+          <label class="inner disabled">
+            <input type="checkbox" name="notifications" value="Email_Now" disabled>
+            Real-time email updates
+          </label>
+        </div>
+      </li>
+      <li>
+        <a href="/logout" tabindex="-1">
+          <i class="grcicon-logout-black"></i>
+          Logout
+        </a>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <a class="nav-trigger active" href="javascript://">
+      <i class="grcicon-nav-trigger"></i>
+      <span>Hide menu</span>
+    </a>
+  </li>
+  <li>
+    <a href="javascript://" id="#page-help" data-toggle="modal-ajax-helpform" data-help-slug="{{self.page_help()|trim}}">
+      <i class="grcicon-help-black"></i>
+      <span>Help</span>
+    </a>
+  </li>
+</ul>

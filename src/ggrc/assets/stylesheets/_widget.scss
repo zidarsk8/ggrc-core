@@ -104,6 +104,7 @@
         }
         li {
           position: relative;
+          overflow: visible;
           .dropdown-menu {
             @include border-radius(0);
             right: -12px;
@@ -111,6 +112,7 @@
             top: 20px;
             padding: 14px 30px 20px 30px;
             min-width: 340px;
+            text-align: left;
             h5 {
               font-size: 16px;
               font-weight: normal;
@@ -921,6 +923,16 @@
 .custom-popover-content {
   display: none;
 }
+
+.task-title {
+  width: 50%;
+}
+
+.task-status {
+  width: 40%;
+  text-align: right;
+}
+
 .preview-container {
   &.person-preview {
     overflow: visible;
@@ -1107,6 +1119,19 @@
   border-bottom: 3px solid $warmGray;
   padding: 0 16px 0 10px;
   margin-bottom: 8px;
+  &.inline-filtering-transparent {
+    line-height: 26px;
+    height: 26px;
+    background: none;
+    border-bottom: none;
+    padding: 0;
+    margin-bottom: 0;
+    .filter-input {
+      .is-expression {
+        top: 6px;
+      }
+    }
+  }
   .filter-title {
     h6 {
       @extend %oneline;
@@ -1624,4 +1649,7 @@ ul.attr-list {
 .filter-holder {
   margin-bottom: 25px;
   overflow: hidden;
+}
+.workflow-wrap-main {
+  display: none;
 }

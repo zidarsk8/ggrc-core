@@ -103,21 +103,36 @@ function makeDateSerializer(type, key) {
 
 can.Model("can.Model.Cacheable", {
 
-  root_object : ""
-  , filter_keys : ["assignee", "code", "company", "contact", "description",
-                   "email", "end_date", "end date", "kind", "name", "notes",
-                   "owner", "owners", "reference_url", "slug", "state",
-                   "status", "start_date", "start date", "test", "title"]
-  , filter_mappings: {
+  root_object : "",
+  filter_keys: ["assignee", "company", "contact", "description",
+                "email", "end_date", "kind", "name", "notes",
+                "owners", "reference_url", "slug", "status",
+                "start_date", "test", "title", "updated_at", "created_at",
+                "due_on"
+  ],
+  filter_mappings: {
     //'search term', 'actual value in the object'
-    'owner' : 'owners',
-    'workflow' : 'workflows',
-    'due date' : 'end_date',
-    'end date' : 'end_date',
-    'start date' : 'start_date',
-    'code' : 'slug',
-    'state': 'status'
+    "owner": "owners",
+    "workflow": "workflows",
+    "due date": "end_date",
+    "end date": "end_date",
+    "stop date": "end_date",
+    "effective date": "start_date",
+    "start date": "start_date",
+    "created date": "created_at",
+    "updated date": "updated_at",
+    "code": "slug",
+    "state": "status"
   }
+  , attr_list : [
+    {attr_title: 'Title', attr_name: 'title'},
+    {attr_title: 'Owner', attr_name: 'owner'},
+    {attr_title: 'Code', attr_name: 'slug'},
+    {attr_title: 'State', attr_name: 'status'},
+    {attr_title: 'Primary Contact', attr_name: 'contact'},
+    {attr_title: 'Secondary Contact', attr_name: 'secondary_contact'},
+    {attr_title: 'Last Updated', attr_name: 'updated_at'}
+  ]
   , root_collection : ""
   , model_singular : ""
   , model_plural : ""
@@ -997,8 +1012,8 @@ can.Model("can.Model.Cacheable", {
     }
 
     pre_save_notifier.on_empty(function() {
-
-      xhr = _super.apply(that, arguments).then(function(result) {
+      xhr = _super.apply(that, arguments)
+      .then(function(result) {
         if (isNew) {
           that.after_create && that.after_create();
         } else {
@@ -1009,10 +1024,14 @@ can.Model("can.Model.Cacheable", {
       }, function(xhr, status, message) {
         that.save_error && that.save_error(xhr.responseText);
         return new $.Deferred().reject(xhr, status, message);
-      });
-
-      xhr.always(function() {
-        that.notifier.on_empty(function() {
+      })
+      .fail(function (response) {
+        that.notifier.on_empty(function () {
+          dfd.reject(that, response.responseText);
+        });
+      })
+      .done(function () {
+        that.notifier.on_empty(function () {
           dfd.resolve(that);
         });
       });
@@ -1039,7 +1058,7 @@ can.Model("can.Model.Cacheable", {
 
     return RefreshQueue.refresh_all(this, props, true);
   },
-  get_filter_vals: function(keys, mappings){
+  get_filter_vals: function (keys, mappings) {
     keys = keys || this.class.filter_keys;
     mappings = mappings || this.class.filter_mappings;
 
@@ -1049,9 +1068,8 @@ can.Model("can.Model.Cacheable", {
     if (!mappings[long_title]){
       mappings[long_title] = "title";
     }
-    keys.push(long_title);
-
-    $.each(keys, function(index, key){
+    keys = _.union(keys, long_title, _.keys(mappings));
+    $.each(keys, function(index, key) {
       var val = mappings[key] ?
         this[mappings[key]] :
         this[key];
@@ -1076,7 +1094,7 @@ can.Model("can.Model.Cacheable", {
   },
 
   hash_fragment: function () {
-    var type = can.spaceCamelCase(this.type)
+    var type = can.spaceCamelCase(this.type || "")
             .toLowerCase()
             .replace(/ /g, '_');
 

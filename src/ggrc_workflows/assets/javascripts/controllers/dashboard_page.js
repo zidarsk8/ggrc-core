@@ -218,10 +218,13 @@
 
         ev.stopPropagation();
       },
+      // Show Audits
       "li.audit-tab click" : function(el, ev) {
         this.element.find('li.task-tab').removeClass('active');
         this.element.find('ul.inline-task-filter').hide();
         this.element.find('ul.task-tree').hide();
+        this.element.find('li.workflow-tab').removeClass('active');
+        this.element.find('.workflow-wrap-main').hide();
 
         el.addClass('active');
 
@@ -233,10 +236,24 @@
         }
         ev.stopPropagation();
       },
-      // Show tasks
+      // Show Workflows
+      "li.workflow-tab click" : function(el, ev) {
+        this.element.find('li.task-tab').removeClass('active');
+        this.element.find('ul.inline-task-filter').hide();
+        this.element.find('ul.task-tree').hide();
+        this.element.find('li.audit-tab').removeClass('active');
+        this.element.find('ul.audit-tree').hide();
+
+        el.addClass('active');
+        this.element.find('.workflow-wrap-main').show();
+        ev.stopPropagation();
+      },
+      // Show Tasks
       "li.task-tab click" : function(el, ev) {
         this.element.find('li.audit-tab').removeClass('active');
         this.element.find('ul.audit-tree').hide();
+        this.element.find('li.workflow-tab').removeClass('active');
+        this.element.find('.workflow-wrap-main').hide();
 
         el.addClass('active');
         this.element.find('ul.inline-task-filter').show();

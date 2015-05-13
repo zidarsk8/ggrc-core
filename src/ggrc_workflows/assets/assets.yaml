@@ -14,6 +14,7 @@ dashboard-js-spec-files:
 
 dashboard-js-template-files:
   - base_objects/task_group_subtree_footer.mustache
+  - base_objects/task_group_subtree_add_item.mustache
   - base_objects/task_group_subtree.mustache
   - base_objects/approval_link.mustache
   - cycles/tree.mustache
@@ -21,6 +22,7 @@ dashboard-js-template-files:
   - cycles/info.mustache
   - cycle_task_entries/tree.mustache
   - cycle_task_entries/tree_footer.mustache
+  - cycle_task_entries/tree_add_item.mustache
   - cycle_task_entries/modal_content.mustache
   - cycle_task_entries/documents.mustache
   - cycle_task_entries/documents_footer.mustache
@@ -32,6 +34,7 @@ dashboard-js-template-files:
   - cycle_task_group_object_tasks/tree.mustache
   - cycle_task_group_object_tasks/modal_content.mustache
   - cycle_task_group_object_tasks/tree_footer.mustache
+  - cycle_task_group_object_tasks/tree_add_item.mustache
   - cycle_task_group_object_tasks/tree_header.mustache
   - dashboard/lhn_workflows.mustache
   - dashboard/widgets.mustache
@@ -43,6 +46,7 @@ dashboard-js-template-files:
   - dashboard/info/errors.mustache
   - tasks/modal_content.mustache
   - tasks/tree_footer.mustache
+  - tasks/tree_add_item.mustache
   - tasks/info.mustache
   - tasks/extended_info.mustache
   - tasks/tree.mustache
@@ -51,9 +55,11 @@ dashboard-js-template-files:
   - task_groups/modal_content.mustache
   - task_groups/tree.mustache
   - task_groups/tree_footer.mustache
+  - task_groups/tree_add_item.mustache
   - task_groups/tree_header.mustache
   - task_group_tasks/modal_content.mustache
   - task_group_tasks/task_group_subtree_footer.mustache
+  - task_group_tasks/task_group_subtree_add_item.mustache
   - task_group_tasks/task_group_subtree.mustache
   - workflows/confirm_start.mustache
   - workflows/confirm_start_buttons.mustache
@@ -72,6 +78,7 @@ dashboard-js-template-files:
   - selectors/multitype_multiselect_base_modal.mustache
   - selectors/multitype_multiselect_option_column.mustache
   - selectors/multitype_multiselect_option_items.mustache
+  - wf_people/tree_add_item.mustache
   - wf_people/tree_footer.mustache
   - wf_people/people_items.mustache
   - task_groups/tier2_content.mustache

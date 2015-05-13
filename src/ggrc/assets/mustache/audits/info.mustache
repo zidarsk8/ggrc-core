@@ -28,6 +28,9 @@
             </a>
           </li>
           {{/is_info_pin}}
+          <li>
+            <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+          </li>
           {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
             <li>
             {{! FIXME: Better way to get the Audit link }}

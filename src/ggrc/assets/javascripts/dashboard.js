@@ -119,6 +119,10 @@ jQuery(function($) {
       file_select_elem = 'form.import input[type=file]';
 
   function onSubmitClick(ev){
+    if (typeof ev !== "object") {
+      // sometimes browser triggers submit, not the user -> ignore
+      return;
+    }
     if ($(this).hasClass('disabled') || $(file_select_elem).val() === "") {
       ev && ev.preventDefault();
     }
@@ -339,19 +343,32 @@ jQuery(function($) {
     ev.stopPropagation();
   });
 
-  $('body').on('click', 'input[name=notifications]', function(ev, el){
+  $('body').on('click', 'input[name=notifications]', function (ev, el) {
     var li = $(ev.target).closest('.notify-wrap'),
-        inputs = li.find('input'),
-        active = [];
+        inputs = li.find('input'), active = [],
+        email_now  = li.find('input[value="Email_Now"]'),
+        email_now_label = email_now.closest('label'),
+        email_digest =  li.find('input[value="Email_Digest"]');
+
+    if (email_digest[0].checked) {
+        email_now_label.removeClass('disabled');
+        email_now.prop('disabled', false);
+    } else if (!email_digest[0].checked) {//uncheck email_now
+        email_now.prop('checked', false);
+        email_now_label.addClass('disabled');
+    }
 
     inputs.prop('disabled', true);
-    active = $.map(inputs, function(input){
-      if(input.checked){
+    active = $.map(inputs, function (input) {
+      if (input.checked) {
         return input.value;
       }
     });
-    CMS.Models.NotificationConfig.setActive(active).always(function(response){
-      inputs.prop('disabled', false);
+    CMS.Models.NotificationConfig.setActive(active).always(function (response) {
+      email_digest.prop('disabled', false);
+      if (email_digest[0].checked) {
+        email_now.prop('disabled', false);
+      }
     });
   });
 
@@ -402,7 +419,6 @@ function resize_areas(event, target_info_pin_height) {
   ,   $lhsHolder
   ,   $area
   ,   $header
-  ,   $headerBar
   ,   $footer
   ,   $topNav
   ,   $innerNav
@@ -426,7 +442,6 @@ function resize_areas(event, target_info_pin_height) {
   $lhsHolder = $(".lhs-holder");
   $footer = $(".footer");
   $header = $(".header-content");
-  $headerBar = $(".header-bar");
   $innerNav = $(".inner-nav");
   $objectArea = $(".object-area");
   $topNav = $(".top-inner-nav");
@@ -436,7 +451,7 @@ function resize_areas(event, target_info_pin_height) {
 
   winHeight = $window.height();
   winWidth = $window.width();
-  lhsHeight = winHeight - 220; //new ui
+  lhsHeight = winHeight - 180; //new ui
   footerMargin = lhsHeight + 130; //new UI
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
@@ -462,7 +477,7 @@ function resize_areas(event, target_info_pin_height) {
               ? Number($topNav.css("top").replace("px", ""))
               : 0;
 
-      if (nav_pos < $header.height()+$headerBar.height()) {
+      if (nav_pos < $header.height()) {
           height -= $topNav.height();
       }
 
@@ -484,7 +499,7 @@ function resize_areas(event, target_info_pin_height) {
 
           // the 5 gives user peace of mind they've reached bottom
           UIHeight = [$topNav.height(), $header.height(),
-                      $headerBar.height(), $footer.height(),
+                      $footer.height(),
                       margins, pin_height, 5]
               .reduce(function (m, h) { return m+h; }, 0);
 
@@ -565,56 +580,6 @@ jQuery(function($) {
       ;
     $this.hide();
     $descField.removeClass('short');
-  });
-
-  // activate widget from object nav
-
-  $('body').on('mouseenter', 'ul.internav li a', function(e) {
-    var $this = $(this)
-    ,   $widgetID = $this.attr("href")
-    ,   $targetWidget = $($widgetID)
-    ;
-
-    if( ! $targetWidget.hasClass("widget-active") ) {
-      $targetWidget.addClass("widget-active");
-    }
-  });
-
-  $('body').on('mouseleave', 'ul.internav li a', function(e) {
-    var $this = $(this)
-    ,   $widgetID = $this.attr("href")
-    ,   $targetWidget = $($widgetID)
-    ,   control
-    ;
-
-    if( $targetWidget.hasClass("widget-active")
-      && (control = $('.cms_controllers_inner_nav').control('inner_nav'))
-      && control.options.contexts.attr('active_widget.selector') !== $widgetID
-    ) {
-      $targetWidget.removeClass("widget-active");
-    }
-  });
-
-  $('body').on('mouseenter', '.widget', function(e) {
-    var $this = $(this)
-    ,   $navitem = $('[href=#' + $this.attr('id') + ']').closest('li')
-    ;
-    if( ! $this.hasClass("widget-active") ) {
-      $this.addClass("widget-active");
-      var inner_nav = $('.cms_controllers_inner_nav').control('inner_nav');
-      if (inner_nav) {
-        inner_nav.show_active_widget('#' + $this.attr('id'));
-      }
-    }
-  });
-
-  $('body').on('deactivate', '.widget', function(e) {
-    var $this = $(this)
-    ,   $navitem = $('[href=#' + $this.attr('id') + ']').closest('li')
-    ;
-    if( $this.hasClass("widget-active") ) {
-      $this.removeClass("widget-active");
-    }
   });
 
   // show/hide audit lead and firm
