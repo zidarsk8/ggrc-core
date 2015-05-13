@@ -15,6 +15,7 @@ from ggrc_workflows.models import (
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
 from ggrc.utils import merge_dicts
+from copy import deepcopy
 
 
 """
@@ -53,7 +54,7 @@ def get_cycle_created_task_data(notification):
           },
           "cycle_started": {
               cycle.id: {
-                  "my_tasks": task
+                  "my_tasks": deepcopy(task)
               }
           }
       }
@@ -67,7 +68,7 @@ def get_cycle_created_task_data(notification):
           "cycle_started": {
               cycle.id: {
                   "my_task_groups": {
-                      cycle_task_group.id: task
+                      cycle_task_group.id: deepcopy(task)
                   }
               }
           }
@@ -82,7 +83,7 @@ def get_cycle_created_task_data(notification):
             },
             "cycle_started": {
                 cycle.id: {
-                    "cycle_tasks": task
+                    "cycle_tasks": deepcopy(task)
                 }
             }
         }
