@@ -25,6 +25,10 @@ from . import db
 db.app = app
 db.init_app(app)
 
+if hasattr(settings, "FLASK_DEBUGTOOLBAR") and settings.FLASK_DEBUGTOOLBAR:
+  from flask_debugtoolbar import DebugToolbarExtension
+  toolbar = DebugToolbarExtension(app)
+
 
 # Ensure `db.session` is correctly removed
 #   (Reason: Occasionally requests are terminated without calling the teardown

@@ -113,12 +113,12 @@ can.Model.Mixin("contactable", {
 }, {
   before_create : function() {
     if (!this.contact) {
-      this.attr('contact', { id: GGRC.current_user.id, type : "Person" });
+      this.attr("contact", { id: GGRC.current_user.id, type : "Person" });
     }
   }
   , form_preload : function(new_object_form) {
     if (new_object_form && !this.contact) {
-      this.attr('contact', { id: GGRC.current_user.id, type : "Person" });
+      this.attr("contact", { id: GGRC.current_user.id, type : "Person" });
     }
   }
 });

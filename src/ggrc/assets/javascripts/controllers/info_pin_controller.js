@@ -49,8 +49,12 @@ can.Control("CMS.Controllers.InfoPin", {
       }
     });
   },
+  hideInstance: function () {
+    this.element.stop(true);
+    this.element.height(0).html("");
+    $(window).trigger("resize");
+  },
   unsetInstance: function () {
-    // Stop the animation and clear the queue:
     this.element.stop(true);
     this.element.animate({
         height: 0
@@ -73,7 +77,8 @@ can.Control("CMS.Controllers.InfoPin", {
       model: instance.class,
       is_info_pin: true,
       options: options,
-      result: options.result
+      result: options.result,
+      page_instance: GGRC.page_instance()
     }));
 
     // Load trees inside info pin

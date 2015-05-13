@@ -16,18 +16,7 @@
     </div>
     {{/is_info_pin}}
 
-    {{#is_allowed 'update' instance context='for'}}
-      <div class="details-wrap">
-        <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-          {{> /static/mustache/base_objects/dropdown_menu.mustache}}
-
-          {{#is_parent_of_type 'Policy,Regulation,Standard'}}
-              {{> /static/mustache/base_objects/create_objective_dropdown_option.mustache}}
-          {{/is_parent_of_type}}
-        </ul>
-      </div>
-    {{/is_allowed}}
+    {{> /static/mustache/sections/dropdown_menu.mustache}}
 
     {{^is_info_pin}}
       {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}

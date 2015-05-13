@@ -15,7 +15,6 @@ permissions = {
         "ObjectSection",
         "Program",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "UserRole",
         "Context",
@@ -26,7 +25,6 @@ permissions = {
         "ObjectPerson",
         "ObjectSection",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "UserRole",
         "Audit",
@@ -41,7 +39,6 @@ permissions = {
         "ObjectSection",
         "Program",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "UserRole"
     ],
@@ -52,7 +49,6 @@ permissions = {
         "ObjectSection",
         "Program",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "UserRole",
     ]

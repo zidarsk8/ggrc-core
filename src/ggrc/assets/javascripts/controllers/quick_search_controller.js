@@ -209,9 +209,6 @@ can.Control("CMS.Controllers.LHN", {
         self.options.display_prefs.setLHNState({ "panel_scroll" : this.scrollTop });
       });
       this.element.find(".lhs-holder").on("scroll", self.lhs_holder_onscroll);
-
-      // this is ugly, but the trigger doesn't nest inside our top element
-      $(".lhn-trigger").on("click", this.animate_lhn.bind(this));
     }
 
   , should_show_lhn: function() {
@@ -246,8 +243,26 @@ can.Control("CMS.Controllers.LHN", {
   }
 
   , ".widgetsearch keyup": function(el, ev) {
-      el.toggleClass("active", el.val().trim().length);
+      this.toggle_filter_active();
     }
+
+  , toggle_filter_active: function () {
+      // Set active state to search field if the input is not empty:
+      var $filter = this.element.find('.widgetsearch'),
+          $off = this.element.find('.filter-off'),
+          got_filter = !!$filter.val().trim().length;
+
+      $filter.toggleClass("active", got_filter);
+      $off.toggleClass("active", got_filter);
+  }
+
+  , ".filter-off a click": function (el, ev) {
+    ev.preventDefault();
+
+    this.element.find('.widgetsearch').val('');
+    this.toggle_filter_active();
+    this.do_search('');
+  }
 
   , "a[data-name='work_type'] click": function(el, ev) {
       var target = $(ev.target),
@@ -260,7 +275,7 @@ can.Control("CMS.Controllers.LHN", {
       this.set_active_tab(checked);
     }
 
-  , animate_lhn: function (ev) {
+  , toggle_lhn: function (ev) {
       ev && ev.preventDefault();
       var is_open = this.is_lhn_open();
 
@@ -374,10 +389,8 @@ can.Control("CMS.Controllers.LHN", {
           } else {
             this.initial_scroll();
           }
-          // Set active state to search field if the input is not empty:
-          this.element.find('.widgetsearch').filter(function() {
-            return this.value;
-          }).addClass('active');
+          
+          this.toggle_filter_active();
 
           if (this.options.display_prefs.getLHNState().is_pinned) {
             this.pin();
@@ -397,10 +410,13 @@ can.Control("CMS.Controllers.LHN", {
   // requestAnimationFrame takes browser render optimizations into account
   // it ain't pretty, but it works
   , initial_lhn_render: function (try_count) {
-    if (!$(".lhs-holder").size()) {
+    if (!$(".lhs-holder").size() || !$(".lhn-trigger").size()) {
       window.requestAnimationFrame(this.initial_lhn_render.bind(this));
       return;
     }
+
+    // this is ugly, but the trigger doesn't nest inside our top element
+    $(".lhn-trigger").on("click", this.toggle_lhn.bind(this));
 
     this.resize_lhn();
 

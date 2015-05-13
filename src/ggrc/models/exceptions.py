@@ -15,6 +15,8 @@ def field_lookup(field_string):
         bad_field = 'title'
     elif field_string.endswith('email'):
         bad_field = 'email'
+    elif field_string.endswith('title'):
+        bad_field = 'title'
     return output_format.format(bad_field)
 
 def translate_message(exception):
@@ -22,6 +24,7 @@ def translate_message(exception):
   Translates db exceptions to something a user can understand.
   """
   message = exception.message
+
   if isinstance(exception, IntegrityError):
     # TODO: Handle not null, foreign key errors, uniqueness errors with compound keys
     duplicate_entry_pattern = re.compile(r'\(1062, u?"Duplicate entry (\'.*\') for key \'([^\']*)\'')

@@ -758,6 +758,11 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
 
+Mustache.registerHelper("get_permalink", function () {
+  return window.location.href;
+});
+
+
 Mustache.registerHelper("schemed_url", function (url) {
   var domain, max_label, url_split;
 
@@ -1859,8 +1864,8 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
   }
 });
 
-Mustache.registerHelper('last_approved', function (instance, options) {
-  var loader = instance.get_binding('approval_tasks'),
+Mustache.registerHelper("last_approved", function (instance, options) {
+  var loader = instance.get_binding("approval_tasks"),
       frame = new can.Observe();
 
   frame.attr(instance, loader.list);
@@ -1876,16 +1881,13 @@ Mustache.registerHelper('last_approved', function (instance, options) {
       });
     }
     item = item ? item[0] : list[0];
-    if (item) {
-      options.contexts.add(item);
-    }
-    return options.fn(options.contexts);
+    return options.fn(item ? item : options.contexts);
   }
   function fail(error) {
     return options.inverse(options.contexts.add({error: error}));
   }
 
-  return defer_render('span', { done : finish, fail : fail }, loader.refresh_instances());
+  return defer_render("span", {done: finish, fail: fail}, loader.refresh_instances());
 });
 
 Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
@@ -1924,7 +1926,7 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
     // Mark the title to be populated when computed_program is defined,
     // returning an empty string here would disable the save button.
     instance.attr('title', '');
-    instance.attr('_transient.default_title', instance.title);
+    instance.attr('_transient', {default_title: instance.title});
     return;
   }
   if (instance._transient.default_title !== instance.title) {
@@ -1941,7 +1943,7 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
       index = result.getCountFor('Audit') + 1;
       title = title + ' ' + index;
       instance.attr('title', title);
-      instance.attr('_transient.default_title', instance.title);
+      instance.attr('_transient', {default_title: instance.title});
     });
   });
 });
@@ -2428,7 +2430,7 @@ can.each({
                        }).then(function(user_role_bindings) {
                           var rq = new RefreshQueue();
                           can.each(user_role_bindings, function(urb) {
-                            if(urb.instance.person.id === GGRC.current_user.id) {
+                            if(urb.instance.person && urb.instance.person.id === GGRC.current_user.id) {
                               rq.enqueue(urb.instance.role.reify());
                             }
                           });
@@ -2999,6 +3001,60 @@ Mustache.registerHelper("if_less", function (a, b, options) {
   }
 });
 
+
+/*
+  Used to get the string value for default attributes
+  This doesn't work for nested object reference
+*/
+Mustache.registerHelper("get_default_attr_value", function (attr_name, instance) {
+  instance = Mustache.resolve(instance);
+  attr_name = Mustache.resolve(attr_name);
+
+  if (instance[attr_name]) {
+    if (['slug', 'status', 'url', 'reference_url', 'kind'].indexOf(attr_name) !== -1) {
+      return instance[attr_name];
+    }
+    if (['start_date', 'end_date', 'updated_at'].indexOf(attr_name) !== -1) {
+      //convert to localize date
+      return moment(instance[attr_name]).format('MM/DD/YYYY');
+    }
+  }
+
+  return '';
+});
+/*
+  Used to get the string value for custom attributes
+*/
+Mustache.registerHelper('get_custom_attr_value', function (attr_info, instance) {
+  var ins, atr, attr_name, value = '';
+
+  ins = Mustache.resolve(instance);
+  atr = Mustache.resolve(attr_info);
+  attr_name = atr.attr_name;
+
+  if (ins.custom_attribute_definitions && ins.custom_attribute_definitions.length) {
+    var current_id = 0;
+    //find the id for the attr_name
+    can.each(ins.custom_attribute_definitions, function (def) {
+      if (def.title === attr_name) {
+        current_id = def.id;
+        return false;
+      }
+    });
+    //go to the ins.custom_attribute_values, if id == id then return the value
+    if (current_id) {
+      can.each(ins.custom_attribute_values, function (item) {
+        item = item.reify();
+        if (item.custom_attribute_id === current_id) {
+          value = item.attribute_value;
+        }
+      });
+    }
+  }
+
+  return value;
+});
+
 Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   instance = Mustache.resolve(instance);
 
@@ -3019,6 +3075,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
     program: {title: program.title, id: program.id, type: program.type},
     control: {title: control.title, id: control.id, type: control.type},
     control_assessment: {title: instance.title, id: instance.id, type: instance.type},
+    audit_object: {title: instance.title, id: instance.id, type: instance.type},
   };
 
   return options.fn(options.contexts.add({'create_issue_json': JSON.stringify(json)}));

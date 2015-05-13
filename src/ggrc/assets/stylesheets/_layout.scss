@@ -15,10 +15,10 @@
 
 .lhs-holder {
   position: fixed;
-  top: 176px;
+  top: 128px;
   left: -240px;
   width: 240px;
-  height: 500px;
+  height: 548px;
   overflow-y: auto;
   background: $white;
   &.active {
@@ -28,7 +28,7 @@
 
 .lhn-type {
   position: fixed;
-  top: 142px;
+  top: 94px;
   left: -246px;
   &.active {
     @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
@@ -42,7 +42,7 @@
   height:47px;
   line-height:47px;
   position:fixed;
-  top: 48px;
+  top: 0;
   width:100%;
   border-bottom: 1px solid $headerBorder;
 }
@@ -52,15 +52,15 @@
   height: 29px;
   position: fixed;
   z-index: 1;
-  top: 96px;
+  top: 48px;
   background: $tabBgnd;
 }
 .object-area {
   position:fixed;
-  top: 126px;
+  top: 78px;
   overflow-y:auto;
   overflow-x:hidden;
-  height:445px;
+  height: 493px;
   padding-top: 20px;
   background: $contentBgnd;
   &.import-area {

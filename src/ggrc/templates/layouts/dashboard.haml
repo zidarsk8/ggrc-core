@@ -15,88 +15,11 @@
 
 -block body
   %header.header.main
-    .header-bar
-      .container-fluid
-        .row-fluid
-          .span12
-            %button{ 'class': 'lhn-trigger pull-left', 'href': 'javascript://'}
-              %span.icon-bar
-              %span.icon-bar
-              %span.icon-bar
-            .logo.pull-left
-              %h2
-                %a{ 'class': 'to-my-work', 'href': '/dashboard' }
-                  -set logo_url = config.get("COMPANY_LOGO")
-                  -set logo_text = config.get("COMPANY_LOGO_TEXT")
-                  -if logo_url
-                    %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
-                  -elif logo_text != None
-                    =logo_text
-                  -else
-                    Google GRC
-            %ul.menu
-              %li
-                %a{ 'href': 'javascript://', 'data-toggle': 'multitype-search-modal-selector', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
-                  %i.grcicon-search
-                  %span
-                    Search
-              %li
-                %a#page-help{ 'href': "/dashboard#task_widget" }
-                  %i.grcicon-task-black
-                  %span
-                    My Tasks
-                    %span.task-count
-              %li.user.dropdown
-                %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
-                  %i.grcicon-user-black
-                  %span
-                    =current_user.email
-                  %i.grcicon-carot
-                %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
-                  %li
-                    %a{'href': "/dashboard"}
-                      %i.grcicon-my-work
-                      My Work ({{current_user.system_wide_role}})
-                  -if permissions.is_allowed_read('/admin', 1)
-                    %li
-                      %a{'href': "/admin#people_list_widget"}
-                        %i.grcicon-dashboard-black
-                        Admin Dashboard
-                  %li.notify-wrap
-                    %span
-                      %i.grcicon-alarm-black
-                      Notifications
-                    %div.inner-list
-                      %label
-                        %input{
-                          'type': 'checkbox',
-                          'name': 'notifications',
-                          'value': 'Email_Now'
-                        }
-                        Real-time email updates
-                      %label
-                        %input{
-                          'type': 'checkbox',
-                          'name': 'notifications',
-                          'value': 'Email_Digest'
-                        }
-                        Daily email digest
-                  %li
-                    %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
-                      %i.grcicon-logout-black
-                      Logout
-              %li
-                %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
-                  %i.grcicon-help-black
-                  %span
-                    Help
   .area{ 'class': '={ model_display_class }' }
     .header-content
       .row-fluid
         #page-header.span12
           -block header
-        -# .span3
-          -block subheader_extras
 
     .top-inner-nav
       .object-nav

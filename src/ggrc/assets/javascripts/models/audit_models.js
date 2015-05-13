@@ -79,13 +79,24 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , defaults : {
     status : "Draft",
-    object_type: "Control"
+    object_type: "ControlAssessment"
   }
   , obj_nav_options: {
     show_all_tabs: true,
   }
   , tree_view_options : {
     header_view : GGRC.mustache_path + "/audits/tree_header.mustache"
+    , attr_list : [
+      {attr_title: 'Title', attr_name: 'title'},
+      {attr_title: 'Audit Lead', attr_name: 'audit_lead'},
+      {attr_title: 'Code', attr_name: 'slug'},
+      {attr_title: 'Status', attr_name: 'status'},
+      {attr_title: 'Last Updated', attr_name: 'updated_at'},
+      {attr_title: 'Start Date', attr_name: 'start_date'},
+      {attr_title: 'End Date', attr_name: 'end_date'},
+      {attr_title: 'Report Period', attr_name: 'report_period'},
+      {attr_title: 'Audit Firm', attr_name: 'audit_firm'}
+    ]
     , draw_children : true
     , child_options : [{
       model : "Request"
@@ -263,11 +274,17 @@ can.Model.Mixin("requestorable", {
 });
 
 can.Model.Cacheable("CMS.Models.Request", {
-  root_object : "request"
-  , filter_keys : ["assignee", "code", "company", "control",
-                   "due date", "due", "name", "notes", "request",
-                   "requested on", "status", "test", "title"]
-  , root_collection : "requests"
+  root_object : "request",
+  filter_keys : ["assignee", "code", "company", "control",
+                 "due date", "due", "name", "notes", "request",
+                 "requested on", "status", "test", "title", "request_type",
+                 "type", "request type", "due_on"
+  ],
+  filter_mappings: {
+    "type": "request_type",
+    "request type": "request_type"
+  },
+  root_collection : "requests"
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
@@ -291,6 +308,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
     , header_view : GGRC.mustache_path + "/requests/tree_header.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+    , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
     , draw_children : true
     , child_options : [{
       model : "Response"
@@ -373,7 +391,7 @@ can.Model.Cacheable("CMS.Models.Request", {
         matching_objs;
     if(that.audit_object
        && (!that.audit_object_object
-           || that.audit_object.reify().auditable.id !== that.audit_object_object.id
+           || that.audit_object.reify().auditable.id === that.audit_object_object.id
     )) {
       return;
     }
@@ -406,28 +424,27 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
     }
   }
-  , get_filter_vals: function(){
+  , get_filter_vals: function () {
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
-        mappings = jQuery.extend({}, this.class.filter_mappings, {
-          'title': 'description',
-          'state': 'status',
-          'due date': 'due_on',
-          'due': 'due_on'
+        mappings = $.extend({}, this.class.filter_mappings, {
+          "title": "description",
+          "state": "status",
+          "due date": "due_on",
+          "due": "due_on"
         }),
-        keys = this.class.filter_keys.concat([
-          'state'
-        ]),
-        vals = filter_vals.apply(this, [keys, mappings]);
+        keys, vals;
+
+    keys = _.union(this.class.filter_keys, ["state"], _.keys(mappings));
+    vals = filter_vals.call(this, keys, mappings);
 
     try {
-      vals['due'] = moment(vals['due']).format("YYYY-MM-DD");
-      vals['due date'] = vals['due'];
+      vals["due_on"] = moment(this["due_on"]).format("YYYY-MM-DD");
+      vals["due"] = vals["due date"] = vals["due_on"];
       if (this.assignee){
-        vals['assignee'] = filter_vals.apply(this.assignee.reify(), []);
+        vals["assignee"] = filter_vals.apply(this.assignee.reify(), []);
       }
-      vals['control'] = this.audit_object.reify().auditable.reify().title;
+      vals["control"] = this.audit_object.reify().auditable.reify().title;
     } catch (e) {}
-
     return vals;
   }
 
@@ -522,6 +539,7 @@ can.Model.Cacheable("CMS.Models.Response", {
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/responses/tree.mustache"
     , footer_view : GGRC.mustache_path + "/responses/tree_footer.mustache"
+    , add_item_view : GGRC.mustache_path + "/responses/tree_add_item.mustache"
     , draw_children : true
     , child_options : [{
       //0: mapped objects
@@ -529,6 +547,7 @@ can.Model.Cacheable("CMS.Models.Response", {
       , model : can.Model.Cacheable
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , allow_mapping : false
       , allow_creating: false
       , exclude_option_types : function() {
@@ -551,6 +570,7 @@ can.Model.Cacheable("CMS.Models.Response", {
       , mapping : "people"
       , show_view : GGRC.mustache_path + "/people/tree.mustache"
       , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
+      , add_item_view : GGRC.mustache_path + "/people/tree_add_item.mustache"
       , allow_mapping: false
       , allow_creating: false
     }, {
@@ -559,6 +579,7 @@ can.Model.Cacheable("CMS.Models.Response", {
       , mapping : "meetings"
       , show_view : GGRC.mustache_path + "/meetings/tree.mustache"
       , footer_view : GGRC.mustache_path + "/meetings/tree_footer.mustache"
+      , add_item_view : GGRC.mustache_path + "/meeting/tree_add_item.mustache"
       , allow_mapping: false
       , allow_creating: false
     }]
@@ -744,9 +765,14 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
     this.validateNonBlank("title");
   }
 }, {
-  object_model: can.compute(function() {
-    return CMS.Models[this.attr("object_type")];
-  }),
+  form_preload : function(new_object_form) {
+    var page_instance = GGRC.page_instance();
+    if(new_object_form && page_instance && page_instance.type === 'Audit') {
+      if (!this.audit) {
+        this.attr('audit', page_instance);
+      }
+    }
+  }
 });
 
 })(this.can);

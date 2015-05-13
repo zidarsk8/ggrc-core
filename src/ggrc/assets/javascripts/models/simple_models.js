@@ -51,9 +51,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , objectives : "CMS.Models.Objective.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
-    , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directives : "CMS.Models.Directive.stubs"
-    , program_controls : "CMS.Models.ProgramControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , audits : "CMS.Models.Audit.stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
@@ -61,15 +59,17 @@ can.Model.Cacheable("CMS.Models.Program", {
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/programs/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+    , attr_list : can.Model.Cacheable.attr_list.concat([
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
+    ])
+    , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     }
   , links_to : {
-    "Regulation" : "ProgramDirective"
-    , "Policy" : "ProgramDirective"
-    , "Contract" : "ProgramDirective"
-    , "Standard" : "ProgramDirective"
-    , "System" : {}
+    "System" : {}
     , "Process" : {}
-    , "Control" : "ProgramControl"
     , "Product" : {}
     , "Facility" : {}
     , "OrgGroup" : {}
@@ -145,6 +145,11 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/objectives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/objectives/tree_footer.mustache"
+    , attr_list : can.Model.Cacheable.attr_list.concat([
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'}
+    ])
+    , add_item_view : GGRC.mustache_path + "/objectives/tree_add_item.mustache"
     , create_link : true
     //, draw_children : true
     , start_expanded : false
@@ -152,6 +157,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
         model : can.Model.Cacheable
       , mapping : "related_and_able_objects"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+      , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
     }]

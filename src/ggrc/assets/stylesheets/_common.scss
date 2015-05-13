@@ -15,30 +15,29 @@ h1 {
   @extend %oneline;
   color: $headerTitle;
   font-size: 24px;
-  line-height: 48px;
+  line-height: 47px;
   height: 47px;
   font-family: $fontTitle;
   font-weight: normal;
+  width: 40%;
+  float: left;
   position: relative;
-  .title-prev {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 1000;
+  .lhn-trigger {
+    float: left;
   }
-  .title-slide {
+  .title-content {
     @extend %oneline;
-    position: absolute;
-    left: 39px;
-    top: 0;
-    z-index: 9999;
-    background: $white;
     width: 85%;
+    float: left;
   }
   .right-side {
     position: absolute;
     right: 104px;
     top: 0;
+    text-align: right;
+  }
+  .child-title-content {
+    float: right;
     text-align: right;
   }
 }
@@ -847,6 +846,7 @@ select.multiple-selector {
     font-size: 44px;
     font-weight: normal;
     line-height: 1.5em;
+    width: 100%;
   }
   h2 {
     text-align:center;
@@ -958,13 +958,18 @@ p {
   padding-right: 4px;
   margin-left: 10px;
   a {
-    .grcicon-to-right {
+    display: inline-block;
+    line-height: 16px;
+    i {
       @include opacity(0.25);
       @include transition(opacity 0.2s ease);
-      margin-top: 6px;
+      ul.new-tree & {
+        margin-top: 0;
+      }
     }
     &:hover {
-      .grcicon-to-right {
+      text-decoration: none;
+      i {
         @include opacity(1);
       }
     }
@@ -1116,6 +1121,23 @@ p {
     }
     li {
       margin-bottom: 20px;
+    }
+  }
+  .btn {
+    display: inline-block;
+    text-transform: none;
+    color: $white;
+    font-weight: bold;
+  }
+  .close-dropdown {
+    padding: 0;
+    margin-right: -10px;
+    @include opacity(.3);
+    @include transition(opacity 0.2s ease);
+    cursor: pointer;
+    &:hover {
+      text-decoration: none;
+      @include opacity(1);
     }
   }
 }
