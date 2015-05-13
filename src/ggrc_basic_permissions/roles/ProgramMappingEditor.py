@@ -12,8 +12,6 @@ permissions = {
         "ObjectPerson",
         "ObjectSection",
         "Program",
-        "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "ObjectFolder",
         "UserRole",
@@ -24,8 +22,6 @@ permissions = {
         "ObjectObjective",
         "ObjectPerson",
         "ObjectSection",
-        "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "ObjectFolder"
     ],
@@ -37,8 +33,6 @@ permissions = {
         "ObjectObjective",
         "ObjectPerson",
         "ObjectSection",
-        "ProgramControl",
-        "ProgramDirective",
         "Relationship"
     ],
     "delete": [
@@ -46,8 +40,6 @@ permissions = {
         "ObjectObjective",
         "ObjectPerson",
         "ObjectSection",
-        "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "ObjectFolder"
     ]

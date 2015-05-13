@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from .base import *
 from ggrc.models import (
-    Directive, Policy, Regulation, Contract, Standard, Program, DirectiveControl, ProgramControl
+    Directive, Policy, Regulation, Contract, Standard, Program, DirectiveControl
 )
 from ggrc.models.mixins import BusinessObject
 from .base_row import *
@@ -79,12 +79,6 @@ class ControlRowConverter(BaseRowConverter):
         if program_control.program_id == program_id:
           return
       program = Program.query.get(program_id)
-      if program:
-          db_session.add(ProgramControl(
-              program=program,
-              context_id=program.context_id,
-              control=self.obj
-          ))
 
 class ControlsConverter(BaseConverter):
 
@@ -166,4 +160,3 @@ class ControlsConverter(BaseConverter):
     yield[]
     yield[]
     yield self.object_map.keys()
-

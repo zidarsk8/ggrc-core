@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+cd "${SCRIPTPATH}/../src"
 mysql -uroot -proot -e "DROP DATABASE IF EXISTS ggrcdevtest; CREATE DATABASE ggrcdevtest; USE ggrcdevtest;"
 export GGRC_SETTINGS_MODULE="testing ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development"
 db_migrate
 
-SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
-
-cd "${SCRIPTPATH}/../src"
-sniffer -x tests -x--logging-clear-handlers
+nosetests tests --logging-clear-handlers ${@:1}
