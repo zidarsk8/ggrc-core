@@ -6,7 +6,7 @@
  */
 
 // defaults
-  
+
   $default-border-radius: 4px;
   $topBorderRadius: 4px 4px 0 0;
   $bottomBorderRadius: 0 0 4px 4px;
@@ -14,7 +14,7 @@
 // colors
 
   // font-sizes
-  
+
     $f-regular:90%; // equals 16px ?????
     $f-medium:85%;
     $f-small:75%;
@@ -29,7 +29,7 @@
     $filterBgnd: #bebebe;
       // widget info
       $infoWidgetHeader: #111;
-      
+
 
   // texts
     $darkText:#333; // WCAG AAA
@@ -56,25 +56,25 @@
     $midGray: #aaa;
     $textGray: #757575;
     $defaultBlue: #2196f3;
-  
+
   // quick search
     $topBarSearchText: #bbbdc1;
     $topBarSearchBorder: #282a2c;
     $topBarSearchBgnd: #6a6b6d;
     $quickSearchOpen: #cbcbcb;
-  
+
   // modal
     $modalHeader: #0071cc;
     $modalHeaderBorder: #074fb2;
     $modalHeaderShadow: #9ac5ff;
     $modalDarkBlue: #0055cc;
     $modalLightBlue: #0088cc;
-    
+
   //popover
     $popOverHeaderBgnd: #f7f7f7;
     $popOverHeaderBorder: #ebebeb;
     $popOverBorder: #b0b0b0;
-    
+
   // PBC
     $btnGreen: #51a351;
     $btnOrange: #f9a732;
@@ -82,7 +82,7 @@
     $responsBorder: #cdecb4;
     $pbcListGray: #f0f0f0;
     $responsTitle: #333;
-  
+
   $headerBgnd: #f1f1f1;
   $headerBorder: #d9d9d9;
   $menuLink: #d7dce8;
@@ -132,7 +132,7 @@
   $programs: #512da8; // WCAG AAA
   $objectives: #2b8ccc;
   $controls: #243ea4;
-  
+
   // pbc requests color states
   $rqDraft: #f7f7f7;
   $rqAccepted: #d1fcb5;
@@ -142,7 +142,7 @@
   $rqAmmend: #ffffbe;
   $rqRespond: #cbeaff;
   $rqUpdate: #cbeaff;
-  
+
   $rqAssigned: #ffffbe;
   $rqSubmitted: #cbeaff;
 
@@ -232,7 +232,7 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
     padding:0;
     list-style:none;
   }
-  
+
   @mixin outline-fix() {
     outline:0;
   }
@@ -251,18 +251,18 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
       min-height:0;
     }
   }
-  
+
   @mixin input-block-level() {
     display: block;
     width: 100%;
     @include box-sizing(border-box);
     min-height: 28px;
   }
-  
+
   @mixin default-border-bottom() {
     border-bottom: 1px solid $lightGray;
   }
-  
+
   @mixin default-border-top() {
     border-top: 1px solid $lightGray;
   }
@@ -272,7 +272,7 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
     &:-moz-placeholder { @content; }
     &::-moz-placeholder { @content; }
     &:-ms-input-placeholder { @content; }
-    &::-webkit-input-placeholder { @content; } 
+    &::-webkit-input-placeholder { @content; }
   }
 
   @mixin btn-size($font: 16px, $l-height: 24px, $padding: 4px 14px) {
@@ -407,7 +407,7 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   background: $status-draft !important;
 }
 %status-declined {
-  background: $status-draft !important;
+  background: $yellow !important;
 }
 %status-planned {
   background: $status-draft !important;
@@ -457,7 +457,7 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: $status-draft;
 }
 %state-declined {
-  color: $status-draft;
+  color: $yellow;
 }
 %state-planned {
   color: $status-draft;
