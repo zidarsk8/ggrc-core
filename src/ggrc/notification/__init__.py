@@ -45,6 +45,7 @@ services = NotificationServices()
 def get_filter_data(notification):
   result = {}
   data = services.call_service(notification.object_type.name, notification)
+
   for user, user_data in data.iteritems():
     if should_receive(notification,
                       user_data["force_notifications"][notification.id],
@@ -101,10 +102,17 @@ def dispatch_notifications():
 
 def should_receive(notif, force_notif, person_id, nightly_cron=True):
   def is_enabled(notif_type):
-    return NotificationConfig.query.filter(
+    result = NotificationConfig.query.filter(
         and_(NotificationConfig.person_id == person_id,
-             NotificationConfig.enable_flag == True,  # noqa
-             NotificationConfig.notif_type == notif_type)).count() > 0
+             NotificationConfig.notif_type == notif_type))
+    # TODO: create_user function should make entries in the notification
+    # config table. The code below should not make sure we have default
+    # values for new users.
+    if result.count() == 0:
+      # If we have no results, we need to use the default value, which is
+      # true for digest emails.
+      return notif_type == "Email_Digest"
+    return result.one().enable_flag
 
   has_instant = force_notif or is_enabled("Email_Now")
   has_digest = has_instant or is_enabled("Email_Digest")
