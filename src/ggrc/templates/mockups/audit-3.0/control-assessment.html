@@ -13,127 +13,103 @@
 
 </head>
 <body>
-  <header class="header main">
-    <div class="header-bar">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span12">
-            <button class="lhn-trigger pull-left">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            <div class="logo pull-left">
-              <h2>
-                <a href="#my-work-widget" class='to-my-work'>Google GRC</a>
-              </h2>
-            </div>
-            <ul class="menu">
-              <li>
-                <a data-toggle="multitype-search-modal-selector" href="javascript://" data-original-title="search items" data-join-object-type="MultitypeSearch">
-                  <i class="grcicon-search"></i>
-                  <span>
-                    Search
-                  </span>
-                </a>
-              </li>
-              <li>
-                <a id="page-help" href="/dashboard#task_widget">
-                  <i class="grcicon-task-black"></i>
-                  <span>
-                    My Tasks
-                    <span class="task-count ggrc_controllers_mapping_count">
-                      <small class="count">&nbsp;12&nbsp;</small>
-                    </span>
-                  </span>
-                </a>
-              </li>
-              <li class="user dropdown">
-                <a class="dropdown-toggle" href="#" data-toggle="dropdown" role="button">
-                  <i class="grcicon-user-black"></i>
-                  <span>user@example.com</span>
-                  <i class="grcicon-carot"></i>
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                  <li>
-                    <a href="#my-work-widget" class="to-my-work">
-                      <i class="grcicon-dashboard-black"></i>
-                      My Work (gGRC Admin)
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/admin">
-                      <i class="grcicon-admin-black"></i>
-                      Admin Dashboard
-                    </a>
-                  </li>
-                  <li class="notify-wrap">
-                    <span>
-                      <i class="grcicon-alarm-black"></i>
-                      Notifications
-                    </span>
-                    <div class="inner-list">
-                      <label>
-                        <input type="checkbox" name="notify-digest">
-                        Email notifications
-                      </label>
-                      <label>
-                        <input type="checkbox" name="notify-digest" checked="checked">
-                        Daily email digest
-                      </label>
-                      <label>
-                        <input type="checkbox" name="notify-digest">
-                        Calendar notifications
-                      </label>
-                    </div>
-                  </li>
-                  <li>
-                    <a class="set-display-settings-default" href="#" tabindex="-1">
-                      <i class="grcicon-desktop-black"></i>
-                      Save Layout
-                    </a>
-                  </li>
-                  <li>
-                    <a class="clear-display-settings" href="#" tabindex="-1">
-                      <i class="grcicon-reset-black"></i>
-                      Reset Layout
-                    </a>
-                  </li>
-                  <li class="logout-wrap">
-                    <a href="#" tabindex="-1">
-                      <i class="grcicon-logout-black"></i>
-                      Logout
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <a id="page-help" href="javascript://" data-toggle="modal-ajax-helpform" data-help-slug="help">
-                  <i class="grcicon-help-black"></i>
-                  <span>Help</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
   <div class="area">
     <div class="header-content">
       <div class="row-fluid">
         <div id="page-header" class="span12">
           <h1 class="entities">
-            <span class="left-side">
+            <button class="lhn-trigger">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <span class="title-content">
               <i class="grciconlarge-audit"></i>
               Imagine all the people
+              <!--
+              <div class="pull-right">
+                <i class="grciconlarge-program"></i>
+                ISO 27005
+              </div>
+              -->
             </span>
-            <span class="right-side">
-              <i class="grciconlarge-program"></i>
-              ISO 27005
-            </span>
-            <a class="nav-trigger active" href="#"><i class="grciconlarge-nav-trigger" rel="tooltip" data-placement="left" title="Hide menu"></i></a>
           </h1>
+          <ul class="menu">
+            <li>
+              <a href="javascript://">
+                <i class="grcicon-search"></i>
+                <span>
+                  Search
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="/dashboard#task_widget">
+                <i class="grcicon-task-black"></i>
+                <span>
+                  My Tasks
+                  <span class="task-count">
+                    <small class="count">&nbsp;12&nbsp;</small>
+                  </span>
+                </span>
+              </a>
+            </li>
+            <li class="user user-dropdown dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                <i class="grcicon-user-black"></i>
+                <span>user@example.com</span>
+                <i class="grcicon-carot"></i>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+                <li class="full-opacity">
+                  <a href="/dashboard">
+                    <i class="grcicon-my-work"></i>
+                    My Work (Superuser)
+                  </a>
+                </li>
+                <li>
+                  <a href="/admin#people_list_widget">
+                    <i class="grcicon-dashboard-black"></i>
+                    Admin Dashboard
+                  </a>
+                </li>
+                <li class="notify-wrap">
+                  <span>
+                    <i class="grcicon-alarm-black"></i>
+                    Notifications
+                  </span>
+                  <div class="inner-list">
+                    <label>
+                      <input type="checkbox" name="notifications" value="Email_Digest">
+                      Daily email digest
+                    </label>
+                    <label class="inner disabled">
+                      <input type="checkbox" name="notifications" value="Email_Now" disabled>
+                      Real-time email updates
+                    </label>
+                  </div>
+                </li>
+                <li>
+                  <a href="/logout" tabindex="-1">
+                    <i class="grcicon-logout-black"></i>
+                    Logout
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a class="nav-trigger active" href="javascript://">
+                <i class="grcicon-nav-trigger"></i>
+                <span>Hide menu</span>
+              </a>
+            </li>
+            <li>
+              <a href="javascript://">
+                <i class="grcicon-help-black"></i>
+                <span>Help</span>
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </div>

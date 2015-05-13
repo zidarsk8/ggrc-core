@@ -766,13 +766,13 @@ $(document).ready(function(){
     if($this.hasClass("active")) {
       $this.removeClass("active");
       $tooltip.attr("data-original-title", "Show menu");
-      $nav.animate({top: "66"}, options);
-      $fake_merge.animate({top: "106"}, options);
+      $nav.animate({top: "19"}, options);
+      $fake_merge.animate({top: "49"}, options);
     } else {
       $this.addClass("active");
       $tooltip.attr("data-original-title", "Hide menu");
-      $nav.animate({top: "96"}, options);
-      $fake_merge.animate({top: "136"}, options);
+      $nav.animate({top: "48"}, options);
+      $fake_merge.animate({top: "78"}, options);
     }
   }
 
