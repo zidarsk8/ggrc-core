@@ -397,7 +397,7 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   background: $status-draft !important;
 }
 %status-declined {
-  background: $status-draft !important;
+  background: $yellow !important;
 }
 %status-planned {
   background: $status-draft !important;
@@ -447,7 +447,7 @@ $fontTitle: 'RalewayRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: $status-draft;
 }
 %state-declined {
-  color: $status-draft;
+  color: $yellow;
 }
 %state-planned {
   color: $status-draft;
