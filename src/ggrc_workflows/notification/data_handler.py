@@ -5,7 +5,6 @@
 
 from datetime import date
 # from babel.dates import format_timedelta
-from flask import request
 
 from sqlalchemy import and_
 
