@@ -195,7 +195,7 @@ def get_object_type(obj):
 
 def get_notification_type(name):
   return db.session.query(NotificationType).filter(
-      NotificationType.name == name).one()
+      NotificationType.name == name).first()
 
 
 def add_notif(obj, notif_type, send_on=None):
