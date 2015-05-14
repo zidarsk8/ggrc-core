@@ -10,6 +10,7 @@ import time
 from flask import current_app, request
 from settings import custom_url_root
 
+
 class DateTimeEncoder(json.JSONEncoder):
   """Custom JSON Encoder to handle datetime objects
 
@@ -28,6 +29,7 @@ class DateTimeEncoder(json.JSONEncoder):
     else:
       return super(DateTimeEncoder, self).default(obj)
 
+
 class UnicodeSafeJsonWrapper(dict):
   """JSON received via POST has keys as unicode. This makes get work with plain
   `str` keys.
@@ -41,8 +43,10 @@ class UnicodeSafeJsonWrapper(dict):
   def get(self, key, default=None):
     return super(UnicodeSafeJsonWrapper, self).get(unicode(key), default)  # noqa
 
+
 def as_json(obj, **kwargs):
   return json.dumps(obj, cls=DateTimeEncoder, **kwargs)
+
 
 def service_for(obj):
   module = sys.modules['ggrc.services']
@@ -52,6 +56,7 @@ def service_for(obj):
     model_type = obj.__class__.__name__
   return getattr(module, model_type, None)
 
+
 def url_for(obj, id=None):
   service = service_for(obj)
   if service is None:
@@ -60,6 +65,7 @@ def url_for(obj, id=None):
     return service.url_for(id=id)
   return service.url_for(obj)
 
+
 def view_service_for(obj):
   module = sys.modules['ggrc.views']
   if type(obj) is str or type(obj) is unicode:  # noqa
@@ -67,6 +73,7 @@ def view_service_for(obj):
   else:
     model_type = obj.__class__.__name__
   return getattr(module, model_type, None)
+
 
 def view_url_for(obj, id=None):
   service = view_service_for(obj)
@@ -88,6 +95,7 @@ def encoded_dict(in_dict):
       v.decode('utf8')
     out_dict[k] = v
   return out_dict
+
 
 def merge_dict(destination, source, path=None):
   """merges source into destination"""
