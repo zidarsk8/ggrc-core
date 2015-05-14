@@ -1508,11 +1508,12 @@ ul.attr-list {
       }
     }
     tr {
+      background: lighten($lightGray,2%);
       &:nth-child(odd) {
-        background: lighten($lightGray,3%);
+        background: lighten($lightGray,5%);
       }
       th {
-        background: darken($lightGray,7%);
+        background: darken($lightGray,3%);
         vertical-align: top;
         position: relative;
         padding: 8px 12px 8px 8px;
@@ -1524,12 +1525,12 @@ ul.attr-list {
       }
     }
     &.table-bordered {
-      border: 1px solid $darkGray;
+      border: 1px solid $widgetBorder;
       border-left: none;
       td,
       th {
-        border-top: 1px solid $darkGray;
-        border-left: 1px solid $darkGray;
+        border-top: 1px solid $widgetBorder;
+        border-left: 1px solid $widgetBorder;
       }
       thead {
         &:first-child {
