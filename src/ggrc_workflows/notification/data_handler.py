@@ -5,7 +5,6 @@
 
 from datetime import date
 # from babel.dates import format_timedelta
-from flask import request
 
 from sqlalchemy import and_
 
@@ -14,7 +13,7 @@ from ggrc_workflows.models import (
 )
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
-from ggrc.utils import merge_dicts
+from ggrc.utils import merge_dicts, get_url_root
 from copy import deepcopy
 
 
@@ -337,7 +336,7 @@ def get_cycle_task_url(cycle_task):
   return ("{base}workflows/{workflow_id}#current_widget/cycle/{cycle_id}"
           "/cycle_task_group/{cycle_task_group_id}/"
           "/cycle_task_group_object_task/{cycle_task_id}").format(
-      base=request.url_root,
+      base=get_url_root(),
       workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
       cycle_id=cycle_task.cycle_task_group.cycle.id,
       cycle_task_group_id=cycle_task.cycle_task_group.id,
@@ -378,7 +377,7 @@ def get_person_dict(person):
 def get_cycle_url(cycle):
   return "{base}workflows/{workflow_id}#current_widget/cycle/{cycle_id}"\
       .format(
-          base=request.url_root,
+          base=get_url_root(),
           workflow_id=cycle.workflow.id,
           cycle_id=cycle.id,
       )
@@ -397,6 +396,6 @@ def get_cycle_dict(cycle, manual=False):
 
 def get_workflow_url(workflow):
   return "{base}workflows/{workflow_id}#current_widget".format(
-      base=request.url_root,
+      base=get_url_root(),
       workflow_id=workflow.id,
   )
