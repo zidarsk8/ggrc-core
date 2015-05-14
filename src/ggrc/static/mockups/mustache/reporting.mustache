@@ -33,7 +33,7 @@
           <div id="middle_column" class="widget-area ui-sortable">
 
             <!-- Widget: New Report -->
-            <section class="widget sticky_header widget-active" style="display: block;">
+            <section class="widget widget-active widget-no-pin">
               <section class="content ggrc_controllers_list_view">
                 <div class="choose-object-wrap parent">
 
@@ -71,7 +71,12 @@
                         </select>
                         <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
                         <div class="attr-wrap">
-                          <h3>Select program attributes to show in report</h3>
+                          <h3>
+                            Select program attributes to show in report
+                            <a class="popover-close pull-right" href="javascript://">
+                              <i class="grcicon-x-grey"></i>
+                            </a>
+                          </h3>
                           <ul class="attr-list">
                             <li>
                               <label>
@@ -208,7 +213,7 @@
                         </h6>
                       </div>
                       <div class="span4">
-                        <h6>Filter anchor objects</h6>
+                        <h6>Filter object groups</h6>
                       </div>
                     </div>
                     {{#relevantFilter}}

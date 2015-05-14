@@ -1405,6 +1405,21 @@ ul.attr-list {
   .popover-content {
     @include border-radius($default-border-radius);
   }
+  &.popover-medium {
+    width: 420px;
+    h3 {
+      i {
+        @include opacity(.4);
+        @include transition(opacity 0.2s ease);
+        margin-right: 0;
+      }
+      a:hover {
+        i {
+          @include opacity(1);
+        }
+      }
+    }
+  }
 }
 
 .attribute-trigger {
