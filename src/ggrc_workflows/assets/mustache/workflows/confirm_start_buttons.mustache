@@ -10,20 +10,9 @@
     <div class="span6">&nbsp;</div>
     <div class="span6">
       <div class="confirm-buttons">
-        {{#defer 'is_mid_frequency' instance.is_mid_frequency}}
-        {{#if is_mid_frequency}}
-          {{!
-            TODO: Fix for CORE-1678, our current/next start date isn't working as expected
-          }}
-            <a class="btn btn-small btn-info preventdoubleclick" data-option="next" data-toggle="confirm" href="javascript://">
-              Generate
-            </a>
-        {{else}}
         <a class="btn btn-small btn-info preventdoubleclick" data-toggle="confirm" href="javascript://">
           Proceed
         </a>
-        {{/if}}
-        {{/defer}}
       </div>
     </div>
   </div>
