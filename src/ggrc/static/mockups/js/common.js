@@ -750,26 +750,31 @@ $(document).ready(function(){
   // Top navigation show/hide
   function topNav() {
     var options = {
-          duration: 100,
+          duration: 800,
           easing: 'easeOutExpo'
         },
         $this = $(this),
         $tooltip = $this.find("i"),
         $nav = $this.closest("body").find(".top-inner-nav"),
         $lhn_nav = $this.closest("body").find(".lhs-holder"),
+        $lhn_type = $this.closest("body").find(".lhn-type"),
         $bar = $this.closest("body").find(".bar-v"),
         $content = $this.closest("body").find(".object-area"),
-        $fake_merge = $content.add($lhn_nav).add($bar);
+        $fake_merge = $content.add($bar);
     if($this.hasClass("active")) {
       $this.removeClass("active");
       $tooltip.attr("data-original-title", "Show menu");
       $nav.animate({top: "19"}, options);
       $fake_merge.animate({top: "49"}, options);
+      $lhn_nav.animate({top: "99"}, options);
+      $lhn_type.animate({top: "65"}, options);
     } else {
       $this.addClass("active");
       $tooltip.attr("data-original-title", "Hide menu");
       $nav.animate({top: "48"}, options);
       $fake_merge.animate({top: "78"}, options);
+      $lhn_nav.animate({top: "128"}, options);
+      $lhn_type.animate({top: "94"}, options);
     }
   }
 
