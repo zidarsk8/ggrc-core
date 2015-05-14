@@ -67,11 +67,12 @@
                       %i.grcicon-alarm-black
                       Notifications
                     %div.inner-list
-                      %label
+                      %label{style: "opacity: .6"}
                         %input{
                           'type': 'checkbox',
-                          'name': 'notifications',
-                          'value': 'Email_Now'
+                          'name': 'notifications_disabled',
+                          'value': 'Email_Now',
+                          'disabled': 'true'
                         }
                         Real-time email updates
                       %label

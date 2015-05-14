@@ -345,7 +345,7 @@ jQuery(function($) {
 
   $('body').on('click', 'input[name=notifications]', function(ev, el){
     var li = $(ev.target).closest('.notify-wrap'),
-        inputs = li.find('input'),
+        inputs = li.find('input[name=notifications]'),
         active = [];
 
     inputs.prop('disabled', true);
