@@ -12,7 +12,6 @@ from mock import patch
 import os
 from ggrc import notification
 from ggrc.models import Notification
-from ggrc_workflows import start_recurring_cycles
 from ggrc_workflows.views import send_todays_digest_notifications
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
@@ -70,7 +69,7 @@ class TestCycleStartFailed(TestCase):
       self.assertIn(wf_owner, notif_data)
       self.assertIn("cycle_starts_in", notif_data[wf_owner])
 
-    with freeze_time("2015-02-05 13:39:20"):
+    with freeze_time("2015-03-05 13:39:20"):
       _, notif_data = notification.get_todays_notifications()
       self.assertIn(wf_owner, notif_data)
       self.assertNotIn("cycle_started", notif_data[wf_owner])

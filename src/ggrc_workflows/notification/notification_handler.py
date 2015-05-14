@@ -7,8 +7,7 @@
 from sqlalchemy import and_, or_, inspect
 from datetime import timedelta, datetime, date
 
-from ggrc.models import (
-    Notification, NotificationType, NotificationConfig, ObjectType)
+from ggrc.models import Notification, NotificationType, ObjectType
 from ggrc import db
 
 
@@ -48,7 +47,7 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
     add_notif(obj, notif_type, send_on)
 
     notif_type = get_notification_type("cycle_start_failed")
-    add_notif(obj, notif_type, obj.next_cycle_start_date)
+    add_notif(obj, notif_type, obj.next_cycle_start_date + timedelta(1))
 
   for task_group in obj.task_groups:
     for task_group_task in task_group.task_group_tasks:
