@@ -20,6 +20,12 @@ env = Environment(loader=PackageLoader('ggrc_workflows', 'templates'))
 # module.
 
 
+def nightly_cron_endpoint():
+  start_recurring_cycles()
+  send_todays_digest_notifications()
+  return 'Ok'
+
+
 def modify_data(data):
   """
   for easyer use in templates, it joins the due_in and due today fields
@@ -40,11 +46,6 @@ def modify_data(data):
         data["cycle_started_tasks"].update(cycle["my_tasks"])
 
   return data
-
-
-def do_start_recurring_cycles():
-  start_recurring_cycles()
-  return 'Ok'
 
 
 def show_pending_notifications():
@@ -91,8 +92,8 @@ def send_todays_digest_notifications():
 
 def init_extra_views(app):
   app.add_url_rule(
-      "/start_recurring_cycles", "start_recurring_cycles",
-      view_func=do_start_recurring_cycles)
+      "/nightly_cron_endpoint", "nightly_cron_endpoint",
+      view_func=nightly_cron_endpoint)
 
   app.add_url_rule(
       "/_notifications/show_pending", "show_pending_notifications",
