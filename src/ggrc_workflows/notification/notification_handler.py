@@ -47,6 +47,9 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
     send_on = obj.next_cycle_start_date - timedelta(notif_type.advance_notice)
     add_notif(obj, notif_type, send_on)
 
+    notif_type = get_notification_type("cycle_start_failed")
+    add_notif(obj, notif_type, obj.next_cycle_start_date)
+
   for task_group in obj.task_groups:
     for task_group_task in task_group.task_group_tasks:
       handle_task_group_task(task_group_task, notif_type)
