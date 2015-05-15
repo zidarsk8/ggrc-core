@@ -3,6 +3,8 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+from ggrc_workflows import start_recurring_cycles
+from ggrc_workflows.models import Workflow
 from ggrc import db
 from ggrc_workflows import start_recurring_cycles
 from ggrc import notification
@@ -12,6 +14,7 @@ from jinja2 import Environment, PackageLoader
 from datetime import date, datetime
 from ggrc.rbac import permissions
 from werkzeug.exceptions import Forbidden
+from flask import render_template, redirect, url_for
 
 
 env = Environment(loader=PackageLoader('ggrc_workflows', 'templates'))
@@ -90,6 +93,29 @@ def send_todays_digest_notifications():
   return "emails sent to: <br> {}".format("<br>".join(sent_emails))
 
 
+def _get_unstarted_workflows():
+  return db.session.query(Workflow).filter(
+      Workflow.next_cycle_start_date < date.today(),
+      Workflow.recurrences == True,
+      Workflow.status == 'Active',
+  ).all()
+
+
+def unstarted_cycles():
+  workflows = _get_unstarted_workflows()
+  return render_template("unstarted_cycles.haml", workflows=workflows)
+
+
+def start_unstarted_cycles():
+  workflows = _get_unstarted_workflows()
+  for workflow in workflows:
+    workflow.next_cycle_start_date = date.today()
+    db.session.add(workflow)
+  db.session.commit()
+  start_recurring_cycles()
+  return redirect(url_for('unstarted_cycles'))
+
+
 def init_extra_views(app):
   app.add_url_rule(
       "/nightly_cron_endpoint", "nightly_cron_endpoint",
@@ -106,3 +132,11 @@ def init_extra_views(app):
   app.add_url_rule(
       "/_notifications/send_todays_digest", "send_todays_digest_notifications",
       view_func=send_todays_digest_notifications)
+
+  app.add_url_rule(
+      "/admin/unstarted_cycles",
+      view_func=login_required(unstarted_cycles))
+
+  app.add_url_rule(
+      "/admin/start_unstarted_cycles",
+      view_func=login_required(start_unstarted_cycles))
