@@ -5,6 +5,7 @@
 #
 # See https://developers.google.com/appengine/docs/python/config/appconfig
 
+cron:
 - description: gGRC workflow - starting point for all batch jobs
   url: /nightly_cron_endpoint
   schedule: every day 12:01
