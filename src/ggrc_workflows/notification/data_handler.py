@@ -367,6 +367,9 @@ def get_object(obj_class, obj_id):
 
 def get_fuzzy_date(end_date):
   delta = end_date - date.today()
+  if delta.days < 0:
+    days = abs(delta.days)
+    return "{} day{} ago".format(days, "s" if days > 1 else "")
   if delta.days == 0:
     return "today"
   # TODO: use format_timedelta from babel package.
