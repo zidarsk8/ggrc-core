@@ -94,6 +94,19 @@ All notifications handle the following structure:
               , ...
           }
 
+          "cycle_start_failed": {
+              workflow.id: {
+                  "custom_message": ""
+                  "title": ""
+                  "workflow_url": "",
+                  "workflow_owners":
+                      { workflow_owner.id: workflow_owner_info, ...},
+                  "start_date": MM/DD/YYYY
+                  "fuzzy_start_date": "in X days/weeks ..."
+              }
+              , ...
+          }
+
           "cycle_started": {
               cycle.id: {
                   # manually started cycles have instant notification

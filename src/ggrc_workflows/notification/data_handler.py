@@ -49,7 +49,7 @@ def get_cycle_created_task_data(notification):
       task_assignee['email']: {
           "user": task_assignee,
           "force_notifications": {
-            notification.id: force
+              notification.id: force
           },
           "cycle_started": {
               cycle.id: {
@@ -62,7 +62,7 @@ def get_cycle_created_task_data(notification):
       task_group_assignee['email']: {
           "user": task_group_assignee,
           "force_notifications": {
-            notification.id: force
+              notification.id: force
           },
           "cycle_started": {
               cycle.id: {
@@ -78,7 +78,7 @@ def get_cycle_created_task_data(notification):
         workflow_owner['email']: {
             "user": workflow_owner,
             "force_notifications": {
-              notification.id: force
+                notification.id: force
             },
             "cycle_started": {
                 cycle.id: {
@@ -103,7 +103,7 @@ def get_cycle_task_due(notification):
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
           "force_notifications": {
-            notification.id: force
+              notification.id: force
           },
           due: {
               cycle_task.id: get_cycle_task_dict(cycle_task)
@@ -121,7 +121,7 @@ def get_all_cycle_tasks_completed_data(notification, cycle):
         workflow_owner['email']: {
             "user": workflow_owner,
             "force_notifications": {
-              notification.id: force
+                notification.id: force
             },
             "all_tasks_completed": {
                 cycle.id: get_cycle_dict(cycle)
@@ -144,7 +144,7 @@ def get_cycle_created_data(notification, cycle):
     result[person.email] = {
         "user": get_person_dict(person),
         "force_notifications": {
-          notification.id: force
+            notification.id: force
         },
         "cycle_started": {
             cycle.id: get_cycle_dict(cycle, manual)
@@ -177,7 +177,7 @@ def get_cycle_task_declined_data(notification):
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
           "force_notifications": {
-            notification.id: force
+              notification.id: force
           },
           "task_declined": {
               cycle_task.id: get_cycle_task_dict(cycle_task)
@@ -213,6 +213,11 @@ def get_task_group_task_data(notification):
   workflow = task_group.workflow
   force = workflow.notify_on_change
 
+  if workflow.next_cycle_start_date < date.today():
+    return {}  # this can only be if the cycle has successfully started
+  if workflow.status != "Active":
+    return {}
+
   tasks = {}
 
   task_assignee = get_person_dict(task_group_task.contact)
@@ -230,7 +235,7 @@ def get_task_group_task_data(notification):
       task_assignee['email']: {
           "user": task_assignee,
           "force_notifications": {
-            notification.id: force
+              notification.id: force
           },
           "cycle_starts_in": {
               workflow.id: {
@@ -243,7 +248,7 @@ def get_task_group_task_data(notification):
       task_group_assignee['email']: {
           "user": task_group_assignee,
           "force_notifications": {
-            notification.id: force
+              notification.id: force
           },
           "cycle_starts_in": {
               workflow.id: {
@@ -259,7 +264,7 @@ def get_task_group_task_data(notification):
         workflow_owner['email']: {
             "user": workflow_owner,
             "force_notifications": {
-              notification.id: force
+                notification.id: force
             },
             "cycle_starts_in": {
                 workflow.id: {
@@ -273,16 +278,11 @@ def get_task_group_task_data(notification):
   return merge_dicts(result, tg_assignee_data, assignee_data)
 
 
-def get_workflow_data(notification):
-  workflow = get_object(Workflow, notification.object_id)
-  if not workflow:
+def get_workflow_starts_in_data(notification, workflow):
+  if workflow.next_cycle_start_date < date.today():
+    return {}  # this can only be if the cycle has successfully started
+  if workflow.status != "Active":
     return {}
-
-  if workflow.frequency == "one_time":
-    # one time workflows get cycles manually created and that triggers
-    # the instant notification.
-    return {}
-
   result = {}
 
   workflow_owners = get_workflow_owners_dict(workflow.context_id)
@@ -292,7 +292,7 @@ def get_workflow_data(notification):
     result[wf_person.person.email] = {
         "user": get_person_dict(wf_person.person),
         "force_notifications": {
-          notification.id: force
+            notification.id: force
         },
         "cycle_starts_in": {
             workflow.id: {
@@ -307,6 +307,55 @@ def get_workflow_data(notification):
         }
     }
   return result
+
+
+def get_cycle_start_failed_data(notification, workflow):
+  if workflow.next_cycle_start_date >= date.today():
+    return {}  # this can only be if the cycle has successfully started
+  if workflow.status != "Active":
+    return {}
+
+  result = {}
+  workflow_owners = get_workflow_owners_dict(workflow.context_id)
+  force = workflow.notify_on_change
+
+  for wf_owner in workflow_owners.itervalues():
+    result[wf_owner["email"]] = {
+        "user": wf_owner,
+        "force_notifications": {
+            notification.id: force
+        },
+        "cycle_start_failed": {
+            workflow.id: {
+                "workflow_owners": workflow_owners,
+                "workflow_url": get_workflow_url(workflow),
+                "start_date": workflow.next_cycle_start_date,
+                "fuzzy_start_date": get_fuzzy_date(
+                    workflow.next_cycle_start_date),
+                "custom_message": workflow.notify_custom_message,
+                "title": workflow.title,
+            }
+        }
+    }
+  return result
+
+
+def get_workflow_data(notification):
+  workflow = get_object(Workflow, notification.object_id)
+  if not workflow:
+    return {}
+
+  if workflow.frequency == "one_time":
+    # one time workflows get cycles manually created and that triggers
+    # the instant notification.
+    return {}
+
+  if "_workflow_starts_in" in notification.notification_type.name:
+    return get_workflow_starts_in_data(notification, workflow)
+  if "cycle_start_failed" == notification.notification_type.name:
+    return get_cycle_start_failed_data(notification, workflow)
+
+  return {}
 
 
 def get_object(obj_class, obj_id):
