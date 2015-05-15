@@ -722,11 +722,12 @@ $(document).ready(function(){
   $(".attribute-trigger").each(function() {
     $(".attribute-trigger").popover({
       html: true,
+      trigger: "click",
       content: function(){
         return $(this).next('.attr-wrap').html();
       },
       placement: "bottom",
-      template: '<div class="popover" role="tooltip"><div class="popover-content"></div></div>'
+      template: '<div class="popover popover-medium popover-manual-close" role="tooltip"><div class="popover-content"></div></div>'
     });
 
     $(this).on('shown.bs.popover', function () {
@@ -736,6 +737,20 @@ $(document).ready(function(){
     $(this).on('hidden.bs.popover', function () {
       $(this).removeClass("active");
     });
+  });
+
+  // Close popover on close click
+  $(".popover-close").on("click", function(el) {
+    $(this).closest(".popover-manual-close").popover('hide');
+  });
+
+  // Close all popovers with a class "popover-manual-close" if you click anywhere except inside popover
+  $("html").on("mouseup", function(el) {
+    if(!$(el.target).closest(".popover-manual-close").length) {
+      $(".popover-manual-close").each(function(){
+        $(this.previousSibling).popover('hide');
+      });
+    }
   });
 
   // Dropdown menu form stop propagation
@@ -990,6 +1005,7 @@ function pinContent() {
       $pin_height = $pin.height(),
       $info = $(".pin-content").find(".info"),
       $widget = $(".widget"),
+      $widget_no_pin = $(".widget-no-pin"),
       $window = $(window),
       $win_height = $window.height(),
       $win_height_part = $win_height / 3,
@@ -999,6 +1015,7 @@ function pinContent() {
 
   $info.css("height", $pin_default);
   $widget.css("margin-bottom", $win_height_part + 80);
+  $widget_no_pin.css("margin-bottom", "0");
 
   $(".pin-action .max").on("click", function() {
     $info.animate({height: $pin_max}, options);

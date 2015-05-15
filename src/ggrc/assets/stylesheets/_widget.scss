@@ -1114,6 +1114,9 @@
   background: $lightGray;
   border-bottom: 1px solid $infoMessageBorder;
   padding-bottom: 40px;
+  .white-widget & {
+    background: $white;
+  }
   h2 {
     line-height: 36px;
     font-size: 24px;
@@ -1390,6 +1393,7 @@ ul.attr-list {
   @include reset-list();
   @include clearfix();
   margin-top: 20px;
+  margin-bottom: 10px;
   li {
     float: left;
     width: 33.3333%;
@@ -1404,6 +1408,21 @@ ul.attr-list {
   width: 350px;
   .popover-content {
     @include border-radius($default-border-radius);
+  }
+  &.popover-medium {
+    width: 420px;
+    h3 {
+      i {
+        @include opacity(.4);
+        @include transition(opacity 0.2s ease);
+        margin-right: 0;
+      }
+      a:hover {
+        i {
+          @include opacity(1);
+        }
+      }
+    }
   }
 }
 
@@ -1493,11 +1512,12 @@ ul.attr-list {
       }
     }
     tr {
+      background: lighten($lightGray,2%);
       &:nth-child(odd) {
-        background: lighten($lightGray,3%);
+        background: lighten($lightGray,5%);
       }
       th {
-        background: darken($lightGray,7%);
+        background: darken($lightGray,3%);
         vertical-align: top;
         position: relative;
         padding: 8px 12px 8px 8px;
@@ -1509,12 +1529,12 @@ ul.attr-list {
       }
     }
     &.table-bordered {
-      border: 1px solid $darkGray;
+      border: 1px solid $widgetBorder;
       border-left: none;
       td,
       th {
-        border-top: 1px solid $darkGray;
-        border-left: 1px solid $darkGray;
+        border-top: 1px solid $widgetBorder;
+        border-left: 1px solid $widgetBorder;
       }
       thead {
         &:first-child {
@@ -1693,4 +1713,8 @@ ul.attr-list {
 }
 .workflow-wrap-main {
   display: none;
+}
+
+.white-widget {
+  background: $white;
 }

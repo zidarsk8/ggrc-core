@@ -33,7 +33,7 @@
           <div id="middle_column" class="widget-area ui-sortable">
 
             <!-- Widget: New Report -->
-            <section class="widget sticky_header widget-active" style="display: block;">
+            <section class="widget widget-active widget-no-pin">
               <section class="content ggrc_controllers_list_view">
                 <div class="choose-object-wrap parent">
 
@@ -71,7 +71,12 @@
                         </select>
                         <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
                         <div class="attr-wrap">
-                          <h3>Select program attributes to show in report</h3>
+                          <h3>
+                            Select program attributes to show in report
+                            <a class="popover-close pull-right" href="javascript://">
+                              <i class="grcicon-x-grey"></i>
+                            </a>
+                          </h3>
                           <ul class="attr-list">
                             <li>
                               <label>
@@ -146,6 +151,7 @@
                               </label>
                             </li>
                           </ul>
+                          <a href="javascript://" class="btn btn-small btn-success">I'm done</a>
                         </div>
                       </div>
                     </div>
@@ -208,7 +214,7 @@
                         </h6>
                       </div>
                       <div class="span4">
-                        <h6>Filter anchor objects</h6>
+                        <h6>Filter object groups</h6>
                       </div>
                     </div>
                     {{#relevantFilter}}
@@ -359,6 +365,7 @@
                                   </label>
                                 </li>
                               </ul>
+                              <a href="javascript://" class="btn btn-small btn-success">I'm done</a>
                             </div>
                           </div>
                         </div>
@@ -390,239 +397,241 @@
 
                 </div>
 
-                <div class="save-template-wrap">
-                  <div class="save-template">
-                    <label class="small">
-                      <input type="checkbox" name="" id="" checked="checked" placeholder="enter report name">
-                      Save report as
-                    </label>
-                    <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
-                    <button type="submit" class="btn btn-success btn-small report-trigger">Generate report</button>
-                    <div class="btn-group pull-right">
-                      <button type="submit" data-toggle="dropdown" class="btn btn-primary btn-small dropdown-toggle" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> <i class="grcicon-carot-white"></i></a></button>
-                      <ul class="dropdown-menu">
-                        <li><a href="#">Export to Sheets</a></li>
-                        <li><a href="#">Export to CSV</a></li>
-                      </ul>
+                <div class="white-widget">
+                  <div class="save-template-wrap white">
+                    <div class="save-template">
+                      <label class="small">
+                        <input type="checkbox" name="" id="" checked="checked" placeholder="enter report name">
+                        Save report as
+                      </label>
+                      <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
+                      <button type="submit" class="btn btn-success btn-small report-trigger">Generate report</button>
+                      <div class="btn-group pull-right">
+                        <button type="submit" data-toggle="dropdown" class="btn btn-primary btn-small dropdown-toggle" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> <i class="grcicon-carot-white"></i></a></button>
+                        <ul class="dropdown-menu">
+                          <li><a href="#">Export to Sheets</a></li>
+                          <li><a href="#">Export to CSV</a></li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="generated-report">
-                  <table class="table table-bordered">
-                    <thead>
-                      <tr>
-                        {{#table_title}}
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_1}}" href="#">{{tbl_title_1}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_2}}" href="#">{{tbl_title_2}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <div class="people-autocomplete">
-                                <input type="text" class="dropdown-input autocomplete ui-autocomplete-input" placeholder="Search Owner" data-autocomplete-type="people" data-type="people">
+                  <div class="generated-report">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          {{#table_title}}
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_1}}" href="#">{{tbl_title_1}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
                                 <button type="submit" class="btn btn-small btn-info">Go</button>
                               </div>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_3}}" href="#">{{tbl_title_3}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_4}}" href="#">{{tbl_title_4}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_5}}" href="#">{{tbl_title_5}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_6}}" href="#">{{tbl_title_6}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_7}}" href="#">{{tbl_title_7}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_8}}" href="#">{{tbl_title_8}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <select class="dropdown-input">
-                                <option>Draft</option>
-                                <option>Final</option>
-                                <option>Effective</option>
-                                <option>Ineffective</option>
-                                <option>Launched</option>
-                                <option>Not Launched</option>
-                                <option>In Scope</option>
-                                <option>Not in Scope</option>
-                                <option>Deprecated</option>
-                              </select>
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_9}}" href="#">{{tbl_title_9}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_10}}" href="#">{{tbl_title_10}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_11}}" href="#">{{tbl_title_11}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_12}}" href="#">{{tbl_title_12}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_13}}" href="#">{{tbl_title_13}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_14}}" href="#">{{tbl_title_14}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu dropdown-menu-form" role="menu">
-                              <div class="range">
-                                <div class="row-fluid">
-                                  <div class="span5">
-                                    <input class="input-block-level date hasDatepicker" name="custom_report_start_date" data-toggle="datepicker" data-before="custom_report_end_date" placeholder="MM/DD/YYYY" type="text" value="" id="">
-                                  </div>
-                                  <div class="span2 date-range-text">
-                                    <div class="centered">to</div>
-                                  </div>
-                                  <div class="span5">
-                                    <input class="input-block-level date hasDatepicker" name="custom_report_end_date" data-toggle="datepicker" data-after="custom_report_start_date" placeholder="MM/DD/YYYY" type="text" value="" id="">
-                                  </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_2}}" href="#">{{tbl_title_2}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <div class="people-autocomplete">
+                                  <input type="text" class="dropdown-input autocomplete ui-autocomplete-input" placeholder="Search Owner" data-autocomplete-type="people" data-type="people">
+                                  <button type="submit" class="btn btn-small btn-info">Go</button>
                                 </div>
                               </div>
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_15}}" href="#">{{tbl_title_15}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu right dropdown-menu-form" role="menu">
-                              <div class="range">
-                                <div class="row-fluid">
-                                  <div class="span5">
-                                    <input class="input-block-level date hasDatepicker" name="custom_report_start_date" data-toggle="datepicker" data-before="custom_report_end_date" placeholder="MM/DD/YYYY" type="text" value="" id="">
-                                  </div>
-                                  <div class="span2 date-range-text">
-                                    <div class="centered">to</div>
-                                  </div>
-                                  <div class="span5">
-                                    <input class="input-block-level date hasDatepicker" name="custom_report_end_date" data-toggle="datepicker" data-after="custom_report_start_date" placeholder="MM/DD/YYYY" type="text" value="" id="">
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_3}}" href="#">{{tbl_title_3}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_4}}" href="#">{{tbl_title_4}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_5}}" href="#">{{tbl_title_5}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_6}}" href="#">{{tbl_title_6}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_7}}" href="#">{{tbl_title_7}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_8}}" href="#">{{tbl_title_8}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <select class="dropdown-input">
+                                  <option>Draft</option>
+                                  <option>Final</option>
+                                  <option>Effective</option>
+                                  <option>Ineffective</option>
+                                  <option>Launched</option>
+                                  <option>Not Launched</option>
+                                  <option>In Scope</option>
+                                  <option>Not in Scope</option>
+                                  <option>Deprecated</option>
+                                </select>
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_9}}" href="#">{{tbl_title_9}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_10}}" href="#">{{tbl_title_10}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_11}}" href="#">{{tbl_title_11}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_12}}" href="#">{{tbl_title_12}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_13}}" href="#">{{tbl_title_13}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" id="" name="" placeholder="Filter">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_14}}" href="#">{{tbl_title_14}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu dropdown-menu-form" role="menu">
+                                <div class="range">
+                                  <div class="row-fluid">
+                                    <div class="span5">
+                                      <input class="input-block-level date hasDatepicker" name="custom_report_start_date" data-toggle="datepicker" data-before="custom_report_end_date" placeholder="MM/DD/YYYY" type="text" value="" id="">
+                                    </div>
+                                    <div class="span2 date-range-text">
+                                      <div class="centered">to</div>
+                                    </div>
+                                    <div class="span5">
+                                      <input class="input-block-level date hasDatepicker" name="custom_report_end_date" data-toggle="datepicker" data-after="custom_report_start_date" placeholder="MM/DD/YYYY" type="text" value="" id="">
+                                    </div>
                                   </div>
                                 </div>
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
                               </div>
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                          <th>
-                            <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_16}}" href="#">{{tbl_title_16}}</a>
-                            <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
-                            <div class="dropdown-menu right dropdown-menu-form" role="menu">
-                              <input type="text" class="dropdown-input" placeholder="Filter" id="" name="">
-                              <button type="submit" class="btn btn-small btn-info">Go</button>
-                            </div>
-                          </th>
-                        {{/table_title}}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {{#table_data}}
-                        <tr>
-                          <td>{{tbl_data_1}}</td>
-                          <td>{{tbl_data_2}}</td>
-                          <td>{{tbl_data_3}}</td>
-                          <td>{{tbl_data_4}}</td>
-                          <td>{{tbl_data_5}}</td>
-                          <td>{{tbl_data_6}}</td>
-                          <td>{{tbl_data_7}}</td>
-                          <td>{{tbl_data_8}}</td>
-                          <td>{{tbl_data_9}}</td>
-                          <td>{{tbl_data_10}}</td>
-                          <td>{{tbl_data_11}}</td>
-                          <td>{{tbl_data_12}}</td>
-                          <td>{{tbl_data_13}}</td>
-                          <td>{{tbl_data_14}}</td>
-                          <td>{{tbl_data_15}}</td>
-                          <td>{{tbl_data_16}}</td>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_15}}" href="#">{{tbl_title_15}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu right dropdown-menu-form" role="menu">
+                                <div class="range">
+                                  <div class="row-fluid">
+                                    <div class="span5">
+                                      <input class="input-block-level date hasDatepicker" name="custom_report_start_date" data-toggle="datepicker" data-before="custom_report_end_date" placeholder="MM/DD/YYYY" type="text" value="" id="">
+                                    </div>
+                                    <div class="span2 date-range-text">
+                                      <div class="centered">to</div>
+                                    </div>
+                                    <div class="span5">
+                                      <input class="input-block-level date hasDatepicker" name="custom_report_end_date" data-toggle="datepicker" data-after="custom_report_start_date" placeholder="MM/DD/YYYY" type="text" value="" id="">
+                                    </div>
+                                  </div>
+                                </div>
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                            <th>
+                              <a rel="tooltip" data-placement="bottom" data-original-title="Sort by {{tbl_title_16}}" href="#">{{tbl_title_16}}</a>
+                              <a href="#" class="table-filter dropdown-toggle" data-toggle="dropdown"><i class="grcicon-carot"></i></a>
+                              <div class="dropdown-menu right dropdown-menu-form" role="menu">
+                                <input type="text" class="dropdown-input" placeholder="Filter" id="" name="">
+                                <button type="submit" class="btn btn-small btn-info">Go</button>
+                              </div>
+                            </th>
+                          {{/table_title}}
                         </tr>
-                      {{/table_data}}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {{#table_data}}
+                          <tr>
+                            <td>{{tbl_data_1}}</td>
+                            <td>{{tbl_data_2}}</td>
+                            <td>{{tbl_data_3}}</td>
+                            <td>{{tbl_data_4}}</td>
+                            <td>{{tbl_data_5}}</td>
+                            <td>{{tbl_data_6}}</td>
+                            <td>{{tbl_data_7}}</td>
+                            <td>{{tbl_data_8}}</td>
+                            <td>{{tbl_data_9}}</td>
+                            <td>{{tbl_data_10}}</td>
+                            <td>{{tbl_data_11}}</td>
+                            <td>{{tbl_data_12}}</td>
+                            <td>{{tbl_data_13}}</td>
+                            <td>{{tbl_data_14}}</td>
+                            <td>{{tbl_data_15}}</td>
+                            <td>{{tbl_data_16}}</td>
+                          </tr>
+                        {{/table_data}}
+                      </tbody>
+                    </table>
+                  </div>
 
-                <div class="zero-state">
-                  <h2>No results for the current search</h2>
-                </div>
+                  <div class="zero-state white">
+                    <h2>No results for the current search</h2>
+                  </div>
 
-                <div class="save-template-wrap">
-                  <div class="save-template">
-                    <label class="small">
-                      <input type="checkbox" name="" id="" checked="checked" placeholder="enter report name">
-                      Save report as
-                    </label>
-                    <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
-                    <button type="submit" class="btn btn-success btn-small report-trigger">Generate report</button>
-                    <div class="btn-group pull-right">
-                      <button type="submit" data-toggle="dropdown" class="btn btn-primary btn-small dropdown-toggle" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> <i class="grcicon-carot-white"></i></a></button>
-                      <ul class="dropdown-menu">
-                        <li><a href="#">Export to Sheets</a></li>
-                        <li><a href="#">Export to CSV</a></li>
-                      </ul>
+                  <div class="save-template-wrap white">
+                    <div class="save-template">
+                      <label class="small">
+                        <input type="checkbox" name="" id="" checked="checked" placeholder="enter report name">
+                        Save report as
+                      </label>
+                      <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
+                      <button type="submit" class="btn btn-success btn-small report-trigger">Generate report</button>
+                      <div class="btn-group pull-right">
+                        <button type="submit" data-toggle="dropdown" class="btn btn-primary btn-small dropdown-toggle" {{^if report_gen}}disabled="disabled"{{/if}}><i class="grcicon-export-white"></i> <i class="grcicon-carot-white"></i></a></button>
+                        <ul class="dropdown-menu">
+                          <li><a href="#">Export to Sheets</a></li>
+                          <li><a href="#">Export to CSV</a></li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
