@@ -1114,6 +1114,9 @@
   background: $lightGray;
   border-bottom: 1px solid $infoMessageBorder;
   padding-bottom: 40px;
+  .white-widget & {
+    background: $white;
+  }
   h2 {
     line-height: 36px;
     font-size: 24px;
@@ -1390,6 +1393,7 @@ ul.attr-list {
   @include reset-list();
   @include clearfix();
   margin-top: 20px;
+  margin-bottom: 10px;
   li {
     float: left;
     width: 33.3333%;
@@ -1709,4 +1713,8 @@ ul.attr-list {
 }
 .workflow-wrap-main {
   display: none;
+}
+
+.white-widget {
+  background: $white;
 }
