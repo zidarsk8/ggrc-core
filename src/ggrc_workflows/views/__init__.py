@@ -3,29 +3,50 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from ggrc_workflows import start_recurring_cycles
-from ggrc_workflows.models import Workflow
+from datetime import date, datetime
+from flask import render_template, redirect, url_for, current_app
+from ggrc.rbac import permissions
+from jinja2 import Environment, PackageLoader
+from werkzeug.exceptions import Forbidden
+
 from ggrc import db
-from ggrc_workflows import start_recurring_cycles
 from ggrc import notification
 from ggrc.login import login_required
 from ggrc.notification import email
-from jinja2 import Environment, PackageLoader
-from datetime import date, datetime
-from ggrc.rbac import permissions
-from werkzeug.exceptions import Forbidden
-from flask import render_template, redirect, url_for
-
+from ggrc_workflows import start_recurring_cycles
+from ggrc_workflows.models import Workflow
 
 env = Environment(loader=PackageLoader('ggrc_workflows', 'templates'))
 
 # TODO: move these views to ggrc_views and all the functions to notifications
 # module.
 
+def send_error_notification(message):
+  try:
+    user_email = email.getAppEngineEmail()
+    email.send_email(user_email, "Error in nightly cron job", message)
+  except Exception as e:
+    current_app.logger.error(e)
+
+
+def run_job(job):
+  try:
+    job()
+  except Exception as e:
+    message = "job '{}' failed with: \n{}".format(job.__name__, e.message)
+    current_app.logger.error(message)
+    send_error_notification(message)
+
 
 def nightly_cron_endpoint():
-  start_recurring_cycles()
-  send_todays_digest_notifications()
+  cron_jobs = [
+    start_recurring_cycles,
+    send_todays_digest_notifications
+  ]
+
+  for job in cron_jobs:
+    run_job(job)
+
   return 'Ok'
 
 
@@ -96,7 +117,7 @@ def send_todays_digest_notifications():
 def _get_unstarted_workflows():
   return db.session.query(Workflow).filter(
       Workflow.next_cycle_start_date < date.today(),
-      Workflow.recurrences == True,
+      Workflow.recurrences == True,  # noqa
       Workflow.status == 'Active',
   ).all()
 
@@ -112,7 +133,7 @@ def start_unstarted_cycles():
     workflow.next_cycle_start_date = date.today()
     db.session.add(workflow)
   db.session.commit()
-  start_recurring_cycles()
+  run_job(start_recurring_cycles)
   return redirect(url_for('unstarted_cycles'))
 
 
