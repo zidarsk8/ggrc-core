@@ -213,10 +213,10 @@ def get_task_group_task_data(notification):
   workflow = task_group.workflow
   force = workflow.notify_on_change
 
-  if workflow.next_cycle_start_date < date.today():
-    return {}  # this can only be if the cycle has successfully started
   if workflow.status != "Active":
     return {}
+  if workflow.next_cycle_start_date < date.today():
+    return {}  # this can only be if the cycle has successfully started
 
   tasks = {}
 
@@ -279,10 +279,10 @@ def get_task_group_task_data(notification):
 
 
 def get_workflow_starts_in_data(notification, workflow):
-  if workflow.next_cycle_start_date < date.today():
-    return {}  # this can only be if the cycle has successfully started
   if workflow.status != "Active":
     return {}
+  if workflow.next_cycle_start_date < date.today():
+    return {}  # this can only be if the cycle has successfully started
   result = {}
 
   workflow_owners = get_workflow_owners_dict(workflow.context_id)
@@ -310,10 +310,10 @@ def get_workflow_starts_in_data(notification, workflow):
 
 
 def get_cycle_start_failed_data(notification, workflow):
-  if workflow.next_cycle_start_date >= date.today():
-    return {}  # this can only be if the cycle has successfully started
   if workflow.status != "Active":
     return {}
+  if workflow.next_cycle_start_date >= date.today():
+    return {}  # this can only be if the cycle has successfully started
 
   result = {}
   workflow_owners = get_workflow_owners_dict(workflow.context_id)
