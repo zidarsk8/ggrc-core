@@ -1,6 +1,6 @@
 
 .attachment-list {
-  @include reset-list();
+  @extend %reset-list;
   padding: 4px 0 0 0;
   li {
     margin-left: -6px;
@@ -122,7 +122,6 @@ ul.new-tree {
       }
     }
   }
-
 }
 
 .choose-object-wrap {
@@ -180,11 +179,11 @@ ul.new-tree {
   padding-top: 6px;
 }
 .entry-list {
-  @include reset-list();
+  @extend %reset-list;
   margin-top: 4px;
   li {
-    margin-bottom: 14px;
     @include clearfix();
+    margin-bottom: 14px;
     .entry-author {
       color: $gray;
       font-size: 11px;
@@ -212,10 +211,6 @@ ul.new-tree {
     &.add-entry {
       border-bottom: none;
       margin-top: 12px;
-      .cancel-text {
-        line-height: 30px;
-        display: inline-block;
-      }
       textarea {
         margin-bottom: 4px;
       }
@@ -241,15 +236,15 @@ ul.new-tree {
         li {
           margin-bottom: 0;
           a {
+            @include transition(background 0.2s ease, color 0.2s ease);
             line-height: 30px;
             padding: 0 10px;
             background: none;
             color: $gray;
-            @include transition(background 0.2s ease, color 0.2s ease);
             i {
-              margin: 7px 4px 0 0;
               @include opacity(0.4);
               @include transition(opacity 0.2s ease);
+              margin: 7px 4px 0 0;
             }
             &:hover {
               background: $headerBgnd;
@@ -363,7 +358,7 @@ ul.new-tree {
 }
 
 .items-list {
-  @include reset-list();
+  @extend %reset-list;
   li {
     margin-bottom: 10px;
     input {

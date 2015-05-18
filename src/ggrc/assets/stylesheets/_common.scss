@@ -12,7 +12,7 @@ body {
 
 // typography
 h1 {
-  @include clearfix();
+  @extend %oneline;
   color: $headerTitle;
   font-size: 24px;
   line-height: 47px;
@@ -26,7 +26,7 @@ h1 {
     float: left;
   }
   .title-content {
-    @include oneline();
+    @extend %oneline;
     width: 85%;
     float: left;
   }
@@ -75,33 +75,6 @@ h6 {
   font-weight: bold;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  &.programs {
-    color:$programs;
-  }
-  &.governance {
-    color:$governance;
-  }
-  &.business {
-    color:$business;
-  }
-  &.risk {
-    color:$risk;
-  }
-  &.objectives {
-    color:$objectives;
-  }
-  &.controls {
-    color:$controls;
-  }
-  &.entities {
-    color:$black;
-  }
-  &.workflow {
-    color:$programs;
-  }
-}
-
 span.error {
   color:$error;
   font-weight:bold;
@@ -113,15 +86,6 @@ blockquote {
 
 u {
   text-decoration: underline;
-}
-
-.welcome {
-  background: $white;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  bottom: auto;
-  right: auto;
 }
 
 select {
@@ -167,21 +131,6 @@ a {
   text-align: right;
 }
 
-.no-results {
-  margin-top:20px;
-  h3, p {
-    color:$subTitle;
-    margin-bottom:6px;
-  }
-}
-.widget-status {
-  text-align: right;
-  display: block;
-  padding-right: 20px;
-  font-style: italic;
-  color: $black;
-}
-
 .bottom-spacing {
   margin-bottom: 16px;
 }
@@ -195,10 +144,6 @@ small {
 
 .inline {
   display:inline;
-}
-
-.button-space {
-  margin-right: 4px;
 }
 
 .spacing {
@@ -239,18 +184,6 @@ small {
 
 .assignee-dark {
   color: $subTitle;
-}
-
-.tab-position {
-  position: relative;
-  overflow: visible;
-}
-
-.cancel-text {
-  color: $black;
-  &:hover {
-    color: $black;
-  }
 }
 
 .checkbox-inline {
@@ -332,9 +265,9 @@ small {
 
 .objective-selector {
   .search-icon {
+    @include background-size(21px 16px);
     background-image: image-url("magnifying-glass.png");
     background-repeat: no-repeat;
-    @include background-size(21px 16px);
     background-position: right center;
     padding-right: 28px;
   }
@@ -348,10 +281,11 @@ small {
   z-index: 2000 !important;
 }
 
+// status
 .status-label {
+  @include border-radius($default-border-radius);
   width: 8px;
   height: 8px;
-  @include border-radius($default-border-radius);
   float: left;
   margin: 9px 10px 0 10px;
   background: $status-draft;
@@ -359,9 +293,9 @@ small {
     margin: 5px 10px 0 4px !important;
   }
   .lhn-items-list & {
+    @include border-radius(2px);
     width: 4px;
     height: 4px;
-    @include border-radius(2px);
     margin: 10px 8px 0 1px;
   }
   .inner-tree & {
@@ -384,14 +318,14 @@ small {
 
 // progress bar
 .progress {
-  background: $lightGray;
-  height: 20px;
   @include box-shadow(none);
   @include border-radius($default-border-radius);
+  background: $lightGray;
+  height: 20px;
   margin: 4px 0 0 0;
   .bar {
-    height: 20px;
     @include box-shadow(none);
+    height: 20px;
     float: left;
     margin-right: 0px;
   }
@@ -428,16 +362,10 @@ small {
   &.btn-footer {
     margin-top: 4px;
   }
-  .population-upload & {
-    width: 100%;
-    box-sizing: border-box;
-    padding-left: 1px;
-    padding-right: 3px;
-  }
   &.pending-ajax {
+    @include box-shadow(none);
     cursor: default;
     background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 6px;
-    @include box-shadow(none);
     border: 1px solid $ajaxBtnDisabled;
     color: $ajaxGray;
     text-shadow: none;
@@ -446,9 +374,9 @@ small {
       color: $ajaxGray;
     }
     &:active {
+      @include box-shadow(none);
       background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 5px;
       border: 1px solid $ajaxBtnDisabled;
-      @include box-shadow(none);
     }
   }
 }
@@ -467,10 +395,9 @@ small {
 // removing outline on anchor element
 .nav-tabs,
 .menu,
-.btn,
-.program-list {
+.btn {
   a {
-    @include outline-fix();
+    @extend %outline-fix;
   }
 }
 
@@ -482,20 +409,13 @@ small {
 
 // one line display of paragraphs
 .oneline {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  width:100%;
+  @extend %oneline;
   &.expandable {
     cursor:pointer;
   }
   &.expand-on-hover {
     cursor:pointer;
   }
-}
-
-.inhover {
-  cursor:pointer;
 }
 
 // RTF
@@ -523,11 +443,11 @@ small {
 
 // Date input field - To see date icon just add class .date to input field
 input.date {
-  padding-left: 26px;
   @include background-size(368px 440px);
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
   background-position: -340px -364px;
+  padding-left: 26px;
   &.short-field {
     height: 16px !important;
     line-height: 16px !important;
@@ -539,37 +459,21 @@ input.date {
 //Making input 100% width of his parent element
 input.input-block-level,
 select.input-block-level {
-  display: block;
-  width: 100%;
-  @include box-sizing(border-box);
-  min-height: 28px;
-}
-
-//tree-structure no results
-.no-result {
-  text-align: center;
-  font-weight: bold;
-  color: $darkGray;
-  line-height: 20px;
-  font-size: $f-small;
-  &.object-no-result {
-    font-size: $f-regular;
-    padding-top: 8px;
-  }
+  @extend %input-block-level;
 }
 
 // resizible widget functionality
 .widget {
   .ui-resizable-handle {
+    @include background-size(30px 2px);
+    @include opacity(0.6);
     height:8px;
     background-color:#fff;
     border-top:1px solid #aaa;
     border-bottom:1px solid #aaa;
     background-image: image-url("bgnds/drag-h.png");
-    @include background-size(30px 2px);
     background-repeat:no-repeat;
     background-position:50% 1px;
-    @include opacity(0.6);
     &:hover {
       @include opacity(1);
     }
@@ -613,8 +517,8 @@ select.input-block-level {
 // input error
 .field-failure {
   input {
-    border: 1px solid $red;
     @include placeholder($lightRed);
+    border: 1px solid $red;
   }
   label {
     color: $red;
@@ -643,22 +547,18 @@ input.disabled.pending-ajax{
 }
 
 .widget .wysiwyg-area {
-  //border: 1px solid $widgetBorder;
-  //@include border-radius($default-border-radius);
-  //padding: 4px;
-  //background: $lightGray;
   margin-bottom: 10px;
   .double {
+    @extend %input-block-level;
     height: 70px;
-    @include input-block-level();
   }
   .triple {
+    @extend %input-block-level;
     height: 120px;
-    @include input-block-level();
   }
   .quadruple {
+    @extend %input-block-level;
     height: 150px;
-    @include input-block-level();
   }
   iframe {
     width: 97.5% !important;
@@ -679,9 +579,9 @@ input.disabled.pending-ajax{
   }
   // smaller buttons in wysiwyg editor
   .btn {
+    @include opacity(0.5);
     padding:0px 5px 2px 5px;
     font-size:$f-small;
-    @include opacity(0.5);
     &:hover {
       @include opacity(1);
     }
@@ -701,32 +601,8 @@ input.disabled.pending-ajax{
 }
 
 // backdrop
-
 .modal-backdrop, .modal-backdrop.fade.in {
   @include opacity(0.6);
-}
-
-// additional styles
-
-li.text-governance,
-span.text-governance,
-strong.text-governance {
-  color:$governance;
-  a {
-    color:$governance !important;
-  }
-}
-
-
-span,
-strong {
-  &.text-risk {
-    color:$risk;
-  }
-  &.text-business {
-    color:$business;
-  }
-
 }
 
 .description {
@@ -737,44 +613,11 @@ strong {
   }
 }
 
-.key-p {
-  margin-right:40px;
-}
-
-.flash {
-  position:absolute;
-  top:5px;
-  left:0;
-  width:50%;
-  margin-left:25%;
-  z-index:9000;
-  .notice {
-    p {
-      color:$green;
-      font-size:11px;
-      font-weight:bold;
-      text-align:center;
-      margin:0;
-      padding:0;
-      line-height:30px;
-      i {
-        margin-top:6px;
-      }
-    }
-  }
-}
-
-.modal-header {
-  .flash {
-    z-index:9999;
-  }
-}
-
 .coding {
+  @include border-radius();
   font-family: "Courier New", Courier, monospace;
   margin:0.5em 0 1.5em 0;
   border:1px solid $lightGray;
-  @include border-radius();
   padding:1em;
   &.good {
     border-color:$green;
@@ -809,7 +652,6 @@ span.no-data {
 }
 
 // container-fluid reset
-
 .container-fluid {
   padding:0;
 }
@@ -840,45 +682,17 @@ select.multiple-selector {
   margin: 0;
 }
 
-// Input file styling
-.input-file-main {
-  width: 400px;
-  margin-bottom: 15px;
-  .input-file-holder {
-    position: relative;
-    width: 400px;
-    input[type="file"] {
-      position: relative;
-      z-index: 2;
-      @include opacity(0);
-      width: 400px;
-      padding: 0;
-    }
-    .clone {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 400px;
-      padding: 0;
-      margin: 0;
-      z-index: 1;
-      input[type="text"] {
-        width: 300px;
-        float: left;
-      }
-      span {
-        float: left;
-        margin-left: 10px;
-      }
-    }
-  }
-}
 // Sticky headers
-.sticky {
-    position: -webkit-sticky;
-    position: sticky;
-    z-index: 999;
-    top: 0;
+.sticky-header {
+  @extend %sticky;
+  @include box-shadow(inset 0 0 3px 0 #bbb);
+  border-top: none !important;
+}
+
+.sticky-footer {
+  @extend %sticky;
+  @include box-shadow(inset 0 0 3px 0 #bbb);
+  border-bottom: none !important;
 }
 
 // Datepicker
@@ -887,14 +701,14 @@ select.multiple-selector {
   .ui-datepicker-next {
     top: 4px !important;
     .ui-icon {
+      @include background-size(368px 440px);
+      background-image: image-url("grcicons/icons.png");
+      background-position: -2000px -2000px;
+      background-repeat: no-repeat;
       width: 20px;
       height: 16px;
       line-height: 16px;
       vertical-align: top;
-      background-image: image-url("grcicons/icons.png");
-      background-position: -2000px -2000px;
-      background-repeat: no-repeat;
-      @include background-size(368px 440px);
       margin-top: -7px;
     }
   }
@@ -930,34 +744,10 @@ select.multiple-selector {
   }
 }
 
-// Saved Message
-.saved {
-  position: relative;
-  input,
-  select,
-  textarea {
-    border: 1px solid $green;
-    margin-bottom: 3px;
-  }
-  .saved-message {
-    position: absolute;
-    right: 0;
-    font-size: 10px;
-    color: $green;
-    font-weight: bold;
-  }
-}
-
 .rtf-block {
   word-wrap: break-word;
   margin-bottom:10px;
   line-height:18px;
-}
-
-.top-align-label {
-  input {
-    margin-bottom: 0;
-  }
 }
 
 .drag {
@@ -1040,14 +830,14 @@ select.multiple-selector {
   }
 }
 
-.top-separator {
-  border-top:1px dotted #ccc;
-  padding-top:20px;
-}
-
 // Welcome page
-
 .welcome {
+  background: $white;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  bottom: auto;
+  right: auto;
   h1 {
     text-align: center;
     margin-top: 3em;  // allow space for flash messages
@@ -1081,10 +871,10 @@ select.multiple-selector {
 }
 
 .inline-warning {
+  @include border-radius();
   background:lighten($lightRed,10%);
   border:1px solid $lightRed;
   color:$red;
-  @include border-radius();
   padding:6px;
   font-size:12px;
   line-height:16px;
@@ -1137,7 +927,7 @@ p {
 }
 
 .item-util {
-  @include reset-list();
+  @extend %reset-list;
   @include clearfix();
   font-size: 11px;
   line-height: 16px;
@@ -1189,7 +979,7 @@ p {
 .pos-wrap {
   position: relative;
   .dropdown-menu {
-    @include reset-list();
+    @extend %reset-list;
     @include border-radius(0);
     min-width: 210px;
     float: none;
@@ -1272,9 +1062,9 @@ p {
     max-width: 130px;
   }
   ul {
-    @include reset-list();
+    @extend %reset-list;
+    @extend %oneline;
     @include clearfix();
-    @include oneline();
     li {
       display: inline-block;
       margin-left: 20px;
@@ -1292,8 +1082,8 @@ p {
 
 .hidden-widgets-list {
   .dropdown-menu {
-    width: 320px;
     @include clearfix();
+    width: 320px;
     .inner-nav-item {
       float: left;
       width: 160px;
@@ -1327,7 +1117,7 @@ p {
       margin-bottom: 0;
     }
     ul {
-      @include reset-list();
+      @extend %reset-list;
     }
     li {
       margin-bottom: 20px;
@@ -1363,6 +1153,7 @@ p {
   }
 }
 
+// State values
 .state-value {
   text-transform: uppercase;
   font-weight: bold;
@@ -1378,7 +1169,7 @@ p {
 }
 
 .inner-count-list {
-  @include reset-list();
+  @extend %reset-list;
   li {
     margin-bottom: 6px;
     [class^="grcicon-"] {
