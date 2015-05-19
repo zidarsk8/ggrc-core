@@ -732,16 +732,14 @@ $(document).ready(function(){
 
     $(this).on('shown.bs.popover', function () {
       $(this).addClass("active");
+      $(this).next(".popover-manual-close").find(".popover-close").click(function (e) {
+          $(".attribute-trigger").popover("hide");
+      });
     });
 
     $(this).on('hidden.bs.popover', function () {
       $(this).removeClass("active");
     });
-  });
-
-  // Close popover on close click
-  $(".popover-close").on("click", function(el) {
-    $(this).closest(".popover-manual-close").popover('hide');
   });
 
   // Close all popovers with a class "popover-manual-close" if you click anywhere except inside popover

@@ -1453,8 +1453,26 @@ ul.attr-list {
   overflow-x: auto;
   table {
     @include border-radius(0);
+    font-size: 12px;
+    line-height: 20px;
     th, td {
       min-width: 70px;
+    }
+    th {
+      i {
+        @include opacity(.4);
+      }
+      &:hover {
+        i {
+          @include opacity(1);
+        }
+      }
+      &.open {
+        i {
+          @include opacity(1);
+          background-position: -198px -416px;
+        }
+      }
     }
     .dropdown-menu {
       min-width: 240px;
@@ -1483,8 +1501,14 @@ ul.attr-list {
     }
     tr {
       background: lighten($lightGray,2%);
+      &:hover {
+        background: darken($lightGray,5%);
+      }
       &:nth-child(odd) {
         background: lighten($lightGray,5%);
+        &:hover {
+          background: darken($lightGray,5%);
+        }
       }
       th {
         background: darken($lightGray,3%);
