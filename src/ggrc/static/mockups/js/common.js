@@ -742,6 +742,15 @@ $(document).ready(function(){
     });
   });
 
+  // "Save report as" checkbox sync
+  $(".report-save-check").change(function() {
+    $(".report-save-check-bottom").prop("checked", this.checked);
+  });
+
+  $(".report-save-check-bottom").change(function() {
+    $(".report-save-check").prop("checked", this.checked);
+  });
+
   // Close all popovers with a class "popover-manual-close" if you click anywhere except inside popover
   $("html").on("mouseup", function(el) {
     if(!$(el.target).closest(".popover-manual-close").length) {
