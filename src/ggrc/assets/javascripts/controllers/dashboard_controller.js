@@ -446,10 +446,12 @@ can.Control("CMS.Controllers.InnerNav", {
       widget = this.widget_by_selector(widget);
     }
 
-    widget.attr("force_show", true);
-    this.update_add_more_link();
-    this.options.contexts.attr("active_widget", widget);
-    this.show_active_widget();
+    if (widget !== this.options.contexts.attr("active_widget")) {
+      widget.attr("force_show", true);
+      this.update_add_more_link();
+      this.options.contexts.attr("active_widget", widget);
+      this.show_active_widget();
+    }
   }
 
   , show_active_widget: function (selector) {
@@ -461,7 +463,7 @@ can.Control("CMS.Controllers.InnerNav", {
     if (info_pin_controller) {
       info_pin_controller.hideInstance();
     }
-
+      
     if (widget.length) {
       dashboard_controller.show_widget_area();
       widget.siblings(':visible').hide().end().show();
