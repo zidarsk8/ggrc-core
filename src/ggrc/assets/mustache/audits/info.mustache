@@ -11,7 +11,23 @@
     <div class="clearfix">
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
       <div class="tier-content pin">
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+        {{#instance}}
+          <div class="row-fluid wrap-row">
+            <div class="span6">
+              <h6>Title</h6>
+              <h3>{{title}}</h3>
+              {{#if type}}
+              <p>
+                {{type.title}}
+              </p>
+              {{/if}}
+            </div>
+            <div class="span6">
+              <h6>State</h6>
+              <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+            </div>
+          </div>
+        {{/instance}}
       </div>
     </div>
     {{/is_info_pin}}
@@ -62,7 +78,23 @@
 
     <div class="tier-content">
       {{^is_info_pin}}
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+        {{#instance}}
+          <div class="row-fluid wrap-row">
+            <div class="span6">
+              <h6>Title</h6>
+              <h3>{{title}}</h3>
+              {{#if type}}
+              <p>
+                {{type.title}}
+              </p>
+              {{/if}}
+            </div>
+            <div class="span6">
+              <h6>State</h6>
+              <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+            </div>
+          </div>
+        {{/instance}}
       {{/is_info_pin}}
       {{#instance.description}}
         <div class="row-fluid wrap-row">
