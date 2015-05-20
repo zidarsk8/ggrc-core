@@ -48,7 +48,6 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
     , people: "CMS.Models.Person.stubs"
     , object_documents: "CMS.Models.ObjectDocument.stubs"
     , documents: "CMS.Models.Document.stubs"
-    , object_controls: "CMS.Models.ObjectControl.stubs"
     , directive: "CMS.Models.get_stub"
     , children: "CMS.Models.get_stubs"
     , directive_sections: "CMS.Models.DirectiveSection.stubs"

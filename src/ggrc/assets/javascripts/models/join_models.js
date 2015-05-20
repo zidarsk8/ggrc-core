@@ -162,25 +162,6 @@ can.Model.Join("CMS.Models.ObjectSection", {
 }, {
 });
 
-can.Model.Join("CMS.Models.ObjectControl", {
-    root_object: "object_control"
-  , root_collection: "object_controls"
-  , join_keys : {
-      "control" : CMS.Models.Control
-    , "controllable" : can.Model.Cacheable
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , control : "CMS.Models.Control.stub"
-    , controllable : "CMS.Models.get_stub"
-  }
-  , findAll: "GET /api/object_controls"
-  , create: "POST /api/object_controls"
-  , destroy: "DELETE /api/object_controls/{id}"
-}, {
-});
-
 can.Model.Join("CMS.Models.ObjectObjective", {
     root_object: "object_objective"
   , root_collection: "object_objectives"

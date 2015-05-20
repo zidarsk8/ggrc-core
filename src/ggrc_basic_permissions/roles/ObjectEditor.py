@@ -26,7 +26,6 @@ permissions = {
         "Market",
         "Objective",
         "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectOwner",
@@ -80,7 +79,6 @@ permissions = {
         "Market",
         "Objective",
         "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectOwner",
@@ -210,7 +208,6 @@ permissions = {
             "condition": "contains"
         },
         "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectOwner",
@@ -406,7 +403,6 @@ permissions = {
             "condition": "contains"
         },
         "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectOwner",

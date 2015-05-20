@@ -7,7 +7,6 @@ from sqlalchemy.orm import validates
 
 from ggrc import db
 from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
-from .object_control import Controllable
 from .object_document import Documentable
 from .object_objective import Objectiveable
 from .object_owner import Ownable
@@ -78,9 +77,9 @@ class SystemOrProcess(HasObjectState,
 
 track_state_for_class(SystemOrProcess)
 
-class System(
-    CustomAttributable, Documentable, Personable, Objectiveable, Controllable,
-    Sectionable, Relatable, Ownable, SystemOrProcess):
+
+class System(CustomAttributable, Documentable, Personable, Objectiveable,
+             Sectionable, Relatable, Ownable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': False
       }
@@ -91,9 +90,8 @@ class System(
     return False
 
 
-class Process(
-    CustomAttributable, Documentable, Personable, Objectiveable, Controllable,
-    Sectionable, Relatable, Ownable, SystemOrProcess):
+class Process(CustomAttributable, Documentable, Personable, Objectiveable,
+              Sectionable, Relatable, Ownable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': True
       }

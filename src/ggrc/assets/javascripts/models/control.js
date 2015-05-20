@@ -36,7 +36,6 @@ can.Model.Cacheable("CMS.Models.Control", {
     , sections : "CMS.Models.get_stubs"
     , programs : "CMS.Models.Program.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
-    , object_controls : "CMS.Models.ObjectControl.stubs"
     , kind : "CMS.Models.Option.stub"
     , means : "CMS.Models.Option.stub"
     , verify_frequency : "CMS.Models.Option.stub"

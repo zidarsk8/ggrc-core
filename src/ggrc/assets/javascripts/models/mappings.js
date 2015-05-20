@@ -257,26 +257,11 @@
 
     // Governance
     Control: {
-      _mixins: ["personable", "ownable"], //controllable
+      _mixins: ["related_object", "personable", "ownable"],
       _canonical: {
-        "related_objects": ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
-          "Project", "System"
-        ],
-        "related_objects_as_source": ["Issue", "Program", "Control", "Section", "Clause"],
         "objectives": "Objective",
         "joined_directives": ["Regulation", "Policy", "Contract", "Standard"]
       },
-      related_objects: Proxy(
-          null, "controllable", "ObjectControl", "control", "object_controls"), //control_objects
-      related_data_assets: TypeFilter("related_objects", "DataAsset"),
-      related_facilities: TypeFilter("related_objects", "Facility"),
-      related_markets: TypeFilter("related_objects", "Market"),
-      related_org_groups: TypeFilter("related_objects", "OrgGroup"),
-      related_vendors: TypeFilter("related_objects", "Vendor"),
-      related_processes: TypeFilter("related_objects", "Process"),
-      related_products: TypeFilter("related_objects", "Product"),
-      related_projects: TypeFilter("related_objects", "Project"),
-      related_systems: TypeFilter("related_objects", "System"),
       related_business_objects: Multi([
         "related_data_assets", "related_facilities", "related_markets",
         "related_org_groups", "related_vendors", "related_processes", "related_products",
@@ -311,17 +296,6 @@
       policies: TypeFilter("directives", "Policy"),
       standards: TypeFilter("directives", "Standard"),
       regulations: TypeFilter("directives", "Regulation"),
-      related_objects_as_source: Proxy(
-        null, "destination", "Relationship", "source", "related_destinations"),
-      related_objects_as_destination: Proxy(
-        null, "source", "Relationship", "destination", "related_sources"),
-      related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"]),
-      related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment"),
-      related_issues: TypeFilter("related_objects_via_relationship", "Issue"),
-      programs: TypeFilter("related_objects_via_relationship", "Program"),
-      controls: TypeFilter("related_objects_via_relationship", "Control"),
-      sections: TypeFilter("related_objects_via_relationship", "Section"),
-      clauses: TypeFilter("related_objects_via_relationship", "Clause"),
       orphaned_objects: Multi([
         "related_objects", "clauses", "controls", "programs", "objectives", "joined_directives", "people"
       ])
@@ -335,7 +309,6 @@
         "objectives": "Objective",
         "controls": "Control",
         "_sections_base": ["Section", "Clause"]
-
       },
       related_objects: Proxy(
         null, "objectiveable", "ObjectObjective", "objective", "objective_objects"),
@@ -401,7 +374,7 @@
       controls: TypeFilter("related_objects_via_relationship", "Control"),
       objectives: Proxy(
         "Objective", "objective", "SectionObjective", "section", "section_objectives"),
-      orphaned_objects: Multi([
+       orphaned_objects: Multi([
         "related_objects", "objectives", "people"
       ])
     },
@@ -419,13 +392,6 @@
       },
       contracts: Proxy(
         "Contract", "directive", "DirectiveSection", "section", "directive_sections")
-    },
-    controllable: {
-      _canonical: {
-        "controls": "Control"
-      },
-      controls: Proxy(
-        "Control", "control", "ObjectControl", "controllable", "object_controls")
     },
     objectiveable: {
       _canonical: {
@@ -466,7 +432,7 @@
         "related_objects_as_source": [
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
-          "Program", "Issue", "Control"
+          "Program", "Issue", "Control", "Section", "Clause"
         ]
       },
       related_objects_as_source: Proxy(
@@ -484,12 +450,15 @@
       related_projects: TypeFilter("related_objects", "Project"),
       related_systems: TypeFilter("related_objects", "System"),
       related_issues: TypeFilter("related_objects", "Issue"),
+      related_control_assessments: TypeFilter("related_objects", "ControlAssessment"),
       regulations: TypeFilter("related_objects", "Regulation"),
       contracts: TypeFilter("related_objects", "Contract"),
       policies: TypeFilter("related_objects", "Policy"),
       standards: TypeFilter("related_objects", "Standard"),
       programs: TypeFilter("related_objects", "Program"),
       controls: TypeFilter("related_objects", "Control"),
+      sections: TypeFilter("related_objects", "Section"),
+      clauses: TypeFilter("related_objects", "Clause"),
       related_documentation_responses: TypeFilter("related_objects", "DocumentationResponse"),
       related_interview_responses: TypeFilter("related_objects", "InterviewResponse"),
       related_population_sample_responses: TypeFilter("related_objects", "PopulationSampleResponse"),
@@ -575,7 +544,7 @@
     business_object: {
       _mixins: [
         "related_object", "personable",
-        "controllable", "objectiveable", "sectionable",
+        "objectiveable", "sectionable",
         "ownable"
       ],
       orphaned_objects: Multi([

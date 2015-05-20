@@ -55,8 +55,10 @@ class ControlRowConverter(BaseRowConverter):
     self.handle('categories', LinkControlCategoriesHandler)
     self.handle('assertions', LinkControlAssertionsHandler)
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
-    self.handle('systems', LinkObjectControl, model_class = System)
-    self.handle('processes', LinkObjectControl, model_class = Process)
+    self.handle('systems', LinkRelationshipsHandler, model_class=System,
+                 direction='from', model_human_name='System')
+    self.handle('processes', LinkRelationshipsHandler, model_class=Process,
+                 direction='from', model_human_name='Process')
     self.handle('principal_assessor', ContactEmailHandler, person_must_exist=True)
     self.handle('secondary_assessor', ContactEmailHandler, person_must_exist=True)
     self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)

@@ -10,7 +10,6 @@ from .mixins import (
 from .relationship import Relatable
 from .object_document import Documentable
 from .object_person import Personable
-from .object_control import Controllable
 from .object_objective import Objectiveable
 
 class Response(
@@ -90,8 +89,9 @@ class Response(
     return query.options(
         orm.joinedload('request'))
 
-class DocumentationResponse(
-    Relatable, Documentable, Personable, Controllable, Objectiveable, Response):
+
+class DocumentationResponse(Relatable, Documentable, Personable,
+                            Objectiveable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'documentation'
@@ -111,8 +111,8 @@ class DocumentationResponse(
     query = super(DocumentationResponse, cls).eager_query()
     return query.options()
 
-class InterviewResponse(
-    Relatable, Documentable, Personable, Controllable, Response):
+
+class InterviewResponse(Relatable, Documentable, Personable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'interview'
@@ -138,8 +138,8 @@ class InterviewResponse(
     return query.options(
       orm.subqueryload('meetings'))
 
-class PopulationSampleResponse(
-    Relatable, Documentable, Personable, Controllable, Response):
+
+class PopulationSampleResponse(Relatable, Documentable, Personable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'population sample'

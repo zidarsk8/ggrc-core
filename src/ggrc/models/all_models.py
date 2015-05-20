@@ -24,7 +24,6 @@ from .document import Document
 from .facility import Facility
 from .help import Help
 from .market import Market
-from .object_control import ObjectControl
 from .object_document import ObjectDocument
 from .object_objective import ObjectObjective
 from .object_owner import ObjectOwner
@@ -86,7 +85,6 @@ all_models = [
     Meeting,
     Objective,
     ObjectiveControl,
-    ObjectControl,
     ObjectDocument,
     ObjectObjective,
     ObjectOwner,

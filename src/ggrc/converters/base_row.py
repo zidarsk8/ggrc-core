@@ -8,7 +8,7 @@ from datetime import datetime
 from .common import *
 from ggrc.models.all_models import (
     Audit, ControlCategory, ControlAssertion,
-    Control, Document, Objective, ObjectControl, ObjectiveControl,
+    Control, Document, Objective, ObjectiveControl,
     ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process,
     Relationship, Request, SectionBase, SectionObjective,
     System, SystemOrProcess,
@@ -1111,26 +1111,6 @@ class LinkObjectHandler(LinksHandler):
     where_params = self.get_where_params(data)
     model_class = self.options.get('model_class') or self.model_class
     return model_class.query.filter_by(**where_params).first() if model_class else None
-
-class LinkObjectControl(LinkObjectHandler):
-
-  def get_existing_items(self):
-    objects = []
-    model_class = self.options.get('model_class') or self.model_class
-    importer_cls_name = self.importer.obj.__class__.__name__
-    where_params = {}
-    where_params['control_id'] = self.importer.obj.id
-    where_params['controllable_type'] = model_class.__name__
-    object_controls = ObjectControl.query.filter_by(**where_params).all()
-    return [obj_cont.controllable for obj_cont in object_controls]
-
-  def after_save(self, obj):
-    for linked_object in self.created_links():
-      db.session.add(linked_object)
-      object_control = ObjectControl()
-      object_control.control = self.importer.obj
-      object_control.controllable = linked_object
-      db.session.add(object_control)
 
 
 class LinkObjectObjective(LinkObjectHandler):
