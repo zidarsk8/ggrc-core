@@ -1,5 +1,6 @@
 // Pin content
 .pin-content {
+  @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   position: fixed;
   bottom: 40px;
   left: 32px;
@@ -7,10 +8,9 @@
   background: $white;
   z-index: 0;
   overflow: auto;
-  @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   .info {
-    padding: 15px 20px 20px 20px;
     @include box-shadow(none);
+    padding: 15px 20px 20px 20px;
     .small-info {
       i {
         @include opacity(.25);
@@ -25,11 +25,30 @@
   .info-widget-footer {
     display: none;
   }
+  select {
+    margin-bottom: 0;
+  }
+}
+
+.inline-date-wrap {
+  input {
+    margin-bottom: 0;
+  }
+}
+
+.inline-date-label {
+  display: inline-block;
+  line-height: 28px;
+  margin-right: 10px;
+  margin-left: 10px;
+  &:first-child {
+    margin-left: 0;
+  }
 }
 
 .pin-action {
+  @extend %reset-list;
   @include clearfix();
-  @include reset-list();
   margin-bottom: 20px;
   li {
     float: left;
@@ -52,7 +71,7 @@
 }
 
 .visual-radio {
-  @include reset-list();
+  @extend %reset-list;
   @include clearfix();
   li {
     float: left;
@@ -79,7 +98,7 @@
 }
 
 .repeated-utility {
-  @include reset-list();
+  @extend %reset-list;
   @include clearfix();
   li {
     float: left;
