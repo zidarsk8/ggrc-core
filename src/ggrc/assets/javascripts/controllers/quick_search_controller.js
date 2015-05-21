@@ -7,7 +7,7 @@
 
 //require can.jquery-all
 
-(function(can, $) {
+(function(can, $, Mousetrap) {
   function with_params(href, params) {
     if (href.charAt(href.length - 1) === '?')
       return href + params;
@@ -29,7 +29,6 @@
     });
     return attrval;
   }
-
 
 CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
   defaults : {
@@ -389,7 +388,7 @@ can.Control("CMS.Controllers.LHN", {
           } else {
             this.initial_scroll();
           }
-          
+
           this.toggle_filter_active();
 
           if (this.options.display_prefs.getLHNState().is_pinned) {
@@ -417,6 +416,7 @@ can.Control("CMS.Controllers.LHN", {
 
     // this is ugly, but the trigger doesn't nest inside our top element
     $(".lhn-trigger").on("click", this.toggle_lhn.bind(this));
+    Mousetrap.bind("alt+m", this.toggle_lhn.bind(this));
 
     this.resize_lhn();
 
@@ -1420,5 +1420,4 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
     this.on_mouseleave();
   }
 });
-
-})(this.can, this.can.$);
+})(this.can, this.can.$, Mousetrap);
