@@ -10,7 +10,6 @@ permissions = {
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Program",
         "Relationship",
         "UserRole",
@@ -20,7 +19,6 @@ permissions = {
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
     ],
     "view_object_page": [
@@ -30,7 +28,6 @@ permissions = {
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Program",
         "Relationship"
     ],
@@ -38,7 +35,6 @@ permissions = {
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
     ]
 }

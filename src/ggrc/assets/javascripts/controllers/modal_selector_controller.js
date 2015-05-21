@@ -359,33 +359,6 @@
         join_list: get_page_object().object_documents
       },
 
-      object_sections: {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: "Section",
-        modal_title: "Select Sections",
-
-        related_model_singular: "Section",
-        related_table_plural: "sections",
-        related_table_singluar: "section",
-        related_title_singular: "Section",
-        related_title_plural: "Sections",
-
-        option_model: CMS.Models.Section,
-
-        join_model: CMS.Models.ObjectSection,
-        option_attr: 'section',
-        join_attr: 'sectionable',
-        option_id_field: 'section_id',
-        option_type_field: null,
-        join_id_field: 'sectionable_id',
-        join_type_field: 'sectionable_type',
-
-        join_object: get_page_object(),
-      },
-
       object_objectives: {
         option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",

@@ -378,12 +378,6 @@ class ObjectPersonFactory(ModelFactory):
   personable = FactoryStubMarker(models.Market)
 
 
-class ObjectSectionFactory(ModelFactory):
-  MODEL = models.ObjectSection
-  status = FuzzyChoice(MODEL.VALID_STATES)
-  sectionable = FactoryStubMarker(models.Market)
-
-
 class ObjectiveControlFactory(ModelFactory):
   MODEL = models.ObjectiveControl
   status = FuzzyChoice(MODEL.VALID_STATES)

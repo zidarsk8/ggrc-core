@@ -143,25 +143,6 @@ can.Model.Join("CMS.Models.Relationship", {
   }
 });
 
-can.Model.Join("CMS.Models.ObjectSection", {
-    root_object: "object_section"
-  , root_collection: "object_sections"
-  , join_keys : {
-      "section" : CMS.Models.SectionBase
-    , "sectionable" : can.Model.Cacheable
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , section : "CMS.Models.get_stub"
-    , sectionable : "CMS.Models.get_stub"
-  }
-  , findAll: "GET /api/object_sections"
-  , create: "POST /api/object_sections"
-  , destroy: "DELETE /api/object_sections/{id}"
-}, {
-});
-
 can.Model.Join("CMS.Models.ObjectObjective", {
     root_object: "object_objective"
   , root_collection: "object_objectives"

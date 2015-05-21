@@ -31,7 +31,6 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , controls : "CMS.Models.Control.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
@@ -120,7 +119,6 @@ can.Model.Cacheable("CMS.Models.Project", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , controls : "CMS.Models.Control.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
@@ -194,7 +192,6 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , controls : "CMS.Models.Control.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
@@ -283,7 +280,6 @@ can.Model.Cacheable("CMS.Models.Product", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , controls : "CMS.Models.Control.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , kind : "CMS.Models.Option.stub"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
@@ -375,7 +371,6 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , controls : "CMS.Models.Control.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
@@ -464,7 +459,6 @@ can.Model.Cacheable("CMS.Models.Market", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , controls : "CMS.Models.Control.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
@@ -538,7 +532,6 @@ can.Model.Cacheable("CMS.Models.Vendor", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , controls : "CMS.Models.Control.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }

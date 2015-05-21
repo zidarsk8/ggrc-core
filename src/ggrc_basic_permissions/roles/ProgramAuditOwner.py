@@ -19,7 +19,6 @@ permissions = {
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
         "Document",
         "Meeting",
@@ -40,7 +39,6 @@ permissions = {
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
         "Document",
         "Meeting",
@@ -64,7 +62,6 @@ permissions = {
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
         "Document",
         "Meeting"
@@ -77,7 +74,6 @@ permissions = {
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
         "Document",
         "Meeting"

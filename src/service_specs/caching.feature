@@ -267,7 +267,6 @@ Feature: Resource caching
       | DataAsset                 | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | DataAsset                 | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | DataAsset                 | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | DataAsset                 | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | DataAsset                 | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | DataAsset                 | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | DataAsset                 | related_destinations | source               | Relationship              | status   | Draft  | Final  |
@@ -307,7 +306,6 @@ Feature: Resource caching
       | Facility                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Facility                  | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Facility                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Facility                  | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | Facility                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Facility                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Facility                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
@@ -315,7 +313,6 @@ Feature: Resource caching
       | Market                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Market                    | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Market                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Market                    | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | Market                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Market                    | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Market                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
@@ -331,7 +328,6 @@ Feature: Resource caching
       | OrgGroup                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | OrgGroup                  | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | OrgGroup                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | OrgGroup                  | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | OrgGroup                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | OrgGroup                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | OrgGroup                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
@@ -340,7 +336,6 @@ Feature: Resource caching
       | Product                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Product                   | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Product                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Product                   | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | Product                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Product                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Product                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
@@ -356,7 +351,6 @@ Feature: Resource caching
       | Project                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Project                   | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Project                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Project                   | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | Project                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Project                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Project                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
@@ -377,19 +371,16 @@ Feature: Resource caching
       | PopulationSampleResponse  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Section                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Section                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Section                   | object_sections      | section              | ObjectSection             | status   | Draft  | Final  |
       | Section                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Section                   | section_objectives   | section              | SectionObjective          | status   | Draft  | Final  |
       | Clause                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Clause                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Clause                    | object_sections      | section              | ObjectSection             | status   | Draft  | Final  |
       | Clause                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Clause                    | section_objectives   | section              | SectionObjective          | status   | Draft  | Final  |
       | System                    | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | System                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | System                    | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | System                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | System                    | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | System                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | System                    | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | System                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
@@ -397,7 +388,6 @@ Feature: Resource caching
       | Process                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Process                   | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Process                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Process                   | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | Process                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Process                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Process                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |

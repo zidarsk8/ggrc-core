@@ -336,35 +336,13 @@
       ])
     },
     section_base: {
-      _mixins: ["personable", "ownable"],
+      _mixins: ["related_object", "personable", "ownable"],
       _canonical: {
-        "related_objects": ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue"],
         "objectives": "Objective",
-        "related_objects_as_source": ["Control", "Contract"],
       },
-      related_objects_as_source: Proxy(
-        null, "destination", "Relationship", "source", "related_destinations"),
-      related_objects_as_destination: Proxy(
-        null, "source", "Relationship", "destination", "related_sources"),
-      related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"]),
-      related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment"),
-      related_objects: Proxy(
-          null, "sectionable", "ObjectSection", "section", "object_sections"), //section_objects
       related_and_able_objects: Multi([
         "objectives", "controls", "related_objects", "people"
       ]),
-      related_data_assets: TypeFilter("related_objects", "DataAsset"),
-      related_facilities: TypeFilter("related_objects", "Facility"),
-      related_markets: TypeFilter("related_objects", "Market"),
-      related_org_groups: TypeFilter("related_objects", "OrgGroup"),
-      related_vendors: TypeFilter("related_objects", "Vendor"),
-      related_processes: TypeFilter("related_objects", "Process"),
-      related_products: TypeFilter("related_objects", "Product"),
-      related_projects: TypeFilter("related_objects", "Project"),
-      related_systems: TypeFilter("related_objects", "System"),
-      related_issues: TypeFilter("related_objects", "Issue"),
-      controls: TypeFilter("related_objects_via_relationship", "Control"),
-      contracts: TypeFilter("related_objects_via_relationship", "Contract"),
       objectives: Proxy(
         "Objective", "objective", "SectionObjective", "section", "section_objectives"),
        orphaned_objects: Multi([
@@ -383,15 +361,6 @@
       },
       objectives: Proxy(
         "Objective", "objective", "ObjectObjective", "objectiveable", "object_objectives")
-    },
-    sectionable: {
-      _canonical: {
-        _sections_base: ["Section", "Clause"]
-      },
-      _sections_base: Proxy(
-        null, "section", "ObjectSection", "sectionable", "object_sections"),
-      sections: TypeFilter("_sections_base", "Section"),
-      clauses: TypeFilter("_sections_base", "Clause")
     },
     personable: {
       _canonical: {
@@ -519,7 +488,7 @@
     business_object: {
       _mixins: [
         "related_object", "personable",
-        "objectiveable", "sectionable",
+        "objectiveable",
         "ownable"
       ],
       orphaned_objects: Multi([

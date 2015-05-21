@@ -43,7 +43,6 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , object_objectives : "CMS.Models.ObjectObjective.stubs"
       , objectives : "CMS.Models.Objective.stubs"
       , controls : "CMS.Models.Control.stubs"
-      , object_sections : "CMS.Models.ObjectSection.stubs"
       , sections : "CMS.Models.get_stubs"
       , response : "CMS.Models.Response.stub"
       , network_zone : "CMS.Models.Option.stub"

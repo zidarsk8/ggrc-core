@@ -9,7 +9,6 @@ permissions = {
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Program",
         "Relationship",
         "Context",

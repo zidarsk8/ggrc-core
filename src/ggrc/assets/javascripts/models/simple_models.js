@@ -49,7 +49,6 @@ can.Model.Cacheable("CMS.Models.Program", {
     , related_destinations : "CMS.Models.Relationship.stubs"
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
-    , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.get_stubs"
     , directives : "CMS.Models.Directive.stubs"
     , controls : "CMS.Models.Control.stubs"

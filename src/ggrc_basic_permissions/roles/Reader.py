@@ -29,7 +29,6 @@ permissions = {
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Option",
         "OrgGroup",
         "Vendor",

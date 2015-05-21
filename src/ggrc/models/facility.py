@@ -9,14 +9,13 @@ from .object_document import Documentable
 from .object_objective import Objectiveable
 from .object_owner import Ownable
 from .object_person import Personable
-from .object_section import Sectionable
 from .relationship import Relatable
 from .track_object_state import HasObjectState, track_state_for_class
 
 
 class Facility(HasObjectState,
                CustomAttributable, Documentable, Personable, Objectiveable,
-               Sectionable, Relatable, Timeboxed, Ownable,
+               Relatable, Timeboxed, Ownable,
                BusinessObject, db.Model):
   __tablename__ = 'facilities'
 

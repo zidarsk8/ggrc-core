@@ -26,7 +26,6 @@ from .object_document import ObjectDocument
 from .object_objective import ObjectObjective
 from .object_owner import ObjectOwner
 from .object_person import ObjectPerson
-from .object_section import ObjectSection
 from .object_type import ObjectType
 from .objective import Objective
 from .objective_control import ObjectiveControl
@@ -85,7 +84,6 @@ all_models = [
     ObjectObjective,
     ObjectOwner,
     ObjectPerson,
-    ObjectSection,
     ObjectType,
     Option,
     OrgGroup,

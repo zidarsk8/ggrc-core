@@ -28,7 +28,6 @@ permissions = {
         "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         "Option",
         "OrgGroup",
         "Vendor",
@@ -81,7 +80,6 @@ permissions = {
         "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         "Option",
         "OrgGroup",
         "Vendor",
@@ -224,7 +222,6 @@ permissions = {
         "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         {
             "type": "Option",
             "terms": {
@@ -433,7 +430,6 @@ permissions = {
         "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         {
             "type": "Option",
             "terms": {

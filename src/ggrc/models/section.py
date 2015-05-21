@@ -48,8 +48,6 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
       'SectionObjective', backref='section', cascade='all, delete-orphan')
   objectives = association_proxy(
       'section_objectives', 'objective', 'SectionObjective')
-  object_sections = db.relationship(
-      'ObjectSection', backref='section', cascade='all, delete-orphan')
 
   __mapper_args__ = {
       'polymorphic_on': type
@@ -61,7 +59,6 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
       'notes',
       PublishOnly('section_objectives'),
       'objectives',
-      'object_sections',
   ]
   _sanitize_html = [
       'notes',
@@ -87,8 +84,7 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
     query = super(SectionBase, cls).eager_query()
     return cls.eager_inclusions(query, SectionBase._include_links).options(
         orm.joinedload('directive'),
-        orm.subqueryload('section_objectives'),
-        orm.subqueryload('object_sections'))
+        orm.subqueryload('section_objectives'))
 
 track_state_for_class(SectionBase)
 
