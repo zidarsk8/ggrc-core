@@ -156,7 +156,6 @@ Feature: Private Programs
       | Policy           |
       | Regulation       |
       | Standard         |
-      | DirectiveControl |
       | Document         |
       | Facility         |
       #| Help             |

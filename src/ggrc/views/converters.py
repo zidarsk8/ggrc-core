@@ -350,7 +350,6 @@ def import_controls(directive_id):
   from werkzeug import secure_filename
 
   directive = Directive.query.get(directive_id)
-  ensure_create_permissions_for("DirectiveControl", directive.context_id)
 
   return_to = unicode(request.args.get('return_to') or '')
 

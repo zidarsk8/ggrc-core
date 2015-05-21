@@ -34,7 +34,6 @@ def all_cache_entries():
     resource('policies', 'Policy'),
     resource('regulations', 'Regulation'),
     resource('standards', 'Standard'),
-    resource('directive_controls', 'DirectiveControl'),
     resource('documents', 'Document'),
     resource('events', 'Event'),
     resource('facilities', 'Facility'),

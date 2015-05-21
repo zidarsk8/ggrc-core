@@ -22,8 +22,6 @@ Feature: Basic RESTful CRUD Support
       | ControlCategory    |
       | Control            |
       | DataAsset          |
-      #| Directive          |
-      | DirectiveControl   |
       | DirectiveSection   |
       | Contract           |
       | Policy             |
@@ -52,4 +50,3 @@ Feature: Basic RESTful CRUD Support
       #| SystemOrProcess    |
       | System             |
       | Process            |
-

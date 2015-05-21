@@ -73,13 +73,6 @@ class TestConsistency(TestCase):
         'parent_id': pol1.id,
         'export': True,
     }
-    # then export right back
-    handle_converter_csv_export(
-        "dummy_filename.csv",
-        [x.control for x in pol1.directive_controls],
-        ControlsConverter,
-        **export_options
-    )
     name, args, kwargs = mock_response.mock_calls[0]
     # called with one argument, which is a tuple w/ csv as first arg
     # so access first/only argument, then first arg of tuple

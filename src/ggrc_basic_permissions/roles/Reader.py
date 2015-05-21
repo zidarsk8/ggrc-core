@@ -19,7 +19,6 @@ permissions = {
         "Policy",
         "Regulation",
         "Standard",
-        "DirectiveControl",
         "DirectiveSection",
         "Document",
         "Facility",

@@ -130,8 +130,7 @@ class Control(HasObjectState, Relatable,
       'ObjectiveControl', backref='control', cascade='all, delete-orphan')
   objectives = association_proxy(
       'objective_controls', 'objective', 'ObjectiveControl')
-  directive_controls = db.relationship(
-      'DirectiveControl', backref='control', cascade='all, delete-orphan')
+
   @staticmethod
   def _extra_table_args(cls):
     return (
@@ -155,7 +154,6 @@ class Control(HasObjectState, Relatable,
       'principal_assessor',
       'secondary_assessor',
       PublishOnly('objective_controls'),
-      PublishOnly('directive_controls'),
       ]
 
   _sanitize_html = [
@@ -179,7 +177,6 @@ class Control(HasObjectState, Relatable,
         orm.joinedload('principal_assessor'),
         orm.joinedload('secondary_assessor'),
         orm.subqueryload('objective_controls'),
-        orm.subqueryload('directive_controls').joinedload('directive'),
         )
 
   def log_json(self):

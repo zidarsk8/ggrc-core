@@ -260,7 +260,6 @@
       _mixins: ["related_object", "personable", "ownable"],
       _canonical: {
         "objectives": "Objective",
-        "joined_directives": ["Regulation", "Policy", "Contract", "Standard"]
       },
       related_business_objects: Multi([
         "related_data_assets", "related_facilities", "related_markets",
@@ -269,7 +268,7 @@
       ]),
       related_and_able_objects: Multi([
         "objectives", "related_business_objects",
-        "people", "joined_directives", "programs", "clauses"
+        "people", "programs", "clauses"
       ]),
       related_documentation_responses: TypeFilter("related_objects", "DocumentationResponse"),
       related_interview_responses: TypeFilter("related_objects", "InterviewResponse"),
@@ -289,15 +288,8 @@
       }),
       objectives: Proxy(
         "Objective", "objective", "ObjectiveControl", "control", "objective_controls"),
-      joined_directives: Proxy(
-        null, "directive", "DirectiveControl", "control", "directive_controls"),
-      directives: Multi(["joined_directives"]), // "direct_directives"
-      contracts: TypeFilter("directives", "Contract"),
-      policies: TypeFilter("directives", "Policy"),
-      standards: TypeFilter("directives", "Standard"),
-      regulations: TypeFilter("directives", "Regulation"),
       orphaned_objects: Multi([
-        "related_objects", "clauses", "controls", "programs", "objectives", "joined_directives", "people"
+        "related_objects", "clauses", "controls", "programs", "objectives", "people"
       ])
     },
     Objective: {
@@ -510,17 +502,12 @@
       _canonical: {
         "sections": "Section",
         "clauses": "Clause",
-        "joined_controls": "Control",
       },
       sections: Direct("Section", "directive", "sections"),
       joined_sections: Proxy(
         "Section", "section", "DirectiveSection", "directive", "directive_sections"),
       clauses: Proxy(
           "Clause", "section", "DirectiveSection", "directive", "directive_sections"),
-      direct_controls: Direct("Control", "directive", "controls"),
-      joined_controls: Proxy(
-        "Control", "control", "DirectiveControl", "directive", "directive_controls"),
-      controls: Multi(["direct_controls", "joined_controls"]),
       orphaned_objects: Multi([
         "sections", "clauses", "people", "controls", "objectives", "related_objects"
       ])

@@ -131,7 +131,7 @@ all_tables = [
 reader_objects = [
   'Categorization', 'Category', 'Control', 'ControlControl', 'ControlSection',
   'DataAsset', 'Directive', 'Contract', 'Policy', 'Regulation',
-  'DirectiveControl', 'Document', 'Facility', 'Help', 'Market', 'Objective',
+  'Document', 'Facility', 'Help', 'Market', 'Objective',
   'ObjectiveControl', 'ObjectControl', 'ObjectDocument', 'ObjectObjective',
   'ObjectPerson', 'ObjectSection', 'Option', 'OrgGroup', 'PopulationSample',
   'Product', 'ProgramControl', 'ProgramDirective', 'Project', 'Relationship',
@@ -320,7 +320,7 @@ def upgrade():
       'created_at', sa.DateTime(), default=sa.text('current_timestamp')),
     sa.Column(
       'updated_at',
-      sa.DateTime(), 
+      sa.DateTime(),
       default=sa.text('current_timestamp'),
       onupdate=sa.text('current_timestamp'),
       ),

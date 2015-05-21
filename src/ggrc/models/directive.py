@@ -33,11 +33,6 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
   sections = db.relationship(
       'SectionBase', backref='directive', order_by='SectionBase.slug', cascade='all, delete-orphan')
   controls = db.relationship( 'Control', backref='directive', order_by='Control.slug')
-  directive_controls = db.relationship(
-      'DirectiveControl', backref='directive', cascade='all, delete-orphan')
-  # Not needed for the client at this time
-  #mapped_controls = association_proxy(
-  #    'directive_controls', 'control', 'DirectiveControl')
   directive_sections = db.relationship(
       'DirectiveSection', backref='directive', cascade='all, delete-orphan')
   joined_sections = association_proxy(
@@ -66,7 +61,6 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'controls',
       'kind',
       'organization',
-      PublishOnly('directive_controls'),
       PublishOnly('directive_sections'),
       'scope',
       'sections',
@@ -104,7 +98,6 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
         orm.joinedload('audit_frequency'),
         orm.joinedload('audit_duration'),
         orm.subqueryload('controls'),
-        orm.subqueryload('directive_controls'),
         orm.subqueryload('directive_sections'),
         orm.subqueryload('sections'))
 

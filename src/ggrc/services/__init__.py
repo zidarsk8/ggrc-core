@@ -35,7 +35,6 @@ def contributed_services():
       service('policies', models.Policy),
       service('regulations', models.Regulation),
       service('standards', models.Standard),
-      service('directive_controls', models.DirectiveControl),
       service('directive_sections', models.DirectiveSection),
       service('documents', models.Document),
       service('events', models.Event, ReadOnlyResource),

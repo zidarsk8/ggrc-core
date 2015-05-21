@@ -19,7 +19,6 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | ControlAssertion   |
       | DataAsset          |
       | Directive          |
-      | DirectiveControl   |
       | Contract           |
       | Policy             |
       | Regulation         |
