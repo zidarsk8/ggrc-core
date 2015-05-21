@@ -45,12 +45,12 @@
     tree_view_options: {
       show_view: GGRC.mustache_path + "/workflows/tree.mustache",
       attr_list : [
-        {attr_title: 'Title', attr_name: 'title'},
-        {attr_title: 'Owner', attr_name: 'owner'},
-        {attr_title: 'Code', attr_name: 'slug'},
-        {attr_title: 'State', attr_name: 'status'},
-        {attr_title: 'Frequency', attr_name: 'frequency'},
-        {attr_title: 'Last Updated', attr_name: 'updated_at'}
+        {attr_title: 'Title', attr_name: 'title', attr_sort_field: 'title'},
+        {attr_title: 'Owner', attr_name: 'owner', attr_sort_field: ''},
+        {attr_title: 'Code', attr_name: 'slug', attr_sort_field: 'slug'},
+        {attr_title: 'State', attr_name: 'status', attr_sort_field: 'status'},
+        {attr_title: 'Frequency', attr_name: 'frequency', attr_sort_field: 'frequency'},
+        {attr_title: 'Last Updated', attr_name: 'updated_at', attr_sort_field: 'updated_at'}
       ]
     },
 

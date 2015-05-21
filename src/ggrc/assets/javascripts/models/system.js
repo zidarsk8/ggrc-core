@@ -54,9 +54,9 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       show_view : "/static/mustache/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , attr_list : can.Model.Cacheable.attr_list.concat([
-        {attr_title: 'Network Zone', attr_name: 'network_zone'},
-        {attr_title: 'Effective Date', attr_name: 'start_date'},
-        {attr_title: 'Stop Date', attr_name: 'end_date'}
+        {attr_title: 'Network Zone', attr_name: 'network_zone', attr_sort_field: 'network_zone.title'},
+        {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
+        {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
       ])
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , link_buttons : true
