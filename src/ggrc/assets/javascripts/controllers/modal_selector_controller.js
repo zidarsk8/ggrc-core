@@ -46,7 +46,7 @@
     ],
 
     defaults: {
-      base_modal_view: GGRC.mustache_path + "/selectors/base_modal.mustache",
+      base_modal_view: GGRC.mustache_path + "/modals/mapper/base.mustache",
       option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
       active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
       option_object_view: null, //GGRC.mustache_path + "/selectors/option_object.mustache",
@@ -453,62 +453,62 @@
     return options;
   }
 
-  $(function() {
-    $('body').on('click', '[data-toggle="modal-relationship-selector"]', function(e) {
-      var $this = $(this)
-        ;
+  // $(function() {
+  //   $('body').on('click', '[data-toggle="modal-relationship-selector"]', function(e) {
+  //     var $this = $(this)
+  //       ;
 
-      e.preventDefault();
+  //     e.preventDefault();
 
-      // Trigger the controller
-      GGRC.Controllers.ModalSelector.launch(
-        $this, get_relationship_option_set({
-            related_model_singular: $this.data('related-model-singular')
-          , related_title_singular: $this.data('related-title-singular')
-          , related_title_plural: $this.data('related-title-plural')
-          , related_table_plural: $this.data('related-table-plural')
-          , related_table_singular: $this.data('related-table-singular')
-          , related_side: $this.data('related-side')
-          , related_model: $this.data('related-model')
-          , join_object_id: $this.data('join-object-id')
-          , join_object_type: $this.data('join-object-type')
-          , object_side: $this.data('object-side')
-          , relationship_type: $this.data('relationship-type')
-          , join_query: $this.data('join-query')
-        })).on("relationshipcreated relationshipdestroyed", function(ev, data) {
-          $this.trigger("modal:" + ev.type, data);
-        });
-    });
-  });
+  //     // Trigger the controller
+  //     GGRC.Controllers.ModalSelector.launch(
+  //       $this, get_relationship_option_set({
+  //           related_model_singular: $this.data('related-model-singular')
+  //         , related_title_singular: $this.data('related-title-singular')
+  //         , related_title_plural: $this.data('related-title-plural')
+  //         , related_table_plural: $this.data('related-table-plural')
+  //         , related_table_singular: $this.data('related-table-singular')
+  //         , related_side: $this.data('related-side')
+  //         , related_model: $this.data('related-model')
+  //         , join_object_id: $this.data('join-object-id')
+  //         , join_object_type: $this.data('join-object-type')
+  //         , object_side: $this.data('object-side')
+  //         , relationship_type: $this.data('relationship-type')
+  //         , join_query: $this.data('join-query')
+  //       })).on("relationshipcreated relationshipdestroyed", function(ev, data) {
+  //         $this.trigger("modal:" + ev.type, data);
+  //       });
+  //   });
+  // });
 
-  $(function() {
-    $('body').on('click', '[data-toggle="modal-selector"]', function(e) {
-      var $this = $(this)
-        , options = $this.data('modal-selector-options')
-        , data_set = can.extend({}, $this.data())
-        ;
+  // $(function() {
+  //   $('body').on('click', '[data-toggle="modal-selector"]', function(e) {
+  //     var $this = $(this)
+  //       , options = $this.data('modal-selector-options')
+  //       , data_set = can.extend({}, $this.data())
+  //       ;
 
-      can.each($this.data(), function(v, k) {
-        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
-        if(/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
-          delete data_set[k];
-      });
+  //     can.each($this.data(), function(v, k) {
+  //       data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+  //       if(/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+  //         delete data_set[k];
+  //     });
 
-      if (typeof(options) === "string")
-        options = get_option_set(
-          options
-          , data_set
-        );
+  //     if (typeof(options) === "string")
+  //       options = get_option_set(
+  //         options
+  //         , data_set
+  //       );
 
-      e.preventDefault();
+  //     e.preventDefault();
 
-      // Trigger the controller
-      GGRC.Controllers.ModalSelector.launch($this, options)
-      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
-        $this.trigger("modal:" + ev.type, data);
-      });
-    });
-  });
+  //     // Trigger the controller
+  //     GGRC.Controllers.ModalSelector.launch($this, options)
+  //     .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+  //       $this.trigger("modal:" + ev.type, data);
+  //     });
+  //   });
+  // });
 
   //************************************************************************************************
 
@@ -1182,38 +1182,38 @@
     return option_set;
   }
 
-  $(function() {
-    $('body').on('click', '[data-toggle="multitype-modal-selector"]', function(e) {
-      var $this = $(this)
-        , options
-        , data_set = can.extend({}, $this.data())
-        ;
+  // $(function() {
+  //   $('body').on('click', '[data-toggle="multitype-modal-selector"]', function(e) {
+  //     var $this = $(this)
+  //       , options
+  //       , data_set = can.extend({}, $this.data())
+  //       ;
 
-      can.each($this.data(), function(v, k) {
-        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
-        if(/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
-          delete data_set[k];
-      });
+  //     can.each($this.data(), function(v, k) {
+  //       data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+  //       if(/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+  //         delete data_set[k];
+  //     });
 
-      options = get_multitype_option_set(
-        data_set.join_object_type, data_set.join_option_type, data_set);
+  //     options = get_multitype_option_set(
+  //       data_set.join_object_type, data_set.join_option_type, data_set);
 
-      options.selected_object = CMS.Models.get_instance(
-          data_set.join_object_type, data_set.join_object_id);
-      options.binding = options.selected_object.get_binding(
-          data_set.join_mapping);
+  //     options.selected_object = CMS.Models.get_instance(
+  //         data_set.join_object_type, data_set.join_object_id);
+  //     options.binding = options.selected_object.get_binding(
+  //         data_set.join_mapping);
 
-      options.object_params = $this.data("object-params");
+  //     options.object_params = $this.data("object-params");
 
-      e.preventDefault();
+  //     e.preventDefault();
 
-      // Trigger the controller
-      GGRC.Controllers.MultitypeModalSelector.launch($this, options)
-      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
-        $this.trigger("modal:" + ev.type, data);
-      });
-    });
-  });
+  //     // Trigger the controller
+  //     GGRC.Controllers.MultitypeModalSelector.launch($this, options)
+  //     .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+  //       $this.trigger("modal:" + ev.type, data);
+  //     });
+  //   });
+  // });
 
 
 
@@ -2010,47 +2010,47 @@
 
 
   ////Set up handler for all multiselect -modal-selector
-  $(function() {
-    $('body').on('click', '[data-toggle="multitype-multiselect-modal-selector"]', function(e) {
-      var $this = $(this)
-        , options
-        , data_set = can.extend({}, $this.data())
-        ;
+  // $(function() {
+  //   $('body').on('click', '[data-toggle="multitype-multiselect-modal-selector"]', function(e) {
+  //     var $this = $(this)
+  //       , options
+  //       , data_set = can.extend({}, $this.data())
+  //       ;
 
-      can.each($this.data(), function(v, k) {
-        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
-        if(/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
-          delete data_set[k];
-      });
+  //     can.each($this.data(), function(v, k) {
+  //       data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+  //       if(/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+  //         delete data_set[k];
+  //     });
 
 
-      //set up the options for new multitype Object  modal
-      var column_view = GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache",
-      item_view =  GGRC.mustache_path + "/selectors/multitype_multiselect_option_items.mustache" ;
+  //     //set up the options for new multitype Object  modal
+  //     var column_view = GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache",
+  //     item_view =  GGRC.mustache_path + "/selectors/multitype_multiselect_option_items.mustache" ;
 
-      options = get_object_multitype_option_set(
-        data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
+  //     options = get_object_multitype_option_set(
+  //       data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
 
-      options.selected_object = CMS.Models.get_instance(
-          data_set.join_object_type, data_set.join_object_id);
+  //     options.selected_object = CMS.Models.get_instance(
+  //         data_set.join_object_type, data_set.join_object_id);
 
-      options.binding = options.selected_object.get_binding(
-          data_set.join_mapping);
+  //     options.binding = options.selected_object.get_binding(
+  //         data_set.join_mapping);
 
-      options.deferred = data_set.deferred;
+  //     options.deferred = data_set.deferred;
 
-      //the below line is not needed, verify and clean up
-      //options.object_params = $this.data("object-params");
+  //     //the below line is not needed, verify and clean up
+  //     //options.object_params = $this.data("object-params");
 
-      e.preventDefault();
+  //     e.preventDefault();
 
-      // Trigger the controller
-      GGRC.Controllers.MultitypeMultiSelectModalSelector.launch($this, options)
-      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
-        $this.trigger("modal:" + ev.type, data);
-      });
-    });
-  });
+  //     // Trigger the controller
+  //     GGRC.Controllers.MultitypeMultiSelectModalSelector.launch($this, options)
+  //     .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+  //       $this.trigger("modal:" + ev.type, data);
+  //     });
+  //   });
+  // });
 
 
 
@@ -2098,46 +2098,46 @@
   });
 
 
-  $(function() {
-    $('body').on('click', '[data-toggle="multitype-object-modal-selector"]', function(e) {
-      var $this = $(this)
-        , options
-        , data_set = can.extend({}, $this.data())
-        ;
+  // $(function() {
+  //   $('body').on('click', '[data-toggle="multitype-object-modal-selector"]', function(e) {
+  //     var $this = $(this)
+  //       , options
+  //       , data_set = can.extend({}, $this.data())
+  //       ;
 
-      can.each($this.data(), function(v, k) {
-        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
-        if(/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
-          delete data_set[k];
-      });
+  //     can.each($this.data(), function(v, k) {
+  //       data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+  //       if(/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+  //         delete data_set[k];
+  //     });
 
 
-      //set up the options for new multitype Object  modal
-      var column_view = GGRC.mustache_path + "/selectors/object_selector_option_column.mustache",
-      item_view =  GGRC.mustache_path + "/selectors/object_selector_option_items.mustache" ;
-      options = get_object_multitype_option_set(
-        data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
+  //     //set up the options for new multitype Object  modal
+  //     var column_view = GGRC.mustache_path + "/selectors/object_selector_option_column.mustache",
+  //     item_view =  GGRC.mustache_path + "/selectors/object_selector_option_items.mustache" ;
+  //     options = get_object_multitype_option_set(
+  //       data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
 
-      options.selected_object = data_set.join_object || CMS.Models.get_instance(
-          data_set.join_object_type, data_set.join_object_id);
+  //     options.selected_object = data_set.join_object || CMS.Models.get_instance(
+  //         data_set.join_object_type, data_set.join_object_id);
 
-      options.binding = options.selected_object.get_binding(
-          data_set.join_mapping);
+  //     options.binding = options.selected_object.get_binding(
+  //         data_set.join_mapping);
 
-      options.deferred = data_set.deferred;
+  //     options.deferred = data_set.deferred;
 
-      //The below line is not needed, verify and clean up
-      //options.object_params = $this.data("object-params");
+  //     //The below line is not needed, verify and clean up
+  //     //options.object_params = $this.data("object-params");
 
-      e.preventDefault();
+  //     e.preventDefault();
 
-      // Trigger the controller
-      GGRC.Controllers.MultitypeObjectModalSelector.launch($this, options)
-      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
-        $this.trigger("modal:" + ev.type, data);
-      });
-    });
-  });
+  //     // Trigger the controller
+  //     GGRC.Controllers.MultitypeObjectModalSelector.launch($this, options)
+  //     .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+  //       $this.trigger("modal:" + ev.type, data);
+  //     });
+  //   });
+  // });
 
   can.Component.extend({
     tag: "lazy-openclose",

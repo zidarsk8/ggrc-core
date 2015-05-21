@@ -109,6 +109,7 @@ dashboard-js-files:
   - components/link_to_clipboard.js
   - components/csv/import.js
   - components/csv/export.js
+  - components/mapper.js
   #- d3.v2.js
   #- related_graph.js
 
