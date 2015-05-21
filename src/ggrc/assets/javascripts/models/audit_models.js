@@ -537,7 +537,6 @@ can.Model.Cacheable("CMS.Models.Response", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/responses/tree.mustache"
-    , footer_view : GGRC.mustache_path + "/responses/tree_footer.mustache"
     , add_item_view : GGRC.mustache_path + "/responses/tree_add_item.mustache"
     , draw_children : true
     , child_options : [{

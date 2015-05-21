@@ -296,7 +296,6 @@ dashboard-js-template-files:
   - responses/confirm_delete_evidence.mustache
   - responses/tree.mustache
   - responses/info.mustache
-  - responses/tree_footer.mustache
   - responses/tree_add_item.mustache
   - responses/modal_content.mustache
   - meetings/modal_content.mustache
