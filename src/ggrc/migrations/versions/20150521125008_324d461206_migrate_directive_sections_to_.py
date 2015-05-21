@@ -26,7 +26,7 @@ def upgrade():
   SELECT dc.modified_by_id, dc.created_at, dc.updated_at,
          dc.section_id as source_id, 'Clause' as source_type,
          dc.directive_id as destination_id,
-         IFNULL(d.kind, "Policy") as destination_type,
+         d.meta_kind as destination_type,
          dc.context_id
   FROM directive_sections as dc JOIN directives as d ON dc.directive_id = d.id;
   """
