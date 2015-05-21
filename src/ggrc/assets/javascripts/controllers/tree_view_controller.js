@@ -1073,6 +1073,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.display_prefs.setTreeViewHeaders(this.options.model.model_singular, attr_to_save);
     this.display_prefs.save();
 
+    can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
+                  'click',
+                  this.sort.bind(this)
+                 );
+
   }
   , sort: function (event) {
       var $el = $(event.currentTarget),
