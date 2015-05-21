@@ -263,25 +263,6 @@ can.Model.Join("CMS.Models.SectionObjective", {
 }, {
 });
 
-can.Model.Join("CMS.Models.DirectiveSection", {
-    root_collection : "directive_sections"
-  , root_object : "directive_section"
-  , findAll : "GET /api/directive_sections"
-  , create : "POST /api/directive_sections"
-  , destroy : "DELETE /api/directive_sections/{id}"
-  , join_keys : {
-      directive : CMS.Models.Directive
-    , section : CMS.Models.SectionBase
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , directive : "CMS.Models.Directive.stub"
-    , section : "CMS.Models.get_stub"
-  }
-}, {
-});
-
 can.Model.Join("CMS.Models.ObjectPerson", {
   root_object : "object_person"
   , root_collection : "object_people"

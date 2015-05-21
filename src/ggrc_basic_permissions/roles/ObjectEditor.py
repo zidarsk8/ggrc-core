@@ -18,7 +18,6 @@ permissions = {
         "Policy",
         "Regulation",
         "Standard",
-        "DirectiveSection",
         "Document",
         "Facility",
         "Help",
@@ -73,7 +72,6 @@ permissions = {
         "Policy",
         "Regulation",
         "Standard",
-        "DirectiveSection",
         "Document",
         "Facility",
         "Market",
@@ -189,7 +187,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "DirectiveSection",
         {
             "type": "Document",
             "terms": {
@@ -399,7 +396,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "DirectiveSection",
         {
             "type": "Document",
             "terms": {

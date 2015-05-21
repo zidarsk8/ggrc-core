@@ -336,11 +336,11 @@
       ])
     },
     section_base: {
-      _mixins: ["personable", "ownable"], //sectionable
+      _mixins: ["personable", "ownable"],
       _canonical: {
         "related_objects": ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue"],
         "objectives": "Objective",
-        "related_objects_as_source": ["Control"],
+        "related_objects_as_source": ["Control", "Contract"],
       },
       related_objects_as_source: Proxy(
         null, "destination", "Relationship", "source", "related_destinations"),
@@ -364,6 +364,7 @@
       related_systems: TypeFilter("related_objects", "System"),
       related_issues: TypeFilter("related_objects", "Issue"),
       controls: TypeFilter("related_objects_via_relationship", "Control"),
+      contracts: TypeFilter("related_objects_via_relationship", "Contract"),
       objectives: Proxy(
         "Objective", "objective", "SectionObjective", "section", "section_objectives"),
        orphaned_objects: Multi([
@@ -372,18 +373,9 @@
     },
     Section: {
       _mixins: ["section_base"],
-      _canonical: {
-        directive: ["Regulation", "Policy", "Standard"]
-      },
-      directive: Direct("Directive", "sections", "directive")
     },
     Clause: {
       _mixins: ["section_base"],
-      _canonical: {
-        contracts: "Contract"
-      },
-      contracts: Proxy(
-        "Contract", "directive", "DirectiveSection", "section", "directive_sections")
     },
     objectiveable: {
       _canonical: {
@@ -504,12 +496,8 @@
         "clauses": "Clause",
       },
       sections: Direct("Section", "directive", "sections"),
-      joined_sections: Proxy(
-        "Section", "section", "DirectiveSection", "directive", "directive_sections"),
-      clauses: Proxy(
-          "Clause", "section", "DirectiveSection", "directive", "directive_sections"),
       orphaned_objects: Multi([
-        "sections", "clauses", "people", "controls", "objectives", "related_objects"
+        "sections", "people", "controls", "objectives", "related_objects"
       ])
     },
 

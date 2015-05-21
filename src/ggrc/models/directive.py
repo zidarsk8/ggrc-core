@@ -4,18 +4,17 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .associationproxy import association_proxy
 from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
 from .object_document import Documentable
 from .object_person import Personable
 from .object_objective import Objectiveable
 from .object_owner import Ownable
 from .relationship import Relatable
-from .reflection import PublishOnly
 from .utils import validate_option
 
 from sqlalchemy.orm import validates
 from .track_object_state import HasObjectState, track_state_for_class
+
 
 class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'directives'
@@ -31,28 +30,26 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
   kind = deferred(db.Column(db.String), 'Directive')
 
   sections = db.relationship(
-      'SectionBase', backref='directive', order_by='SectionBase.slug', cascade='all, delete-orphan')
-  controls = db.relationship( 'Control', backref='directive', order_by='Control.slug')
-  directive_sections = db.relationship(
-      'DirectiveSection', backref='directive', cascade='all, delete-orphan')
-  joined_sections = association_proxy(
-      'directive_sections', 'section', 'DirectiveSection')
+      'SectionBase', backref='directive',
+      order_by='SectionBase.slug', cascade='all, delete-orphan')
+  controls = db.relationship(
+      'Control', backref='directive', order_by='Control.slug')
   audit_frequency = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Directive.audit_frequency_id) == Option.id, '\
-                       'Option.role == "audit_frequency")',
+                  'Option.role == "audit_frequency")',
       uselist=False,
-      )
+  )
   audit_duration = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Directive.audit_duration_id) == Option.id, '\
-                       'Option.role == "audit_duration")',
+                  'Option.role == "audit_duration")',
       uselist=False,
-      )
+  )
 
   __mapper_args__ = {
       'polymorphic_on': meta_kind
-      }
+  }
 
   _publish_attrs = [
       'audit_start_date',
@@ -61,17 +58,16 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'controls',
       'kind',
       'organization',
-      PublishOnly('directive_sections'),
       'scope',
       'sections',
       'version',
-      ]
+  ]
 
   _sanitize_html = [
       'organization',
       'scope',
       'version',
-      ]
+  ]
 
   _include_links = []
 
@@ -81,7 +77,7 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
       return None
     if value not in self.valid_kinds:
       message = "Invalid value '{}' for attribute {}.{}.".format(
-        value, self.__class__.__name__, key)
+                value, self.__class__.__name__, key)
       raise ValueError(message)
     return value
 
@@ -98,39 +94,37 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
         orm.joinedload('audit_frequency'),
         orm.joinedload('audit_duration'),
         orm.subqueryload('controls'),
-        orm.subqueryload('directive_sections'),
         orm.subqueryload('sections'))
 
   @staticmethod
   def _extra_table_args(cls):
     return (
         db.Index('ix_{}_meta_kind'.format(cls.__tablename__), 'meta_kind'),
-        )
+    )
 
 
 # FIXME: For subclasses, restrict kind
-class Policy(
-    CustomAttributable, Relatable, Objectiveable, Documentable, Personable,
-    Ownable, Directive):
+class Policy(CustomAttributable, Relatable, Objectiveable, Documentable,
+             Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
-      }
+  }
   _table_plural = 'policies'
   valid_kinds = (
       "Company Policy", "Org Group Policy", "Data Asset Policy",
       "Product Policy", "Contract-Related Policy", "Company Controls Policy"
-      )
+  )
 
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
     return 'Policy'
 
-class Regulation(
-    CustomAttributable, Relatable, Objectiveable, Documentable, Personable,
-    Ownable, Directive):
+
+class Regulation(CustomAttributable, Relatable, Objectiveable, Documentable,
+                 Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
-      }
+  }
   _table_plural = 'regulations'
   valid_kinds = ("Regulation",)
 
@@ -138,12 +132,12 @@ class Regulation(
   def validates_meta_kind(self, key, value):
     return 'Regulation'
 
-class Standard(
-    CustomAttributable, Relatable, Objectiveable, Documentable, Personable,
-    Ownable, Directive):
+
+class Standard(CustomAttributable, Relatable, Objectiveable, Documentable,
+               Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Standard'
-      }
+  }
   _table_plural = 'standards'
   valid_kinds = ("Standard",)
 
@@ -151,12 +145,12 @@ class Standard(
   def validates_meta_kind(self, key, value):
     return 'Standard'
 
-class Contract(
-    CustomAttributable, Relatable, Objectiveable, Documentable, Personable,
-    Ownable, Directive):
+
+class Contract(CustomAttributable, Relatable, Objectiveable, Documentable,
+               Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'
-      }
+  }
   _table_plural = 'contracts'
   valid_kinds = ("Contract",)
 

@@ -18,7 +18,6 @@ from .custom_attribute_definition import CustomAttributeDefinition
 from .custom_attribute_value import CustomAttributeValue
 from .data_asset import DataAsset
 from .directive import Directive, Regulation, Policy, Contract, Standard
-from .directive_section import DirectiveSection
 from .document import Document
 from .facility import Facility
 from .help import Help
@@ -75,7 +74,6 @@ all_models = [
     Policy,
     Regulation,
     Standard,
-    DirectiveSection,
     Document,
     Facility,
     Help,

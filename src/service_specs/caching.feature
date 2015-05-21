@@ -59,7 +59,6 @@ Feature: Resource caching
       | ControlCategory    | control_categories   | name        | name1    | name2    |
       | Control            | controls             | description | desc1    | desc2    |
       | DataAsset          | data_assets          | description | desc1    | desc2    |
-      | DirectiveSection   | directive_sections   | status      | Draft    | Final    |
       | Contract           | contracts            | description | desc1    | desc2    |
       | Policy             | policies             | description | desc1    | desc2    |
       | Regulation         | regulations          | description | desc1    | desc2    |
@@ -273,7 +272,6 @@ Feature: Resource caching
       | DataAsset                 | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | DataAsset                 | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Contract                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
-      | Contract                  | directive_sections   | directive            | DirectiveSection          | status   | Draft  | Final  |
       | Contract                  | program_directives   | directive            | ProgramDirective          | status   | Draft  | Final  |
       | Contract                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Contract                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
@@ -281,7 +279,6 @@ Feature: Resource caching
       | Contract                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Contract                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Policy                    | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
-      | Policy                    | directive_sections   | directive            | DirectiveSection          | status   | Draft  | Final  |
       | Policy                    | program_directives   | directive            | ProgramDirective          | status   | Draft  | Final  |
       | Policy                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Policy                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
@@ -290,7 +287,6 @@ Feature: Resource caching
       | Policy                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Policy                     | sections             | directive            | Section                   | title    | title1 | title2 |
       | Regulation                | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
-      | Regulation                | directive_sections   | directive            | DirectiveSection          | status   | Draft  | Final  |
       | Regulation                | program_directives   | directive            | ProgramDirective          | status   | Draft  | Final  |
       | Regulation                | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Regulation                | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
@@ -299,7 +295,6 @@ Feature: Resource caching
       | Regulation                | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Regulation                 | sections             | directive            | Section                   | title    | title1 | title2 |
       | Standard                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
-      | Standard                  | directive_sections   | directive            | DirectiveSection          | status   | Draft  | Final  |
       | Standard                  | program_directives   | directive            | ProgramDirective          | status   | Draft  | Final  |
       | Standard                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Standard                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
@@ -380,13 +375,11 @@ Feature: Resource caching
       | PopulationSampleResponse  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | PopulationSampleResponse  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | PopulationSampleResponse  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
-      | Section                   | directive_sections   | section              | DirectiveSection          | status   | Draft  | Final  |
       | Section                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Section                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Section                   | object_sections      | section              | ObjectSection             | status   | Draft  | Final  |
       | Section                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Section                   | section_objectives   | section              | SectionObjective          | status   | Draft  | Final  |
-      | Clause                    | directive_sections   | section              | DirectiveSection          | status   | Draft  | Final  |
       | Clause                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Clause                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Clause                    | object_sections      | section              | ObjectSection             | status   | Draft  | Final  |
