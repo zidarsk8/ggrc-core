@@ -11,9 +11,8 @@ runtime: python27
 api_version: 1
 threadsafe: true
 instance_class: {INSTANCE_CLASS}
-basic_scaling:
-  max_instances: {MAX_INSTANCES}
-  idle_timeout: 10m
+manual_scaling:
+  instances: {MAX_INSTANCES}
 
 handlers:
   - url: /login
