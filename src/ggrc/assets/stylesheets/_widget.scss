@@ -1712,3 +1712,32 @@ ul.attr-list {
 .white-widget {
   background: $white;
 }
+
+.report-title {
+  margin-bottom: 20px;
+  h2 {
+    font-size: 24px;
+    line-height: 30px;
+    font-family: $fontTitle;
+    font-weight: normal;
+  }
+}
+
+.report-title-change {
+  display: none;
+  height: 30px;
+}
+
+.report-title-trigger {
+  @include border-radius($default-border-radius);
+  display: inline-block;
+  line-height: 26px;
+  height: 26px;
+  width: 50px;
+  text-align: center;
+  border: 1px solid $infoMessageText;
+  margin-left: 10px;
+  i {
+    margin-top: 4px;
+  }
+}
