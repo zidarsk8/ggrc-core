@@ -74,9 +74,9 @@
               Logout
       %li
         %a.nav-trigger.active{'href': 'javascript://'}
-          %i.grcicon-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Hide menu'}
+          %i.grcicon-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Menu'}
           %span
-            Hide menu
+            Menu
       -if self.page_help
         %li
           %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}

@@ -77,11 +77,6 @@
       cursor: default;
     }
   }
-  .nav-trigger {
-    &.active {
-      .grcicon-nav-trigger { background-position: -342px -416px; }
-    }
-  }
   .menu {
     @extend %reset-list;
     @include clearfix();
