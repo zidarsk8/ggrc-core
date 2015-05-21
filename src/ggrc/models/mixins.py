@@ -6,15 +6,20 @@
 from uuid import uuid1
 
 from flask import current_app
+from sqlalchemy import and_
 from sqlalchemy import event
+from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import foreign
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import validates
 from sqlalchemy.orm.session import Session
 
 from ggrc import db
-from .inflector import ModelInflectorDescriptor
-from .reflection import AttributeInfo
-from .computed_property import computed_property
+from ggrc.models.inflector import ModelInflectorDescriptor
+from ggrc.models.reflection import AttributeInfo
+from ggrc.models.reflection import PublishOnly
+from ggrc.models.computed_property import computed_property
 
 
 """Mixins to add common attributes and relationships. Note, all model classes
@@ -493,36 +498,35 @@ class CustomAttributable(object):
 
   @declared_attr
   def custom_attribute_values(cls):
-    joinstr = 'and_(foreign(CustomAttributeValue.attributable_id) == {type}.id, '\
-        'foreign(CustomAttributeValue.attributable_type) == "{type}")'
-    joinstr = joinstr.format(type=cls.__name__)
+    from ggrc.models.custom_attribute_value import CustomAttributeValue
+    join_function = lambda: and_(
+        foreign(CustomAttributeValue.attributable_id) == cls.id,
+        foreign(CustomAttributeValue.attributable_type) == cls.__name__)
     return relationship(
         "CustomAttributeValue",
-        primaryjoin=joinstr,
+        primaryjoin=join_function,
         backref='{0}_custom_attributable'.format(cls.__name__),
         cascade='all, delete-orphan',
     )
 
   def custom_attributes(cls, attributes):
+    from ggrc.fulltext.mysql import MysqlRecordProperty
+    from ggrc.models.custom_attribute_value import CustomAttributeValue
     if 'custom_attributes' not in attributes:
       return
     attributes = attributes['custom_attributes']
-    from .custom_attribute_value import CustomAttributeValue
     # attributes looks like this:
-    #    {<id of attribute definition> : attribute value, ... }
+    #    [ {<id of attribute definition> : attribute value, ... }, ... ]
 
     # 1) Get all custom attribute values for the CustomAttributable instance
-    attr_values = db.session.query(CustomAttributeValue)\
-        .filter(CustomAttributeValue.attributable_type == cls.__class__.__name__)\
-        .filter(CustomAttributeValue.attributable_id == cls.id)\
-        .all()
+    attr_values = db.session.query(CustomAttributeValue).filter(and_(
+        CustomAttributeValue.attributable_type == cls.__class__.__name__,
+        CustomAttributeValue.attributable_id == cls.id)).all()
 
     attr_value_ids = [v.id for v in attr_values]
     ftrp_properties = [
         "attribute_value_{id}".format(id=_id) for _id in attr_value_ids]
 
-    from ggrc.fulltext.mysql import MysqlRecordProperty
-    from sqlalchemy import and_
     # 2) Delete all fulltext_record_properties for the list of values
     if len(attr_value_ids) > 0:
       db.session.query(MysqlRecordProperty)\
@@ -542,20 +546,21 @@ class CustomAttributable(object):
     # 4) Instantiate custom attribute values for each of the definitions
     #    passed in (keys)
     for ad_id in attributes.keys():
-      av = CustomAttributeValue()
-      av.custom_attribute_id = ad_id
-      av.attributable_id = cls.id
-      av.attributable_type = cls.__class__.__name__
-      av.attribute_value = attributes[ad_id]
+      av = CustomAttributeValue(
+          custom_attribute_id=ad_id,
+          attributable_id=cls.id,
+          attributable_type=cls.__class__.__name__,
+          attribute_value=attributes[ad_id],
+      )
       # 5) Set the context_id for each custom attribute value to the context id
       #    of the custom attributable.
       # TODO: We are ignoring contexts for now
       # av.context_id = cls.context_id
-      # 6) Save the new set of custom attribute values.
       db.session.add(av)
 
   _publish_attrs = [
-      'custom_attribute_values'
+      'custom_attribute_values',
+      # PublishOnly('custom_attribute_definitions')
   ]
   _update_attrs = [
       'custom_attributes'
@@ -563,14 +568,23 @@ class CustomAttributable(object):
   _include_links = [
       # 'custom_attribute_values',
   ]
-  #
-  # @declared_attr
-  # def custom_attribute_definitions(cls):
-  #     from .custom_attribute_definition import CustomAttributeDefinition
-  #     # FIXME definitions should be class scoped, not instance scoped.
-  #     joinstr = 'foreign(CustomAttributeDefinition.definition_type) == "{name}"'
-  #     joinstr = joinstr.format(name=cls.__name__)
-  #     return db.relationship("CustomAttributeDefinition",primaryjoin=joinstr)
+
+  @declared_attr
+  def custom_attribute_definitions(cls):
+    # FIXME definitions should be class scoped, not instance scoped.
+    from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+    definition_type = foreign(CustomAttributeDefinition.definition_type)
+    join_function = lambda: or_(
+        definition_type == cls.__name__,
+        # The bottom statement always evaluates to False, and is here just to
+        # satisfy sqlalchemys need for use of foreing keys while defining a
+        # relationship.
+        definition_type == cls.id,
+    )
+    return db.relationship(
+        "CustomAttributeDefinition",
+        primaryjoin=join_function
+    )
 
 
 class TestPlanned(object):
