@@ -27,7 +27,6 @@ from .object_owner import ObjectOwner
 from .object_person import ObjectPerson
 from .object_type import ObjectType
 from .objective import Objective
-from .objective_control import ObjectiveControl
 from .option import Option
 from .org_group import OrgGroup
 from .vendor import Vendor
@@ -78,7 +77,6 @@ all_models = [
     Market,
     Meeting,
     Objective,
-    ObjectiveControl,
     ObjectDocument,
     ObjectOwner,
     ObjectPerson,

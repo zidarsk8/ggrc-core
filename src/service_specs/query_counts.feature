@@ -32,7 +32,6 @@ Feature: Requests should require a bounded number of queries
       | /api/markets                     | 10              |
 #      | /api/meetings                    | 10              |
       | /api/objectives                  | 10              |
-      | /api/objective_controls          | 10              |
       | /api/object_documents            | 10              |
       | /api/object_people               | 10              |
       | /api/object_controls             | 10              |

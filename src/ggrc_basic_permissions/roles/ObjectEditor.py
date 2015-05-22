@@ -23,7 +23,6 @@ permissions = {
         "Help",
         "Market",
         "Objective",
-        "ObjectiveControl",
         "ObjectDocument",
         "ObjectOwner",
         "ObjectPerson",
@@ -74,7 +73,6 @@ permissions = {
         "Facility",
         "Market",
         "Objective",
-        "ObjectiveControl",
         "ObjectDocument",
         "ObjectOwner",
         "ObjectPerson",
@@ -215,7 +213,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ObjectiveControl",
         "ObjectDocument",
         "ObjectOwner",
         "ObjectPerson",
@@ -422,7 +419,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ObjectiveControl",
         "ObjectDocument",
         "ObjectOwner",
         "ObjectPerson",

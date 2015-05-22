@@ -28,7 +28,6 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | Market             |
 #      | Meeting            |
       | Objective          |
-      | ObjectiveControl   |
       | ObjectDocument     |
       | ObjectPerson       |
       | ObjectControl      |

@@ -132,7 +132,7 @@ reader_objects = [
   'Categorization', 'Category', 'Control', 'ControlControl', 'ControlSection',
   'DataAsset', 'Directive', 'Contract', 'Policy', 'Regulation',
   'Document', 'Facility', 'Help', 'Market', 'Objective',
-  'ObjectiveControl', 'ObjectControl', 'ObjectDocument', 'ObjectObjective',
+  'ObjectControl', 'ObjectDocument', 'ObjectObjective',
   'ObjectPerson', 'ObjectSection', 'Option', 'OrgGroup', 'PopulationSample',
   'Product', 'ProgramControl', 'ProgramDirective', 'Project', 'Relationship',
   'RelationshipType', 'Section', 'SectionObjective', 'SystemOrProcess',

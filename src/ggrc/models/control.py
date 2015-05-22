@@ -6,12 +6,12 @@
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
-from .associationproxy import association_proxy
 from .category import CategoryBase
 from .categorization import Categorizable
 from .mixins import (
-    deferred, BusinessObject, Hierarchical, Timeboxed, CustomAttributable, TestPlanned
-    )
+    deferred, BusinessObject, Hierarchical, Timeboxed, CustomAttributable,
+    TestPlanned
+)
 from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
@@ -22,17 +22,18 @@ from .relationship import Relatable
 
 from .track_object_state import HasObjectState, track_state_for_class
 
+
 class ControlCategory(CategoryBase):
   __mapper_args__ = {
       'polymorphic_identity': 'ControlCategory'
-      }
+  }
   _table_plural = 'control_categories'
 
 
 class ControlAssertion(CategoryBase):
   __mapper_args__ = {
       'polymorphic_identity': 'ControlAssertion'
-      }
+  }
   _table_plural = 'control_assertions'
 
 
@@ -40,16 +41,14 @@ class ControlCategorized(Categorizable):
   @declared_attr
   def categorizations(cls):
     return cls.declare_categorizable(
-      "ControlCategory", "category", "categories", "categorizations")
+        "ControlCategory", "category", "categories", "categorizations")
 
   _publish_attrs = [
       'categories',
       PublishOnly('categorizations'),
-      ]
+  ]
 
-  _include_links = [
-      #'categories',
-      ]
+  _include_links = []
 
   @classmethod
   def eager_query(cls):
@@ -57,23 +56,21 @@ class ControlCategorized(Categorizable):
     query = super(ControlCategorized, cls).eager_query()
     return query.options(
         orm.subqueryload('categorizations').joinedload('category'),
-        )
+    )
 
 
 class AssertionCategorized(Categorizable):
   @declared_attr
   def assertations(cls):
     return cls.declare_categorizable(
-      "ControlAssertion", "assertion", "assertions", "assertations")
+        "ControlAssertion", "assertion", "assertions", "assertations")
 
   _publish_attrs = [
       'assertions',
       PublishOnly('assertations'),
-      ]
+  ]
 
-  _include_links = [
-      #'assertions',
-      ]
+  _include_links = []
 
   @classmethod
   def eager_query(cls):
@@ -81,12 +78,13 @@ class AssertionCategorized(Categorizable):
     query = super(AssertionCategorized, cls).eager_query()
     return query.options(
         orm.subqueryload('assertations').joinedload('category'),
-        )
+    )
 
 
-class Control(HasObjectState, Relatable,
-    CustomAttributable, Documentable, Personable, ControlCategorized, AssertionCategorized,
-    Hierarchical, Timeboxed, Ownable, BusinessObject, Auditable, TestPlanned, db.Model):
+class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
+              Personable, ControlCategorized, AssertionCategorized,
+              Hierarchical, Timeboxed, Ownable, BusinessObject, Auditable,
+              TestPlanned, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
@@ -110,7 +108,6 @@ class Control(HasObjectState, Relatable,
   secondary_assessor = db.relationship(
       'Person', uselist=False, foreign_keys='Control.secondary_assessor_id')
 
-
   kind = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Control.kind_id) == Option.id, '\
@@ -126,17 +123,13 @@ class Control(HasObjectState, Relatable,
       primaryjoin='and_(foreign(Control.verify_frequency_id) == Option.id, '\
                   'Option.role == "verify_frequency")',
       uselist=False)
-  objective_controls = db.relationship(
-      'ObjectiveControl', backref='control', cascade='all, delete-orphan')
-  objectives = association_proxy(
-      'objective_controls', 'objective', 'ObjectiveControl')
 
   @staticmethod
   def _extra_table_args(cls):
     return (
         db.Index('ix_controls_principal_assessor', 'principal_assessor_id'),
         db.Index('ix_controls_secondary_assessor', 'secondary_assessor_id'),
-        )
+    )
 
   # REST properties
   _publish_attrs = [
@@ -148,18 +141,16 @@ class Control(HasObjectState, Relatable,
       'key_control',
       'kind',
       'means',
-      'objectives',
       'verify_frequency',
       'version',
       'principal_assessor',
       'secondary_assessor',
-      PublishOnly('objective_controls'),
-      ]
+  ]
 
   _sanitize_html = [
       'documentation_description',
       'version',
-      ]
+  ]
 
   _include_links = []
 
@@ -176,8 +167,7 @@ class Control(HasObjectState, Relatable,
         orm.joinedload('directive'),
         orm.joinedload('principal_assessor'),
         orm.joinedload('secondary_assessor'),
-        orm.subqueryload('objective_controls'),
-        )
+    )
 
   def log_json(self):
     out_json = super(Control, self).log_json()

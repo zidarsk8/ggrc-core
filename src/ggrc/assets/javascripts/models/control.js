@@ -29,7 +29,6 @@ can.Model.Cacheable("CMS.Models.Control", {
     , documents : "CMS.Models.Document.stubs"
     , categories : "CMS.Models.ControlCategory.stubs"
     , assertions : "CMS.Models.ControlAssertion.stubs"
-    , objective_controls : "CMS.Models.ObjectiveControl.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , directive : "CMS.Models.Directive.stub"
     , audit_objects : "CMS.Models.AuditObject.stubs"

@@ -258,9 +258,6 @@
     // Governance
     Control: {
       _mixins: ["related_object", "personable", "ownable"],
-      _canonical: {
-        "objectives": "Objective",
-      },
       related_business_objects: Multi([
         "related_data_assets", "related_facilities", "related_markets",
         "related_org_groups", "related_vendors", "related_processes", "related_products",
@@ -270,11 +267,6 @@
         "objectives", "related_business_objects",
         "people", "programs", "clauses"
       ]),
-      related_documentation_responses: TypeFilter("related_objects", "DocumentationResponse"),
-      related_interview_responses: TypeFilter("related_objects", "InterviewResponse"),
-      related_population_sample_responses: TypeFilter("related_objects", "PopulationSampleResponse"),
-      related_responses: Multi(["related_documentation_responses", "related_interview_responses", "related_population_sample_responses"]),
-      related_audits_via_related_responses: Cross("related_responses", "audit_via_request"),
       audits: Proxy(
         "Audit", "audit", "AuditObject", "auditable", "audit_objects"),
       potential_requests: Cross("audits", "active_requests"),
@@ -286,8 +278,6 @@
         }
         return audit_object.auditable && audit_object.auditable.type === 'Control' && audit_object.auditable.id === control.id;
       }),
-      objectives: Proxy(
-        "Objective", "objective", "ObjectiveControl", "control", "objective_controls"),
       orphaned_objects: Multi([
         "related_objects", "clauses", "controls", "programs", "objectives", "people"
       ])
@@ -295,15 +285,12 @@
     Objective: {
       _mixins: ["related_object", "personable", "ownable"],
       _canonical: {
-        "controls": "Control",
         "_sections_base": ["Section", "Clause"]
       },
       related_and_able_objects: Multi([
         "controls", "objectives", "related_objects", "people",
         "sections", "clauses"
       ]),
-      controls: Proxy(
-        "Control", "control", "ObjectiveControl", "objective", "objective_controls"),
       _sections_base: Proxy(
         null, "section", "SectionObjective", "objective", "section_objectives"),
       sections: TypeFilter("_sections_base", "Section"),

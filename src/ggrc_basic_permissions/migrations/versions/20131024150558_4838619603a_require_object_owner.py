@@ -45,7 +45,6 @@ basic_objects_editable = [
     'Help',
     'Market',
     'Objective',
-    'ObjectiveControl',
     'ObjectControl',
     'ObjectDocument',
     'ObjectObjective',

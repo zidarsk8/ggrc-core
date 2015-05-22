@@ -161,7 +161,6 @@ Feature: Private Programs
       #| Help             |
       | Market           |
       | Objective        |
-      | ObjectiveControl |
       #| ObjectControl    |
       #| ObjectDocument   |
       #| ObjectPerson     |

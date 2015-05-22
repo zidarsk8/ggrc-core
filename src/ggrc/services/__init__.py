@@ -45,7 +45,6 @@ def contributed_services():
       service('object_owners', models.ObjectOwner),
       service('object_people', models.ObjectPerson),
       service('objectives', models.Objective),
-      service('objective_controls', models.ObjectiveControl),
       service('options', models.Option),
       service('org_groups', models.OrgGroup),
       service('vendors', models.Vendor),

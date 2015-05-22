@@ -23,16 +23,10 @@ class Objective(HasObjectState, CustomAttributable, Auditable, Relatable,
       'SectionObjective', backref='objective', cascade='all, delete-orphan')
   sections = association_proxy(
       'section_objectives', 'section', 'SectionObjective')
-  objective_controls = db.relationship(
-      'ObjectiveControl', backref='objective', cascade='all, delete-orphan')
-  controls = association_proxy(
-      'objective_controls', 'control', 'ObjectiveControl')
 
   _publish_attrs = [
       PublishOnly('section_objectives'),
       'sections',
-      PublishOnly('objective_controls'),
-      'controls',
   ]
 
   _include_links = []
@@ -43,7 +37,6 @@ class Objective(HasObjectState, CustomAttributable, Auditable, Relatable,
 
     query = super(Objective, cls).eager_query()
     return cls.eager_inclusions(query, Objective._include_links).options(
-        orm.subqueryload('section_objectives').joinedload('section'),
-        orm.subqueryload('objective_controls'))
+        orm.subqueryload('section_objectives').joinedload('section'))
 
 track_state_for_class(Objective)

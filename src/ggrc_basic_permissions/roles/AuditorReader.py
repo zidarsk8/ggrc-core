@@ -25,7 +25,6 @@ permissions = {
         "Help",
         "Market",
         "Objective",
-        "ObjectiveControl",
         "ObjectDocument",
         "ObjectPerson",
         "Option",

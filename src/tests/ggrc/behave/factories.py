@@ -372,11 +372,6 @@ class ObjectPersonFactory(ModelFactory):
   personable = FactoryStubMarker(models.Market)
 
 
-class ObjectiveControlFactory(ModelFactory):
-  MODEL = models.ObjectiveControl
-  status = FuzzyChoice(MODEL.VALID_STATES)
-
-
 class ProgramControlFactory(ModelFactory):
   MODEL = models.ProgramControl
   status = FuzzyChoice(MODEL.VALID_STATES)

@@ -143,25 +143,6 @@ can.Model.Join("CMS.Models.Relationship", {
   }
 });
 
-can.Model.Join("CMS.Models.ObjectiveControl", {
-  root_object : "objective_control"
-  , root_collection : "objective_controls"
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , objective : "CMS.Models.Objective.stub"
-    , control : "CMS.Models.Control.stub"
-    }
-  , join_keys : {
-      "objective" : CMS.Models.Objective
-    , "control" : CMS.Models.Control
-    }
-  , findAll: "GET /api/objective_controls"
-  , create: "POST /api/objective_controls"
-  , destroy : "DELETE /api/objective_controls/{id}"
-}, {
-});
-
 can.Model.Join("CMS.Models.UserRole", {
   root_object : "user_role"
   , root_collection : "user_roles"

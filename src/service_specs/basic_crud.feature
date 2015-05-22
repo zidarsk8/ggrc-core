@@ -34,7 +34,6 @@ Feature: Basic RESTful CRUD Support
       #| ObjectDocument     |
       #| ObjectPerson       |
       | Objective          |
-      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | Person             |

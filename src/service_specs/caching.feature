@@ -72,7 +72,6 @@ Feature: Resource caching
       | ObjectDocument     | object_documents     | status      | Draft    | Final    |
       | ObjectPerson       | object_people        | status      | Draft    | Final    |
       | Objective          | objectives           | description | desc1    | desc2    |
-      | ObjectiveControl   | objective_controls   | status      | Draft    | Final    |
       | Option             | options              | title       | title1   | title2   |
       | OrgGroup           | org_groups           | description | desc1    | desc2    |
       | Person             | people               | name        | name1    | name2    |
@@ -258,7 +257,6 @@ Feature: Resource caching
       | Audit                     | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Control                   | program_controls     | control              | ProgramControl            | status   | Draft  | Final  |
       | Control                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
-      | Control                   | objective_controls   | control              | ObjectiveControl          | status   | Draft  | Final  |
       | Control                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Control                   | object_controls      | control              | ObjectControl             | status   | Draft  | Final  |
       | Control                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
@@ -309,7 +307,6 @@ Feature: Resource caching
       | Market                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Market                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Meeting                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Objective                 | objective_controls   | objective            | ObjectiveControl          | status   | Draft  | Final  |
       | Objective                 | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Objective                 | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Objective                 | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
