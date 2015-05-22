@@ -7,7 +7,6 @@ from ggrc import db
 from sqlalchemy.orm import validates
 from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
 from .object_document import Documentable
-from .object_objective import Objectiveable
 from .object_owner import Ownable
 from .object_person import Personable
 from .relationship import Relatable
@@ -16,8 +15,7 @@ from .track_object_state import HasObjectState, track_state_for_class
 
 
 class Product(HasObjectState, CustomAttributable, Documentable, Personable,
-              Objectiveable, Relatable, Timeboxed, Ownable,
-              BusinessObject, db.Model):
+              Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'products'
 
   kind_id = deferred(db.Column(db.Integer), 'Product')
@@ -28,19 +26,20 @@ class Product(HasObjectState, CustomAttributable, Documentable, Personable,
       primaryjoin='and_(foreign(Product.kind_id) == Option.id, '\
                        'Option.role == "product_type")',
       uselist=False,
-      )
+  )
 
   _publish_attrs = [
       'kind',
       'version',
-      ]
+  ]
   _sanitize_html = [
       'version',
-      ]
+  ]
 
   @validates('kind')
   def validate_product_options(self, key, option):
-    return validate_option(self.__class__.__name__, key, option, 'product_type')
+    return validate_option(
+        self.__class__.__name__, key, option, 'product_type')
 
   @classmethod
   def eager_query(cls):

@@ -143,25 +143,6 @@ can.Model.Join("CMS.Models.Relationship", {
   }
 });
 
-can.Model.Join("CMS.Models.ObjectObjective", {
-    root_object: "object_objective"
-  , root_collection: "object_objectives"
-  , join_keys : {
-      "objective" : CMS.Models.Objective
-    , "objectiveable" : can.Model.Cacheable
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , objective : "CMS.Models.Objective.stub"
-    , objectiveable : "CMS.Models.get_stub"
-  }
-  , findAll: "GET /api/object_objectives"
-  , create: "POST /api/object_objectives"
-  , destroy: "DELETE /api/object_objectives/{id}"
-}, {
-});
-
 can.Model.Join("CMS.Models.ObjectiveControl", {
   root_object : "objective_control"
   , root_collection : "objective_controls"

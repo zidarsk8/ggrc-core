@@ -42,7 +42,6 @@ def contributed_services():
       service('markets', models.Market),
       service('meetings', models.Meeting),
       service('object_documents', models.ObjectDocument),
-      service('object_objectives', models.ObjectObjective),
       service('object_owners', models.ObjectOwner),
       service('object_people', models.ObjectPerson),
       service('objectives', models.Objective),

@@ -40,7 +40,6 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , documents : "CMS.Models.Document.stubs"
       , related_sources : "CMS.Models.Relationship.stubs"
       , related_destinations : "CMS.Models.Relationship.stubs"
-      , object_objectives : "CMS.Models.ObjectObjective.stubs"
       , objectives : "CMS.Models.Objective.stubs"
       , controls : "CMS.Models.Control.stubs"
       , sections : "CMS.Models.get_stubs"

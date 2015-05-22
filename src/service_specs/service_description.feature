@@ -32,7 +32,6 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | ObjectDocument     |
       | ObjectPerson       |
       | ObjectControl      |
-      | ObjectObjective    |
       | Option             |
       | OrgGroup           |
       | Person             |

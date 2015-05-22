@@ -36,7 +36,6 @@ Feature: Requests should require a bounded number of queries
       | /api/object_documents            | 10              |
       | /api/object_people               | 10              |
       | /api/object_controls             | 10              |
-      | /api/object_objectives           | 10              |
       | /api/options                     | 10              |
       | /api/org_groups                  | 10              |
       | /api/people                      | 10              |

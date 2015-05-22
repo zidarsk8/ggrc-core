@@ -47,7 +47,6 @@ permissions = {
         },
         "Meeting",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
         "Relationship",
         "Document",

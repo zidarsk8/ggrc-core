@@ -13,13 +13,12 @@ from .base_row import *
 
 DIRECTIVE_CLASSES = [Directive, Policy, Regulation, Contract, Standard]
 
+
 class ObjectiveRowConverter(BaseRowConverter):
   model_class = Objective
 
   def find_by_slug(self, slug):
-    from sqlalchemy import orm
-    return self.model_class.query.filter_by(slug=slug).options(
-        orm.joinedload('object_objectives')).first()
+    return self.model_class.query.filter_by(slug=slug).first()
 
   def setup_object(self):
     self.obj = self.setup_object_by_slug(self.attrs)
@@ -43,54 +42,27 @@ class ObjectiveRowConverter(BaseRowConverter):
   def save_object(self, db_session, **options):
     db_session.add(self.obj)
 
-  def after_save(self, db_session, **options):
-    super(ObjectiveRowConverter, self).after_save(db_session, **options)
-    # use self.options, which will, if relevant, be overwritten
-    # with data about section instead of directive
-    parent_type = self.options.get('parent_type')
-    parent_id = self.options.get('parent_id')
-    # always connect to directive; if parent is section/clause,
-    # find the directive through it
-    if parent_type in DIRECTIVE_CLASSES or parent_type == Program:
-      parent_obj = parent_type.query.get(parent_id)
-      parent_string = unicode(parent_obj.__class__.__name__)
-      # check if no such directive/object mapping exists; if none, add
-      matching_relationship_count = ObjectObjective.query\
-        .filter(ObjectObjective.objectiveable_id==parent_id)\
-        .filter(ObjectObjective.objectiveable_type==parent_string)\
-        .filter(ObjectObjective.objective_id==self.obj.id)\
-        .count()
-      if matching_relationship_count == 0:
-        db_options = {
-                "objectiveable_type": parent_string,
-                "objectiveable_id": parent_id,
-                "objective": self.obj,
-        }
-        if parent_type == Program:
-          db_options["context_id"] = parent_obj.context_id
-        db_session.add(ObjectObjective(**db_options))
-
 
 class ObjectivesConverter(BaseConverter):
 
   _metadata_map = OrderedDict([
-    ('Type', 'type'),
-    ('Directive Code', 'slug')
+      ('Type', 'type'),
+      ('Directive Code', 'slug')
   ])
 
   _object_map = OrderedDict([
-    ('Objective Code', 'slug'),
-    ('Title', 'title'),
-    ('Description', 'description'),
-    ('URL', 'url'),
-    ('Reference URL', 'reference_url'),
-    ('Notes', 'notes'),
-    ('Created', 'created_at'),
-    ('Updated', 'updated_at'),
-    ('Map:Section', 'section'),
-    ('Map:Control', 'control'),
-    ('Map:Person of Contact', 'contact'),
-    ('State', 'status'),
+      ('Objective Code', 'slug'),
+      ('Title', 'title'),
+      ('Description', 'description'),
+      ('URL', 'url'),
+      ('Reference URL', 'reference_url'),
+      ('Notes', 'notes'),
+      ('Created', 'created_at'),
+      ('Updated', 'updated_at'),
+      ('Map:Section', 'section'),
+      ('Map:Control', 'control'),
+      ('Map:Person of Contact', 'contact'),
+      ('State', 'status'),
   ])
 
   row_converter = ObjectiveRowConverter
@@ -138,4 +110,3 @@ class ObjectivesConverter(BaseConverter):
     yield[]
     yield[]
     yield self.object_map.keys()
-

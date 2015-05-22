@@ -25,7 +25,6 @@ permissions = {
         "Objective",
         "ObjectiveControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
         "Option",
@@ -77,7 +76,6 @@ permissions = {
         "Objective",
         "ObjectiveControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
         "Option",
@@ -219,7 +217,6 @@ permissions = {
         },
         "ObjectiveControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
         {
@@ -427,7 +424,6 @@ permissions = {
         },
         "ObjectiveControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
         {

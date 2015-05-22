@@ -360,12 +360,6 @@ class ObjectDocumentFactory(ModelFactory):
   documentable = FactoryStubMarker(models.Market)
 
 
-class ObjectObjectiveFactory(ModelFactory):
-  MODEL = models.ObjectObjective
-  status = FuzzyChoice(MODEL.VALID_STATES)
-  objectiveable = FactoryStubMarker(models.Market)
-
-
 class ObjectOwnerFactory(ModelFactory):
   MODEL = models.ObjectOwner
   status = FuzzyChoice(MODEL.VALID_STATES)

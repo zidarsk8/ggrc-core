@@ -164,7 +164,6 @@ Feature: Private Programs
       | ObjectiveControl |
       #| ObjectControl    |
       #| ObjectDocument   |
-      #| ObjectObjective  |
       #| ObjectPerson     |
       #| ObjectSection    |
       | Option           |

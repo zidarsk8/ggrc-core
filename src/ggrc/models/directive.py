@@ -7,7 +7,6 @@ from ggrc import db
 from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
 from .object_document import Documentable
 from .object_person import Personable
-from .object_objective import Objectiveable
 from .object_owner import Ownable
 from .relationship import Relatable
 from .utils import validate_option
@@ -104,7 +103,7 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
 
 
 # FIXME: For subclasses, restrict kind
-class Policy(CustomAttributable, Relatable, Objectiveable, Documentable,
+class Policy(CustomAttributable, Relatable, Documentable,
              Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
@@ -120,7 +119,7 @@ class Policy(CustomAttributable, Relatable, Objectiveable, Documentable,
     return 'Policy'
 
 
-class Regulation(CustomAttributable, Relatable, Objectiveable, Documentable,
+class Regulation(CustomAttributable, Relatable, Documentable,
                  Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
@@ -133,7 +132,7 @@ class Regulation(CustomAttributable, Relatable, Objectiveable, Documentable,
     return 'Regulation'
 
 
-class Standard(CustomAttributable, Relatable, Objectiveable, Documentable,
+class Standard(CustomAttributable, Relatable, Documentable,
                Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Standard'
@@ -146,7 +145,7 @@ class Standard(CustomAttributable, Relatable, Objectiveable, Documentable,
     return 'Standard'
 
 
-class Contract(CustomAttributable, Relatable, Objectiveable, Documentable,
+class Contract(CustomAttributable, Relatable, Documentable,
                Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'

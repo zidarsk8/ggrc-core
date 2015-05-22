@@ -15,7 +15,6 @@ permissions = {
         "AuditObject",
         "Meeting",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
         "Relationship",
         "Document",
@@ -28,7 +27,6 @@ permissions = {
         "InterviewResponse",
         "Response",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
         "Relationship",
         "Document"
@@ -64,7 +62,6 @@ permissions = {
     ],
     "delete": [
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
         "Relationship"
     ]

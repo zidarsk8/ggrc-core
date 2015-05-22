@@ -359,33 +359,6 @@
         join_list: get_page_object().object_documents
       },
 
-      object_objectives: {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: "Objective",
-        modal_title: "Select Objectives",
-
-        related_model_singular: "Objective",
-        related_table_plural: "objectives",
-        related_table_singular: "objective",
-        related_title_singular: "Objective",
-        related_title_plural: "Objectives",
-
-        option_model: CMS.Models.Objective,
-
-        join_model: CMS.Models.ObjectObjective,
-        option_attr: 'objective',
-        join_attr: 'objectiveable',
-        option_id_field: 'objective_id',
-        option_type_field: null,
-        join_id_field: 'objectiveable_id',
-        join_type_field: 'objectiveable_type',
-
-        join_object: get_page_object(),
-      },
-
       object_people: {
         option_column_view: GGRC.mustache_path + "/people/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/people/active_column.mustache",

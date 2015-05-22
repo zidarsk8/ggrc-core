@@ -27,7 +27,6 @@ permissions = {
         "Objective",
         "ObjectiveControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
         "Option",
         "OrgGroup",

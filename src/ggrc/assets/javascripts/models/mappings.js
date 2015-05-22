@@ -293,38 +293,15 @@
       ])
     },
     Objective: {
-      _mixins: ["personable", "ownable"], //objectiveable
+      _mixins: ["related_object", "personable", "ownable"],
       _canonical: {
-        "related_objects": ["DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product", "Project", "System",
-          "Regulation", "Contract", "Policy", "Standard", "Program", "Issue"
-        ],
-        "objectives": "Objective",
         "controls": "Control",
         "_sections_base": ["Section", "Clause"]
       },
-      related_objects: Proxy(
-        null, "objectiveable", "ObjectObjective", "objective", "objective_objects"),
       related_and_able_objects: Multi([
         "controls", "objectives", "related_objects", "people",
         "sections", "clauses"
       ]),
-      related_data_assets: TypeFilter("related_objects", "DataAsset"),
-      related_facilities: TypeFilter("related_objects", "Facility"),
-      related_markets: TypeFilter("related_objects", "Market"),
-      related_org_groups: TypeFilter("related_objects", "OrgGroup"),
-      related_vendors: TypeFilter("related_objects", "Vendor"),
-      related_processes: TypeFilter("related_objects", "Process"),
-      related_products: TypeFilter("related_objects", "Product"),
-      related_projects: TypeFilter("related_objects", "Project"),
-      related_systems: TypeFilter("related_objects", "System"),
-      related_issues: TypeFilter("related_objects", "Issue"),
-      regulations: TypeFilter("related_objects", "Regulation"),
-      contracts: TypeFilter("related_objects", "Contract"),
-      policies: TypeFilter("related_objects", "Policy"),
-      standards: TypeFilter("related_objects", "Standard"),
-      programs: TypeFilter("related_objects", "Program"),
-      objectives: Proxy(
-        "Objective", "objective", "ObjectObjective", "objectiveable", "object_objectives"),
       controls: Proxy(
         "Control", "control", "ObjectiveControl", "objective", "objective_controls"),
       _sections_base: Proxy(
@@ -355,13 +332,6 @@
     Clause: {
       _mixins: ["section_base"],
     },
-    objectiveable: {
-      _canonical: {
-        objectives: "Objective"
-      },
-      objectives: Proxy(
-        "Objective", "objective", "ObjectObjective", "objectiveable", "object_objectives")
-    },
     personable: {
       _canonical: {
         "people": "Person"
@@ -385,7 +355,7 @@
         "related_objects_as_source": [
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
-          "Program", "Issue", "Control", "Section", "Clause"
+          "Program", "Issue", "Control", "Section", "Clause", "Objective"
         ]
       },
       related_objects_as_source: Proxy(
@@ -412,6 +382,7 @@
       controls: TypeFilter("related_objects", "Control"),
       sections: TypeFilter("related_objects", "Section"),
       clauses: TypeFilter("related_objects", "Clause"),
+      objectives: TypeFilter("related_objects", "Objective"),
       related_documentation_responses: TypeFilter("related_objects", "DocumentationResponse"),
       related_interview_responses: TypeFilter("related_objects", "InterviewResponse"),
       related_population_sample_responses: TypeFilter("related_objects", "PopulationSampleResponse"),
@@ -422,7 +393,7 @@
     // Program
     Program: {
       _mixins: [
-        "related_object", "personable", "objectiveable"
+        "related_object", "personable"
       ],
       _canonical: {
         "audits": "Audit",
@@ -458,7 +429,7 @@
     },
     directive_object: {
       _mixins: [
-        "related_object", "personable", "objectiveable", "ownable"
+        "related_object", "personable", "ownable"
       ],
       _canonical: {
         "sections": "Section",
@@ -488,7 +459,6 @@
     business_object: {
       _mixins: [
         "related_object", "personable",
-        "objectiveable",
         "ownable"
       ],
       orphaned_objects: Multi([
@@ -750,7 +720,7 @@
     },
     Issue: {
       _mixins: [
-        "related_object", "personable", "ownable", "objectiveable"
+        "related_object", "personable", "ownable"
       ],
       _canonical: {
         "related_objects_as_source": [

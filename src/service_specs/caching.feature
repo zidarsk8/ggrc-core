@@ -70,7 +70,6 @@ Feature: Resource caching
       #| Meeting            | meetings             |
       | ObjectControl      | object_controls      | status      | Draft    | Final    |
       | ObjectDocument     | object_documents     | status      | Draft    | Final    |
-      | ObjectObjective    | object_objectives    | status      | Draft    | Final    |
       | ObjectPerson       | object_people        | status      | Draft    | Final    |
       | Objective          | objectives           | description | desc1    | desc2    |
       | ObjectiveControl   | objective_controls   | status      | Draft    | Final    |
@@ -268,21 +267,18 @@ Feature: Resource caching
       | DataAsset                 | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | DataAsset                 | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | DataAsset                 | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | DataAsset                 | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | DataAsset                 | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Contract                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Contract                  | program_directives   | directive            | ProgramDirective          | status   | Draft  | Final  |
       | Contract                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Contract                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Contract                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Contract                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Contract                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Policy                    | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Policy                    | program_directives   | directive            | ProgramDirective          | status   | Draft  | Final  |
       | Policy                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Policy                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Policy                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Policy                    | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Policy                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Policy                     | sections             | directive            | Section                   | title    | title1 | title2 |
       | Regulation                | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
@@ -290,7 +286,6 @@ Feature: Resource caching
       | Regulation                | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Regulation                | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Regulation                | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Regulation                | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Regulation                | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Regulation                 | sections             | directive            | Section                   | title    | title1 | title2 |
       | Standard                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
@@ -298,7 +293,6 @@ Feature: Resource caching
       | Standard                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Standard                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Standard                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Standard                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Standard                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Standard                   | sections             | directive            | Section                   | title    | title1 | title2 |
       | Document                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
@@ -307,29 +301,24 @@ Feature: Resource caching
       | Facility                  | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Facility                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Facility                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Facility                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Facility                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Market                    | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Market                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Market                    | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Market                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Market                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Market                    | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Market                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Meeting                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Objective                 | objective_objects    | objective            | ObjectObjective           | status   | Draft  | Final  |
       | Objective                 | objective_controls   | objective            | ObjectiveControl          | status   | Draft  | Final  |
       | Objective                 | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Objective                 | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Objective                 | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Objective                 | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Objective                 | section_objectives   | objective            | SectionObjective          | status   | Draft  | Final  |
       | OrgGroup                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | OrgGroup                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | OrgGroup                  | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | OrgGroup                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | OrgGroup                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | OrgGroup                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | OrgGroup                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Person                    | object_people        | person               | ObjectPerson              | status   | Draft  | Final  |
       | Product                   | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
@@ -337,7 +326,6 @@ Feature: Resource caching
       | Product                   | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Product                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Product                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Product                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Product                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Program                   | program_controls     | program              | ProgramControl            | status   | Draft  | Final  |
       | Program                   | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
@@ -345,14 +333,12 @@ Feature: Resource caching
       | Program                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Program                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Program                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Program                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Program                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Project                   | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Project                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Project                   | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Project                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Project                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Project                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Project                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | DocumentationResponse     | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | DocumentationResponse     | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
@@ -382,14 +368,12 @@ Feature: Resource caching
       | System                    | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | System                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | System                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | System                    | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | System                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Process                   | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Process                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Process                   | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Process                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Process                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Process                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Process                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
 
   Examples: Cached resources with mappings from `ggrc_gdrive_integration`

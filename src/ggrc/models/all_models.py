@@ -23,7 +23,6 @@ from .facility import Facility
 from .help import Help
 from .market import Market
 from .object_document import ObjectDocument
-from .object_objective import ObjectObjective
 from .object_owner import ObjectOwner
 from .object_person import ObjectPerson
 from .object_type import ObjectType
@@ -81,7 +80,6 @@ all_models = [
     Objective,
     ObjectiveControl,
     ObjectDocument,
-    ObjectObjective,
     ObjectOwner,
     ObjectPerson,
     ObjectType,
