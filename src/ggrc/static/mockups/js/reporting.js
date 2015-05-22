@@ -38,12 +38,17 @@ $(document).ready(function() {
     events: {
       "#custom_report_name keyup": function(el, ev) {
         var $item = this.element.find('li.active'),
+            $report_item = this.element.find('.report-title h2'),
             index = $item.index(),
+            report_index = $report_item.index(),
             tabs = this.scope.tabs,
+            report = this.scope.reportTitle,
             new_tabs = 0;
 
         tabs[index].attr('title', el.val());
         this.element.find("#newReport .closed").show();
+
+        report[report_index].attr('title', el.val());
 
         // Calculate tabs numbers
         tabs.forEach(function(tab) {

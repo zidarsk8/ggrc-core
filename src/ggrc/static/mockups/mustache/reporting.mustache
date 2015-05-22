@@ -46,7 +46,7 @@
                           <a class="report-title-trigger" href="#"><i class="grcicon-edit"></i></a>
                         </h2>
                         <div class="report-title-change">
-                          <input type="text" value="{{title}}">
+                          <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
                           <a class="btn btn-primary btn-small title-change" href="#">Save</a>
                         </div>
                       </div>
@@ -420,11 +420,14 @@
                       </label>
                     </div>
                     <div class="save-template">
+                      <!-- Temporary commented out. We will use this in next release
                       <label class="small">
                         <input type="checkbox" class="report-save-check" name="" id="" checked="checked" placeholder="enter report name">
                         Save report as
                       </label>
                       <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
+                      -->
+                      <button type="submit" class="btn btn-primary btn-small">Save report</button>
                       <div class="btn-group pull-right">
                         <button type="submit" data-toggle="dropdown" class="btn btn-success btn-small dropdown-toggle"><i class="grcicon-export-white"></i> Export report <i class="grcicon-carot-white"></i></a></button>
                         <ul class="dropdown-menu">
