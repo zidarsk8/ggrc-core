@@ -44,7 +44,6 @@ Feature: Basic RESTful CRUD Support
       #| Relationship       |
       | Section            |
       | Clause             |
-      | SectionObjective   |
       #| SystemOrProcess    |
       | System             |
       | Process            |

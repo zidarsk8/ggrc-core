@@ -187,25 +187,6 @@ can.Model.Join("CMS.Models.UserRole", {
   }
 });
 
-can.Model.Join("CMS.Models.SectionObjective", {
-  root_collection : "section_objectives"
-  , root_object : "section_objective"
-  , findAll : "GET /api/section_objectives"
-  , create : "POST /api/section_objectives"
-  , destroy : "DELETE /api/section_objectives/{id}"
-  , join_keys : {
-      section : CMS.Models.SectionBase
-    , objective : CMS.Models.Objective
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , section : "CMS.Models.get_stub"
-    , objective : "CMS.Models.Objective.stub"
-  }
-}, {
-});
-
 can.Model.Join("CMS.Models.ObjectPerson", {
   root_object : "object_person"
   , root_collection : "object_people"

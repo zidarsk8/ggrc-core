@@ -34,7 +34,6 @@ class ObjectiveRowConverter(BaseRowConverter):
     self.handle_text_or_html('notes')
     self.handle_date('created_at', no_import=True)
     self.handle_date('updated_at', no_import=True)
-    self.handle('section', LinkSectionObjective)
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)
 

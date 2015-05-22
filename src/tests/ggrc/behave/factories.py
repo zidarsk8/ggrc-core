@@ -389,11 +389,6 @@ class RelationshipFactory(ModelFactory):
   destination = FactoryStubMarker(models.Process)
 
 
-class SectionObjectiveFactory(ModelFactory):
-  MODEL = models.SectionObjective
-  status = FuzzyChoice(MODEL.VALID_STATES)
-
-
 # ggrc_basic_permissions model factories
 class RoleFactory(ModelFactory):
   MODEL = models.get_model("Role")

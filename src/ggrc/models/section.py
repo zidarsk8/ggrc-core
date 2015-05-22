@@ -15,7 +15,6 @@ from .mixins import (
 from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
-from .reflection import PublishOnly
 from .relationship import Relatable
 from .track_object_state import HasObjectState, track_state_for_class
 
@@ -44,10 +43,6 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   na = deferred(db.Column(db.Boolean, default=False, nullable=False),
                 'SectionBase')
   notes = deferred(db.Column(db.Text), 'SectionBase')
-  section_objectives = db.relationship(
-      'SectionObjective', backref='section', cascade='all, delete-orphan')
-  objectives = association_proxy(
-      'section_objectives', 'objective', 'SectionObjective')
 
   __mapper_args__ = {
       'polymorphic_on': type
@@ -57,8 +52,6 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
       'directive',
       'na',
       'notes',
-      PublishOnly('section_objectives'),
-      'objectives',
   ]
   _sanitize_html = [
       'notes',
@@ -83,8 +76,7 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
 
     query = super(SectionBase, cls).eager_query()
     return cls.eager_inclusions(query, SectionBase._include_links).options(
-        orm.joinedload('directive'),
-        orm.subqueryload('section_objectives'))
+        orm.joinedload('directive'))
 
 track_state_for_class(SectionBase)
 

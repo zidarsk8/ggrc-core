@@ -48,7 +48,6 @@ from .issue import Issue
 # TODO: This isn't currently used
 # from .relationship_type import RelationshipType
 from .section import SectionBase, Section, Clause
-from .section_objective import SectionObjective
 from .system import SystemOrProcess, System, Process
 
 from .revision import Revision
@@ -98,7 +97,6 @@ all_models = [
     SectionBase,
     Section,
     Clause,
-    SectionObjective,
     SystemOrProcess,
     System,
     Process,

@@ -171,6 +171,5 @@ Feature: Private Programs
       | Project          |
       #| Relationship     |
       | Section          |
-      | SectionObjective |
       | System           |
       | Process          |

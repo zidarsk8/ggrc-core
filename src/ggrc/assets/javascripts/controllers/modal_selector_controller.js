@@ -386,33 +386,6 @@
         join_object: get_page_object(),
         join_list: get_page_object().object_people
       }
-      , section_objectives : {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: "Objective",
-        modal_title: "Select Objectives",
-
-        related_model_singular: "Objective",
-        related_table_plural: "objectives",
-        related_table_singular: "objective",
-        related_title_singular: "Objective",
-        related_title_plural: "Objectives",
-
-        object_model: CMS.Models.Section,
-        option_model: CMS.Models.Objective,
-        join_model: CMS.Models.SectionObjective,
-
-        option_attr: 'objective',
-        join_attr: 'section',
-        option_id_field: 'objective_id',
-        //option_type_field: 'objective_type',
-        join_id_field: 'section_id',
-        join_type_field: null,
-
-        join_object: CMS.Models.Section.findInCacheById(data.join_object_id)
-      }
     };
 
     // If no 'name' provided, return all

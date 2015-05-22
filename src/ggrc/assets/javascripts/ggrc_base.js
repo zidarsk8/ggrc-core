@@ -73,7 +73,6 @@
         "objective": CMS.Models.Objective,
         "section": CMS.Models.Section,
         "clause": CMS.Models.Clause,
-        "section_objective": CMS.Models.SectionObjective,
         "person": CMS.Models.Person,
         "role": CMS.Models.Role,
         "threat": CMS.Models.Threat,

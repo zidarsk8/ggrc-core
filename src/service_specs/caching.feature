@@ -83,7 +83,6 @@ Feature: Resource caching
       #| SectionBase        | section_bases        | description | desc1    | desc2    |
       | Section            | sections             | description | desc1    | desc2    |
       | Clause             | clauses              | description | desc1    | desc2    |
-      | SectionObjective   | section_objectives   | status      | Draft    | Final    |
       #| SystemOrProcess    | systems_or_processes | description | desc1    | desc2    |
       | System             | systems              | description | desc1    | desc2    |
       | Process            | processes            | description | desc1    | desc2    |
@@ -310,7 +309,6 @@ Feature: Resource caching
       | Objective                 | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Objective                 | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Objective                 | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Objective                 | section_objectives   | objective            | SectionObjective          | status   | Draft  | Final  |
       | OrgGroup                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | OrgGroup                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | OrgGroup                  | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
@@ -355,11 +353,9 @@ Feature: Resource caching
       | Section                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Section                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Section                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Section                   | section_objectives   | section              | SectionObjective          | status   | Draft  | Final  |
       | Clause                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Clause                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Clause                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Clause                    | section_objectives   | section              | SectionObjective          | status   | Draft  | Final  |
       | System                    | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | System                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | System                    | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |

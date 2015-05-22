@@ -70,7 +70,6 @@ Feature: RBAC Permissions enforcement for REST API
       #| ProgramDirective   |
       | Section            |
       | Clause             |
-      | SectionObjective   |
       | System             |
 
   Scenario Outline: GET requires read permission for the context
@@ -144,7 +143,6 @@ Feature: RBAC Permissions enforcement for REST API
       #| ProgramDirective   |
       | Section            |
       | Clause             |
-      | SectionObjective   |
       | System             |
 
   Scenario Outline: PUT requires update permission for the context
@@ -228,7 +226,6 @@ Feature: RBAC Permissions enforcement for REST API
       #| ProgramDirective   |
       | Section            |
       | Clause             |
-      | SectionObjective   |
       | System             |
 
   Scenario Outline: DELETE requires delete permission for the context
@@ -314,7 +311,6 @@ Feature: RBAC Permissions enforcement for REST API
       #| ProgramDirective   |
       | Section            |
       | Clause             |
-      | SectionObjective   |
       | System             |
 
   Scenario: Property link objects can be included with __include if the user has read access to the target

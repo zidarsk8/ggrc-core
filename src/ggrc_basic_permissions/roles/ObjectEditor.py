@@ -37,7 +37,6 @@ permissions = {
         "SectionBase",
         "Section",
         "Clause",
-        "SectionObjective",
         "SystemOrProcess",
         "System",
         "Process",
@@ -87,7 +86,6 @@ permissions = {
         "SectionBase",
         "Section",
         "Clause",
-        "SectionObjective",
         "SystemOrProcess",
         "System",
         "Process",
@@ -275,7 +273,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "SectionObjective",
         {
             "type": "SystemOrProcess",
             "terms": {
@@ -481,7 +478,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "SectionObjective",
         {
             "type": "SystemOrProcess",
             "terms": {

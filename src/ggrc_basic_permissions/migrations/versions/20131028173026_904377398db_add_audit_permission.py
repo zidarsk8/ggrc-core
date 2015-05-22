@@ -135,7 +135,7 @@ reader_objects = [
   'ObjectControl', 'ObjectDocument', 'ObjectObjective',
   'ObjectPerson', 'ObjectSection', 'Option', 'OrgGroup', 'PopulationSample',
   'Product', 'ProgramControl', 'ProgramDirective', 'Project', 'Relationship',
-  'RelationshipType', 'Section', 'SectionObjective', 'SystemOrProcess',
+  'RelationshipType', 'Section', 'SystemOrProcess',
   'System', 'Process', 'SystemControl', 'SystemSystem', 'ObjectOwner',
   'Person', 'Program', 'Role',
   ]

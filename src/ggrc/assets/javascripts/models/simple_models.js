@@ -122,7 +122,6 @@ can.Model.Cacheable("CMS.Models.Objective", {
       context : "CMS.Models.Context.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
-    , section_objectives : "CMS.Models.SectionObjective.stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
     //, people : "CMS.Models.Person.stubs"

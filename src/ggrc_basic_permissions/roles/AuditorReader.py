@@ -38,7 +38,6 @@ permissions = {
         "SectionBase",
         "Section",
         "Clause",
-        "SectionObjective",
         "SystemOrProcess",
         "System",
         "Process",

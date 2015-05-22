@@ -52,7 +52,6 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
     , children: "CMS.Models.get_stubs"
     , directive_sections: "CMS.Models.DirectiveSection.stubs"
     , directives: "CMS.Models.get_stubs"
-    , section_objectives: "CMS.Models.SectionObjective.stubs"
     , objectives: "CMS.Models.Objective.stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }

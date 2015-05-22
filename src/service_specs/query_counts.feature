@@ -52,7 +52,6 @@ Feature: Requests should require a bounded number of queries
       | /api/risky_attributes            | 10              |
       | /api/risk_risky_attributes       | 10              |
       | /api/sections                    | 10              |
-      | /api/section_objectives          | 10              |
       | /api/systems_or_processes        | -1              |
       | /api/systems                     | 10              |
       | /api/processes                   | 10              |

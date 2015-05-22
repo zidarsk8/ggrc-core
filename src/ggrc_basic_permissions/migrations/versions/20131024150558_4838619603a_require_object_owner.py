@@ -60,7 +60,6 @@ basic_objects_editable = [
     'Relationship',
     'RelationshipType',
     'Section',
-    'SectionObjective',
     'SystemOrProcess',
       'System',
       'Process',

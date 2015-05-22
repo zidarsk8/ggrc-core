@@ -62,7 +62,6 @@ def contributed_services():
       service('section_bases', models.SectionBase, ReadOnlyResource),
       service('sections', models.Section),
       service('clauses', models.Clause),
-      service('section_objectives', models.SectionObjective),
       service(
           'systems_or_processes', models.SystemOrProcess, ReadOnlyResource),
       service('systems', models.System),

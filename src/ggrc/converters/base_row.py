@@ -10,8 +10,7 @@ from ggrc.models.all_models import (
     Audit, ControlCategory, ControlAssertion,
     Control, Document, Objective,
     ObjectOwner, ObjectPerson, Option, Person, Process,
-    Relationship, Request, SectionBase, SectionObjective,
-    System, SystemOrProcess,
+    Relationship, Request, System, SystemOrProcess,
 )
 from ggrc.models.exceptions import ValidationError
 from ggrc.app import app
@@ -1130,27 +1129,3 @@ class LinkObjectHandler(LinksHandler):
     model_class = self.options.get('model_class') or self.model_class
     return model_class.query.filter_by(
         **where_params).first() if model_class else None
-
-
-class LinkSectionObjective(LinkObjectHandler):
-
-  model_class = SectionBase  # Needs to see clauses
-
-  def get_existing_items(self):
-    where_params = {}
-    where_params['objective_id'] = self.importer.obj.id
-    section_objectives = SectionObjective.query.filter_by(**where_params).all()
-    return [sec_cont.section for sec_cont in section_objectives]
-
-  def after_save(self, obj):
-    # connect any number of sections/clauses
-    section_list = [x for x in self.created_links() if isinstance(x, SectionBase)]  # get the section or clause that was created
-    for sec in section_list:
-      db.session.add(sec)
-      matching_relationship_count = SectionObjective.query\
-          .filter(SectionObjective.objective_id == obj.id)\
-          .filter(SectionObjective.section_id == sec.id)\
-          .count()
-      if matching_relationship_count == 0:
-        db.session.add(SectionObjective(
-            section=sec, objective=obj))

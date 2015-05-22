@@ -284,40 +284,19 @@
     },
     Objective: {
       _mixins: ["related_object", "personable", "ownable"],
-      _canonical: {
-        "_sections_base": ["Section", "Clause"]
-      },
       related_and_able_objects: Multi([
         "controls", "objectives", "related_objects", "people",
         "sections", "clauses"
       ]),
-      _sections_base: Proxy(
-        null, "section", "SectionObjective", "objective", "section_objectives"),
-      sections: TypeFilter("_sections_base", "Section"),
-      clauses: TypeFilter("_sections_base", "Clause"),
       orphaned_objects: Multi([
         "related_objects", "clauses", "contracts", "controls", "objectives", "people", "policies", "programs", "regulations", "sections", "standards"
       ])
     },
-    section_base: {
-      _mixins: ["related_object", "personable", "ownable"],
-      _canonical: {
-        "objectives": "Objective",
-      },
-      related_and_able_objects: Multi([
-        "objectives", "controls", "related_objects", "people"
-      ]),
-      objectives: Proxy(
-        "Objective", "objective", "SectionObjective", "section", "section_objectives"),
-       orphaned_objects: Multi([
-        "related_objects", "objectives", "people"
-      ])
-    },
     Section: {
-      _mixins: ["section_base"],
+      _mixins: ["related_object", "personable", "ownable"],
     },
     Clause: {
-      _mixins: ["section_base"],
+      _mixins: ["related_object", "personable", "ownable"],
     },
     personable: {
       _canonical: {
