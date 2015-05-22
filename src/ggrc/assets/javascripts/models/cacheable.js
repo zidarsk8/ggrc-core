@@ -1117,10 +1117,24 @@ can.Model("can.Model.Cacheable", {
           keys = d.shift().split('|'),
           rest = d.join('.');
 
+      if (val.instance) {
+        val = val.instance;
+      }
+
       return _.reduce(keys, function (res, key) {
         if (res && res.length) return res;
 
-        if (typeof val[key] === "undefined") {
+        var binding = val.get_binding 
+                ? val.get_binding(key)
+                : null;
+
+        if (binding && binding.list && binding.list.length) {
+          val = binding.list;
+
+          return rest.length
+                ? get_deep_property(rest, val)
+                : val;
+        } else if (typeof val[key] === "undefined") {
           return undefined;
         } else {
           if (typeof val[key].reify === "function") {

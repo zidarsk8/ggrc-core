@@ -61,7 +61,11 @@ can.Model.Cacheable("CMS.Models.Program", {
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/programs/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-    , attr_list : can.Model.Cacheable.attr_list.concat([
+    , attr_list : [
+      {attr_title: 'Owner', attr_name: 'owner', attr_sort_field: 'authorizations.0.person.name|email'}
+    ].concat(can.Model.Cacheable.attr_list.filter(function (d) {
+      return d.attr_name != 'owner';
+    })).concat([
       {attr_title: 'URL', attr_name: 'url', attr_sort_field: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url', attr_sort_field: 'reference_url'},
       {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
