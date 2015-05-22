@@ -1,0 +1,76 @@
+<import>
+
+  <div class="top-inner-nav">
+    <div class="object-nav">
+      <ul class="nav internav">
+        <li class="active">
+          <a href="#">
+            <div class="oneline">
+              <i class="grcicon-imp-exp"></i>
+              Import from file
+            </div>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="content">
+    <div class="clearfix">
+      <div class="object-area import-area">
+        <div id="show_columns" class="column-set">
+          <div class="row-fluid">
+            <div class="span12 full-width">
+              <div class="widget-area inner-content">
+                <section id="import_controls_widget" class="widget " data-widget-view="">
+                  <header class="header">
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <h2>
+                          <div class="oneline">
+                            <i class="grcicon-imp-exp"></i>
+                            Import from file
+                          </div>
+                        </h2>
+                      </div>
+                    </div>
+                  </header>
+                  <section class="content">
+                    <div class="info">
+                      <form class="import" method="post">
+                        <div class="row-fluid wrap-row">
+                          <div class="span8">
+                            <h3>
+                              Choose CSV file to upload
+                            </h3>
+                          </div>
+                          <div class="span4">
+                            <div class="download-template">
+                              <a class="section-import" href="import_controls_template">
+                                <i class="grcicon-download"></i>
+                                Download Import Controls template
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row-fluid wrap-row">
+                          <div class="span12">
+                            <input type="file" name="file" value="choose file">
+                            <div class="import-buttons">
+                              <input class="btn btn-large btn-info disabled" type="submit" value="Upload and Review">
+                            </div>
+                          </div>
+                        </div>
+                        <div id="results-container"></div>
+                      </form>
+                    </div>
+                  </section>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</import>
