@@ -77,11 +77,6 @@
       cursor: default;
     }
   }
-  .nav-trigger {
-    &.active {
-      .grcicon-nav-trigger { background-position: -342px -416px; }
-    }
-  }
   .menu {
     @extend %reset-list;
     @include clearfix();
@@ -92,7 +87,7 @@
       float:left;
       color: $black;
       line-height: 47px;
-      font-size: 14px;
+      font-size: 12px;
       .count {
         @include border-radius(8px);
         font-size: 12px;
@@ -109,7 +104,7 @@
         line-height: 47px;
         padding: 0 10px;
         i {
-          margin: 16px 2px 0 0;
+          margin: 15px 2px 0 0;
           &.grcicon-carot-white {
             margin-right: 0;
           }

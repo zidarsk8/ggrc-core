@@ -123,14 +123,12 @@ can.Control("CMS.Controllers.Dashboard", {
         duration: 800,
         easing: 'easeOutExpo'
     },
-        $label = el.find("span"),
         $nav = el.closest("body").find(".top-inner-nav"),
         $lhn_nav = el.closest("body").find(".lhs-holder"),
         $lhn_type = el.closest("body").find(".lhn-type"),
         $content = el.closest("body").find(".object-area");
 
     el.addClass("active");
-    $label.text("Hide menu");
     $nav.animate({top: "48"}, options);
     $lhn_type.animate({top: "94"}, options);
     $lhn_nav.animate({top: "128"}, options);
@@ -146,14 +144,12 @@ can.Control("CMS.Controllers.Dashboard", {
         duration: 800,
         easing: 'easeOutExpo'
     },
-        $label = el.find("span"),
         $nav = el.closest("body").find(".top-inner-nav"),
         $lhn_nav = el.closest("body").find(".lhs-holder"),
         $lhn_type = el.closest("body").find(".lhn-type"),
         $content = el.closest("body").find(".object-area");
 
     el.removeClass("active");
-    $label.text("Show menu");
     $nav.animate({top: "18"}, options);
     $lhn_type.animate({top: "65"}, options);
     $lhn_nav.animate({top: "99"}, options);
