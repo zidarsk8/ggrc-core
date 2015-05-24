@@ -642,40 +642,41 @@ class Resource(ModelView):
       )
 
   def dispatch_request(self, *args, **kwargs):
-    method = request.method
+    with benchmark("Dispatch request"):
+      method = request.method
 
-    if method in ('POST', 'PUT', 'DELETE')\
-        and 'X-Requested-By' not in request.headers:
-      raise BadRequest('X-Requested-By header is REQUIRED.')
+      if method in ('POST', 'PUT', 'DELETE')\
+          and 'X-Requested-By' not in request.headers:
+        raise BadRequest('X-Requested-By header is REQUIRED.')
 
-    if getattr(settings, 'CALENDAR_MECHANISM', False) is True:
-      if method in ('POST', 'PUT', 'DELETE'):
-        request.oauth_credentials=get_oauth_credentials()
+      if getattr(settings, 'CALENDAR_MECHANISM', False) is True:
+        if method in ('POST', 'PUT', 'DELETE'):
+          request.oauth_credentials=get_oauth_credentials()
 
-    try:
-      if method == 'GET':
-        if self.pk in kwargs and kwargs[self.pk] is not None:
-          return self.get(*args, **kwargs)
+      try:
+        if method == 'GET':
+          if self.pk in kwargs and kwargs[self.pk] is not None:
+            return self.get(*args, **kwargs)
+          else:
+            return self.collection_get()
+        elif method == 'POST':
+          if self.pk in kwargs and kwargs[self.pk] is not None:
+            return self.post(*args, **kwargs)
+          else:
+            return self.collection_post()
+        elif method == 'PUT':
+          return self.put(*args, **kwargs)
+        elif method == 'DELETE':
+          return self.delete(*args, **kwargs)
         else:
-          return self.collection_get()
-      elif method == 'POST':
-        if self.pk in kwargs and kwargs[self.pk] is not None:
-          return self.post(*args, **kwargs)
-        else:
-          return self.collection_post()
-      elif method == 'PUT':
-        return self.put(*args, **kwargs)
-      elif method == 'DELETE':
-        return self.delete(*args, **kwargs)
-      else:
-        raise NotImplementedError()
-    except (IntegrityError, ValidationError) as v:
-      message = translate_message(v)
-      current_app.logger.warn(message)
-      return ((message, 403, []))
-    except Exception as e:
-      current_app.logger.exception(e)
-      raise
+          raise NotImplementedError()
+      except (IntegrityError, ValidationError) as v:
+        message = translate_message(v)
+        current_app.logger.warn(message)
+        return ((message, 403, []))
+      except Exception as e:
+        current_app.logger.exception(e)
+        raise
 
   def post(*args, **kwargs):
     raise NotImplementedError()
