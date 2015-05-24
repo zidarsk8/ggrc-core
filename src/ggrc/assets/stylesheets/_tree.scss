@@ -1307,7 +1307,8 @@ ul.new-tree {
           @include transition(opacity 0.2s ease);
           margin: 7px 4px 0 0;
         }
-        &:hover {
+        &:hover,
+        &.zeroclipboard-is-hover {
           background: $headerBgnd;
           color: $black;
           i {

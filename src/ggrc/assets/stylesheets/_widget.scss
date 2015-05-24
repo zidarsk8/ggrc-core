@@ -229,6 +229,9 @@
       padding-left: 0;
       padding-right: 0;
     }
+    .header {
+      margin: 6px 0 4px;
+    }
   }
   &.workflow-info-widget {
     overflow-y: visible;
@@ -1640,7 +1643,7 @@ ul.attr-list {
   }
 }
 
-.info-expand, .info-expand-custom {
+.info-expand {
   border-bottom: 1px solid $itemBorder;
   a {
     display: block;
@@ -1650,7 +1653,7 @@ ul.attr-list {
     line-height: 20px;
     i {
       @include opacity(0.25);
-      margin-top: 2px;
+      margin-top: 2px !important;
     }
     &:hover {
       text-decoration:none;
@@ -1672,6 +1675,10 @@ ul.attr-list {
       border-top: none;
     }
   }
+}
+
+.info-expand-custom {
+  @extend .info-expand;
 }
 
 .expand-link {
