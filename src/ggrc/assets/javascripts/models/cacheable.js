@@ -1140,6 +1140,8 @@ can.Model("can.Model.Cacheable", {
                 : val;
         } else if (typeof val[key] === "undefined") {
           return undefined;
+        } else if (val[key] === null) {
+          return null;
         } else {
           if (typeof val[key].reify === "function") {
             val[key] = val[key].reify();
