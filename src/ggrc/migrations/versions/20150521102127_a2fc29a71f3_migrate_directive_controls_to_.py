@@ -33,6 +33,10 @@ def upgrade():
   """
   op.execute(sql)
   op.drop_constraint(
+      'fk_context_id',
+      'directive_controls',
+      type_='foreignkey')
+  op.drop_constraint(
       'fk_control_id',
       'directive_controls',
       type_='foreignkey')
@@ -43,6 +47,13 @@ def upgrade():
 
 
 def downgrade():
+  op.create_foreign_key(
+      'fk_context_id',
+      'directive_controls',
+      'contexts',
+      ['context_id'],
+      ['id']
+  )
   op.create_foreign_key(
       'fk_control_id',
       'directive_controls',

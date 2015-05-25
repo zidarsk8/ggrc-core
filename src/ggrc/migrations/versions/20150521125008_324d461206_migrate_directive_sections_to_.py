@@ -32,6 +32,10 @@ def upgrade():
   """
   op.execute(sql)
   op.drop_constraint(
+      'directive_sections_ibfk_1',
+      'directive_sections',
+      type_='foreignkey')
+  op.drop_constraint(
       'directive_sections_ibfk_2',
       'directive_sections',
       type_='foreignkey')
@@ -42,6 +46,12 @@ def upgrade():
 
 
 def downgrade():
+  op.create_foreign_key(
+      'directive_sections_ibfk_1',
+      'directive_sections',
+      'contexts',
+      ['context_id'],
+      ['id'])
   op.create_foreign_key(
       'directive_sections_ibfk_2',
       'directive_sections',

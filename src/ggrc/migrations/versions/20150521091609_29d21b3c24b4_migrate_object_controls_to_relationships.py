@@ -31,10 +31,19 @@ def upgrade():
   """
   op.execute(sql)
   op.drop_constraint(
+      'object_controls_ibfk_1', 'object_controls', type_='foreignkey')
+  op.drop_constraint(
       'object_controls_ibfk_2', 'object_controls', type_='foreignkey')
 
 
 def downgrade():
+  op.create_foreign_key(
+      'object_controls_ibfk_1',
+      'object_controls',
+      'contexts',
+      ['context_id'],
+      ['id']
+  )
   op.create_foreign_key(
       'object_controls_ibfk_2',
       'object_controls',
