@@ -7,19 +7,15 @@ from sqlalchemy.orm import validates
 
 from ggrc import db
 from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
-from .object_control import Controllable
 from .object_document import Documentable
-from .object_objective import Objectiveable
 from .object_owner import Ownable
 from .object_person import Personable
-from .object_section import Sectionable
 from .relationship import Relatable
 from .utils import validate_option
 from .track_object_state import HasObjectState, track_state_for_class
 
 
-class SystemOrProcess(HasObjectState,
-    Timeboxed, BusinessObject, db.Model):
+class SystemOrProcess(HasObjectState, Timeboxed, BusinessObject, db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'
   __tablename__ = 'systems'
@@ -33,11 +29,11 @@ class SystemOrProcess(HasObjectState,
       primaryjoin='and_(foreign(SystemOrProcess.network_zone_id) == Option.id, '\
                        'Option.role == "network_zone")',
       uselist=False,
-      )
+  )
 
   __mapper_args__ = {
       'polymorphic_on': is_biz_process
-      }
+  }
 
   # REST properties
   _publish_attrs = [
@@ -45,16 +41,15 @@ class SystemOrProcess(HasObjectState,
       'is_biz_process',
       'version',
       'network_zone',
-      ]
+  ]
   _update_attrs = [
       'infrastructure',
-      #'is_biz_process',
       'version',
       'network_zone',
-      ]
+  ]
   _sanitize_html = [
       'version',
-      ]
+  ]
 
   @validates('network_zone')
   def validate_system_options(self, key, option):
@@ -72,18 +67,18 @@ class SystemOrProcess(HasObjectState,
   @staticmethod
   def _extra_table_args(cls):
     return (
-        db.Index(
-          'ix_{}_is_biz_process'.format(cls.__tablename__), 'is_biz_process'),
-        )
+        db.Index('ix_{}_is_biz_process'.format(cls.__tablename__),
+                 'is_biz_process'),
+    )
 
 track_state_for_class(SystemOrProcess)
 
-class System(
-    CustomAttributable, Documentable, Personable, Objectiveable, Controllable,
-    Sectionable, Relatable, Ownable, SystemOrProcess):
+
+class System(CustomAttributable, Documentable, Personable,
+             Relatable, Ownable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': False
-      }
+  }
   _table_plural = 'systems'
 
   @validates('is_biz_process')
@@ -91,12 +86,11 @@ class System(
     return False
 
 
-class Process(
-    CustomAttributable, Documentable, Personable, Objectiveable, Controllable,
-    Sectionable, Relatable, Ownable, SystemOrProcess):
+class Process(CustomAttributable, Documentable, Personable,
+              Relatable, Ownable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': True
-      }
+  }
   _table_plural = 'processes'
 
   @validates('is_biz_process')

@@ -25,7 +25,7 @@ def upgrade():
       source_type, destination_id, destination_type, context_id
   )
   SELECT pd.modified_by_id, pd.created_at, pd.updated_at, pd.program_id as source_id,
-         'Program' as source_type, pd.directive_id, IFNULL(d.kind, "Policy") as destination_type, pd.context_id
+         'Program' as source_type, pd.directive_id, d.meta_kind as destination_type, pd.context_id
   FROM program_directives as pd JOIN directives as d ON pd.directive_id = d.id;
   """
   op.execute(sql)

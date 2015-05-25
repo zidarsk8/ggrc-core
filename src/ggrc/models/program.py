@@ -4,41 +4,39 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
-from .associationproxy import association_proxy
 from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
 from .object_document import Documentable
-from .object_objective import Objectiveable
 from .object_owner import Ownable
 from .object_person import Personable
-from .reflection import PublishOnly
 from .relationship import Relatable
 from .context import HasOwnContext
 from .track_object_state import HasObjectState, track_state_for_class
 
-class Program(HasObjectState,
-    CustomAttributable, Documentable, Personable, Objectiveable, Relatable,
-    HasOwnContext, Timeboxed, Ownable, BusinessObject, db.Model):
+
+class Program(HasObjectState, CustomAttributable, Documentable,
+              Personable, Relatable, HasOwnContext, Timeboxed,
+              Ownable, BusinessObject, db.Model):
   __tablename__ = 'programs'
 
   KINDS = [
       'Directive',
-      ]
+  ]
 
   KINDS_HIDDEN = [
       'Company Controls Policy',
-      ]
+  ]
 
   private = db.Column(db.Boolean, default=False, nullable=False)
   kind = deferred(db.Column(db.String), 'Program')
 
   audits = db.relationship(
-     'Audit', backref='program', cascade='all, delete-orphan')
+      'Audit', backref='program', cascade='all, delete-orphan')
 
   _publish_attrs = [
       'kind',
       'audits',
       'private',
-      ]
+  ]
 
   _include_links = []
 

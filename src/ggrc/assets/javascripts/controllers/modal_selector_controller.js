@@ -359,60 +359,6 @@
         join_list: get_page_object().object_documents
       },
 
-      object_sections: {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: "Section",
-        modal_title: "Select Sections",
-
-        related_model_singular: "Section",
-        related_table_plural: "sections",
-        related_table_singluar: "section",
-        related_title_singular: "Section",
-        related_title_plural: "Sections",
-
-        option_model: CMS.Models.Section,
-
-        join_model: CMS.Models.ObjectSection,
-        option_attr: 'section',
-        join_attr: 'sectionable',
-        option_id_field: 'section_id',
-        option_type_field: null,
-        join_id_field: 'sectionable_id',
-        join_type_field: 'sectionable_type',
-
-        join_object: get_page_object(),
-      },
-
-      object_objectives: {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: "Objective",
-        modal_title: "Select Objectives",
-
-        related_model_singular: "Objective",
-        related_table_plural: "objectives",
-        related_table_singular: "objective",
-        related_title_singular: "Objective",
-        related_title_plural: "Objectives",
-
-        option_model: CMS.Models.Objective,
-
-        join_model: CMS.Models.ObjectObjective,
-        option_attr: 'objective',
-        join_attr: 'objectiveable',
-        option_id_field: 'objective_id',
-        option_type_field: null,
-        join_id_field: 'objectiveable_id',
-        join_type_field: 'objectiveable_type',
-
-        join_object: get_page_object(),
-      },
-
       object_people: {
         option_column_view: GGRC.mustache_path + "/people/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/people/active_column.mustache",
@@ -439,61 +385,6 @@
 
         join_object: get_page_object(),
         join_list: get_page_object().object_people
-      }
-      , section_objectives : {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: "Objective",
-        modal_title: "Select Objectives",
-
-        related_model_singular: "Objective",
-        related_table_plural: "objectives",
-        related_table_singular: "objective",
-        related_title_singular: "Objective",
-        related_title_plural: "Objectives",
-
-        object_model: CMS.Models.Section,
-        option_model: CMS.Models.Objective,
-        join_model: CMS.Models.SectionObjective,
-
-        option_attr: 'objective',
-        join_attr: 'section',
-        option_id_field: 'objective_id',
-        //option_type_field: 'objective_type',
-        join_id_field: 'section_id',
-        join_type_field: null,
-
-        join_object: CMS.Models.Section.findInCacheById(data.join_object_id)
-      }
-
-      , section_controls : {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: "Control",
-        modal_title: "Select Controls",
-
-        related_model_singular: "Control",
-        related_table_plural: "controls",
-        related_table_singular: "control",
-        related_title_singular: "Control",
-        related_title_plural: "Controls",
-
-        option_model: CMS.Models.Control,
-        join_model: CMS.Models.ControlSection,
-
-        option_attr: 'control',
-        join_attr: 'section',
-        option_id_field: 'control_id',
-        //option_type_field: 'control_type',
-        join_id_field: 'section_id',
-        join_type_field: null,
-
-        join_object_id: data.join_object_id,
-        join_object_type: data.join_object_type
       }
     };
 

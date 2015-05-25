@@ -12,7 +12,7 @@ from ggrc import db
 from ggrc.converters.import_helper import handle_converter_csv_export
 from ggrc.converters.controls import ControlsConverter
 from ggrc.models.all_models import (
-    ControlCategory, Control, Policy, ObjectControl, Option, System,
+    ControlCategory, Control, Policy, Option, System,
     )
 from tests.ggrc import TestCase
 from nose.plugins.skip import SkipTest
@@ -114,11 +114,6 @@ class TestExport(TestCase):
     cat1 = ControlCategory(name="Governance")
     cat2 = ControlCategory(name="Authorization")
     sys1 = System(slug="ACLS", title="System1")
-    ob_cont1 = ObjectControl(
-        controllable=sys1,
-        control=cont1,
-    )
-    cont1.object_controls.append(ob_cont1)
     db.session.add(cont1)
     db.session.add(cat1)
     db.session.add(cat2)

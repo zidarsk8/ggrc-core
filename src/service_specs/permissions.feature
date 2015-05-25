@@ -60,7 +60,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Market             |
       #| Meeting            |
       | Objective          |
-      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | Person             |
@@ -71,7 +70,6 @@ Feature: RBAC Permissions enforcement for REST API
       #| ProgramDirective   |
       | Section            |
       | Clause             |
-      | SectionObjective   |
       | System             |
 
   Scenario Outline: GET requires read permission for the context
@@ -135,7 +133,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Market             |
       #| Meeting            |
       | Objective          |
-      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | Person             |
@@ -146,7 +143,6 @@ Feature: RBAC Permissions enforcement for REST API
       #| ProgramDirective   |
       | Section            |
       | Clause             |
-      | SectionObjective   |
       | System             |
 
   Scenario Outline: PUT requires update permission for the context
@@ -220,7 +216,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Market             |
       #| Meeting            |
       | Objective          |
-      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | Person             |
@@ -231,7 +226,6 @@ Feature: RBAC Permissions enforcement for REST API
       #| ProgramDirective   |
       | Section            |
       | Clause             |
-      | SectionObjective   |
       | System             |
 
   Scenario Outline: DELETE requires delete permission for the context
@@ -263,7 +257,7 @@ Feature: RBAC Permissions enforcement for REST API
     And current user has create permissions on resource types that "<resource_type>" depends on in context "context1"
     And "resource" is POSTed to its collection
     Then GET of "resource" is allowed
-    Then DELETE of "resource" is forbidden 
+    Then DELETE of "resource" is forbidden
     Given the current user
     """
     { "email": "bobtester@testertester.com",
@@ -307,7 +301,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Market             |
       #| Meeting            |
       | Objective          |
-      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | Person             |
@@ -318,7 +311,6 @@ Feature: RBAC Permissions enforcement for REST API
       #| ProgramDirective   |
       | Section            |
       | Clause             |
-      | SectionObjective   |
       | System             |
 
   Scenario: Property link objects can be included with __include if the user has read access to the target
@@ -632,4 +624,3 @@ Feature: RBAC Permissions enforcement for REST API
       | ControlAssertion | name          | assertion1          |
       | Help             | title         | foo                 |
       #| Program          | state         | draft               |
-

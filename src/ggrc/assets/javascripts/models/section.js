@@ -48,16 +48,11 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
     , people: "CMS.Models.Person.stubs"
     , object_documents: "CMS.Models.ObjectDocument.stubs"
     , documents: "CMS.Models.Document.stubs"
-    , object_controls: "CMS.Models.ObjectControl.stubs"
-    , controls: "CMS.Models.Control.stubs"
     , directive: "CMS.Models.get_stub"
     , children: "CMS.Models.get_stubs"
-    , control_sections: "CMS.Models.ControlSection.stubs"
     , directive_sections: "CMS.Models.DirectiveSection.stubs"
     , directives: "CMS.Models.get_stubs"
-    , section_objectives: "CMS.Models.SectionObjective.stubs"
     , objectives: "CMS.Models.Objective.stubs"
-    , object_sections: "CMS.Models.ObjectSection.stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
 

@@ -5,18 +5,16 @@
 
 from ggrc import db
 from .mixins import BusinessObject, Timeboxed, CustomAttributable
-from .object_control import Controllable
 from .object_document import Documentable
-from .object_objective import Objectiveable
 from .object_owner import Ownable
 from .object_person import Personable
-from .object_section import Sectionable
 from .relationship import Relatable
 from .track_object_state import HasObjectState, track_state_for_class
 
+
 class DataAsset(HasObjectState,
-    CustomAttributable, Personable, Documentable, Objectiveable, Controllable,
-    Sectionable, Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
+                CustomAttributable, Personable, Documentable, Relatable,
+                Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'data_assets'
 
 track_state_for_class(DataAsset)

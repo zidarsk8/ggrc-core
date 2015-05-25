@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from .base import *
 from ggrc.models import (
-    Directive, Policy, Regulation, Contract, Standard, Program, DirectiveControl
+    Directive, Policy, Regulation, Contract, Standard, Program
 )
 from ggrc.models.mixins import BusinessObject
 from .base_row import *
@@ -20,8 +20,7 @@ class ControlRowConverter(BaseRowConverter):
 
   def find_by_slug(self, slug):
     from sqlalchemy import orm
-    return self.model_class.query.filter_by(slug=slug).options(
-        orm.joinedload('directive_controls')).first()
+    return self.model_class.query.filter_by(slug=slug).first()
 
   def setup_object(self):
     self.obj = self.setup_object_by_slug(self.attrs)
@@ -55,8 +54,10 @@ class ControlRowConverter(BaseRowConverter):
     self.handle('categories', LinkControlCategoriesHandler)
     self.handle('assertions', LinkControlAssertionsHandler)
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
-    self.handle('systems', LinkObjectControl, model_class = System)
-    self.handle('processes', LinkObjectControl, model_class = Process)
+    self.handle('systems', LinkRelationshipsHandler, model_class=System,
+                 direction='from', model_human_name='System')
+    self.handle('processes', LinkRelationshipsHandler, model_class=Process,
+                 direction='from', model_human_name='Process')
     self.handle('principal_assessor', ContactEmailHandler, person_must_exist=True)
     self.handle('secondary_assessor', ContactEmailHandler, person_must_exist=True)
     self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)
@@ -66,14 +67,7 @@ class ControlRowConverter(BaseRowConverter):
 
   def after_save(self, db_session, **options):
     super(ControlRowConverter, self).after_save(db_session, **options)
-    if options.get('parent_type') in DIRECTIVE_CLASSES:
-      directive_id = options.get('parent_id')
-      for directive_control in self.obj.directive_controls:
-        if directive_control.directive_id == directive_id:
-          return
-      db_session.add(
-          DirectiveControl(directive_id=directive_id, control=self.obj))
-    elif options.get('parent_type') == Program:
+    if options.get('parent_type') == Program:
       program_id = options.get('parent_id')
       for program_control in self.obj.program_controls:
         if program_control.program_id == program_id:

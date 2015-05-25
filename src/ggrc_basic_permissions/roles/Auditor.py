@@ -46,11 +46,8 @@ permissions = {
             "condition": "in"
         },
         "Meeting",
-        "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
         "Document",
         "Meeting",

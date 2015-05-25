@@ -59,9 +59,6 @@ Feature: Resource caching
       | ControlCategory    | control_categories   | name        | name1    | name2    |
       | Control            | controls             | description | desc1    | desc2    |
       | DataAsset          | data_assets          | description | desc1    | desc2    |
-      #| Directive          | directives           | description | desc1    | desc2    |
-      | DirectiveControl   | directive_controls   | status      | Draft    | Final    |
-      | DirectiveSection   | directive_sections   | status      | Draft    | Final    |
       | Contract           | contracts            | description | desc1    | desc2    |
       | Policy             | policies             | description | desc1    | desc2    |
       | Regulation         | regulations          | description | desc1    | desc2    |
@@ -73,10 +70,8 @@ Feature: Resource caching
       #| Meeting            | meetings             |
       | ObjectControl      | object_controls      | status      | Draft    | Final    |
       | ObjectDocument     | object_documents     | status      | Draft    | Final    |
-      | ObjectObjective    | object_objectives    | status      | Draft    | Final    |
       | ObjectPerson       | object_people        | status      | Draft    | Final    |
       | Objective          | objectives           | description | desc1    | desc2    |
-      | ObjectiveControl   | objective_controls   | status      | Draft    | Final    |
       | Option             | options              | title       | title1   | title2   |
       | OrgGroup           | org_groups           | description | desc1    | desc2    |
       | Person             | people               | name        | name1    | name2    |
@@ -88,7 +83,6 @@ Feature: Resource caching
       #| SectionBase        | section_bases        | description | desc1    | desc2    |
       | Section            | sections             | description | desc1    | desc2    |
       | Clause             | clauses              | description | desc1    | desc2    |
-      | SectionObjective   | section_objectives   | status      | Draft    | Final    |
       #| SystemOrProcess    | systems_or_processes | description | desc1    | desc2    |
       | System             | systems              | description | desc1    | desc2    |
       | Process            | processes            | description | desc1    | desc2    |
@@ -260,61 +254,42 @@ Feature: Resource caching
       | near_resource_type        | near_resource_key    | mapping_near_key     | mapping_type              | property | value1 | value2 |
       | Audit                     | requests             | audit                | Request                   | status   | Requested | Responded |
       | Audit                     | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Control                   | control_controls     | control              | ControlControl            | status   | Draft  | Final  |
-      | Control                   | implementing_control_controls | implemented_control | ControlControl            | status   | Draft  | Final  |
       | Control                   | program_controls     | control              | ProgramControl            | status   | Draft  | Final  |
       | Control                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
-      | Control                   | objective_controls   | control              | ObjectiveControl          | status   | Draft  | Final  |
-      | Control                   | directive_controls   | control              | DirectiveControl          | status   | Draft  | Final  |
       | Control                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Control                   | object_controls      | control              | ObjectControl             | status   | Draft  | Final  |
-      | Control                   | control_sections     | control              | ControlSection            | status   | Draft  | Final  |
       | Control                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | DataAsset                 | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | DataAsset                 | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | DataAsset                 | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | DataAsset                 | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | DataAsset                 | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | DataAsset                 | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | DataAsset                 | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | DataAsset                 | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Contract                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
-      | Contract                  | directive_sections   | directive            | DirectiveSection          | status   | Draft  | Final  |
-      | Contract                  | directive_controls   | directive            | DirectiveControl          | status   | Draft  | Final  |
       | Contract                  | program_directives   | directive            | ProgramDirective          | status   | Draft  | Final  |
       | Contract                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Contract                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Contract                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Contract                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Contract                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Policy                    | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
-      | Policy                    | directive_sections   | directive            | DirectiveSection          | status   | Draft  | Final  |
-      | Policy                    | directive_controls   | directive            | DirectiveControl          | status   | Draft  | Final  |
       | Policy                    | program_directives   | directive            | ProgramDirective          | status   | Draft  | Final  |
       | Policy                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Policy                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Policy                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Policy                    | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Policy                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Policy                     | sections             | directive            | Section                   | title    | title1 | title2 |
       | Regulation                | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
-      | Regulation                | directive_sections   | directive            | DirectiveSection          | status   | Draft  | Final  |
-      | Regulation                | directive_controls   | directive            | DirectiveControl          | status   | Draft  | Final  |
       | Regulation                | program_directives   | directive            | ProgramDirective          | status   | Draft  | Final  |
       | Regulation                | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Regulation                | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Regulation                | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Regulation                | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Regulation                | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Regulation                 | sections             | directive            | Section                   | title    | title1 | title2 |
       | Standard                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
-      | Standard                  | directive_sections   | directive            | DirectiveSection          | status   | Draft  | Final  |
-      | Standard                  | directive_controls   | directive            | DirectiveControl          | status   | Draft  | Final  |
       | Standard                  | program_directives   | directive            | ProgramDirective          | status   | Draft  | Final  |
       | Standard                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Standard                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Standard                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Standard                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Standard                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Standard                   | sections             | directive            | Section                   | title    | title1 | title2 |
       | Document                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
@@ -322,42 +297,30 @@ Feature: Resource caching
       | Facility                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Facility                  | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Facility                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Facility                  | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | Facility                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Facility                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Facility                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Market                    | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Market                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Market                    | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Market                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Market                    | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | Market                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Market                    | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Market                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Meeting                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Objective                 | objective_objects    | objective            | ObjectObjective           | status   | Draft  | Final  |
-      | Objective                 | objective_controls   | objective            | ObjectiveControl          | status   | Draft  | Final  |
       | Objective                 | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Objective                 | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Objective                 | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Objective                 | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
-      | Objective                 | section_objectives   | objective            | SectionObjective          | status   | Draft  | Final  |
       | OrgGroup                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | OrgGroup                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | OrgGroup                  | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | OrgGroup                  | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | OrgGroup                  | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | OrgGroup                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | OrgGroup                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | OrgGroup                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Person                    | object_people        | person               | ObjectPerson              | status   | Draft  | Final  |
       | Product                   | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Product                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Product                   | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Product                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Product                   | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | Product                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Product                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Product                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Program                   | program_controls     | program              | ProgramControl            | status   | Draft  | Final  |
       | Program                   | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
@@ -365,15 +328,12 @@ Feature: Resource caching
       | Program                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Program                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
       | Program                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Program                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Program                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Project                   | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Project                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Project                   | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Project                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Project                   | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | Project                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Project                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Project                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | DocumentationResponse     | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | DocumentationResponse     | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
@@ -390,35 +350,23 @@ Feature: Resource caching
       | PopulationSampleResponse  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | PopulationSampleResponse  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | PopulationSampleResponse  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
-      | Section                   | directive_sections   | section              | DirectiveSection          | status   | Draft  | Final  |
-      | Section                   | control_sections     | section              | ControlSection            | status   | Draft  | Final  |
       | Section                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Section                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Section                   | object_sections      | section              | ObjectSection             | status   | Draft  | Final  |
       | Section                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Section                   | section_objectives   | section              | SectionObjective          | status   | Draft  | Final  |
-      | Clause                    | directive_sections   | section              | DirectiveSection          | status   | Draft  | Final  |
-      | Clause                    | control_sections     | section              | ControlSection            | status   | Draft  | Final  |
       | Clause                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Clause                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Clause                    | object_sections      | section              | ObjectSection             | status   | Draft  | Final  |
       | Clause                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Clause                    | section_objectives   | section              | SectionObjective          | status   | Draft  | Final  |
       | System                    | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | System                    | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | System                    | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | System                    | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | System                    | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | System                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | System                    | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | System                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Process                   | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Process                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Process                   | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
       | Process                   | object_documents     | documentable         | ObjectDocument            | status   | Draft  | Final  |
-      | Process                   | object_sections      | sectionable          | ObjectSection             | status   | Draft  | Final  |
       | Process                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
-      | Process                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Process                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
 
   Examples: Cached resources with mappings from `ggrc_gdrive_integration`

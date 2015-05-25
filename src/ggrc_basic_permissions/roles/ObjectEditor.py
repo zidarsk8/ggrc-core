@@ -12,27 +12,20 @@ permissions = {
         "ControlAssessment",
         "Issue",
         "ControlControl",
-        "ControlSection",
         "DataAsset",
         "Directive",
         "Contract",
         "Policy",
         "Regulation",
         "Standard",
-        "DirectiveControl",
-        "DirectiveSection",
         "Document",
         "Facility",
         "Help",
         "Market",
         "Objective",
-        "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         "Option",
         "OrgGroup",
         "Vendor",
@@ -44,7 +37,6 @@ permissions = {
         "SectionBase",
         "Section",
         "Clause",
-        "SectionObjective",
         "SystemOrProcess",
         "System",
         "Process",
@@ -70,26 +62,19 @@ permissions = {
         "ControlAssessment",
         "Issue",
         "ControlControl",
-        "ControlSection",
         "DataAsset",
         "Directive",
         "Contract",
         "Policy",
         "Regulation",
         "Standard",
-        "DirectiveControl",
-        "DirectiveSection",
         "Document",
         "Facility",
         "Market",
         "Objective",
-        "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         "Option",
         "OrgGroup",
         "Vendor",
@@ -101,7 +86,6 @@ permissions = {
         "SectionBase",
         "Section",
         "Clause",
-        "SectionObjective",
         "SystemOrProcess",
         "System",
         "Process",
@@ -147,7 +131,6 @@ permissions = {
             "condition": "contains"
         },
         "ControlControl",
-        "ControlSection",
         {
             "type": "DataAsset",
             "terms": {
@@ -196,8 +179,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "DirectiveControl",
-        "DirectiveSection",
         {
             "type": "Document",
             "terms": {
@@ -230,13 +211,9 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         {
             "type": "Option",
             "terms": {
@@ -296,7 +273,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "SectionObjective",
         {
             "type": "SystemOrProcess",
             "terms": {
@@ -360,7 +336,6 @@ permissions = {
             "condition": "contains"
         },
         "ControlControl",
-        "ControlSection",
         {
             "type": "DataAsset",
             "terms": {
@@ -409,8 +384,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "DirectiveControl",
-        "DirectiveSection",
         {
             "type": "Document",
             "terms": {
@@ -443,13 +416,9 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         {
             "type": "Option",
             "terms": {
@@ -509,7 +478,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "SectionObjective",
         {
             "type": "SystemOrProcess",
             "terms": {

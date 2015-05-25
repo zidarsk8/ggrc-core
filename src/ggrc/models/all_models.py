@@ -14,27 +14,19 @@ from .category import CategoryBase
 from .context import Context
 from .control import Control, ControlCategory, ControlAssertion
 from .control_assessment import ControlAssessment
-from .control_control import ControlControl
-from .control_section import ControlSection
 from .custom_attribute_definition import CustomAttributeDefinition
 from .custom_attribute_value import CustomAttributeValue
 from .data_asset import DataAsset
 from .directive import Directive, Regulation, Policy, Contract, Standard
-from .directive_control import DirectiveControl
-from .directive_section import DirectiveSection
 from .document import Document
 from .facility import Facility
 from .help import Help
 from .market import Market
-from .object_control import ObjectControl
 from .object_document import ObjectDocument
-from .object_objective import ObjectObjective
 from .object_owner import ObjectOwner
 from .object_person import ObjectPerson
-from .object_section import ObjectSection
 from .object_type import ObjectType
 from .objective import Objective
-from .objective_control import ObjectiveControl
 from .option import Option
 from .org_group import OrgGroup
 from .vendor import Vendor
@@ -56,7 +48,6 @@ from .issue import Issue
 # TODO: This isn't currently used
 # from .relationship_type import RelationshipType
 from .section import SectionBase, Section, Clause
-from .section_objective import SectionObjective
 from .system import SystemOrProcess, System, Process
 
 from .revision import Revision
@@ -71,8 +62,6 @@ all_models = [
     Context,
     Control,
     ControlAssessment,
-    ControlControl,
-    ControlSection,
     CustomAttributeDefinition,
     CustomAttributeValue,
     DataAsset,
@@ -81,21 +70,15 @@ all_models = [
     Policy,
     Regulation,
     Standard,
-    DirectiveControl,
-    DirectiveSection,
     Document,
     Facility,
     Help,
     Market,
     Meeting,
     Objective,
-    ObjectiveControl,
-    ObjectControl,
     ObjectDocument,
-    ObjectObjective,
     ObjectOwner,
     ObjectPerson,
-    ObjectSection,
     ObjectType,
     Option,
     OrgGroup,
@@ -114,7 +97,6 @@ all_models = [
     SectionBase,
     Section,
     Clause,
-    SectionObjective,
     SystemOrProcess,
     System,
     Process,
