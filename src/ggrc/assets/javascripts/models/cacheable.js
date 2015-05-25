@@ -1112,6 +1112,10 @@ can.Model("can.Model.Cacheable", {
       return undefined;
     } else if (val[descriptor]) {
       return val[descriptor];
+    } else if (descriptor.match(/^custom:/)) {
+      return this.get_deep_property(
+          this._find_custom_attr(descriptor),
+          val);
     } else {
       var d = descriptor.split('.'),
           keys = d.shift().split('|'),
@@ -1147,6 +1151,27 @@ can.Model("can.Model.Cacheable", {
         }
       }, "");
     }
+  },
+
+  // finds path descriptors for custom fields
+  // something like custom:Custom field
+  // becomes custom_attribute_values.1.attribute_value
+  // the index is what we're looking for
+  _find_custom_attr: function (descriptor, val) {
+    descriptor = descriptor.replace(/^custom:/, '');
+    val = typeof val === "undefined" ? this : val;
+
+    var needle = _.find(GGRC.custom_attr_defs, function (attr) {
+      return attr.definition_type === val.class.table_singular && 
+            attr.title === descriptor;
+    });
+
+    var index = _.findIndex(val.custom_attribute_values, function (attr) {
+      attr = attr.reify();
+      return attr.custom_attribute_id === needle.id;
+    });
+
+    return 'custom_attribute_values.'+index+'.attribute_value';
   }
 });
 

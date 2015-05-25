@@ -460,12 +460,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         can.Model.Cacheable.tree_view_options.mandatory_attr_names;
 
     //get custom attrs
-    can.each(GGRC.custom_attr_defs, function (def) {
+    can.each(GGRC.custom_attr_defs, function (def, i) {
       if (def.definition_type === model_definition && def.attribute_type !== 'Rich Text') {
         var obj = {};
         obj.attr_title = obj.attr_name = def.title;
         obj.display_status = false;
         obj.attr_type = 'custom';
+        obj.attr_sort_field = 'custom:'+obj.attr_name;
         select_attr_list.push(obj);
       }
     });
