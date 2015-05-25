@@ -110,20 +110,18 @@ form.import {
 }
 
 .download-template {
-  text-align: right;
-  font-weight: bold;
-  a {
-    @include opacity(0.4);
-    @include transition(opacity 0.2s ease);
-    font-size: 11px;
-    color: $widgetTitle;
-    text-transform: uppercase;
-    text-decoration: none;
-    i {
-      margin-top: 2px;
+  background: $lightGray;
+  border: 1px solid $darkGray;
+  padding: 20px;
+  .center-block {
+    text-align: center;
+    padding: 40px 0 10px;
+    small {
+      display: block;
     }
-    &:hover {
+    i {
       @include opacity(1);
+      margin-top: 4px;
     }
   }
 }
