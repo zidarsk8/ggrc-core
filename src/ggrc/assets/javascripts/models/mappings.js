@@ -688,7 +688,7 @@
           "Program", "Regulation", "Contract", "Policy", "Standard",
           "Section", "Clause", "Objective", "Control",
           "System", "Process", "DataAsset", "Product", "Project", "Facility",
-          "Market", "OrgGroup", "Vendor", "Audit" //, "Request", "Response"
+          "Market", "OrgGroup", "Vendor", "Audit", "Issue" //, "Request", "Response"
         ];
 
         return GGRC.Models.Search.search_for_types(
@@ -718,6 +718,7 @@
       extended_related_projects_via_search: TypeFilter("related_objects_via_search", "Project"),
       extended_related_systems_via_search: TypeFilter("related_objects_via_search", "System"),
       extended_related_audits_via_search: TypeFilter("related_objects_via_search", "Audit"),
+      extended_related_issues_via_search: TypeFilter("related_objects_via_search", "Issue"),
       audit_requests: Search(function (binding) {
         return CMS.Models.Request.findAll({
           'assignee_id': binding.instance.id

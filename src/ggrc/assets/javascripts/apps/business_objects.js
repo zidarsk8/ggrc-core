@@ -876,6 +876,9 @@ $(function() {
               footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
               add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
             },
+            Issue: {
+              mapping: "extended_related_issues_via_search"
+            },
             DataAsset: {
               mapping: "extended_related_data_assets_via_search"
             },
