@@ -214,22 +214,7 @@ class Cache:
     return cache_key
 
   def parse_filter(self, filter):
-    ids = None
-    attrs = None
-
-    ids_exist = 'ids' in filter
-    attrs_exist = 'attrs' in filter
-
-    if ids_exist or attrs_exist:
-      if ids_exist and attrs_exist:
-        ids = filter.get('ids')
-        attrs = filter.get('attrs')
-      elif ids_exist:
-        ids = filter.get('ids')
-      else:
-        attrs = filter.get('attrs')
-
-    return ids, attrs
+    return filter.get('ids'), filter.get('attrs')
 
   def is_caching_supported(self, category, resource):
     if category is 'collection':
