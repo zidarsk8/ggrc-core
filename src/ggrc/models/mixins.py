@@ -6,15 +6,20 @@
 from uuid import uuid1
 
 from flask import current_app
+from sqlalchemy import and_
 from sqlalchemy import event
+from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import foreign
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import validates
 from sqlalchemy.orm.session import Session
 
 from ggrc import db
-from .inflector import ModelInflectorDescriptor
-from .reflection import AttributeInfo
-from .computed_property import computed_property
+from ggrc.models.inflector import ModelInflectorDescriptor
+from ggrc.models.reflection import AttributeInfo
+from ggrc.models.reflection import PublishOnly
+from ggrc.models.computed_property import computed_property
 
 
 """Mixins to add common attributes and relationships. Note, all model classes
@@ -27,6 +32,7 @@ must also inherit from ``db.Model``. For example:
 
 """
 
+
 def deferred(column, classname):
   """Defer column loading for basic properties, such as boolean or string, so
   that they are not loaded on joins. However, Identifiable provides an
@@ -37,9 +43,11 @@ def deferred(column, classname):
   In join tables, this function should not wrap foreign keys nor should it wrap
   type properties for polymorphic relations.
   """
-  return db.deferred(column, group=classname+'_complete')
+  return db.deferred(column, group=classname + '_complete')
+
 
 class Identifiable(object):
+
   """A model with an ``id`` property that is the primary key."""
   id = db.Column(db.Integer, primary_key=True)
 
@@ -58,8 +66,9 @@ class Identifiable(object):
   def eager_query(cls):
     mapper_class = cls._sa_class_manager.mapper.base_mapper.class_
     return db.session.query(cls).options(
-        db.Load(mapper_class).undefer_group(mapper_class.__name__+'_complete'),
-        )
+        db.Load(mapper_class).undefer_group(
+            mapper_class.__name__ + '_complete'),
+    )
 
   @classmethod
   def eager_inclusions(cls, query, include_links):
@@ -68,8 +77,8 @@ class Identifiable(object):
     for include_link in include_links:
       inclusion_class = getattr(cls, include_link).property.mapper.class_
       options.append(
-          orm.subqueryload(include_link)\
-              .undefer_group(inclusion_class.__name__ + '_complete'))
+          orm.subqueryload(include_link)
+          .undefer_group(inclusion_class.__name__ + '_complete'))
     return query.options(*options)
 
   @declared_attr
@@ -114,16 +123,19 @@ class Identifiable(object):
 
 def created_at_args():
   """Sqlite doesn't have a server, per se, so the server_* args are useless."""
-  return {'default': db.text('current_timestamp'),}
+  return {'default': db.text('current_timestamp'), }
+
 
 def updated_at_args():
   """Sqlite doesn't have a server, per se, so the server_* args are useless."""
   return {
-    'default': db.text('current_timestamp'),
-    'onupdate': db.text('current_timestamp'),
-    }
+      'default': db.text('current_timestamp'),
+      'onupdate': db.text('current_timestamp'),
+  }
+
 
 class ChangeTracked(object):
+
   """A model with fields to tracked the last user to modify the model, the
   creation time of the model, and the last time the model was updated.
   """
@@ -136,14 +148,14 @@ class ChangeTracked(object):
   @declared_attr
   def created_at(cls):
     return deferred(db.Column(
-      db.DateTime,
-      **created_at_args()), cls.__name__)
+        db.DateTime,
+        **created_at_args()), cls.__name__)
 
   @declared_attr
   def updated_at(cls):
     return deferred(db.Column(
-      db.DateTime,
-      **updated_at_args()), cls.__name__)
+        db.DateTime,
+        **updated_at_args()), cls.__name__)
 
   @declared_attr
   def modified_by(cls):
@@ -152,24 +164,24 @@ class ChangeTracked(object):
         primaryjoin='{0}.modified_by_id == Person.id'.format(cls.__name__),
         foreign_keys='{0}.modified_by_id'.format(cls.__name__),
         uselist=False,
-        )
+    )
 
   @staticmethod
   def _extra_table_args(cls):
     return (
         db.Index('ix_{}_updated_at'.format(cls.__tablename__), 'updated_at'),
-        )
+    )
 
-  #TODO Add a transaction id, this will be handy for generating etags
-  #and for tracking the changes made to several resources together.
-  #transaction_id = db.Column(db.Integer)
+  # TODO Add a transaction id, this will be handy for generating etags
+  # and for tracking the changes made to several resources together.
+  # transaction_id = db.Column(db.Integer)
 
   # REST properties
   _publish_attrs = [
       'modified_by',
       'created_at',
       'updated_at',
-      ]
+  ]
   _update_attrs = []
 
 
@@ -184,8 +196,8 @@ class Titled(object):
     if getattr(cls, '_title_uniqueness', True):
       return (
           db.UniqueConstraint(
-            'title', name='uq_t_{}'.format(cls.__tablename__)),
-          )
+              'title', name='uq_t_{}'.format(cls.__tablename__)),
+      )
     return ()
 
   # REST properties
@@ -195,10 +207,10 @@ class Titled(object):
 
 
 class Described(object):
+
   @declared_attr
   def description(cls):
     return deferred(db.Column(db.Text), cls.__name__)
-
 
   # REST properties
   _publish_attrs = ['description']
@@ -207,6 +219,7 @@ class Described(object):
 
 
 class Noted(object):
+
   @declared_attr
   def notes(cls):
     return deferred(db.Column(db.Text), cls.__name__)
@@ -218,6 +231,7 @@ class Noted(object):
 
 
 class Hyperlinked(object):
+
   @declared_attr
   def url(cls):
     return deferred(db.Column(db.String), cls.__name__)
@@ -231,6 +245,7 @@ class Hyperlinked(object):
 
 
 class Hierarchical(object):
+
   @declared_attr
   def parent_id(cls):
     return deferred(db.Column(
@@ -241,14 +256,15 @@ class Hierarchical(object):
   def children(cls):
     return db.relationship(
         cls.__name__,
-        backref=db.backref('parent', remote_side='{0}.id'.format(cls.__name__)),
-        )
+        backref=db.backref(
+            'parent', remote_side='{0}.id'.format(cls.__name__)),
+    )
 
   # REST properties
   _publish_attrs = [
       'children',
       'parent',
-      ]
+  ]
 
   @classmethod
   def eager_query(cls):
@@ -257,11 +273,12 @@ class Hierarchical(object):
     query = super(Hierarchical, cls).eager_query()
     return query.options(
         orm.subqueryload('children'),
-        #orm.joinedload('parent'),
-        )
+        # orm.joinedload('parent'),
+    )
 
 
 class Timeboxed(object):
+
   @declared_attr
   def start_date(cls):
     return deferred(db.Column(db.Date), cls.__name__)
@@ -275,6 +292,7 @@ class Timeboxed(object):
 
 
 class Stateful(object):
+
   @declared_attr
   def status(cls):
     return deferred(
@@ -301,6 +319,7 @@ class Stateful(object):
 
 
 class ContextRBAC(object):
+
   @declared_attr
   def context_id(cls):
     return db.Column(db.Integer, db.ForeignKey('contexts.id'))
@@ -313,20 +332,21 @@ class ContextRBAC(object):
   def _extra_table_args(cls):
     return (
         db.Index('fk_{}_contexts'.format(cls.__tablename__), 'context_id'),
-        )
+    )
 
   _publish_attrs = ['context']
 
-  #@classmethod
-  #def eager_query(cls):
-    #from sqlalchemy import orm
+  # @classmethod
+  # def eager_query(cls):
+  # from sqlalchemy import orm
 
-    #query = super(ContextRBAC, cls).eager_query()
-    #return query.options(
-        #orm.subqueryload('context'))
+  # query = super(ContextRBAC, cls).eager_query()
+  # return query.options(
+  # orm.subqueryload('context'))
 
 
 class Base(ChangeTracked, ContextRBAC, Identifiable):
+
   """Several of the models use the same mixins. This class covers that common
   case.
   """
@@ -345,7 +365,7 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
   def display_name(self):
     try:
       return self._display_name()
-    except Exception as e:
+    except:
       current_app.logger.warn(
           "display_name error in {}".format(type(self)), exc_info=True)
       return ""
@@ -355,6 +375,7 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
 
 
 class Slugged(Base):
+
   """Several classes make use of the common mixins and additional are
   "slugged" and have additional fields related to their publishing in the
   system.
@@ -369,7 +390,7 @@ class Slugged(Base):
     if getattr(cls, '_slug_uniqueness', True):
       return (
           db.UniqueConstraint('slug', name='uq_{}'.format(cls.__tablename__)),
-          )
+      )
     return ()
 
   # REST properties
@@ -408,17 +429,18 @@ class Slugged(Base):
 
 event.listen(Session, 'before_flush', Slugged.ensure_slug_before_flush)
 event.listen(
-  Session, 'after_flush_postexec', Slugged.ensure_slug_after_flush_postexec)
+    Session, 'after_flush_postexec', Slugged.ensure_slug_after_flush_postexec)
 
 
 class Mapping(Stateful, Base):
   VALID_STATES = [
       'Draft',
       'Final',
-      ]
+  ]
 
 
 class WithContact(object):
+
   @declared_attr
   def contact_id(cls):
     return deferred(
@@ -427,7 +449,7 @@ class WithContact(object):
   @declared_attr
   def secondary_contact_id(cls):
     return deferred(
-      db.Column(db.Integer, db.ForeignKey('people.id')), cls.__name__)
+        db.Column(db.Integer, db.ForeignKey('people.id')), cls.__name__)
 
   @declared_attr
   def contact(cls):
@@ -447,14 +469,15 @@ class WithContact(object):
   def _extra_table_args(cls):
     return (
         db.Index('fk_{}_contact'.format(cls.__tablename__), 'contact_id'),
-        db.Index('fk_{}_secondary_contact'.format(cls.__tablename__), 'secondary_contact_id'),
-        )
+        db.Index('fk_{}_secondary_contact'.format(
+            cls.__tablename__), 'secondary_contact_id'),
+    )
 
   _publish_attrs = ['contact', 'secondary_contact']
 
 
 class BusinessObject(
-    Stateful, Noted, Described, Hyperlinked, WithContact, Titled, Slugged):
+        Stateful, Noted, Described, Hyperlinked, WithContact, Titled, Slugged):
   VALID_STATES = [
       'Draft',
       'Final',
@@ -465,93 +488,107 @@ class BusinessObject(
       'In Scope',
       'Not in Scope',
       'Deprecated',
-      ]
+  ]
 
 # This class is just a marker interface/mixin to indicate that a model type
 # supports custom attributes.
+
+
 class CustomAttributable(object):
-    @declared_attr
-    def custom_attribute_values(cls):
-        joinstr = 'and_(foreign(CustomAttributeValue.attributable_id) == {type}.id, '\
-                        'foreign(CustomAttributeValue.attributable_type) == "{type}")'
-        joinstr = joinstr.format(type=cls.__name__)
-        return relationship(
-            "CustomAttributeValue",
-            primaryjoin=joinstr,
-            backref='{0}_custom_attributable'.format(cls.__name__),
-            cascade='all, delete-orphan',
-            )
 
-    def custom_attributes(cls, attributes):
-        if 'custom_attributes' not in attributes:
-          return
-        attributes = attributes['custom_attributes']
-        from .custom_attribute_value import CustomAttributeValue
-        # attributes looks like this:
-        #    {<id of attribute definition> : attribute value, ... }
+  @declared_attr
+  def custom_attribute_values(cls):
+    from ggrc.models.custom_attribute_value import CustomAttributeValue
+    join_function = lambda: and_(
+        foreign(CustomAttributeValue.attributable_id) == cls.id,
+        foreign(CustomAttributeValue.attributable_type) == cls.__name__)
+    return relationship(
+        "CustomAttributeValue",
+        primaryjoin=join_function,
+        backref='{0}_custom_attributable'.format(cls.__name__),
+        cascade='all, delete-orphan',
+    )
 
-        # 1) Get all custom attribute values for the CustomAttributable instance
-        attr_values = db.session.query(CustomAttributeValue)\
-            .filter(CustomAttributeValue.attributable_type==cls.__class__.__name__)\
-            .filter(CustomAttributeValue.attributable_id==cls.id)\
-            .all()
+  def custom_attributes(cls, attributes):
+    from ggrc.fulltext.mysql import MysqlRecordProperty
+    from ggrc.models.custom_attribute_value import CustomAttributeValue
+    if 'custom_attributes' not in attributes:
+      return
+    attributes = attributes['custom_attributes']
+    # attributes looks like this:
+    #    [ {<id of attribute definition> : attribute value, ... }, ... ]
 
-        attr_value_ids = [v.id for v in attr_values]
-        ftrp_properties = ["attribute_value_{id}".format(id=_id) for _id in attr_value_ids]
+    # 1) Get all custom attribute values for the CustomAttributable instance
+    attr_values = db.session.query(CustomAttributeValue).filter(and_(
+        CustomAttributeValue.attributable_type == cls.__class__.__name__,
+        CustomAttributeValue.attributable_id == cls.id)).all()
 
-        from ggrc.fulltext.mysql import MysqlRecordProperty
-        from sqlalchemy import and_
-        # 2) Delete all fulltext_record_properties for the list of values
-        if len(attr_value_ids) > 0:
-          db.session.query(MysqlRecordProperty)\
-              .filter(
-                  and_(
-                      MysqlRecordProperty.type == cls.__class__.__name__,
-                      MysqlRecordProperty.property.in_(ftrp_properties)))\
-              .delete(synchronize_session='fetch')
+    attr_value_ids = [v.id for v in attr_values]
+    ftrp_properties = [
+        "attribute_value_{id}".format(id=_id) for _id in attr_value_ids]
 
-          # 3) Delete the list of custom attribute values
-          db.session.query(CustomAttributeValue)\
-              .filter(CustomAttributeValue.id.in_(attr_value_ids))\
-              .delete(synchronize_session='fetch')
+    # 2) Delete all fulltext_record_properties for the list of values
+    if len(attr_value_ids) > 0:
+      db.session.query(MysqlRecordProperty)\
+          .filter(
+              and_(
+                  MysqlRecordProperty.type == cls.__class__.__name__,
+                  MysqlRecordProperty.property.in_(ftrp_properties)))\
+          .delete(synchronize_session='fetch')
 
-          db.session.commit()
+      # 3) Delete the list of custom attribute values
+      db.session.query(CustomAttributeValue)\
+          .filter(CustomAttributeValue.id.in_(attr_value_ids))\
+          .delete(synchronize_session='fetch')
 
-        # 4) Instantiate custom attribute values for each of the definitions
-        #    passed in (keys)
-        for ad_id in attributes.keys():
-            av = CustomAttributeValue()
-            av.custom_attribute_id = ad_id
-            av.attributable_id = cls.id
-            av.attributable_type = cls.__class__.__name__
-            av.attribute_value = attributes[ad_id]
-            # 5) Set the context_id for each custom attribute value to the context id
-            #    of the custom attributable.
-            # TODO: We are ignoring contexts for now
-            # av.context_id = cls.context_id
-            # 6) Save the new set of custom attribute values.
-            db.session.add(av)
+      db.session.commit()
 
-    _publish_attrs = [
-        'custom_attribute_values'
-    ]
-    _update_attrs = [
-        'custom_attributes'
-    ]
-    _include_links = [
-        # 'custom_attribute_values',
-    ]
-    #
-    # @declared_attr
-    # def custom_attribute_definitions(cls):
-    #     from .custom_attribute_definition import CustomAttributeDefinition
-    #     # FIXME definitions should be class scoped, not instance scoped.
-    #     joinstr = 'foreign(CustomAttributeDefinition.definition_type) == "{name}"'
-    #     joinstr = joinstr.format(name=cls.__name__)
-    #     return db.relationship("CustomAttributeDefinition",primaryjoin=joinstr)
+    # 4) Instantiate custom attribute values for each of the definitions
+    #    passed in (keys)
+    for ad_id in attributes.keys():
+      av = CustomAttributeValue(
+          custom_attribute_id=ad_id,
+          attributable_id=cls.id,
+          attributable_type=cls.__class__.__name__,
+          attribute_value=attributes[ad_id],
+      )
+      # 5) Set the context_id for each custom attribute value to the context id
+      #    of the custom attributable.
+      # TODO: We are ignoring contexts for now
+      # av.context_id = cls.context_id
+      db.session.add(av)
+
+  _publish_attrs = [
+      'custom_attribute_values',
+      # PublishOnly('custom_attribute_definitions')
+  ]
+  _update_attrs = [
+      'custom_attributes'
+  ]
+  _include_links = [
+      # 'custom_attribute_values',
+  ]
+
+  @declared_attr
+  def custom_attribute_definitions(cls):
+    # FIXME definitions should be class scoped, not instance scoped.
+    from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+    definition_type = foreign(CustomAttributeDefinition.definition_type)
+    join_function = lambda: or_(
+        definition_type == cls.__name__,
+        # The bottom statement always evaluates to False, and is here just to
+        # satisfy sqlalchemys need for use of foreing keys while defining a
+        # relationship.
+        definition_type == cls.id,
+    )
+    return db.relationship(
+        "CustomAttributeDefinition",
+        primaryjoin=join_function
+    )
 
 
 class TestPlanned(object):
+
   @declared_attr
   def test_plan(cls):
     return deferred(db.Column(db.Text), cls.__name__)
