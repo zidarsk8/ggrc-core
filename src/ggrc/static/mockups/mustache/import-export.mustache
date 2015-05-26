@@ -37,15 +37,55 @@
                   </header>
                   <section class="content">
                     <div class="info">
-                      <form class="import" method="post">
+                      <!-- <form class="import" method="post"> -->
                         <div class="row-fluid wrap-row">
-                          <div class="span8">
+                          <div class="span8 import">
                             <p>
                               Here you are able to import all gGRC objects.
                               Please make sure you have your CSV file ready, or
                               download one of the predefined templates.
                             </p>
-                            <button type="submit" class="btn btn-large btn-success">Choose CSV file to import</button>
+                            <div class="clearfix">
+                              <button id="chooseFile" class="btn btn-large btn-success btn-fixed">Choose CSV file to import</button>
+                              <button id="analysingFile" class="btn btn-large btn-draft btn-fixed">Analysing</button>
+                              <button id="importFile" class="btn btn-large btn-primary btn-fixed"><i class="grcicon-imp-exp-white"></i> Import 252 Controls</button>
+                              <button id="importingFile" class="btn btn-large btn-draft btn-fixed">Importing</button>
+                              <div class="import-progress">
+                                <div class="progress-wrap">
+                                  <span class="total-num">252</span>
+                                  <span class="current-num">210 imported</span>
+                                  <div class="progress custom-progress">
+                                    <div class="bar bar-verify" style="width: 60%;"></div>
+                                  </div>
+                                </div>
+                              </div>
+                              <button id="importedFile" class="btn btn-large btn-success btn-fixed"><i class="grcicon-check-white"></i> Import successful</button>
+                              <div class="import-progress-final">
+                                <div class="progress-wrap">
+                                  <span class="total-num">252</span>
+                                  <span class="current-num">252 imported</span>
+                                  <div class="progress custom-progress">
+                                    <div class="bar bar-verify" style="width: 100%;"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="import-wrap import-analyze">
+                              <h4>pci_controls_2015.csv</h4>
+                              <ul>
+                                <li><strong>Object type</strong>: Controls <i class="grcicon-check-solo-green"></i></li>
+                                <li><strong>Number of rows</strong>: 252 <i class="grcicon-check-solo-green"></i></li>
+                                <li><strong>File structure</strong> <i class="grcicon-check-solo-green"></i></li>
+                              </ul>
+                            </div>
+                            <div class="import-wrap import-final">
+                              <ul>
+                                <li><strong>243</strong> records created</li>
+                                <li><strong>73</strong> records updated</li>
+                                <li><strong>42</strong> records deleted</li>
+                                <li><strong>2</strong> records identical</li>
+                              </ul>
+                            </div>
                             <div class="text-top-space">
                               <h3>Quick import tips</h3>
                               <ul>
@@ -113,7 +153,7 @@
                           </div>
                         </div>
                         <div id="results-container"></div>
-                      </form>
+                      <!-- </form> -->
                     </div>
                   </section>
                 </section>

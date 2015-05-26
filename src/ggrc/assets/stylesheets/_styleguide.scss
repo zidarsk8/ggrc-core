@@ -181,3 +181,14 @@
     }
   }
 }
+
+#analysingFile,
+#importFile,
+#importingFile,
+#importedFile,
+.import-analyze,
+.import-final,
+.import-progress,
+.import-progress-final {
+  display: none;
+}
