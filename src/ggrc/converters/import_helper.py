@@ -11,6 +11,7 @@ from StringIO import StringIO
 
 from ggrc.converters import base_row
 from ggrc.converters import HANDLERS
+from ggrc.converters import COLUMN_ORDER
 from ggrc.converters.common import ImportException
 from ggrc.models import Directive
 from ggrc.models.reflection import AttributeInfo
@@ -28,6 +29,7 @@ def get_custom_attributes_definitions(target_class):
         "handler": handler,
         "validator": None,
         "default": None,
+        "description": "",
     }
   return definitions
 
@@ -60,6 +62,7 @@ def get_object_column_definitions(target_class):
         "handler": getattr(target_class, "default_{}".format(key), None),
         "validator": getattr(target_class, "validate_{}".format(key), None),
         "default": HANDLERS.get(key, base_row.ColumnHandler),
+        "description": "",
     }
 
     if type(value) is dict:
@@ -149,3 +152,16 @@ def handle_converter_csv_export(filename, objects, converter_class, **options):
   body = output_buffer.getvalue()
   output_buffer.close()
   return current_app.make_response((body, 200, headers))
+
+
+def generate_array(width, height, value=None):
+  return [[value for _ in range(width)] for _ in range(height)]
+
+
+def get_column_order(attr_list):
+  def sort_index(item):
+    if item in COLUMN_ORDER:
+      return COLUMN_ORDER.index(item)
+    else:
+      return len(COLUMN_ORDER)
+  return sorted(attr_list, key=sort_index)
