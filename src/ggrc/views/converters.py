@@ -3,19 +3,50 @@
 # Created By: silas@reciprocitylabs.com
 # Maintained By: silas@reciprocitylabs.com
 
-import json
-
-from flask import flash, render_template, request, redirect
-from werkzeug.exceptions import Forbidden
+from flask import current_app
+from flask import flash
+from flask import redirect
+from flask import render_template
+from flask import request
 from flask import url_for
+from urlparse import urlparse
+from urlparse import urlunparse
+from werkzeug import secure_filename
+from werkzeug.exceptions import Forbidden
+from werkzeug.utils import secure_filename
+import json
+import urllib
 
 from ggrc.app import app
 from ggrc.converters.common import ImportException
-from ggrc.converters.import_helper import handle_csv_import, handle_converter_csv_export
-from ggrc.login import get_current_user, login_required
-from ggrc.models.background_task import create_task, queued_task
+from ggrc.converters.controls import ControlsConverter
+from ggrc.converters.help import HelpConverter
+from ggrc.converters.import_helper import handle_converter_csv_export
+from ggrc.converters.import_helper import handle_csv_import
+from ggrc.converters.objectives import ObjectivesConverter
+from ggrc.converters.people import PeopleConverter
+from ggrc.converters.requests import RequestsConverter
+from ggrc.converters.sections import ClausesConverter
+from ggrc.converters.sections import SectionsConverter
+from ggrc.converters.systems import ProcessesConverter
+from ggrc.converters.systems import SystemsConverter
+from ggrc.login import get_current_user
+from ggrc.login import login_required
+from ggrc.models import Audit
+from ggrc.models import Contract
+from ggrc.models import Control
+from ggrc.models import Directive
+from ggrc.models import Help
+from ggrc.models import Objective
+from ggrc.models import Person
+from ggrc.models import Process
+from ggrc.models import Program
+from ggrc.models import Request
+from ggrc.models import System
+from ggrc.models.background_task import create_task
+from ggrc.models.background_task import queued_task
 from ggrc.rbac import permissions
-
+from ggrc.utils import view_url_for
 
 _default_context = object()
 def ensure_read_permissions_for(resource_type, context_id=_default_context):
@@ -42,8 +73,7 @@ def ensure_create_permissions_for(resource_type, context_id):
 
 
 def filter_objects_by_permissions(user, objs):
-  from ggrc.rbac.permissions import permissions_for
-  permissions = permissions_for(user)
+  permissions = permissions.permissions_for(user)
 
   permitted_objects = []
   for obj in objs:
@@ -79,7 +109,6 @@ ADMIN_KIND_TEMPLATES = {
 @app.route("/<admin_kind>/import_template", methods=['GET'])
 @login_required
 def process_import_template(admin_kind):
-  from flask import current_app
   ensure_admin_permissions()
 
   if admin_kind in ADMIN_KIND_TEMPLATES:
@@ -96,8 +125,6 @@ def process_import_template(admin_kind):
 @app.route("/programs/<program_id>/import_template", methods=['GET'])
 @login_required
 def system_program_import_template(program_id):
-  from flask import current_app
-  from ggrc.models import Program
   program = Program.query.get(program_id)
   ensure_read_permissions_for(program)
 
@@ -117,7 +144,6 @@ def system_program_import_template(program_id):
 @app.route("/_background_tasks/import_people", methods=['POST'])
 @queued_task
 def import_people_task(task):
-  from ggrc.converters.people import PeopleConverter
 
   csv_file = task.parameters.get("csv_file")
   dry_run = task.parameters.get("dry_run")
@@ -151,7 +177,6 @@ def help_redirect(count):
 @app.route("/_background_tasks/import_help", methods=['POST'])
 @queued_task
 def import_help_task(task):
-  from ggrc.converters.help import HelpConverter
 
   csv_file = task.parameters.get("csv_file")
   dry_run = task.parameters.get("dry_run")
@@ -179,8 +204,6 @@ def import_help_task(task):
 @app.route("/programs/<program_id>/import_controls", methods=['GET', 'POST'])
 @login_required
 def import_controls_to_program(program_id):
-  from ggrc.models import Program
-  from werkzeug import secure_filename
 
   program = Program.query.get(program_id)
 
@@ -223,8 +246,6 @@ def import_controls_to_program(program_id):
 @app.route("/contracts/<directive_id>/import_objectives", methods=['GET', 'POST'])
 @login_required
 def import_objectives(directive_id):
-  from ggrc.models import Directive
-  from werkzeug import secure_filename
 
   directive = Directive.query.get(directive_id)
   return_to = unicode(request.args.get('return_to') or '')
@@ -262,8 +283,6 @@ def import_objectives(directive_id):
 @app.route("/programs/<program_id>/import_objectives", methods=['GET', 'POST'])
 @login_required
 def import_objectives_to_program(program_id):
-  from ggrc.models import Program
-  from werkzeug import secure_filename
 
   program = Program.query.get(program_id)
   ensure_create_permissions_for("Relationship", program.context_id)
@@ -302,9 +321,6 @@ def import_objectives_to_program(program_id):
 @app.route("/_background_tasks/import_objective_directive", methods=['POST'])
 @queued_task
 def import_objective_directive_task(task):
-  from ggrc.converters.objectives import ObjectivesConverter
-  from ggrc.models import Directive
-  from ggrc.utils import view_url_for
 
   csv_file = task.parameters.get("csv_file")
   dry_run = task.parameters.get("dry_run")
@@ -345,8 +361,6 @@ def import_objective_directive_task(task):
 @app.route("/contracts/<directive_id>/import_controls", methods=['GET', 'POST'])
 @login_required
 def import_controls(directive_id):
-  from ggrc.models import Directive
-  from werkzeug import secure_filename
 
   directive = Directive.query.get(directive_id)
 
@@ -385,9 +399,6 @@ def import_controls(directive_id):
 @app.route("/_background_tasks/import_control_directive", methods=['POST'])
 @queued_task
 def import_control_directive_task(task):
-  from ggrc.converters.controls import ControlsConverter
-  from ggrc.models import Directive
-  from ggrc.utils import view_url_for
 
   csv_file = task.parameters.get("csv_file")
   dry_run = task.parameters.get("dry_run")
@@ -422,9 +433,6 @@ def import_control_directive_task(task):
 @app.route("/_background_tasks/import_control_program", methods=['POST'])
 @queued_task
 def import_control_program_task(task):
-  from ggrc.converters.controls import ControlsConverter
-  from ggrc.models import Program
-  from ggrc.utils import view_url_for
 
   csv_file = task.parameters.get("csv_file")
   dry_run = task.parameters.get("dry_run")
@@ -461,10 +469,6 @@ def import_control_program_task(task):
 @app.route("/_background_tasks/import_objective_program", methods=['POST'])
 @queued_task
 def import_objective_program_task(task):
-  from ggrc.converters.objectives import ObjectivesConverter
-  from ggrc.models import Program
-  from ggrc.utils import view_url_for
-
   csv_file = task.parameters.get("csv_file")
   dry_run = task.parameters.get("dry_run")
   program_id = task.parameters.get("parent_id")
@@ -501,7 +505,6 @@ def import_objective_program_task(task):
 @app.route("/_background_tasks/import_process", methods=["POST"])
 @queued_task
 def import_system_task(task):
-  from ggrc.converters.systems import SystemsConverter, ProcessesConverter
 
   kind_lookup = {"systems": "System(s)", "processes": "Process(es)"}
   csv_file = task.parameters.get("csv_file")
@@ -536,8 +539,6 @@ def import_system_task(task):
 @app.route("/_background_tasks/export_people", methods=['GET'])
 @queued_task
 def export_people_task(task):
-  from ggrc.converters.people import PeopleConverter
-  from ggrc.models.all_models import Person
   options = {}
   options['export'] = True
   people = Person.query.all()
@@ -547,8 +548,6 @@ def export_people_task(task):
 @app.route("/_background_tasks/export_help", methods=['GET'])
 @queued_task
 def export_help_task(task):
-  from ggrc.converters.help import HelpConverter
-  from ggrc.models.all_models import Help
   options = {}
   options['export'] = True
   people = Help.query.all()
@@ -558,9 +557,6 @@ def export_help_task(task):
 @app.route("/_background_tasks/export_process", methods=['GET'])
 @queued_task
 def export_process_task(task):
-  from ggrc.converters.systems import ProcessesConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Process
 
   options = {}
   options['export'] = True
@@ -572,9 +568,6 @@ def export_process_task(task):
 @app.route("/_background_tasks/export_system", methods=['GET'])
 @queued_task
 def export_system_task(task):
-  from ggrc.converters.systems import SystemsConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import System
 
   options = {}
   options['export'] = True
@@ -609,7 +602,6 @@ def import_people(import_type):
   csv_file = request.files['file']
 
   if csv_file and allowed_file(csv_file.filename):
-    from werkzeug.utils import secure_filename
     filename = secure_filename(csv_file.filename)
   else:
     file_msg = "Could not import: invalid csv file."
@@ -629,14 +621,6 @@ def import_people(import_type):
 @app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
 @login_required
 def import_requests(audit_id):
-  from werkzeug import secure_filename
-  from ggrc.converters.common import ImportException
-  from ggrc.converters.requests import RequestsConverter
-  from ggrc.converters.import_helper import handle_csv_import
-  from ggrc.models import Audit
-  from ggrc.utils import view_url_for
-  from urlparse import urlparse, urlunparse
-  import urllib
 
   audit = Audit.query.get(audit_id)
   program = audit.program
@@ -700,8 +684,6 @@ def post_import_requests():
 @app.route("/audits/<audit_id>/import_pbc_template", methods=['GET'])
 @login_required
 def import_requests_template(audit_id):
-  from flask import current_app
-  from ggrc.models.all_models import Audit
 
   audit = Audit.query.get(audit_id)
   ensure_read_permissions_for(audit)
@@ -721,12 +703,6 @@ def import_requests_template(audit_id):
 @app.route("/contracts/<directive_id>/import_clauses", methods=['GET', 'POST'])
 @login_required
 def import_sections(directive_id):
-  from werkzeug import secure_filename
-  from ggrc.converters.common import ImportException
-  from ggrc.converters.sections import SectionsConverter, ClausesConverter
-  from ggrc.converters.import_helper import handle_csv_import
-  from ggrc.models import Directive, Contract
-  from ggrc.utils import view_url_for
 
   directive = Directive.query.get(directive_id)
   directive_url = view_url_for(directive)
@@ -811,7 +787,6 @@ def import_systems_processes(object_kind):
   dry_run = not ('confirm' in request.form)
   csv_file = request.files['file']
   if csv_file and allowed_file(csv_file.filename):
-    from werkzeug import secure_filename
     filename = secure_filename(csv_file.filename)
   else:
     file_msg = "Could not import: invalid csv file."
@@ -831,12 +806,6 @@ def import_systems_processes(object_kind):
 @app.route("/programs/<program_id>/import_systems", methods=['GET', 'POST'])
 @login_required
 def import_systems_to_program(program_id):
-  from werkzeug import secure_filename
-  from ggrc.converters.common import ImportException
-  from ggrc.converters.systems import SystemsConverter
-  from ggrc.converters.import_helper import handle_csv_import
-  from ggrc.models import Program
-  from ggrc.utils import view_url_for
 
   program = Program.query.get(program_id)
   ensure_create_permissions_for("Relationship", program.context_id)
@@ -908,9 +877,6 @@ def export(export_type):
 @app.route("/policies/<directive_id>/export_sections", methods=['GET'])
 @login_required
 def export_sections(directive_id):
-  from ggrc.converters.sections import SectionsConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Directive
 
   options = {}
   directive = Directive.query.filter_by(id=int(directive_id)).first()
@@ -924,9 +890,6 @@ def export_sections(directive_id):
 @app.route("/contracts/<directive_id>/export_clauses", methods=['GET'])
 @login_required
 def export_clauses(directive_id):
-  from ggrc.converters.sections import SectionsConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Directive
 
   options = {}
   directive = Directive.query.filter_by(id=int(directive_id)).first()
@@ -943,9 +906,6 @@ def export_clauses(directive_id):
 @app.route("/contracts/<directive_id>/export_objectives", methods=['GET'])
 @login_required
 def export_objectives(directive_id):
-  from ggrc.converters.objectives import ObjectivesConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Directive, Objective
 
   directive = Directive.query.get(directive_id)
   ensure_read_permissions_for(directive)
@@ -965,9 +925,6 @@ def export_objectives(directive_id):
 @app.route("/programs/<program_id>/export_objectives", methods=['GET'])
 @login_required
 def export_objectives_from_program(program_id):
-  from ggrc.converters.objectives import ObjectivesConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Program, Objective
 
   program = Program.query.filter_by(id=int(program_id)).first()
   ensure_read_permissions_for(program)
@@ -991,8 +948,6 @@ def export_objectives_from_program(program_id):
 @app.route("/contracts/<directive_id>/import_clauses_template", methods=['GET'])
 @login_required
 def import_directive_sections_template(directive_id):
-  from flask import current_app
-  from ggrc.models.all_models import Directive
   directive = Directive.query.filter_by(id=int(directive_id)).first()
   ensure_read_permissions_for(directive)
   directive_type = directive.type
@@ -1021,9 +976,6 @@ def import_directive_sections_template(directive_id):
 @app.route("/audits/<audit_id>/export_pbcs", methods=['GET'])
 @login_required
 def export_requests(audit_id):
-  from ggrc.converters.requests import RequestsConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Audit, Request
 
   options = {}
   audit = Audit.query.get(audit_id)
@@ -1045,9 +997,6 @@ def export_requests(audit_id):
 @app.route("/contracts/<directive_id>/export_controls", methods=['GET'])
 @login_required
 def export_controls(directive_id):
-  from ggrc.converters.controls import ControlsConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Directive, Control
 
   directive = Directive.query.filter_by(id=int(directive_id)).first()
   ensure_read_permissions_for(directive)
@@ -1070,9 +1019,6 @@ def export_controls(directive_id):
 @app.route("/programs/<program_id>/export_controls", methods=['GET'])
 @login_required
 def export_controls_from_program(program_id):
-  from ggrc.converters.controls import ControlsConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Program, Control
 
   program = Program.query.filter_by(id=int(program_id)).first()
   ensure_read_permissions_for(program)
@@ -1093,9 +1039,6 @@ def export_controls_from_program(program_id):
 @app.route("/programs/<program_id>/export_systems", methods=['GET'])
 @login_required
 def export_systems_from_program(program_id):
-  from ggrc.converters.systems import SystemsConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Program, System
 
   program = Program.query.get(program_id)
   ensure_read_permissions_for(program)
@@ -1120,9 +1063,6 @@ def export_systems_from_program(program_id):
 @app.route("/<object_type>/<object_id>/import_controls_template", methods=['GET'])
 @login_required
 def import_controls_template(object_type, object_id):
-  from flask import current_app
-  from ggrc.models.all_models import Directive, Program
-  # mapping from template/import type to formatted type name
   IMPORT_TYPE_MAP = {
       "import_objectives_template": "Objective",
       "import_controls_template": "Control",
