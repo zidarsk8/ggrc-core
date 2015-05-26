@@ -65,7 +65,7 @@ class Audit(
   _include_links = []
 
   _aliases = {
-      "map:program": "Program",
+      "program_id": "Program",
       "user_role:Auditor": "Auditors",
       "status": "Status",
       "start_date": "Planned Start Date",
