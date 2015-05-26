@@ -163,7 +163,6 @@ form.import {
 }
 
 .import-wrap {
-  width: 250px;
   margin-top: 10px;
 }
 
@@ -171,11 +170,24 @@ form.import {
   h4 {
     font-weight: bold;
     margin-bottom: 10px;
+    &.error {
+      margin-top: 20px;
+      color: $red;
+    }
   }
   ul {
     @extend %reset-list;
     li {
       margin-bottom: 5px;
+      ul {
+        margin-left: 30px;
+        li {
+          list-style-type: disc;
+        }
+        &.error {
+          color: $red;
+        }
+      }
     }
   }
 }

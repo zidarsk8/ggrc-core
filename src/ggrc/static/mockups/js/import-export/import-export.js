@@ -2,12 +2,7 @@ $(document).ready(function() {
 
   can.Component.extend({
     tag: "import",
-    scope: {
-      report_gen: false,
-    },
     template: "<content/>",
-    helpers: {
-    },
     events: {
       ".download-template select change": function(el, ev) {
         var $value = this.element.find('option:selected').text(),
@@ -17,8 +12,24 @@ $(document).ready(function() {
       }
     }
   });
+  $(".import-content").html(can.view("/static/mockups/mustache/import-export/import-export.mustache",{}));
 
-  $(".import-content").html(can.view("/static/mockups/mustache/import-export.mustache",{}));
+  can.Component.extend({
+    tag: "import-not-pass",
+    template: "<content/>",
+  });
+  $(".import-not-pass").html(can.view("/static/mockups/mustache/import-export/import-not-pass.mustache",{}));
+
+  function innerNavTrigger() {
+    var $this = $(this),
+        $allList = $this.closest(".nav").children("li"),
+        $list = $this.closest("li"),
+        aId = $this.attr("href"),
+        $element = $("div"+aId);
+
+    $(".import-main").hide();
+    $(".import-main"+aId).show();
+  }
 
   function chooseCSV() {
     $("#chooseFile").fadeOut(500);
@@ -26,6 +37,14 @@ $(document).ready(function() {
     $(".import-analyze").delay(1500).fadeIn(500);
     $("#analysingFile").delay(2000).fadeOut(500);
     $("#importFile").delay(3500).fadeIn(500);
+  }
+
+  function chooseCSV2() {
+    $("#chooseFile2").fadeOut(500);
+    $("#analysingFile2").delay(500).fadeIn(500);
+    $(".import-analyze").delay(1500).fadeIn(500);
+    $("#analysingFile2").delay(1500).fadeOut(500);
+    $("#chooseFile2").delay(2500).fadeIn(500);
   }
 
   function importing() {
@@ -41,7 +60,10 @@ $(document).ready(function() {
     $(".import-final").delay(4500).fadeIn(500);
   }
 
+  $(".top-inner-nav a").on("click", innerNavTrigger);
   $("#chooseFile").on("click", chooseCSV);
   $("#importFile").on("click", importing);
+
+  $("#chooseFile2").on("click", chooseCSV2);
 
 });
