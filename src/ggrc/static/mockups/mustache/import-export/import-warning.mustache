@@ -1,9 +1,9 @@
-<import>
+<import-warning>
 
   <div class="top-inner-nav">
     <div class="object-nav">
       <ul class="nav internav">
-        <li class="active">
+        <li>
           <a href="#import">
             <div class="oneline">
               <i class="grcicon-imp-exp"></i>
@@ -19,7 +19,7 @@
             </div>
           </a>
         </li>
-        <li>
+        <li class="active">
           <a href="#warning">
             <div class="oneline">
               <i class="grcicon-imp-exp"></i>
@@ -62,10 +62,10 @@
                               download one of the predefined templates.
                             </p>
                             <div class="clearfix">
-                              <button id="chooseFile" class="btn btn-large btn-success btn-fixed">Choose CSV file to import</button>
-                              <button id="analysingFile" class="btn btn-large btn-draft btn-fixed">Analysing</button>
-                              <button id="importFile" class="btn btn-large btn-primary btn-fixed"><i class="grcicon-imp-exp-white"></i> Import 252 Controls</button>
-                              <button id="importingFile" class="btn btn-large btn-draft btn-fixed">Importing</button>
+                              <button id="chooseFile3" class="btn btn-large btn-success btn-fixed">Choose CSV file to import</button>
+                              <button id="analysingFile3" class="btn btn-large btn-draft btn-fixed">Analysing</button>
+                              <button id="importFile3" class="btn btn-large btn-primary btn-fixed"><i class="grcicon-imp-exp-white"></i> Import 252 Controls</button>
+                              <button id="importingFile3" class="btn btn-large btn-draft btn-fixed">Importing</button>
                               <div class="import-progress">
                                 <div class="progress-wrap">
                                   <span class="total-num">252</span>
@@ -75,7 +75,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <button id="importedFile" class="btn btn-large btn-success btn-fixed"><i class="grcicon-check-white"></i> Import successful</button>
+                              <button id="importedFile3" class="btn btn-large btn-success btn-fixed"><i class="grcicon-check-white"></i> Import successful</button>
                               <div class="import-progress-final">
                                 <div class="progress-wrap">
                                   <span class="total-num">252</span>
@@ -92,6 +92,20 @@
                                 <li><strong>Object type</strong>: Controls <i class="grcicon-check-solo-green"></i></li>
                                 <li><strong>Number of rows</strong>: 252 <i class="grcicon-check-solo-green"></i></li>
                                 <li><strong>File structure</strong> <i class="grcicon-check-solo-green"></i></li>
+                                <li>
+                                  <strong>Invalid data</strong> <i class="grcicon-warning"></i>
+                                  <ul>
+                                    <li>line 102 <strong>contact</strong> doesn't exist</li>
+                                    <li>line 201 <strong>object</strong> can't be deleted - doesn't exist</li>
+                                  </ul>
+                                </li>
+                                <li>
+                                  <strong>Permission issues</strong> <i class="grcicon-warning"></i>
+                                  <ul>
+                                    <li>line 102 you have no permission to update this record</li>
+                                    <li>line 201 you have no permission to map <strong>facility FAC-29</strong></li>
+                                  </ul>
+                                </li>
                               </ul>
                             </div>
                             <div class="import-wrap import-final">
@@ -180,4 +194,4 @@
       </div>
     </div>
   </section>
-</import>
+</import-warning>
