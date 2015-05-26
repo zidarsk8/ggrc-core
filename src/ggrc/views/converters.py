@@ -19,6 +19,7 @@ import urllib
 import re
 
 from ggrc.app import app
+from ggrc.converters import IMPORTABLE
 from ggrc.converters.common import ImportException
 from ggrc.converters.controls import ControlsConverter
 from ggrc.converters.help import HelpConverter
@@ -1151,3 +1152,39 @@ def import_controls_template(object_type, object_id):
   }
   body = render_template("csv_files/" + template_name, **options)
   return current_app.make_response((body, 200, headers))
+
+
+def pretty_class_name(cls):
+  return " ".join(re.findall('[A-Z][^A-Z]*', cls.__name__))
+
+
+@app.route("/_service/export_csv/<object_type>", methods=['GET', 'POST'])
+@login_required
+def export_csv(object_type):
+  object_type = object_type.lower()
+  if object_type not in IMPORTABLE:
+    return "ERROR"
+  cls = IMPORTABLE[object_type]
+
+  definitions = get_object_column_definitions(cls)
+  array = generate_array(len(definitions), 4, "")
+  ordered_keys = get_column_order(definitions.keys())
+
+  for index, key in enumerate(ordered_keys):
+    item = definitions[key]
+    array[0][index] = ""
+    array[1][index] = item["description"]
+    array[2][index] = "required" if item["mandatory"] else ""
+    array[3][index] = item["display_name"]
+
+  array[0][0] = "Object Type"
+  array[0][1] = pretty_class_name(cls)
+
+  lines = [",".join(line) for line in array]
+  csv = "\n".join(lines)
+
+  response = current_app.make_response(csv)
+  response.headers[
+      "Content-Disposition"] = "attachment; filename={}_template.csv".format(
+      object_type)
+  return response
