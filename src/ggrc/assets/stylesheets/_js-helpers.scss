@@ -6,11 +6,11 @@
  */
 
 .width-selector-bar {
-  background:$lightGray image-url('bgnds/drag-bar.png') repeat-y 1px 0;
-  @include background-size(3px 12px);
-  border:1px solid $white;
   @include border-radius();
   @include box-shadow(0 0 2px $darkGray);
+  @include background-size(3px 12px);
+  background:$lightGray image-url('bgnds/drag-bar.png') repeat-y 1px 0;
+  border:1px solid $white;
   cursor:move;
 }
 

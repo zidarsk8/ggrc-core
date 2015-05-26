@@ -48,13 +48,8 @@ can.Model.Cacheable("CMS.Models.Directive", {
     , documents : "CMS.Models.Document.stubs"
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
-    , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
-    , program_directives : "CMS.Models.ProgramDirective.stubs"
-    , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
-    , directive_sections: "CMS.Models.DirectiveSection.stubs"
-    , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
@@ -67,7 +62,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
     this._super.apply(this, arguments);
   }
   , meta_kinds : []
-  , links_to : { "Control" : "DirectiveControl", "Program" : "ProgramDirective" }
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);

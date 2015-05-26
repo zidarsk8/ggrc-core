@@ -29,20 +29,11 @@ can.Model.Cacheable("CMS.Models.Control", {
     , documents : "CMS.Models.Document.stubs"
     , categories : "CMS.Models.ControlCategory.stubs"
     , assertions : "CMS.Models.ControlAssertion.stubs"
-    , control_controls : "CMS.Models.ControlControl.stubs"
-    , implemented_controls : "CMS.Models.Control.stubs"
-    , implementing_control_controls : "CMS.Models.ControlControl.stubs"
-    , implementing_controls : "CMS.Models.Control.stubs"
-    , objective_controls : "CMS.Models.ObjectiveControl.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , directive : "CMS.Models.Directive.stub"
     , audit_objects : "CMS.Models.AuditObject.stubs"
-    , control_sections : "CMS.Models.ControlSection.stubs"
     , sections : "CMS.Models.get_stubs"
-    , program_controls : "CMS.Models.ProgramControl.stubs"
     , programs : "CMS.Models.Program.stubs"
-    , directive_controls : "CMS.Models.DirectiveControl.stubs"
-    , object_controls : "CMS.Models.ObjectControl.stubs"
     , kind : "CMS.Models.Option.stub"
     , means : "CMS.Models.Option.stub"
     , verify_frequency : "CMS.Models.Option.stub"
@@ -50,15 +41,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     , secondary_assessor : "CMS.Models.Person.stub"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
-  , links_to : {
-    "Section" : "ControlSection"
-    , "Regulation" : "DirectiveControl"
-    , "Policy" : "DirectiveControl"
-    , "Standard" : "DirectiveControl"
-    , "Contract" : "DirectiveControl"
-    , "Program" : "ProgramControl"
-  }
-
+  , links_to : {}
   , defaults : {
       "selected" : false
     , "title" : ""

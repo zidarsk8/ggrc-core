@@ -7,7 +7,7 @@
 
 //= require can.jquery-all
 
-(function (can, $) {
+(function(can, $) {
 
   if (!GGRC.widget_descriptors)
     GGRC.widget_descriptors = {};
@@ -30,20 +30,20 @@
       instance - an instance that is a subclass of can.Model.Cacheable
       widget_view [optional] - a template for rendering the info.
     */
-    make_info_widget: function (instance, widget_view) {
+    make_info_widget : function(instance, widget_view) {
       var default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
       return new this(
         instance.constructor.shortName + ":info", {
           widget_id: "info",
-          widget_name: function () {
+          widget_name: function() {
             if (instance.constructor.title_singular === 'Person')
               return 'Info';
             else
               return instance.constructor.title_singular + " Info";
           },
           widget_icon: "grcicon-info",
-          content_controller: GGRC.Controllers.InfoWidget,
-          content_controller_options: {
+          content_controller : GGRC.Controllers.InfoWidget,
+          content_controller_options : {
             instance: instance,
             model: instance.constructor,
             widget_view: widget_view || default_info_widget_view
@@ -58,31 +58,31 @@
       mapping - a mapping object taken from the instance
       extenders [optional] - an array of objects that will extend the default widget config.
     */
-    make_tree_view: function (instance, far_model, mapping, extenders) {
+    make_tree_view : function(instance, far_model, mapping, extenders) {
       var descriptor = {
         content_controller: CMS.Controllers.TreeView,
         content_controller_selector: "ul",
         widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
         widget_id: far_model.table_singular,
-        widget_guard: function () {
+        widget_guard: function(){
           if (far_model.title_plural === "Audits" && instance instanceof CMS.Models.Program) {
             return "context" in instance && !!(instance.context.id);
           }
           return true;
         },
-        widget_name: function () {
-          var $objectArea = $(".object-area");
-          if ($objectArea.hasClass("dashboard-area") || instance.constructor.title_singular === "Person") {
-            if (/dashboard/.test(window.location)) {
-              return "My " + far_model.title_plural;
+        widget_name: function() {
+            var $objectArea = $(".object-area");
+            if ( $objectArea.hasClass("dashboard-area") || instance.constructor.title_singular === "Person" ) {
+              if (/dashboard/.test(window.location)) {
+                return "My " + far_model.title_plural;
+              } else {
+                return far_model.title_plural;
+              }
+            } else if (far_model.title_plural === "Audits") {
+              return "Mapped Audits";
             } else {
-              return far_model.title_plural;
+              return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;
             }
-          } else if (far_model.title_plural === "Audits") {
-            return "Mapped Audits";
-          } else {
-            return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;
-          }
         },
         widget_icon: far_model.table_singular,
         object_category: far_model.category || 'default',
@@ -93,24 +93,24 @@
           parent_instance: instance,
           model: far_model,
           list_loader: function () {
-            return mapping.refresh_list();
+                return mapping.refresh_list();
+              }
           }
-        }
       };
 
       $.extend.apply($, [true, descriptor].concat(extenders || []));
 
       return new this(instance.constructor.shortName + ":" + far_model.table_singular, descriptor);
     },
-    newInstance: function (id, opts) {
+    newInstance : function(id, opts) {
       var ret;
-      if (!opts && typeof id === "object") {
+      if(!opts && typeof id === "object") {
         opts = id;
         id = opts.widget_id;
       }
 
-      if (GGRC.widget_descriptors[id]) {
-        if (GGRC.widget_descriptors[id] instanceof this) {
+      if(GGRC.widget_descriptors[id]) {
+        if(GGRC.widget_descriptors[id] instanceof this) {
           $.extend(GGRC.widget_descriptors[id], opts);
         } else {
           ret = this._super.apply(this);
@@ -141,7 +141,7 @@
     a widget descriptor.
   */
   can.Construct("GGRC.WidgetList", {
-    modules: {},
+    modules : {},
     /*
       get_widget_list_for: return a keyed object of widget descriptors for the specified page type.
 
@@ -150,11 +150,11 @@
       The widget descriptors are built on the first call of this function; subsequently they are retrieved from the
        widget descriptor cache.
     */
-    get_widget_list_for: function (page_type) {
+    get_widget_list_for : function(page_type) {
       var widgets = {};
-      can.each(this.modules, function (module) {
-        can.each(module[page_type], function (descriptor, id) {
-          if (!widgets[id]) {
+      can.each(this.modules, function(module) {
+        can.each(module[page_type], function(descriptor, id) {
+          if(!widgets[id]) {
             widgets[id] = descriptor;
           } else {
             can.extend(true, widgets[id], descriptor);
@@ -162,13 +162,13 @@
         });
       });
       var descriptors = {};
-      can.each(widgets, function (widget, widget_id) {
-        switch (widget.content_controller) {
+      can.each(widgets, function(widget, widget_id) {
+        switch(widget.content_controller) {
         case GGRC.Controllers.InfoWidget:
           descriptors[widget_id] = GGRC.WidgetDescriptor.make_info_widget(
             widget.content_controller_options && widget.content_controller_options.instance || widget.instance,
             widget.content_controller_options && widget.content_controller_options.widget_view || widget.widget_view
-          );
+            );
           break;
         case GGRC.Controllers.TreeView:
           descriptors[widget_id] = GGRC.WidgetDescriptor.make_tree_view(
@@ -176,14 +176,14 @@
             widget.content_controller_options && widget.content_controller_options.model || widget.far_model || widget.model,
             widget.content_controller_options && widget.content_controller_options.mapping || widget.mapping,
             widget
-          );
+            );
           break;
         default:
           descriptors[widget_id] = new GGRC.WidgetDescriptor(page_type + ":" + widget_id, widget);
         }
       });
-      can.each(descriptors, function (descriptor, id) {
-        if (descriptor.suppressed) {
+      can.each(descriptors, function(descriptor, id) {
+        if(descriptor.suppressed) {
           delete descriptors[id];
         }
       });
@@ -192,14 +192,14 @@
     /*
       returns a keyed object of widget descriptors that represents the current page.
     */
-    get_current_page_widgets: function () {
+    get_current_page_widgets : function() {
       return this.get_widget_list_for(GGRC.page_instance().constructor.shortName);
     },
-    get_default_widget_sort: function () {
+    get_default_widget_sort: function(){
       return this.sort;
     },
   }, {
-    init: function (name, opts, sort) {
+    init : function(name, opts, sort) {
       this.constructor.modules[name] = this;
       can.extend(this, opts);
       if (sort && sort.length) {
@@ -215,17 +215,17 @@
       descriptor - a widget descriptor appropriate for the widget type. FIXME - the descriptor's
         widget_id value must match the value passed as "id"
     */
-    add_widget: function (page_type, id, descriptor) {
+    add_widget : function(page_type, id, descriptor) {
       this[page_type] = this[page_type] || {};
-      if (this[page_type][id]) {
+      if(this[page_type][id]) {
         can.extend(true, this[page_type][id], descriptor);
       } else {
         this[page_type][id] = descriptor;
       }
     },
-    suppress_widget: function (page_type, id) {
+    suppress_widget : function(page_type, id) {
       this[page_type] = this[page_type] || {};
-      if (this[page_type][id]) {
+      if(this[page_type][id]) {
         can.extend(true, this[page_type][id], {
           suppressed: true
         });
@@ -239,18 +239,18 @@
 
   var widget_list = new GGRC.WidgetList("ggrc_core");
 
-  $(function () {
+$(function() {
 
     var object_class = GGRC.infer_object_type(GGRC.page_object),
       object_table = object_class && object_class.table_plural,
       object = GGRC.page_instance();
 
-    if (!GGRC.page_object)
-      return;
+  if (!GGRC.page_object)
+    return;
 
-    // Info widgets display the object information instead of listing connected
-    //  objects.
-    var info_widget_views = {
+  // Info widgets display the object information instead of listing connected
+  //  objects.
+  var info_widget_views = {
       'programs': GGRC.mustache_path + "/programs/info.mustache",
       'audits': GGRC.mustache_path + "/audits/info.mustache",
       'people': GGRC.mustache_path + "/people/info.mustache",
@@ -260,104 +260,109 @@
       'controls': GGRC.mustache_path + "/controls/info.mustache",
       'systems': GGRC.mustache_path + "/systems/info.mustache",
       'processes': GGRC.mustache_path + "/processes/info.mustache",
-      'products': GGRC.mustache_path + "/products/info.mustache"
-    };
-    widget_list.add_widget(object.constructor.shortName, "info", {
-      widget_id: "info",
-      content_controller: GGRC.Controllers.InfoWidget,
-      instance: object,
-      widget_view: info_widget_views[object_table]
+      'products': GGRC.mustache_path + "/products/info.mustache",
+      'control_assessments': GGRC.mustache_path + "/control_assessments/info.mustache",
+      'issues': GGRC.mustache_path + "/issues/info.mustache",
+
+  };
+  widget_list.add_widget(object.constructor.shortName, "info", {
+    widget_id : "info",
+    content_controller : GGRC.Controllers.InfoWidget,
+    instance : object,
+    widget_view : info_widget_views[object_table]
+  });
+
+  var base_widgets_by_type = {
+    "Program": "Issue Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Audit": "Issue ControlAssessment Request history Person program program_controls",
+    "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",
+    "ControlAssessment": "Issue Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Regulation" : "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Policy" : "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Standard" : "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Contract" : "Program Issue Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Clause" : "Contract Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Section" : "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Objective" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+    "Control" : "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Person" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",
+    "OrgGroup" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Vendor" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "System" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Process" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "DataAsset" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Product" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Project" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Facility" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+    "Market" : "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit"
+  };
+  base_widgets_by_type = _.mapValues(base_widgets_by_type,
+                                     function (conf) {
+                                       return conf.split(' ');
+                                     });
+
+  function sort_sections(sections) {
+    return can.makeArray(sections).sort(window.natural_comparator);
+  }
+
+  function apply_mixins(definitions) {
+    var mappings = {};
+
+    // Recursively handle mixins
+    function reify_mixins(definition) {
+      var final_definition = {};
+      if (definition._mixins) {
+        can.each(definition._mixins, function(mixin) {
+          if (typeof(mixin) === "string") {
+            // If string, recursive lookup
+            if (!definitions[mixin])
+              console.debug("Undefined mixin: " + mixin, definitions);
+            else
+              can.extend(final_definition, reify_mixins(definitions[mixin]));
+          } else if (can.isFunction(mixin)) {
+            // If function, call with current definition state
+            mixin(final_definition);
+          } else {
+            // Otherwise, assume object and extend
+            can.extend(final_definition, mixin);
+          }
+        });
+      }
+      can.extend(final_definition, definition);
+      delete final_definition._mixins;
+      return final_definition;
+    }
+
+    can.each(definitions, function(definition, name) {
+      // Only output the mappings if it's a model, e.g., uppercase first letter
+      if (name[0] === name[0].toUpperCase())
+        mappings[name] = reify_mixins(definition);
     });
 
-    var base_widgets_by_type = {
-      "Program": "Issue Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Audit": "Issue ControlAssessment Request history Person program program_controls",
-      "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",
-      "ControlAssessment": "Issue Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Regulation": "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Policy": "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Standard": "Program Issue Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Contract": "Program Issue Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Clause": "Contract Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Section": "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Objective": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Control": "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Person": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",
-      "OrgGroup": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Vendor": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "System": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Process": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "DataAsset": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Product": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Project": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Facility": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Market": "Program Issue Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit"
-    };
-    base_widgets_by_type = _.mapValues(base_widgets_by_type,
-      function (conf) {
-        return conf.split(' ');
-      });
-
-    function sort_sections(sections) {
-      return can.makeArray(sections).sort(window.natural_comparator);
-    }
-
-    function apply_mixins(definitions) {
-      var mappings = {};
-
-      // Recursively handle mixins
-      function reify_mixins(definition) {
-        var final_definition = {};
-        if (definition._mixins) {
-          can.each(definition._mixins, function (mixin) {
-            if (typeof (mixin) === "string") {
-              // If string, recursive lookup
-              if (!definitions[mixin])
-                console.debug("Undefined mixin: " + mixin, definitions);
-              else
-                can.extend(final_definition, reify_mixins(definitions[mixin]));
-            } else if (can.isFunction(mixin)) {
-              // If function, call with current definition state
-              mixin(final_definition);
-            } else {
-              // Otherwise, assume object and extend
-              can.extend(final_definition, mixin);
-            }
-          });
-        }
-        can.extend(final_definition, definition);
-        delete final_definition._mixins;
-        return final_definition;
-      }
-
-      can.each(definitions, function (definition, name) {
-        // Only output the mappings if it's a model, e.g., uppercase first letter
-        if (name[0] === name[0].toUpperCase())
-          mappings[name] = reify_mixins(definition);
-      });
-
-      return mappings;
-    }
+    return mappings;
+  }
 
     var far_models = base_widgets_by_type[object.constructor.shortName],
       model_widget_descriptors = {},
       model_default_widgets = [],
-      // here we are going to define extra descriptor options, meaning that
-      //  these will be used as extra options to create widgets on top of
+
+    // here we are going to define extra descriptor options, meaning that
+    //  these will be used as extra options to create widgets on top of
+
       extra_descriptor_options = {
           all: {
-            Person: {
-              widget_icon: 'grcicon-user-black'
+              Person: {
+                  widget_icon: 'grcicon-user-black'
             },
             Document: {
-              widget_icon: 'grcicon-link'
-            }
+                  widget_icon: 'grcicon-link'
+              }
           },
           Contract: {
             Clause: {
-              widget_name: function () {
+              widget_name : function() {
                 var $objectArea = $(".object-area");
-                if ($objectArea.hasClass("dashboard-area")) {
+                if ( $objectArea.hasClass("dashboard-area") ) {
                   return "Clauses";
                 } else {
                   return "Mapped Clauses";
@@ -366,15 +371,15 @@
             }
           },
           Program: {
-            Person: {
+          Person: {
               widget_id: "person",
               widget_name: "People",
               widget_icon: "person",
               content_controller: GGRC.Controllers.TreeView
-            }
+          }
           },
           Audit: {
-            Person: {
+          Person: {
               widget_id: "person",
               widget_name: "People",
               widget_icon: "person",
@@ -383,45 +388,45 @@
                 mapping: "authorized_people",
                 allow_mapping: false,
                 allow_creating: false
-              }
-            },
-            Request: {
-              widget_id: "Request",
-              widget_name: "Open Requests"
-            },
-            history: {
-              widget_id: "history",
-              widget_name: "Complete",
-              widget_icon: "history"
-            },
-            program_controls: {
-              widget_id: "control",
-              widget_name: "In Scope Controls",
-              widget_icon: "control"
-            },
-            program: {
-              widget_id: "program",
-              widget_name: "Program",
-              widget_icon: "program"
-            },
-            ControlAssessment: {
-              widget_id: "ControlAssessment",
-              widget_name: "Control Assessments",
-              widget_icon: "control_assessment"
             }
           },
-          Control: {
-            Request: {
-              widget_id: "Request",
-              widget_name: "Audit Requests"
-            }
+          Request: {
+            widget_id: "Request",
+            widget_name: "Open Requests"
+          },
+          history: {
+            widget_id: "history",
+            widget_name: "Complete",
+            widget_icon: "history"
+          },
+          program_controls: {
+            widget_id: "control",
+            widget_name: "In Scope Controls",
+            widget_icon: "control"
+          },
+          program: {
+            widget_id: "program",
+            widget_name: "Program",
+            widget_icon: "program"
+          },
+          ControlAssessment: {
+            widget_id: "ControlAssessment",
+            widget_name: "Control Assessments",
+            widget_icon: "control_assessment"
           }
+          },
+          Control: {
+          Request: {
+            widget_id: "Request",
+            widget_name: "Audit Requests"
+          }
+        }
         },
-        // Prevent widget creation with <model_name>: false
-        // e.g. to prevent ever creating People widget:
-        //     { all : { Person: false }}
-        // or to prevent creating People widget on Objective page:
-        //     { Objective: { Person: false } }
+    // Prevent widget creation with <model_name>: false
+    // e.g. to prevent ever creating People widget:
+    //     { all : { Person: false }}
+    // or to prevent creating People widget on Objective page:
+    //     { Objective: { Person: false } }
         overridden_models = {
           Program: {
             //  Objective: false
@@ -456,63 +461,63 @@
         },
         extra_content_controller_options = apply_mixins({
           objectives: {
-            Objective: {
+              Objective: {
               mapping: "objectives",
               draw_children: true,
               show_view: GGRC.mustache_path + "/objectives/tree.mustache",
               footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache",
               add_item_view: GGRC.mustache_path + "/objectives/tree_add_item.mustache"
-            }
+                }
           },
           controls: {
-            Control: {
+              Control: {
               mapping: "controls",
               draw_children: true,
               show_view: GGRC.mustache_path + "/controls/tree.mustache",
               footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache",
               add_item_view: GGRC.mustache_path + "/controls/tree_add_item.mustache"
-            }
+                }
           },
           business_objects: {
-            DataAsset: {
-              mapping: "related_data_assets"
+              DataAsset: {
+                  mapping: "related_data_assets"
             },
             Facility: {
-              mapping: "related_facilities"
+                  mapping: "related_facilities"
             },
             Market: {
-              mapping: "related_markets"
+                  mapping: "related_markets"
             },
             OrgGroup: {
-              mapping: "related_org_groups"
+                  mapping: "related_org_groups"
             },
             Vendor: {
-              mapping: "related_vendors"
+                  mapping: "related_vendors"
             },
             Process: {
-              mapping: "related_processes"
+                  mapping: "related_processes"
             },
             Product: {
-              mapping: "related_products"
+                  mapping: "related_products"
             },
             Project: {
-              mapping: "related_projects"
+                  mapping: "related_projects"
             },
             System: {
-              mapping: "related_systems"
+                  mapping: "related_systems"
             },
             Document: {
-              mapping: "documents"
+                  mapping: "documents"
             },
             Person: {
-              mapping: "people"
+                  mapping: "people"
             },
             Program: {
-              mapping: "programs"
-            }
+                  mapping: "programs"
+                }
           },
           issues: {
-            Issue: {
+          Issue: {
               mapping: "related_issues",
               footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
               add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
@@ -870,6 +875,9 @@
               show_view: GGRC.mustache_path + "/controls/tree.mustache",
               footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
               add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
+            },
+            Issue: {
+              mapping: "extended_related_issues_via_search"
             },
             DataAsset: {
               mapping: "extended_related_data_assets_via_search"

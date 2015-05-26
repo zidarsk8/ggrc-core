@@ -3,7 +3,7 @@
 # Created By: brad@reciprocitylabs.com
 # Maintained By: brad@reciprocitylabs.com
 
-Feature: Many resources type pairs reference each other M x N relations. This 
+Feature: Many resources type pairs reference each other M x N relations. This
   feature will exercise the cases where the linking between resources is M x N.
 
   Background:
@@ -39,7 +39,6 @@ Feature: Many resources type pairs reference each other M x N relations. This
      #| Control   | documents            | Document  | FIXME no property??   |
      #| Control   | people               | Person    | ??                    |
       | Control   | sections             | Section   | controls              |
-      #| Control   | implemented_controls | Control   | implementing_controls |
       #| Directive | programs             | Program   | directives            |
       | Contract  | programs             | Program   | directives            |
       | Policy    | programs             | Program   | directives            |

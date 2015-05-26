@@ -719,32 +719,51 @@ $(document).ready(function(){
     }
   });
 
-  $(".attribute-trigger").popover({
-    container: "body",
-    html: true,
-    content: function(){
-      return $(this).next('.attr-wrap').html();
-    },
-    placement: "bottom",
-    template: '<div class="popover" role="tooltip"><div class="popover-content"></div></div>'
+  $(".attribute-trigger").each(function() {
+    $(".attribute-trigger").popover({
+      html: true,
+      trigger: "click",
+      content: function(){
+        return $(this).next('.attr-wrap').html();
+      },
+      placement: "bottom",
+      template: '<div class="popover popover-medium popover-manual-close" role="tooltip"><div class="popover-content"></div></div>'
+    });
+
+    $(this).on('shown.bs.popover', function () {
+      $(this).addClass("active");
+      $(this).next(".popover-manual-close").find(".popover-close").click(function (e) {
+          $(".attribute-trigger").popover("hide");
+      });
+    });
+
+    $(this).on('hidden.bs.popover', function () {
+      $(this).removeClass("active");
+    });
   });
 
-  $('.attribute-trigger').on('shown.bs.popover', function () {
-    $(this).addClass("active");
+  // "Save report as" checkbox sync
+  $(".report-save-check").change(function() {
+    $(".report-save-check-bottom").prop("checked", this.checked);
   });
 
-  $('.attribute-trigger.right').on('shown.bs.popover', function () {
-    $('.popover').css('left',parseInt($('.popover').css('left')) - 276 + 'px')
+  $(".report-save-check-bottom").change(function() {
+    $(".report-save-check").prop("checked", this.checked);
   });
 
-  $('.attribute-trigger').on('hidden.bs.popover', function () {
-    $(this).removeClass("active");
+  // Close all popovers with a class "popover-manual-close" if you click anywhere except inside popover
+  $("html").on("mouseup", function(el) {
+    if(!$(el.target).closest(".popover-manual-close").length) {
+      $(".popover-manual-close").each(function(){
+        $(this.previousSibling).popover('hide');
+      });
+    }
   });
 
   // Dropdown menu form stop propagation
   $(".dropdown-menu").on("click", function(el) {
       var $this = $(this);
-    
+
     if($this.hasClass("dropdown-menu-form")) {
       el.stopPropagation();
     }
@@ -760,26 +779,29 @@ $(document).ready(function(){
         $tooltip = $this.find("i"),
         $nav = $this.closest("body").find(".top-inner-nav"),
         $lhn_nav = $this.closest("body").find(".lhs-holder"),
+        $lhn_type = $this.closest("body").find(".lhn-type"),
         $bar = $this.closest("body").find(".bar-v"),
         $content = $this.closest("body").find(".object-area"),
-        $fake_merge = $content.add($lhn_nav).add($bar);
+        $fake_merge = $content.add($bar);
     if($this.hasClass("active")) {
       $this.removeClass("active");
-      $tooltip.attr("data-original-title", "Show menu");
-      $nav.animate({top: "66"}, options);
-      $fake_merge.animate({top: "106"}, options);
+      $nav.animate({top: "19"}, options);
+      $fake_merge.animate({top: "49"}, options);
+      $lhn_nav.animate({top: "99"}, options);
+      $lhn_type.animate({top: "65"}, options);
     } else {
       $this.addClass("active");
-      $tooltip.attr("data-original-title", "Hide menu");
-      $nav.animate({top: "96"}, options);
-      $fake_merge.animate({top: "136"}, options);
+      $nav.animate({top: "48"}, options);
+      $fake_merge.animate({top: "78"}, options);
+      $lhn_nav.animate({top: "128"}, options);
+      $lhn_type.animate({top: "94"}, options);
     }
   }
 
   // LHN show/hide
   function lhnAnimate() {
     var options = {
-          duration: 800,
+          duration: 100,
           easing: 'easeOutExpo'
         },
         $this = $(this),
@@ -791,15 +813,13 @@ $(document).ready(function(){
     if($this.hasClass("active")) {
       $this.removeClass("active");
       $lhn.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
-      $lhnType.removeClass("active").animate({left: "-246"}, options).css("width", "246px");
-      $lhn_bar.removeClass("active").animate({left: "-8"}, options);
+      $lhnType.removeClass("active").animate({left: "-240"}, options).css("width", "240px");
       $lhs_search.removeClass("active").css("width", "196px");
       $lhs_search.find(".widgetsearch").css("width", "130px");
     } else {
       $this.addClass("active");
       $lhn.addClass("active").animate({left: "0"}, options);
       $lhnType.addClass("active").animate({left: "0"}, options);
-      $lhn_bar.addClass("active").animate({left: "240"}, options);
       $lhs_search.addClass("active");
     }
   }
@@ -995,6 +1015,7 @@ function pinContent() {
       $pin_height = $pin.height(),
       $info = $(".pin-content").find(".info"),
       $widget = $(".widget"),
+      $widget_no_pin = $(".widget-no-pin"),
       $window = $(window),
       $win_height = $window.height(),
       $win_height_part = $win_height / 3,
@@ -1004,6 +1025,7 @@ function pinContent() {
 
   $info.css("height", $pin_default);
   $widget.css("margin-bottom", $win_height_part + 80);
+  $widget_no_pin.css("margin-bottom", "0");
 
   $(".pin-action .max").on("click", function() {
     $info.animate({height: $pin_max}, options);
@@ -1065,7 +1087,6 @@ function resize_areas() {
   $topNav = $(".top-inner-nav");
   $area = $(".area");
   $bar = $(".bar-v");
-  $barActive = $(".bar-v.active");
   $lhsSearch = $(".lhs-search");
   $lhsSearchActive = $(".lhs-search.active");
   $lhnType = $(".lhn-type");
@@ -1088,15 +1109,11 @@ function resize_areas() {
   objectWidth = winWidth;
   //headerWidth = winWidth - lhsWidth - barWidth - 20;
   headerWidth = winWidth - 40;
-  lhnType_width = lhsWidth + 6;
+  lhnType_width = lhsWidth;
 
-  $lhsHolder
-    .css("height",lhsHeight);
+  $lhsHolder.css("height",lhsHeight).css("width", lhsWidth);
   $lhsHolderActive.css("left", "0");
-  $bar
-    .css("height",lhsHeight)
-    .css("left","-8px");
-  $barActive.css("left", lhsWidth);
+  $bar.css("height",lhsHeight);
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);

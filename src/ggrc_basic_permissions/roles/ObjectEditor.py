@@ -10,43 +10,33 @@ permissions = {
         "ControlAssertion",
         "Control",
         "ControlAssessment",
-        "Issues",
+        "Issue",
         "ControlControl",
-        "ControlSection",
         "DataAsset",
         "Directive",
         "Contract",
         "Policy",
         "Regulation",
         "Standard",
-        "DirectiveControl",
-        "DirectiveSection",
         "Document",
         "Facility",
         "Help",
         "Market",
         "Objective",
-        "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         "Option",
         "OrgGroup",
         "Vendor",
         "PopulationSample",
         "Product",
-        "ProgramControl",
-        "ProgramDirective",
         "Project",
         "Relationship",
         "RelationshipType",
         "SectionBase",
         "Section",
         "Clause",
-        "SectionObjective",
         "SystemOrProcess",
         "System",
         "Process",
@@ -69,41 +59,33 @@ permissions = {
         "Categorization",
         "Category",
         "Control",
+        "ControlAssessment",
+        "Issue",
         "ControlControl",
-        "ControlSection",
         "DataAsset",
         "Directive",
         "Contract",
         "Policy",
         "Regulation",
         "Standard",
-        "DirectiveControl",
-        "DirectiveSection",
         "Document",
         "Facility",
         "Market",
         "Objective",
-        "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         "Option",
         "OrgGroup",
         "Vendor",
         "PopulationSample",
         "Product",
-        "ProgramControl",
-        "ProgramDirective",
         "Project",
         "Relationship",
         "RelationshipType",
         "SectionBase",
         "Section",
         "Clause",
-        "SectionObjective",
         "SystemOrProcess",
         "System",
         "Process",
@@ -125,6 +107,22 @@ permissions = {
             "condition": "contains"
         },
         {
+            "type": "Issue",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
+        {
+            "type": "ControlAssessment",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
+        {
             "type": "Control",
             "terms": {
                 "list_property": "owners",
@@ -133,7 +131,6 @@ permissions = {
             "condition": "contains"
         },
         "ControlControl",
-        "ControlSection",
         {
             "type": "DataAsset",
             "terms": {
@@ -182,8 +179,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "DirectiveControl",
-        "DirectiveSection",
         {
             "type": "Document",
             "terms": {
@@ -216,13 +211,9 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         {
             "type": "Option",
             "terms": {
@@ -256,16 +247,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ProgramControl",
-        "ProgramDirective",
-        {
-            "type": "Project",
-            "terms": {
-                "list_property": "owners",
-                "value": "$current_user"
-            },
-            "condition": "contains"
-        },
         "Relationship",
         "RelationshipType",
         {
@@ -292,7 +273,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "SectionObjective",
         {
             "type": "SystemOrProcess",
             "terms": {
@@ -339,8 +319,23 @@ permissions = {
             },
             "condition": "contains"
         },
+        {
+            "type": "Issue",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
+        {
+            "type": "ControlAssessment",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
         "ControlControl",
-        "ControlSection",
         {
             "type": "DataAsset",
             "terms": {
@@ -389,8 +384,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "DirectiveControl",
-        "DirectiveSection",
         {
             "type": "Document",
             "terms": {
@@ -423,13 +416,9 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ObjectiveControl",
-        "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectOwner",
         "ObjectPerson",
-        "ObjectSection",
         {
             "type": "Option",
             "terms": {
@@ -463,16 +452,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ProgramControl",
-        "ProgramDirective",
-        {
-            "type": "Project",
-            "terms": {
-                "list_property": "owners",
-                "value": "$current_user"
-            },
-            "condition": "contains"
-        },
         "Relationship",
         "RelationshipType",
         {
@@ -499,7 +478,6 @@ permissions = {
             },
             "condition": "contains"
         },
-        "SectionObjective",
         {
             "type": "SystemOrProcess",
             "terms": {

@@ -47,7 +47,6 @@ def upgrade():
       'Help',
       'Market',
       'Objective',
-      'ObjectiveControl',
       'ObjectControl'
       'ObjectDocument',
       'ObjectObjective',
@@ -61,7 +60,6 @@ def upgrade():
       'Relationship',
       'RelationshipType',
       'Section',
-      'SectionObjective',
       'SystemOrProcess',
         'System',
         'Process',

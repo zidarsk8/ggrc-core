@@ -7,7 +7,7 @@ permissions = {
     "read": [
         "Request",
         "ControlAssessment",
-        "Issues",
+        "Issue",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -16,9 +16,7 @@ permissions = {
         "Meeting",
         "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
         "Document",
         "Meeting",
@@ -28,16 +26,14 @@ permissions = {
     "create": [
         "Request",
         "ControlAssessment",
-        "Issues",
+        "Issue",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
         "Meeting",
         "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
         "Document",
         "Meeting",
@@ -67,8 +63,22 @@ permissions = {
             "type": "Request",
             "condition": "is"
         },
-        "ControlAssessment",
-        "Issues",
+        {
+            "type": "ControlAssessment",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
+        {
+            "type": "Issue",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -77,9 +87,7 @@ permissions = {
         "Meeting",
         "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
         "Document",
         "Meeting"
@@ -87,9 +95,7 @@ permissions = {
     "delete": [
         "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
         "Document",
         "Meeting",

@@ -70,21 +70,16 @@
       }
     }
     &:focus {
-      @include outline-fix();
+      @extend %outline-fix;
     }
     &.disabled {
       @include opacity(0.5);
       cursor: default;
     }
   }
-  .nav-trigger {
-    &.active {
-      .grcicon-nav-trigger { background-position: -342px -416px; }
-    }
-  }
   .menu {
+    @extend %reset-list;
     @include clearfix();
-    @include reset-list();
     position: absolute;
     right: 0px;
     margin-right: 40px;
@@ -92,23 +87,24 @@
       float:left;
       color: $black;
       line-height: 47px;
-      font-size: 14px;
+      font-size: 12px;
       .count {
+        @include border-radius(8px);
         font-size: 12px;
         font-weight: bold;
         line-height: 16px;
         text-align: center;
         width: 16px;
         height: 16px;
-        @include border-radius(8px);
       }
       a {
+        @include transition(background 0.2s ease);
         display: block;
         color: $black;
         line-height: 47px;
         padding: 0 10px;
         i {
-          margin: 16px 2px 0 0;
+          margin: 15px 2px 0 0;
           &.grcicon-carot-white {
             margin-right: 0;
           }
@@ -119,7 +115,7 @@
         }
       }
       .dropdown-menu {
-        @include reset-list();
+        @extend %reset-list;
         @include border-radius(0);
         min-width: 210px;
         float: none;
@@ -149,8 +145,15 @@
               text-shadow: none;
             }
             i {
-              margin: 7px 2px 0 0;
               @include opacity(0.6);
+              margin: 7px 2px 0 0;
+            }
+          }
+          &.full-opacity {
+            a {
+              i {
+                @include opacity(1);
+              }
             }
           }
         }
@@ -161,77 +164,15 @@
           left: auto;
           right: 0;
         }
-        &.open {
-          > a {
-            background: $headerBgnd;
-          }
-        }
       }
-      &.active {
-        text-shadow: none;
-        i {
-          @include opacity(0.8);
-        }
-        a {
-          color:$black;
-          background: $white;
-          &:hover {
-            background: $white;
-            color:$black;
-            i {
-              @include opacity(0.8);
-            }
-          }
-        }
-      }
-    }
-  }
-  .object-header-notification {
-    font-size: 14px;
-    line-height: 18px;
-    font-weight: bold;
-    font-style: italic;
-    margin: 18px 20px 0 0;
-    text-align: right;
-    i {
-      margin-top: 1px;
-      &.grcicon-attribute-color {
-        margin-top: 3px;
-        margin-left: -4px;
-      }
-    }
-    &.object-approved {
-      color: $green;
-    }
-    &.object-error {
-      color: $red;
-    }
-  }
-  .btn-group {
-    margin-top: 27px;
-  }
-  .dropdown-menu {
-    margin-top: 6px;
-    .title {
-      padding: 0 7px 6px 7px;
-      font-weight: bold;
-    }
-  }
-  .demo {
-    margin-top: 27px;
-  }
-  .dashboard-title {
-		padding-left:20px;
-    i {
-      margin-top: 6px;
     }
   }
 }
 
 .actions {
+  @extend %reset-list;
   @include clearfix();
-	@include reset-list();
-	padding-right:40px;
+  padding-right:40px;
   margin-top: 16px;
   li {
     li a {
@@ -274,16 +215,16 @@
           }
         }
         a {
+          @include transition(none);
           color: $black;
           text-align: left;
           font-weight: normal;
           margin: 0;
           text-transform: none;
           display: block;
-          @include transition(none);
           &:hover {
-            color: $white;
             @include transition(none);
+            color: $white;
           }
         }
       }
@@ -297,12 +238,12 @@
       }
     }
     a {
+      @include transition(color 0.3s ease);
       color: $text;
       font-size: $f-small;
       line-height: 16px;
       font-weight: bold;
       text-transform: uppercase;
-      @include transition(color 0.3s ease);
       i {
         @include opacity(0.4);
         @include transition(opacity 0.3s ease);
@@ -319,8 +260,8 @@
       }
       .caret {
         @include opacity(0.4);
-        margin-top: 6px;
         @include transition(opacity 0.3s ease);
+        margin-top: 6px;
       }
       &.disabled {
         color:#ccc;
@@ -339,11 +280,11 @@
 }
 
 .breadcrumbs {
+  @extend %reset-list;
+  @extend %oneline;
   @include clearfix();
-  @include reset-list();
   text-transform:uppercase;
   margin-top:4px;
-  @include oneline();
 	padding-left:20px;
   li {
     display: inline-block;
@@ -379,8 +320,8 @@
     line-height:30px;
     padding: 0 10px;
     i {
-      margin: 7px 6px 0 0;
       @include opacity(0.6);
+      margin: 7px 6px 0 0;
     }
   }
   .inner-list {
@@ -390,6 +331,12 @@
       font-size: 12px;
       input {
         margin: -2px 0 0 0;
+      }
+      &.inner {
+        margin-left: 15px;
+      }
+      &.disabled {
+        color: $gray;
       }
     }
   }
@@ -403,8 +350,8 @@
 
 small {
   &.count {
-    background: $error;
     @include border-radius(4px);
+    background: $error;
     text-align: center;
     text-shadow: none;
     color: $white;

@@ -19,7 +19,6 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | ControlAssertion   |
       | DataAsset          |
       | Directive          |
-      | DirectiveControl   |
       | Contract           |
       | Policy             |
       | Regulation         |
@@ -29,12 +28,9 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | Market             |
 #      | Meeting            |
       | Objective          |
-      | ObjectiveControl   |
       | ObjectDocument     |
       | ObjectPerson       |
       | ObjectControl      |
-      | ObjectSection      |
-      | ObjectObjective    |
       | Option             |
       | OrgGroup           |
       | Person             |
@@ -49,7 +45,6 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | InterviewResponse        |
       | PopulationSampleResponse |
       | Section            |
-      | SectionObjective   |
       | SystemOrProcess    |
       | System             |
       | Process            |

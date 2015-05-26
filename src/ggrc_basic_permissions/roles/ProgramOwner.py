@@ -10,23 +10,17 @@ description = """
 permissions = {
     "read": [
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Program",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "UserRole",
         "Context",
     ],
     "create": [
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "UserRole",
         "Audit",
@@ -36,23 +30,17 @@ permissions = {
     ],
     "update": [
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Program",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "UserRole"
     ],
     "delete": [
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Program",
         "ProgramControl",
-        "ProgramDirective",
         "Relationship",
         "UserRole",
     ]

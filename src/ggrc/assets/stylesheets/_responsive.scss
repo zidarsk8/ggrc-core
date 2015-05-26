@@ -248,8 +248,8 @@
         display: inline-block;
       }
       span {
+        // @extend %oneline;
         display: block;
-        @include oneline();
         &.left-space {
           margin-right: 0;
         }

@@ -69,13 +69,11 @@
       {{^is_info_pin}}
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       {{/is_info_pin}}
+      {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
 
       <div class="row-fluid wrap-row" {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true" data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
         <div class="span6">
-          <h6>Test plan</h6>
-          <div class="rtf-block">
-            {{{firstnonempty test_plan '<em>No description</em>'}}}
-          </div>
+          {{{render '/static/mustache/base_objects/test_plan.mustache' instance=instance}}}
         </div>
         <div class="span3">
           <h6>Conclusion: Design</h6>
@@ -88,7 +86,7 @@
           </select>
         </div>
         <div class="span3">
-          <h6>Conclusion: Operational</h6>
+          <h6>Conclusion: Operation</h6>
           <p><small><em>Is this control operationally effective?</em></small></p>
           <select class="input-medium visual-selector" name="operationally">
             <option value="" {{#if_equals operationally ""}}selected{{/if_equals}}>---</option>
@@ -98,6 +96,7 @@
           </select>
         </div>
       </div>
+      {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
 
       <div class="row-fluid wrap-row">
         <div class="span6">
@@ -160,6 +159,7 @@
         </div>
       </div>
 
+      {{{render '/static/mustache/base_objects/urls.mustache' is_program=true instance=instance}}}
 
       <div class="custom-attr-wrap">
         <div class="row-fluid">

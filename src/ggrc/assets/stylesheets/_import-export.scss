@@ -110,20 +110,84 @@ form.import {
 }
 
 .download-template {
-  text-align: right;
-  font-weight: bold;
-  a {
-    font-size: 11px;
-    color: $widgetTitle;
-    text-transform: uppercase;
-    @include opacity(0.4);
-    @include transition(opacity 0.2s ease);
-    text-decoration: none;
-    i {
-      margin-top: 2px;
+  background: $lightGray;
+  border: 1px solid $darkGray;
+  padding: 20px;
+  .center-block {
+    text-align: center;
+    padding: 40px 0 10px;
+    small {
+      display: block;
     }
-    &:hover {
+    i {
       @include opacity(1);
+      margin-top: 4px;
+    }
+  }
+}
+
+.import {
+  .btn-fixed {
+    float: left;
+    i {
+      @include opacity(1);
+      margin-top: 4px;
+    }
+  }
+  .import-progress {
+    float: left;
+    width: 450px;
+    margin-top: -6px;
+    margin-left: 20px;
+  }
+  .import-progress-final {
+    @extend .import-progress;
+  }
+  .progress-wrap {
+    position: relative;
+    padding-top: 18px;
+    .custom-progress {
+      margin-top: 0;
+    }
+    .current-num {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .total-num {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+}
+
+.import-wrap {
+  margin-top: 10px;
+}
+
+.import-analyze {
+  h4 {
+    font-weight: bold;
+    margin-bottom: 10px;
+    &.error {
+      margin-top: 20px;
+      color: $red;
+    }
+  }
+  ul {
+    @extend %reset-list;
+    li {
+      margin-bottom: 5px;
+      ul {
+        margin-left: 30px;
+        li {
+          list-style-type: disc;
+        }
+        &.error {
+          color: $red;
+        }
+      }
     }
   }
 }

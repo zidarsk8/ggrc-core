@@ -64,7 +64,6 @@ def upgrade():
       'Relationship',
       'RelationshipType',
       'Section',
-      'SectionObjective',
       'SystemOrProcess',
         'System',
         'Process',
