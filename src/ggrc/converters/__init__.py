@@ -3,11 +3,11 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-from .sections import SectionsConverter
+from ggrc.converters.sections import SectionsConverter
 
-all_converters = [
-    ('sections', SectionsConverter)
-    ]
+all_converters = [('sections', SectionsConverter)]
+
+HANDLERS = {}
 
 def get_converter(name):
   return all_converters(name)

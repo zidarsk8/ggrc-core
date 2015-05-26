@@ -424,8 +424,7 @@ class ContactEmailHandler(ColumnHandler):
 class AssigneeHandler(ContactEmailHandler):
 
   def parse_item(self, value):
-    # in case Assignee field does not exist or stripped version is empty
-    if not value or len(value.strip()) == 0:
+    if not value or not value.strip():
       # Use current request owner if there is one
       current_request_assignee = self.importer.obj.assignee
       if current_request_assignee:

@@ -4,14 +4,72 @@
 # Maintained By: dan@reciprocitylabs.com
 
 import csv
+import chardet
 import _csv
+from flask import current_app
 from StringIO import StringIO
 
-from flask import current_app
-
-import chardet
+from ggrc.converters import base_row
+from ggrc.converters import HANDLERS
+from ggrc.converters.common import ImportException
 from ggrc.models import Directive
-from .common import ImportException
+from ggrc.models.reflection import AttributeInfo
+
+
+def get_custom_attributes_definitions(target_class):
+  definitions = {}
+  custom_attributes = target_class.get_custom_attribute_definitions()
+  for attr in custom_attributes:
+    handler = HANDLERS.get(attr.title, base_row.ColumnHandler)
+    definitions[attr.title] = {
+        "attr_name": attr.title,
+        "display_name": attr.display_name,
+        "mandatory": attr.mandatory,
+        "handler": handler,
+        "validator": None,
+        "default": None,
+    }
+  return definitions
+
+
+def update_definition(definition, values_dict):
+  for key, value in values_dict.items():
+    if key in definition:
+      definition[key] = value
+
+
+def get_object_column_definitions(target_class):
+  definitions = {}
+  custom_attr_def = {}
+  aliases = AttributeInfo.gather_aliases(target_class)
+
+  custom_attributes = aliases.pop("custom_attributes", None)
+  if custom_attributes:
+    custom_attr_def = get_custom_attributes_definitions(target_class)
+
+  filtered_aliases = [(k, v) for k, v in aliases.items() if v is not None]
+
+  for key, value in filtered_aliases:
+
+    column = target_class.__table__.columns.get(key)
+
+    definition = {
+        "attr_name": key,
+        "display_name": value,
+        "mandatory": False if column is None else not column.nullable,
+        "handler": getattr(target_class, "default_{}".format(key), None),
+        "validator": getattr(target_class, "validate_{}".format(key), None),
+        "default": HANDLERS.get(key, base_row.ColumnHandler),
+    }
+
+    if type(value) is dict:
+      update_definition(definition, value)
+
+    definitions[key] = definition
+
+  definitions.update(custom_attr_def)
+
+  return definitions
 
 
 def handle_csv_import(converter_class, filepath, **options):
@@ -21,15 +79,19 @@ def handle_csv_import(converter_class, filepath, **options):
     csv_file = open(filepath, 'rbU')
 
   if options.get('directive_id') and not options.get('directive'):
-    options['directive'] = Directive.query.filter_by(id=int(options['directive_id'])).first()
+    options['directive'] = Directive.query.filter_by(
+        id=int(options['directive_id'])).first()
 
   try:
     if isinstance(csv_file, list):
       rows = [row for row in csv_reader(csv_file)]
     else:
       rows = [row for row in csv_reader(csv_file.read().splitlines(True))]
-  except (UnicodeDecodeError, _csv.Error): # Decode error occurs when a special character symbol is inserted in excel.
-    raise ImportException("Could not import: invalid character or spreadsheet encountered; verify the file is correctly formatted.")
+  # Decode error occurs when a special character symbol is inserted in excel.
+  except (UnicodeDecodeError, _csv.Error):
+    raise ImportException(
+        "Could not import: invalid character or spreadsheet encountered;"
+        "verify the file is correctly formatted.")
   if not isinstance(csv_file, list):
     csv_file.close()
   converter = converter_class.from_rows(rows, **options)
@@ -39,10 +101,18 @@ def handle_csv_import(converter_class, filepath, **options):
   del options['dry_run']
   return converter.do_import(is_dry_run, **options)
 
+
 def csv_reader(csv_data, dialect=csv.excel, **kwargs):
   reader = csv.reader(utf_8_encoder(csv_data), dialect=dialect, **kwargs)
   for row in reader:
     yield [unicode(cell, 'utf-8') for cell in row]
+
+
+def read_csv_file(csv_file):
+  if isinstance(csv_file, basestring):
+    csv_file = open(csv_file, 'rbU')
+  return [row for row in csv_reader(csv_file)]
+
 
 def utf_8_encoder(csv_data):
   """This function is a generator that attempts to encode the string as utf-8.
@@ -61,18 +131,21 @@ def utf_8_encoder(csv_data):
       encoding_guess = chardet.detect(line)['encoding']
       yield line.decode(encoding_guess).encode('utf-8')
 
+
 def handle_converter_csv_export(filename, objects, converter_class, **options):
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
+  headers = [
+      ('Content-Type', 'text/csv'),
+      ('Content-Disposition', 'attachment; filename="{}"'.format(filename))
+  ]
 
   exporter = converter_class(objects, **options)
   output_buffer = StringIO()
   writer = csv.writer(output_buffer)
 
   for metadata_row in exporter.do_export_metadata():
-    writer.writerow([ line.encode("utf-8") for line in metadata_row ])
+    writer.writerow([line.encode("utf-8") for line in metadata_row])
 
   exporter.do_export(writer)
   body = output_buffer.getvalue()
   output_buffer.close()
   return current_app.make_response((body, 200, headers))
-
