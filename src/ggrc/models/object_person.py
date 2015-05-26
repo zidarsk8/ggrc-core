@@ -3,11 +3,14 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import deferred, Mapping, Timeboxed
-from .reflection import PublishOnly
+from sqlalchemy import orm
+
+from ggrc import db
+from ggrc.models.mixins import deferred, Mapping, Timeboxed
+from ggrc.models.reflection import PublishOnly
+
 
 class ObjectPerson(Timeboxed, Mapping, db.Model):
   __tablename__ = 'object_people'
@@ -38,17 +41,17 @@ class ObjectPerson(Timeboxed, Mapping, db.Model):
     return (
         db.UniqueConstraint('person_id', 'personable_id', 'personable_type'),
         db.Index('ix_person_id', 'person_id'),
-        )
+    )
 
   _publish_attrs = [
       'role',
       'notes',
       'person',
       'personable',
-      ]
+  ]
   _sanitize_html = [
       'notes',
-      ]
+  ]
 
   @classmethod
   def eager_query(cls):
@@ -61,7 +64,9 @@ class ObjectPerson(Timeboxed, Mapping, db.Model):
   def _display_name(self):
     return self.personable.display_name + '<->' + self.person.display_name
 
+
 class Personable(object):
+
   @declared_attr
   def object_people(cls):
     cls.people = association_proxy(
@@ -69,31 +74,26 @@ class Personable(object):
         creator=lambda person: ObjectPerson(
             person=person,
             personable_type=cls.__name__,
-            )
         )
+    )
     joinstr = 'and_(foreign(ObjectPerson.personable_id) == {type}.id, '\
-                   'foreign(ObjectPerson.personable_type) == "{type}")'
+        'foreign(ObjectPerson.personable_type) == "{type}")'
     joinstr = joinstr.format(type=cls.__name__)
     return db.relationship(
         'ObjectPerson',
         primaryjoin=joinstr,
         backref='{0}_personable'.format(cls.__name__),
         cascade='all, delete-orphan',
-        )
+    )
 
   _publish_attrs = [
       PublishOnly('people'),
       'object_people',
-      ]
-
-  _include_links = [
-      #'object_people',
-      ]
+  ]
+  _include_links = []
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(Personable, cls).eager_query()
     return cls.eager_inclusions(query, Personable._include_links).options(
         orm.subqueryload('object_people'))

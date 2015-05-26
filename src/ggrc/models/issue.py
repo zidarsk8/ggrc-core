@@ -24,4 +24,6 @@ class Issue(HasObjectState, TestPlanned, CustomAttributable, Documentable,
   _publish_attrs = [
   ]
 
+  _aliases = {"url": "Issue URL"}
+
 track_state_for_class(Issue)
