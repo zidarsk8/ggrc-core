@@ -399,6 +399,13 @@ def audit_3_0_ca():
   """
   return render_template("/mockups/audit-3.0/control-assessment.html")
 
+@app.route("/mockups/import-export/")
+@login_required
+def import_export():
+  """Import Export prototype
+  """
+  return render_template("/mockups/import-export/index.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():

@@ -181,3 +181,21 @@
     }
   }
 }
+
+.import-not-pass,
+.import-warning,
+#analysingFile,
+#analysingFile2,
+#analysingFile3,
+#importFile,
+#importFile3,
+#importingFile,
+#importingFile3,
+#importedFile,
+#importedFile3,
+.import-analyze,
+.import-final,
+.import-progress,
+.import-progress-final {
+  display: none;
+}
