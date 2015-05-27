@@ -293,8 +293,6 @@ can.Control("CMS.Controllers.TreeLoader", {
         var instance = item.instance || item;
         if (instance.custom_attribute_values) {
           return instance.refresh_all('custom_attribute_values');
-        } else {
-          return instance.refresh();
         }
       })).then(this._ifNotRemoved(processChunk));
       return this._loading_deferred;
@@ -414,7 +412,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           display_options.title_width = title_width - 1;
           display_options.action_width = action_width - 1;
           display_options.selectable_width = selectable_width + 2;
-          break
+          break;
         default:
           display_options.title_width = title_width;
           display_options.action_width = action_width;
