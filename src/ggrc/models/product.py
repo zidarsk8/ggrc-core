@@ -32,9 +32,11 @@ class Product(HasObjectState, CustomAttributable, Documentable, Personable,
       'kind',
       'version',
   ]
-  _sanitize_html = [
-      'version',
-  ]
+  _sanitize_html = ['version',]
+  _aliases = {
+    "url": "Product URL",
+    "kind": "Kind/Type",
+  }
 
   @validates('kind')
   def validate_product_options(self, key, option):

@@ -3,11 +3,14 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-from ggrc import db
 from sqlalchemy.orm import validates
-from .mixins import deferred, Base
-from .object_owner import Ownable
-from .utils import validate_option
+
+from ggrc import db
+from ggrc.models.mixins import deferred
+from ggrc.models.mixins import Base
+from ggrc.models.object_owner import Ownable
+from ggrc.models.utils import validate_option
+
 
 class Document(Ownable, Base, db.Model):
   __tablename__ = 'documents'
@@ -19,31 +22,33 @@ class Document(Ownable, Base, db.Model):
   year_id = deferred(db.Column(db.Integer), 'Document')
   language_id = deferred(db.Column(db.Integer), 'Document')
 
-  object_documents = db.relationship('ObjectDocument', backref='document', cascade='all, delete-orphan')
+  object_documents = db.relationship(
+      'ObjectDocument', backref='document', cascade='all, delete-orphan')
   kind = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(Document.kind_id) == Option.id, '\
-                       'Option.role == "reference_type")',
+      primaryjoin='and_(foreign(Document.kind_id) == Option.id, '
+      'Option.role == "reference_type")',
       uselist=False,
-      )
+  )
   year = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(Document.year_id) == Option.id, '\
-                       'Option.role == "document_year")',
+      primaryjoin='and_(foreign(Document.year_id) == Option.id, '
+      'Option.role == "document_year")',
       uselist=False,
-      )
+  )
   language = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(Document.language_id) == Option.id, '\
-                       'Option.role == "language")',
+      primaryjoin='and_(foreign(Document.language_id) == Option.id, '
+      'Option.role == "language")',
       uselist=False,
-      )
+  )
 
   _fulltext_attrs = [
       'title',
       'link',
       'description',
-      ]
+  ]
+
   _publish_attrs = [
       'title',
       'link',
@@ -52,16 +57,23 @@ class Document(Ownable, Base, db.Model):
       'kind',
       'year',
       'language',
-      ]
+  ]
+
   _sanitize_html = [
       'title',
       'description',
-      ]
+  ]
+
+  _aliases = {
+      'title': "Title",
+      'link': "Link",
+      'description': "description",
+  }
 
   @validates('kind', 'year', 'language')
   def validate_document_options(self, key, option):
     if key == 'year':
-      desired_role  = 'document_year'
+      desired_role = 'document_year'
     elif key == 'kind':
       desired_role = 'reference_type'
     else:

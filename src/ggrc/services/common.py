@@ -643,40 +643,37 @@ class Resource(ModelView):
 
   def dispatch_request(self, *args, **kwargs):
     with benchmark("Dispatch request"):
-      method = request.method
+      with benchmark("dispatch_request > Check Headers"):
+        method = request.method
+        if method in ('POST', 'PUT', 'DELETE')\
+            and 'X-Requested-By' not in request.headers:
+          raise BadRequest('X-Requested-By header is REQUIRED.')
 
-      if method in ('POST', 'PUT', 'DELETE')\
-          and 'X-Requested-By' not in request.headers:
-        raise BadRequest('X-Requested-By header is REQUIRED.')
-
-      if getattr(settings, 'CALENDAR_MECHANISM', False) is True:
-        if method in ('POST', 'PUT', 'DELETE'):
-          request.oauth_credentials=get_oauth_credentials()
-
-      try:
-        if method == 'GET':
-          if self.pk in kwargs and kwargs[self.pk] is not None:
-            return self.get(*args, **kwargs)
+      with benchmark("dispatch_request > Try"):
+        try:
+          if method == 'GET':
+            if self.pk in kwargs and kwargs[self.pk] is not None:
+              return self.get(*args, **kwargs)
+            else:
+              return self.collection_get()
+          elif method == 'POST':
+            if self.pk in kwargs and kwargs[self.pk] is not None:
+              return self.post(*args, **kwargs)
+            else:
+              return self.collection_post()
+          elif method == 'PUT':
+            return self.put(*args, **kwargs)
+          elif method == 'DELETE':
+            return self.delete(*args, **kwargs)
           else:
-            return self.collection_get()
-        elif method == 'POST':
-          if self.pk in kwargs and kwargs[self.pk] is not None:
-            return self.post(*args, **kwargs)
-          else:
-            return self.collection_post()
-        elif method == 'PUT':
-          return self.put(*args, **kwargs)
-        elif method == 'DELETE':
-          return self.delete(*args, **kwargs)
-        else:
-          raise NotImplementedError()
-      except (IntegrityError, ValidationError) as v:
-        message = translate_message(v)
-        current_app.logger.warn(message)
-        return ((message, 403, []))
-      except Exception as e:
-        current_app.logger.exception(e)
-        raise
+            raise NotImplementedError()
+        except (IntegrityError, ValidationError) as v:
+          message = translate_message(v)
+          current_app.logger.warn(message)
+          return ((message, 403, []))
+        except Exception as e:
+          current_app.logger.exception(e)
+          raise
 
   def post(*args, **kwargs):
     raise NotImplementedError()
@@ -883,63 +880,65 @@ class Resource(ModelView):
     return cache_objs, database_objs
 
   def collection_get(self):
-    if 'Accept' in self.request.headers and \
-        'application/json' not in self.request.headers['Accept']:
-      return current_app.make_response((
-        'application/json', 406, [('Content-Type', 'text/plain')]))
-    matches_query = self.get_collection_matches(self.model)
+    with benchmark("dispatch_request > collection_get > Check headers"):
+      if 'Accept' in self.request.headers and \
+          'application/json' not in self.request.headers['Accept']:
+        return current_app.make_response((
+          'application/json', 406, [('Content-Type', 'text/plain')]))
+    with benchmark("dispatch_request > collection_get > Get collection matches"):
+      matches_query = self.get_collection_matches(self.model)
+    with benchmark("dispatch_request > collection_get > Query Data"):
+      if '__page' in request.args or '__page_only' in request.args:
+        with benchmark("Query matches with paging"):
+          matches, extras = self.apply_paging(matches_query)
+      else:
+        with benchmark("Query matches"):
+          matches = matches_query.all()
+          extras = {}
+    with benchmark("dispatch_request > collection_get > Get matched resources"):
+      cache_op = None
+      if '__stubs_only' in request.args:
+        objs = [{
+            'id': m[0],
+            'type': m[1],
+            'href': utils.url_for(m[1], id=m[0]),
+            'context_id': m[2]
+            } for m in matches]
 
-    if '__page' in request.args or '__page_only' in request.args:
-      with benchmark("Query matches with paging"):
-        matches, extras = self.apply_paging(matches_query)
-    else:
-      with benchmark("Query matches"):
-        matches = matches_query.all()
-        extras = {}
+      else:
+        cache_objs, database_objs = self.get_matched_resources(matches)
 
-    cache_op = None
-    if '__stubs_only' in request.args:
-      objs = [{
-          'id': m[0],
-          'type': m[1],
-          'href': utils.url_for(m[1], id=m[0]),
-          'context_id': m[2]
-          } for m in matches]
+        objs = {}
+        objs.update(cache_objs)
+        objs.update(database_objs)
 
-    else:
-      cache_objs, database_objs = self.get_matched_resources(matches)
+        objs = [objs[m] for m in matches if m in objs]
 
-      objs = {}
-      objs.update(cache_objs)
-      objs.update(database_objs)
+        with benchmark("Filter resources based on permissions"):
+          objs = filter_resource(objs)
 
-      objs = [objs[m] for m in matches if m in objs]
+        cache_op = 'Hit' if len(cache_objs) > 0 else 'Miss'
+    with benchmark("dispatch_request > collection_get > Create Response"):
+      # Return custom fields specified via `__fields=id,title,description` etc.
+      # TODO this can be optimized by filter_resource() not retrieving the other fields to being with
+      if '__fields' in request.args:
+          custom_fields = request.args['__fields'].split(',')
+          objs = [
+              {f: o[f] for f in custom_fields if f in o}
+              for o in objs]
 
-      with benchmark("Filter resources based on permissions"):
-        objs = filter_resource(objs)
+      with benchmark("Serialize collection"):
+        collection = self.build_collection_representation(
+            objs, extras=extras)
 
-      cache_op = 'Hit' if len(cache_objs) > 0 else 'Miss'
+      if 'If-None-Match' in self.request.headers and \
+          self.request.headers['If-None-Match'] == self.etag(collection):
+        return current_app.make_response((
+          '', 304, [('Etag', self.etag(collection))]))
 
-    # Return custom fields specified via `__fields=id,title,description` etc.
-    # TODO this can be optimized by filter_resource() not retrieving the other fields to being with
-    if '__fields' in request.args:
-        custom_fields = request.args['__fields'].split(',')
-        objs = [
-            {f: o[f] for f in custom_fields if f in o}
-            for o in objs]
-
-    with benchmark("Serialize collection"):
-      collection = self.build_collection_representation(
-          objs, extras=extras)
-
-    if 'If-None-Match' in self.request.headers and \
-        self.request.headers['If-None-Match'] == self.etag(collection):
-      return current_app.make_response((
-        '', 304, [('Etag', self.etag(collection))]))
-
-    with benchmark("Make response"):
-      return self.json_success_response(
-        collection, self.collection_last_modified(), cache_op=cache_op)
+      with benchmark("Make response"):
+        return self.json_success_response(
+          collection, self.collection_last_modified(), cache_op=cache_op)
 
   def get_resources_from_cache(self, matches):
     """Get resources from cache for specified matches"""

@@ -38,6 +38,7 @@ class ControlAssertion(CategoryBase):
 
 
 class ControlCategorized(Categorizable):
+
   @declared_attr
   def categorizations(cls):
     return cls.declare_categorizable(
@@ -50,6 +51,8 @@ class ControlCategorized(Categorizable):
 
   _include_links = []
 
+  _aliases = {"categories": "Categories"}
+
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
@@ -60,6 +63,7 @@ class ControlCategorized(Categorizable):
 
 
 class AssertionCategorized(Categorizable):
+
   @declared_attr
   def assertations(cls):
     return cls.declare_categorizable(
@@ -69,8 +73,8 @@ class AssertionCategorized(Categorizable):
       'assertions',
       PublishOnly('assertations'),
   ]
-
   _include_links = []
+  _aliases = {"assertions": "Assertions"}
 
   @classmethod
   def eager_query(cls):
@@ -110,17 +114,17 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
 
   kind = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(Control.kind_id) == Option.id, '\
+      primaryjoin='and_(foreign(Control.kind_id) == Option.id, '
                   'Option.role == "control_kind")',
       uselist=False)
   means = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(Control.means_id) == Option.id, '\
+      primaryjoin='and_(foreign(Control.means_id) == Option.id, '
                   'Option.role == "control_means")',
       uselist=False)
   verify_frequency = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(Control.verify_frequency_id) == Option.id, '\
+      primaryjoin='and_(foreign(Control.verify_frequency_id) == Option.id, '
                   'Option.role == "verify_frequency")',
       uselist=False)
 
@@ -153,6 +157,17 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
   ]
 
   _include_links = []
+
+  _aliases = {
+      "url": "Control URL",
+      "kind": "Kind/Nature",
+      "means": "Type/Means",
+      "verify_frequency": "Frequency",
+      "fraud_related": "Fraud Related",
+      "principal_assessor": "Principal Assessor",
+      "secondary_assessor": "Secondary Assessor",
+      "key_control": "Significance",
+  }
 
   @validates('kind', 'means', 'verify_frequency')
   def validate_control_options(self, key, option):
