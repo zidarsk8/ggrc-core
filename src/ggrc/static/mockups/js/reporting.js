@@ -9,6 +9,9 @@ $(document).ready(function() {
         {title: "ISO Systems"},
         {title: "Overdue tasks"},
       ],
+      reportTitle: [
+        {title: "New Report"},
+      ],
       table_title: [
         {tbl_title_1: "Program Title", tbl_title_2: "Program Owner", tbl_title_3: "Control Title", tbl_title_4: "Control Owner", tbl_title_5: "Control Contact", tbl_title_6: "Control URL", tbl_title_7: "Control Code", tbl_title_8: "Control State", tbl_title_9: "System Title", tbl_title_10: "System Owner", tbl_title_11: "System Contact", tbl_title_12: "System URL", tbl_title_13: "System Code", tbl_title_14: "System Effective date", tbl_title_15: "System Stop date", tbl_title_16: "System State"}
       ],
@@ -35,12 +38,17 @@ $(document).ready(function() {
     events: {
       "#custom_report_name keyup": function(el, ev) {
         var $item = this.element.find('li.active'),
+            $report_item = this.element.find('.report-title h2'),
             index = $item.index(),
+            report_index = $report_item.index(),
             tabs = this.scope.tabs,
+            report = this.scope.reportTitle,
             new_tabs = 0;
 
         tabs[index].attr('title', el.val());
         this.element.find("#newReport .closed").show();
+
+        report[report_index].attr('title', el.val());
 
         // Calculate tabs numbers
         tabs.forEach(function(tab) {
@@ -103,6 +111,20 @@ $(document).ready(function() {
             index = $item.index(),
             rules = this.scope.relevantFilter;
         rules.splice(index - 1, 1);
+      },
+      ".report-title-trigger click": function(el) {
+        var $title_change = this.element.find('.report-title-change'),
+            $parent = this.element.find("h2");
+
+        $parent.fadeOut(500);
+        $title_change.delay(500).fadeIn(500);
+      },
+      ".title-change click": function(el) {
+        var $title = this.element.find("h2"),
+            $parent = this.element.find(".report-title-change");
+
+        $parent.fadeOut(500);
+        $title.delay(500).fadeIn(500);
       }
     }
   });
