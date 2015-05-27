@@ -274,35 +274,27 @@ can.Control("CMS.Controllers.TreeLoader", {
         if (!that._pending_items) {
           return;
         }
-        var chunk = that._pending_items.splice(0, 5),
-            to_refresh = can.map(chunk, function(item) {
-              item = item.instance || item;
-              return item.selfLink ? undefined : item;
-            })
-            ;
+        var chunk = that._pending_items.splice(0, 5);
 
-        new RefreshQueue().enqueue(to_refresh).trigger().then(function() {
-
-          that.insert_items(chunk);
-          if (that._pending_items && that._pending_items.length > 0) {
-            setTimeout(that._ifNotRemoved(processChunk), 100);
-          }
-          else {
-            that._pending_items = null;
-            setTimeout(that._ifNotRemoved(function() {
-              if (!that._pending_items) {
-                $.when(that.fetch_custom_attr_values()).
-                  then(function () {
-                    that._loading_finished();
-                  });
-              }
-            }), 200);
-          }
-        });
+        that.insert_items(chunk);
+        if (that._pending_items && that._pending_items.length > 0) {
+          setTimeout(that._ifNotRemoved(processChunk), 10);
+        }
+        else {
+          that._pending_items = null;
+          setTimeout(that._ifNotRemoved(function() {
+            if (!that._pending_items) {
+              that._loading_finished();
+            }
+          }), 200);
+        }
       };
-
-      setTimeout(this._ifNotRemoved(processChunk), 100);
-
+      $.when.apply($, can.map(this._pending_items, function(item) {
+        var instance = item.instance || item;
+        if (instance.custom_attribute_values) {
+          return instance.refresh_all('custom_attribute_values');
+        }
+      })).then(this._ifNotRemoved(processChunk));
       return this._loading_deferred;
     }
 
@@ -420,7 +412,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           display_options.title_width = title_width - 1;
           display_options.action_width = action_width - 1;
           display_options.selectable_width = selectable_width + 2;
-          break
+          break;
         default:
           display_options.title_width = title_width;
           display_options.action_width = action_width;
@@ -676,16 +668,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       return this.find_all_deferred;
     }
-  }
-
-  , fetch_custom_attr_values: function() {
-    var deferred = new $.Deferred();
-    CMS.Models.CustomAttributeValue.findAll({attributable_type: this.options.model.shortName})
-      .then(function (defs) {
-        deferred.resolve();
-    });
-    return deferred;
-
   }
 
   , display_path: function(path) {
