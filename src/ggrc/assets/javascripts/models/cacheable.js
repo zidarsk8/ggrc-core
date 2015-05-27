@@ -704,6 +704,9 @@ can.Model("can.Model.Cacheable", {
   }
   , load_custom_attribute_definitions: function custom_attribute_definitions() {
     var self = this;
+    if (self.attr('custom_attribute_definitions')) {
+      return new $.Deferred().resolve(self.attr('custom_attribute_definitions'));
+    }
     return CMS.Models.CustomAttributeDefinition.findAll({
       definition_type: self.class.root_object
     }).then(function(definitions) {
