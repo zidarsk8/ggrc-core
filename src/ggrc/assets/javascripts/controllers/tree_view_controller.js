@@ -408,8 +408,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     display_options = {
       title_width: selected_widths[0],
-      action_width: selected_widths[1],
-      selectable_width: selected_widths[2],
+      selectable_width: selected_widths[1],
+      action_width: selected_widths[2],
       selectable_attr_width: display_width / Math.max(attr_count, 1)
     }
     this.options.attr('display_options', display_options);
