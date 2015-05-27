@@ -17,4 +17,6 @@ class DataAsset(HasObjectState,
                 Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'data_assets'
 
+  _aliases = {"url": "Data Asset URL"}
+
 track_state_for_class(DataAsset)

@@ -16,9 +16,8 @@ from .relationship import Relatable
 class Objective(HasObjectState, CustomAttributable, Auditable, Relatable,
                 Documentable, Personable, Ownable, BusinessObject, db.Model):
   __tablename__ = 'objectives'
-
   _publish_attrs = []
-
   _include_links = []
+  _aliases = {"url": "Objective URL"}
 
 track_state_for_class(Objective)

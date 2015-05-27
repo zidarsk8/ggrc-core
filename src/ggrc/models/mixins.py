@@ -204,6 +204,7 @@ class Titled(object):
   _publish_attrs = ['title']
   _fulltext_attrs = ['title']
   _sanitize_html = ['title']
+  _aliases = {"title": "Title"}
 
 
 class Described(object):
@@ -216,6 +217,7 @@ class Described(object):
   _publish_attrs = ['description']
   _fulltext_attrs = ['description']
   _sanitize_html = ['description']
+  _aliases = {"description": "Description"}
 
 
 class Noted(object):
@@ -228,6 +230,7 @@ class Noted(object):
   _publish_attrs = ['notes']
   _fulltext_attrs = ['notes']
   _sanitize_html = ['notes']
+  _aliases = {"notes": "Notes"}
 
 
 class Hyperlinked(object):
@@ -242,6 +245,11 @@ class Hyperlinked(object):
 
   # REST properties
   _publish_attrs = ['url', 'reference_url']
+
+  _aliases = {
+      "url": "Url",
+      "reference_url": "Reference URL",
+  }
 
 
 class Hierarchical(object):
@@ -290,6 +298,11 @@ class Timeboxed(object):
   # REST properties
   _publish_attrs = ['start_date', 'end_date']
 
+  _aliases = {
+      "start_date": "Effective Date",
+      "end_date": "Stop Date",
+  }
+
 
 class Stateful(object):
 
@@ -299,6 +312,7 @@ class Stateful(object):
         db.Column(db.String, default=cls.default_status), cls.__name__)
 
   _publish_attrs = ['status']
+  _aliases = {"status": "State"}
 
   @classmethod
   def default_status(cls):
@@ -397,6 +411,7 @@ class Slugged(Base):
   _publish_attrs = ['slug']
   _fulltext_attrs = ['slug']
   _sanitize_html = ['slug']
+  _aliases = {"slug": "Code"}
 
   @classmethod
   def generate_slug_for(cls, obj):
@@ -433,10 +448,10 @@ event.listen(
 
 
 class Mapping(Stateful, Base):
-  VALID_STATES = [
+  VALID_STATES = (
       'Draft',
       'Final',
-  ]
+  )
 
 
 class WithContact(object):
@@ -474,11 +489,15 @@ class WithContact(object):
     )
 
   _publish_attrs = ['contact', 'secondary_contact']
+  _aliases = {
+      "contact": "Primary Contact",
+      "secondary_contact": "Secondary Contact",
+  }
 
 
 class BusinessObject(
         Stateful, Noted, Described, Hyperlinked, WithContact, Titled, Slugged):
-  VALID_STATES = [
+  VALID_STATES = (
       'Draft',
       'Final',
       'Effective',
@@ -488,7 +507,7 @@ class BusinessObject(
       'In Scope',
       'Not in Scope',
       'Deprecated',
-  ]
+  )
 
 # This class is just a marker interface/mixin to indicate that a model type
 # supports custom attributes.
@@ -558,16 +577,10 @@ class CustomAttributable(object):
       # av.context_id = cls.context_id
       db.session.add(av)
 
-  _publish_attrs = [
-      'custom_attribute_values',
-      # PublishOnly('custom_attribute_definitions')
-  ]
-  _update_attrs = [
-      'custom_attributes'
-  ]
-  _include_links = [
-      # 'custom_attribute_values',
-  ]
+  _publish_attrs = ['custom_attribute_values', ]
+  _update_attrs = ['custom_attributes']
+  _include_links = []
+  _aliases = {"custom_attributes": "Custom Attributes"}
 
   @declared_attr
   def custom_attribute_definitions(cls):
@@ -586,6 +599,12 @@ class CustomAttributable(object):
         primaryjoin=join_function
     )
 
+  @classmethod
+  def get_custom_attribute_definitions(cls):
+    from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+    return CustomAttributeDefinition.query.filter(
+        CustomAttributeDefinition.definition_type == cls.__name__).all()
+
 
 class TestPlanned(object):
 
@@ -597,3 +616,4 @@ class TestPlanned(object):
   _publish_attrs = ['test_plan']
   _fulltext_attrs = ['test_plan']
   _sanitize_html = ['test_plan']
+  _aliases = {"test_plan": "Test Plan"}

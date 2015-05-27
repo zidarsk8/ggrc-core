@@ -47,9 +47,8 @@ class SystemOrProcess(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'version',
       'network_zone',
   ]
-  _sanitize_html = [
-      'version',
-  ]
+  _sanitize_html = ['version']
+  _aliases = {"network_zone": "Network Zone"}
 
   @validates('network_zone')
   def validate_system_options(self, key, option):
@@ -81,6 +80,8 @@ class System(CustomAttributable, Documentable, Personable,
   }
   _table_plural = 'systems'
 
+  _aliases = {"url": "System URL"}
+
   @validates('is_biz_process')
   def validates_is_biz_process(self, key, value):
     return False
@@ -92,6 +93,8 @@ class Process(CustomAttributable, Documentable, Personable,
       'polymorphic_identity': True
   }
   _table_plural = 'processes'
+
+  _aliases = {"url": "Process URL"}
 
   @validates('is_biz_process')
   def validates_is_biz_process(self, key, value):

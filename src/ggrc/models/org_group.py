@@ -16,5 +16,6 @@ class OrgGroup(HasObjectState, CustomAttributable, Documentable,
                Personable, Relatable, Timeboxed,
                Ownable, BusinessObject, db.Model):
   __tablename__ = 'org_groups'
+  _aliases = {"url": "Org Group URL"}
 
 track_state_for_class(OrgGroup)

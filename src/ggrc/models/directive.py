@@ -35,13 +35,13 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'Control', backref='directive', order_by='Control.slug')
   audit_frequency = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(Directive.audit_frequency_id) == Option.id, '\
+      primaryjoin='and_(foreign(Directive.audit_frequency_id) == Option.id, '
                   'Option.role == "audit_frequency")',
       uselist=False,
   )
   audit_duration = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(Directive.audit_duration_id) == Option.id, '\
+      primaryjoin='and_(foreign(Directive.audit_duration_id) == Option.id, '
                   'Option.role == "audit_duration")',
       uselist=False,
   )
@@ -70,11 +70,13 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
 
   _include_links = []
 
+  _aliases = {'kind': "Kind/Type", }
+
   @validates('kind')
   def validate_kind(self, key, value):
     if not value:
       return None
-    if value not in self.valid_kinds:
+    if value not in self.VALID_KINDS:
       message = "Invalid value '{}' for attribute {}.{}.".format(
                 value, self.__class__.__name__, key)
       raise ValueError(message)
@@ -108,11 +110,15 @@ class Policy(CustomAttributable, Relatable, Documentable,
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
   }
+
   _table_plural = 'policies'
-  valid_kinds = (
+
+  VALID_KINDS = frozenset([
       "Company Policy", "Org Group Policy", "Data Asset Policy",
       "Product Policy", "Contract-Related Policy", "Company Controls Policy"
-  )
+  ])
+
+  _aliases = {"url": "Policy URL"}
 
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
@@ -124,8 +130,15 @@ class Regulation(CustomAttributable, Relatable, Documentable,
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
   }
+
   _table_plural = 'regulations'
-  valid_kinds = ("Regulation",)
+
+  VALID_KINDS = ("Regulation",)
+
+  _aliases = {
+      "url": "Regulation URL",
+      "kind": None,
+  }
 
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
@@ -137,8 +150,15 @@ class Standard(CustomAttributable, Relatable, Documentable,
   __mapper_args__ = {
       'polymorphic_identity': 'Standard'
   }
+
   _table_plural = 'standards'
-  valid_kinds = ("Standard",)
+
+  VALID_KINDS = ("Standard",)
+
+  _aliases = {
+      "url": "Standard URL",
+      "kind": None,
+  }
 
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
@@ -150,8 +170,15 @@ class Contract(CustomAttributable, Relatable, Documentable,
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'
   }
+
   _table_plural = 'contracts'
-  valid_kinds = ("Contract",)
+
+  VALID_KINDS = ("Contract",)
+
+  _aliases = {
+      "url": "Contract URL",
+      "kind": None,
+  }
 
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):

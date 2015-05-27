@@ -18,13 +18,8 @@ class Program(HasObjectState, CustomAttributable, Documentable,
               Ownable, BusinessObject, db.Model):
   __tablename__ = 'programs'
 
-  KINDS = [
-      'Directive',
-  ]
-
-  KINDS_HIDDEN = [
-      'Company Controls Policy',
-  ]
+  KINDS = ['Directive']
+  KINDS_HIDDEN = ['Company Controls Policy']
 
   private = db.Column(db.Boolean, default=False, nullable=False)
   kind = deferred(db.Column(db.String), 'Program')
@@ -37,8 +32,12 @@ class Program(HasObjectState, CustomAttributable, Documentable,
       'audits',
       'private',
   ]
-
   _include_links = []
+  _aliases = {
+    "url": "Program URL",
+    "kind": "Kind/Type",
+    "private": "Privacy",
+  }
 
   @classmethod
   def eager_query(cls):
