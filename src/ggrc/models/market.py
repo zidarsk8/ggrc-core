@@ -16,5 +16,6 @@ class Market(HasObjectState, CustomAttributable, Documentable, Personable,
              Relatable, Timeboxed, Ownable,
              BusinessObject, db.Model):
   __tablename__ = 'markets'
+  _aliases = {"url": "Market URL"}
 
 track_state_for_class(Market)

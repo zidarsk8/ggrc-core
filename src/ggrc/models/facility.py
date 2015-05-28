@@ -17,5 +17,6 @@ class Facility(HasObjectState,
                Relatable, Timeboxed, Ownable,
                BusinessObject, db.Model):
   __tablename__ = 'facilities'
+  _aliases = {"url": "Facility URL"}
 
 track_state_for_class(Facility)

@@ -21,6 +21,7 @@ dashboard-js-files:
   - bootstrap/modal-form.js
   - zeroclipboard/ZeroClipboard.min.js
   - stickyfill.js
+  - mousetrap.min.js
   - can.jquery.js
   - can.construct.super.js
   - can.map.validations.js

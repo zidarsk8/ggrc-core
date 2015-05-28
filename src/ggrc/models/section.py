@@ -6,17 +6,17 @@
 from sqlalchemy.orm import validates
 
 from ggrc import db
-from .associationproxy import association_proxy
-from .exceptions import ValidationError
-from .mixins import (
+from ggrc.models.exceptions import ValidationError
+from ggrc.models.mixins import (
     deferred, Hierarchical, Noted, Described, Hyperlinked, WithContact,
     Titled, Slugged, CustomAttributable, Stateful, Timeboxed
 )
-from .object_document import Documentable
-from .object_owner import Ownable
-from .object_person import Personable
-from .relationship import Relatable
-from .track_object_state import HasObjectState, track_state_for_class
+from ggrc.models.object_document import Documentable
+from ggrc.models.object_owner import Ownable
+from ggrc.models.object_person import Personable
+from ggrc.models.relationship import Relatable
+from ggrc.models.track_object_state import track_state_for_class
+from ggrc.models.track_object_state import HasObjectState
 
 
 class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
@@ -53,11 +53,9 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
       'na',
       'notes',
   ]
-  _sanitize_html = [
-      'notes',
-  ]
-
+  _sanitize_html = ['notes']
   _include_links = []
+  _aliases = {"directive_id": "Policy / Regulation / Standard"}
 
   @validates('type')
   def validates_type(self, key, value):
@@ -87,6 +85,10 @@ class Section(CustomAttributable, Documentable, Personable,
       'polymorphic_identity': 'Section'
   }
   _table_plural = 'sections'
+  _aliases = {
+      "url": "Section URL",
+      "description": "Text of Section",
+  }
 
   @validates('directive_id')
   def validates_directive_id(self, key, value):
@@ -107,3 +109,7 @@ class Clause(CustomAttributable, Documentable, Personable, Ownable,
       'polymorphic_identity': 'Clause'
   }
   _table_plural = 'clauses'
+  _aliases = {
+      "url": "Clause URL",
+      "directive_id": None,
+  }
