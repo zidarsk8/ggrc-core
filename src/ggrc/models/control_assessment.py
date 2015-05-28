@@ -64,11 +64,11 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
     return value if value in self.VALID_CONCLUSIONS else ""
 
   @validates("operationally")
-  def validate_opperationally(self, value):
+  def validate_opperationally(self, key, value):
     return self.validate_conclusion(value)
 
   @validates("design")
-  def validate_design(self, value):
+  def validate_design(self, key, value):
     return self.validate_conclusion(value)
 
   @classmethod
