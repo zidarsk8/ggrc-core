@@ -114,13 +114,13 @@ $(document).ready(function() {
       },
       ".report-title-trigger click": function(el) {
         var $title_change = this.element.find('.report-title-change'),
-            $parent = this.element.find("h2");
+            $parent = this.element.find("h2.title");
 
         $parent.fadeOut(500);
         $title_change.delay(500).fadeIn(500);
       },
       ".title-change click": function(el) {
-        var $title = this.element.find("h2"),
+        var $title = this.element.find("h2.title"),
             $parent = this.element.find(".report-title-change");
 
         $parent.fadeOut(500);

@@ -1332,11 +1332,17 @@
   .left-content {
     float: left;
     padding: 15px 20px 10px;
+    &.no-padd {
+      padding: 0;
+    }
   }
 }
 .save-template {
   float: right;
   padding: 10px 20px;
+  &.no-padd {
+    padding: 0;
+  }
   label {
     display: inline-block;
     &.disabled {
@@ -1362,9 +1368,19 @@ ul.attr-list {
   @include clearfix();
   margin-top: 20px;
   margin-bottom: 10px;
+  .attribute-wrap & {
+    margin: 0;
+  }
   li {
     float: left;
     width: 33.3333%;
+    .attribute-wrap & {
+      width: auto;
+      margin-left: 15px;
+      &:first-child {
+        margin-left: 0;
+      }
+    }
     input {
       margin-top: -3px;
     }
@@ -1734,6 +1750,9 @@ ul.attr-list {
 .report-title-change {
   display: none;
   height: 30px;
+  input {
+    margin-bottom: 0;
+  }
 }
 
 .report-title-trigger {
@@ -1748,4 +1767,10 @@ ul.attr-list {
   i {
     margin-top: 4px;
   }
+}
+
+.export-note {
+  float: left;
+  font-weight: bold;
+  margin: 4px 10px 0 0;
 }
