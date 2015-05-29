@@ -375,8 +375,9 @@ can.Model.Cacheable("CMS.Models.Request", {
   },
   before_save: function(notifier) {
     var that = this,
-        obj = this.audit_object_object ? this.audit_object_object.reify() : this.audit_object_object,
+        obj = this.audit_object_object ? this.audit_object_object.reify() : this.control_assessment,
         matching_objs;
+
     if(that.audit_object
        && (!that.audit_object_object
            || that.audit_object.reify().auditable.id === that.audit_object_object.id
@@ -390,7 +391,7 @@ can.Model.Cacheable("CMS.Models.Request", {
       notifier.queue(
         new CMS.Models.AuditObject({
           audit: this.audit,
-          auditable: this.audit_object_object,
+          auditable: obj,
           context: this.audit.reify().context
         }).save().then(function(ao) {
           that.attr("audit_object", ao.stub());
