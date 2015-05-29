@@ -88,7 +88,11 @@ $(document).ready(function() {
             new_rules++;
           }
         });
-        newRule.push({label: "Relevant to:", new_rule: true});
+        if (newRule.length >= 1) {
+          newRule.push({filterPrefix: true, label: "Relevant to:", new_rule: true});
+        } else {
+          newRule.push({filterPrefix: false, label: "Relevant to:", new_rule: true});
+        }
       },
       "#addRelevantFilterRule click": function(el, ev) {
         var relevantGroup = this.scope.relevantFilter,

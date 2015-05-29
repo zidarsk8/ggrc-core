@@ -193,7 +193,15 @@
                             <button type="submit" class="remove_filter">
                               <i class="grcicon-deleted"></i>
                             </button>
-                            <label><strong>{{label}}</strong></label>
+                            <label>
+                              {{#filterPrefix}}
+                                <select class="input-mini">
+                                  <option>AND</option>
+                                  <option>OR</option>
+                                </select>
+                              {{/filterPrefix}}
+                              <strong>{{label}}</strong>
+                            </label>
                             <select class="input-small relevant-set-choose">
                               <option value="Program" label="Program">Program</option>
                               <option value="Regulation">Regulation</option>
