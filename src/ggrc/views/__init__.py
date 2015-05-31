@@ -406,6 +406,20 @@ def import_export():
   """
   return render_template("/mockups/import-export/index.html")
 
+@app.route("/mockups/export/")
+@login_required
+def export_redesign():
+  """Export prototype
+  """
+  return render_template("/mockups/import-export/export.html")
+
+@app.route("/mockups/reporting/export.html")
+@login_required
+def reporting_export():
+  """Reporting export mockup
+  """
+  return render_template("mockups/reporting/export.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():

@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
   can.Component.extend({
-    tag: "reporting",
+    tag: "reporting-export",
     scope: {
       report_gen: false,
       //attr_selected: false,
@@ -10,7 +10,7 @@ $(document).ready(function() {
         {title: "Overdue tasks"},
       ],
       reportTitle: [
-        {title: "New Report"},
+        {title: "ISO 27001 Controls"},
       ],
       table_title: [
         {tbl_title_1: "Program Title", tbl_title_2: "Program Owner", tbl_title_3: "Control Title", tbl_title_4: "Control Owner", tbl_title_5: "Control Contact", tbl_title_6: "Control URL", tbl_title_7: "Control Code", tbl_title_8: "Control State", tbl_title_9: "System Title", tbl_title_10: "System Owner", tbl_title_11: "System Contact", tbl_title_12: "System URL", tbl_title_13: "System Code", tbl_title_14: "System Effective date", tbl_title_15: "System Stop date", tbl_title_16: "System State"}
@@ -88,11 +88,7 @@ $(document).ready(function() {
             new_rules++;
           }
         });
-        if (newRule.length >= 1) {
-          newRule.push({filterPrefix: true, label: "Relevant to:", new_rule: true});
-        } else {
-          newRule.push({filterPrefix: false, label: "Relevant to:", new_rule: true});
-        }
+        newRule.push({label: "Relevant to:", new_rule: true});
       },
       "#addRelevantFilterRule click": function(el, ev) {
         var relevantGroup = this.scope.relevantFilter,
@@ -118,13 +114,13 @@ $(document).ready(function() {
       },
       ".report-title-trigger click": function(el) {
         var $title_change = this.element.find('.report-title-change'),
-            $parent = this.element.find("h2");
+            $parent = this.element.find("h2.title");
 
         $parent.fadeOut(500);
         $title_change.delay(500).fadeIn(500);
       },
       ".title-change click": function(el) {
-        var $title = this.element.find("h2"),
+        var $title = this.element.find("h2.title"),
             $parent = this.element.find(".report-title-change");
 
         $parent.fadeOut(500);
@@ -133,5 +129,5 @@ $(document).ready(function() {
     }
   });
 
-  $(".reporting-import").html(can.view("/static/mockups/mustache/reporting.mustache",{}));
+  $(".reporting-export").html(can.view("/static/mockups/mustache/reporting-export.mustache",{}));
 });
