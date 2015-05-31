@@ -463,7 +463,7 @@
         "related_objects": [
           "Program", "Regulation", "Contract", "Policy", "Standard",
           "Objective", "Control", "Section", "Clause", "DataAsset", "Facility", "Market",
-          "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue"
+          "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue", "ControlAssessment"
         ],
         "authorizations": "UserRole"
       },
@@ -561,6 +561,7 @@
       extended_related_systems_via_search: TypeFilter("related_objects_via_search", "System"),
       extended_related_audits_via_search: TypeFilter("related_objects_via_search", "Audit"),
       extended_related_issues_via_search: TypeFilter("related_objects_via_search", "Issue"),
+      extended_related_control_assessment_via_search: TypeFilter("related_objects_via_search", "ControlAssessment"),
       audit_requests: Search(function (binding) {
         return CMS.Models.Request.findAll({
           'assignee_id': binding.instance.id

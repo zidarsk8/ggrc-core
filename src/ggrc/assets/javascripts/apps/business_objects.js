@@ -908,6 +908,9 @@ $(function() {
             },
             Document: {
               mapping: "extended_related_documents_via_search"
+            },
+            ControlAssessment: {
+              mapping: "extended_related_control_assessment_via_search"
             }
           }
         });
