@@ -3,18 +3,57 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+from nose.plugins.skip import SkipTest
+
+from ggrc.utils import merge_dicts
+from ggrc.utils import merge_dict
+from ggrc.utils import get_mapping_rules
 from tests.ggrc import TestCase
 
-from ggrc.utils import merge_dict, merge_dicts
 
+class TestUtilsDictFunctions(TestCase):
 
-class TestOneTimeWorkflowNotification(TestCase):
+  def test_mapping_rules(self):
+    """ Test that all mappings go both ways """
+    mappings = get_mapping_rules()
+    verificationErrors = []
+    self.maxDiff = None
 
-  def setUp(self):
-    pass
+    # Special cases in mappings as defined in utils.py:
+    audit_mappings = ["Control", "DataAsset", "Facility", "Market", "OrgGroup",
+                      "Process", "Product", "Program", "Project", "System",
+                      "Vendor"]
+    section_mappings = ["Policy", "Regulation", "Standard"]
 
-  def tearDown(self):
-    pass
+    for object_name, object_mappings in mappings.items():
+      for mapping in object_mappings:
+        try:
+          if mapping == "Request":
+            self.assertNotIn(mapping, mappings)
+          elif mapping == "Audit" and object_name in audit_mappings:
+            self.assertNotIn(
+                object_name, mappings[mapping],
+                "{} found in {} mappings".format(object_name, mapping)
+            )
+          elif mapping == "Section" and object_name in section_mappings:
+            self.assertNotIn(
+                object_name, mappings[mapping],
+                "{} found in {} mappings".format(object_name, mapping)
+            )
+          else:
+            self.assertIn(
+                mapping, mappings,
+                "- {} is not in the mappings dict".format(mapping)
+            )
+            self.assertIn(
+                object_name, mappings[mapping],
+                "{} not found in {} mappings".format(object_name, mapping)
+            )
+        except AssertionError as e:
+          verificationErrors.append(str(e))
+
+    verificationErrors.sort()
+    self.assertEqual(verificationErrors, [])
 
   def test_merge_dict(self):
     dict1 = {
@@ -103,11 +142,11 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "2": {
                     "custom_message": "",
                     "cycle_title": "monthly",
-                    "cycle_url": "http://localhost:8080/workflows/2#current_widget/cycle/2",
+                    "cycle_url": "http://a.com",
                     "manually": False,
                     "my_tasks": {
                         "2": {
-                            "cycle_task_url": "http://localhost:8080/workflows/2#current_widget/cycle/2/cycle_task_group/2//cycle_task_group_object_task/2",
+                            "cycle_task_url": "http://a.com",
                             "end_date": "05/18/2015",
                             "fuzzy_due_in": "in 5 days",
                             "object_title": "",
@@ -139,7 +178,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "2": {
                     "custom_message": "",
                     "cycle_title": "monthly",
-                    "cycle_url": "http://localhost:8080/workflows/2#current_widget/cycle/2",
+                    "cycle_url": "http://a.com",
                     "manually": False,
                     "workflow_owners": {
                         "1": {
@@ -164,7 +203,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "2": {
                     "custom_message": "",
                     "cycle_title": "monthly",
-                    "cycle_url": "http://localhost:8080/workflows/2#current_widget/cycle/2",
+                    "cycle_url": "http://a.com",
                     "manually": False,
                     "workflow_owners": {
                         "1": {
@@ -189,12 +228,12 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "1": {
                     "custom_message": "",
                     "cycle_title": "onetime",
-                    "cycle_url": "http://localhost:8080/workflows/1#current_widget/cycle/1",
+                    "cycle_url": "http://a.com",
                     "manually": True,
                     "my_task_groups": {
                         "1": {
                             "1": {
-                                "cycle_task_url": "http://localhost:8080/workflows/1#current_widget/cycle/1/cycle_task_group/1//cycle_task_group_object_task/1",
+                                "cycle_task_url": "http://a.com",
                                 "end_date": "05/29/2015",
                                 "fuzzy_due_in": "in 16 days",
                                 "object_title": "",
@@ -204,7 +243,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                     },
                     "my_tasks": {
                         "1": {
-                            "cycle_task_url": "http://localhost:8080/workflows/1#current_widget/cycle/1/cycle_task_group/1//cycle_task_group_object_task/1",
+                            "cycle_task_url": "http://a.com",
                             "end_date": "05/29/2015",
                             "fuzzy_due_in": "in 16 days",
                             "object_title": "",
@@ -220,7 +259,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                     },
                     "workflow_tasks": {
                         "1": {
-                            "cycle_task_url": "http://localhost:8080/workflows/1#current_widget/cycle/1/cycle_task_group/1//cycle_task_group_object_task/1",
+                            "cycle_task_url": "http://a.com",
                             "end_date": "05/29/2015",
                             "fuzzy_due_in": "in 16 days",
                             "object_title": "",
@@ -231,12 +270,12 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "2": {
                     "custom_message": "",
                     "cycle_title": "monthly",
-                    "cycle_url": "http://localhost:8080/workflows/2#current_widget/cycle/2",
+                    "cycle_url": "http://a.com",
                     "manually": False,
                     "my_task_groups": {
                         "2": {
                             "2": {
-                                "cycle_task_url": "http://localhost:8080/workflows/2#current_widget/cycle/2/cycle_task_group/2//cycle_task_group_object_task/2",
+                                "cycle_task_url": "http://a.com",
                                 "end_date": "05/18/2015",
                                 "fuzzy_due_in": "in 5 days",
                                 "object_title": "",
@@ -253,7 +292,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                     },
                     "workflow_tasks": {
                         "2": {
-                            "cycle_task_url": "http://localhost:8080/workflows/2#current_widget/cycle/2/cycle_task_group/2//cycle_task_group_object_task/2",
+                            "cycle_task_url": "http://a.com",
                             "end_date": "05/18/2015",
                             "fuzzy_due_in": "in 5 days",
                             "object_title": "",
@@ -285,7 +324,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                     "my_task_groups": {
                         "2": {
                             "3": {
-                                "cycle_task_url": "http://localhost:8080/workflows/2#current_widget/cycle/2/cycle_task_group/2//cycle_task_group_object_task/3",
+                                "cycle_task_url": "http://a.com",
                                 "end_date": "05/18/2015",
                                 "fuzzy_due_in": "in 5 days",
                                 "object_title": "",
@@ -295,7 +334,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                     },
                     "workflow_tasks": {
                         "3": {
-                            "cycle_task_url": "http://localhost:8080/workflows/2#current_widget/cycle/2/cycle_task_group/2//cycle_task_group_object_task/3",
+                            "cycle_task_url": "http://a.com",
                             "end_date": "05/18/2015",
                             "fuzzy_due_in": "in 5 days",
                             "object_title": "",
@@ -317,5 +356,5 @@ class TestOneTimeWorkflowNotification(TestCase):
 
     merged_data = merge_dict(aggregate_data, user_data)
 
-
-    self.assertNotIn("3", merged_data["all@emails.me"]["cycle_started"]["2"]["my_tasks"])
+    self.assertNotIn(
+        "3", merged_data["all@emails.me"]["cycle_started"]["2"]["my_tasks"])
