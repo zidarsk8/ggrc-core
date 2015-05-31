@@ -3,18 +3,17 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+from copy import deepcopy
 from datetime import date
-# from babel.dates import format_timedelta
-
 from sqlalchemy import and_
+from urlparse import urljoin
 
+from ggrc import db
+from ggrc.utils import merge_dicts, get_url_root
+from ggrc_basic_permissions.models import Role, UserRole
 from ggrc_workflows.models import (
     Workflow, Cycle, CycleTaskGroupObjectTask, TaskGroupTask
 )
-from ggrc_basic_permissions.models import Role, UserRole
-from ggrc import db
-from ggrc.utils import merge_dicts, get_url_root
-from copy import deepcopy
 
 
 """
@@ -384,18 +383,6 @@ def get_workflow_owners_dict(context_id):
           for user_role in owners}
 
 
-def get_cycle_task_url(cycle_task):
-  return ("{base}workflows/{workflow_id}#current_widget/cycle/{cycle_id}"
-          "/cycle_task_group/{cycle_task_group_id}/"
-          "/cycle_task_group_object_task/{cycle_task_id}").format(
-      base=get_url_root(),
-      workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
-      cycle_id=cycle_task.cycle_task_group.cycle.id,
-      cycle_task_group_id=cycle_task.cycle_task_group.id,
-      cycle_task_id=cycle_task.id,
-  )
-
-
 def get_cycle_task_dict(cycle_task):
 
   object_title = ""
@@ -426,15 +413,6 @@ def get_person_dict(person):
   return {"email": "", "name": "", "id": -1}
 
 
-def get_cycle_url(cycle):
-  return "{base}workflows/{workflow_id}#current_widget/cycle/{cycle_id}"\
-      .format(
-          base=get_url_root(),
-          workflow_id=cycle.workflow.id,
-          cycle_id=cycle.id,
-      )
-
-
 def get_cycle_dict(cycle, manual=False):
   workflow_owners = get_workflow_owners_dict(cycle.context_id)
   return {
@@ -447,7 +425,25 @@ def get_cycle_dict(cycle, manual=False):
 
 
 def get_workflow_url(workflow):
-  return "{base}workflows/{workflow_id}#current_widget".format(
-      base=get_url_root(),
-      workflow_id=workflow.id,
+  url = "workflows/{}#current_widget".format(workflow.id)
+  return urljoin(get_url_root(), url)
+
+
+def get_cycle_task_url(cycle_task):
+  url = ("/workflows/{workflow_id}#current_widget/cycle/{cycle_id}"
+         "/cycle_task_group/{cycle_task_group_id}"
+         "/cycle_task_group_object_task/{cycle_task_id}").format(
+      workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
+      cycle_id=cycle_task.cycle_task_group.cycle.id,
+      cycle_task_group_id=cycle_task.cycle_task_group.id,
+      cycle_task_id=cycle_task.id,
   )
+  return urljoin(get_url_root(), url)
+
+
+def get_cycle_url(cycle):
+  url = "workflows/{workflow_id}#current_widget/cycle/{cycle_id}".format(
+      workflow_id=cycle.workflow.id,
+      cycle_id=cycle.id,
+  )
+  return urljoin(get_url_root(), url)

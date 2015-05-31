@@ -3075,8 +3075,13 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
     audit: {title: audit.title, id: audit.id, type: audit.type},
     program: {title: program.title, id: program.id, type: program.type},
     control: {title: control.title, id: control.id, type: control.type},
-    control_assessment: {title: instance.title, id: instance.id, type: instance.type},
-    audit_object: {title: instance.title, id: instance.id, type: instance.type},
+    control_assessment: {
+      title: instance.title,
+      id: instance.id,
+      type: instance.type,
+      title_singular: instance.class.title_singular,
+      table_singular: instance.class.table_singular
+    }
   };
 
   return options.fn(options.contexts.add({'create_issue_json': JSON.stringify(json)}));

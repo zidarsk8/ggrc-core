@@ -384,33 +384,36 @@ can.Model.Cacheable("CMS.Models.Request", {
       this.assignee
     ).then(update_program_authorizations);
     GGRC.delay_leaving_page_until(dfd);
-  },
-  before_save: function(notifier) {
-    var that = this,
-        obj = this.audit_object_object ? this.audit_object_object.reify() : this.audit_object_object,
-        matching_objs;
-    if(that.audit_object
-       && (!that.audit_object_object
-           || that.audit_object.reify().auditable.id === that.audit_object_object.id
-    )) {
-      return;
-    }
-    if(obj && (matching_objs = can.map(this.get_mapping("audit_objects_via_audit"), function(mapping) {
-      if(mapping.instance === obj)
-        return mapping;
-    })).length < 1) {
-      notifier.queue(
-        new CMS.Models.AuditObject({
+  }
+  , before_save: function(notifier) {
+    // this.control_assessment is the control assessment passed in by clicking
+    // "Open Request" on the control assessment page
+    var obj = this.audit_object_object || this.control_assessment,
+        audit = this.audit.reify(),
+        audit_object;
+
+    // We fetch all audit_objets, because we need to check if this audit_object
+    // is already mapped to a request
+    notifier.queue(audit.refresh_all("audit_objects").then(function(objects) {
+      audit_object = _.reduce(objects, function(previous, audit_object) {
+        var auditable = audit_object.auditable || {};
+        if (obj && auditable.id === obj.id && auditable.type === obj.type) {
+          return audit_object;
+        }
+        return previous;
+      }, null);
+
+      if (obj && !audit_object) {
+        return new CMS.Models.AuditObject({
           audit: this.audit,
-          auditable: this.audit_object_object,
+          auditable: obj,
           context: this.audit.reify().context
-        }).save().then(function(ao) {
-          that.attr("audit_object", ao.stub());
-        })
-      );
-    } else {
-      that.attr("audit_object", matching_objs && matching_objs.length && matching_objs[0].mappings[0].instance.stub() || null);
-    }
+        }).save();
+      }
+      return $.when(audit_object);
+    }.bind(this)).then(function(audit_object) {
+      this.attr("audit_object", audit_object);
+    }.bind(this)));
   }
   , form_preload : function(new_object_form) {
     var audit, that = this;
