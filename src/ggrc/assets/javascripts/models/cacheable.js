@@ -125,13 +125,13 @@ can.Model("can.Model.Cacheable", {
     "state": "status"
   }
   , attr_list : [
-    {attr_title: 'Title', attr_name: 'title', attr_sort_field: 'title'},
+    {attr_title: 'Title', attr_name: 'title'},
     {attr_title: 'Owner', attr_name: 'owner', attr_sort_field: 'contact.name|email'},
-    {attr_title: 'Code', attr_name: 'slug', attr_sort_field: 'slug'},
-    {attr_title: 'State', attr_name: 'status', attr_sort_field: 'status'},
+    {attr_title: 'Code', attr_name: 'slug'},
+    {attr_title: 'State', attr_name: 'status'},
     {attr_title: 'Primary Contact', attr_name: 'contact', attr_sort_field: 'contact.name|email'},
     {attr_title: 'Secondary Contact', attr_name: 'secondary_contact', attr_sort_field: 'secondary_contact.name|email'},
-    {attr_title: 'Last Updated', attr_name: 'updated_at', attr_sort_field: 'updated_at'}
+    {attr_title: 'Last Updated', attr_name: 'updated_at'}
   ]
   , root_collection : ""
   , model_singular : ""

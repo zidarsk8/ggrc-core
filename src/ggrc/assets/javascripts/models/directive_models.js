@@ -91,10 +91,10 @@ CMS.Models.Directive("CMS.Models.Standard", {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_sort_field: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_sort_field: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
@@ -129,10 +129,10 @@ CMS.Models.Directive("CMS.Models.Regulation", {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_sort_field: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_sort_field: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
@@ -168,8 +168,8 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'Type', attr_name: 'kind', attr_sort_field: 'kind.title'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
@@ -204,10 +204,10 @@ CMS.Models.Directive("CMS.Models.Contract", {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_sort_field: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_sort_field: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }

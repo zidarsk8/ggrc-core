@@ -38,10 +38,10 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_sort_field: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_sort_field: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
     , child_options : [{
       model : null
@@ -124,10 +124,10 @@ can.Model.Cacheable("CMS.Models.Project", {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_sort_field: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_sort_field: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
     , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     , child_options : [{
@@ -196,10 +196,10 @@ can.Model.Cacheable("CMS.Models.Facility", {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_sort_field: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_sort_field: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
     , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     , child_options : [{
@@ -287,7 +287,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'Type', attr_name: 'type', attr_sort_field: 'type'}
+      {attr_title: 'Type', attr_name: 'type'}
     ])
     , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     , child_options : [{
@@ -373,10 +373,10 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_sort_field: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_sort_field: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
     , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     , child_options : [{
@@ -460,10 +460,10 @@ can.Model.Cacheable("CMS.Models.Market", {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_sort_field: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_sort_field: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
     , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     , child_options : [{
@@ -532,10 +532,10 @@ can.Model.Cacheable("CMS.Models.Vendor", {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url', attr_sort_field: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url', attr_sort_field: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date', attr_sort_field: 'end_date'}
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
     , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     , child_options : [{

@@ -313,14 +313,14 @@
       sort_property: 'sort_index',
       show_view: _mustache_path + "/tree.mustache",
       attr_list : [
-        {attr_title: 'Title', attr_name: 'title', attr_sort_field: 'title'},
+        {attr_title: 'Title', attr_name: 'title'},
         {attr_title: 'Mapped Object', attr_name: 'mapped_object', attr_sort_field: 'mapped_object.title'},
         {attr_title: 'Workflow', attr_name: 'workflow', attr_sort_field: 'workflow.title'},
-        {attr_title: 'State', attr_name: 'status', attr_sort_field: 'status'},
+        {attr_title: 'State', attr_name: 'status'},
         {attr_title: 'Assignee', attr_name: 'assignee', attr_sort_field: 'contact.name|email'},
-        {attr_title: 'Start Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-        {attr_title: 'End Date', attr_name: 'end_date', attr_sort_field: 'end_date'},
-        {attr_title: 'Last Updated', attr_name: 'updated_at', attr_sort_field: 'updated_at'}
+        {attr_title: 'Start Date', attr_name: 'start_date'},
+        {attr_title: 'End Date', attr_name: 'end_date'},
+        {attr_title: 'Last Updated', attr_name: 'updated_at'}
       ],
       display_attr_names : ['title', 'mapped_object', 'workflow'],
       mandatory_attr_name : ['title'],

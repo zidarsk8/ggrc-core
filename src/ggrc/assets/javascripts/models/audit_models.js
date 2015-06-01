@@ -87,15 +87,15 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , tree_view_options : {
     header_view : GGRC.mustache_path + "/audits/tree_header.mustache"
     , attr_list : [
-      {attr_title: 'Title', attr_name: 'title', attr_sort_field: 'title'},
+      {attr_title: 'Title', attr_name: 'title'},
       {attr_title: 'Audit Lead', attr_name: 'audit_lead', attr_sort_field: 'contact.name|email'},
-      {attr_title: 'Code', attr_name: 'slug', attr_sort_field: 'slug'},
-      {attr_title: 'Status', attr_name: 'status', attr_sort_field: 'status'},
-      {attr_title: 'Last Updated', attr_name: 'updated_at', attr_sort_field: 'updated_at'},
-      {attr_title: 'Start Date', attr_name: 'start_date', attr_sort_field: 'start_date'},
-      {attr_title: 'End Date', attr_name: 'end_date', attr_sort_field: 'end_date'},
+      {attr_title: 'Code', attr_name: 'slug'},
+      {attr_title: 'Status', attr_name: 'status'},
+      {attr_title: 'Last Updated', attr_name: 'updated_at'},
+      {attr_title: 'Start Date', attr_name: 'start_date'},
+      {attr_title: 'End Date', attr_name: 'end_date'},
       {attr_title: 'Report Period', attr_name: 'report_period', attr_sort_field: 'report_end_date'},
-      {attr_title: 'Audit Firm', attr_name: 'audit_firm', attr_sort_field: 'audit_firm'}
+      {attr_title: 'Audit Firm', attr_name: 'audit_firm'}
     ]
     , draw_children : true
     , child_options : [{

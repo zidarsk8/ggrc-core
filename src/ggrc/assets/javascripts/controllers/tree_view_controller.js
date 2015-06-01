@@ -428,6 +428,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     //get standard attrs for each model
     can.each(model.tree_view_options.attr_list || can.Model.Cacheable.attr_list, function (item) {
+        if (!item.attr_sort_field) {
+          item.attr_sort_field = item.attr_name;
+        }
         select_attr_list.push(item);
     });
     //Get mandatory_attr_names
