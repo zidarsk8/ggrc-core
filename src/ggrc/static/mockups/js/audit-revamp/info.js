@@ -298,6 +298,20 @@ $(document).ready(function() {
     $(".object-wrap-issues").show();
   }
 
+  function sortableHeader() {
+    var $this = $(this),
+        $all = $this.closest(".tree-header").find(".widget-col-title");
+
+    if($this.hasClass("asc")) {
+      $this.removeClass("asc");
+      $this.addClass("desc");
+    } else {
+      $all.removeClass("asc desc");
+      $this.addClass("asc");
+      $this.removeClass("desc");
+    }
+  }
+
   $(".top-inner-nav a").on("click", innerNavTrigger);
 
   $("#autoGenerateCA").on("click", generateCA);
@@ -317,5 +331,7 @@ $(document).ready(function() {
   $("#CASave").on("click", AddCA);
 
   $("#issueSave").on("click", newIssue);
+
+  $(".widget-col-title").on("click", sortableHeader);
 
 });

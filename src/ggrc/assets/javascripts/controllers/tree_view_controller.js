@@ -331,6 +331,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , single_object : false
     , find_params : {}
     , sort_property : null
+    , sort_direction: null
+    , sort_by: null
     , sort_function : null
     , sortable : true
     , filter : null
@@ -426,6 +428,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     //get standard attrs for each model
     can.each(model.tree_view_options.attr_list || can.Model.Cacheable.attr_list, function (item) {
+        if (!item.attr_sort_field) {
+          item.attr_sort_field = item.attr_name;
+        }
         select_attr_list.push(item);
     });
     //Get mandatory_attr_names
@@ -434,12 +439,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         can.Model.Cacheable.tree_view_options.mandatory_attr_names;
 
     //get custom attrs
-    can.each(GGRC.custom_attr_defs, function (def) {
+    can.each(GGRC.custom_attr_defs, function (def, i) {
       if (def.definition_type === model_definition && def.attribute_type !== 'Rich Text') {
         var obj = {};
         obj.attr_title = obj.attr_name = def.title;
         obj.display_status = false;
         obj.attr_type = 'custom';
+        obj.attr_sort_field = 'custom:'+obj.attr_name;
         select_attr_list.push(obj);
       }
     });
@@ -535,47 +541,55 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this._attached_deferred.resolve();
     }
   , init_view : function() {
-      var that = this
-        , dfds = []
-        ;
+      var dfds = [];
 
       if(this.options.header_view && this.options.show_header) {
         dfds.push(
           can.view(this.options.header_view, $.when(this.options)).then(
             this._ifNotRemoved(function(frag) {
-              that.element.before(frag);
+              this.element.before(frag);
               // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
-              can.bind.call(that.element.parent().find('.filter-trigger > a'), 'click', function (evnt) {
-                if (that.display_prefs.getFilterHidden()) {
-                  that.show_filter();
-                } else {
-                  that.hide_filter();
-                }
-              });
-              can.bind.call(that.element.parent().find('.set-tree-attrs'), 'click', function (evnt) {
-                that.set_tree_attrs();
-              });
-        })));
+              can.bind.call(
+                  this.element.parent().find('.filter-trigger > a'), 
+                  'click', 
+                  function () {
+                    if (this.display_prefs.getFilterHidden()) {
+                      this.show_filter();
+                    } else {
+                      this.hide_filter();
+                    }
+                  }.bind(this)
+              );
+
+              can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
+                            'click',
+                            this.sort.bind(this)
+                           );
+              can.bind.call(this.element.parent().find('.set-tree-attrs'), 
+                            'click',
+                            this.set_tree_attrs.bind(this)
+                           );
+            }.bind(this))));
       }
 
       // Init the spinner if items need to be loaded:
       dfds.push(this.init_count().then(function(count) {
-        if (!that.element) {
+        if (!this.element) {
           return;
         }
         if (count()) {
-          that._loading_started();
+          this._loading_started();
         } else {
-          that.element.trigger("loaded");
+          this.element.trigger("loaded");
         }
-      }));
+      }.bind(this)));
 
       if (this.options.footer_view) {
         dfds.push(
           can.view(this.options.footer_view, this.options,
             this._ifNotRemoved(function(frag) {
-              that.element.append(frag);
-            })
+              this.element.append(frag);
+            }.bind(this))
           ));
       }
       return $.when.apply($.when, dfds);
@@ -824,8 +838,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               }
               else {
                 compare = GGRC.Math.string_less_than(
-                  old_item[sort_prop],
-                  new_item[sort_prop]
+                    old_item[sort_prop],
+                    new_item[sort_prop]
                 );
               }
               if (compare) {
@@ -1029,7 +1043,46 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.display_prefs.setTreeViewHeaders(this.options.model.model_singular, attr_to_save);
     this.display_prefs.save();
 
+    can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
+                  'click',
+                  this.sort.bind(this)
+                 );
+
   }
+  , sort: function (event) {
+      var $el = $(event.currentTarget),
+          key = $el.data("field");
+
+      if (key !== this.options.sort_by) {
+          this.options.sort_direction = null;
+      }
+
+      var order = this.options.sort_direction === "asc"
+              ? "desc"
+              : "asc";
+
+      this.options.sort_function = function (val1, val2) {
+        var a = val1.get_deep_property(key),
+            b = val2.get_deep_property(key);
+
+        if (a !== b){
+          return (a < b) ^ (order !== 'asc');
+        }
+        return false;
+      };
+
+      this.options.sort_direction = order;
+      this.options.sort_by = key;
+
+      $el.closest(".tree-header")
+          .find(".widget-col-title")
+          .removeClass("asc")
+          .removeClass("desc");
+
+      $el.addClass(order);
+
+      this.reload_list();
+    }
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
