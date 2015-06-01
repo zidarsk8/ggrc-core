@@ -839,6 +839,31 @@ can.Model("can.Model.Cacheable", {
         return "_" + mapper + "_binding";
     }
 
+  // checks if binding exists without throwing debug statements
+  // modeled after what get_binding is doing
+  , has_binding: function (mapper) {
+    var binding,
+        mapping,
+        binding_attr = this._get_binding_attr(mapper);
+
+    if (binding_attr) {
+      binding = this[binding_attr];
+    }
+
+    if (!binding) {
+      if (typeof(mapper) === "string") {
+        mapping = this.constructor.get_mapper(mapper);
+        if (!mapping) {
+          return false;
+        }
+      }else if (!(mapper instanceof GGRC.ListLoaders.BaseListLoader)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   , get_binding: function(mapper) {
       var mappings
         , mapping
@@ -1135,7 +1160,7 @@ can.Model("can.Model.Cacheable", {
       return _.reduce(keys, function (res, key) {
         if (res && res.length) return res;
 
-        var binding = val.get_binding 
+        var binding = val.get_binding && val.has_binding(key)
                 ? val.get_binding(key)
                 : null;
 
