@@ -10,6 +10,7 @@ from ggrc.models import (
     OrgGroup, Vendor, Person, Product, Program, Project, Request, Response,
     Section, Clause, System, Process, Issue,
 )
+from ggrc.utils import get_mapping_rules
 
 
 all_converters = [('sections', SectionsConverter)]
@@ -59,3 +60,6 @@ IMPORTABLE = {
     "process": Process,
     "issue": Issue,
 }
+
+
+ALLOWED_MAPPINGS = get_mapping_rules()
