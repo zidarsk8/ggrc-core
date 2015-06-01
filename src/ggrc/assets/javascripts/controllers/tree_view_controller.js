@@ -274,32 +274,27 @@ can.Control("CMS.Controllers.TreeLoader", {
         if (!that._pending_items) {
           return;
         }
-        var chunk = that._pending_items.splice(0, 5),
-            to_refresh = can.map(chunk, function(item) {
-              item = item.instance || item;
-              return item.selfLink ? undefined : item;
-            })
-            ;
+        var chunk = that._pending_items.splice(0, 5);
 
-        new RefreshQueue().enqueue(to_refresh).trigger().then(function() {
-
-          that.insert_items(chunk);
-          if (that._pending_items && that._pending_items.length > 0) {
-            setTimeout(that._ifNotRemoved(processChunk), 100);
-          }
-          else {
-            that._pending_items = null;
-            setTimeout(that._ifNotRemoved(function() {
-              if (!that._pending_items) {
-                that._loading_finished();
-              }
-            }), 200);
-          }
-        });
+        that.insert_items(chunk);
+        if (that._pending_items && that._pending_items.length > 0) {
+          setTimeout(that._ifNotRemoved(processChunk), 10);
+        }
+        else {
+          that._pending_items = null;
+          setTimeout(that._ifNotRemoved(function() {
+            if (!that._pending_items) {
+              that._loading_finished();
+            }
+          }), 200);
+        }
       };
-
-      setTimeout(this._ifNotRemoved(processChunk), 100);
-
+      $.when.apply($, can.map(this._pending_items, function(item) {
+        var instance = item.instance || item;
+        if (instance.custom_attribute_values) {
+          return instance.refresh_all('custom_attribute_values');
+        }
+      })).then(this._ifNotRemoved(processChunk));
       return this._loading_deferred;
     }
 
@@ -336,6 +331,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , single_object : false
     , find_params : {}
     , sort_property : null
+    , sort_direction: null
+    , sort_by: null
     , sort_function : null
     , sortable : true
     , filter : null
@@ -391,64 +388,110 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var hash = window.location.hash.split('/');
     hash.pop();
     window.location.hash = hash.join('/');
-  }
+  },
+
+  // Total display with is set to be span12.
+  // Default: title : span4
+  //          middle selectable : span4, by default 2 attributes are selected
+  //          action : span4
+  // When user selects 3 middle selectable attribute, title width is reduced to span3
+  // and when user selects 4 attributes, the action column is also reduced to span3
+  setup_column_width: function () {
+    var display_options,
+        display_width = 12,
+        attr_count = this.options.display_attr_list.length,
+        widths = {
+          defaults: [4, 4, 4],
+          0: [7, 1, 4],
+          3: [3, 5, 4],
+          4: [3, 6, 3],
+        },
+        selected_widths = widths[attr_count] || widths.defaults;
+
+    display_options = {
+      title_width: selected_widths[0],
+      selectable_width: selected_widths[1],
+      action_width: selected_widths[2],
+      selectable_attr_width: display_width / Math.max(attr_count, 1)
+    }
+    this.options.attr('display_options', display_options);
+  },
 
   //Displays attribute list for tree-header, Select attribute list drop down
   //Gets default and custom attribute list for each model, and sets upthe display-list
-  , init_display_options: function (opts) {
-    var i, display_width = 12, //total width of display = span12
+  init_display_options: function (opts) {
+    var i, saved_attr_list, display_width = 12, //total width of display = span12
         select_attr_list = [], display_attr_list = [],
-        model = opts.model, model_name = model.model_singular;
+        model = opts.model, model_name = model.model_singular,
+        model_definition = model().class.root_object,
+        mandatory_attr_names, display_attr_names;
 
-    //Get default attr list
+    //get standard attrs for each model
     can.each(model.tree_view_options.attr_list || can.Model.Cacheable.attr_list, function (item) {
+        if (!item.attr_sort_field) {
+          item.attr_sort_field = item.attr_name;
+        }
         select_attr_list.push(item);
     });
-    //Get custom attr_list
-    CMS.Models.CustomAttributeDefinition.findAll({definition_type: model_name})
-      .then(function (defs) {
-        if (defs.length) {
-          //create custom_attr_list objects
-          for (i = 0; i < defs.length; i++) {
-            if (defs[i].attribute_type !== 'Rich Text') {
-              var obj = {};
-              obj.attr_title = defs[i].title;
-              obj.attr_name = defs[i].title;
-              obj.display_status = false;
-              obj.attr_type = 'custom';
-              select_attr_list.push(obj);
-            }
-          }
-        }
-        //Initialize the display status for title, owner, status to be true
-        for (i = 0; i < select_attr_list.length; i++) {
-          var obj = select_attr_list[i];
-          if (model_name === 'CycleTaskGroupObjectTask') {
-            obj.display_status = ['title', 'mapped_object', 'workflow'].indexOf(obj.attr_name) !== -1;
-          } else {
-            obj.display_status = ['title', 'owner', 'status'].indexOf(obj.attr_name) !== -1;
-          }
-          //Make title the mandatory attribute
-          obj.mandatory = ['title'].indexOf(obj.attr_name) !== -1;
-        }
+    //Get mandatory_attr_names
+    mandatory_attr_names = model.tree_view_options.mandatory_attr_names ?
+      model.tree_view_options.mandatory_attr_names :
+        can.Model.Cacheable.tree_view_options.mandatory_attr_names;
 
+    //get custom attrs
+    can.each(GGRC.custom_attr_defs, function (def, i) {
+      if (def.definition_type === model_definition && def.attribute_type !== 'Rich Text') {
+        var obj = {};
+        obj.attr_title = obj.attr_name = def.title;
+        obj.display_status = false;
+        obj.attr_type = 'custom';
+        obj.attr_sort_field = 'custom:'+obj.attr_name;
+        select_attr_list.push(obj);
+      }
+    });
 
-        //Create display list
-        can.each(select_attr_list, function (item) {
-          if (item.attr_title !== 'Title' && item.display_status) {
-              display_attr_list.push(item);
-          }
-        });
+    //Get the display attr_list from local storage
+    saved_attr_list = this.display_prefs.getTreeViewHeaders(model_name);
 
-        this.options.attr('select_attr_list', select_attr_list);
-        this.options.attr('display_attr_list', display_attr_list);
-        this.options.attr('display_attr_width',
-          Math.floor(display_width/display_attr_list.length));
+    if (!saved_attr_list.length) {
+      //Initialize the display status, Get display_attr_names for model
+      display_attr_names = model.tree_view_options.display_attr_names ?
+        model.tree_view_options.display_attr_names :
+          can.Model.Cacheable.tree_view_options.display_attr_names;
 
-      }.bind(this));
-  }
+      for (i = 0; i < select_attr_list.length; i++) {
+        var obj = select_attr_list[i];
 
-  , init : function(el, opts) {
+        obj.display_status = display_attr_names.indexOf(obj.attr_name) !== -1;
+        obj.mandatory = mandatory_attr_names.indexOf(obj.attr_name) !== -1;
+      }
+    } else {
+      //Mandatory attr should be always displayed in tree view
+      can.each(mandatory_attr_names, function (attr_name) {
+        saved_attr_list.push(attr_name);
+      });
+
+      for (i = 0; i < select_attr_list.length; i++) {
+        var obj = select_attr_list[i];
+        obj.display_status = saved_attr_list.indexOf(obj.attr_name) !== -1;
+        obj.mandatory = mandatory_attr_names.indexOf(obj.attr_name) !== -1;
+      }
+    }
+
+    //Create display list
+    can.each(select_attr_list, function (item) {
+      if (!item.mandatory && item.display_status) {
+          display_attr_list.push(item);
+      }
+    });
+
+    this.options.attr('select_attr_list', select_attr_list);
+    this.options.attr('display_attr_list', display_attr_list);
+    this.setup_column_width();
+
+  },
+
+  init : function(el, opts) {
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       this.display_prefs = display_prefs;
       this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
@@ -489,58 +532,66 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       if (this.element && this.element.closest('body').length) {
         this._attached_deferred.resolve();
       }
+      this.init_display_options(opts);
     }.bind(this));
-    this.init_display_options(opts);
+
   }
 
   , " inserted": function() {
       this._attached_deferred.resolve();
     }
   , init_view : function() {
-      var that = this
-        , dfds = []
-        ;
+      var dfds = [];
 
       if(this.options.header_view && this.options.show_header) {
         dfds.push(
           can.view(this.options.header_view, $.when(this.options)).then(
             this._ifNotRemoved(function(frag) {
-              that.element.before(frag);
+              this.element.before(frag);
               // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
-              can.bind.call(that.element.parent().find('.filter-trigger > a'), 'click', function (evnt) {
-                if (that.display_prefs.getFilterHidden()) {
-                  that.show_filter();
-                } else {
-                  that.hide_filter();
-                }
-              });
-              can.bind.call(that.element.parent().find('.set-tree-attrs'), 'click', function (evnt) {
-                that.set_tree_attrs();
-              });
-        })));
+              can.bind.call(
+                  this.element.parent().find('.filter-trigger > a'), 
+                  'click', 
+                  function () {
+                    if (this.display_prefs.getFilterHidden()) {
+                      this.show_filter();
+                    } else {
+                      this.hide_filter();
+                    }
+                  }.bind(this)
+              );
+
+              can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
+                            'click',
+                            this.sort.bind(this)
+                           );
+              can.bind.call(this.element.parent().find('.set-tree-attrs'), 
+                            'click',
+                            this.set_tree_attrs.bind(this)
+                           );
+            }.bind(this))));
       }
 
       // Init the spinner if items need to be loaded:
       dfds.push(this.init_count().then(function(count) {
-        if (!that.element) {
+        if (!this.element) {
           return;
         }
         if (count()) {
-          that._loading_started();
+          this._loading_started();
         } else {
-          that.element.trigger("loaded");
+          this.element.trigger("loaded");
         }
-      }));
+      }.bind(this)));
 
       if (this.options.footer_view) {
         dfds.push(
           can.view(this.options.footer_view, this.options,
             this._ifNotRemoved(function(frag) {
-              that.element.append(frag);
-            })
+              this.element.append(frag);
+            }.bind(this))
           ));
       }
-
       return $.when.apply($.when, dfds);
     }
 
@@ -787,8 +838,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               }
               else {
                 compare = GGRC.Math.string_less_than(
-                  old_item[sort_prop],
-                  new_item[sort_prop]
+                    old_item[sort_prop],
+                    new_item[sort_prop]
                 );
               }
               if (compare) {
@@ -960,7 +1011,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //update the display attrbute list and re-draw
     //1: find checked items
     //2. update
-    var display_width = 12,
+    var display_width = 12, attr_to_save = [],
         $check = this.element.parent().find('.attr-checkbox'),
         $selected = $check.filter(':checked'),
         selected_items=[];
@@ -982,13 +1033,56 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
     }, this);
     this.options.attr('display_attr_list', this.options.display_attr_list);
-    this.options.attr('display_attr_width',
-      Math.floor(display_width/this.options.display_attr_list.length));
+    this.setup_column_width();
 
     this.reload_list();
     //set user preferences for next time
+    can.each(this.options.display_attr_list, function (item) {
+      attr_to_save.push(item.attr_name);
+    });
+    this.display_prefs.setTreeViewHeaders(this.options.model.model_singular, attr_to_save);
+    this.display_prefs.save();
+
+    can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
+                  'click',
+                  this.sort.bind(this)
+                 );
 
   }
+  , sort: function (event) {
+      var $el = $(event.currentTarget),
+          key = $el.data("field");
+
+      if (key !== this.options.sort_by) {
+          this.options.sort_direction = null;
+      }
+
+      var order = this.options.sort_direction === "asc"
+              ? "desc"
+              : "asc";
+
+      this.options.sort_function = function (val1, val2) {
+        var a = val1.get_deep_property(key),
+            b = val2.get_deep_property(key);
+
+        if (a !== b){
+          return (a < b) ^ (order !== 'asc');
+        }
+        return false;
+      };
+
+      this.options.sort_direction = order;
+      this.options.sort_by = key;
+
+      $el.closest(".tree-header")
+          .find(".widget-col-title")
+          .removeClass("asc")
+          .removeClass("desc");
+
+      $el.addClass(order);
+
+      this.reload_list();
+    }
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
@@ -1275,7 +1369,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
         this.scope.attr('controller', this);
       },
 
-      'input.attr-checkbox click' : function (el, ev) {
+      disable_attrs: function (el, ev) {
         var MAX_ATTR = 5,
             $check = this.element.find('.attr-checkbox'),
             $mandatory = $check.filter('.mandatory'),
@@ -1292,11 +1386,19 @@ can.Control("CMS.Controllers.TreeViewNode", {
           $mandatory.prop('disabled', true)
             .closest('li').addClass('disabled');
         }
+      },
+
+      'input.attr-checkbox click' : function (el, ev) {
+        this.disable_attrs(el, ev);
         ev.stopPropagation();
       },
 
       '.dropdown-menu-form click' : function (el, ev) {
         ev.stopPropagation();
+      },
+
+      '.tview-dropdown-toggle click' : function (el, ev) {
+        this.disable_attrs(el, ev);
       },
 
       '.set-tree-attrs,.close-dropdown click' : function(el, ev) {

@@ -1729,6 +1729,26 @@ ul.attr-list {
   margin-bottom: 25px;
   overflow: hidden;
 }
+.widget-col-title {
+  display: inline-block;
+  cursor: pointer;
+  i {
+    margin-top: 1px;
+    display: none;
+  }
+  &.asc,
+  &.desc {
+    i {
+      display: inline-block;
+    }
+  }
+  &.asc {
+    i { background-position: -198px -416px; }
+  }
+  &.desc {
+    i { background-position: -78px -56px; }
+  }
+}
 .workflow-wrap-main {
   display: none;
 }

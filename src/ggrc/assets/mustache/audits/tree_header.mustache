@@ -9,15 +9,18 @@
 
 <header class="header sticky tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
   <div class="row-fluid">
-    <div class="span4">
+    <div class="span{{display_options.title_width}}">
       <div class="title-heading oneline">
-        {{model.title_singular}} Title
+        <span class="widget-col-title" data-field="title">
+          {{model.title_singular}} Title
+          <i class="grcicon-carrot"></i>
+        </span>
       </div>
     </div>
 
     {{{> "/static/mustache/base_objects/tree_column_names.mustache"}}}
 
-    <div class="span4">
+    <div class="span{{display_options.action_width}}">
       <ul class="tree-action-list">
         {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
         {{{> "/static/mustache/base_objects/tree_column_selector.mustache"}}}

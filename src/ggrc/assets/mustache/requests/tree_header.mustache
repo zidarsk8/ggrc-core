@@ -11,7 +11,10 @@
   <div class="row-fluid">
     <div class="span3">
       <div class="title-heading oneline">
-        {{model.title_singular}} Title
+        <span class="widget-col-title" data-field="description">
+          {{model.title_singular}} Title
+          <i class="grcicon-carrot"></i>
+        </span>
       </div>
     </div>
     <div class="span2">
@@ -23,7 +26,10 @@
         </div>
         <div class="span6">
           <div class="oneline">
-            Assignee
+            <span class="widget-col-title" data-field="assignee.name|email">
+              Assignee
+              <i class="grcicon-carot"></i>
+            </span>
           </div>
         </div>
       </div>
@@ -32,12 +38,18 @@
       <div class="row-fluid">
         <div class="span5">
           <div class="oneline">
-            Due Date
+            <span class="widget-col-title" data-field="due_on">
+              Due Date
+              <i class="grcicon-carot"></i>
+            </span>
           </div>
         </div>
         <div class="span7">
           <div class="oneline">
-            State
+            <span class="widget-col-title" data-field="status">
+              State
+              <i class="grcicon-carot"></i>
+            </span>
           </div>
         </div>
       </div>

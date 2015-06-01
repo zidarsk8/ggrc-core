@@ -15,18 +15,18 @@
       <div class="select">
         <div class="item-data">
           <div class="row-fluid">
-            <div class="span4">
-              <div class="title tree-title-area">
+            <div class="span{{display_options.title_width}}">
+              <div class="title tree-title-area" rel="tooltip" data-placement="left" title="" data-original-title="{{instance.title}}">
                 <i class="grcicon-task-black"></i>
                 {{instance.title}}
               </div>
             </div>
 
             {{#is_dashboard}}
-              <div class="span4">
+              <div class="span{{display_options.selectable_width}}">
                 <div class="row-fluid">
                   {{#display_attr_list}}
-                    <div class="span{{display_attr_width}}">
+                    <div class="span{{display_options.selectable_attr_width}}">
                       <div class="owner tree-title-area">
                         {{#instance}}
                           {{#switch attr_name}}
@@ -59,7 +59,15 @@
                               {{/using}}
                             {{/case}}
                             {{#default}}
-                              {{get_default_attr_value attr_name instance}}
+                              {{#if_helpers '\
+                                #if_equals' attr_name 'url' '\
+                                or #if_equals' attr_name 'reference_url'}}
+                                  <a class="url" href="{{get_url_value attr_name instance}}" target="_blank">
+                                    {{get_default_attr_value attr_name instance}}
+                                  </a>
+                              {{else}}
+                                {{get_default_attr_value attr_name instance}}
+                              {{/in_helpers}}
                             {{/default}}
                           {{/switch}}
                         {{/instance}}
@@ -70,7 +78,7 @@
               </div>
             {{/is_dashboard}}
 
-            <div class="span4">
+            <div class="span{{display_options.action_width}}">
               <ul class="tree-action-list tasks-action">
                 <li>
                   <div class="date">

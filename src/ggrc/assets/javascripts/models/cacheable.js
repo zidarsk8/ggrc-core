@@ -126,11 +126,11 @@ can.Model("can.Model.Cacheable", {
   }
   , attr_list : [
     {attr_title: 'Title', attr_name: 'title'},
-    {attr_title: 'Owner', attr_name: 'owner'},
+    {attr_title: 'Owner', attr_name: 'owner', attr_sort_field: 'contact.name|email'},
     {attr_title: 'Code', attr_name: 'slug'},
     {attr_title: 'State', attr_name: 'status'},
-    {attr_title: 'Primary Contact', attr_name: 'contact'},
-    {attr_title: 'Secondary Contact', attr_name: 'secondary_contact'},
+    {attr_title: 'Primary Contact', attr_name: 'contact', attr_sort_field: 'contact.name|email'},
+    {attr_title: 'Secondary Contact', attr_name: 'secondary_contact', attr_sort_field: 'secondary_contact.name|email'},
     {attr_title: 'Last Updated', attr_name: 'updated_at'}
   ]
   , root_collection : ""
@@ -570,7 +570,10 @@ can.Model("can.Model.Cacheable", {
     , "date" : makeDateSerializer("date")
     , "packaged_datetime" : makeDateSerializer("datetime", "dateTime")
   }
-  , tree_view_options : {}
+  , tree_view_options : {
+    display_attr_names : ['title', 'owner', 'status'],
+    mandatory_attr_names : ['title']
+  }
   , obj_nav_options: {}
   , list_view_options : {}
   , getRootModelName: function() {
@@ -701,6 +704,9 @@ can.Model("can.Model.Cacheable", {
   }
   , load_custom_attribute_definitions: function custom_attribute_definitions() {
     var self = this;
+    if (self.attr('custom_attribute_definitions')) {
+      return new $.Deferred().resolve(self.attr('custom_attribute_definitions'));
+    }
     return CMS.Models.CustomAttributeDefinition.findAll({
       definition_type: self.class.root_object
     }).then(function(definitions) {
@@ -832,6 +838,31 @@ can.Model("can.Model.Cacheable", {
       if (typeof(mapper) === "string")
         return "_" + mapper + "_binding";
     }
+
+  // checks if binding exists without throwing debug statements
+  // modeled after what get_binding is doing
+  , has_binding: function (mapper) {
+    var binding,
+        mapping,
+        binding_attr = this._get_binding_attr(mapper);
+
+    if (binding_attr) {
+      binding = this[binding_attr];
+    }
+
+    if (!binding) {
+      if (typeof(mapper) === "string") {
+        mapping = this.constructor.get_mapper(mapper);
+        if (!mapping) {
+          return false;
+        }
+      }else if (!(mapper instanceof GGRC.ListLoaders.BaseListLoader)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   , get_binding: function(mapper) {
       var mappings
@@ -1100,6 +1131,81 @@ can.Model("can.Model.Cacheable", {
 
     return [type,
             this.id].join('/');
+  },
+
+  // easier accessor for deep properties
+  // owners.0.name -> this.owners[0].reify().name
+  // owners.0.name|email -> 
+  //  firstnonempty this.owners[0].reify().name this.owners[0].reify().email
+  get_deep_property: function get_deep_property (descriptor, val) {
+    val = typeof val === "undefined" ? this : val;
+    
+    if (!descriptor || !descriptor.length) {
+      return undefined;
+    } else if (val[descriptor]) {
+      return val[descriptor];
+    } else if (descriptor.match(/^custom:/)) {
+      return this.get_deep_property(
+          this._find_custom_attr(descriptor),
+          val);
+    } else {
+      var d = descriptor.split('.'),
+          keys = d.shift().split('|'),
+          rest = d.join('.');
+
+      if (val.instance) {
+        val = val.instance;
+      }
+
+      return _.reduce(keys, function (res, key) {
+        if (res && res.length) return res;
+
+        var binding = val.get_binding && val.has_binding(key)
+                ? val.get_binding(key)
+                : null;
+
+        if (binding && binding.list && binding.list.length) {
+          val = binding.list;
+
+          return rest.length
+                ? get_deep_property(rest, val)
+                : val;
+        } else if (typeof val[key] === "undefined") {
+          return undefined;
+        } else if (val[key] === null) {
+          return null;
+        } else {
+          if (typeof val[key].reify === "function") {
+            val[key] = val[key].reify();
+          }
+          
+          return rest.length
+                ? get_deep_property(rest, val[key])
+                : val[key];
+        }
+      }, "");
+    }
+  },
+
+  // finds path descriptors for custom fields
+  // something like custom:Custom field
+  // becomes custom_attribute_values.1.attribute_value
+  // the index is what we're looking for
+  _find_custom_attr: function (descriptor, val) {
+    descriptor = descriptor.replace(/^custom:/, '');
+    val = typeof val === "undefined" ? this : val;
+
+    var needle = _.find(GGRC.custom_attr_defs, function (attr) {
+      return attr.definition_type === val.class.table_singular && 
+            attr.title === descriptor;
+    });
+
+    var index = _.findIndex(val.custom_attribute_values, function (attr) {
+      attr = attr.reify();
+      return attr.custom_attribute_id === needle.id;
+    });
+
+    return 'custom_attribute_values.'+index+'.attribute_value';
   }
 });
 

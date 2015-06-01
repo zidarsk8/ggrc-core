@@ -167,7 +167,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'Type', attr_name: 'kind'},
+      {attr_title: 'Type', attr_name: 'kind', attr_sort_field: 'kind.title'},
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
