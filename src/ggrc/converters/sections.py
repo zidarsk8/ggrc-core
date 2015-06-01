@@ -4,10 +4,10 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .base import *
-
-from ggrc.models import Directive, DirectiveSection, Section, Clause, SectionBase
+from ggrc.models import Section, Clause, SectionBase
 from .base_row import *
 from collections import OrderedDict
+
 
 class SectionRowConverter(BaseRowConverter):
   model_class = Section
@@ -15,8 +15,9 @@ class SectionRowConverter(BaseRowConverter):
   def setup_object(self):
     self.obj = self.setup_object_by_slug(self.attrs)
     if self.obj.directive \
-        and self.obj.directive is not self.importer.options.get('directive'):
-          self.importer.errors.append('Section code is already used elsewhere.')
+       and self.obj.directive is not self.importer.options.get('directive'):
+          self.importer.errors.append(
+              'Section code is already used elsewhere.')
     else:
       self.obj.directive = self.importer.options.get('directive')
       if self.obj.id is not None:
@@ -32,7 +33,8 @@ class SectionRowConverter(BaseRowConverter):
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('controls', LinkControlsHandler)
     self.handle_title('title', is_required=True)
-    self.handle('status', StatusColumnHandler, valid_states=SectionBase.VALID_STATES, default_value='Draft')
+    self.handle('status', StatusColumnHandler,
+                valid_states=SectionBase.VALID_STATES, default_value='Draft')
 
   def save_object(self, db_session, **options):
     directive_id = options.get('directive_id')
@@ -42,6 +44,7 @@ class SectionRowConverter(BaseRowConverter):
 
   def handle_title(self, key, **options):
     return self.handle(key, SectionTitleHandler, **options)
+
 
 class ClauseRowConverter(SectionRowConverter):
   model_class = Clause
@@ -58,16 +61,6 @@ class ClauseRowConverter(SectionRowConverter):
     directive_id = options.get('directive_id')
     if not directive_id:
       return
-    # Make sure directive/clause aren't already connected before creating
-    clause_id = getattr(self.obj, 'id', None)
-    matching_relationship_count = DirectiveSection.query\
-      .filter(DirectiveSection.directive_id==directive_id)\
-      .filter(DirectiveSection.section_id==clause_id)\
-      .count()
-    if matching_relationship_count == 0:
-      db_session.add(self.obj)
-      ds = DirectiveSection(directive_id=directive_id, section=self.obj)
-      db_session.add(ds)
 
   def handle_title(self, key, **options):
     return self.handle(key, TitleHandler, **options)
@@ -78,33 +71,34 @@ class SectionsConverter(BaseConverter):
   metadata_export_order = ['type', 'slug']
 
   _metadata_map = OrderedDict([
-    ('Type','type'),
-    ('Directive Code','slug'),
+      ('Type', 'type'),
+      ('Directive Code', 'slug'),
   ])
 
   object_export_order = [
-    'slug', 'title', 'description',
-    'controls', 'created_at', 'updated_at'
+      'slug', 'title', 'description',
+      'controls', 'created_at', 'updated_at'
   ]
 
   _object_map = OrderedDict([
-    ('Section Code', 'slug'),
-    ('Section Title', 'title'),
-    ('Section Description' , 'description'),
-    ('Notes', 'notes'),
-    ('Reference URL', 'reference_url'),
-    ('Map:Person of Contact', 'contact'),
-    ('Controls', 'controls'),
-    ('Created', 'created_at'),
-    ('Updated', 'updated_at'),
-    ('Status', 'status')
+      ('Section Code', 'slug'),
+      ('Section Title', 'title'),
+      ('Section Description', 'description'),
+      ('Notes', 'notes'),
+      ('Reference URL', 'reference_url'),
+      ('Map:Person of Contact', 'contact'),
+      ('Controls', 'controls'),
+      ('Created', 'created_at'),
+      ('Updated', 'updated_at'),
+      ('Status', 'status')
   ])
 
   row_converter = SectionRowConverter
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append(u'Missing {} Code heading'.format(self.directive_kind()))
+      self.errors.append(
+          u'Missing {} Code heading'.format(self.directive_kind()))
     elif attrs['slug'] != self.directive().slug:
       self.errors.append(u'{0} Code must be {1}'.format(
           self.directive_kind(),

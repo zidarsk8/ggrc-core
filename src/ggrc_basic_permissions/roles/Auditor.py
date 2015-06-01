@@ -8,7 +8,7 @@ permissions = {
         "Audit",
         "Request",
         "ControlAssessment",
-        "Issues",
+        "Issue",
         {
             "terms": {
                 "property_name": "status",
@@ -46,11 +46,8 @@ permissions = {
             "condition": "in"
         },
         "Meeting",
-        "ObjectControl",
         "ObjectDocument",
-        "ObjectObjective",
         "ObjectPerson",
-        "ObjectSection",
         "Relationship",
         "Document",
         "Meeting",
@@ -60,7 +57,7 @@ permissions = {
     "create": [
         "Request",
         "ControlAssessment",
-        "Issues",
+        "Issue",
     ],
     "view_object_page": [
         "__GGRC_ALL__"
@@ -68,7 +65,7 @@ permissions = {
     "update": [
         "Request",
         "ControlAssessment",
-        "Issues",
+        "Issue",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse"

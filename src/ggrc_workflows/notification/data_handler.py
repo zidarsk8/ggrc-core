@@ -5,7 +5,6 @@
 
 from datetime import date
 # from babel.dates import format_timedelta
-from flask import request
 
 from sqlalchemy import and_
 
@@ -14,7 +13,8 @@ from ggrc_workflows.models import (
 )
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
-from ggrc.utils import merge_dicts
+from ggrc.utils import merge_dicts, get_url_root
+from copy import deepcopy
 
 
 """
@@ -28,8 +28,13 @@ exposed functions
 
 def get_cycle_created_task_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  if not cycle_task:
+    return {}
+
   cycle_task_group = cycle_task.cycle_task_group
   cycle = cycle_task_group.cycle
+
+  force = cycle.workflow.notify_on_change
 
   task_assignee = get_person_dict(cycle_task.contact)
   task_group_assignee = get_person_dict(cycle_task_group.contact)
@@ -43,9 +48,12 @@ def get_cycle_created_task_data(notification):
   assignee_data = {
       task_assignee['email']: {
           "user": task_assignee,
+          "force_notifications": {
+              notification.id: force
+          },
           "cycle_started": {
               cycle.id: {
-                  "my_tasks": task
+                  "my_tasks": deepcopy(task)
               }
           }
       }
@@ -53,10 +61,13 @@ def get_cycle_created_task_data(notification):
   tg_assignee_data = {
       task_group_assignee['email']: {
           "user": task_group_assignee,
+          "force_notifications": {
+              notification.id: force
+          },
           "cycle_started": {
               cycle.id: {
                   "my_task_groups": {
-                      cycle_task_group.id: task
+                      cycle_task_group.id: deepcopy(task)
                   }
               }
           }
@@ -66,9 +77,12 @@ def get_cycle_created_task_data(notification):
     wf_owner_data = {
         workflow_owner['email']: {
             "user": workflow_owner,
+            "force_notifications": {
+                notification.id: force
+            },
             "cycle_started": {
                 cycle.id: {
-                    "cycle_tasks": task
+                    "cycle_tasks": deepcopy(task)
                 }
             }
         }
@@ -79,11 +93,18 @@ def get_cycle_created_task_data(notification):
 
 def get_cycle_task_due(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  if not cycle_task:
+    return {}
+
   notif_name = notification.notification_type.name
   due = "due_today" if notif_name == "cycle_task_due_today" else "due_in"
+  force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
   return {
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
+          "force_notifications": {
+              notification.id: force
+          },
           due: {
               cycle_task.id: get_cycle_task_dict(cycle_task)
           }
@@ -93,11 +114,15 @@ def get_cycle_task_due(notification):
 
 def get_all_cycle_tasks_completed_data(notification, cycle):
   workflow_owners = get_workflow_owners_dict(cycle.context_id)
+  force = cycle.workflow.notify_on_change
   result = {}
   for workflow_owner in workflow_owners.itervalues():
     wf_data = {
         workflow_owner['email']: {
             "user": workflow_owner,
+            "force_notifications": {
+                notification.id: force
+            },
             "all_tasks_completed": {
                 cycle.id: get_cycle_dict(cycle)
             }
@@ -108,13 +133,19 @@ def get_all_cycle_tasks_completed_data(notification, cycle):
 
 
 def get_cycle_created_data(notification, cycle):
+  if not cycle.is_current:
+    return {}
 
   manual = notification.notification_type.name == "manual_cycle_created"
+  force = cycle.workflow.notify_on_change
   result = {}
 
   for person in cycle.workflow.people:
     result[person.email] = {
         "user": get_person_dict(person),
+        "force_notifications": {
+            notification.id: force
+        },
         "cycle_started": {
             cycle.id: get_cycle_dict(cycle, manual)
         }
@@ -124,6 +155,9 @@ def get_cycle_created_data(notification, cycle):
 
 def get_cycle_data(notification):
   cycle = get_object(Cycle, notification.object_id)
+  if not cycle:
+    return {}
+
   notification_name = notification.notification_type.name
   if notification_name in ["manual_cycle_created", "cycle_created"]:
     return get_cycle_created_data(notification, cycle)
@@ -135,9 +169,16 @@ def get_cycle_data(notification):
 
 def get_cycle_task_declined_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  if not cycle_task:
+    return {}
+
+  force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
   return {
       cycle_task.contact.email: {
           "user": get_person_dict(cycle_task.contact),
+          "force_notifications": {
+              notification.id: force
+          },
           "task_declined": {
               cycle_task.id: get_cycle_task_dict(cycle_task)
           }
@@ -165,8 +206,17 @@ def get_cycle_task_data(notification):
 
 def get_task_group_task_data(notification):
   task_group_task = get_object(TaskGroupTask, notification.object_id)
+  if not task_group_task:
+    return {}
+
   task_group = task_group_task.task_group
   workflow = task_group.workflow
+  force = workflow.notify_on_change
+
+  if workflow.status != "Active":
+    return {}
+  if workflow.next_cycle_start_date < date.today():
+    return {}  # this can only be if the cycle has successfully started
 
   tasks = {}
 
@@ -184,6 +234,9 @@ def get_task_group_task_data(notification):
   assignee_data = {
       task_assignee['email']: {
           "user": task_assignee,
+          "force_notifications": {
+              notification.id: force
+          },
           "cycle_starts_in": {
               workflow.id: {
                   "my_tasks": tasks
@@ -194,6 +247,9 @@ def get_task_group_task_data(notification):
   tg_assignee_data = {
       task_group_assignee['email']: {
           "user": task_group_assignee,
+          "force_notifications": {
+              notification.id: force
+          },
           "cycle_starts_in": {
               workflow.id: {
                   "my_task_groups": {
@@ -207,6 +263,9 @@ def get_task_group_task_data(notification):
     wf_owner_data = {
         workflow_owner['email']: {
             "user": workflow_owner,
+            "force_notifications": {
+                notification.id: force
+            },
             "cycle_starts_in": {
                 workflow.id: {
                     "workflow_tasks": tasks
@@ -219,21 +278,22 @@ def get_task_group_task_data(notification):
   return merge_dicts(result, tg_assignee_data, assignee_data)
 
 
-def get_workflow_data(notification):
-  workflow = get_object(Workflow, notification.object_id)
-
-  if workflow.frequency == "one_time":
-    # one time workflows get cycles manually created and that triggers
-    # the instant notification.
+def get_workflow_starts_in_data(notification, workflow):
+  if workflow.status != "Active":
     return {}
-
+  if workflow.next_cycle_start_date < date.today():
+    return {}  # this can only be if the cycle has successfully started
   result = {}
 
   workflow_owners = get_workflow_owners_dict(workflow.context_id)
+  force = workflow.notify_on_change
 
   for wf_person in workflow.workflow_people:
     result[wf_person.person.email] = {
         "user": get_person_dict(wf_person.person),
+        "force_notifications": {
+            notification.id: force
+        },
         "cycle_starts_in": {
             workflow.id: {
                 "workflow_owners": workflow_owners,
@@ -249,12 +309,67 @@ def get_workflow_data(notification):
   return result
 
 
+def get_cycle_start_failed_data(notification, workflow):
+  if workflow.status != "Active":
+    return {}
+  if workflow.next_cycle_start_date >= date.today():
+    return {}  # this can only be if the cycle has successfully started
+
+  result = {}
+  workflow_owners = get_workflow_owners_dict(workflow.context_id)
+  force = workflow.notify_on_change
+
+  for wf_owner in workflow_owners.itervalues():
+    result[wf_owner["email"]] = {
+        "user": wf_owner,
+        "force_notifications": {
+            notification.id: force
+        },
+        "cycle_start_failed": {
+            workflow.id: {
+                "workflow_owners": workflow_owners,
+                "workflow_url": get_workflow_url(workflow),
+                "start_date": workflow.next_cycle_start_date,
+                "fuzzy_start_date": get_fuzzy_date(
+                    workflow.next_cycle_start_date),
+                "custom_message": workflow.notify_custom_message,
+                "title": workflow.title,
+            }
+        }
+    }
+  return result
+
+
+def get_workflow_data(notification):
+  workflow = get_object(Workflow, notification.object_id)
+  if not workflow:
+    return {}
+
+  if workflow.frequency == "one_time":
+    # one time workflows get cycles manually created and that triggers
+    # the instant notification.
+    return {}
+
+  if "_workflow_starts_in" in notification.notification_type.name:
+    return get_workflow_starts_in_data(notification, workflow)
+  if "cycle_start_failed" == notification.notification_type.name:
+    return get_cycle_start_failed_data(notification, workflow)
+
+  return {}
+
+
 def get_object(obj_class, obj_id):
-  return db.session.query(obj_class).filter(obj_class.id == obj_id).one()
+  result = db.session.query(obj_class).filter(obj_class.id == obj_id)
+  if result.count() == 1:
+    return result.one()
+  return None
 
 
 def get_fuzzy_date(end_date):
   delta = end_date - date.today()
+  if delta.days < 0:
+    days = abs(delta.days)
+    return "{} day{} ago".format(days, "s" if days > 1 else "")
   if delta.days == 0:
     return "today"
   # TODO: use format_timedelta from babel package.
@@ -273,7 +388,7 @@ def get_cycle_task_url(cycle_task):
   return ("{base}workflows/{workflow_id}#current_widget/cycle/{cycle_id}"
           "/cycle_task_group/{cycle_task_group_id}/"
           "/cycle_task_group_object_task/{cycle_task_id}").format(
-      base=request.url_root,
+      base=get_url_root(),
       workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
       cycle_id=cycle_task.cycle_task_group.cycle.id,
       cycle_task_group_id=cycle_task.cycle_task_group.id,
@@ -314,7 +429,7 @@ def get_person_dict(person):
 def get_cycle_url(cycle):
   return "{base}workflows/{workflow_id}#current_widget/cycle/{cycle_id}"\
       .format(
-          base=request.url_root,
+          base=get_url_root(),
           workflow_id=cycle.workflow.id,
           cycle_id=cycle.id,
       )
@@ -333,6 +448,6 @@ def get_cycle_dict(cycle, manual=False):
 
 def get_workflow_url(workflow):
   return "{base}workflows/{workflow_id}#current_widget".format(
-      base=request.url_root,
+      base=get_url_root(),
       workflow_id=workflow.id,
   )

@@ -528,8 +528,6 @@ can.Model.Cacheable("CMS.Models.Response", {
     , assignee : "CMS.Models.Person.stub"
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
-    , object_controls : "CMS.Models.ObjectControl.stubs"
-    , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , controls : "CMS.Models.Control.stubs"
     , contact : "CMS.Models.Person.stub"
   }
@@ -538,7 +536,6 @@ can.Model.Cacheable("CMS.Models.Response", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/responses/tree.mustache"
-    , footer_view : GGRC.mustache_path + "/responses/tree_footer.mustache"
     , add_item_view : GGRC.mustache_path + "/responses/tree_add_item.mustache"
     , draw_children : true
     , child_options : [{

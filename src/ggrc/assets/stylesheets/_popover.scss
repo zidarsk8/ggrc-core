@@ -160,7 +160,7 @@
       padding:4px 12px 0 12px;
       color: $text;
       h3 {
-        @include oneline();
+        @extend %oneline;
         color: $subTitle;
         font-weight: normal;
         font-size:$f-regular;
@@ -205,13 +205,13 @@
         }
       }
       .rtf {
-        border:1px solid lighten($gray,10%);
         @include border-radius();
+        border:1px solid lighten($gray,10%);
         padding:10px;
         overflow:auto;
         max-height:60px;
         ul {
-          @include reset-list();
+          @extend %reset-list;
           margin:8px 0 10px 25px;
           li {
             padding-bottom: 0;
@@ -220,7 +220,7 @@
         }
       }
       ul {
-        @include reset-list();
+        @extend %reset-list;
         li {
           padding-bottom: 4px;
         }
@@ -279,7 +279,6 @@
   }
   .title {
     color:$black;
-    //font-weight:bold;
   }
   &.person-tooltip {
     .popover-inner,
@@ -380,4 +379,8 @@
 
 .filter-help-content {
   display: none;
+}
+
+.popover-manual-close {
+  @include box-shadow(0 0 7px rgba(0,0,0, .25));
 }

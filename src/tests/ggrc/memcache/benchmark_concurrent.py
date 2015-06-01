@@ -10,7 +10,7 @@
  PUT
  DELETE
 
-The threads are started for simultaneous GET/PUT/DELETE operation 
+The threads are started for simultaneous GET/PUT/DELETE operation
 
 """
 import requests
@@ -46,11 +46,11 @@ create_resources = {
 }
 
 update_resources = {
- 'regulations': '{"regulation":{"kind":"Regulation","contact":{"id":1260,"href":"/api/people/1260","type":"Person"},"description":"Benchmark Regulation","object_people":[],"program_directives":[],"controls":[],"url":"","type":"Regulation","status":"Draft","owners":[{"id":1260,"href":"/api/people/1260","type":"Person"}],"scope":"","directive_controls":[],"sections":[],"selfLink":"/api/regulations/71","programs":[],"created_at":"2014-03-20T22:09:24Z","updated_at":"2014-03-20T22:09:24Z","object_owners":[{"status":"Draft","modified_by":{"href":"/api/people/1260","id":1260,"type":"Person"},"id":1083,"selfLink":"/api/object_owners/1083","person":{"href":"/api/people/1260","id":1260,"type":"Person"},"context":null,"created_at":"2014-03-20T22:09:24","updated_at":"2014-03-20T22:09:24","type":"ObjectOwner","ownable":{"href":"/api/regulations/71","id":71,"type":"Regulation"}}],"reference_url":"","organization":"","documents":[],"title":"Benchmark Regulation","object_objectives":[],"objectives":[],"modified_by":{"id":1260,"href":"/api/people/1260","type":"Person"},"people":[],"id":71,"notes":"Benchmark Regulation UPDATED 1","version":"","viewLink":"/regulations/71","object_documents":[],"related_sources":[],"related_destinations":[], "slug": "REGULATION-101", "start_date":"","end_date":"","context":{"id":null}}}'
+ 'regulations': '{"regulation":{"kind":"Regulation","contact":{"id":1260,"href":"/api/people/1260","type":"Person"},"description":"Benchmark Regulation","object_people":[],"program_directives":[],"controls":[],"url":"","type":"Regulation","status":"Draft","owners":[{"id":1260,"href":"/api/people/1260","type":"Person"}],"scope":"","directive_controls":[],"sections":[],"selfLink":"/api/regulations/71","programs":[],"created_at":"2014-03-20T22:09:24Z","updated_at":"2014-03-20T22:09:24Z","object_owners":[{"status":"Draft","modified_by":{"href":"/api/people/1260","id":1260,"type":"Person"},"id":1083,"selfLink":"/api/object_owners/1083","person":{"href":"/api/people/1260","id":1260,"type":"Person"},"context":null,"created_at":"2014-03-20T22:09:24","updated_at":"2014-03-20T22:09:24","type":"ObjectOwner","ownable":{"href":"/api/regulations/71","id":71,"type":"Regulation"}}],"reference_url":"","organization":"","documents":[],"title":"Benchmark Regulation","objectives":[],"modified_by":{"id":1260,"href":"/api/people/1260","type":"Person"},"people":[],"id":71,"notes":"Benchmark Regulation UPDATED 1","version":"","viewLink":"/regulations/71","object_documents":[],"related_sources":[],"related_destinations":[], "slug": "REGULATION-101", "start_date":"","end_date":"","context":{"id":null}}}'
 }
 
 update_resources2 = {
- 'regulations': '{"regulation":{"kind":"Regulation","contact":{"id":1260,"href":"/api/people/1260","type":"Person"},"description":"Benchmark Regulation","object_people":[],"program_directives":[],"controls":[],"url":"","type":"Regulation","status":"Draft","owners":[{"id":1260,"href":"/api/people/1260","type":"Person"}],"scope":"","directive_controls":[],"sections":[],"selfLink":"/api/regulations/71","programs":[],"created_at":"2014-03-20T22:09:24Z","updated_at":"2014-03-20T22:09:24Z","object_owners":[{"status":"Draft","modified_by":{"href":"/api/people/1260","id":1260,"type":"Person"},"id":1083,"selfLink":"/api/object_owners/1083","person":{"href":"/api/people/1260","id":1260,"type":"Person"},"context":null,"created_at":"2014-03-20T22:09:24","updated_at":"2014-03-20T22:09:24","type":"ObjectOwner","ownable":{"href":"/api/regulations/71","id":71,"type":"Regulation"}}],"reference_url":"","organization":"","documents":[],"title":"Benchmark Regulation","object_objectives":[],"objectives":[],"modified_by":{"id":1260,"href":"/api/people/1260","type":"Person"},"people":[],"id":71,"notes":"Benchmark Regulation UPDATED 2","version":"","viewLink":"/regulations/71","object_documents":[],"related_sources":[],"related_destinations":[],"slug": "REGULATION-101", "start_date":"","end_date":"","context":{"id":null}}}'
+ 'regulations': '{"regulation":{"kind":"Regulation","contact":{"id":1260,"href":"/api/people/1260","type":"Person"},"description":"Benchmark Regulation","object_people":[],"program_directives":[],"controls":[],"url":"","type":"Regulation","status":"Draft","owners":[{"id":1260,"href":"/api/people/1260","type":"Person"}],"scope":"","directive_controls":[],"sections":[],"selfLink":"/api/regulations/71","programs":[],"created_at":"2014-03-20T22:09:24Z","updated_at":"2014-03-20T22:09:24Z","object_owners":[{"status":"Draft","modified_by":{"href":"/api/people/1260","id":1260,"type":"Person"},"id":1083,"selfLink":"/api/object_owners/1083","person":{"href":"/api/people/1260","id":1260,"type":"Person"},"context":null,"created_at":"2014-03-20T22:09:24","updated_at":"2014-03-20T22:09:24","type":"ObjectOwner","ownable":{"href":"/api/regulations/71","id":71,"type":"Regulation"}}],"reference_url":"","organization":"","documents":[],"title":"Benchmark Regulation","objectives":[],"modified_by":{"id":1260,"href":"/api/people/1260","type":"Person"},"people":[],"id":71,"notes":"Benchmark Regulation UPDATED 2","version":"","viewLink":"/regulations/71","object_documents":[],"related_sources":[],"related_destinations":[],"slug": "REGULATION-101", "start_date":"","end_date":"","context":{"id":null}}}'
 }
 
 mapping_resource = {
@@ -71,7 +71,7 @@ class TestGetThread(threading.Thread):
     for cnt in range(self.loop_cnt):
       #print "Running GET Thread: " + self.name + " Iteration " + str(cnt+1)
       if not cnt % 100:
-        print "GET Iteration " + str(cnt+1)  + " of " + str(self.loop_cnt) 
+        print "GET Iteration " + str(cnt+1)  + " of " + str(self.loop_cnt)
       benchmark_get(self.data, 1, "Concurrency Test")
     self.endtime=datetime.now()
 
@@ -90,7 +90,7 @@ class TestPutThread(threading.Thread):
     for cnt in range(self.loop_cnt):
       #print "Running PUT/GET Thread: " + self.name + " Iteration " + str(cnt+1)
       if not cnt % 100:
-        print "PUT/GET Iteration " + str(cnt+1)  + " of " + str(self.loop_cnt) 
+        print "PUT/GET Iteration " + str(cnt+1)  + " of " + str(self.loop_cnt)
       for resource, payload in self.put_data.items():
        json_payload = json.loads(payload)
        updated_notes = "Benchmark Regulation UPDATED#" + str(cnt+1)
@@ -100,10 +100,10 @@ class TestPutThread(threading.Thread):
       benchmark_get(self.get_data, 1, "Concurrency GET Test", updated_notes)
     self.endtime=datetime.now()
 
-def invoke_url(op, prefix, host, url, payload, headers, count): 
+def invoke_url(op, prefix, host, url, payload, headers, count):
   response=None
   for cnt in range(count):
-    testurl = prefix + "://" + host + url 
+    testurl = prefix + "://" + host + url
     starttime=datetime.now()
     if op == 'post':
       response = requests.post(testurl, data=payload, headers=headers)
@@ -135,7 +135,7 @@ def benchmark_delete(resource_data, num_iterations):
   payload=None
   for resource, data in resource_data.items():
     #print "Test DELETE for resource: " + resource + " with ids " + str(data['ids'])
-    testurl = "/api/" + resource 
+    testurl = "/api/" + resource
     ids = data['ids']
     etags= data['etag']
     last_modified_items = data['last-modified']
@@ -151,7 +151,7 @@ def benchmark_delete(resource_data, num_iterations):
 def benchmark_get(resource_data, num_iterations, name, verify_notes=None):
   for resource, data in resource_data.items():
     #print "Test GET for owner: " + name + " resource: " + resource + " with ids " + str(data['ids'])
-    testurl = "/api/" + resource 
+    testurl = "/api/" + resource
     ids = ""
     idslen= len(data['ids'])
     cnt = 0
@@ -173,7 +173,7 @@ def benchmark_get(resource_data, num_iterations, name, verify_notes=None):
       #print "Regulation last-modified: " + str(response.headers['last-modified'])
       #resource_data[resource]['last-modified']=[]
       #resource_data[resource]['etag']=[]
-      responses = json_response[resource + '_collection'][resource] 
+      responses = json_response[resource + '_collection'][resource]
       for item in responses:
         if verify_notes is not None:
           #print "UPDATE Notes: " + verify_notes
@@ -185,7 +185,7 @@ def benchmark_get(resource_data, num_iterations, name, verify_notes=None):
 def benchmark_create(resource_data, resource_cnt, num_iterations):
   resource_dict={}
   for resource, payload in resource_data.items():
-    testurl = "/api/" + resource 
+    testurl = "/api/" + resource
     resource_dict[resource]={}
     resource_dict[resource]['ids']=[]
     resource_dict[resource]['etag']=[]
@@ -207,7 +207,7 @@ def benchmark_create(resource_data, resource_cnt, num_iterations):
 
 def benchmark_update(resource_data, resource_dict, num_iterations):
   for resource, payload in resource_data.items():
-    testurl = "/api/" + resource 
+    testurl = "/api/" + resource
     ids = resource_dict[resource]['ids']
     #print "Test UPDATE for resource: " + resource + " with ids " + str(ids)
     etags= resource_dict[resource]['etag']

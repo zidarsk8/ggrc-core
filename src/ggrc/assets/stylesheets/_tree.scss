@@ -6,7 +6,7 @@
  */
 
 ul.new-tree {
-  @include reset-list();
+  @extend %reset-list;
   margin-bottom: 40px;
   .openclose {
     cursor: pointer;
@@ -19,14 +19,14 @@ ul.new-tree {
     }
     &.active {
       .tier-trigger {
-        background: image-url('grcicons/open.png') no-repeat 20px center;
         @include background-size(17px 12px);
+        background: image-url('grcicons/open.png') no-repeat 20px center;
       }
     }
     .tier-trigger {
       float: left;
-      background: image-url('grcicons/not-open.png') no-repeat 20px center;
       @include background-size(17px 12px);
+      background: image-url('grcicons/not-open.png') no-repeat 20px center;
       width: 17px;
       height: 30px;
       padding-left: 20px;
@@ -70,12 +70,12 @@ ul.new-tree {
       margin-right: 4px;
     }
     .utility-link {
+      @include opacity(0.4);
+      @include transition(opacity 0.2s);
       font-size:11px;
       font-weight:bold;
       color:#111;
       text-transform:uppercase;
-      @include opacity(0.4);
-      @include transition(opacity 0.2s);
       &:hover {
         @include opacity(1);
         text-decoration:none;
@@ -122,8 +122,8 @@ ul.new-tree {
               .openclose {
                 .row-fluid {
                   &:hover {
-                    background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
                     @include background-size(30px 6px);
+                    background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
                     .counter {
                       @include opacity(1);
                     }
@@ -144,8 +144,8 @@ ul.new-tree {
   }
   &.request-list {
     .item-data {
-      padding-left: 5px;
       @include clearfix();
+      padding-left: 5px;
       overflow: visible;
       .type {
         float: left;
@@ -233,7 +233,7 @@ ul.new-tree {
         text-overflow: inherit;
         width: auto;
         ul {
-          @include reset-list();
+          @extend %reset-list;
           line-height: 18px;
           padding-top: 7px;
           padding-bottom: 5px;
@@ -290,9 +290,9 @@ ul.new-tree {
         margin-top: 7px;
       }
       .info-action {
+        @include opacity(1);
         text-transform: none;
         font-size: 13px;
-        @include opacity(1);
       }
       .disabled {
         @include opacity(.3);
@@ -325,7 +325,7 @@ ul.new-tree {
           text-overflow: ellipsis !important;
           width:100% !important;
           .event-main-title {
-            @include oneline();
+            @extend %oneline;
             height: 31px;
             min-height: 31px;
             i {
@@ -369,7 +369,7 @@ ul.new-tree {
             }
           }
           .event-date {
-            @include oneline();
+            @extend %oneline;
             text-align: right;
           }
         }
@@ -382,7 +382,7 @@ ul.new-tree {
       }
       .events-content {
         p {
-          @include oneline();
+          @extend %oneline;
           .event-action {
             margin:0 20px;
           }
@@ -406,9 +406,9 @@ ul.new-tree {
           font-weight:bold;
         }
         .info-action {
+          @include opacity(0.6);
           text-transform: uppercase;
           font-size: 11px;
-          @include opacity(0.6);
           &:hover {
             @include opacity(1);
             text-decoration:none;
@@ -430,10 +430,10 @@ ul.new-tree {
   }
 
   li.tree-item {
+    @include transition(all 0.18s cubic-bezier(.55,0,.1,1));
     min-height: 30px;
     line-height: 28px;
     position: relative;
-    @include transition(all 0.18s cubic-bezier(.55,0,.1,1));
     .counter-wrap {
       line-height: 28px;
       text-align: right;
@@ -458,13 +458,13 @@ ul.new-tree {
         border-bottom: 1px solid $itemBorder;
         > .openclose {
           .grcicon-arrow-right {
-            margin: 5px 0 0 4px;
             @include opacity(0.25);
+            margin: 5px 0 0 4px;
           }
           &.active {
             .grcicon-arrow-right {
-              background-position: -102px -80px;
               @include opacity(1);
+              background-position: -102px -80px;
             }
           }
         }
@@ -474,8 +474,8 @@ ul.new-tree {
         }
         .drag {
           [class^="grcicon-"] {
-            margin-top: 6px;
             @include opacity(.2);
+            margin-top: 6px;
           }
           &:hover {
             [class^="grcicon-"] {
@@ -611,11 +611,11 @@ ul.new-tree {
       color: $green;
     }
     .inner-item-count {
+      @include opacity(0.3);
       padding-right: 20px;
       color: $black;
       font-size: 12px;
       font-weight: bold;
-      @include opacity(0.3);
     }
     .response-connect {
       font-style: italic;
@@ -779,15 +779,15 @@ ul.new-tree {
     }
   }
   .tree-info {
-    @include oneline();
+    @extend %oneline;
     vertical-align: middle;
     a {
       &.reference {
         display: inline;
       }
       &.shrink-it {
+        @extend %oneline;
         display: inline-block;
-        @include oneline();
         line-height: 12px;
         width: 80% !important;
         margin-bottom: -2px;
@@ -795,7 +795,7 @@ ul.new-tree {
     }
     font-size:13px;
     .tree-info-list {
-      @include reset-list();
+      @extend %reset-list;
       margin: 6px 0 2px 0;
       li {
         padding-bottom: 4px;
@@ -810,8 +810,8 @@ ul.new-tree {
     li.tree-item {
       background: $white;
       &.item-open {
-        margin: 25px -20px 25px -20px;
         @include box-shadow(0 0 6px rgba(0,0,0, .16), 0 6px 12px rgba(0,0,0, .32));
+        margin: 25px -20px 25px -20px;
         .inner-item-count {
           @include opacity(1);
         }
@@ -839,7 +839,7 @@ ul.new-tree {
             }
           }
         }
-      } 
+      }
     }
     .filter-wrap {
       .filter-border {
@@ -852,9 +852,9 @@ ul.new-tree {
       li.tree-item {
         @include scale(1);
         @include opacity(1);
+        @include box-shadow(none);
         margin-top: 0;
         margin-bottom: 0;
-        @include box-shadow(none);
         li.tree-item {
           > .item-main {
             background: none;
@@ -930,7 +930,7 @@ ul.new-tree {
     li.tree-item {
       line-height: 28px;
       .generated-link {
-        @include oneline();
+        @extend %oneline;
       }
       .row-fluid {
         [class*="span"] {
@@ -955,8 +955,8 @@ ul.new-tree {
             }
             &.active {
               .grcicon-arrow-right {
-                background-position: -126px -80px;
                 @include opacity(1);
+                background-position: -126px -80px;
               }
             }
           }
@@ -1014,11 +1014,11 @@ ul.new-tree {
   display: none;
 }
 .tier-2-info-content {
+  @include clearfix();
   padding: 0 10px 0 32px;
   position: relative;
   font-size: 13px;
   line-height: 20px;
-  @include clearfix();
   .wrap-row {
     margin-bottom: 14px;
     p {
@@ -1042,12 +1042,12 @@ ul.new-tree {
   }
 
   .edit-auditor a {
+    @include opacity(0.4);
+    @include transition(opacity 0.2s);
     font-size:11px;
     font-weight:bold;
     color:#111;
     text-transform:uppercase;
-    @include opacity(0.4);
-    @include transition(opacity 0.2s);
     &:hover {
       @include opacity(1);
       text-decoration:none;
@@ -1058,7 +1058,7 @@ ul.new-tree {
   }
 
   .info-audit {
-    @include reset-list();
+    @extend %reset-list;
     @include clearfix();
     margin: 10px 0 0;
     li {
@@ -1066,12 +1066,12 @@ ul.new-tree {
       margin-right: 20px;
       margin-bottom: 10px;
       a {
+        @include opacity(0.4);
+        @include transition(opacity 0.2s);
         font-size:11px;
         font-weight:bold;
         color:#111;
         text-transform:uppercase;
-        @include opacity(0.4);
-        @include transition(opacity 0.2s);
         &:hover {
           @include opacity(1);
           text-decoration:none;
@@ -1080,35 +1080,6 @@ ul.new-tree {
     }
     [class^="grcicon-"] {
       margin-top: 2px;
-    }
-  }
-  .population-upload {
-    @include reset-list();
-    margin-top: 20px;
-    li {
-      margin-bottom: 20px;
-      label {
-        margin-bottom: 3px;
-      }
-      [class^="grcicon-"] {
-        margin-top: 0;
-      }
-      .choose {
-        margin: 6px 0 0 0;
-        display: inline-block;
-      }
-      .evidence {
-        padding-top: 0;
-        .row-fluid {
-          margin-bottom: 0 !important;
-        }
-      }
-      input {
-        margin-bottom: 0;
-      }
-      .span2 {
-        margin-left: 0;
-      }
     }
   }
 }
@@ -1125,8 +1096,8 @@ ul.new-tree {
     }
   }
   .tree-title-area {
+    @extend %oneline;
     font-size: 12px;
-    @include oneline();
     &.w-status {
       float: left;
       width: 94%;
@@ -1214,6 +1185,7 @@ ul.new-tree {
 }
 
 .info-action {
+  @include opacity(0.6);
   font-size:11px;
   text-transform:uppercase;
   font-weight:bold;
@@ -1221,18 +1193,17 @@ ul.new-tree {
   i.grcicon-edit {
     margin-top:5px;
   }
-  @include opacity(0.6);
   &:hover {
     @include opacity(1);
     text-decoration:none;
   }
   &.relevant-action {
+    @include opacity(0.5);
     padding-right: 20px;
     color: $subTitle;
-    @include opacity(0.5);
     &:hover {
-      color: $subTitle;
       @include opacity(1);
+      color: $subTitle;
     }
     &.all-relevant {
       i {
@@ -1243,8 +1214,8 @@ ul.new-tree {
 }
 
 .counter {
-  color:#000;
   @include opacity(0.5);
+  color:#000;
   .overdue & {
     color: $red;
   }
@@ -1265,8 +1236,8 @@ ul.new-tree {
       display: inline-block;
       line-height: 20px;
       i {
-        margin-top: 2px;
         @include opacity(0.3);
+        margin-top: 2px;
       }
       &:hover {
         i {
@@ -1309,7 +1280,7 @@ ul.new-tree {
     margin-top: 5px;
   }
   .dropdown-menu {
-    @include reset-list();
+    @extend %reset-list;
     @include border-radius(0);
     min-width: 210px;
     float: none;
@@ -1324,19 +1295,20 @@ ul.new-tree {
       clear: both;
       text-transform: none;
       a {
+        @include transition(background 0.2s ease, color 0.2s ease);
         display: block;
         line-height: 30px;
         padding: 0 10px;
         background: none;
         text-shadow: none;
         color: $gray;
-        @include transition(background 0.2s ease, color 0.2s ease);
         i {
-          margin: 7px 4px 0 0;
           @include opacity(0.4);
           @include transition(opacity 0.2s ease);
+          margin: 7px 4px 0 0;
         }
-        &:hover {
+        &:hover,
+        &.zeroclipboard-is-hover {
           background: $headerBgnd;
           color: $black;
           i {
@@ -1358,6 +1330,20 @@ ul.new-tree {
       }
     }
   }
+  &.status-wrap {
+    float: none;
+    clear: both;
+    margin-left: 0;
+    width: auto;
+    margin-top: 0;
+    .dropdown-toggle {
+      display: inline-block;
+    }
+    .dropdown-menu {
+      right: auto;
+      left: 0;
+    }
+  }
 }
 
 .selector-list {
@@ -1376,13 +1362,13 @@ ul.new-tree {
 .state-type {
   display: inline-block;
   .dropdown-menu {
+    @include border-radius($default-border-radius);
     left: -10px;
     top: 26px;
     z-index: 9999;
     margin: 0;
     padding: 0;
     font-weight: normal;
-    @include border-radius($default-border-radius);
     min-width: 160px;
     float: none;
     background: $white;
@@ -1419,7 +1405,7 @@ ul.new-tree {
 .show-in-tree {
   font-size: 11px;
   span {
-    @include oneline();
+    @extend %oneline;
     display: block;
   }
   .red {

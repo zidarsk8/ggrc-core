@@ -704,6 +704,9 @@ can.Model("can.Model.Cacheable", {
   }
   , load_custom_attribute_definitions: function custom_attribute_definitions() {
     var self = this;
+    if (self.attr('custom_attribute_definitions')) {
+      return new $.Deferred().resolve(self.attr('custom_attribute_definitions'));
+    }
     return CMS.Models.CustomAttributeDefinition.findAll({
       definition_type: self.class.root_object
     }).then(function(definitions) {
@@ -1015,8 +1018,8 @@ can.Model("can.Model.Cacheable", {
     }
 
     pre_save_notifier.on_empty(function() {
-
-      xhr = _super.apply(that, arguments).then(function(result) {
+      xhr = _super.apply(that, arguments)
+      .then(function(result) {
         if (isNew) {
           that.after_create && that.after_create();
         } else {
@@ -1027,10 +1030,14 @@ can.Model("can.Model.Cacheable", {
       }, function(xhr, status, message) {
         that.save_error && that.save_error(xhr.responseText);
         return new $.Deferred().reject(xhr, status, message);
-      });
-
-      xhr.always(function() {
-        that.notifier.on_empty(function() {
+      })
+      .fail(function (response) {
+        that.notifier.on_empty(function () {
+          dfd.reject(that, response.responseText);
+        });
+      })
+      .done(function () {
+        that.notifier.on_empty(function () {
           dfd.resolve(that);
         });
       });

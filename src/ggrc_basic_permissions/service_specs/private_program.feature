@@ -151,22 +151,18 @@ Feature: Private Programs
       #| ControlAssertion |
       #| ControlCategory  |
       | ControlControl   |
-      | ControlSection   |
       | DataAsset        |
       | Contract         |
       | Policy           |
       | Regulation       |
       | Standard         |
-      | DirectiveControl |
       | Document         |
       | Facility         |
       #| Help             |
       | Market           |
       | Objective        |
-      | ObjectiveControl |
       #| ObjectControl    |
       #| ObjectDocument   |
-      #| ObjectObjective  |
       #| ObjectPerson     |
       #| ObjectSection    |
       | Option           |
@@ -175,6 +171,5 @@ Feature: Private Programs
       | Project          |
       #| Relationship     |
       | Section          |
-      | SectionObjective |
       | System           |
       | Process          |

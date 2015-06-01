@@ -25,6 +25,7 @@ if os.environ.get('TRAVIS', False):
 class TestRecurringCycleNotifications(TestCase):
 
   def setUp(self):
+    TestCase.setUp(self)
     self.api = Api()
     self.generator = WorkflowsGenerator()
     self.ggrc_generator = GgrcGenerator()
@@ -98,6 +99,7 @@ class TestRecurringCycleNotifications(TestCase):
         "description": "",
         "owners": [person_dict(self.assignee.id)],
         "frequency": "quarterly",
+        "notify_on_change": True,
         "task_groups": [{
             "title": "tg_1",
             "contact": person_dict(self.assignee.id),

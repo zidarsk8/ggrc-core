@@ -6,16 +6,13 @@
 .row-fluid
   .span12
     %h1
-      %span.title-prev
-        -if current_user.system_wide_role.lower() != 'no access'
-          %button{ 'class': 'lhn-trigger pull-left', 'href': 'javascript://'}
-            %span.icon-bar
-            %span.icon-bar
-            %span.icon-bar
-        %a.title-trigger{'href': '/dashboard'}
-          %i.grciconlarge-dashboard-new{'rel': 'tooltip', 'data-original-title': 'My Work'}
+      -if current_user.system_wide_role.lower() != 'no access'
+        %button{ 'class': 'lhn-trigger', 'href': 'javascript://'}
+          %span.icon-bar
+          %span.icon-bar
+          %span.icon-bar
 
-      %span.title-slide
+      %span.title-content
         -if request.path.startswith('/admin')
           %i.grciconlarge-dashboard
           Admin Dashboard
@@ -43,7 +40,7 @@
             =current_user.email
           %i.grcicon-carot
         %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
-          %li
+          %li.full-opacity
             %a{'href': "/dashboard"}
               %i.grcicon-my-work
               My Work ({{current_user.system_wide_role}})
@@ -61,25 +58,25 @@
                 %input{
                   'type': 'checkbox',
                   'name': 'notifications',
-                  'value': 'Email_Now'
-                }
-                Real-time email updates
-              %label
-                %input{
-                  'type': 'checkbox',
-                  'name': 'notifications',
                   'value': 'Email_Digest'
                 }
                 Daily email digest
+              %label.inner
+                %input{
+                  'type': 'checkbox',
+                  'name': 'notifications',
+                  'value': 'Email_Now'
+                }
+                Real-time email updates
           %li
             %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
               %i.grcicon-logout-black
               Logout
       %li
         %a.nav-trigger.active{'href': 'javascript://'}
-          %i.grcicon-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Hide menu'}
+          %i.grcicon-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Menu'}
           %span
-            Hide menu
+            Menu
       -if self.page_help
         %li
           %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}

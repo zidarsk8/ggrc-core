@@ -274,35 +274,27 @@ can.Control("CMS.Controllers.TreeLoader", {
         if (!that._pending_items) {
           return;
         }
-        var chunk = that._pending_items.splice(0, 5),
-            to_refresh = can.map(chunk, function(item) {
-              item = item.instance || item;
-              return item.selfLink ? undefined : item;
-            })
-            ;
+        var chunk = that._pending_items.splice(0, 5);
 
-        new RefreshQueue().enqueue(to_refresh).trigger().then(function() {
-
-          that.insert_items(chunk);
-          if (that._pending_items && that._pending_items.length > 0) {
-            setTimeout(that._ifNotRemoved(processChunk), 100);
-          }
-          else {
-            that._pending_items = null;
-            setTimeout(that._ifNotRemoved(function() {
-              if (!that._pending_items) {
-                $.when(that.fetch_custom_attr_values()).
-                  then(function () {
-                    that._loading_finished();
-                  });
-              }
-            }), 200);
-          }
-        });
+        that.insert_items(chunk);
+        if (that._pending_items && that._pending_items.length > 0) {
+          setTimeout(that._ifNotRemoved(processChunk), 10);
+        }
+        else {
+          that._pending_items = null;
+          setTimeout(that._ifNotRemoved(function() {
+            if (!that._pending_items) {
+              that._loading_finished();
+            }
+          }), 200);
+        }
       };
-
-      setTimeout(this._ifNotRemoved(processChunk), 100);
-
+      $.when.apply($, can.map(this._pending_items, function(item) {
+        var instance = item.instance || item;
+        if (instance.custom_attribute_values) {
+          return instance.refresh_all('custom_attribute_values');
+        }
+      })).then(this._ifNotRemoved(processChunk));
       return this._loading_deferred;
     }
 
@@ -405,40 +397,24 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   // When user selects 3 middle selectable attribute, title width is reduced to span3
   // and when user selects 4 attributes, the action column is also reduced to span3
   setup_column_width: function () {
-    var display_options = {},
-        title_width = 4,
-        action_width = 4,
-        selectable_width = 4,
-        display_width = 12;
+    var display_options,
+        display_width = 12,
+        attr_count = this.options.display_attr_list.length,
+        widths = {
+          defaults: [4, 4, 4],
+          0: [7, 1, 4],
+          3: [3, 5, 4],
+          4: [3, 6, 3],
+        },
+        selected_widths = widths[attr_count] || widths.defaults;
 
-    if (this.options.display_attr_list.length) {
-      switch (this.options.display_attr_list.length) {
-        case 3:
-          display_options.title_width = title_width - 1;
-          display_options.action_width = action_width;
-          display_options.selectable_width = selectable_width + 1;
-          break;
-        case 4:
-          display_options.title_width = title_width - 1;
-          display_options.action_width = action_width - 1;
-          display_options.selectable_width = selectable_width + 2;
-          break
-        default:
-          display_options.title_width = title_width;
-          display_options.action_width = action_width;
-          display_options.selectable_width = selectable_width;
-          break;
-      }
-      display_options.selectable_attr_width =
-        Math.floor(display_width/this.options.display_attr_list.length);
-    } else {
-      display_options.title_width = title_width + selectable_width - 1; //leave a little space
-      display_options.action_width = action_width;
-      display_options.selectable_width = 1;
-      display_options.selectable_attr_width = display_width;
+    display_options = {
+      title_width: selected_widths[0],
+      selectable_width: selected_widths[1],
+      action_width: selected_widths[2],
+      selectable_attr_width: display_width / Math.max(attr_count, 1)
     }
     this.options.attr('display_options', display_options);
-
   },
 
   //Displays attribute list for tree-header, Select attribute list drop down
@@ -687,16 +663,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       return this.find_all_deferred;
     }
-  }
-
-  , fetch_custom_attr_values: function() {
-    var deferred = new $.Deferred();
-    CMS.Models.CustomAttributeValue.findAll({attributable_type: this.options.model.shortName})
-      .then(function (defs) {
-        deferred.resolve();
-    });
-    return deferred;
-
   }
 
   , display_path: function(path) {

@@ -65,13 +65,6 @@ class TestImport(TestCase):
     actual_slugs = set()
     actual_start_dates = set()
     actual_end_dates = set()
-    ctrls = Control.query.all()
-    for directive_control in pol1.directive_controls:
-      control = directive_control.control
-      actual_titles.add(control.title)
-      actual_slugs.add(control.slug)
-      actual_start_dates.add(control.start_date)
-      actual_end_dates.add(control.end_date)
     self.assertEqual(
         expected_titles,
         actual_titles,
@@ -134,22 +127,6 @@ class TestImport(TestCase):
         ControlsConverter,
         csv_filename,
         **options
-    )
-    actual_titles = set()
-    actual_slugs = set()
-    controls = [x.control for x in pol1.directive_controls]
-    for control in controls:
-      actual_titles.add(control.title)
-      actual_slugs.add(control.slug)
-    self.assertEqual(
-        expected_titles,
-        actual_titles,
-        "Control titles not imported correctly"
-    )
-    self.assertEqual(
-        expected_slugs,
-        actual_slugs,
-        "Control slugs not imported correctly"
     )
     systems = System.query.all()
     for system in systems:
@@ -253,12 +230,6 @@ class TestImport(TestCase):
     actual_slugs = set()
     actual_start_dates = set()
     actual_end_dates = set()
-    controls = [x.control for x in pol1.directive_controls]
-    for control in controls:
-      actual_titles.add(control.title)
-      actual_slugs.add(control.slug)
-      actual_start_dates.add(control.start_date)
-      actual_end_dates.add(control.end_date)
     self.assertEqual(
         expected_titles,
         actual_titles,

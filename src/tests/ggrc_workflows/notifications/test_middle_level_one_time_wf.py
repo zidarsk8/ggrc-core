@@ -32,6 +32,7 @@ class TestOneTimeWorkflowNotification(TestCase):
   """
 
   def setUp(self):
+    TestCase.setUp(self)
     self.api = Api()
     self.wf_generator = WorkflowsGenerator()
     self.ggrc_generator = GgrcGenerator()

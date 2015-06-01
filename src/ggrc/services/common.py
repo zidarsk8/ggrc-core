@@ -642,40 +642,38 @@ class Resource(ModelView):
       )
 
   def dispatch_request(self, *args, **kwargs):
-    method = request.method
+    with benchmark("Dispatch request"):
+      with benchmark("dispatch_request > Check Headers"):
+        method = request.method
+        if method in ('POST', 'PUT', 'DELETE')\
+            and 'X-Requested-By' not in request.headers:
+          raise BadRequest('X-Requested-By header is REQUIRED.')
 
-    if method in ('POST', 'PUT', 'DELETE')\
-        and 'X-Requested-By' not in request.headers:
-      raise BadRequest('X-Requested-By header is REQUIRED.')
-
-    if getattr(settings, 'CALENDAR_MECHANISM', False) is True:
-      if method in ('POST', 'PUT', 'DELETE'):
-        request.oauth_credentials=get_oauth_credentials()
-
-    try:
-      if method == 'GET':
-        if self.pk in kwargs and kwargs[self.pk] is not None:
-          return self.get(*args, **kwargs)
-        else:
-          return self.collection_get()
-      elif method == 'POST':
-        if self.pk in kwargs and kwargs[self.pk] is not None:
-          return self.post(*args, **kwargs)
-        else:
-          return self.collection_post()
-      elif method == 'PUT':
-        return self.put(*args, **kwargs)
-      elif method == 'DELETE':
-        return self.delete(*args, **kwargs)
-      else:
-        raise NotImplementedError()
-    except (IntegrityError, ValidationError) as v:
-      message = translate_message(v)
-      current_app.logger.warn(message)
-      return ((message, 403, []))
-    except Exception as e:
-      current_app.logger.exception(e)
-      raise
+      with benchmark("dispatch_request > Try"):
+        try:
+          if method == 'GET':
+            if self.pk in kwargs and kwargs[self.pk] is not None:
+              return self.get(*args, **kwargs)
+            else:
+              return self.collection_get()
+          elif method == 'POST':
+            if self.pk in kwargs and kwargs[self.pk] is not None:
+              return self.post(*args, **kwargs)
+            else:
+              return self.collection_post()
+          elif method == 'PUT':
+            return self.put(*args, **kwargs)
+          elif method == 'DELETE':
+            return self.delete(*args, **kwargs)
+          else:
+            raise NotImplementedError()
+        except (IntegrityError, ValidationError) as v:
+          message = translate_message(v)
+          current_app.logger.warn(message)
+          return ((message, 403, []))
+        except Exception as e:
+          current_app.logger.exception(e)
+          raise
 
   def post(*args, **kwargs):
     raise NotImplementedError()
@@ -689,11 +687,12 @@ class Resource(ModelView):
     if 'Accept' in self.request.headers and \
         'application/json' not in self.request.headers['Accept']:
       return current_app.make_response((
-        'application/json', 406, [('Content-Type', 'text/plain')]))
-    if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
-      raise Forbidden()
-    if not permissions.is_allowed_read_for(obj):
-      raise Forbidden()
+          'application/json', 406, [('Content-Type', 'text/plain')]))
+    with benchmark("Query read permissions"):
+      if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
+        raise Forbidden()
+      if not permissions.is_allowed_read_for(obj):
+        raise Forbidden()
     with benchmark("Serialize object"):
       object_for_json = self.object_for_json(obj)
 
@@ -748,28 +747,33 @@ class Resource(ModelView):
     except KeyError, e:
       return current_app.make_response((
         'Required attribute "{0}" not found'.format(root_attribute), 400, []))
-    if not permissions.is_allowed_update(self.model.__name__, obj.context_id):
-      raise Forbidden()
-    if not permissions.is_allowed_update_for(obj):
-      raise Forbidden()
-    new_context = self.get_context_id_from_json(src)
-    if new_context != obj.context_id \
-        and not permissions.is_allowed_update(self.model.__name__, new_context):
-      raise Forbidden()
+    with benchmark("Query update permissions"):
+      if not permissions.is_allowed_update(self.model.__name__, obj.context_id):
+        raise Forbidden()
+      if not permissions.is_allowed_update_for(obj):
+        raise Forbidden()
+      new_context = self.get_context_id_from_json(src)
+      if new_context != obj.context_id \
+          and not permissions.is_allowed_update(self.model.__name__, new_context):
+        raise Forbidden()
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
-    self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
-    modified_objects = get_modified_objects(db.session)
-    log_event(db.session, obj)
+    with benchmark("Send PUTed event"):
+      self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
+    with benchmark("Get modified objects"):
+      modified_objects = get_modified_objects(db.session)
+    with benchmark("Log event"):
+      log_event(db.session, obj)
     with benchmark("Update memcache before commit for resource collection PUT"):
       update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
     with benchmark("Query for object"):
       obj = self.get_object(id)
-    update_index(db.session, modified_objects)
+    with benchmark("Update index"):
+      update_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for resource collection PUT"):
       update_memcache_after_commit(self.request)
     with benchmark("Serialize collection"):
@@ -796,25 +800,31 @@ class Resource(ModelView):
       header_error = self.validate_headers_for_put_or_delete(obj)
       if header_error:
         return header_error
-      if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
-        raise Forbidden()
-      if not permissions.is_allowed_delete_for(obj):
-        raise Forbidden()
+      with benchmark("Query delete permissions"):
+        if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
+          raise Forbidden()
+        if not permissions.is_allowed_delete_for(obj):
+          raise Forbidden()
       db.session.delete(obj)
-      self.model_deleted.send(obj.__class__, obj=obj, service=self)
-      modified_objects = get_modified_objects(db.session)
-      log_event(db.session, obj)
+      with benchmark("Send DELETEd event"):
+        self.model_deleted.send(obj.__class__, obj=obj, service=self)
+      with benchmark("Get modified objects"):
+        modified_objects = get_modified_objects(db.session)
+      with benchmark("Log event"):
+        log_event(db.session, obj)
       with benchmark("Update memcache before commit for resource collection DELETE"):
         update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
       with benchmark("Commit"):
         db.session.commit()
-      update_index(db.session, modified_objects)
+      with benchmark("Update index"):
+        update_index(db.session, modified_objects)
       with benchmark("Update memcache after commit for resource collection DELETE"):
         update_memcache_after_commit(self.request)
       with benchmark("Query for object"):
         object_for_json = self.object_for_json(obj)
-      result = self.json_success_response(
-          object_for_json, self.modified_at(obj))
+      with benchmark("Make response"):
+        result = self.json_success_response(
+            object_for_json, self.modified_at(obj))
     except:
       import traceback
       task.finish("Failure", traceback.format_exc())
@@ -870,62 +880,65 @@ class Resource(ModelView):
     return cache_objs, database_objs
 
   def collection_get(self):
-    if 'Accept' in self.request.headers and \
-        'application/json' not in self.request.headers['Accept']:
-      return current_app.make_response((
-        'application/json', 406, [('Content-Type', 'text/plain')]))
+    with benchmark("dispatch_request > collection_get > Check headers"):
+      if 'Accept' in self.request.headers and \
+          'application/json' not in self.request.headers['Accept']:
+        return current_app.make_response((
+          'application/json', 406, [('Content-Type', 'text/plain')]))
+    with benchmark("dispatch_request > collection_get > Get collection matches"):
+      matches_query = self.get_collection_matches(self.model)
+    with benchmark("dispatch_request > collection_get > Query Data"):
+      if '__page' in request.args or '__page_only' in request.args:
+        with benchmark("Query matches with paging"):
+          matches, extras = self.apply_paging(matches_query)
+      else:
+        with benchmark("Query matches"):
+          matches = matches_query.all()
+          extras = {}
+    with benchmark("dispatch_request > collection_get > Get matched resources"):
+      cache_op = None
+      if '__stubs_only' in request.args:
+        objs = [{
+            'id': m[0],
+            'type': m[1],
+            'href': utils.url_for(m[1], id=m[0]),
+            'context_id': m[2]
+            } for m in matches]
 
-    matches_query = self.get_collection_matches(self.model)
+      else:
+        cache_objs, database_objs = self.get_matched_resources(matches)
 
-    if '__page' in request.args or '__page_only' in request.args:
-      matches, extras = self.apply_paging(matches_query)
-    else:
-      matches = matches_query.all()
-      extras = {}
+        objs = {}
+        objs.update(cache_objs)
+        objs.update(database_objs)
 
-    cache_op = None
-    if '__stubs_only' in request.args:
-      objs = [{
-          'id': m[0],
-          'type': m[1],
-          'href': utils.url_for(m[1], id=m[0]),
-          'context_id': m[2]
-          } for m in matches]
+        objs = [objs[m] for m in matches if m in objs]
 
-    else:
-      cache_objs, database_objs = self.get_matched_resources(matches)
+        with benchmark("Filter resources based on permissions"):
+          objs = filter_resource(objs)
 
-      objs = {}
-      objs.update(cache_objs)
-      objs.update(database_objs)
+        cache_op = 'Hit' if len(cache_objs) > 0 else 'Miss'
+    with benchmark("dispatch_request > collection_get > Create Response"):
+      # Return custom fields specified via `__fields=id,title,description` etc.
+      # TODO this can be optimized by filter_resource() not retrieving the other fields to being with
+      if '__fields' in request.args:
+          custom_fields = request.args['__fields'].split(',')
+          objs = [
+              {f: o[f] for f in custom_fields if f in o}
+              for o in objs]
 
-      objs = [objs[m] for m in matches if m in objs]
+      with benchmark("Serialize collection"):
+        collection = self.build_collection_representation(
+            objs, extras=extras)
 
-      with benchmark("Filter resources"):
-        objs = filter_resource(objs)
+      if 'If-None-Match' in self.request.headers and \
+          self.request.headers['If-None-Match'] == self.etag(collection):
+        return current_app.make_response((
+          '', 304, [('Etag', self.etag(collection))]))
 
-      cache_op = 'Hit' if len(cache_objs) > 0 else 'Miss'
-
-    # Return custom fields specified via `__fields=id,title,description` etc.
-    # TODO this can be optimized by filter_resource() not retrieving the other fields to being with
-    if '__fields' in request.args:
-        custom_fields = request.args['__fields'].split(',')
-        objs = [
-            {f: o[f] for f in custom_fields if f in o}
-            for o in objs]
-
-    with benchmark("Serialize collection"):
-      collection = self.build_collection_representation(
-          objs, extras=extras)
-
-    if 'If-None-Match' in self.request.headers and \
-        self.request.headers['If-None-Match'] == self.etag(collection):
-      return current_app.make_response((
-        '', 304, [('Etag', self.etag(collection))]))
-
-    with benchmark("Make response"):
-      return self.json_success_response(
-        collection, self.collection_last_modified(), cache_op=cache_op)
+      with benchmark("Make response"):
+        return self.json_success_response(
+          collection, self.collection_last_modified(), cache_op=cache_op)
 
   def get_resources_from_cache(self, matches):
     """Get resources from cache for specified matches"""
@@ -999,10 +1012,12 @@ class Resource(ModelView):
       src = src[root_attribute]
     except KeyError, e:
       return current_app.make_response((
-        'Required attribute "{0}" not found'.format(root_attribute), 400, []))
-    if not permissions.is_allowed_create(
-        self.model.__name__, self.get_context_id_from_json(src)):
-      raise Forbidden()
+          'Required attribute "{0}" not found'.format(
+              root_attribute), 400, []))
+    with benchmark("Query create permissions"):
+      if not permissions.is_allowed_create(self.model.__name__,
+                                           self.get_context_id_from_json(src)):
+        raise Forbidden()
     if src.get('private') == True and src.get('context') is not None \
         and src['context'].get('id') is not None:
       raise BadRequest(
@@ -1015,17 +1030,22 @@ class Resource(ModelView):
         raise Forbidden()
     with benchmark("Deserialize object"):
       self.json_create(obj, src)
-    self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
+    with benchmark("Send model POSTed event"):
+      self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
-    modified_objects = get_modified_objects(db.session)
-    set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
-    log_event(db.session, obj)
+    with benchmark("Get modified objects"):
+      modified_objects = get_modified_objects(db.session)
+    with benchmark("Update custom attribute values"):
+      set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
+    with benchmark("Log event"):
+      log_event(db.session, obj)
     with benchmark("Update memcache before commit for resource collection POST"):
       update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
-    update_index(db.session, modified_objects)
+    with benchmark("Update index"):
+      update_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for resource collection POST"):
       update_memcache_after_commit(self.request)
     with benchmark("Serialize object"):

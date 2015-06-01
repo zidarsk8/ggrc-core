@@ -21,6 +21,7 @@ dashboard-js-files:
   - bootstrap/modal-form.js
   - zeroclipboard/ZeroClipboard.min.js
   - stickyfill.js
+  - mousetrap.min.js
   - can.jquery.js
   - can.construct.super.js
   - can.map.validations.js
@@ -167,6 +168,7 @@ dashboard-js-template-files:
   - control_assessments/tree_add_item.mustache
   - control_assessments/info.mustache
   - issues/modal_content.mustache
+  - issues/info.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
@@ -295,7 +297,6 @@ dashboard-js-template-files:
   - responses/confirm_delete_evidence.mustache
   - responses/tree.mustache
   - responses/info.mustache
-  - responses/tree_footer.mustache
   - responses/tree_add_item.mustache
   - responses/modal_content.mustache
   - meetings/modal_content.mustache

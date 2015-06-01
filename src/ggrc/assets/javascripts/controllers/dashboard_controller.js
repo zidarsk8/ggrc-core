@@ -105,7 +105,7 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , init_info_pin: function() {
-    new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
+    this.info_pin = new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
   }
 
   , ".nav-trigger click": function(el, ev) {
@@ -115,20 +115,30 @@ can.Control("CMS.Controllers.Dashboard", {
         this.open_nav(el);
       }
     }
+
+  , '.user-dropdown click': function (el, ev) {
+    var email_now = el.find('input[value="Email_Now"]'),
+        email_digest = el.find('input[value="Email_Digest"]'),
+        email_now_label = email_now.closest('label');
+
+    if (email_digest[0].checked) {
+      email_now_label.removeClass('disabled');
+      email_now.prop('disabled', false);
+    }
+  }
+
   , open_nav: function (el) {
     el || (el = $(".nav-trigger"));
     var options = {
         duration: 800,
         easing: 'easeOutExpo'
     },
-        $label = el.find("span"),
         $nav = el.closest("body").find(".top-inner-nav"),
         $lhn_nav = el.closest("body").find(".lhs-holder"),
         $lhn_type = el.closest("body").find(".lhn-type"),
         $content = el.closest("body").find(".object-area");
 
     el.addClass("active");
-    $label.text("Hide menu");
     $nav.animate({top: "48"}, options);
     $lhn_type.animate({top: "94"}, options);
     $lhn_nav.animate({top: "128"}, options);
@@ -144,14 +154,12 @@ can.Control("CMS.Controllers.Dashboard", {
         duration: 800,
         easing: 'easeOutExpo'
     },
-        $label = el.find("span"),
         $nav = el.closest("body").find(".top-inner-nav"),
         $lhn_nav = el.closest("body").find(".lhs-holder"),
         $lhn_type = el.closest("body").find(".lhn-type"),
         $content = el.closest("body").find(".object-area");
 
     el.removeClass("active");
-    $label.text("Show menu");
     $nav.animate({top: "18"}, options);
     $lhn_type.animate({top: "65"}, options);
     $lhn_nav.animate({top: "99"}, options);
@@ -369,7 +377,7 @@ can.Control("CMS.Controllers.InnerNav", {
 
         this.options.instance = GGRC.page_instance();
         if (!(this.options.contexts instanceof can.Observe)) {
-         this.options.contexts = new can.Observe(this.options.contexts);
+          this.options.contexts = new can.Observe(this.options.contexts);
         }
 
         // FIXME: Initialize from `*_widget` hash when hash has no `#!`
@@ -403,14 +411,10 @@ can.Control("CMS.Controllers.InnerNav", {
 
       window.location.hash = path;
 
-      if (path.length > 0) {
-        this.display_path(path);
-      } else {
-        this.display_path('info_widget');
-      }
+      this.display_path(path.length ? path : "info_widget");
     }
 
-  , display_path: function(path) {
+  , display_path: function (path) {
       var step = path.split("/")[0],
           rest = path.substr(step.length + 1),
           widget_list = this.options.widget_list;
@@ -424,47 +428,50 @@ can.Control("CMS.Controllers.InnerNav", {
       if (widget) {
         this.set_active_widget(widget);
         return this.display_widget_path(rest);
-      } else {
-        return new $.Deferred().resolve();
       }
+      return new $.Deferred().resolve();
     }
 
-  , display_widget_path: function(path) {
-      var active_widget_selector = this.options.contexts.active_widget.selector
-        , $active_widget = $(active_widget_selector)
-        , widget_controller = $active_widget.control()
-        ;
+  , display_widget_path: function (path) {
+      var active_widget_selector = this.options.contexts.active_widget.selector,
+          $active_widget = $(active_widget_selector),
+          widget_controller = $active_widget.control();
+
       if (widget_controller && widget_controller.display_path) {
         return widget_controller.display_path(path);
       }
-      else {
-        return new $.Deferred().resolve();
-      }
+      return new $.Deferred().resolve();
     }
 
   , set_active_widget: function (widget) {
-    var active_widget = widget,
-        info_pin = $(this.options.pin_view).control();
-
     if (typeof widget === "string") {
-      active_widget = this.widget_by_selector(widget);
+      widget = this.widget_by_selector(widget);
     }
 
-    active_widget.attr("force_show", true);
-    this.update_add_more_link();
-    this.options.contexts.attr("active_widget", active_widget);
-    this.show_active_widget();
+    if (widget !== this.options.contexts.attr("active_widget")) {
+      widget.attr("force_show", true);
+      this.update_add_more_link();
+      this.options.contexts.attr("active_widget", widget);
+      this.show_active_widget();
+    }
   }
 
-  , show_active_widget : function(selector) {
-    var that = this
-      , widget = $(selector || this.options.contexts.attr('active_widget').selector);
+  , show_active_widget: function (selector) {
+    var panel_selector = selector || this.options.contexts.attr('active_widget').selector,
+        widget = $(panel_selector),
+        dashboard_controller = this.options.dashboard_controller,
+        info_pin_controller = dashboard_controller.info_pin.element.control();
+
+    if (info_pin_controller) {
+      info_pin_controller.hideInstance();
+    }
+      
     if (widget.length) {
-      this.options.dashboard_controller.show_widget_area();
+      dashboard_controller.show_widget_area();
       widget.siblings(':visible').hide().end().show();
-      $('[href=' + (selector || that.options.contexts.attr('active_widget').selector) + ']')
-        .closest('li').addClass('active')
-        .siblings().removeClass('active');
+      $("[href=" + panel_selector + "]")
+        .closest("li").addClass("active")
+        .siblings().removeClass("active");
     }
   }
 
@@ -624,22 +631,30 @@ can.Control("CMS.Controllers.InnerNav", {
     "{window} resize" : function(el, ev) {
       this.show_hide_titles();
     },
-    show_hide_titles: function() {
+    show_hide_titles: _.debounce(function() {
       var $el = this.element,
-          $last = $el.children().not(':hidden,.inner-nav-button').last(),
-          widgets = this.options.widget_list,
-          last_pos = $last.position() || {},
+          widgets = this.options.widget_list;
 
-          are_shown = widgets.length && widgets[0].attr('show_title'),
-          num_visible = $el.children(':visible').length,
-
-          threshold = are_shown ? 180 : 180 + 70*num_visible,
-          do_show = $el.width() - last_pos.left > threshold;
-
+      // first expand all
       widgets.forEach(function(widget) {
-        widget.attr('show_title', do_show);
+        widget.attr('show_title', true);
       });
-    },
+
+      // see if too wide
+      var widths = _.map($el.children(':visible'),
+                         function (el) {
+                           return $(el).width();
+                         }).reduce(function (m, w) {
+                           return m+w;
+                         }, 0);
+
+      // adjust
+      if (widths > $el.width()) {
+        widgets.forEach(function (widget) {
+          widget.attr('show_title', false);
+        });
+      }
+    }, 100),
     '.closed click' : function(el, ev) {
       var $link = el.closest('a'),
           widget = this.widget_by_selector($link.attr('href')),

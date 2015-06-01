@@ -13,24 +13,29 @@ from factory.compat import UTC
 from ggrc import models
 from ggrc.models.reflection import AttributeInfo
 
+
 def random_string(prefix='', no_unicode=False):
   return u'{prefix}{suffix}{extra}'.format(
       prefix=prefix,
-      suffix=random.randint(0,9999999999),
+      suffix=random.randint(0, 9999999999),
       extra='' if no_unicode else u'\xff'
-      )
+  )
+
 
 def random_string_attribute(prefix=''):
   return factory.LazyAttribute(lambda m: random_string(prefix))
+
 
 class FuzzyEmail(BaseFuzzyAttribute):
   def fuzz(self):
     return u"{0}@{1}.{2}".format(
         random_string('user-', True), random_string('domain-', True), 'com')
 
+
 class FactoryStubMarker(object):
   def __init__(self, class_):
     self.class_ = class_
+
 
 class FactoryAttributeGenerator(object):
   """Use the SQLAlchemy ORM model to generate factory attributes."""
@@ -46,7 +51,7 @@ class FactoryAttributeGenerator(object):
     else:
       attr_name = attr
       class_attr = getattr(model_class, attr_name)
-      #look up the class method to use to generate the attribute
+      # look up the class method to use to generate the attribute
       method = getattr(cls, class_attr.__class__.__name__)
       value = method(attr_name, class_attr)
     attrs[attr_name] = value
@@ -71,16 +76,16 @@ class FactoryAttributeGenerator(object):
   @classmethod
   def DateTime(cls, attr_name, class_attr):
     return FuzzyDateTime(
-      datetime.datetime(2013,1,1,tzinfo=UTC),
-      datetime.datetime.now(UTC) + datetime.timedelta(days=730),
-      )
+        datetime.datetime(2013, 1, 1, tzinfo=UTC),
+        datetime.datetime.now(UTC) + datetime.timedelta(days=730),
+    )
 
   @classmethod
   def Date(cls, attr_name, class_attr):
     return FuzzyDate(
-      datetime.date(2013,1,1),
-      datetime.date.today() + datetime.timedelta(days=730),
-      )
+        datetime.date(2013, 1, 1),
+        datetime.date.today() + datetime.timedelta(days=730),
+    )
 
   @classmethod
   def Boolean(cls, attr_name, class_attr):
@@ -88,7 +93,7 @@ class FactoryAttributeGenerator(object):
 
   @classmethod
   def Integer(cls, attr_name, class_attr):
-    return FuzzyInteger(0,100000)
+    return FuzzyInteger(0, 100000)
 
   @classmethod
   def RelationshipProperty(cls, attr_name, class_attr):
@@ -120,6 +125,7 @@ class FactoryAttributeGenerator(object):
   def simple_property(cls, attr_name, class_attr):
     return None
 
+
 class ModelFactoryMetaClass(FactoryMetaClass):
   def __new__(cls, class_name, bases, attrs, extra_attrs=None):
     """Use model reflection to build up the list of factory attributes.
@@ -135,20 +141,21 @@ class ModelFactoryMetaClass(FactoryMetaClass):
           attr_name = attr.attr_name
         else:
           attr_name = attr
-        if not attr_name in attrs:
+        if attr_name not in attrs:
           FactoryAttributeGenerator.generate(attrs, model_class, attr)
     return super(ModelFactoryMetaClass, cls).__new__(
         cls, class_name, bases, attrs)
 
 ModelFactory = ModelFactoryMetaClass(
     'ModelFactory', (BaseFactory,), {
-    'ABSTRACT_FACTORY': True,
-    'FACTORY_STRATEGY': CREATE_STRATEGY,
-    '__doc__': """ModelFactory base with build and create support.
+        'ABSTRACT_FACTORY': True,
+        'FACTORY_STRATEGY': CREATE_STRATEGY,
+        '__doc__': """ModelFactory base with build and create support.
 
-    This class has supports SQLAlchemy ORM.
-    """,
+        This class has supports SQLAlchemy ORM.
+        """,
     })
+
 
 def factory_for(model_class):
   """Get the factory for a model by name or by class.
@@ -180,7 +187,6 @@ def factory_for(model_class):
   return factory
 
 
-
 class PersonFactory(ModelFactory):
   MODEL = models.Person
   email = FuzzyEmail()
@@ -193,25 +199,30 @@ class ProgramFactory(ModelFactory):
   kind = FuzzyChoice(['Directive', 'Company Controls'])
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+
 class ContractFactory(ModelFactory):
   MODEL = models.Contract
   kind = FuzzyChoice(MODEL.valid_kinds)
   status = FuzzyChoice(MODEL.VALID_STATES)
+
 
 class PolicyFactory(ModelFactory):
   MODEL = models.Policy
   kind = FuzzyChoice(MODEL.valid_kinds)
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+
 class RegulationFactory(ModelFactory):
   MODEL = models.Regulation
   kind = FuzzyChoice(MODEL.valid_kinds)
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+
 class StandardFactory(ModelFactory):
   MODEL = models.Standard
   kind = FuzzyChoice(MODEL.valid_kinds)
   status = FuzzyChoice(MODEL.VALID_STATES)
+
 
 class SectionFactory(ModelFactory):
   MODEL = models.Section
@@ -219,12 +230,15 @@ class SectionFactory(ModelFactory):
   # column, but uses @validate to maintain requirement
   directive = FactoryStubMarker(models.Regulation)
 
+
 class ClauseFactory(ModelFactory):
   MODEL = models.Clause
+
 
 class ObjectiveFactory(ModelFactory):
   MODEL = models.Objective
   status = FuzzyChoice(MODEL.VALID_STATES)
+
 
 class ControlFactory(ModelFactory):
   MODEL = models.Control
@@ -236,29 +250,36 @@ class DataAssetFactory(ModelFactory):
   MODEL = models.DataAsset
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+
 class FacilityFactory(ModelFactory):
   MODEL = models.Facility
   status = FuzzyChoice(MODEL.VALID_STATES)
+
 
 class MarketFactory(ModelFactory):
   MODEL = models.Market
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+
 class OrgGroupFactory(ModelFactory):
   MODEL = models.OrgGroup
   status = FuzzyChoice(MODEL.VALID_STATES)
+
 
 class ProductFactory(ModelFactory):
   MODEL = models.Product
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+
 class ProjectFactory(ModelFactory):
   MODEL = models.Project
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+
 class SystemFactory(ModelFactory):
   MODEL = models.System
   status = FuzzyChoice(MODEL.VALID_STATES)
+
 
 class ProcessFactory(ModelFactory):
   MODEL = models.Process
@@ -271,22 +292,27 @@ class AuditFactory(ModelFactory):
   MODEL = models.Audit
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+
 class RequestFactory(ModelFactory):
   MODEL = models.Request
   status = FuzzyChoice(MODEL.VALID_STATES)
   request_type = FuzzyChoice(MODEL.VALID_TYPES)
 
+
 class ResponseFactory(ModelFactory):
   MODEL = models.Response
   status = FuzzyChoice(MODEL.VALID_STATES)
+
 
 class DocumentationResponseFactory(ResponseFactory):
   MODEL = models.DocumentationResponse
   response_type = 'documentation'
 
+
 class InterviewResponseFactory(ResponseFactory):
   MODEL = models.InterviewResponse
   response_type = 'interview'
+
 
 class PopulationSampleResponseFactory(ResponseFactory):
   MODEL = models.PopulationSampleResponse
@@ -299,6 +325,7 @@ class ControlCategoryFactory(ModelFactory):
   MODEL = models.ControlCategory
   type = "ControlCategory"
 
+
 class ControlAssertionFactory(ModelFactory):
   MODEL = models.ControlAssertion
   type = "ControlAssertion"
@@ -310,59 +337,50 @@ class ControlControlFactory(ModelFactory):
   MODEL = models.ControlControl
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+
 class ControlSectionFactory(ModelFactory):
   MODEL = models.ControlSection
   status = FuzzyChoice(MODEL.VALID_STATES)
+
 
 class DirectiveControlFactory(ModelFactory):
   MODEL = models.DirectiveControl
   status = FuzzyChoice(MODEL.VALID_STATES)
 
-class DirectiveSectionFactory(ModelFactory):
-  MODEL = models.DirectiveSection
-  status = FuzzyChoice(MODEL.VALID_STATES)
 
 class ObjectControlFactory(ModelFactory):
   MODEL = models.ObjectControl
   status = FuzzyChoice(MODEL.VALID_STATES)
   controllable = FactoryStubMarker(models.Market)
 
+
 class ObjectDocumentFactory(ModelFactory):
   MODEL = models.ObjectDocument
   status = FuzzyChoice(MODEL.VALID_STATES)
   documentable = FactoryStubMarker(models.Market)
 
-class ObjectObjectiveFactory(ModelFactory):
-  MODEL = models.ObjectObjective
-  status = FuzzyChoice(MODEL.VALID_STATES)
-  objectiveable = FactoryStubMarker(models.Market)
 
 class ObjectOwnerFactory(ModelFactory):
   MODEL = models.ObjectOwner
   status = FuzzyChoice(MODEL.VALID_STATES)
   ownable = FactoryStubMarker(models.Market)
 
+
 class ObjectPersonFactory(ModelFactory):
   MODEL = models.ObjectPerson
   status = FuzzyChoice(MODEL.VALID_STATES)
   personable = FactoryStubMarker(models.Market)
 
-class ObjectSectionFactory(ModelFactory):
-  MODEL = models.ObjectSection
-  status = FuzzyChoice(MODEL.VALID_STATES)
-  sectionable = FactoryStubMarker(models.Market)
-
-class ObjectiveControlFactory(ModelFactory):
-  MODEL = models.ObjectiveControl
-  status = FuzzyChoice(MODEL.VALID_STATES)
 
 class ProgramControlFactory(ModelFactory):
   MODEL = models.ProgramControl
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+
 class ProgramDirectiveFactory(ModelFactory):
   MODEL = models.ProgramDirective
   status = FuzzyChoice(MODEL.VALID_STATES)
+
 
 class RelationshipFactory(ModelFactory):
   MODEL = models.Relationship
@@ -370,17 +388,15 @@ class RelationshipFactory(ModelFactory):
   source = FactoryStubMarker(models.Market)
   destination = FactoryStubMarker(models.Process)
 
-class SectionObjectiveFactory(ModelFactory):
-  MODEL = models.SectionObjective
-  status = FuzzyChoice(MODEL.VALID_STATES)
-
 
 # ggrc_basic_permissions model factories
 class RoleFactory(ModelFactory):
   MODEL = models.get_model("Role")
 
+
 class UserRoleFactory(ModelFactory):
   MODEL = models.get_model("UserRole")
+
 
 class ContextImplicationFactory(ModelFactory):
   MODEL = models.get_model("ContextImplication")
@@ -391,9 +407,11 @@ class ObjectFileFactory(ModelFactory):
   MODEL = models.get_model("ObjectFile")
   fileable = FactoryStubMarker(models.DocumentationResponse)
 
+
 class ObjectFolderFactory(ModelFactory):
   MODEL = models.get_model("ObjectFolder")
   folderable = FactoryStubMarker(models.Audit)
+
 
 class ObjectEventFactory(ModelFactory):
   MODEL = models.get_model("ObjectEvent")

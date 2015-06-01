@@ -6,21 +6,21 @@
 from sqlalchemy.orm import validates
 
 from ggrc import db
-from .associationproxy import association_proxy
-from .exceptions import ValidationError
-from .mixins import (
+from ggrc.models.exceptions import ValidationError
+from ggrc.models.mixins import (
     deferred, Hierarchical, Noted, Described, Hyperlinked, WithContact,
-    Titled, Slugged, CustomAttributable, Stateful
-    )
-from .object_document import Documentable
-from .object_owner import Ownable
-from .object_person import Personable
-from .reflection import PublishOnly
-from .track_object_state import HasObjectState, track_state_for_class
+    Titled, Slugged, CustomAttributable, Stateful, Timeboxed
+)
+from ggrc.models.object_document import Documentable
+from ggrc.models.object_owner import Ownable
+from ggrc.models.object_person import Personable
+from ggrc.models.relationship import Relatable
+from ggrc.models.track_object_state import track_state_for_class
+from ggrc.models.track_object_state import HasObjectState
 
-class SectionBase(HasObjectState,
-    Hierarchical, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
-    Stateful, db.Model):
+
+class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
+                  WithContact, Titled, Slugged, Stateful, db.Model):
   VALID_STATES = [
       'Draft',
       'Final',
@@ -31,7 +31,7 @@ class SectionBase(HasObjectState,
       'In Scope',
       'Not in Scope',
       'Deprecated',
-      ]
+  ]
   _table_plural = 'section_bases'
   __tablename__ = 'sections'
   _title_uniqueness = False
@@ -41,58 +41,21 @@ class SectionBase(HasObjectState,
       db.Column(db.Integer, db.ForeignKey('directives.id'), nullable=True),
       'SectionBase')
   na = deferred(db.Column(db.Boolean, default=False, nullable=False),
-      'SectionBase')
+                'SectionBase')
   notes = deferred(db.Column(db.Text), 'SectionBase')
-
-  control_sections = db.relationship(
-      'ControlSection', backref='section', cascade='all, delete-orphan')
-  controls = association_proxy(
-      'control_sections', 'control', 'ControlSection')
-  section_objectives = db.relationship(
-      'SectionObjective', backref='section', cascade='all, delete-orphan')
-  objectives = association_proxy(
-      'section_objectives', 'objective', 'SectionObjective')
-  object_sections = db.relationship(
-      'ObjectSection', backref='section', cascade='all, delete-orphan')
-  directive_sections = db.relationship(
-      'DirectiveSection', backref='section', cascade='all, delete-orphan')
-  directives = association_proxy(
-      'directive_sections', 'directive', 'DirectiveSection')
 
   __mapper_args__ = {
       'polymorphic_on': type
-      }
+  }
 
   _publish_attrs = [
       'directive',
       'na',
       'notes',
-      PublishOnly('control_sections'),
-      'controls',
-      PublishOnly('section_objectives'),
-      'objectives',
-      PublishOnly('directive_sections'),
-      'directives',
-      'object_sections',
-      ]
-  _sanitize_html = [
-      'notes',
-      ]
-  #_update_attrs = [
-  #    'directive',
-  #    'na',
-  #    'notes',
-  #    'controls',
-  #    'objectives',
-  #    'object_sections',
-  #    ]
-
-  _include_links = [
-      #'control_sections',
-      #'section_objectives',
-      #'object_sections',
-      #'directive_sections',
-      ]
+  ]
+  _sanitize_html = ['notes']
+  _include_links = []
+  _aliases = {"directive_id": "Policy / Regulation / Standard"}
 
   @validates('type')
   def validates_type(self, key, value):
@@ -111,19 +74,21 @@ class SectionBase(HasObjectState,
 
     query = super(SectionBase, cls).eager_query()
     return cls.eager_inclusions(query, SectionBase._include_links).options(
-        orm.joinedload('directive'),
-        orm.subqueryload('control_sections'),
-        orm.subqueryload('section_objectives'),
-        orm.subqueryload('directive_sections'),
-        orm.subqueryload('object_sections'))
+        orm.joinedload('directive'))
 
 track_state_for_class(SectionBase)
 
-class Section(CustomAttributable, Documentable, Personable, Ownable, SectionBase):
+
+class Section(CustomAttributable, Documentable, Personable,
+              Ownable, Relatable, SectionBase):
   __mapper_args__ = {
       'polymorphic_identity': 'Section'
-      }
+  }
   _table_plural = 'sections'
+  _aliases = {
+      "url": "Section URL",
+      "description": "Text of Section",
+  }
 
   @validates('directive_id')
   def validates_directive_id(self, key, value):
@@ -138,8 +103,13 @@ class Section(CustomAttributable, Documentable, Personable, Ownable, SectionBase
     return out_json
 
 
-class Clause(CustomAttributable, Documentable, Personable, Ownable, SectionBase):
+class Clause(CustomAttributable, Documentable, Personable, Ownable,
+             Timeboxed, Relatable, SectionBase):
   __mapper_args__ = {
       'polymorphic_identity': 'Clause'
-      }
+  }
   _table_plural = 'clauses'
+  _aliases = {
+      "url": "Clause URL",
+      "directive_id": None,
+  }

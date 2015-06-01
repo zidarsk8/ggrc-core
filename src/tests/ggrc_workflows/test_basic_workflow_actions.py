@@ -23,6 +23,7 @@ if os.environ.get('TRAVIS', False):
 class TestBasicWorkflowActions(TestCase):
 
   def setUp(self):
+    TestCase.setUp(self)
     self.api = Api()
     self.generator = WorkflowsGenerator()
     self.ggrc_generator = GgrcGenerator()

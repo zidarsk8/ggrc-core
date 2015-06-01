@@ -22,9 +22,6 @@ Feature: Basic RESTful CRUD Support
       | ControlCategory    |
       | Control            |
       | DataAsset          |
-      #| Directive          |
-      | DirectiveControl   |
-      | DirectiveSection   |
       | Contract           |
       | Policy             |
       | Regulation         |
@@ -37,7 +34,6 @@ Feature: Basic RESTful CRUD Support
       #| ObjectDocument     |
       #| ObjectPerson       |
       | Objective          |
-      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | Person             |
@@ -48,8 +44,6 @@ Feature: Basic RESTful CRUD Support
       #| Relationship       |
       | Section            |
       | Clause             |
-      | SectionObjective   |
       #| SystemOrProcess    |
       | System             |
       | Process            |
-

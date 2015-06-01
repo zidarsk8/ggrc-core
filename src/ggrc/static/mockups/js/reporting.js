@@ -9,6 +9,9 @@ $(document).ready(function() {
         {title: "ISO Systems"},
         {title: "Overdue tasks"},
       ],
+      reportTitle: [
+        {title: "New Report"},
+      ],
       table_title: [
         {tbl_title_1: "Program Title", tbl_title_2: "Program Owner", tbl_title_3: "Control Title", tbl_title_4: "Control Owner", tbl_title_5: "Control Contact", tbl_title_6: "Control URL", tbl_title_7: "Control Code", tbl_title_8: "Control State", tbl_title_9: "System Title", tbl_title_10: "System Owner", tbl_title_11: "System Contact", tbl_title_12: "System URL", tbl_title_13: "System Code", tbl_title_14: "System Effective date", tbl_title_15: "System Stop date", tbl_title_16: "System State"}
       ],
@@ -25,28 +28,9 @@ $(document).ready(function() {
         {tbl_data_1: "Program 1", tbl_data_2: "Predrag", tbl_data_3: "CTRL 5", tbl_data_4: "Carl Grove", tbl_data_5: "Julius Robert Oppenheimer", tbl_data_6: "http://google.com/control/manhattan-project", tbl_data_7: "CT-PR", tbl_data_8: "Effective", tbl_data_9: "", tbl_data_10: "", tbl_data_11: "", tbl_data_12: "", tbl_data_13: "", tbl_data_14: "", tbl_data_15: "", tbl_data_15: ""}
       ],
       filterRules: [
+      ],
+      relevantFilter: [
       ]
-      /*
-      attr_select: function() {
-        $(".attribute-trigger").popover({
-          container: "body",
-          html: true,
-          content: function(){
-            return $(this).next('.attr-wrap').html();
-          },
-          placement: "bottom",
-          template: '<div class="popover" role="tooltip"><div class="popover-content"></div></div>'
-        });
-
-        $('.attribute-trigger').on('shown.bs.popover', function () {
-          $(this).addClass("active");
-        });
-
-        $('.attribute-trigger').on('hidden.bs.popover', function () {
-          $(this).removeClass("active");
-        });
-      }
-      */
     },
     template: "<content/>",
     helpers: {
@@ -54,13 +38,18 @@ $(document).ready(function() {
     events: {
       "#custom_report_name keyup": function(el, ev) {
         var $item = this.element.find('li.active'),
+            $report_item = this.element.find('.report-title h2'),
             index = $item.index(),
+            report_index = $report_item.index(),
             tabs = this.scope.tabs,
+            report = this.scope.reportTitle,
             new_tabs = 0;
 
         tabs[index].attr('title', el.val());
         this.element.find("#newReport .closed").show();
-        
+
+        report[report_index].attr('title', el.val());
+
         // Calculate tabs numbers
         tabs.forEach(function(tab) {
           if (tab.new_report) {
@@ -91,16 +80,6 @@ $(document).ready(function() {
         tabs.push({title: "New Report " + new_tabs, new_report: true});
         $ul.find('li').not('.hidden-widgets-list').last().addClass("active");
       },
-      // Trying to activate or deactivate popover when value in select is changed.
-      /*
-      ".sec-obj change": function(el, ev) {
-        var choose = el.val();
-        if(choose === "System") {
-          this.scope.attr('attr_selected', true);
-          this.scope.attr_select();
-        }
-      },
-      */
       "#addFilterRule click": function(el, ev) {
         var newRule = this.scope.filterRules,
             new_rules = 0;
@@ -109,20 +88,46 @@ $(document).ready(function() {
             new_rules++;
           }
         });
-        if (new_rules === 0) {
-          newRule.push({label: "Relevant to:", new_rule: true});
-        } else {
-          newRule.push({label: "AND Relevant to:", new_rule: true});
-        }
+        newRule.push({label: "Relevant to:", new_rule: true});
+      },
+      "#addRelevantFilterRule click": function(el, ev) {
+        var relevantGroup = this.scope.relevantFilter,
+            new_relevant = 0;
+        relevantGroup.forEach(function(relevant) {
+          if (relevant.new_relevant_group) {
+            new_relevant++;
+          }
+        });
+        relevantGroup.push({new_relevant_group: true});
       },
       ".remove_filter click": function(el) {
         var $item = el.closest(".single-line-filter"),
             index = $item.index(),
             rule = this.scope.filterRules;
         rule.splice(index - 1, 1);
+      },
+      ".remove_filter_group click": function(el) {
+        var $item = el.closest(".single-line-filter"),
+            index = $item.index(),
+            rules = this.scope.relevantFilter;
+        rules.splice(index - 1, 1);
+      },
+      ".report-title-trigger click": function(el) {
+        var $title_change = this.element.find('.report-title-change'),
+            $parent = this.element.find("h2");
+
+        $parent.fadeOut(500);
+        $title_change.delay(500).fadeIn(500);
+      },
+      ".title-change click": function(el) {
+        var $title = this.element.find("h2"),
+            $parent = this.element.find(".report-title-change");
+
+        $parent.fadeOut(500);
+        $title.delay(500).fadeIn(500);
       }
     }
   });
 
-  $(".area").html(can.view("/static/mockups/mustache/reporting.mustache",{}));
+  $(".reporting-import").html(can.view("/static/mockups/mustache/reporting.mustache",{}));
 });
