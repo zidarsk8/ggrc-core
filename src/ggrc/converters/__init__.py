@@ -10,6 +10,7 @@ from ggrc.models import (
     Section, Clause, System, Process, Issue,
 )
 from ggrc.utils import get_mapping_rules
+from ggrc.converters import handlers
 
 
 def get_allowed_mappings():
@@ -98,6 +99,14 @@ COLUMN_ORDER = (
     "_custom_attributes",
 )
 
-COLUMN_HANDLERS = {}
 
-ALLOWED_MAPPINGS = get_allowed_mappings()
+
+COLUMN_HANDLERS = {
+    "slug": handlers.SlugColumnHandler,
+    "title": handlers.TitleColumnHandler,
+    "owner": handlers.OwnerColumnHandler,
+    "status": handlers.StatusColumnHandler,
+}
+
+
+ALLOWED_MAPPINGS = get_mapping_rules()
