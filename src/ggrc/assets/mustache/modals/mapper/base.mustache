@@ -5,59 +5,108 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-
-<div class="modal-header">
-  <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
-    <i class="grcicon-x-grey"></i>
-  </a>
-  <h2>
-    {{ modal_title }}
-  </h2>
-</div>
-<div class="modal-filter">
-  <div class="row-fluid">
-    <div class="span3">
-      &nbsp;
-    </div>
-    <div class="span6">
-      <div class="modal-search">
-        &nbsp;
+<modal-mapper object="{{object}}" type="{{type}}" join-object-id="{{join-id}}">
+  <div class="modal-header">
+    <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
+      <i class="grcicon-x-grey"></i>
+    </a>
+    <h2>
+      Map object
+    </h2>
+  </div>
+  <div class="modal-filter">
+    <div class="row-fluid">
+      <div class="span3">
+        <h6>Object type</h6>
+        <mapper-selector type="{{type}}">
+          <select>
+            {{#each groups}}
+              {{#if items}}
+                <optgroup label="{{name}}">
+                  {{#each items}}
+                    <option {{#isSelected}}selected="selected"{{/isSelected}}
+                            data-singular="{{singular}}"
+                            data-plural="{{plural}}"
+                            value="{{value}}"
+                            label="{{label}}"
+                    ></option>
+                  {{/each}}
+                </optgroup>
+              {{else}}
+                <option {{#isSelected}}selected="selected"{{/isSelected}}
+                        data-singular="{{singular}}"
+                        data-plural="{{plural}}"
+                        value="{{value}}"
+                        label="{{name}}"
+                ></option>
+              {{/if}}
+            {{/each}}
+          </select>
+        </mapper-selector>
       </div>
-    </div>
-    <div class="span3">
-      <div class="pull-right">
-        <a class="btn btn-add" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="{{related_model_singular}}" data-object-plural="{{related_table_plural}}">
-          <i class="grcicon-add"></i>
-          {{ new_object_title }}
-        </a>
+      <div class="span6">
+        <div class="modal-search">
+          <div class="row-fluid">
+            <div class="span8">
+              <h6>Matching terms</h6>
+              <div class="modal-search objective-selector">
+                <input id="search" class="input-block-level" placeholder="Enter text to search..." can-value="option_search_term" type="text" autofocus="">
+              </div>
+            </div>
+            <div class="span4">
+              <h6>Filter by person</h6>
+              <div class="modal-search objective-selector">
+                <input id="search-by-owner" class="search-by-owner input-block-level ui-autocomplete-input" placeholder="Find owner or contact" type="text" name="owner" value="" data-lookup="Person" data-params="Person:is_enabled=1" data-template="/people/autocomplete_result.mustache" null-if-empty="null-if-empty" autocomplete="off"><span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="span3">
+        <div class="pull-right">
+          <mapper-create-new>
+            <a
+               href="javascript://"
+               data-toggle="modal-ajax-form"
+               data-modal-class="modal-wide"
+               data-object-singular="{{singular}}"
+               data-object-plural="{{plural}}"
+               data-join-object-id="{{join-id}}"
+               {{#if_equals value "AllObject"}}class="disabled"{{/if}}
+            >
+              <i class="grcicon-add-black"></i>
+              Create New {{^if_equals value "AllObject"}}{{value}}{{/if}}
+            </a>
+          </mapper-create-new>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<div class="modal-content">
-  <div class="row-fluid">
-    <div class="span3 detail_column">
+  <div class="modal-content">
+    <div class="row-fluid">
+      <div class="span3 detail_column">
 
-    </div>
-    <div class="span4 option_column">
+      </div>
+      <div class="span4 option_column">
 
-    </div>
-    <div class="span5 active_column" style="margin-left:0; width:42.17094%">
+      </div>
+      <div class="span5 active_column" style="margin-left:0; width:42.17094%">
 
-    </div>
-  </div>
-</div>
-<div class="modal-footer">
-  <div class="row-fluid">
-    <div class="span6">
-      <div class="deny-buttons"></div>
-    </div>
-    <div class="span6">
-      <div class="confirm-buttons">
-        <a class="btn btn-small btn-success preventdoubleclick" xdata-toggle="modal-submit" data-dismiss="modal" href="javascript://">
-          Done
-        </a>
       </div>
     </div>
   </div>
-</div>
+  <div class="modal-footer">
+    <div class="row-fluid">
+      <div class="span6">
+        <div class="deny-buttons"></div>
+      </div>
+      <div class="span6">
+        <div class="confirm-buttons">
+          <a class="btn btn-small btn-success preventdoubleclick" xdata-toggle="modal-submit" data-dismiss="modal" href="javascript://">
+            Done
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</modal-mapper>
