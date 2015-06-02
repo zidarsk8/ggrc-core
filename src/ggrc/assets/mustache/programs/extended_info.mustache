@@ -74,29 +74,31 @@
         </a>
       </div>
       <div class="span6">
-      {{#with_page_object_as 'page_instance'}}
-        {{^if_equals instance page_instance}}
-          {{#with_direct_mappings_as 'mappings' page_instance instance}}
-            {{#if mappings.length}}
-              <span class="primary">
-                <i class="grcicon-checked"></i>
-                Relevant to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
-              </span>
-            {{else}}
-              {{#is_allowed_to_map page_instance instance join=true}}
-              {{#if_helpers '\
-                ^if_instance_of' page_instance 'Directive' '\
-                or ^if_instance_of' instance 'Section'}}
-              <a class="primary map-to-page-object" href="javascript://" data-follow="true" {{#instance}}{{data 'instance'}}{{/instance}}>
-                <i class="grcicon-reg-map"></i>
-                Map to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
-              </a>
-              {{/if_helpers}}
-              {{/is_allowed_to_map}}
-            {{/if}}
-          {{/with_direct_mappings_as}}
-        {{/if_equals}}
-      {{/with_page_object_as}}
+        <div class="oneline">
+          {{#with_page_object_as 'page_instance'}}
+            {{^if_equals instance page_instance}}
+              {{#with_direct_mappings_as 'mappings' page_instance instance}}
+                {{#if mappings.length}}
+                  <span class="primary">
+                    <i class="grcicon-checked"></i>
+                    Relevant to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
+                  </span>
+                {{else}}
+                  {{#is_allowed_to_map page_instance instance join=true}}
+                  {{#if_helpers '\
+                    ^if_instance_of' page_instance 'Directive' '\
+                    or ^if_instance_of' instance 'Section'}}
+                  <a class="primary map-to-page-object" href="javascript://" data-follow="true" {{#instance}}{{data 'instance'}}{{/instance}}>
+                    <i class="grcicon-reg-map"></i>
+                    Map to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
+                  </a>
+                  {{/if_helpers}}
+                  {{/is_allowed_to_map}}
+                {{/if}}
+              {{/with_direct_mappings_as}}
+            {{/if_equals}}
+          {{/with_page_object_as}}
+        </div>
       </div>
     </div>
   </div>
