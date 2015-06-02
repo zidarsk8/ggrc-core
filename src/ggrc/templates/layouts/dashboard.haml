@@ -19,6 +19,17 @@
     .header-content
       .row-fluid
         #page-header.span12
+          .pull-left
+            %h2
+              %a{ 'class': 'to-my-work', 'href': '/dashboard' }
+                -set logo_url = config.get("COMPANY_LOGO")
+                -set logo_text = config.get("COMPANY_LOGO_TEXT")
+                -if logo_url
+                  %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
+                -elif logo_text != None
+                  =logo_text
+                -else
+                  Google GRC
           -block header
 
     .top-inner-nav
