@@ -31,6 +31,33 @@
     }
   });
   can.Component.extend({
+    tag: "mapper-filter",
+    template: "<content />",
+    scope: {
+      panels: [],
+      menu: can.map(
+            Array.prototype.concat.call([],
+              "Program Regulation Policy Standard Contract Clause Section Objective Control".split(" "),
+              "Person System Process DataAsset Product Project Facility Market".split(" ")
+            ), function (key) {
+              return CMS.Models[key];
+            })
+    },
+    events: {
+      ".add-filter-rule click": function (el, ev) {
+        ev.preventDefault();
+        this.scope.panels.push({
+          value: "",
+          model_name: this.scope.menu[0].model_singular
+        });
+      },
+      ".remove_filter click": function(el) {
+        var index = el.data("index");
+        this.scope.panels.splice(index, 1);
+      }
+    }
+  });
+  can.Component.extend({
     tag: "mapper-selector",
     template: "<content />",
     scope: {

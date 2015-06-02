@@ -81,6 +81,51 @@
         </div>
       </div>
     </div>
+    <div class="relevance-filters">
+      <div class="row-fluid">
+        <div class="span12">
+          <mapper-filter>
+            <h6>Filter by mapping relevance</h6>
+            {{#each panels}}
+            <div class="single-line-filter">
+              <button type="submit" data-index="{{@index}}" class="remove_filter">
+                <i class="grcicon-deleted"></i>
+              </button>
+              <label>
+                {{#if @index}}AND {{/if}}Relevant to:
+              </label>
+              <select class="input-small filter-type-selector select-filter{{@index}}" can-value="model_name">
+                {{#menu}}
+                <option
+                  value="{{model_singular}}"
+                  label="{{title_singular}}">
+                </option>
+                {{/menu}}
+              </select>
+              {{#model_name}}
+              <div class="modal-search objective-selector">
+                <input
+                  id="search-filter{{@index}}"
+                  class="input-large search-icon search-filter{{@index}}"
+                  placeholder="Enter text to search for {{model_name}}"
+                  type="text"
+                  name="filter_list.{{@index}}.search_filter"
+                  value="{{firstnonempty search_filter.name search_filter.email search_filter.title}}"
+                  data-lookup="{{this}}"
+                  data-template="/{{#if_equals model_name 'Person'}}people{{else}}base_objects{{/if_equals}}/autocomplete_result.mustache"
+                  {{ autocomplete_select }}
+                  >
+              </div>
+              {{/model_name}}
+            </div>
+            {{/each}}
+            <div class="add-rule">
+              <a href="javascript://" class="add-filter-rule">+ Add New Rule</a>
+            </div>
+          </mapper-filter>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="modal-content">
     <div class="row-fluid">
