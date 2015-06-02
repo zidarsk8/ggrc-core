@@ -35,7 +35,7 @@ try:
 except (ImportError):
   pass
 
-VERSION = "0.9.3-Mango" + BUILD_NUMBER
+VERSION = "0.9.4-Plum" + BUILD_NUMBER
 
 # Google Analytics variables
 GOOGLE_ANALYTICS_ID = os.environ.get('GGRC_GOOGLE_ANALYTICS_ID', '')
