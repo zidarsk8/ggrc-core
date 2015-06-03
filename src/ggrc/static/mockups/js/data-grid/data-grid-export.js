@@ -29,6 +29,8 @@ $(document).ready(function() {
       ],
       filterRules: [
       ],
+      filterRulesNext: [
+      ],
       relevantFilter: [
       ]
     },
@@ -88,7 +90,17 @@ $(document).ready(function() {
             new_rules++;
           }
         });
-        newRule.push({label: "Relevant to:", new_rule: true});
+        newRule.push({filterPrefix: true, label: "Relevant to:", new_rule: true});
+      },
+      "#addFilterRuleNext click": function(el, ev) {
+        var newRule = this.scope.filterRulesNext,
+            new_rules = 0;
+        newRule.forEach(function(rule) {
+          if (rule.new_rule) {
+            new_rules++;
+          }
+        });
+        newRule.push({filterPrefixNext: true, labelNext: "Relevant to:", new_rule: true});
       },
       "#addRelevantFilterRule click": function(el, ev) {
         var relevantGroup = this.scope.relevantFilter,
@@ -104,6 +116,12 @@ $(document).ready(function() {
         var $item = el.closest(".single-line-filter"),
             index = $item.index(),
             rule = this.scope.filterRules;
+        rule.splice(index - 1, 1);
+      },
+      ".remove_filter_next click": function(el) {
+        var $item = el.closest(".single-line-filter"),
+            index = $item.index(),
+            rule = this.scope.filterRulesNext;
         rule.splice(index - 1, 1);
       },
       ".remove_filter_group click": function(el) {

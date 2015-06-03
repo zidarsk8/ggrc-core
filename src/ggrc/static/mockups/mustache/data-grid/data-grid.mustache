@@ -60,7 +60,7 @@
                         Query by Object type
                       </h6>
                       <div class="single-line-filter">
-                        <select class="input-xlarge option-type-selector">
+                        <select class="input-block-level option-type-selector">
                           <optgroup label="Governance">
                             <option value="Program" selected="selected">Programs</option>
                             <option value="Regulation">Regulations</option>
@@ -86,90 +86,6 @@
                             <option value="Project">Projects</option>
                           </optgroup>
                         </select>
-                        <a href="#" class="attribute-trigger" data-trigger="focus" tabindex="0"><i class="grcicon-setup-color"></i></a>
-                        <div class="attr-wrap">
-                          <h3>
-                            Select program attributes to show in report
-                            <a class="popover-close pull-right" href="#">
-                              <i class="grcicon-x-grey"></i>
-                            </a>
-                          </h3>
-                          <ul class="attr-list">
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Title
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Description
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="" checked="checked">
-                                Owner
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Contact
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Notes
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                System URL
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Reference URL
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Code
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Network Zone
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Effective date
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                Stop date
-                              </label>
-                            </li>
-                            <li>
-                              <label>
-                                <input type="checkbox" name="" id="">
-                                State
-                              </label>
-                            </li>
-                          </ul>
-                          <a href="#" class="btn btn-small btn-success popover-close">I'm done</a>
-                        </div>
                       </div>
                     </div>
                     <div class="span4">
@@ -184,10 +100,95 @@
                       </div>
                     </div>
                   </div>
+
+                  <div class="row-fluid wrap-row">
+                    <div class="span12">
+                      <h6>
+                        Select attributes to show in grid
+                      </h6>
+                      <div class="attribute-wrap">
+                        <ul class="attr-list">
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="" checked="checked">
+                              Title
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="">
+                              Description
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="" checked="checked">
+                              Owner
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="">
+                              Contact
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="">
+                              Notes
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="">
+                              System URL
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="">
+                              Reference URL
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="">
+                              Code
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="">
+                              Network Zone
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="">
+                              Effective date
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="">
+                              Stop date
+                            </label>
+                          </li>
+                          <li>
+                            <label>
+                              <input type="checkbox" name="" id="">
+                              State
+                            </label>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="relevance-filters">
                     <div class="row-fluid">
                       <div class="span12">
-                        <h6>Filter by mapping relevance</h6>
+                        <h6>Add filters by mapping relevance</h6>
                         {{#filterRules}}
                           <div class="single-line-filter">
                             <button type="submit" class="remove_filter">
@@ -435,9 +436,10 @@
                       </label>
                       <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
                       -->
-                      <button type="submit" class="btn btn-primary btn-small">Save report</button>
+                      <span class="export-note">745 records will be exported</span>
+                      <button type="submit" class="btn btn-primary btn-small">Save data grid template</button>
                       <div class="btn-group pull-right">
-                        <button type="submit" data-toggle="dropdown" class="btn btn-success btn-small dropdown-toggle"><i class="grcicon-export-white"></i> Export report <i class="grcicon-carot-white"></i></a></button>
+                        <button type="submit" data-toggle="dropdown" class="btn btn-success btn-small dropdown-toggle"><i class="grcicon-export-white"></i> Export Data <i class="grcicon-carot-white"></i></a></button>
                         <ul class="dropdown-menu">
                           <li><a href="#">Export to Sheets</a></li>
                           <li><a href="#">Export to CSV</a></li>

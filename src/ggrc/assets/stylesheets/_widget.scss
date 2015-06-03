@@ -1384,6 +1384,9 @@ ul.attr-list {
     input {
       margin-top: -3px;
     }
+    &.disabled {
+      color: $lightGray;
+    }
   }
 }
 
@@ -1429,9 +1432,6 @@ ul.attr-list {
 .single-line-filter {
   margin-bottom: 20px;
   .relevance-filters & {
-    margin-bottom: 6px;
-  }
-  .relevant-filter-group & {
     margin-bottom: 6px;
   }
   .input-xlarge {
