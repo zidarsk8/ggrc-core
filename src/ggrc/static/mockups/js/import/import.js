@@ -12,7 +12,7 @@ $(document).ready(function() {
       }
     }
   });
-  $(".import-content").html(can.view("/static/mockups/mustache/import-export/import-export.mustache",{}));
+  $(".import-content").html(can.view("/static/mockups/mustache/import/import.mustache",{}));
 
   can.Component.extend({
     tag: "import-not-pass",
@@ -26,7 +26,7 @@ $(document).ready(function() {
       }
     }
   });
-  $(".import-not-pass").html(can.view("/static/mockups/mustache/import-export/import-not-pass.mustache",{}));
+  $(".import-not-pass").html(can.view("/static/mockups/mustache/import/import-not-pass.mustache",{}));
 
   can.Component.extend({
     tag: "import-warning",
@@ -40,7 +40,7 @@ $(document).ready(function() {
       }
     }
   });
-  $(".import-warning").html(can.view("/static/mockups/mustache/import-export/import-warning.mustache",{}));
+  $(".import-warning").html(can.view("/static/mockups/mustache/import/import-warning.mustache",{}));
 
   function innerNavTrigger() {
     var $this = $(this),

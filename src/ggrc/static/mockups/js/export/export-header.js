@@ -8,5 +8,5 @@ $(document).ready(function() {
     template: "<content/>",
   });
 
-  $(".title-content").html(can.view("/static/mockups/mustache/import-export/import-export-header.mustache",{}));
+  $(".title-content").html(can.view("/static/mockups/mustache/export/export-header.mustache",{}));
 });

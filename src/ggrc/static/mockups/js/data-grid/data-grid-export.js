@@ -129,5 +129,5 @@ $(document).ready(function() {
     }
   });
 
-  $(".reporting-export").html(can.view("/static/mockups/mustache/reporting-export.mustache",{}));
+  $(".reporting-export").html(can.view("/static/mockups/mustache/data-grid/data-grid-export.mustache",{}));
 });

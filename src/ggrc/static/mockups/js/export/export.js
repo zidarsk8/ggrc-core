@@ -4,13 +4,13 @@ $(document).ready(function() {
     tag: "export",
     template: "<content/>",
   });
-  $(".export-info").html(can.view("/static/mockups/mustache/import-export/export.mustache",{}));
+  $(".export-info").html(can.view("/static/mockups/mustache/export/export.mustache",{}));
 
   can.Component.extend({
     tag: "export-control",
     template: "<content/>",
   });
-  $(".export-control").html(can.view("/static/mockups/mustache/import-export/export-control.mustache",{}));
+  $(".export-control").html(can.view("/static/mockups/mustache/export/export-control.mustache",{}));
 
   function innerNavTrigger() {
     var $this = $(this),

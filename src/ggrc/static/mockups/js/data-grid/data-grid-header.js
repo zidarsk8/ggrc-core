@@ -8,5 +8,5 @@ $(document).ready(function() {
     template: "<content/>",
   });
 
-  $(".title-content").html(can.view("/static/mockups/mustache/reporting-export-header.mustache",{}));
+  $(".title-content").html(can.view("/static/mockups/mustache/data-grid/data-grid-header.mustache",{}));
 });
