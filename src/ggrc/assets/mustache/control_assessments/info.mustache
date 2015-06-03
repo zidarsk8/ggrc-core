@@ -51,9 +51,14 @@
           {{/using}}
           {{/with_mapping}}
           {{/is_allowed}}
+          {{#is_allowed_to_map page_instance instance}}
+            {{^options.is_in_selector}}
+              {{> /static/mustache/base_objects/unmap.mustache}}
+            {{/options}}
+          {{/is_allowed_to_map}}
           {{#if instance.viewLink}}
             {{#is_allowed "view_object_page" instance}}
-              <li class="border">
+              <li>
                 <a href="{{instance.viewLink}}">
                   View {{instance.class.title_singular}}
                   <i class="grcicon-goto"></i>
