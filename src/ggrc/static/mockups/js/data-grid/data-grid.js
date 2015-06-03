@@ -10,7 +10,7 @@ $(document).ready(function() {
         {title: "Overdue tasks"},
       ],
       reportTitle: [
-        {title: "New Report"},
+        {title: "New Data Grid"},
       ],
       table_title: [
         {tbl_title_1: "Program Title", tbl_title_2: "Program Owner", tbl_title_3: "Control Title", tbl_title_4: "Control Owner", tbl_title_5: "Control Contact", tbl_title_6: "Control URL", tbl_title_7: "Control Code", tbl_title_8: "Control State", tbl_title_9: "System Title", tbl_title_10: "System Owner", tbl_title_11: "System Contact", tbl_title_12: "System URL", tbl_title_13: "System Code", tbl_title_14: "System Effective date", tbl_title_15: "System Stop date", tbl_title_16: "System State"}
@@ -59,7 +59,7 @@ $(document).ready(function() {
 
         // Revert "New Report n" if custom_report_name is empty
         if (tabs[index].attr('title').trim() === "") {
-          tabs[index].attr('title', "New Report " + new_tabs);
+          tabs[index].attr('title', "New Data Grid" + new_tabs);
         }
       },
       ".report-trigger click": function(el, ev) {
@@ -77,7 +77,7 @@ $(document).ready(function() {
             new_tabs++;
           }
         });
-        tabs.push({title: "New Report " + new_tabs, new_report: true});
+        tabs.push({title: "New Data Grid" + new_tabs, new_report: true});
         $ul.find('li').not('.hidden-widgets-list').last().addClass("active");
       },
       "#addFilterRule click": function(el, ev) {
