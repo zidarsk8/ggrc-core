@@ -1331,18 +1331,11 @@
   @include clearfix();
   .left-content {
     float: left;
-    padding: 15px 20px 10px;
-    &.no-padd {
-      padding: 0;
-    }
+    padding-top: 5px;
   }
 }
 .save-template {
   float: right;
-  padding: 10px 20px;
-  &.no-padd {
-    padding: 0;
-  }
   label {
     display: inline-block;
     &.disabled {
@@ -1376,9 +1369,9 @@ ul.attr-list {
     width: 33.3333%;
     .attribute-wrap & {
       width: auto;
-      margin-left: 15px;
-      &:first-child {
-        margin-left: 0;
+      margin-right: 15px;
+      &:last-child {
+        margin-right: 0;
       }
     }
     input {
@@ -1442,6 +1435,13 @@ ul.attr-list {
       width: 79%;
     }
   }
+}
+
+.relevant-filter-group {
+  .add-object {
+    margin-top: 20px;
+  }
+
 }
 
 .relevance-filters {
