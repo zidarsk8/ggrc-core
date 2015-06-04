@@ -413,12 +413,19 @@ def export_redesign():
   """
   return render_template("/mockups/export/index.html")
 
-@app.route("/mockups/data-grid/export.html")
+@app.route("/mockups/export-object/")
 @login_required
-def data_grid_export():
-  """Data grid export mockup
+def export_object_redesign():
+  """Export object prototype
   """
-  return render_template("mockups/data-grid/export.html")
+  return render_template("/mockups/export/object.html")
+
+@app.route("/mockups/data-grid/export-object.html")
+@login_required
+def data_grid_export_object():
+  """Data grid export object mockup
+  """
+  return render_template("mockups/data-grid/export-object.html")
 
 @app.route("/permissions")
 @login_required
