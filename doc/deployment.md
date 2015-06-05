@@ -32,17 +32,16 @@ Create or update the deployment settings file (e.g. `deploy_settings_ggrc_prod.s
 
     #!/usr/bin/env bash
 
-    APPENGINE_INSTANCE=google.com:ggrc-prod
+    APPENGINE_INSTANCE=******
     SETTINGS_MODULE='app_engine_ggrc_prod ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development'
-    DATABASE_URI='mysql+gaerdbms:///ggrc_prod_db?instance=google.com:ggrc-prod:ggrc-prod-db'
+    DATABASE_URI='********'
     GAPI_KEY='XXX'
     GAPI_CLIENT_ID='YYY'
     GAPI_CLIENT_SECRET='ZZZ'
-    GAPI_ADMIN_GROUP='ggrc-admin@prod.google.com'
-    BOOTSTRAP_ADMIN_USERS='hsainion@google.com [tommyward@google.com](mailto:tommyward@google.com)'
-    RISK_ASSESSMENT_URL='https://ggrc-risk-dev.googleplex.com'
+    GAPI_ADMIN_GROUP='***@***.com'
+    BOOTSTRAP_ADMIN_USERS='***@***.com RISK_ASSESSMENT_URL='https://****************'
     SECRET_KEY='--CHANGE-TO-SOMETHING-SECRET--'
-    APPENGINE_EMAIL='prasannav@google.com'
+    APPENGINE_EMAIL='*****@****.com'
     INSTANCE_CLASS='B4'
     MAX_INSTANCES='4'
 
@@ -179,7 +178,7 @@ Go back to the virtual machine, and do the following (note the `GGRC_DATABASE_UR
 
     export GGRC_SETTINGS_MODULE='app_engine_ggrc_test ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development ggrc_workflow.settings.development'
 
-    export GGRC_DATABASE_URI='mysql+gaerdbms:///ggrc_test_20130822?instance=google.com:ggrc-dev-db:ggrc-dev-db'
+    export GGRC_DATABASE_URI='*****'
 
     # This line prepares the static assets (Javascripts and Stylesheets) and creates
     # the required `app.yaml` file. Choose one, or edit to match your .sh file.
