@@ -9,10 +9,23 @@
   height: 48px;
 }
 
+.logo-wrap {
+  float: left;
+  height: 27px;
+  line-height: 27px;
+  margin: 10px 20px 0 0;
+  a {
+    display: block;
+  }
+  img {
+    @extend a;
+  }
+}
+
 .header-content {
   background: $white;
   z-index:3;
-  padding-left: 40px;
+  padding-left: 30px;
   h1 {
     span.private {
       i {
