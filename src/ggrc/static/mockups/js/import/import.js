@@ -12,7 +12,7 @@ $(document).ready(function() {
       }
     }
   });
-  $(".import-content").html(can.view("/static/mockups/mustache/import-export/import-export.mustache",{}));
+  $(".import-content").html(can.view("/static/mockups/mustache/import/import.mustache",{}));
 
   can.Component.extend({
     tag: "import-not-pass",
@@ -26,7 +26,7 @@ $(document).ready(function() {
       }
     }
   });
-  $(".import-not-pass").html(can.view("/static/mockups/mustache/import-export/import-not-pass.mustache",{}));
+  $(".import-not-pass").html(can.view("/static/mockups/mustache/import/import-not-pass.mustache",{}));
 
   can.Component.extend({
     tag: "import-warning",
@@ -40,7 +40,7 @@ $(document).ready(function() {
       }
     }
   });
-  $(".import-warning").html(can.view("/static/mockups/mustache/import-export/import-warning.mustache",{}));
+  $(".import-warning").html(can.view("/static/mockups/mustache/import/import-warning.mustache",{}));
 
   function innerNavTrigger() {
     var $this = $(this),
@@ -56,7 +56,7 @@ $(document).ready(function() {
   function chooseCSV() {
     $("#chooseFile").fadeOut(500);
     $("#analysingFile").delay(500).fadeIn(500);
-    $(".import-analyze").delay(1500).fadeIn(500);
+    $(".import-main-wrap-analyze").delay(1500).fadeIn(500);
     $("#analysingFile").delay(2000).fadeOut(500);
     $("#importFile").delay(3500).fadeIn(500);
   }
@@ -64,7 +64,7 @@ $(document).ready(function() {
   function chooseCSV2() {
     $("#chooseFile2").fadeOut(500);
     $("#analysingFile2").delay(500).fadeIn(500);
-    $(".import-analyze").delay(1500).fadeIn(500);
+    $(".import-main-wrap-analyze").delay(1500).fadeIn(500);
     $("#analysingFile2").delay(1500).fadeOut(500);
     $("#chooseFile2").delay(2500).fadeIn(500);
   }
@@ -72,7 +72,7 @@ $(document).ready(function() {
   function chooseCSV3() {
     $("#chooseFile3").fadeOut(500);
     $("#analysingFile3").delay(500).fadeIn(500);
-    $(".import-analyze").delay(1500).fadeIn(500);
+    $(".import-main-wrap-analyze").delay(1500).fadeIn(500);
     $("#analysingFile3").delay(2000).fadeOut(500);
     $("#importFile3").delay(3500).fadeIn(500);
   }
@@ -86,7 +86,7 @@ $(document).ready(function() {
     $("#importedFile").delay(3500).fadeIn(500);
     $(".import-progress").delay(2000).fadeOut(500);
     $(".import-progress-final").delay(3500).fadeIn(500);
-    $(".import-analyze").delay(4000).fadeOut(500);
+    $(".import-main-wrap-analyze").delay(4000).fadeOut(500);
     $(".import-final").delay(4500).fadeIn(500);
   }
 
@@ -99,7 +99,7 @@ $(document).ready(function() {
     $("#importedFile3").delay(3500).fadeIn(500);
     $(".import-progress").delay(2000).fadeOut(500);
     $(".import-progress-final").delay(3500).fadeIn(500);
-    $(".import-analyze").delay(4000).fadeOut(500);
+    $(".import-main-wrap-analyze").delay(4000).fadeOut(500);
     $(".import-final").delay(4500).fadeIn(500);
   }
 

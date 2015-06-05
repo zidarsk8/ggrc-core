@@ -1,9 +1,9 @@
-<import-not-pass>
+<import>
 
   <div class="top-inner-nav">
     <div class="object-nav">
       <ul class="nav internav">
-        <li>
+        <li class="active">
           <a href="#import">
             <div class="oneline">
               <i class="grcicon-imp-exp"></i>
@@ -11,7 +11,7 @@
             </div>
           </a>
         </li>
-        <li class="active">
+        <li>
           <a href="#not-pass">
             <div class="oneline">
               <i class="grcicon-imp-exp"></i>
@@ -62,24 +62,84 @@
                               download one of the predefined templates.
                             </p>
                             <div class="clearfix">
-                              <button id="chooseFile2" class="btn btn-large btn-success btn-fixed">Choose CSV file to import</button>
-                              <button id="analysingFile2" class="btn btn-large btn-draft btn-fixed">Analysing</button>
+                              <button id="chooseFile" class="btn btn-large btn-success btn-fixed">Choose CSV file to import</button>
+                              <button id="analysingFile" class="btn btn-large btn-draft btn-fixed">Analysing</button>
+                              <button id="importFile" class="btn btn-large btn-primary btn-fixed"><i class="grcicon-imp-exp-white"></i> Import 252 Controls</button>
+                              <button id="importingFile" class="btn btn-large btn-draft btn-fixed">Importing</button>
+                              <div class="import-progress">
+                                <div class="progress-wrap">
+                                  <span class="total-num">252</span>
+                                  <span class="current-num">210 imported</span>
+                                  <div class="progress custom-progress">
+                                    <div class="bar bar-verify" style="width: 60%;"></div>
+                                  </div>
+                                </div>
+                              </div>
+                              <button id="importedFile" class="btn btn-large btn-success btn-fixed"><i class="grcicon-check-white"></i> Import successful</button>
+                              <div class="import-progress-final">
+                                <div class="progress-wrap">
+                                  <span class="total-num">252</span>
+                                  <span class="current-num">252 imported</span>
+                                  <div class="progress custom-progress">
+                                    <div class="bar bar-verify" style="width: 100%;"></div>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                            <div class="import-wrap import-analyze">
-                              <h4>pci_controls_2015.csv</h4>
+                            <div class="import-main-wrap import-main-wrap-analyze">
+                              <div class="row-fluid wrap-row">
+                                <div class="span6">
+                                  <div class="import-wrap import-analyze">
+                                    <h4>pci_controls_2015.csv</h4>
+                                    <ul>
+                                      <li><strong>Object type</strong>: Controls <i class="grcicon-check-solo-green"></i></li>
+                                      <li><strong>Number of rows</strong>: 252 <i class="grcicon-check-solo-green"></i></li>
+                                      <li><strong>File structure</strong> <i class="grcicon-check-solo-green"></i></li>
+                                    </ul>
+                                  </div>
+                                </div>
+                                <div class="span6">
+                                  <div class="import-wrap import-analyze">
+                                    <h4>pci_controls_2015.csv</h4>
+                                    <ul>
+                                      <li><strong>Object type</strong>: Programs <i class="grcicon-check-solo-green"></i></li>
+                                      <li><strong>Number of rows</strong>: 152 <i class="grcicon-check-solo-green"></i></li>
+                                      <li><strong>File structure</strong> <i class="grcicon-check-solo-green"></i></li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="row-fluid">
+                                <div class="span6">
+                                  <div class="import-wrap import-analyze">
+                                    <h4>pci_controls_2015.csv</h4>
+                                    <ul>
+                                      <li><strong>Object type</strong>: Regulations <i class="grcicon-check-solo-green"></i></li>
+                                      <li><strong>Number of rows</strong>: 762 <i class="grcicon-check-solo-green"></i></li>
+                                      <li><strong>File structure</strong> <i class="grcicon-check-solo-green"></i></li>
+                                    </ul>
+                                  </div>
+                                </div>
+                                <div class="span6">
+                                  <div class="import-wrap import-analyze">
+                                    <h4>pci_controls_2015.csv</h4>
+                                    <ul>
+                                      <li><strong>Object type</strong>: sections <i class="grcicon-check-solo-green"></i></li>
+                                      <li><strong>Number of rows</strong>: 50 <i class="grcicon-check-solo-green"></i></li>
+                                      <li><strong>File structure</strong> <i class="grcicon-check-solo-green"></i></li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="import-wrap import-final">
                               <ul>
-                                <li><strong>Object type</strong>: Controls <i class="grcicon-check-solo-green"></i></li>
-                                <li><strong>Number of rows</strong>: 252 <i class="grcicon-check-solo-green"></i></li>
-                                <li>
-                                  <strong>File structure</strong> <i class="grcicon-not-done"></i>
-                                  <ul class="error">
-                                    <li>required column <strong>title</strong> is missing</li>
-                                  </ul>
-                                </li>
+                                <li><strong>243</strong> records created</li>
+                                <li><strong>73</strong> records updated</li>
+                                <li><strong>42</strong> records deleted</li>
+                                <li><strong>2</strong> records identical</li>
                               </ul>
-                              <h4 class="error">
-                                <strong>Import canceled!</strong> Please fix errors and try again
-                              </h4>
                             </div>
                             <div class="text-top-space">
                               <h3>Quick import tips</h3>
@@ -159,4 +219,4 @@
       </div>
     </div>
   </section>
-</import-not-pass>
+</import>

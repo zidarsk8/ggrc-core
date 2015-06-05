@@ -1,16 +1,15 @@
 $(document).ready(function() {
 
   can.Component.extend({
-    tag: "reporting",
+    tag: "export",
     scope: {
       report_gen: false,
       //attr_selected: false,
       tabs: [
-        {title: "ISO Systems"},
-        {title: "Overdue tasks"},
+        {title: "Export Objects"}
       ],
       reportTitle: [
-        {title: "New Report"},
+        {title: "Export Objects"},
       ],
       table_title: [
         {tbl_title_1: "Program Title", tbl_title_2: "Program Owner", tbl_title_3: "Control Title", tbl_title_4: "Control Owner", tbl_title_5: "Control Contact", tbl_title_6: "Control URL", tbl_title_7: "Control Code", tbl_title_8: "Control State", tbl_title_9: "System Title", tbl_title_10: "System Owner", tbl_title_11: "System Contact", tbl_title_12: "System URL", tbl_title_13: "System Code", tbl_title_14: "System Effective date", tbl_title_15: "System Stop date", tbl_title_16: "System State"}
@@ -28,6 +27,8 @@ $(document).ready(function() {
         {tbl_data_1: "Program 1", tbl_data_2: "Predrag", tbl_data_3: "CTRL 5", tbl_data_4: "Carl Grove", tbl_data_5: "Julius Robert Oppenheimer", tbl_data_6: "http://google.com/control/manhattan-project", tbl_data_7: "CT-PR", tbl_data_8: "Effective", tbl_data_9: "", tbl_data_10: "", tbl_data_11: "", tbl_data_12: "", tbl_data_13: "", tbl_data_14: "", tbl_data_15: "", tbl_data_15: ""}
       ],
       filterRules: [
+      ],
+      filterRulesNext: [
       ],
       relevantFilter: [
       ]
@@ -59,7 +60,7 @@ $(document).ready(function() {
 
         // Revert "New Report n" if custom_report_name is empty
         if (tabs[index].attr('title').trim() === "") {
-          tabs[index].attr('title', "New Report " + new_tabs);
+          tabs[index].attr('title', "Export Objects" + new_tabs);
         }
       },
       ".report-trigger click": function(el, ev) {
@@ -77,7 +78,7 @@ $(document).ready(function() {
             new_tabs++;
           }
         });
-        tabs.push({title: "New Report " + new_tabs, new_report: true});
+        tabs.push({title: "Export Objects" + new_tabs, new_report: true});
         $ul.find('li').not('.hidden-widgets-list').last().addClass("active");
       },
       "#addFilterRule click": function(el, ev) {
@@ -88,11 +89,17 @@ $(document).ready(function() {
             new_rules++;
           }
         });
-        if (newRule.length >= 1) {
-          newRule.push({filterPrefix: true, label: "Relevant to:", new_rule: true});
-        } else {
-          newRule.push({filterPrefix: false, label: "Relevant to:", new_rule: true});
-        }
+        newRule.push({filterPrefix: true, label: "Relevant to:", new_rule: true});
+      },
+      "#addFilterRuleNext click": function(el, ev) {
+        var newRule = this.scope.filterRulesNext,
+            new_rules = 0;
+        newRule.forEach(function(rule) {
+          if (rule.new_rule) {
+            new_rules++;
+          }
+        });
+        newRule.push({filterPrefixNext: true, labelNext: "Relevant to:", new_rule: true});
       },
       "#addRelevantFilterRule click": function(el, ev) {
         var relevantGroup = this.scope.relevantFilter,
@@ -110,6 +117,12 @@ $(document).ready(function() {
             rule = this.scope.filterRules;
         rule.splice(index - 1, 1);
       },
+      ".remove_filter_next click": function(el) {
+        var $item = el.closest(".single-line-filter"),
+            index = $item.index(),
+            rule = this.scope.filterRulesNext;
+        rule.splice(index - 1, 1);
+      },
       ".remove_filter_group click": function(el) {
         var $item = el.closest(".single-line-filter"),
             index = $item.index(),
@@ -118,13 +131,13 @@ $(document).ready(function() {
       },
       ".report-title-trigger click": function(el) {
         var $title_change = this.element.find('.report-title-change'),
-            $parent = this.element.find("h2");
+            $parent = this.element.find("h2.title");
 
         $parent.fadeOut(500);
         $title_change.delay(500).fadeIn(500);
       },
       ".title-change click": function(el) {
-        var $title = this.element.find("h2"),
+        var $title = this.element.find("h2.title"),
             $parent = this.element.find(".report-title-change");
 
         $parent.fadeOut(500);
@@ -133,5 +146,6 @@ $(document).ready(function() {
     }
   });
 
-  $(".reporting-import").html(can.view("/static/mockups/mustache/reporting.mustache",{}));
+  $(".export").html(can.view("/static/mockups/mustache/export/export.mustache",{}));
+
 });

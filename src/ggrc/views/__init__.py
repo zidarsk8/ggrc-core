@@ -301,12 +301,12 @@ def custom_attributes():
   """
   return render_template("mockups/custom-attributes/index.html")
 
-@app.route("/mockups/reporting/index.html")
+@app.route("/mockups/data-grid/")
 @login_required
 def reporting():
   """Reporting mockup
   """
-  return render_template("mockups/reporting/index.html")
+  return render_template("mockups/data-grid/index.html")
 
 @app.route("/mockups/dashboard-ui/index.html")
 @login_required
@@ -399,26 +399,33 @@ def audit_3_0_ca():
   """
   return render_template("/mockups/audit-3.0/control-assessment.html")
 
-@app.route("/mockups/import-export/")
+@app.route("/mockups/import/")
 @login_required
-def import_export():
-  """Import Export prototype
+def import_redesign():
+  """Import prototype
   """
-  return render_template("/mockups/import-export/index.html")
+  return render_template("/mockups/import/index.html")
 
 @app.route("/mockups/export/")
 @login_required
 def export_redesign():
   """Export prototype
   """
-  return render_template("/mockups/import-export/export.html")
+  return render_template("/mockups/export/index.html")
 
-@app.route("/mockups/reporting/export.html")
+@app.route("/mockups/export-object/")
 @login_required
-def reporting_export():
-  """Reporting export mockup
+def export_object_redesign():
+  """Export object prototype
   """
-  return render_template("mockups/reporting/export.html")
+  return render_template("/mockups/export/object.html")
+
+@app.route("/mockups/data-grid/export-object.html")
+@login_required
+def data_grid_export_object():
+  """Data grid export object mockup
+  """
+  return render_template("mockups/data-grid/export-object.html")
 
 @app.route("/permissions")
 @login_required

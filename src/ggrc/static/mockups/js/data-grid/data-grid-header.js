@@ -1,12 +1,12 @@
 $(document).ready(function() {
 
   can.Component.extend({
-    tag: "header",
+    tag: "reporting-header",
     scope: {
       report_gen: false,
     },
     template: "<content/>",
   });
 
-  $(".title-content").html(can.view("/static/mockups/mustache/import-export/import-export-header.mustache",{}));
+  $(".title-content").html(can.view("/static/mockups/mustache/data-grid/data-grid-header.mustache",{}));
 });

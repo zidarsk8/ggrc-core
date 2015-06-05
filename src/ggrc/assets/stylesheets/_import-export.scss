@@ -162,11 +162,7 @@ form.import {
   }
 }
 
-.import-wrap {
-  margin-top: 10px;
-}
-
-.import-analyze {
+.import-main-wrap {
   h4 {
     font-weight: bold;
     margin-bottom: 10px;
@@ -175,6 +171,13 @@ form.import {
       color: $red;
     }
   }
+}
+
+.import-wrap {
+  margin-top: 10px;
+}
+
+.import-analyze {
   ul {
     @extend %reset-list;
     li {
