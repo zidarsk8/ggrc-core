@@ -13,11 +13,28 @@
     template: "<content />",
     scope: {
       object: "@",
-      type: "@"
+      type: "@",
+      selected: [],
+      "join-object-id": "@"
     },
     events: {
+      ".modalSearchButton click": function (el, ev) {
+        ev.preventDefault();
+
+      },
       "mapper-selector onTypeChange": function (el, ev, data) {
         this.scope.attr("type", data.value);
+      },
+      "mapper-results onSelectChange": function (el, ev, select) {
+        var id = select.data("id"),
+            isChecked = select.prop("checked"),
+            selected = this.scope.attr("selected");
+
+        if (isChecked) {
+          selected.push(id);
+        } else {
+          selected.splice(selected.indexOf(id), 1);
+        }
       }
     }
   });
@@ -27,6 +44,83 @@
     events: {
       "{document} onTypeChange": function (el, ev, data) {
         this.scope.attr(data);
+      }
+    }
+  });
+  can.Component.extend({
+    tag: "mapper-results",
+    template: "<content />",
+    scope: {
+      "join-object-id": "@",
+      "items-per-page": "@",
+      page: 0,
+      options: new can.List(),
+      entries: [],
+      isLoading: false
+    },
+    events: {
+      "inserted":  function () {
+        this.element.find(".results-wrap").cms_controllers_infinite_scroll();
+      },
+      ".results-wrap scrollNext": "drawPage",
+      "{document} onTypeChange": function (el, ev, data) {
+        this.scope.attr("entries", []);
+        this.scope.attr("options", []);
+        this.scope.attr("name", data.value);
+        this.getResults();
+      },
+      ".tree-item .openclose click": function (el, ev) {
+        ev.preventDefault();
+        el.openclose();
+      },
+      ".tree-item .object-check-single change": function (el, ev) {
+        this.element.trigger.apply(this.element, ["onSelectChange"].concat(arguments));
+      },
+      "drawPage": function () {
+        if (this.scope.attr("isLoading")) {
+          return;
+        }
+        var que = new RefreshQueue(),
+            page = this.scope.attr("page"),
+            per_page = this.scope.attr("items-per-page"),
+            page_items = this.scope.attr("entries").slice(page * per_page, per_page),
+            options = this.scope.attr("options");
+
+        this.scope.attr("isLoading", true);
+        que.enqueue(page_items).trigger().then(function (models) {
+          this.scope.attr("isLoading", false);
+          this.scope.attr("page", page++);
+          options.push.apply(options, can.map(models, function (model) {
+            return {
+              instance: model,
+              selected_object: CMS.Models[this.scope.attr("name")],
+              binding: null,
+              mappings: []
+            };
+          }.bind(this)));
+        }.bind(this));
+      },
+      "getResults": function () {
+        var join_model = GGRC.Mappings.join_model_name_for(CMS.Models[model_name], model_name),
+            model_name = this.scope.attr("name"),
+            permission_parms = {
+              __permission_type: "read"
+            },
+            term;
+
+        if (join_model !== "TaskGroupObject" && model_name === "Program") {
+          permission_parms = {
+            __permission_type: "create",
+            __permission_model: join_model
+          };
+        }
+        GGRC.Models.Search
+          .search_for_types(term || "", [model_name], permission_parms)
+          .then(function (response) {
+            var entries = response.getResultsForType(model_name);
+            this.scope.attr("entries", entries);
+            this.drawPage();
+          }.bind(this));
       }
     }
   });
@@ -51,9 +145,8 @@
           model_name: this.scope.menu[0].model_singular
         });
       },
-      ".remove_filter click": function(el) {
-        var index = el.data("index");
-        this.scope.panels.splice(index, 1);
+      ".remove_filter click": function (el) {
+        this.scope.panels.splice(el.data("index"), 1);
       }
     }
   });
@@ -114,7 +207,6 @@
               singular: selected.data("singular"),
               plural: selected.data("plural")
             };
-        console.log("onTypeChange", data);
         this.element.trigger("onTypeChange", data);
       },
       "select change": "onTypeChange",

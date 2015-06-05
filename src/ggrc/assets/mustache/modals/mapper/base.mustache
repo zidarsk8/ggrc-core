@@ -127,18 +127,36 @@
       </div>
     </div>
   </div>
-  <div class="modal-content">
+  <div class="filter-actions">
     <div class="row-fluid">
-      <div class="span3 detail_column">
-
-      </div>
-      <div class="span4 option_column">
-
-      </div>
-      <div class="span5 active_column" style="margin-left:0; width:42.17094%">
-
+      <div class="span12">
+        <a class="btn btn-small btn-info pull-right modalSearchButton" href="javascript://">
+          Search
+        </a>
       </div>
     </div>
+  </div>
+  <div class="results">
+    <mapper-results join-object-id="{{join-id}}" items-per-page="20">
+      <div class="row-fluid">
+        <div class="span9">
+          <strong>
+            {{ entries.length }} Objects found
+          </strong>
+        </div>
+        <div class="span3">
+          <label rel="tooltip" data-placement="right" data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria.">
+            Select all
+            <input type="checkbox" value="" class="object-check-all">
+          </label>
+        </div>
+      </div>
+      <div class="results-wrap">
+        <ul class="result-tree">
+          {{> /static/mustache/selectors/object_selector_option_items.mustache}}
+        </ul>
+      </div>
+    </mapper-results>
   </div>
   <div class="modal-footer">
     <div class="row-fluid">
@@ -147,8 +165,11 @@
       </div>
       <div class="span6">
         <div class="confirm-buttons">
-          <a class="btn btn-small btn-success preventdoubleclick" xdata-toggle="modal-submit" data-dismiss="modal" href="javascript://">
-            Done
+          <span>
+            <strong> {{ selected.length }} objects selected </strong>
+          </span>
+          <a class="{{^if selected.length}}disabled{{/if}} btn btn-small btn-success preventdoubleclick" data-toggle="modal-submit" data-dismiss="modal" href="javascript://">
+            Add Selected
           </a>
         </div>
       </div>
