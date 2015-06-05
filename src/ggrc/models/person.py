@@ -142,7 +142,8 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
         u'gGRC Admin': 0,
         u'ProgramCreator': 1,
         u'ObjectEditor': 2,
-        u'Reader': 3
+        u'Reader': 3,
+        u'Creator': 4,
     }
     unique_roles = set([
         user_role.role.name
