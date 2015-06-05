@@ -67,7 +67,7 @@ def InCondition(instance, value, property_name):
 All functions with a signature
 
 ..
-  
+
   func(instance, **kwargs)
 """
 _CONDITIONS_MAP = {
@@ -120,14 +120,15 @@ class DefaultUserPermissions(UserPermissions):
     # Check for admin permission
     if self._permission_match(self.ADMIN_PERMISSION, self._permissions()):
       return True
-
+    permissions = self._permissions()
+    if not permissions.get(action) or not permissions[action].get(instance._inflector.model_singular):
+      return False
     conditions = self._permissions()\
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('conditions', {})\
         .setdefault(instance.context_id, [])
     #FIXME Check for basic resource permission
-
     #Check any conditions applied per resource
     if not conditions:
       return True
@@ -210,13 +211,7 @@ class DefaultUserPermissions(UserPermissions):
     return self._get_contexts_for('delete', resource_type)
 
   def is_allowed_view_object_page_for(self, instance):
-    return self._is_allowed(
-        Permission(
-          'view_object_page',
-          instance.__class__.__name__,
-          instance.context_id
-          )
-        )
+    return self._is_allowed_for(instance, 'read')
 
   def is_admin(self):
     """Whether the user has ADMIN permissions."""
