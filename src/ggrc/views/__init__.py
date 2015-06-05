@@ -106,7 +106,7 @@ def index():
   """
   from ggrc import settings
   if not settings.PRODUCTION:
-    contact = ' For any questions, please contact eng-compliance@google.com.' if settings.GOOGLE_INTERNAL else ""
+    contact = ' For any questions, please contact your administrator.' if settings.GOOGLE_INTERNAL else ""
     flash(u'WARNING - This is not the production instance of the GGRC application.', 'alert alert-warning')
     flash(u'Company confidential, sensitive or personally identifiable information *MUST NOT* be entered or stored here.%s' % (contact), 'alert alert-warning')
   return render_template("welcome/index.haml")
