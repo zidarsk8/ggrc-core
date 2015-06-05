@@ -27,12 +27,14 @@ class Api():
     self.user_headers = {}
 
   def set_user(self, person=None):
-    if  person:
+    # Refresh the person instance from the db:
+    person = person.__class__.query.get(person.id)
+    if person:
       self.user_headers = {
-        "X-ggrc-user": self.resource.as_json({
-          "name": person.name,
-          "email": person.email,
-        })
+          "X-ggrc-user": self.resource.as_json({
+              "name": person.name,
+              "email": person.email,
+          })
       }
 
     else:
