@@ -506,6 +506,9 @@
           System: {
             mapping: "related_systems"
           },
+          ControlAssessment: {
+            mapping: "related_control_assessments"
+          },
           Document: {
             mapping: "documents"
           },
@@ -514,7 +517,7 @@
           },
           Program: {
             mapping: "programs"
-          }
+          },
         },
         issues: {
           Issue: {
