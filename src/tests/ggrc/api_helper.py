@@ -100,3 +100,7 @@ class Api():
     headers.update(self.headers)
     api_link = self.api_link(obj, obj.id)
     return self.tc.delete(api_link, headers=headers)
+
+  def search(self, types, q="", counts=False):
+    return (self.tc.get('/search?q={}&types={}&counts_only={}'.format(
+        q, types, counts)), self.headers)
