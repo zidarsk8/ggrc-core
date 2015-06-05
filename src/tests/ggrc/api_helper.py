@@ -9,7 +9,6 @@ from ggrc import services
 import inspect
 import flask
 import logging
-from sqlalchemy.orm.collections import InstrumentedList
 
 
 # style: should the class name be all capitals?
@@ -36,7 +35,6 @@ class Api():
               "email": person.email,
           })
       }
-
     else:
       self.user_headers = {}
 
@@ -61,7 +59,6 @@ class Api():
       response.json = None
     return response
 
-
   def send_request(self, request, obj, data, headers={}, api_link=None):
     if api_link is None:
       api_link = self.api_link(obj)
@@ -79,11 +76,12 @@ class Api():
   def put(self, obj, data):
     response = self.get(obj, obj.id)
     headers = {
-      "If-Match": response.headers.get("Etag"),
-      "If-Unmodified-Since": response.headers.get("Last-Modified")
+        "If-Match": response.headers.get("Etag"),
+        "If-Unmodified-Since": response.headers.get("Last-Modified")
     }
     api_link = self.api_link(obj, obj.id)
-    return self.send_request(self.tc.put , obj, data, headers=headers, api_link=api_link)
+    return self.send_request(
+        self.tc.put, obj, data, headers=headers, api_link=api_link)
 
   def post(self, obj, data):
     return self.send_request(self.tc.post, obj, data)
@@ -94,8 +92,8 @@ class Api():
   def delete(self, obj, id):
     response = self.get(obj, obj.id)
     headers = {
-      "If-Match": response.headers.get("Etag"),
-      "If-Unmodified-Since": response.headers.get("Last-Modified")
+        "If-Match": response.headers.get("Etag"),
+        "If-Unmodified-Since": response.headers.get("Last-Modified")
     }
     headers.update(self.headers)
     api_link = self.api_link(obj, obj.id)
