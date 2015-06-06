@@ -4,15 +4,19 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from datetime import date, timedelta
-from ggrc.services.common import Resource
-from ggrc.models import *
-from ggrc_basic_permissions.models import *
-from ggrc.app import app
-from ggrc import db
-from tests.ggrc.api_helper import Api
-import string
-import random
 import names
+import random
+import string
+
+from ggrc import db
+from ggrc.app import app
+from ggrc.models import (
+  Person, Policy, Control, Objective, Standard, System, NotificationConfig,
+  CustomAttributeDefinition
+)
+from ggrc.services.common import Resource
+from ggrc_basic_permissions.models import UserRole, Role
+from tests.ggrc.api_helper import Api
 
 
 class Generator():
@@ -71,7 +75,6 @@ class GgrcGenerator(Generator):
     }]})
     obj_dict[obj_name].update(data)
     return self.generate(obj_class, obj_name, obj_dict)
-
 
   def generate_policy(self, data={}):
     obj_name = "policy"
@@ -172,3 +175,24 @@ class GgrcGenerator(Generator):
         }
     }
     return self.generate(NotificationConfig, obj_name, data)
+
+  def generate_custom_attribute(self, definition_type, **kwargs):
+    obj_name = "custom_attribute_definition"
+    title = kwargs["title"] if "title" in kwargs else self.random_str()
+    data = {
+        obj_name: {
+            "title": title,
+            "custom_attribute_definitions": [],
+            "custom_attributes": {},
+            "definition_type": definition_type,
+            "modal_title": title,
+            "attribute_type": "Text",
+            "mandatory": False,
+            "helptext": "",
+            "placeholder": "",
+            "context": {"id": None},
+            "multi_choice_options": ""
+        }
+    }
+    data[obj_name].update(kwargs)
+    self.generate(CustomAttributeDefinition, obj_name, data)
