@@ -252,7 +252,14 @@ permissions = {
         "SystemOrProcess",
         "System",
         "Process",
-        "ObjectOwner",  # TODO: This allows creator to become an owner of any object in the db.
+        {
+            "type": "ObjectOwner",
+            "terms": {
+                "property_name": "ownable.modified_by",
+                "value": "$current_user"
+            },
+            "condition": "is"
+        },
         "Person",
         "Program",
         "Role",

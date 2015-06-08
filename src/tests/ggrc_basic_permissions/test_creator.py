@@ -127,5 +127,22 @@ class TestCreator(TestCase):
     creator_count = self._get_count('Person')
     self.assertEquals(admin_count, creator_count)
 
+  def test_creator_cannot_become_owner(self):
+    self.api.set_user(self.admin)
+    _, obj = self.generator.generate(all_models.Regulation, "regulation", {
+        "regulation": {"title": "Test regulation", "context": None},
+    })
+    self.api.set_user(self.creator)
+    response = self.api.post(all_models.ObjectOwner, {"object_owner": {
+        "person": {
+            "id": self.creator.id,
+            "type": "Person",
+        }, "ownable": {
+            "type": "Regulation",
+            "id": obj.id,
+        }, "context": None},
+    })
+    self.assertEquals(response.status_code, 403)
+
 if __name__ == '__main__':
   unittest.main()

@@ -48,19 +48,29 @@ def resolve_permission_variable(value):
   else:
     return value
 
+
+def get_deep_attr(instance, names):
+  value = instance
+  for name in names.split("."):
+    value = getattr(value, name)
+  return value
+
+
 def ContainsCondition(instance, value, list_property):
   value = resolve_permission_variable(value)
-  list_value = getattr(instance, list_property)
+  list_value = get_deep_attr(instance, list_property)
   return value in list_value
+
 
 def IsCondition(instance, value, property_name):
   value = resolve_permission_variable(value)
-  property_value = getattr(instance, property_name)
+  property_value = get_deep_attr(instance, property_name)
   return value == property_value
+
 
 def InCondition(instance, value, property_name):
   value = resolve_permission_variable(value)
-  property_value = getattr(instance, property_name)
+  property_value = get_deep_attr(instance, property_name)
   return property_value in value
 
 """
@@ -71,10 +81,11 @@ All functions with a signature
   func(instance, **kwargs)
 """
 _CONDITIONS_MAP = {
-  'contains': ContainsCondition,
-  'is': IsCondition,
-  'in': InCondition,
-  }
+    'contains': ContainsCondition,
+    'is': IsCondition,
+    'in': InCondition,
+}
+
 
 class DefaultUserPermissions(UserPermissions):
   # super user, context_id 0 indicates all contexts
@@ -143,6 +154,9 @@ class DefaultUserPermissions(UserPermissions):
     """Whether or not the user is allowed to create a resource of the specified
     type in the context."""
     return self._is_allowed(Permission('create', resource_type, context_id))
+
+  def is_allowed_create_for(self, instance):
+    return self._is_allowed_for(instance, 'create')
 
   def is_allowed_read(self, resource_type, context_id):
     """Whether or not the user is allowed to read a resource of the specified
