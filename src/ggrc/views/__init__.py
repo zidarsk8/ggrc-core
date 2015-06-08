@@ -13,6 +13,7 @@ from ggrc.rbac import permissions
 from ggrc.login import get_current_user
 from ggrc.services.common import as_json, inclusion_filter, filter_resource
 from ggrc.builder.json import publish, publish_representation
+import ggrc.views.relationships
 from ggrc.views.converters import *  # necessary for import endpoints
 from werkzeug.exceptions import Forbidden
 from . import filters

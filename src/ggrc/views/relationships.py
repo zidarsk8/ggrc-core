@@ -136,6 +136,16 @@ def related_objects():
       'application/json', 200, [('Content-Type', 'application/json')]))
   return as_json(results)
 
+@app.route('/relationships/triggered_automappings')
+def triggered_automappings():
+  obj_id = request.args['oid']
+  results = Relationship.query.filter_by(automapping_id=obj_id).all()
+  results = [ggrc.builder.json.publish(r) for r in results]
+  ggrc.builder.json.publish_representation(results)
+  current_app.make_response((
+      'application/json', 200, [('Content-Type', 'application/json')]))
+  return as_json(results)
+
 def related_objects_link(obj_id, obj_type, far_type):
   return "{base_url}?{params}".format(
       base_url=url_for('related_objects'),
