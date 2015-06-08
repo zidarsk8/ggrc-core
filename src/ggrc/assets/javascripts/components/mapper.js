@@ -14,23 +14,24 @@
     scope: {
       object: "@",
       type: "@",
-      selected: [],
+      selected: new can.List(),
       "join-object-id": "@"
     },
     events: {
       ".modalSearchButton click": function (el, ev) {
         ev.preventDefault();
-
       },
       "mapper-selector onTypeChange": function (el, ev, data) {
         this.scope.attr("type", data.value);
+      },
+      "mapper-results onSelectAll": function (el, ev, ids) {
+        this.scope.attr("selected").attr(ids);
       },
       "mapper-results onSelectChange": function (el, ev, select) {
         var id = select.data("id"),
             isChecked = select.prop("checked"),
             selected = this.scope.attr("selected");
-
-        if (isChecked) {
+        if (!~selected.indexOf(id)) {
           selected.push(id);
         } else {
           selected.splice(selected.indexOf(id), 1);
@@ -73,6 +74,9 @@
         ev.preventDefault();
         el.openclose();
       },
+      ".object-check-all change": function (el, ev) {
+        this.element.trigger("onSelectAll", [_.pluck(this.scope.attr("entries"), "id")]);
+      },
       ".tree-item .object-check-single change": function (el, ev) {
         this.element.trigger.apply(this.element, ["onSelectChange"].concat(arguments));
       },
@@ -91,6 +95,7 @@
           this.scope.attr("isLoading", false);
           this.scope.attr("page", page++);
           options.push.apply(options, can.map(models, function (model) {
+            console.log("MODEL", model);
             return {
               instance: model,
               selected_object: CMS.Models[this.scope.attr("name")],
