@@ -411,7 +411,13 @@ class Slugged(Base):
   _publish_attrs = ['slug']
   _fulltext_attrs = ['slug']
   _sanitize_html = ['slug']
-  _aliases = {"slug": "Code"}
+  _aliases = {
+      "slug": {
+          "display_name": "Code",
+          "description": ("Must be unique. Can be left empty for autogeneration."
+                          " If updating or deleting, code is required"),
+      }
+  }
 
   @classmethod
   def generate_slug_for(cls, obj):
