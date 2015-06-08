@@ -47,7 +47,6 @@ class TestCreator(TestCase):
                     "type": "Person",
                     "id": self.creator.id,
                 },
-                "context": None,
             },
         })
         if response.status_code != 201:
