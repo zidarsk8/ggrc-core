@@ -26,9 +26,10 @@ class TestSplitArry(TestCase):
       ["hello", "world"],
       ["hello", "world"],
     ]
-    data_blocks = split_array(test_data)
+    offests, data_blocks = split_array(test_data)
     self.assertEquals(len(data_blocks), 1)
     self.assertEquals(data_blocks[0], test_data)
+    self.assertEquals(offests[0], 0)
 
   def test_sigle_block_with_padding(self):
     test_data = [
@@ -38,9 +39,10 @@ class TestSplitArry(TestCase):
       ["hello", "world"],
       ["hello", "world"],
     ]
-    data_blocks = split_array(test_data)
+    offests, data_blocks = split_array(test_data)
     self.assertEquals(len(data_blocks), 1)
     self.assertEquals(data_blocks[0], test_data[1:])
+    self.assertEquals(offests[0], 1)
 
     test_data = [
       ["", ""],
@@ -53,9 +55,10 @@ class TestSplitArry(TestCase):
       ["", ""],
       ["", ""],
     ]
-    data_blocks = split_array(test_data)
+    offests, data_blocks = split_array(test_data)
     self.assertEquals(len(data_blocks), 1)
     self.assertEquals(data_blocks[0], test_data[3:7])
+    self.assertEquals(offests[0], 3)
 
   def test_multiple_blocks(self):
     test_data = [
@@ -66,10 +69,12 @@ class TestSplitArry(TestCase):
       ["hello", "world"],
       ["hello", "world"],
     ]
-    data_blocks = split_array(test_data)
+    offests, data_blocks = split_array(test_data)
     self.assertEquals(len(data_blocks), 2)
     self.assertEquals(data_blocks[0], test_data[1:3])
     self.assertEquals(data_blocks[1], test_data[4:6])
+    self.assertEquals(offests[0], 1)
+    self.assertEquals(offests[1], 4)
 
     test_data = [
       ["", ""],
@@ -85,11 +90,14 @@ class TestSplitArry(TestCase):
       ["hello", "world"],
       ["hello", "world"],
     ]
-    data_blocks = split_array(test_data)
+    offests, data_blocks = split_array(test_data)
     self.assertEquals(len(data_blocks), 3)
     self.assertEquals(data_blocks[0], test_data[1:4])
     self.assertEquals(data_blocks[1], test_data[6:7])
     self.assertEquals(data_blocks[2], test_data[9:])
+    self.assertEquals(offests[0], 1)
+    self.assertEquals(offests[1], 6)
+    self.assertEquals(offests[2], 9)
 
 
 

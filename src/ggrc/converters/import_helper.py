@@ -127,17 +127,19 @@ def equalize_array(array):
 def split_array(csv_data):
   """ Split array by empty lines """
   data_blocks = []
+  offsets = []
   current_block = None
-  for line in csv_data:
+  for ofset, line in enumerate(csv_data):
     if sum(map(len, line)) > 0:
       if current_block is None:
+        offsets.append(ofset)
         data_blocks.append([])
         current_block = len(data_blocks) - 1
       data_blocks[current_block].append(line)
     else:
       current_block = None
 
-  return data_blocks
+  return offsets, data_blocks
 
 
 def generate_2d_array(width, height, value=None):
