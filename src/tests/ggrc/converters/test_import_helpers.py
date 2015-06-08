@@ -10,11 +10,88 @@ from random import shuffle
 from ggrc import models
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.converters.import_helper import get_column_order
+from ggrc.converters.import_helper import split_array
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
+
+
+class TestSplitArry(TestCase):
+
+  def test_sigle_block(self):
+    test_data = [
+      ["hello", "world"],
+      ["hello", "world"],
+      ["hello", "world"],
+    ]
+    data_blocks = split_array(test_data)
+    self.assertEquals(len(data_blocks), 1)
+    self.assertEquals(data_blocks[0], test_data)
+
+  def test_sigle_block_with_padding(self):
+    test_data = [
+      ["", ""],
+      ["hello", "world"],
+      ["hello", "world", "uet"],
+      ["hello", "world"],
+      ["hello", "world"],
+    ]
+    data_blocks = split_array(test_data)
+    self.assertEquals(len(data_blocks), 1)
+    self.assertEquals(data_blocks[0], test_data[1:])
+
+    test_data = [
+      ["", ""],
+      ["", ""],
+      ["", ""],
+      ["hello", "world"],
+      ["hello", "world", "uet"],
+      ["hello", "world"],
+      ["hello", "world"],
+      ["", ""],
+      ["", ""],
+    ]
+    data_blocks = split_array(test_data)
+    self.assertEquals(len(data_blocks), 1)
+    self.assertEquals(data_blocks[0], test_data[3:7])
+
+  def test_multiple_blocks(self):
+    test_data = [
+      ["", ""],
+      ["hello", "world"],
+      ["hello", "world", "uet"],
+      ["", ""],
+      ["hello", "world"],
+      ["hello", "world"],
+    ]
+    data_blocks = split_array(test_data)
+    self.assertEquals(len(data_blocks), 2)
+    self.assertEquals(data_blocks[0], test_data[1:3])
+    self.assertEquals(data_blocks[1], test_data[4:6])
+
+    test_data = [
+      ["", ""],
+      ["hello", "world"],
+      ["hello", "world", "uet"],
+      ["hello", "world"],
+      ["", ""],
+      ["", ""],
+      ["hello", "world"],
+      ["", ""],
+      ["", ""],
+      ["hello", "world"],
+      ["hello", "world"],
+      ["hello", "world"],
+    ]
+    data_blocks = split_array(test_data)
+    self.assertEquals(len(data_blocks), 3)
+    self.assertEquals(data_blocks[0], test_data[1:4])
+    self.assertEquals(data_blocks[1], test_data[6:7])
+    self.assertEquals(data_blocks[2], test_data[9:])
+
+
 
 
 class TestCulumnOrder(TestCase):
