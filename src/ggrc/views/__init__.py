@@ -31,6 +31,7 @@ from ggrc.services.common import as_json
 from ggrc.services.common import inclusion_filter
 from ggrc.views import filters
 from ggrc.views import mockups
+from ggrc.views import converters
 from ggrc.views.common import RedirectedPolymorphView
 from ggrc.views.registry import object_view
 
@@ -246,3 +247,4 @@ def user_permissions():
 
 mockups.init_mockup_views()
 filters.init_filter_views()
+converters.init_converter_views()
