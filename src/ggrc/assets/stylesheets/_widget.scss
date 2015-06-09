@@ -653,6 +653,10 @@
       @include opacity(0.8);
     }
   }
+  &.no-space {
+    padding-left: 0;
+    padding-right: 0;
+  }
   &.tier-info {
     padding:16px 0 0 0;
     h3 {
@@ -1329,6 +1333,8 @@
 // Report
 .save-template-wrap {
   @include clearfix();
+  padding-left: 30px;
+  padding-right: 30px;
   .left-content {
     float: left;
     padding-top: 5px;
@@ -1440,6 +1446,7 @@ ul.attr-list {
 .relevant-filter-group {
   .add-object {
     margin-top: 20px;
+    margin-left: 30px;
   }
 
 }
@@ -1793,4 +1800,9 @@ ul.attr-list {
   float: left;
   font-weight: bold;
   margin: 4px 10px 0 0;
+}
+
+.left-right-space {
+  padding-left: 30px;
+  padding-right: 30px;
 }

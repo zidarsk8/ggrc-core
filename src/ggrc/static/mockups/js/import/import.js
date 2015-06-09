@@ -3,12 +3,24 @@ $(document).ready(function() {
   can.Component.extend({
     tag: "import",
     template: "<content/>",
+    importList: [
+    ],
     events: {
-      ".download-template select change": function(el, ev) {
+      "#importSelect change": function(el, ev) {
         var $value = this.element.find('option:selected').text(),
-            $button_value = this.element.find('.import-button');
+            $itemWrap = this.element.closest('.download-template').find('.import-list'),
+            $item = $itemWrap.find('li'),
+            index = $item.index(),
+            importList = this.scope.importList;
 
-        $button_value.find('span').text($value);
+        importList[index].attr('title', $value);
+
+        // var $value = this.element.find('option:selected').text(),
+        //     $list_value = this.element.find('.import-list'),
+        //     importList = this.scope.importList;
+
+        // $list_value.find('li').text($value);
+        // importList.push({title: $value});
       }
     }
   });
