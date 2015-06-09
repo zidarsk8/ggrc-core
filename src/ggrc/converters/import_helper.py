@@ -8,7 +8,7 @@ import re
 import chardet
 from StringIO import StringIO
 
-from ggrc.converters import COLUMN_HANDLERS
+from ggrc.converters.handlers import COLUMN_HANDLERS
 from ggrc.converters import COLUMN_ORDER
 from ggrc.converters import handlers
 from ggrc.models.reflection import AttributeInfo

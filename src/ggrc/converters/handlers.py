@@ -9,6 +9,7 @@ from inspect import getmro
 
 from ggrc.models import Person
 
+
 class ColumnHandler(object):
 
   def __init__(self, row_converter, key, **options):
@@ -18,7 +19,7 @@ class ColumnHandler(object):
     self.raw_value = options.get("raw_value")
     self.validator = options.get("validator")
     self.mandatory = options.get("mandatory", False)
-    self.default= options.get("default")
+    self.default = options.get("default")
     self.description = options.get("description", "")
     self.display_name = options.get("description", "")
 
@@ -140,7 +141,6 @@ class TitleColumnHandler(TextColumnHandler):
     return True
 
 
-
 class TextareaColumnHandler(ColumnHandler):
 
   """ Multi line text field handler """
@@ -151,3 +151,11 @@ class TextareaColumnHandler(ColumnHandler):
       return ""
 
     return re.sub(r'\s+', " ", self.raw_value).strip()
+
+
+COLUMN_HANDLERS = {
+    "slug": SlugColumnHandler,
+    "title": TitleColumnHandler,
+    "owners": OwnerColumnHandler,
+    "status": StatusColumnHandler,
+}
