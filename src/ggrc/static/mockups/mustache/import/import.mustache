@@ -170,7 +170,7 @@
                                 generate CSV template, with all fields and instructions.
                               </p>
                               <label>I'm importing/updating...</label>
-                              <select>
+                              <select id="importSelect" class="input-block-level" multiple>
                                 <optgroup label="Governance">
                                   <option value="Regulation" label="Regulations">Regulations</option>
                                   <option value="Contract" label="Contracts">Contracts</option>
@@ -197,10 +197,17 @@
                                   <option value="System" label="Systems">Systems</option>
                                 </optgroup>
                               </select>
+                              <p>CSV template will be generated for following object types:</p>
+                              <ul class="import-list">
+                                <li><a href="#"><i class="grcicon-deleted"></i></a> Regulation</li>
+                                <li><a href="#"><i class="grcicon-deleted"></i></a> Program</li>
+                                <li><a href="#"><i class="grcicon-deleted"></i></a> Section</li>
+                                <li><a href="#"><i class="grcicon-deleted"></i></a> Data Assets</li>
+                              </ul>
                               <div class="center-block">
                                 <a href="import_controls_template" class="btn btn-primary btn-large import-button">
                                   <i class="grcicon-imp-exp-white"></i>
-                                  Import template - <span>Regulations</span>
+                                  Import template
                                 </a>
                                 <small>Click to download</small>
                               </div>
