@@ -79,6 +79,9 @@ ggrc.indexer = get_indexer()
 from ggrc.rbac import permissions
 permissions.get_permissions_provider()
 
+from ggrc.automapper import register_automapping_listeners
+register_automapping_listeners()
+
 if settings.ENABLE_JASMINE:
   # Configure Flask-Jasmine, for dev mode unit testing
   from flask.ext.jasmine import Jasmine, Asset
