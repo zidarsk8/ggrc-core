@@ -11,12 +11,19 @@ from ggrc import models
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import split_array
+from ggrc.converters.import_helper import pretty_name
+from ggrc.utils import get_mapping_rules
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
 
+def get_mapping_names(class_name):
+  mapping_rules = get_mapping_rules()[class_name]
+  pretty_rules = map(pretty_name, mapping_rules)
+  mapping_names = set(["map:{}".format(name) for name in pretty_rules])
+  return mapping_names
 
 class TestSplitArry(TestCase):
 
@@ -148,8 +155,9 @@ class TestCustomAttributesDefinitions(TestCase):
     self.generator.generate_custom_attribute(
         "policy", title="Mandatory Attribute", mandatory=True)
     definitions = get_object_column_definitions(models.Policy)
+    mapping_names = get_mapping_names(models.Policy.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Code",
         "Title",
         "Description",
@@ -166,6 +174,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "My Attribute",
         "Mandatory Attribute",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -190,8 +199,9 @@ class TestCustomAttributesDefinitions(TestCase):
         multi_choice="hello,world,what's,up"
     )
     definitions = get_object_column_definitions(models.Program)
+    mapping_names = get_mapping_names(models.Program.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -210,6 +220,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "Mandatory Attribute",
         "Choose",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -226,11 +237,14 @@ class TestGetObjectColumnDefinitions(TestCase):
   order of these test functions is the same as the objects in LHN
   """
 
+
+
   def test_program_definitions(self):
     """ test default headers for Program """
     definitions = get_object_column_definitions(models.Program)
+    mapping_names = get_mapping_names(models.Program.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -246,6 +260,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -254,8 +269,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_audit_definitions(self):
     """ test default headers for Audit """
     definitions = get_object_column_definitions(models.Audit)
+    mapping_names = get_mapping_names(models.Audit.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Program",
         "Title",
         "Description",
@@ -267,6 +283,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Planned Report Period to",
         "Auditors",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -276,8 +293,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_control_assessment_definitions(self):
     """ test default headers for Control Assessment """
     definitions = get_object_column_definitions(models.ControlAssessment)
+    mapping_names = get_mapping_names(models.ControlAssessment.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -296,6 +314,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Conclusion: Design",
         "Conclusion: Operation",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -306,8 +325,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_issue_definitions(self):
     """ test default headers for Issue """
     definitions = get_object_column_definitions(models.Issue)
+    mapping_names = get_mapping_names(models.Issue.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -322,6 +342,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -330,8 +351,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_regulation_definitions(self):
     """ test default headers for Regulation """
     definitions = get_object_column_definitions(models.Regulation)
+    mapping_names = get_mapping_names(models.Regulation.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -345,6 +367,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -353,8 +376,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_policy_definitions(self):
     """ test default headers for Policy """
     definitions = get_object_column_definitions(models.Policy)
+    mapping_names = get_mapping_names(models.Policy.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -369,6 +393,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -377,8 +402,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_standard_definitions(self):
     """ test default headers for Standard """
     definitions = get_object_column_definitions(models.Standard)
+    mapping_names = get_mapping_names(models.Standard.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -392,6 +418,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -400,8 +427,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_contract_definitions(self):
     """ test default headers for Contract """
     definitions = get_object_column_definitions(models.Contract)
+    mapping_names = get_mapping_names(models.Contract.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -415,6 +443,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -423,8 +452,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_clause_definitions(self):
     """ test default headers for Clause """
     definitions = get_object_column_definitions(models.Clause)
+    mapping_names = get_mapping_names(models.Clause.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -438,6 +468,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -446,8 +477,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_section_definitions(self):
     """ test default headers for Section """
     definitions = get_object_column_definitions(models.Section)
+    mapping_names = get_mapping_names(models.Section.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Text of Section",
         "Notes",
@@ -460,6 +492,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Code",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -468,8 +501,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_control_definitions(self):
     """ test default headers for Control """
     definitions = get_object_column_definitions(models.Control)
+    mapping_names = get_mapping_names(models.Control.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Test Plan",
@@ -493,6 +527,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Secondary Assessor",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -501,8 +536,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_objective_definitions(self):
     """ test default headers for Objective """
     definitions = get_object_column_definitions(models.Objective)
+    mapping_names = get_mapping_names(models.Objective.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -514,6 +550,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Code",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -522,13 +559,15 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_person_definitions(self):
     """ test default headers for Person """
     definitions = get_object_column_definitions(models.Person)
+    mapping_names = get_mapping_names(models.Person.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Name",
         "Email",
         "enabled user",
         "Company",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -537,8 +576,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_org_group_definitions(self):
     """ test default headers for OrgGroup """
     definitions = get_object_column_definitions(models.OrgGroup)
+    mapping_names = get_mapping_names(models.OrgGroup.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -552,6 +592,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -560,8 +601,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_vendor_definitions(self):
     """ test default headers for Vendor """
     definitions = get_object_column_definitions(models.Vendor)
+    mapping_names = get_mapping_names(models.Vendor.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -575,6 +617,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -583,8 +626,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_system_definitions(self):
     """ test default headers for System """
     definitions = get_object_column_definitions(models.System)
+    mapping_names = get_mapping_names(models.System.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -599,6 +643,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -607,8 +652,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_process_definitions(self):
     """ test default headers for Process """
     definitions = get_object_column_definitions(models.Process)
+    mapping_names = get_mapping_names(models.Process.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -623,6 +669,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -631,8 +678,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_data_asset_definitions(self):
     """ test default headers for DataAsset """
     definitions = get_object_column_definitions(models.DataAsset)
+    mapping_names = get_mapping_names(models.DataAsset.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -646,6 +694,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -654,8 +703,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_product_definitions(self):
     """ test default headers for Product """
     definitions = get_object_column_definitions(models.Product)
+    mapping_names = get_mapping_names(models.Product.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -670,6 +720,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -678,8 +729,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_project_definitions(self):
     """ test default headers for Project """
     definitions = get_object_column_definitions(models.Project)
+    mapping_names = get_mapping_names(models.Project.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -693,6 +745,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -701,8 +754,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_facility_definitions(self):
     """ test default headers for Facility """
     definitions = get_object_column_definitions(models.Facility)
+    mapping_names = get_mapping_names(models.Facility.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -716,6 +770,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
@@ -724,8 +779,9 @@ class TestGetObjectColumnDefinitions(TestCase):
   def test_market_definitions(self):
     """ test default headers for Market """
     definitions = get_object_column_definitions(models.Market)
+    mapping_names = get_mapping_names(models.Market.__name__)
     display_names = set([val["display_name"] for val in definitions.values()])
-    expected_names = set([
+    element_names = set([
         "Title",
         "Description",
         "Notes",
@@ -739,6 +795,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
     ])
+    expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     mandatory = {val["display_name"]: val["mandatory"]
                  for val in definitions.values()}
