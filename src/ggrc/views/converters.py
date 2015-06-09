@@ -12,6 +12,8 @@ from ggrc.login import login_required
 from ggrc.converters import IMPORTABLE
 from ggrc.converters.base import Converter
 from ggrc.converters.import_helper import generate_csv_string
+from ggrc.converters.import_helper import read_csv_file
+from ggrc.converters.import_helper import split_array
 
 
 def check_required_headers(required_headers):
@@ -21,6 +23,9 @@ def check_required_headers(required_headers):
       errors.append("Missing required header '{}'".format(header))
     elif request.headers[header] not in valid_values:
       errors.append("Invalid header value for '{}'".format(header))
+
+  if errors:
+    raise BadRequest("\n".join(errors))
 
 
 def check_export_request_data():
@@ -40,12 +45,9 @@ def parse_export_request():
   """ Check if request contains all required fields """
   required_headers = {
       "X-Requested-By": ["gGRC"],
-      "Content-Type": "application/json"
+      "Content-Type": ["application/json"],
   }
-
-  header_errors = check_required_headers(required_headers)
-  if header_errors:
-    raise BadRequest("\n".join(header_errors))
+  check_required_headers(required_headers)
   check_export_request_data()
 
   export_data = {k: v for k, v in request.json.items() if k in IMPORTABLE}
@@ -70,9 +72,43 @@ def handle_export_request():
       ('Content-Type', 'text/csv'),
       ('Content-Disposition', 'attachment; filename="{}"'.format(filename))
   ]
-
   return current_app.make_response((csv_string, 200, headers))
 
+
+def check_import_file():
+  if "file" not in request.files or not request.files["file"]:
+    raise BadRequest("Missing csv file")
+  csv_file = request.files["file"]
+  if not csv_file.filename.lower().endswith(".csv"):
+    raise BadRequest("Invalid file type.")
+  return csv_file
+
+
+def parse_import_request():
+  """ Check if request contains all required fields """
+  required_headers = {
+      "X-Requested-By": ["gGRC"],
+      "X-test-only": ["true", "false"],
+  }
+  check_required_headers(required_headers)
+  csv_file = check_import_file()
+  csv_data = read_csv_file(csv_file)
+  dry_run = request.headers["X-test-only"] == "true"
+  return dry_run, csv_data
+
+
+def handle_import_request():
+  dry_run, csv_data = parse_import_request()
+  offests, data_blocks = split_array(csv_data)
+
+  for data in data_blocks:
+    converter = Converter.from_csv(data)
+    if dry_run:
+      converter.test_import()
+    else:
+      converter.import_objects()
+
+  return "OK"
 
 
 def init_converter_views():
@@ -80,3 +116,8 @@ def init_converter_views():
   @login_required
   def export_csv():
     return handle_export_request()
+
+  @app.route("/_service/import_csv", methods=['POST'])
+  @login_required
+  def import_csv():
+    return handle_import_request()
