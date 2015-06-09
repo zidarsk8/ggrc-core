@@ -8,10 +8,32 @@ import re
 import chardet
 from StringIO import StringIO
 
+from ggrc.utils import get_mapping_rules
 from ggrc.converters.handlers import COLUMN_HANDLERS
 from ggrc.converters import COLUMN_ORDER
 from ggrc.converters import handlers
 from ggrc.models.reflection import AttributeInfo
+
+
+def get_mapping_definitions(object_class):
+  definitions = {}
+  mapping_rules = get_mapping_rules()
+  if object_class.__name__ not in mapping_rules:
+    return {}
+
+  for mapping_class in mapping_rules[object_class.__name__]:
+    class_name = pretty_name(mapping_class)
+    mapping_name = "map:{}".format(class_name)
+    definitions[mapping_name.lower()] = {
+        "display_name": mapping_name,
+        "mandatory": False,
+        "handler": handlers.MappingColumnHandler,
+        "validator": None,
+        "default": None,
+        "description": "",
+    }
+
+  return definitions
 
 
 def get_custom_attributes_definitions(object_class):
@@ -57,7 +79,9 @@ def get_object_column_definitions(object_class):
     definitions[key] = definition
 
   custom_attr_def = get_custom_attributes_definitions(object_class)
+  mapping_def = get_mapping_definitions(object_class)
   definitions.update(custom_attr_def)
+  definitions.update(mapping_def)
 
   return definitions
 

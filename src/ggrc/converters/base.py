@@ -120,8 +120,6 @@ class Converter(object):
       if header in header_names:
         field_name = header_names[header]
         clean_headers[field_name] = self.object_headers[field_name]
-      elif header.startswith("map:"):
-        clean_headers[field_name] = {"mapping_header": True}
       else:
         self.warnings.append("Uknown column " + header)
         self.remove_culumn(index)
