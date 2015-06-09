@@ -45,14 +45,15 @@ class Converter(object):
   """
 
   @classmethod
-  def from_csv(cls, csv_data):
-    object_class = IMPORTABLE.get(csv_data[0][1])
+  def from_csv(cls, csv_data, dry_run=True):
+    object_class = IMPORTABLE.get(csv_data[1][0])
     if not object_class:
       return "ERROR"
 
     raw_headers, rows = extract_relevant_data(csv_data)
 
-    return Converter(object_class, rows=rows, raw_headers=raw_headers)
+    return Converter(object_class, rows=rows, raw_headers=raw_headers,
+                     dry_run=dry_run)
 
   @classmethod
   def from_ids(cls, object_class, ids=[]):
@@ -61,6 +62,7 @@ class Converter(object):
   def __init__(self, object_class, **options):
     self.rows = options.get('rows', [])
     self.ids = options.get('ids', [])
+    self.dry_run = options.get('dry_run', )
     self.object_class = object_class
     self.errors = []
     self.warnings = []

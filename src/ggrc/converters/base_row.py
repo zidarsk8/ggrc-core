@@ -15,10 +15,14 @@ class RowConverter(object):
     self.converter = converter
     self.options = options.copy()
     self.object_type = object_type
+    self.errors = []
     self.obj = None
     row = options.get("row", [])
     headers = options.get("headers", [])
     self.attrs = self.handle_row_data(row, headers)
+
+  def add_error(self, error):
+    self.errors.append(error)
 
   def setup_import(self):
     self.setup_object()
