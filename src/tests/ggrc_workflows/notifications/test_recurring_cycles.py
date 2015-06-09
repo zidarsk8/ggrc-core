@@ -14,7 +14,7 @@ from ggrc import notification
 from ggrc.models import Person
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 from ggrc_workflows import views
 
 
@@ -28,9 +28,9 @@ class TestRecurringCycleNotifications(TestCase):
     TestCase.setUp(self)
     self.api = Api()
     self.generator = WorkflowsGenerator()
-    self.ggrc_generator = GgrcGenerator()
+    self.object_generator = ObjectGenerator()
 
-    _, self.assignee = self.ggrc_generator.generate_person(
+    _, self.assignee = self.object_generator.generate_person(
         user_role="gGRC Admin")
 
     self.create_test_cases()
