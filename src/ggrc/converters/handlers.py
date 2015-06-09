@@ -8,6 +8,7 @@ from dateutil.parser import parse
 from inspect import getmro
 
 from ggrc.models import Person
+from ggrc.converters import IMPORTABLE
 
 
 class ColumnHandler(object):
@@ -151,6 +152,28 @@ class TextareaColumnHandler(ColumnHandler):
       return ""
 
     return re.sub(r'\s+', " ", self.raw_value).strip()
+
+
+class MappingColumnHandler(ColumnHandler):
+
+  """ Handler for mapped objects """
+
+  def __init__(self, row_converter, key, **options):
+    super(MappingColumnHandler, self).__init__(row_converter, key, **options)
+    self.key = key
+    self.mapping_name = key[4:]  # remove "map:" prefix
+    self.mapping_object = IMPORTABLE.get(self.mapping_name)
+
+  def parse_item(self):
+    """ Remove multiple spaces and new lines from text """
+    if not self.raw_value:
+      return ""
+
+    return re.sub(r'\s+', " ", self.raw_value).strip()
+
+  def set_obj_attr(self):
+    """ Create a new mapping object """
+    pass
 
 
 COLUMN_HANDLERS = {
