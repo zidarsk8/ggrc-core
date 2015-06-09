@@ -104,7 +104,7 @@ COLUMN_ORDER = (
 COLUMN_HANDLERS = {
     "slug": handlers.SlugColumnHandler,
     "title": handlers.TitleColumnHandler,
-    "owner": handlers.OwnerColumnHandler,
+    "owners": handlers.OwnerColumnHandler,
     "status": handlers.StatusColumnHandler,
 }
 
