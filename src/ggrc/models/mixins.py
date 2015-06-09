@@ -586,7 +586,6 @@ class CustomAttributable(object):
   _publish_attrs = ['custom_attribute_values', ]
   _update_attrs = ['custom_attributes']
   _include_links = []
-  _aliases = {"custom_attributes": "Custom Attributes"}
 
   @declared_attr
   def custom_attribute_definitions(cls):

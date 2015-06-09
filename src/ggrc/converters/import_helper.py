@@ -38,19 +38,12 @@ def update_definition(definition, values_dict):
 
 def get_object_column_definitions(object_class):
   definitions = {}
-  custom_attr_def = {}
+
   aliases = AttributeInfo.gather_aliases(object_class)
-
-  custom_attributes = aliases.pop("custom_attributes", None)
-  if custom_attributes:
-    custom_attr_def = get_custom_attributes_definitions(object_class)
-
   filtered_aliases = [(k, v) for k, v in aliases.items() if v is not None]
 
   for key, value in filtered_aliases:
-
     column = object_class.__table__.columns.get(key)
-
     definition = {
         "display_name": value,
         "mandatory": False if column is None else not column.nullable,
@@ -59,12 +52,11 @@ def get_object_column_definitions(object_class):
         "handler": COLUMN_HANDLERS.get(key, handlers.ColumnHandler),
         "description": "",
     }
-
     if type(value) is dict:
       update_definition(definition, value)
-
     definitions[key] = definition
 
+  custom_attr_def = get_custom_attributes_definitions(object_class)
   definitions.update(custom_attr_def)
 
   return definitions
@@ -109,7 +101,8 @@ def extract_relevant_data(csv_data):
   """ Split csv data into data and metadata """
   transpose_data = zip(*csv_data[1:])
   data = zip(*transpose_data[1:])
-  column_definitions = data.pop(0)
+  column_definitions = list(data.pop(0))
+  data = map(list, data)
   return column_definitions, data
 
 
@@ -147,8 +140,12 @@ def generate_2d_array(width, height, value=None):
   return [[value for _ in range(width)] for _ in range(height)]
 
 
+def pretty_name(name):
+  return " ".join(re.findall('[A-Z][^A-Z]*', name))
+
+
 def pretty_class_name(cls):
-  return " ".join(re.findall('[A-Z][^A-Z]*', cls.__name__))
+  return pretty_name(cls.__name__)
 
 
 def csv_reader(csv_data, dialect=csv.excel, **kwargs):
