@@ -72,3 +72,25 @@ class TestCsvImport(TestCase):
     self.assertIn("4 objects will be inserted.", response_json["info"])
     self.assertIn("0 objects will be updated.", response_json["info"])
     self.assertIn("0 objects will fail.", response_json["info"])
+
+  def test_policy_import_working_with_warnings(self):
+    def test_instance(policy):
+      self.assertNotEqual([], policy.owners)
+      self.assertEqual("user@example.com", policy.owners[0].email)
+    filename = "policy_import_working_with_warnings.csv"
+
+    data = {"file": (open(join(CSV_DIR, filename)), filename)}
+    headers = {
+        "X-test-only": "false",
+        "X-requested-by": "gGRC",
+    }
+
+    response = self.client.post("/_service/import_csv",
+                                data=data, headers=headers)
+    self.assertEqual(response.status_code, 200)
+    json.loads(response.data)
+
+    policies = Policy.query.all()
+    self.assertEqual(len(policies), 4)
+    for policy in policies:
+      test_instance(policy)
