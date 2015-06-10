@@ -18,6 +18,8 @@ class RowConverter(object):
     self.errors = []
     self.warnings = []
     self.obj = None
+    self.is_new = True
+    self.index = options.get("index", -1)
     row = options.get("row", [])
     headers = options.get("headers", [])
     self.attrs = self.handle_row_data(row, headers)

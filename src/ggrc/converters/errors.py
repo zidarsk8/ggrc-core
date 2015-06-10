@@ -37,8 +37,8 @@ UNKNOWN_OBJECT = ("Line {line}: {object_type} '{slug}' doesn't exist, so it"
 WHITESPACE_WARNING = ("Line {line}: Field {column_name} has multiple spaces"
                       " that will be merged into one.")
 
-UNKNOWN_USER_WARNING = ("Specified user '{email}' does not exist. That user"
-                        " will be ignored.")
+UNKNOWN_USER_WARNING = ("Line {line}: Specified user '{email}' does not exist."
+                        " That user will be ignored.")
 
 UNKNOWN_USER_ERROR = ("Specified user '{email}' does not exist. That user will"
                       " be ignored.")

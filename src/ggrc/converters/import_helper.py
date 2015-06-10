@@ -1,7 +1,7 @@
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
 import csv
 import re
@@ -12,6 +12,7 @@ from ggrc.utils import get_mapping_rules
 from ggrc.converters.handlers import COLUMN_HANDLERS
 from ggrc.converters import COLUMN_ORDER
 from ggrc.converters import handlers
+from ggrc.converters.utils import pretty_name
 from ggrc.models.reflection import AttributeInfo
 
 
@@ -162,14 +163,6 @@ def split_array(csv_data):
 def generate_2d_array(width, height, value=None):
   """ Generate 2D array of size width x height """
   return [[value for _ in range(width)] for _ in range(height)]
-
-
-def pretty_name(name):
-  return " ".join(re.findall('[A-Z][^A-Z]*', name))
-
-
-def pretty_class_name(cls):
-  return pretty_name(cls.__name__)
 
 
 def csv_reader(csv_data, dialect=csv.excel, **kwargs):

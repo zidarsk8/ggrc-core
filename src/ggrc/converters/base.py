@@ -6,7 +6,6 @@
 from collections import defaultdict
 from collections import OrderedDict
 
-
 from ggrc import db
 from ggrc.converters import IMPORTABLE
 from ggrc.converters.base_row import RowConverter
@@ -14,7 +13,7 @@ from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import generate_2d_array
-from ggrc.converters.import_helper import pretty_class_name
+from ggrc.converters.utils import pretty_class_name
 
 
 class Converter(object):
@@ -150,14 +149,27 @@ class Converter(object):
     }
     messages["errors"].extend(self.errors)
     messages["warnings"].extend(self.warnings)
-    import_count = 0
+    fail = 0
+    insert = 0
+    update = 0
     for row_converter in self.row_converters:
       messages["errors"].extend(row_converter.errors)
       messages["warnings"].extend(row_converter.warnings)
-      if not row_converter.errors:
-        import_count += 1
+      if row_converter.errors:
+        fail += 1
+      elif row_converter.is_new:
+        insert += 1
+      else:
+        update += 1
 
-    messages["info"].append("{} objects to be imported".format(import_count))
+    be_text  = "will be" if self.dry_run else "were"
+    fail_text = "will fail" if self.dry_run else "failed"
+
+    # TODO: remame erros to messages and add this text there
+    messages["info"].append("{} objects {} inserted.".format(insert, be_text))
+    messages["info"].append("{} objects {} updated.".format(update, be_text))
+    messages["info"].append("{} objects {}.".format(fail, fail_text))
+
     return messages
 
   def test_import(self):

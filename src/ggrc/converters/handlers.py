@@ -5,10 +5,11 @@
 
 import re
 from dateutil.parser import parse
-from inspect import getmro
 
 from ggrc.models import Person
 from ggrc.converters import IMPORTABLE
+from ggrc.converters import errors
+from ggrc.converters.utils import pretty_class_name
 
 
 class ColumnHandler(object):
@@ -22,26 +23,22 @@ class ColumnHandler(object):
     self.mandatory = options.get("mandatory", False)
     self.default = options.get("default")
     self.description = options.get("description", "")
-    self.display_name = options.get("description", "")
+    self.display_name = options.get("display_name", "")
 
-    self.errors = []
-    self.warnings = []
     self.set_value()
 
   def set_value(self):
     self.value = self.parse_item()
 
   def add_error(self, message):
-    self.errors.append(message)
+    self.row_converter.errors.append(message)
 
-  def add_warning(self, message):
-    self.warnings.append(message)
-
-  def has_errors(self):
-    return any(self.errors) or self.row_converter.errors.get(self.key)
-
-  def has_warnings(self):
-    return any(self.warnings) or self.row_converter.warnings.get(self.key)
+  def add_warning(self, template, **kwargs):
+    offset = 3  # 2 header rows and 1 for 0 based index
+    block_offset = self.row_converter.converter.offset
+    line = self.row_converter.index + block_offset + offset
+    message = template.format(line=line, **kwargs)
+    self.row_converter.warnings.append(message)
 
   def display(self):
     value = getattr(self.row_converter.obj, self.key, '') or ''
@@ -76,6 +73,7 @@ class StatusColumnHandler(ColumnHandler):
     if self.raw_value:
       return self.raw_value.strip()
 
+
 class UserColumnHandler(ColumnHandler):
 
   """ Handler for primary and secondary contacts """
@@ -83,25 +81,28 @@ class UserColumnHandler(ColumnHandler):
   def parse_item(self):
     email = self.raw_value.strip()
     person = Person.query.filter(Person.email == email).first()
-    if not person:
-      self.add_warning("unknown owner {}".format(email))
+    if email and not person:
+      self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
     return person
+
 
 class OwnerColumnHandler(ColumnHandler):
 
   def parse_item(self):
-    owner_emails = self.raw_value.splitlines()
+    email_lines = self.raw_value.splitlines()
     owners = []
-    for email in owner_emails:
+    owner_emails = filter(unicode.strip, email_lines)  # noqa
+    for raw_line in owner_emails:
+      email = raw_line.strip()
       person = Person.query.filter(Person.email == email).first()
       if person:
         owners.append(person)
       else:
-        self.add_warning("unknown owner {}".format(email))
+        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
     if not owners:
       # TODO: add default owner
-      self.add_error("no valid owners found")
+      self.add_warning(errors.OWNER_MISSING)
 
     return owners
 
@@ -170,17 +171,24 @@ class MappingColumnHandler(ColumnHandler):
   """ Handler for mapped objects """
 
   def __init__(self, row_converter, key, **options):
-    super(MappingColumnHandler, self).__init__(row_converter, key, **options)
     self.key = key
     self.mapping_name = key[4:]  # remove "map:" prefix
     self.mapping_object = IMPORTABLE.get(self.mapping_name)
+    super(MappingColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
-    if not self.raw_value:
-      return ""
-
-    return re.sub(r'\s+', " ", self.raw_value).strip()
+    class_ = self.mapping_object
+    lines = self.raw_value.splitlines()
+    slugs = filter(unicode.strip, lines)  # noqa
+    objects = []
+    for slug in slugs:
+      obj = class_.query.filter(class_.slug == slug).first()
+      if obj:
+        objects.append(obj)
+      else:
+        self.add_warning(errors.UNKNOWN_OBJECT,
+                         object_type=pretty_class_name(class_), slug=slug)
 
   def set_obj_attr(self):
     """ Create a new mapping object """
