@@ -43,3 +43,17 @@ class TestCsvImport(TestCase):
                                 data=data, headers=headers)
     self.assertEqual(response.status_code, 200)
     self.assertEqual(Policy.query.count(), 3)
+
+
+  def test_policy_import_working_with_warnings(self):
+    filename = "policy_import_working_with_warnings.csv"
+
+    data = {"file": (open(join(CSV_DIR, filename)), filename)}
+    headers = {
+        "X-test-only": "true",
+        "X-requested-by": "gGRC",
+    }
+
+    response = self.client.post("/_service/import_csv",
+                                data=data, headers=headers)
+    self.assertEqual(response.status_code, 200)

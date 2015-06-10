@@ -76,6 +76,16 @@ class StatusColumnHandler(ColumnHandler):
     if self.raw_value:
       return self.raw_value.strip()
 
+class UserColumnHandler(ColumnHandler):
+
+  """ Handler for primary and secondary contacts """
+
+  def parse_item(self):
+    email = self.raw_value.strip()
+    person = Person.query.filter(Person.email == email).first()
+    if not person:
+      self.add_warning("unknown owner {}".format(email))
+    return person
 
 class OwnerColumnHandler(ColumnHandler):
 
@@ -90,6 +100,7 @@ class OwnerColumnHandler(ColumnHandler):
         self.add_warning("unknown owner {}".format(email))
 
     if not owners:
+      # TODO: add default owner
       self.add_error("no valid owners found")
 
     return owners
@@ -181,4 +192,5 @@ COLUMN_HANDLERS = {
     "title": TitleColumnHandler,
     "owners": OwnerColumnHandler,
     "status": StatusColumnHandler,
+    "contact": UserColumnHandler,
 }
