@@ -51,11 +51,13 @@
           {{/using}}
           {{/with_mapping}}
           {{/is_allowed}}
-          {{#is_allowed_to_map page_instance instance}}
-            {{^options.is_in_selector}}
-              {{> /static/mustache/base_objects/unmap.mustache}}
-            {{/options}}
-          {{/is_allowed_to_map}}
+          {{#with_page_object_as 'page_instance'}}
+            {{#is_allowed_to_map page_instance instance}}
+              {{^options.is_in_selector}}
+                {{> /static/mustache/base_objects/unmap.mustache}}
+              {{/options}}
+            {{/is_allowed_to_map}}
+          {{/with}}
           {{#if instance.viewLink}}
             {{#is_allowed "view_object_page" instance}}
               <li>
