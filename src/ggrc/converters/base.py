@@ -52,8 +52,11 @@ class Converter(object):
 
     raw_headers, rows = extract_relevant_data(csv_data)
 
-    return Converter(object_class, rows=rows, raw_headers=raw_headers,
-                     dry_run=dry_run)
+    converter = Converter(object_class, rows=rows, raw_headers=raw_headers,
+                          dry_run=dry_run)
+
+    converter.generate_row_converters()
+    return converter
 
   @classmethod
   def from_ids(cls, object_class, ids=[]):
@@ -67,6 +70,7 @@ class Converter(object):
     self.errors = []
     self.warnings = []
     self.row_objects = []
+    self.row_converters = []
     self.object_headers = get_object_column_definitions(object_class)
     raw_headers = options.get('raw_headers', [])
     self.headers = self.clean_headers(raw_headers)
@@ -81,8 +85,8 @@ class Converter(object):
       display_name = self.object_headers[code]["display_name"]
       if self.object_headers[code]["mandatory"]:
         display_name += "*"
-      csv_header[0][index+1] = self.object_headers[code]["description"]
-      csv_header[1][index+1] = display_name
+      csv_header[0][index + 1] = self.object_headers[code]["description"]
+      csv_header[1][index + 1] = display_name
     return csv_header
 
   def generate_csv_body(self):
@@ -92,7 +96,7 @@ class Converter(object):
   def to_array(self):
     csv_header = self.generate_csv_header()
     csv_body = self.generate_csv_body()
-    two_empty_rows = [[],[]]
+    two_empty_rows = [[], []]
     return csv_header + csv_body + two_empty_rows
 
   def get_header_names(self):
@@ -130,21 +134,25 @@ class Converter(object):
     for row in self.rows:
       row.pop(index)
 
+  def generate_row_converters(self):
+    """ Generate a row converter object for every csv row """
+    self.row_converters = []
+    for i, row in enumerate(self.rows):
+      self.row_converters.append(RowConverter(self, self.object_class, row=row,
+                                             headers=self.headers, index=i))
+
   def test_import(self):
-    for row in self.rows:
-      row_converter = RowConverter(self, self.object_class, row=row,
-                                   headers=self.headers)
+    for row_converter in self.row_converters:
       row_converter.setup_import()
       row_converter
+    return {}
 
   def import_objects(self):
-    for row in self.rows:
-      row_converter = RowConverter(
-          self, self.object_class, row=row, headers=self.headers)
+    for row_converter in self.row_converters:
       row_converter.setup_import()
       row_converter.insert_object()
-
     db.session.commit()
+    return {}
 
   def import_mappings(self):
     pass
