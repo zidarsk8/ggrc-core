@@ -512,7 +512,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     //Set child tree options
     var child_tree_model_list = can.Model.Cacheable.model_type_list;
-    var child_tree_display_list = ['Program', 'Market'];
+    var child_tree_display_list = ['Program', 'Market']; //This should be taken from model/child_options
+    for (i = 0; i < child_tree_model_list.length; i++) {
+      var obj = child_tree_model_list[i];
+      obj.display_status = child_tree_display_list.indexOf(obj.model_name) !== -1;
+    }
     this.options.attr('child_tree_model_list', child_tree_model_list);
     this.options.attr('child_tree_display_list', child_tree_display_list);
 
