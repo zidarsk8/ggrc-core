@@ -47,6 +47,7 @@ dashboard-js-files:
   - plugins/tooltip.js
   - plugins/popover.js
   - plugins/popover_template.js
+  - plugins/popover_template_child_node.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js

@@ -4,7 +4,7 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 */
-(function(root, $, GGRC) {
+(function(root, $) {
   'use strict';
 
   function Popover(element) {
@@ -22,7 +22,7 @@
     this.bindEvents();
   }
   Popover.prototype.get_template = function () {
-    return $.parseHTML(GGRC.Templates[this.file]);
+    return $.parseHTML(can.view.render(this.file, {}));
   };
   Popover.prototype.bindEvents = function () {
     this.$el.on('click', $.proxy(this.displayToggle, this));
@@ -52,7 +52,7 @@
   Popover.prototype.displayToggle = function (evnt) {
     evnt.preventDefault();
 
-    this.popover[this._isShown ? 'hide' : 'show']();
+      this.popover[this._isShown ? 'hide' : 'show']();
 
     if (!this._isShown) {
       this.popover.tip().on('click', '.btn-success', $.proxy(this.close, this));
@@ -64,16 +64,13 @@
       trigger: 'manual',
       html: true,
       placement: function (el, src) {
-        $(el).addClass('popover-help-wrap');
+        $(el).addClass('popover-child-node');
         return 'bottom';
       }.bind(this),
-      title: function () {
-        return this.template.find('.popup__title').text();
-      }.bind(this),
       content: function () {
-        return this.template.find('.popup__content').html();
+        return this.template.filter('.popup__content').html();
       }.bind(this)
-    }).data('popover');
+    }).data('bs.popover');
   };
 
   function Plugin(option) {
@@ -89,7 +86,7 @@
   $.fn.popover_template = Plugin;
   $.fn.popover_template.Constructor = Popover;
 
-  $('body').on('mouseover.popover-template', '.popover-template', function (evnt) {
+  $('body').on('mouseover.child-node-trigger', '.child-node-trigger', function (evnt) {
     $(evnt.currentTarget).popover_template();
   });
-})(window, jQuery, GGRC);
+})(window, jQuery);
