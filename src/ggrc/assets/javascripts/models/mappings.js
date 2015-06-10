@@ -679,15 +679,8 @@
       ],
       _canonical: {
         "control": "Control",
-        "related_objects": [
-          "Section", "Clause", "Audit"
-        ],
       },
       control: Direct("Control", "controls", "control_assessment"),
-      related_audits: TypeFilter("related_objects", "Audit"),
-      related_controls: TypeFilter("related_objects", "Control"),
-      related_sections: TypeFilter("related_objects", "Section"),
-      related_clauses: TypeFilter("related_objects", "Clause")
     },
     Issue: {
       _mixins: [
