@@ -7,6 +7,7 @@ import re
 from dateutil.parser import parse
 
 from ggrc.models import Person
+from ggrc.login import get_current_user
 from ggrc.converters import IMPORTABLE
 from ggrc.converters import errors
 from ggrc.converters.utils import pretty_class_name
@@ -101,8 +102,8 @@ class OwnerColumnHandler(ColumnHandler):
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
     if not owners:
-      # TODO: add default owner
       self.add_warning(errors.OWNER_MISSING)
+      owners.append(get_current_user())
 
     return owners
 
