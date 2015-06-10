@@ -45,7 +45,7 @@ class Converter(object):
   """
 
   @classmethod
-  def from_csv(cls, csv_data, dry_run=True):
+  def from_csv(cls, csv_data, offset=0, dry_run=True):
     object_class = IMPORTABLE.get(csv_data[1][0])
     if not object_class:
       return "ERROR"
@@ -53,7 +53,7 @@ class Converter(object):
     raw_headers, rows = extract_relevant_data(csv_data)
 
     converter = Converter(object_class, rows=rows, raw_headers=raw_headers,
-                          dry_run=dry_run)
+                          dry_run=dry_run, offset=offset)
 
     converter.generate_row_converters()
     return converter
@@ -64,6 +64,7 @@ class Converter(object):
 
   def __init__(self, object_class, **options):
     self.rows = options.get('rows', [])
+    self.offset = options.get('offset', 0)
     self.ids = options.get('ids', [])
     self.dry_run = options.get('dry_run', )
     self.object_class = object_class
@@ -143,15 +144,15 @@ class Converter(object):
 
   def gather_messages(self):
     messages = {
-      "error": [],
+      "errors": [],
       "warnings": [],
       "info": [],
     }
-    messages["error"].extend(self.errors)
+    messages["errors"].extend(self.errors)
     messages["warnings"].extend(self.warnings)
     import_count = 0
     for row_converter in self.row_converters:
-      messages["error"].extend(row_converter.errors)
+      messages["errors"].extend(row_converter.errors)
       messages["warnings"].extend(row_converter.warnings)
       if not row_converter.errors:
         import_count += 1

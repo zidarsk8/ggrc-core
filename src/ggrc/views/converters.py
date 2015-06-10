@@ -100,11 +100,11 @@ def parse_import_request():
 
 def handle_import_request():
   dry_run, csv_data = parse_import_request()
-  offests, data_blocks = split_array(csv_data)
+  offsets, data_blocks = split_array(csv_data)
 
   response_data = {}
-  for data in data_blocks:
-    converter = Converter.from_csv(data)
+  for offset, data in zip(offsets, data_blocks):
+    converter = Converter.from_csv(data, offset=offset)
     if dry_run:
       response_data = converter.test_import()
     else:
