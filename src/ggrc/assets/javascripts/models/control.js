@@ -77,6 +77,7 @@ can.Model.Cacheable("CMS.Models.Control", {
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
+      //, view_object_list: ['Program', 'Market']
     }]
   }
 

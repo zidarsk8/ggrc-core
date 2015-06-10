@@ -166,6 +166,7 @@ can.Control("CMS.Controllers.TreeLoader", {
   }
 
   , display: function() {
+    console.log("sasmita--- display, this will call draw list()");
       var that = this
         , tracker_stop = GGRC.Tracker.start(
             "TreeView", "display", this.options.model.shortName)
@@ -194,6 +195,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       return this._display_deferred;
     }
   , draw_list : function(list) {
+    console.log("sasmita--draw-list---");
     if (this._draw_list_deferred)
       return this._draw_list_deferred;
     this._draw_list_deferred = new $.Deferred();
@@ -255,11 +257,29 @@ can.Control("CMS.Controllers.TreeLoader", {
     }
 
   , enqueue_items: function(items) {
-      var that = this
-        , processChunk;
+    console.log("sasmita-enqueue-items");
+      var that = this, i, processChunk, filtered_items = [], 
+          child_tree_display_list = this.options.child_tree_display_list;
 
       if (!items || items.length == 0) {
         return new $.Deferred().resolve();
+      }
+
+      //find current widget model and check if first layer tree
+
+      //Tree noise reduce
+      if (this.options.model._shortName === "cacheable") {
+        //update list, because this is a second layer tree
+        //Need to get parent instance's tree_view_controller's child_tree_display_list
+        console.log("sasmita-- child tree ***");
+        for (i = 0; i < items.length; i++) {
+          if (child_tree_display_list.indexOf(items[i].instance.class.model_singular) !== -1) {
+            filtered_items.push(items[i]);
+          }
+        }
+      } else {
+        console.log("sasmita---   first-label tree *");
+        filtered_items = items;
       }
 
       if (!this._pending_items) {
@@ -267,7 +287,8 @@ can.Control("CMS.Controllers.TreeLoader", {
         this._loading_started();
       }
 
-      this._pending_items.push.apply(this._pending_items, items);
+      this._pending_items.push.apply(this._pending_items, filtered_items);
+      //this._pending_items.push.apply(this._pending_items, items);
       this._pending_items_ms = Date.now();
 
       processChunk = function() {
@@ -488,6 +509,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.options.attr('select_attr_list', select_attr_list);
     this.options.attr('display_attr_list', display_attr_list);
     this.setup_column_width();
+
+    //Set child tree options
+    var child_tree_model_list = can.Model.Cacheable.model_type_list;
+    var child_tree_display_list = ['Program', 'Market'];
+    this.options.attr('child_tree_model_list', child_tree_model_list);
+    this.options.attr('child_tree_display_list', child_tree_display_list);
 
   },
 
