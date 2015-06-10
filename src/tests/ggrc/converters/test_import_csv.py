@@ -8,10 +8,8 @@ import os
 from os.path import abspath
 from os.path import dirname
 from os.path import join
-from nose.plugins.skip import SkipTest
 
-from ggrc.models import CustomAttributeDefinition
-from tests.ggrc.api_helper import Api
+from ggrc.models import Policy
 from tests.ggrc import TestCase
 
 
@@ -27,21 +25,21 @@ class TestCsvImport(TestCase):
 
   def setUp(self):
     TestCase.setUp(self)
+    self.client.get("/login")
 
   def tearDown(self):
     pass
 
-  def test_valid_imports(self):
-    response = self.client.get("/login")
+  def test_policy_basic_import(self):
     filename = "policy_basic_import.csv"
 
     data = {"file": (open(join(CSV_DIR, filename)), filename)}
     headers = {
-      "X-test-only": "false",
-      "X-requested-by": "gGRC",
+        "X-test-only": "false",
+        "X-requested-by": "gGRC",
     }
 
     response = self.client.post("/_service/import_csv",
                                 data=data, headers=headers)
-    self.assertEqual("OK", response.data)
     self.assertEqual(response.status_code, 200)
+    self.assertEqual(Policy.query.count(), 3)

@@ -5,6 +5,7 @@
 
 from flask import current_app
 from flask import request
+from flask import json
 from werkzeug.exceptions import BadRequest
 
 from ggrc.app import app
@@ -70,7 +71,7 @@ def handle_export_request():
 
   headers = [
       ('Content-Type', 'text/csv'),
-      ('Content-Disposition', 'attachment; filename="{}"'.format(filename))
+      ('Content-Disposition', 'attachment; filename="{}"'.format(filename)),
   ]
   return current_app.make_response((csv_string, 200, headers))
 
@@ -101,14 +102,17 @@ def handle_import_request():
   dry_run, csv_data = parse_import_request()
   offests, data_blocks = split_array(csv_data)
 
+  response_data = {}
   for data in data_blocks:
     converter = Converter.from_csv(data)
     if dry_run:
-      converter.test_import()
+      response_data = converter.test_import()
     else:
-      converter.import_objects()
+      response_data = converter.import_objects()
 
-  return "OK"
+  response_json = json.dumps(response_data)
+  headers = [('Content-Type', 'application/json')]
+  return current_app.make_response((response_json, 200, headers))
 
 
 def init_converter_views():
