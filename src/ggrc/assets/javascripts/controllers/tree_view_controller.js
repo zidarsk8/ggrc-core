@@ -1114,6 +1114,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       this.reload_list();
     }
+
+  , ".set-display-object-list click" : function (el, ev) {
+    console.log("Sasmita----- ---------object list clicked");
+    //this.reload_list();
+  }
+
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
@@ -1340,8 +1346,8 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , ".select:not(.disabled) click": function(el, ev) {
     var tree = el.closest('.cms_controllers_tree_view_node'),
         node = tree.control();
-
-    node.select();
+    if (node)
+      node.select();
   }
   , select: function () {
     var $tree = this.element;
@@ -1356,6 +1362,20 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , "input,select click" : function(el, ev) {
     // Don't toggle accordion when clicking on input/select fields
     ev.stopPropagation();
+  }
+
+  , ".set-display-object-list click" : function (el, ev) {
+    console.log("Sasmita----- ---------object list clicked---tree view_node controller");
+    var ele, tview_el, control;
+    //this._expand_deferred = false;
+    //this._display_deferred = false;
+    //this.expand();
+    //element  = el.find('.cms_controller_tree_view');
+    ele = el.closest('.cms_controllers_tree_view_node'); //parent tree-view_node
+    //get the child tree tree_view
+    tview_el = ele.find('.cms_controllers_tree_view')
+    control = tview_el.control();
+    control.reload_list();
   }
 
   , trigger_expand: function() {
