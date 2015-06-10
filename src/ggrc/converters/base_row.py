@@ -4,6 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 
+import ggrc.services
 from ggrc import db
 from ggrc.services.common import Resource
 from ggrc.services.common import get_modified_objects, update_index
@@ -72,16 +73,14 @@ class RowConverter(object):
     self.obj = self.get_object_by_slug()
     self.reify()
 
-  def insert_object(self):
-    obj = self.obj
-    cls = obj.__class__
-    service_class = type(cls.__name__, (Resource,), {
-        '_model': cls,
-    })
-    service_class.model = cls
+  def send_signals(self):
+    service_class = getattr(ggrc.services, self.object_type.__name__)
     Resource.model_posted.send(
-        obj.__class__, obj=obj, src={}, service=service_class)
-    db.session.add(obj)
+        self.object_type, obj=self.obj, src={}, service=service_class)
+
+  def insert_object(self):
+    self.send_signals()
+    db.session.add(self.obj)
     modified_objects = get_modified_objects(db.session)
     update_index(db.session, modified_objects)
 
