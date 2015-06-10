@@ -178,6 +178,7 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Mandatory Attribute"]["mandatory"])
 
   def test_program_definitions(self):
@@ -223,6 +224,7 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Mandatory Attribute"]["mandatory"])
     self.assertTrue(vals["Choose"]["mandatory"])
 
@@ -262,6 +264,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_audit_definitions(self):
     """ test default headers for Audit """
@@ -284,6 +287,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Internal Audit Lead"]["mandatory"])
 
   def test_control_assessment_definitions(self):
@@ -314,6 +318,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Control"]["mandatory"])
     self.assertTrue(vals["Audit"]["mandatory"])
 
@@ -341,6 +346,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_regulation_definitions(self):
     """ test default headers for Regulation """
@@ -365,6 +371,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_policy_definitions(self):
     """ test default headers for Policy """
@@ -390,6 +397,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_standard_definitions(self):
     """ test default headers for Standard """
@@ -414,6 +422,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_contract_definitions(self):
     """ test default headers for Contract """
@@ -438,6 +447,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_clause_definitions(self):
     """ test default headers for Clause """
@@ -462,6 +472,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    # self.assertTrue(vals["Title"]["unique"])
 
   def test_section_definitions(self):
     """ test default headers for Section """
@@ -485,6 +496,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    # self.assertTrue(vals["Title"]["unique"])
 
   def test_control_definitions(self):
     """ test default headers for Control """
@@ -519,6 +531,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_objective_definitions(self):
     """ test default headers for Objective """
@@ -541,6 +554,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_person_definitions(self):
     """ test default headers for Person """
@@ -581,6 +595,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_vendor_definitions(self):
     """ test default headers for Vendor """
@@ -605,6 +620,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_system_definitions(self):
     """ test default headers for System """
@@ -630,6 +646,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_process_definitions(self):
     """ test default headers for Process """
@@ -655,6 +672,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_data_asset_definitions(self):
     """ test default headers for DataAsset """
@@ -679,6 +697,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_product_definitions(self):
     """ test default headers for Product """
@@ -704,6 +723,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_project_definitions(self):
     """ test default headers for Project """
@@ -728,6 +748,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_facility_definitions(self):
     """ test default headers for Facility """
@@ -752,6 +773,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
 
   def test_market_definitions(self):
     """ test default headers for Market """
@@ -776,3 +798,4 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
