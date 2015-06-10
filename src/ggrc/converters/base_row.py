@@ -16,6 +16,7 @@ class RowConverter(object):
     self.options = options.copy()
     self.object_type = object_type
     self.errors = []
+    self.warnings = []
     self.obj = None
     row = options.get("row", [])
     headers = options.get("headers", [])

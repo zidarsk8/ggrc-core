@@ -117,7 +117,7 @@ class Converter(object):
     Returns:
       Ordered Dictionary containing all valid headers
     """
-    headers = [val.strip("*") for val in raw_headers]
+    headers = [val.strip("*").lower() for val in raw_headers]
     clean_headers = OrderedDict()
     header_names = self.get_header_names()
     for index, header in enumerate(headers):
@@ -125,7 +125,7 @@ class Converter(object):
         field_name = header_names[header]
         clean_headers[field_name] = self.object_headers[field_name]
       else:
-        self.warnings.append("Uknown column " + header)
+        self.warnings.append("Unknown column " + header)
         self.remove_culumn(index)
     return clean_headers
 
@@ -141,18 +141,39 @@ class Converter(object):
       self.row_converters.append(RowConverter(self, self.object_class, row=row,
                                              headers=self.headers, index=i))
 
+  def gather_messages(self):
+    messages = {
+      "error": [],
+      "warnings": [],
+      "info": [],
+    }
+    messages["error"].extend(self.errors)
+    messages["warnings"].extend(self.warnings)
+    import_count = 0
+    for row_converter in self.row_converters:
+      messages["error"].extend(row_converter.errors)
+      messages["warnings"].extend(row_converter.warnings)
+      if not row_converter.errors:
+        import_count += 1
+
+    messages["info"].append("{} objects to be imported".format(import_count))
+    return messages
+
   def test_import(self):
     for row_converter in self.row_converters:
       row_converter.setup_import()
       row_converter
-    return {}
+    return self.gather_messages()
 
   def import_objects(self):
     for row_converter in self.row_converters:
       row_converter.setup_import()
       row_converter.insert_object()
-    db.session.commit()
-    return {}
+    self.commit()
+    return self.gather_messages()
+
+  def commit(self):
+    pass
 
   def import_mappings(self):
     pass
