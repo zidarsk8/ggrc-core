@@ -7,7 +7,6 @@
 import ggrc.services
 from ggrc import db
 from ggrc.services.common import Resource
-from ggrc.services.common import get_modified_objects, update_index
 
 
 class RowConverter(object):
@@ -20,6 +19,7 @@ class RowConverter(object):
     self.warnings = []
     self.obj = None
     self.is_new = True
+    self.ignore = False
     self.index = options.get("index", -1)
     row = options.get("row", [])
     headers = options.get("headers", [])
@@ -41,7 +41,7 @@ class RowConverter(object):
       row (list of str): row from csv file.
 
     Returns:
-      Array containing handlers with values for all elements in the row.
+      dict containing handlers with values for all elements in the row.
     """
     if len(headers) != len(row):
       print headers, row
@@ -62,10 +62,12 @@ class RowConverter(object):
       return None
     slug = self.attrs["slug"].value
     obj = None
+    self.is_new = False
     if slug:
       obj = self.find_by_slug(slug)
     if not obj:
       obj = self.object_type()
+      self.is_new = True
 
     return obj
 
@@ -75,14 +77,18 @@ class RowConverter(object):
 
   def send_signals(self):
     service_class = getattr(ggrc.services, self.object_type.__name__)
-    Resource.model_posted.send(
-        self.object_type, obj=self.obj, src={}, service=service_class)
+    if self.is_new:
+      Resource.model_posted.send(
+          self.object_type, obj=self.obj, src={}, service=service_class)
+    else:
+      Resource.model_put.send(
+          self.object_type, obj=self.obj, src={}, service=service_class)
 
   def insert_object(self):
+    if self.ignore:
+      return
     self.send_signals()
     db.session.add(self.obj)
-    modified_objects = get_modified_objects(db.session)
-    update_index(db.session, modified_objects)
 
   def reify(self):
     """ Set the object values or relate object values
