@@ -4,9 +4,9 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import csv
-import re
 import chardet
 from StringIO import StringIO
+from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc.utils import get_mapping_rules
 from ggrc.converters.handlers import COLUMN_HANDLERS
@@ -31,6 +31,7 @@ def get_mapping_definitions(object_class):
         "handler": handlers.MappingColumnHandler,
         "validator": None,
         "default": None,
+        "unique": False,
         "description": "",
     }
 
@@ -48,6 +49,7 @@ def get_custom_attributes_definitions(object_class):
         "handler": handler,
         "validator": None,
         "default": None,
+        "unique": False,
         "description": "",
     }
   return definitions
@@ -59,11 +61,22 @@ def update_definition(definition, values_dict):
       definition[key] = value
 
 
+def get_unique_constraints(object_class):
+  """ Return a set of attribute names for single unique columns """
+  constraints = object_class.__table__.constraints
+  unique = filter(lambda x: isinstance(x, UniqueConstraint), constraints)
+  # we only handle single column unique constraints
+  unique_columns = [u.columns.keys() for u in unique if len(u.columns) == 1]
+  return set(sum(unique_columns, []))
+
+
 def get_object_column_definitions(object_class):
   definitions = {}
 
   aliases = AttributeInfo.gather_aliases(object_class)
   filtered_aliases = [(k, v) for k, v in aliases.items() if v is not None]
+
+  unique_columns = get_unique_constraints(object_class)
 
   for key, value in filtered_aliases:
     column = object_class.__table__.columns.get(key)
@@ -73,6 +86,7 @@ def get_object_column_definitions(object_class):
         "default": getattr(object_class, "default_{}".format(key), None),
         "validator": getattr(object_class, "validate_{}".format(key), None),
         "handler": COLUMN_HANDLERS.get(key, handlers.ColumnHandler),
+        "unique": key in unique_columns,
         "description": "",
     }
     if type(value) is dict:
@@ -168,11 +182,11 @@ def generate_2d_array(width, height, value=None):
 def csv_reader(csv_data, dialect=csv.excel, **kwargs):
   reader = csv.reader(utf_8_encoder(csv_data), dialect=dialect, **kwargs)
   for row in reader:
-    yield [unicode(cell, 'utf-8') for cell in row]
+    yield [unicode(cell, 'utf-8') for cell in row]  # noqa
 
 
 def read_csv_file(csv_file):
-  if isinstance(csv_file, basestring):
+  if isinstance(csv_file, basestring):  # noqa
     csv_file = open(csv_file, 'rbU')
   return [row for row in csv_reader(csv_file)]
 

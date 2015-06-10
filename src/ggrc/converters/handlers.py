@@ -25,10 +25,6 @@ class ColumnHandler(object):
     self.default = options.get("default")
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
-
-    self.set_value()
-
-  def set_value(self):
     self.value = self.parse_item()
 
   def add_error(self, message):
