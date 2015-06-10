@@ -14,6 +14,7 @@ from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import generate_2d_array
 from ggrc.converters.utils import pretty_class_name
+from ggrc.services.common import get_modified_objects, update_index
 
 
 class Converter(object):
@@ -139,13 +140,21 @@ class Converter(object):
     self.row_converters = []
     for i, row in enumerate(self.rows):
       self.row_converters.append(RowConverter(self, self.object_class, row=row,
-                                             headers=self.headers, index=i))
+                                              headers=self.headers, index=i))
+
+    self.check_uniq_columns()
+
+  def check_uniq_columns(self):
+    for header in self.headers:
+      pass
+    pass
+
 
   def gather_messages(self):
     messages = {
-      "errors": [],
-      "warnings": [],
-      "info": [],
+        "errors": [],
+        "warnings": [],
+        "info": [],
     }
     messages["errors"].extend(self.errors)
     messages["warnings"].extend(self.warnings)
@@ -162,7 +171,7 @@ class Converter(object):
       else:
         update += 1
 
-    be_text  = "will be" if self.dry_run else "were"
+    be_text = "will be" if self.dry_run else "were"
     fail_text = "will fail" if self.dry_run else "failed"
 
     # TODO: remame erros to messages and add this text there
@@ -175,13 +184,14 @@ class Converter(object):
   def test_import(self):
     for row_converter in self.row_converters:
       row_converter.setup_import()
-      row_converter
     return self.gather_messages()
 
   def import_objects(self):
     for row_converter in self.row_converters:
       row_converter.setup_import()
       row_converter.insert_object()
+    modified_objects = get_modified_objects(db.session)
+    update_index(db.session, modified_objects)
     self.commit()
     return self.gather_messages()
 
