@@ -4,31 +4,34 @@
 # Maintained By: andraz@reciprocitylabs.com
 
 from collections import namedtuple
+from ggrc.utils import get_mapping_rules
+import ipdb
 
 Rule = namedtuple('Rule', ['src', 'mappings', 'dst'])
 
 class RuleSet(object):
   def __init__(self, rule_list):
     rules = dict()
+    allowed= get_mapping_rules()
+    wrap = lambda o: o if isinstance(o, set) else {o}
     for rule in rule_list:
-      wrap = lambda o: o if isinstance(o, set) else {o}
       for src in wrap(rule.src):
         for dst in wrap(rule.dst):
-          if src > dst:
-            src, dst = dst, src
-          rules[(src,dst)] = frozenset(wrap(rule.mappings))
+          key = (src, dst)
+          existing_rules = rules[key] if key in rules else set()
+          allowed_mappings = allowed[dst] if dst in allowed else set() 
+          rules[key] = existing_rules | set(filter(allowed_mappings.__contains__, 
+                                                   wrap(rule.mappings)))
+    for key in rules:
+      rules[key] = frozenset(rules[key])
     self._rule_list = rule_list
     self._rules = rules
 
   def  __getitem__(self, key): 
-    (src, dst) = key
-    if src > dst:
-      src, dst = dst, src
-    key = (src, dst)
     if key in self._rules:
       return self._rules[key]
     else:
-      return None
+      return set()
 
   def __repr__(self):
     return 'Rules(%s)' % repr(self._rule_list)
@@ -68,9 +71,16 @@ mapping_to_objective = Rule(
     {'Section'},
 )
 
-rules= RuleSet([
+test_mapping_issues = Rule(
+    'Issue',
+    'Issue',
+    'Issue',
+)
+
+rules = RuleSet([
     mapping_directive_to_a_program,
     mapping_directive_to_a_program,
     mapping_to_sections_and_clauses,
     mapping_to_objective,
+    # test_mapping_issues,
 ])
