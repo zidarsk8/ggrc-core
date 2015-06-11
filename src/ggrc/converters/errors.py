@@ -21,11 +21,12 @@ UNKNOWN_COLUMN = ("Line {line}: Column {column_name}: Attribute does not"
 DELETE_UNKNOWN_OBJECT = ("Line {line}: Object '{slug}' does not exist, so it"
                          " can't be deleted")
 
-DUPLICATE_TITLE = ("Line {line}: Title '{title}' already exists. Record will"
-                   " be ignored.")
+DUPLICATE_VALUE = ("Line {line}: {column_name} '{title}' already exists."
+                   "Record will be ignored.")
 
-DUPLICATE_TITLE_IN_CSV = ("Lines {line_list} have same title '{title}'. Record"
-                          " after line {import_line} will be ignored.")
+DUPLICATE_VALUE_IN_CSV = ("Lines {line_list} have same {column_name}"
+                          " '{value}'. Line{s} {ignore_lines} will be"
+                          " ignored.")
 
 MAP_UNMAP_CONFLICT = ("Line {line}: Object '{slug}' scheduled for mapping and"
                       " unmapping at the same time. Mapping rule update will"
@@ -54,9 +55,6 @@ WRONG_REQUIRED_VALUE = ("Line {line}: Required field {column_name} contains"
 
 MISSING_VALUE_ERROR = ("Line {line}: Field {colum_name} is required. The line"
                        " will be ignored.")
-
-DUPLICATE_CODE_IN_CSV = ("Lines {line_list} have same code '{title}'. Record"
-                         " after line {import_line} will be ignored.")
 
 PERMISSION_ERROR = ("Line {line}: You don't have permission to update/delete"
                     " this record")

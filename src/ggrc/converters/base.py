@@ -14,6 +14,7 @@ from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import generate_2d_array
 from ggrc.converters.utils import pretty_class_name
+from ggrc.converters import errors
 from ggrc.services.common import get_modified_objects, update_index
 
 
@@ -139,16 +140,15 @@ class Converter(object):
     """ Generate a row converter object for every csv row """
     self.row_converters = []
     for i, row in enumerate(self.rows):
-      self.row_converters.append(RowConverter(self, self.object_class, row=row,
-                                              headers=self.headers, index=i))
-
+      row = RowConverter(self, self.object_class, row=row,
+                         headers=self.headers, index=i)
+      self.row_converters.append(row)
     self.check_uniq_columns()
 
   def check_uniq_columns(self):
-    for header in self.headers:
-      pass
-    pass
-
+    unique = [key for key, header in self.headers.items() if header["unique"]]
+    for key in unique:
+      self.remove_duplicati_keys(key)
 
   def gather_messages(self):
     messages = {
@@ -164,7 +164,7 @@ class Converter(object):
     for row_converter in self.row_converters:
       messages["errors"].extend(row_converter.errors)
       messages["warnings"].extend(row_converter.warnings)
-      if row_converter.errors:
+      if row_converter.errors or row_converter.ignore:
         fail += 1
       elif row_converter.is_new:
         insert += 1
@@ -183,12 +183,12 @@ class Converter(object):
 
   def test_import(self):
     for row_converter in self.row_converters:
-      row_converter.setup_import()
+      row_converter.setup_object()
     return self.gather_messages()
 
   def import_objects(self):
     for row_converter in self.row_converters:
-      row_converter.setup_import()
+      row_converter.setup_object()
       row_converter.insert_object()
     modified_objects = get_modified_objects(db.session)
     update_index(db.session, modified_objects)
@@ -198,8 +198,35 @@ class Converter(object):
   def commit(self):
     pass
 
+  def add_warning(self, template, **kwargs):
+    message = template.format(**kwargs)
+    self.warnings.append(message)
+
   def import_mappings(self):
     pass
+
+  def remove_duplicati_keys(self, key):
+    counts = defaultdict(list)
+    for index, row in enumerate(self.row_converters):
+      value = row.get_value(key)
+      if value:
+        counts[value].append(index)
+
+    for value, indexes in counts.items():
+      if len(indexes) > 1:
+        offset_indexes = [i + self.offset + 3 for i in indexes]
+        str_indexes = map(str, offset_indexes)
+        self.add_warning(
+            errors.DUPLICATE_VALUE_IN_CSV,
+            line_list=", ".join(str_indexes),
+            column_name=self.headers[key]["display_name"],
+            s="s" if len(str_indexes) > 2 else "",
+            value=value,
+            ignore_lines=", ".join(str_indexes[1:]),
+        )
+
+      for index in indexes[1:]:
+        self.row_converters[index].set_ignore()
 
   def remove_duplicate_codes(self):
     """ Check for duplacte code entries

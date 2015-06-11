@@ -28,9 +28,6 @@ class RowConverter(object):
   def add_error(self, error):
     self.errors.append(error)
 
-  def setup_import(self):
-    self.setup_object()
-
   def setup_export(self):
     pass
 
@@ -56,6 +53,15 @@ class RowConverter(object):
   def find_by_slug(self, slug):
     return self.object_type.query.filter_by(slug=slug).first()
 
+  def get_value(self, key):
+    item = self.attrs.get(key)
+    if item:
+      return item.value
+    return None
+
+  def set_ignore(self, ignore=True):
+    self.ignore = ignore
+
   def get_object_by_slug(self):
     """ Get object if the slug is in the system or return a new object """
     if "slug" not in self.attrs:
@@ -72,6 +78,8 @@ class RowConverter(object):
     return obj
 
   def setup_object(self):
+    if self.ignore:
+      return
     self.obj = self.get_object_by_slug()
     self.reify()
 
