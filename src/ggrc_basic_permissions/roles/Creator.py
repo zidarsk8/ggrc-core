@@ -211,6 +211,8 @@ _is_owner = [
         },
         "condition": "contains"
     },
+    "Request",
+    "Response",
     "Person"
 ]
 
@@ -264,6 +266,8 @@ permissions = {
         "Program",
         "Role",
         "UserRole",
+        "Request",
+        "Response",
         "Context",
         {
             "type": "BackgroundTask",
