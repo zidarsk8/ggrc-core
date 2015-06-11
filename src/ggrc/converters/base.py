@@ -188,7 +188,13 @@ class Converter(object):
     return messages
 
   def import_mappings(self, codes):
-    pass
+    for row_converter in self.row_converters:
+      row_converter.setup_mappings()
+
+    if not self.dry_run:
+      for row_converter in self.row_converters:
+        row_converter.insert_mapping()
+      self.save_import()
 
   def import_objects(self):
     for row_converter in self.row_converters:
@@ -209,6 +215,10 @@ class Converter(object):
   def add_warning(self, template, **kwargs):
     message = template.format(**kwargs)
     self.warnings.append(message)
+
+  def get_new_slugs(self):
+    slugs = set([row.get_value("slug") for row in self.row_converters])
+    return self.object_class, slugs
 
   def remove_duplicati_keys(self, key):
     counts = defaultdict(list)

@@ -6,6 +6,7 @@
 from flask import current_app
 from flask import request
 from flask import json
+from collections import defaultdict
 from werkzeug.exceptions import BadRequest
 
 from ggrc.app import app
@@ -97,16 +98,27 @@ def parse_import_request():
   dry_run = request.headers["X-test-only"] == "true"
   return dry_run, csv_data
 
-
 def handle_import_request():
+  def update_response_data(data, new_data):
+    for k, v in new_data.items():
+      data[k].extend(v)
+
   dry_run, csv_data = parse_import_request()
   offsets, data_blocks = split_array(csv_data)
 
-  response_data = {}
+  response_data = defaultdict(list)
+  new_slugs = defaultdict(set)
+  converters = []
   for offset, data in zip(offsets, data_blocks):
     converter = Converter.from_csv(data, offset=offset, dry_run=dry_run)
+    converters.append(converter)
     converter.import_objects()
-    response_data = converter.gather_messages()
+    update_response_data(response_data, converter.gather_messages())
+    object_class, slugs = converter.get_new_slugs()
+    new_slugs[object_class].update(slugs)
+
+  for converter in converters:
+    converter.import_mappings(new_slugs)
 
   response_json = json.dumps(response_data)
   headers = [('Content-Type', 'application/json')]

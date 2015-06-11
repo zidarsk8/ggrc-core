@@ -11,9 +11,11 @@ from os.path import join
 from flask import json
 
 from ggrc.models import Policy
+from ggrc.models import Relationship
 from ggrc.converters import errors
 from tests.ggrc import TestCase
 from nose.plugins.skip import SkipTest
+from tests.ggrc.generator import GgrcGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
@@ -27,10 +29,18 @@ class TestCsvImport(TestCase):
 
   def setUp(self):
     TestCase.setUp(self)
+    self.generator = GgrcGenerator()
     self.client.get("/login")
 
   def tearDown(self):
     pass
+
+  def generate_people(self, people):
+    for person in people:
+      self.generator.generate_person({
+        "name": person,
+        "email": "{}@reciprocitylabs.com".format(person),
+      }, "gGRC Admin")
 
   def import_file(self, filename, dry_run=False):
     data = {"file": (open(join(CSV_DIR, filename)), filename)}
@@ -43,13 +53,11 @@ class TestCsvImport(TestCase):
     self.assertEqual(response.status_code, 200)
     return json.loads(response.data)
 
-  @SkipTest
   def test_policy_basic_import(self):
     filename = "policy_basic_import.csv"
     self.import_file(filename)
     self.assertEqual(Policy.query.count(), 3)
 
-  @SkipTest
   def test_policy_import_working_with_warnings_dry_run(self):
     filename = "policy_import_working_with_warnings.csv"
 
@@ -61,7 +69,9 @@ class TestCsvImport(TestCase):
             line=3, object_type="Program", slug="P753"),
         errors.OWNER_MISSING.format(line=4),
         errors.UNKNOWN_USER_WARNING.format(line=6, email="not@a.user"),
-        errors.OWNER_MISSING.format(line=6)
+        errors.OWNER_MISSING.format(line=6),
+        errors.WRONG_REQUIRED_VALUE.format(line=5, column_name="State"),
+        errors.WRONG_REQUIRED_VALUE.format(line=6, column_name="State"),
     ])
     self.assertEqual(expected_warnings, set(response_json["warnings"]))
     self.assertEqual([], response_json["errors"])
@@ -71,7 +81,6 @@ class TestCsvImport(TestCase):
     policies = Policy.query.all()
     self.assertEqual(len(policies), 0)
 
-  @SkipTest
   def test_policy_import_working_with_warnings(self):
     def test_owners(policy):
       self.assertNotEqual([], policy.owners)
@@ -84,7 +93,6 @@ class TestCsvImport(TestCase):
     for policy in policies:
       test_owners(policy)
 
-  @SkipTest
   def test_policy_same_titles(self):
     def test_owners(policy):
       self.assertNotEqual([], policy.owners)
@@ -118,29 +126,37 @@ class TestCsvImport(TestCase):
     for policy in policies:
       test_owners(policy)
 
+  @SkipTest
+  def test_facilities_intermappings_dry_run(self):
+    self.generate_people(["miha", "predrag", "vladan", "ivan"])
+
+    filename = "facilities_intermappings.csv"
+    response_json = self.import_file(filename, dry_run=True)
+
+    info_set = set([
+        "4 objects will be inserted.",
+        "0 objects will be updated.",
+        "0 objects will fail.",
+    ])
+    self.assertEqual(info_set, set(response_json["info"]))
+
+    self.assertEqual(set(), set(response_json["warnings"]))
+    self.assertEqual(0, Relationship.query.count())
+
+  @SkipTest
   def test_facilities_intermappings(self):
+    self.generate_people(["miha", "predrag", "vladan", "ivan"])
+
     filename = "facilities_intermappings.csv"
     response_json = self.import_file(filename)
 
     info_set = set([
-        "3 objects were inserted.",
+        "4 objects were inserted.",
         "0 objects were updated.",
-        "6 objects failed.",
+        "0 objects failed.",
     ])
     self.assertEqual(info_set, set(response_json["info"]))
 
-    expected_warnings = set([
-        errors.DUPLICATE_VALUE_IN_CSV.format(
-            line_list="3, 4, 6, 10, 11", column_name="Title",
-            value="A title", s="s", ignore_lines="4, 6, 10, 11"),
-        errors.DUPLICATE_VALUE_IN_CSV.format(
-            line_list="5, 7", column_name="Title", value="A different title",
-            s="", ignore_lines="7"),
-        errors.DUPLICATE_VALUE_IN_CSV.format(
-            line_list="8, 9, 10, 11", column_name="Code", value="code",
-            s="s", ignore_lines="9, 10, 11"),
-    ])
-    self.assertEqual(expected_warnings, set(response_json["warnings"]))
+    self.assertEqual(set(), set(response_json["warnings"]))
+    self.assertEqual(2, Relationship.query.count())
 
-    policies = Policy.query.all()
-    self.assertEqual(len(policies), 3)

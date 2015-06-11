@@ -23,7 +23,9 @@ class RowConverter(object):
     self.index = options.get("index", -1)
     row = options.get("row", [])
     headers = options.get("headers", [])
-    self.attrs = self.handle_row_data(row, headers)
+    self.attrs = {}
+    self.mappings = {}
+    self.handle_row_data(row, headers)
 
   def add_error(self, error):
     self.errors.append(error)
@@ -36,19 +38,18 @@ class RowConverter(object):
 
     Args:
       row (list of str): row from csv file.
-
-    Returns:
-      dict containing handlers with values for all elements in the row.
     """
     if len(headers) != len(row):
       print headers, row
       raise Exception("Error: element count does not match header count")
-    items = {}
     for i, (attr_name, header_dict) in enumerate(headers.items()):
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=row[i], **header_dict)
-      items[attr_name] = item
-    return items
+      if attr_name.startswith("map:"):
+        self.mappings[attr_name] = item
+      else:
+        self.attrs[attr_name] = item
+
 
   def find_by_slug(self, slug):
     return self.object_type.query.filter_by(slug=slug).first()
@@ -77,11 +78,23 @@ class RowConverter(object):
 
     return obj
 
+  def setup_mappings(self):
+    if not self.obj or self.ignore:
+      return
+
   def setup_object(self):
+    """ Set the object values or relate object values
+
+    Set all object attributes to the value specified in attrs. If the value
+    is in some related object such as "UserRole" it should be added there and
+    handled by the handler defined in attrs.
+    """
     if self.ignore:
       return
+
     self.obj = self.get_object_by_slug()
-    self.reify()
+    for item_handler in self.attrs.values():
+      item_handler.set_obj_attr()
 
   def send_signals(self):
     service_class = getattr(ggrc.services, self.object_type.__name__)
@@ -98,14 +111,5 @@ class RowConverter(object):
     self.send_signals()
     db.session.add(self.obj)
 
-  def reify(self):
-    """ Set the object values or relate object values
-
-    Set all object attributes to the value specified in attrs. If the value
-    is in some related object such as "UserRole" it should be added there and
-    handled by the handler defined in attrs.
-    """
-    if not self.obj:
-      raise Exception("Reify object is not set")
-    for item_handler in self.attrs.values():
-      item_handler.set_obj_attr()
+  def insert_mapping(self):
+    pass
