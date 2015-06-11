@@ -94,3 +94,45 @@ class TestCsvImport(TestCase):
     self.assertEqual(len(policies), 4)
     for policy in policies:
       test_instance(policy)
+
+  def test_policy_same_titles(self):
+    def test_instance(policy):
+      self.assertNotEqual([], policy.owners)
+      self.assertEqual("user@example.com", policy.owners[0].email)
+    filename = "policy_same_titles.csv"
+
+    data = {"file": (open(join(CSV_DIR, filename)), filename)}
+    headers = {
+        "X-test-only": "false",
+        "X-requested-by": "gGRC",
+    }
+
+    response = self.client.post("/_service/import_csv",
+                                data=data, headers=headers)
+    self.assertEqual(response.status_code, 200)
+    response_json = json.loads(response.data)
+
+    info_set = set([
+        "3 objects will be inserted.",
+        "0 objects will be updated.",
+        "6 objects will fail.",
+    ])
+    self.assertEqual(info_set, set(response_json["info"]))
+
+    expected_warnings = set([
+        errors.DUPLICATE_VALUE_IN_CSV.format(
+            line_list="3, 4, 6, 10, 11", column_name="Title",
+            value="A title", s="s", ignore_lines="4, 6, 10, 11"),
+        errors.DUPLICATE_VALUE_IN_CSV.format(
+            line_list="5, 7", column_name="Title", value="A different title",
+            s="", ignore_lines="7"),
+        errors.DUPLICATE_VALUE_IN_CSV.format(
+            line_list="8, 9, 10, 11", column_name="Code", value="code",
+            s="s", ignore_lines="9, 10, 11"),
+    ])
+    self.assertEqual(expected_warnings, set(response_json["warnings"]))
+
+    policies = Policy.query.all()
+    self.assertEqual(len(policies), 3)
+    for policy in policies:
+      test_instance(policy)

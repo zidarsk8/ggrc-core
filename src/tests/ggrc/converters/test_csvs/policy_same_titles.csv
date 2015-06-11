@@ -1,0 +1,11 @@
+Object type,required,required,required,required
+policy,code,title,owner,state
+,,A title,user@example.com,Draft
+,,A title,user@example.com,Draft
+,,A different title,user@example.com,Draft
+,,A title,user@example.com,Draft
+,,A different title,user@example.com,Draft
+,code,different title,user@example.com,Draft
+,code,A totally different title,user@example.com,Draft
+,code,A title,user@example.com,Draft
+,code,A title,user@example.com,Draft
