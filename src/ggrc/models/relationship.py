@@ -7,6 +7,7 @@ import ggrc.models
 from ggrc import db
 from .mixins import deferred, Base, Described, Mapping
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy import or_, and_
 
 class Relationship(Mapping, db.Model):
   __tablename__ = 'relationships'
@@ -51,6 +52,19 @@ class Relationship(Mapping, db.Model):
     self.destination_type = value.__class__.__name__ if value is not None \
         else None
     return setattr(self, self.destination_attr, value)
+
+  @classmethod
+  def find_related(cls, object1, object2):
+    def predicate(src, dst):
+      return and_(
+          Relationship.source_type==src.type,
+          Relationship.source_id==src.id,
+          Relationship.destination_type==dst.type,
+          Relationship.destination_id==dst.id
+      )
+    return Relationship.query.filter(
+        or_(predicate(object1, object2), predicate(object2, object1))
+    ).first()
 
   @staticmethod
   def _extra_table_args(cls):
