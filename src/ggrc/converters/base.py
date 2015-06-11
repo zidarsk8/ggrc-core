@@ -53,7 +53,7 @@ class Converter(object):
 
   @classmethod
   def from_csv(cls, csv_data, offset=0, dry_run=True):
-    object_class = IMPORTABLE.get(csv_data[1][0])
+    object_class = IMPORTABLE.get(csv_data[1][0].strip().lower())
     if not object_class:
       return "ERROR"
 
@@ -157,6 +157,11 @@ class Converter(object):
       self.remove_duplicati_keys(key)
 
   def gather_messages(self):
+
+    def get_propper_name(count):
+      if count > 1:
+        return self.object_class._inflector.human_plural
+      return self.object_class._inflector.human_singular
     messages = {
         "errors": [],
         "warnings": [],
@@ -181,9 +186,15 @@ class Converter(object):
     fail_text = "will fail" if self.dry_run else "failed"
 
     # TODO: remame erros to messages and add this text there
-    messages["info"].append("{} objects {} inserted.".format(insert, be_text))
-    messages["info"].append("{} objects {} updated.".format(update, be_text))
-    messages["info"].append("{} objects {}.".format(fail, fail_text))
+    if insert:
+      messages["info"].append("{} {} {} inserted.".format(
+          insert, get_propper_name(insert), be_text))
+    if update:
+      messages["info"].append("{} {} {} updated.".format(
+          update, get_propper_name(update), be_text))
+    if fail:
+      messages["info"].append("{} {} {}.".format(
+          fail, get_propper_name(fail), fail_text))
 
     return messages
 

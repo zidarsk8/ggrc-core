@@ -74,9 +74,7 @@ class TestCsvImport(TestCase):
     ])
     self.assertEqual(expected_warnings, set(response_json["warnings"]))
     self.assertEqual([], response_json["errors"])
-    self.assertIn("4 objects will be inserted.", response_json["info"])
-    self.assertIn("0 objects will be updated.", response_json["info"])
-    self.assertIn("0 objects will fail.", response_json["info"])
+    self.assertIn("4 policies will be inserted.", response_json["info"])
     policies = Policy.query.all()
     self.assertEqual(len(policies), 0)
 
@@ -101,9 +99,8 @@ class TestCsvImport(TestCase):
     response_json = self.import_file(filename)
 
     info_set = set([
-        "3 objects were inserted.",
-        "0 objects were updated.",
-        "6 objects failed.",
+        "3 policies were inserted.",
+        "6 policies failed.",
     ])
     self.assertEqual(info_set, set(response_json["info"]))
 
@@ -131,11 +128,7 @@ class TestCsvImport(TestCase):
     filename = "facilities_intermappings.csv"
     response_json = self.import_file(filename, dry_run=True)
 
-    info_set = set([
-        "4 objects will be inserted.",
-        "0 objects will be updated.",
-        "0 objects will fail.",
-    ])
+    info_set = set(["4 facilities will be inserted."])
     self.assertEqual(info_set, set(response_json["info"]))
 
     self.assertEqual(set(), set(response_json["warnings"]))
@@ -147,11 +140,7 @@ class TestCsvImport(TestCase):
     filename = "facilities_intermappings.csv"
     response_json = self.import_file(filename)
 
-    info_set = set([
-        "4 objects were inserted.",
-        "0 objects were updated.",
-        "0 objects failed.",
-    ])
+    info_set = set(["4 facilities were inserted."])
     self.assertEqual(info_set, set(response_json["info"]))
 
     self.assertEqual(set(), set(response_json["warnings"]))
