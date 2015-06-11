@@ -112,3 +112,30 @@ class TestCsvImport(TestCase):
     self.assertEqual(len(policies), 3)
     for policy in policies:
       test_owners(policy)
+
+  def test_facilities_intermappings(self):
+    filename = "facilities_intermappings.csv"
+    response_json = self.import_file(filename)
+
+    info_set = set([
+        "3 objects were inserted.",
+        "0 objects were updated.",
+        "6 objects failed.",
+    ])
+    self.assertEqual(info_set, set(response_json["info"]))
+
+    expected_warnings = set([
+        errors.DUPLICATE_VALUE_IN_CSV.format(
+            line_list="3, 4, 6, 10, 11", column_name="Title",
+            value="A title", s="s", ignore_lines="4, 6, 10, 11"),
+        errors.DUPLICATE_VALUE_IN_CSV.format(
+            line_list="5, 7", column_name="Title", value="A different title",
+            s="", ignore_lines="7"),
+        errors.DUPLICATE_VALUE_IN_CSV.format(
+            line_list="8, 9, 10, 11", column_name="Code", value="code",
+            s="s", ignore_lines="9, 10, 11"),
+    ])
+    self.assertEqual(expected_warnings, set(response_json["warnings"]))
+
+    policies = Policy.query.all()
+    self.assertEqual(len(policies), 3)
