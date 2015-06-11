@@ -72,6 +72,8 @@ class TestCsvImport(TestCase):
     self.assertIn("4 objects will be inserted.", response_json["info"])
     self.assertIn("0 objects will be updated.", response_json["info"])
     self.assertIn("0 objects will fail.", response_json["info"])
+    policies = Policy.query.all()
+    self.assertEqual(len(policies), 0)
 
   def test_policy_import_working_with_warnings(self):
     def test_instance(policy):
@@ -113,9 +115,9 @@ class TestCsvImport(TestCase):
     response_json = json.loads(response.data)
 
     info_set = set([
-        "3 objects will be inserted.",
-        "0 objects will be updated.",
-        "6 objects will fail.",
+        "3 objects were inserted.",
+        "0 objects were updated.",
+        "6 objects failed.",
     ])
     self.assertEqual(info_set, set(response_json["info"]))
 

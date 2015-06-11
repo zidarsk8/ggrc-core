@@ -104,11 +104,9 @@ def handle_import_request():
 
   response_data = {}
   for offset, data in zip(offsets, data_blocks):
-    converter = Converter.from_csv(data, offset=offset)
-    if dry_run:
-      response_data = converter.test_import()
-    else:
-      response_data = converter.import_objects()
+    converter = Converter.from_csv(data, offset=offset, dry_run=dry_run)
+    converter.import_objects()
+    response_data = converter.gather_messages()
 
   response_json = json.dumps(response_data)
   headers = [('Content-Type', 'application/json')]

@@ -15,7 +15,13 @@ from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import generate_2d_array
 from ggrc.converters.utils import pretty_class_name
 from ggrc.converters import errors
-from ggrc.services.common import get_modified_objects, update_index
+from ggrc.services.common import get_modified_objects
+from ggrc.services.common import update_index
+from ggrc.services.common import update_memcache_before_commit
+from ggrc.services.common import update_memcache_after_commit
+
+
+CACHE_EXPIRY_IMPORT = 600
 
 
 class Converter(object):
@@ -181,29 +187,28 @@ class Converter(object):
 
     return messages
 
-  def test_import(self):
-    for row_converter in self.row_converters:
-      row_converter.setup_object()
-    return self.gather_messages()
+  def import_mappings(self, codes):
+    pass
 
   def import_objects(self):
     for row_converter in self.row_converters:
       row_converter.setup_object()
-      row_converter.insert_object()
-    modified_objects = get_modified_objects(db.session)
-    update_index(db.session, modified_objects)
-    self.commit()
-    return self.gather_messages()
 
-  def commit(self):
-    pass
+    if not self.dry_run:
+      for row_converter in self.row_converters:
+        row_converter.insert_object()
+      self.save_import()
+
+  def save_import(self):
+    modified_objects = get_modified_objects(db.session)
+    update_memcache_before_commit(self, modified_objects, CACHE_EXPIRY_IMPORT)
+    db.session.commit()
+    update_memcache_after_commit(self)
+    update_index(db.session, modified_objects)
 
   def add_warning(self, template, **kwargs):
     message = template.format(**kwargs)
     self.warnings.append(message)
-
-  def import_mappings(self):
-    pass
 
   def remove_duplicati_keys(self, key):
     counts = defaultdict(list)
