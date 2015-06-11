@@ -102,7 +102,7 @@ Note: This step only needs to be done once, but required APIs might change, so d
 3. Select “Credentials” in the left-hand column, and click “CREATE NEW CLIENT ID”.
 
   * Select “Web Application”
-  * Add “<https://ggrc-prod.googleplex.com>” to the box labeled “Authorized JavaScript origins”
+  * Add “<https://*****.****.com>” to the box labeled “Authorized JavaScript origins”
   * Delete the content from the box labeled “Authorized redirect URI”
 
    Your screen should look like the following:
@@ -152,8 +152,7 @@ In the left-hand column of the Google Developers Console (<https://cloud.google.
 
 In the top line, click the “Export...” button, select a Cloud Storage path, and click “OK”.  The Cloud Storage Path should look something like:
 
-* test: `gs://ggrc-db-backups/ggrc-test-yyyymmdd.sql`
-* prod: `gs://ggrc-prod-backup/ggrc-prod.yyyymmdd.sql`
+* `gs://****-backups/****-yyyymmdd.sql`
 
 ### 5. Complete the deployment
 
@@ -162,8 +161,8 @@ Go back to the virtual machine, and do the following (note the `GGRC_DATABASE_UR
     # Update the local repository
     git fetch
 
-    # Checkout the release tag we want to deploy, e.g. 0.9a28.5
-    git checkout 0.9a28.5
+    # Checkout the release tag we want to deploy, e.g. 0.9.2-Grapes
+    git checkout 0.9.2-Grapes
 
     # If Python packages may have changed, you need to remove previous packages
     make clean_appengine_packages
@@ -183,9 +182,7 @@ Go back to the virtual machine, and do the following (note the `GGRC_DATABASE_UR
     # This line prepares the static assets (Javascripts and Stylesheets) and creates
     # the required `app.yaml` file. Choose one, or edit to match your .sh file.
 
-    bin/deploy_appengine deploy_settings_ggrc_test.sh
-    bin/deploy_appengine deploy_settings_ggrc_uat.sh
-    bin/deploy_appengine deploy_settings_ggrc_prod.sh
+    bin/deploy_appengine deploy_settings_ggrc_<something>.sh
 
     # Update the database for new changes. This command may take a while to complete.
     db_migrate
