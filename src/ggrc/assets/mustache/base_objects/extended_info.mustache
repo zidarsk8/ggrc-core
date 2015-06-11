@@ -36,18 +36,13 @@
       <div class="span12">
         <h6>Email</h6>
         <p class="oneline">
-          <a class="url" href="mailto:{{email}}" target="_blank">
-            {{email}}
-          </a>
-          {{^if is_enabled}}
-            <span class="user-disabled">
-              (Disabled)
-            </span>
-          {{/if}}
+          {{#using person=this}}
+            {{>'/static/mustache/people/popover.mustache'}}
+          {{/using}}
         </p>
       </div>
     </div>
-    
+
     {{#if company.length}}
       <div class="row-fluid">
         <div class="span12">
@@ -57,9 +52,9 @@
           </p>
         </div>
       </div>
-    {{/if}}   
-    
-  {{/if_equals}}  
+    {{/if}}
+
+  {{/if_equals}}
 
   {{^if_equals instance.class.table_singular 'person'}}
     {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}

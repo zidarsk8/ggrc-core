@@ -39,10 +39,10 @@
           Owner
           <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
         </label>
-        <input tabindex="3" class="input-block-level search-icon" name="owners.0.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+        <input tabindex="3" class="input-block-level search-icon" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
         {{/using}}
         {{#using contact=contact}}
-        <input type="text" name="contact.email" data-lookup="Person" data-params="Person:is_enabled=1" class="span9 audit-selector search-icon" value="{{firstnonempty contact.email ''}}">
+        <input type="text" name="contact.email" data-lookup="Person" class="span9 audit-selector search-icon" value="{{firstnonempty contact.email ''}}">
         <i class="grcicon-person-green"></i>
         {{/using}}
       </div>
