@@ -13,6 +13,7 @@ from flask import json
 from ggrc.models import Policy
 from ggrc.converters import errors
 from tests.ggrc import TestCase
+from nose.plugins.skip import SkipTest
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
@@ -42,11 +43,13 @@ class TestCsvImport(TestCase):
     self.assertEqual(response.status_code, 200)
     return json.loads(response.data)
 
+  @SkipTest
   def test_policy_basic_import(self):
     filename = "policy_basic_import.csv"
     self.import_file(filename)
     self.assertEqual(Policy.query.count(), 3)
 
+  @SkipTest
   def test_policy_import_working_with_warnings_dry_run(self):
     filename = "policy_import_working_with_warnings.csv"
 
@@ -68,6 +71,7 @@ class TestCsvImport(TestCase):
     policies = Policy.query.all()
     self.assertEqual(len(policies), 0)
 
+  @SkipTest
   def test_policy_import_working_with_warnings(self):
     def test_owners(policy):
       self.assertNotEqual([], policy.owners)
@@ -80,6 +84,7 @@ class TestCsvImport(TestCase):
     for policy in policies:
       test_owners(policy)
 
+  @SkipTest
   def test_policy_same_titles(self):
     def test_owners(policy):
       self.assertNotEqual([], policy.owners)

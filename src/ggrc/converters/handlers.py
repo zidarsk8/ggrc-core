@@ -217,4 +217,9 @@ COLUMN_HANDLERS = {
     "owners": OwnerColumnHandler,
     "status": StatusColumnHandler,
     "contact": UserColumnHandler,
+    "secondary_contact": UserColumnHandler,
+    "start_date": DateColumnHandler,
+    "end_date": DateColumnHandler,
+    "report_end_date": DateColumnHandler,
+    "report_start_date": DateColumnHandler,
 }
