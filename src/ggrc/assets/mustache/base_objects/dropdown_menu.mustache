@@ -33,13 +33,22 @@
         {{#is_allowed "view_object_page" instance}}
           <li>
             <a href="{{instance.viewLink}}">
-              View {{instance.class.title_singular}}
               <i class="grcicon-goto"></i>
+              View {{instance.class.title_singular}}
             </a>
           </li>
         {{/is_allowed}}
       {{/if}}
     {{/is_info_pin}}
+
+    {{#is_allowed 'delete' instance}}
+      <li>
+        <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+          <i class="grcicon-deleted"></i>
+          Delete
+        </a>
+      </li>
+    {{/is_allowed}}
 
   </ul>
 </div>

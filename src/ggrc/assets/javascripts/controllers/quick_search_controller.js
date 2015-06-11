@@ -194,12 +194,7 @@ can.Control("CMS.Controllers.LHN", {
 
       this.obs = new can.Observe();
 
-      if (this.should_show_lhn()) {
-        this.init_lhn();
-      }
-      else {
-        this.hide_lhn();
-      }
+      this.init_lhn();
 
       // Set up a scroll handler to capture the current scroll-Y position on the
       // whole LHN search panel.  scroll events do not bubble, so this cannot be
@@ -208,10 +203,6 @@ can.Control("CMS.Controllers.LHN", {
         self.options.display_prefs.setLHNState({ "panel_scroll" : this.scrollTop });
       });
       this.element.find(".lhs-holder").on("scroll", self.lhs_holder_onscroll);
-    }
-
-  , should_show_lhn: function() {
-      return Permission.is_allowed("view_object_page", "__GGRC_ALL__", null);
     }
 
   , is_lhn_open: function () {

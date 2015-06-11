@@ -29,6 +29,12 @@ def is_allowed_create(resource_type, context_id):
   return permissions_for(get_user()).is_allowed_create(
       resource_type, context_id)
 
+def is_allowed_create_for(instance):
+  """Whether or not the user is allowed to create this particular resource
+  instance.
+  """
+  return permissions_for(get_user()).is_allowed_create_for(instance)
+
 def is_allowed_read(resource_type, context_id):
   """Whether or not the user is allowed to read a resource of the specified
   type in the context.

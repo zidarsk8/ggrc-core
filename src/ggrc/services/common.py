@@ -1030,6 +1030,9 @@ class Resource(ModelView):
         raise Forbidden()
     with benchmark("Deserialize object"):
       self.json_create(obj, src)
+    with benchmark("Query create permissions"):
+      if not permissions.is_allowed_create_for(obj):
+        raise Forbidden()
     with benchmark("Send model POSTed event"):
       self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()

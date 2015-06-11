@@ -17,6 +17,9 @@ def auditor_reader():
 def reader():
   return _find_basic('Reader')
 
+def creator():
+  return _find_basic('Creator')
+  
 def program_creator():
   return _find_basic('ProgramCreator')
 
