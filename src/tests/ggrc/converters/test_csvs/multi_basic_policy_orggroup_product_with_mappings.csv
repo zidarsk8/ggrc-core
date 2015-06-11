@@ -1,0 +1,29 @@
+Object type,,,,
+Policy,code,title,Map: Org group,
+,p-1,Bacon,,
+,p-2,ipsum,org-1,
+,p-3,dolor,org-1,
+,p-4,amet,org-1,
+,,,,
+,,,,
+,,,,
+Object type,,,,
+Org group,code,title,Map:Policy,map:product
+,org-1,boudin,"p-1
+p-2
+p-3",pro 4
+,org-2,tail,,pro 5
+,org-3,filet,,
+,org-4,mignon,"p-1
+p-2
+p-3","pro 1
+pro 4
+pro 3"
+,,,,
+Object type,,,,
+product,code,title,map:org group,map:policy
+,pro 1,meatloaf,,
+,pro 2,pastrami,,
+,pro 3,landjaeger,,
+,pro 4,ham,org-4,p-1
+,pro 5,bacon,,
