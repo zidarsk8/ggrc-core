@@ -187,9 +187,9 @@ class Converter(object):
 
     return messages
 
-  def import_mappings(self, codes):
+  def import_mappings(self, slugs_dict):
     for row_converter in self.row_converters:
-      row_converter.setup_mappings()
+      row_converter.setup_mappings(slugs_dict)
 
     if not self.dry_run:
       for row_converter in self.row_converters:

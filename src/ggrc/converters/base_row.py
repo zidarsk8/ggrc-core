@@ -55,7 +55,8 @@ class RowConverter(object):
     return self.object_type.query.filter_by(slug=slug).first()
 
   def get_value(self, key):
-    item = self.attrs.get(key)
+    key_set = self.mappings if key.startswith("map:") else self.attrs
+    item = key_set.get(key)
     if item:
       return item.value
     return None
@@ -78,9 +79,12 @@ class RowConverter(object):
 
     return obj
 
-  def setup_mappings(self):
+  def setup_mappings(self, slugs_dict):
     if not self.obj or self.ignore:
       return
+    for mapping in self.mappings.values():
+      mapping.set_slugs(slugs_dict)
+      mapping.set_value()
 
   def setup_object(self):
     """ Set the object values or relate object values
@@ -112,4 +116,7 @@ class RowConverter(object):
     db.session.add(self.obj)
 
   def insert_mapping(self):
-    pass
+    if not self.obj or self.ignore:
+      return
+    for mapping in self.mappings.values():
+      mapping.set_obj_attr()

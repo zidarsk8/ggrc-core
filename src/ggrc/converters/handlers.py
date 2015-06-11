@@ -6,7 +6,9 @@
 import re
 from dateutil.parser import parse
 
+from ggrc import db
 from ggrc.models import Person
+from ggrc.models import Relationship
 from ggrc.login import get_current_user
 from ggrc.converters import IMPORTABLE
 from ggrc.converters import errors
@@ -25,7 +27,13 @@ class ColumnHandler(object):
     self.default = options.get("default")
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
+    self.set_value()
+
+  def set_value(self):
     self.value = self.parse_item()
+
+  def get_value(self):
+    return getattr(self.row_converter.obj, self.key, self.value)
 
   def add_error(self, message):
     self.row_converter.errors.append(message)
@@ -190,7 +198,19 @@ class MappingColumnHandler(ColumnHandler):
     self.key = key
     self.mapping_name = key[4:]  # remove "map:" prefix
     self.mapping_object = IMPORTABLE.get(self.mapping_name)
-    super(MappingColumnHandler, self).__init__(row_converter, key, **options)
+    self.row_converter = row_converter
+    self.key = key
+    self.value = None
+    self.raw_value = options.get("raw_value")
+    self.validator = options.get("validator")
+    self.mandatory = options.get("mandatory", False)
+    self.default = options.get("default")
+    self.description = options.get("description", "")
+    self.display_name = options.get("display_name", "")
+    self.new_slugs = []
+
+  def set_slugs(self, slugs_dict):
+    self.new_slugs = slugs_dict.get(self.row_converter.object_type, [])
 
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
@@ -202,14 +222,21 @@ class MappingColumnHandler(ColumnHandler):
       obj = class_.query.filter(class_.slug == slug).first()
       if obj:
         objects.append(obj)
-      else:
+      elif not (slug in self.new_slugs and
+                self.row_converter.converter.dry_run):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=pretty_class_name(class_), slug=slug)
+    return objects
+
 
   def set_obj_attr(self):
     """ Create a new mapping object """
-    pass
-
+    current_obj = self.row_converter.obj
+    for obj in self.value:
+      if not Relationship.find_related(current_obj, obj):
+        mapping = Relationship(source=current_obj, destination=obj)
+        db.session.add(mapping)
+    db.session.flush()
 
 COLUMN_HANDLERS = {
     "slug": SlugColumnHandler,

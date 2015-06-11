@@ -113,12 +113,12 @@ def handle_import_request():
     converter = Converter.from_csv(data, offset=offset, dry_run=dry_run)
     converters.append(converter)
     converter.import_objects()
-    update_response_data(response_data, converter.gather_messages())
     object_class, slugs = converter.get_new_slugs()
     new_slugs[object_class].update(slugs)
 
   for converter in converters:
     converter.import_mappings(new_slugs)
+    update_response_data(response_data, converter.gather_messages())
 
   response_json = json.dumps(response_data)
   headers = [('Content-Type', 'application/json')]

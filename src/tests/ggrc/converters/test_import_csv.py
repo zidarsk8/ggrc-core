@@ -14,7 +14,6 @@ from ggrc.models import Policy
 from ggrc.models import Relationship
 from ggrc.converters import errors
 from tests.ggrc import TestCase
-from nose.plugins.skip import SkipTest
 from tests.ggrc.generator import GgrcGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
@@ -126,7 +125,6 @@ class TestCsvImport(TestCase):
     for policy in policies:
       test_owners(policy)
 
-  @SkipTest
   def test_facilities_intermappings_dry_run(self):
     self.generate_people(["miha", "predrag", "vladan", "ivan"])
 
@@ -143,7 +141,6 @@ class TestCsvImport(TestCase):
     self.assertEqual(set(), set(response_json["warnings"]))
     self.assertEqual(0, Relationship.query.count())
 
-  @SkipTest
   def test_facilities_intermappings(self):
     self.generate_people(["miha", "predrag", "vladan", "ivan"])
 
@@ -158,5 +155,5 @@ class TestCsvImport(TestCase):
     self.assertEqual(info_set, set(response_json["info"]))
 
     self.assertEqual(set(), set(response_json["warnings"]))
-    self.assertEqual(2, Relationship.query.count())
+    self.assertEqual(4, Relationship.query.count())
 
