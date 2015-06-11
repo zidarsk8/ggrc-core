@@ -63,12 +63,31 @@ class ColumnHandler(object):
   def export(self):
     return getattr(self.row_converter.obj, self.key, '')
 
+  def get_default(self):
+    if callable(self.default):
+      return self.default()
+    return self.default
+
 
 class StatusColumnHandler(ColumnHandler):
 
+  def __init__(self, row_converter, key, **options):
+    self.key = key
+    valid_states = row_converter.object_type.VALID_STATES
+    self.state_mappings = {s.lower():s for s in valid_states}
+
+    super(StatusColumnHandler, self).__init__(row_converter, key, **options)
+
   def parse_item(self):
-    if self.raw_value:
-      return self.raw_value.strip()
+    # TODO: check if mandatory and replace with default if it's wrong
+    value = self.raw_value.strip().lower()
+    status = self.state_mappings.get(value)
+    if not status:
+      self.add_warning(errors.WRONG_REQUIRED_VALUE,
+                       column_name=self.display_name)
+    else:
+      status = self.get_default()
+    return status
 
 
 class UserColumnHandler(ColumnHandler):
