@@ -31,33 +31,26 @@ class TestCsvImport(TestCase):
   def tearDown(self):
     pass
 
-  def test_policy_basic_import(self):
-    filename = "policy_basic_import.csv"
-
+  def import_file(self, filename, dry_run=False):
     data = {"file": (open(join(CSV_DIR, filename)), filename)}
     headers = {
-        "X-test-only": "false",
+        "X-test-only": "true" if dry_run else "false",
         "X-requested-by": "gGRC",
     }
-
     response = self.client.post("/_service/import_csv",
                                 data=data, headers=headers)
     self.assertEqual(response.status_code, 200)
+    return json.loads(response.data)
+
+  def test_policy_basic_import(self):
+    filename = "policy_basic_import.csv"
+    self.import_file(filename)
     self.assertEqual(Policy.query.count(), 3)
 
   def test_policy_import_working_with_warnings_dry_run(self):
     filename = "policy_import_working_with_warnings.csv"
 
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {
-        "X-test-only": "true",
-        "X-requested-by": "gGRC",
-    }
-
-    response = self.client.post("/_service/import_csv",
-                                data=data, headers=headers)
-    self.assertEqual(response.status_code, 200)
-    response_json = json.loads(response.data)
+    response_json = self.import_file(filename, dry_run=True)
 
     expected_warnings = set([
         errors.UNKNOWN_USER_WARNING.format(line=3, email="miha@policy.com"),
@@ -76,43 +69,24 @@ class TestCsvImport(TestCase):
     self.assertEqual(len(policies), 0)
 
   def test_policy_import_working_with_warnings(self):
-    def test_instance(policy):
+    def test_owners(policy):
       self.assertNotEqual([], policy.owners)
       self.assertEqual("user@example.com", policy.owners[0].email)
     filename = "policy_import_working_with_warnings.csv"
-
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {
-        "X-test-only": "false",
-        "X-requested-by": "gGRC",
-    }
-
-    response = self.client.post("/_service/import_csv",
-                                data=data, headers=headers)
-    self.assertEqual(response.status_code, 200)
-    json.loads(response.data)
+    self.import_file(filename)
 
     policies = Policy.query.all()
     self.assertEqual(len(policies), 4)
     for policy in policies:
-      test_instance(policy)
+      test_owners(policy)
 
   def test_policy_same_titles(self):
-    def test_instance(policy):
+    def test_owners(policy):
       self.assertNotEqual([], policy.owners)
       self.assertEqual("user@example.com", policy.owners[0].email)
+
     filename = "policy_same_titles.csv"
-
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {
-        "X-test-only": "false",
-        "X-requested-by": "gGRC",
-    }
-
-    response = self.client.post("/_service/import_csv",
-                                data=data, headers=headers)
-    self.assertEqual(response.status_code, 200)
-    response_json = json.loads(response.data)
+    response_json = self.import_file(filename)
 
     info_set = set([
         "3 objects were inserted.",
@@ -137,4 +111,4 @@ class TestCsvImport(TestCase):
     policies = Policy.query.all()
     self.assertEqual(len(policies), 3)
     for policy in policies:
-      test_instance(policy)
+      test_owners(policy)
