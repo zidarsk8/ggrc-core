@@ -8,7 +8,7 @@ from .roles import (
     Auditor, AuditorProgramReader, AuditorReader, ObjectEditor,
     ProgramAuditEditor, ProgramAuditOwner, ProgramAuditReader,
     ProgramBasicReader, ProgramCreator, ProgramEditor, ProgramMappingEditor,
-    ProgramOwner, ProgramReader, Reader, gGRC_Admin,
+    ProgramOwner, ProgramReader, Reader, gGRC_Admin, Creator
     )
 
 
@@ -132,6 +132,7 @@ class BasicRoleDeclarations(RoleDeclarations):
     return {
         'AuditorReader': AuditorReader,
         'Reader': Reader,
+        'Creator': Creator,
         'ProgramCreator': ProgramCreator,
         'ObjectEditor': ObjectEditor,
         'ProgramBasicReader': ProgramBasicReader,

@@ -861,6 +861,10 @@ class WorkflowRoleContributions(RoleContributions):
           'read': ['Workflow'],
           'create': ['Workflow'],
       },
+      'Creator': {
+          'read': [],
+          'create': ['Workflow'],
+      },
       'ObjectEditor': {
           'read': ['Workflow'],
           'create': ['Workflow'],
@@ -898,10 +902,12 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
           'ProgramCreator': ['BasicWorkflowReader'],
           'ObjectEditor': ['BasicWorkflowReader'],
           'Reader': ['BasicWorkflowReader'],
+          'Creator': ['WorkflowBasicReader'],
       },
       ('Workflow', None): {
           'WorkflowOwner': ['WorkflowBasicReader'],
           'WorkflowMember': ['WorkflowBasicReader'],
+          'Creator': ['WorkflowBasicReader'],
       },
   }
 
