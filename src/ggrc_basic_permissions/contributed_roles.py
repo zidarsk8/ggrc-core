@@ -181,6 +181,8 @@ class BasicRoleImplications(DeclarativeRoleImplications):
           'ProgramReader': ['ProgramBasicReader'],
       },
       (None, None): {
+          'Reader': ['Creator'],
+          'ObjectEditor': ['Creator'],
           'ProgramCreator': ['ObjectEditor'],
       },
       (None, 'Program'): {
