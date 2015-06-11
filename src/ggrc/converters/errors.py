@@ -15,7 +15,7 @@ MISSING_CUSTOM_ATTRIBUTE_COLUMN = ("Line {line}: Missing custom column"
 WRONG_OBJECT_TYPE = ("Line {line}: Object type in your CSV file is not set or"
                      " does not exist. Please fill it in")
 
-UNKNOWN_COLUMN = ("Line {line}: Column {column_name}: Attribute does not"
+UNKNOWN_COLUMN = ("Line {line}: Attribute '{column_name}' does not"
                   " exist. Column will be ignored")
 
 DELETE_UNKNOWN_OBJECT = ("Line {line}: Object '{slug}' does not exist, so it"

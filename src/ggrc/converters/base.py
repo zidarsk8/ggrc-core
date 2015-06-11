@@ -114,6 +114,12 @@ class Converter(object):
     return header_names
 
   def clean_headers(self, raw_headers):
+
+    def sanitize_header(header):
+      header = header.strip("*").lower()
+      if header.startswith("map:"):
+        header = ":".join(map(unicode.strip, header.split(":")))  # noqa
+      return header
     """ Sanitize columns from csv file
 
     Clear out all the bad column headers and remove coresponding column in the
@@ -125,7 +131,8 @@ class Converter(object):
     Returns:
       Ordered Dictionary containing all valid headers
     """
-    headers = [val.strip("*").lower() for val in raw_headers]
+    headers = [sanitize_header(val) for val in raw_headers]
+
     clean_headers = OrderedDict()
     header_names = self.get_header_names()
     for index, header in enumerate(headers):
@@ -133,14 +140,17 @@ class Converter(object):
         field_name = header_names[header]
         clean_headers[field_name] = self.object_headers[field_name]
       else:
-        self.warnings.append("Unknown column " + header)
+        self.add_warning(errors.UNKNOWN_COLUMN,
+                         line=self.offset + 2,
+                         column_name=header)
         self.remove_culumn(index)
     return clean_headers
 
   def remove_culumn(self, index):
     """ Remove a column from all rows """
     for row in self.rows:
-      row.pop(index)
+      if len(row) > index:
+        row.pop(index)
 
   def generate_row_converters(self):
     """ Generate a row converter object for every csv row """

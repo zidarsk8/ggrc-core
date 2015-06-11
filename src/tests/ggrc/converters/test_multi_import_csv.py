@@ -9,10 +9,12 @@ from os.path import abspath
 from os.path import dirname
 from os.path import join
 from flask import json
+from sqlalchemy import or_, and_
 
 from ggrc.models import Policy
 from ggrc.models import OrgGroup
 from ggrc.models import Product
+from ggrc.models import Relationship
 from ggrc.converters import errors
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
@@ -54,7 +56,6 @@ class TestCsvImport(TestCase):
     return json.loads(response.data)
 
   def test_multi_basic_policy_orggroup_product(self):
-    self.generate_people(["miha", "predrag", "vladan", "ivan"])
 
     filename = "multi_basic_policy_orggroup_product.csv"
     response_json = self.import_file(filename)
@@ -71,7 +72,6 @@ class TestCsvImport(TestCase):
     self.assertEqual(Product.query.count(), 5)
 
   def test_multi_basic_policy_orggroup_product_with_warnings(self):
-    self.generate_people(["miha", "predrag", "vladan", "ivan"])
 
     filename = "multi_basic_policy_orggroup_product_with_warnings.csv"
     response_json = self.import_file(filename)
@@ -103,3 +103,32 @@ class TestCsvImport(TestCase):
     self.assertEqual(Policy.query.count(), 3)
     self.assertEqual(OrgGroup.query.count(), 4)
     self.assertEqual(Product.query.count(), 5)
+
+  def test_multi_basic_policy_orggroup_product_with_mappings(self):
+
+    def get_relationships_for(obj):
+      return Relationship.query.filter(or_(
+          and_(Relationship.source_id == obj.id,
+               Relationship.source_type == obj.type),
+          and_(Relationship.destination_id == obj.id,
+               Relationship.destination_type == obj.type),
+      ))
+
+    filename = "multi_basic_policy_orggroup_product_with_mappings.csv"
+    response_json = self.import_file(filename)
+
+    info_set = set([
+        "4 org groups were inserted.",
+        "4 policies were inserted.",
+        "5 products were inserted.",
+    ])
+    self.assertEqual(info_set, set(response_json["info"]))
+    self.assertEqual(set(), set(response_json["warnings"]))
+    self.assertEqual(Policy.query.count(), 4)
+    self.assertEqual(OrgGroup.query.count(), 4)
+    self.assertEqual(Product.query.count(), 5)
+    p1 = Policy.query.filter_by(slug="p-1").first()
+    org1 = OrgGroup.query.filter_by(slug="org-1").first()
+
+    self.assertEqual(get_relationships_for(p1).count(), 3)
+    self.assertEqual(get_relationships_for(org1).count(), 5)

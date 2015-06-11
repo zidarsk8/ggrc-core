@@ -138,8 +138,10 @@ def generate_csv_string(csv_data):
 
 def extract_relevant_data(csv_data):
   """ Split csv data into data and metadata """
-  transpose_data = zip(*csv_data[1:])
-  data = zip(*transpose_data[1:])
+  striped_data = [map(unicode.strip, line) for line in csv_data]
+  transpose_data = zip(*striped_data[1:])
+  non_empty = filter(any, transpose_data)
+  data = zip(*non_empty[1:])
   column_definitions = list(data.pop(0))
   data = map(list, data)
   return column_definitions, data
