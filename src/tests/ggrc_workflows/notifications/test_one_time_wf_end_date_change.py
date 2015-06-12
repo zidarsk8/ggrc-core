@@ -143,9 +143,9 @@ class TestOneTimeWfEndDateChange(TestCase):
       task2 = CycleTaskGroupObjectTask.query.get(
         cycle.cycle_task_group_object_tasks[1].id)
 
-      self.wf_generator.modify_cycle_task_group_object_task(
+      self.wf_generator.modify_object(
         task1, data = {"end_date": date(2015, 5, 15)})
-      self.wf_generator.modify_cycle_task_group_object_task(
+      self.wf_generator.modify_object(
         task2, data = {"end_date": date(2015, 5, 15)})
 
     with freeze_time("2015-05-04 03:21:34"):  # one day befor due date
@@ -201,9 +201,9 @@ class TestOneTimeWfEndDateChange(TestCase):
       task2 = CycleTaskGroupObjectTask.query.get(
         cycle.cycle_task_group_object_tasks[1].id)
 
-      self.wf_generator.modify_cycle_task_group_object_task(
+      self.wf_generator.modify_object(
         task1, data = {"end_date": date(2015, 5, 1)})
-      self.wf_generator.modify_cycle_task_group_object_task(
+      self.wf_generator.modify_object(
         task2, data = {"end_date": date(2015, 5, 1)})
 
     with freeze_time("2015-05-03 03:21:34"):  # one day befor due date
@@ -244,9 +244,9 @@ class TestOneTimeWfEndDateChange(TestCase):
       task2 = CycleTaskGroupObjectTask.query.get(
         cycle.cycle_task_group_object_tasks[1].id)
 
-      self.wf_generator.modify_cycle_task_group_object_task(
+      self.wf_generator.modify_object(
         task1, data = {"end_date": date(2015, 5, 3)})
-      self.wf_generator.modify_cycle_task_group_object_task(
+      self.wf_generator.modify_object(
         task2, data = {"end_date": date(2015, 5, 4)})
 
     with freeze_time("2015-05-03 03:21:34"):  # one day befor due date
