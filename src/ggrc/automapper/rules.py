@@ -9,21 +9,28 @@ import ipdb
 
 Rule = namedtuple('Rule', ['src', 'mappings', 'dst'])
 
+
 class RuleSet(object):
   def __init__(self, rule_list):
     rules = dict()
-    allowed= get_mapping_rules()
+    allowed_mappings = set()
+    relate = lambda src, dst: (src, dst) if src < dst else (dst, src)
+    for src, dsts in get_mapping_rules().iteritems():
+      for dst in dsts:
+        allowed_mappings.add(relate(src, dst))
     wrap = lambda o: o if isinstance(o, set) else {o}
     for rule in rule_list:
       for src in wrap(rule.src):
         for dst in wrap(rule.dst):
           key = (src, dst)
           existing_rules = rules[key] if key in rules else set()
-          allowed_mappings = allowed[dst] if dst in allowed else set() 
-          rules[key] = existing_rules | set(filter(allowed_mappings.__contains__, 
-                                                   wrap(rule.mappings)))
+          mappings = wrap(rule.mappings)
+          mappings = set(obj for obj in mappings
+                         if relate(dst, obj) in allowed_mappings)
+          rules[key] = existing_rules | mappings
     for key in rules:
       rules[key] = frozenset(rules[key])
+    self._allowed = allowed_mappings
     self._rule_list = rule_list
     self._rules = rules
 
@@ -35,6 +42,15 @@ class RuleSet(object):
 
   def __repr__(self):
     return 'Rules(%s)' % repr(self._rule_list)
+
+  def __str__(self):
+    rules = []
+    for key in self._rules:
+      src, dst = key
+      for mapping in self._rules[key]:
+        rules.append('  -> %s <--> %s <--> %s <-' % (dst, src, mapping))
+    rules.sort()
+    return 'RulesSet\n' + '\n'.join(rules)
 
 
 class Types(object):
@@ -75,7 +91,7 @@ mapping_to_objective = Rule(
 )
 
 rules = RuleSet([
-    mapping_directive_to_a_program,
+    mapping_to_a_program,
     mapping_directive_to_a_program,
     mapping_to_sections_and_clauses,
     mapping_to_objective,
