@@ -71,16 +71,9 @@ mapping_to_objective = Rule(
     {'Section'},
 )
 
-test_mapping_issues = Rule(
-    'Issue',
-    'Issue',
-    'Issue',
-)
-
 rules = RuleSet([
     mapping_directive_to_a_program,
     mapping_directive_to_a_program,
     mapping_to_sections_and_clauses,
     mapping_to_objective,
-    # test_mapping_issues,
 ])
