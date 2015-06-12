@@ -21,11 +21,11 @@ class RowConverter(object):
     self.is_new = True
     self.ignore = False
     self.index = options.get("index", -1)
-    row = options.get("row", [])
-    headers = options.get("headers", [])
+    self.row = options.get("row", [])
+    self.headers = options.get("headers", [])
     self.attrs = {}
     self.mappings = {}
-    self.handle_row_data(row, headers)
+    self.handle_row_data()
 
   def add_error(self, error):
     self.errors.append(error)
@@ -33,23 +33,18 @@ class RowConverter(object):
   def setup_export(self):
     pass
 
-  def handle_row_data(self, row, headers):
-    """ Pack row data with handlers
-
-    Args:
-      row (list of str): row from csv file.
-    """
-    if len(headers) != len(row):
-      print headers, row
+  def handle_row_data(self):
+    """ Pack row data with handlers """
+    if len(self.headers) != len(self.row):
       raise Exception("Error: element count does not match header count")
-    for i, (attr_name, header_dict) in enumerate(headers.items()):
+    for i, (attr_name, header_dict) in enumerate(self.headers.items()):
       Handler = header_dict["handler"]
-      item = Handler(self, attr_name, raw_value=row[i], **header_dict)
+      item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
       if attr_name.startswith("map:"):
         self.mappings[attr_name] = item
       else:
         self.attrs[attr_name] = item
-
+    self.obj = self.get_object_by_slug()
 
   def find_by_slug(self, slug):
     return self.object_type.query.filter_by(slug=slug).first()
@@ -68,7 +63,7 @@ class RowConverter(object):
     """ Get object if the slug is in the system or return a new object """
     if "slug" not in self.attrs:
       return None
-    slug = self.attrs["slug"].value
+    slug = self.get_value("slug")
     obj = None
     self.is_new = False
     if slug:
@@ -96,7 +91,6 @@ class RowConverter(object):
     if self.ignore:
       return
 
-    self.obj = self.get_object_by_slug()
     for item_handler in self.attrs.values():
       item_handler.set_obj_attr()
 

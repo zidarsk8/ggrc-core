@@ -52,7 +52,7 @@ class Converter(object):
   """
 
   @classmethod
-  def from_csv(cls, csv_data, offset=0, dry_run=True):
+  def from_csv(cls, csv_data, offset=0, dry_run=True, unique_counts=None):
     object_class = IMPORTABLE.get(csv_data[1][0].strip().lower())
     if not object_class:
       return "ERROR"
@@ -62,7 +62,7 @@ class Converter(object):
     converter = Converter(object_class, rows=rows, raw_headers=raw_headers,
                           dry_run=dry_run, offset=offset)
 
-    converter.generate_row_converters()
+    converter.generate_row_converters(unique_counts)
     return converter
 
   @classmethod
@@ -152,7 +152,7 @@ class Converter(object):
       if len(row) > index:
         row.pop(index)
 
-  def generate_row_converters(self):
+  def generate_row_converters(self, unique_counts):
     """ Generate a row converter object for every csv row """
     self.row_converters = []
     for i, row in enumerate(self.rows):
@@ -161,10 +161,11 @@ class Converter(object):
       self.row_converters.append(row)
     self.check_uniq_columns()
 
-  def check_uniq_columns(self):
+  def check_uniq_columns(self, counts=None):
     unique = [key for key, header in self.headers.items() if header["unique"]]
     for key in unique:
-      self.remove_duplicati_keys(key)
+      key_counts = counts.get(key) if counts else None
+      self.remove_duplicate_keys(key, key_counts)
 
   def gather_messages(self):
 
@@ -241,8 +242,10 @@ class Converter(object):
     slugs = set([row.get_value("slug") for row in self.row_converters])
     return self.object_class, slugs
 
-  def remove_duplicati_keys(self, key):
-    counts = defaultdict(list)
+  def remove_duplicate_keys(self, key, counts=None):
+    if not counts:
+      counts = defaultdict(list)
+
     for index, row in enumerate(self.row_converters):
       value = row.get_value(key)
       if value:
