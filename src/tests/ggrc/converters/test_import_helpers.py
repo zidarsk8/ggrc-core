@@ -178,6 +178,7 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Mandatory Attribute"]["mandatory"])
 
@@ -224,6 +225,7 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Mandatory Attribute"]["mandatory"])
     self.assertTrue(vals["Choose"]["mandatory"])
@@ -264,6 +266,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_audit_definitions(self):
@@ -318,6 +321,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Control"]["mandatory"])
     self.assertTrue(vals["Audit"]["mandatory"])
@@ -346,6 +350,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_regulation_definitions(self):
@@ -371,6 +376,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_policy_definitions(self):
@@ -397,6 +403,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_standard_definitions(self):
@@ -422,6 +429,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_contract_definitions(self):
@@ -447,6 +455,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_clause_definitions(self):
@@ -472,6 +481,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     # self.assertTrue(vals["Title"]["unique"])
 
   def test_section_definitions(self):
@@ -496,6 +506,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     # self.assertTrue(vals["Title"]["unique"])
 
   def test_control_definitions(self):
@@ -531,6 +542,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_objective_definitions(self):
@@ -554,6 +566,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_person_definitions(self):
@@ -595,6 +608,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_vendor_definitions(self):
@@ -620,6 +634,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_system_definitions(self):
@@ -646,6 +661,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_process_definitions(self):
@@ -672,6 +688,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_data_asset_definitions(self):
@@ -697,6 +714,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_product_definitions(self):
@@ -723,6 +741,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_project_definitions(self):
@@ -748,6 +767,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_facility_definitions(self):
@@ -773,6 +793,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_market_definitions(self):
@@ -798,4 +819,5 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
