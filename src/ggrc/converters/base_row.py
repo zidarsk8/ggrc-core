@@ -26,22 +26,18 @@ class RowConverter(object):
     self.headers = options.get("headers", [])
     self.attrs = {}
     self.mappings = {}
+    offset = 3  # 2 header rows and 1 for 0 based index
+    self.line = self.index + self.converter.offset + offset
+
     self.handle_row_data()
 
-
   def add_error(self, template, **kwargs):
-    offset = 3  # 2 header rows and 1 for 0 based index
-    block_offset = self.converter.offset
-    line = self.index + block_offset + offset
-    message = template.format(line=line, **kwargs)
+    message = template.format(line=self.line, **kwargs)
     self.errors.append(message)
     self.ignore = True
 
   def add_warning(self, template, **kwargs):
-    offset = 3  # 2 header rows and 1 for 0 based index
-    block_offset = self.converter.offset
-    line = self.index + block_offset + offset
-    message = template.format(line=line, **kwargs)
+    message = template.format(line=self.line, **kwargs)
     self.warnings.append(message)
 
   def handle_row_data(self):
@@ -66,8 +62,8 @@ class RowConverter(object):
     missing = set(mandatory).difference(set(self.headers.keys()))
     if missing:
       self.add_error(errors.MISSING_COLUMN,
-                     s= "s" if len(missing) > 1 else "",
-                     column_names = ", ".join(missing))
+                     s="s" if len(missing) > 1 else "",
+                     column_names=", ".join(missing))
 
   def find_by_slug(self, slug):
     return self.object_type.query.filter_by(slug=slug).first()

@@ -225,7 +225,11 @@ class Converter(object):
 
     if not self.dry_run:
       for row_converter in self.row_converters:
-        row_converter.insert_object()
+        try:
+          row_converter.insert_object()
+          db.session.flush()
+        except:
+          row_converter.add_error(errors.UNKNOWN_ROW_ERROR)
       self.save_import()
 
   def save_import(self):
