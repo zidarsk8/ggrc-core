@@ -39,18 +39,21 @@ class RuleSet(object):
 
 class Types(object):
   all = {'Audit', 'Clause', 'Contract', 'Control', 'ControlAssessment', 
-         'DataAsset', 'Facility', 'Issue', 'Market', 'Objective', 'OrgGroup', 
-         'Person', 'Policy', 'Process', 'Product', 'Program', 'Project', 
-         'Regulation', 'Request', 'Section', 'Standard', 'System', 'Vendor'}
+         'Issue', 'Objective', 'Policy', 'Program', 'Project', 'Regulation',
+         'Request', 'Section', 'Standard'}
   directives = {'Regulation', 'Policy', 'Standard', 'Contract', 'Clause', 
                 'Section'}
   objectives = {'Control', 'Objective'}
+  assets_business = {'System', 'Process', 'DataAsset', 'Product', 'Project',
+                     'Facility', 'Market'}
+  people_groups = {'Person', 'OrgGroup', 'Vendor'}
 
 
 mapping_to_a_program = Rule(
     'Program', 
-    Types.all - {'Audit'} - Types.directives,
     Types.directives,
+    Types.all - {'Audit'} - Types.directives | 
+      Types.assets_business | Types.people_groups,
 )
 
 mapping_directive_to_a_program = Rule(
@@ -67,8 +70,8 @@ mapping_to_sections_and_clauses = Rule(
 
 mapping_to_objective = Rule(
     Types.objectives,
-    Types.all,
     {'Section'},
+    Types.all,
 )
 
 rules = RuleSet([
