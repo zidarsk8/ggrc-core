@@ -31,21 +31,26 @@
 
               <div class="span1">
                 <div class="object-check" align="left">
-                  {{#if mappings.length}}
-                    {{#has_pending_removal selected_object instance}}
-                      <input type="checkbox" value="{{instance.title}}" data-id="{{instance.id}}" class="object-check-single">
+                  <input
+                    type="checkbox"
+                    value="{{instance.title}}"
+                    data-id="{{instance.id}}"
+                    class="object-check-single"
+
+                    {{#if selected}}checked{{/if}}
+                    {{#if mappings.length}}
+                      {{#has_pending_removal selected_object instance}}
+                        {{#result_direct_mappings bindings_compute selected_object}}
+                          checked disabled="true"
+                        {{/result_direct_mappings}}
+                      {{/has_pending_addition}}
                     {{else}}
-                    {{#result_direct_mappings bindings_compute selected_object}}
-                      <input type="checkbox" value="{{instance.title}}" data-id="{{instance.id}}" checked="checked" disabled="true" class="object-check-single">
-                    {{/result_direct_mappings}}
-                    {{/has_pending_addition}}
-                  {{else}}
-                    {{#has_pending_addition selected_object instance}}
-                      <input type="checkbox" value="{{instance.title}}" data-id="{{instance.id}}" checked="checked" disabled="true" class="object-check-single">
-                    {{else}}
-                      <input type="checkbox" value="{{instance.title}}" data-id="{{instance.id}}" class="object-check-single">
-                    {{/has_pending_addition}}
-                  {{/if}}
+                      {{#has_pending_addition selected_object instance}}
+                        checked
+                        disabled="true"
+                      {{/has_pending_addition}}
+                    {{/if}}
+                  >
                 </div>
               </div>
             </div>
