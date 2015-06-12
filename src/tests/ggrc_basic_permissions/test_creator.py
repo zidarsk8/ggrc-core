@@ -61,7 +61,11 @@ class TestCreator(TestCase):
           all_errors.append(
               "{} can retrieve object if not owner".format(model_singular))
           continue
-
+        response = self.api.get_collection(model, obj_id)
+        if response.status_code != 403:  # we are not onwers yet
+          all_errors.append(
+              "{} can retrieve object if not owner (collection)".format(model_singular))
+          continue
         # Become an owner
         response = self.api.post(all_models.ObjectOwner, {"object_owner": {
             "person": {

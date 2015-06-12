@@ -89,6 +89,10 @@ class Api():
   def get(self, obj, id):
     return self.data_to_json(self.tc.get(self.api_link(obj, id)))
 
+  def get_collection(self, obj, ids):
+    return self.data_to_json(self.tc.get(
+        "{}?ids={}".format(self.api_link(obj), ids)))
+
   def delete(self, obj, id):
     response = self.get(obj, obj.id)
     headers = {
