@@ -21,6 +21,7 @@ from .notification_handler import (
     handle_workflow_modify,
     handle_cycle_task_group_object_task_put,
     handle_cycle_created,
+    handle_cycle_modify,
     handle_cycle_task_status_change,
 )
 
@@ -46,6 +47,10 @@ def register_listeners():
   def cycle_task_group_object_task_put_listener(
           sender, obj=None, src=None, service=None):
     handle_cycle_task_group_object_task_put(obj)
+
+  @Resource.model_put.connect_via(Cycle)
+  def cycle_post_listener(sender, obj=None, src=None, service=None):
+    handle_cycle_modify(sender, obj, src, service)
 
   @Resource.model_posted.connect_via(Cycle)
   def cycle_post_listener(sender, obj=None, src=None, service=None):
