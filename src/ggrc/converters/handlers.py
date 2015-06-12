@@ -216,6 +216,10 @@ class MappingColumnHandler(ColumnHandler):
         db.session.add(mapping)
     db.session.flush()
 
+
+class CustomAttributeColumHandler(ColumnHandler):
+  pass
+
 COLUMN_HANDLERS = {
     "slug": SlugColumnHandler,
     "title": TextColumnHandler,

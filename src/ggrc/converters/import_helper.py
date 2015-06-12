@@ -42,7 +42,7 @@ def get_custom_attributes_definitions(object_class):
   definitions = {}
   custom_attributes = object_class.get_custom_attribute_definitions()
   for attr in custom_attributes:
-    handler = COLUMN_HANDLERS.get(attr.title, handlers.ColumnHandler)
+    handler = handlers.CustomAttributeColumHandler
     definitions[attr.title] = {
         "display_name": attr.display_name,
         "mandatory": attr.mandatory,

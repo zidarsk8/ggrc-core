@@ -24,7 +24,7 @@ if os.environ.get("TRAVIS", False):
   random.seed(1)  # so we can reproduce the tests if needed
 
 
-class TestCsvImport(TestCase):
+class TestBasicCsvImport(TestCase):
 
   def setUp(self):
     TestCase.setUp(self)
