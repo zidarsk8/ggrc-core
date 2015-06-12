@@ -77,7 +77,7 @@ class TestCsvImport(TestCase):
     response_json = self.import_file(filename)
 
     info_set = set([
-        "4 org groups were inserted.",
+        "4 org groups failed.",
         "3 policies were inserted.",
         "5 products were inserted.",
         "2 products failed.",
@@ -96,12 +96,17 @@ class TestCsvImport(TestCase):
         errors.DUPLICATE_VALUE_IN_CSV.format(
             line_list="21, 26, 27", column_name="Code", value="pro 1",
             s="s", ignore_lines="26, 27"),
+        errors.OWNER_MISSING.format(line=26),
+        errors.MISSING_COLUMN.format(line=13, column_names="owners", s=""),
+        errors.MISSING_COLUMN.format(line=14, column_names="owners", s=""),
+        errors.MISSING_COLUMN.format(line=15, column_names="owners", s=""),
+        errors.MISSING_COLUMN.format(line=16, column_names="owners", s=""),
     ])
 
     self.assertEqual(info_set, set(response_json["info"]))
     self.assertEqual(expected_warnings, set(response_json["warnings"]))
     self.assertEqual(Policy.query.count(), 3)
-    self.assertEqual(OrgGroup.query.count(), 4)
+    self.assertEqual(OrgGroup.query.count(), 0)
     self.assertEqual(Product.query.count(), 5)
 
   def test_multi_basic_policy_orggroup_product_with_mappings(self):

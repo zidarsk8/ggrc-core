@@ -184,7 +184,8 @@ class Converter(object):
     insert = 0
     update = 0
     for row_converter in self.row_converters:
-      messages["errors"].extend(row_converter.errors)
+      # row errors are just warnings since other rows can still import
+      messages["warnings"].extend(row_converter.errors)
       messages["warnings"].extend(row_converter.warnings)
       if row_converter.errors or row_converter.ignore:
         fail += 1

@@ -35,41 +35,27 @@ class ColumnHandler(object):
   def get_value(self):
     return getattr(self.row_converter.obj, self.key, self.value)
 
-  def add_error(self, message):
-    self.row_converter.errors.append(message)
+  def add_error(self, template, **kwargs):
+    self.row_converter.add_error(template, **kwargs)
 
   def add_warning(self, template, **kwargs):
-    offset = 3  # 2 header rows and 1 for 0 based index
-    block_offset = self.row_converter.converter.offset
-    line = self.row_converter.index + block_offset + offset
-    message = template.format(line=line, **kwargs)
-    self.row_converter.warnings.append(message)
-
-  def display(self):
-    value = getattr(self.row_converter.obj, self.key, '') or ''
-    return value if value != 'null' else ''
+    self.row_converter.add_warning(template, **kwargs)
 
   def parse_item(self):
     return self.raw_value
 
   def validate(self):
-    if self.validator:
+    if callable(self.validator):
       try:
         self.validator(self.row_converter.obj, self.key, self.value)
       except ValueError:
-        self.row_converter.add_error("invalid status '{}'".format(self.value))
+        self.add_error("invalid status '{}'".format(self.value))
     return True
 
   def set_obj_attr(self):
     if not self.value:
       return
-    if not self.validate():
-      return
-
     setattr(self.row_converter.obj, self.key, self.value)
-
-  def export(self):
-    return getattr(self.row_converter.obj, self.key, '')
 
   def get_default(self):
     if callable(self.default):
@@ -83,7 +69,6 @@ class StatusColumnHandler(ColumnHandler):
     self.key = key
     valid_states = row_converter.object_type.VALID_STATES
     self.state_mappings = {s.lower():s for s in valid_states}
-
     super(StatusColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
@@ -165,17 +150,10 @@ class TextColumnHandler(ColumnHandler):
     stripped_value = self.raw_value.strip()
     clean_value = re.sub(r'\s+', " ", stripped_value)
     if clean_value != stripped_value:
-      self.add_warning("Some whitespace characters were removed")
+      self.add_warning(errors.WHITESPACE_WARNING,
+                       column_name=self.display_name)
 
     return clean_value
-
-
-class TitleColumnHandler(TextColumnHandler):
-
-  """ Handle unique titles """
-
-  def validate(self):
-    return True
 
 
 class TextareaColumnHandler(ColumnHandler):
@@ -240,7 +218,7 @@ class MappingColumnHandler(ColumnHandler):
 
 COLUMN_HANDLERS = {
     "slug": SlugColumnHandler,
-    "title": TitleColumnHandler,
+    "title": TextColumnHandler,
     "owners": OwnerColumnHandler,
     "status": StatusColumnHandler,
     "contact": UserColumnHandler,

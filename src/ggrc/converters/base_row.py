@@ -7,6 +7,7 @@
 import ggrc.services
 from ggrc import db
 from ggrc.services.common import Resource
+from ggrc.converters import errors
 
 
 class RowConverter(object):
@@ -27,11 +28,21 @@ class RowConverter(object):
     self.mappings = {}
     self.handle_row_data()
 
-  def add_error(self, error):
-    self.errors.append(error)
 
-  def setup_export(self):
-    pass
+  def add_error(self, template, **kwargs):
+    offset = 3  # 2 header rows and 1 for 0 based index
+    block_offset = self.converter.offset
+    line = self.index + block_offset + offset
+    message = template.format(line=line, **kwargs)
+    self.errors.append(message)
+    self.ignore = True
+
+  def add_warning(self, template, **kwargs):
+    offset = 3  # 2 header rows and 1 for 0 based index
+    block_offset = self.converter.offset
+    line = self.index + block_offset + offset
+    message = template.format(line=line, **kwargs)
+    self.warnings.append(message)
 
   def handle_row_data(self):
     """ Pack row data with handlers """
@@ -45,6 +56,18 @@ class RowConverter(object):
       else:
         self.attrs[attr_name] = item
     self.obj = self.get_object_by_slug()
+    self.chect_mandatory_fields()
+
+  def chect_mandatory_fields(self):
+    if not self.is_new:
+      return
+    mandatory = [key for key, header in self.converter.object_headers.items()
+                 if header["mandatory"]]
+    missing = set(mandatory).difference(set(self.headers.keys()))
+    if missing:
+      self.add_error(errors.MISSING_COLUMN,
+                     s= "s" if len(missing) > 1 else "",
+                     column_names = ", ".join(missing))
 
   def find_by_slug(self, slug):
     return self.object_type.query.filter_by(slug=slug).first()
@@ -61,9 +84,9 @@ class RowConverter(object):
 
   def get_object_by_slug(self):
     """ Get object if the slug is in the system or return a new object """
-    if "slug" not in self.attrs:
-      return None
     slug = self.get_value("slug")
+    if slug is None:
+      return
     obj = None
     self.is_new = False
     if slug:

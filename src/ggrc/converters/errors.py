@@ -6,8 +6,8 @@
 WRONG_FILE_TYPE = ("Line {line}: Wrong file type. Only .csv files are"
                    " suported. Please upload .csv file.")
 
-MISSING_COLUMN = ("Line {line}: Missing column {column_name}, when adding"
-                  " object.")
+MISSING_COLUMN = ("Line {line}: Missing mandatory column{s} {column_names},"
+                  " when adding object.")
 
 MISSING_CUSTOM_ATTRIBUTE_COLUMN = ("Line {line}: Missing custom column"
                                    " {column_name}, when adding object")
@@ -35,8 +35,8 @@ MAP_UNMAP_CONFLICT = ("Line {line}: Object '{slug}' scheduled for mapping and"
 UNKNOWN_OBJECT = ("Line {line}: {object_type} '{slug}' doesn't exist, so it"
                   " can't be mapped/unmapped")
 
-WHITESPACE_WARNING = ("Line {line}: Field {column_name} has multiple spaces"
-                      " that will be merged into one.")
+WHITESPACE_WARNING = ("Line {line}: Field {column_name} contains multiple"
+                      "spaces together, that will be merged into one.")
 
 UNKNOWN_USER_WARNING = ("Line {line}: Specified user '{email}' does not exist."
                         " That user will be ignored.")
