@@ -186,6 +186,11 @@ def get_cycle_task_declined_data(notification):
 
 
 def get_cycle_task_data(notification):
+
+  cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  if not cycle_task.cycle_task_group.cycle.is_current:
+    return {}
+
   notification_name = notification.notification_type.name
   if notification_name in ["manual_cycle_created", "cycle_created"]:
     return get_cycle_created_task_data(notification)
