@@ -20,7 +20,6 @@ from ggrc_workflows.models import (
 exposed functions
     get_cycle_data,
     get_workflow_data,
-    get_task_group_task_data,
     get_cycle_task_data,
 """
 
@@ -206,80 +205,6 @@ def get_cycle_task_data(notification):
     return get_cycle_task_due(notification)
 
   return {}
-
-
-def get_task_group_task_data(notification):
-  task_group_task = get_object(TaskGroupTask, notification.object_id)
-  if not task_group_task:
-    return {}
-
-  task_group = task_group_task.task_group
-  workflow = task_group.workflow
-  force = workflow.notify_on_change
-
-  if workflow.status != "Active":
-    return {}
-  if workflow.next_cycle_start_date < date.today():
-    return {}  # this can only be if the cycle has successfully started
-
-  tasks = {}
-
-  task_assignee = get_person_dict(task_group_task.contact)
-  task_group_assignee = get_person_dict(task_group.contact)
-  workflow_owners = get_workflow_owners_dict(workflow.context_id)
-
-  for task_group_object in task_group.task_group_objects:
-    tasks[task_group_task.id, task_group_object.id] = {
-        "task_title": task_group_task.title,
-        "object_title": task_group_object.object.title,
-    }
-
-  result = {}
-  assignee_data = {
-      task_assignee['email']: {
-          "user": task_assignee,
-          "force_notifications": {
-              notification.id: force
-          },
-          "cycle_starts_in": {
-              workflow.id: {
-                  "my_tasks": tasks
-              }
-          }
-      }
-  }
-  tg_assignee_data = {
-      task_group_assignee['email']: {
-          "user": task_group_assignee,
-          "force_notifications": {
-              notification.id: force
-          },
-          "cycle_starts_in": {
-              workflow.id: {
-                  "my_task_groups": {
-                      task_group.id: tasks
-                  }
-              }
-          }
-      }
-  }
-  for workflow_owner in workflow_owners.itervalues():
-    wf_owner_data = {
-        workflow_owner['email']: {
-            "user": workflow_owner,
-            "force_notifications": {
-                notification.id: force
-            },
-            "cycle_starts_in": {
-                workflow.id: {
-                    "workflow_tasks": tasks
-                }
-            }
-        }
-    }
-    result = merge_dicts(result, wf_owner_data)
-
-  return merge_dicts(result, tg_assignee_data, assignee_data)
 
 
 def get_workflow_starts_in_data(notification, workflow):
