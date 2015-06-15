@@ -9,7 +9,8 @@ import random
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
 
-from ggrc.models import Regulation, Section, Issue, Relationship, Program
+from ggrc.models import (Regulation, Section, Issue, Relationship, Program,
+                         Control)
 from ggrc import db
 
 if os.environ.get('TRAVIS', False):
@@ -41,7 +42,8 @@ class TestAutomappings(TestCase):
   def assert_mapping(self, obj1, obj2):
     db.session.flush()
     rel = Relationship.find_related(obj1, obj2)
-    self.assertIsNotNone(rel)
+    self.assertIsNotNone(rel,
+                         msg='%s not mapped to %s' % (obj1.type, obj2.type))
 
   def test_mapping_to_a_program(self):
     program = self.create_object(Program, {'title': 'Program1'})
@@ -74,3 +76,18 @@ class TestAutomappings(TestCase):
     self.create_mapping(issue, section)
     self.assert_mapping(issue, regulation)
 
+  def test_mapping_to_objective(self):
+    regulation = self.create_object(Regulation, {
+        'title': 'Test PD Regulation'
+    })
+    section = self.create_object(Section, {
+        'title': 'Test section',
+        'directive': {'id': regulation.id},
+    })
+    control = self.create_object(Control, {'title': 'Test control'})
+    self.create_mapping(control, section)
+
+    issue = self.create_object(Issue, {'title': 'Test issue'})
+    self.create_mapping(issue, control)
+    self.assert_mapping(issue, section)
+    self.assert_mapping(issue, regulation)

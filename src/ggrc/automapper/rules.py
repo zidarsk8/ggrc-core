@@ -4,7 +4,6 @@
 # Maintained By: andraz@reciprocitylabs.com
 
 from collections import namedtuple
-from ggrc.utils import get_mapping_rules
 from ggrc import models
 
 Rule = namedtuple('Rule', ['src', 'mappings', 'dst'])
@@ -17,17 +16,12 @@ class RuleSet(object):
 
   def __init__(self, rule_list):
     rules = dict()
-    allowed_mappings = set()
 
     def relate(src, dst):
       if src < dst:
         return (src, dst)
       else:
         return (dst, src)
-
-    for src, dsts in get_mapping_rules().iteritems():
-      for dst in dsts:
-        allowed_mappings.add(relate(src, dst))
 
     def wrap(o):
       if isinstance(o, set):
@@ -46,15 +40,15 @@ class RuleSet(object):
                             if key in rules else RuleSet.Entry(set(), set()))
           mappings = wrap(rule.mappings)
           explicit = set(obj for obj in mappings
-                         if relate(dst, obj) in allowed_mappings)
+                         if isinstance(obj, str))
           implicit = set(obj for obj in mappings
                          if isinstance(obj, Attr) and available(src, obj.name))
+
           rules[key] = RuleSet.Entry(existing_rules.explicit | explicit,
                                      existing_rules.implicit | implicit)
     for key in rules:
       explicit, implicit = rules[key]
       rules[key] = RuleSet.Entry(frozenset(explicit), frozenset(implicit))
-    self._allowed = allowed_mappings
     self._rule_list = rule_list
     self._rules = rules
 
