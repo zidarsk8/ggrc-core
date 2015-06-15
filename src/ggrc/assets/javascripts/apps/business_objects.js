@@ -681,11 +681,6 @@
             show_view: GGRC.mustache_path + "/audits/tree.mustache",
             footer_view: null
           },
-          ControlAssessment: {
-            mapping: "related_control_assessment",
-            show_view: GGRC.mustache_path + "/control_assessments/tree.mustache",
-            header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
-          }
         },
         open_requests: {
           Request: {
