@@ -10,6 +10,7 @@ from ggrc.services.common import Resource
 from ggrc import db
 from .rules import rules
 
+
 def register_automapping_listeners():
   @Resource.model_posted.connect_via(Relationship)
   def handle_relationship_post(sender, obj=None, src=None, service=None):
@@ -18,13 +19,21 @@ def register_automapping_listeners():
       return
     generate_automappings_for_relationship(obj)
 
+
 def generate_automappings_for_relationship(relationship):
     processed = set()
     queue = set()
+
     def related(obj):
-      return (set(r.source for r in obj.related_sources) | 
+      return (set(r.source for r in obj.related_sources) |
               set(r.destination for r in obj.related_destinations))
-    relate = lambda src, dst: (src, dst) if src < dst else (dst, src)
+
+    def relate(src, dst):
+      if src < dst:
+        return (src, dst)
+      else:
+        return (dst, src)
+
     queue.add(relate(relationship.source, relationship.destination))
     db_session = db.session
 
@@ -45,18 +54,19 @@ def generate_automappings_for_relationship(relationship):
           if entry not in processed:
             queue.add(entry)
         else:
-          logging.warning('Automapping by attr: object %s has no attribute %s' %
-                          (str(src), str(attr.name)))
+          logging.warning(
+              'Automapping by attr: object %s has no attribute %s' %
+              (str(src), str(attr.name))
+          )
 
     while len(queue) > 0:
       src, dst = entry = queue.pop()
       if Relationship.find_related(src, dst) is None:
         db_session.add(Relationship(
-          source=src, 
-          destination=dst, 
-          automapping_id=relationship.id
+            source=src,
+            destination=dst,
+            automapping_id=relationship.id
         ))
       processed.add(entry)
       go(src, dst)
       go(dst, src)
-

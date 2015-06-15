@@ -34,5 +34,6 @@ def upgrade():
 
 
 def downgrade():
-  op.drop_constraint('relationships_automapping_parent', 'relationships', type_='foreignkey')
+  op.drop_constraint('relationships_automapping_parent', 'relationships',
+                     type_='foreignkey')
   op.drop_column('relationships', 'automapping_id')

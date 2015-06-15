@@ -6,7 +6,6 @@
 from collections import namedtuple
 from ggrc.utils import get_mapping_rules
 from ggrc import models
-import ipdb
 
 Rule = namedtuple('Rule', ['src', 'mappings', 'dst'])
 Attr = namedtuple('Attr', ['name'])
@@ -19,23 +18,37 @@ class RuleSet(object):
   def __init__(self, rule_list):
     rules = dict()
     allowed_mappings = set()
-    relate = lambda src, dst: (src, dst) if src < dst else (dst, src)
+
+    def relate(src, dst):
+      if src < dst:
+        return (src, dst)
+      else:
+        return (dst, src)
+
     for src, dsts in get_mapping_rules().iteritems():
       for dst in dsts:
         allowed_mappings.add(relate(src, dst))
-    wrap = lambda o: o if isinstance(o, set) else {o}
-    available = lambda m, l: hasattr(getattr(models, m), l + '_id')
+
+    def wrap(o):
+      if isinstance(o, set):
+        return o
+      else:
+        return {o}
+
+    def available(m, l):
+      return hasattr(getattr(models, m), l + '_id')
+
     for rule in rule_list:
       for src in wrap(rule.src):
         for dst in wrap(rule.dst):
           key = (src, dst)
-          existing_rules = rules[key] if key in rules \
-                                      else RuleSet.Entry(set(), set())
+          existing_rules = (rules[key]
+                            if key in rules else RuleSet.Entry(set(), set()))
           mappings = wrap(rule.mappings)
           explicit = set(obj for obj in mappings
                          if relate(dst, obj) in allowed_mappings)
-          implicit = set(obj for obj in mappings 
-                             if isinstance(obj, Attr) and available(src, obj.name))
+          implicit = set(obj for obj in mappings
+                         if isinstance(obj, Attr) and available(src, obj.name))
           rules[key] = RuleSet.Entry(existing_rules.explicit | explicit,
                                      existing_rules.implicit | implicit)
     for key in rules:
@@ -45,7 +58,7 @@ class RuleSet(object):
     self._rule_list = rule_list
     self._rules = rules
 
-  def  __getitem__(self, key): 
+  def __getitem__(self, key):
     if key in self._rules:
       return self._rules[key]
     else:
@@ -65,10 +78,10 @@ class RuleSet(object):
 
 
 class Types(object):
-  all = {'Audit', 'Clause', 'Contract', 'Control', 'ControlAssessment', 
+  all = {'Audit', 'Clause', 'Contract', 'Control', 'ControlAssessment',
          'Issue', 'Objective', 'Policy', 'Program', 'Project', 'Regulation',
          'Request', 'Section', 'Standard'}
-  directives = {'Regulation', 'Policy', 'Standard', 'Contract', 'Clause', 
+  directives = {'Regulation', 'Policy', 'Standard', 'Contract', 'Clause',
                 'Section'}
   objectives = {'Control', 'Objective'}
   assets_business = {'System', 'Process', 'DataAsset', 'Product', 'Project',
@@ -77,10 +90,10 @@ class Types(object):
 
 
 mapping_to_a_program = Rule(
-    'Program', 
+    'Program',
     Types.directives,
-    Types.all - {'Audit'} - Types.directives | 
-      Types.assets_business | Types.people_groups,
+    (Types.all - {'Audit'} - Types.directives |
+     Types.assets_business | Types.people_groups),
 )
 
 mapping_directive_to_a_program = Rule(

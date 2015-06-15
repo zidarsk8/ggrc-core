@@ -28,14 +28,14 @@ class TestAutomappings(TestCase):
   def create_object(self, cls, data):
     name = cls.__name__.lower()
     data['context'] = None
-    _, obj = self.gen.generate(cls, name, { name: data })
+    _, obj = self.gen.generate(cls, name, {name: data})
     self.assertIsNotNone(obj)
     return obj
 
   def create_mapping(self, src, dst):
     return self.create_object(Relationship, {
-      'source': { 'id': src.id, 'type': src.type },
-      'destination': { 'id': dst.id, 'type': dst.type }
+        'source': {'id': src.id, 'type': src.type},
+        'destination': {'id': dst.id, 'type': dst.type}
     })
 
   def assert_mapping(self, obj1, obj2):
@@ -44,28 +44,32 @@ class TestAutomappings(TestCase):
     self.assertIsNotNone(rel)
 
   def test_mapping_to_a_program(self):
-    program = self.create_object(Program, { 'title': 'Program1' })
-    issue = self.create_object(Issue, { 'title': 'Issue2' })
-    regulation = self.create_object(Regulation, { 'title': 'Program Regulation' })
+    program = self.create_object(Program, {'title': 'Program1'})
+    issue = self.create_object(Issue, {'title': 'Issue2'})
+    regulation = self.create_object(Regulation, {
+        'title': 'Program Regulation'
+    })
     self.create_mapping(program, regulation)
     self.create_mapping(issue, program)
     self.assert_mapping(issue, regulation)
 
   def test_mapping_directive_to_a_program(self):
-    regulation = self.create_object(Regulation, { 'title': 'Test PD Regulation' })
-    issue = self.create_object(Issue, { 'title': 'Issue3' })
-    program = self.create_object(Program, { 'title': 'Program3' })
+    regulation = self.create_object(Regulation, {
+        'title': 'Test PD Regulation'
+    })
+    issue = self.create_object(Issue, {'title': 'Issue3'})
+    program = self.create_object(Program, {'title': 'Program3'})
     self.create_mapping(regulation, issue)
     self.create_mapping(program, regulation)
     self.assert_mapping(program, issue)
 
   def test_mapping_to_sections(self):
-    regulation = self.create_object(Regulation, { 'title': 'Test Regulation' })
+    regulation = self.create_object(Regulation, {'title': 'Test Regulation'})
     section = self.create_object(Section, {
-      'title': 'Test section',
-      'directive': { 'id': regulation.id },
+        'title': 'Test section',
+        'directive': {'id': regulation.id},
     })
-    issue = self.create_object(Issue, { 'title': 'Test issue' })
+    issue = self.create_object(Issue, {'title': 'Test issue'})
 
     self.create_mapping(issue, section)
     self.assert_mapping(issue, regulation)
