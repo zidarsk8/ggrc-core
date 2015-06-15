@@ -24,7 +24,8 @@
     events: {
       ".modalSearchButton click": function (el, ev) {
         ev.preventDefault();
-        console.log("SEARCH TERM", this.scope.attr("term"), this.scope.attr("owner", data.item));
+        var results = this.element.find("mapper-results").control();
+        results.getResults(this.scope.attr("term"), this.scope.attr("owner"));
       },
       "#search-by-owner autocomplete:select": function (el, ev, data) {
         this.scope.attr("owner", data.item);
@@ -81,8 +82,6 @@
       },
       ".results-wrap scrollNext": "drawPage",
       "{document} onTypeChange": function (el, ev, data) {
-        this.scope.attr("entries", []);
-        this.scope.attr("options", []);
         this.scope.attr("data", data);
         this.scope.attr("name", data.value);
         this.getResults();
@@ -105,19 +104,23 @@
         this.element.trigger.apply(this.element, ["onSelectChange"].concat(arguments));
       },
       "drawPage": function () {
-        if (this.scope.attr("isLoading")) {
+        if (this.scope.attr("isLoading") || this.scope.attr("lastPage")) {
           return;
         }
         var que = new RefreshQueue(),
             page = this.scope.attr("page"),
-            per_page = this.scope.attr("items-per-page"),
-            page_items = this.scope.attr("entries").slice(page * per_page, per_page),
+            next_page = page + 1,
+            per_page = +this.scope.attr("items-per-page"),
+            page_items = this.scope.attr("entries").slice(page * per_page, next_page * per_page),
             options = this.scope.attr("options");
 
+        if (!page_items.length) {
+          return;
+        }
         this.scope.attr("isLoading", true);
         que.enqueue(page_items).trigger().then(function (models) {
           this.scope.attr("isLoading", false);
-          this.scope.attr("page", page++);
+          this.scope.attr("page", next_page);
           options.push.apply(options, can.map(models, function (model) {
             return {
               instance: model,
@@ -136,6 +139,9 @@
               __permission_type: "read"
             };
 
+        this.scope.attr("page", 0);
+        this.scope.attr("entries", []);
+        this.scope.attr("options", []);
         if (join_model !== "TaskGroupObject" && model_name === "Program") {
           permission_parms = {
             __permission_type: "create",
@@ -145,6 +151,10 @@
         if (model_name === "AllObject") {
           model_name = this.scope.attr("data").models;
         }
+        if (owner) {
+          permission_parms.contact_id = owner.id;
+        }
+        this.scope.attr("isLoading", true);
         model_name = _.isString(model_name) ? [model_name] : model_name;
         GGRC.Models.Search
           .search_for_types(term || "", model_name, permission_parms)
@@ -154,6 +164,7 @@
                           }));
 
             this.scope.attr("entries", entries);
+            this.scope.attr("isLoading", false);
             this.drawPage();
           }.bind(this));
       }

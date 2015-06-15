@@ -168,9 +168,14 @@
         </div>
       </div>
       <div class="results-wrap">
-        <ul class="result-tree">
-          {{> /static/mustache/selectors/object_selector_option_items.mustache}}
-        </ul>
+          <ul class="result-tree">
+            {{> /static/mustache/selectors/object_selector_option_items.mustache}}
+          </ul>
+          {{#if isLoading}}
+            <div class="row-fluid clearfix">
+              <span {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
+            </div>
+          {{/if}}
       </div>
     </mapper-results>
   </div>

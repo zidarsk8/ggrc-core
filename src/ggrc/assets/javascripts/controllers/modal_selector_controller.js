@@ -1110,9 +1110,6 @@
         join_params[this.join_option_attr] = {};
         join_params[this.join_option_attr].id = option.id;
         join_params[this.join_option_attr].type = option.constructor.shortName;
-        join_params[this.join_object_attr] = {};
-        join_params[this.join_object_attr].id = object.id;
-        join_params[this.join_object_attr].type = object.constructor.shortName;
         join_params.context = { id: context_id };
         return new (this.join_model)(join_params);
       }
