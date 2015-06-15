@@ -5,12 +5,17 @@
 
 from collections import namedtuple
 from ggrc.utils import get_mapping_rules
+from ggrc import models
 import ipdb
 
 Rule = namedtuple('Rule', ['src', 'mappings', 'dst'])
+Attr = namedtuple('Attr', ['name'])
 
 
 class RuleSet(object):
+  Entry = namedtuple('RuleSetEntry', ['explicit', 'implicit'])
+  entry_empty = Entry(frozenset(set()), frozenset(set()))
+
   def __init__(self, rule_list):
     rules = dict()
     allowed_mappings = set()
@@ -19,17 +24,23 @@ class RuleSet(object):
       for dst in dsts:
         allowed_mappings.add(relate(src, dst))
     wrap = lambda o: o if isinstance(o, set) else {o}
+    available = lambda m, l: hasattr(getattr(models, m), l + '_id')
     for rule in rule_list:
       for src in wrap(rule.src):
         for dst in wrap(rule.dst):
           key = (src, dst)
-          existing_rules = rules[key] if key in rules else set()
+          existing_rules = rules[key] if key in rules \
+                                      else RuleSet.Entry(set(), set())
           mappings = wrap(rule.mappings)
-          mappings = set(obj for obj in mappings
+          explicit = set(obj for obj in mappings
                          if relate(dst, obj) in allowed_mappings)
-          rules[key] = existing_rules | mappings
+          implicit = set(obj for obj in mappings 
+                             if isinstance(obj, Attr) and available(src, obj.name))
+          rules[key] = RuleSet.Entry(existing_rules.explicit | explicit,
+                                     existing_rules.implicit | implicit)
     for key in rules:
-      rules[key] = frozenset(rules[key])
+      explicit, implicit = rules[key]
+      rules[key] = RuleSet.Entry(frozenset(explicit), frozenset(implicit))
     self._allowed = allowed_mappings
     self._rule_list = rule_list
     self._rules = rules
@@ -38,7 +49,7 @@ class RuleSet(object):
     if key in self._rules:
       return self._rules[key]
     else:
-      return set()
+      return RuleSet.entry_empty
 
   def __repr__(self):
     return 'Rules(%s)' % repr(self._rule_list)
@@ -47,7 +58,7 @@ class RuleSet(object):
     rules = []
     for key in self._rules:
       src, dst = key
-      for mapping in self._rules[key]:
+      for mapping in self._rules[key].explicit | self._rules[key].implicit:
         rules.append('  -> %s <--> %s <--> %s <-' % (dst, src, mapping))
     rules.sort()
     return 'RulesSet\n' + '\n'.join(rules)
@@ -80,7 +91,7 @@ mapping_directive_to_a_program = Rule(
 
 mapping_to_sections_and_clauses = Rule(
     {'Section', 'Clause'},
-    Types.directives,
+    Attr('directive'),
     Types.all,
 )
 

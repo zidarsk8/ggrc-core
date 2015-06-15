@@ -28,6 +28,26 @@ def generate_automappings_for_relationship(relationship):
     queue.add(relate(relationship.source, relationship.destination))
     db_session = db.session
 
+    def go(src, dst):
+      explicit, implicit = rules[src.type, dst.type]
+      if len(explicit) != 0:
+        src_related = filter(lambda o: o.type in explicit, related(src))
+        for r in src_related:
+          if r == dst:
+            continue
+          entry = relate(r, dst)
+          if entry not in processed:
+            queue.add(entry)
+      for attr in implicit:
+        if hasattr(src, attr.name):
+          attr = getattr(src, attr.name)
+          entry = relate(attr, dst)
+          if entry not in processed:
+            queue.add(entry)
+        else:
+          logging.warning('Automapping by attr: object %s has no attribute %s' %
+                          (str(src), str(attr.name)))
+
     while len(queue) > 0:
       src, dst = entry = queue.pop()
       if Relationship.find_related(src, dst) is None:
@@ -37,22 +57,6 @@ def generate_automappings_for_relationship(relationship):
           automapping_id=relationship.id
         ))
       processed.add(entry)
-      triggered_src = rules[(src.type, dst.type)]
-      if len(triggered_src) != 0:
-        src_related = filter(lambda o: o.type in triggered_src, related(src))
-        for r in src_related:
-          if r == dst:
-            continue
-          entry = relate(r, dst)
-          if entry not in processed:
-            queue.add(entry)
-      triggered_dst = rules[(dst.type, src.type)]
-      if len(triggered_dst) != 0:
-        dst_related = filter(lambda o: o.type in triggered_dst, related(dst))
-        for r in dst_related:
-          if r == src: 
-            continue
-          entry = relate(r, src)
-          if entry not in processed:
-            queue.add(entry)
+      go(src, dst)
+      go(dst, src)
 

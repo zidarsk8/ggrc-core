@@ -67,7 +67,6 @@ class TestAutomappings(TestCase):
     })
     issue = self.create_object(Issue, { 'title': 'Test issue' })
 
-    self.create_mapping(section, regulation) 
     self.create_mapping(issue, section)
     self.assert_mapping(issue, regulation)
 
