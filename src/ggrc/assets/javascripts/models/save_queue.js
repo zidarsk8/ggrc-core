@@ -18,7 +18,7 @@
   can.Construct("GGRC.SaveQueue", {
 
     DELAY: 100, // Number of ms to wait before the first batch is fired
-    BATCH: 3,   // Maximum number of POST/PUT requests at any given time
+    BATCH: GGRC.config.MAX_INSTANCES || 3, // Maximum number of POST/PUT requests at any given time
     _queue: [],
     _timeout: null,
 
