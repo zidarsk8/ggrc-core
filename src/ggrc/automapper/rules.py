@@ -6,7 +6,7 @@
 from collections import namedtuple
 from ggrc import models
 
-Rule = namedtuple('Rule', ['src', 'mappings', 'dst'])
+Rule = namedtuple('Rule', ['name', 'src', 'mappings', 'dst'])
 Attr = namedtuple('Attr', ['name'])
 
 
@@ -16,6 +16,7 @@ class RuleSet(object):
 
   def __init__(self, rule_list):
     rules = dict()
+    rule_source = dict()
 
     def relate(src, dst):
       if src < dst:
@@ -44,6 +45,8 @@ class RuleSet(object):
           implicit = set(obj for obj in mappings
                          if isinstance(obj, Attr) and available(src, obj.name))
 
+          for obj in explicit | implicit:
+            rule_source[src, dst, obj] = rule
           rules[key] = RuleSet.Entry(existing_rules.explicit | explicit,
                                      existing_rules.implicit | implicit)
     for key in rules:
@@ -51,6 +54,7 @@ class RuleSet(object):
       rules[key] = RuleSet.Entry(frozenset(explicit), frozenset(implicit))
     self._rule_list = rule_list
     self._rules = rules
+    self._rule_source = rule_source
 
   def __getitem__(self, key):
     if key in self._rules:
@@ -66,7 +70,11 @@ class RuleSet(object):
     for key in self._rules:
       src, dst = key
       for mapping in self._rules[key].explicit | self._rules[key].implicit:
-        rules.append('  -> %s <--> %s <--> %s <-' % (dst, src, mapping))
+        source = self._rule_source[src, dst, mapping].name
+        rule = ('  -> %s <--> %s <--> %s <- )' % (dst, src, mapping))
+        rule += ' ' * (70 - len(rule))
+        rule += source
+        rules.append(rule)
     rules.sort()
     return 'RulesSet\n' + '\n'.join(rules)
 
@@ -83,34 +91,33 @@ class Types(object):
   people_groups = {'Person', 'OrgGroup', 'Vendor'}
 
 
-mapping_to_a_program = Rule(
-    'Program',
-    Types.directives,
-    (Types.all - {'Audit'} - Types.directives |
-     Types.assets_business | Types.people_groups),
-)
-
-mapping_directive_to_a_program = Rule(
-    Types.directives,
-    Types.all - {'Program'},
-    'Program',
-)
-
-mapping_to_sections_and_clauses = Rule(
-    {'Section', 'Clause'},
-    Attr('directive'),
-    Types.all,
-)
-
-mapping_to_objective = Rule(
-    Types.objectives,
-    {'Section'},
-    Types.all,
-)
-
 rules = RuleSet([
-    mapping_to_a_program,
-    mapping_directive_to_a_program,
-    mapping_to_sections_and_clauses,
-    mapping_to_objective,
+    Rule(
+        'mapping to a program',
+        'Program',
+        Types.directives,
+        (Types.all - {'Audit'} - Types.directives |
+         Types.assets_business | Types.people_groups),
+    ),
+
+    Rule(
+        'mapping directive to a program', 
+        Types.directives,
+        Types.all - {'Program'},
+        'Program',
+    ),
+
+    Rule(
+        'mapping to sections and clauses',
+        {'Section', 'Clause'},
+        Attr('directive'),
+        Types.all,
+    ),
+
+    Rule(
+        'mapping to objective',
+        Types.objectives,
+        {'Section'},
+        Types.all,
+    ),
 ])
