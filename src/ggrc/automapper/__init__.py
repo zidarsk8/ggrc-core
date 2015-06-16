@@ -11,62 +11,73 @@ from ggrc import db
 from .rules import rules
 
 
+class AutomapperGenerator(object):
+  def __init__(self, relationship):
+    self.relationship = relationship
+    self.processed = set()
+    self.queue = set()
+
+  def related(self, obj):
+    return (set(r.source for r in obj.related_sources) |
+            set(r.destination for r in obj.related_destinations))
+
+  def relate(self, src, dst):
+    if src < dst:
+      return (src, dst)
+    else:
+      return (dst, src)
+
+  def generate_automappings(self):
+      self.queue.add(self.relate(self.relationship.source,
+                     self.relationship.destination))
+      while len(self.queue) > 0:
+        src, dst = entry = self.queue.pop()
+        # TODO check that user can see both objects
+        self._ensure_relationship(src, dst)
+        self.processed.add(entry)
+        self._step(src, dst)
+        self._step(dst, src)
+
+  def _step(self, src, dst):
+    explicit, implicit = rules[src.type, dst.type]
+    self._step_explicit(src, dst, explicit)
+    self._step_implicit(src, dst, implicit)
+
+  def _step_explicit(self, src, dst, explicit):
+    if len(explicit) != 0:
+      src_related = (o for o in self.related(src)
+                     if o.type in explicit and o != dst)
+      for r in src_related:
+        entry = self.relate(r, dst)
+        if entry not in self.processed:
+          self.queue.add(entry)
+
+  def _step_implicit(self, src, dst, implicit):
+    for attr in implicit:
+      if hasattr(src, attr.name):
+        attr = getattr(src, attr.name)
+        entry = self.relate(attr, dst)
+        if entry not in self.processed:
+          self.queue.add(entry)
+      else:
+        logging.warning(
+            'Automapping by attr: object %s has no attribute %s' %
+            (str(src), str(attr.name))
+        )
+
+  def _ensure_relationship(self, src, dst):
+    if Relationship.find_related(src, dst) is None:
+      db.session.add(Relationship(
+          source=src,
+          destination=dst,
+          automapping_id=self.relationship.id
+      ))
+
+
 def register_automapping_listeners():
   @Resource.model_posted.connect_via(Relationship)
   def handle_relationship_post(sender, obj=None, src=None, service=None):
     if obj is None:
       logging.warning("Automapping listener: no obj, no mappings created")
       return
-    generate_automappings_for_relationship(obj)
-
-
-def generate_automappings_for_relationship(relationship):
-    processed = set()
-    queue = set()
-
-    def related(obj):
-      return (set(r.source for r in obj.related_sources) |
-              set(r.destination for r in obj.related_destinations))
-
-    def relate(src, dst):
-      if src < dst:
-        return (src, dst)
-      else:
-        return (dst, src)
-
-    queue.add(relate(relationship.source, relationship.destination))
-    db_session = db.session
-
-    def go(src, dst):
-      explicit, implicit = rules[src.type, dst.type]
-      if len(explicit) != 0:
-        src_related = filter(lambda o: o.type in explicit, related(src))
-        for r in src_related:
-          if r == dst:
-            continue
-          entry = relate(r, dst)
-          if entry not in processed:
-            queue.add(entry)
-      for attr in implicit:
-        if hasattr(src, attr.name):
-          attr = getattr(src, attr.name)
-          entry = relate(attr, dst)
-          if entry not in processed:
-            queue.add(entry)
-        else:
-          logging.warning(
-              'Automapping by attr: object %s has no attribute %s' %
-              (str(src), str(attr.name))
-          )
-
-    while len(queue) > 0:
-      src, dst = entry = queue.pop()
-      if Relationship.find_related(src, dst) is None:
-        db_session.add(Relationship(
-            source=src,
-            destination=dst,
-            automapping_id=relationship.id
-        ))
-      processed.add(entry)
-      go(src, dst)
-      go(dst, src)
+    AutomapperGenerator(obj).generate_automappings()
