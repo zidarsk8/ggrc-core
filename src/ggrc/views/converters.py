@@ -6,6 +6,7 @@
 from flask import current_app
 from flask import request
 from flask import json
+from flask import render_template
 from collections import defaultdict
 from werkzeug.exceptions import BadRequest
 
@@ -128,10 +129,15 @@ def handle_import_request():
 def init_converter_views():
   @app.route("/_service/export_csv", methods=['POST'])
   @login_required
-  def export_csv():
+  def handle_export_csv():
     return handle_export_request()
 
   @app.route("/_service/import_csv", methods=['POST'])
   @login_required
-  def import_csv():
+  def handle_import_csv():
     return handle_import_request()
+
+  @app.route("/import")
+  @login_required
+  def import_view():
+    return render_template("import_export/import.haml")

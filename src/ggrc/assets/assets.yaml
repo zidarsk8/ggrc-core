@@ -107,6 +107,7 @@ dashboard-js-files:
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   - components/link_to_clipboard.js
+  - components/csv_import.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -323,8 +324,7 @@ dashboard-js-template-files:
   - search/advanced_search_option_column.mustache
   - search/advanced_search_option_items.mustache
   - search/advanced_search_people_items.mustache
-
-
+  - import_export/import.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`
