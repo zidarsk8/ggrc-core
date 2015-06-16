@@ -32,6 +32,10 @@
       },
       "mapper-selector onTypeChange": function (el, ev, data) {
         this.scope.attr("type", data.value);
+        this.scope.attr("term", "");
+        this.scope.attr("owner", {});
+        this.scope.attr("selected", []);
+        this.scope.attr("selected_all", false);
       },
       "mapper-results onSelect": function (el, ev, count) {
         this.scope.attr("selected_all", count === this.scope.attr("selected").length);
