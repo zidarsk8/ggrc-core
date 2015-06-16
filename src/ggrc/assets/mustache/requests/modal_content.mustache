@@ -97,7 +97,7 @@
       {{#using assignee=instance.assignee}}
       {{#if_can_reassign_request instance}}
         <div class="objective-selector">
-          <input tabindex="7" type="text" name="assignee.email" class="span10 search-icon" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty assignee.email ''}}">
+          <input tabindex="7" type="text" name="assignee.email" class="span10 search-icon" data-lookup="Person" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty assignee.email ''}}">
         </div>
       {{else}}
         {{firstnonempty assignee.email ''}}

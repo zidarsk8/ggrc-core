@@ -28,7 +28,6 @@ Each modal can have its own controller that handles actions performed by the mod
  - establishes two-way data binding with the form fields; you want to find the state where things stop changing
  - `data-also-set` - TBD
  - 'dfd' = abbreviation for deferred; we need the promise
- - regulations/modal_content.mustache line 52: data-params="Person:is_enabled=1" to look only for authorized
  - wysiwyg_html extension - we need it to fire triggers when the textarea is updates because we can't read the iframe, it's not in the same domain
 
  * init()

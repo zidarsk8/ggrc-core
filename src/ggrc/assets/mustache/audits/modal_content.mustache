@@ -49,7 +49,7 @@
         <i class="grcicon-person-green pull-left icon-field"></i>
         <div class="objective-selector">
           {{#using contact=instance.contact}}
-            <input data-id="internal_audit_lead" tabindex="3" type="text" name="contact.email" data-lookup="Person" data-params="Person:is_enabled=1" class="span10 audit-selector search-icon" placeholder="Enter text to search for Internal Audit Lead" value="{{firstnonempty contact.email ''}}">
+            <input data-id="internal_audit_lead" tabindex="3" type="text" name="contact.email" data-lookup="Person" class="span10 audit-selector search-icon" placeholder="Enter text to search for Internal Audit Lead" value="{{firstnonempty contact.email ''}}">
           {{/using}}
         </div>
       </div>
@@ -146,7 +146,7 @@
               {{#toggle show_new_object_form}}
                 {{#prune_context}}
                   <div class="span12 objective-selector field-wrap">
-                    <input tabindex="11" type="text" data-lookup="Person" data-params="Person:is_enabled=1" null-if-empty="true" class="search-icon" placeholder="Enter text to search for Auditor" {{autocomplete_select}} value="{{instance.email}}">
+                    <input tabindex="11" type="text" data-lookup="Person" null-if-empty="true" class="search-icon" placeholder="Enter text to search for Auditor" {{autocomplete_select}} value="{{instance.email}}">
                     <a class="remove-field" href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
 
                   </div>
