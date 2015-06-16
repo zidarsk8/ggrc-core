@@ -15,6 +15,19 @@
   }
 }
 
+h4.search-title {
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+  line-height: 18px;
+  padding-left: 13px;
+  padding-top: 6px;
+  display: none;
+  &.active {
+    display: block;
+  }
+}
+
 .lhs {
   position:relative;
   padding-left: 10px;
