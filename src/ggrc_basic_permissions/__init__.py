@@ -112,8 +112,11 @@ def collect_permissions(src_permissions, context_id, permissions):
         terms = resource_permission.get('terms', [])
       permissions.setdefault(action, {})\
           .setdefault(resource_type, dict())\
-          .setdefault('contexts', list())\
-          .append(context_id)
+          .setdefault('contexts', list())
+      if context_id is not None:
+        permissions[action][resource_type]['contexts'].append(context_id)
+      elif condition is None:
+        permissions[action][resource_type]['contexts'].append(context_id)
       if condition:
         permissions[action][resource_type]\
             .setdefault('conditions', dict())\
@@ -267,6 +270,15 @@ def load_permissions_for(user):
       implied_role = all_implied_roles_by_name[implied_rolename]
       collect_permissions(
           implied_role.permissions, implied_context_id, permissions)
+
+  # Agregate from owners:
+  all_owners = {}
+  for object_owner in user.object_owners:
+    for action in ['read', 'create', 'update', 'delete']:
+      permissions.setdefault(action, {})\
+          .setdefault(object_owner.ownable_type, {})\
+          .setdefault('resources', list())\
+          .append(object_owner.ownable_id)
 
   personal_context = _get_or_create_personal_context(user)
 
@@ -516,11 +528,11 @@ def handle_resource_deleted(sender, obj=None, service=None):
 # @BaseObjectView.extension_contributions.connect_via(Program)
 def contribute_to_program_view(sender, obj=None, context=None):
   if obj.context_id != None and \
-      permissions.is_allowed_read('Role', 1) and \
-      permissions.is_allowed_read('UserRole', obj.context_id) and \
-      permissions.is_allowed_create('UserRole', obj.context_id) and \
-      permissions.is_allowed_update('UserRole', obj.context_id) and \
-      permissions.is_allowed_delete('UserRole', obj.context_id):
+      permissions.is_allowed_read('Role', None, 1) and \
+      permissions.is_allowed_read('UserRole', None, obj.context_id) and \
+      permissions.is_allowed_create('UserRole', None, obj.context_id) and \
+      permissions.is_allowed_update('UserRole', None, obj.context_id) and \
+      permissions.is_allowed_delete('UserRole', None, obj.context_id):
     return 'permissions/programs/_role_assignments.haml'
   return None
 

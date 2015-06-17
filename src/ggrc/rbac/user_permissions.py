@@ -7,12 +7,12 @@ class UserPermissions(object):
   """Interface required for extensions providing user rights information for
   role-based access control.
   """
-  def is_allowed_create(self, resource_type, context_id):
+  def is_allowed_create(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to create a resource of the specified
     type in the context."""
     raise NotImplementedError()
 
-  def is_allowed_read(self, resource_type, context_id):
+  def is_allowed_read(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to read a resource of the specified
     type in the context."""
     raise NotImplementedError()
@@ -25,7 +25,7 @@ class UserPermissions(object):
     """
     raise NotImplementedError()
 
-  def is_allowed_update(self, resource_type, context_id):
+  def is_allowed_update(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to update a resource of the specified
     type in the context."""
     raise NotImplementedError()
@@ -39,7 +39,7 @@ class UserPermissions(object):
     """
     raise NotImplementedError()
 
-  def is_allowed_delete(self, resource_type, context_id):
+  def is_allowed_delete(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to delete a resource of the specified
     type in the context."""
     raise NotImplementedError()
@@ -93,25 +93,25 @@ class BasicUserPermissions(UserPermissions):
     self.update_contexts = update_contexts or {}
     self.delete_contexts = delete_contexts or {}
 
-  def is_allowed_create(self, resource_type, context_id):
+  def is_allowed_create(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to create a resource of the specified
     type in the context."""
     return resource_type in self.create_contexts and \
         context_id in self.create_contexts[resource_type]
 
-  def is_allowed_read(self, resource_type, context_id):
+  def is_allowed_read(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to read a resource of the specified
     type in the context."""
     return resource_type in self.read_contexts and \
         context_id in self.read_contexts[resource_type]
 
-  def is_allowed_update(self, resource_type, context_id):
+  def is_allowed_update(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to update a resource of the specified
     type in the context."""
     return resource_type in self.update_contexts and \
         context_id in self.update_contexts[resource_type]
 
-  def is_allowed_delete(self, resource_type, context_id):
+  def is_allowed_delete(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to delete a resource of the specified
     type in the context."""
     return resource_type in self.delete_contexts and \

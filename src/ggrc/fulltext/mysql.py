@@ -81,6 +81,9 @@ class MysqlIndexer(SqlIndexer):
             permissions.read_contexts_for(model_name))
 
       if contexts is not None:
+        # Don't filter out None contexts here
+        if None not in contexts:
+          contexts.append(None)
         type_query = and_(
             MysqlRecordProperty.type == model_name,
             context_query_filter(MysqlRecordProperty.context_id, contexts))

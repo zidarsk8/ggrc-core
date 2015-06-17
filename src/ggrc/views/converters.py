@@ -63,19 +63,19 @@ def ensure_read_permissions_for(resource_type, context_id=_default_context):
     if not isinstance(resource_type, type):
       resource_type = resource_type.__class__
     resource_type = resource_type.__name__
-  if not permissions.is_allowed_read(resource_type, context_id):
+  if not permissions.is_allowed_read(resource_type, resource_id, context_id):
     raise Forbidden()
 
 
 def ensure_admin_permissions():
   # This is actually wrong, but currently *no one* has permissions for
   # `/admin`, so it works.
-  if not permissions.is_allowed_read("/admin", 1):
+  if not permissions.is_allowed_read("/admin", None, 1):
     raise Forbidden()
 
 
-def ensure_create_permissions_for(resource_type, context_id):
-  if not permissions.is_allowed_create(resource_type, context_id):
+def ensure_create_permissions_for(resource_type, resource_id, context_id):
+  if not permissions.is_allowed_create(resource_type, resource_id, context_id):
     raise Forbidden()
 
 
@@ -84,7 +84,7 @@ def filter_objects_by_permissions(user, objs):
 
   permitted_objects = []
   for obj in objs:
-    if permissions.is_allowed_read(obj.__class__.__name__, obj.context_id):
+    if permissions.is_allowed_read(obj.__class__.__name__, obj.id, obj.context_id):
       permitted_objects.append(obj)
   return permitted_objects
 
@@ -803,7 +803,7 @@ def import_sections(directive_id):
 @app.route("/<object_kind>/import", methods=['GET', 'POST'])
 @login_required
 def import_systems_processes(object_kind):
-  if not permissions.is_allowed_read("/admin", 1):
+  if not permissions.is_allowed_read("/admin", None, 1):
     raise Forbidden()
   kind_lookup = {"systems": "Systems", "processes": "Processes"}
   if object_kind == "systems":
