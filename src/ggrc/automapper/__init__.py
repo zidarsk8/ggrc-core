@@ -8,7 +8,7 @@ import logging
 from ggrc.models.relationship import Relationship
 from ggrc.services.common import Resource
 from ggrc import db
-from .rules import rules
+from ggrc.automapper.rules import rules
 
 
 class AutomapperGenerator(object):
