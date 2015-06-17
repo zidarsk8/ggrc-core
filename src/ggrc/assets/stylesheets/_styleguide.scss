@@ -197,7 +197,11 @@
 .import-final,
 .import-progress,
 .import-progress-final {
-  display: none;
+  // display: none;
+}
+
+.download-template select[multiple] {
+  min-height: 320px;
 }
 
 .export-control {
