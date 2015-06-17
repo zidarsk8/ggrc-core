@@ -32,20 +32,33 @@ class RuleSet(object):
     def available(m, l):
       return hasattr(getattr(models, m), l + '_id')
 
-    for rule in rule_list:
-      for src, dst in itertools.product(rule.src, rule.dst):
-        key = (src, dst)
-        existing_rules = self._rules.get(key, RuleSet.Entry(set(), set()))
-        explicit = set(obj for obj in rule.mappings
-                       if isinstance(obj, str))
-        implicit = set(obj for obj in rule.mappings
-                       if isinstance(obj, Attr) and available(src, obj.name))
+    for src, dst, mapping, source in self._explode_rules(rule_list):
+      key = (src, dst)
+      entry = self._rules.get(key, RuleSet.Entry(set(), set()))
+      if isinstance(mapping, Attr):
+        entry = RuleSet.Entry(entry.explicit, entry.implicit | {mapping})
+      else:
+        entry = RuleSet.Entry(entry.explicit | {mapping}, entry.implicit)
+      self._rules[key] = entry
 
-        for obj in explicit | implicit:
-          self._rule_source[src, dst, obj] = rule
-        self._rules[key] = RuleSet.Entry(existing_rules.explicit | explicit,
-                                         existing_rules.implicit | implicit)
+      sources = self._rule_source.get((src, dst, mapping), set())
+      sources.add(source)
+      self._rule_source[src, dst, mapping] = sources
+
     self._freeze()
+
+  def _explode_rules(self, rule_list):
+    for rule in rule_list:
+      for src, dst, mapping in itertools.product(rule.src, rule.dst,
+                                                 rule.mappings):
+        if Attr in map(type, [src, dst, mapping]):
+          # if this is a direct mapping
+          # there is only one way to form the triangle
+          yield (src, dst, mapping, rule)
+        else:
+          for src1, dst1, mapping1 in set(itertools.permutations([src, dst,
+                                                                  mapping])):
+            yield (src1, dst1, mapping1, rule)
 
   def _freeze(self):
     for key in self._rules:
@@ -67,7 +80,7 @@ class RuleSet(object):
     for key in self._rules:
       src, dst = key
       for mapping in self._rules[key].explicit | self._rules[key].implicit:
-        source = self._rule_source[src, dst, mapping].name
+        source = ','.join(r.name for r in self._rule_source[src, dst, mapping])
         rule = ('  -> %s <--> %s <--> %s <- )' % (dst, src, mapping))
         rule += ' ' * (70 - len(rule))
         rule += source

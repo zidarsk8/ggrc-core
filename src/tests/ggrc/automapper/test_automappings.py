@@ -5,6 +5,7 @@
 
 import os
 import random
+import itertools
 
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
@@ -15,6 +16,15 @@ from ggrc import db
 
 if os.environ.get('TRAVIS', False):
   random.seed(1)  # so we can reproduce the tests if needed
+
+
+counter = 0
+
+
+def next(msg):
+  global counter
+  counter += 1
+  return msg + str(counter)
 
 
 class TestAutomappings(TestCase):
@@ -29,8 +39,8 @@ class TestAutomappings(TestCase):
   def create_object(self, cls, data):
     name = cls.__name__.lower()
     data['context'] = None
-    _, obj = self.gen.generate(cls, name, {name: data})
-    self.assertIsNotNone(obj)
+    res, obj = self.gen.generate(cls, name, {name: data})
+    self.assertIsNotNone(obj, '%s, %s: %s' % (name, str(data), str(res)))
     return obj
 
   def create_mapping(self, src, dst):
@@ -45,49 +55,58 @@ class TestAutomappings(TestCase):
     self.assertIsNotNone(rel,
                          msg='%s not mapped to %s' % (obj1.type, obj2.type))
 
+  def with_permutations(self, mk_obj1, mk_obj2, mk_obj3):
+    for mk1, mk2, mk3 in itertools.permutations([mk_obj1, mk_obj2, mk_obj3]):
+      obj1 = mk1()
+      obj2 = mk2()
+      obj3 = mk3()
+      self.create_mapping(obj1, obj2)
+      self.create_mapping(obj2, obj3)
+      self.assert_mapping(obj1, obj3)
+
   def test_mapping_to_a_program(self):
-    program = self.create_object(Program, {'title': 'Program1'})
-    issue = self.create_object(Issue, {'title': 'Issue2'})
-    regulation = self.create_object(Regulation, {
-        'title': 'Program Regulation'
-    })
-    self.create_mapping(program, regulation)
-    self.create_mapping(issue, program)
-    self.assert_mapping(issue, regulation)
+    self.with_permutations(
+        lambda: self.create_object(Program, {'title': next('Program')}),
+        lambda: self.create_object(Issue, {'title': next('Issue')}),
+        lambda: self.create_object(Regulation, {
+            'title': next('Program Regulation')
+        }),
+    )
 
   def test_mapping_directive_to_a_program(self):
-    regulation = self.create_object(Regulation, {
-        'title': 'Test PD Regulation'
-    })
-    issue = self.create_object(Issue, {'title': 'Issue3'})
-    program = self.create_object(Program, {'title': 'Program3'})
-    self.create_mapping(regulation, issue)
-    self.create_mapping(program, regulation)
-    self.assert_mapping(program, issue)
+    self.with_permutations(
+        lambda: self.create_object(Regulation, {
+            'title': next('Test PD Regulation')
+        }),
+        lambda: self.create_object(Issue, {'title': next('Issue')}),
+        lambda: self.create_object(Program, {'title': next('Program')}),
+    )
 
   def test_mapping_to_sections(self):
-    regulation = self.create_object(Regulation, {'title': 'Test Regulation'})
+    regulation = self.create_object(Regulation, {
+        'title': next('Test Regulation')
+    })
     section = self.create_object(Section, {
-        'title': 'Test section',
+        'title': next('Test section'),
         'directive': {'id': regulation.id},
     })
-    issue = self.create_object(Issue, {'title': 'Test issue'})
+    issue = self.create_object(Issue, {'title': next('Test issue')})
 
     self.create_mapping(issue, section)
     self.assert_mapping(issue, regulation)
 
   def test_mapping_to_objective(self):
     regulation = self.create_object(Regulation, {
-        'title': 'Test PD Regulation'
+        'title': next('Test PD Regulation')
     })
     section = self.create_object(Section, {
-        'title': 'Test section',
+        'title': next('Test section'),
         'directive': {'id': regulation.id},
     })
-    control = self.create_object(Control, {'title': 'Test control'})
+    control = self.create_object(Control, {'title': next('Test control')})
     self.create_mapping(control, section)
 
-    issue = self.create_object(Issue, {'title': 'Test issue'})
+    issue = self.create_object(Issue, {'title': next('Test issue')})
     self.create_mapping(issue, control)
     self.assert_mapping(issue, section)
     self.assert_mapping(issue, regulation)
