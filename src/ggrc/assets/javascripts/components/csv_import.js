@@ -73,30 +73,40 @@
     template: "<content></content>",
     scope: {
       csv_import_url: "/_service/import_csv",
-      // import_state: "@",
-      import_info: [],
-      import_errors: [],
-      import_warnings: [],
+      import: null,
+      filename: "",
+      isLoading: false,
       state: "select",
       states: function () {
-        var states = {
-          select: {class: "btn-success", text: "Choose CSV file to import"},
-          analyse: {class: "btn-draft", text: "Analysing"},
-          import: {class: "btn-primary", text: "Import data"},
-          importing: {class: "btn-draft", text: "Importing"}
-        };
-        console.log("States", this, arguments);
-        return states[this.attr("state")] || states["select"];
-      },
-      upload_file: function (file) {
-        var form_data = new FormData();
+        var state = this.attr("state") || "select",
+            states = {
+              select: {class: "btn-success", text: "Choose CSV file to import"},
+              analyse: {class: "btn-draft", text: "Analysing", isDisabled: true},
+              import: {class: "btn-primary", text: "Import data"},
+              importing: {class: "btn-draft", text: "Importing", isDisabled: true},
+              success: {class: "btn-success", text: "<i class=\"grcicon-check-white\"></i> Import successful", isDisabled: true}
+            };
 
-        this.attr("import_state", "analysing_file");
+        return _.extend(states[state], {state: state});
+      }
+    },
+    events: {
+      ".state-select click": function (el, ev) {
+        ev.preventDefault();
+        this.element.find(".csv-upload").trigger("click");
+      },
+      ".csv-upload change": function (el, ev) {
+        var file = el[0].files[0],
+            form_data = new FormData();
+
+        this.scope.attr("state", "analysing");
+        this.scope.attr("isLoading", true);
+        this.scope.attr("filename", file.name);
         form_data.append("file", file);
 
         $.ajax({
           type: "POST",
-          url: this.csv_import_url,
+          url: this.scope.attr("csv_import_url"),
           data: form_data,
           cache: false,
           contentType: false,
@@ -106,40 +116,16 @@
             "X-requested-by": "gGRC"
           }
         }).done(function (data) {
-          console.log(data);
-          _.forIn(data, function (value, key) {
-            this.attr("import_" + key, value);
-          }.bind(this));
-          this.attr("import_state", "import_file");
-        }.bind(this)).fail(function (e) {
-          this.attr("import_state", "select_file");
+          this.scope.attr("import", data);
+          this.scope.attr("state", "import");
+        }.bind(this))
+        .fail(function (data) {
+          this.scope.attr("state", "select");
           // TODO: write error
+        }.bind(this))
+        .always(function () {
+          this.scope.attr("isLoading", false);
         }.bind(this));
-      }
-    },
-    events: {
-      "#import_btn click": function (el, ev) {
-        ev.preventDefault();
-        var states = "select analyse import importing".split(" ");
-
-        // switch (this.scope.import_state) {
-        //   case "select_file":
-        //     $("[data-file-upload]").trigger("click");
-        //     break;
-        //   case "import_file":
-        //     break;
-        // }
-      },
-      "[data-file-upload] change": function(el, ev) {
-        var file = el[0].files[0];
-        this.scope.upload_file(file);
-      }
-    },
-    helpers: {
-      with_button_state: function (state, options) {
-        state = Mustache.resolve(state);
-        return options.fn(options.contexts.add(
-            options.context.button_states[state]));
       }
     }
   });

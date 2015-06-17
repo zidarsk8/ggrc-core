@@ -15,53 +15,53 @@
           download one of the predefined templates.
         </p>
         <div class="clearfix">
-          <input type="file" data-file-upload name="upload" style="visibility: hidden; width: 1px; height: 1px" />
+          <input type="file" data-file-upload class="csv-upload" name="upload" style="visibility: hidden; width: 1px; height: 1px" />
           {{#states}}
-            <button id="import_btn" class="btn btn-large btn-fixed {{class}}">{{text}}</button>
+            <button id="import_btn" {{#isDisabled}}disabled{{/isDisabled}} class="btn btn-large btn-fixed state-{{state}} {{class}}">{{{text}}}</button>
           {{/states}}
-        <div class="import-wrap">
-          <ul>
-          {{#import_info}}
-            <li>{{.}}</li>
-          {{/import_info}}
-          {{#import_warnings}}
-            <li>{{.}}</li>
-          {{/import_warnings}}
-          {{#import_errors}}
-            <li>{{.}}</li>
-          {{/import_errors}}
-          </ul>
         </div>
-        <button id="importedFile" class="btn btn-large btn-success btn-fixed"><i class="grcicon-check-white"></i> Import successful</button>
-        </div>
+        {{#if filename}}
         <div class="import-main-wrap import-main-wrap-analyze">
           <div class="row-fluid wrap-row">
             <div class="span6">
               <div class="import-wrap import-analyze">
-                <h4>pci_controls_2015.csv</h4>
+                <h4>
+                  {{filename}}
+                  {{#if isLoading}}
+                    <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+                  {{/if}}
+                </h4>
                 <hr />
+
+                {{#each import}}
                 <ul>
-                  <li><strong>Object type</strong>: Controls <i class="grcicon-check-solo-green"></i></li>
-                  <li><strong>Number of rows</strong>: 252 <i class="grcicon-check-solo-green"></i></li>
-                  <li><strong>File structure</strong> <i class="grcicon-check-solo-green"></i></li>
+                  <li><strong>Object type</strong>: {{name}}</li>
+                  <li><strong>Number of rows</strong>: {{rows}}</li>
+                  <li><strong>Number of updated</strong>: {{updated}}</li>
+                  {{#data}}
+                    <li>
+                      <strong>{{status}}</strong>
+                      {{#if_equals status "errors"}}
+                        <i class="grcicon-warning"></i>
+                      {{/if}}
+                      {{#if messages.length}}
+                        <ul>
+                          {{#messages}}
+                            <li>{{.}}</li>
+                          {{/messages}}
+                        </ul>
+                      {{/if}}
+                    </li>
+                  {{/data}}
                 </ul>
                 <hr />
-                <ul>
-                  <li><strong>Object type</strong>: Regulations <i class="grcicon-check-solo-green"></i></li>
-                  <li><strong>Number of rows</strong>: 762 <i class="grcicon-check-solo-green"></i></li>
-                  <li><strong>File structure</strong> <i class="grcicon-check-solo-green"></i></li>
-                </ul>
-                <hr />
-                <ul>
-                  <li><strong>Object type</strong>: Programs <i class="grcicon-check-solo-green"></i></li>
-                  <li><strong>Number of rows</strong>: 152 <i class="grcicon-check-solo-green"></i></li>
-                  <li><strong>File structure</strong> <i class="grcicon-check-solo-green"></i></li>
-                </ul>
-                <hr />
+                {{/each}}
               </div>
             </div>
           </div>
         </div>
+        {{/if}}
+        {{#if results}}
         <div class="import-wrap import-final">
           <ul>
             <li><strong>243</strong> records created</li>
@@ -70,6 +70,7 @@
             <li><strong>2</strong> records identical</li>
           </ul>
         </div>
+        {{/if}}
         {{> /static/mustache/import_export/faq.mustache}}
       </div>
       <div class="span4">
