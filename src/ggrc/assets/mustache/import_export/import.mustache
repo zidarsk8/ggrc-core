@@ -15,17 +15,26 @@
         download one of the predefined templates.
       </p>
       <div class="clearfix">
+        <input type="file" data-file-upload name="upload" style="visibility: hidden; width: 1px; height: 1px" />
         {{#with_button_state import_state}}
-          <button id="select_file" class="btn btn-large btn-fixed {{class}}">
+          <button id="import_btn" class="btn btn-large btn-fixed {{class}}">
             {{text}}
           </button>
         {{/with_button_state}}
-        <button id="importFile" class="btn btn-large btn-primary btn-fixed">
-          <i class="grcicon-imp-exp-white"></i> Import 252 Controls
-        </button>
-        <button id="importingFile" class="btn btn-large btn-draft btn-fixed">
-          Importing
-        </button>
+      <div class="import-wrap">
+        <ul>
+        {{#import_info}}
+          <li>{{.}}</li>
+        {{/import_info}}
+        {{#import_warnings}}
+          <li>{{.}}</li>
+        {{/import_warnings}}
+        {{#import_errors}}
+          <li>{{.}}</li>
+        {{/import_errors}}
+        </ul>
+      </div>
+
         <div class="import-progress">
           <div class="progress-wrap">
             <span class="total-num">252</span>
