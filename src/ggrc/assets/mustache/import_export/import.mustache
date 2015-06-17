@@ -23,57 +23,14 @@
             {{/if}}
           {{/states}}
         </div>
-        {{#if filename}}
-        <div class="import-main-wrap import-main-wrap-analyze">
-          <div class="row-fluid wrap-row">
-            <div class="span6">
-              <div class="import-wrap import-analyze">
-                <h4>
-                  {{filename}}
-                  {{#if isLoading}}
-                    <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-                  {{/if}}
-                </h4>
-                <hr />
+        {{#if_equals state "import"}}
+          {{> /static/mustache/import_export/reporting.mustache}}
+        {{/if_equals}}
 
-                {{#each import}}
-                <ul>
-                  <li><strong>Object type</strong>: {{name}}</li>
-                  <li><strong>Number of rows</strong>: {{rows}}</li>
-                  <li><strong>Number of updated</strong>: {{updated}}</li>
-                  {{#data}}
-                    <li>
-                      <strong>{{status}}</strong>
-                      {{#if_equals status "errors"}}
-                        <i class="grcicon-warning"></i>
-                      {{/if}}
-                      {{#if messages.length}}
-                        <ul>
-                          {{#messages}}
-                            <li>{{.}}</li>
-                          {{/messages}}
-                        </ul>
-                      {{/if}}
-                    </li>
-                  {{/data}}
-                </ul>
-                <hr />
-                {{/each}}
-              </div>
-            </div>
-          </div>
-        </div>
-        {{/if}}
-        {{#if results}}
-        <div class="import-wrap import-final">
-          <ul>
-            <li><strong>243</strong> records created</li>
-            <li><strong>73</strong> records updated</li>
-            <li><strong>42</strong> records deleted</li>
-            <li><strong>2</strong> records identical</li>
-          </ul>
-        </div>
-        {{/if}}
+        {{#if_equals state "success"}}
+          {{> /static/mustache/import_export/complete.mustache}}
+        {{/if_equals}}
+
         {{> /static/mustache/import_export/faq.mustache}}
       </div>
       <div class="span4">

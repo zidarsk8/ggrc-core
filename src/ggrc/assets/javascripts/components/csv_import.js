@@ -84,16 +84,31 @@
               analyse: {class: "btn-draft", text: "Analysing", isDisabled: true},
               import: {class: "btn-primary", text: "Import data"},
               importing: {class: "btn-draft", text: "Importing", isDisabled: true},
-              success: {class: "btn-success", text: "<i class=\"grcicon-check-white\"></i> Import successful", isDisabled: true}
+              success: {class: "btn-success", text: "<i class=\"grcicon-check-white\"></i> Import successful"}
             };
 
         return _.extend(states[state], {state: state});
       }
     },
     events: {
+      ".state-reset click": function (el, ev) {
+        ev.preventDefault();
+        this.scope.attr({
+          state: "select",
+          filename: "",
+          import: null
+        });
+      },
       ".state-select click": function (el, ev) {
         ev.preventDefault();
         this.element.find(".csv-upload").trigger("click");
+      },
+      ".state-import click": function (el, ev) {
+        ev.preventDefault();
+        this.scope.attr("state", "importing");
+        setTimeout(function () {
+          this.scope.attr("state", "success");
+        }.bind(this), 5000);
       },
       ".csv-upload change": function (el, ev) {
         var file = el[0].files[0],
