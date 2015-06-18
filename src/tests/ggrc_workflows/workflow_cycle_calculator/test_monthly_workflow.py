@@ -16,7 +16,7 @@ from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
 from tests.ggrc.generator import ObjectGenerator
 
-from tests.ggrc_workflows.workflow_date_calculator.BaseWorkflowTestCase import BaseWorkflowTestCase
+from tests.ggrc_workflows.workflow_cycle_calculator.base_workflow_test_case import BaseWorkflowTestCase
 
 
 if os.environ.get('TRAVIS', False):
@@ -29,8 +29,34 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
     We create a monthly workflow whose cycle should start on 12th and end on
     3rd of next month.
     """
+    monthly_workflow = {
+      "title": "monthly test wf",
+      "description": "start this many a time",
+      "frequency": "monthly",
+      "task_groups": [
+        {"title": "task group 1",
+         'task_group_tasks': [
+           {
+             'title': 'monthly task 1',
+             "relative_start_day": 15, # 6/15/2015 Mon
+             "relative_start_month": None,
+             "relative_end_day": 19, # 6/19/2015 Fri
+             "relative_end_month": None,
+           },
+           {
+             'title': 'monthly task 2',
+             "relative_start_day": 12, # 6/12/2015 Fri
+             "relative_start_month": None,
+             "relative_end_day": 3, # 7/3/2015 Fri
+             "relative_end_month": None,
+           }],
+         "task_group_objects": self.random_objects
+         },
+      ]
+    }
+
     with freeze_time("2015-6-9 13:00:00"): # Tuesday, 6/9/2015
-      _, wf = self.generator.generate_workflow(self.monthly_workflow_1)
+      _, wf = self.generator.generate_workflow(monthly_workflow)
       resp, tg = self.generator.generate_task_group(wf, data={
         'task_group_tasks': [
           {
@@ -55,14 +81,20 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
 
       self.assertEqual(active_wf.status, "Active")
 
-      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 10)) # Should be 12th, but that is sunday, so it must be Friday
+      # Should be 12th, but that is Sunday, so it must be Friday
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 10))
       self.assertEqual(cycle.start_date, date(2015, 6, 12))
-      self.assertEqual(cycle.end_date, date(2015, 7, 3))
+      # Should be 3rd but 2nd and 3rd are Independence Day Holiday and
+      # Independence Day Eve, therefore it must be 1st
+      self.assertEqual(cycle.end_date, date(2015, 7, 1))
 
     with freeze_time("2015-7-10 13:00:00"): # Friday, 7/10/2015
       start_recurring_cycles()
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id,
+        Cycle.start_date > date(2015, 7, 1)).one()
 
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 8, 12)) # 8/12/2015 Wed
       self.assertEqual(cycle.start_date, date(2015, 7, 10)) # 7/10/2015 Fri

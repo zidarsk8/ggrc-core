@@ -74,10 +74,16 @@ class CycleCalculator(object):
 
     # In case we still don't have a workday, repeat
     if not self.is_work_day(ddate):
-      self.adjust_date(ddate)
+      return self.adjust_date(ddate)
     return ddate
 
   def task_date_range(self, task, base_date=None):
+    if task.id in self.reified_tasks:
+      return (
+        self.reified_tasks[task.id]['start_date'],
+        self.reified_tasks[task.id]['end_date']
+      )
+
     if not base_date:
       base_date = datetime.date.today()
     start_day = self.relative_day_to_date(task.relative_start_day)
