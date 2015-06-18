@@ -3,6 +3,7 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+from ggrc import db
 from ggrc.app import app
 from ggrc.services.common import Resource
 from ggrc import services
@@ -40,6 +41,8 @@ class Api():
 
     self.tc.get("/logout")
     self.tc.get("/login", headers=self.user_headers)
+    db.session.commit()
+    db.session.flush()
 
   def get_service(self, obj):
     if inspect.isclass(obj):
