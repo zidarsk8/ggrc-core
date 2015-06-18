@@ -23,11 +23,14 @@ class Relationship(Mapping, db.Model):
       'RelationshipType',
       primaryjoin='foreign(RelationshipType.relationship_type) == Relationship.relationship_type_id',
       uselist=False)
-  automapping_id = db.Column(db.Integer, db.ForeignKey('relationships.id'), nullable=True)
+  automapping_id = db.Column(db.Integer,
+                             db.ForeignKey('relationships.id', ondelete='SET NULL'),
+                             nullable=True,
+                             )
   automapping = db.relationship(
-      'Relationship', 
-      primaryjoin=lambda: db.foreign(Relationship.id) == Relationship.automapping_id,
-      uselist=False)
+      lambda: Relationship,
+      remote_side= lambda: Relationship.id
+  )
 
   @property
   def source_attr(self):

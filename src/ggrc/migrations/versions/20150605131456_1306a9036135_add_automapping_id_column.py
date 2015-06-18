@@ -29,7 +29,8 @@ def upgrade():
       'relationships',
       'relationships',
       ['automapping_id'],
-      ['id']
+      ['id'],
+      ondelete='SET NULL'
   )
 
 
