@@ -287,7 +287,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       var that = this, i, processChunk, filtered_items = [], 
           child_tree_display_list = [];
 
-      if (!items || items.length == 0) {
+      if (!items || items.length === 0) {
         return new $.Deferred().resolve();
       }
 
@@ -473,7 +473,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
   init_child_tree_display: function (model) {
     //Set child tree options
-    var model_name = model.model_singular, all_obj_list = [],
+    var i, model_name = model.model_singular, all_obj_list = [],
         def_child_tree_display_list, saved_child_tree_display_list, child_tree_display_list = [],
         child_tree_model_list = GGRC.tree_view.child_tree_model_list;
 
@@ -1189,7 +1189,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , set_tree_display_list : function (ev) {
-    var model_name = this.options.model.model_singular, child_model_to_save = [],
+    var model_name = this.options.model.model_singular,
         $check = this.element.parent().find('.model-checkbox'),
         $selected = $check.filter(':checked'),
         selected_items=[];
