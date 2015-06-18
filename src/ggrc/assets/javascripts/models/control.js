@@ -70,6 +70,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     ])
     , add_item_view : GGRC.mustache_path + "/controls/tree_add_item.mustache"
     , draw_children : true
+    , child_tree_display_list : ['System', 'Process']
     , child_options : [{
         model : can.Model.Cacheable
       , mapping : "related_and_able_objects"
@@ -77,7 +78,6 @@ can.Model.Cacheable("CMS.Models.Control", {
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
-      //, view_object_list: ['Program', 'Market']
     }]
   }
 

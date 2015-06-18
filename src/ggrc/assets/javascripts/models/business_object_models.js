@@ -289,6 +289,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     , attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'Type', attr_name: 'type'}
     ])
+    , child_tree_display_list : ['System']
     , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     , child_options : [{
       model : null

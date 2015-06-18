@@ -22,6 +22,8 @@ var COLLAPSE = "collapse"
 , TOP_NAV = "top_nav"
 , FILTER_WIDGET = "filter_widget"
 , TREE_VIEW_HEADERS = "tree_view_headers"
+, TREE_VIEW = "tree_view"
+, CHILD_TREE_DISPLAY_LIST = "child_tree_display_list"
 , path = window.location.pathname.replace(/\./g, "/");
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
@@ -203,6 +205,29 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
     if (!value || !value[model_name]) {
       return [];
+    }
+
+    return value[model_name].display_list;
+  }
+
+  , setChildTreeDisplayList : function (model_name, display_list) {
+    var hdr = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST), obj = {};
+    if (!hdr) {
+      hdr = this.makeObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
+    }
+
+    obj.display_list = display_list;
+    hdr.attr(model_name, obj);
+
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getChildTreeDisplayList : function (model_name) {
+    var value = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
+
+    if (!value || !value[model_name]) {
+      return null; //in this case user should use default list an empty list, [], is different  than null
     }
 
     return value[model_name].display_list;

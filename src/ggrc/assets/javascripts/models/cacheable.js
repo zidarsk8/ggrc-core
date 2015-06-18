@@ -133,31 +133,6 @@ can.Model("can.Model.Cacheable", {
     {attr_title: 'Secondary Contact', attr_name: 'secondary_contact', attr_sort_field: 'secondary_contact.name|email'},
     {attr_title: 'Last Updated', attr_name: 'updated_at'}
   ]
-  , model_type_list : [
-    { model_name: 'Audit', model_lowercase: 'audit', model_plural: 'audits', display_name: 'Audits'},
-    { model_name: 'Clause', model_lowercase: 'clause', model_plural: 'clauses', display_name: 'Clauses'},
-    { model_name: 'Contract', model_lowercase: 'contract', model_plural: 'contracts', display_name: 'Contracts'},
-    { model_name: 'Control', model_lowercase: 'control', model_plural: 'controls', display_name: 'Controls'},
-    { model_name: 'ControlAssessment', model_lowercase: 'control_assessment',
-        model_plural: 'control_assessments', display_name: 'Control Assessments'},
-    { model_name: 'DataAsset', model_lowercase: 'data_asset', model_plural: 'data_assets', display_name: 'Data Assets'},
-    { model_name: 'Facility', model_lowercase: 'facility', model_plural: 'facilities', display_name: 'Facilities'},
-    { model_name: 'Issue', model_lowercase: 'issue', model_plural: 'issues', display_name: 'issues'},
-    { model_name: 'Market', model_lowercase: 'market', model_plural: 'markets', display_name: 'Markets'},
-    { model_name: 'Objective', model_lowercase: 'objective', model_plural: 'objectives', display_name: 'Objectives'},
-    { model_name: 'OrgGroup', model_lowercase: 'org_group', model_plural: 'org_groups', display_name: 'Org Groups'},
-    { model_name: 'Person', model_lowercase: 'person', model_plural: 'people', display_name: 'People'},
-    { model_name: 'Policy', model_lowercase: 'policy', model_plural: 'policies', display_name: 'Policies'},
-    { model_name: 'Process', model_lowercase: 'process', model_plural: 'processes', display_name: 'Processes'},
-    { model_name: 'Product', model_lowercase: 'product', model_plural: 'products', display_name: 'Products'},
-    { model_name: 'Program', model_lowercase: 'program', model_plural: 'programs', display_name: 'Programs'},
-    { model_name: 'Project', model_lowercase: 'project', model_plural: 'projects', display_name: 'Projects'},
-    { model_name: 'Regulation', model_lowercase: 'regulation', model_plural: 'regulations', display_name: 'Regulations'},
-    { model_name: 'Section', model_lowercase: 'section', model_plural: 'sections', display_name: 'Sections'},
-    { model_name: 'Standard', model_lowercase: 'standard', model_plural: 'standards', display_name: 'Standards'},
-    { model_name: 'System', model_lowercase: 'system', model_plural: 'systems', display_name: 'Systems'},
-    { model_name: 'Vendor', model_lowercase: 'vendor', model_plural: 'vendors', display_name: 'Vendors'}
-  ]
   , root_collection : ""
   , model_singular : ""
   , model_plural : ""

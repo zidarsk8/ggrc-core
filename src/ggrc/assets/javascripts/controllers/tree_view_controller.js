@@ -18,6 +18,35 @@ function _firstElementChild(el) {
   }
 }
 
+GGRC.tree_view = {};
+GGRC.tree_view.child_tree_model_list = [
+    { model_name: 'Audit', model_lowercase: 'audit', model_plural: 'audits', display_name: 'Audits'},
+    { model_name: 'Clause', model_lowercase: 'clause', model_plural: 'clauses', display_name: 'Clauses'},
+    { model_name: 'Contract', model_lowercase: 'contract', model_plural: 'contracts', display_name: 'Contracts'},
+    { model_name: 'Control', model_lowercase: 'control', model_plural: 'controls', display_name: 'Controls'},
+    { model_name: 'ControlAssessment', model_lowercase: 'control_assessment',
+        model_plural: 'control_assessments', display_name: 'Control Assessments'},
+    { model_name: 'DataAsset', model_lowercase: 'data_asset', model_plural: 'data_assets', display_name: 'Data Assets'},
+    { model_name: 'Facility', model_lowercase: 'facility', model_plural: 'facilities', display_name: 'Facilities'},
+    { model_name: 'Issue', model_lowercase: 'issue', model_plural: 'issues', display_name: 'Issues'},
+    { model_name: 'Market', model_lowercase: 'market', model_plural: 'markets', display_name: 'Markets'},
+    { model_name: 'Objective', model_lowercase: 'objective', model_plural: 'objectives', display_name: 'Objectives'},
+    { model_name: 'OrgGroup', model_lowercase: 'org_group', model_plural: 'org_groups', display_name: 'Org Groups'},
+    { model_name: 'Person', model_lowercase: 'person', model_plural: 'people', display_name: 'People'},
+    { model_name: 'Policy', model_lowercase: 'policy', model_plural: 'policies', display_name: 'Policies'},
+    { model_name: 'Process', model_lowercase: 'process', model_plural: 'processes', display_name: 'Processes'},
+    { model_name: 'Product', model_lowercase: 'product', model_plural: 'products', display_name: 'Products'},
+    { model_name: 'Program', model_lowercase: 'program', model_plural: 'programs', display_name: 'Programs'},
+    { model_name: 'Project', model_lowercase: 'project', model_plural: 'projects', display_name: 'Projects'},
+    { model_name: 'Regulation', model_lowercase: 'regulation', model_plural: 'regulations', display_name: 'Regulations'},
+    { model_name: 'Request', model_lowercase: 'request', model_plural: 'requests', display_name: 'Requests'},
+    { model_name: 'Response', model_lowercase: 'response', model_plural: 'responses', display_name: 'Responses'},
+    { model_name: 'Section', model_lowercase: 'section', model_plural: 'sections', display_name: 'Sections'},
+    { model_name: 'Standard', model_lowercase: 'standard', model_plural: 'standards', display_name: 'Standards'},
+    { model_name: 'System', model_lowercase: 'system', model_plural: 'systems', display_name: 'Systems'},
+    { model_name: 'Vendor', model_lowercase: 'vendor', model_plural: 'vendors', display_name: 'Vendors'}
+];
+GGRC.tree_view.child_tree_display_list = new can.Observe.List([]);
 
 function _display_tree_subpath(el, path, attempt_counter) {
   attempt_counter || (attempt_counter = 0);
@@ -166,7 +195,6 @@ can.Control("CMS.Controllers.TreeLoader", {
   }
 
   , display: function() {
-    console.log("sasmita--- display, this will call draw list()");
       var that = this
         , tracker_stop = GGRC.Tracker.start(
             "TreeView", "display", this.options.model.shortName)
@@ -195,7 +223,6 @@ can.Control("CMS.Controllers.TreeLoader", {
       return this._display_deferred;
     }
   , draw_list : function(list) {
-    console.log("sasmita--draw-list---");
     if (this._draw_list_deferred)
       return this._draw_list_deferred;
     this._draw_list_deferred = new $.Deferred();
@@ -257,28 +284,35 @@ can.Control("CMS.Controllers.TreeLoader", {
     }
 
   , enqueue_items: function(items) {
-    console.log("sasmita-enqueue-items");
       var that = this, i, processChunk, filtered_items = [], 
-          child_tree_display_list = this.options.child_tree_display_list;
+          child_tree_display_list = [];
 
       if (!items || items.length == 0) {
         return new $.Deferred().resolve();
       }
 
       //find current widget model and check if first layer tree
+      if (this.options.parent) { //this is a second label tree
+        var parent_model_name = this.options.parent.options.model.shortName;
+        var obj = _.find(GGRC.tree_view.child_tree_display_list, function (obj) {
+          return obj.model_name == parent_model_name ;
+        });
+        child_tree_display_list = obj.display_list;
 
-      //Tree noise reduce
-      if (this.options.model._shortName === "cacheable") {
-        //update list, because this is a second layer tree
-        //Need to get parent instance's tree_view_controller's child_tree_display_list
-        console.log("sasmita-- child tree ***");
-        for (i = 0; i < items.length; i++) {
-          if (child_tree_display_list.indexOf(items[i].instance.class.model_singular) !== -1) {
-            filtered_items.push(items[i]);
+        //check if all objects selected, then skip filter
+        if (child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
+          //skip filter
+          filtered_items = items;
+        } else if (child_tree_display_list.length === 0) { //no item is selected to filter, so just return
+          return new $.Deferred().resolve();
+        } else {
+          for (i = 0; i < items.length; i++) {
+            if (child_tree_display_list.indexOf(items[i].instance.class.model_singular) !== -1) {
+              filtered_items.push(items[i]);
+            }
           }
         }
       } else {
-        console.log("sasmita---   first-label tree *");
         filtered_items = items;
       }
 
@@ -288,7 +322,6 @@ can.Control("CMS.Controllers.TreeLoader", {
       }
 
       this._pending_items.push.apply(this._pending_items, filtered_items);
-      //this._pending_items.push.apply(this._pending_items, items);
       this._pending_items_ms = Date.now();
 
       processChunk = function() {
@@ -438,6 +471,52 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.options.attr('display_options', display_options);
   },
 
+  init_child_tree_display: function (model) {
+    //Set child tree options
+    var model_name = model.model_singular, all_obj_list = [],
+        def_child_tree_display_list, saved_child_tree_display_list, child_tree_display_list = [],
+        child_tree_model_list = GGRC.tree_view.child_tree_model_list;
+
+    can.each(child_tree_model_list, function(item) {
+      all_obj_list.push(item.model_name);
+    });
+
+    def_child_tree_display_list = model.tree_view_options.child_tree_display_list || all_obj_list;
+
+    // Get child_tree_display_list from local storage
+    saved_child_tree_display_list = this.display_prefs.getChildTreeDisplayList(model_name);
+
+    var updated_ggrc_tree_view = false;
+    if (saved_child_tree_display_list !== null) {
+      //update GGRC.tree_view.child_tree_display_list
+      child_tree_display_list = saved_child_tree_display_list;
+      can.each(GGRC.tree_view.child_tree_display_list, function (item, i) {
+        if(item.model_name === model_name) { //item already exists, update the display_list
+          GGRC.tree_view.child_tree_display_list[i].display_list = saved_child_tree_display_list;
+          updated_ggrc_tree_view = true;
+        }
+      });
+      if (!updated_ggrc_tree_view) {
+        GGRC.tree_view.child_tree_display_list
+          .push({model_name : model_name, display_list : saved_child_tree_display_list});
+      }
+    } else {
+      //update GGRC.tree_view.child_tree_display_list to default list
+      child_tree_display_list = def_child_tree_display_list;
+      GGRC.tree_view.child_tree_display_list
+          .push({model_name : model_name, display_list : def_child_tree_display_list});
+    }
+
+    //set up display status for UI
+    for (i = 0; i < child_tree_model_list.length; i++) {
+      var obj = child_tree_model_list[i];
+      obj.display_status = child_tree_display_list.indexOf(obj.model_name) !== -1;
+    }
+
+    this.options.attr('child_tree_model_list', child_tree_model_list);
+    //this.options.attr('child_tree_display_list', child_tree_display_list);
+  },
+
   //Displays attribute list for tree-header, Select attribute list drop down
   //Gets default and custom attribute list for each model, and sets upthe display-list
   init_display_options: function (opts) {
@@ -509,17 +588,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.options.attr('select_attr_list', select_attr_list);
     this.options.attr('display_attr_list', display_attr_list);
     this.setup_column_width();
-
-    //Set child tree options
-    var child_tree_model_list = can.Model.Cacheable.model_type_list;
-    var child_tree_display_list = ['Program', 'Market']; //This should be taken from model/child_options
-    for (i = 0; i < child_tree_model_list.length; i++) {
-      var obj = child_tree_model_list[i];
-      obj.display_status = child_tree_display_list.indexOf(obj.model_name) !== -1;
-    }
-    this.options.attr('child_tree_model_list', child_tree_model_list);
-    this.options.attr('child_tree_display_list', child_tree_display_list);
-
+    this.init_child_tree_display(model);
   },
 
   init : function(el, opts) {
@@ -599,6 +668,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               can.bind.call(this.element.parent().find('.set-tree-attrs'), 
                             'click',
                             this.set_tree_attrs.bind(this)
+                           );
+              can.bind.call(this.element.parent().find('.set-display-object-list'),
+                            'click',
+                            this.set_tree_display_list.bind(this)
                            );
             }.bind(this))));
       }
@@ -1115,9 +1188,40 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.reload_list();
     }
 
-  , ".set-display-object-list click" : function (el, ev) {
-    console.log("Sasmita----- ---------object list clicked");
-    //this.reload_list();
+  , set_tree_display_list : function (ev) {
+    var model_name = this.options.model.model_singular, child_model_to_save = [],
+        $check = this.element.parent().find('.model-checkbox'),
+        $selected = $check.filter(':checked'),
+        selected_items=[];
+    //save the list
+    $selected.each( function(index) {
+      selected_items.push(this.value);
+    });
+    //find the object in GGRC.tree_view.child_tree_display_list and update
+    can.each(GGRC.tree_view.child_tree_display_list, function (item, i) {
+      if (item.model_name === model_name) {
+        GGRC.tree_view.child_tree_display_list[i].display_list = selected_items;
+      }
+    });
+    //save in local storage
+    this.display_prefs.setChildTreeDisplayList(model_name, selected_items);
+
+    //check if any inner tree is open
+    var el = this.element, open_items, control, tview_el;
+    if (el.hasClass('tree-open')) {
+      //find the inner tree and reload it
+      open_items = el.find('.item-open');
+      if (open_items.length) {
+        //for each open items load child tree
+        can.each(open_items, function (item, i) {
+          tview_el = $(item).find('.cms_controllers_tree_view');
+          control = tview_el.control();
+          if (control) {
+            control.reload_list();
+          }
+        });
+      }
+    }
   }
 
 });
@@ -1364,20 +1468,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
     ev.stopPropagation();
   }
 
-  , ".set-display-object-list click" : function (el, ev) {
-    console.log("Sasmita----- ---------object list clicked---tree view_node controller");
-    var ele, tview_el, control;
-    //this._expand_deferred = false;
-    //this._display_deferred = false;
-    //this.expand();
-    //element  = el.find('.cms_controller_tree_view');
-    ele = el.closest('.cms_controllers_tree_view_node'); //parent tree-view_node
-    //get the child tree tree_view
-    tview_el = ele.find('.cms_controllers_tree_view')
-    control = tview_el.control();
-    control.reload_list();
-  }
-
   , trigger_expand: function() {
       var $expand_el = this.element.find(".openclose").first();
       if (!$expand_el.hasClass("active"))
@@ -1453,6 +1543,37 @@ can.Control("CMS.Controllers.TreeViewNode", {
       },
 
       '.set-tree-attrs,.close-dropdown click' : function(el, ev) {
+        this.element.find('.dropdown-menu').closest('li').removeClass('open');
+      }
+    }
+  });
+})(this.can, this.can.$);
+
+(function (can, $) {
+    can.Component.extend ({
+    tag: 'tree-type-selector',
+    // <content> in a component template will be replaced with whatever is contained
+    //  within the component tag.  Since the views for the original uses of these components
+    //  were already created with content, we just used <content> instead of making
+    //  new view template files.
+    template: '<content/>',
+    scope: {
+      instance: null
+    },
+    events: {
+      init: function () {
+        this.scope.attr('controller', this);
+      },
+
+      'input.model-checkbox click' : function (el, ev) {
+        ev.stopPropagation();
+      },
+
+      '.dropdown-menu-form click' : function (el, ev) {
+        ev.stopPropagation();
+      },
+
+      '.set-display-object-list,.close-dropdown click' : function(el, ev) {
         this.element.find('.dropdown-menu').closest('li').removeClass('open');
       }
     }
