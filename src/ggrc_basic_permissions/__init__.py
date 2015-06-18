@@ -280,6 +280,16 @@ def load_permissions_for(user):
           .setdefault('resources', list())\
           .append(object_owner.ownable_id)
 
+  # Load Read from program relationships
+  for object_person in user.object_people:
+    rels = Relationship.query.filter(and_(
+      Relationship.source_type == object_person.personable_type,
+      Relationship.source_id == object_person.personable_id)).all()
+    for rel in rels:
+      permissions.setdefault('read', {})\
+          .setdefault(rel.destination_type, {})\
+          .setdefault('resources', list())\
+          .append(rel.destination_id)
   personal_context = _get_or_create_personal_context(user)
 
   permissions.setdefault('__GGRC_ADMIN__',{})\

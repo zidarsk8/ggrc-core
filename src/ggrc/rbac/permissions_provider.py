@@ -144,6 +144,12 @@ class DefaultUserPermissions(UserPermissions):
     permissions = self._permissions()
     if not permissions.get(action) or not permissions[action].get(instance._inflector.model_singular):
       return False
+    resources = conditions = self._permissions()\
+        .setdefault(action, {})\
+        .setdefault(instance._inflector.model_singular, {})\
+        .setdefault('resources', {})
+    if instance.id in resources:
+      return True
     conditions = self._permissions()\
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
