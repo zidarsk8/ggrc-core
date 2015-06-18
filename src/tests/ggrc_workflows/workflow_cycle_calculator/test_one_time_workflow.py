@@ -11,11 +11,8 @@ from datetime import date, datetime
 import os
 from ggrc import db
 from ggrc_workflows.models import Workflow, Cycle
-from tests.ggrc_workflows.generator import WorkflowsGenerator
-from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import ObjectGenerator
 
-from tests.ggrc_workflows.workflow_date_calculator.BaseWorkflowTestCase import BaseWorkflowTestCase
+from tests.ggrc_workflows.workflow_cycle_calculator.base_workflow_test_case import BaseWorkflowTestCase
 
 
 if os.environ.get('TRAVIS', False):
@@ -24,10 +21,8 @@ if os.environ.get('TRAVIS', False):
 class TestOneTimeWorkflow(BaseWorkflowTestCase):
   def test_basic_one_time_workflow(self):
     """Basic one time workflow test.
-
-
     """
-    with freeze_time("2014-06-10 13:00:00"):
+    with freeze_time("2015-06-10 13:00:00"): # 6/10/2015 Wednesday
       _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
       resp, tg = self.generator.generate_task_group(wf, data={
         'task_group_tasks': [
@@ -51,3 +46,100 @@ class TestOneTimeWorkflow(BaseWorkflowTestCase):
       # one-time workflow shouldn't do date adjustment
       self.assertEqual(cycle.start_date, date(2015, 6, 18))
       self.assertEqual(cycle.end_date, date(2015, 8, 9))
+
+  def test_future_start_month_after_end_month_next_year(self):
+    """
+      Testing that workflow is activated if it's
+      * in the future
+      * start_date.year < end_date.year
+      * start_date.month > end_date.month
+    """
+    with freeze_time("2014-09-25"):
+      _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
+      resp, tg = self.generator.generate_task_group(wf, data={
+        'task_group_tasks': [
+          {
+            'start_date': date(2014, 10, 1),
+            'end_date': date(2015, 5, 27)
+          },
+        ]
+      })
+
+      _, cycle = self.generator.generate_cycle(wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+
+  def test_future_start_month_before_end_month(self):
+    """
+      Testing that workflow is activated if it's
+      * in the future
+      * start_date.year < end_date.year
+      * start_date.month < end_date.month
+    """
+    with freeze_time("2014-09-25"):
+      _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
+      resp, tg = self.generator.generate_task_group(wf, data={
+        'task_group_tasks': [
+          {
+            'start_date': date(2014, 10, 1),
+            'end_date': date(2015, 11, 27)
+          },
+        ]
+      })
+
+      _, cycle = self.generator.generate_cycle(wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+
+
+  def test_past_start_month_after_end_month(self):
+    """
+      Testing that workflow is activated if it's
+      * in the past
+      * start_date.year < end_date.year
+      * start_date.month > end_date.month
+    """
+    with freeze_time("2015-06-01"):
+      _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
+      resp, tg = self.generator.generate_task_group(wf, data={
+        'task_group_tasks': [
+          {
+            'start_date': date(2014, 10, 1),
+            'end_date': date(2015, 5, 27)
+          },
+        ]
+      })
+
+      _, cycle = self.generator.generate_cycle(wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+
+  def test_past_start_month_before_end_month(self):
+    """
+      Testing that workflow is activated if it's
+      * in the past
+      * start_date.year < end_date.year
+      * start_date.month < end_date.month
+    """
+    with freeze_time("2015-06-01"):
+      _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
+      resp, tg = self.generator.generate_task_group(wf, data={
+        'task_group_tasks': [
+          {
+            'start_date': date(2014, 3, 1),
+            'end_date': date(2015, 5, 27)
+          },
+        ]
+      })
+
+      _, cycle = self.generator.generate_cycle(wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
