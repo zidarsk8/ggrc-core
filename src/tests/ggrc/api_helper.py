@@ -93,6 +93,10 @@ class Api():
     return self.data_to_json(self.tc.get(
         "{}?ids={}".format(self.api_link(obj), ids)))
 
+  def get_query(self, obj, query):
+    return self.data_to_json(self.tc.get(
+        "{}?{}".format(self.api_link(obj), query)))
+
   def delete(self, obj, id):
     response = self.get(obj, obj.id)
     headers = {
