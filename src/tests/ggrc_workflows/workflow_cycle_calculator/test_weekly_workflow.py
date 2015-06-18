@@ -12,6 +12,7 @@ import os
 from ggrc import db
 from ggrc_workflows.models import Workflow, Cycle
 from ggrc_workflows import start_recurring_cycles
+from ggrc_workflows.services.workflow_cycle_calculator.weekly_cycle_calculator import WeeklyCycleCalculator
 
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
@@ -24,6 +25,35 @@ if os.environ.get('TRAVIS', False):
   random.seed(1)  # so we can reproduce the tests if needed
 
 class TestWeeklyWorkflow(BaseWorkflowTestCase):
+  def test_relative_to_day(self):
+    rtd = WeeklyCycleCalculator.relative_day_to_date
+
+    # Test relative day to date conversion at the start of the week
+    with freeze_time("2015-6-8 13:00:00"): # Monday, 6/8/2015
+      self.assertEqual(rtd("1"), date(2015, 6, 8))
+      self.assertEqual(rtd("2"), date(2015, 6, 9))
+      self.assertEqual(rtd("3"), date(2015, 6, 10))
+      self.assertEqual(rtd("4"), date(2015, 6, 11))
+      self.assertEqual(rtd("5"), date(2015, 6, 12))
+      with self.assertRaises(ValueError): rtd("6")
+      with self.assertRaises(ValueError): rtd(7)
+
+    # Test relative day to date conversion at the end of the week
+    with freeze_time("2015-6-12 13:00:00"): # Friday, 6/12/2015
+      self.assertEqual(rtd("1"), date(2015, 6, 8))
+      self.assertEqual(rtd("2"), date(2015, 6, 9))
+      self.assertEqual(rtd("3"), date(2015, 6, 10))
+      self.assertEqual(rtd("4"), date(2015, 6, 11))
+      self.assertEqual(rtd("5"), date(2015, 6, 12))
+
+    # Test that we correctly adjust if we run on the weekend
+    with freeze_time("2015-6-14 13:00:00"): # Sunday, 6/14/2015
+      self.assertEqual(rtd("1"), date(2015, 6, 15))
+      self.assertEqual(rtd("2"), date(2015, 6, 16))
+      self.assertEqual(rtd("3"), date(2015, 6, 17))
+      self.assertEqual(rtd("4"), date(2015, 6, 18))
+      self.assertEqual(rtd("5"), date(2015, 6, 19))
+
   def test_future_cycle(self):
     """Future cycle workflow
 
@@ -155,9 +185,9 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
           },
           {
             'title': 'weekly task 2',
-            "relative_start_day": 2, # Wednesday, 10th
+            "relative_start_day": 2, # Tuesday, 9th
             "relative_start_month": None,
-            "relative_end_day": 4, # 11th, Tuesday
+            "relative_end_day": 4, # 11th, Thursday
             "relative_end_month": None,
             }
         ],

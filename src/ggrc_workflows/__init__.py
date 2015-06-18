@@ -200,14 +200,8 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user):
   description = models.CycleTaskGroupObjectTask.default_description if \
       task_group_task.object_approval else task_group_task.description
 
-  # print "_create_cycle_task: ", cycle.calculator
   date_range = cycle.calculator.task_date_range(task_group_task)
-  start_date, end_date = date_range['start_date'], date_range['end_date']
-  # print "task: ", task_group_task.title
-  # print "    date range: ", date_range
-  # print "    start date", start_date, task_group_task.relative_start_day
-  # print "    end date", end_date, task_group_task.relative_end_day
-
+  start_date, end_date = date_range
 
   cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
       context=cycle.context,
@@ -546,7 +540,7 @@ def update_workflow_state(workflow):
 
   calculator = WorkflowCycleCalculator(workflow)
   date_range = WorkflowCycleCalculator(workflow).workflow_date_range()
-  start_date, end_date = date_range['start_date'], date_range['end_date']
+  start_date, end_date = date_range
 
   # Start the first cycle if min_start_date < today < max_end_date
   if workflow.recurrences:
@@ -555,7 +549,7 @@ def update_workflow_state(workflow):
             and not workflow.cycles:
       cycle = models.Cycle()
       cycle.workflow = workflow
-      cycle.calculator = WorkflowCycleCalculator(workflow)
+      cycle.calculator = calculator
       # Other cycle attributes will be set in build_cycle.
       # So, no need to set them here.
       build_cycle(cycle, None)
@@ -563,7 +557,6 @@ def update_workflow_state(workflow):
 
     # Set the next_cycle_start_date to one frequency period (month, day, year)
     # ahead of the min_start_date
-    print
     workflow.next_cycle_start_date = calculator.next_cycle_start_date()
     db.session.add(workflow)
     db.session.flush()
