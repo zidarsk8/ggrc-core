@@ -32,7 +32,6 @@ class PersonGenerator():
     name = name if name else names.get_full_name()
     return self.api.post(Person, {'person': {
         'name': name,
-        'is_enabled': True,
         'email': '{}@reciprocitylabs.com'.format(name.replace(' ', '.').lower()),
         'context': None,
       }})

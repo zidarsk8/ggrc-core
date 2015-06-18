@@ -577,7 +577,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     element_names = set([
         "Name",
         "Email",
-        "enabled user",
         "Company",
     ])
     expected_names = element_names.union(mapping_names)

@@ -26,7 +26,7 @@
       </label>
         {{#using assignee=instance.contact model_singular=model.model_singular}}
         <div class="objective-selector">
-          <input id="task_group_assignee" tabindex="2" type="text" name="contact.email" class="span10 search-icon" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.email ''}}">
+          <input id="task_group_assignee" tabindex="2" type="text" name="contact.email" class="span10 search-icon" data-lookup="Person" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.email ''}}">
         </div>
         {{/using}}
 
