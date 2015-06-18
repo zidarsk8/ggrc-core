@@ -46,7 +46,8 @@ GGRC.tree_view.child_tree_model_list = [
     { model_name: 'System', model_lowercase: 'system', model_plural: 'systems', display_name: 'Systems'},
     { model_name: 'Vendor', model_lowercase: 'vendor', model_plural: 'vendors', display_name: 'Vendors'}
 ];
-GGRC.tree_view.child_tree_display_list = new can.Observe.List([]);
+
+GGRC.tree_view.sub_tree_for = [];
 
 function _display_tree_subpath(el, path, attempt_counter) {
   attempt_counter || (attempt_counter = 0);
@@ -294,10 +295,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       //find current widget model and check if first layer tree
       if (this.options.parent) { //this is a second label tree
         var parent_model_name = this.options.parent.options.model.shortName;
-        var obj = _.find(GGRC.tree_view.child_tree_display_list, function (obj) {
-          return obj.model_name == parent_model_name ;
-        });
-        child_tree_display_list = obj.display_list;
+        child_tree_display_list = GGRC.tree_view.sub_tree_for[parent_model_name].display_list;
 
         //check if all objects selected, then skip filter
         if (child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
@@ -486,25 +484,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     // Get child_tree_display_list from local storage
     saved_child_tree_display_list = this.display_prefs.getChildTreeDisplayList(model_name);
 
-    var updated_ggrc_tree_view = false;
     if (saved_child_tree_display_list !== null) {
-      //update GGRC.tree_view.child_tree_display_list
       child_tree_display_list = saved_child_tree_display_list;
-      can.each(GGRC.tree_view.child_tree_display_list, function (item, i) {
-        if(item.model_name === model_name) { //item already exists, update the display_list
-          GGRC.tree_view.child_tree_display_list[i].display_list = saved_child_tree_display_list;
-          updated_ggrc_tree_view = true;
-        }
-      });
-      if (!updated_ggrc_tree_view) {
-        GGRC.tree_view.child_tree_display_list
-          .push({model_name : model_name, display_list : saved_child_tree_display_list});
-      }
+      GGRC.tree_view.sub_tree_for[model_name] = {display_list: saved_child_tree_display_list};
     } else {
-      //update GGRC.tree_view.child_tree_display_list to default list
       child_tree_display_list = def_child_tree_display_list;
-      GGRC.tree_view.child_tree_display_list
-          .push({model_name : model_name, display_list : def_child_tree_display_list});
+      GGRC.tree_view.sub_tree_for[model_name] = {display_list: def_child_tree_display_list};
     }
 
     //set up display status for UI
@@ -514,6 +499,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
     this.options.attr('child_tree_model_list', child_tree_model_list);
+    this.options.attr('selected_model_name', model_name);
     //this.options.attr('child_tree_display_list', child_tree_display_list);
   },
 
@@ -1197,12 +1183,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     $selected.each( function(index) {
       selected_items.push(this.value);
     });
-    //find the object in GGRC.tree_view.child_tree_display_list and update
-    can.each(GGRC.tree_view.child_tree_display_list, function (item, i) {
-      if (item.model_name === model_name) {
-        GGRC.tree_view.child_tree_display_list[i].display_list = selected_items;
-      }
-    });
+    //update GGRC.tree_view
+    GGRC.tree_view.sub_tree_for[model_name] = {display_list: selected_items};
+
     //save in local storage
     this.display_prefs.setChildTreeDisplayList(model_name, selected_items);
 
