@@ -167,48 +167,26 @@ class Converter(object):
       key_counts = counts.get(key) if counts else None
       self.remove_duplicate_keys(key, key_counts)
 
-  def gather_messages(self):
-
-    def get_propper_name(count):
-      if count > 1:
-        return self.object_class._inflector.human_plural
-      return self.object_class._inflector.human_singular
-    messages = {
-        "errors": [],
-        "warnings": [],
-        "info": [],
-    }
-    messages["errors"].extend(self.errors)
-    messages["warnings"].extend(self.warnings)
-    fail = 0
-    insert = 0
-    update = 0
+  def get_info(self):
+    error_messages= []
+    warning_messages= []
     for row_converter in self.row_converters:
-      # row errors are just warnings since other rows can still import
-      messages["warnings"].extend(row_converter.errors)
-      messages["warnings"].extend(row_converter.warnings)
-      if row_converter.errors or row_converter.ignore:
-        fail += 1
-      elif row_converter.is_new:
-        insert += 1
-      else:
-        update += 1
+      error_messages.extend(row_converter.errors)
+      warning_messages.extend(row_converter.warnings)
+    statuses = [(r.is_new, r.ignore) for r in self.row_converters]
+    info = {
+        "name": self.object_class._inflector.human_singular.title(),
+        "rows": len(self.rows),
+        "new": statuses.count((True, False)),
+        "updated": statuses.count((False, False)),
+        "errors": statuses.count((False, True)) + statuses.count((True, True)),
+        "data": [
+            {"status": "errors", "messages": error_messages},
+            {"status": "warnings", "messages": warning_messages},
+        ]
+    }
 
-    be_text = "will be" if self.dry_run else "were"
-    fail_text = "will fail" if self.dry_run else "failed"
-
-    # TODO: remame erros to messages and add this text there
-    if insert:
-      messages["info"].append("{} {} {} inserted.".format(
-          insert, get_propper_name(insert), be_text))
-    if update:
-      messages["info"].append("{} {} {} updated.".format(
-          update, get_propper_name(update), be_text))
-    if fail:
-      messages["info"].append("{} {} {}.".format(
-          fail, get_propper_name(fail), fail_text))
-
-    return messages
+    return info
 
   def import_mappings(self, slugs_dict):
     for row_converter in self.row_converters:

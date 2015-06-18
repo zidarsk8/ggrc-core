@@ -107,7 +107,7 @@ def handle_import_request():
   dry_run, csv_data = parse_import_request()
   offsets, data_blocks = split_array(csv_data)
 
-  response_data = defaultdict(list)
+  response_data = []
   new_slugs = defaultdict(set)
   converters = []
   for offset, data in zip(offsets, data_blocks):
@@ -119,9 +119,9 @@ def handle_import_request():
 
   for converter in converters:
     converter.import_mappings(new_slugs)
-    update_response_data(response_data, converter.gather_messages())
+    response_data.append(converter.get_info())
 
-  # response_json = json.dumps(response_data)
+  response_json = json.dumps(response_data)
   response_json = json.dumps([
       {
         "name": "Controls",
