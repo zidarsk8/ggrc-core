@@ -86,6 +86,7 @@ dashboard-js-files:
   - controllers/mapping_count_controller.js
   - controllers/info_pin_controller.js
   - controllers/assessment_generator.js
+  - controllers/automapper_controller.js
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
