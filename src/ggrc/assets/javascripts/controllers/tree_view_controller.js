@@ -1175,10 +1175,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , set_tree_display_list : function (ev) {
-    var model_name = this.options.model.model_singular,
+    var model_name,// = this.options.model.model_singular,
         $check = this.element.parent().find('.model-checkbox'),
         $selected = $check.filter(':checked'),
         selected_items=[];
+
+    model_name = this.element.parent().find('.object-type-selector').val();
+
     //save the list
     $selected.each( function(index) {
       selected_items.push(this.value);
@@ -1544,7 +1547,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
       instance: null
     },
     events: {
-      init: function () {
+      init : function () {
         this.scope.attr('controller', this);
       },
 
@@ -1555,6 +1558,26 @@ can.Control("CMS.Controllers.TreeViewNode", {
       '.dropdown-menu-form click' : function (el, ev) {
         ev.stopPropagation();
       },
+
+      update_check_boxes : function (el, ev) {
+        var model_name = this.element.find('.object-type-selector').val(),
+            display_list = GGRC.tree_view.sub_tree_for[model_name].display_list,
+            $check = this.element.find('.model-checkbox'),
+            $selected = $check.filter(':checked');
+
+        //uncheck all checked, and check based on display_list
+        $selected.prop('checked', false);
+
+        can.each($check, function (item) {
+          if (display_list.indexOf(item.value) !== -1) {
+            $(item).prop('checked', true);
+          }
+        });
+      },
+
+      'select.object-type-selector change' : 'update_check_boxes',
+
+      '.tview-type-toggle click' : 'update_check_boxes',
 
       '.set-display-object-list,.close-dropdown click' : function(el, ev) {
         this.element.find('.dropdown-menu').closest('li').removeClass('open');
