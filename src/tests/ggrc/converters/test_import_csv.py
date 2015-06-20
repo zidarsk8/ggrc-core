@@ -37,8 +37,8 @@ class TestBasicCsvImport(TestCase):
   def generate_people(self, people):
     for person in people:
       self.generator.generate_person({
-        "name": person,
-        "email": "{}@reciprocitylabs.com".format(person),
+          "name": person,
+          "email": "{}@reciprocitylabs.com".format(person),
       }, "gGRC Admin")
 
   def import_file(self, filename, dry_run=False):
@@ -72,9 +72,11 @@ class TestBasicCsvImport(TestCase):
         errors.WRONG_REQUIRED_VALUE.format(line=5, column_name="State"),
         errors.WRONG_REQUIRED_VALUE.format(line=6, column_name="State"),
     ])
-    self.assertEqual(expected_warnings, set(response_json["warnings"]))
-    self.assertEqual([], response_json["errors"])
-    self.assertIn("4 policies will be inserted.", response_json["info"])
+    response_warnings = response_json[0]["row_warnings"]
+    self.assertEqual(expected_warnings, set(response_warnings))
+    response_errors = response_json[0]["row_errors"]
+    self.assertEqual(set(), set(response_errors))
+    self.assertEqual(4, response_json[0]["new"])
     policies = Policy.query.all()
     self.assertEqual(len(policies), 0)
 
@@ -98,13 +100,12 @@ class TestBasicCsvImport(TestCase):
     filename = "policy_same_titles.csv"
     response_json = self.import_file(filename)
 
-    info_set = set([
-        "3 policies were inserted.",
-        "6 policies failed.",
-    ])
-    self.assertEqual(info_set, set(response_json["info"]))
+    self.assertEqual(3, response_json[0]["new"])
+    self.assertEqual(6, response_json[0]["ignored"])
+    self.assertEqual(0, response_json[0]["updated"])
+    self.assertEqual(9, response_json[0]["rows"])
 
-    expected_warnings = set([
+    expected_errors = set([
         errors.DUPLICATE_VALUE_IN_CSV.format(
             line_list="3, 4, 6, 10, 11", column_name="Title",
             value="A title", s="s", ignore_lines="4, 6, 10, 11"),
@@ -115,7 +116,8 @@ class TestBasicCsvImport(TestCase):
             line_list="8, 9, 10, 11", column_name="Code", value="code",
             s="s", ignore_lines="9, 10, 11"),
     ])
-    self.assertEqual(expected_warnings, set(response_json["warnings"]))
+    response_errors = response_json[0]["row_errors"]
+    self.assertEqual(expected_errors, set(response_errors))
 
     policies = Policy.query.all()
     self.assertEqual(len(policies), 3)
@@ -128,10 +130,10 @@ class TestBasicCsvImport(TestCase):
     filename = "facilities_intermappings.csv"
     response_json = self.import_file(filename, dry_run=True)
 
-    info_set = set(["4 facilities will be inserted."])
-    self.assertEqual(info_set, set(response_json["info"]))
+    self.assertEqual(4, response_json[0]["new"])
 
-    self.assertEqual(set(), set(response_json["warnings"]))
+    response_warnings = response_json[0]["row_warnings"]
+    self.assertEqual(set(), set(response_warnings))
     self.assertEqual(0, Relationship.query.count())
 
   def test_facilities_intermappings(self):
@@ -140,9 +142,8 @@ class TestBasicCsvImport(TestCase):
     filename = "facilities_intermappings.csv"
     response_json = self.import_file(filename)
 
-    info_set = set(["4 facilities were inserted."])
-    self.assertEqual(info_set, set(response_json["info"]))
+    self.assertEqual(4, response_json[0]["new"])
 
-    self.assertEqual(set(), set(response_json["warnings"]))
+    response_warnings = response_json[0]["row_warnings"]
+    self.assertEqual(set(), set(response_warnings))
     self.assertEqual(4, Relationship.query.count())
-

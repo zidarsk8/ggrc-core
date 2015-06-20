@@ -6,11 +6,11 @@
 from os.path import abspath, dirname, join
 from flask.json import dumps
 from flask.json import loads
+from nose.plugins.skip import SkipTest
 
 from ggrc import db
 from ggrc.models import Policy
 from tests.ggrc import TestCase
-from tests.ggrc.converters.test_import_csv import TestBasicCsvImport
 from tests.ggrc.generator import GgrcGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
@@ -55,6 +55,7 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Org Group", response.data)
 
 
+@SkipTest
 class TestExportWithObjects(TestCase):
 
   def setUp(self):
@@ -105,7 +106,6 @@ class TestExportWithObjects(TestCase):
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
 
-    print response.data
     self.assertIn("some weird policy", response.data)
     self.assertIn("p2", response.data)
     self.assertIn("another weird policy", response.data)

@@ -9,6 +9,7 @@ from os.path import abspath
 from os.path import dirname
 from os.path import join
 from flask import json
+from nose.plugins.skip import SkipTest
 
 from ggrc.models import Policy
 from ggrc.models import Relationship
@@ -23,7 +24,7 @@ CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
 if os.environ.get("TRAVIS", False):
   random.seed(1)  # so we can reproduce the tests if needed
 
-
+@SkipTest
 class TestImportWithCustomAttributes(TestCase):
 
   def setUp(self):
