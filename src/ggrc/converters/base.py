@@ -31,8 +31,10 @@ class Converter(object):
   Attributes:
     attr_index (dict): reverse index for getting attribute name from
       display_name
-    errors (list of str): list containing fatal import errors
-    warnings (list of str): list containing import warnings
+    block_errors (list of str): list containing fatal import errors
+    block_warnings (list of str): list containing blokc level import warnings
+    row_errors (list of str): list containing row errors
+    row_warnings (list of str): list containing row warnings
     ids (list of int): list containing all ids for the converted objects
     rows (list of list of str): 2D array containg csv data
     row_objects (list of RowConverter): list of row convertor objects with
@@ -75,8 +77,10 @@ class Converter(object):
     self.ids = options.get('ids', [])
     self.dry_run = options.get('dry_run', )
     self.object_class = object_class
-    self.errors = []
-    self.warnings = []
+    self.block_errors = []
+    self.block_warnings = []
+    self.row_errors = []
+    self.row_warnings = []
     self.row_objects = []
     self.row_converters = []
     self.object_headers = get_object_column_definitions(object_class)
@@ -168,22 +172,17 @@ class Converter(object):
       self.remove_duplicate_keys(key, key_counts)
 
   def get_info(self):
-    error_messages = []
-    warning_messages = []
-    for row_converter in self.row_converters:
-      error_messages.extend(row_converter.errors)
-      warning_messages.extend(row_converter.warnings)
-    statuses = [(r.is_new, r.ignore) for r in self.row_converters]
+    stats = [(r.is_new, r.ignore) for r in self.row_converters]
     info = {
         "name": self.object_class._inflector.human_singular.title(),
         "rows": len(self.rows),
-        "new": statuses.count((True, False)),
-        "updated": statuses.count((False, False)),
-        "ignored": statuses.count((False, True)) + statuses.count((True, True)),
-        "messages": {
-            "warnings": warning_messages,
-            "errors": error_messages,
-        },
+        "new": stats.count((True, False)),
+        "updated": stats.count((False, False)),
+        "ignored": stats.count((False, True)) + stats.count((True, True)),
+        "block_warnings": self.block_warnings,
+        "block_errors": self.block_errors,
+        "row_warnings": self.row_warnings,
+        "row_errors": self.row_errors,
     }
 
     return info
@@ -217,9 +216,13 @@ class Converter(object):
     update_memcache_after_commit(self)
     update_index(db.session, modified_objects)
 
+  def add_errors(self, template, **kwargs):
+    message = template.format(**kwargs)
+    self.block_errors.append(message)
+
   def add_warning(self, template, **kwargs):
     message = template.format(**kwargs)
-    self.warnings.append(message)
+    self.block_warnings.append(message)
 
   def get_new_slugs(self):
     slugs = set([row.get_value("slug") for row in self.row_converters])
@@ -238,13 +241,14 @@ class Converter(object):
       if len(indexes) > 1:
         offset_indexes = [i + self.offset + 3 for i in indexes]
         str_indexes = map(str, offset_indexes)
-        self.add_warning(
-            errors.DUPLICATE_VALUE_IN_CSV,
-            line_list=", ".join(str_indexes),
-            column_name=self.headers[key]["display_name"],
-            s="s" if len(str_indexes) > 2 else "",
-            value=value,
-            ignore_lines=", ".join(str_indexes[1:]),
+        self.row_errors.append(
+            errors.DUPLICATE_VALUE_IN_CSV.format(
+                line_list=", ".join(str_indexes),
+                column_name=self.headers[key]["display_name"],
+                s="s" if len(str_indexes) > 2 else "",
+                value=value,
+                ignore_lines=", ".join(str_indexes[1:]),
+            )
         )
 
       for index in indexes[1:]:

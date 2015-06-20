@@ -16,8 +16,6 @@ class RowConverter(object):
     self.converter = converter
     self.options = options.copy()
     self.object_type = object_type
-    self.errors = []
-    self.warnings = []
     self.obj = None
     self.is_new = True
     self.ignore = False
@@ -33,12 +31,12 @@ class RowConverter(object):
 
   def add_error(self, template, **kwargs):
     message = template.format(line=self.line, **kwargs)
-    self.errors.append(message)
+    self.converter.row_errors.append(message)
     self.ignore = True
 
   def add_warning(self, template, **kwargs):
     message = template.format(line=self.line, **kwargs)
-    self.warnings.append(message)
+    self.converter.row_warnings.append(message)
 
   def handle_row_data(self):
     """ Pack row data with handlers """
