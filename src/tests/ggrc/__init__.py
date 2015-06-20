@@ -27,7 +27,7 @@ class TestCase(BaseTestCase):
     # this is a horrible hack because db.metadata.sorted_tables does not sort
     # by dependencies. Events table is before Person table - reversed is bad.
     ignore_tables = (
-        "test_model", "roles", "notification_types", "object_types"
+        "test_model", "roles", "notification_types", "object_types", "options"
     )
     tables = set(db.metadata.tables).difference(ignore_tables)
     for _ in range(len(tables)):
