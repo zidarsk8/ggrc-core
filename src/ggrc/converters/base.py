@@ -168,8 +168,8 @@ class Converter(object):
       self.remove_duplicate_keys(key, key_counts)
 
   def get_info(self):
-    error_messages= []
-    warning_messages= []
+    error_messages = []
+    warning_messages = []
     for row_converter in self.row_converters:
       error_messages.extend(row_converter.errors)
       warning_messages.extend(row_converter.warnings)
@@ -179,11 +179,11 @@ class Converter(object):
         "rows": len(self.rows),
         "new": statuses.count((True, False)),
         "updated": statuses.count((False, False)),
-        "errors": statuses.count((False, True)) + statuses.count((True, True)),
-        "data": [
-            {"status": "errors", "messages": error_messages},
-            {"status": "warnings", "messages": warning_messages},
-        ]
+        "ignored": statuses.count((False, True)) + statuses.count((True, True)),
+        "messages": {
+            "warnings": warning_messages,
+            "errors": error_messages,
+        },
     }
 
     return info

@@ -122,25 +122,6 @@ def handle_import_request():
     response_data.append(converter.get_info())
 
   response_json = json.dumps(response_data)
-  response_json = json.dumps([
-      {
-        "name": "Controls",
-        "rows": 52,
-        "updated": 52231,
-        "data": [
-          {"status": "errors", "messages": ["Z Hello", "ZZ World"]},
-          {"status": "warnings", "messages": ["Hello", "World"]},
-        ]
-      }, {
-        "name": "Program",
-        "rows": 52,
-        "updated": 52231,
-        "data": [
-          {"status": "errors", "messages": ["Z Hello", "ZZ World"]},
-          {"status": "warnings", "messages": ["Hello", "World"]},
-        ],
-      }
-    ])
   headers = [('Content-Type', 'application/json')]
   return current_app.make_response((response_json, 200, headers))
 
