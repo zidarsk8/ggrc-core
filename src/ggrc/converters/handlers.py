@@ -5,9 +5,11 @@
 
 import re
 from dateutil.parser import parse
+from sqlalchemy import and_
 
 from ggrc import db
 from ggrc.models import Person
+from ggrc.models import Option
 from ggrc.models import Relationship
 from ggrc.login import get_current_user
 from ggrc.converters import IMPORTABLE
@@ -68,7 +70,7 @@ class StatusColumnHandler(ColumnHandler):
   def __init__(self, row_converter, key, **options):
     self.key = key
     valid_states = row_converter.object_type.VALID_STATES
-    self.state_mappings = {s.lower():s for s in valid_states}
+    self.state_mappings = {s.lower(): s for s in valid_states}
     super(StatusColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
@@ -206,7 +208,6 @@ class MappingColumnHandler(ColumnHandler):
                          object_type=pretty_class_name(class_), slug=slug)
     return objects
 
-
   def set_obj_attr(self):
     """ Create a new mapping object """
     current_obj = self.row_converter.obj
@@ -220,6 +221,19 @@ class MappingColumnHandler(ColumnHandler):
 class CustomAttributeColumHandler(ColumnHandler):
   pass
 
+
+class OptionColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    print "---- '{}'".format(self.raw_value)
+    item = Option.query.filter(
+        and_(Option.role == self.key,
+             Option.title == self.raw_value.strip())).first()
+    return item
+
+
+
+
 COLUMN_HANDLERS = {
     "slug": SlugColumnHandler,
     "title": TextColumnHandler,
@@ -231,4 +245,6 @@ COLUMN_HANDLERS = {
     "end_date": DateColumnHandler,
     "report_end_date": DateColumnHandler,
     "report_start_date": DateColumnHandler,
+    "verify_frequency": OptionColumnHandler,
+    "kind": OptionColumnHandler,
 }
