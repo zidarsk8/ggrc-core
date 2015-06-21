@@ -86,6 +86,12 @@ class TestCreatorProgram(TestCase):
             "href": "/api/contexts/{}".format(context_id)
         }},
     })
+    self.api.set_user(self.creator2)
+    response = self.api.get(all_models.Program, program_id)
+    self.assertEquals(response.status_code, 403)
+    response = self.api.get(all_models.System, system_id)
+    self.assertEquals(response.status_code, 403)
+    self.api.set_user(self.creator1)
     response = self.api.post(all_models.UserRole, {"user_role": {
         "person": {
             "id": self.creator2_id,
