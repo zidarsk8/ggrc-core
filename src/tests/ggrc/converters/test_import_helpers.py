@@ -413,7 +413,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     expected_names = set([
         "Name",
         "Email",
-        "enabled user",
         "Company",
     ])
     self.assertEquals(expected_names, display_names)

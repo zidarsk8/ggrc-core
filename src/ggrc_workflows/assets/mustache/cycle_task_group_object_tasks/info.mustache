@@ -51,7 +51,7 @@
           <div data-force-refresh="true" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
             {{#using contact=instance.contact}}
               <div class="objective-selector">
-                <input type="text" name="contact.name" data-lookup="Person" data-params="Person:is_enabled=1" class="search-icon input-block-level" {{#if_equals instance.status 'Verified'}}disabled="disabled"{{/if}} placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
+                <input type="text" name="contact.name" data-lookup="Person" class="search-icon input-block-level" {{#if_equals instance.status 'Verified'}}disabled="disabled"{{/if}} placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
               </div>
             {{/using}}
           </div>
