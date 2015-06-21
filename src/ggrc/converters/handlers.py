@@ -149,12 +149,24 @@ class TextColumnHandler(ColumnHandler):
     """ Remove multiple spaces and new lines from text """
     if not self.raw_value:
       return ""
-    stripped_value = self.raw_value.strip()
-    clean_value = re.sub(r'\s+', " ", stripped_value)
-    if clean_value != stripped_value:
+
+    return self.clean_whitespaces(self.raw_value.strip())
+
+  def clean_whitespaces(self, value):
+    clean_value = re.sub(r'\s+', " ", value)
+    if clean_value != value:
       self.add_warning(errors.WHITESPACE_WARNING,
                        column_name=self.display_name)
+    return value
 
+
+class RequiredTextColumnHandler(TextColumnHandler):
+
+  def parse_item(self):
+    value = self.raw_value or ""
+    clean_value = self.clean_whitespaces(value.strip())
+    if not clean_value:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return clean_value
 
 
@@ -236,7 +248,7 @@ class OptionColumnHandler(ColumnHandler):
 
 COLUMN_HANDLERS = {
     "slug": SlugColumnHandler,
-    "title": TextColumnHandler,
+    "title": RequiredTextColumnHandler,
     "owners": OwnerColumnHandler,
     "status": StatusColumnHandler,
     "contact": UserColumnHandler,

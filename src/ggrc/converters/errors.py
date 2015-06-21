@@ -53,7 +53,7 @@ WRONG_VALUE = ("Line {line}: {column_name} contains invalid data. The value"
 WRONG_REQUIRED_VALUE = ("Line {line}: Required field {column_name} contains"
                      " invalid data. The default value will be used")
 
-MISSING_VALUE_ERROR = ("Line {line}: Field {colum_name} is required. The line"
+MISSING_VALUE_ERROR = ("Line {line}: Field {column_name} is required. The line"
                        " will be ignored.")
 
 PERMISSION_ERROR = ("Line {line}: You don't have permission to update/delete"
