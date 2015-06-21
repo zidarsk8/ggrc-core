@@ -6,6 +6,7 @@
 import re
 from dateutil.parser import parse
 from sqlalchemy import and_
+from sqlalchemy import or_
 
 from ggrc import db
 from ggrc.models import Person
@@ -237,13 +238,13 @@ class CustomAttributeColumHandler(ColumnHandler):
 class OptionColumnHandler(ColumnHandler):
 
   def parse_item(self):
-    print "---- '{}'".format(self.raw_value)
+    prefixed_key = "{}_{}".format(
+        self.row_converter.object_type._inflector.table_singular, self.key)
     item = Option.query.filter(
-        and_(Option.role == self.key,
-             Option.title == self.raw_value.strip())).first()
+        and_(Option.title == self.raw_value.strip(),
+             or_(Option.role == self.key,
+                 Option.role == prefixed_key))).first()
     return item
-
-
 
 
 COLUMN_HANDLERS = {
