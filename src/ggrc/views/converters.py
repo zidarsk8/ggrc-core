@@ -142,3 +142,8 @@ def init_converter_views():
   @login_required
   def import_view():
     return render_template("import_export/import.haml")
+
+  @app.route("/export")
+  @login_required
+  def export_view():
+    return render_template("import_export/export.haml")

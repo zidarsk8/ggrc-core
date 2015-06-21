@@ -107,7 +107,8 @@ dashboard-js-files:
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   - components/link_to_clipboard.js
-  - components/csv_import.js
+  - components/csv/import.js
+  - components/csv/export.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -329,6 +330,13 @@ dashboard-js-template-files:
   - import_export/complete.mustache
   - import_export/faq.mustache
   - import_export/import.mustache
+  - import_export/export.mustache
+  - import_export/export/object_selector.mustache
+  - import_export/export/attribute_selector.mustache
+  - import_export/export/filter_query.mustache
+  - import_export/export/relevance.mustache
+
+
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`

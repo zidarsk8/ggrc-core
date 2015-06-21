@@ -1,0 +1,52 @@
+{{!
+  Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: ivan@reciprocitylabs.com
+  Maintained By: ivan@reciprocitylabs.com
+}}
+
+<csv-export filename="Export Objects">
+<div class="info no-space">
+  <div class="choose-object-wrap bottom-space">
+    <div class="left-right-space">
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="report-title">
+            {{#if editFilename}}
+              <div class="report-title-change">
+                <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
+                <a class="btn btn-primary btn-small title-change" href="#">Save</a>
+              </div>
+            {{else}}
+              <h2 class="title">
+                {{filename}} <a class="report-title-trigger" href="#"><i class="grcicon-edit"></i></a>
+              </h2>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      {{> /static/mustache/import_export/export/object_selector.mustache}}
+      {{> /static/mustache/import_export/export/attribute_selector.mustache}}
+      {{> /static/mustache/import_export/export/filter_query.mustache}}
+      <csv-relevance-filter>
+        {{> /static/mustache/import_export/export/relevance.mustache}}
+      </csv-relevance-filter>
+      <div class="add-rule add-object">
+        <a href="#" id="addRelevantFilterRule" class="addFilterRule btn btn-small btn-info">Export another object type</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="save-template-wrap">
+    <div class="save-template">
+      <span class="export-note">0 records will be exported</span>
+      <div class="btn-group pull-right">
+        <button type="submit" class="btn btn-success btn-small">
+          <i class="grcicon-export-white"></i> Export Data
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</csv-export>

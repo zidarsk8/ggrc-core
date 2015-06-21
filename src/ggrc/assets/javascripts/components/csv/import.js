@@ -39,7 +39,9 @@
                 memo[item.value] = [];
                 return memo;
               }, {});
-
+        // data = {
+        //   "Section": [1, 2, 3]
+        // }
         $.ajax({
           type: "POST",
           dataType: "json",
