@@ -139,6 +139,7 @@ class Converter(object):
 
     clean_headers = OrderedDict()
     header_names = self.get_header_names()
+    removed_count = 0
     for index, header in enumerate(headers):
       if header in header_names:
         field_name = header_names[header]
@@ -147,7 +148,8 @@ class Converter(object):
         self.add_warning(errors.UNKNOWN_COLUMN,
                          line=self.offset + 2,
                          column_name=header)
-        self.remove_culumn(index)
+        self.remove_culumn(index - removed_count)
+        removed_count += 1
     return clean_headers
 
   def remove_culumn(self, index):
