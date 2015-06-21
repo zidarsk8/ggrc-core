@@ -6,10 +6,12 @@
 import datetime
 from flask import Blueprint, session, g
 import sqlalchemy.orm
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy import and_, or_
 from ggrc import db, settings
 from ggrc.login import get_current_user, login_required
+from ggrc.models import all_models
 from ggrc.models.person import Person
 from ggrc.models.audit import Audit
 from ggrc.models.response import Response
@@ -280,16 +282,42 @@ def load_permissions_for(user):
           .setdefault('resources', list())\
           .append(object_owner.ownable_id)
 
-  # Load Read from program relationships
-  for object_person in user.object_people:
-    rels = Relationship.query.filter(and_(
-      Relationship.source_type == object_person.personable_type,
-      Relationship.source_id == object_person.personable_id)).all()
-    for rel in rels:
-      permissions.setdefault('read', {})\
-          .setdefault(rel.destination_type, {})\
-          .setdefault('resources', list())\
-          .append(rel.destination_id)
+  # select r.name,
+  #   case when rl.destination_type = 'Program' then rl.source_id else rl.destination_id end,
+  #   case when rl.destination_type = 'Program' then rl.source_type else rl.destination_type end
+  # from user_roles as ur
+  #      join roles as r on ur.role_id = r.id
+  #      join programs as p on p.context_id = ur.context_id
+  #      join relationships as rl on rl.destination_type = 'Program' and rl.destination_id = p.id or rl.source_type = 'Program' and rl.source_id = p.id
+  # where r.name in ('ProgramEditor', 'ProgramOwner', 'ProgramReader') and ur.person_id=1;
+
+  _role = aliased(all_models.Role, name="r")
+  _program = aliased(all_models.Program, name="p")
+  _relationship = aliased(all_models.Relationship, name="rl")
+  _user_role = all_models.UserRole
+
+  q = db.session.query(_user_role).\
+      add_columns(
+          _role.name,
+          _relationship.destination_id, _relationship.destination_type,
+          _relationship.source_id, _relationship.source_type).\
+      join(_role, _user_role.role_id == _role.id).\
+      join(_program, _user_role.context_id == _program.context_id).\
+      join(_relationship, or_(
+          and_(_relationship.destination_type == 'Program',
+               _relationship.destination_id == _program.id),
+          and_(_relationship.source_type == 'Program',
+               _relationship.source_id == _program.id))).\
+      filter(_role.name.in_(('ProgramEditor', 'ProgramOwner', 'ProgramReader'))).\
+      filter(_user_role.person_id == user.id)
+  for res in q.all():
+    _, role_name, s_id, s_type, d_id, d_type = res
+    _type, _id = (d_type, d_id) if s_type == 'Program' else (s_type, s_id)
+    permissions.setdefault('read', {})\
+        .setdefault(_type, {})\
+        .setdefault('resources', list())\
+        .append(_id)
+
   personal_context = _get_or_create_personal_context(user)
 
   permissions.setdefault('__GGRC_ADMIN__',{})\
