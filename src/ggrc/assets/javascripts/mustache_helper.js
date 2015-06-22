@@ -1221,11 +1221,14 @@ Mustache.registerHelper("is_allowed", function () {
 
   // Check permissions
   can.each(actions, function (action) {
+    if (resource) {
+      return Permission.is_allowed_for(action, resource);
+    }
     if (context_id !== undefined) {
       passed = passed && Permission.is_allowed(action, resource_type, context_id);
     }
     if (passed && context_override === 'for' && resource) {
-      passed = passed && Permission.is_allowed_for (action, resource);
+      passed = passed && Permission.is_allowed_for(action, resource);
     }
     else if (passed && context_override === 'any' && resource_type) {
       passed = passed && Permission.is_allowed_any(action, resource_type);
