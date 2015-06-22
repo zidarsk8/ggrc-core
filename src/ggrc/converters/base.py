@@ -61,7 +61,7 @@ class Converter(object):
     object_class = IMPORTABLE.get(csv_data[1][0].strip().lower())
     if not object_class:
       converter = Converter()
-      converter.add_errors(errors.WRONG_OBJECT_TYPE, line=offset+2)
+      converter.add_errors(errors.WRONG_OBJECT_TYPE, line=offset + 2)
       return converter
 
     raw_headers, rows = extract_relevant_data(csv_data)
@@ -266,14 +266,21 @@ class Converter(object):
       for index, row in enumerate(self.row_converters):
         value = row.get_value(key)
         if value:
-          self.unique_counts[key][value].append(index)
+          self.unique_counts[key][value].append(index + self.offset + 3)
+
+  def in_range(self, index, remove_offset=True):
+    if remove_offset:
+      index -= 3 + self.offset
+    return index >= 0 and index < len(self.row_converters)
 
   def remove_duplicate_keys(self, key, counts):
 
     for value, indexes in counts.items():
+      if not any(map(self.in_range, indexes)):
+        continue  # ignore duplicates in other related code blocks
+
       if len(indexes) > 1:
-        offset_indexes = [i + self.offset + 3 for i in indexes]
-        str_indexes = map(str, offset_indexes)
+        str_indexes = map(str, indexes)
         self.row_errors.append(
             errors.DUPLICATE_VALUE_IN_CSV.format(
                 line_list=", ".join(str_indexes),
@@ -284,8 +291,10 @@ class Converter(object):
             )
         )
 
-      for index in indexes[1:]:
-        self.row_converters[index].set_ignore()
+      for offset_index in indexes[1:]:
+        index = offset_index - 3 - self.offset
+        if self.in_range(index, remove_offset=False):
+          self.row_converters[index].set_ignore()
 
   def remove_duplicate_codes(self):
     """ Check for duplacte code entries
