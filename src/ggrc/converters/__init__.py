@@ -12,6 +12,25 @@ from ggrc.models import (
 from ggrc.utils import get_mapping_rules
 
 
+def get_shared_unique_rules():
+  """ get rules for all cross checks betveen classes
+
+  used for checking unique constraints on colums such as code and title
+  """
+
+  shared_tables = [
+      (System, Process),
+      (Section, Clause),
+      (Policy, Regulation, Standard, Contract),
+  ]
+  rules = {}
+  for tables in shared_tables:
+    for table in tables:
+      rules[table] = tables
+
+  return rules
+
+
 def get_allowed_mappings():
   """ get all mapping rules with lowercase names
 

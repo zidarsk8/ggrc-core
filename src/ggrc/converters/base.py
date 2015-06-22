@@ -15,6 +15,7 @@ from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import generate_2d_array
 from ggrc.converters.utils import pretty_class_name
 from ggrc.converters import errors
+from ggrc.converters import get_shared_unique_rules
 from ggrc.services.common import get_modified_objects
 from ggrc.services.common import update_index
 from ggrc.services.common import update_memcache_before_commit
@@ -64,7 +65,9 @@ class Converter(object):
     converter = Converter(object_class, rows=rows, raw_headers=raw_headers,
                           dry_run=dry_run, offset=offset)
 
-    converter.generate_row_converters(unique_counts)
+    converter.add_existing_unique_counts(unique_counts)
+
+    converter.generate_row_converters()
     return converter
 
   @classmethod
@@ -86,6 +89,16 @@ class Converter(object):
     self.object_headers = get_object_column_definitions(object_class)
     raw_headers = options.get('raw_headers', [])
     self.headers = self.clean_headers(raw_headers)
+    self.unique_counts = defaultdict(lambda: defaultdict(list))
+
+  def add_existing_unique_counts(self, unique_counts):
+    rules = get_shared_unique_rules()
+    if self.object_class not in rules:
+      return
+
+    classes = rules[self.object_class]
+    self.unique_counts = unique_counts.get(classes, self.unique_counts)
+    unique_counts[classes] = self.unique_counts
 
   def generate_csv_header(self):
     """ Generate 2D array with csv headre description """
@@ -158,7 +171,7 @@ class Converter(object):
       if len(row) > index:
         row.pop(index)
 
-  def generate_row_converters(self, unique_counts):
+  def generate_row_converters(self):
     """ Generate a row converter object for every csv row """
     self.row_converters = []
     for i, row in enumerate(self.rows):
@@ -168,10 +181,9 @@ class Converter(object):
     self.check_uniq_columns()
 
   def check_uniq_columns(self, counts=None):
-    unique = [key for key, header in self.headers.items() if header["unique"]]
-    for key in unique:
-      key_counts = counts.get(key) if counts else None
-      self.remove_duplicate_keys(key, key_counts)
+    self.generate_unique_counts()
+    for key, counts in self.unique_counts.items():
+      self.remove_duplicate_keys(key, counts)
 
   def get_info(self):
     stats = [(r.is_new, r.ignore) for r in self.row_converters]
@@ -230,14 +242,15 @@ class Converter(object):
     slugs = set([row.get_value("slug") for row in self.row_converters])
     return self.object_class, slugs
 
-  def remove_duplicate_keys(self, key, counts=None):
-    if not counts:
-      counts = defaultdict(list)
+  def generate_unique_counts(self):
+    unique = [key for key, header in self.headers.items() if header["unique"]]
+    for key in unique:
+      for index, row in enumerate(self.row_converters):
+        value = row.get_value(key)
+        if value:
+          self.unique_counts[key][value].append(index)
 
-    for index, row in enumerate(self.row_converters):
-      value = row.get_value(key)
-      if value:
-        counts[value].append(index)
+  def remove_duplicate_keys(self, key, counts):
 
     for value, indexes in counts.items():
       if len(indexes) > 1:
