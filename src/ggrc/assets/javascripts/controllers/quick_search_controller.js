@@ -222,6 +222,7 @@ can.Control("CMS.Controllers.LHN", {
 
         value = $(ev.target).val();
         this.do_search(value);
+        this.toggle_filter_active();
       }
     }
 
@@ -230,28 +231,29 @@ can.Control("CMS.Controllers.LHN", {
 
       var value = $(ev.target).find("input.widgetsearch").val();
       this.do_search(value);
-  }
-
-  , ".widgetsearch keyup": function(el, ev) {
       this.toggle_filter_active();
-    }
+  }
 
   , toggle_filter_active: function () {
       // Set active state to search field if the input is not empty:
       var $filter = this.element.find('.widgetsearch'),
+          $button = this.element.find('.widgetsearch-submit'),
           $off = this.element.find('.filter-off'),
+          $search_title = this.element.find(".search-title"),
           got_filter = !!$filter.val().trim().length;
 
       $filter.toggleClass("active", got_filter);
+      $button.toggleClass("active", got_filter);
       $off.toggleClass("active", got_filter);
+      $search_title.toggleClass("active", got_filter);
   }
 
   , ".filter-off a click": function (el, ev) {
     ev.preventDefault();
 
     this.element.find('.widgetsearch').val('');
-    this.toggle_filter_active();
     this.do_search('');
+    this.toggle_filter_active();
   }
 
   , "a[data-name='work_type'] click": function(el, ev) {
@@ -440,10 +442,12 @@ can.Control("CMS.Controllers.LHN", {
     }
 
   , do_search: function (value) {
+    var $search_title = this.element.find(".search-title");
     value = $.trim(value);
     if (this._value === value) {
       return;
     }
+    $search_title.addClass("active");
     this.obs.attr("value", value);
     this.options.display_prefs.setLHNState("search_text", value);
     this._value = value;

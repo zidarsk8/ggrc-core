@@ -5,51 +5,6 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-{{! dashboard object listing}}
-<!--
-<div class="advanced-filters">
-  <div class="row-fluid">
-    <div class="span3">
-      <select class="input-block-level">
-        <option>Show All Events</option>
-        <option>Mappings</option>
-        <option>Unmappings</option>
-        <option>Updates</option>
-        <option>Creations</option>
-        <option>Deletions</option>
-      </select>
-    </div>
-    <div class="span5">
-      <ul class="filter-date-range">
-        <li>
-          <span>Date Range:</span>
-        </li>
-        <li>
-          <input class="input-small date" name="filter_start_date" data-toggle="datepicker" data-before="filter_end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date filter_start_date}}"> - 
-        </li>
-        <li>
-          <input class="input-small date" name="filter_end_date" data-toggle="datepicker" data-after="filter_start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date filter_end_date}}">
-        </li>
-      </ul>
-    </div>
-    <div class="span4">
-      <div class="objective-selector">
-        {{#using owner=instance.owners.0 model_singular=model.model_singular}}
-        <label>
-          Owner
-          <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
-        </label>
-        <input tabindex="3" class="input-block-level search-icon" name="owners.0.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
-        {{/using}}
-        {{#using contact=contact}}
-        <input type="text" name="contact.email" data-lookup="Person" data-params="Person:is_enabled=1" class="span9 audit-selector search-icon" value="{{firstnonempty contact.email ''}}">
-        <i class="grcicon-person-green"></i>
-        {{/using}}
-      </div>
-    </div>
-  </div>
-</div>
--->
 <ul class="tree-structure new-tree event-tree">
   {{#each list}}
     <li class="tree-item {{resource_type.toLowerCase}}" data-model="true" {{data 'model'}}>

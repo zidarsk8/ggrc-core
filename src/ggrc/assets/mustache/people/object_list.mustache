@@ -17,10 +17,10 @@
               <div class="row-fluid">
                 <div class="span4">
                   <div class="title tree-title-area">
-                    {{{render '/static/mustache/people/popover.mustache' person=this}}}
+                    {{name}}
                   </div>
                 </div>
-                <div class="span2">
+                <div class="span4">
                   <div class="email tree-title-area">
                     {{#if_match name '\\\\S'}}
                       {{#name}}
@@ -53,15 +53,6 @@
                       </li>
                     {{/if}}
                   {{/person_roles}}
-                </div>
-                <div class="span2">
-                  <div class="email tree-title-area">
-                    {{^if is_enabled}}
-                      <span class="user-disabled">
-                        (Disabled)
-                      </span>
-                    {{/if}}
-                  </div>
                 </div>
                 <div class="span2">
                   <div class="show-details">

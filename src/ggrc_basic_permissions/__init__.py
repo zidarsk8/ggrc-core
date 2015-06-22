@@ -548,15 +548,3 @@ def contributed_object_views():
 from .contributed_roles import BasicRoleDeclarations, BasicRoleImplications
 ROLE_DECLARATIONS = BasicRoleDeclarations()
 ROLE_IMPLICATIONS = BasicRoleImplications()
-
-# standard decorator style
-from sqlalchemy import event
-from sqlalchemy.orm import make_transient
-@event.listens_for(Person.is_enabled, 'set')
-def receive_set(target, value, oldvalue, initiator):
-  "listen for the the is_enabled flag to be set to False"
-
-  if value is False:
-    # Delete UserRoles related to the Person
-    db.session.query(UserRole).filter(UserRole.person_id==target.id).delete()
-    db.session.commit()

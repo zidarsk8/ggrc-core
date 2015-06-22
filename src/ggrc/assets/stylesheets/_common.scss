@@ -21,9 +21,10 @@ h1 {
   font-weight: normal;
   width: 40%;
   float: left;
-  position: relative;
   .lhn-trigger {
-    float: left;
+    position: absolute;
+    left: -2px;
+    top: 0;
   }
   .title-content {
     @extend %oneline;

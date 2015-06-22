@@ -26,9 +26,9 @@
                   {{#if_match instance.name '\\\\S'}}
                     {{#instance.name}}
                       <span class="email">{{instance.email}}</span>
-                      {{^if instance.is_enabled}}
+                      {{#if_equals system_wide_role 'No Access'}}
                         <span class="user-disabled">
-                          (Disabled)
+                          (No Access)
                         </span>
                       {{/if}}
                     {{/instance.name}}
@@ -60,16 +60,6 @@
                                 + {{sum roles.length '-1'}}
                               {{/if_in_map}}
                             {{/roles.1}}
-                          </span>
-                        </div>
-                      </div>
-                    </li>
-                    {{else}}
-                    <li>
-                      <div class="item-data">
-                        <div class="tree-title-area">
-                          <span class="no-role">
-                            No Access
                           </span>
                         </div>
                       </div>
