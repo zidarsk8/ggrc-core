@@ -80,6 +80,7 @@ class RowConverter(object):
     """ Get object if the slug is in the system or return a new object """
     slug = self.get_value("slug")
     if slug is None:
+      self.ignore = True
       return
     obj = None
     self.is_new = False
