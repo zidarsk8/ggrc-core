@@ -10,7 +10,7 @@ from os.path import dirname
 from os.path import join
 from flask import json
 
-from ggrc.models import Policy
+from ggrc.models import Control
 # from ggrc.converters import errors
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
@@ -35,6 +35,7 @@ class TestComprehensiveSheets(TestCase):
     TestCase.setUp(self)
     self.generator = GgrcGenerator()
     self.create_custom_attributes()
+    self.create_people()
 
   def test_policy_basic_import(self):
 
@@ -46,7 +47,14 @@ class TestComprehensiveSheets(TestCase):
         title="cuStom Mandatory Text",
         mandatory=True)
 
-    filename = "policy_basic_custom_attributes.csv"
+    filename = "comprehensive_sheet1.csv"
+    response = self.import_file(filename)
+
+    from flask.json import dumps
+    print(dumps(response, indent=2, sort_keys=True))
+    controls = Control.query.all()
+
+    print(controls)
 
   def create_custom_attributes(self):
     self.generator.generate_custom_attribute(
@@ -61,18 +69,18 @@ class TestComprehensiveSheets(TestCase):
   def tearDown(self):
     pass
 
-  def create_people(self, people):
+  def create_people(self):
     emails = [
-      "user1@ggrc.com",
-      "miha@policy.com",
-      "someone.else@ggrc.com",
-      "another@user.com",
+        "user1@ggrc.com",
+        "miha@policy.com",
+        "someone.else@ggrc.com",
+        "another@user.com",
 
     ]
     for email in emails:
       self.generator.generate_person({
-        "name": email.split("@")[0].title(),
-        "email": email,
+          "name": email.split("@")[0].title(),
+          "email": email,
       }, "gGRC Admin")
 
   def import_file(self, filename, dry_run=False):
@@ -85,4 +93,3 @@ class TestComprehensiveSheets(TestCase):
                                 data=data, headers=headers)
     self.assertEqual(response.status_code, 200)
     return json.loads(response.data)
-
