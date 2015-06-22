@@ -8,7 +8,7 @@ from flask import Blueprint, session, g
 import sqlalchemy.orm
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm.attributes import get_history
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, case, literal
 from ggrc import db, settings
 from ggrc.login import get_current_user, login_required
 from ggrc.models import all_models
@@ -44,6 +44,48 @@ def get_public_config(current_user):
     if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS'):
       public_config['BOOTSTRAP_ADMIN_USERS'] = settings.BOOTSTRAP_ADMIN_USERS
   return public_config
+
+
+def objects_via_program_relationships_query(user_id, context_not_role=False):
+  """Creates a query that returns objects a user can access via program.
+
+    Args:
+        user_id: id of the user
+        context_not_role: use context instead of the role for the third column
+            in the search api we need to return (obj_id, obj_type, context_id),
+            but in ggrc_basic_permissions we need a role instead of a
+            context_id (obj_id, obj_type, role_name)
+
+    Returns:
+        db.session.query object that selects the following columns:
+            | id | type | role_name or context |
+  """
+  _role = aliased(all_models.Role, name="r")
+  _program = aliased(all_models.Program, name="p")
+  _relationship = aliased(all_models.Relationship, name="rl")
+  _user_role = aliased(all_models.UserRole, name="ur")
+
+  return db.session.query(
+      case([
+          (_relationship.destination_type == "Program",
+           _relationship.source_id.label('id'))
+      ], else_=_relationship.destination_id.label('id')),
+      case([
+          (_relationship.destination_type == "Program",
+           _relationship.source_type.label('type'))
+      ], else_=_relationship.destination_type.label('id')),
+      literal(None).label('context_id') if context_not_role else _role.name).\
+      join(_program, or_(
+          and_(_relationship.source_type == 'Program',
+               _program.id == _relationship.source_id),
+          and_(_relationship.destination_type == 'Program',
+               _program.id == _relationship.destination_id))).\
+      join(_user_role, _program.context_id == _user_role.context_id).\
+      join(_role, _user_role.role_id == _role.id).\
+      filter(_user_role.person_id == user_id).\
+      filter(_role.name.in_(
+          ('ProgramEditor', 'ProgramOwner', 'ProgramReader')))
+
 
 
 class CompletePermissionsProvider(object):
@@ -282,37 +324,8 @@ def load_permissions_for(user):
           .setdefault('resources', list())\
           .append(object_owner.ownable_id)
 
-  # select r.name,
-  #   case when rl.destination_type = 'Program' then rl.source_id else rl.destination_id end,
-  #   case when rl.destination_type = 'Program' then rl.source_type else rl.destination_type end
-  # from user_roles as ur
-  #      join roles as r on ur.role_id = r.id
-  #      join programs as p on p.context_id = ur.context_id
-  #      join relationships as rl on rl.destination_type = 'Program' and rl.destination_id = p.id or rl.source_type = 'Program' and rl.source_id = p.id
-  # where r.name in ('ProgramEditor', 'ProgramOwner', 'ProgramReader') and ur.person_id=1;
-
-  _role = aliased(all_models.Role, name="r")
-  _program = aliased(all_models.Program, name="p")
-  _relationship = aliased(all_models.Relationship, name="rl")
-  _user_role = all_models.UserRole
-
-  q = db.session.query(_user_role).\
-      add_columns(
-          _role.name,
-          _relationship.destination_id, _relationship.destination_type,
-          _relationship.source_id, _relationship.source_type).\
-      join(_role, _user_role.role_id == _role.id).\
-      join(_program, _user_role.context_id == _program.context_id).\
-      join(_relationship, or_(
-          and_(_relationship.destination_type == 'Program',
-               _relationship.destination_id == _program.id),
-          and_(_relationship.source_type == 'Program',
-               _relationship.source_id == _program.id))).\
-      filter(_role.name.in_(('ProgramEditor', 'ProgramOwner', 'ProgramReader'))).\
-      filter(_user_role.person_id == user.id)
-  for res in q.all():
-    _, role_name, s_id, s_type, d_id, d_type = res
-    _type, _id = (d_type, d_id) if s_type == 'Program' else (s_type, s_id)
+  for res in objects_via_program_relationships_query(user.id).all():
+    _id, _type, role_name = res
     permissions.setdefault('read', {})\
         .setdefault(_type, {})\
         .setdefault('resources', list())\
@@ -320,7 +333,7 @@ def load_permissions_for(user):
 
   personal_context = _get_or_create_personal_context(user)
 
-  permissions.setdefault('__GGRC_ADMIN__',{})\
+  permissions.setdefault('__GGRC_ADMIN__', {})\
       .setdefault('__GGRC_ALL__', dict())\
       .setdefault('contexts', list())\
       .append(personal_context.id)
@@ -331,8 +344,7 @@ def _get_or_create_personal_context(user):
   personal_context = user.get_or_create_object_context(
       context=1,
       name='Personal Context for {0}'.format(user.id),
-      description='',
-      )
+      description='')
   personal_context.modified_by = get_current_user()
   db.session.add(personal_context)
   db.session.flush()
