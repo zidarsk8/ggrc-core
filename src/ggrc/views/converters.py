@@ -109,11 +109,9 @@ def handle_import_request():
 
   response_data = []
   new_slugs = defaultdict(set)
-  unique_counts = {}
   converters = []
   for offset, data in zip(offsets, data_blocks):
-    converter = Converter.from_csv(data, offset=offset, dry_run=dry_run,
-                                   unique_counts=unique_counts)
+    converter = Converter.from_csv(data, offset=offset, dry_run=dry_run)
     converters.append(converter)
     converter.import_objects()
     object_class, slugs = converter.get_new_slugs()

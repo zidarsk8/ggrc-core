@@ -54,8 +54,10 @@ class Converter(object):
 
   """
 
+  _shared_unique_counts = {}
+
   @classmethod
-  def from_csv(cls, csv_data, offset=0, dry_run=True, unique_counts=None):
+  def from_csv(cls, csv_data, offset=0, dry_run=True):
     object_class = IMPORTABLE.get(csv_data[1][0].strip().lower())
     if not object_class:
       converter = Converter()
@@ -68,14 +70,26 @@ class Converter(object):
                           raw_headers=raw_headers, dry_run=dry_run,
                           offset=offset)
 
-    converter.add_existing_unique_counts(unique_counts)
-
     converter.generate_row_converters()
     return converter
 
   @classmethod
   def from_ids(cls, object_class, ids=[]):
     return Converter(object_class=object_class)
+
+  @classmethod
+  def get_unique_counts_dict(cls, object_class):
+    """ get a the varible for storing unique counts
+
+    Make sure to always return the same variable for object with shared tables,
+    as defined in sharing rules.
+    """
+    sharing_rules = get_shared_unique_rules()
+    new = defaultdict(lambda: defaultdict(list))
+    classes = sharing_rules.get(object_class, object_class)
+    if classes not in cls._shared_unique_counts:
+      cls._shared_unique_counts[classes] = new
+    return cls._shared_unique_counts[classes]
 
   def __init__(self, **options):
     self.rows = options.get('rows', [])
@@ -93,21 +107,12 @@ class Converter(object):
       self.object_headers = get_object_column_definitions(self.object_class)
       raw_headers = options.get('raw_headers', [])
       self.headers = self.clean_headers(raw_headers)
-      self.unique_counts = defaultdict(lambda: defaultdict(list))
+      self.unique_counts = self.get_unique_counts_dict(self.object_class)
       self.name = self.object_class._inflector.human_singular.title()
       self.ignore = False
     else:
       self.ignore = True
       self.name = ""
-
-  def add_existing_unique_counts(self, unique_counts):
-    rules = get_shared_unique_rules()
-    if self.object_class not in rules:
-      return
-
-    classes = rules[self.object_class]
-    self.unique_counts = unique_counts.get(classes, self.unique_counts)
-    unique_counts[classes] = self.unique_counts
 
   def generate_csv_header(self):
     """ Generate 2D array with csv headre description """
