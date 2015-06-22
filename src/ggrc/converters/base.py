@@ -58,12 +58,15 @@ class Converter(object):
   def from_csv(cls, csv_data, offset=0, dry_run=True, unique_counts=None):
     object_class = IMPORTABLE.get(csv_data[1][0].strip().lower())
     if not object_class:
-      return "ERROR"
+      converter = Converter()
+      converter.add_errors(errors.WRONG_OBJECT_TYPE, line=offset+2)
+      return converter
 
     raw_headers, rows = extract_relevant_data(csv_data)
 
-    converter = Converter(object_class, rows=rows, raw_headers=raw_headers,
-                          dry_run=dry_run, offset=offset)
+    converter = Converter(object_class=object_class, rows=rows,
+                          raw_headers=raw_headers, dry_run=dry_run,
+                          offset=offset)
 
     converter.add_existing_unique_counts(unique_counts)
 
@@ -72,24 +75,30 @@ class Converter(object):
 
   @classmethod
   def from_ids(cls, object_class, ids=[]):
-    return Converter(object_class)
+    return Converter(object_class=object_class)
 
-  def __init__(self, object_class, **options):
+  def __init__(self, **options):
     self.rows = options.get('rows', [])
     self.offset = options.get('offset', 0)
     self.ids = options.get('ids', [])
     self.dry_run = options.get('dry_run', )
-    self.object_class = object_class
+    self.object_class = options.get('object_class', )
     self.block_errors = []
     self.block_warnings = []
     self.row_errors = []
     self.row_warnings = []
     self.row_objects = []
     self.row_converters = []
-    self.object_headers = get_object_column_definitions(object_class)
-    raw_headers = options.get('raw_headers', [])
-    self.headers = self.clean_headers(raw_headers)
-    self.unique_counts = defaultdict(lambda: defaultdict(list))
+    if self.object_class:
+      self.object_headers = get_object_column_definitions(self.object_class)
+      raw_headers = options.get('raw_headers', [])
+      self.headers = self.clean_headers(raw_headers)
+      self.unique_counts = defaultdict(lambda: defaultdict(list))
+      self.name = self.object_class._inflector.human_singular.title()
+      self.ignore = False
+    else:
+      self.ignore = True
+      self.name = ""
 
   def add_existing_unique_counts(self, unique_counts):
     rules = get_shared_unique_rules()
@@ -188,7 +197,7 @@ class Converter(object):
   def get_info(self):
     stats = [(r.is_new, r.ignore) for r in self.row_converters]
     info = {
-        "name": self.object_class._inflector.human_singular.title(),
+        "name": self.name,
         "rows": len(self.rows),
         "new": stats.count((True, False)),
         "updated": stats.count((False, False)),
@@ -211,6 +220,9 @@ class Converter(object):
       self.save_import()
 
   def import_objects(self):
+    if self.ignore:
+      return
+
     for row_converter in self.row_converters:
       row_converter.setup_object()
 
@@ -233,6 +245,7 @@ class Converter(object):
   def add_errors(self, template, **kwargs):
     message = template.format(**kwargs)
     self.block_errors.append(message)
+    self.ignore = True
 
   def add_warning(self, template, **kwargs):
     message = template.format(**kwargs)
