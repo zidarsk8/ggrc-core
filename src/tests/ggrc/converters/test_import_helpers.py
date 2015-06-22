@@ -634,6 +634,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
     self.assertTrue(vals["Owner"]["mandatory"])
+    self.assertTrue(vals["Reference URL"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_system_definitions(self):
