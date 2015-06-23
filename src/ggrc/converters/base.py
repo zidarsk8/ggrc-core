@@ -54,10 +54,8 @@ class Converter(object):
 
   """
 
-  _shared_unique_counts = {}
-
   @classmethod
-  def from_csv(cls, csv_data, offset=0, dry_run=True):
+  def from_csv(cls, csv_data, offset=0, dry_run=True, shared_state=None):
     object_class = IMPORTABLE.get(csv_data[1][0].strip().lower())
     if not object_class:
       converter = Converter()
@@ -68,7 +66,7 @@ class Converter(object):
 
     converter = Converter(object_class=object_class, rows=rows,
                           raw_headers=raw_headers, dry_run=dry_run,
-                          offset=offset)
+                          offset=offset, shared_state=shared_state)
 
     converter.generate_row_converters()
     return converter
@@ -77,22 +75,21 @@ class Converter(object):
   def from_ids(cls, object_class, ids=[]):
     return Converter(object_class=object_class)
 
-  @classmethod
-  def get_unique_counts_dict(cls, object_class):
+  def get_unique_counts_dict(self, object_class):
     """ get a the varible for storing unique counts
 
     Make sure to always return the same variable for object with shared tables,
     as defined in sharing rules.
     """
     sharing_rules = get_shared_unique_rules()
-    new = defaultdict(lambda: defaultdict(list))
     classes = sharing_rules.get(object_class, object_class)
-    if classes not in cls._shared_unique_counts:
-      cls._shared_unique_counts[classes] = new
-    return cls._shared_unique_counts[classes]
+    if classes not in self.shared_state:
+      self.shared_state[classes] = defaultdict(lambda: defaultdict(list))
+    return self.shared_state[classes]
 
   def __init__(self, **options):
     self.rows = options.get('rows', [])
+    self.shared_state = options.get('shared_state', {})
     self.offset = options.get('offset', 0)
     self.ids = options.get('ids', [])
     self.dry_run = options.get('dry_run', )

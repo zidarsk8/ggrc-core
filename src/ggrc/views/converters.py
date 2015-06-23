@@ -110,8 +110,9 @@ def handle_import_request():
   response_data = []
   new_slugs = defaultdict(set)
   converters = []
+  shared_state = {}
   for offset, data in zip(offsets, data_blocks):
-    converter = Converter.from_csv(data, offset=offset, dry_run=dry_run)
+    converter = Converter.from_csv(data, offset, dry_run, shared_state)
     converters.append(converter)
     converter.import_objects()
     object_class, slugs = converter.get_new_slugs()
