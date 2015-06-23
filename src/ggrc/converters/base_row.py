@@ -126,6 +126,8 @@ class RowConverter(object):
       return
     self.send_signals()
     db.session.add(self.obj)
+    for handler in self.attrs.values():
+      handler.insert_object()
 
   def insert_mapping(self):
     if not self.obj or self.ignore:

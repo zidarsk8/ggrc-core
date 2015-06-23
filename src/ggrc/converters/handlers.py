@@ -65,6 +65,10 @@ class ColumnHandler(object):
       return self.default()
     return self.default
 
+  def insert_object(self):
+    """ For inserting fields such as custom attributes and mappings """
+    pass
+
 
 class StatusColumnHandler(ColumnHandler):
 
