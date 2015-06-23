@@ -19,7 +19,7 @@ class TestCreatorProgram(TestCase):
     self._init_roles()
 
   def _init_roles(self):
-    response = self.api.get_query(all_models.Role, "scope=Private+Program")
+    response = self.api.get_query(all_models.Role, "")
     self.roles = {}
     for role in response.json.get('roles_collection').get('roles'):
       self.roles[role.get('name')] = role
