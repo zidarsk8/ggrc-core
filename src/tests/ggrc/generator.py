@@ -177,20 +177,19 @@ class GgrcGenerator(Generator):
 
   def generate_custom_attribute(self, definition_type, **kwargs):
     obj_name = "custom_attribute_definition"
-    title = kwargs["title"] if "title" in kwargs else self.random_str()
     data = {
         obj_name: {
-            "title": title,
+            "title": kwargs.get("title", self.random_str()),
             "custom_attribute_definitions": [],
             "custom_attributes": {},
             "definition_type": definition_type,
-            "modal_title": title,
-            "attribute_type": "Text",
-            "mandatory": False,
-            "helptext": "",
-            "placeholder": "",
+            "modal_title": kwargs.get("modal_title", self.random_str()),
+            "attribute_type": kwargs.get("attribute_type", "Text"),
+            "mandatory": kwargs.get("mandatory", False),
+            "helptext": kwargs.get("helptext", False),
+            "placeholder": kwargs.get("placeholder", False),
             "context": {"id": None},
-            "multi_choice_options": ""
+            "multi_choice_options": kwargs.get("options", False),
         }
     }
     data[obj_name].update(kwargs)
