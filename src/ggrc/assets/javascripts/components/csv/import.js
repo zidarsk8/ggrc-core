@@ -90,6 +90,18 @@
             };
 
         return _.extend(states[state], {state: state});
+      },
+      prepare_data: function(response_data){
+        return _.map(response_data, function (element){
+          element.data = [
+            { status: "warnings",
+              messages: element.block_warnings.concat(element.row_warnings)
+            },
+            { status: "errors",
+              messages: element.block_errors.concat(element.row_errors)
+            },
+          ];
+        });
       }
     },
     events: {
@@ -133,7 +145,7 @@
             "X-requested-by": "gGRC"
           }
         }).done(function (data) {
-          this.scope.attr("import", data);
+          this.scope.attr("import", this.scope.prepare_data(data));
           this.scope.attr("state", "import");
         }.bind(this))
         .fail(function (data) {

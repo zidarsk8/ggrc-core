@@ -21,7 +21,10 @@
         <ul>
           <li><strong>Object type</strong>: {{name}}</li>
           <li><strong>Number of rows</strong>: {{rows}}</li>
-          <li><strong>Number of updated</strong>: {{updated}}</li>
+          {{#if new}} <li><strong>new</strong>: {{new}}</li> {{/if}}
+          {{#if updated}} <li><strong>updated</strong>: {{updated}}</li> {{/if}}
+          {{#if ignored}} <li><strong>ignored</strong>: {{ignored}}</li> {{/if}}
+          {{#if deleted}} <li><strong>deleted</strong>: {{deleted}}</li> {{/if}}
           {{#data}}
             <li>
               <strong>{{status}}</strong>
