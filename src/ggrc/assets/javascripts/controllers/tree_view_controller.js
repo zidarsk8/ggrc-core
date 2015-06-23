@@ -1193,19 +1193,17 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.display_prefs.setChildTreeDisplayList(model_name, selected_items);
 
     //check if any inner tree is open
-    var el = this.element, open_items, control, tview_el;
+    var i, el = this.element, open_items, control, tview_el;
     if (el.hasClass('tree-open')) {
       //find the inner tree and reload it
-      open_items = el.find('.item-open');
-      if (open_items.length) {
-        //for each open items load child tree
-        can.each(open_items, function (item, i) {
-          tview_el = $(item).find('.cms_controllers_tree_view');
-          control = tview_el.control();
-          if (control) {
-            control.reload_list();
-          }
-        });
+      open_items = el.find('.item-open .cms_controllers_tree_view');
+
+      for (i = 0; i < open_items.length; i++) {
+        tview_el = $(open_items[i]);
+        control = tview_el.control();
+        if (control) {
+          control.reload_list();
+        }
       }
     }
   }
