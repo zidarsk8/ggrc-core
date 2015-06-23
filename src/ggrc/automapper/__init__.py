@@ -4,12 +4,21 @@
 # Maintained By: andraz@reciprocitylabs.com
 
 import logging
+from collections import namedtuple
 
+from sqlalchemy import or_, and_
+
+from ggrc import models
 from ggrc.models.relationship import Relationship
 from ggrc.services.common import Resource
 from ggrc import db
 from ggrc.automapper.rules import rules
 from ggrc.utils import benchmark
+
+
+Stub = namedtuple("Stub", ["type", "id"])
+stub_from_source = lambda r: Stub(r.source_type, r.source_id)
+stub_from_destination = lambda r: Stub(r.destination_type, r.destination_id)
 
 
 class AutomapperGenerator(object):
@@ -20,8 +29,16 @@ class AutomapperGenerator(object):
 
   def related(self, obj):
     with benchmark("Automapping related"):
-      return (set(r.source for r in obj.related_sources) |
-              set(r.destination for r in obj.related_destinations))
+      relationships = Relationship.query.filter(or_(
+          and_(Relationship.source_type == obj.type,
+               Relationship.source_id == obj.id),
+          and_(Relationship.destination_type == obj.type,
+               Relationship.destination_id == obj.id),
+      )).all()
+      return set((stub_from_destination(r)
+                  if r.source_type == obj.type and r.source_id == obj.id
+                  else stub_from_source(r))
+                 for r in relationships)
 
   def relate(self, src, dst):
     if src < dst:
@@ -31,15 +48,15 @@ class AutomapperGenerator(object):
 
   def generate_automappings(self):
     with benchmark("Automapping generate_automappings"):
-        self.queue.add(self.relate(self.relationship.source,
-                       self.relationship.destination))
-        while len(self.queue) > 0:
-          src, dst = entry = self.queue.pop()
-          # TODO check that user can see both objects
-          self._ensure_relationship(src, dst)
-          self.processed.add(entry)
-          self._step(src, dst)
-          self._step(dst, src)
+      self.queue.add(self.relate(stub_from_source(self.relationship),
+                     stub_from_destination(self.relationship)))
+      while len(self.queue) > 0:
+        src, dst = entry = self.queue.pop()
+        # TODO check that user can see both objects
+        self._ensure_relationship(src, dst)
+        self.processed.add(entry)
+        self._step(src, dst)
+        self._step(dst, src)
 
   def _step(self, src, dst):
     with benchmark("Automapping _step"):
@@ -59,10 +76,19 @@ class AutomapperGenerator(object):
 
   def _step_implicit(self, src, dst, implicit):
     with benchmark("Automapping _step_implicit"):
+      if not hasattr(models, src.type):
+        logging.warning('Automapping by attr: cannot find model %s' % src.type)
+        return
+      model = getattr(models, src.type)
+      instance = model.query.filter(model.id == src.id).first()
+      if instance is None:
+        logging.warning("Automapping by attr: cannot load model %s: %s" %
+                        (src.type, str(src.id)))
+        return
       for attr in implicit:
-        if hasattr(src, attr.name):
-          attr = getattr(src, attr.name)
-          entry = self.relate(attr, dst)
+        if hasattr(instance, attr.name):
+          attr = getattr(instance, attr.name)
+          entry = self.relate(Stub(attr.type, attr.id), dst)
           if entry not in self.processed:
             self.queue.add(entry)
         else:
@@ -75,8 +101,10 @@ class AutomapperGenerator(object):
     with benchmark("Automapping _ensure_relationship"):
       if Relationship.find_related(src, dst) is None:
         db.session.add(Relationship(
-            source=src,
-            destination=dst,
+            source_type=src.type,
+            source_id=src.id,
+            destination_type=dst.type,
+            destination_id=dst.id,
             automapping_id=self.relationship.id
         ))
 
