@@ -300,7 +300,7 @@ def load_permissions_for(user):
       implied_role_names_list.extend(implied_role_names)
   # If some roles are required, query for them in bulk
   all_implied_roles_by_name = {}
-  if implied_context_to_implied_roles:
+  if implied_context_to_implied_roles and all_implied_roles_set:
     implied_roles = db.session.query(Role)\
         .filter(Role.name.in_(all_implied_roles_set))\
         .options(sqlalchemy.orm.undefer_group('Role_complete'))\
