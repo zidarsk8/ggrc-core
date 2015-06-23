@@ -8,34 +8,84 @@
 <csv-export filename="Export Objects">
 <div class="info no-space">
   <div class="choose-object-wrap bottom-space">
-    <div class="left-right-space">
-      <div class="row-fluid">
-        <div class="span12">
-          <div class="report-title">
-            {{#if editFilename}}
-              <div class="report-title-change">
-                <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
-                <a class="btn btn-primary btn-small title-change" href="#">Save</a>
-              </div>
-            {{else}}
-              <h2 class="title">
-                {{filename}} <a class="report-title-trigger" href="#"><i class="grcicon-edit"></i></a>
-              </h2>
-            {{/if}}
-          </div>
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="report-title">
+          {{#if editFilename}}
+            <div class="report-title-change">
+              <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
+              <a class="btn btn-primary btn-small title-change" href="#">Save</a>
+            </div>
+          {{else}}
+            <h2 class="title">
+              {{filename}} <a class="report-title-trigger" href="#"><i class="grcicon-edit"></i></a>
+            </h2>
+          {{/if}}
         </div>
       </div>
+    </div>
 
-      {{> /static/mustache/import_export/export/object_selector.mustache}}
-      {{> /static/mustache/import_export/export/attribute_selector.mustache}}
-      {{> /static/mustache/import_export/export/filter_query.mustache}}
-      <csv-relevance-filter>
-        {{> /static/mustache/import_export/export/relevance.mustache}}
-      </csv-relevance-filter>
+    <export-type>
+      <div class="relevant-filter-group">
+        {{#panels}}
+          <export-panel index="{{index}}">
+            <div class="new-relevant-block">
+              <div class="row-fluid">
+                <div class="span4">
+                  <h6>
+                    {{#first_panel}}
+                      Query by Object type
+                    {{else}}
+                      Include mapped object type
+                    {{/first_panel}}
+                  </h6>
+                  <div class="single-line-filter">
+                    {{#first_panel}}
+                      <button type="submit" class="remove_filter_group">
+                        <i class="grcicon-deleted"></i>
+                      </button>
+                    {{/first_panel}}
+                    <select class="input-block-level option-type-selector">
+                      <optgroup label="Governance">
+                        <option value="Program">Programs</option>
+                        <option value="Regulation">Regulations</option>
+                        <option value="Standard">Standards</option>
+                        <option value="Policy">Policies</option>
+                        <option value="Contract">Contracts</option>
+                        <option value="Objective">Objectives</option>
+                        <option value="Control">Controls</option>
+                        <option value="Section">Sections</option>
+                        <option value="Clause">Clauses</option>
+                      </optgroup>
+                      <optgroup label="People/Groups">
+                        <option value="People">People</option>
+                        <option value="OrgGroup">Org Groups</option>
+                      </optgroup>
+                      <optgroup label="Assets/Business">
+                        <option value="System">Systems</option>
+                        <option value="Process">Processes</option>
+                        <option value="DataAsset">Data Assets</option>
+                        <option value="Facility">Facilities</option>
+                        <option value="Market">Markets</option>
+                        <option value="Product">Products</option>
+                        <option value="Project">Projects</option>
+                      </optgroup>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {{> /static/mustache/import_export/export/attribute_selector.mustache}}
+              {{> /static/mustache/import_export/export/filter_query.mustache}}
+              {{> /static/mustache/import_export/export/relevance.mustache}}
+            </div>
+          </export-panel>
+        {{/panels}}
+      </div>
       <div class="add-rule add-object">
         <a href="#" id="addRelevantFilterRule" class="addFilterRule btn btn-small btn-info">Export another object type</a>
       </div>
-    </div>
+    </export-type>
   </div>
 
   <div class="save-template-wrap">

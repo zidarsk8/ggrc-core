@@ -6,66 +6,83 @@
 */
 
 (function(can, $) {
-
   can.Component.extend({
     tag: "csv-export",
     template: "<content></content>",
     scope: {
       url: "/_service/export_csv",
-      selected: []
+      editFilename: false,
+      filename: function () {
+        return "Export Objects";
+      }
     },
     events: {
-      "#importSelect change": function (el, ev) {
-        var $items = el.find(":selected"),
-            selected = this.scope.attr("selected");
+    }
+  });
 
-        function isSelected(val) {
-          return ;
-        }
-        $items.each(function () {
-          var $item = $(this);
-          if (_.findWhere(selected, {value: $item.val()})) {
-            return;
-          }
-          return selected.push({
-            name: $item.attr("label"),
-            value: $item.val()
+  can.Component.extend({
+    tag: "export-type",
+    template: "<content></content>",
+    scope: {
+      _index: 0,
+      _panels: [],
+      panels: function () {
+        if (!this._panels.length) {
+          this._panels.push({
+            type: "Programs",
+            index: 0
           });
-        });
+        }
+        return this._panels;
+      }
+    },
+    events: {
+      getIndex: function (el) {
+        return +el.closest("export-panel").attr("index");
       },
-      ".import-button click": function (el, ev) {
-        ev.preventDefault();
-        var data = _.reduce(this.scope.attr("selected"), function (memo, item) {
-                memo[item.value] = [];
-                return memo;
-              }, {});
-        // data = {
-        //   "Section": [1, 2, 3]
-        // }
-        $.ajax({
-          type: "POST",
-          dataType: "json",
-          headers: {
-            "Content-Type": "application/json",
-            "X-test-only": "true",
-            "X-requested-by": "gGRC"
-          },
-          url: this.scope.attr("url"),
-          data: data
-        });
+      addPanel: function (data) {
+        data = data || {};
+        var index = this.scope.attr("_index") + 1;
+        if (!data.type) {
+          data.type = "Programs";
+        }
+
+        this.scope.attr("_index", index);
+        data.index = index;
+        return this.scope.attr("_panels").push(data);
       },
-      ".import-list a click": function (el, ev) {
+      ".remove_filter_group click": function (el, ev) {
         ev.preventDefault();
+        var index = this.getIndex(el);
+        this.scope.attr("_panels").splice(index, 1);
+      },
+      "#addRelevantFilterRule click": function (el, ev) {
+        ev.preventDefault();
+        this.addPanel();
+      },
+      "export-panel .option-type-selector change": function (el, ev) {
+        var $el = $(ev.currentTarget),
+            val = $el.val(),
+            index = this.getIndex($el);
 
-        var index = el.data("index"),
-            item = this.scope.attr("selected").splice(index, 1)[0];
+      }
+    }
+  });
 
-        this.element.find("#importSelect option:selected").each(function () {
-          var $item = $(this);
-          if ($item.val() === item.value) {
-            $item.prop("selected", false);
-          }
-        });
+  can.Component.extend({
+    tag: "export-panel",
+    template: "<content></content>",
+    scope: {
+      index: "@"
+    },
+    events: {
+    },
+    helpers: {
+      first_panel: function (options) {
+        if (+this.attr("index") > 0) {
+          return options.fn();
+        }
+        return options.inverse();
       }
     }
   });

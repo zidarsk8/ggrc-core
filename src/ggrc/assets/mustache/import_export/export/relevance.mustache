@@ -5,11 +5,13 @@
   Maintained By: ivan@reciprocitylabs.com
 }}
 
-<div class="relevance-filters">
+<csv-relevance-filter>
+  <div class="relevance-filters">
     <div class="row-fluid">
       <div class="span12">
         <h6>Add filters by mapping relevance</h6>
-        <div class="single-line-filter">
+        {{#panel}}
+          <div class="single-line-filter">
           <button type="submit" class="remove_filter">
             <i class="grcicon-deleted"></i>
           </button>
@@ -34,6 +36,7 @@
             <option value="Market">Market</option>
           </select>
           <input class="input-large search-icon search-filter0 ui-autocomplete-input" placeholder="Type to search for object" type="text" name="" value="">
+        {{/panel}}
         </div>
         <div class="add-rule">
           <a href="#" id="addFilterRule" class="addFilterRule">+ Add New Rule</a>
@@ -41,3 +44,4 @@
       </div>
     </div>
   </div>
+</csv-relevance-filter>
