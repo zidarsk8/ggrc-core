@@ -10,7 +10,6 @@ from os.path import dirname
 from os.path import join
 from flask import json
 
-from ggrc.models import Control
 # from ggrc.converters import errors
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
@@ -36,38 +35,41 @@ class TestComprehensiveSheets(TestCase):
     self.generator = GgrcGenerator()
     self.create_custom_attributes()
     self.create_people()
-
-  def test_policy_basic_import(self):
-
-    self.generator.generate_custom_attribute(
-        "policy",
-        title="Custom text")
-    self.generator.generate_custom_attribute(
-        "policy",
-        title="cuStom Mandatory Text",
-        mandatory=True)
-
-    filename = "comprehensive_sheet1.csv"
-    response = self.import_file(filename)
-
-    from flask.json import dumps
-    print(dumps(response, indent=2, sort_keys=True))
-    controls = Control.query.all()
-
-    print(controls)
-
-  def create_custom_attributes(self):
-    self.generator.generate_custom_attribute(
-        "control",
-        title="my custom text",
-        mandatory=True)
-    self.generator.generate_custom_attribute(
-        "policy",
-        title="Custom text")
     self.client.get("/login")
+    pass
 
   def tearDown(self):
     pass
+
+  def test_policy_basic_import(self):
+
+    filename = "comprehensive_sheet1.csv"
+    self.import_file(filename)
+
+    # import ipdb; ipdb.set_trace()
+    # from ggrc import db
+    # from ggrc.models import Control
+    # from ggrc.models import CustomAttributeValue
+    # control = Control.query.first()
+    # cav = CustomAttributeValue()
+    # cav.custom_attribute_id = control.custom_attribute_definitions[0].id
+    # cav.attributable_type = "Control"
+    # cav.attributable_id = control.id
+    # cav.attribute_value = "Control your self"
+    # db.session.add(cav)
+    # db.session.commit()
+
+    # print control.title
+
+  def create_custom_attributes(self):
+    gen = self.generator.generate_custom_attribute
+    gen("control", title="my custom text", mandatory=True)
+    gen("program", title="my_text", mandatory=True)
+    gen("program", title="my_date", attribute_type="Date")
+    gen("program", title="my_date", attribute_type="Checkbox")
+    gen("program", title="my_dropdown", attribute_type="Dropdown",
+        options="a,b,c,d")
+    # gen("program", title="my_description", attribute_type="Rich Text")
 
   def create_people(self):
     emails = [
@@ -75,7 +77,6 @@ class TestComprehensiveSheets(TestCase):
         "miha@policy.com",
         "someone.else@ggrc.com",
         "another@user.com",
-
     ]
     for email in emails:
       self.generator.generate_person({
@@ -91,5 +92,5 @@ class TestComprehensiveSheets(TestCase):
     }
     response = self.client.post("/_service/import_csv",
                                 data=data, headers=headers)
-    self.assertEqual(response.status_code, 200)
+    self.assert200(response)
     return json.loads(response.data)

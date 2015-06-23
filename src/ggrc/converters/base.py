@@ -201,7 +201,7 @@ class Converter(object):
     info = {
         "name": self.name,
         "rows": len(self.rows),
-        "new": stats.count((True, False)),
+        "created": stats.count((True, False)),
         "updated": stats.count((False, False)),
         "ignored": stats.count((False, True)) + stats.count((True, True)),
         "block_warnings": self.block_warnings,

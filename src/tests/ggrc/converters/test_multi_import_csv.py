@@ -61,8 +61,8 @@ class TestCsvImport(TestCase):
     response_json = self.import_file(filename)
 
     object_counts = [(4, 0, 0), (4, 0, 0), (5, 0, 0)]
-    for i, (new, updated, ignored) in enumerate(object_counts):
-      self.assertEqual(new, response_json[i]["new"])
+    for i, (created, updated, ignored) in enumerate(object_counts):
+      self.assertEqual(created, response_json[i]["created"])
       self.assertEqual(updated, response_json[i]["updated"])
       self.assertEqual(ignored, response_json[i]["ignored"])
       self.assertEqual(set(), set(response_json[i]["row_warnings"]))
@@ -78,8 +78,8 @@ class TestCsvImport(TestCase):
 
     row_messages = []
     object_counts = [(3, 0, 2), (0, 0, 4), (5, 0, 2)]
-    for i, (new, updated, ignored) in enumerate(object_counts):
-      self.assertEqual(new, response_json[i]["new"])
+    for i, (created, updated, ignored) in enumerate(object_counts):
+      self.assertEqual(created, response_json[i]["created"])
       self.assertEqual(updated, response_json[i]["updated"])
       self.assertEqual(ignored, response_json[i]["ignored"])
       row_messages.extend(response_json[i]["row_warnings"])
@@ -124,8 +124,8 @@ class TestCsvImport(TestCase):
     response_json = self.import_file(filename)
 
     object_counts = [(4, 0, 0), (4, 0, 0), (5, 0, 0)]
-    for i, (new, updated, ignored) in enumerate(object_counts):
-      self.assertEqual(new, response_json[i]["new"])
+    for i, (created, updated, ignored) in enumerate(object_counts):
+      self.assertEqual(created, response_json[i]["created"])
       self.assertEqual(updated, response_json[i]["updated"])
       self.assertEqual(ignored, response_json[i]["ignored"])
       self.assertEqual(set(), set(response_json[i]["row_warnings"]))

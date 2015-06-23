@@ -76,7 +76,7 @@ class TestBasicCsvImport(TestCase):
     self.assertEqual(expected_warnings, set(response_warnings))
     response_errors = response_json[0]["row_errors"]
     self.assertEqual(set(), set(response_errors))
-    self.assertEqual(4, response_json[0]["new"])
+    self.assertEqual(4, response_json[0]["created"])
     policies = Policy.query.all()
     self.assertEqual(len(policies), 0)
 
@@ -100,7 +100,7 @@ class TestBasicCsvImport(TestCase):
     filename = "policy_same_titles.csv"
     response_json = self.import_file(filename)
 
-    self.assertEqual(3, response_json[0]["new"])
+    self.assertEqual(3, response_json[0]["created"])
     self.assertEqual(6, response_json[0]["ignored"])
     self.assertEqual(0, response_json[0]["updated"])
     self.assertEqual(9, response_json[0]["rows"])
@@ -130,7 +130,7 @@ class TestBasicCsvImport(TestCase):
     filename = "facilities_intermappings.csv"
     response_json = self.import_file(filename, dry_run=True)
 
-    self.assertEqual(4, response_json[0]["new"])
+    self.assertEqual(4, response_json[0]["created"])
 
     response_warnings = response_json[0]["row_warnings"]
     self.assertEqual(set(), set(response_warnings))
@@ -142,7 +142,7 @@ class TestBasicCsvImport(TestCase):
     filename = "facilities_intermappings.csv"
     response_json = self.import_file(filename)
 
-    self.assertEqual(4, response_json[0]["new"])
+    self.assertEqual(4, response_json[0]["created"])
 
     response_warnings = response_json[0]["row_warnings"]
     self.assertEqual(set(), set(response_warnings))

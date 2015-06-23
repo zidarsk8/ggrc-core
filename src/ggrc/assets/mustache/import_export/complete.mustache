@@ -8,9 +8,11 @@
 
 <div class="import-wrap import-final">
   <ul>
-    <li><strong>243</strong> records created</li>
-    <li><strong>73</strong> records updated</li>
-    <li><strong>42</strong> records deleted</li>
-    <li><strong>2</strong> records identical</li>
+    {{#data}}
+      {{#if created}} <li><strong>{{created}}</strong> records created</li>{{/if}}
+      {{#if updated}} <li><strong>{{updated}}</strong> records updated</li>{{/if}}
+      {{#if ignored}} <li><strong>{{ignored}}</strong> records ignored</li>{{/if}}
+      {{#if deleted}} <li><strong>{{deleted}}</strong> records deleted</li>{{/if}}
+    {{/data}}
   </ul>
 </div>

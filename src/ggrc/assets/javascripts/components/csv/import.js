@@ -73,8 +73,9 @@
   can.Component.extend({
     tag: "csv-import",
     template: "<content></content>",
+    requestData: null,
     scope: {
-      csv_import_url: "/_service/import_csv",
+      importUrl: "/_service/import_csv",
       import: null,
       filename: "",
       isLoading: false,
@@ -90,18 +91,6 @@
             };
 
         return _.extend(states[state], {state: state});
-      },
-      prepare_data: function(response_data){
-        return _.map(response_data, function (element){
-          element.data = [
-            { status: "warnings",
-              messages: element.block_warnings.concat(element.row_warnings)
-            },
-            { status: "errors",
-              messages: element.block_errors.concat(element.row_errors)
-            },
-          ];
-        });
       }
     },
     events: {
@@ -120,23 +109,41 @@
       ".state-import click": function (el, ev) {
         ev.preventDefault();
         this.scope.attr("state", "importing");
-        setTimeout(function () {
+        this.requestData.headers["X-test-only"] = "false";
+
+        $.ajax(this.requestData)
+        .done(function (data) {
+          var result_count = data.reduce(function(prev, curr){
+            _.each(Object.keys(prev), function(key){
+              prev[key] += curr[key] || 0;
+            });
+            return prev
+          }, {inserted: 0, updated: 0, deleted: 0, ignored: 0})
+
           this.scope.attr("state", "success");
-        }.bind(this), 5000);
+          this.scope.attr("data", [result_count]);
+        }.bind(this))
+        .fail(function (data) {
+          this.scope.attr("state", "select");
+          // TODO: write error
+        }.bind(this))
+        .always(function () {
+          this.scope.attr("isLoading", false);
+        }.bind(this));
       },
       ".csv-upload change": function (el, ev) {
         var file = el[0].files[0],
-            form_data = new FormData();
+            formData = new FormData();
 
         this.scope.attr("state", "analysing");
         this.scope.attr("isLoading", true);
         this.scope.attr("filename", file.name);
-        form_data.append("file", file);
+        formData.append("file", file);
 
-        $.ajax({
+        this.requestData =  {
           type: "POST",
-          url: this.scope.attr("csv_import_url"),
-          data: form_data,
+          url: this.scope.attr("importUrl"),
+          data: formData,
           cache: false,
           contentType: false,
           processData: false,
@@ -144,8 +151,21 @@
             "X-test-only": "true",
             "X-requested-by": "gGRC"
           }
-        }).done(function (data) {
-          this.scope.attr("import", this.scope.prepare_data(data));
+        };
+
+        $.ajax(this.requestData)
+        .done(function (data) {
+          this.scope.attr("import", _.map(data, function (element){
+            element.data = [
+              { status: "warnings",
+                messages: element.block_warnings.concat(element.row_warnings)
+              },
+              { status: "errors",
+                messages: element.block_errors.concat(element.row_errors)
+              },
+            ];
+            return element;
+          }));
           this.scope.attr("state", "import");
         }.bind(this))
         .fail(function (data) {
