@@ -295,27 +295,3 @@ class Converter(object):
         index = offset_index - 3 - self.offset
         if self.in_range(index, remove_offset=False):
           self.row_converters[index].set_ignore()
-
-  def remove_duplicate_codes(self):
-    """ Check for duplacte code entries
-
-    Remove first columns with the same code and return an error """
-    duplicate_codes = defaultdict(list)
-    for i, row in reversed(list(enumerate(self.rows))):
-      code = row[0]
-      duplicate_codes[code].append(i)
-
-    errors = []
-    bad_rows = set()
-    for code, indexes in duplicate_codes.items():
-      if len(indexes) > 1:
-        keep, ignore = indexes[0], indexes[1:]
-        errors.append(
-            "Duplicate records: Lines {ignore} and {keep} contain the same "
-            "code. Lines {ignore} will be ignored.".format(
-                ignore=", ".join(ignore), keep=keep)
-        )
-      bad_rows.update(ignore)
-
-    result = filter(lambda i, row: i not in bad_rows, enumerate(self.rows))
-    return errors, result
