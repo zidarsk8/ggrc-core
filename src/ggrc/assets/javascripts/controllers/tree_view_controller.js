@@ -1479,7 +1479,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
 });
 
 (function (can, $) {
-    can.Component.extend ({
+  can.Component.extend ({
     tag: 'tree-header-selector',
     // <content> in a component template will be replaced with whatever is contained
     //  within the component tag.  Since the views for the original uses of these components
@@ -1531,10 +1531,8 @@ can.Control("CMS.Controllers.TreeViewNode", {
       }
     }
   });
-})(this.can, this.can.$);
 
-(function (can, $) {
-    can.Component.extend ({
+  can.Component.extend ({
     tag: 'tree-type-selector',
     // <content> in a component template will be replaced with whatever is contained
     //  within the component tag.  Since the views for the original uses of these components

@@ -16,6 +16,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , findAll : "/api/directives"
   , findOne : "/api/directives/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , child_tree_display_list : ['Section', 'Clause']
 
   , model : function(params) {
       if (this.shortName !== 'Directive')
@@ -40,7 +41,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }
 
   , attributes : {
-      context : "CMS.Models.Context.stub"
+    context : "CMS.Models.Context.stub"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
@@ -71,7 +72,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
 });
 
 CMS.Models.Directive("CMS.Models.Standard", {
-    root_object : "standard"
+  root_object : "standard"
   , root_collection : "standards"
   , model_plural : "Standards"
   , table_plural : "standards"
@@ -96,7 +97,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
-    , child_tree_display_list : ['Section', 'Clause']
+    , child_tree_display_list : CMS.Models.Directive.child_tree_display_list
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
@@ -135,7 +136,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
-    , child_tree_display_list : ['Section', 'Clause']
+    , child_tree_display_list : CMS.Models.Directive.child_tree_display_list
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
@@ -173,7 +174,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
-    , child_tree_display_list : ['Section', 'Clause']
+    , child_tree_display_list : CMS.Models.Directive.child_tree_display_list
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
@@ -212,7 +213,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
-    , child_tree_display_list : ['Section', 'Clause']
+    , child_tree_display_list : CMS.Models.Directive.child_tree_display_list
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
   , is_custom_attributable: true
