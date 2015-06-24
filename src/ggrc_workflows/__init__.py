@@ -3,10 +3,9 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from sqlalchemy import inspect, and_
-
 from datetime import datetime, date
 from flask import Blueprint
+from sqlalchemy import inspect, and_
 
 from ggrc import db
 from ggrc.login import get_current_user
@@ -25,7 +24,6 @@ from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
 from ggrc_basic_permissions.contributed_roles import (
     RoleContributions, RoleDeclarations, DeclarativeRoleImplications
 )
-
 
 
 # Initialize Flask Blueprint for extension
@@ -200,7 +198,7 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user, b
   # TaskGroupTasks for one_time workflows don't save relative start/end
   # month/day. They only saves start and end dates.
   # TaskGroupTasks for all other workflow frequencies save the relative
-  # start/end dates.
+  # start/end days.
   if not base_date:
     base_date = date.today()
 
