@@ -99,9 +99,13 @@ can.Construct("Permission", {
           instance.constructor ? instance.constructor.shortName : instance.type
       , type_obj = action_obj[instance_type] || {}
       , conditions_by_context = type_obj['conditions'] || {}
+      , resources = type_obj.resources || []
       , context = instance.context || {id: null}
       , conditions = conditions_by_context[context.id] || [];
 
+    if (~resources.indexOf(instance.id)) {
+      return true;
+    }
     // FIXME Check for basic resource permission
     //if (!_is_allowed(permissions, new Permission(action, instance_type, context.id))) {
       //return false;
