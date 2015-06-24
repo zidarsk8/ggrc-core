@@ -229,6 +229,7 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Mandatory Attribute"]["mandatory"])
     self.assertTrue(vals["Choose"]["mandatory"])
+    self.assertTrue(vals["Privacy"]["mandatory"])
 
 
 class TestGetObjectColumnDefinitions(TestCase):
@@ -634,7 +635,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
     self.assertTrue(vals["Owner"]["mandatory"])
-    self.assertTrue(vals["Reference URL"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
   def test_system_definitions(self):
