@@ -340,6 +340,16 @@ class OptionColumnHandler(ColumnHandler):
                  Option.role == prefixed_key))).first()
     return item
 
+class CheckboxColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    """ mandatory checkboxes will get evelauted to false on empty value """
+    if self.raw_value == "":
+      return False
+    value = self.raw_value.lower() in ("yes", "true")
+    if self.raw_value.lower() not in ("yes", "true", "no", "false"):
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    return value
 
 COLUMN_HANDLERS = {
     "slug": SlugColumnHandler,
@@ -354,4 +364,5 @@ COLUMN_HANDLERS = {
     "report_start_date": DateColumnHandler,
     "verify_frequency": OptionColumnHandler,
     "kind": OptionColumnHandler,
+    "private": CheckboxColumnHandler,
 }

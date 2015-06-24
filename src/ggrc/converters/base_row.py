@@ -114,6 +114,7 @@ class RowConverter(object):
 
   def send_signals(self):
     service_class = getattr(ggrc.services, self.object_class.__name__)
+    service_class.model = self.object_class
     if self.is_new:
       Resource.model_posted.send(
           self.object_class, obj=self.obj, src={}, service=service_class)
