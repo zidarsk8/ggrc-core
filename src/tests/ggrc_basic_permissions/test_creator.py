@@ -4,7 +4,7 @@ from ggrc.models import get_model
 from ggrc.models import all_models
 from tests.ggrc.api_helper import Api
 from tests.ggrc.generator import Generator
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 
 
 class TestCreator(TestCase):
@@ -13,14 +13,14 @@ class TestCreator(TestCase):
 
     self.generator = Generator()
     self.api = Api()
-    self.ggrc_generator = GgrcGenerator()
+    self.object_generator = ObjectGenerator()
     self.maxDiff = None
     self._generate_users()
 
   def _generate_users(self):
     users = [('creator', 'Creator'), ('admin', 'gGRC Admin')]
     for (name, role) in users:
-      _, user = self.ggrc_generator.generate_person(
+      _, user = self.object_generator.generate_person(
           data={"name": name}, user_role=role)
       setattr(self, name, user)
 
