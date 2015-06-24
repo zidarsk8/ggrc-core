@@ -178,6 +178,23 @@
                 }
               }
             }
+            .select-clear-all {
+              margin-top: 5px;
+              margin-bottom: 5px;
+              li {
+                margin: 0;
+                text-transform: none;
+                float: right;
+                width: 25%;
+                label {
+                  display: inline-block;
+                  cursor: pointer;
+                }
+                input {
+                  margin-top: -3px;
+                }
+              }
+            }
           }
           &.filter-trigger {
             .active {

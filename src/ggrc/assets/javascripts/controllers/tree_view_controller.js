@@ -1629,6 +1629,25 @@ can.Control("CMS.Controllers.TreeViewNode", {
 
       '.tview-type-toggle click' : 'update_check_boxes',
 
+      'input.select-all-checkbox click' : function (el, ev) {
+        var clear = this.element.find('.clear-all-checkbox'),
+            $check = this.element.find('.model-checkbox');
+        if (el.is(':checked')) {
+          $check.prop('checked', true);
+          clear.prop('checked', false);
+        }
+      },
+
+      'input.clear-all-checkbox click' : function (el, ev) {
+        var sel = this.element.find('.select-all-checkbox'),
+            $check = this.element.find('.model-checkbox');
+
+        if (el.is(':checked')) {
+          $check.prop('checked', false);
+          sel.prop('checked', false);
+        }
+      },
+
       '.set-display-object-list,.close-dropdown click' : function(el, ev) {
         this.element.find('.dropdown-menu').closest('li').removeClass('open');
       }

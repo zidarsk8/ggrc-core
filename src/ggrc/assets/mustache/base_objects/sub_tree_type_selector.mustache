@@ -27,10 +27,27 @@
       </h5>
 
       <!--h5>Select object type for {{model.title_singular}}</h5-->
-
+      <ul class="model-list select-clear-all">
+        <li>
+          <label class="checkbox-inline">
+            Select all: 
+            <input type="checkbox"
+              class="notify-wrap select-all-checkbox"
+            >
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-inline">
+            Select none: 
+            <input type="checkbox"
+              class="notify-wrap clear-all-checkbox"
+            >
+          </label>
+        </li>
+      </ul>
       <ul class="model-list">
         {{#selected_child_tree_model_list}}
-        <li class="{{#if mandatory}}disabled{{/if_equals}}">
+        <li>
           <label class="checkbox-inline">
             <input type="checkbox"
               {{#if display_status}}checked="checked"{{/if}}
