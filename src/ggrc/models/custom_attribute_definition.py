@@ -44,4 +44,4 @@ class CustomAttributeDefinition(Base, Titled, db.Model):
     RICH_TEXT = "Rich Text"
     DROPDOWN = "Dropdown"
     CHECKBOX = "Checkbox"
-    FILE_UPLOAD = "File upload"
+    DATE = "Date"
