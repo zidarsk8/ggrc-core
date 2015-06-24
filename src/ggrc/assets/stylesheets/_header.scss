@@ -9,11 +9,15 @@
   height: 48px;
 }
 
+#page-header {
+  position: relative;
+}
+
 .logo-wrap {
   float: left;
   height: 27px;
   line-height: 27px;
-  margin: 10px 20px 0 0;
+  margin: 10px 20px 0 46px;
   a {
     display: block;
   }

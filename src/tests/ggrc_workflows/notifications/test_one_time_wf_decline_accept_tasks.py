@@ -243,6 +243,30 @@ class TestCycleTaskStatusChange(TestCase):
       self.assertNotIn(user.email, notif_data)
       self.assertIn("all_tasks_completed", notif_data["user@example.com"])
 
+  @patch("ggrc.notification.email.send_email")
+  def test_end_cycle(self, mock_mail):
+    """
+    manaually ending a cycle should stop all notifications for that cycle
+    """
+
+    with freeze_time("2015-05-01"):
+      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, cycle = self.wf_generator.generate_cycle(wf)
+      self.wf_generator.activate_workflow(wf)
+
+    with freeze_time("2015-05-03"):
+      _, notif_data = notification.get_todays_notifications()
+      cycle = Cycle.query.get(cycle.id)
+      user = Person.query.get(self.user.id)
+      self.assertIn(user.email, notif_data)
+      self.wf_generator.modify_object(cycle, data={"is_current":False})
+      cycle = Cycle.query.get(cycle.id)
+      self.assertFalse(cycle.is_current)
+
+      _, notif_data = notification.get_todays_notifications()
+      self.assertNotIn(user.email, notif_data)
+
+
   def create_test_cases(self):
     def person_dict(person_id):
       return {
@@ -297,7 +321,7 @@ class TestCycleTaskStatusChange(TestCase):
         ObjectType.name == obj.__class__.__name__).one()
 
   def task_change_status(self, task, status="Verified"):
-    self.wf_generator.modify_cycle_task_group_object_task(
+    self.wf_generator.modify_object(
         task, data={"status": status})
 
     task = CycleTaskGroupObjectTask.query.get(task.id)

@@ -52,3 +52,7 @@ MEMCACHE_MECHANISM = True
 APPENGINE_EMAIL = os.environ.get('APPENGINE_EMAIL', '')
 
 CALENDAR_MECHANISM = False
+
+MAX_INSTANCES = os.environ.get('MAX_INSTANCES', '3')
+
+exports = ['VERSION', 'MAX_INSTANCES']

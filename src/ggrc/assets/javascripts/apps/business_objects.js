@@ -414,11 +414,6 @@
             widget_name: "Program",
             widget_icon: "program"
           },
-          ControlAssessment: {
-            widget_id: "ControlAssessment",
-            widget_name: "Control Assessments",
-            widget_icon: "control_assessment"
-          }
         },
         Control: {
           Request: {
@@ -686,11 +681,6 @@
             show_view: GGRC.mustache_path + "/audits/tree.mustache",
             footer_view: null
           },
-          ControlAssessment: {
-            mapping: "related_control_assessment",
-            show_view: GGRC.mustache_path + "/control_assessments/tree.mustache",
-            header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache"
-          }
         },
         open_requests: {
           Request: {
@@ -713,26 +703,9 @@
         },
         Control: {
           _mixins: ["governance_objects", "business_objects", "extended_audits", "open_requests", "issues"],
-          ControlAssessment: {
-            mapping: "related_control_assessments",
-            parent_instance: GGRC.page_instance(),
-            draw_children: true,
-            model: CMS.Models.ControlAssessment,
-            show_view: GGRC.mustache_path + "/control_assessments/tree.mustache",
-            header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache",
-            footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/control_assessments/tree_add_item.mustache"
-          }
         },
         ControlAssessment: {
           _mixins: ["governance_objects", "business_objects", "issues"],
-          Control: {
-            mapping: "related_controls",
-            draw_children: true,
-            allow_creating: false,
-            allow_mapping: false,
-            show_view: GGRC.mustache_path + "/controls/tree.mustache"
-          },
           Audit: {
             mapping: "related_audits",
             draw_children: true,
@@ -774,16 +747,6 @@
             footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
             add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
           },
-          ControlAssessment: {
-            mapping: "related_control_assessments",
-            draw_children: true,
-            allow_creating: true,
-            allow_mapping: true,
-            show_view: GGRC.mustache_path + "/control_assessments/tree.mustache",
-            header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache",
-            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
-          }
         },
         DataAsset: {
           _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]

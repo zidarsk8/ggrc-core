@@ -13,7 +13,6 @@ from ggrc_workflows.services.common import Signals
 from .data_handler import (
     get_cycle_data,
     get_workflow_data,
-    get_task_group_task_data,
     get_cycle_task_data,
 )
 
@@ -21,8 +20,14 @@ from .notification_handler import (
     handle_workflow_modify,
     handle_cycle_task_group_object_task_put,
     handle_cycle_created,
+    handle_cycle_modify,
     handle_cycle_task_status_change,
 )
+
+
+def empty_notification(*agrs):
+  """ Used for ignoring notificaitons of a certain type """
+  return {}
 
 
 def contributed_notifications():
@@ -31,7 +36,7 @@ def contributed_notifications():
   return {
       'Cycle': get_cycle_data,
       'Workflow': get_workflow_data,
-      'TaskGroupTask': get_task_group_task_data,
+      'TaskGroupTask': empty_notification,
       'CycleTaskGroupObjectTask': get_cycle_task_data,
   }
 
@@ -46,6 +51,10 @@ def register_listeners():
   def cycle_task_group_object_task_put_listener(
           sender, obj=None, src=None, service=None):
     handle_cycle_task_group_object_task_put(obj)
+
+  @Resource.model_put.connect_via(Cycle)
+  def cycle_post_listener(sender, obj=None, src=None, service=None):
+    handle_cycle_modify(sender, obj, src, service)
 
   @Resource.model_posted.connect_via(Cycle)
   def cycle_post_listener(sender, obj=None, src=None, service=None):
@@ -77,19 +86,6 @@ All notifications handle the following structure:
                       { workflow_owner.id: workflow_owner_info, ...},
                   "start_date": MM/DD/YYYY
                   "fuzzy_start_date": "in X days/weeks ..."
-
-                  "my_tasks" : # list of all tasks assigned to the user
-                      { (task.id, object.id): { task_info, obj_info}, ... }
-
-                  # list of all task groups assigned to the user, including
-                  # tasks
-                  "my_task_groups" :
-                      { task_group.id:
-                          { (task.id, object.id): { task_info, obj_info}, ... }
-                      }
-
-                  "workflow_tasks" : # list of all tasks in the workflow
-                      { (task.id, object.id): { task_info, obj_info}, ... }
               }
               , ...
           }

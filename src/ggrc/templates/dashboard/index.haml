@@ -14,10 +14,4 @@
   =super()
   GGRC.page_object = { "person": ={ current_user_json()|safe } };
 
--block header
-  %h1{ 'class': "={ model_display_class }" }
-    .grcobject{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "Person", 'class': "" }
-      %i.grcicon-person
-    My Work
-
 -block widget_area
