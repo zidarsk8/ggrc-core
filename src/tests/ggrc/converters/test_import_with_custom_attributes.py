@@ -3,13 +3,14 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
-import os
+from flask import json
 from os.path import abspath
 from os.path import dirname
 from os.path import join
-from flask import json
+import os
+import random
 
+from ggrc.models import Product
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
 
@@ -74,7 +75,7 @@ class TestImportWithCustomAttributes(TestCase):
 
   def test_product_with_all_custom_attributes(self):
     filename = "product_with_all_custom_attributes.csv"
-    response = self.import_file(filename)
+    response = self.import_file(filename)[0]
     expected_warnings = set([
         "Line 6: man CH contains invalid data. The value will be ignored.",
         "Line 8: normal select contains invalid data. The value will be"
@@ -84,12 +85,12 @@ class TestImportWithCustomAttributes(TestCase):
         "Line 11: normal CH contains invalid data. The value will be ignored.",
         "Line 12: man CH contains invalid data. The value will be ignored.",
         "Line 14: normal Date contains invalid data. The value will be"
-        "  ignored.",
+        " ignored.",
         "Line 16: man Date contains invalid data. The value will be ignored.",
         "Line 21: Owner field does not contain a valid owner. You will be"
-        "  assigned as object owner.",
+        " assigned as object owner.",
         "Line 22: Specified user 'kr@en.com' does not exist. That user will be"
-        "  ignored.",
+        " ignored.",
         "Line 22: Owner field does not contain a valid owner. You will be"
         " assigned as object owner.",
         "Line 26: Owner field does not contain a valid owner. You will be"
@@ -113,7 +114,6 @@ class TestImportWithCustomAttributes(TestCase):
 
     self.assertEqual(expected_warnings, set(response["row_warnings"]))
     self.assertEqual(expected_errors, set(response["row_errors"]))
-    self.assertEqual(18, set(response["created"]))
-    self.assertEqual(8, set(response["ignored"]))
-
-    self.assertTrue(True)
+    self.assertEqual(18, response["created"])
+    self.assertEqual(8, response["ignored"])
+    self.assertEqual(18, Product.query.count())
