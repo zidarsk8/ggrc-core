@@ -318,7 +318,7 @@ def load_permissions_for(user):
   # Agregate from owners:
   all_owners = {}
   for object_owner in user.object_owners:
-    for action in ['read', 'create', 'update', 'delete']:
+    for action in ["read", "create", "update", "delete", "view_object_page"]:
       permissions.setdefault(action, {})\
           .setdefault(object_owner.ownable_type, {})\
           .setdefault('resources', list())\
@@ -326,7 +326,7 @@ def load_permissions_for(user):
 
   for res in objects_via_program_relationships_query(user.id).all():
     id_, type_, role_name = res
-    actions = ["read"]
+    actions = ["read", "view_object_page"]
     if role_name in ("ProgramEditor", "ProgramOwner"):
       actions += ["create", "update", "delete"]
     for action in actions:
