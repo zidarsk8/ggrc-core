@@ -742,19 +742,7 @@ class Resource(ModelView):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
-    if self.request.mimetype != 'application/json':
-      return current_app.make_response((
-        'Content-Type must be application/json', 415,[]))
-    header_error = self.validate_headers_for_put_or_delete(obj)
-    if header_error:
-      return header_error
     src = UnicodeSafeJsonWrapper(self.request.json)
-    root_attribute = self.model._inflector.table_singular
-    try:
-      src = src[root_attribute]
-    except KeyError, e:
-      return current_app.make_response((
-        'Required attribute "{0}" not found'.format(root_attribute), 400, []))
     with benchmark("Query update permissions"):
       if not permissions.is_allowed_update(self.model.__name__, obj.id, obj.context_id):
         raise Forbidden()
@@ -764,6 +752,18 @@ class Resource(ModelView):
       if new_context != obj.context_id \
           and not permissions.is_allowed_update(self.model.__name__, obj.id, new_context):
         raise Forbidden()
+    if self.request.mimetype != 'application/json':
+      return current_app.make_response((
+        'Content-Type must be application/json', 415,[]))
+    header_error = self.validate_headers_for_put_or_delete(obj)
+    if header_error:
+      return header_error
+    root_attribute = self.model._inflector.table_singular
+    try:
+      src = src[root_attribute]
+    except KeyError, e:
+      return current_app.make_response((
+        'Required attribute "{0}" not found'.format(root_attribute), 400, []))
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
@@ -805,14 +805,14 @@ class Resource(ModelView):
         obj = self.get_object(id)
       if obj is None:
         return self.not_found_response()
-      header_error = self.validate_headers_for_put_or_delete(obj)
-      if header_error:
-        return header_error
       with benchmark("Query delete permissions"):
         if not permissions.is_allowed_delete(self.model.__name__, obj.id, obj.context_id):
           raise Forbidden()
         if not permissions.is_allowed_delete_for(obj):
           raise Forbidden()
+      header_error = self.validate_headers_for_put_or_delete(obj)
+      if header_error:
+        return header_error
       db.session.delete(obj)
       with benchmark("Send DELETEd event"):
         self.model_deleted.send(obj.__class__, obj=obj, service=self)
