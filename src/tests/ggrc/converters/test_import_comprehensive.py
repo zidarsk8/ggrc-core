@@ -10,7 +10,7 @@ from os.path import dirname
 from os.path import join
 from flask import json
 
-# from ggrc.converters import errors
+from ggrc.models import Program
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
 
@@ -44,29 +44,170 @@ class TestComprehensiveSheets(TestCase):
   def test_policy_basic_import(self):
 
     filename = "comprehensive_sheet1.csv"
-    self.import_file(filename)
+    response = self.import_file(filename)
+    indexed = {r["name"]: r for r in response}
 
-    # import ipdb; ipdb.set_trace()
-    # from ggrc import db
-    # from ggrc.models import Control
-    # from ggrc.models import CustomAttributeValue
-    # control = Control.query.first()
-    # cav = CustomAttributeValue()
-    # cav.custom_attribute_id = control.custom_attribute_definitions[0].id
-    # cav.attributable_type = "Control"
-    # cav.attributable_id = control.id
-    # cav.attribute_value = "Control your self"
-    # db.session.add(cav)
-    # db.session.commit()
+    expected = {
+        "Control": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 2,
+            "row_warnings": 3,
+            "rows": 16,
+        },
+        "Objective": {
+            "created": 8,
+            "ignored": 7,
+            "row_errors": 5,
+            "row_warnings": 4,
+            "rows": 15,
+        },
+        "Program": {
+            "created": 13,
+            "ignored": 3,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
+        },
+        "Issue": {
+            "created": 10,
+            "ignored": 4,
+            "row_errors": 4,
+            "row_warnings": 4,
+            "rows": 14,
+        },
+        "Policy": {
+            "created": 13,
+            "ignored": 3,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
+        },
+        "Regulation": {
+            "created": 13,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 3,
+            "rows": 15,
+        },
+        "Standard": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 5,
+            "rows": 16,
+        },
+        "Contract": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
+        },
+        "System": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
+        },
+        "Clause": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 2,
+            "row_warnings": 4,
+            "rows": 16,
+        },
+        "Process": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
+        },
+        "Data Asset": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
+        },
+        "Product": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
+        },
+        "Project": {
+            "created": 8,
+            "ignored": 0,
+            "row_errors": 0,
+            "row_warnings": 0,
+            "rows": 8,
+        },
+        "Facility": {
+            "created": 14,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 4,
+            "rows": 16,
+        },
+        "Market": {
+            "created": 13,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 3,
+            "rows": 15,
+        },
+        "Org Group": {
+            "created": 13,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 3,
+            "rows": 15,
+        },
+        "Vendor": {
+            "created": 13,
+            "ignored": 2,
+            "row_errors": 3,
+            "row_warnings": 3,
+            "rows": 15,
+        },
+        "Person": {
+            "created": 0,
+            "ignored": 10,
+            "row_errors": 0,
+            "row_warnings": 0,
+            "rows": 10,
+        }
+    }
 
-    # print control.title
+    # general numbers check
+    for name, data in expected.items():
+      current = indexed[name]
+      self.assertEquals(current["rows"], data["rows"])
+      self.assertEquals(current["ignored"], data["ignored"])
+      self.assertEquals(current["created"], data["created"])
+      self.assertEquals(len(current["row_errors"]), data["row_errors"])
+      self.assertEquals(len(current["row_warnings"]), data["row_warnings"])
+
+    prog = Program.query.filter_by(slug="prog-8").first()
+    self.assertTrue(prog.private)
+    self.assertEquals(prog.title, "program 8")
+    self.assertEquals(prog.status, "Draft")
+    self.assertEquals(prog.description, "test")
+
+    custom_vals = [v.attribute_value for v in prog.custom_attribute_values]
+    expected_custom_vals = ['0', 'a', '2015-12-12 00:00:00', 'test1']
+    self.assertEquals(set(custom_vals), set(expected_custom_vals))
 
   def create_custom_attributes(self):
     gen = self.generator.generate_custom_attribute
     gen("control", title="my custom text", mandatory=True)
     gen("program", title="my_text", mandatory=True)
     gen("program", title="my_date", attribute_type="Date")
-    gen("program", title="my_date", attribute_type="Checkbox")
+    gen("program", title="my_checkbox", attribute_type="Checkbox")
     gen("program", title="my_dropdown", attribute_type="Dropdown",
         options="a,b,c,d")
     # gen("program", title="my_description", attribute_type="Rich Text")
