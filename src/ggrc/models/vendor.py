@@ -18,10 +18,7 @@ class Vendor(HasObjectState, CustomAttributable, Documentable, Personable,
 
   _aliases = {
       "url": "Vendor URL",
-      "reference_url": {
-          "display_name": "Reference URL",
-          "mandatory": True,
-      }
+      "reference_url": "Reference URL",
   }
 
 track_state_for_class(Vendor)
