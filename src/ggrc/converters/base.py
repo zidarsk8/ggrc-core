@@ -5,6 +5,7 @@
 
 from collections import defaultdict
 from collections import OrderedDict
+from flask import current_app
 
 from ggrc import db
 from ggrc.converters import IMPORTABLE
@@ -233,7 +234,8 @@ class Converter(object):
         try:
           row_converter.insert_object()
           db.session.flush()
-        except:
+        except Exception as e:
+          current_app.logger.error("Import failed with: {}".format(e.message))
           row_converter.add_error(errors.UNKNOWN_ROW_ERROR)
       self.save_import()
 
