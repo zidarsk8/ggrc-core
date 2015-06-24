@@ -12,10 +12,10 @@ from ggrc.converters import errors
 
 class RowConverter(object):
 
-  def __init__(self, converter, object_type, **options):
+  def __init__(self, converter, object_class, **options):
     self.converter = converter
     self.options = options.copy()
-    self.object_type = object_type
+    self.object_class = object_class
     self.obj = None
     self.is_new = True
     self.ignore = False
@@ -64,7 +64,7 @@ class RowConverter(object):
                      column_names=", ".join(missing))
 
   def find_by_slug(self, slug):
-    return self.object_type.query.filter_by(slug=slug).first()
+    return self.object_class.query.filter_by(slug=slug).first()
 
   def get_value(self, key):
     key_set = self.mappings if key.startswith("map:") else self.attrs
@@ -87,7 +87,7 @@ class RowConverter(object):
     if slug:
       obj = self.find_by_slug(slug)
     if not obj:
-      obj = self.object_type()
+      obj = self.object_class()
       self.is_new = True
 
     return obj
@@ -113,13 +113,13 @@ class RowConverter(object):
       item_handler.set_obj_attr()
 
   def send_signals(self):
-    service_class = getattr(ggrc.services, self.object_type.__name__)
+    service_class = getattr(ggrc.services, self.object_class.__name__)
     if self.is_new:
       Resource.model_posted.send(
-          self.object_type, obj=self.obj, src={}, service=service_class)
+          self.object_class, obj=self.obj, src={}, service=service_class)
     else:
       Resource.model_put.send(
-          self.object_type, obj=self.obj, src={}, service=service_class)
+          self.object_class, obj=self.obj, src={}, service=service_class)
 
   def insert_object(self):
     if self.ignore:
