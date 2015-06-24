@@ -5,6 +5,7 @@
 
 import os
 import random
+import itertools
 
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
@@ -47,22 +48,51 @@ class TestAutomappings(TestCase):
         'destination': {'id': dst.id, 'type': dst.type}
     })
 
-  def assert_mapping(self, obj1, obj2):
+  def assert_mapping(self, obj1, obj2, missing=False):
     db.session.flush()
     rel = Relationship.find_related(obj1, obj2)
-    self.assertIsNotNone(rel,
-                         msg='%s not mapped to %s' % (obj1.type, obj2.type))
+    if not missing:
+      self.assertIsNotNone(rel,
+                           msg='%s not mapped to %s' % (obj1.type, obj2.type))
+    else:
+      self.assertIsNone(rel,
+                        msg='%s mapped to %s' % (obj1.type, obj2.type))
+
+  def assert_mapping_implication(self, to_create, implied):
+    objects = set()
+    mappings = set()
+    relate = lambda src, dst: (src, dst) if src < dst else (dst, src)
+    if type(to_create) is not list:
+      to_create = [to_create]
+    for src, dst in to_create:
+      objects.add(src)
+      objects.add(dst)
+      self.create_mapping(src, dst)
+      mappings.add(relate(src, dst))
+    if type(implied) is not list:
+      implied = [implied]
+    for src, dst in implied:
+      objects.add(src)
+      objects.add(dst)
+      self.assert_mapping(src, dst)
+      mappings.add(relate(src, dst))
+    possible = set()
+    for src, dst in itertools.product(objects, objects):
+      possible.add(relate(src, dst))
+    for src, dst in possible - mappings:
+      self.assert_mapping(src, dst, missing=True)
 
   def with_permutations(self, mk1, mk2, mk3):
-      obj1, obj2, obj3 = mk1(), mk2(), mk3()
-      self.create_mapping(obj1, obj2)
-      self.create_mapping(obj2, obj3)
-      self.assert_mapping(obj1, obj3)
-
-      obj1, obj2, obj3 = mk1(), mk2(), mk3()
-      self.create_mapping(obj2, obj3)
-      self.create_mapping(obj1, obj2)
-      self.assert_mapping(obj1, obj3)
+    obj1, obj2, obj3 = mk1(), mk2(), mk3()
+    self.assert_mapping_implication(
+        to_create=[(obj1, obj2), (obj2, obj3)],
+        implied=(obj1, obj3),
+    )
+    obj1, obj2, obj3 = mk1(), mk2(), mk3()
+    self.assert_mapping_implication(
+        to_create=[(obj2, obj3), (obj1, obj2)],
+        implied=(obj1, obj3),
+    )
 
   def test_mapping_directive_to_a_program(self):
     self.with_permutations(
@@ -83,5 +113,7 @@ class TestAutomappings(TestCase):
     })
     objective = self.create_object(Objective, {'title': next('Objective')})
 
-    self.create_mapping(objective, section)
-    self.assert_mapping(objective, regulation)
+    self.assert_mapping_implication(
+        to_create=(objective, section),
+        implied=(objective, regulation),
+    )
