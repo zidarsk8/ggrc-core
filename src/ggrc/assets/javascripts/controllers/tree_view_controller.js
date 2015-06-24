@@ -21,60 +21,7 @@ function _firstElementChild(el) {
 if (!GGRC.tree_view) {
   GGRC.tree_view = {};
 }
-GGRC.tree_view.display_name = {
-  'Audit' : 'Audits',
-  'Clause' : 'Clauses',
-  'Contract' : 'Contracts',
-  'Control' : 'Controls',
-  'ControlAssessment' : 'Control Assessments',
-  'DataAsset' : 'DataAssets',
-  'Facility' : 'Facilities',
-  'Issue' : 'Issues',
-  'Market' : 'Markets',
-  'Objective' : 'Objectives',
-  'OrgGroup' : 'Org Groups',
-  'Person' : 'Person',
-  'Policy' : 'Policies',
-  'Process' : 'Processes',
-  'Product' : 'Products',
-  'Program' : 'Programs',
-  'Project' : 'Projects',
-  'Regulation' : 'Regulations',
-  'Request' : 'Requests',
-  'Response' : 'Responses',
-  'Section' : 'Sections',
-  'Standard' : 'Standards',
-  'System' : 'Systems',
-  'Vendor' : 'Vendors'
-};
-
-GGRC.tree_view.child_tree_model_list = [
-    { model_name: 'Audit', display_name: 'Audits'},
-    { model_name: 'Clause', display_name: 'Clauses'},
-    { model_name: 'Contract', display_name: 'Contracts'},
-    { model_name: 'Control', display_name: 'Controls'},
-    { model_name: 'ControlAssessment', display_name: 'Control Assessments'},
-    { model_name: 'DataAsset', display_name: 'Data Assets'},
-    { model_name: 'Facility', display_name: 'Facilities'},
-    { model_name: 'Issue', display_name: 'Issues'},
-    { model_name: 'Market', display_name: 'Markets'},
-    { model_name: 'Objective', display_name: 'Objectives'},
-    { model_name: 'OrgGroup', display_name: 'Org Groups'},
-    { model_name: 'Person', display_name: 'People'},
-    { model_name: 'Policy', display_name: 'Policies'},
-    { model_name: 'Process', display_name: 'Processes'},
-    { model_name: 'Product', display_name: 'Products'},
-    { model_name: 'Program', display_name: 'Programs'},
-    { model_name: 'Project', display_name: 'Projects'},
-    { model_name: 'Regulation', display_name: 'Regulations'},
-    { model_name: 'Request', display_name: 'Requests'},
-    { model_name: 'Response', display_name: 'Responses'},
-    { model_name: 'Section', display_name: 'Sections'},
-    { model_name: 'Standard', display_name: 'Standards'},
-    { model_name: 'System', display_name: 'Systems'},
-    { model_name: 'Vendor', display_name: 'Vendors'}
-];
-
+GGRC.tree_view.child_tree_model_list = new can.Observe.List([]);
 GGRC.tree_view.sub_tree_for = [];
 
 function _display_tree_subpath(el, path, attempt_counter) {
@@ -505,7 +452,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var i, model_name = model.model_singular, all_obj_list = [],
         child_tree_model_list = [], w_list,
         def_child_tree_display_list, saved_child_tree_display_list,
-        child_tree_display_list = [];
+        child_tree_display_list = [],
+        valid_models = Object.keys(GGRC.tree_view.base_widgets_by_type);
 
     //Create child tree model list for each model type as defined in business_object.js file
     w_list = GGRC.tree_view.base_widgets_by_type[model_name]; //possible widget/mapped model_list
@@ -514,11 +462,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     } else { //create child_tree_model_list
       w_list.sort();
       can.each(w_list, function (m_name) {
-        var obj = {};
-        obj.model_name = m_name;
-        obj.display_name = GGRC.tree_view.display_name[m_name];
-        if (obj.display_name !== undefined) {
-          child_tree_model_list.push(obj);
+        if (valid_models.indexOf(m_name) !== -1) {
+          child_tree_model_list.push({model_name: m_name, display_name: CMS.Models[m_name].title_singular});
         }
       });
     }
@@ -529,6 +474,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     can.each(child_tree_model_list, function(item) {
       all_obj_list.push(item.model_name);
     });
+
 
     // Get child_tree_display_list from local storage
     saved_child_tree_display_list = this.display_prefs.getChildTreeDisplayList(model_name);
@@ -551,7 +497,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.options.attr('selected_child_tree_model_list', child_tree_model_list);
     this.options.attr('select_model_list', GGRC.tree_view.child_tree_model_list);
     this.options.attr('selected_model_name', model_name);
-    //this.options.attr('child_tree_display_list', child_tree_display_list);
   },
 
   //Displays attribute list for tree-header, Select attribute list drop down

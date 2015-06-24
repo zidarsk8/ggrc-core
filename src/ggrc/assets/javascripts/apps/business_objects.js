@@ -305,6 +305,13 @@
       GGRC.tree_view = {};
     }
     GGRC.tree_view.base_widgets_by_type = base_widgets_by_type;
+    var model_names = Object.keys(base_widgets_by_type);
+    //Remove Person, not loaded for my_work page
+    model_names.splice(model_names.indexOf("Person"), 1);
+    model_names.sort();
+    can.each(model_names, function (name) {
+      GGRC.tree_view.child_tree_model_list.push({model_name: name, display_name: CMS.Models[name].title_singular})
+    });
 
     function sort_sections(sections) {
       return can.makeArray(sections).sort(window.natural_comparator);

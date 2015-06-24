@@ -99,7 +99,6 @@ CMS.Models.Directive("CMS.Models.Standard", {
   , defaults : {
     kind : "Standard"
   }
-  , tree_view_options : CMS.Models.Directive.tree_view_options
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [ "Standard" ]
@@ -127,7 +126,6 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , defaults : {
     kind : "Regulation"
   }
-  , tree_view_options : CMS.Models.Directive.tree_view_options
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [ "Regulation" ]
@@ -189,7 +187,6 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , defaults : {
     kind : "Contract"
   }
-  , tree_view_options : CMS.Models.Directive.tree_view_options
   , is_custom_attributable: true
   , attributes : {
   }
