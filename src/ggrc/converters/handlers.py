@@ -3,19 +3,21 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import re
 from dateutil.parser import parse
 from sqlalchemy import and_
 from sqlalchemy import or_
+import re
 
 from ggrc import db
-from ggrc.models import Person
-from ggrc.models import Option
-from ggrc.models import Relationship
-from ggrc.login import get_current_user
 from ggrc.converters import IMPORTABLE
 from ggrc.converters import errors
 from ggrc.converters.utils import pretty_class_name
+from ggrc.login import get_current_user
+from ggrc.models import CustomAttributeValue
+from ggrc.models import CustomAttributeDefinition
+from ggrc.models import Option
+from ggrc.models import Person
+from ggrc.models import Relationship
 
 
 class ColumnHandler(object):
@@ -24,7 +26,7 @@ class ColumnHandler(object):
     self.row_converter = row_converter
     self.key = key
     self.value = None
-    self.raw_value = options.get("raw_value")
+    self.raw_value = options.get("raw_value").strip()
     self.validator = options.get("validator")
     self.mandatory = options.get("mandatory", False)
     self.default = options.get("default")
@@ -74,13 +76,13 @@ class StatusColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
-    valid_states = row_converter.object_type.VALID_STATES
+    valid_states = row_converter.object_class.VALID_STATES
     self.state_mappings = {s.lower(): s for s in valid_states}
     super(StatusColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
     # TODO: check if mandatory and replace with default if it's wrong
-    value = self.raw_value.strip().lower()
+    value = self.raw_value.lower()
     status = self.state_mappings.get(value)
     if not status:
       self.add_warning(errors.WRONG_REQUIRED_VALUE,
@@ -95,7 +97,7 @@ class UserColumnHandler(ColumnHandler):
   """ Handler for primary and secondary contacts """
 
   def parse_item(self):
-    email = self.raw_value.strip()
+    email = self.raw_value
     person = Person.query.filter(Person.email == email).first()
     if email and not person:
       self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
@@ -132,7 +134,7 @@ class SlugColumnHandler(ColumnHandler):
 
   def parse_item(self):
     if self.raw_value:
-      return self.raw_value.strip()
+      return self.raw_value
     return ""
 
 
@@ -155,7 +157,7 @@ class TextColumnHandler(ColumnHandler):
     if not self.raw_value:
       return ""
 
-    return self.clean_whitespaces(self.raw_value.strip())
+    return self.clean_whitespaces(self.raw_value)
 
   def clean_whitespaces(self, value):
     clean_value = re.sub(r'\s+', " ", value)
@@ -169,7 +171,7 @@ class RequiredTextColumnHandler(TextColumnHandler):
 
   def parse_item(self):
     value = self.raw_value or ""
-    clean_value = self.clean_whitespaces(value.strip())
+    clean_value = self.clean_whitespaces(value)
     if not clean_value:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return clean_value
@@ -207,7 +209,7 @@ class MappingColumnHandler(ColumnHandler):
     self.new_slugs = []
 
   def set_slugs(self, slugs_dict):
-    self.new_slugs = slugs_dict.get(self.row_converter.object_type, [])
+    self.new_slugs = slugs_dict.get(self.row_converter.object_class, [])
 
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
@@ -226,6 +228,8 @@ class MappingColumnHandler(ColumnHandler):
     return objects
 
   def set_obj_attr(self):
+    if not self.value:
+      return
     """ Create a new mapping object """
     current_obj = self.row_converter.obj
     for obj in self.value:
@@ -235,15 +239,101 @@ class MappingColumnHandler(ColumnHandler):
     db.session.flush()
 
 
-class CustomAttributeColumHandler(ColumnHandler):
-  pass
+types = CustomAttributeDefinition.ValidTypes
+
+
+class CustomAttributeColumHandler(TextColumnHandler):
+
+  _type_handlers = {
+      types.TEXT: lambda self: self.get_text_value(),
+      types.DATE: lambda self: self.get_date_value(),
+      types.DROPDOWN: lambda self: self.get_dropdown_value(),
+      types.CHECKBOX: lambda self: self.get_checkbox_value(),
+      types.RICH_TEXT: lambda self: self.get_rich_text_value(),
+  }
+
+  def parse_item(self):
+    self.definition = self.get_ca_definition()
+    value = CustomAttributeValue(custom_attribute_id=self.definition.id)
+    value_handler = self._type_handlers[self.definition.attribute_type]
+    value.attribute_value = value_handler(self)
+    if value.attribute_value is None:
+      return None
+    return value
+
+  def set_obj_attr(self):
+    if self.value:
+      self.row_converter.obj.custom_attribute_values.append(self.value)
+
+  def insert_object(self):
+    if self.value is None:
+      return
+    self.value.attributable_type = self.row_converter.obj.__class__.__name__
+    self.value.attributable_id = self.row_converter.obj.id
+    db.session.add(self.value)
+
+  def get_ca_definition(self):
+    for definition in self.row_converter.object_class\
+            .get_custom_attribute_definitions():
+      if definition.title == self.key:
+        return definition
+    return None
+
+  def get_date_value(self):
+    if not self.mandatory and self.raw_value == "":
+      return None  # ignore empty fields
+    value = None
+    try:
+      value = parse(self.raw_value)
+    except:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    if self.mandatory and value is None:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+    return value
+
+  def get_checkbox_value(self):
+    if not self.mandatory and self.raw_value == "":
+      return None  # ignore empty fields
+    value = self.raw_value.lower() in ("yes", "true")
+    if self.raw_value.lower() not in ("yes", "true", "no", "false"):
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      value = None
+    if self.mandatory and value is None:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+    return value
+
+  def get_dropdown_value(self):
+    choices_list = self.definition.multi_choice_options.split(",")
+    valid_choices = map(unicode.strip, choices_list)  # noqa
+    choice_map = {choice.lower(): choice for choice in valid_choices}
+    value = choice_map.get(self.raw_value.lower())
+    if value is None and self.raw_value != "":
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    if self.mandatory and value is None:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+    return value
+
+  def get_text_value(self):
+    if not self.mandatory and self.raw_value == "":
+      return None  # ignore empty fields
+    value = self.clean_whitespaces(self.raw_value)
+    if self.mandatory and not value:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+    return value
+
+  def get_rich_text_value(self):
+    if not self.mandatory and self.raw_value == "":
+      return None  # ignore empty fields
+    if self.mandatory and not self.raw_value:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+    return self.raw_value
 
 
 class OptionColumnHandler(ColumnHandler):
 
   def parse_item(self):
     prefixed_key = "{}_{}".format(
-        self.row_converter.object_type._inflector.table_singular, self.key)
+        self.row_converter.object_class._inflector.table_singular, self.key)
     item = Option.query.filter(
         and_(Option.title == self.raw_value.strip(),
              or_(Option.role == self.key,
