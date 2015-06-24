@@ -18,33 +18,61 @@ function _firstElementChild(el) {
   }
 }
 
-GGRC.tree_view = {};
+if (!GGRC.tree_view) {
+  GGRC.tree_view = {};
+}
+GGRC.tree_view.display_name = {
+  'Audit' : 'Audits',
+  'Clause' : 'Clauses',
+  'Contract' : 'Contracts',
+  'Control' : 'Controls',
+  'ControlAssessment' : 'Control Assessments',
+  'DataAsset' : 'DataAssets',
+  'Facility' : 'Facilities',
+  'Issue' : 'Issues',
+  'Market' : 'Markets',
+  'Objective' : 'Objectives',
+  'OrgGroup' : 'Org Groups',
+  'Person' : 'Person',
+  'Policy' : 'Policies',
+  'Process' : 'Processes',
+  'Product' : 'Products',
+  'Program' : 'Programs',
+  'Project' : 'Projects',
+  'Regulation' : 'Regulations',
+  'Request' : 'Requests',
+  'Response' : 'Responses',
+  'Section' : 'Sections',
+  'Standard' : 'Standards',
+  'System' : 'Systems',
+  'Vendor' : 'Vendors'
+};
+
 GGRC.tree_view.child_tree_model_list = [
-    { model_name: 'Audit', model_lowercase: 'audit', model_plural: 'audits', display_name: 'Audits'},
-    { model_name: 'Clause', model_lowercase: 'clause', model_plural: 'clauses', display_name: 'Clauses'},
-    { model_name: 'Contract', model_lowercase: 'contract', model_plural: 'contracts', display_name: 'Contracts'},
-    { model_name: 'Control', model_lowercase: 'control', model_plural: 'controls', display_name: 'Controls'},
-    { model_name: 'ControlAssessment', model_lowercase: 'control_assessment',
-        model_plural: 'control_assessments', display_name: 'Control Assessments'},
-    { model_name: 'DataAsset', model_lowercase: 'data_asset', model_plural: 'data_assets', display_name: 'Data Assets'},
-    { model_name: 'Facility', model_lowercase: 'facility', model_plural: 'facilities', display_name: 'Facilities'},
-    { model_name: 'Issue', model_lowercase: 'issue', model_plural: 'issues', display_name: 'Issues'},
-    { model_name: 'Market', model_lowercase: 'market', model_plural: 'markets', display_name: 'Markets'},
-    { model_name: 'Objective', model_lowercase: 'objective', model_plural: 'objectives', display_name: 'Objectives'},
-    { model_name: 'OrgGroup', model_lowercase: 'org_group', model_plural: 'org_groups', display_name: 'Org Groups'},
-    { model_name: 'Person', model_lowercase: 'person', model_plural: 'people', display_name: 'People'},
-    { model_name: 'Policy', model_lowercase: 'policy', model_plural: 'policies', display_name: 'Policies'},
-    { model_name: 'Process', model_lowercase: 'process', model_plural: 'processes', display_name: 'Processes'},
-    { model_name: 'Product', model_lowercase: 'product', model_plural: 'products', display_name: 'Products'},
-    { model_name: 'Program', model_lowercase: 'program', model_plural: 'programs', display_name: 'Programs'},
-    { model_name: 'Project', model_lowercase: 'project', model_plural: 'projects', display_name: 'Projects'},
-    { model_name: 'Regulation', model_lowercase: 'regulation', model_plural: 'regulations', display_name: 'Regulations'},
-    { model_name: 'Request', model_lowercase: 'request', model_plural: 'requests', display_name: 'Requests'},
-    { model_name: 'Response', model_lowercase: 'response', model_plural: 'responses', display_name: 'Responses'},
-    { model_name: 'Section', model_lowercase: 'section', model_plural: 'sections', display_name: 'Sections'},
-    { model_name: 'Standard', model_lowercase: 'standard', model_plural: 'standards', display_name: 'Standards'},
-    { model_name: 'System', model_lowercase: 'system', model_plural: 'systems', display_name: 'Systems'},
-    { model_name: 'Vendor', model_lowercase: 'vendor', model_plural: 'vendors', display_name: 'Vendors'}
+    { model_name: 'Audit', display_name: 'Audits'},
+    { model_name: 'Clause', display_name: 'Clauses'},
+    { model_name: 'Contract', display_name: 'Contracts'},
+    { model_name: 'Control', display_name: 'Controls'},
+    { model_name: 'ControlAssessment', display_name: 'Control Assessments'},
+    { model_name: 'DataAsset', display_name: 'Data Assets'},
+    { model_name: 'Facility', display_name: 'Facilities'},
+    { model_name: 'Issue', display_name: 'Issues'},
+    { model_name: 'Market', display_name: 'Markets'},
+    { model_name: 'Objective', display_name: 'Objectives'},
+    { model_name: 'OrgGroup', display_name: 'Org Groups'},
+    { model_name: 'Person', display_name: 'People'},
+    { model_name: 'Policy', display_name: 'Policies'},
+    { model_name: 'Process', display_name: 'Processes'},
+    { model_name: 'Product', display_name: 'Products'},
+    { model_name: 'Program', display_name: 'Programs'},
+    { model_name: 'Project', display_name: 'Projects'},
+    { model_name: 'Regulation', display_name: 'Regulations'},
+    { model_name: 'Request', display_name: 'Requests'},
+    { model_name: 'Response', display_name: 'Responses'},
+    { model_name: 'Section', display_name: 'Sections'},
+    { model_name: 'Standard', display_name: 'Standards'},
+    { model_name: 'System', display_name: 'Systems'},
+    { model_name: 'Vendor', display_name: 'Vendors'}
 ];
 
 GGRC.tree_view.sub_tree_for = [];
@@ -292,6 +320,9 @@ can.Control("CMS.Controllers.TreeLoader", {
         return new $.Deferred().resolve();
       }
 
+      //Debug: No filter
+      //filtered_items = items;
+
       //find current widget model and check if first layer tree
       if (this.options.parent) { //this is a second label tree
         var parent_model_name = this.options.parent.options.model.shortName;
@@ -472,24 +503,42 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   init_child_tree_display: function (model) {
     //Set child tree options
     var i, model_name = model.model_singular, all_obj_list = [],
-        def_child_tree_display_list, saved_child_tree_display_list, child_tree_display_list = [],
-        child_tree_model_list = GGRC.tree_view.child_tree_model_list;
+        child_tree_model_list = [], w_list,
+        def_child_tree_display_list, saved_child_tree_display_list,
+        child_tree_display_list = [];
+
+    //Create child tree model list for each model type as defined in business_object.js file
+    w_list = GGRC.tree_view.base_widgets_by_type[model_name]; //possible widget/mapped model_list
+    if (w_list === undefined) {
+      child_tree_model_list = GGRC.tree_view.child_tree_model_list;
+    } else { //create child_tree_model_list
+      w_list.sort();
+      can.each(w_list, function (m_name) {
+        var obj = {};
+        obj.model_name = m_name;
+        obj.display_name = GGRC.tree_view.display_name[m_name];
+        if (obj.display_name !== undefined) {
+          child_tree_model_list.push(obj);
+        }
+      });
+    }
+    //Update model_list check boxes for each object type
+    GGRC.tree_view.sub_tree_for[model_name] = {};
+    GGRC.tree_view.sub_tree_for[model_name].model_list = child_tree_model_list;
 
     can.each(child_tree_model_list, function(item) {
       all_obj_list.push(item.model_name);
     });
-
-    def_child_tree_display_list = model.tree_view_options.child_tree_display_list || all_obj_list;
 
     // Get child_tree_display_list from local storage
     saved_child_tree_display_list = this.display_prefs.getChildTreeDisplayList(model_name);
 
     if (saved_child_tree_display_list !== null) {
       child_tree_display_list = saved_child_tree_display_list;
-      GGRC.tree_view.sub_tree_for[model_name] = {display_list: saved_child_tree_display_list};
+      GGRC.tree_view.sub_tree_for[model_name].display_list = saved_child_tree_display_list;
     } else {
-      child_tree_display_list = def_child_tree_display_list;
-      GGRC.tree_view.sub_tree_for[model_name] = {display_list: def_child_tree_display_list};
+      GGRC.tree_view.sub_tree_for[model_name].display_list =
+                  model.tree_view_options.child_tree_display_list || all_obj_list;
     }
 
     //set up display status for UI
@@ -499,6 +548,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
     this.options.attr('child_tree_model_list', child_tree_model_list);
+    this.options.attr('selected_child_tree_model_list', child_tree_model_list);
+    this.options.attr('select_model_list', GGRC.tree_view.child_tree_model_list);
     this.options.attr('selected_model_name', model_name);
     //this.options.attr('child_tree_display_list', child_tree_display_list);
   },
@@ -1187,7 +1238,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       selected_items.push(this.value);
     });
     //update GGRC.tree_view
-    GGRC.tree_view.sub_tree_for[model_name] = {display_list: selected_items};
+    GGRC.tree_view.sub_tree_for[model_name].display_list = selected_items;
 
     //save in local storage
     this.display_prefs.setChildTreeDisplayList(model_name, selected_items);
@@ -1556,19 +1607,22 @@ can.Control("CMS.Controllers.TreeViewNode", {
       },
 
       update_check_boxes : function (el, ev) {
-        var model_name = this.element.find('.object-type-selector').val(),
+        //change checkboxes based on the model_type
+        //get the closest tree_view controller, change the options to reload the checkboxes.
+        var i, select_el = this.element.find('.object-type-selector'),
+            model_name = select_el.val(),
+            sec_el = select_el.closest('section'),
+            tree_view_el = sec_el.find('.cms_controllers_tree_view'),
+            control = tree_view_el.control(),
             display_list = GGRC.tree_view.sub_tree_for[model_name].display_list,
-            $check = this.element.find('.model-checkbox'),
-            $selected = $check.filter(':checked');
+            select_model_list = GGRC.tree_view.sub_tree_for[model_name].model_list;
 
-        //uncheck all checked, and check based on display_list
-        $selected.prop('checked', false);
-
-        can.each($check, function (item) {
-          if (display_list.indexOf(item.value) !== -1) {
-            $(item).prop('checked', true);
-          }
-        });
+        //set up display status for UI
+        for (i = 0; i < select_model_list.length; i++) {
+          var obj = select_model_list[i];
+          obj.display_status = display_list.indexOf(obj.model_name) !== -1;
+        }
+        control.options.attr('selected_child_tree_model_list', select_model_list);
       },
 
       'select.object-type-selector change' : 'update_check_boxes',

@@ -274,7 +274,7 @@
 
     var base_widgets_by_type = {
       "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Audit": "Issue ControlAssessment Request history Person program program_controls",
+      "Audit": "Issue ControlAssessment Request history Person Program Control",
       "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",
       "ControlAssessment": "Issue Objective Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
       "Regulation": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
@@ -300,6 +300,11 @@
       function (conf) {
         return conf.split(' ');
       });
+    //Update GGRC.base_widgets_by_type for tree_view of each widget type
+    if (!GGRC.tree_view) {
+      GGRC.tree_view = {};
+    }
+    GGRC.tree_view.base_widgets_by_type = base_widgets_by_type;
 
     function sort_sections(sections) {
       return can.makeArray(sections).sort(window.natural_comparator);
@@ -399,7 +404,7 @@
             widget_name: "Complete",
             widget_icon: "history"
           },
-          program_controls: {
+          Control: {
             widget_id: "control",
             widget_name: "In Scope Controls",
             widget_icon: "control"
@@ -620,7 +625,7 @@
             allow_mapping: false,
             allow_creating: false
           },
-          program_controls: {
+          Control: {
             mapping: "program_controls",
             parent_instance: GGRC.page_instance(),
             draw_children: true,
@@ -631,7 +636,7 @@
             allow_mapping: false,
             allow_creating: false
           },
-          program: {
+          Program: {
             mapping: "_program",
             parent_instance: GGRC.page_instance(),
             draw_children: false,

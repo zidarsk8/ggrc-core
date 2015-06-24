@@ -15,21 +15,21 @@
       <h5>
         Select child tree object type for:
         <select class="input-medium object-type-selector">
-          {{#child_tree_model_list}}
+          {{#select_model_list}}
           <option
             value="{{model_name}}"
             label="{{display_name}}"
             {{#if_equals model_name selected_model_name}}selected="selected"
             {{/if_equals}}>
           </option>
-          {{/child_tree_model_list}}
+          {{/select_model_list}}
         </select>
       </h5>
 
       <!--h5>Select object type for {{model.title_singular}}</h5-->
 
       <ul class="model-list">
-        {{#child_tree_model_list}}
+        {{#selected_child_tree_model_list}}
         <li class="{{#if mandatory}}disabled{{/if_equals}}">
           <label class="checkbox-inline">
             <input type="checkbox"
@@ -41,7 +41,7 @@
             {{display_name}}
           </label>
         </li>
-        {{/child_tree_model_list}}
+        {{/selected_child_tree_model_list}}
       </ul>
 
       <a class="btn btn-small btn-info set-display-object-list" href="javascript://">Set Visibility</a>
