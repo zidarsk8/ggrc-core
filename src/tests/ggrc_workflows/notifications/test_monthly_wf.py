@@ -55,7 +55,7 @@ class TestMonthlyWorkflowNotification(TestCase):
   def test_auto_generate_cycle(self, mock_mail):
 
     with freeze_time("2015-04-01"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, wf = self.wf_generator.generate_workflow(self.monthly_workflow_1)
       self.wf_generator.activate_workflow(wf)
 
       person_1 = Person.query.get(self.person_1.id)
@@ -94,7 +94,7 @@ class TestMonthlyWorkflowNotification(TestCase):
   def test_manual_generate_cycle(self, mock_mail):
 
     with freeze_time("2015-04-01"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, wf = self.wf_generator.generate_workflow(self.monthly_workflow_1)
       self.wf_generator.activate_workflow(wf)
 
       person_1 = Person.query.get(self.person_1.id)
@@ -121,7 +121,7 @@ class TestMonthlyWorkflowNotification(TestCase):
           "type": "Person"
       }
 
-    self.one_time_workflow_1 = {
+    self.monthly_workflow_1 = {
         "title": "test monthly wf notifications",
         "notify_on_change": True,
         "description": "some test workflow",
