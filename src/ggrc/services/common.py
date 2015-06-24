@@ -19,7 +19,7 @@ from urllib import urlencode
 from blinker import Namespace
 from flask import url_for, request, current_app, g, has_request_context
 from flask.views import View
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 import sqlalchemy.orm.exc
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -258,7 +258,7 @@ def build_cache_status(data, key, expiry_timeout, status):
   data[key] = {'expiry': expiry_timeout, 'status': status}
 
 def inclusion_filter(obj):
-  return permissions.is_allowed_read(obj.__class__.__name__, obj.context_id)
+  return permissions.is_allowed_read(obj.__class__.__name__, obj.id, obj.context_id)
 
 def get_cache(create=False):
   """
@@ -451,14 +451,22 @@ class ModelView(View):
         query = query.filter(filter)
     if filter_by_contexts:
       contexts = permissions.read_contexts_for(self.model.__name__)
+      resources = permissions.read_resources_for(self.model.__name__)
       filter_expr = context_query_filter(self.model.context_id, contexts)
+      if resources:
+        filter_expr = or_(filter_expr, self.model.id.in_(resources))
       query = query.filter(filter_expr)
       for j in joinlist:
         j_class = j.property.mapper.class_
         j_contexts = permissions.read_contexts_for(j_class.__name__)
+        j_resources = permissions.read_resources_for(j_class.__name__)
         if j_contexts is not None:
-          query = query.filter(
-              context_query_filter(j_class.context_id, j_contexts))
+          j_filter_expr = context_query_filter(j_class.context_id, j_contexts)
+          if resources:
+            j_filter_expr = or_(j_filter_expr, self.model.id.in_(j_resources))
+          query = query.filter(j_filter_expr)
+        elif resources:
+          query = query.filter(self.model.id.in_(resources))
     if '__search' in request.args:
       terms = request.args['__search']
       types = self._get_matching_types(self.model)
@@ -689,7 +697,7 @@ class Resource(ModelView):
       return current_app.make_response((
           'application/json', 406, [('Content-Type', 'text/plain')]))
     with benchmark("Query read permissions"):
-      if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
+      if not permissions.is_allowed_read(self.model.__name__, obj.id, obj.context_id):
         raise Forbidden()
       if not permissions.is_allowed_read_for(obj):
         raise Forbidden()
@@ -748,13 +756,13 @@ class Resource(ModelView):
       return current_app.make_response((
         'Required attribute "{0}" not found'.format(root_attribute), 400, []))
     with benchmark("Query update permissions"):
-      if not permissions.is_allowed_update(self.model.__name__, obj.context_id):
+      if not permissions.is_allowed_update(self.model.__name__, obj.id, obj.context_id):
         raise Forbidden()
       if not permissions.is_allowed_update_for(obj):
         raise Forbidden()
       new_context = self.get_context_id_from_json(src)
       if new_context != obj.context_id \
-          and not permissions.is_allowed_update(self.model.__name__, new_context):
+          and not permissions.is_allowed_update(self.model.__name__, obj.id, new_context):
         raise Forbidden()
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
@@ -801,7 +809,7 @@ class Resource(ModelView):
       if header_error:
         return header_error
       with benchmark("Query delete permissions"):
-        if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
+        if not permissions.is_allowed_delete(self.model.__name__, obj.id, obj.context_id):
           raise Forbidden()
         if not permissions.is_allowed_delete_for(obj):
           raise Forbidden()
@@ -907,13 +915,11 @@ class Resource(ModelView):
 
       else:
         cache_objs, database_objs = self.get_matched_resources(matches)
-
         objs = {}
         objs.update(cache_objs)
         objs.update(database_objs)
 
         objs = [objs[m] for m in matches if m in objs]
-
         with benchmark("Filter resources based on permissions"):
           objs = filter_resource(objs)
 
@@ -1015,18 +1021,20 @@ class Resource(ModelView):
           'Required attribute "{0}" not found'.format(
               root_attribute), 400, []))
     with benchmark("Query create permissions"):
-      if not permissions.is_allowed_create(self.model.__name__,
+      if not permissions.is_allowed_create(self.model.__name__, None,
                                            self.get_context_id_from_json(src)):
         raise Forbidden()
+
     if src.get('private') == True and src.get('context') is not None \
         and src['context'].get('id') is not None:
       raise BadRequest(
         'context MUST be "null" when creating a private resource.')
     elif 'context' not in src:
       raise BadRequest('context MUST be specified.')
+
     else:
       if not permissions.is_allowed_create(
-          self.model.__name__, self.get_context_id_from_json(src)):
+          self.model.__name__, None, self.get_context_id_from_json(src)):
         raise Forbidden()
     with benchmark("Deserialize object"):
       self.json_create(obj, src)
@@ -1231,8 +1239,7 @@ def filter_resource(resource, depth=0, user_permissions=None):
     elif 'context_id' in resource:
       context_id = resource['context_id']
     assert context_id is not False, "No context found for object"
-
-    if not user_permissions.is_allowed_read(resource['type'], context_id):
+    if not user_permissions.is_allowed_read(resource['type'], resource['id'], context_id):
       return None
     else:
       # Then, filter any typed keys

@@ -37,6 +37,7 @@ class TestCreator(TestCase):
       try:
         model = get_model(model_singular)
         table_singular = model._inflector.table_singular
+        table_plural = model._inflector.table_plural
         # Test POST creation
         response = self.api.post(model, {
             table_singular: {
@@ -61,7 +62,13 @@ class TestCreator(TestCase):
           all_errors.append(
               "{} can retrieve object if not owner".format(model_singular))
           continue
-
+        response = self.api.get_collection(model, obj_id)
+        collection = response.json.get(
+            "{}_collection".format(table_plural)).get(table_plural)
+        if len(collection) != 0:
+          all_errors.append(
+              "{} can retrieve object if not owner (collection)".format(model_singular))
+          continue
         # Become an owner
         response = self.api.post(all_models.ObjectOwner, {"object_owner": {
             "person": {
@@ -82,6 +89,15 @@ class TestCreator(TestCase):
         if response.status_code != 200:
           all_errors.append("{} can't GET object {}".format(
               model_singular, response.status))
+          continue
+
+        # Test GET collection when owner
+        response = self.api.get_collection(model, obj_id)
+        collection = response.json.get(
+            "{}_collection".format(table_plural)).get(table_plural)
+        if len(collection) == 0:
+          all_errors.append(
+              "{} cannot retrieve object even if owner (collection)".format(model_singular))
           continue
       except:
           all_errors.append("{} exception thrown".format(model_singular))

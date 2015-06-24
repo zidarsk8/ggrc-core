@@ -148,7 +148,7 @@ def generate_query_chunks(query):
 def admin_reindex():
   """Calls a webhook that reindexes indexable objects
   """
-  if not permissions.is_allowed_read("/admin", 1):
+  if not permissions.is_allowed_read("/admin", None, 1):
     raise Forbidden()
   tq = create_task("reindex", url_for(reindex.__name__), reindex)
   return tq.make_response(app.make_response(("scheduled %s" % tq.name,
@@ -161,7 +161,7 @@ def admin_reindex():
 def admin():
   """The admin dashboard page
   """
-  if not permissions.is_allowed_read("/admin", 1):
+  if not permissions.is_allowed_read("/admin", None, 1):
     raise Forbidden()
   return render_template("admin/index.haml")
 
