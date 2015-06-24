@@ -154,7 +154,7 @@
   display: none;
 }
 
-.popover {
+.popover-manual-close {
   &.bottom {
     margin-top: 5px !important;
     right: auto !important;
@@ -193,7 +193,7 @@
 #importingFile3,
 #importedFile,
 #importedFile3,
-.import-analyze,
+.import-main-wrap-analyze,
 .import-final,
 .import-progress,
 .import-progress-final {

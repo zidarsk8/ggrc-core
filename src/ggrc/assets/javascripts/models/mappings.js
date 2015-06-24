@@ -321,7 +321,8 @@
         "related_objects_as_source": [
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
-          "Program", "Issue", "Control", "Section", "Clause", "Objective"
+          "Program", "Issue", "Control", "Section", "Clause", "Objective",
+          "Audit", "ControlAssessment"
         ]
       },
       related_objects_as_source: Proxy(
@@ -339,6 +340,8 @@
       related_projects: TypeFilter("related_objects", "Project"),
       related_systems: TypeFilter("related_objects", "System"),
       related_issues: TypeFilter("related_objects", "Issue"),
+      related_audits: TypeFilter("related_objects", "Audit"),
+      related_controls: TypeFilter("related_objects", "Control"),
       related_control_assessments: TypeFilter("related_objects", "ControlAssessment"),
       regulations: TypeFilter("related_objects", "Regulation"),
       contracts: TypeFilter("related_objects", "Contract"),
@@ -676,29 +679,13 @@
       ],
       _canonical: {
         "control": "Control",
-        "related_objects": [
-          "Section", "Clause", "Audit"
-        ],
       },
       control: Direct("Control", "controls", "control_assessment"),
-      related_audits: TypeFilter("related_objects", "Audit"),
-      related_controls: TypeFilter("related_objects", "Control"),
-      related_sections: TypeFilter("related_objects", "Section"),
-      related_clauses: TypeFilter("related_objects", "Clause")
     },
     Issue: {
       _mixins: [
         "related_object", "personable", "ownable"
       ],
-      _canonical: {
-        "related_objects_as_source": [
-          "Program", "ControlAssessment", "Audit", "Control",
-          "DataAsset", "Facility", "OrgGroup", "Market"
-        ],
-      },
-      related_audits: TypeFilter("related_objects", "Audit"),
-      related_controls: TypeFilter("related_objects", "Control"),
-      related_control_assessments: TypeFilter("related_objects", "ControlAssessment")
     },
     Request: {
       _canonical: {

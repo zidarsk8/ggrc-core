@@ -160,10 +160,10 @@ class WorkflowsGenerator(Generator):
 
     return response, workflow
 
-  def modify_cycle_task_group_object_task(self, obj, data={}):
+  def modify_object(self, obj, data={}):
     obj = self._session_add(obj)
 
-    obj_name = "cycle_task_group_object_task"
+    obj_name = obj._inflector.table_singular
 
     obj_dict = builder.json.publish(obj)
     builder.json.publish_representation(obj_dict)

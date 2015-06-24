@@ -11,15 +11,15 @@
     <a href='mailto:{{email}}' target="_blank"><span class="person-tooltip-trigger" data-placement="top">
       {{email}}
     </span></a>
-    {{^if is_enabled}}
-      <span class="user-disabled">
-        (Disabled)
-      </span>
-    {{/if}}
   {{else}}
     <a href="/people/{{id}}"><span class="person-tooltip-trigger" data-placement="top">
       {{firstnonempty name email}}
     </span></a>
+  {{/if}}
+  {{#if_equals system_wide_role 'No Access'}}
+    <span class="user-disabled">
+      (No Access)
+    </span>
   {{/if}}
   <div class="custom-popover-content">
     <div class="preview-container person-preview">
@@ -28,22 +28,22 @@
           <div class="profile-info">
             <ul>
               <li><h4>{{firstnonempty name email}}
-              {{^if is_enabled}}
-                <span class="user-disabled">
-                  (Disabled)
-                </span>
-              {{/if}}
+                {{#if_equals system_wide_role 'No Access'}}
+                  <span class="user-disabled">
+                    (No Access)
+                  </span>
+                {{/if}}
               </h4></li>
               <li><strong>Email:</strong> <a href="mailto:{{email}}" target="_blank">{{email}}</a></li>
               {{#company}}<li><strong>Company:</strong> {{company}}</li>{{/company}}
             </ul>
-            
+
             {{{render_hooks 'Person.popover_actions' person=person}}}
 
             <a class="info-action" href="/people/{{id}}">View profile <i class="grcicon-goto"></i></a>
           </div>
         </div>
-        
+
         {{{render_hooks 'Person.popover_info' person=person}}}
 
       </div>

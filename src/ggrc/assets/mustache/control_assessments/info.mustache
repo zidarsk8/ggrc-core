@@ -51,16 +51,32 @@
           {{/using}}
           {{/with_mapping}}
           {{/is_allowed}}
+          {{#with_page_object_as 'page_instance'}}
+            {{#is_allowed_to_map page_instance instance}}
+              {{^options.is_in_selector}}
+                {{> /static/mustache/base_objects/unmap.mustache}}
+              {{/options}}
+            {{/is_allowed_to_map}}
+          {{/with}}
           {{#if instance.viewLink}}
             {{#is_allowed "view_object_page" instance}}
-              <li class="border">
+              <li>
                 <a href="{{instance.viewLink}}">
-                  View {{instance.class.title_singular}}
                   <i class="grcicon-goto"></i>
+                  View {{instance.class.title_singular}}
                 </a>
               </li>
             {{/is_allowed}}
           {{/if}}
+
+          {{#is_allowed 'delete' instance}}
+            <li>
+              <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                <i class="grcicon-deleted"></i>
+                Delete
+              </a>
+            </li>
+          {{/is_allowed}}
         </ul>
       </div>
     {{/is_allowed}}
@@ -104,12 +120,7 @@
           <h6>Primary Contact</h6>
           <p class="oneline">
             {{#if person}}
-              {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
-              {{^if person.is_enabled}}
-                <span class="user-disabled">
-                  (Disabled)
-                </span>
-              {{/if}}
+              {{>'/static/mustache/people/popover.mustache'}}
             {{else}}
               <span class="error">
                 Not Assigned
@@ -122,12 +133,7 @@
           <h6>Secondary Contact</h6>
           <p class="oneline">
             {{#if person}}
-              {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
-              {{^if person.is_enabled}}
-                <span class="user-disabled">
-                  (Disabled)
-                </span>
-              {{/if}}
+              {{>'/static/mustache/people/popover.mustache'}}
             {{else}}
               <span class="error">
                 Not Assigned
@@ -197,14 +203,6 @@
               <h6>Stop Date</h6>
               <p>
               {{localize_date end_date}}
-              </p>
-            </div>
-          </div><!-- row-fluid end -->
-          <div class="row-fluid wrap-row">
-            <div class="span4">
-              <h6>State</h6>
-              <p>
-                {{status}}
               </p>
             </div>
           </div><!-- row-fluid end -->

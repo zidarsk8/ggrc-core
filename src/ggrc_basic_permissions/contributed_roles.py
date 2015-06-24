@@ -4,12 +4,12 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc.extensions import get_extension_modules
-from .roles import (
+from ggrc_basic_permissions.roles import (
     Auditor, AuditorProgramReader, AuditorReader, ObjectEditor,
     ProgramAuditEditor, ProgramAuditOwner, ProgramAuditReader,
     ProgramBasicReader, ProgramCreator, ProgramEditor, ProgramMappingEditor,
-    ProgramOwner, ProgramReader, Reader, gGRC_Admin,
-    )
+    ProgramOwner, ProgramReader, Reader, Creator
+)
 
 
 DECLARED_ROLE = "CODE DECLARED ROLE"
@@ -30,7 +30,8 @@ def get_declared_role(rolename, resolved_roles={}):
   if rolename in declarations:
     role_definition = declarations[rolename]
     role_contributions = lookup_contributions(rolename)
-    contribute_role_permissions(role_definition.permissions, role_contributions)
+    contribute_role_permissions(
+        role_definition.permissions, role_contributions)
     resolved_roles[rolename] = role_definition
     return role_definition
   return None
@@ -59,7 +60,7 @@ def lookup_contributions(rolename):
     if ext_contributions:
       ext_role_contributions = ext_contributions.contributions_for(rolename)
       contribute_role_permissions(contributions, ext_role_contributions)
-  return contributions;
+  return contributions
 
 
 def lookup_role_implications(rolename, context_implication):
@@ -74,6 +75,7 @@ def lookup_role_implications(rolename, context_implication):
 
 
 class RoleDeclarations(object):
+
   """
   A RoleDeclarations object provides the names of roles declared by this
   extension.
@@ -82,14 +84,17 @@ class RoleDeclarations(object):
   permissions. Scope and descriptions are strings, permissions MUST be a
   dict.
   """
+
   def roles(self):
     return {}
 
 
 class RoleContributions(object):
+
   """
   A RoleContributions object provides role definition dictionaries by name.
   """
+
   def contributions_for(self, rolename):
     """
     look up a method in self for the role name, return value of method is the
@@ -105,6 +110,7 @@ class RoleContributions(object):
 
 
 class RoleImplications(object):
+
   def implications_for(self, rolename, context_implication):
     """
     Return a list of rolenames implied for the given rolename, or an empty
@@ -128,10 +134,12 @@ class DeclarativeRoleImplications(RoleImplications):
 
 
 class BasicRoleDeclarations(RoleDeclarations):
+
   def roles(self):
     return {
         'AuditorReader': AuditorReader,
         'Reader': Reader,
+        'Creator': Creator,
         'ProgramCreator': ProgramCreator,
         'ObjectEditor': ObjectEditor,
         'ProgramBasicReader': ProgramBasicReader,
@@ -144,39 +152,42 @@ class BasicRoleDeclarations(RoleDeclarations):
         'ProgramAuditEditor': ProgramAuditEditor,
         'ProgramAuditReader': ProgramAuditReader,
         'Auditor': Auditor,
-        }
+    }
+
 
 class BasicRoleImplications(DeclarativeRoleImplications):
   # (Source Context Type, Context Type)
   #   -> Source Role -> Implied Role for Context
   implications = {
       ('Program', 'Audit'): {
-        'ProgramOwner': ['ProgramAuditOwner'],
-        'ProgramEditor': ['ProgramAuditEditor'],
-        'ProgramReader': ['ProgramAuditReader'],
-        },
+          'ProgramOwner': ['ProgramAuditOwner'],
+          'ProgramEditor': ['ProgramAuditEditor'],
+          'ProgramReader': ['ProgramAuditReader'],
+      },
       ('Audit', 'Program'): {
-        'Auditor': ['AuditorProgramReader'],
-        },
+          'Auditor': ['AuditorProgramReader'],
+      },
       ('Audit', None): {
-        'Auditor': ['AuditorReader'],
-        },
+          'Auditor': ['AuditorReader'],
+      },
       ('Program', 'Program'): {
-        'ProgramOwner': ['ProgramReader'],
-        'ProgramEditor': ['ProgramReader'],
-        'ProgramReader': ['ProgramReader'],
-        },
+          'ProgramOwner': ['ProgramReader'],
+          'ProgramEditor': ['ProgramReader'],
+          'ProgramReader': ['ProgramReader'],
+      },
       ('Program', None): {
-        'ProgramOwner': ['ProgramBasicReader'],
-        'ProgramEditor': ['ProgramBasicReader'],
-        'ProgramReader': ['ProgramBasicReader'],
-        },
+          'ProgramOwner': ['ProgramBasicReader'],
+          'ProgramEditor': ['ProgramBasicReader'],
+          'ProgramReader': ['ProgramBasicReader'],
+      },
       (None, None): {
-        'ProgramCreator': ['ObjectEditor'],
-        },
+          'Reader': ['Creator'],
+          'ObjectEditor': ['Creator'],
+          'ProgramCreator': ['ObjectEditor'],
+      },
       (None, 'Program'): {
-        'ProgramCreator': ['ProgramMappingEditor'],
-        'ObjectEditor': ['ProgramMappingEditor'],
-        'Reader': ['ProgramReader'],
-        },
-      }
+          'ProgramCreator': ['ProgramMappingEditor'],
+          'ObjectEditor': ['ProgramMappingEditor'],
+          'Reader': ['ProgramReader'],
+      },
+  }

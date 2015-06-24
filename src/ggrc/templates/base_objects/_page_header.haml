@@ -3,146 +3,144 @@
 -# Created By: silas@reciprocitylabs.com
 -# Maintained By: brad@reciprocitylabs.com
 
-.row-fluid
-  .span12
-    %h1
-      -if current_user.system_wide_role.lower() != 'no access'
-        %button{ 'class': 'lhn-trigger', 'href': 'javascript://'}
-          %span.icon-bar
-          %span.icon-bar
-          %span.icon-bar
+%h1.entities
+  -if current_user.system_wide_role.lower() != 'no access'
+    %button{ 'class': 'lhn-trigger', 'href': 'javascript://'}
+      %span.icon-bar
+      %span.icon-bar
+      %span.icon-bar
 
-      %span.title-content
-        -if request.path.startswith('/admin')
-          %i.grciconlarge-dashboard
-          Admin Dashboard
+  %span.title-content
+    -if request.path.startswith('/admin')
+      %i.grciconlarge-dashboard
+      Admin Dashboard
 
-        -if import_kind
-          %i.grciconlarge-import
-          Import {{import_kind}}
+    -if import_kind
+      %i.grciconlarge-import
+      Import {{import_kind}}
 
-    %ul.menu
-      %li
-        %a{ 'href': 'javascript://', 'data-toggle': 'multitype-search-modal-selector', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
-          %i.grcicon-search
-          %span
-            Search
-      %li
-        %a#page-help{ 'href': "/dashboard#task_widget" }
-          %i.grcicon-task-black
-          %span
-            My Tasks
-            %span.task-count
-      %li.user.dropdown
-        %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
-          %i.grcicon-user-black
-          %span
-            =current_user.email
-          %i.grcicon-carot
-        %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
-          %li.full-opacity
-            %a{'href': "/dashboard"}
-              %i.grcicon-my-work
-              My Work ({{current_user.system_wide_role}})
-          -if permissions.is_allowed_read('/admin', 1)
-            %li
-              %a{'href': "/admin#people_list_widget"}
-                %i.grcicon-dashboard-black
-                Admin Dashboard
-          %li.notify-wrap
-            %span
-              %i.grcicon-alarm-black
-              Notifications
-            %div.inner-list
-              %label
-                %input{
-                  'type': 'checkbox',
-                  'name': 'notifications',
-                  'value': 'Email_Digest'
-                }
-                Daily email digest
-              %label.inner
-                %input{
-                  'type': 'checkbox',
-                  'name': 'notifications',
-                  'value': 'Email_Now'
-                }
-                Real-time email updates
-          %li
-            %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
-              %i.grcicon-logout-black
-              Logout
-      %li
-        %a.nav-trigger.active{'href': 'javascript://'}
-          %i.grcicon-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Menu'}
-          %span
-            Menu
-      -if self.page_help
+%ul.menu
+  %li
+    %a{ 'href': 'javascript://', 'data-toggle': 'multitype-search-modal-selector', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
+      %i.grcicon-search
+      %span
+        Search
+  %li
+    %a#page-help{ 'href': "/dashboard#task_widget" }
+      %i.grcicon-task-black
+      %span
+        My Tasks
+        %span.task-count
+  %li.user.dropdown
+    %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
+      %i.grcicon-user-black
+      %span
+        =current_user.email
+      %i.grcicon-carot
+    %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
+      %li.full-opacity
+        %a{'href': "/dashboard"}
+          %i.grcicon-my-work
+          My Work ({{current_user.system_wide_role}})
+      -if permissions.is_allowed_read('/admin', 1)
         %li
-          %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
+          %a{'href': "/admin#people_list_widget"}
+            %i.grcicon-dashboard-black
+            Admin Dashboard
+      %li.notify-wrap
+        %span
+          %i.grcicon-alarm-black
+          Notifications
+        %div.inner-list
+          %label
+            %input{
+              'type': 'checkbox',
+              'name': 'notifications',
+              'value': 'Email_Digest'
+            }
+            Daily email digest
+          %label.inner
+            %input{
+              'type': 'checkbox',
+              'name': 'notifications',
+              'value': 'Email_Now'
+            }
+            Real-time email updates
+      %li
+        %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
+          %i.grcicon-logout-black
+          Logout
+  %li
+    %a.nav-trigger.active{'href': 'javascript://'}
+      %i.grcicon-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Menu'}
+      %span
+        Menu
+  -if self.page_help
+    %li
+      %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
+        %i.grcicon-help-black
+          %span
+            Help
+
+  -if request.path.startswith('/admin')
+    %li.user.dropdown
+      %a.dropdown-toggle{ 'href': '#', 'data-toggle': 'dropdown' }
+        %i.grcicon-imp-exp
+        %span Import/Export
+        %i.grcicon-carot
+      %ul.dropdown-menu
+        %li.title
+          Systems
+        %li
+          %a{ 'href': "/systems/import" }
+            %i.grcicon-system-color
+            %span Import Systems
+        %li
+          %a.export-link{ 'href': "/admin/export/system" }
+            %i.grcicon-system-color
+            %span Export Systems
+        %li.divider
+        %li.title
+          Processes
+        %li
+          %a{ 'href': "/processes/import" }
+            %i.grcicon-process-color
+            %span Import Processes
+        %li
+          %a.export-link{ 'href': "/admin/export/process" }
+            %i.grcicon-process-color
+            %span Export Processes
+        %li.divider
+        %li.title
+          People
+        %li
+          %a{ 'href': "/admin/import/people" }
+            %i.grcicon-user-black
+            %span Import People
+        %li
+          %a.export-link{ 'href': "/admin/export/people" }
+            %i.grcicon-user-black
+            %span Export People
+
+        %li.divider
+        %li.title
+          Help
+        %li
+          %a{ 'href': "/admin/import/help" }
             %i.grcicon-help-black
-              %span
-                Help
+            %span Import Help
+        %li
+          %a.export-link{ 'href': "/admin/export/help" }
+            %i.grcicon-help-black
+            %span Export Help
 
-      -if request.path.startswith('/admin')
-        %li.user.dropdown
-          %a.dropdown-toggle{ 'href': '#', 'data-toggle': 'dropdown' }
-            %i.grcicon-imp-exp
-            %span Import/Export
-            %i.grcicon-carot
-          %ul.dropdown-menu
-            %li.title
-              Systems
-            %li
-              %a{ 'href': "/systems/import" }
-                %i.grcicon-system-color
-                %span Import Systems
-            %li
-              %a.export-link{ 'href': "/admin/export/system" }
-                %i.grcicon-system-color
-                %span Export Systems
-            %li.divider
-            %li.title
-              Processes
-            %li
-              %a{ 'href': "/processes/import" }
-                %i.grcicon-process-color
-                %span Import Processes
-            %li
-              %a.export-link{ 'href': "/admin/export/process" }
-                %i.grcicon-process-color
-                %span Export Processes
-            %li.divider
-            %li.title
-              People
-            %li
-              %a{ 'href': "/admin/import/people" }
-                %i.grcicon-user-black
-                %span Import People
-            %li
-              %a.export-link{ 'href': "/admin/export/people" }
-                %i.grcicon-user-black
-                %span Export People
-
-            %li.divider
-            %li.title
-              Help
-            %li
-              %a{ 'href': "/admin/import/help" }
-                %i.grcicon-help-black
-                %span Import Help
-            %li
-              %a.export-link{ 'href': "/admin/export/help" }
-                %i.grcicon-help-black
-                %span Export Help
-
-            %li.title
-              risks
-            %li
-              %a{ 'href': "/risks/import" }
-                %i.grcicon-risk-color
-                %span import risks
-            %li
-              %a{ "data-toggle": "modal-ajax", 'href': "/risks/export.html" }
-                %i.grcicon-risk-color
-                %span export risks
+        %li.title
+          risks
+        %li
+          %a{ 'href': "/risks/import" }
+            %i.grcicon-risk-color
+            %span import risks
+        %li
+          %a{ "data-toggle": "modal-ajax", 'href': "/risks/export.html" }
+            %i.grcicon-risk-color
+            %span export risks

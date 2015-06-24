@@ -9,7 +9,6 @@ from ggrc import services
 import inspect
 import flask
 import logging
-from sqlalchemy.orm.collections import InstrumentedList
 
 
 # style: should the class name be all capitals?
@@ -27,14 +26,15 @@ class Api():
     self.user_headers = {}
 
   def set_user(self, person=None):
-    if  person:
+    # Refresh the person instance from the db:
+    person = person.__class__.query.get(person.id)
+    if person:
       self.user_headers = {
-        "X-ggrc-user": self.resource.as_json({
-          "name": person.name,
-          "email": person.email,
-        })
+          "X-ggrc-user": self.resource.as_json({
+              "name": person.name,
+              "email": person.email,
+          })
       }
-
     else:
       self.user_headers = {}
 
@@ -59,7 +59,6 @@ class Api():
       response.json = None
     return response
 
-
   def send_request(self, request, obj, data, headers={}, api_link=None):
     if api_link is None:
       api_link = self.api_link(obj)
@@ -77,11 +76,12 @@ class Api():
   def put(self, obj, data):
     response = self.get(obj, obj.id)
     headers = {
-      "If-Match": response.headers.get("Etag"),
-      "If-Unmodified-Since": response.headers.get("Last-Modified")
+        "If-Match": response.headers.get("Etag"),
+        "If-Unmodified-Since": response.headers.get("Last-Modified")
     }
     api_link = self.api_link(obj, obj.id)
-    return self.send_request(self.tc.put , obj, data, headers=headers, api_link=api_link)
+    return self.send_request(
+        self.tc.put, obj, data, headers=headers, api_link=api_link)
 
   def post(self, obj, data):
     return self.send_request(self.tc.post, obj, data)
@@ -89,12 +89,20 @@ class Api():
   def get(self, obj, id):
     return self.data_to_json(self.tc.get(self.api_link(obj, id)))
 
+  def get_collection(self, obj, ids):
+    return self.data_to_json(self.tc.get(
+        "{}?ids={}".format(self.api_link(obj), ids)))
+
   def delete(self, obj, id):
     response = self.get(obj, obj.id)
     headers = {
-      "If-Match": response.headers.get("Etag"),
-      "If-Unmodified-Since": response.headers.get("Last-Modified")
+        "If-Match": response.headers.get("Etag"),
+        "If-Unmodified-Since": response.headers.get("Last-Modified")
     }
     headers.update(self.headers)
     api_link = self.api_link(obj, obj.id)
     return self.tc.delete(api_link, headers=headers)
+
+  def search(self, types, q="", counts=False):
+    return (self.tc.get('/search?q={}&types={}&counts_only={}'.format(
+        q, types, counts)), self.headers)

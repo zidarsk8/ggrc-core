@@ -22,11 +22,6 @@
                     {{#if_match instance.name '\\\\S'}}
                       {{#instance.name}}
                         <span class="email">{{instance.email}}</span>
-                        {{^if instance.is_enabled}}
-                          <span class="user-disabled">
-                            (Disabled)
-                          </span>
-                        {{/if}}
                       {{/instance.name}}
                     {{/if_match}}
                   </div>

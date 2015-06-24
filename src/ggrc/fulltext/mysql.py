@@ -4,6 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
+from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.object_person import ObjectPerson
 from ggrc.models.object_owner import ObjectOwner
@@ -12,7 +13,7 @@ from ggrc.models.response import Response
 from ggrc_basic_permissions.models import UserRole
 from ggrc.rbac import permissions, context_query_filter
 from sqlalchemy import \
-    event, and_, or_, text, literal, union, alias, case, func, distinct
+    event, and_, or_, literal, union, alias, case, func, distinct
 from sqlalchemy.schema import DDL
 from sqlalchemy.ext.declarative import declared_attr
 from .sql import SqlIndexer
@@ -80,6 +81,9 @@ class MysqlIndexer(SqlIndexer):
             permissions.read_contexts_for(model_name))
 
       if contexts is not None:
+        # Don't filter out None contexts here
+        if None not in contexts:
+          contexts.append(None)
         type_query = and_(
             MysqlRecordProperty.type == model_name,
             context_query_filter(MysqlRecordProperty.context_id, contexts))
@@ -142,6 +146,12 @@ class MysqlIndexer(SqlIndexer):
     This method only *limits* the result set -- Contexts and Roles will still
     filter out forbidden objects.
     '''
+
+    # Check if the user has Creator role
+    current_user = get_current_user()
+    if current_user.system_wide_role == "Creator":
+      contact_id = current_user.id
+
     if not contact_id:
       return query
 
@@ -158,6 +168,13 @@ class MysqlIndexer(SqlIndexer):
     models = [(model, self._get_type_select_column(model)) for model in models]
 
     type_union_queries = []
+
+    all_people = db.session.query(
+        all_models.Person.id.label('id'),
+        literal(all_models.Person.__name__).label('type'),
+        literal(None).label('context_id')
+    )
+    type_union_queries.append(all_people)
 
     # Objects to which the user is "mapped"
     object_people_query = db.session.query(

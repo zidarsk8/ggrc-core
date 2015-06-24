@@ -93,24 +93,6 @@
       this.validateNonBlank("contact");
       this.validateContact(["_transient.contact", "contact"]);
 
-      this.validate('relative_start_day relative_start_month relative_end_day relative_end_month start_date end_date'.split(' '),
-        function (newVal, prop) {
-        var that = this,
-         workflow = GGRC.page_instance(),
-         dates_are_valid = true;
-
-        // Handle cases of a workflow with start and end dates
-        if (workflow.frequency === 'one_time') {
-            dates_are_valid =
-                 that.start_date && 0 < that.start_date.length
-              && that.end_date && 0 < that.end_date.length;
-        }
-
-        if (!dates_are_valid) {
-          return "Start and/or end date is invalid";
-        }
-      });
-
       this.bind("created", function(ev, instance) {
         if (instance instanceof that) {
           if (instance.task_group.reify().selfLink) {

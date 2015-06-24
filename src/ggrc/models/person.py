@@ -24,7 +24,6 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
   name = deferred(db.Column(db.String), 'Person')
   language_id = deferred(db.Column(db.Integer), 'Person')
   company = deferred(db.Column(db.String), 'Person')
-  is_enabled = deferred(db.Column(db.Boolean), 'Person')
 
   object_people = db.relationship(
       'ObjectPerson', backref='person', cascade='all, delete-orphan')
@@ -36,12 +35,6 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
       'Option.role == "person_language")',
       uselist=False,
   )
-
-  def __init__(self, **kwargs):
-    # Default is_enabled to True
-    if 'is_enabled' not in kwargs:
-      kwargs['is_enabled'] = True
-    super(Person, self).__init__(**kwargs)
 
   @staticmethod
   def _extra_table_args(cls):
@@ -60,7 +53,6 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
       'email',
       'language',
       'name',
-      'is_enabled',
       PublishOnly('object_people'),
       PublishOnly('system_wide_role'),
   ]
@@ -72,7 +64,6 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
   _aliases = {
       "name": "Name",
       "email": "Email",
-      "is_enabled": "enabled user",
       "company": "Company",
   }
 
@@ -142,7 +133,8 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
         u'gGRC Admin': 0,
         u'ProgramCreator': 1,
         u'ObjectEditor': 2,
-        u'Reader': 3
+        u'Reader': 3,
+        u'Creator': 4,
     }
     unique_roles = set([
         user_role.role.name

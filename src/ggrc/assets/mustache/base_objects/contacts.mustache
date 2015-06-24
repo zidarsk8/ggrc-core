@@ -29,12 +29,9 @@
         <ul class="inner-count-list">
           {{#each contacts}}
             <li>
-              {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-              {{^if is_enabled}}
-                <span class="user-disabled">
-                  (Disabled)
-                </span>
-              {{/if}}
+              {{#using person=this}}
+                {{>'/static/mustache/people/popover.mustache'}}
+              {{/using}}
             </li>
           {{/each}}
         </ul>
@@ -52,37 +49,25 @@
       <h6>Primary Contact</h6>
       <p class="oneline">
         {{#if person}}
-          {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
-          {{^if person.is_enabled}}
-            <span class="user-disabled">
-              (Disabled)
-            </span>
-          {{/if}}
+          {{>'/static/mustache/people/popover.mustache'}}
         {{else}}
           <span class="error">
             Not Assigned
-          </span>      
+          </span>
         {{/if}}
       </p>
       {{/using}}
       {{#using person=secondary_contact}}
-      {{#if person}}
       <h6>Secondary Contact</h6>
       <p class="oneline">
         {{#if person}}
-          {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
-          {{^if person.is_enabled}}
-            <span class="user-disabled">
-              (Disabled)
-            </span>
-          {{/if}}
+          {{>'/static/mustache/people/popover.mustache'}}
         {{else}}
           <span class="error">
             Not Assigned
-          </span>      
+          </span>
         {{/if}}
       </p>
-      {{/if}}
       {{/using}}
     </div>
 </div>

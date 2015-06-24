@@ -94,11 +94,11 @@ CMS.Models.SectionBase("CMS.Models.Section", {
     , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
     , child_options : [{
         model : can.Model.Cacheable
-      , mapping : "related_and_able_objects"
+      , mapping : "related_objects"
       , title_plural : "Business Objects"
-      , draw_children : function(){
+      , draw_children : function() {
           return this.instance.type === "Objective";
-        }
+      }
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , child_options : [{

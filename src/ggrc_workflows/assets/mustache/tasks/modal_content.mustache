@@ -23,7 +23,7 @@
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
-      <input tabindex="2" class="input-block-level" name="contact.email" data-lookup="Person" data-params="Person:is_enabled=1" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+      <input tabindex="2" class="input-block-level" name="contact.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
       {{/using}}
       <br>
     </div>

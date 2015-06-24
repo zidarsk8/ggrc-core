@@ -21,9 +21,10 @@ h1 {
   font-weight: normal;
   width: 40%;
   float: left;
-  position: relative;
   .lhn-trigger {
-    float: left;
+    position: absolute;
+    left: -2px;
+    top: 0;
   }
   .title-content {
     @extend %oneline;
@@ -1085,7 +1086,8 @@ p {
 }
 
 .hidden-widgets-list {
-  .dropdown-menu {
+  .dropdown-menu,
+  .dropdown-list {
     @include clearfix();
     width: 320px;
     .inner-nav-item {
@@ -1108,6 +1110,9 @@ p {
         clear: both;
       }
     }
+  }
+  &.child-node-wrap {
+    text-align: left;
   }
 }
 
@@ -1228,5 +1233,43 @@ label.disabled {
   margin-top: 30px;
   h3 {
     margin-bottom: 10px;
+  }
+}
+
+.popover-child-node {
+  @include box-shadow(0 5px 10px rgba(0, 0, 0, .2));
+  border: 1px solid rgba(0,0,0, .2);
+  .arrow {
+    display: none !important;
+  }
+}
+
+.child-node-wrap {
+  a {
+    @include transition(color .2s ease);
+    padding: 0 14px 0 10px;
+    display: block;
+    line-height: 29px;
+    font-size: 13px;
+    color: $gray;
+    text-transform: none;
+    i {
+      @include opacity(.4);
+    }
+    &:hover {
+      color: $black;
+      text-decoration: none;
+      i {
+        @include opacity(1);
+      }
+    }
+  }
+}
+
+.child-node {
+  .popover-template:hover {
+    i {
+      background-position: -246px -416px;
+    }
   }
 }

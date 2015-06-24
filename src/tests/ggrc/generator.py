@@ -129,7 +129,6 @@ class ObjectGenerator(Generator):
             "context": None,
             "name": name,
             "email": "%s@test.com" % name.replace(" ", ".").lower(),
-            "is_enabled": True,
         }
     }
     default[obj_name].update(data)

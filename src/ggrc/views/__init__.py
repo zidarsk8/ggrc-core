@@ -106,7 +106,7 @@ def index():
   """
   from ggrc import settings
   if not settings.PRODUCTION:
-    contact = ' For any questions, please contact eng-compliance@google.com.' if settings.GOOGLE_INTERNAL else ""
+    contact = ' For any questions, please contact your administrator.' if settings.GOOGLE_INTERNAL else ""
     flash(u'WARNING - This is not the production instance of the GGRC application.', 'alert alert-warning')
     flash(u'Company confidential, sensitive or personally identifiable information *MUST NOT* be entered or stored here.%s' % (contact), 'alert alert-warning')
   return render_template("welcome/index.haml")
@@ -132,7 +132,7 @@ def admin_reindex():
   """Calls a webhook that reindexes indexable objects
   """
   from ggrc import settings
-  if not permissions.is_allowed_read("/admin", 1):
+  if not permissions.is_allowed_read("/admin", None, 1):
     raise Forbidden()
   tq = create_task("reindex", url_for(reindex.__name__), reindex)
   return tq.make_response(app.make_response(("scheduled %s" % tq.name,
@@ -144,7 +144,7 @@ def admin_reindex():
 def admin():
   """The admin dashboard page
   """
-  if not permissions.is_allowed_read("/admin", 1):
+  if not permissions.is_allowed_read("/admin", None, 1):
     raise Forbidden()
   return render_template("admin/index.haml")
 
@@ -301,12 +301,12 @@ def custom_attributes():
   """
   return render_template("mockups/custom-attributes/index.html")
 
-@app.route("/mockups/reporting/index.html")
+@app.route("/mockups/data-grid/")
 @login_required
 def reporting():
   """Reporting mockup
   """
-  return render_template("mockups/reporting/index.html")
+  return render_template("mockups/data-grid/index.html")
 
 @app.route("/mockups/dashboard-ui/index.html")
 @login_required
@@ -399,26 +399,33 @@ def audit_3_0_ca():
   """
   return render_template("/mockups/audit-3.0/control-assessment.html")
 
-@app.route("/mockups/import-export/")
+@app.route("/mockups/import/")
 @login_required
-def import_export():
-  """Import Export prototype
+def import_redesign():
+  """Import prototype
   """
-  return render_template("/mockups/import-export/index.html")
+  return render_template("/mockups/import/index.html")
 
 @app.route("/mockups/export/")
 @login_required
 def export_redesign():
   """Export prototype
   """
-  return render_template("/mockups/import-export/export.html")
+  return render_template("/mockups/export/index.html")
 
-@app.route("/mockups/reporting/export.html")
+@app.route("/mockups/export-object/")
 @login_required
-def reporting_export():
-  """Reporting export mockup
+def export_object_redesign():
+  """Export object prototype
   """
-  return render_template("mockups/reporting/export.html")
+  return render_template("/mockups/export/object.html")
+
+@app.route("/mockups/data-grid/export-object.html")
+@login_required
+def data_grid_export_object():
+  """Data grid export object mockup
+  """
+  return render_template("mockups/data-grid/export-object.html")
 
 @app.route("/permissions")
 @login_required

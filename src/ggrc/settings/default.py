@@ -24,6 +24,7 @@ exports = []
 
 # Deployment-specific variables
 COMPANY = "Company, Inc."
+COMPANY_LOGO = "/static/images/ggrc-logo.png"
 COMPANY_LOGO_TEXT = "Company GRC"
 COPYRIGHT = u"Confidential. Copyright \u00A9"  # \u00A9 is the (c) symbol
 
@@ -35,7 +36,7 @@ try:
 except (ImportError):
   pass
 
-VERSION = "0.9.3-Mango" + BUILD_NUMBER
+VERSION = "0.9.4-Plum" + BUILD_NUMBER
 
 # Google Analytics variables
 GOOGLE_ANALYTICS_ID = os.environ.get('GGRC_GOOGLE_ANALYTICS_ID', '')
@@ -51,3 +52,7 @@ MEMCACHE_MECHANISM = True
 APPENGINE_EMAIL = os.environ.get('APPENGINE_EMAIL', '')
 
 CALENDAR_MECHANISM = False
+
+MAX_INSTANCES = os.environ.get('MAX_INSTANCES', '3')
+
+exports = ['VERSION', 'MAX_INSTANCES']

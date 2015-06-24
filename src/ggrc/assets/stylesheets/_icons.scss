@@ -280,6 +280,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-not-done-black { background-position: -102px -416px; }
 .grcicon-nav-trigger { background-position: -318px -416px; }
 .grcicon-nav-trigger-active { background-position: -342px -416px; }
+.grcicon-child-node { background-position: -222px -416px; }
 
 // Large icons
 .grciconlarge-dashboard { background-position:-8px -8px; }
@@ -318,6 +319,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grciconlarge-clause { background-position: -40px -200px; }
 .grciconlarge-standard { background-position: -72px -200px; }
 .grciconlarge-import { background-position: -104px -200px; }
+.grciconlarge-export { background-position: -200px -200px; }
 .grciconlarge-issue { background-position: -136px -200px; }
 .grciconlarge-control_assessment { background-position: -168px -200px; }
 
@@ -652,4 +654,9 @@ i.short {
   .select {
     @extend %black-icons;
   }
+}
+
+// Subtree child node list
+.child-node-wrap {
+  @extend %black-icons;
 }
