@@ -6,24 +6,23 @@
 from one_time_cycle_calculator import OneTimeCycleCalculator
 from weekly_cycle_calculator import WeeklyCycleCalculator
 from monthly_cycle_calculator import MonthlyCycleCalculator
+from quarterly_cycle_calculator import QuarterlyCycleCalculator
+from annually_cycle_calculator import AnnuallyCycleCalculator
 
-class WorkflowCycleCalculator:
+def get_cycle_calculator(workflow):
+  """Gets the cycle calculator based on the workflow's frequency.
+
+  Args:
+    workflow: Workflow object
+
+  Returns:
+    SomeCalculator(CycleCalculator): CycleCalculator's concrete implementation
+  """
   calculators = {
     "one_time": OneTimeCycleCalculator,
     "weekly": WeeklyCycleCalculator,
     "monthly": MonthlyCycleCalculator,
-    # "quarterly": QuarterlyCycleCalculator,
-    # "annually": AnnualCycleCalculator
+    "quarterly": QuarterlyCycleCalculator,
+    "annually": AnnuallyCycleCalculator
   }
-
-  def __init__(self, workflow):
-    self.calculator = self.calculators[workflow.frequency](workflow)
-
-  def task_date_range(self, task):
-    return self.calculator.task_date_range(task)
-
-  def workflow_date_range(self):
-    return self.calculator.workflow_date_range()
-
-  def next_cycle_start_date(self):
-    return self.calculator.next_cycle_start_date()
+  return calculators[workflow.frequency](workflow)

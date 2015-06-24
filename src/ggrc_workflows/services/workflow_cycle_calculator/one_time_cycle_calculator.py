@@ -6,9 +6,16 @@
 from ggrc_workflows.services.workflow_cycle_calculator.cycle_calculator import CycleCalculator
 
 class OneTimeCycleCalculator(CycleCalculator):
+  """CycleCalculator implementation for one-time workflows
+
+  Because one-time workflows have concrete start and end dates already specified
+  for tasks, we don't have to implement relative_day_to_date function and
+  we can return all values in their raw format (we don't need to adjust for
+  holidays).
+  """
   def __init__(self, workflow):
     super(OneTimeCycleCalculator, self).__init__(workflow)
-    self.tasks = sorted(self.tasks, key=lambda t: t.start_date)
+    self.tasks.sort(key=lambda t: t.start_date)
 
   def relative_day_to_date(self):
     raise NotImplemented("Relative days are not applicable "
