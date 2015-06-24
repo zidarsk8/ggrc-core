@@ -5,13 +5,11 @@
 
 import os
 import random
-import itertools
 
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
 
-from ggrc.models import (Regulation, Section, Issue, Relationship, Program,
-                         Control)
+from ggrc.models import (Regulation, Section, Relationship, Program, Objective)
 from ggrc import db
 
 if os.environ.get('TRAVIS', False):
@@ -55,31 +53,24 @@ class TestAutomappings(TestCase):
     self.assertIsNotNone(rel,
                          msg='%s not mapped to %s' % (obj1.type, obj2.type))
 
-  def with_permutations(self, mk_obj1, mk_obj2, mk_obj3):
-    for mk1, mk2, mk3 in itertools.permutations([mk_obj1, mk_obj2, mk_obj3]):
-      obj1 = mk1()
-      obj2 = mk2()
-      obj3 = mk3()
+  def with_permutations(self, mk1, mk2, mk3):
+      obj1, obj2, obj3 = mk1(), mk2(), mk3()
       self.create_mapping(obj1, obj2)
       self.create_mapping(obj2, obj3)
       self.assert_mapping(obj1, obj3)
 
-  def test_mapping_to_a_program(self):
-    self.with_permutations(
-        lambda: self.create_object(Program, {'title': next('Program')}),
-        lambda: self.create_object(Issue, {'title': next('Issue')}),
-        lambda: self.create_object(Regulation, {
-            'title': next('Program Regulation')
-        }),
-    )
+      obj1, obj2, obj3 = mk1(), mk2(), mk3()
+      self.create_mapping(obj2, obj3)
+      self.create_mapping(obj1, obj2)
+      self.assert_mapping(obj1, obj3)
 
   def test_mapping_directive_to_a_program(self):
     self.with_permutations(
+        lambda: self.create_object(Program, {'title': next('Program')}),
         lambda: self.create_object(Regulation, {
             'title': next('Test PD Regulation')
         }),
-        lambda: self.create_object(Issue, {'title': next('Issue')}),
-        lambda: self.create_object(Program, {'title': next('Program')}),
+        lambda: self.create_object(Objective, {'title': next('Objective')}),
     )
 
   def test_mapping_to_sections(self):
@@ -90,23 +81,7 @@ class TestAutomappings(TestCase):
         'title': next('Test section'),
         'directive': {'id': regulation.id},
     })
-    issue = self.create_object(Issue, {'title': next('Test issue')})
+    objective = self.create_object(Objective, {'title': next('Objective')})
 
-    self.create_mapping(issue, section)
-    self.assert_mapping(issue, regulation)
-
-  def test_mapping_to_objective(self):
-    regulation = self.create_object(Regulation, {
-        'title': next('Test PD Regulation')
-    })
-    section = self.create_object(Section, {
-        'title': next('Test section'),
-        'directive': {'id': regulation.id},
-    })
-    control = self.create_object(Control, {'title': next('Test control')})
-    self.create_mapping(control, section)
-
-    issue = self.create_object(Issue, {'title': next('Test issue')})
-    self.create_mapping(issue, control)
-    self.assert_mapping(issue, section)
-    self.assert_mapping(issue, regulation)
+    self.create_mapping(objective, section)
+    self.assert_mapping(objective, regulation)

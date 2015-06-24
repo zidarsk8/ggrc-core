@@ -5,19 +5,32 @@
 
 from collections import namedtuple
 import itertools
+import logging
 from ggrc import models
 
 Attr = namedtuple('Attr', ['name'])
 
 
+type_ordering = [['Program'], ['Regulation', 'Policy', 'Standard', 'Contract'],
+                 ['Section', 'Clause'], ['Objective'], ['Control']]
+
+
+def get_type_indices():
+  indices = dict()
+  for i, layer in enumerate(type_ordering):
+    for type_ in layer:
+      indices[type_] = i
+  return indices
+
+
 class Rule(object):
-  def __init__(self, name, src, mappings, dst):
+  def __init__(self, name, top, mid, bottom):
     def wrap(o):
       return o if isinstance(o, set) else {o}
     self.name = name
-    self.src = wrap(src)
-    self.mappings = wrap(mappings)
-    self.dst = wrap(dst)
+    self.top = wrap(top)
+    self.mid = wrap(mid)
+    self.bottom = wrap(bottom)
 
 
 class RuleSet(object):
@@ -28,6 +41,7 @@ class RuleSet(object):
     self._rule_list = rule_list
     self._rules = dict()
     self._rule_source = dict()
+    self._type_indices = get_type_indices()
 
     def available(m, l):
       return hasattr(getattr(models, m), l + '_id')
@@ -47,18 +61,38 @@ class RuleSet(object):
 
     self._freeze()
 
+  def _check_type_order(self, type1, type2):
+    i1 = self._type_indices.get(type1, None)
+    if i1 is None:
+      return "Unknown level for %s" % type1
+    i2 = self._type_indices.get(type2, None)
+    if i2 is None:
+      return "Unknown level for %s" % type2
+    if not i1 < i2:
+      return "Type %s does not occur higher than type %s" % (type1, type2)
+
   def _explode_rules(self, rule_list):
     for rule in rule_list:
-      for src, dst, mapping in itertools.product(rule.src, rule.dst,
-                                                 rule.mappings):
-        if Attr in map(type, [src, dst, mapping]):
+      for top, mid, bottom in itertools.product(rule.top, rule.mid,
+                                                rule.bottom):
+        if Attr in map(type, [top, mid, bottom]):
           # if this is a direct mapping
           # there is only one way to form the triangle
-          yield (src, dst, mapping, rule)
+          # TODO rule sanity check
+          yield (mid, bottom, top, rule)
         else:
-          for src1, dst1, mapping1 in set(itertools.permutations([src, dst,
-                                                                  mapping])):
-            yield (src1, dst1, mapping1, rule)
+          err1 = self._check_type_order(top, mid)
+          err2 = self._check_type_order(mid, bottom)
+          if err1 is not None or err2 is not None:
+            logging.warning("Automapping rule ordering violation")
+            if err1 is not None:
+              logging.warning(err1)
+            if err2 is not None:
+              logging.warning(err2)
+            logging.warning("Skipping bad rule " + str((top, mid, bottom)))
+            continue
+          yield (mid, bottom, top, rule)
+          yield (mid, top, bottom, rule)
 
   def _freeze(self):
     for key in self._rules:
@@ -90,12 +124,9 @@ class RuleSet(object):
 
 
 class Types(object):
-  all = {'Audit', 'Clause', 'Contract', 'Control', 'ControlAssessment',
-         'Issue', 'Objective', 'Policy', 'Program', 'Project', 'Regulation',
-         'Request', 'Section', 'Standard'}
-  directives = {'Regulation', 'Policy', 'Standard', 'Contract', 'Clause',
-                'Section'}
-  objectives = {'Control', 'Objective'}
+  all = {'Program', 'Regulation', 'Policy', 'Standard', 'Contract',
+         'Section', 'Clause', 'Objective', 'Control'}
+  directives = {'Regulation', 'Policy', 'Standard', 'Contract'}
   assets_business = {'System', 'Process', 'DataAsset', 'Product', 'Project',
                      'Facility', 'Market'}
   people_groups = {'Person', 'OrgGroup', 'Vendor'}
@@ -103,31 +134,16 @@ class Types(object):
 
 rules = RuleSet([
     Rule(
-        'mapping to a program',
-        'Program',
-        Types.directives,
-        (Types.all - {'Audit'} - Types.directives |
-         Types.assets_business | Types.people_groups),
-    ),
-
-    Rule(
         'mapping directive to a program',
-        Types.directives,
-        Types.all - {'Program'},
         'Program',
+        Types.directives,
+        Types.all - {'Program'} - Types.directives,
     ),
 
     Rule(
         'mapping to sections and clauses',
-        {'Section', 'Clause'},
         Attr('directive'),
-        Types.all,
-    ),
-
-    Rule(
-        'mapping to objective',
-        Types.objectives,
-        {'Section'},
-        Types.all,
+        {'Section', 'Clause'},
+        {'Objective', 'Control'},
     ),
 ])
