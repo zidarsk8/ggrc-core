@@ -27,6 +27,7 @@ class AutomapperGenerator(object):
     self.processed = set()
     self.queue = set()
     self.cache = dict()
+    self.auto_mappings = set()
 
   def related(self, obj):
     if obj in self.cache:
@@ -64,6 +65,15 @@ class AutomapperGenerator(object):
         with benchmark("Automapping _step: %d" % count):
           self._step(src, dst)
           self._step(dst, src)
+
+        with benchmark("Automapping flush"):
+          db.session.add_all(Relationship(
+              source_type=src.type,
+              source_id=src.id,
+              destination_type=dst.type,
+              destination_id=dst.id,
+              automapping_id=self.relationship.id
+          ) for src, dst  in self.auto_mappings)
 
   def _step(self, src, dst):
       explicit, implicit = rules[src.type, dst.type]
@@ -105,18 +115,18 @@ class AutomapperGenerator(object):
         )
 
   def _ensure_relationship(self, src, dst):
+    if dst in self.cache.get(src, []):
+      return
+    if src in self.cache.get(dst, []):
+      return
+
     if Relationship.find_related(src, dst) is None:
-      db.session.add(Relationship(
-          source_type=src.type,
-          source_id=src.id,
-          destination_type=dst.type,
-          destination_id=dst.id,
-          automapping_id=self.relationship.id
-      ))
-      if src in self.cache:
-        self.cache[src].add(dst)
-      if dst in self.cache:
-        self.cache[dst].add(src)
+      self.auto_mappings.add((src, dst))
+
+    if src in self.cache:
+      self.cache[src].add(dst)
+    if dst in self.cache:
+      self.cache[dst].add(src)
 
 
 def register_automapping_listeners():
