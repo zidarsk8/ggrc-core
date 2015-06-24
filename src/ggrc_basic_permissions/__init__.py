@@ -325,11 +325,15 @@ def load_permissions_for(user):
           .append(object_owner.ownable_id)
 
   for res in objects_via_program_relationships_query(user.id).all():
-    _id, _type, role_name = res
-    permissions.setdefault('read', {})\
-        .setdefault(_type, {})\
-        .setdefault('resources', list())\
-        .append(_id)
+    id_, type_, role_name = res
+    actions = ["read"]
+    if role_name in ("ProgramEditor", "ProgramOwner"):
+      actions += ["create", "update", "delete"]
+    for action in actions:
+      permissions.setdefault(action, {})\
+          .setdefault(type_, {})\
+          .setdefault('resources', list())\
+          .append(id_)
 
   personal_context = _get_or_create_personal_context(user)
 
