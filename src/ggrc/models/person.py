@@ -63,7 +63,10 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
   _include_links = []
   _aliases = {
       "name": "Name",
-      "email": "Email",
+      "email": {
+          "display_name": "Email",
+          "unique": True,
+      },
       "company": "Company",
   }
 
@@ -78,7 +81,7 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
     return False
 
   def get_id(self):
-    return unicode(self.id)
+    return unicode(self.id)  # noqa
 
   @validates('language')
   def validate_person_options(self, key, option):

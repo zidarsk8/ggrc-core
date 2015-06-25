@@ -584,6 +584,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Email"]["mandatory"])
+    self.assertTrue(vals["Email"]["unique"])
 
   def test_org_group_definitions(self):
     """ test default headers for OrgGroup """
