@@ -21,6 +21,7 @@ from ggrc.models.background_task import (
     BackgroundTask, queued_task, create_task, make_task_response
     )
 from . import notification
+from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
@@ -84,6 +85,16 @@ def get_current_user_json():
   result = publish_representation(publish(person, (), inclusion_filter))
   return as_json(result)
 
+
+def get_attributes_json():
+  attrs = CustomAttributeDefinition.eager_query().all()
+  published = []
+  for attr in attrs:
+    published.append(publish_representation(publish(attr)))
+  print published
+  return as_json(published)
+
+
 @app.context_processor
 def base_context():
   from ggrc.models import get_model
@@ -93,7 +104,8 @@ def base_context():
       permissions=permissions,
       config_json=get_config_json,
       current_user_json=get_current_user_json,
-      )
+      attributes_json=get_attributes_json,
+  )
 
 from flask import render_template, flash
 

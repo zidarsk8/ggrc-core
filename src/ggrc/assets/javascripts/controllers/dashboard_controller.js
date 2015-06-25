@@ -176,10 +176,8 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , init_default_widgets: function() {
-      $.when(getCustomAttributes()).always(function(){
         can.each(this.options.default_widgets, function (name) {
           this.add_dashboard_widget_from_descriptor(this.options.widget_descriptors[name]);
-        }.bind(this));
       }.bind(this));
     }
 
