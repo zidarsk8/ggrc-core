@@ -222,7 +222,7 @@ class MappingColumnHandler(ColumnHandler):
       if obj:
         objects.append(obj)
       elif not (slug in self.new_slugs and
-                self.row_converter.converter.dry_run):
+                self.row_converter.block_converter.dry_run):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=pretty_class_name(class_), slug=slug)
     return objects

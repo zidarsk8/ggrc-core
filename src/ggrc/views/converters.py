@@ -13,7 +13,7 @@ from werkzeug.exceptions import BadRequest
 from ggrc.app import app
 from ggrc.login import login_required
 from ggrc.converters import IMPORTABLE
-from ggrc.converters.base import Converter
+from ggrc.converters.base_block import BlockConverter
 from ggrc.converters.import_helper import generate_csv_string
 from ggrc.converters.import_helper import read_csv_file
 from ggrc.converters.import_helper import split_array
@@ -64,8 +64,8 @@ def handle_export_request():
   csv_data = []
   for object_name, ids in data.items():
     object_type = IMPORTABLE[object_name]
-    converter = Converter.from_ids(object_type, ids)
-    csv_data.extend(converter.to_array())
+    block_converter = BlockConverter.from_ids(object_type, ids)
+    csv_data.extend(block_converter.to_array())
   csv_string = generate_csv_string(csv_data)
 
   object_names = "_".join(data.keys())
@@ -112,7 +112,7 @@ def handle_import_request():
   converters = []
   shared_state = {}
   for offset, data in zip(offsets, data_blocks):
-    converter = Converter.from_csv(data, offset, dry_run, shared_state)
+    converter = BlockConverter.from_csv(data, offset, dry_run, shared_state)
     converters.append(converter)
     converter.import_objects()
     object_class, slugs = converter.get_new_slugs()

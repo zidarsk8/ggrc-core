@@ -12,8 +12,8 @@ from ggrc.converters import errors
 
 class RowConverter(object):
 
-  def __init__(self, converter, object_class, **options):
-    self.converter = converter
+  def __init__(self, block_converter, object_class, **options):
+    self.block_converter = block_converter
     self.options = options.copy()
     self.object_class = object_class
     self.obj = None
@@ -25,18 +25,18 @@ class RowConverter(object):
     self.attrs = {}
     self.mappings = {}
     offset = 3  # 2 header rows and 1 for 0 based index
-    self.line = self.index + self.converter.offset + offset
+    self.line = self.index + self.block_converter.offset + offset
 
     self.handle_row_data()
 
   def add_error(self, template, **kwargs):
     message = template.format(line=self.line, **kwargs)
-    self.converter.row_errors.append(message)
+    self.block_converter.row_errors.append(message)
     self.ignore = True
 
   def add_warning(self, template, **kwargs):
     message = template.format(line=self.line, **kwargs)
-    self.converter.row_warnings.append(message)
+    self.block_converter.row_warnings.append(message)
 
   def handle_row_data(self):
     """ Pack row data with handlers """
@@ -55,7 +55,8 @@ class RowConverter(object):
   def chect_mandatory_fields(self):
     if not self.is_new:
       return
-    mandatory = [key for key, header in self.converter.object_headers.items()
+    mandatory = [key for key, header in
+                 self.block_converter.object_headers.items()
                  if header["mandatory"]]
     missing = set(mandatory).difference(set(self.headers.keys()))
     if missing:
