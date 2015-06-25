@@ -17,6 +17,7 @@ from ggrc import db
 
 
 class TestCreatorProgram(TestCase):
+  """Set up necessary objects and test Creator role with Program roles"""
 
   def setUp(self):
     TestCase.setUp(self)

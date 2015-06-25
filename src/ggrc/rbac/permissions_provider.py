@@ -13,10 +13,11 @@ Permission = namedtuple('Permission', 'action resource_type resource_id context_
 
 _contributing_resource_types = {}
 
-# Return a list of resource types using the same context space.
-# This is needed because permissions may be given for, e.g., "Contract", but
-#   the restriction on join is done knowing only "Directive".
 def get_contributing_resource_types(resource_type):
+  """Return a list of resource types using the same context space.
+     This is needed because permissions may be given for, e.g., "Contract", but
+     the restriction on join is done knowing only "Directive".
+  """
   resource_types = _contributing_resource_types.get(resource_type, None)
   if resource_types is None:
     resource_types = [resource_type]
@@ -42,7 +43,7 @@ def resolve_permission_variable(value):
       if value == '$current_user':
         return current_user
       raise Exception(
-          'The permission condition variable {0} is not defined!'.format(name))
+          'The permission condition variable {0} is not defined!'.format(value))
     else:
       return value
   else:
@@ -56,22 +57,34 @@ def get_deep_attr(instance, names):
   return value
 
 
-def ContainsCondition(instance, value, list_property):
+def contains_condition(instance, value, list_property):
+  """Check if instance contains a value in a list.
+     Example:
+        "terms": {
+            "list_property": "owners",
+            "value": "$current_user"
+        },
+        "condition": "contains"
+  """
   value = resolve_permission_variable(value)
   list_value = get_deep_attr(instance, list_property)
   return value in list_value
 
 
-def IsCondition(instance, value, property_name):
+def is_condition(instance, value, property_name):
+  """Check if instance attribute is of a given value
+     Example:
+      "terms": {
+         "property_name": "person",
+         "value": "$current_user"
+       },
+       "condition": "is"
+
+  """
   value = resolve_permission_variable(value)
   property_value = get_deep_attr(instance, property_name)
   return value == property_value
 
-
-def InCondition(instance, value, property_name):
-  value = resolve_permission_variable(value)
-  property_value = get_deep_attr(instance, property_name)
-  return property_value in value
 
 """
 All functions with a signature
@@ -81,9 +94,9 @@ All functions with a signature
   func(instance, **kwargs)
 """
 _CONDITIONS_MAP = {
-    'contains': ContainsCondition,
-    'is': IsCondition,
-    'in': InCondition,
+    'contains': contains_condition,
+    'is': is_condition,
+    'in': contains_condition,
 }
 
 
@@ -97,6 +110,7 @@ class DefaultUserPermissions(UserPermissions):
       )
 
   def _admin_permission_for_context(self, context_id):
+    """Create an admin permission object for the given context"""
     return Permission(
         self.ADMIN_PERMISSION.action,
         self.ADMIN_PERMISSION.resource_type,
@@ -104,6 +118,7 @@ class DefaultUserPermissions(UserPermissions):
         context_id)
 
   def _permission_match(self, permission, permissions):
+    """Check if the user has the given permission"""
     return \
         permission.resource_id in \
           permissions\
@@ -125,6 +140,7 @@ class DefaultUserPermissions(UserPermissions):
             .get('contexts', [])
 
   def _permissions(self):
+    """Returns request permission from the global scope"""
     return getattr(g, '_request_permissions', {})
 
   def _is_allowed(self, permission):
@@ -155,8 +171,7 @@ class DefaultUserPermissions(UserPermissions):
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('conditions', {})\
         .setdefault(instance.context_id, [])
-    #FIXME Check for basic resource permission
-    #Check any conditions applied per resource
+    # Check any conditions applied per resource
     if not conditions:
       return True
     for condition in conditions:
@@ -172,6 +187,7 @@ class DefaultUserPermissions(UserPermissions):
     return self._is_allowed(Permission('create', resource_type, resource_id, context_id))
 
   def is_allowed_create_for(self, instance):
+    """Whether or not the user is allowed to create the given instance"""
     return self._is_allowed_for(instance, 'create')
 
   def is_allowed_read(self, resource_type, resource_id, context_id):
@@ -180,6 +196,7 @@ class DefaultUserPermissions(UserPermissions):
     return self._is_allowed(Permission('read', resource_type, resource_id, context_id))
 
   def is_allowed_read_for(self, instance):
+    """Whether or not the user is allowed to read the given instance"""
     return self._is_allowed_for(instance, 'read')
 
   def is_allowed_update(self, resource_type, resource_id, context_id):
@@ -188,6 +205,7 @@ class DefaultUserPermissions(UserPermissions):
     return self._is_allowed(Permission('update', resource_type, resource_id, context_id))
 
   def is_allowed_update_for(self, instance):
+    """Whether or not the user is allowed to update the given instance"""
     return self._is_allowed_for(instance, 'update')
 
   def is_allowed_delete(self, resource_type, resource_id, context_id):
@@ -196,9 +214,11 @@ class DefaultUserPermissions(UserPermissions):
     return self._is_allowed(Permission('delete', resource_type, resource_id, context_id))
 
   def is_allowed_delete_for(self, instance):
+    """Whether or not the user is allowed to delete the given instance"""
     return self._is_allowed_for(instance, 'delete')
 
   def _get_resources_for(self, action, resource_type):
+    """Get resources resources (object ids) for a given action and resource_type"""
     permissions = self._permissions()
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
       return None
@@ -209,10 +229,11 @@ class DefaultUserPermissions(UserPermissions):
 
     ret = []
     for resource_type in resource_types:
-      ret.extend(permissions
-                .get(action, {})
-                .get(resource_type, {})
-                .get('resources', []))
+      ret.extend(
+          permissions
+          .get(action, {})
+          .get(resource_type, {})
+          .get('resources', []))
     return ret
 
   def _get_contexts_for(self, action, resource_type):
@@ -274,6 +295,7 @@ class DefaultUserPermissions(UserPermissions):
     return self._get_resources_for('delete', resource_type)
 
   def is_allowed_view_object_page_for(self, instance):
+    """All resources in which the user can access object page."""
     return self._is_allowed_for(instance, 'read')
 
   def is_admin(self):
