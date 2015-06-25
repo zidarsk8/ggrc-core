@@ -175,9 +175,9 @@ class TestComprehensiveSheets(TestCase):
             "rows": 15,
         },
         "Person": {
-            "created": 0,
-            "ignored": 10,
-            "row_errors": 0,
+            "created": 9,
+            "ignored": 1,
+            "row_errors": 1,
             "row_warnings": 0,
             "rows": 10,
         }
