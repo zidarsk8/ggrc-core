@@ -78,7 +78,9 @@ class AutomapperGenerator(object):
               automapping_id=self.relationship.id
           ) for src, dst in self.auto_mappings)
       else:
-        pass  # TODO inform the user
+        self.relationship._json_extras = {
+            'automapping_limit_exceeded': True
+        }
 
   def _step(self, src, dst):
       explicit, implicit = rules[src.type, dst.type]
