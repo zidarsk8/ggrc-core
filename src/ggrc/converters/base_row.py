@@ -49,7 +49,7 @@ class RowConverter(object):
         self.mappings[attr_name] = item
       else:
         self.attrs[attr_name] = item
-    self.obj = self.get_object_by_slug()
+    self.obj = self.get_or_generate_object()
     self.chect_mandatory_fields()
 
   def chect_mandatory_fields(self):
@@ -64,8 +64,8 @@ class RowConverter(object):
                      s="s" if len(missing) > 1 else "",
                      column_names=", ".join(missing))
 
-  def find_by_slug(self, slug):
-    return self.object_class.query.filter_by(slug=slug).first()
+  def find_by_key(self, key, value):
+    return self.object_class.query.filter_by(**{key:value}).first()
 
   def get_value(self, key):
     key_set = self.mappings if key.startswith("map:") else self.attrs
@@ -77,16 +77,26 @@ class RowConverter(object):
   def set_ignore(self, ignore=True):
     self.ignore = ignore
 
-  def get_object_by_slug(self):
+  def get_or_generate_object(self):
+    """ fetch existing object if possible or create and return a new one
+
+    Person object is the only exception here since it does not have a slug
+    field."""
+    if self.object_class.__name__ == "Person":
+      return self.get_object_by_key("email")
+    return self.get_object_by_key()
+
+
+  def get_object_by_key(self, key="slug"):
     """ Get object if the slug is in the system or return a new object """
-    slug = self.get_value("slug")
-    if slug is None:
-      self.ignore = True
+    value = self.get_value(key)
+    if value is None:
+      self.add_error(errors.MISSING_COLUMN, s="", column_name=key)
       return
     obj = None
     self.is_new = False
-    if slug:
-      obj = self.find_by_slug(slug)
+    if value:
+      obj = self.find_by_key(key, value)
     if not obj:
       obj = self.object_class()
       self.is_new = True
