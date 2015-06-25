@@ -69,7 +69,7 @@ class RuleSet(object):
     i2 = self._type_indices.get(type2, None)
     if i2 is None:
       return "Unknown level for %s" % type2
-    if not i1 < i2:
+    if not i1 <= i2:
       return "Type %s does not occur higher than type %s" % (type1, type2)
 
   def _explode_rules(self, rule_list):
@@ -145,6 +145,13 @@ rules = RuleSet(count_limit=10000, rule_list=[
         'mapping to sections and clauses',
         Attr('directive'),
         {'Section', 'Clause'},
+        {'Objective', 'Control'},
+    ),
+
+    Rule(
+        'mapping to objective',
+        {'Section'},
+        {'Objective'},
         {'Objective', 'Control'},
     ),
 ])

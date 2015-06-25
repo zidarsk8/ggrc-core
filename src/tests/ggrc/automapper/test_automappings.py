@@ -10,7 +10,8 @@ import itertools
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
 
-from ggrc.models import (Regulation, Section, Relationship, Program, Objective)
+from ggrc.models import (Regulation, Section, Relationship, 
+                         Program, Control, Objective)
 from ggrc import db
 from ggrc.automapper.rules import rules
 
@@ -143,3 +144,43 @@ class TestAutomappings(TestCase):
           to_create=[(regulation, objective), (objective, program)],
           implied=[],
       )
+
+  def test_mapping_to_objective(self):
+    regulation = self.create_object(Regulation, {
+        'title': next('Test PD Regulation')
+    })
+    section = self.create_object(Section, {
+        'title': next('Test section'),
+        'directive': {'id': regulation.id},
+    })
+    control = self.create_object(Control, {'title': next('Test control')})
+    objective = self.create_object(Objective, {'title': next('Test control')})
+
+    self.assert_mapping_implication(
+        to_create=[(section, objective), (objective, control)],
+        implied=[
+            (regulation, objective),
+            (section, control),
+            (regulation, control),
+        ]
+    )
+
+  def test_mapping_between_objectives(self):
+    regulation = self.create_object(Regulation, {
+        'title': next('Test PD Regulation')
+    })
+    section = self.create_object(Section, {
+        'title': next('Test section'),
+        'directive': {'id': regulation.id},
+    })
+    objective1 = self.create_object(Objective, {'title': next('Test Objective')})
+    objective2 = self.create_object(Objective, {'title': next('Test Objective')})
+
+    self.assert_mapping_implication(
+        to_create=[(section, objective1), (objective1, objective2)],
+        implied=[
+            (section, objective2),
+            (regulation, objective1),
+            (regulation, objective2),
+        ]
+    )
