@@ -7,16 +7,15 @@ from flask import current_app
 from flask import request
 from flask import json
 from flask import render_template
-from collections import defaultdict
 from werkzeug.exceptions import BadRequest
 
 from ggrc.app import app
 from ggrc.login import login_required
 from ggrc.converters import IMPORTABLE
-from ggrc.converters.base_block import BlockConverter
+from ggrc.converters.base import Converter
+from ggrc.converters.base import BlockConverter
 from ggrc.converters.import_helper import generate_csv_string
 from ggrc.converters.import_helper import read_csv_file
-from ggrc.converters.import_helper import split_array
 
 
 def check_required_headers(required_headers):
@@ -99,29 +98,12 @@ def parse_import_request():
   dry_run = request.headers["X-test-only"] == "true"
   return dry_run, csv_data
 
+
 def handle_import_request():
-  def update_response_data(data, new_data):
-    for k, v in new_data.items():
-      data[k].extend(v)
-
   dry_run, csv_data = parse_import_request()
-  offsets, data_blocks = split_array(csv_data)
-
-  response_data = []
-  new_slugs = defaultdict(set)
-  converters = []
-  shared_state = {}
-  for offset, data in zip(offsets, data_blocks):
-    converter = BlockConverter.from_csv(data, offset, dry_run, shared_state)
-    converters.append(converter)
-    converter.import_objects()
-    object_class, slugs = converter.get_new_slugs()
-    new_slugs[object_class].update(slugs)
-
-  for converter in converters:
-    converter.import_mappings(new_slugs)
-    response_data.append(converter.get_info())
-
+  converter = Converter.from_csv(dry_run, csv_data)
+  converter.import_csv()
+  response_data = converter.get_info()
   response_json = json.dumps(response_data)
   headers = [('Content-Type', 'application/json')]
   return current_app.make_response((response_json, 200, headers))

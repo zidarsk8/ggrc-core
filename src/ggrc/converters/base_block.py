@@ -66,8 +66,8 @@ class BlockConverter(object):
     raw_headers, rows = extract_relevant_data(csv_data)
 
     converter = BlockConverter(object_class=object_class, rows=rows,
-                          raw_headers=raw_headers, dry_run=dry_run,
-                          offset=offset, shared_state=shared_state)
+                               raw_headers=raw_headers, dry_run=dry_run,
+                               offset=offset, shared_state=shared_state)
 
     converter.generate_row_converters()
     return converter
@@ -294,4 +294,3 @@ class BlockConverter(object):
         index = offset_index - 3 - self.offset
         if self.in_range(index, remove_offset=False):
           self.row_converters[index].set_ignore()
-

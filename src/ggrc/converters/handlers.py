@@ -340,6 +340,7 @@ class OptionColumnHandler(ColumnHandler):
                  Option.role == prefixed_key))).first()
     return item
 
+
 class CheckboxColumnHandler(ColumnHandler):
 
   def parse_item(self):
