@@ -57,6 +57,8 @@ class AutomapperGenerator(object):
                      stub_from_destination(self.relationship)))
       count = 0
       while len(self.queue) > 0:
+        if len(self.auto_mappings) > rules.count_limit:
+          break
         count += 1
         src, dst = entry = self.queue.pop()
         # TODO check that user can see both objects
@@ -66,6 +68,7 @@ class AutomapperGenerator(object):
           self._step(src, dst)
           self._step(dst, src)
 
+      if len(self.auto_mappings) <= rules.count_limit:
         with benchmark("Automapping flush"):
           db.session.add_all(Relationship(
               source_type=src.type,
@@ -73,7 +76,9 @@ class AutomapperGenerator(object):
               destination_type=dst.type,
               destination_id=dst.id,
               automapping_id=self.relationship.id
-          ) for src, dst  in self.auto_mappings)
+          ) for src, dst in self.auto_mappings)
+      else:
+        pass  # TODO inform the user
 
   def _step(self, src, dst):
       explicit, implicit = rules[src.type, dst.type]

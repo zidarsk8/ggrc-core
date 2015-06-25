@@ -12,6 +12,8 @@ from tests.ggrc.generator import GgrcGenerator
 
 from ggrc.models import (Regulation, Section, Relationship, Program, Objective)
 from ggrc import db
+from ggrc.automapper.rules import rules
+
 
 if os.environ.get('TRAVIS', False):
   random.seed(1)  # so we can reproduce the tests if needed
@@ -24,6 +26,18 @@ def next(msg):
   global counter
   counter += 1
   return msg + str(counter)
+
+
+class automapping_count_limit:
+  def __init__(self, new_limit):
+    self.new_limit = new_limit
+
+  def __enter__(self):
+    self.original_limit = rules.count_limit
+    rules.count_limit = self.new_limit
+
+  def __exit__(self, type, value, traceback):
+    rules.count_limit = self.original_limit
 
 
 class TestAutomappings(TestCase):
@@ -117,3 +131,15 @@ class TestAutomappings(TestCase):
         to_create=(objective, section),
         implied=(objective, regulation),
     )
+
+  def test_automapping_limit(self):
+    with automapping_count_limit(-1):
+      program = self.create_object(Program, {'title': next('Program')})
+      regulation = self.create_object(Regulation, {
+          'title': next('Test PD Regulation')
+      })
+      objective = self.create_object(Objective, {'title': next('Objective')})
+      self.assert_mapping_implication(
+          to_create=[(regulation, objective), (objective, program)],
+          implied=[],
+      )

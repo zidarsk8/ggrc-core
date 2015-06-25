@@ -37,7 +37,8 @@ class RuleSet(object):
   Entry = namedtuple('RuleSetEntry', ['explicit', 'implicit'])
   entry_empty = Entry(frozenset(set()), frozenset(set()))
 
-  def __init__(self, rule_list):
+  def __init__(self, count_limit, rule_list):
+    self.count_limit = count_limit
     self._rule_list = rule_list
     self._rules = dict()
     self._rule_source = dict()
@@ -132,7 +133,7 @@ class Types(object):
   people_groups = {'Person', 'OrgGroup', 'Vendor'}
 
 
-rules = RuleSet([
+rules = RuleSet(count_limit=10000, rule_list=[
     Rule(
         'mapping directive to a program',
         'Program',
