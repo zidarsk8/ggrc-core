@@ -53,6 +53,7 @@ class TestBasicCsvImport(TestCase):
     self.assertEquals(1, Person.query.count())
     self.assertEquals(response[1]["name"], "Org Group")
     self.assertEquals(set(), set(response[1]["row_warnings"]))
+    self.assertEquals(set(), set(response[1]["row_errors"]))
 
   def test_people_import_wrong_order_dry_run(self):
     filename = "people_import_correct_order.csv"
@@ -61,6 +62,7 @@ class TestBasicCsvImport(TestCase):
     self.assertEquals(1, Person.query.count())
     self.assertEquals(response[1]["name"], "Org Group")
     self.assertEquals(set(), set(response[1]["row_warnings"]))
+    self.assertEquals(set(), set(response[1]["row_errors"]))
 
   def test_people_import_correct_order(self):
     filename = "people_import_correct_order.csv"
@@ -68,6 +70,7 @@ class TestBasicCsvImport(TestCase):
     self.assertEquals(5, Person.query.count())
     self.assertEquals(response[1]["name"], "Org Group")
     self.assertEquals(set(), set(response[1]["row_warnings"]))
+    self.assertEquals(set(), set(response[1]["row_errors"]))
 
   def test_people_import_wrong_order(self):
     filename = "people_import_correct_order.csv"
@@ -76,4 +79,5 @@ class TestBasicCsvImport(TestCase):
     self.assertEquals(5, Person.query.count())
     self.assertEquals(response[1]["name"], "Org Group")
     self.assertEquals(set(), set(response[1]["row_warnings"]))
+    self.assertEquals(set(), set(response[1]["row_errors"]))
 
