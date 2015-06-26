@@ -254,8 +254,8 @@ class BlockConverter(object):
     message = template.format(**kwargs)
     self.block_warnings.append(message)
 
-  def get_new_slugs(self):
-    slugs = set([row.get_value("slug") for row in self.row_converters])
+  def get_new_values(self, key):
+    slugs = set([row.get_value(key) for row in self.row_converters])
     return self.object_class, slugs
 
   def generate_unique_counts(self):
