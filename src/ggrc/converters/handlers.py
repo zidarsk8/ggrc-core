@@ -207,6 +207,7 @@ class MappingColumnHandler(ColumnHandler):
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
     self.new_slugs = []
+    self.dry_run = row_converter.block_converter.converter.dry_run
 
   def set_slugs(self, slugs_dict):
     self.new_slugs = slugs_dict.get(self.row_converter.object_class, [])
@@ -221,8 +222,7 @@ class MappingColumnHandler(ColumnHandler):
       obj = class_.query.filter(class_.slug == slug).first()
       if obj:
         objects.append(obj)
-      elif not (slug in self.new_slugs and
-                self.row_converter.block_converter.dry_run):
+      elif not (slug in self.new_slugs and self.dry_run):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=pretty_class_name(class_), slug=slug)
     return objects

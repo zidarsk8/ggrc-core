@@ -35,7 +35,7 @@ class Converter(object):
     for object_name, ids in data.items():
       object_type = IMPORTABLE[object_name]
       converter.block_converters.append(
-          BlockConverter.from_ids(object_type, ids))
+          BlockConverter.from_ids(converter, object_type, ids))
     return converter
 
   def to_array(self):
@@ -65,8 +65,7 @@ class Converter(object):
   def generate_converters(self):
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
-      converter = BlockConverter.from_csv(
-          data, offset, self.dry_run, self)
+      converter = BlockConverter.from_csv(self, data, offset)
       self.block_converters.append(converter)
 
     order = defaultdict(lambda: len(self.class_order))

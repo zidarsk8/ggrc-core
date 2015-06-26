@@ -56,22 +56,22 @@ class BlockConverter(object):
   """
 
   @classmethod
-  def from_csv(cls, csv_data, offset=0, dry_run=True, converter=None):
+  def from_csv(cls, converter, csv_data, offset=0):
     object_class = IMPORTABLE.get(csv_data[1][0].strip().lower())
     if not object_class:
-      block_converter = BlockConverter()
+      block_converter = BlockConverter(converter)
       block_converter.add_errors(errors.WRONG_OBJECT_TYPE, line=offset + 2)
       return block_converter
     raw_headers, rows = extract_relevant_data(csv_data)
-    block_converter = BlockConverter(
-        object_class=object_class, rows=rows, raw_headers=raw_headers,
-        dry_run=dry_run, offset=offset, converter=converter,
-        shared_state=converter.shared_state)
+    block_converter = BlockConverter(converter, object_class=object_class,
+                                     rows=rows, raw_headers=raw_headers,
+                                     offset=offset)
+
     return block_converter
 
   @classmethod
-  def from_ids(cls, object_class, ids=[]):
-    return BlockConverter(object_class=object_class)
+  def from_ids(cls, converter, object_class, ids=[]):
+    return BlockConverter(converter, object_class=object_class)
 
   def get_unique_counts_dict(self, object_class):
     """ get a the varible for storing unique counts
@@ -81,17 +81,16 @@ class BlockConverter(object):
     """
     sharing_rules = get_shared_unique_rules()
     classes = sharing_rules.get(object_class, object_class)
-    if classes not in self.shared_state:
-      self.shared_state[classes] = defaultdict(lambda: defaultdict(list))
-    return self.shared_state[classes]
+    shared_state = self.converter.shared_state
+    if classes not in shared_state:
+      shared_state[classes] = defaultdict(lambda: defaultdict(list))
+    return shared_state[classes]
 
-  def __init__(self, **options):
+  def __init__(self, converter, **options):
+    self.converter = converter
     self.rows = options.get('rows', [])
-    self.converter = options.get('converter')
-    self.shared_state = options.get('shared_state', {})
     self.offset = options.get('offset', 0)
     self.ids = options.get('ids', [])
-    self.dry_run = options.get('dry_run', )
     self.object_class = options.get('object_class', )
     self.block_errors = []
     self.block_warnings = []
@@ -217,7 +216,7 @@ class BlockConverter(object):
     for row_converter in self.row_converters:
       row_converter.setup_mappings(slugs_dict)
 
-    if not self.dry_run:
+    if not self.converter.dry_run:
       for row_converter in self.row_converters:
         row_converter.insert_mapping()
       self.save_import()
@@ -229,7 +228,7 @@ class BlockConverter(object):
     for row_converter in self.row_converters:
       row_converter.setup_object()
 
-    if not self.dry_run:
+    if not self.converter.dry_run:
       for row_converter in self.row_converters:
         try:
           row_converter.insert_object()
