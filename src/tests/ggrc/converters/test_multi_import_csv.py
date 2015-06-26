@@ -138,3 +138,19 @@ class TestCsvImport(TestCase):
 
     self.assertEqual(get_relationships_for(p1).count(), 3)
     self.assertEqual(get_relationships_for(org1).count(), 5)
+
+  def test_big_import_with_mappings(self):
+    response = self.import_file("data_for_export_testing.csv")
+    for block in response:
+      self.assertEquals(set(), set(block["row_warnings"]),
+                        json.dumps(block, indent=2, sort_keys=True))
+      self.assertEquals(set(), set(block["row_errors"]),
+                        json.dumps(block, indent=2, sort_keys=True))
+
+  def test_big_import_with_mappings_dry_run(self):
+    response = self.import_file("data_for_export_testing.csv", dry_run=True)
+    for block in response:
+      self.assertEquals(set(), set(block["row_warnings"]),
+                        json.dumps(block, indent=2, sort_keys=True))
+      self.assertEquals(set(), set(block["row_errors"]),
+                        json.dumps(block, indent=2, sort_keys=True))
