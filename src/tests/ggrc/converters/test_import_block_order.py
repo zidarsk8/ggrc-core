@@ -9,6 +9,7 @@ from os.path import abspath
 from os.path import dirname
 from os.path import join
 from flask import json
+from nose.plugins.skip import SkipTest
 
 from ggrc.models import Person
 from ggrc.converters import errors
@@ -46,15 +47,33 @@ class TestBasicCsvImport(TestCase):
     response = self.import_file(filename)
     self.assertEquals(5, Person.query.count())
 
+  def test_people_import_correct_order_dry_run(self):
+    filename = "people_import_correct_order.csv"
+    response = self.import_file(filename, dry_run=True)
+    self.assertEquals(1, Person.query.count())
+    self.assertEquals(response[1]["name"], "Org Group")
+    self.assertEquals(set(), set(response[1]["row_warnings"]))
+
+  def test_people_import_wrong_order_dry_run(self):
+    filename = "people_import_correct_order.csv"
+    filename = "people_import_wrong_order.csv"
+    response = self.import_file(filename, dry_run=True)
+    self.assertEquals(1, Person.query.count())
+    self.assertEquals(response[1]["name"], "Org Group")
+    self.assertEquals(set(), set(response[1]["row_warnings"]))
+
   def test_people_import_correct_order(self):
     filename = "people_import_correct_order.csv"
     response = self.import_file(filename)
     self.assertEquals(5, Person.query.count())
+    self.assertEquals(response[1]["name"], "Org Group")
     self.assertEquals(set(), set(response[1]["row_warnings"]))
 
   def test_people_import_wrong_order(self):
+    filename = "people_import_correct_order.csv"
     filename = "people_import_wrong_order.csv"
     response = self.import_file(filename)
     self.assertEquals(5, Person.query.count())
-    self.assertEquals(set(), set(response[0]["row_warnings"]))
+    self.assertEquals(response[1]["name"], "Org Group")
+    self.assertEquals(set(), set(response[1]["row_warnings"]))
 
