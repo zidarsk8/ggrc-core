@@ -56,17 +56,18 @@ class BlockConverter(object):
   """
 
   @classmethod
-  def from_csv(cls, csv_data, offset=0, dry_run=True, shared_state=None):
+  def from_csv(cls, csv_data, offset=0, dry_run=True, converter=None):
     object_class = IMPORTABLE.get(csv_data[1][0].strip().lower())
     if not object_class:
-      converter = BlockConverter()
-      converter.add_errors(errors.WRONG_OBJECT_TYPE, line=offset + 2)
-      return converter
+      block_converter = BlockConverter()
+      block_converter.add_errors(errors.WRONG_OBJECT_TYPE, line=offset + 2)
+      return block_converter
     raw_headers, rows = extract_relevant_data(csv_data)
-    converter = BlockConverter(object_class=object_class, rows=rows,
-                               raw_headers=raw_headers, dry_run=dry_run,
-                               offset=offset, shared_state=shared_state)
-    return converter
+    block_converter = BlockConverter(
+        object_class=object_class, rows=rows, raw_headers=raw_headers,
+        dry_run=dry_run, offset=offset, converter=converter,
+        shared_state=converter.shared_state)
+    return block_converter
 
   @classmethod
   def from_ids(cls, object_class, ids=[]):
@@ -86,6 +87,7 @@ class BlockConverter(object):
 
   def __init__(self, **options):
     self.rows = options.get('rows', [])
+    self.converter = options.get('converter')
     self.shared_state = options.get('shared_state', {})
     self.offset = options.get('offset', 0)
     self.ids = options.get('ids', [])

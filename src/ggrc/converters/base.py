@@ -5,6 +5,7 @@
 
 from collections import defaultdict
 
+from ggrc.converters import IMPORTABLE
 from ggrc.converters.import_helper import split_array
 from ggrc.converters.base_block import BlockConverter
 
@@ -28,6 +29,21 @@ class Converter(object):
     converter = Converter(dry_run=dry_run, csv_data=csv_data)
     return converter
 
+  @classmethod
+  def from_ids(cls, data):
+    converter = Converter()
+    for object_name, ids in data.items():
+      object_type = IMPORTABLE[object_name]
+      converter.block_converters.append(
+          BlockConverter.from_ids(object_type, ids))
+    return converter
+
+  def to_array(self):
+    csv_data = []
+    for block_converter in self.block_converters:
+      csv_data.extend(block_converter.to_array())
+    return csv_data
+
   def __init__(self, **kwargs):
     self.dry_run = kwargs.get("dry_run", True)
     self.csv_data = kwargs.get("csv_data", [])
@@ -50,13 +66,12 @@ class Converter(object):
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
       converter = BlockConverter.from_csv(
-          data, offset, self.dry_run, self.shared_state)
+          data, offset, self.dry_run, self)
       self.block_converters.append(converter)
 
     order = defaultdict(lambda: len(self.class_order))
-    order.update({c:i for i,c in enumerate(self.class_order)})
+    order.update({c: i for i, c in enumerate(self.class_order)})
     self.block_converters.sort(key=order.get)
-
 
   def gather_new_slugs(self):
     for converter in self.block_converters:

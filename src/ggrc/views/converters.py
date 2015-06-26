@@ -59,12 +59,8 @@ def parse_export_request():
 def handle_export_request():
 
   data = parse_export_request()
-
-  csv_data = []
-  for object_name, ids in data.items():
-    object_type = IMPORTABLE[object_name]
-    block_converter = BlockConverter.from_ids(object_type, ids)
-    csv_data.extend(block_converter.to_array())
+  converter = Converter.from_ids(data)
+  csv_data = converter.to_array()
   csv_string = generate_csv_string(csv_data)
 
   object_names = "_".join(data.keys())
