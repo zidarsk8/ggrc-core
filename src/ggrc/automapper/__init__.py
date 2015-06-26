@@ -16,9 +16,15 @@ from ggrc.automapper.rules import rules
 from ggrc.utils import benchmark
 
 
-Stub = namedtuple("Stub", ["type", "id"])
-stub_from_source = lambda r: Stub(r.source_type, r.source_id)
-stub_from_destination = lambda r: Stub(r.destination_type, r.destination_id)
+class Stub(namedtuple("Stub", ["type", "id"])):
+
+  @classmethod
+  def from_source(cls, relationship):
+    return Stub(relationship.source_type, relationship.source_id)
+
+  @classmethod
+  def from_destination(cls, relationship):
+    return Stub(relationship.destination_type, relationship.destination_id)
 
 
 class AutomapperGenerator(object):
@@ -38,9 +44,9 @@ class AutomapperGenerator(object):
         and_(Relationship.destination_type == obj.type,
              Relationship.destination_id == obj.id),
     )).all()
-    res = set((stub_from_destination(r)
+    res = set((Stub.from_destination(r)
                if r.source_type == obj.type and r.source_id == obj.id
-               else stub_from_source(r))
+               else Stub.from_source(r))
               for r in relationships)
     self.cache[obj] = res
     return res
@@ -53,8 +59,8 @@ class AutomapperGenerator(object):
 
   def generate_automappings(self):
     with benchmark("Automapping generate_automappings"):
-      self.queue.add(self.relate(stub_from_source(self.relationship),
-                     stub_from_destination(self.relationship)))
+      self.queue.add(self.relate(Stub.from_source(self.relationship),
+                     Stub.from_destination(self.relationship)))
       count = 0
       while len(self.queue) > 0:
         if len(self.auto_mappings) > rules.count_limit:
@@ -69,18 +75,22 @@ class AutomapperGenerator(object):
           self._step(dst, src)
 
       if len(self.auto_mappings) <= rules.count_limit:
-        with benchmark("Automapping flush"):
-          db.session.add_all(Relationship(
-              source_type=src.type,
-              source_id=src.id,
-              destination_type=dst.type,
-              destination_id=dst.id,
-              automapping_id=self.relationship.id
-          ) for src, dst in self.auto_mappings)
+        self._flush()
       else:
         self.relationship._json_extras = {
             'automapping_limit_exceeded': True
         }
+
+  def _flush(self):
+    with benchmark("Automapping flush"):
+      db.session.add_all(Relationship(
+          source_type=src.type,
+          source_id=src.id,
+          destination_type=dst.type,
+          destination_id=dst.id,
+          automapping_id=self.relationship.id
+      ) for src, dst in self.auto_mappings)
+      db.session.flush()
 
   def _step(self, src, dst):
       explicit, implicit = rules[src.type, dst.type]

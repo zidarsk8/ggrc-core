@@ -10,7 +10,7 @@ import itertools
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
 
-from ggrc.models import (Regulation, Section, Relationship, 
+from ggrc.models import (Regulation, Section, Relationship,
                          Program, Control, Objective)
 from ggrc import db
 from ggrc.automapper.rules import rules
@@ -173,8 +173,12 @@ class TestAutomappings(TestCase):
         'title': next('Test section'),
         'directive': {'id': regulation.id},
     })
-    objective1 = self.create_object(Objective, {'title': next('Test Objective')})
-    objective2 = self.create_object(Objective, {'title': next('Test Objective')})
+    objective1 = self.create_object(Objective, {
+        'title': next('Test Objective')
+    })
+    objective2 = self.create_object(Objective, {
+        'title': next('Test Objective')
+    })
 
     self.assert_mapping_implication(
         to_create=[(section, objective1), (objective1, objective2)],
