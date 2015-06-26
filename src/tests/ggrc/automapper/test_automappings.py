@@ -73,8 +73,10 @@ class TestAutomappings(TestCase):
       self.assertIsNone(rel,
                         msg='%s mapped to %s' % (obj1.type, obj2.type))
 
-  def assert_mapping_implication(self, to_create, implied):
+  def assert_mapping_implication(self, to_create, implied, relevant=set()):
     objects = set()
+    for obj in relevant:
+      objects.add(obj)
     mappings = set()
     relate = lambda src, dst: (src, dst) if src < dst else (dst, src)
     if type(to_create) is not list:
@@ -117,6 +119,13 @@ class TestAutomappings(TestCase):
         }),
         lambda: self.create_object(Objective, {'title': next('Objective')}),
     )
+    program = self.create_object(Program, {'title': next('Program')})
+    objective1 = self.create_object(Objective, {'title': next('Objective')})
+    objective2 = self.create_object(Objective, {'title': next('Objective')})
+    self.assert_mapping_implication(
+        to_create=[(program, objective1), (objective1, objective2)],
+        implied=[],
+    )
 
   def test_mapping_to_sections(self):
     regulation = self.create_object(Regulation, {
@@ -131,6 +140,14 @@ class TestAutomappings(TestCase):
     self.assert_mapping_implication(
         to_create=(objective, section),
         implied=(objective, regulation),
+
+    )
+
+    program = self.create_object(Program, {'title': next('Program')})
+    self.assert_mapping_implication(
+        to_create=[(objective, program)],
+        implied=[(objective, section), (objective, regulation)],
+        relevant=[regulation, section, objective]
     )
 
   def test_automapping_limit(self):
@@ -163,6 +180,19 @@ class TestAutomappings(TestCase):
             (section, control),
             (regulation, control),
         ]
+    )
+
+    program = self.create_object(Program, {'title': next('Program')})
+    self.assert_mapping_implication(
+        to_create=[(control, program)],
+        implied=[
+            (section, objective),
+            (objective, control),
+            (regulation, objective),
+            (section, control),
+            (regulation, control),
+        ],
+        relevant=[regulation, section, objective, control]
     )
 
   def test_mapping_between_objectives(self):
