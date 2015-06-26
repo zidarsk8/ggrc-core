@@ -69,8 +69,10 @@ class TestBasicCsvImport(TestCase):
         errors.OWNER_MISSING.format(line=4),
         errors.UNKNOWN_USER_WARNING.format(line=6, email="not@a.user"),
         errors.OWNER_MISSING.format(line=6),
-        errors.WRONG_REQUIRED_VALUE.format(line=5, column_name="State"),
-        errors.WRONG_REQUIRED_VALUE.format(line=6, column_name="State"),
+        errors.WRONG_REQUIRED_VALUE.format(line=5, value="",
+                                           column_name="State"),
+        errors.WRONG_REQUIRED_VALUE.format(line=6, value="",
+                                           column_name="State"),
     ])
     response_warnings = response_json[0]["row_warnings"]
     self.assertEqual(expected_warnings, set(response_warnings))
