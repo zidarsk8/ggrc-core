@@ -32,6 +32,7 @@ class ColumnHandler(object):
     self.default = options.get("default")
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
+    self.dry_run = row_converter.block_converter.converter.dry_run
     self.set_value()
 
   def set_value(self):
@@ -96,33 +97,39 @@ class UserColumnHandler(ColumnHandler):
 
   """ Handler for primary and secondary contacts """
 
+  def get_person(self, email):
+    new_emails = self.row_converter.block_converter.converter.new_emails
+    if self.dry_run and email in new_emails:
+      return get_current_user()
+    return Person.query.filter(Person.email == email).first()
+
   def parse_item(self):
     email = self.raw_value
-    person = Person.query.filter(Person.email == email).first()
-    if email and not person:
+    person = self.get_person(email)
+    if not person and email != "":
       self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
     return person
 
 
-class OwnerColumnHandler(ColumnHandler):
+class OwnerColumnHandler(UserColumnHandler):
 
   def parse_item(self):
+    owners = set()
     email_lines = self.raw_value.splitlines()
-    owners = []
     owner_emails = filter(unicode.strip, email_lines)  # noqa
     for raw_line in owner_emails:
       email = raw_line.strip()
-      person = Person.query.filter(Person.email == email).first()
+      person = self.get_person(email)
       if person:
-        owners.append(person)
+        owners.add(person)
       else:
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
     if not owners:
       self.add_warning(errors.OWNER_MISSING)
-      owners.append(get_current_user())
+      owners.add(get_current_user())
 
-    return owners
+    return list(owners)
 
   def set_obj_attr(self):
     if self.value:

@@ -51,14 +51,27 @@ class Converter(object):
     self.new_slugs = defaultdict(set)
     self.new_emails = set()
     self.shared_state = {}
+    self.response_data = []
 
   def import_csv(self):
     self.generate_converters()
+    self.handle_priority_blocks()
     self.generate_row_converters()
     self.import_objects()
     self.gather_new_slugs()
-    self.gather_new_emails()
     self.import_mappings()
+
+  def handle_priority_blocks(self):
+    self.handle_person_blocks()
+
+  def handle_person_blocks(self):
+    while (self.block_converters and
+           self.block_converters[0].object_class.__name__ == "Person"):
+      person_converter = self.block_converters.pop(0)
+      person_converter.generate_row_converters()
+      person_converter.import_objects()
+      _, self.new_emails = person_converter.get_new_values("email")
+      self.response_data.append(person_converter.get_info())
 
   def generate_row_converters(self):
     for converter in self.block_converters:
@@ -74,11 +87,6 @@ class Converter(object):
     order.update({c: i for i, c in enumerate(self.class_order)})
     self.block_converters.sort(key=lambda x: order[x.name])
 
-  def gather_new_emails(self):
-    if self.block_converters[0].object_class.__name__ == "Person":
-      _, self.new_emails = self.block_converters[0].get_new_values("email")
-
-
   def gather_new_slugs(self):
     for converter in self.block_converters:
       object_class, slugs = converter.get_new_values("slug")
@@ -93,8 +101,7 @@ class Converter(object):
       converter.import_mappings(self.new_slugs)
 
   def get_info(self):
-    response_data = []
     for converter in self.block_converters:
       converter.import_mappings(self.new_slugs)
-      response_data.append(converter.get_info())
-    return response_data
+      self.response_data.append(converter.get_info())
+    return self.response_data
