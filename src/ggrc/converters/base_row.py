@@ -107,7 +107,6 @@ class RowConverter(object):
     if not self.obj or self.ignore:
       return
     for mapping in self.mappings.values():
-      mapping.set_slugs(slugs_dict)
       mapping.set_value()
 
   def setup_object(self):

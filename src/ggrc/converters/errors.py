@@ -51,7 +51,7 @@ WRONG_VALUE = ("Line {line}: {column_name} contains invalid data. The value"
                " will be ignored.")
 
 WRONG_REQUIRED_VALUE = ("Line {line}: Required field {column_name} contains"
-                     " invalid data. The default value will be used")
+                     " invalid data '{value}'. The default value will be used")
 
 MISSING_VALUE_ERROR = ("Line {line}: Field {column_name} is required. The line"
                        " will be ignored.")

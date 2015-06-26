@@ -87,6 +87,7 @@ class StatusColumnHandler(ColumnHandler):
     status = self.state_mappings.get(value)
     if not status:
       self.add_warning(errors.WRONG_REQUIRED_VALUE,
+                       value=value[:20],
                        column_name=self.display_name)
     else:
       status = self.get_default()
@@ -213,11 +214,8 @@ class MappingColumnHandler(ColumnHandler):
     self.default = options.get("default")
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
-    self.new_slugs = []
+    self.new_slugs = row_converter.block_converter.converter.new_slugs[self.mapping_object]
     self.dry_run = row_converter.block_converter.converter.dry_run
-
-  def set_slugs(self, slugs_dict):
-    self.new_slugs = slugs_dict.get(self.row_converter.object_class, [])
 
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
@@ -360,17 +358,24 @@ class CheckboxColumnHandler(ColumnHandler):
     return value
 
 COLUMN_HANDLERS = {
-    "slug": SlugColumnHandler,
-    "title": RequiredTextColumnHandler,
-    "owners": OwnerColumnHandler,
-    "status": StatusColumnHandler,
     "contact": UserColumnHandler,
-    "secondary_contact": UserColumnHandler,
-    "start_date": DateColumnHandler,
+    "description": TextareaColumnHandler,
     "end_date": DateColumnHandler,
+    "kind": OptionColumnHandler,
+    "link": TextColumnHandler,
+    "means": OptionColumnHandler,
+    "notes": TextareaColumnHandler,
+    "owners": OwnerColumnHandler,
+    "private": CheckboxColumnHandler,
     "report_end_date": DateColumnHandler,
     "report_start_date": DateColumnHandler,
+    "secondary_contact": UserColumnHandler,
+    "secondary_assessor": UserColumnHandler,
+    "principal_assessor": UserColumnHandler,
+    "slug": SlugColumnHandler,
+    "start_date": DateColumnHandler,
+    "status": StatusColumnHandler,
+    "test_plan": TextareaColumnHandler,
+    "title": RequiredTextColumnHandler,
     "verify_frequency": OptionColumnHandler,
-    "kind": OptionColumnHandler,
-    "private": CheckboxColumnHandler,
 }
