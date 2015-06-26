@@ -173,5 +173,32 @@ class TestCreator(TestCase):
         }, "context": None}})
     self.assertEquals(response.status_code, 403)
 
+  def test_relationships_access(self):
+    """Check if creator cannot access relationship objects"""
+    self.api.set_user(self.users['admin'])
+    _, obj_0 = self.generator.generate(all_models.Regulation, "regulation", {
+        "regulation": {"title": "Test regulation", "context": None},
+    })
+    _, obj_1 = self.generator.generate(all_models.Regulation, "regulation", {
+        "regulation": {"title": "Test regulation 2", "context": None},
+    })
+    response, rel = self.generator.generate(all_models.Relationship, "relationship", {
+        "relationship": {"source": {
+            "id": obj_0.id,
+            "type": "Regulation"
+        }, "destination": {
+            "id": obj_1.id,
+            "type": "Regulation"
+        }, "context": None},
+    })
+    relationship_id = rel.id
+    self.assertEquals(response.status_code, 201)
+    self.api.set_user(self.users['creator'])
+    response = self.api.get_collection(all_models.Relationship, relationship_id)
+    self.assertEquals(response.status_code, 200)
+    num = len(response.json["relationships_collection"]["relationships"])
+    self.assertEquals(num, 0)
+
+
 if __name__ == "__main__":
   unittest.main()

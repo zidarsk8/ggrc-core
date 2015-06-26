@@ -86,6 +86,9 @@ def is_condition(instance, value, property_name):
   return value == property_value
 
 
+def relationship_condition(instance):
+  return True
+
 """
 All functions with a signature
 
@@ -97,6 +100,7 @@ _CONDITIONS_MAP = {
     'contains': contains_condition,
     'is': is_condition,
     'in': contains_condition,
+    'relationship': relationship_condition,
 }
 
 
@@ -119,15 +123,18 @@ class DefaultUserPermissions(UserPermissions):
 
   def _permission_match(self, permission, permissions):
     """Check if the user has the given permission"""
+    has_conditions = permissions\
+        .get(permission.action, {})\
+        .get(permission.resource_type, {})\
+        .get('conditions', False)
     return \
-        permission.resource_id in \
-          permissions\
+        permission.resource_id in permissions\
             .get(permission.action, {})\
             .get(permission.resource_type, {})\
             .get('resources', [])\
         or permission.context_id is None and permissions\
             .get(permission.action, {})\
-            .get(permission.resource_type, False)\
+            .get(permission.resource_type, False) and not has_conditions\
         or permission.context_id in \
           permissions\
             .get(permission.action, {})\
