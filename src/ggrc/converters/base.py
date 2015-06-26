@@ -11,6 +11,18 @@ from ggrc.converters.base_block import BlockConverter
 
 class Converter(object):
 
+  class_order = [
+      "Person",
+      "Program",
+      "Audit",
+      "Policy",
+      "Regulation",
+      "Standard",
+      "Section",
+      "Control",
+      "ControlAssessment",
+  ]
+
   @classmethod
   def from_csv(cls, dry_run, csv_data):
     converter = Converter(dry_run=dry_run, csv_data=csv_data)
@@ -25,15 +37,26 @@ class Converter(object):
 
   def import_csv(self):
     self.generate_converters()
+    self.generate_row_converters()
     self.import_objects()
     self.gather_new_slugs()
     self.import_mappings()
 
+  def generate_row_converters(self):
+    for converter in self.block_converters:
+      converter.generate_row_converters()
+
   def generate_converters(self):
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
-      self.block_converters.append(BlockConverter.from_csv(
-        data, offset, self.dry_run, self.shared_state))
+      converter = BlockConverter.from_csv(
+          data, offset, self.dry_run, self.shared_state)
+      self.block_converters.append(converter)
+
+    order = defaultdict(lambda: len(self.class_order))
+    order.update({c:i for i,c in enumerate(self.class_order)})
+    self.block_converters.sort(key=order.get)
+
 
   def gather_new_slugs(self):
     for converter in self.block_converters:

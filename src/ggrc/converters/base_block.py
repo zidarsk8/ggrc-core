@@ -62,14 +62,10 @@ class BlockConverter(object):
       converter = BlockConverter()
       converter.add_errors(errors.WRONG_OBJECT_TYPE, line=offset + 2)
       return converter
-
     raw_headers, rows = extract_relevant_data(csv_data)
-
     converter = BlockConverter(object_class=object_class, rows=rows,
                                raw_headers=raw_headers, dry_run=dry_run,
                                offset=offset, shared_state=shared_state)
-
-    converter.generate_row_converters()
     return converter
 
   @classmethod
@@ -185,6 +181,8 @@ class BlockConverter(object):
 
   def generate_row_converters(self):
     """ Generate a row converter object for every csv row """
+    if self.ignore:
+      return
     self.row_converters = []
     for i, row in enumerate(self.rows):
       row = RowConverter(self, self.object_class, row=row,
