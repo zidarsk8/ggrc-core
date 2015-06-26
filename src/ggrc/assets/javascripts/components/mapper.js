@@ -47,6 +47,7 @@
         var id = select.data("id"),
             isChecked = select.prop("checked"),
             selected = this.scope.attr("selected");
+
         if (!~selected.indexOf(id)) {
           selected.push(id);
         } else {
@@ -158,6 +159,7 @@
         if (owner) {
           permission_parms.contact_id = owner.id;
         }
+
         this.scope.attr("isLoading", true);
         model_name = _.isString(model_name) ? [model_name] : model_name;
         GGRC.Models.Search
@@ -279,12 +281,16 @@
    [data-toggle='multitype-modal-selector']",
   function (ev) {
     ev.preventDefault();
-    var btn = $(ev.currentTarget);
-
-    GGRC.Controllers.ModalSelector.launch($(this), {
+    var btn = $(ev.currentTarget),
+        data = btn.data();
+    _.each(data, function (val, key) {
+      data[can.camelCaseToUnderscore(key)] = val;
+      delete data[key];
+    });
+    GGRC.Controllers.ModalSelector.launch($(this), _.extend({
       "object": btn.data("join-object-type"),
       "type": btn.data("join-option-type"),
       "join-id": btn.data("join-object-id")
-    });
+    }, data));
   });
 })(window.can, window.can.$);

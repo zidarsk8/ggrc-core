@@ -2148,5 +2148,4 @@
       }.bind(this));
     }
   });
-
 })(window.can, window.can.$);
