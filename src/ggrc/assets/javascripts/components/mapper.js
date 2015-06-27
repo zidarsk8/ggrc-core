@@ -24,8 +24,28 @@
     events: {
       ".modalSearchButton click": function (el, ev) {
         ev.preventDefault();
-        var results = this.element.find("mapper-results").control();
-        results.getResults(this.scope.attr("term"), this.scope.attr("owner"));
+        var results = this.element.find("mapper-results").control(),
+            hasPerson = this.element.find("#search-by-owner").val();
+
+        results.getResults(this.scope.attr("term"), hasPerson && this.scope.attr("owner"));
+      },
+      ".modal-footer .btn-map click": function (el, ev) {
+        ev.preventDefault();
+        var instance = GGRC.page_instance(),
+            data = {};
+
+        data["context"] = null;
+        data["source"] = {
+          href: instance.href,
+          type: instance.type,
+          id: instance.id
+        };
+        _.each(this.scope.attr("selected"), function (desination) {
+          data["destination"] = desination;
+          var model = new CMS.Models.Relationship(data);
+
+          model.save();
+        });
       },
       "#search-by-owner autocomplete:select": function (el, ev, data) {
         this.scope.attr("owner", data.item);
@@ -41,17 +61,24 @@
         this.scope.attr("selected_all", count === this.scope.attr("selected").length);
       },
       "mapper-results onSelectAll": function (el, ev, ids) {
-        this.scope.attr("selected").attr(ids);
+        this.scope.attr("selected", ids);
       },
-      "mapper-results onSelectChange": function (el, ev, select) {
-        var id = select.data("id"),
-            isChecked = select.prop("checked"),
-            selected = this.scope.attr("selected");
+      "mapper-results onSelectChange": function (oEl, oEv, el, ev, item) {
+        var id = el.data("id"),
+            isChecked = el.prop("checked"),
+            selected = this.scope.attr("selected"),
+            needle = {id: item.instance.id},
+            index;
 
-        if (!~selected.indexOf(id)) {
-          selected.push(id);
+        if (!_.findWhere(selected, needle)) {
+          selected.push({
+            id: item.instance.id,
+            type: item.instance.type,
+            href: item.instance.href
+          });
         } else {
-          selected.splice(selected.indexOf(id), 1);
+          index = _.findIndex(selected, needle);
+          selected.splice(index, 1);
         }
       }
     }
@@ -96,17 +123,32 @@
         el.openclose();
       },
       ".object-check-all change": function (el, ev) {
+        var que = new RefreshQueue(),
+            enteries = this.scope.attr("entries");
+
         can.each(this.scope.attr("options"), function (model) {
           model.attr("selected", true);
         });
-        this.element.trigger("onSelectAll", [_.pluck(this.scope.attr("entries"), "id")]);
+        que.enqueue(enteries).trigger().then(function (models) {
+          this.element.trigger("onSelectAll", [_.map(models, function (model) {
+            return {
+              id: model.id,
+              type: model.type,
+              href: model.href
+            };
+          })]);
+        }.bind(this));
       },
       ".tree-item .object-check-single change": function (el, ev) {
         var uid = el.closest(".tree-item").data("id"),
-            isChecked = el.prop("checked", isChecked),
-            item = _.findWhere(this.scope.attr("options"), {id: uid});
+            isChecked = el.prop("checked"),
+            item = _.find(this.scope.attr("options"), function (option) {
+                return option.instance.id === uid;
+              }),
+            args = Array.prototype.slice.call(arguments);
 
-        this.element.trigger.apply(this.element, ["onSelectChange"].concat(arguments));
+        args.push(item);
+        this.element.trigger("onSelectChange", args);
       },
       "drawPage": function () {
         if (this.scope.attr("isLoading") || this.scope.attr("lastPage")) {

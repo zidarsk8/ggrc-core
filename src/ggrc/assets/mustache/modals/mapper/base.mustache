@@ -65,7 +65,6 @@
                     name="owner"
                     value="{{firstnonempty name email title}}"
                     data-lookup="Person"
-                    data-params="Person:is_enabled=1"
                     data-template="/people/autocomplete_result.mustache"
                     null-if-empty="null-if-empty"
                     {{ autocomplete_select }}
@@ -189,7 +188,7 @@
           <span>
             <strong> {{ selected.length }} objects selected </strong>
           </span>
-          <a class="{{^if selected.length}}disabled{{/if}} btn btn-small btn-success preventdoubleclick" data-toggle="modal-submit" data-dismiss="modal" href="javascript://">
+          <a class="{{^if selected.length}}disabled{{/if}} btn-map btn btn-small btn-success preventdoubleclick" href="#">
             Add Selected
           </a>
         </div>
