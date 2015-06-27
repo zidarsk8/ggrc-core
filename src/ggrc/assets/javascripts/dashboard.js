@@ -205,20 +205,6 @@ jQuery(function($) {
     }
   });
 
-  $('body').on('click', 'a.export-link', function(e, el){
-    e.preventDefault();
-    var url = e.currentTarget.href;
-    can.ajax({
-      url: url,
-      success: function(data, status, xhr) {
-        var jsonResult = $.parseJSON($(data).html());
-        setTimeout(function(){
-          checkStatus(jsonResult, "Export");
-        }, 500);
-      }
-    });
-  });
-
   // change button to disabled when no file selected, and vice versa
   $(file_select_elem).change(function(ev) {
     if (this.value === "") {
