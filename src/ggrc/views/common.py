@@ -86,7 +86,8 @@ class BaseObjectView(ModelView):
        'text/html' not in self.request.headers['Accept']:
       return current_app.make_response((
           'text/html', 406, [('Content-Type', 'text/plain')]))
-    if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
+    if not permissions.is_allowed_read(self.model.__name__, obj.id,
+                                       obj.context_id):
       raise Forbidden()
     if not permissions.is_allowed_view_object_page_for(obj):
       raise Forbidden()
@@ -141,6 +142,7 @@ class RedirectedPolymorphView(BaseObjectView):
             'text/html' not in self.request.headers['Accept']:
       return current_app.make_response((
           'text/html', 406, [('Content-Type', 'text/plain')]))
-    if not permissions.is_allowed_read(self.model.__name__, obj.id, obj.context_id):
+    if not permissions.is_allowed_read(self.model.__name__, obj.id,
+                                       obj.context_id):
       raise Forbidden()
     return redirect(view_url_for(obj))
