@@ -170,7 +170,7 @@ class DefaultUserPermissions(UserPermissions):
     resources = self._permissions()\
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
-        .setdefault('resources', {})
+        .setdefault('resources', [])
     if instance.id in resources:
       return True
     conditions = self._permissions()\
