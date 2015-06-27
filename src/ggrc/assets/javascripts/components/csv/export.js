@@ -8,7 +8,7 @@
 (function(can, $) {
 
   can.Component.extend({
-    tag: "csv-template",
+    tag: "csv-export",
     template: "<content></content>",
     scope: {
       url: "/_service/export_csv",
