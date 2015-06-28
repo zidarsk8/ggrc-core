@@ -20,7 +20,8 @@ class TestExportEmptyTemplate(TestCase):
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',
-        "X-Requested-By": "gGRC"
+        "X-Requested-By": "gGRC",
+        "X-export-view": "blocks",
     }
 
   def test_basic_policy_template(self):
@@ -60,7 +61,8 @@ class TestExportWithObjects(TestCase):
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',
-        "X-Requested-By": "gGRC"
+        "X-Requested-By": "gGRC",
+        "X-export-view": "blocks",
     }
     self.import_file("data_for_export_testing.csv")
 
@@ -87,6 +89,15 @@ class TestExportWithObjects(TestCase):
             ]]
         },
         "fields": ["Code", "title", "description"],
+    },{
+        "object_name": "Contract",
+        "filters": {
+            "relevant_filters": [[
+                {"object_name": "Program",
+                 "slugs": ["prog-1", "prog2"]},
+            ]]
+        },
+        "fields": ["Code", "title", "description"],
     }]
 
     response = self.client.post("/_service/export_csv",
@@ -98,3 +109,5 @@ class TestExportWithObjects(TestCase):
     self.assertIn("prog-1", response.data)
     self.assertIn("prog-2", response.data)
     self.assertIn("prog-4", response.data)
+    self.assertIn("con 15", response.data)
+    self.assertIn("con 5", response.data)
