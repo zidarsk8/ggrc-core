@@ -70,8 +70,10 @@ class BlockConverter(object):
     return block_converter
 
   @classmethod
-  def from_ids(cls, converter, object_class, ids=[]):
-    return BlockConverter(converter, object_class=object_class)
+  def from_ids(cls, converter, object_class, ids=[], fields="All"):
+    block_converter = BlockConverter(converter, object_class=object_class,
+                                     fields=fields, ids=ids)
+    return block_converter
 
   def get_unique_counts_dict(self, object_class):
     """ get a the varible for storing unique counts
@@ -88,10 +90,11 @@ class BlockConverter(object):
 
   def __init__(self, converter, **options):
     self.converter = converter
-    self.rows = options.get('rows', [])
-    self.offset = options.get('offset', 0)
-    self.ids = options.get('ids', [])
-    self.object_class = options.get('object_class', )
+    self.rows = options.get("rows", [])
+    self.offset = options.get("offset", 0)
+    self.ids = options.get("ids", [])
+    self.object_class = options.get("object_class", )
+    self.fields = options.get("fields", "All")
     self.block_errors = []
     self.block_warnings = []
     self.row_errors = []
@@ -100,7 +103,8 @@ class BlockConverter(object):
     self.row_converters = []
     if self.object_class:
       self.object_headers = get_object_column_definitions(self.object_class)
-      raw_headers = options.get('raw_headers', [])
+      all_header_names = map(unicode, self.get_header_names().keys())
+      raw_headers = options.get("raw_headers", all_header_names)
       self.headers = self.clean_headers(raw_headers)
       self.unique_counts = self.get_unique_counts_dict(self.object_class)
       self.name = self.object_class._inflector.human_singular.title()
@@ -125,13 +129,12 @@ class BlockConverter(object):
 
   def generate_csv_body(self):
     """ Generate 2D array populated with object values """
-    return []
+    return [r.to_array() for r in self.row_converters]
 
   def to_array(self):
     csv_header = self.generate_csv_header()
     csv_body = self.generate_csv_body()
-    two_empty_rows = [[], []]
-    return csv_header + csv_body + two_empty_rows
+    return csv_header, csv_body
 
   def get_header_names(self):
     """ Get all posible user column names for current object """
@@ -187,6 +190,19 @@ class BlockConverter(object):
     self.row_converters = []
     for i, row in enumerate(self.rows):
       row = RowConverter(self, self.object_class, row=row,
+                         headers=self.headers, index=i)
+      self.row_converters.append(row)
+    self.check_uniq_columns()
+
+  def ids_to_row_converters(self):
+    """ Generate a row converter object for every csv row """
+    if self.ignore or not self.ids:
+      return
+    self.row_converters = []
+    objects = self.object_class.query.filter(
+        self.object_class.id.in_(self.ids)).all()
+    for i, obj in enumerate(objects):
+      row = RowConverter(self, self.object_class, obj=obj,
                          headers=self.headers, index=i)
       self.row_converters.append(row)
     self.check_uniq_columns()

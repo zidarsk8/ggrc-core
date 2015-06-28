@@ -27,7 +27,7 @@ class ColumnHandler(object):
     self.row_converter = row_converter
     self.key = key
     self.value = None
-    self.raw_value = options.get("raw_value").strip()
+    self.raw_value = options.get("raw_value", "").strip()
     self.validator = options.get("validator")
     self.mandatory = options.get("mandatory", False)
     self.default = options.get("default")
@@ -260,7 +260,7 @@ class MappingColumnHandler(ColumnHandler):
 
   def get_value(self):
     related_slugs = []
-    related_ids = RelationshipHelper.get_objects_ids_related_to(
+    related_ids = RelationshipHelper.get_ids_related_to(
         self.mapping_object.__name__,
         self.row_converter.object_class.__name__,
         [self.row_converter.obj.id])

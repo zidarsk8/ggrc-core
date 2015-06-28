@@ -6,10 +6,7 @@
 from os.path import abspath, dirname, join
 from flask.json import dumps
 from flask.json import loads
-from nose.plugins.skip import SkipTest
 
-from ggrc import db
-from ggrc.models import Policy
 from tests.ggrc import TestCase
 from tests.ggrc.generator import GgrcGenerator
 
@@ -27,7 +24,7 @@ class TestExportEmptyTemplate(TestCase):
     }
 
   def test_basic_policy_template(self):
-    data = {"policy": []}
+    data = [{"object_name": "Policy"}]
 
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
@@ -36,13 +33,13 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Policy", response.data)
 
   def test_multiple_empty_objects(self):
-    data = {
-        "policy": [],
-        "regulation": [],
-        "contract": [],
-        "clause": [],
-        "org group": [],
-    }
+    data = [
+        {"object_name": "Policy"},
+        {"object_name": "Regulation"},
+        {"object_name": "Clause"},
+        {"object_name": "OrgGroup"},
+        {"object_name": "Contract"},
+    ]
 
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
@@ -65,8 +62,7 @@ class TestExportWithObjects(TestCase):
         'Content-Type': 'application/json',
         "X-Requested-By": "gGRC"
     }
-    response = self.import_file("data_for_export_testing.csv", dry_run=True)
-
+    self.import_file("data_for_export_testing.csv")
 
   def import_file(self, filename, dry_run=False):
     data = {"file": (open(join(CSV_DIR, filename)), filename)}
@@ -80,4 +76,25 @@ class TestExportWithObjects(TestCase):
     return loads(response.data)
 
   def test_basic_export(self):
-    pass
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "relevant_filters": [[
+                {"object_name": "Contract",
+                 "slugs": ["contract-25", "contract-27"]},
+                {"object_name": "Policy",
+                 "slugs": ["policy-1"]},
+            ]]
+        },
+        "fields": ["Code", "title", "description"],
+    }]
+
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+
+    self.assertIn("contract-25", response.data)
+    self.assertIn("contract-27", response.data)
+    self.assertIn("cat ipsum", response.data)
+    self.assertIn("prog-1", response.data)
+    self.assertIn("prog-2", response.data)
+    self.assertIn("prog-4", response.data)

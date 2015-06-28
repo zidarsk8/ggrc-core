@@ -14,6 +14,7 @@ from ggrc.login import login_required
 from ggrc.converters import IMPORTABLE
 from ggrc.converters.base import Converter
 from ggrc.converters.base import BlockConverter
+from ggrc.converters.query_helper import QueryHelper
 from ggrc.converters.import_helper import generate_csv_string
 from ggrc.converters.import_helper import read_csv_file
 
@@ -30,19 +31,6 @@ def check_required_headers(required_headers):
     raise BadRequest("\n".join(errors))
 
 
-def check_export_request_data():
-  """ Check request.json structure matches dict(str, list(int)) """
-  if type(request.json) is not dict:
-    raise BadRequest("export requst data invalid")
-
-  if not all(isinstance(ids, list) for ids in request.json.values()):
-    raise BadRequest("export requst data invalid")
-
-  for ids in request.json.values():
-    if not all(isinstance(id_, int) for id_ in ids):
-      raise BadRequest("export requst data invalid")
-
-
 def parse_export_request():
   """ Check if request contains all required fields """
   required_headers = {
@@ -50,21 +38,19 @@ def parse_export_request():
       "Content-Type": ["application/json"],
   }
   check_required_headers(required_headers)
-  check_export_request_data()
-
-  export_data = {k: v for k, v in request.json.items() if k in IMPORTABLE}
-  return export_data
+  return request.json
 
 
 def handle_export_request():
 
   data = parse_export_request()
-  converter = Converter.from_ids(data)
+  query_helper = QueryHelper(data)
+  converter = Converter.from_ids(query_helper.get_ids())
   csv_data = converter.to_array()
   csv_string = generate_csv_string(csv_data)
 
-  object_names = "_".join(data.keys())
-  filename = "{}_template.csv".format(object_names)
+  object_names = "_".join(converter.get_object_names())
+  filename = "{}.csv".format(object_names)
 
   headers = [
       ('Content-Type', 'text/csv'),

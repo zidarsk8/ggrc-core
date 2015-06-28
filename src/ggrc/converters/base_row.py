@@ -16,17 +16,16 @@ class RowConverter(object):
     self.block_converter = block_converter
     self.options = options.copy()
     self.object_class = object_class
-    self.obj = None
+    self.obj = options.get("obj")
     self.is_new = True
     self.ignore = False
     self.index = options.get("index", -1)
     self.row = options.get("row", [])
-    self.headers = options.get("headers", [])
     self.attrs = {}
     self.mappings = {}
     offset = 3  # 2 header rows and 1 for 0 based index
     self.line = self.index + self.block_converter.offset + offset
-
+    self.headers = options.get("headers", [])
     self.handle_row_data()
 
   def add_error(self, template, **kwargs):
@@ -38,7 +37,7 @@ class RowConverter(object):
     message = template.format(line=self.line, **kwargs)
     self.block_converter.row_warnings.append(message)
 
-  def handle_row_data(self):
+  def handle_csv_row_data(self):
     """ Pack row data with handlers """
     if len(self.headers) != len(self.row):
       raise Exception("Error: element count does not match header count")
@@ -52,6 +51,21 @@ class RowConverter(object):
         self.attrs[attr_name] = item
     self.obj = self.get_or_generate_object()
     self.chect_mandatory_fields()
+
+  def handle_obj_row_data(self):
+    for i, (attr_name, header_dict) in enumerate(self.headers.items()):
+      Handler = header_dict["handler"]
+      item = Handler(self, attr_name, **header_dict)
+      if attr_name.startswith("map:"):
+        self.mappings[attr_name] = item
+      else:
+        self.attrs[attr_name] = item
+
+  def handle_row_data(self):
+    if self.obj:
+      self.handle_obj_row_data()
+    else:
+      self.handle_csv_row_data()
 
   def chect_mandatory_fields(self):
     if not self.is_new:
@@ -146,3 +160,9 @@ class RowConverter(object):
       return
     for mapping in self.mappings.values():
       mapping.set_obj_attr()
+
+  def to_array(self):
+    slug = self.attrs["slug"].get_value()
+    values = [handler.get_value() for handler in self.attrs.values()]
+    mappings = [handler.get_value() for handler in self.mappings.values()]
+    return [slug] + values + mappings

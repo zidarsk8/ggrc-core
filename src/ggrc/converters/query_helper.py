@@ -89,7 +89,7 @@ class QueryHelper(object):
 
   def get_related_object_ids(self, object_name, related_name, related_slugs):
     related_ids = self.slugs_to_ids(related_name, related_slugs)
-    object_ids = RelationshipHelper.get_objects_ids_related_to(
+    object_ids = RelationshipHelper.get_ids_related_to(
         object_name, related_name, related_ids)
     return object_ids
 

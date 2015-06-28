@@ -31,18 +31,55 @@ class Converter(object):
 
   @classmethod
   def from_ids(cls, data):
+    """ generate converter form list of objects and ids
+
+    Args:
+      data (list of tuples): List containing tuples with object_name and
+                             a list of ids for that object
+    """
+    object_map = {o.__name__: o for o in IMPORTABLE.values()}
     converter = Converter()
-    for object_name, ids in data.items():
-      object_type = IMPORTABLE[object_name]
-      converter.block_converters.append(
-          BlockConverter.from_ids(converter, object_type, ids))
+    for object_data in data:
+      object_class = object_map[object_data["object_name"]]
+      id_list = object_data.get("ids", [])
+      fields = object_data.get("fields")
+      block_converter = BlockConverter.from_ids(
+          converter, object_class, ids=id_list, fields=fields)
+      block_converter.ids_to_row_converters()
+      converter.block_converters.append(block_converter)
+
     return converter
 
-  def to_array(self):
+  def to_array(self, data_grid=False):
+    if data_grid:
+      return self.to_data_grid()
+    return self.to_block_array()
+
+  def to_block_array(self):
+    """ exporting each in it's own block separated by empty lines
+
+    Generate 2d array where each cell represents a cell in a csv file
+    """
     csv_data = []
     for block_converter in self.block_converters:
-      csv_data.extend(block_converter.to_array())
+      csv_header, csv_body = block_converter.to_array()
+      # multi block csv must have first column empty
+      [line.insert(0, "") for line in csv_body]
+      two_empty_lines = [[], []]
+      csv_data.extend(csv_header + csv_body + two_empty_lines)
     return csv_data
+
+  def to_data_grid(self):
+    """ multi join datagrid with all objects in one block
+
+    Generate 2d array where each cell represents a cell in a csv file
+    """
+    grid_body = []
+    grid_header = []
+    for block_converter in self.block_converters:
+      csv_header, csv_body = block_converter.to_array()
+      [line.pop(0) for line in csv_header]
+    return grid_header + grid_body
 
   def __init__(self, **kwargs):
     self.dry_run = kwargs.get("dry_run", True)
@@ -105,3 +142,6 @@ class Converter(object):
       converter.import_mappings(self.new_slugs)
       self.response_data.append(converter.get_info())
     return self.response_data
+
+  def get_object_names(self):
+    return [c.object_class.__name__ for c in self.block_converters]
