@@ -41,11 +41,24 @@ class QueryHelper(object):
   """
 
   def __init__(self, query):
-    self.query = self.clean_query(query)
     self.object_map = {o.__name__: o for o in IMPORTABLE.values()}
+    self.query = self.clean_query(query)
 
   def clean_query(self, query):
+    for object_query in query:
+      filters = object_query.get("filters", {}).get("relevant_filters")
+      self.clean_relevant_filters(filters)
     return query
+
+  def clean_relevant_filters(self, filters):
+    if not filters:
+      return
+    for or_filter in filters:
+      for and_filter in or_filter:
+        ids = and_filter.get("ids", [])
+        ids.extend(self.slugs_to_ids(and_filter["object_name"],
+                                     and_filter["slugs"]))
+        and_filter["ids"] = ids
 
   def get_ids(self):
     for object_query in self.query:
@@ -77,21 +90,15 @@ class QueryHelper(object):
     """ get object ids by relevancy filters """
     results = set()
     for or_filters in filters:
-      and_results = [self.get_related_object_ids(
+      and_results = [RelationshipHelper.get_ids_related_to(
           object_name,
           and_filter["object_name"],
-          and_filter["slugs"],
+          and_filter["ids"],
       )for and_filter in or_filters]
       and_results = map(set, and_results)
       and_results = reduce(set.intersection, and_results)
       results |= and_results
     return results
-
-  def get_related_object_ids(self, object_name, related_name, related_slugs):
-    related_ids = self.slugs_to_ids(related_name, related_slugs)
-    object_ids = RelationshipHelper.get_ids_related_to(
-        object_name, related_name, related_ids)
-    return object_ids
 
   def slugs_to_ids(self, object_name, slugs):
     object_class = self.object_map.get(object_name)
