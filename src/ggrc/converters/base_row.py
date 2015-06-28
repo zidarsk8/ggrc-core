@@ -164,5 +164,6 @@ class RowConverter(object):
   def to_array(self):
     slug = self.attrs["slug"].get_value()
     values = [handler.get_value() for handler in self.attrs.values()]
+    str_values = [v or "" for v in values]
     mappings = [handler.get_value() for handler in self.mappings.values()]
-    return [slug] + values + mappings
+    return [slug] + str_values + mappings
