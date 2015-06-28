@@ -4,6 +4,8 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from collections import defaultdict
+from itertools import product
+from itertools import chain
 
 from ggrc.converters import IMPORTABLE
 from ggrc.converters.import_helper import split_array
@@ -74,12 +76,14 @@ class Converter(object):
 
     Generate 2d array where each cell represents a cell in a csv file
     """
-    grid_body = []
+    grid_blocks = []
     grid_header = []
     for block_converter in self.block_converters:
       csv_header, csv_body = block_converter.to_array()
-      [line.pop(0) for line in csv_header]
-    return grid_header + grid_body
+      grid_header.extend(csv_header[1][:1])
+      grid_blocks.append(csv_body)
+    grid_data = [list(chain(*i)) for i in product(*grid_blocks)]
+    return [grid_header] + grid_data
 
   def __init__(self, **kwargs):
     self.dry_run = kwargs.get("dry_run", True)
