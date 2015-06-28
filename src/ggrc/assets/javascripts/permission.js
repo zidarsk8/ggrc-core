@@ -106,10 +106,10 @@ can.Construct("Permission", {
     if (~resources.indexOf(instance.id)) {
       return true;
     }
-    // FIXME Check for basic resource permission
-    //if (!_is_allowed(permissions, new Permission(action, instance_type, context.id))) {
-      //return false;
-    //}
+    if (!this._is_allowed(permissions,
+        new Permission(action, instance_type, context.id))) {
+      return false;
+    }
 
     // Check any conditions applied per instance
     if (conditions.length === 0) return true;
