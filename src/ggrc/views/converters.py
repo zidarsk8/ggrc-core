@@ -11,9 +11,7 @@ from werkzeug.exceptions import BadRequest
 
 from ggrc.app import app
 from ggrc.login import login_required
-from ggrc.converters import IMPORTABLE
 from ggrc.converters.base import Converter
-from ggrc.converters.base import BlockConverter
 from ggrc.converters.query_helper import QueryHelper
 from ggrc.converters.import_helper import generate_csv_string
 from ggrc.converters.import_helper import read_csv_file
@@ -36,17 +34,19 @@ def parse_export_request():
   required_headers = {
       "X-Requested-By": ["gGRC"],
       "Content-Type": ["application/json"],
+      "X-export-view": ["blocks", "grid"],
   }
   check_required_headers(required_headers)
-  return request.json
+  data_grid = request.headers["X-export-view"] == "grid"
+  return data_grid, request.json
 
 
 def handle_export_request():
 
-  data = parse_export_request()
+  data_grid, data = parse_export_request()
   query_helper = QueryHelper(data)
   converter = Converter.from_ids(query_helper.get_ids())
-  csv_data = converter.to_array()
+  csv_data = converter.to_array(data_grid)
   csv_string = generate_csv_string(csv_data)
 
   object_names = "_".join(converter.get_object_names())
