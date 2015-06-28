@@ -18,6 +18,7 @@ from ggrc.models import CustomAttributeDefinition
 from ggrc.models import Option
 from ggrc.models import Person
 from ggrc.models import Relationship
+from ggrc.models.relationship import RelationshipHelper
 
 
 class ColumnHandler(object):
@@ -33,7 +34,6 @@ class ColumnHandler(object):
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
     self.dry_run = row_converter.block_converter.converter.dry_run
-    self.set_value()
 
   def set_value(self):
     self.value = self.parse_item()
@@ -111,6 +111,12 @@ class UserColumnHandler(ColumnHandler):
       self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
     return person
 
+  def get_value(self):
+    person = getattr(self.row_converter.obj, self.key)
+    if person:
+      return person.email
+    return self.value
+
 
 class OwnerColumnHandler(UserColumnHandler):
 
@@ -137,6 +143,10 @@ class OwnerColumnHandler(UserColumnHandler):
       for owner in self.value:
         self.row_converter.obj.owners.append(owner)
 
+  def get_value(self):
+    emails = [owner.email for owner in self.row_converter.obj.owners]
+    return "\n".join(emails)
+
 
 class SlugColumnHandler(ColumnHandler):
 
@@ -154,6 +164,10 @@ class DateColumnHandler(ColumnHandler):
     except:
       self.add_error(
           u"Unknown date format, use YYYY-MM-DD or MM/DD/YYYY format")
+
+  def get_value(self):
+    date = getattr(self.row_converter.obj, self.key)
+    return date.strftime("%m/%d/%Y")
 
 
 class TextColumnHandler(ColumnHandler):
@@ -214,7 +228,8 @@ class MappingColumnHandler(ColumnHandler):
     self.default = options.get("default")
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
-    self.new_slugs = row_converter.block_converter.converter.new_slugs[self.mapping_object]
+    self.new_slugs = row_converter.block_converter.converter.new_slugs[
+        self.mapping_object]
     self.dry_run = row_converter.block_converter.converter.dry_run
 
   def parse_item(self):
@@ -242,6 +257,18 @@ class MappingColumnHandler(ColumnHandler):
         mapping = Relationship(source=current_obj, destination=obj)
         db.session.add(mapping)
     db.session.flush()
+
+  def get_value(self):
+    related_slugs = []
+    related_ids = RelationshipHelper.get_objects_ids_related_to(
+        self.mapping_object.__name__,
+        self.row_converter.object_class.__name__,
+        [self.row_converter.obj.id])
+    if related_ids:
+      related_objects = self.mapping_object.query.filter(
+          self.mapping_object.id.in_(related_ids))
+      related_slugs = [o.slug for o in related_objects]
+    return "\n".join(related_slugs)
 
 
 types = CustomAttributeDefinition.ValidTypes
@@ -356,6 +383,10 @@ class CheckboxColumnHandler(ColumnHandler):
     if self.raw_value.lower() not in ("yes", "true", "no", "false"):
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
     return value
+
+  def get_value(self):
+    val = getattr(self.row_converter.obj, self.key, False)
+    return "true" if val else "false"
 
 COLUMN_HANDLERS = {
     "contact": UserColumnHandler,

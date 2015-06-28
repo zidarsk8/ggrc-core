@@ -48,6 +48,7 @@ class RowConverter(object):
       if attr_name.startswith("map:"):
         self.mappings[attr_name] = item
       else:
+        item.set_value()
         self.attrs[attr_name] = item
     self.obj = self.get_or_generate_object()
     self.chect_mandatory_fields()
@@ -91,7 +92,7 @@ class RowConverter(object):
     """ Get object if the slug is in the system or return a new object """
     value = self.get_value(key)
     if value is None:
-      self.add_error(errors.MISSING_COLUMN, s="", column_name=key)
+      self.add_error(errors.MISSING_COLUMN, s="", column_names=key)
       return
     obj = None
     self.is_new = False
