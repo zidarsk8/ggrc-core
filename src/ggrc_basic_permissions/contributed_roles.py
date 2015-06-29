@@ -5,7 +5,7 @@
 
 from ggrc.extensions import get_extension_modules
 from ggrc_basic_permissions.roles import (
-    Auditor, AuditorProgramReader, AuditorReader, ObjectEditor,
+    Auditor, AuditorProgramReader, AuditorReader, Editor,
     ProgramAuditEditor, ProgramAuditOwner, ProgramAuditReader,
     ProgramBasicReader, ProgramCreator, ProgramEditor, ProgramMappingEditor,
     ProgramOwner, ProgramReader, Reader, Creator
@@ -141,7 +141,7 @@ class BasicRoleDeclarations(RoleDeclarations):
         'Reader': Reader,
         'Creator': Creator,
         'ProgramCreator': ProgramCreator,
-        'ObjectEditor': ObjectEditor,
+        'Editor': Editor,
         'ProgramBasicReader': ProgramBasicReader,
         'ProgramMappingEditor': ProgramMappingEditor,
         'ProgramOwner': ProgramOwner,
@@ -181,13 +181,11 @@ class BasicRoleImplications(DeclarativeRoleImplications):
           'ProgramReader': ['ProgramBasicReader'],
       },
       (None, None): {
-          'Reader': ['Creator'],
-          'ObjectEditor': ['Creator'],
-          'ProgramCreator': ['ObjectEditor'],
+          'ProgramCreator': ['Editor'],
       },
       (None, 'Program'): {
           'ProgramCreator': ['ProgramMappingEditor'],
-          'ObjectEditor': ['ProgramMappingEditor'],
+          'Editor': ['ProgramMappingEditor'],
           'Reader': ['ProgramReader'],
       },
   }

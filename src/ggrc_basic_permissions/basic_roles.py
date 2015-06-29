@@ -19,12 +19,12 @@ def reader():
 
 def creator():
   return _find_basic('Creator')
-  
+
 def program_creator():
   return _find_basic('ProgramCreator')
 
-def object_editor():
-  return _find_basic('ObjectEditor')
+def editor():
+  return _find_basic('Editor')
 
 def program_basic_reader():
   return _find_basic('ProgramBasicReader')

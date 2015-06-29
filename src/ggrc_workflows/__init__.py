@@ -865,7 +865,7 @@ class WorkflowRoleContributions(RoleContributions):
           'read': [],
           'create': ['Workflow'],
       },
-      'ObjectEditor': {
+      'Editor': {
           'read': ['Workflow'],
           'create': ['Workflow'],
       },
@@ -900,7 +900,7 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
   implications = {
       (None, 'Workflow'): {
           'ProgramCreator': ['BasicWorkflowReader'],
-          'ObjectEditor': ['BasicWorkflowReader'],
+          'Editor': ['BasicWorkflowReader'],
           'Reader': ['BasicWorkflowReader'],
           'Creator': ['WorkflowBasicReader'],
       },
