@@ -14,6 +14,7 @@ from ggrc.services.common import Resource
 from ggrc import db
 from ggrc.automapper.rules import rules
 from ggrc.utils import benchmark
+from ggrc.rbac.permissions import is_allowed_update
 
 
 class Stub(namedtuple("Stub", ["type", "id"])):
@@ -67,7 +68,10 @@ class AutomapperGenerator(object):
           break
         count += 1
         src, dst = entry = self.queue.pop()
-        # TODO check that user can see both objects
+
+        if not (self._can_map_to(src) and self._can_map_to(dst)):
+          continue
+
         self._ensure_relationship(src, dst)
         self.processed.add(entry)
         with benchmark("Automapping _step: %d" % count):
@@ -80,6 +84,9 @@ class AutomapperGenerator(object):
         self.relationship._json_extras = {
             'automapping_limit_exceeded': True
         }
+
+  def _can_map_to(self, obj):
+    return is_allowed_update(obj.type, obj.id, self.relationship.context)
 
   def _flush(self):
     with benchmark("Automapping flush"):
