@@ -17,7 +17,7 @@ from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
 revision = '1d1e9807c46c'
-down_revision = '1306a9036135'
+down_revision = '3261848aaa2b'
 
 
 def upgrade():
