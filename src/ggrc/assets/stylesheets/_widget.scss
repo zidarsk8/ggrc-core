@@ -185,13 +185,17 @@
                 margin: 0;
                 text-transform: none;
                 float: right;
-                width: 25%;
-                label {
-                  display: inline-block;
+                width: 20%;
+                a {
+                  margin: 0;
+                  text-decoration: underline;
+                  text-align: right;
                   cursor: pointer;
-                }
-                input {
-                  margin-top: -3px;
+                  color: #505050;
+                  &:hover {
+                    text-decoration: none;
+                    background-color: #eeeeee;
+                  }
                 }
               }
             }

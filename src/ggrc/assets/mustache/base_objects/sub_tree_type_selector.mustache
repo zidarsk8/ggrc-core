@@ -26,25 +26,15 @@
         </select>
       </h5>
 
-      <!--h5>Select object type for {{model.title_singular}}</h5-->
       <ul class="model-list select-clear-all">
         <li>
-          <label class="checkbox-inline">
-            Select all: 
-            <input type="checkbox"
-              class="notify-wrap select-all-checkbox"
-            >
-          </label>
+          <a href="javascript://" class="select-all">Select all </a>
         </li>
         <li>
-          <label class="checkbox-inline">
-            Select none: 
-            <input type="checkbox"
-              class="notify-wrap clear-all-checkbox"
-            >
-          </label>
+          <a href="javascript://" class="select-none">Select none </a>
         </li>
       </ul>
+
       <ul class="model-list">
         {{#selected_child_tree_model_list}}
         <li>
