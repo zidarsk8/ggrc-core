@@ -120,10 +120,12 @@
         select: function(ev, ui) {
           var original_event,
             that = this,
-            ctl = $(this).data($(this).data("autocomplete-widget-name")).options.controller
+            $this = $(this),
+            ctl = $this.data($this.data("autocomplete-widget-name")).options.controller
           ;
 
           if (ui.item) {
+            $this.trigger("autocomplete:select", [ui]);
             if (ctl.scope && ctl.scope.autocomplete_select) {
               return ctl.scope.autocomplete_select($(this), ev, ui);
             } else if (ctl.autocomplete_select) {

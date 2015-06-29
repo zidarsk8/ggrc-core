@@ -1,8 +1,8 @@
 /*!
-    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: ivan@reciprocitylabs.com
-    Maintained By: ivan@reciprocitylabs.com
+  Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: ivan@reciprocitylabs.com
+  Maintained By: ivan@reciprocitylabs.com
 */
 
 (function(can, $) {
@@ -64,7 +64,6 @@
         var $el = $(ev.currentTarget),
             val = $el.val(),
             index = this.getIndex($el);
-
       }
     }
   });
@@ -87,5 +86,40 @@
     }
   });
 
-  $("#csv_export").html(can.view(GGRC.mustache_path + "/import_export/export.mustache", {}));
+  can.Component.extend({
+    tag: "csv-relevance-filter",
+    template: "<content />",
+    scope: {
+      panels: [],
+      menu: can.map(["Program", "Regulation", "Policy", "Standard", "Contract",
+                    "Clause", "Section", "Objective", "Control", "Person", 
+                    "System", "Process", "DataAsset", "Product", "Project",
+                    "Facility", "Market"], 
+                    function (key) {
+                      return CMS.Models[key];
+                    })
+    },
+    events: {
+      ".add-filter-rule click": function (el, ev) {
+        ev.preventDefault();
+        this.scope.panels.push({
+          value: "",
+          filter: new can.Map(),
+          model_name: this.scope.menu[0].model_singular
+        });
+      },
+      ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
+        var index = el.data("index"),
+            panel = this.scope.attr("panels")[index];
+
+        panel.attr("filter", data.item);
+      },
+      ".remove_filter click": function (el) {
+        this.scope.panels.splice(el.data("index"), 1);
+      }
+    }
+  });
+
+  $("#csv_export").html(can.view(GGRC.mustache_path + 
+                                 "/import_export/export.mustache", {}));
 })(window.can, window.can.$);

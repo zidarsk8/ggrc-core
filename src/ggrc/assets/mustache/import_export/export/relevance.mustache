@@ -6,42 +6,44 @@
 }}
 
 <csv-relevance-filter>
-  <div class="relevance-filters">
-    <div class="row-fluid">
-      <div class="span12">
-        <h6>Add filters by mapping relevance</h6>
-        {{#panel}}
-          <div class="single-line-filter">
-          <button type="submit" class="remove_filter">
-            <i class="grcicon-deleted"></i>
-          </button>
-          <label><strong>Relevant to:</strong></label>
-          <select class="input-small relevant-set-choose">
-            <option value="Program" label="Program">Program</option>
-            <option value="Regulation">Regulation</option>
-            <option value="Policy">Policy</option>
-            <option value="Standard">Standard</option>
-            <option value="Contract">Contract</option>
-            <option value="Clause">Clause</option>
-            <option value="Section">Section</option>
-            <option value="Objective">Objective</option>
-            <option value="Control">Control</option>
-            <option value="Person">Person</option>
-            <option value="System">System</option>
-            <option value="Process">Process</option>
-            <option value="DataAsset">Data Asset</option>
-            <option value="Product">Product</option>
-            <option value="Project">Project</option>
-            <option value="Facility">Facility</option>
-            <option value="Market">Market</option>
-          </select>
-          <input class="input-large search-icon search-filter0 ui-autocomplete-input" placeholder="Type to search for object" type="text" name="" value="">
-        {{/panel}}
-        </div>
-        <div class="add-rule">
-          <a href="#" id="addFilterRule" class="addFilterRule">+ Add New Rule</a>
-        </div>
+  <h6>Filter by mapping relevance</h6>
+  {{#each panels}}
+  <div class="single-line-filter">
+    <button type="submit" data-index="{{@index}}" class="remove_filter">
+      <i class="grcicon-deleted"></i>
+    </button>
+    <label>
+      {{#if @index}}AND {{/if}}Relevant to:
+    </label>
+    <select class="input-small filter-type-selector select-filter{{@index}}" 
+            can-value="model_name">
+      {{#menu}}
+      <option
+        value="{{model_singular}}"
+        label="{{title_singular}}">
+      </option>
+      {{/menu}}
+    </select>
+    {{#filter}}
+    {{#model_name}}
+      <div class="modal-search objective-selector">
+        <input
+          class="input-large search-icon search-filter-{{@index}}"
+          placeholder="Enter text to search for {{model_name}}"
+          type="text"
+          data-index="{{@index}}"
+          name="filter_list.{{@index}}.filter"
+          value="{{firstnonempty filter.name filter.email filter.title}}"
+          data-lookup="{{this}}"
+          data-template="/{{#if_equals model_name 'Person'}}people{{else}}base_objects{{/if_equals}}/autocomplete_result.mustache"
+          {{ autocomplete_select }}
+          >
       </div>
-    </div>
+    {{/model_name}}
+    {{/filter}}
+  </div>
+  {{/each}}
+  <div class="add-rule">
+    <a href="javascript://" class="add-filter-rule">+ Add New Rule</a>
   </div>
 </csv-relevance-filter>
