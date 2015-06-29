@@ -127,6 +127,12 @@ class DefaultUserPermissions(UserPermissions):
         .get(permission.action, {})\
         .get(permission.resource_type, {})\
         .get('conditions', False)
+    if None in \
+      permissions\
+        .get(permission.action, {})\
+        .get(permission.resource_type, {})\
+        .get('contexts', []):
+      return True
     return \
         permission.resource_id in permissions\
             .get(permission.action, {})\

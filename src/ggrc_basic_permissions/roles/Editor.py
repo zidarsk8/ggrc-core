@@ -4,6 +4,7 @@ description = """
   """
 permissions = {
     "read": [
+        "Audit",
         "Categorization",
         "Category",
         "ControlCategory",
@@ -53,6 +54,7 @@ permissions = {
         },
     ],
     "create": [
+        "Audit",
         "Workflow"
         "Categorization",
         "Category",
@@ -109,6 +111,7 @@ permissions = {
         "__GGRC_ALL__"
     ],
     "update": [
+        "Audit",
         "Workflow"
         "Categorization",
         "Category",
@@ -161,6 +164,7 @@ permissions = {
         },
     ],
     "delete": [
+        "Audit",
         "Workflow"
         "Categorization",
         "Category",
