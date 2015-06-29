@@ -29,7 +29,7 @@
       panels: function () {
         if (!this._panels.length) {
           this._panels.push({
-            type: "Programs",
+            type: "Program",
             index: 0
           });
         }
@@ -44,7 +44,7 @@
         data = data || {};
         var index = this.scope.attr("_index") + 1;
         if (!data.type) {
-          data.type = "Programs";
+          data.type = "Program";
         }
 
         this.scope.attr("_index", index);
@@ -72,9 +72,17 @@
     tag: "export-panel",
     template: "<content></content>",
     scope: {
-      index: "@"
+      index: "@",
+      type: "@",
+      columns: []
     },
     events: {
+      ".option-type-selector change": function (el, ev) {
+        var $el = $(ev.currentTarget),
+            val = $el.val();
+
+        this.scope.attr("columns", CMS.Models[val].tree_view_options.attr_list);
+      }
     },
     helpers: {
       first_panel: function (options) {

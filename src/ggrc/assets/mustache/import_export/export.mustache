@@ -29,7 +29,7 @@
       <div class="relevant-filter-group">
         {{#panels}}
           <div class="new-relevant-block">
-            <export-panel index="{{index}}">
+            <export-panel type="{{type}}"  index="{{index}}">
               <div class="row-fluid">
                 <div class="span4">
                   <h6>
@@ -45,7 +45,7 @@
                         <i class="grcicon-deleted"></i>
                       </button>
                     {{/first_panel}}
-                    <select class="input-block-level option-type-selector">
+                    <select can-value="type" class="input-block-level option-type-selector">
                       <optgroup label="Governance">
                         <option value="Program">Programs</option>
                         <option value="Regulation">Regulations</option>
