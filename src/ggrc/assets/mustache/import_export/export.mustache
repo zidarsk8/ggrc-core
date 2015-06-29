@@ -28,8 +28,8 @@
     <export-type>
       <div class="relevant-filter-group">
         {{#panels}}
-          <export-panel index="{{index}}">
-            <div class="new-relevant-block">
+          <div class="new-relevant-block">
+            <export-panel index="{{index}}">
               <div class="row-fluid">
                 <div class="span4">
                   <h6>
@@ -78,12 +78,12 @@
               {{> /static/mustache/import_export/export/attribute_selector.mustache}}
               {{> /static/mustache/import_export/export/filter_query.mustache}}
               {{> /static/mustache/import_export/export/relevance.mustache}}
-            </div>
-          </export-panel>
+            </export-panel>
+          </div>
         {{/panels}}
       </div>
       <div class="add-rule add-object">
-        <a href="#" id="addRelevantFilterRule" class="addFilterRule btn btn-small btn-info">Export another object type</a>
+        <a href="#" id="addAnotherObjectType" class="addFilterRule btn btn-small btn-info">Export another object type</a>
       </div>
     </export-type>
   </div>

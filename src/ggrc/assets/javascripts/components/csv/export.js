@@ -56,7 +56,7 @@
         var index = this.getIndex(el);
         this.scope.attr("_panels").splice(index, 1);
       },
-      "#addRelevantFilterRule click": function (el, ev) {
+      "#addAnotherObjectType click": function (el, ev) {
         ev.preventDefault();
         this.addPanel();
       },
