@@ -300,17 +300,31 @@
       function (conf) {
         return conf.split(' ');
       });
+
     //Update GGRC.base_widgets_by_type for tree_view of each widget type
     if (!GGRC.tree_view) {
       GGRC.tree_view = {};
     }
     GGRC.tree_view.base_widgets_by_type = base_widgets_by_type;
+
     var model_names = Object.keys(base_widgets_by_type);
-    //Remove Person, not loaded for my_work page
-    model_names.splice(model_names.indexOf("Person"), 1);
     model_names.sort();
+    var possible_model_type = model_names.slice();
+    possible_model_type.push("Request"); //Missing model-type by selection
     can.each(model_names, function (name) {
-      GGRC.tree_view.child_tree_model_list.push({model_name: name, display_name: CMS.Models[name].title_singular})
+      GGRC.tree_view.basic_model_list.push({model_name: name, display_name: CMS.Models[name].title_singular});
+      //Initialize child_model_list, and child_display_list each model_type
+      var w_list  = base_widgets_by_type[name], child_model_list = [];
+      w_list.sort();
+      can.each(w_list, function (item) {
+        if (possible_model_type.indexOf(item) !== -1) {
+          child_model_list.push({model_name: item, display_name: CMS.Models[item].title_singular});
+        }
+      });
+      GGRC.tree_view.sub_tree_for[name] = {};
+      GGRC.tree_view.sub_tree_for[name].model_list = child_model_list;
+      GGRC.tree_view.sub_tree_for[name].display_list =
+        CMS.Models[name].tree_view_options.child_tree_display_list || w_list;
     });
 
     function sort_sections(sections) {
@@ -948,6 +962,7 @@
 
       widget_list.add_widget(object.constructor.shortName, widget_id, descriptor);
     });
+
   });
 
 })(window.can, window.can.$);

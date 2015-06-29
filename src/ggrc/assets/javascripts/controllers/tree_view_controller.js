@@ -21,7 +21,7 @@ function _firstElementChild(el) {
 if (!GGRC.tree_view) {
   GGRC.tree_view = {};
 }
-GGRC.tree_view.child_tree_model_list = new can.Observe.List([]);
+GGRC.tree_view.basic_model_list = new can.Observe.List([]);
 GGRC.tree_view.sub_tree_for = [];
 
 function _display_tree_subpath(el, path, attempt_counter) {
@@ -449,53 +449,21 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
   init_child_tree_display: function (model) {
     //Set child tree options
-    var i, model_name = model.model_singular, all_obj_list = [],
+    var model_name = model.model_singular,
         child_tree_model_list = [], w_list,
-        def_child_tree_display_list, saved_child_tree_display_list,
-        child_tree_display_list = [],
         valid_models = Object.keys(GGRC.tree_view.base_widgets_by_type);
 
-    //Create child tree model list for each model type as defined in business_object.js file
     w_list = GGRC.tree_view.base_widgets_by_type[model_name]; //possible widget/mapped model_list
     if (w_list === undefined) {
-      child_tree_model_list = GGRC.tree_view.child_tree_model_list;
-    } else { //create child_tree_model_list
-      w_list.sort();
-      can.each(w_list, function (m_name) {
-        if (valid_models.indexOf(m_name) !== -1) {
-          child_tree_model_list.push({model_name: m_name, display_name: CMS.Models[m_name].title_singular});
-        }
-      });
-    }
-    //Update model_list check boxes for each object type
-    GGRC.tree_view.sub_tree_for[model_name] = {};
-    GGRC.tree_view.sub_tree_for[model_name].model_list = child_tree_model_list;
-
-    can.each(child_tree_model_list, function(item) {
-      all_obj_list.push(item.model_name);
-    });
-
-
-    // Get child_tree_display_list from local storage
-    saved_child_tree_display_list = this.display_prefs.getChildTreeDisplayList(model_name);
-
-    if (saved_child_tree_display_list !== null) {
-      child_tree_display_list = saved_child_tree_display_list;
-      GGRC.tree_view.sub_tree_for[model_name].display_list = saved_child_tree_display_list;
-    } else {
-      GGRC.tree_view.sub_tree_for[model_name].display_list =
-                  model.tree_view_options.child_tree_display_list || all_obj_list;
+      child_tree_model_list = GGRC.tree_view.basic_model_list;
+      GGRC.tree_view.sub_tree_for[model_name] = {};
+      GGRC.tree_view.sub_tree_for[model_name].model_list = child_tree_model_list;
+      GGRC.tree_view.sub_tree_for[model_name].display_list = valid_models;
     }
 
-    //set up display status for UI
-    for (i = 0; i < child_tree_model_list.length; i++) {
-      var obj = child_tree_model_list[i];
-      obj.display_status = child_tree_display_list.indexOf(obj.model_name) !== -1;
-    }
-
-    this.options.attr('child_tree_model_list', child_tree_model_list);
-    this.options.attr('selected_child_tree_model_list', child_tree_model_list);
-    this.options.attr('select_model_list', GGRC.tree_view.child_tree_model_list);
+    this.options.attr('child_tree_model_list', GGRC.tree_view.sub_tree_for[model_name].model_list);
+    this.options.attr('selected_child_tree_model_list', GGRC.tree_view.sub_tree_for[model_name].model_list);
+    this.options.attr('select_model_list', GGRC.tree_view.basic_model_list);
     this.options.attr('selected_model_name', model_name);
   },
 

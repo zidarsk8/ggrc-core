@@ -26,7 +26,6 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
   , update: "PUT /api/section_bases/{id}"
   , destroy: "DELETE /api/section_bases/{id}"
   , mixins : ["ownable", "contactable"]
-  , child_tree_display_list : ['Objective']
 
   , model: function(params) {
       if (this.shortName !== 'SectionBase')
@@ -92,7 +91,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
-    , child_tree_display_list : CMS.Models.SectionBase.child_tree_display_list
+    , child_tree_display_list : ['Objective']
     , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
     , child_options : [{
         model : can.Model.Cacheable
@@ -149,7 +148,7 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
     , attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
-    , child_tree_display_list : CMS.Models.SectionBase.child_tree_display_list
+    , child_tree_display_list : ['Objective']
     , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
     , child_options: [{
         model: can.Model.Cacheable
