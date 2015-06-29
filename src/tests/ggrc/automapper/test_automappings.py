@@ -136,13 +136,11 @@ class TestAutomappings(TestCase):
         'directive': {'id': regulation.id},
     })
     objective = self.create_object(Objective, {'title': next('Objective')})
-
     self.assert_mapping_implication(
         to_create=(objective, section),
         implied=(objective, regulation),
 
     )
-
     program = self.create_object(Program, {'title': next('Program')})
     self.assert_mapping_implication(
         to_create=[(objective, program)],
@@ -172,7 +170,6 @@ class TestAutomappings(TestCase):
     })
     control = self.create_object(Control, {'title': next('Test control')})
     objective = self.create_object(Objective, {'title': next('Test control')})
-
     self.assert_mapping_implication(
         to_create=[(section, objective), (objective, control)],
         implied=[
@@ -209,7 +206,6 @@ class TestAutomappings(TestCase):
     objective2 = self.create_object(Objective, {
         'title': next('Test Objective')
     })
-
     self.assert_mapping_implication(
         to_create=[(section, objective1), (objective1, objective2)],
         implied=[
