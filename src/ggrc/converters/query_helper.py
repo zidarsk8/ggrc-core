@@ -4,12 +4,15 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from werkzeug.exceptions import BadRequest
+from sqlalchemy import and_
+from sqlalchemy import or_
 
 from ggrc.models.relationship import RelationshipHelper
 from ggrc.converters import IMPORTABLE
 
 
 class QueryHelper(object):
+
   """ Helper class for handling request queries
 
   Primary use for this class is to get list of object ids for each object
@@ -46,9 +49,14 @@ class QueryHelper(object):
 
   def clean_query(self, query):
     for object_query in query:
-      filters = object_query.get("filters", {}).get("relevant_filters")
-      self.clean_relevant_filters(filters)
+      self.clean_relevant_filters(
+          object_query.get("filters", {}).get("relevant_filters"))
+      self.clean_object_filters(
+          object_query.get("filters", {}).get("object_filters"))
     return query
+
+  def clean_object_filters(self, filters):
+    pass
 
   def clean_relevant_filters(self, filters):
     if not filters:
@@ -76,15 +84,56 @@ class QueryHelper(object):
           object_name, relevant_filters)
     object_filters = filters.get("object_filters")
     if object_filters:
-      return self.get_filtered_objects(
+      return self.get_filtered_object_ids(
           object_name, object_filters, relevant_by_ids)
     if relevant_by_ids:
       return relevant_by_ids
     return set()
 
-  def get_filtered_objects(self, object_name, filters, relevant_ids):
+  def get_filtered_object_ids(self, object_name, filters, relevant_ids):
     """ get objects by key filters """
-    return []
+    expression = filters.get("expression")
+    if not expression:
+      return relevant_ids
+
+    object_class = self.object_map[object_name]
+
+    def build_expression(exp):
+      if exp["op"]["name"] == "AND":
+        return and_(build_expression(exp["left"]),
+                    build_expression(exp["right"]))
+      elif exp["op"]["name"] == "OR":
+        return or_(build_expression(exp["left"]),
+                   build_expression(exp["right"]))
+      elif exp["op"]["name"] == "=":
+        if hasattr(object_class, exp["left"]):
+          return getattr(object_class, exp["left"]) == exp["right"]
+        else:
+          raise Exception("Bad search query: object '{}' does not have "
+                          "attribute '{}'.".format(object_name, exp["left"]))
+      elif exp["op"]["name"] == "!=":
+        if hasattr(object_class, exp["left"]):
+          return getattr(object_class, exp["left"]) != exp["right"]
+        else:
+          raise Exception("Bad search query: object '{}' does not have "
+                          "attribute '{}'.".format(object_name, exp["left"]))
+      elif exp["op"]["name"] == "~":
+        if hasattr(object_class, exp["left"]):
+          return getattr(object_class, exp["left"]).ilike(
+              "%{}%".format(exp["right"]))
+        else:
+          raise Exception("Bad search query: object '{}' does not have "
+                          "attribute '{}'.".format(object_name, exp["left"]))
+      return None
+
+    filter_expression = build_expression(expression)
+    if relevant_ids:
+      filter_expression = and_(object_class.id.in_(relevant_ids),
+                               filter_expression)
+
+    objects = object_class.query.filter(filter_expression).all()
+    object_ids = [o.id for o in objects]
+    return object_ids
 
   def get_by_relevant_filters(self, object_name, filters):
     """ get object ids by relevancy filters """
