@@ -23,8 +23,20 @@
     events: {
       ".save-template .btn-success click": function (el, ev) {
         ev.preventDefault();
-        var control = this.element.find("export-type").control();
-        console.log("YO!", control.scope.attr("_panels"));
+        var control = this.element.find("export-type").control(),
+            panels = control.scope.attr("_panels");
+        console.log("YO!", panels);
+        query = _.map(panels, function(panel, index){
+          return {
+            object_name: panel.type,
+            fields: _.compact(_.map(Object.keys(panel.selected), function(key){ 
+              return panel.selected[key] === true ? key : null;} )),
+            filters: {
+              relevant_filters: null,
+              object_filters: GGRC.query_parser.parse(panel.filter || "")
+            }
+          }
+        });
       }
     }
   });
@@ -107,6 +119,7 @@
       filters: [],
       data_grid: "@",
       index: "@",
+      // TODO: filter menu items with mapping rules from business_object.js
       menu: can.map(["Program", "Regulation", "Policy", "Standard", "Contract",
                     "Clause", "Section", "Objective", "Control", "Person",
                     "System", "Process", "DataAsset", "Product", "Project",
