@@ -6,6 +6,7 @@
 */
 
 (function(can, $) {
+
   can.Component.extend({
     tag: "csv-export",
     template: "<content></content>",
@@ -17,6 +18,20 @@
       }
     },
     events: {
+      ".save-template .btn-success click": function (el, ev) {
+        ev.preventDefault();
+        console.log("YO!");
+      }
+    }
+  });
+
+
+  var exportModel = can.Map({
+    index: 0,
+    type: "Program",
+    selected: {},
+    columns: function () {
+      return CMS.Models[this.attr("type")].tree_view_options.attr_list
     }
   });
 
@@ -28,10 +43,7 @@
       _panels: [],
       panels: function () {
         if (!this._panels.length) {
-          this._panels.push({
-            type: "Program",
-            index: 0
-          });
+          this._panels.push(new exportModel());
         }
         return this._panels;
       }
@@ -49,7 +61,7 @@
 
         this.scope.attr("_index", index);
         data.index = index;
-        return this.scope.attr("_panels").push(data);
+        return this.scope.attr("_panels").push(new exportModel(data));
       },
       ".remove_filter_group click": function (el, ev) {
         ev.preventDefault();
@@ -59,11 +71,6 @@
       "#addAnotherObjectType click": function (el, ev) {
         ev.preventDefault();
         this.addPanel();
-      },
-      "export-panel .option-type-selector change": function (el, ev) {
-        var $el = $(ev.currentTarget),
-            val = $el.val(),
-            index = this.getIndex($el);
       }
     }
   });
@@ -71,18 +78,13 @@
   can.Component.extend({
     tag: "export-panel",
     template: "<content></content>",
-    scope: {
-      index: "@",
-      type: "@",
-      columns: []
+    scope: function(attrs, parentScope, el) {
+      return _.find(parentScope.attr("_panels"), function (panel) {
+        return panel.index === +$(el).attr("index");
+      });
     },
     events: {
-      ".option-type-selector change": function (el, ev) {
-        var $el = $(ev.currentTarget),
-            val = $el.val();
 
-        this.scope.attr("columns", CMS.Models[val].tree_view_options.attr_list);
-      }
     },
     helpers: {
       first_panel: function (options) {
@@ -100,9 +102,9 @@
     scope: {
       panels: [],
       menu: can.map(["Program", "Regulation", "Policy", "Standard", "Contract",
-                    "Clause", "Section", "Objective", "Control", "Person", 
+                    "Clause", "Section", "Objective", "Control", "Person",
                     "System", "Process", "DataAsset", "Product", "Project",
-                    "Facility", "Market"], 
+                    "Facility", "Market"],
                     function (key) {
                       return CMS.Models[key];
                     })
@@ -128,6 +130,6 @@
     }
   });
 
-  $("#csv_export").html(can.view(GGRC.mustache_path + 
+  $("#csv_export").html(can.view(GGRC.mustache_path +
                                  "/import_export/export.mustache", {}));
 })(window.can, window.can.$);

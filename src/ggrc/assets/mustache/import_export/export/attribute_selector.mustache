@@ -14,7 +14,7 @@
       <ul class="attr-list">
         {{#columns}}
         <li>
-          <label><input type="checkbox" name="{{attr_name}}" checked>{{attr_title}}</label>
+          <label><input can-value="selected.{{attr_name}}" type="checkbox" name="{{attr_name}}" checked>{{attr_title}}</label>
         </li>
         {{/columns}}
       </ul>
