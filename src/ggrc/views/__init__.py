@@ -101,7 +101,6 @@ def get_attributes_json():
   published = []
   for attr in attrs:
     published.append(publish_representation(publish(attr)))
-  print published
   return as_json(published)
 
 
