@@ -126,13 +126,12 @@ def index():
   """The initial entry point of the app
   """
   if not settings.PRODUCTION:
-    contact = """ For any questions, please contact
-                  your administrator.""" if settings.GOOGLE_INTERNAL else ""
-    flash(u"""WARNING - This is not the production instance
-              of the GGRC application.""", "alert alert-warning")
-    flash(u"""Company confidential, sensitive or personally identifiable
-              information *MUST NOT* be entered or stored here.%s""" %
-          (contact), "alert alert-warning")
+    flash(u"""<b>WARNING</b> - This is not the production instance
+              of the GGRC application.<br><br>
+              Company confidential, sensitive or personally identifiable
+              information <b>*MUST NOT*</b> be entered or stored here.
+              For any questions, please contact your administrator.""",
+          "alert alert-warning")
   return render_template("welcome/index.haml")
 
 
