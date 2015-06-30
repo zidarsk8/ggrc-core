@@ -276,3 +276,40 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 6, 12))
+
+  def test_delete_all_tasks(self):
+    """Check that workflow doesn't have next cycle start date when all tasks are deleted"""
+    monthly_workflow = {
+      "title": "monthly test wf",
+      "description": "start this many a time",
+      "frequency": "monthly",
+      "task_groups": [
+        {"title": "task group 1",
+         'task_group_tasks': [
+           {
+             'title': 'monthly task 1',
+             "relative_start_day": 15, # 6/15/2015 Mon
+             "relative_start_month": None,
+             "relative_end_day": 19, # 6/19/2015 Fri
+             "relative_end_month": None,
+           }],
+         "task_group_objects": self.random_objects
+         },
+      ]
+    }
+    with freeze_time("2015-6-9 13:00:00"): # Tuesday, 6/9/2015
+      _, wf = self.generator.generate_workflow(monthly_workflow)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 6, 15))
+
+      task_group = db.session.query(TaskGroup).filter(TaskGroup.workflow_id == wf.id).one()
+
+      response = self.generator.api.delete(task_group, task_group.id)
+      self.assert200(response)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, None)

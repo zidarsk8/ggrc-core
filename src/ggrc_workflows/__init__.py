@@ -567,7 +567,6 @@ def handle_cycle_task_group_put(
 
 def update_workflow_state(workflow):
   today = date.today()
-
   calculator = get_cycle_calculator(workflow)
 
   # Start the first cycle if min_start_date < today < max_end_date
@@ -590,6 +589,10 @@ def update_workflow_state(workflow):
       workflow.next_cycle_start_date = next_cycle_start_date
     db.session.add(workflow)
     db.session.flush()
+    return
+
+  if not calculator.tasks:
+    workflow.next_cycle_start_date = None
     return
 
   for cycle in workflow.cycles:

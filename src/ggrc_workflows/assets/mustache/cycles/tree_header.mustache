@@ -80,6 +80,7 @@
 
 {{^if_equals mapping 'previous_cycles'}}
   {{#using workflow=parent_instance}}
+    {{#workflow.next_cycle_start_date}}
   {{^if_equals workflow.frequency 'one_time'}}
   {{#if_equals workflow.status 'Active'}}
     <div class="filters">
@@ -92,5 +93,6 @@
     </div>
   {{/if_equals workflow.status 'Active'}}
   {{/if_equals}}
+    {{/workflow.next_cycle_start_date}}
   {{/using}}
 {{/if_equals}}
