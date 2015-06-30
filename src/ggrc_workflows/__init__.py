@@ -453,6 +453,13 @@ def handle_task_group_task_put(sender, obj=None, src=None, service=None):
 @Resource.model_posted.connect_via(models.TaskGroupTask)
 def handle_task_group_task_post(sender, obj=None, src=None, service=None):
   ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
+  update_workflow_state(obj.task_group.workflow)
+
+
+@Resource.model_deleted.connect_via(models.TaskGroupTask)
+def handle_task_group_task_delete(sender, obj=None, src=None, service=None):
+  db.session.flush()
+  update_workflow_state(obj.task_group.workflow)
 
 
 @Resource.model_put.connect_via(models.TaskGroup)
@@ -483,6 +490,12 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):
     obj.title = source_task_group.title + ' (copy ' + str(obj.id) + ')'
 
   ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
+
+
+@Resource.model_deleted.connect_via(models.TaskGroup)
+def handle_task_group_delete(sender, obj=None, src=None, service=None):
+  db.session.flush()
+  update_workflow_state(obj.workflow)
 
 
 def set_internal_object_state(task_group_object, object_state, status):
@@ -556,10 +569,10 @@ def update_workflow_state(workflow):
   today = date.today()
 
   calculator = get_cycle_calculator(workflow)
-  start_date, end_date = calculator.workflow_date_range()
 
   # Start the first cycle if min_start_date < today < max_end_date
-  if workflow.recurrences:
+  if workflow.recurrences and calculator.tasks:
+    start_date, end_date = calculator.workflow_date_range()
     # Only create the cycle if we're mid-cycle
     if (start_date <= today <= end_date) \
         and not workflow.cycles:
