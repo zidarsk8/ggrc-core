@@ -13,6 +13,7 @@
     scope: {
       url: "/_service/export_csv",
       editFilename: false,
+      only_relevant: false,
       filename: function () {
         return "Export Objects";
       },
@@ -24,7 +25,7 @@
       ".save-template .btn-success click": function (el, ev) {
         ev.preventDefault();
         var control = this.element.find("export-type").control();
-        console.log("YO!", control.scope.attr("_panels"));
+        console.log("YO!", this, control.scope.attr("_panels"));
       }
     }
   });
