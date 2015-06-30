@@ -20,7 +20,8 @@
     events: {
       ".save-template .btn-success click": function (el, ev) {
         ev.preventDefault();
-        console.log("YO!");
+        var control = this.element.find("export-type").control();
+        console.log("YO!", control.scope.attr("_panels"));
       }
     }
   });
