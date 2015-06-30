@@ -15,7 +15,7 @@
       });
     }, 2000); // 2000 is a magic number that feels nice in the UI
   }
-  
+
   function refreshAutomappings(instance) {
     CMS.Models.Relationship.findAll({automapping_id: instance.id}).then(function(relationships) {
       var rq = new RefreshQueue();
@@ -28,7 +28,7 @@
       rq.trigger();
     });
   }
-  
+
   var Controller = can.Control({
     "{CMS.Models.Relationship} created": function(model, ev, instance) {
       if (instance instanceof CMS.Models.Relationship) {
@@ -41,7 +41,7 @@
       }
     }
   });
-  
+
   $(function() {
     new Controller();
   });
