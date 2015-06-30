@@ -6,6 +6,16 @@
 */
 
 (function(can, $) {
+  var url = can.route.deparam(window.location.href.split("?")[1]),
+      exportModel = can.Map({
+        index: 0,
+        type: url.type || "Program",
+        selected: {},
+        columns: function () {
+          return CMS.Models[this.attr("type")].tree_view_options.attr_list;
+        }
+      });
+
 
   can.Component.extend({
     tag: "csv-export",
@@ -13,11 +23,12 @@
     scope: {
       url: "/_service/export_csv",
       editFilename: false,
+      only_relevant: false,
       filename: function () {
         return "Export Objects";
       },
       data_grid: function () {
-        return /data_grid/i.test(window.location.href);
+        return _.has(url, "data_grid");
       }
     },
     events: {
@@ -41,15 +52,6 @@
     }
   });
 
-
-  var exportModel = can.Map({
-    index: 0,
-    type: "Program",
-    selected: {},
-    columns: function () {
-      return CMS.Models[this.attr("type")].tree_view_options.attr_list
-    }
-  });
 
   can.Component.extend({
     tag: "export-type",
@@ -130,13 +132,32 @@
     },
     events: {
       "inserted": function (el, ev) {
-        // TODO: Should be fixed, we should handle this within the template
+        // TODO: Should be fixed, we should handle this within the template 
+        // and fetched properly?
         var dataGrid = /true/i.test(this.scope.attr("data_grid")),
             index = +this.scope.attr("index");
 
         if (dataGrid && index !== 0) {
           this.element.empty();
         }
+        if (url.relevant_id && url.relevant_type) {
+          var dfd = this.searchByType(url.relevant_id, url.relevant_type),
+              que = new RefreshQueue();
+
+          dfd.then(function (response) {
+            var result = response.getResultsFor(url.relevant_type)[0];
+            que.enqueue(result).trigger().then(function (item) {
+              this.scope.filters.push({
+                model_name: url.relevant_type,
+                value: url.relevant_id,
+                filter: result
+              });
+            }.bind(this));
+          }.bind(this));
+        }
+      },
+      "searchByType": function (id, type) {
+        return GGRC.Models.Search.search_for_types(id, [type]);
       },
       ".add-filter-rule click": function (el, ev) {
         ev.preventDefault();

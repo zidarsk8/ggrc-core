@@ -89,13 +89,15 @@
       </div>
     </export-type>
   </div>
-  {{#data_grid}}
-  <div>
-    <h2>Hello world</h2>
-    <input type="checkbox" />
-  </div>
-  {{/data_grid}}
   <div class="save-template-wrap">
+    {{#data_grid}}
+      <div class="left-content">
+        <label class="checkbox-inline">
+          <input type="checkbox" can-value="only_relevant" name="only_relevant" checked="checked">
+          Show only objects relevant to selected anchor objects
+        </label>
+      </div>
+    {{/data_grid}}
     <div class="save-template">
       <span class="export-note">0 records will be exported</span>
       <div class="btn-group pull-right">
