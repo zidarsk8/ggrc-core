@@ -62,5 +62,13 @@ $(document).ready(function() {
     $(".object-wrap"+aId).show();
   }
 
+  function riskAssessmentGenerate() {
+    $('#autoGenerateRA').modal('hide');
+    $('#RAList').show();
+    $('#removeLegend').hide();
+  }
+
   $(".top-inner-nav a").on("click", innerNavTrigger);
+
+  $("#autoGenerateRA").on("click", riskAssessmentGenerate);
 });
