@@ -5,6 +5,7 @@
 
 from werkzeug.exceptions import BadRequest
 from sqlalchemy import and_
+from sqlalchemy import not_
 from sqlalchemy import or_
 
 from ggrc.models.relationship import RelationshipHelper
@@ -93,10 +94,15 @@ class QueryHelper(object):
   def get_filtered_object_ids(self, object_name, filters, relevant_ids):
     """ get objects by key filters """
     expression = filters.get("expression")
+    keys = filters.get("keys")
+    object_class = self.object_map[object_name]
     if not expression:
       return relevant_ids
 
-    object_class = self.object_map[object_name]
+    for key in keys:
+      if not hasattr(object_class, key):
+        raise Exception("Bad search query: object '{}' does not have "
+                        "attribute '{}'.".format(object_name, key))
 
     def build_expression(exp):
       if exp["op"]["name"] == "AND":
@@ -106,24 +112,15 @@ class QueryHelper(object):
         return or_(build_expression(exp["left"]),
                    build_expression(exp["right"]))
       elif exp["op"]["name"] == "=":
-        if hasattr(object_class, exp["left"]):
-          return getattr(object_class, exp["left"]) == exp["right"]
-        else:
-          raise Exception("Bad search query: object '{}' does not have "
-                          "attribute '{}'.".format(object_name, exp["left"]))
+        return getattr(object_class, exp["left"]) == exp["right"]
       elif exp["op"]["name"] == "!=":
-        if hasattr(object_class, exp["left"]):
-          return getattr(object_class, exp["left"]) != exp["right"]
-        else:
-          raise Exception("Bad search query: object '{}' does not have "
-                          "attribute '{}'.".format(object_name, exp["left"]))
+        return getattr(object_class, exp["left"]) != exp["right"]
       elif exp["op"]["name"] == "~":
-        if hasattr(object_class, exp["left"]):
-          return getattr(object_class, exp["left"]).ilike(
-              "%{}%".format(exp["right"]))
-        else:
-          raise Exception("Bad search query: object '{}' does not have "
-                          "attribute '{}'.".format(object_name, exp["left"]))
+        return getattr(object_class, exp["left"]).ilike(
+            "%{}%".format(exp["right"]))
+      elif exp["op"]["name"] == "!~":
+        return not_(getattr(object_class, exp["left"]).ilike(
+            "%{}%".format(exp["right"])))
       return None
 
     filter_expression = build_expression(expression)
