@@ -60,23 +60,23 @@ class TestMonthlyWorkflowNotification(TestCase):
 
       person_1 = Person.query.get(self.person_1.id)
 
-    with freeze_time("2015-04-03"):
+    with freeze_time("2015-04-02"):
       _, notif_data = notification.get_todays_notifications()
       self.assertIn(person_1.email, notif_data)
       self.assertIn("cycle_starts_in", notif_data[person_1.email])
 
-    with freeze_time("2015-04-04"):
+    with freeze_time("2015-04-02"):
       send_todays_digest_notifications()
       _, notif_data = notification.get_todays_notifications()
       self.assertNotIn(person_1.email, notif_data)
 
-    with freeze_time("2015-04-05"):
+    with freeze_time("2015-04-02"):
       start_recurring_cycles()
       _, notif_data = notification.get_todays_notifications()
       self.assertNotIn(person_1.email, notif_data)
 
     # cycle starts on monday - 6th, and not on 5th
-    with freeze_time("2015-04-06"):
+    with freeze_time("2015-04-03"):
       start_recurring_cycles()
 
 
