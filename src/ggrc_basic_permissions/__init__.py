@@ -82,9 +82,8 @@ def objects_via_relationships_query(user_id, context_not_role=False):
                _program.id == _relationship.destination_id))).\
       join(_user_role, _program.context_id == _user_role.context_id).\
       join(_role, _user_role.role_id == _role.id).\
-      filter(_user_role.person_id == user_id).\
-      filter(_role.name.in_(
-          ('ProgramEditor', 'ProgramOwner', 'ProgramReader')))
+      filter(and_(_user_role.person_id == user_id, _role.name.in_(
+          ('ProgramEditor', 'ProgramOwner', 'ProgramReader'))))
 
 
 
