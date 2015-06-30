@@ -65,6 +65,8 @@ def url_for(obj, id=None):
   service = service_for(obj)
   if service is None:
     return None
+  if not hasattr(service, 'url_for'):
+    return None
   if id is not None:
     return service.url_for(id=id)
   return service.url_for(obj)
@@ -82,6 +84,8 @@ def view_service_for(obj):
 def view_url_for(obj, id=None):
   service = view_service_for(obj)
   if service is None:
+    return None
+  if not hasattr(service, 'url_for'):
     return None
   if id is not None:
     return service.url_for(id=id)

@@ -3,33 +3,37 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+"""ggrc.views
+Handle non-RESTful views, e.g. routes which return HTML rather than JSON
+"""
+
 import json
-from collections import namedtuple
-from flask import request, session, url_for, redirect, g
-from flask.views import View
+from flask import flash
+from flask import g
+from flask import render_template
+from flask import url_for
+from ggrc import settings
 from ggrc.extensions import get_extension_modules
 from ggrc.app import app
 from ggrc.rbac import permissions
 from ggrc.login import get_current_user
-from ggrc.services.common import as_json, inclusion_filter, filter_resource
+from ggrc.login import login_required
+from ggrc.services.common import as_json, inclusion_filter
 from ggrc.builder.json import publish, publish_representation
 from ggrc.views.converters import *  # necessary for import endpoints
 from werkzeug.exceptions import Forbidden
 from . import filters
 from .registry import object_view
 from ggrc.models.background_task import (
-    BackgroundTask, queued_task, create_task, make_task_response
-    )
-from . import notification
+    queued_task, create_task, make_task_response
+)
+from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 
-"""ggrc.views
-Handle non-RESTful views, e.g. routes which return HTML rather than JSON
-"""
 
 # Needs to be secured as we are removing @login_required
 @app.route("/_background_tasks/reindex", methods=["POST"])
 @queued_task
-def reindex(task):
+def reindex(_):
   """
   Web hook to update the full text search index
   """
@@ -48,7 +52,7 @@ def reindex(task):
   inheritance_base_models = [
       all_models.Directive, all_models.SectionBase, all_models.SystemOrProcess,
       all_models.Response
-      ]
+  ]
   models = set(all_models.all_models) - set(inheritance_base_models)
   models = [model for model in models if model_is_indexed(model)]
 
@@ -56,20 +60,24 @@ def reindex(task):
     mapper_class = model._sa_class_manager.mapper.base_mapper.class_
     query = model.query.options(
         db.undefer_group(mapper_class.__name__ + '_complete'),
-        )
+    )
     for query_chunk in generate_query_chunks(query):
       for instance in query_chunk:
         indexer.create_record(fts_record_for(instance), False)
       db.session.commit()
 
   return app.make_response((
-    'success', 200, [('Content-Type', 'text/html')]))
+      'success', 200, [('Content-Type', 'text/html')]))
+
 
 def get_permissions_json():
+  """Get all permissions for current user"""
   permissions.permissions_for(permissions.get_user())
   return json.dumps(getattr(g, '_request_permissions', None))
 
+
 def get_config_json():
+  """Get public app config"""
   public_config = dict(app.config.public_config)
   for extension_module in get_extension_modules():
     if hasattr(extension_module, 'get_public_config'):
@@ -77,15 +85,28 @@ def get_config_json():
           extension_module.get_public_config(get_current_user()))
   return json.dumps(public_config)
 
+
 def get_current_user_json():
+  """Get current user"""
   from ggrc.models.person import Person
   current_user = get_current_user()
   person = Person.eager_query().filter_by(id=current_user.id).one()
   result = publish_representation(publish(person, (), inclusion_filter))
   return as_json(result)
 
+
+def get_attributes_json():
+  """Get a list of all custom attribute definitions"""
+  attrs = CustomAttributeDefinition.eager_query().all()
+  published = []
+  for attr in attrs:
+    published.append(publish_representation(publish(attr)))
+  return as_json(published)
+
+
 @app.context_processor
 def base_context():
+  """Gets the base context"""
   from ggrc.models import get_model
   return dict(
       get_model=get_model,
@@ -93,25 +114,26 @@ def base_context():
       permissions=permissions,
       config_json=get_config_json,
       current_user_json=get_current_user_json,
-      )
-
-from flask import render_template, flash
+      attributes_json=get_attributes_json,
+  )
 
 # Actual HTML-producing routes
 #
+
 
 @app.route("/")
 def index():
   """The initial entry point of the app
   """
-  from ggrc import settings
   if not settings.PRODUCTION:
-    contact = ' For any questions, please contact your administrator.' if settings.GOOGLE_INTERNAL else ""
-    flash(u'WARNING - This is not the production instance of the GGRC application.', 'alert alert-warning')
-    flash(u'Company confidential, sensitive or personally identifiable information *MUST NOT* be entered or stored here.%s' % (contact), 'alert alert-warning')
+    flash(u"""<b>WARNING</b> - This is not the production instance
+              of the GGRC application.<br><br>
+              Company confidential, sensitive or personally identifiable
+              information <b>*MUST NOT*</b> be entered or stored here.
+              For any questions, please contact your administrator.""",
+          "alert alert-warning")
   return render_template("welcome/index.haml")
 
-from ggrc.login import login_required
 
 @app.route("/dashboard")
 @login_required
@@ -120,24 +142,27 @@ def dashboard():
   """
   return render_template("dashboard/index.haml")
 
+
 def generate_query_chunks(query):
-  CHUNK_SIZE = 100
+  """Generate query chunks used by pagination"""
+  chunk_size = 100
   count = query.count()
-  for offset in range(0, count, CHUNK_SIZE):
-    yield query.order_by('id').limit(CHUNK_SIZE).offset(offset).all()
+  for offset in range(0, count, chunk_size):
+    yield query.order_by('id').limit(chunk_size).offset(offset).all()
+
 
 @app.route("/admin/reindex", methods=["POST"])
 @login_required
 def admin_reindex():
   """Calls a webhook that reindexes indexable objects
   """
-  from ggrc import settings
   if not permissions.is_allowed_read("/admin", None, 1):
     raise Forbidden()
-  tq = create_task("reindex", url_for(reindex.__name__), reindex)
-  return tq.make_response(app.make_response(("scheduled %s" % tq.name,
-                                            200,
-                                            [('Content-Type', 'text/html')])))
+  task_queue = create_task("reindex", url_for(reindex.__name__), reindex)
+  return task_queue.make_response(
+      app.make_response(("scheduled %s" % task_queue.name, 200,
+                         [('Content-Type', 'text/html')])))
+
 
 @app.route("/admin")
 @login_required
@@ -151,10 +176,12 @@ def admin():
 
 @app.route("/background_task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
+  """Gets the status of a background task"""
   return make_task_response(id_task)
 
 
 def contributed_object_views():
+  """Contributed object views"""
   from ggrc import models
   from .common import RedirectedPolymorphView
 
@@ -188,6 +215,7 @@ def contributed_object_views():
 
 
 def all_object_views():
+  """Gets all object views defined in the application"""
   views = contributed_object_views()
 
   for extension_module in get_extension_modules():
@@ -200,21 +228,23 @@ def all_object_views():
   return views
 
 
-def init_extra_views(app):
+def init_extra_views(_):
+  """Init any extra views needed by the app
+     Currently, init_extra_views is only used by
+     extensions, but this is here for completeness.
+  """
   pass
 
 
 def init_all_views(app):
-  import sys
-  from ggrc import settings
-
+  """Inits all views defined in the core module and submodules"""
   for entry in all_object_views():
     entry.service_class.add_to(
-      app,
-      '/{0}'.format(entry.url),
-      entry.model_class,
-      decorators=(login_required,)
-      )
+        app,
+        '/{0}'.format(entry.url),
+        entry.model_class,
+        decorators=(login_required,)
+    )
 
   init_extra_views(app)
   for extension_module in get_extension_modules():
@@ -231,12 +261,14 @@ def mockup():
   """
   return render_template("mockups/v1.0/program.html")
 
+
 @app.route("/mockups/v1.0/assessment.html")
 @login_required
 def assessments():
   """The assessments guide page
   """
   return render_template("mockups/v1.0/assessment.html")
+
 
 @app.route("/mockups/v1.0/assessment-start.html")
 @login_required
@@ -245,12 +277,14 @@ def assessments_start():
   """
   return render_template("mockups/v1.0/assessment-start.html")
 
+
 @app.route("/mockups/v1.0/object.html")
 @login_required
 def assessments_object():
   """The assessment object guide page
   """
   return render_template("mockups/v1.0/object.html")
+
 
 @app.route("/mockups/v1.0/object-final.html")
 @login_required
@@ -259,12 +293,14 @@ def assessments_object_final():
   """
   return render_template("mockups/v1.0/object-final.html")
 
+
 @app.route("/mockups/v1.0/my-work.html")
 @login_required
 def assessments_my_work():
   """The assessment my work guide page
   """
   return render_template("mockups/v1.0/my-work.html")
+
 
 @app.route("/mockups/assessments_grid")
 @login_required
@@ -273,12 +309,14 @@ def assessments_grid():
   """
   return render_template("mockups/assessments-grid.html")
 
+
 @app.route("/mockups/v1.1/index.html")
 @login_required
 def workflow_assessment():
   """The workflow assessment guide page
   """
   return render_template("mockups/v1.1/index.html")
+
 
 @app.route("/mockups/v1.1/workflow.html")
 @login_required
@@ -287,12 +325,14 @@ def workflow_info():
   """
   return render_template("mockups/v1.1/workflow.html")
 
+
 @app.route("/mockups/rapid-data-entry/index.html")
 @login_required
 def rapid_data_entry():
   """Rapid data entry mockup
   """
   return render_template("mockups/rapid-data-entry/index.html")
+
 
 @app.route("/mockups/custom-attributes/index.html")
 @login_required
@@ -301,12 +341,14 @@ def custom_attributes():
   """
   return render_template("mockups/custom-attributes/index.html")
 
+
 @app.route("/mockups/data-grid/")
 @login_required
 def reporting():
   """Reporting mockup
   """
   return render_template("mockups/data-grid/index.html")
+
 
 @app.route("/mockups/dashboard-ui/index.html")
 @login_required
@@ -315,12 +357,14 @@ def dashboard_ui():
   """
   return render_template("mockups/dashboard-ui/index.html")
 
+
 @app.route("/mockups/dashboard-ui/object.html")
 @login_required
 def object_ui():
   """Object UI UX mockup
   """
   return render_template("mockups/dashboard-ui/object.html")
+
 
 @app.route("/mockups/dashboard-ui/tree.html")
 @login_required
@@ -329,12 +373,14 @@ def tree_ui():
   """
   return render_template("/mockups/dashboard-ui/tree.html")
 
+
 @app.route("/mockups/dashboard-ui/workflow.html")
 @login_required
 def workflow_ui():
   """Workflow UI UX mockup
   """
   return render_template("/mockups/dashboard-ui/workflow.html")
+
 
 @app.route("/mockups/dashboard-ui/workflow-info.html")
 @login_required
@@ -343,12 +389,14 @@ def workflow_info_ui():
   """
   return render_template("/mockups/dashboard-ui/workflow-info.html")
 
+
 @app.route("/mockups/dashboard-ui/workflow-people.html")
 @login_required
 def workflow_people_ui():
   """Workflow people UI UX mockup
   """
   return render_template("/mockups/dashboard-ui/workflow-people.html")
+
 
 @app.route("/mockups/dashboard-ui/audit.html")
 @login_required
@@ -357,12 +405,14 @@ def audit_ui():
   """
   return render_template("/mockups/dashboard-ui/audit.html")
 
+
 @app.route("/mockups/dashboard-ui/audit-info.html")
 @login_required
 def audit_info_ui():
   """Audit info UI UX mockup
   """
   return render_template("/mockups/dashboard-ui/audit-info.html")
+
 
 @app.route("/mockups/dashboard-ui/audit-people.html")
 @login_required
@@ -371,12 +421,14 @@ def audit_people_ui():
   """
   return render_template("/mockups/dashboard-ui/audit-people.html")
 
+
 @app.route("/mockups/audit-revamp/info.html")
 @login_required
 def audit_info_revamp():
   """Audit info revamp mockup
   """
   return render_template("/mockups/audit-revamp/info.html")
+
 
 @app.route("/mockups/audit-revamp/issues.html")
 @login_required
@@ -385,12 +437,14 @@ def audit_info_issues_revamp():
   """
   return render_template("/mockups/audit-revamp/issues.html")
 
+
 @app.route("/mockups/audit-3.0/")
 @login_required
 def audit_3_0():
   """Audit 3.0 mockup
   """
   return render_template("/mockups/audit-3.0/info.html")
+
 
 @app.route("/mockups/audit-3.0/control-assessment.html")
 @login_required
@@ -399,12 +453,14 @@ def audit_3_0_ca():
   """
   return render_template("/mockups/audit-3.0/control-assessment.html")
 
+
 @app.route("/mockups/import/")
 @login_required
 def import_redesign():
   """Import prototype
   """
   return render_template("/mockups/import/index.html")
+
 
 @app.route("/mockups/export/")
 @login_required
@@ -413,12 +469,14 @@ def export_redesign():
   """
   return render_template("/mockups/export/index.html")
 
+
 @app.route("/mockups/export-object/")
 @login_required
 def export_object_redesign():
   """Export object prototype
   """
   return render_template("/mockups/export/object.html")
+
 
 @app.route("/mockups/data-grid/export-object.html")
 @login_required
@@ -427,12 +485,14 @@ def data_grid_export_object():
   """
   return render_template("mockups/data-grid/export-object.html")
 
+
 @app.route("/mockups/risk-assessment")
 @login_required
 def risk_assessment_redesign():
   """Risk Assessment mockup
   """
   return render_template("/mockups/risk-assessment/index.html")
+
 
 @app.route("/permissions")
 @login_required
