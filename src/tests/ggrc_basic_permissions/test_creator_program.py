@@ -240,6 +240,3 @@ class TestCreatorProgram(TestCase):
                 "{}: Tried {} on {}, but received {} instead of {}".format(
                     test_case, action, obj, res, actions[action]))
     self.assertEquals(errors, [])
-
-if __name__ == "__main__":
-  unittest.main()

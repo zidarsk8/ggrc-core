@@ -198,7 +198,3 @@ class TestCreator(TestCase):
     self.assertEquals(response.status_code, 200)
     num = len(response.json["relationships_collection"]["relationships"])
     self.assertEquals(num, 0)
-
-
-if __name__ == "__main__":
-  unittest.main()
