@@ -15,6 +15,9 @@
       editFilename: false,
       filename: function () {
         return "Export Objects";
+      },
+      data_grid: function () {
+        return /data_grid/i.test(window.location.href);
       }
     },
     events: {
@@ -101,7 +104,9 @@
     tag: "csv-relevance-filter",
     template: "<content />",
     scope: {
-      panels: [],
+      filters: [],
+      data_grid: "@",
+      index: "@",
       menu: can.map(["Program", "Regulation", "Policy", "Standard", "Contract",
                     "Clause", "Section", "Objective", "Control", "Person",
                     "System", "Process", "DataAsset", "Product", "Project",
@@ -111,9 +116,18 @@
                     })
     },
     events: {
+      "inserted": function (el, ev) {
+        // TODO: Should be fixed, we should handle this within the template
+        var dataGrid = /true/i.test(this.scope.attr("data_grid")),
+            index = +this.scope.attr("index");
+
+        if (dataGrid && index !== 0) {
+          this.element.empty();
+        }
+      },
       ".add-filter-rule click": function (el, ev) {
         ev.preventDefault();
-        this.scope.panels.push({
+        this.scope.filters.push({
           value: "",
           filter: new can.Map(),
           model_name: this.scope.menu[0].model_singular
@@ -121,12 +135,12 @@
       },
       ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
         var index = el.data("index"),
-            panel = this.scope.attr("panels")[index];
+            panel = this.scope.attr("filters")[index];
 
         panel.attr("filter", data.item);
       },
       ".remove_filter click": function (el) {
-        this.scope.panels.splice(el.data("index"), 1);
+        this.scope.filters.splice(el.data("index"), 1);
       }
     }
   });

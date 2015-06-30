@@ -77,7 +77,9 @@
 
               {{> /static/mustache/import_export/export/attribute_selector.mustache}}
               {{> /static/mustache/import_export/export/filter_query.mustache}}
-              {{> /static/mustache/import_export/export/relevance.mustache}}
+              <csv-relevance-filter data_grid="{{data_grid}}" index="{{index}}">
+                {{> /static/mustache/import_export/export/relevance.mustache}}
+              </csv-relevance-filter>
             </export-panel>
           </div>
         {{/panels}}
@@ -87,7 +89,12 @@
       </div>
     </export-type>
   </div>
-
+  {{#data_grid}}
+  <div>
+    <h2>Hello world</h2>
+    <input type="checkbox" />
+  </div>
+  {{/data_grid}}
   <div class="save-template-wrap">
     <div class="save-template">
       <span class="export-note">0 records will be exported</span>
