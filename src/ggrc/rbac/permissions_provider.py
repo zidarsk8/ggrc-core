@@ -86,6 +86,12 @@ def is_condition(instance, value, property_name):
   return value == property_value
 
 
+def in_condition(instance, value, property_name):
+  value = resolve_permission_variable(value)
+  property_value = get_deep_attr(instance, property_name)
+  return property_value in value
+
+
 def relationship_condition(instance):
   return True
 
@@ -99,7 +105,7 @@ All functions with a signature
 _CONDITIONS_MAP = {
     'contains': contains_condition,
     'is': is_condition,
-    'in': contains_condition,
+    'in': in_condition,
     'relationship': relationship_condition,
 }
 

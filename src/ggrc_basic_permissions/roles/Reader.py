@@ -64,7 +64,7 @@ permissions = {
             "condition": "is"
         },
     ],
-    "create": {
+    "create": [
         "Workflow"
         "Categorization",
         "Category",
@@ -100,7 +100,14 @@ permissions = {
         "SystemOrProcess",
         "System",
         "Process",
-        "ObjectOwner"
+        {
+            "type": "ObjectOwner",
+            "terms": {
+                "property_name": "ownable.modified_by",
+                "value": "$current_user"
+            },
+            "condition": "is"
+        },
         "Person",
         "Program",
         "Role",
@@ -109,7 +116,7 @@ permissions = {
         "Response",
         "Context",
         "BackgroundTask",
-    },
+    ],
     "view_object_page": [
         "__GGRC_ALL__"
     ],
