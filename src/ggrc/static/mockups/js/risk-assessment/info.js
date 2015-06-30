@@ -68,7 +68,17 @@ $(document).ready(function() {
     $('#removeLegend').hide();
   }
 
+  function RAGenerate() {
+    $(".nav").children("li").removeClass('active');
+    $(".nav").children("li:first-child").addClass('active');
+    $(".object-wrap").hide();
+    $(".object-wrap#info").show();
+    $('#RASheet').show();
+  }
+
   $(".top-inner-nav a").on("click", innerNavTrigger);
 
   $("#autoGenerateRA").on("click", riskAssessmentGenerate);
+
+  $("#RAGenerate").on("click", RAGenerate);
 });
