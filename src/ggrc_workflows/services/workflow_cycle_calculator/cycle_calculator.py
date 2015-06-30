@@ -4,12 +4,7 @@
 # Maintained By: urban@reciprocitylabs.com
 
 import datetime
-import monthdelta
-import operator
-# from datetime import date, datetime, timedelta
-from dateutil import relativedelta
 from abc import ABCMeta, abstractmethod
-import holidays
 
 from ggrc_workflows.services.workflow_cycle_calculator.google_holidays import GoogleHolidays
 
