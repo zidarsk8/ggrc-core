@@ -440,6 +440,15 @@ def handle_task_group_task_put(sender, obj=None, src=None, service=None):
   if inspect(obj).attrs.contact.history.has_changes():
     ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
 
+  # If relative days were change we must update workflow next cycle start date
+  workflow_modifying_attrs =[
+    "relative_start_day", "relative_start_month",
+    "relative_end_day", "relative_end_month"]
+
+  if any(getattr(inspect(obj).attrs, attr).history.has_changes() for attr in workflow_modifying_attrs):
+    db.session.add(obj)
+    update_workflow_state(obj.task_group.workflow)
+
 
 @Resource.model_posted.connect_via(models.TaskGroupTask)
 def handle_task_group_task_post(sender, obj=None, src=None, service=None):
@@ -562,8 +571,10 @@ def update_workflow_state(workflow):
       build_cycle(cycle, None, base_date=workflow.next_cycle_start_date)
       notification.handle_cycle_created(None, obj=cycle)
 
-    if not workflow.next_cycle_start_date:
-      workflow.next_cycle_start_date = calculator.next_cycle_start_date()
+    next_cycle_start_date = calculator.next_cycle_start_date()
+    if (not workflow.next_cycle_start_date or
+            workflow.next_cycle_start_date != next_cycle_start_date):
+      workflow.next_cycle_start_date = next_cycle_start_date
     db.session.add(workflow)
     db.session.flush()
     return
