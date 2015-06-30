@@ -427,6 +427,13 @@ def data_grid_export_object():
   """
   return render_template("mockups/data-grid/export-object.html")
 
+@app.route("/mockups/risk-assessment")
+@login_required
+def risk_assessment_redesign():
+  """Risk Assessment mockup
+  """
+  return render_template("/mockups/risk-assessment/index.html")
+
 @app.route("/permissions")
 @login_required
 def user_permissions():
