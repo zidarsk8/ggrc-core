@@ -8,7 +8,7 @@ Feature: Private Programs
   Background:
     Given service description
     And User "secretive.user@example.com" has "Reader" role
-    And User "secretive.user@example.com" has "ObjectEditor" role
+    And User "secretive.user@example.com" has "Editor" role
     And User "secretive.user@example.com" has "ProgramCreator" role
     And User "example.user2@example.com" has "Reader" role
 
@@ -147,7 +147,7 @@ Feature: Private Programs
       #FIXME add back when Auditor role is defined | Audit            |
       #| Categorization   |
       | Control          |
-      #FIXME Should these be creatable for ObjectEditor role?
+      #FIXME Should these be creatable for Editor role?
       #| ControlAssertion |
       #| ControlCategory  |
       | ControlControl   |

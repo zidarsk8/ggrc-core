@@ -8,9 +8,9 @@ Feature: Private Program Audits and Role Implication
   Background:
     Given service description
     And User "program.owner@example.com" has "ProgramCreator" role
-    And User "program.owner@example.com" has "ObjectEditor" role
-    And User "program.editor@example.com" has "ObjectEditor" role
-    And User "program.reader@example.com" has "ObjectEditor" role
+    And User "program.owner@example.com" has "Editor" role
+    And User "program.editor@example.com" has "Editor" role
+    And User "program.reader@example.com" has "Editor" role
     And a user with email "auditor@example.com" as "auditor"
     And a user with email "assignee@example.com" as "assignee"
     And the current user

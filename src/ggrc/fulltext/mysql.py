@@ -11,6 +11,7 @@ from ggrc.models.object_owner import ObjectOwner
 from ggrc.models.request import Request
 from ggrc.models.response import Response
 from ggrc_basic_permissions.models import UserRole
+from ggrc_basic_permissions import objects_via_relationships_query
 from ggrc.rbac import permissions, context_query_filter
 from sqlalchemy import \
     event, and_, or_, literal, union, alias, case, func, distinct
@@ -149,6 +150,7 @@ class MysqlIndexer(SqlIndexer):
 
     # Check if the user has Creator role
     current_user = get_current_user()
+    my_objects = contact_id is not None
     if current_user.system_wide_role == "Creator":
       contact_id = current_user.id
 
@@ -201,6 +203,10 @@ class MysqlIndexer(SqlIndexer):
           )
       )
     type_union_queries.append(object_owners_query)
+
+    if not my_objects:
+      type_union_queries.append(
+          objects_via_relationships_query(contact_id, True))
 
     # FIXME The following line crashes if the Workflow extension is not enabled
     for model in [all_models.Program, all_models.Audit, all_models.Workflow]:

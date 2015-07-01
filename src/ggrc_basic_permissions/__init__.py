@@ -6,10 +6,12 @@
 import datetime
 from flask import Blueprint, session, g
 import sqlalchemy.orm
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm.attributes import get_history
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, case, literal
 from ggrc import db, settings
 from ggrc.login import get_current_user, login_required
+from ggrc.models import all_models
 from ggrc.models.person import Person
 from ggrc.models.audit import Audit
 from ggrc.models.response import Response
@@ -42,6 +44,47 @@ def get_public_config(current_user):
     if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS'):
       public_config['BOOTSTRAP_ADMIN_USERS'] = settings.BOOTSTRAP_ADMIN_USERS
   return public_config
+
+
+def objects_via_relationships_query(user_id, context_not_role=False):
+  """Creates a query that returns objects a user can access via program.
+
+    Args:
+        user_id: id of the user
+        context_not_role: use context instead of the role for the third column
+            in the search api we need to return (obj_id, obj_type, context_id),
+            but in ggrc_basic_permissions we need a role instead of a
+            context_id (obj_id, obj_type, role_name)
+
+    Returns:
+        db.session.query object that selects the following columns:
+            | id | type | role_name or context |
+  """
+  _role = aliased(all_models.Role, name="r")
+  _program = aliased(all_models.Program, name="p")
+  _relationship = aliased(all_models.Relationship, name="rl")
+  _user_role = aliased(all_models.UserRole, name="ur")
+
+  return db.session.query(
+      case([
+          (_relationship.destination_type == "Program",
+           _relationship.source_id.label('id'))
+      ], else_=_relationship.destination_id.label('id')),
+      case([
+          (_relationship.destination_type == "Program",
+           _relationship.source_type.label('type'))
+      ], else_=_relationship.destination_type.label('id')),
+      literal(None).label('context_id') if context_not_role else _role.name).\
+      join(_program, or_(
+          and_(_relationship.source_type == 'Program',
+               _program.id == _relationship.source_id),
+          and_(_relationship.destination_type == 'Program',
+               _program.id == _relationship.destination_id))).\
+      join(_user_role, _program.context_id == _user_role.context_id).\
+      join(_role, _user_role.role_id == _role.id).\
+      filter(and_(_user_role.person_id == user_id, _role.name.in_(
+          ('ProgramEditor', 'ProgramOwner', 'ProgramReader'))))
+
 
 
 class CompletePermissionsProvider(object):
@@ -122,9 +165,9 @@ def collect_permissions(src_permissions, context_id, permissions):
             .setdefault('conditions', dict())\
             .setdefault(context_id, list())\
             .append({
-              'condition': condition,
-              'terms': terms,
-              })
+                'condition': condition,
+                'terms': terms,
+            })
 
 def load_permissions_for(user):
   """Permissions is dictionary that can be exported to json to share with
@@ -151,46 +194,46 @@ def load_permissions_for(user):
   #   from extensions
   default_permissions = {
       "read": [
-        "Help",
-        "CustomAttributeDefinition",
-        {
-          "type": "CustomAttributeValue",
-          "terms": {
-              "list_property": "owners",
-              "value": "$current_user"
+          "Help",
+          "CustomAttributeDefinition",
+          {
+              "type": "CustomAttributeValue",
+              "terms": {
+                  "list_property": "owners",
+                  "value": "$current_user"
+              },
+              "condition": "contains"
           },
-          "condition": "contains"
-        },
-        {
-          "type": "NotificationConfig",
-          "terms": {
-            "property_name": "person",
-            "value": "$current_user"
-            },
-          "condition": "is"
-        },
-        ],
+          {
+              "type": "NotificationConfig",
+              "terms": {
+                  "property_name": "person",
+                  "value": "$current_user"
+              },
+              "condition": "is"
+          },
+      ],
       "create": [
-        {
-          "type": "NotificationConfig",
-          "terms": {
-            "property_name": "person",
-            "value": "$current_user"
-            },
-          "condition": "is"
-        },
-        ],
+          {
+              "type": "NotificationConfig",
+              "terms": {
+                  "property_name": "person",
+                  "value": "$current_user"
+              },
+              "condition": "is"
+          },
+      ],
       "update": [
-        {
-          "type": "NotificationConfig",
-          "terms": {
-            "property_name": "person",
-            "value": "$current_user"
-            },
-          "condition": "is"
-        },
-        ]
-      }
+          {
+              "type": "NotificationConfig",
+              "terms": {
+                  "property_name": "person",
+                  "value": "$current_user"
+              },
+              "condition": "is"
+          },
+      ]
+  }
   collect_permissions(default_permissions, None, permissions)
 
   # Add `ADMIN_PERMISSION` for "bootstrap admin" users
@@ -198,9 +241,9 @@ def load_permissions_for(user):
       and user.email in settings.BOOTSTRAP_ADMIN_USERS:
     admin_permissions = {
         DefaultUserPermissions.ADMIN_PERMISSION.action: [
-          DefaultUserPermissions.ADMIN_PERMISSION.resource_type
-          ]
-        }
+            DefaultUserPermissions.ADMIN_PERMISSION.resource_type
+        ]
+    }
     collect_permissions(
         admin_permissions,
         DefaultUserPermissions.ADMIN_PERMISSION.context_id,
@@ -212,14 +255,14 @@ def load_permissions_for(user):
           sqlalchemy.orm.undefer_group('UserRole_complete'),
           sqlalchemy.orm.undefer_group('Role_complete'),
           sqlalchemy.orm.joinedload('role'))\
-      .filter(UserRole.person_id==user.id)\
+      .filter(UserRole.person_id == user.id)\
       .order_by(UserRole.updated_at.desc())\
       .all()
 
   source_contexts_to_rolenames = {}
   for user_role in user_roles:
     source_contexts_to_rolenames.setdefault(
-        user_role.context_id,list()).append(user_role.role.name)
+        user_role.context_id, list()).append(user_role.role.name)
     if isinstance(user_role.role.permissions, dict):
       collect_permissions(
           user_role.role.permissions, user_role.context_id, permissions)
@@ -230,15 +273,15 @@ def load_permissions_for(user):
   if keys and None in source_contexts_to_rolenames:
     all_context_implications = all_context_implications.filter(
         or_(
-          ContextImplication.source_context_id == None,
-          ContextImplication.source_context_id.in_(keys),
-          )).all()
+            ContextImplication.source_context_id == None,
+            ContextImplication.source_context_id.in_(keys),
+        )).all()
   elif keys:
     all_context_implications = all_context_implications.filter(
-          ContextImplication.source_context_id.in_(keys)).all()
+        ContextImplication.source_context_id.in_(keys)).all()
   elif None in source_contexts_to_rolenames:
     all_context_implications = all_context_implications.filter(
-          ContextImplication.source_context_id == None).all()
+        ContextImplication.source_context_id == None).all()
   else:
     all_context_implications = []
 
@@ -256,7 +299,7 @@ def load_permissions_for(user):
       implied_role_names_list.extend(implied_role_names)
   # If some roles are required, query for them in bulk
   all_implied_roles_by_name = {}
-  if implied_context_to_implied_roles:
+  if implied_context_to_implied_roles and all_implied_roles_set:
     implied_roles = db.session.query(Role)\
         .filter(Role.name.in_(all_implied_roles_set))\
         .options(sqlalchemy.orm.undefer_group('Role_complete'))\
@@ -272,17 +315,27 @@ def load_permissions_for(user):
           implied_role.permissions, implied_context_id, permissions)
 
   # Agregate from owners:
-  all_owners = {}
   for object_owner in user.object_owners:
-    for action in ['read', 'create', 'update', 'delete']:
+    for action in ["read", "create", "update", "delete", "view_object_page"]:
       permissions.setdefault(action, {})\
           .setdefault(object_owner.ownable_type, {})\
           .setdefault('resources', list())\
           .append(object_owner.ownable_id)
 
+  for res in objects_via_relationships_query(user.id).all():
+    id_, type_, role_name = res
+    actions = ["read", "view_object_page"]
+    if role_name in ("ProgramEditor", "ProgramOwner"):
+      actions += ["create", "update", "delete"]
+    for action in actions:
+      permissions.setdefault(action, {})\
+          .setdefault(type_, {})\
+          .setdefault('resources', list())\
+          .append(id_)
+
   personal_context = _get_or_create_personal_context(user)
 
-  permissions.setdefault('__GGRC_ADMIN__',{})\
+  permissions.setdefault('__GGRC_ADMIN__', {})\
       .setdefault('__GGRC_ALL__', dict())\
       .setdefault('contexts', list())\
       .append(personal_context.id)
@@ -293,8 +346,7 @@ def _get_or_create_personal_context(user):
   personal_context = user.get_or_create_object_context(
       context=1,
       name='Personal Context for {0}'.format(user.id),
-      description='',
-      )
+      description='')
   personal_context.modified_by = get_current_user()
   db.session.add(personal_context)
   db.session.flush()
@@ -310,10 +362,10 @@ def handle_program_post(sender, obj=None, src=None, service=None):
   context = obj.build_object_context(
       context=personal_context,
       name='{object_type} Context {timestamp}'.format(
-        object_type=service.model.__name__,
-        timestamp=datetime.datetime.now()),
+          object_type=service.model.__name__,
+          timestamp=datetime.datetime.now()),
       description='',
-      )
+  )
   context.modified_by = get_current_user()
 
   db.session.add(obj)
@@ -360,12 +412,12 @@ def add_public_program_context_implication(context, check_exists=False):
       .count() > 0:
     return
   db.session.add(ContextImplication(
-    source_context=None,
-    context=context,
-    source_context_scope=None,
-    context_scope='Program',
-    modified_by=get_current_user(),
-    ))
+      source_context=None,
+      context=context,
+      source_context_scope=None,
+      context_scope='Program',
+      modified_by=get_current_user(),
+  ))
 
 
 # When adding a private program to an Audit Response, ensure Auditors
@@ -387,22 +439,22 @@ def handle_relationship_post(sender, obj=None, src=None, service=None):
       .count() < 1:
     #Create the audit -> program implication for the Program added to the Response
     parent_program = obj.source.request.audit.program
-    if(parent_program != obj.destination):
+    if parent_program != obj.destination:
       db.session.add(ContextImplication(
-        source_context=obj.source.context,
-        context=obj.destination.context,
-        source_context_scope='Audit',
-        context_scope='Program',
-        modified_by=get_current_user(),
-        ))
+          source_context=obj.source.context,
+          context=obj.destination.context,
+          source_context_scope='Audit',
+          context_scope='Program',
+          modified_by=get_current_user(),
+      ))
 
       db.session.add(ContextImplication(
-        source_context=parent_program.context,
-        context=obj.destination.context,
-        source_context_scope='Program',
-        context_scope='Program',
-        modified_by=get_current_user(),
-        ))
+          source_context=parent_program.context,
+          context=obj.destination.context,
+          source_context_scope='Program',
+          context_scope='Program',
+          modified_by=get_current_user(),
+      ))
 
 # When adding a private program to an Audit Response, ensure Auditors
 #  can read it
@@ -422,7 +474,7 @@ def handle_relationship_delete(sender, obj=None, src=None, service=None):
                          if p.destination == obj.destination]
 
     #Delete the audit -> program implication for the Program removed from the Response
-    if(len(matching_programs) < 1):
+    if len(matching_programs) < 1:
       db.session.query(ContextImplication)\
             .filter(
                 ContextImplication.context_id == obj.destination.context_id,
@@ -441,7 +493,7 @@ def handle_program_put(sender, obj=None, src=None, service=None):
   if get_history(obj, 'private').has_changes():
     if obj.private:
       # Ensure that any implications from null context are removed
-      implications = db.session.query(ContextImplication)\
+      db.session.query(ContextImplication)\
           .filter(
               ContextImplication.context_id == obj.context_id,
               ContextImplication.source_context_id == None)\
@@ -460,30 +512,30 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   context = obj.build_object_context(
       context=obj.context,
       name='Audit Context {timestamp}'.format(
-        timestamp=datetime.datetime.now()),
+          timestamp=datetime.datetime.now()),
       description='',
-      )
+  )
   context.modified_by = get_current_user()
   db.session.add(context)
   db.session.flush()
 
   #Create the program -> audit implication
   db.session.add(ContextImplication(
-    source_context=obj.context,
-    context=context,
-    source_context_scope='Program',
-    context_scope='Audit',
-    modified_by=get_current_user(),
-    ))
+      source_context=obj.context,
+      context=context,
+      source_context_scope='Program',
+      context_scope='Audit',
+      modified_by=get_current_user(),
+  ))
 
   #Create the audit -> program implication
   db.session.add(ContextImplication(
-    source_context=context,
-    context=obj.context,
-    source_context_scope='Audit',
-    context_scope='Program',
-    modified_by=get_current_user(),
-    ))
+      source_context=context,
+      context=obj.context,
+      source_context_scope='Audit',
+      context_scope='Program',
+      modified_by=get_current_user(),
+  ))
 
   db.session.add(obj)
 
@@ -494,7 +546,7 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
       source_context_scope='Audit',
       context_scope=None,
       modified_by=get_current_user(),
-      ))
+  ))
   db.session.flush()
 
   #Place the audit in the audit context
