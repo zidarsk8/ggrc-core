@@ -8,7 +8,7 @@ import random
 import itertools
 
 from tests.ggrc import TestCase
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 
 from ggrc.models import (Regulation, Section, Relationship,
                          Program, Control, Objective)
@@ -45,7 +45,7 @@ class TestAutomappings(TestCase):
 
   def setUp(self):
     TestCase.setUp(self)
-    self.gen = GgrcGenerator()
+    self.gen = ObjectGenerator()
 
   def tearDown(self):
     TestCase.tearDown(self)

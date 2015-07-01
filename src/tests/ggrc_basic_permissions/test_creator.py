@@ -13,7 +13,7 @@ from ggrc.models import get_model
 from ggrc.models import all_models
 from tests.ggrc.api_helper import Api
 from tests.ggrc.generator import Generator
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 
 class TestCreator(TestCase):
   """ TestCreator """
@@ -22,7 +22,7 @@ class TestCreator(TestCase):
     TestCase.setUp(self)
     self.generator = Generator()
     self.api = Api()
-    self.ggrc_generator = GgrcGenerator()
+    self.object_generator = ObjectGenerator()
     self.init_users()
 
   def init_users(self):
@@ -31,7 +31,7 @@ class TestCreator(TestCase):
     users = [("creator", "Creator"), ("admin", "gGRC Admin")]
     self.users = {}
     for (name, role) in users:
-      _, user = self.ggrc_generator.generate_person(
+      _, user = self.object_generator.generate_person(
           data={"name": name}, user_role=role)
       self.users[name] = user
 

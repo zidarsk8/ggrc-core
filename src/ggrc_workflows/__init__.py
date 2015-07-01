@@ -14,16 +14,12 @@ from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import Resource
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
-
 from ggrc_workflows import models, notification
 from ggrc_workflows.services.common import Signals
-from ggrc_workflows.services.workflow_date_calculator import (
-    WorkflowDateCalculator
-)
+from ggrc_workflows.services.workflow_cycle_calculator import get_cycle_calculator
 from ggrc_workflows.roles import (
     WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader
 )
-
 from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
 from ggrc_basic_permissions.contributed_roles import (
     RoleContributions, RoleDeclarations, DeclarativeRoleImplications
@@ -185,65 +181,33 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
   if src.get('autogenerate', False):
     # When called via a REST POST, use current user.
     current_user = get_current_user()
-    build_cycle(obj, current_user=current_user)
-    # calculate next_cycle_start_date
     workflow = obj.workflow
-    calculator = WorkflowDateCalculator(workflow)
-    from datetime import timedelta
-    '''
-    The check for next_cycle_start_date==today looks valid.
-    However, the current next_cycle_start_date was adjusted for holidays and
-    weekends. Because of that, we can't just use
-    WorkflowDateCalculator.next_cycle_start_date_after_start_date because that
-    method assumes an un-adjusted start date. So, instead we'll use
-    calculator.nearest_start_date_after_basedate(...) which will calculate the
-    next unadjusted date, which we will then manually adjust and set as the
-    next cycle start date.
-    '''
-    if workflow.next_cycle_start_date == date.today():
-      workflow.next_cycle_start_date = \
-          WorkflowDateCalculator.adjust_start_date(
-              workflow.frequency,
-              calculator.nearest_start_date_after_basedate(
-                  workflow.next_cycle_start_date + timedelta(days=1))
-          )
+    obj.calculator = get_cycle_calculator(workflow)
+
+    if workflow.next_cycle_start_date:
+      base_date = workflow.next_cycle_start_date
+    else:
+      base_date = date.today()
+
+    build_cycle(obj, current_user=current_user, base_date=base_date)
+    workflow.next_cycle_start_date = obj.calculator.next_cycle_start_date(base_date)
     db.session.add(workflow)
 
 
-def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
-                       frequency, base_date):
+def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user, base_date=None):
   # TaskGroupTasks for one_time workflows don't save relative start/end
-  # month/day. They only saves start/end dates.
+  # month/day. They only saves start and end dates.
   # TaskGroupTasks for all other workflow frequencies save the relative
-  # start/end dates. It should save the relative values instead of the dates.
-  # But it doesn't right now. So, to compensate/work around that, I'm going to
-  # calculate the relative dates and then use them to calculate the actual
-  # start/end dates for the cycletaskgrouptask
-
-  if "one_time" == frequency:
-    sd = task_group_task.start_date
-    ed = task_group_task.end_date
-    rsm = WorkflowDateCalculator.relative_month_from_date(sd, frequency)
-    rsd = WorkflowDateCalculator.relative_day_from_date(sd, frequency)
-    rem = WorkflowDateCalculator.relative_month_from_date(ed, frequency)
-    red = WorkflowDateCalculator.relative_day_from_date(ed, frequency)
-  else:
-    rsm = task_group_task.relative_start_month
-    rsd = task_group_task.relative_start_day
-    rem = task_group_task.relative_end_month
-    red = task_group_task.relative_end_day
+  # start/end days.
+  if not base_date:
+    base_date = date.today()
 
   description = models.CycleTaskGroupObjectTask.default_description if \
       task_group_task.object_approval else task_group_task.description
 
-  start_date = WorkflowDateCalculator.\
-      nearest_start_date_after_basedate_from_dates(
-          base_date, frequency, rsm, rsd)
-  start_date = WorkflowDateCalculator.adjust_start_date(frequency, start_date)
-  end_date = WorkflowDateCalculator.\
-      nearest_end_date_after_start_date_from_dates(
-          frequency, start_date, rem, red)
-  end_date = WorkflowDateCalculator.adjust_end_date(frequency, end_date)
+  date_range = cycle.calculator.task_date_range(task_group_task, base_date=base_date)
+  start_date, end_date = date_range
+
   cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
       context=cycle.context,
       cycle=cycle,
@@ -263,10 +227,12 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user,
   return cycle_task_group_object_task
 
 
-def build_cycle(cycle, current_user=None, base_date=date.today()):
+def build_cycle(cycle, current_user=None, base_date=None):
+  if not base_date:
+    base_date = date.today()
+
   # Determine the relevant Workflow
   workflow = cycle.workflow
-  frequency = workflow.frequency
 
   # Use WorkflowOwner role when this is called via the cron job.
   if not current_user:
@@ -299,9 +265,8 @@ def build_cycle(cycle, current_user=None, base_date=date.today()):
     if len(task_group.task_group_objects) == 0:
       for task_group_task in task_group.task_group_tasks:
         cycle_task_group_object_task = _create_cycle_task(
-            task_group_task, cycle, cycle_task_group, current_user,
-            frequency, base_date
-        )
+            task_group_task, cycle, cycle_task_group, current_user, base_date)
+
         cycle_task_group.cycle_task_group_tasks.append(
             cycle_task_group_object_task)
 
@@ -323,9 +288,7 @@ def build_cycle(cycle, current_user=None, base_date=date.today()):
 
       for task_group_task in task_group.task_group_tasks:
         cycle_task_group_object_task = _create_cycle_task(
-            task_group_task, cycle, cycle_task_group, current_user,
-            frequency, base_date
-        )
+            task_group_task, cycle, cycle_task_group, current_user, base_date)
         cycle_task_group_object.cycle_task_group_object_tasks.append(
             cycle_task_group_object_task)
 
@@ -477,10 +440,26 @@ def handle_task_group_task_put(sender, obj=None, src=None, service=None):
   if inspect(obj).attrs.contact.history.has_changes():
     ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
 
+  # If relative days were change we must update workflow next cycle start date
+  workflow_modifying_attrs =[
+    "relative_start_day", "relative_start_month",
+    "relative_end_day", "relative_end_month"]
+
+  if any(getattr(inspect(obj).attrs, attr).history.has_changes() for attr in workflow_modifying_attrs):
+    db.session.add(obj)
+    update_workflow_state(obj.task_group.workflow)
+
 
 @Resource.model_posted.connect_via(models.TaskGroupTask)
 def handle_task_group_task_post(sender, obj=None, src=None, service=None):
   ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
+  update_workflow_state(obj.task_group.workflow)
+
+
+@Resource.model_deleted.connect_via(models.TaskGroupTask)
+def handle_task_group_task_delete(sender, obj=None, src=None, service=None):
+  db.session.flush()
+  update_workflow_state(obj.task_group.workflow)
 
 
 @Resource.model_put.connect_via(models.TaskGroup)
@@ -511,6 +490,12 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):
     obj.title = source_task_group.title + ' (copy ' + str(obj.id) + ')'
 
   ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
+
+
+@Resource.model_deleted.connect_via(models.TaskGroup)
+def handle_task_group_delete(sender, obj=None, src=None, service=None):
+  db.session.flush()
+  update_workflow_state(obj.workflow)
 
 
 def set_internal_object_state(task_group_object, object_state, status):
@@ -582,35 +567,32 @@ def handle_cycle_task_group_put(
 
 def update_workflow_state(workflow):
   today = date.today()
-
-  calculator = WorkflowDateCalculator(workflow)
-  next_cycle_start_date = WorkflowDateCalculator.adjust_start_date(
-      workflow.frequency, calculator.nearest_start_date_after_basedate(today))
-  # Check the previous cycle to see if today is mid_cycle.
-  previous_cycle_start_date = WorkflowDateCalculator.adjust_start_date(
-      workflow.frequency,
-      calculator.previous_cycle_start_date_before_basedate(today))
-  previous_cycle_end_date = WorkflowDateCalculator.adjust_end_date(
-      workflow.frequency,
-      calculator.nearest_end_date_after_start_date(previous_cycle_start_date))
+  calculator = get_cycle_calculator(workflow)
 
   # Start the first cycle if min_start_date < today < max_end_date
-  if workflow.recurrences:
+  if workflow.recurrences and calculator.tasks:
+    start_date, end_date = calculator.workflow_date_range()
     # Only create the cycle if we're mid-cycle
-    if (previous_cycle_start_date <= today <= previous_cycle_end_date)\
-            and not workflow.cycles:
+    if (start_date <= today <= end_date) \
+        and not workflow.cycles:
       cycle = models.Cycle()
       cycle.workflow = workflow
+      cycle.calculator = calculator
       # Other cycle attributes will be set in build_cycle.
       # So, no need to set them here.
-      build_cycle(cycle, None, previous_cycle_start_date)
+      build_cycle(cycle, None, base_date=workflow.next_cycle_start_date)
       notification.handle_cycle_created(None, obj=cycle)
 
-    # Set the next_cycle_start_date to one frequency period (month, day, year)
-    # ahead of the min_start_date
-    workflow.next_cycle_start_date = next_cycle_start_date
+    next_cycle_start_date = calculator.next_cycle_start_date()
+    if (not workflow.next_cycle_start_date or
+            workflow.next_cycle_start_date != next_cycle_start_date):
+      workflow.next_cycle_start_date = next_cycle_start_date
     db.session.add(workflow)
     db.session.flush()
+    return
+
+  if not calculator.tasks:
+    workflow.next_cycle_start_date = None
     return
 
   for cycle in workflow.cycles:
@@ -829,6 +811,7 @@ def start_recurring_cycles():
 
     cycle = models.Cycle()
     cycle.workflow = workflow
+    cycle.calculator = get_cycle_calculator(workflow)
     cycle.context = workflow.context
     # We can do this because we selected only workflows with
     # next_cycle_start_date = today
@@ -838,14 +821,12 @@ def start_recurring_cycles():
     db.session.add(cycle)
 
     # Create the cycle (including all child objects)
-    build_cycle(cycle)
+    build_cycle(cycle, base_date=date.today())
 
     # Update the workflow next_cycle_start_date to push it ahead based on the
     # frequency.
-    calculator = WorkflowDateCalculator(workflow)
-    workflow.next_cycle_start_date = calculator.nearest_work_day(
-        calculator.nearest_start_date_after_basedate(
-            date.today()), 1, workflow.frequency)
+    workflow.next_cycle_start_date = (cycle.calculator.next_cycle_start_date(
+        base_date=workflow.next_cycle_start_date))
     db.session.add(workflow)
 
     notification.handle_workflow_modify(None, workflow)

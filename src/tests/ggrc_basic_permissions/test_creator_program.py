@@ -12,7 +12,7 @@ from tests.ggrc import TestCase
 from ggrc.models import all_models
 from tests.ggrc.api_helper import Api
 from tests.ggrc.generator import Generator
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 from ggrc import db
 
 
@@ -23,7 +23,7 @@ class TestCreatorProgram(TestCase):
     TestCase.setUp(self)
     self.generator = Generator()
     self.api = Api()
-    self.ggrc_generator = GgrcGenerator()
+    self.object_generator = ObjectGenerator()
     self.init_users()
     self.init_roles()
     self.init_test_cases()
@@ -125,7 +125,7 @@ class TestCreatorProgram(TestCase):
         ("ProgramOwner", "Creator")]
     self.people = {}
     for (name, role) in users:
-      _, user = self.ggrc_generator.generate_person(
+      _, user = self.object_generator.generate_person(
           data={"name": name}, user_role=role)
       self.people[name] = user
 
@@ -151,7 +151,7 @@ class TestCreatorProgram(TestCase):
     test_case = self.test_cases[test_case_name]
     creator = self.people.get('creator')
     self.api.set_user(creator)
-    random_title = self.ggrc_generator.random_str()
+    random_title = self.object_generator.random_str()
     response = self.api.post(all_models.Program, {
         "program": {"title": random_title, "context": None},
     })
