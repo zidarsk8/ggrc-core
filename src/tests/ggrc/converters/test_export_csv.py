@@ -229,3 +229,26 @@ class TestExportWithObjects(TestCase):
     self.assertNotIn("Cat ipsum 11", response.data)
     self.assertNotIn("Cat ipsum 12", response.data)
     self.assertNotIn("Cat ipsum 5", response.data)
+
+    data = [{
+        "fields": [],
+        "filters": {
+            "object_filters": {
+                "expression": {
+                    "left": "title",
+                    "op": {"name": "~"},
+                    "right": "1",
+                },
+                "keys": ["title"],
+                "order_by": {"compare": None, "keys": [], "order": ""},
+            },
+            "relevant_filters": [[]],
+        },
+        "object_name": "Program",
+    }]
+
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+
+    self.assertIn("Cat ipsum 1", response.data)
+    self.assertIn("Cat ipsum 21", response.data)

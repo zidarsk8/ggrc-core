@@ -50,17 +50,17 @@ class QueryHelper(object):
 
   def clean_query(self, query):
     for object_query in query:
-      self.clean_relevant_filters(
-          object_query.get("filters", {}).get("relevant_filters"))
-      self.clean_object_filters(
-          object_query.get("filters", {}).get("object_filters"))
+      self.clean_relevant_filters(object_query.get("filters", {}))
+      self.clean_object_filters(object_query.get("filters", {}))
     return query
 
-  def clean_object_filters(self, filters):
+  def clean_object_filters(self, all_filters):
     pass
 
-  def clean_relevant_filters(self, filters):
-    if not filters:
+  def clean_relevant_filters(self, all_filters):
+    filters = all_filters.get("relevant_filters")
+    if not filters or not filters[0]:
+      all_filters["relevant_filters"] = None
       return
     for or_filter in filters:
       for and_filter in or_filter:
