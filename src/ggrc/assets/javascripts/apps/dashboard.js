@@ -75,6 +75,7 @@ var admin_list_descriptors = {
   }
 };
 
+
 $(function() {
 var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
   admin : {
@@ -160,7 +161,8 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
         }
     };
 
-    if (/^\/\w+\/\d+($|\?|\#)/.test(window.location.pathname) || /^\/dashboard/.test(window.location.pathname)) {
+    if (/^\/\w+\/\d+($|\?|\#)/.test(window.location.pathname) || /^\/dashboard/.test(window.location.pathname)
+        || /^\/objectBrowser\/?$/.test(window.location.pathname)) {
     //if (/\w+\/\d+($|\?|\#)/.test(window.location) || /dashboard/.test(window.location)) {
       instance = GGRC.page_instance();
       model_name = instance.constructor.shortName;

@@ -120,6 +120,13 @@ def dashboard():
   """
   return render_template("dashboard/index.haml")
 
+@app.route("/objectBrowser")
+@login_required
+def objectBrowser():
+  """The object Browser page
+  """
+  return render_template("dashboard/index.haml")
+
 def generate_query_chunks(query):
   CHUNK_SIZE = 100
   count = query.count()

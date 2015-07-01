@@ -536,13 +536,22 @@
           "Market", "OrgGroup", "Vendor", "Audit", "Issue" //, "Request", "Response"
         ];
 
-        return GGRC.Models.Search.search_for_types(
-          "", types, {
-            contact_id: binding.instance.id
-          }
-        ).pipe(function (mappings) {
-          return mappings.entries;
-        });
+        //checkfor window.location
+        if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
+          return GGRC.Models.Search.search_for_types(
+              "", types, {}
+          ).pipe(function (mappings) {
+            return mappings.entries;
+          });
+        } else {
+          return GGRC.Models.Search.search_for_types(
+            "", types, {
+              contact_id: binding.instance.id
+            }
+          ).pipe(function (mappings) {
+            return mappings.entries;
+          });
+        }
       }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,Product,Project,Facility,Market,OrgGroup,Vendor,Audit"),
       extended_related_programs_via_search: TypeFilter("related_objects_via_search", "Program"),
       extended_related_regulations_via_search: TypeFilter("related_objects_via_search", "Regulation"),
