@@ -6,7 +6,7 @@
 */
 
 (function(can, $) {
-  var url = can.route.deparam(window.location.href.split("?")[1]),
+  var url = can.route.deparam(window.location.search.substr(1)),
       filterModel = can.Map({
         model_name: "Program",
         value: "",
