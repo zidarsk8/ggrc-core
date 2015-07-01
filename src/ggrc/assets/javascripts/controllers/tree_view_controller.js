@@ -22,7 +22,7 @@ if (!GGRC.tree_view) {
   GGRC.tree_view = {};
 }
 GGRC.tree_view.basic_model_list = new can.Observe.List([]);
-GGRC.tree_view.sub_tree_for = [];
+GGRC.tree_view.sub_tree_for = {};
 
 function _display_tree_subpath(el, path, attempt_counter) {
   attempt_counter || (attempt_counter = 0);
