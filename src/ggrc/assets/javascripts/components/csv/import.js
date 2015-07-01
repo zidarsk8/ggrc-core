@@ -35,24 +35,29 @@
       },
       ".import-button click": function (el, ev) {
         ev.preventDefault();
-        var data = _.reduce(this.scope.attr("selected"), function (memo, item) {
-                memo[item.value] = [];
-                return memo;
-              }, {});
-        // data = {
-        //   "Section": [1, 2, 3]
-        // }
+        var data = _.map(this.scope.attr("selected"), function (el) {
+              return {object_name: el.value};
+            });
+        if (data.length == 0){
+          return;
+        }
+
         $.ajax({
           type: "POST",
-          dataType: "json",
+          dataType: "text",
           headers: {
             "Content-Type": "application/json",
-            "X-test-only": "true",
+            "X-export-view": "blocks",
             "X-requested-by": "gGRC"
           },
           url: this.scope.attr("url"),
-          data: data
-        });
+          data: JSON.stringify(data)
+        }).then(function(data){
+          GGRC.Utils.download("import_template.csv", data);
+        }.bind(this))
+        .fail(function(data){
+          // TODO: report error
+        }.bind(this));
       },
       ".import-list a click": function (el, ev) {
         ev.preventDefault();
