@@ -101,6 +101,7 @@
           filename: "",
           import: null
         });
+        this.element.find(".csv-upload").val("");
       },
       ".state-select click": function (el, ev) {
         ev.preventDefault();
