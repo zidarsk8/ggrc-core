@@ -3,6 +3,7 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+from ggrc import db
 from ggrc.app import app
 from ggrc.services.common import Resource
 from ggrc import services
@@ -40,6 +41,8 @@ class Api():
 
     self.tc.get("/logout")
     self.tc.get("/login", headers=self.user_headers)
+    db.session.commit()
+    db.session.flush()
 
   def get_service(self, obj):
     if inspect.isclass(obj):
@@ -92,6 +95,10 @@ class Api():
   def get_collection(self, obj, ids):
     return self.data_to_json(self.tc.get(
         "{}?ids={}".format(self.api_link(obj), ids)))
+
+  def get_query(self, obj, query):
+    return self.data_to_json(self.tc.get(
+        "{}?{}".format(self.api_link(obj), query)))
 
   def delete(self, obj, id):
     response = self.get(obj, obj.id)

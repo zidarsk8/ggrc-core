@@ -15,7 +15,7 @@ class PersonGenerator():
     'program_editor': 2,   # ProgramEditor
     'program_reader': 3,   # ProgramReader
     'reader': 5,           # Reader
-    'object_editor': 6,    # ObjectEditor
+    'editor': 6,           # Editor
     'program_creator': 7,  # ProgramCreator
     'admin': 8,            # Admin
   }

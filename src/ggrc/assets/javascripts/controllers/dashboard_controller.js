@@ -7,16 +7,6 @@
 
 (function(can, $) {
 
-function getCustomAttributes () {
-  var custom_attr_deferred = new $.Deferred();
-  CMS.Models.CustomAttributeDefinition.findAll({})
-    .then(function (defs) {
-      GGRC.custom_attr_defs = defs;
-      custom_attr_deferred.resolve();
-  });
-  return custom_attr_deferred;
-}
-
 can.Control("CMS.Controllers.Dashboard", {
     defaults: {
       widget_descriptors: null
@@ -176,10 +166,8 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , init_default_widgets: function() {
-      $.when(getCustomAttributes()).always(function(){
         can.each(this.options.default_widgets, function (name) {
           this.add_dashboard_widget_from_descriptor(this.options.widget_descriptors[name]);
-        }.bind(this));
       }.bind(this));
     }
 
@@ -465,7 +453,7 @@ can.Control("CMS.Controllers.InnerNav", {
     if (info_pin_controller) {
       info_pin_controller.hideInstance();
     }
-      
+
     if (widget.length) {
       dashboard_controller.show_widget_area();
       widget.siblings(':visible').hide().end().show();

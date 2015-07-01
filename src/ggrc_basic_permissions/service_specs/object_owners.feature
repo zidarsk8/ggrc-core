@@ -4,13 +4,13 @@
 # Maintained By: brad@reciprocitylabs.com
 
 Feature: Some object types can have an owner as recorded in an ObjectOwner
-  resource. A role, such as ObjectEditor, might grant priveleges like delete
+  resource. A role, such as Editor, might grant priveleges like delete
   to the owners ownly.
 
   Background:
     Given service description
-    And User "owning.user@example.com" has "ObjectEditor" role
-    And User "non.owning.user@example.com" has "ObjectEditor" role
+    And User "owning.user@example.com" has "Editor" role
+    And User "non.owning.user@example.com" has "Editor" role
     And User link object for "owning.user@example.com" as "owning_user"
     And User link object for "non.owning.user@example.com" as "non_owning_user"
 
