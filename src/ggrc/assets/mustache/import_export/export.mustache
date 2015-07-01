@@ -25,11 +25,11 @@
       </div>
     </div>
 
-    <export-type>
+    <export-group panels="export.panels">
       <div class="relevant-filter-group">
-        {{#panels}}
+        {{#each panels.items}}
           <div class="new-relevant-block">
-            <export-panel type="{{type}}" index="{{index}}">
+            <export-panel type="{{type}}" item=".">
               <div class="row-fluid">
                 <div class="span4">
                   <h6>
@@ -77,17 +77,17 @@
 
               {{> /static/mustache/import_export/export/attribute_selector.mustache}}
               {{> /static/mustache/import_export/export/filter_query.mustache}}
-              <csv-relevance-filter data_grid="{{data_grid}}" index="{{index}}">
+              <csv-relevance-filter data_grid="{{data_grid}}" index="{{_index}}" relevance="item.relevance">
                 {{> /static/mustache/import_export/export/relevance.mustache}}
               </csv-relevance-filter>
             </export-panel>
           </div>
-        {{/panels}}
+        {{/each}}
       </div>
       <div class="add-rule add-object">
         <a href="#" id="addAnotherObjectType" class="addFilterRule btn btn-small btn-info">Export another object type</a>
       </div>
-    </export-type>
+    </export-group>
   </div>
   <div class="save-template-wrap">
     {{#data_grid}}

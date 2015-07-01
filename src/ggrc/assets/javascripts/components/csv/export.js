@@ -7,66 +7,81 @@
 
 (function(can, $) {
   var url = can.route.deparam(window.location.href.split("?")[1]),
-      exportModel = can.Map({
-        index: 0,
-        type: url.type || "Program",
+      filterModel = can.Map({
+        model_name: "Program",
+        value: "",
+        filter: {}
+      }),
+      panelModel = can.Map({
         selected: {},
+        models: null,
+        type: "Program",
+        relevance: can.compute(function () {
+          return new can.List();
+        }),
         columns: function () {
           return CMS.Models[this.attr("type")].tree_view_options.attr_list;
         }
+      }),
+      panelsModel = can.Map({
+        items: new can.List()
+      }),
+      exportModel = can.Map({
+        panels: new panelsModel(),
+        url: "/_service/export_csv",
+        type: url.type || "Program",
+        editFilename: false,
+        only_relevant: false,
+        filename: "Export Objects",
+        data_grid: function () {
+          return _.has(url, "data_grid");
+        }
       });
-
 
   can.Component.extend({
     tag: "csv-export",
     template: "<content></content>",
-    scope: {
-      url: "/_service/export_csv",
-      editFilename: false,
-      only_relevant: false,
-      filename: function () {
-        return "Export Objects";
-      },
-      data_grid: function () {
-        return _.has(url, "data_grid");
-      }
+    scope: function () {
+      return {
+        export: new exportModel()
+      };
     },
     events: {
       ".save-template .btn-success click": function (el, ev) {
         ev.preventDefault();
-        var control = this.element.find("export-type").control(),
-            panels = control.scope.attr("_panels");
-        console.log("YO!", panels);
-        query = _.map(panels, function(panel, index){
-          return {
-            object_name: panel.type,
-            fields: _.compact(_.map(Object.keys(panel.selected), function(key){ 
-              return panel.selected[key] === true ? key : null;} )),
-            filters: {
-              relevant_filters: null,
-              object_filters: GGRC.query_parser.parse(panel.filter || "")
-            }
-          }
-        });
+
+        // var control = this.element.find("export-type").control(),
+        //     panels = control.scope.attr("_panels");
+        // console.log("YO!", panels);
+        // query = _.map(panels, function(panel, index){
+        //   return {
+        //     object_name: panel.type,
+        //     fields: _.compact(_.map(Object.keys(panel.selected), function(key){
+        //       return panel.selected[key] === true ? key : null;} )),
+        //     filters: {
+        //       relevant_filters: null,
+        //       object_filters: GGRC.query_parser.parse(panel.filter || "")
+        //     }
+        //   }
+        // });
+
+        // @Zidar: Everything is withing scope.export :-)
+        console.log("YO!", this);
       }
     }
   });
 
 
   can.Component.extend({
-    tag: "export-type",
+    tag: "export-group",
     template: "<content></content>",
     scope: {
-      _index: 0,
-      _panels: [],
-      panels: function () {
-        if (!this._panels.length) {
-          this._panels.push(new exportModel());
-        }
-        return this._panels;
-      }
+      _index: 0
     },
     events: {
+      "inserted": function () {
+        this.addPanel({ type: url.type || "Program" });
+      },
       getIndex: function (el) {
         return +el.closest("export-panel").attr("index");
       },
@@ -79,7 +94,7 @@
 
         this.scope.attr("_index", index);
         data.index = index;
-        return this.scope.attr("_panels").push(new exportModel(data));
+        return this.scope.attr("panels.items").push(new panelModel(data));
       },
       ".remove_filter_group click": function (el, ev) {
         ev.preventDefault();
@@ -96,14 +111,6 @@
   can.Component.extend({
     tag: "export-panel",
     template: "<content></content>",
-    scope: function(attrs, parentScope, el) {
-      return _.find(parentScope.attr("_panels"), function (panel) {
-        return panel.index === +$(el).attr("index");
-      });
-    },
-    events: {
-
-    },
     helpers: {
       first_panel: function (options) {
         if (+this.attr("index") > 0) {
@@ -118,7 +125,6 @@
     tag: "csv-relevance-filter",
     template: "<content />",
     scope: {
-      filters: [],
       data_grid: "@",
       index: "@",
       // TODO: filter menu items with mapping rules from business_object.js
@@ -132,26 +138,26 @@
     },
     events: {
       "inserted": function (el, ev) {
-        // TODO: Should be fixed, we should handle this within the template 
+        // TODO: Should be fixed, we should handle this within the template
         // and fetched properly?
         var dataGrid = /true/i.test(this.scope.attr("data_grid")),
             index = +this.scope.attr("index");
 
-        if (dataGrid && index !== 0) {
+        if (dataGrid && index !== 1) {
           this.element.empty();
         }
-        if (url.relevant_id && url.relevant_type) {
+        if (index === 1 && url.relevant_id && url.relevant_type) {
           var dfd = this.searchByType(url.relevant_id, url.relevant_type),
               que = new RefreshQueue();
 
           dfd.then(function (response) {
             var result = response.getResultsFor(url.relevant_type)[0];
             que.enqueue(result).trigger().then(function (item) {
-              this.scope.filters.push({
+              this.scope.attr("relevance").push(new filterModel({
                 model_name: url.relevant_type,
                 value: url.relevant_id,
                 filter: result
-              });
+              }));
             }.bind(this));
           }.bind(this));
         }
@@ -161,11 +167,11 @@
       },
       ".add-filter-rule click": function (el, ev) {
         ev.preventDefault();
-        this.scope.filters.push({
+        this.scope.attr("relevance").push(new filterModel({
           value: "",
           filter: new can.Map(),
-          model_name: this.scope.menu[0].model_singular
-        });
+          model_name: this.scope.attr("menu")[0].model_singular
+        }));
       },
       ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
         var index = el.data("index"),
