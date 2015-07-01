@@ -372,6 +372,10 @@ class OptionColumnHandler(ColumnHandler):
                  Option.role == prefixed_key))).first()
     return item
 
+  def get_value(self):
+    option = getattr(self.row_converter.obj, self.key, None)
+    return "" if option is None else option.title
+
 
 class CheckboxColumnHandler(ColumnHandler):
 
