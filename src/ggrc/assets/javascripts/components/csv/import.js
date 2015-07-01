@@ -156,14 +156,19 @@
         $.ajax(this.requestData)
         .done(function (data) {
           this.scope.attr("import", _.map(data, function (element){
-            element.data = [
-              { status: "warnings",
+            element.data = []
+            if (element.block_warnings.concat(element.row_warnings).length){
+              element.data.push({
+                status: "warnings",
                 messages: element.block_warnings.concat(element.row_warnings)
-              },
-              { status: "errors",
+              });
+            }
+            if (element.block_errors.concat(element.row_errors).length){
+              element.data.push({
+                status: "errors",
                 messages: element.block_errors.concat(element.row_errors)
-              },
-            ];
+              });
+            }
             return element;
           }));
           this.scope.attr("state", "import");
