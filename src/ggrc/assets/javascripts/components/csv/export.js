@@ -47,6 +47,14 @@
       };
     },
     events: {
+      ".report-title-trigger click": function (el, ev) {
+        ev.preventDefault();
+        this.scope.attr("export.editFilename", true);
+      },
+      ".report-title-change .btn-primary click": function (el, ev) {
+        ev.preventDefault();
+        this.scope.attr("export.editFilename", false);
+      },
       ".save-template .btn-success click": function (el, ev) {
         ev.preventDefault();
 
