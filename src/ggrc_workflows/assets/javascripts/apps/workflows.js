@@ -223,6 +223,12 @@
         },
         Person: {
           assigned_tasks: Search(function(binding) {
+            if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
+              return CMS.Models.CycleTaskGroupObjectTask.findAll({
+                'cycle.is_current': true,
+                status__in: 'Assigned,InProgress,Finished,Declined'
+              });
+            }
             return CMS.Models.CycleTaskGroupObjectTask.findAll({
               contact_id: binding.instance.id,
               'cycle.is_current': true,
@@ -230,6 +236,9 @@
             });
           }, "Cycle"),
           assigned_tasks_with_history: Search(function(binding) {
+            if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
+              return CMS.Models.CycleTaskGroupObjectTask.findAll({});
+            }
             return CMS.Models.CycleTaskGroupObjectTask.findAll({
               contact_id: binding.instance.id
             });
