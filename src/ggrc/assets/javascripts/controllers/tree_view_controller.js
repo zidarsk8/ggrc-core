@@ -450,19 +450,21 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   init_child_tree_display: function (model) {
     //Set child tree options
     var model_name = model.model_singular,
-        child_tree_model_list = [], w_list,
+        child_tree_model_list = [], w_list, sub_tree,
         valid_models = Object.keys(GGRC.tree_view.base_widgets_by_type);
 
     w_list = GGRC.tree_view.base_widgets_by_type[model_name]; //possible widget/mapped model_list
     if (w_list === undefined) {
       child_tree_model_list = GGRC.tree_view.basic_model_list;
-      GGRC.tree_view.sub_tree_for[model_name] = {};
-      GGRC.tree_view.sub_tree_for[model_name].model_list = child_tree_model_list;
-      GGRC.tree_view.sub_tree_for[model_name].display_list = valid_models;
+      GGRC.tree_view.sub_tree_for[model_name] = {
+        model_list: child_tree_model_list,
+        display_list: valid_models
+      };
     }
 
-    this.options.attr('child_tree_model_list', GGRC.tree_view.sub_tree_for[model_name].model_list);
-    this.options.attr('selected_child_tree_model_list', GGRC.tree_view.sub_tree_for[model_name].model_list);
+    sub_tree = GGRC.tree_view.sub_tree_for[model_name];
+    this.options.attr('child_tree_model_list', sub_tree.model_list);
+    this.options.attr('selected_child_tree_model_list', sub_tree.model_list);
     this.options.attr('select_model_list', GGRC.tree_view.basic_model_list);
     this.options.attr('selected_model_name', model_name);
   },

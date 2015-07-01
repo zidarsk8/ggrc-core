@@ -321,10 +321,10 @@
           child_model_list.push({model_name: item, display_name: CMS.Models[item].title_singular});
         }
       });
-      GGRC.tree_view.sub_tree_for[name] = {};
-      GGRC.tree_view.sub_tree_for[name].model_list = child_model_list;
-      GGRC.tree_view.sub_tree_for[name].display_list =
-        CMS.Models[name].tree_view_options.child_tree_display_list || w_list;
+      GGRC.tree_view.sub_tree_for[name] = {
+        model_list: child_model_list,
+        display_list : CMS.Models[name].tree_view_options.child_tree_display_list || w_list
+      };
     });
 
     function sort_sections(sections) {
