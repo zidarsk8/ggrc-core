@@ -30,7 +30,7 @@
       exportModel = can.Map({
         panels: new panelsModel(),
         url: "/_service/export_csv",
-        type: url.type || "Program",
+        type: url.model_type || "Program",
         editFilename: false,
         only_relevant: false,
         filename: "Export Objects",
@@ -90,7 +90,7 @@
     events: {
       "inserted": function () {
         this.addPanel({
-          type: url.type || "Program"
+          type: url.model_type || "Program"
         });
       },
       addPanel: function (data) {
