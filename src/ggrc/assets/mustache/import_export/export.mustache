@@ -71,7 +71,7 @@
 
               {{> /static/mustache/import_export/export/attribute_selector.mustache}}
               {{> /static/mustache/import_export/export/filter_query.mustache}}
-              <csv-relevance-filter data_grid="{{data_grid}}" index="{{_index}}" relevance="item.relevance">
+              <csv-relevance-filter data_grid="{{export.data_grid}}" index="{{_index}}" relevance="item.relevance">
                 {{> /static/mustache/import_export/export/relevance.mustache}}
               </csv-relevance-filter>
             </export-panel>
@@ -84,10 +84,10 @@
     </export-group>
   </div>
   <div class="save-template-wrap">
-    {{#data_grid}}
+    {{#export.data_grid}}
       <div class="left-content">
         <label class="checkbox-inline">
-          <input type="checkbox" can-value="only_relevant" name="only_relevant" checked="checked">
+          <input type="checkbox" can-value="export.only_relevant" name="only_relevant" checked="checked">
           Show only objects relevant to selected anchor objects
         </label>
       </div>
