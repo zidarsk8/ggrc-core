@@ -14,7 +14,7 @@ from ggrc.converters.import_helper import split_array
 from ggrc.converters.import_helper import pretty_name
 from ggrc.utils import get_mapping_rules
 from tests.ggrc import TestCase
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
@@ -148,7 +148,7 @@ class TestCustomAttributesDefinitions(TestCase):
 
   def setUp(self):
     TestCase.setUp(self)
-    self.generator = GgrcGenerator()
+    self.generator = ObjectGenerator()
 
   def test_policy_definitions(self):
     self.generator.generate_custom_attribute("policy", title="My Attribute")

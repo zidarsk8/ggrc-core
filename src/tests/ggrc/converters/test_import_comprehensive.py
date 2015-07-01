@@ -12,7 +12,7 @@ from flask import json
 
 from ggrc.models import Program
 from tests.ggrc import TestCase
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
@@ -32,7 +32,7 @@ class TestComprehensiveSheets(TestCase):
 
   def setUp(self):
     TestCase.setUp(self)
-    self.generator = GgrcGenerator()
+    self.generator = ObjectGenerator()
     self.create_custom_attributes()
     self.create_people()
     self.client.get("/login")

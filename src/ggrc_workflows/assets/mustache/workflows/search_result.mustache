@@ -33,11 +33,6 @@
     </li>
   {{/list}}
 
-  {{^is_allowed 'read' model.shortName context='any'}}
-    <li class="no-access">
-      You do not have access to read this information.
-    </li>
-  {{/is_allowed}}
   {{#list.is_loading}}
     <li class="spinny"  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' }}>
     </li>

@@ -8,7 +8,7 @@ from flask.json import dumps
 from flask.json import loads
 
 from tests.ggrc import TestCase
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
@@ -57,7 +57,7 @@ class TestExportWithObjects(TestCase):
 
   def setUp(self):
     TestCase.setUp(self)
-    self.generator = GgrcGenerator()
+    self.generator = ObjectGenerator()
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',

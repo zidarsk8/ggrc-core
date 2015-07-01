@@ -6,7 +6,7 @@
 import json
 from flask import request, current_app
 from ggrc.fulltext import get_indexer
-from ggrc.utils import DateTimeEncoder, url_for, benchmark
+from ggrc.utils import GrcEncoder, url_for, benchmark
 
 def search():
   terms = request.args.get('q')
@@ -72,7 +72,7 @@ def do_counts(terms, types=None, contact_id=None, extra_params={}, extra_columns
         'selfLink': request.url,
         'counts': dict(results)
         }
-      }, cls=DateTimeEncoder),
+      }, cls=GrcEncoder),
     200,
     [('Content-Type', 'application/json')],
     ))
@@ -106,7 +106,7 @@ def make_search_result(entries):
         'selfLink': request.url,
         'entries': entries,
         }
-      }, cls=DateTimeEncoder),
+      }, cls=GrcEncoder),
     200,
     [('Content-Type', 'application/json')],
     ))

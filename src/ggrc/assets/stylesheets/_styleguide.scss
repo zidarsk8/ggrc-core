@@ -203,3 +203,12 @@
 .download-template select[multiple] {
   min-height: 320px;
 }
+
+// Risk Assessment
+.object-wrap-people,
+.object-wrap-risks,
+.object-wrap-heat,
+#RAList,
+#RASheet {
+  display: none;
+}

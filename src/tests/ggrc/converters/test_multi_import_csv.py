@@ -17,7 +17,7 @@ from ggrc.models import Product
 from ggrc.models import Relationship
 from ggrc.converters import errors
 from tests.ggrc import TestCase
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
@@ -31,7 +31,7 @@ class TestCsvImport(TestCase):
 
   def setUp(self):
     TestCase.setUp(self)
-    self.generator = GgrcGenerator()
+    self.generator = ObjectGenerator()
     self.client.get("/login")
 
   def tearDown(self):

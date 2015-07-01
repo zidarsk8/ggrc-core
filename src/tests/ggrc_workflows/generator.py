@@ -44,7 +44,7 @@ class WorkflowsGenerator(Generator):
     tgos = data.pop("task_group_objects", [])
 
     obj_name = "task_group"
-    self._session_add(workflow)
+    workflow = self._session_add(workflow)
 
     tg = TaskGroup(
       title="tg " + self.random_str(),
@@ -67,7 +67,7 @@ class WorkflowsGenerator(Generator):
   def generate_task_group_task(self, task_group=None, data={}):
     if not task_group:
       _, task_group = self.generate_task_group()
-    self._session_add(task_group)
+    task_group = self._session_add(task_group)
 
     default_start = self.random_date()
     default_end = self.random_date(default_start, date.today())
@@ -95,8 +95,8 @@ class WorkflowsGenerator(Generator):
   def generate_task_group_object(self, task_group=None, obj=None):
     if not task_group:
       _, task_group = self.generate_task_group()
-    self._session_add(task_group)
-    self._session_add(obj)
+    task_group = self._session_add(task_group)
+    obj = self._session_add(obj)
 
     obj_name = "task_group_object"
 
@@ -114,7 +114,7 @@ class WorkflowsGenerator(Generator):
     if not workflow:
       _, workflow = self.generate_workflow()
 
-    self._session_add(workflow)  # this should be nicer
+    workflow = self._session_add(workflow)  # this should be nicer
 
     obj_name = "cycle"
 
@@ -137,7 +137,7 @@ class WorkflowsGenerator(Generator):
     return self.generate(Cycle, obj_name, obj_dict)
 
   def activate_workflow(self, workflow):
-    self._session_add(workflow)
+    workflow = self._session_add(workflow)
     return self.modify_workflow(workflow, {
       "status": "Active",
       "recurrences": workflow.frequency != "one_time"
@@ -146,7 +146,7 @@ class WorkflowsGenerator(Generator):
   def modify_workflow(self, wf=None, data={}):
     if not wf:
       _, wf = self.generate_workflow()
-    self._session_add(wf)
+    wf = self._session_add(wf)
 
     obj_name = "workflow"
 
@@ -161,7 +161,7 @@ class WorkflowsGenerator(Generator):
     return response, workflow
 
   def modify_object(self, obj, data={}):
-    self._session_add(obj)
+    obj = self._session_add(obj)
 
     obj_name = obj._inflector.table_singular
 
@@ -179,5 +179,6 @@ class WorkflowsGenerator(Generator):
     """ Sometimes tests throw conflicting state present error."""
     try:
       db.session.add(obj)
+      return obj
     except:
-      pass
+      return obj.__class__.query.get(obj.id)

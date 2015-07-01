@@ -41,11 +41,9 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
 
 # Needs to be secured as we are removing @login_required
-
-
 @app.route("/_background_tasks/reindex", methods=["POST"])
 @queued_task
-def reindex(task):
+def reindex(_):
   """
   Web hook to update the full text search index
   """
@@ -77,11 +75,13 @@ def reindex(task):
 
 
 def get_permissions_json():
+  """Get all permissions for current user"""
   permissions.permissions_for(permissions.get_user())
   return json.dumps(getattr(g, '_request_permissions', None))
 
 
 def get_config_json():
+  """Get public app config"""
   public_config = dict(app.config.public_config)
   for extension_module in get_extension_modules():
     if hasattr(extension_module, 'get_public_config'):
@@ -91,6 +91,7 @@ def get_config_json():
 
 
 def get_current_user_json():
+  """Get current user"""
   from ggrc.models.person import Person
   current_user = get_current_user()
   person = Person.eager_query().filter_by(id=current_user.id).one()
@@ -98,14 +99,25 @@ def get_current_user_json():
   return as_json(result)
 
 
+def get_attributes_json():
+  """Get a list of all custom attribute definitions"""
+  attrs = models.CustomAttributeDefinition.eager_query().all()
+  published = []
+  for attr in attrs:
+    published.append(publish_representation(publish(attr)))
+  return as_json(published)
+
+
 @app.context_processor
 def base_context():
+  """Gets the base context"""
   return dict(
       get_model=models.get_model,
       permissions_json=get_permissions_json,
       permissions=permissions,
       config_json=get_config_json,
       current_user_json=get_current_user_json,
+      attributes_json=get_attributes_json,
   )
 
 
@@ -118,13 +130,12 @@ def index():
   """The initial entry point of the app
   """
   if not settings.PRODUCTION:
-    flash(u'WARNING - This is not the production instance of the GGRC '
-          'application.',
-          'alert alert-warning')
-    flash(u'Company confidential, sensitive or personally identifiable '
-          'information *MUST NOT* be entered or stored here. For any '
-          'questions, please contact your administrator.',
-          'alert alert-warning')
+    flash(u"""<b>WARNING</b> - This is not the production instance
+              of the GGRC application.<br><br>
+              Company confidential, sensitive or personally identifiable
+              information <b>*MUST NOT*</b> be entered or stored here.
+              For any questions, please contact your administrator.""",
+          "alert alert-warning")
   return render_template("welcome/index.haml")
 
 
@@ -137,10 +148,11 @@ def dashboard():
 
 
 def generate_query_chunks(query):
-  CHUNK_SIZE = 100
+  """Generate query chunks used by pagination"""
+  chunk_size = 100
   count = query.count()
-  for offset in range(0, count, CHUNK_SIZE):
-    yield query.order_by('id').limit(CHUNK_SIZE).offset(offset).all()
+  for offset in range(0, count, chunk_size):
+    yield query.order_by('id').limit(chunk_size).offset(offset).all()
 
 
 @app.route("/admin/reindex", methods=["POST"])
@@ -150,10 +162,10 @@ def admin_reindex():
   """
   if not permissions.is_allowed_read("/admin", None, 1):
     raise Forbidden()
-  tq = create_task("reindex", url_for(reindex.__name__), reindex)
-  return tq.make_response(app.make_response(("scheduled %s" % tq.name,
-                                             200,
-                                             [('Content-Type', 'text/html')])))
+  task_queue = create_task("reindex", url_for(reindex.__name__), reindex)
+  return task_queue.make_response(
+      app.make_response(("scheduled %s" % task_queue.name, 200,
+                         [('Content-Type', 'text/html')])))
 
 
 @app.route("/admin")
@@ -168,10 +180,12 @@ def admin():
 
 @app.route("/background_task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
+  """Gets the status of a background task"""
   return make_task_response(id_task)
 
 
 def contributed_object_views():
+  """Contributed object views"""
 
   return [
       object_view(models.BackgroundTask),
@@ -203,6 +217,7 @@ def contributed_object_views():
 
 
 def all_object_views():
+  """Gets all object views defined in the application"""
   views = contributed_object_views()
 
   for extension_module in get_extension_modules():
@@ -215,12 +230,16 @@ def all_object_views():
   return views
 
 
-def init_extra_views(app):
+def init_extra_views(_):
+  """Init any extra views needed by the app
+     Currently, init_extra_views is only used by
+     extensions, but this is here for completeness.
+  """
   pass
 
 
 def init_all_views(app):
-
+  """Inits all views defined in the core module and submodules"""
   for entry in all_object_views():
     entry.service_class.add_to(
         app,

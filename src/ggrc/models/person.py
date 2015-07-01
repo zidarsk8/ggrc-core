@@ -135,7 +135,7 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
     ROLE_HIERARCHY = {
         u'gGRC Admin': 0,
         u'ProgramCreator': 1,
-        u'ObjectEditor': 2,
+        u'Editor': 2,
         u'Reader': 3,
         u'Creator': 4,
     }

@@ -3,11 +3,11 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
+import ggrc.models
 from ggrc import db
 from .mixins import deferred, Base, Described, Mapping
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import or_, and_
-
 
 class Relationship(Mapping, db.Model):
   __tablename__ = 'relationships'
@@ -17,13 +17,22 @@ class Relationship(Mapping, db.Model):
   destination_type = db.Column(db.String, nullable=False)
   relationship_type_id = db.Column(db.String)
   # FIXME: Should this be a strict constraint?  If so, a migration is needed.
-  # relationship_type_id = db.Column(
+  #relationship_type_id = db.Column(
   #    db.Integer, db.ForeignKey('relationship_types.id'))
   relationship_type = db.relationship(
       'RelationshipType',
       primaryjoin='foreign(RelationshipType.relationship_type) =='
       ' Relationship.relationship_type_id',
       uselist=False
+  )
+  automapping_id = db.Column(
+      db.Integer,
+      db.ForeignKey('relationships.id', ondelete='SET NULL'),
+      nullable=True,
+  )
+  automapping = db.relationship(
+      lambda: Relationship,
+      remote_side=lambda: Relationship.id
   )
 
   @property

@@ -16,7 +16,7 @@ from ggrc_workflows import start_recurring_cycles
 from ggrc_workflows.views import send_todays_digest_notifications
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 
 
 if os.environ.get('TRAVIS', False):
@@ -33,12 +33,12 @@ class TestMonthlyWorkflowNotification(TestCase):
     TestCase.setUp(self)
     self.api = Api()
     self.wf_generator = WorkflowsGenerator()
-    self.ggrc_generator = GgrcGenerator()
+    self.object_generator = ObjectGenerator()
 
-    self.random_objects = self.ggrc_generator.generate_random_objects()
-    _, self.person_1 = self.ggrc_generator.generate_person(
+    self.random_objects = self.object_generator.generate_random_objects()
+    _, self.person_1 = self.object_generator.generate_person(
         user_role="gGRC Admin")
-    _, self.person_2 = self.ggrc_generator.generate_person(
+    _, self.person_2 = self.object_generator.generate_person(
         user_role="gGRC Admin")
     self.create_test_cases()
 
@@ -55,28 +55,28 @@ class TestMonthlyWorkflowNotification(TestCase):
   def test_auto_generate_cycle(self, mock_mail):
 
     with freeze_time("2015-04-01"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, wf = self.wf_generator.generate_workflow(self.monthly_workflow_1)
       self.wf_generator.activate_workflow(wf)
 
       person_1 = Person.query.get(self.person_1.id)
 
-    with freeze_time("2015-04-03"):
+    with freeze_time("2015-04-02"):
       _, notif_data = notification.get_todays_notifications()
       self.assertIn(person_1.email, notif_data)
       self.assertIn("cycle_starts_in", notif_data[person_1.email])
 
-    with freeze_time("2015-04-04"):
+    with freeze_time("2015-04-02"):
       send_todays_digest_notifications()
       _, notif_data = notification.get_todays_notifications()
       self.assertNotIn(person_1.email, notif_data)
 
-    with freeze_time("2015-04-05"):
+    with freeze_time("2015-04-02"):
       start_recurring_cycles()
       _, notif_data = notification.get_todays_notifications()
       self.assertNotIn(person_1.email, notif_data)
 
     # cycle starts on monday - 6th, and not on 5th
-    with freeze_time("2015-04-06"):
+    with freeze_time("2015-04-03"):
       start_recurring_cycles()
 
 
@@ -94,7 +94,7 @@ class TestMonthlyWorkflowNotification(TestCase):
   def test_manual_generate_cycle(self, mock_mail):
 
     with freeze_time("2015-04-01"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, wf = self.wf_generator.generate_workflow(self.monthly_workflow_1)
       self.wf_generator.activate_workflow(wf)
 
       person_1 = Person.query.get(self.person_1.id)
@@ -121,7 +121,7 @@ class TestMonthlyWorkflowNotification(TestCase):
           "type": "Person"
       }
 
-    self.one_time_workflow_1 = {
+    self.monthly_workflow_1 = {
         "title": "test monthly wf notifications",
         "notify_on_change": True,
         "description": "some test workflow",

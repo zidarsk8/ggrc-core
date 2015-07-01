@@ -12,7 +12,7 @@ import random
 
 from ggrc.models import Product
 from tests.ggrc import TestCase
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
@@ -26,7 +26,7 @@ class TestImportWithCustomAttributes(TestCase):
 
   def setUp(self):
     TestCase.setUp(self)
-    self.generator = GgrcGenerator()
+    self.generator = ObjectGenerator()
     self.create_custom_attributes()
     self.create_people()
     self.client.get("/login")
