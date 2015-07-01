@@ -1135,11 +1135,11 @@ can.Model("can.Model.Cacheable", {
 
   // easier accessor for deep properties
   // owners.0.name -> this.owners[0].reify().name
-  // owners.0.name|email -> 
+  // owners.0.name|email ->
   //  firstnonempty this.owners[0].reify().name this.owners[0].reify().email
   get_deep_property: function get_deep_property (descriptor, val) {
     val = typeof val === "undefined" ? this : val;
-    
+
     if (!descriptor || !descriptor.length) {
       return undefined;
     } else if (val[descriptor]) {
@@ -1178,7 +1178,7 @@ can.Model("can.Model.Cacheable", {
           if (typeof val[key].reify === "function") {
             val[key] = val[key].reify();
           }
-          
+
           return rest.length
                 ? get_deep_property(rest, val[key])
                 : val[key];
@@ -1196,7 +1196,7 @@ can.Model("can.Model.Cacheable", {
     val = typeof val === "undefined" ? this : val;
 
     var needle = _.find(GGRC.custom_attr_defs, function (attr) {
-      return attr.definition_type === val.class.table_singular && 
+      return attr.definition_type === val.class.table_singular &&
             attr.title === descriptor;
     });
 
