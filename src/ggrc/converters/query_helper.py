@@ -65,8 +65,9 @@ class QueryHelper(object):
     for or_filter in filters:
       for and_filter in or_filter:
         ids = and_filter.get("ids", [])
-        ids.extend(self.slugs_to_ids(and_filter["object_name"],
-                                     and_filter["slugs"]))
+        if "slugs" in and_filter:
+          ids.extend(self.slugs_to_ids(and_filter["object_name"],
+                                      and_filter["slugs"]))
         and_filter["ids"] = ids
 
   def get_ids(self):
