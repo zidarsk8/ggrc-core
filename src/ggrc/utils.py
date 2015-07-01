@@ -11,9 +11,9 @@ from flask import current_app, request
 from settings import custom_url_root
 
 
-class DateTimeEncoder(json.JSONEncoder):
+class GrcEncoder(json.JSONEncoder):
 
-  """Custom JSON Encoder to handle datetime objects
+  """Custom JSON Encoder to handle datetime objects and sets
 
   from:
      `http://stackoverflow.com/questions/12122007/python-json-encoder-to-support-datetime`_
@@ -28,8 +28,10 @@ class DateTimeEncoder(json.JSONEncoder):
       return obj.isoformat()
     elif isinstance(obj, datetime.timedelta):
       return (datetime.datetime.min + obj).time().isoformat()
+    elif isinstance(obj, set):
+      return list(obj)
     else:
-      return super(DateTimeEncoder, self).default(obj)
+      return super(GrcEncoder, self).default(obj)
 
 
 class UnicodeSafeJsonWrapper(dict):
@@ -49,7 +51,7 @@ class UnicodeSafeJsonWrapper(dict):
 
 
 def as_json(obj, **kwargs):
-  return json.dumps(obj, cls=DateTimeEncoder, **kwargs)
+  return json.dumps(obj, cls=GrcEncoder, **kwargs)
 
 
 def service_for(obj):

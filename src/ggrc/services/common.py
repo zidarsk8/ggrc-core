@@ -35,7 +35,6 @@ from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
-from ggrc.models.relationship import Relationship
 from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.rbac import permissions, context_query_filter
 from .attribute_query import AttributeQueryBuilder
@@ -43,7 +42,7 @@ from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc import settings
 
 
-CACHE_EXPIRY_COLLECTION=60
+CACHE_EXPIRY_COLLECTION = 60
 
 def get_oauth_credentials():
   from flask import session
@@ -180,7 +179,7 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
             get_related_keys_for_expiration(context, o))
 
   if len(modified_objects.deleted) > 0:
-    items_to_delete=modified_objects.deleted.items()
+    items_to_delete = modified_objects.deleted.items()
     for o, json_obj in items_to_delete:
       cls = get_cache_class(o)
       if context.cache_manager.supported_classes.has_key(cls):
@@ -191,7 +190,7 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
         context.cache_manager.marked_for_delete.extend(
             get_related_keys_for_expiration(context, o))
 
-  status_entries ={}
+  status_entries = {}
   for key in context.cache_manager.marked_for_delete:
     build_cache_status(status_entries, 'DeleteOp:' + key, expiry_time, 'InProgress')
   if len(status_entries) > 0:
@@ -232,7 +231,7 @@ def update_memcache_after_commit(context):
     if delete_result is not True:
       current_app.logger.error("CACHE: Failed to remoe collection from cache")
 
-  status_entries =[]
+  status_entries = []
   for key in cache_manager.marked_for_delete:
     status_entries.append('DeleteOp:' + str(key))
   if len(status_entries) > 0:
@@ -321,11 +320,11 @@ def log_event(session, obj=None, current_user_id=None):
     context_id = obj.context_id
   if revisions:
     event = Event(
-      modified_by_id=current_user_id,
-      action=action,
-      resource_id=resource_id,
-      resource_type=resource_type,
-      context_id=context_id)
+        modified_by_id=current_user_id,
+        action=action,
+        resource_id=resource_id,
+        resource_type=resource_type,
+        context_id=context_id)
     event.revisions = revisions
     session.add(event)
 
@@ -614,19 +613,20 @@ class Resource(ModelView):
   """
 
   signals = Namespace()
-  model_posted = signals.signal('Model POSTed',
-    """
-    Indicates that a model object was received via POST and will be committed
-    to the database. The sender in the signal will be the model class of the
-    POSTed resource. The following arguments will be sent along with the
-    signal:
+  model_posted = signals.signal(
+      'Model POSTed',
+      """
+      Indicates that a model object was received via POST and will be committed
+      to the database. The sender in the signal will be the model class of the
+      POSTed resource. The following arguments will be sent along with the
+      signal:
 
-      :obj: The model instance created from the POSTed JSON.
-      :src: The original POSTed JSON dictionary.
-      :service: The instance of Resource handling the POST request.
-    """,
-    )
-  model_put = signals.signal('Model PUT',
+        :obj: The model instance created from the POSTed JSON.
+        :src: The original POSTed JSON dictionary.
+        :service: The instance of Resource handling the POST request.
+      """,)
+  model_put = signals.signal(
+      'Model PUT',
       """
       Indicates that a model object update was received via PUT and will be
       updated in the database. The sender in the signal will be the model class
@@ -636,9 +636,9 @@ class Resource(ModelView):
         :obj: The model instance updated from the PUT JSON.
         :src: The original PUT JSON dictionary.
         :service: The instance of Resource handling the PUT request.
-      """,
-      )
-  model_deleted = signals.signal('Model DELETEd',
+      """,)
+  model_deleted = signals.signal(
+      'Model DELETEd',
       """
       Indicates that a model object was DELETEd and will be removed from the
       databse. The sender in the signal will be the model class of the DELETEd
@@ -646,8 +646,7 @@ class Resource(ModelView):
 
         :obj: The model instance removed.
         :service: The instance of Resource handling the DELETE request.
-      """,
-      )
+      """,)
 
   def dispatch_request(self, *args, **kwargs):
     with benchmark("Dispatch request"):
@@ -678,7 +677,7 @@ class Resource(ModelView):
         except (IntegrityError, ValidationError) as v:
           message = translate_message(v)
           current_app.logger.warn(message)
-          return ((message, 403, []))
+          return (message, 403, [])
         except Exception as e:
           current_app.logger.exception(e)
           raise
@@ -686,8 +685,8 @@ class Resource(ModelView):
   def post(*args, **kwargs):
     raise NotImplementedError()
 
-  # Default JSON request handlers
   def get(self, id):
+    """Default JSON request handlers"""
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
@@ -707,20 +706,20 @@ class Resource(ModelView):
     if 'If-None-Match' in self.request.headers and \
         self.request.headers['If-None-Match'] == self.etag(object_for_json):
       with benchmark("Make response"):
-        return current_app.make_response((
-          '', 304, [('Etag', self.etag(object_for_json))]))
+        return current_app.make_response(
+            ('', 304, [('Etag', self.etag(object_for_json))]))
     with benchmark("Make response"):
       return self.json_success_response(
         object_for_json, self.modified_at(obj))
 
   def validate_headers_for_put_or_delete(self, obj):
-    # rfc 6585 defines a new status code for missing required headers
+    """rfc 6585 defines a new status code for missing required headers"""
     required_headers = set(['If-Match', 'If-Unmodified-Since'])
     missing_headers = required_headers.difference(set(self.request.headers.keys()))
     if missing_headers:
-      return current_app.make_response((
-        'required headers: ' + ', '.join(missing_headers),
-        428, [('Content-Type', 'text/plain')]))
+      return current_app.make_response(
+          ('required headers: ' + ', '.join(missing_headers),
+           428, [('Content-Type', 'text/plain')]))
 
     if request.headers['If-Match'] != self.etag(self.object_for_json(obj)) or \
         request.headers['If-Unmodified-Since'] != \
@@ -742,19 +741,7 @@ class Resource(ModelView):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
-    if self.request.mimetype != 'application/json':
-      return current_app.make_response((
-        'Content-Type must be application/json', 415,[]))
-    header_error = self.validate_headers_for_put_or_delete(obj)
-    if header_error:
-      return header_error
     src = UnicodeSafeJsonWrapper(self.request.json)
-    root_attribute = self.model._inflector.table_singular
-    try:
-      src = src[root_attribute]
-    except KeyError, e:
-      return current_app.make_response((
-        'Required attribute "{0}" not found'.format(root_attribute), 400, []))
     with benchmark("Query update permissions"):
       if not permissions.is_allowed_update(self.model.__name__, obj.id, obj.context_id):
         raise Forbidden()
@@ -764,6 +751,18 @@ class Resource(ModelView):
       if new_context != obj.context_id \
           and not permissions.is_allowed_update(self.model.__name__, obj.id, new_context):
         raise Forbidden()
+    if self.request.mimetype != 'application/json':
+      return current_app.make_response(
+          ('Content-Type must be application/json', 415, []))
+    header_error = self.validate_headers_for_put_or_delete(obj)
+    if header_error:
+      return header_error
+    root_attribute = self.model._inflector.table_singular
+    try:
+      src = src[root_attribute]
+    except KeyError, e:
+      return current_app.make_response((
+        'Required attribute "{0}" not found'.format(root_attribute), 400, []))
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
@@ -805,14 +804,14 @@ class Resource(ModelView):
         obj = self.get_object(id)
       if obj is None:
         return self.not_found_response()
-      header_error = self.validate_headers_for_put_or_delete(obj)
-      if header_error:
-        return header_error
       with benchmark("Query delete permissions"):
         if not permissions.is_allowed_delete(self.model.__name__, obj.id, obj.context_id):
           raise Forbidden()
         if not permissions.is_allowed_delete_for(obj):
           raise Forbidden()
+      header_error = self.validate_headers_for_put_or_delete(obj)
+      if header_error:
+        return header_error
       db.session.delete(obj)
       with benchmark("Send DELETEd event"):
         self.model_deleted.send(obj.__class__, obj=obj, service=self)
@@ -892,7 +891,7 @@ class Resource(ModelView):
       if 'Accept' in self.request.headers and \
           'application/json' not in self.request.headers['Accept']:
         return current_app.make_response((
-          'application/json', 406, [('Content-Type', 'text/plain')]))
+            'application/json', 406, [('Content-Type', 'text/plain')]))
     with benchmark("dispatch_request > collection_get > Get collection matches"):
       matches_query = self.get_collection_matches(self.model)
     with benchmark("dispatch_request > collection_get > Query Data"):
@@ -940,11 +939,11 @@ class Resource(ModelView):
       if 'If-None-Match' in self.request.headers and \
           self.request.headers['If-None-Match'] == self.etag(collection):
         return current_app.make_response((
-          '', 304, [('Etag', self.etag(collection))]))
+            '', 304, [('Etag', self.etag(collection))]))
 
       with benchmark("Make response"):
         return self.json_success_response(
-          collection, self.collection_last_modified(), cache_op=cache_op)
+            collection, self.collection_last_modified(), cache_op=cache_op)
 
   def get_resources_from_cache(self, matches):
     """Get resources from cache for specified matches"""
@@ -1010,7 +1009,7 @@ class Resource(ModelView):
   def collection_post(self):
     if self.request.mimetype != 'application/json':
       return current_app.make_response((
-        'Content-Type must be application/json', 415,[]))
+          'Content-Type must be application/json', 415, []))
     obj = self.model()
     src = UnicodeSafeJsonWrapper(self.request.json)
     root_attribute = self.model._inflector.table_singular
@@ -1028,13 +1027,13 @@ class Resource(ModelView):
     if src.get('private') == True and src.get('context') is not None \
         and src['context'].get('id') is not None:
       raise BadRequest(
-        'context MUST be "null" when creating a private resource.')
+          'context MUST be "null" when creating a private resource.')
     elif 'context' not in src:
       raise BadRequest('context MUST be specified.')
 
     else:
       if not permissions.is_allowed_create(
-          self.model.__name__, None, self.get_context_id_from_json(src)):
+        self.model.__name__, None, self.get_context_id_from_json(src)):
         raise Forbidden()
     with benchmark("Deserialize object"):
       self.json_create(obj, src)
@@ -1063,7 +1062,7 @@ class Resource(ModelView):
       object_for_json = self.object_for_json(obj)
     with benchmark("Make response"):
       return self.json_success_response(
-        object_for_json, self.modified_at(obj), id=obj.id, status=201)
+          object_for_json, self.modified_at(obj), id=obj.id, status=201)
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
@@ -1081,7 +1080,7 @@ class Resource(ModelView):
         url,
         defaults={cls.pk: None},
         view_func=view_func,
-        methods=['GET','POST'])
+        methods=['GET', 'POST'])
     app.add_url_rule(
         '{url}/<{type}:{pk}>'.format(url=url, type=cls.pk_type, pk=cls.pk),
         view_func=view_func,
@@ -1115,7 +1114,7 @@ class Resource(ModelView):
   def build_page_object_for_json(self, paging):
     def page_args(next_num, per_page):
       # coerce the values to be plain strings, rather than unicode
-      ret = dict([(k,unicode(v)) for k,v in request.args.items()])
+      ret = dict([(k, unicode(v)) for k, v in request.args.items()])
       ret['__page'] = next_num
       if '__page_size' in ret:
         ret['__page_size'] = per_page
@@ -1139,7 +1138,7 @@ class Resource(ModelView):
   def get_resources_from_database(self, matches):
     # FIXME: This is cheating -- `matches` should be allowed to be any model
     model = self.model
-    ids = { m[0]: m for m in matches }
+    ids = {m[0]: m for m in matches}
     query = model.eager_query()
     objs = query.filter(model.id.in_(ids.keys()))
     resources = {}
@@ -1154,10 +1153,10 @@ class Resource(ModelView):
     collection_name = '{0}_collection'.format(table_plural)
     resource = {
         collection_name: {
-          'selfLink': self.url_for_preserving_querystring(),
-          table_plural: objs,
-          }
+            'selfLink': self.url_for_preserving_querystring(),
+            table_plural: objs,
         }
+    }
     if extras:
       resource[collection_name].update(extras)
     return resource
@@ -1169,7 +1168,7 @@ class Resource(ModelView):
     ggrc.builder.json.publish_representation(json_obj)
     if hasattr(obj, "_json_extras"):
       json_obj["extras"] = obj._json_extras
-    return { model_name: json_obj }
+    return {model_name: json_obj}
 
   def build_resource_representation(self, obj, extras=None):
     table_singular = self.model._inflector.table_singular
@@ -1195,7 +1194,7 @@ class Resource(ModelView):
     if cache_op:
       headers.append(('X-GGRC-Cache', cache_op))
     return current_app.make_response(
-      (self.as_json(response_object), status, headers))
+        (self.as_json(response_object), status, headers))
 
   def getval(self, src, attr, *args):
     if args:
@@ -1253,7 +1252,7 @@ def filter_resource(resource, depth=0, user_permissions=None):
           # Apply filtering to sub-resources
           if type(value) is dict and 'type' in value:
             resource[key] = filter_resource(
-              value, depth=depth+1, user_permissions=user_permissions)
+                value, depth=depth+1, user_permissions=user_permissions)
 
       return resource
   else:
