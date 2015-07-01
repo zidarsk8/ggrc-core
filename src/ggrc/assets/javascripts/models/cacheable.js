@@ -703,17 +703,17 @@ can.Model("can.Model.Cacheable", {
     });
   }
   , load_custom_attribute_definitions: function custom_attribute_definitions() {
-    var self = this;
-    if (self.attr('custom_attribute_definitions')) {
-      return new $.Deferred().resolve(self.attr('custom_attribute_definitions'));
+    var definitions;
+    if (this.attr('custom_attribute_definitions')) {
+      return new $.Deferred().resolve(this.attr('custom_attribute_definitions'));
     }
-    return CMS.Models.CustomAttributeDefinition.findAll({
-      definition_type: self.class.root_object
-    }).then(function(definitions) {
-      if(!self.attr('custom_attribute_definitions')) {
-        self.attr('custom_attribute_definitions', definitions);
+    definitions = can.map(GGRC.custom_attr_defs, function(def) {
+      if (def.definition_type === this.constructor.table_singular) {
+        return def;
       }
-    });
+    }.bind(this));
+    this.attr('custom_attribute_definitions', definitions);
+    new $.Deferred().resolve(this.attr('custom_attribute_definitions'));
   }
   , setup_custom_attributes: function setup_custom_attributes() {
     var self = this, key;
