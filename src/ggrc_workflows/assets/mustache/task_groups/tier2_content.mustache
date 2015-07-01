@@ -36,15 +36,18 @@
     {{/if_equals}}
   {{/using}}
 
-  <div class="row-fluid">
-    <div class="span12">
-      <h6>Description</h6>
-      <div class="tree-description">
-        {{{instance.description}}}
+  {{#instance.description}}
+    <div class="row-fluid">
+      <div class="span12">
+        <h6>Description</h6>
+        <div class="tree-description">
+          {{{instance.description}}}
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <br>
+    <br>
+  {{/instance.description}}
   <div class="row-fluid">
     <div class="span12">
       <h6>Code</h6>
