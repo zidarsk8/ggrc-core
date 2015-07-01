@@ -16,6 +16,7 @@
         selected: {},
         models: null,
         type: "Program",
+        filter: "",
         relevance: can.compute(function () {
           return new can.List();
         }),
