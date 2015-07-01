@@ -705,7 +705,7 @@ can.Model("can.Model.Cacheable", {
   , load_custom_attribute_definitions: function custom_attribute_definitions() {
     var definitions;
     if (this.attr('custom_attribute_definitions')) {
-      return new $.Deferred().resolve(this.attr('custom_attribute_definitions'));
+      return;
     }
     definitions = can.map(GGRC.custom_attr_defs, function(def) {
       if (def.definition_type === this.constructor.table_singular) {
@@ -713,7 +713,6 @@ can.Model("can.Model.Cacheable", {
       }
     }.bind(this));
     this.attr('custom_attribute_definitions', definitions);
-    new $.Deferred().resolve(this.attr('custom_attribute_definitions'));
   }
   , setup_custom_attributes: function setup_custom_attributes() {
     var self = this, key;
