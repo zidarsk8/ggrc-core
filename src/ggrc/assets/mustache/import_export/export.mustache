@@ -11,14 +11,14 @@
     <div class="row-fluid">
       <div class="span12">
         <div class="report-title">
-          {{#if editFilename}}
+          {{#if export.editFilename}}
             <div class="report-title-change">
-              <input type="text" id="custom_report_name" class="input-medium" placeholder="Enter report name">
+              <input type="text" can-value="export.filename" class="input-medium" placeholder="Enter report name">
               <a class="btn btn-primary btn-small title-change" href="#">Save</a>
             </div>
           {{else}}
             <h2 class="title">
-              {{filename}} <a class="report-title-trigger" href="#"><i class="grcicon-edit"></i></a>
+              {{export.filename}} <a class="report-title-trigger" href="#"><i class="grcicon-edit"></i></a>
             </h2>
           {{/if}}
         </div>
@@ -29,7 +29,7 @@
       <div class="relevant-filter-group">
         {{#each panels.items}}
           <div class="new-relevant-block">
-            <export-panel type="{{type}}" item=".">
+            <export-panel type="{{type}}" item="." panel_number="{{@index}}">
               <div class="row-fluid">
                 <div class="span4">
                   <h6>

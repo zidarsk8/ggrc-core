@@ -80,10 +80,9 @@
     },
     events: {
       "inserted": function () {
-        this.addPanel({ type: url.type || "Program" });
-      },
-      getIndex: function (el) {
-        return +el.closest("export-panel").attr("index");
+        this.addPanel({
+          type: url.type || "Program"
+        });
       },
       addPanel: function (data) {
         data = data || {};
@@ -96,10 +95,14 @@
         data.index = index;
         return this.scope.attr("panels.items").push(new panelModel(data));
       },
+      getIndex: function (el) {
+        return +el.closest("export-panel").control().scope.attr("item.index");
+      },
       ".remove_filter_group click": function (el, ev) {
         ev.preventDefault();
-        var index = this.getIndex(el);
-        this.scope.attr("_panels").splice(index, 1);
+        var elIndex = this.getIndex(el),
+            index = _.pluck(this.scope.attr("panels.items"), "index").indexOf(elIndex);
+        this.scope.attr("panels.items").splice(index, 1);
       },
       "#addAnotherObjectType click": function (el, ev) {
         ev.preventDefault();
@@ -111,9 +114,12 @@
   can.Component.extend({
     tag: "export-panel",
     template: "<content></content>",
+    scope: {
+      panel_number: "@"
+    },
     helpers: {
       first_panel: function (options) {
-        if (+this.attr("index") > 0) {
+        if (+this.attr("panel_number") > 0) {
           return options.fn();
         }
         return options.inverse();
@@ -175,12 +181,12 @@
       },
       ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
         var index = el.data("index"),
-            panel = this.scope.attr("filters")[index];
+            panel = this.scope.attr("relevance")[index];
 
         panel.attr("filter", data.item);
       },
       ".remove_filter click": function (el) {
-        this.scope.filters.splice(el.data("index"), 1);
+        this.scope.attr("relevance").splice(el.data("index"), 1);
       }
     }
   });
