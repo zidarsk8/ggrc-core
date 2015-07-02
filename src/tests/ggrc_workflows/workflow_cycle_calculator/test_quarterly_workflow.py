@@ -325,8 +325,11 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(cycle.start_date, date(2016, 5, 27))
       self.assertEqual(cycle.end_date, date(2016, 5, 31))
 
-  def test_verify_sting_to_int(self):
-    """Test if string values get converted correctly to integers and arithmetics works"""
+  def test_type_casting(self):
+    """Verify type casting for string input
+
+    Test if string values get converted correctly to integers
+    and arithmetic works"""
     quarterly_wf = {
       "title": "quarterly thingy",
       "description": "start this many a time",
