@@ -52,13 +52,11 @@ class AnnuallyCycleCalculator(CycleCalculator):
     ensure that the day is not overflowing to the next month.
     """
     today = datetime.date.today()
-    if relative_month:
-      relative_month = int(relative_month)
-    if relative_day:
-      if "/" in str(relative_day):
-        rs = relative_day.split("/")
-        relative_day = int(rs[1])
-        relative_month = int(rs[0])
+
+    if not relative_month and "/" in str(relative_day):
+      relative_month, relative_day = relative_day.split("/")
+    relative_day = int(relative_day)
+    relative_month = int(relative_month)
 
     if not relative_day in AnnuallyCycleCalculator.date_domain:
       raise ValueError

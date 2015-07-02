@@ -10,7 +10,7 @@ from datetime import date, datetime
 
 import os
 from ggrc import db
-from ggrc_workflows.models import Workflow, Cycle
+from ggrc_workflows.models import Workflow, Cycle, TaskGroup
 from ggrc_workflows import start_recurring_cycles
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
@@ -78,3 +78,50 @@ class TestAnnuallyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(active_wf.next_cycle_start_date, date(2019, 6, 10))
       self.assertEqual(cycle.start_date, date(2018, 6, 8))
       self.assertEqual(cycle.end_date, date(2018, 8, 9))
+
+  def test_type_casting(self):
+    """Verify type casting for string input
+
+    Test if string values get converted correctly to integers
+    and arithmetic works"""
+
+    annually_wf = {
+      "title": "annually thingy",
+      "description": "start this many a time",
+      "frequency": "annually",
+      "task_groups": [{
+        "title": "task group",
+        "task_group_tasks": [],
+        "task_group_objects": self.random_objects
+      },
+      ]
+    }
+
+    task = {
+      'title': 'annual task 1',
+      "relative_start_day": "10", # 6/10/2015  Wed
+      "relative_start_month": "6",
+      "relative_end_day": "25", # 6/25/2015 Thu
+      "relative_end_month": "6",
+    }
+    with freeze_time("2015-7-1 13:00"):
+      _, wf = self.generator.generate_workflow(annually_wf)
+
+      task_group = db.session.query(TaskGroup).filter(TaskGroup.workflow_id == wf.id).one()
+      _, tgt = self.generator.generate_task_group_task(task_group, data=task)
+
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 6, 10))
+
+    with freeze_time("2016-6-10 13:00"):
+      start_recurring_cycles()
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id).one()
+
+      self.assertEqual(cycle.start_date, date(2016, 6, 10))
+      self.assertEqual(cycle.end_date, date(2016, 6, 24)) # 6/25/2015 is Sat
+      self.assertEqual(active_wf.next_cycle_start_date, date(2017, 6, 9)) # 6/10/2017 is Sat
