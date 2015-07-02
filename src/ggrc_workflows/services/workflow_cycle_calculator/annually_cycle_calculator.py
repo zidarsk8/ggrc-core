@@ -30,8 +30,8 @@ class AnnuallyCycleCalculator(CycleCalculator):
       self.reified_tasks[task.id] = {
         'start_date': start_date,
         'end_date': end_date,
-        'relative_start': self._rel_to_str(task.relative_start_day, task.relative_start_month),
-        'relative_end': self._rel_to_str(task.relative_end_day, task.relative_end_month)
+        'relative_start': (task.relative_start_month, task.relative_start_day),
+        'relative_end': (task.relative_end_month, task.relative_end_day)
       }
 
   @staticmethod
@@ -50,8 +50,6 @@ class AnnuallyCycleCalculator(CycleCalculator):
     """
     today = datetime.date.today()
 
-    if not relative_month and "/" in str(relative_day):
-      relative_month, relative_day = relative_day.split("/")
     relative_day = int(relative_day)
     relative_month = int(relative_month)
 

@@ -81,23 +81,6 @@ class CycleCalculator(object):
       for task in task_group.task_group_tasks]
     self.tasks.sort(key=lambda t: (t.relative_start_month, t.relative_start_day))
 
-  @staticmethod
-  def _rel_to_str(relative_day, relative_month=None):
-    """Get string representation of relative day and month
-
-    Args:
-      relative_day: Relative day of the task
-      relative_month: Relative month of the task
-
-    Returns:
-      String: A number ("5") representing relative day or a string in
-              format "MM/DD" representing both relative month and
-              relative day.
-    """
-    if not relative_month:
-      return str(relative_day)
-    return "{0}/{1}".format(relative_month, relative_day)
-
   def is_work_day(self, ddate):
     """Check whether specific ddate is workday or if it's a holiday/weekend.
 
@@ -220,12 +203,26 @@ class CycleCalculator(object):
       for v in self.reified_tasks.values()]
     tasks_end_dates.sort(key=lambda x: x[0], reverse=True)
 
+    min_date, min_rel = tasks_start_dates[0]
+    if type(min_rel) is tuple:
+      min_rsm, min_rsd = min_rel # min_relative_start_month, min_relative_start_day
+    else:
+      min_rsd = min_rel
+      min_rsm = None
+
     min_start = self.relative_day_to_date(
-      tasks_start_dates[0][1],
+      relative_day=min_rsd, relative_month=min_rsm,
       base_date=base_date)
 
+    max_date, max_rel = tasks_end_dates[0]
+    if type(max_rel) is tuple:
+      max_rem, max_red = max_rel # max_relative_start_month, max_relative_start_day
+    else:
+      max_red = max_rel
+      max_rem = None
+
     max_end = self.relative_day_to_date(
-      tasks_end_dates[0][1],
+      relative_day=max_red, relative_month=max_rem,
       base_date=base_date)
 
     if max_end < min_start:
@@ -249,5 +246,5 @@ class CycleCalculator(object):
       base_date = base_date + self.time_delta
 
     return self.adjust_date(self.relative_day_to_date(
-      tasks_start_dates[0][1],
+      relative_day=min_rsd, relative_month=min_rsm,
       base_date=base_date))
