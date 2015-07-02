@@ -31,9 +31,12 @@
         panels: new panelsModel(),
         url: "/_service/export_csv",
         type: url.model_type || "Program",
-        editFilename: false,
+        edit_filename: false,
         only_relevant: false,
         filename: "Export Objects",
+        get_filename: can.compute(function () {
+          return this.attr("filename").replace(/\s+/, "_").toLowerCase() + ".csv";
+        }),
         data_grid: function () {
           return _.has(url, "data_grid");
         }
@@ -48,47 +51,40 @@
       };
     },
     events: {
-      ".report-title-trigger click": function (el, ev) {
+      ".btn-title-change click": function (el, ev) {
         ev.preventDefault();
-        this.scope.attr("export.editFilename", true);
-      },
-      ".report-title-change .btn-primary click": function (el, ev) {
-        ev.preventDefault();
-        this.scope.attr("export.editFilename", false);
+        this.scope.attr("export.edit_filename", !this.scope.attr("export.edit_filename"));
       },
       ".save-template .btn-success click": function (el, ev) {
         ev.preventDefault();
-
         var panels = this.scope.attr("export.panels.items");
-        query = _.map(panels, function(panel, index){
+        query = _.map(panels, function (panel, index) {
           return {
             object_name: panel.type,
-            fields: _.compact(_.map(Object.keys(panel.selected), function(key){
-              return panel.selected[key] === true ? key : null;} )),
+            fields: _.compact(_.map(Object.keys(panel.selected), function (key) {
+              return panel.selected[key] === true ? key : null;
+            })),
             filters: {
-              relevant_filters: [_.map(panel.relevance(), function(el){
-                return {object_name: el.model_name, ids: [el.filter.id]}
+              relevant_filters: [_.map(panel.relevance(), function (el) {
+                return {
+                  object_name: el.model_name,
+                  ids: [el.filter.id]
+                };
               })],
               object_filters: GGRC.query_parser.parse(panel.filter || "")
             }
-          }
+          };
         });
 
-        $.ajax({
+        GGRC.Utils({
           type: "POST",
-          dataType: "text",
-          headers: {
-            "Content-Type": "application/json",
-            "X-requested-by": "gGRC",
-            "X-export-view": "blocks"
-          },
           url: this.scope.attr("export.url"),
-          data: JSON.stringify(query)
-        }).then(function(data){
-          GGRC.Utils.download("hello.csv", data);
+          data: query
+        }).then(function (data) {
+          GGRC.Utils.download(this.scope.attr("export.get_filename"), data);
         }.bind(this))
-        .fail(function(data){
-          // TODO: report error
+        .fail(function (data) {
+          $("body").trigger("ajax:flash", {"error": data});
         }.bind(this));
       }
     }

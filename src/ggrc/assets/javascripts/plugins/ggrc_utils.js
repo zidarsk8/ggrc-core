@@ -23,5 +23,18 @@
       element.click();
       document.body.removeChild(element);
     },
+    ajax: function (data) {
+      return $.ajax({
+        type: data.type || "POST",
+        dataType: "text",
+        headers: {
+          "Content-Type": "application/json",
+          "X-export-view": "blocks",
+          "X-requested-by": "gGRC"
+        },
+        url: data.url,
+        data: JSON.stringify(data.data || {})
+      });
+    }
   };
 })(jQuery, window.GGRC = window.GGRC || {});
