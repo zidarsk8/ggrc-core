@@ -1,6 +1,9 @@
-# Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By: silas@reciprocitylabs.com
-# Maintained By: silas@reciprocitylabs.com
+# Copyright (C) 2015 Reciprocity, Inc - All Rights Reserved
+# Unauthorized use, copying, distribution, displaying, or public performance
+# of this file, via any medium, is strictly prohibited. All information
+# contained herein is proprietary and confidential and may not be shared
+# with any third party without the express written consent of Reciprocity, Inc.
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
 
 EXTENSIONS = ['ggrc_risk_assessment_v2']
