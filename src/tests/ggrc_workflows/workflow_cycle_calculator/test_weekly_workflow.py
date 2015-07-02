@@ -10,7 +10,7 @@ from datetime import date, datetime
 
 import os
 from ggrc import db
-from ggrc_workflows.models import Workflow, Cycle
+from ggrc_workflows.models import Workflow, Cycle, TaskGroup
 from ggrc_workflows import start_recurring_cycles
 from ggrc_workflows.services.workflow_cycle_calculator.weekly_cycle_calculator import WeeklyCycleCalculator
 
@@ -263,3 +263,48 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
 
       self.assertEqual(cycle.start_date, date(2015, 6, 22))
       self.assertEqual(cycle.end_date, date(2015, 6, 25))
+
+  def test_type_casting(self):
+    """Verify type casting for string input
+
+    Test if string values get converted correctly to integers
+    and arithmetic works"""
+
+    weekly_wf = {
+      "title": "weekly thingy",
+      "description": "start this many a time",
+      "frequency": "weekly",
+      "task_groups": [{
+        "title": "task group 1",
+        "task_group_tasks": [],
+        "task_group_objects": self.random_objects
+      },
+      ]
+    }
+
+    task = {
+      'title': 'weekly task 1',
+      "relative_start_day": "3", # Wed
+      "relative_start_month": None,
+      "relative_end_day": "5", # Fri
+      "relative_end_month": None,
+    }
+
+
+    with freeze_time("2015-7-1 13:00"): # Wed
+      _, wf = self.generator.generate_workflow(weekly_wf)
+
+      task_group = db.session.query(TaskGroup).filter(TaskGroup.workflow_id == wf.id).one()
+      _, tgt = self.generator.generate_task_group_task(task_group, data=task)
+
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id).one()
+
+      self.assertEqual(cycle.start_date, date(2015, 7, 1))
+      self.assertEqual(cycle.end_date, date(2015, 7, 2))
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 8))
