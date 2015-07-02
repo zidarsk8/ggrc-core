@@ -7,256 +7,16 @@
 
 (function(can, $) {
   "use strict";
-
-  can.Component.extend({
-    tag: "modal-mapper",
-    template: "<content />",
-    scope: {
-      object: "@",
-      type: "@",
-      selected: new can.List(),
-      selected_all: false,
-      owner: {},
+  var MapperModel = can.Map({
+      type: "",
+      contact: {},
       term: "",
-      person: "",
-      "join-object-id": "@"
-    },
-    events: {
-      ".modalSearchButton click": function (el, ev) {
-        ev.preventDefault();
-        var results = this.element.find("mapper-results").control(),
-            hasPerson = this.element.find("#search-by-owner").val();
-
-        results.getResults(this.scope.attr("term"), hasPerson && this.scope.attr("owner"));
-      },
-      ".modal-footer .btn-map click": function (el, ev) {
-        ev.preventDefault();
-        var instance = GGRC.page_instance(),
-            data = {};
-
-        data["context"] = null;
-        data["source"] = {
-          href: instance.href,
-          type: instance.type,
-          id: instance.id
-        };
-        _.each(this.scope.attr("selected"), function (desination) {
-          data["destination"] = desination;
-          var model = new CMS.Models.Relationship(data);
-
-          model.save();
-        });
-      },
-      "#search-by-owner autocomplete:select": function (el, ev, data) {
-        this.scope.attr("owner", data.item);
-      },
-      "mapper-selector onTypeChange": function (el, ev, data) {
-        this.scope.attr("type", data.value);
-        this.scope.attr("term", "");
-        this.scope.attr("owner", {});
-        this.scope.attr("selected", []);
-        this.scope.attr("selected_all", false);
-      },
-      "mapper-results onSelect": function (el, ev, count) {
-        this.scope.attr("selected_all", count === this.scope.attr("selected").length);
-      },
-      "mapper-results onSelectAll": function (el, ev, ids) {
-        this.scope.attr("selected", ids);
-      },
-      "mapper-results onSelectChange": function (oEl, oEv, el, ev, item) {
-        var id = el.data("id"),
-            isChecked = el.prop("checked"),
-            selected = this.scope.attr("selected"),
-            needle = {id: item.instance.id},
-            index;
-
-        if (!_.findWhere(selected, needle)) {
-          selected.push({
-            id: item.instance.id,
-            type: item.instance.type,
-            href: item.instance.href
-          });
-        } else {
-          index = _.findIndex(selected, needle);
-          selected.splice(index, 1);
-        }
-      }
-    }
-  });
-  can.Component.extend({
-    tag: "mapper-create-new",
-    template: "<content />",
-    events: {
-      "{document} onTypeChange": function (el, ev, data) {
-        this.scope.attr(data);
-      }
-    }
-  });
-  can.Component.extend({
-    tag: "mapper-results",
-    template: "<content />",
-    scope: {
-      "join-object-id": "@",
-      "items-per-page": "@",
-      page: 0,
-      options: new can.List(),
-      entries: [],
-      isLoading: false
-    },
-    events: {
-      "inserted":  function () {
-        this.element.find(".results-wrap").cms_controllers_infinite_scroll();
-      },
-      "{document} onSelectChange": "onSelect",
-      "{document} onSelectAll": "onSelect",
-      "onSelect": function () {
-        this.element.trigger("onSelect", this.scope.attr("entries").length);
-      },
-      ".results-wrap scrollNext": "drawPage",
-      "{document} onTypeChange": function (el, ev, data) {
-        this.scope.attr("data", data);
-        this.scope.attr("name", data.value);
-        this.getResults();
-      },
-      ".tree-item .openclose click": function (el, ev) {
-        ev.preventDefault();
-        el.openclose();
-      },
-      ".object-check-all change": function (el, ev) {
-        var que = new RefreshQueue(),
-            enteries = this.scope.attr("entries");
-
-        can.each(this.scope.attr("options"), function (model) {
-          model.attr("selected", true);
-        });
-        que.enqueue(enteries).trigger().then(function (models) {
-          this.element.trigger("onSelectAll", [_.map(models, function (model) {
-            return {
-              id: model.id,
-              type: model.type,
-              href: model.href
-            };
-          })]);
-        }.bind(this));
-      },
-      ".tree-item .object-check-single change": function (el, ev) {
-        var uid = el.closest(".tree-item").data("id"),
-            isChecked = el.prop("checked"),
-            item = _.find(this.scope.attr("options"), function (option) {
-                return option.instance.id === uid;
-              }),
-            args = Array.prototype.slice.call(arguments);
-
-        args.push(item);
-        this.element.trigger("onSelectChange", args);
-      },
-      "drawPage": function () {
-        if (this.scope.attr("isLoading") || this.scope.attr("lastPage")) {
-          return;
-        }
-        var que = new RefreshQueue(),
-            page = this.scope.attr("page"),
-            next_page = page + 1,
-            per_page = +this.scope.attr("items-per-page"),
-            page_items = this.scope.attr("entries").slice(page * per_page, next_page * per_page),
-            options = this.scope.attr("options");
-
-        if (!page_items.length) {
-          return;
-        }
-        this.scope.attr("isLoading", true);
-        que.enqueue(page_items).trigger().then(function (models) {
-          this.scope.attr("isLoading", false);
-          this.scope.attr("page", next_page);
-          options.push.apply(options, can.map(models, function (model) {
-            return {
-              instance: model,
-              selected_object: CMS.Models[this.scope.attr("name")],
-              selected: false,
-              binding: null,
-              mappings: []
-            };
-          }.bind(this)));
-        }.bind(this));
-      },
-      "getResults": function (term, owner) {
-        var model_name = this.scope.attr("name"),
-            join_model = GGRC.Mappings.join_model_name_for(CMS.Models[model_name], model_name),
-            permission_parms = {
-              __permission_type: "read"
-            };
-
-        this.scope.attr("page", 0);
-        this.scope.attr("entries", []);
-        this.scope.attr("options", []);
-        if (join_model !== "TaskGroupObject" && model_name === "Program") {
-          permission_parms = {
-            __permission_type: "create",
-            __permission_model: join_model
-          };
-        }
-        if (model_name === "AllObject") {
-          model_name = this.scope.attr("data").models;
-        }
-        if (owner) {
-          permission_parms.contact_id = owner.id;
-        }
-
-        this.scope.attr("isLoading", true);
-        model_name = _.isString(model_name) ? [model_name] : model_name;
-        GGRC.Models.Search
-          .search_for_types(term || "", model_name, permission_parms)
-          .then(function (response) {
-            var entries = _.flatten(_.map(model_name, function (name) {
-                            return response.getResultsForType(name);
-                          }));
-
-            this.scope.attr("entries", entries);
-            this.scope.attr("isLoading", false);
-            this.drawPage();
-          }.bind(this));
-      }
-    }
-  });
-  can.Component.extend({
-    tag: "mapper-filter",
-    template: "<content />",
-    scope: {
-      panels: [],
-      menu: can.map(
-            Array.prototype.concat.call([],
-              "Program Regulation Policy Standard Contract Clause Section Objective Control".split(" "),
-              "Person System Process DataAsset Product Project Facility Market".split(" ")
-            ), function (key) {
-              return CMS.Models[key];
-            })
-    },
-    events: {
-      ".add-filter-rule click": function (el, ev) {
-        ev.preventDefault();
-        this.scope.panels.push({
-          value: "",
-          filter: new can.Map(),
-          model_name: this.scope.menu[0].model_singular
-        });
-      },
-      ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
-        var index = el.data("index"),
-            panel = this.scope.attr("panels")[index];
-
-        panel.attr("filter", data.item);
-      },
-      ".remove_filter click": function (el) {
-        this.scope.panels.splice(el.data("index"), 1);
-      }
-    }
-  });
-  can.Component.extend({
-    tag: "mapper-selector",
-    template: "<content />",
-    scope: {
-      type: "@",
-      groups: function (attrs) {
+      model: {},
+      isLoading: false,
+      allSelected: false,
+      selected: new can.List(),
+      entries: new can.List(),
+      types: can.compute(function () {
         var selector_list = GGRC.Mappings.get_canonical_mappings_for(GGRC.page_model.type),
             groups = {
               "all_objects": {
@@ -298,29 +58,255 @@
           groups["all_objects"]["models"].push(cms_model.shortName);
         }, this);
         return groups;
-      }
+      })
+    });
+
+
+  can.Component.extend({
+    tag: "modal-mapper",
+    template: "<content />",
+    scope: function (attrs, parentScope, el) {
+      var $el = $(el),
+          mapperInst = new MapperModel({
+            type: $el.attr("type"),
+            join_object_id: $el.attr("join-object-id"),
+            object: $el.attr("object"),
+          });
+      return {
+        mapper: mapperInst
+      };
     },
     events: {
-      "onTypeChange": function () {
-        var selected = this.element.find(":selected"),
-            value = selected.val(),
-            groups = this.scope.groups(),
-            data = _.reduce(_.values(groups), function (memo, val) {
-                    return _.findWhere(val.items || val, {value: value}) || memo;
-                  });
-        this.element.trigger("onTypeChange", data);
+      "inserted": "setModel",
+      ".modal-footer .btn-map click": function (el, ev) {
+        ev.preventDefault();
+        return console.log("THIS", this);
+        var instance = GGRC.page_instance(),
+            data = {};
+
+        data["context"] = null;
+        data["source"] = {
+          href: instance.href,
+          type: instance.type,
+          id: instance.id
+        };
+        _.each(this.scope.attr("mapper.selected"), function (desination) {
+          data["destination"] = desination;
+          var model = new CMS.Models.Relationship(data);
+
+          model.save();
+        });
       },
-      "select change": "onTypeChange",
-      "inserted":  "onTypeChange"
+      "setModel": function () {
+        var type = this.scope.attr("mapper.type"),
+            types = this.scope.attr("mapper.types");
+        if (type === "AllObject") {
+          return this.scope.attr("mapper.model", types["all_objects"]);
+        }
+        types = _.reduce(_.values(types), function (memo, val) {
+          if (val.items) {
+            return memo.concat(val.items);
+          }
+          return memo;
+        }, []);
+        this.scope.attr("mapper.model", _.findWhere(types, {value: type}));
+      },
+      "{mapper.type} change": function () {
+        this.scope.attr("mapper.term", "");
+        this.scope.attr("mapper.contact", {});
+        this.setModel();
+      },
+      "#search-by-owner autocomplete:select": function (el, ev, data) {
+        this.scope.attr("mapper.contact", data.item);
+      },
+      "#search-by-owner keyup": function (el, ev) {
+        if (!el.val()) {
+          this.scope.attr("mapper.contact", {});
+        }
+      },
+      "allSelected": function () {
+        var selected = this.scope.attr("mapper.selected"),
+            entries = this.scope.attr("mapper.entries");
+
+        this.scope.attr("mapper.allSelected", selected.length === entries.length);
+      },
+      "{mapper.entries} length": "allSelected",
+      "{mapper.selected} length": "allSelected"
+    }
+  });
+  can.Component.extend({
+    tag: "mapper-results",
+    template: "<content />",
+    scope: {
+      "items-per-page": "@",
+      page: 0,
+      options: new can.List(),
+      pageLoading: false
+    },
+    events: {
+      "inserted":  function () {
+        this.element.find(".results-wrap").cms_controllers_infinite_scroll();
+        this.getResults();
+      },
+      ".modalSearchButton click": "getResults",
+      "{scope} type": "getResults",
+      ".results-wrap scrollNext": "drawPage",
+      ".tree-item .openclose click": function (el, ev) {
+        ev.preventDefault();
+        el.openclose();
+      },
+      ".object-check-all change": function (el, ev) {
+        var que = new RefreshQueue(),
+            entries = this.scope.attr("entries");
+
+        can.each(this.scope.attr("options"), function (model) {
+          model.attr("selected", true);
+        });
+        this.scope.attr("isloading", true);
+        que.enqueue(entries).trigger().then(function (models) {
+          this.scope.attr("isloading", false);
+          this.scope.attr("selected", _.map(models, function (model) {
+            return {
+              id: model.id,
+              type: model.type,
+              href: model.href
+            };
+          }));
+        }.bind(this));
+      },
+      ".tree-item .object-check-single change": function (el, ev) {
+        var uid = el.closest(".tree-item").data("id"),
+            isChecked = el.prop("checked"),
+            item = _.find(this.scope.attr("options"), function (option) {
+                return option.instance.id === uid;
+              }),
+            selected = this.scope.attr("selected"),
+            needle = {id: item.instance.id},
+            index;
+
+        if (!_.findWhere(selected, needle)) {
+          selected.push({
+            id: item.instance.id,
+            type: item.instance.type,
+            href: item.instance.href
+          });
+        } else {
+          index = _.findIndex(selected, needle);
+          selected.splice(index, 1);
+        }
+      },
+      "drawPage": function () {
+        if (this.scope.attr("pageLoading") || this.scope.attr("lastPage")) {
+          return;
+        }
+        var que = new RefreshQueue(),
+            page = this.scope.attr("page"),
+            next_page = page + 1,
+            per_page = +this.scope.attr("items-per-page"),
+            page_items = this.scope.attr("entries").slice(page * per_page, next_page * per_page),
+            options = this.scope.attr("options");
+
+        if (!page_items.length) {
+          return;
+        }
+        this.scope.attr("pageLoading", true);
+        que.enqueue(page_items).trigger().then(function (models) {
+          this.scope.attr("pageLoading", false);
+          this.scope.attr("page", next_page);
+          options.push.apply(options, can.map(models, function (model) {
+            return {
+              instance: model,
+              selected_object: CMS.Models[this.scope.attr("object")],
+              selected: false,
+              binding: null,
+              mappings: []
+            };
+          }.bind(this)));
+        }.bind(this));
+      },
+      "getResults": function () {
+        var model_name = this.scope.attr("type"),
+            contact = this.scope.attr("contact"),
+            join_model = GGRC.Mappings.join_model_name_for(CMS.Models[model_name], model_name),
+            permission_parms = {
+              __permission_type: "read"
+            };
+
+        this.scope.attr("page", 0);
+        console.log("RESULTS", this.scope.attr("entries"), this.scope.attr("options"), this.scope.attr("selected"));
+        this.scope.attr("entries", []);
+        this.scope.attr("selected", []);
+        this.scope.attr("options", []);
+        if (join_model !== "TaskGroupObject" && model_name === "Program") {
+          permission_parms = {
+            __permission_type: "create",
+            __permission_model: join_model
+          };
+        }
+        if (model_name === "AllObject") {
+          model_name = this.scope.attr("types.all_objects.models");
+        }
+        if (contact) {
+          permission_parms.contact_id = contact.id;
+        }
+
+        this.scope.attr("pageLoading", true);
+        model_name = _.isString(model_name) ? [model_name] : model_name;
+        GGRC.Models.Search
+          .search_for_types(this.scope.attr("term") || "", model_name, permission_parms)
+          .then(function (response) {
+            var entries = _.flatten(_.map(model_name, function (name) {
+                            return response.getResultsForType(name);
+                          }));
+
+            this.scope.attr("entries", entries);
+            this.scope.attr("pageLoading", false);
+            this.drawPage();
+          }.bind(this));
+      }
+    }
+  });
+  can.Component.extend({
+    tag: "mapper-filter",
+    template: "<content />",
+    scope: {
+      panels: [],
+      menu: can.map(
+            Array.prototype.concat.call([],
+              "Program Regulation Policy Standard Contract Clause Section Objective Control".split(" "),
+              "Person System Process DataAsset Product Project Facility Market".split(" ")
+            ), function (key) {
+              return CMS.Models[key];
+            })
+    },
+    events: {
+      ".add-filter-rule click": function (el, ev) {
+        ev.preventDefault();
+        this.scope.panels.push({
+          value: "",
+          filter: new can.Map(),
+          model_name: this.scope.menu[0].model_singular
+        });
+      },
+      ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
+        var index = el.data("index"),
+            panel = this.scope.attr("panels")[index];
+
+        panel.attr("filter", data.item);
+      },
+      ".remove_filter click": function (el) {
+        this.scope.panels.splice(el.data("index"), 1);
+      }
     }
   });
 
+
   $("body").on("click",
-  "[data-toggle='modal-selector'], \
-   [data-toggle='modal-relationship-selector'], \
-   [data-toggle='multitype-object-modal-selector'], \
-   [data-toggle='multitype-multiselect-modal-selector'], \
-   [data-toggle='multitype-modal-selector']",
+  '[data-toggle="modal-selector"], \
+   [data-toggle="modal-relationship-selector"], \
+   [data-toggle="multitype-object-modal-selector"], \
+   [data-toggle="multitype-multiselect-modal-selector"], \
+   [data-toggle="multitype-modal-selector"]',
   function (ev) {
     ev.preventDefault();
     var btn = $(ev.currentTarget),
@@ -336,3 +322,4 @@
     }, data));
   });
 })(window.can, window.can.$);
+

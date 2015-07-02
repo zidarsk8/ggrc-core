@@ -38,6 +38,7 @@
                     class="object-check-single"
 
                     {{#if selected}}checked{{/if}}
+                    {{#if isloading}}disabled="true"{{/if}}
                     {{#if mappings.length}}
                       {{#has_pending_removal selected_object instance}}
                         {{#result_direct_mappings bindings_compute selected_object}}
