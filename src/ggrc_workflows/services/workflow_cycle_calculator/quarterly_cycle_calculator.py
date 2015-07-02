@@ -19,9 +19,9 @@ class QuarterlyCycleCalculator(CycleCalculator):
   time_delta = relativedelta.relativedelta(months=3)
 
   date_domain = {
-    "1": set({1, 4, 7, 10}), # Jan/Apr/Jul/Oct
-    "2": set({2, 5, 8, 11}), # Feb/May/Aug/Nov
-    "3": set({3, 6, 9, 12})  # Mar/Jun/Sep/Dec
+    1: {1, 4, 7, 10}, # Jan/Apr/Jul/Oct
+    2: {2, 5, 8, 11}, # Feb/May/Aug/Nov
+    3: {3, 6, 9, 12}  # Mar/Jun/Sep/Dec
   }
 
   def __init__(self, workflow, base_date=None):
@@ -68,15 +68,10 @@ class QuarterlyCycleCalculator(CycleCalculator):
 
     # If we don't get relative month as argument, get month information from
     # relative day.
-    if relative_month:
-      relative_month = str(relative_month)
-    elif relative_day:
-      if "/" in str(relative_day):
-        rs = relative_day.split("/")
-        relative_day = int(rs[1])
-        relative_month = rs[0]
-      else:
-        raise ValueError("Unknown format.")
+    if not relative_month and "/" in str(relative_day):
+      relative_month, relative_day = relative_day.split("/")
+    relative_day = int(relative_day)
+    relative_month = int(relative_month)
 
     if not base_date:
       base_date = today
@@ -88,7 +83,7 @@ class QuarterlyCycleCalculator(CycleCalculator):
     month = max(filter(lambda x: x <= base_date.month, month_domain))
 
     start_month = datetime.date(base_date.year, month, 1)
-    ddate = start_month + relativedelta.relativedelta(days=int(relative_day) - 1)
+    ddate = start_month + relativedelta.relativedelta(days=relative_day - 1)
 
     # We want to go up to the end of the month and not over
     if ddate.month != start_month.month:
