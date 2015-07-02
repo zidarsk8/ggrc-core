@@ -19,9 +19,6 @@
         var $items = el.find(":selected"),
             selected = this.scope.attr("selected");
 
-        function isSelected(val) {
-          return ;
-        }
         $items.each(function () {
           var $item = $(this);
           if (_.findWhere(selected, {value: $item.val()})) {
@@ -38,25 +35,20 @@
         var data = _.map(this.scope.attr("selected"), function (el) {
               return {object_name: el.value};
             });
-        if (data.length == 0){
+
+        if (!data.length) {
           return;
         }
 
-        $.ajax({
-          type: "POST",
-          dataType: "text",
-          headers: {
-            "Content-Type": "application/json",
-            "X-export-view": "blocks",
-            "X-requested-by": "gGRC"
-          },
+        GGRC.Utils.ajax({
           url: this.scope.attr("url"),
-          data: JSON.stringify(data)
-        }).then(function(data){
+          data: data,
+          type: "POST"
+        }).then(function (data) {
           GGRC.Utils.download("import_template.csv", data);
         }.bind(this))
-        .fail(function(data){
-          // TODO: report error
+        .fail(function (data) {
+          $("body").trigger("ajax:flash", {"error": data});
         }.bind(this));
       },
       ".import-list a click": function (el, ev) {
@@ -119,19 +111,19 @@
 
         $.ajax(this.requestData)
         .done(function (data) {
-          var result_count = data.reduce(function(prev, curr){
-            _.each(Object.keys(prev), function(key){
-              prev[key] += curr[key] || 0;
-            });
-            return prev
-          }, {inserted: 0, updated: 0, deleted: 0, ignored: 0})
+          var result_count = data.reduce(function (prev, curr) {
+                _.each(Object.keys(prev), function(key) {
+                  prev[key] += curr[key] || 0;
+                });
+                return prev;
+              }, {inserted: 0, updated: 0, deleted: 0, ignored: 0});
 
           this.scope.attr("state", "success");
           this.scope.attr("data", [result_count]);
         }.bind(this))
         .fail(function (data) {
           this.scope.attr("state", "select");
-          // TODO: write error
+          $("body").trigger("ajax:flash", {"error": data});
         }.bind(this))
         .always(function () {
           this.scope.attr("isLoading", false);
@@ -146,7 +138,7 @@
         this.scope.attr("filename", file.name);
         formData.append("file", file);
 
-        this.requestData =  {
+        this.requestData = {
           type: "POST",
           url: this.scope.attr("importUrl"),
           data: formData,
@@ -161,15 +153,15 @@
 
         $.ajax(this.requestData)
         .done(function (data) {
-          this.scope.attr("import", _.map(data, function (element){
-            element.data = []
-            if (element.block_warnings.concat(element.row_warnings).length){
+          this.scope.attr("import", _.map(data, function (element) {
+            element.data = [];
+            if (element.block_warnings.concat(element.row_warnings).length) {
               element.data.push({
                 status: "warnings",
                 messages: element.block_warnings.concat(element.row_warnings)
               });
             }
-            if (element.block_errors.concat(element.row_errors).length){
+            if (element.block_errors.concat(element.row_errors).length) {
               element.data.push({
                 status: "errors",
                 messages: element.block_errors.concat(element.row_errors)
@@ -181,7 +173,7 @@
         }.bind(this))
         .fail(function (data) {
           this.scope.attr("state", "select");
-          // TODO: write error
+          $("body").trigger("ajax:flash", {"error": data});
         }.bind(this))
         .always(function () {
           this.scope.attr("isLoading", false);
