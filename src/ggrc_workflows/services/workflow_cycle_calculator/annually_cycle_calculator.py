@@ -23,9 +23,6 @@ class AnnuallyCycleCalculator(CycleCalculator):
       base_date = datetime.date.today()
 
     super(AnnuallyCycleCalculator, self).__init__(workflow)
-    self.tasks.sort(key=lambda t: "{0}/{1}".format(
-      t.relative_start_month,
-      t.relative_start_day))
 
     self.reified_tasks = {}
     for task in self.tasks:

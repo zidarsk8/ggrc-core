@@ -79,6 +79,7 @@ class CycleCalculator(object):
     self.tasks = [
       task for task_group in self.workflow.task_groups
       for task in task_group.task_group_tasks]
+    self.tasks.sort(key=lambda t: (t.relative_start_month, t.relative_start_day))
 
   @staticmethod
   def _rel_to_str(relative_day, relative_month=None):

@@ -23,8 +23,6 @@ class MonthlyCycleCalculator(CycleCalculator):
     if not base_date:
       base_date = datetime.date.today()
 
-    self.tasks.sort(key=lambda t: t.relative_start_day)
-
     self.reified_tasks = {}
     for task in self.tasks:
       start_date, end_date = self.task_date_range(task, base_date=base_date)
