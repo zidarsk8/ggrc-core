@@ -22,23 +22,24 @@ class QueryHelper(object):
 
   query object = [
     {
-      object_name: class name,
-      fields: [list of column names],
+      object_name: search class name,
       filters: {
-      relevant_filters:
-        [ list of filters joined by OR expression
-          [ list of filters joined by AND expression
-            {
-              "object_name": class of relevant object,
-              "slugs": list of relevant object slugs,
-                      optional and if exists will be converted into ids
-              "ids": list of relevant object ids
-            }
-          ]
-        ]
-      }
-      object_filters: {
-        TODO: allow filtering by title, description and other object fields
+        relevant_filters:
+          these filters will return all ids of the "search class name" object
+          that are mapped to objects defined in the dictionary insde the list.
+          [ list of filters joined by OR expression
+            [ list of filters joined by AND expression
+              {
+                "object_name": class of relevant object,
+                "slugs": list of relevant object slugs,
+                        optional and if exists will be converted into ids
+                "ids": list of relevant object ids
+              }
+            ]
+          ],
+        object_filters: {
+          TODO: allow filtering by title, description and other object fields
+        }
       }
     }
   ]
@@ -49,6 +50,7 @@ class QueryHelper(object):
     self.query = self.clean_query(query)
 
   def clean_query(self, query):
+    """ sanitize the query object """
     for object_query in query:
       self.clean_relevant_filters(object_query.get("filters", {}))
       self.clean_object_filters(object_query.get("filters", {}))
@@ -71,6 +73,19 @@ class QueryHelper(object):
         and_filter["ids"] = ids
 
   def get_ids(self):
+    """ get list of objects and their ids according to the query
+
+    Returns:
+      list of dicts: The order of dicts is determened by the query.
+          Example:
+              [
+                  {
+                      "object_name": <class_name1>,
+                      "ids": [ id1, id2, ...]
+                  },
+                  ...
+              ]
+    """
     for object_query in self.query:
       object_query["ids"] = self.get_object_ids(object_query)
     return self.query
@@ -154,11 +169,3 @@ class QueryHelper(object):
     ids = [c.id for c in object_class.query.filter(
         object_class.slug.in_(slugs)).all()]
     return ids
-
-  def test_export_query_json(self, query):
-    for export_object in query:
-      if set(["object_class", "filters"]) != set(export_object.keys):
-        raise BadRequest("object_class and filters are needed")
-      if export_object["object_class"] not in self.object_map:
-        raise BadRequest("object_class '{}' is not exportable".format(
-            export_object["object_class"]))

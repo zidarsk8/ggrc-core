@@ -1,7 +1,7 @@
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By: dan@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
 from collections import defaultdict
 from collections import OrderedDict
@@ -103,7 +103,7 @@ class BlockConverter(object):
     self.row_converters = []
     if self.object_class:
       self.object_headers = get_object_column_definitions(self.object_class)
-      all_header_names = map(unicode, self.get_header_names().keys())
+      all_header_names = map(unicode, self.get_header_names().keys())  # noqa
       raw_headers = options.get("raw_headers", all_header_names)
       self.headers = self.clean_headers(raw_headers)
       self.unique_counts = self.get_unique_counts_dict(self.object_class)
@@ -143,12 +143,6 @@ class BlockConverter(object):
     return header_names
 
   def clean_headers(self, raw_headers):
-
-    def sanitize_header(header):
-      header = header.strip("*").lower()
-      if header.startswith("map:"):
-        header = ":".join(map(unicode.strip, header.split(":")))  # noqa
-      return header
     """ Sanitize columns from csv file
 
     Clear out all the bad column headers and remove coresponding column in the
@@ -160,7 +154,8 @@ class BlockConverter(object):
     Returns:
       Ordered Dictionary containing all valid headers
     """
-    headers = [sanitize_header(val) for val in raw_headers]
+
+    headers = [self._sanitize_header(val) for val in raw_headers]
 
     clean_headers = OrderedDict()
     header_names = self.get_header_names()
@@ -309,3 +304,9 @@ class BlockConverter(object):
         index = offset_index - 3 - self.offset
         if self.in_range(index, remove_offset=False):
           self.row_converters[index].set_ignore()
+
+  def _sanitize_header(self, header):
+    header = header.strip("*").lower()
+    if header.startswith("map:"):
+      header = ":".join(map(unicode.strip, header.split(":")))  # noqa
+    return header

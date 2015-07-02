@@ -328,7 +328,7 @@ dashboard-js-template-files:
   - search/advanced_search_option_items.mustache
   - search/advanced_search_people_items.mustache
   - import_export/create_template.mustache
-  - import_export/reporting.mustache
+  - import_export/import_test_result.mustache
   - import_export/complete.mustache
   - import_export/faq.mustache
   - import_export/import.mustache

@@ -33,7 +33,7 @@ class Converter(object):
 
   @classmethod
   def from_ids(cls, data):
-    """ generate converter form list of objects and ids
+    """ generate the converter form a list of objects and ids
 
     Args:
       data (list of tuples): List containing tuples with object_name and

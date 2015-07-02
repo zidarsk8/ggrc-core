@@ -4,22 +4,22 @@
 # Maintained By: miha@reciprocitylabs.com
 
 WRONG_FILE_TYPE = ("Line {line}: Wrong file type. Only .csv files are"
-                   " suported. Please upload .csv file.")
+                   " supported. Please upload a .csv file.")
 
 MISSING_COLUMN = ("Line {line}: Missing mandatory column{s} {column_names},"
                   " when adding object.")
 
 MISSING_CUSTOM_ATTRIBUTE_COLUMN = ("Line {line}: Missing custom column"
-                                   " {column_name}, when adding object")
+                                   " {column_name}, when adding object.")
 
 WRONG_OBJECT_TYPE = ("Line {line}: Object type in your CSV file is not set or"
-                     " does not exist. Please fill it in")
+                     " does not exist. Please fill it in.")
 
 UNKNOWN_COLUMN = ("Line {line}: Attribute '{column_name}' does not"
-                  " exist. Column will be ignored")
+                  " exist. Column will be ignored.")
 
 DELETE_UNKNOWN_OBJECT = ("Line {line}: Object '{slug}' does not exist, so it"
-                         " can't be deleted")
+                         " can't be deleted.")
 
 DUPLICATE_VALUE = ("Line {line}: {column_name} '{title}' already exists."
                    "Record will be ignored.")
@@ -33,7 +33,7 @@ MAP_UNMAP_CONFLICT = ("Line {line}: Object '{slug}' scheduled for mapping and"
                       " be ignored.")
 
 UNKNOWN_OBJECT = ("Line {line}: {object_type} '{slug}' doesn't exist, so it"
-                  " can't be mapped/unmapped")
+                  " can't be mapped/unmapped.")
 
 WHITESPACE_WARNING = ("Line {line}: Field {column_name} contains multiple"
                       "spaces together, that will be merged into one.")
@@ -51,20 +51,16 @@ WRONG_VALUE = ("Line {line}: {column_name} contains invalid data. The value"
                " will be ignored.")
 
 WRONG_REQUIRED_VALUE = ("Line {line}: Required field {column_name} contains"
-                     " invalid data '{value}'. The default value will be used")
+                        " invalid data '{value}'. The default value will be"
+                        "used.")
 
 MISSING_VALUE_ERROR = ("Line {line}: Field {column_name} is required. The line"
                        " will be ignored.")
 
 PERMISSION_ERROR = ("Line {line}: You don't have permission to update/delete"
-                    " this record")
+                    " this record.")
 
 MAPPING_PERMISSION_ERROR = ("Line {line}: You don't have permission to update"
                             " mappings for {object_type}: {title} ({slug}).")
 
 UNKNOWN_ROW_ERROR = "Line {line}: Import failed due to unknown error."
-
-# replaced by UNKNOWN_COLUMN
-# Created at/modified by
-#   Column [created by] can not be updated through import.
-#   Column will be ignored during import.
