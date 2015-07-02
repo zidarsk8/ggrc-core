@@ -102,13 +102,12 @@
       //     .find(".grc-badge")
       //     .text("(" + self.options.join_list.length + ")");
       // });
+      this.post_init();
+      // $.when(
 
-      $.when(
-        this.post_init(),
-        this.fetch_data()
-      ).then(
-        this.proxy('post_draw')
-      );
+      // ).then(
+      //   this.proxy('post_draw')
+      // );
     },
 
     "{join_list} change" : function() {

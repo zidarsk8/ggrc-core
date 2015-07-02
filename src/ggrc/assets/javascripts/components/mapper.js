@@ -45,7 +45,6 @@
             return;
           }
           var cms_model = CMS.Models[model_name],
-              join_model = GGRC.ModalOptionDescriptor.from_join_model(model.model_name, model.option_attr, model_name),
               group = !groups[cms_model.category] ? "governance" : cms_model.category;
 
           groups[group]["items"].push({
@@ -80,9 +79,12 @@
       "inserted": "setModel",
       ".modal-footer .btn-map click": function (el, ev) {
         ev.preventDefault();
-        return console.log("THIS", this);
+        if (el.hasClass("disabled")) {
+          return;
+        }
         var instance = GGRC.page_instance(),
-            data = {};
+            data = {},
+            deffer = [];
 
         data["context"] = null;
         data["source"] = {
@@ -90,12 +92,18 @@
           type: instance.type,
           id: instance.id
         };
+        this.scope.attr("isLoading", true);
         _.each(this.scope.attr("mapper.selected"), function (desination) {
           data["destination"] = desination;
           var model = new CMS.Models.Relationship(data);
 
-          model.save();
+          deffer.push(model.save());
         });
+        $.when.apply($, deffer).then(function () {
+          this.scope.attr("isLoading", false);
+          // TODO: Find proper way to dismiss the modal
+          this.element.find(".modal-dismiss").trigger("click");
+        }.bind(this));
       },
       "setModel": function () {
         var type = this.scope.attr("mapper.type"),
@@ -233,7 +241,6 @@
             };
 
         this.scope.attr("page", 0);
-        console.log("RESULTS", this.scope.attr("entries"), this.scope.attr("options"), this.scope.attr("selected"));
         this.scope.attr("entries", []);
         this.scope.attr("selected", []);
         this.scope.attr("options", []);
@@ -311,6 +318,7 @@
     ev.preventDefault();
     var btn = $(ev.currentTarget),
         data = btn.data();
+
     _.each(data, function (val, key) {
       data[can.camelCaseToUnderscore(key)] = val;
       delete data[key];

@@ -200,7 +200,10 @@
                   {{/if}}
                   objects selected </strong>
           </span>
-          <a class="{{^if mapper.selected.length}}disabled{{/if}} btn-map btn btn-small btn-success preventdoubleclick" href="#">
+          <a class="
+              {{^if mapper.selected.length}}disabled{{/if}}
+              {{#if isLoading}}disabled{{/if}}
+              btn-map btn btn-small btn-success preventdoubleclick" href="#">
             Add Selected
           </a>
         </div>
