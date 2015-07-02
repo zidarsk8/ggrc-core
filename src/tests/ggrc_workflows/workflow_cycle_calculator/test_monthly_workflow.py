@@ -363,3 +363,207 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(cycle.start_date, date(2015, 7, 15))
       self.assertEqual(cycle.end_date, date(2015, 7, 17)) # 19 is Sun
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 8, 14)) # 15 is Sat
+
+
+  def test_ncsd_in_previous_month_automatic(self):
+    """Check starting cycles on periodic basis with one of next cycle start dates in previous month"""
+    monthly_workflow = {
+      "title": "monthly test wf",
+      "description": "start this many a time",
+      "frequency": "monthly",
+      "task_groups": [
+        {
+          "title": "task group 1",
+          'task_group_tasks': [
+            {
+              'title': 'monthly task 1',
+              "relative_start_day": 1, # 7/10/2015 Fri
+              "relative_start_month": None,
+              "relative_end_day": 15, # 7/15/2015 Wed
+              "relative_end_month": None,
+            },
+            {
+              'title': 'monthly task 2',
+              "relative_start_day": 10, # 7/10/2015 Fri
+              "relative_start_month": None,
+              "relative_end_day": 15, # 7/15/2015 Wed
+              "relative_end_month": None,
+            }],
+          "task_group_objects": self.random_objects
+        },
+      ]
+    }
+
+    with freeze_time("2015-5-30 14:00"):
+      _, wf = self.generator.generate_workflow(monthly_workflow)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 6, 1))
+
+    ###### Jun
+
+    with freeze_time("2015-6-1 01:00"):
+      start_recurring_cycles()
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 1))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id,
+        Cycle.start_date == date(2015, 6, 1)).one()
+
+      self.assertEqual(cycle.start_date, date(2015, 6, 1))
+      self.assertEqual(cycle.end_date, date(2015, 6, 15))
+
+    ##### Jul
+
+    with freeze_time("2015-7-1 01:00"):
+      start_recurring_cycles()
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 31))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id,
+        Cycle.start_date == date(2015, 7, 1)).one()
+
+      self.assertEqual(cycle.start_date, date(2015, 7, 1))
+      self.assertEqual(cycle.end_date, date(2015, 7, 15))
+
+    ###### Aug
+
+    with freeze_time("2015-7-31 01:00"):
+      start_recurring_cycles()
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 9, 1))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id,
+        Cycle.start_date == date(2015, 7, 31)).one()
+
+      self.assertEqual(cycle.start_date, date(2015, 7, 31))
+      self.assertEqual(cycle.end_date, date(2015, 8, 14))
+
+    ###### Sept
+
+    with freeze_time("2015-9-1 01:00"):
+      start_recurring_cycles()
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 1))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id,
+        Cycle.start_date == date(2015, 9, 1)).one()
+
+      self.assertEqual(cycle.start_date, date(2015, 9, 1))
+      self.assertEqual(cycle.end_date, date(2015, 9, 15))
+
+  def test_manual_starting_cycles_ncsd_in_previous_month(self):
+    """Check starting cycles manually with one next cycle start date in the previous month"""
+    monthly_workflow = {
+      "title": "monthly test wf",
+      "description": "start this many a time",
+      "frequency": "monthly",
+      "task_groups": [
+        {
+          "title": "task group 1",
+          'task_group_tasks': [
+            {
+              'title': 'monthly task 1',
+              "relative_start_day": 10, # 7/10/2015 Fri
+              "relative_start_month": None,
+              "relative_end_day": 15, # 7/15/2015 Wed
+              "relative_end_month": None,
+            }],
+          "task_group_objects": self.random_objects
+        },
+      ]
+    }
+
+    task = {
+      'title': 'monthly task 2',
+      "relative_start_day": 1, # 7/10/2015 Fri
+      "relative_start_month": None,
+      "relative_end_day": 15, # 7/15/2015 Wed
+      "relative_end_month": None,
+    }
+    with freeze_time("2015-7-1 13:00:00"): # 7/1/2015 Wed
+      # We start with a single task from 10-15
+      _, wf = self.generator.generate_workflow(monthly_workflow)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+
+      # First cycle should start on 10th
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 10))
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 10))
+
+      # We add another task that starts on 1st (today)
+      task_group = db.session.query(TaskGroup).filter(TaskGroup.workflow_id == wf.id).one()
+      _, tgt = self.generator.generate_task_group_task(task_group, data=task)
+
+      # Workflow should have one active cycle and
+      # next cycle start date at the start of August
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 31))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id,
+        Cycle.start_date == date(2015, 7, 1)).one()
+
+      self.assertEqual(cycle.start_date, date(2015, 7, 1))
+      self.assertEqual(cycle.end_date, date(2015, 7, 15))
+
+      ###### Aug
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 7, 31))
+      self.assertEqual(cycle.end_date, date(2015, 8, 14))
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 9, 1))
+
+      ###### Sep
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 9, 1))
+      self.assertEqual(cycle.end_date, date(2015, 9, 15))
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 1))
+
+      ###### Oct
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 10, 1))
+      self.assertEqual(cycle.end_date, date(2015, 10, 15))
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 30))
+
+      ###### Nov
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 10, 30))
+      self.assertEqual(cycle.end_date, date(2015, 11, 13))
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 12, 1))
+
+      ###### Dec
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 12, 1))
+      self.assertEqual(cycle.end_date, date(2015, 12, 15))
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 12, 30))
+
+      ###### Jan
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 12, 30))
+      self.assertEqual(cycle.end_date, date(2016, 1, 15))
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 2, 1))
