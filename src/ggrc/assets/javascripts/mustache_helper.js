@@ -1026,8 +1026,7 @@ Mustache.registerHelper("with_direct_mappings_as",
   return options.fn(options.contexts.add(frame));
 });
 
-Mustache.registerHelper("result_direct_mappings", function (
-    bindings, parent_instance, options) {
+Mustache.registerHelper("result_direct_mappings", function (bindings, parent_instance, options) {
   bindings = Mustache.resolve(bindings);
   bindings = resolve_computed(bindings);
   parent_instance = Mustache.resolve(parent_instance);
@@ -1047,9 +1046,11 @@ Mustache.registerHelper("result_direct_mappings", function (
       }
     }
   }
+
   mappings_type = has_direct_mappings ?
       (has_external_mappings ? "Dir & Ext" : "Dir") : "Ext";
   options.context.mappings_type = mappings_type;
+
   return options.fn(options.contexts);
 });
 

@@ -12,6 +12,7 @@
       contact: {},
       term: "",
       model: {},
+      bindings: {},
       isLoading: false,
       allSelected: false,
       selected: new can.List(),
@@ -76,7 +77,10 @@
       };
     },
     events: {
-      "inserted": "setModel",
+      "inserted": function () {
+        this.setModel();
+        this.setBinding();
+      },
       ".modal-footer .btn-map click": function (el, ev) {
         ev.preventDefault();
         if (el.hasClass("disabled")) {
@@ -105,6 +109,16 @@
           this.element.find(".modal-dismiss").trigger("click");
         }.bind(this));
       },
+      "setBinding": function () {
+        var selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
+            binding = selected.get_binding(this.scope.attr("mapper.model.plural").toLowerCase());
+
+        binding.refresh_list().then(function (mappings) {
+          can.each(mappings, function (mapping) {
+            this.scope.attr("mapper.bindings")[mapping.instance.id] = mapping;
+          }, this);
+        }.bind(this));
+      },
       "setModel": function () {
         var type = this.scope.attr("mapper.type"),
             types = this.scope.attr("mapper.types");
@@ -123,6 +137,7 @@
         this.scope.attr("mapper.term", "");
         this.scope.attr("mapper.contact", {});
         this.setModel();
+        this.setBinding();
       },
       "#search-by-owner autocomplete:select": function (el, ev, data) {
         this.scope.attr("mapper.contact", data.item);
@@ -149,6 +164,7 @@
       "items-per-page": "@",
       page: 0,
       options: new can.List(),
+      select_all: false,
       pageLoading: false
     },
     events: {
@@ -167,9 +183,7 @@
         var que = new RefreshQueue(),
             entries = this.scope.attr("entries");
 
-        can.each(this.scope.attr("options"), function (model) {
-          model.attr("selected", true);
-        });
+        this.scope.attr("select_all", true);
         this.scope.attr("isloading", true);
         que.enqueue(entries).trigger().then(function (models) {
           this.scope.attr("isloading", false);
@@ -183,6 +197,10 @@
         }.bind(this));
       },
       ".tree-item .object-check-single change": function (el, ev) {
+        if (el.hasClass("disabled")) {
+          return;
+        }
+
         var uid = el.closest(".tree-item").data("id"),
             isChecked = el.prop("checked"),
             item = _.find(this.scope.attr("options"), function (option) {
@@ -222,11 +240,19 @@
           this.scope.attr("pageLoading", false);
           this.scope.attr("page", next_page);
           options.push.apply(options, can.map(models, function (model) {
+            var selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
+                binding = selected.get_binding(this.scope.attr("mapper.model.plural").toLowerCase()),
+                bindings = this.scope.attr("mapper.bindings");
+
+            if (bindings[model.id]) {
+              return _.extend(bindings[model.id], {
+                selected_object: selected
+              });
+            }
             return {
               instance: model,
-              selected_object: CMS.Models[this.scope.attr("object")],
-              selected: false,
-              binding: null,
+              selected_object: selected,
+              binding: binding,
               mappings: []
             };
           }.bind(this)));
@@ -244,6 +270,8 @@
         this.scope.attr("entries", []);
         this.scope.attr("selected", []);
         this.scope.attr("options", []);
+        this.scope.attr("select_all", false);
+
         if (join_model !== "TaskGroupObject" && model_name === "Program") {
           permission_parms = {
             __permission_type: "create",
