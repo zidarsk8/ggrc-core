@@ -55,6 +55,34 @@ describe('GGRC.query_parser', function() {
     it("parses text search queries", function(){
 
       var text_search_queries = [
+        '!~a',
+        '!~word',
+        '!~ --this --is',
+        '!~ order by something',
+        '!~ order by s,thing',
+        '!~ order by s,thin  "elese" g',
+        '!~7531902 468'
+      ];
+
+      can.each(text_search_queries, function(query_str){
+        var text = query_str.replace("!~","").trim()
+        expect(GGRC.query_parser.parse(query_str)).toEqual({
+          expression: { 
+            text: text, 
+            op: 'exclude_text_search', 
+            evaluate: jasmine.any(Function)
+          },
+          order_by : { keys : [ ], order : '', compare : null },
+          keys: [],
+          evaluate: jasmine.any(Function)
+        });
+      });
+    });
+
+
+    it("parses text search queries", function(){
+
+      var text_search_queries = [
         'a',
         'word',
         ' --this --is',
@@ -81,7 +109,6 @@ describe('GGRC.query_parser', function() {
           evaluate: jasmine.any(Function)
         });
       });
-
     });
 
 
@@ -205,6 +232,25 @@ describe('GGRC.query_parser', function() {
             .evaluate(values, all_keys)).toEqual(false);
         expect(GGRC.query_parser.parse('order bacon something ipsum')
             .evaluate(values, all_keys)).toEqual(false);
+      });
+
+      it("does full text exclude search", function(){
+        expect(GGRC.query_parser.parse('!~b')
+            .evaluate(values, ['n'])).toEqual(true);
+        expect(GGRC.query_parser.parse('!~b')
+            .evaluate(values, all_keys)).toEqual(false);
+        expect(GGRC.query_parser.parse('!~ 22')
+            .evaluate(values, all_keys)).toEqual(false);
+        expect(GGRC.query_parser.parse('!~bacon')
+            .evaluate(values, all_keys)).toEqual(false);
+        expect(GGRC.query_parser.parse('!~bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(false);
+        expect(GGRC.query_parser.parse(' !~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(false);
+        expect(GGRC.query_parser.parse(' !~ bacon something ipsum')
+            .evaluate(values, all_keys)).toEqual(true);
+        expect(GGRC.query_parser.parse('!~order bacon something ipsum')
+            .evaluate(values, all_keys)).toEqual(true);
       });
     });
 

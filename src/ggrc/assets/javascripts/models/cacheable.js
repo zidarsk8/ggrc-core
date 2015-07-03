@@ -703,17 +703,16 @@ can.Model("can.Model.Cacheable", {
     });
   }
   , load_custom_attribute_definitions: function custom_attribute_definitions() {
-    var self = this;
-    if (self.attr('custom_attribute_definitions')) {
-      return new $.Deferred().resolve(self.attr('custom_attribute_definitions'));
+    var definitions;
+    if (this.attr('custom_attribute_definitions')) {
+      return;
     }
-    return CMS.Models.CustomAttributeDefinition.findAll({
-      definition_type: self.class.root_object
-    }).then(function(definitions) {
-      if(!self.attr('custom_attribute_definitions')) {
-        self.attr('custom_attribute_definitions', definitions);
+    definitions = can.map(GGRC.custom_attr_defs, function(def) {
+      if (def.definition_type === this.constructor.table_singular) {
+        return def;
       }
-    });
+    }.bind(this));
+    this.attr('custom_attribute_definitions', definitions);
   }
   , setup_custom_attributes: function setup_custom_attributes() {
     var self = this, key;
@@ -1135,11 +1134,11 @@ can.Model("can.Model.Cacheable", {
 
   // easier accessor for deep properties
   // owners.0.name -> this.owners[0].reify().name
-  // owners.0.name|email -> 
+  // owners.0.name|email ->
   //  firstnonempty this.owners[0].reify().name this.owners[0].reify().email
   get_deep_property: function get_deep_property (descriptor, val) {
     val = typeof val === "undefined" ? this : val;
-    
+
     if (!descriptor || !descriptor.length) {
       return undefined;
     } else if (val[descriptor]) {
@@ -1178,7 +1177,7 @@ can.Model("can.Model.Cacheable", {
           if (typeof val[key].reify === "function") {
             val[key] = val[key].reify();
           }
-          
+
           return rest.length
                 ? get_deep_property(rest, val[key])
                 : val[key];
@@ -1196,7 +1195,7 @@ can.Model("can.Model.Cacheable", {
     val = typeof val === "undefined" ? this : val;
 
     var needle = _.find(GGRC.custom_attr_defs, function (attr) {
-      return attr.definition_type === val.class.table_singular && 
+      return attr.definition_type === val.class.table_singular &&
             attr.title === descriptor;
     });
 
