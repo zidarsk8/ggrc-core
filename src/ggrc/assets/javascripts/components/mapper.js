@@ -17,6 +17,7 @@
       allSelected: false,
       selected: new can.List(),
       entries: new can.List(),
+      relevant: new can.List(),
       types: can.compute(function () {
         var selector_list = GGRC.Mappings.get_canonical_mappings_for(GGRC.page_model.type),
             groups = {
@@ -145,6 +146,10 @@
       "{mapper.type} change": function () {
         this.scope.attr("mapper.term", "");
         this.scope.attr("mapper.contact", {});
+        this.scope.attr("mapper.relevant", []);
+        this.scope.attr("mapper.entries", []);
+        this.scope.attr("mapper.selected", []);
+
         this.setModel();
         this.setBinding();
       },
@@ -276,8 +281,6 @@
             };
 
         this.scope.attr("page", 0);
-        this.scope.attr("entries", []);
-        this.scope.attr("selected", []);
         this.scope.attr("options", []);
         this.scope.attr("select_all", false);
 
@@ -314,32 +317,31 @@
     tag: "mapper-filter",
     template: "<content />",
     scope: {
-      panels: [],
-      menu: can.map(
-            Array.prototype.concat.call([],
-              "Program Regulation Policy Standard Contract Clause Section Objective Control".split(" "),
-              "Person System Process DataAsset Product Project Facility Market".split(" ")
-            ), function (key) {
-              return CMS.Models[key];
-            })
+      menu: can.compute(function () {
+        var type = this.attr("type") === "AllObject" ? GGRC.page_model.type : this.attr("type"),
+            mappings = GGRC.Mappings.get_canonical_mappings_for(type);
+        return _.map(_.keys(mappings), function (mapping) {
+          return CMS.Models[mapping];
+        });
+      })
     },
     events: {
       ".add-filter-rule click": function (el, ev) {
         ev.preventDefault();
-        this.scope.panels.push({
+        this.scope.attr("relevant").push({
           value: "",
           filter: new can.Map(),
-          model_name: this.scope.menu[0].model_singular
+          model_name: this.scope.attr("menu")[0].model_singular
         });
       },
       ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
         var index = el.data("index"),
-            panel = this.scope.attr("panels")[index];
+            panel = this.scope.attr("relevant")[index];
 
         panel.attr("filter", data.item);
       },
       ".remove_filter click": function (el) {
-        this.scope.panels.splice(el.data("index"), 1);
+        this.scope.attr("relevant").splice(el.data("index"), 1);
       }
     }
   });
