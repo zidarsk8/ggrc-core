@@ -88,7 +88,6 @@ can.Control("CMS.Controllers.TreeLoader", {
   defaults : {}
 }, {
   init_spinner: function() {
-    console.log("treeLoader.init_spinner");
     var spinner,
         $spinner,
         $spinner_li,
@@ -167,7 +166,6 @@ can.Control("CMS.Controllers.TreeLoader", {
   }
 
   , display: function() {
-      //console.log("tree_view.display()");
       var that = this
         , tracker_stop = GGRC.Tracker.start(
             "TreeView", "display", this.options.model.shortName)
@@ -196,7 +194,6 @@ can.Control("CMS.Controllers.TreeLoader", {
       return this._display_deferred;
     }
   , draw_list : function(list) {
-    console.log("tree_view_controller.draw_list", list);
 
     if (this._draw_list_deferred)
       return this._draw_list_deferred;
@@ -259,7 +256,6 @@ can.Control("CMS.Controllers.TreeLoader", {
     }
 
   , enqueue_items: function(items) {
-      console.log("tree_loader.enqueue_items");
       var that = this;
 
       if (!items || items.length == 0) {
@@ -284,7 +280,6 @@ can.Control("CMS.Controllers.TreeLoader", {
     }
 
   , insert_items: function(items) {
-      console.log("tree_loader.insert_items", items);
       var that = this
         , prepped_items = []
         ;
@@ -530,18 +525,15 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , " inserted": function() {
-      console.log("inserted");
       this._attached_deferred.resolve();
     }
   , init_view : function() {
-      console.log("tree_view.TreeView.init_view");
       var dfds = [];
 
       if(this.options.header_view && this.options.show_header) {
         dfds.push(
           can.view(this.options.header_view, $.when(this.options)).then(
             this._ifNotRemoved(function(frag) {
-              console.log("rendering tree view");
               this.element.before(frag);
               // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
               can.bind.call(
@@ -625,7 +617,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , fetch_list : function() {
-    //console.log("tree_view.fetch_list");
     var find_function;
     if (this.find_all_deferred) {
       //  Skip, because already done, e.g., display() already called
@@ -671,7 +662,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , prepare_child_options: function(v) {
-    //console.log("tree_view.prepare_child_options", v);
     //  v may be any of:
     //    <model_instance>
     //    { instance: <model instance>, mappings: [...] }
@@ -705,7 +695,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       return total_children;
     }));
-    //console.log("tree_view.prepare_child_options", v);
     return v;
   }
 
@@ -763,7 +752,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       hi += 1;
     }
     var end = Date.now()
-    console.log("Visible", lo, hi, "| Took:", end - start);
     start = end;
 
     var count_red = 0;
@@ -907,7 +895,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , draw_items : function(options_list) {
-      console.log('tree_view_controller.draw_items');
       var that = this
         , $footer = this.element.children('.tree-item-add').first()
         , $items = $()
@@ -925,16 +912,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           if (control !== undefined) {
             draw_items_dfds.push(control._draw_node_deferred);
           } else {
-            debugger
+            console.log("misfire")
+            //debugger
           }
           $items.push($li[0]);
         }
       });
-
-    console.log("items: ", $items);
-    console.log("footer: ", $footer);
-    console.log("this.elements: ", this.element);
-
 
     if (sort_prop || sort_function) {
         $items.each(function(i, item) {
@@ -1056,7 +1039,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     ev.stopPropagation();
   },
   reload_list: function() {
-    //console.log("tree_view.reload_list")
     if (this.options.list === undefined){
       return;
     }
@@ -1235,7 +1217,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
     }
   }
   , init : function(el, opts) {
-    console.log("tree view node init", this);
     var that = this;
     if(that.options.instance && !that.options.show_view) {
       that.options.show_view =
@@ -1243,19 +1224,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
         || that.options.model[that.options.options_property].show_view
         || GGRC.mustache_path + "/base_objects/tree.mustache";
     }
-    console.log("pre");
-    //setTimeout(this._ifNotRemoved(this.proxy("draw_node")), 20);
-    //setTimeout(this._ifNotRemoved(this.proxy("draw_placeholder")), 20);
-    //setTimeout(this._ifNotRemoved(this.proxy("draw_placeholder")), 0);
     this._draw_node_deferred = new $.Deferred();
-    //this.proxy("draw_placeholder");
     this.draw_placeholder();
-    console.log("post")
 
   }
 
   , draw_node: function() {
-    console.log("tree_view.draw_node", this);
     this.add_child_lists_to_child();
     //setTimeout(function() {
       var that = this;
@@ -1266,9 +1240,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
     //}, 20);
   }
   , draw_placeholder: function() {
-      console.log("tree_view_node.draw_placeholder");
       var that = this;
-      console.log("TreeViewNode.draw_placeholder", that);
       can.view(GGRC.mustache_path + "/base_objects/tree_placeholder.mustache", that.options, this._ifNotRemoved(function(frag) {
         that.replace_element(frag);
         that._draw_node_deferred.resolve();
@@ -1282,7 +1254,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
   }
   // add all child options to one TreeViewOptions object
   , add_child_lists_to_child : function() {
-    //console.log("tree_view.add_child_lists_to_child");
     var that = this
       , original_child_options = this.options.child_options
       , new_child_options = [];
@@ -1315,7 +1286,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
 
   // data is an entry from child options.  if child options is an array, run once for each.
   , add_child_list : function(item, data) {
-    //console.log("tree_view.add_child_list", item, data);
     //var $subtree = $("<ul class='tree-structure'>").appendTo(el);
     //var model = $(el).closest("[data-model]").data("model");
     data.attr({ start_expanded : false });
@@ -1355,7 +1325,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
   }
 
   , replace_element : function(el) {
-    console.log("tree_view.replace_element");
     var old_el = this.element
       , $el
       , old_data
