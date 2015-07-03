@@ -278,7 +278,7 @@
         var join_model = GGRC.Mappings.join_model_name_for(this.scope.attr("mapper.object"), data.model_name);
 
         if (join_model !== "TaskGroupObject" && data.model_name === "Program") {
-          permission_parms = {
+          data.options.permission_parms = {
             __permission_type: "create",
             __permission_model: join_model
           };
@@ -292,8 +292,8 @@
         var model_name = this.scope.attr("type"),
             contact = this.scope.attr("contact"),
             permission_parms = {},
-            deffer = [],
-            search = [];
+            search = [],
+            relevant;
 
         this.scope.attr("page", 0);
         this.scope.attr("options", []);
@@ -307,22 +307,25 @@
         }
 
         this.scope.attr("pageLoading", true);
-        search.push({
-          term: this.scope.attr("term"),
-          model_name: model_name,
-          options: permission_parms
-        });
-        search.concat(_.map(this.scope.attr("mapper.relevant"), function (relevant) {
+        relevant = _.map(this.scope.attr("mapper.relevant"), function (relevant) {
           return {
             model_name: relevant.model_name,
             term: relevant.filter.title
           };
-        }));
+        });
+        search.push({
+            term: this.scope.attr("term"),
+            model_name: model_name,
+            options: permission_parms
+        });
+        $.merge(search, relevant);
 
+        debugger;
         $.when.apply($, _.map(search, function (query) {
           return this.searchFor(query);
         }.bind(this)))
         .done(function (response) {
+          console.log("SEARCH RESULTS", response, Array.prototype.slice.call(arguments).slice(1));
           var entries = _.flatten(_.map((_.isString(model_name) ? [model_name] : model_name), function (name) {
                           return response.getResultsForType(name);
                         }));
@@ -342,6 +345,7 @@
         var type = this.attr("type") === "AllObject" ? GGRC.page_model.type : this.attr("type"),
             mappings = GGRC.Mappings.get_canonical_mappings_for(type);
         return _.map(_.keys(mappings), function (mapping) {
+          console.log("MENU", CMS.Models[mapping], mapping);
           return CMS.Models[mapping];
         });
       })
