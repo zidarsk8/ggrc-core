@@ -774,7 +774,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     for (var i = lo; i <= hi; i++) {
       if (!(i >= lo_old && i <= hi_old)) {
-          $(children[i]).control().draw_node();
+        $(children[i]).control().draw_node();
         count_blue++;
       }
     }
@@ -959,8 +959,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           $items.appendTo(this.element);
         }
       }
-      setTimeout(this.draw_visible.bind(this), 0);
-      return $.when.apply($, draw_items_dfds);
+      var res = $.when.apply($, draw_items_dfds);
+      res.then(function(){setTimeout(that.draw_visible.bind(that), 0)});
+      return res;
     }
 
   , " sortupdate" : function(el, ev, ui) {
