@@ -110,9 +110,12 @@
         }.bind(this));
       },
       "setBinding": function () {
-        var selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
-            binding = selected.get_binding(this.scope.attr("mapper.model.plural").toLowerCase());
+        var model_name = this.scope.attr("mapper.model.plural").toLowerCase(),
+            selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
+            binding;
 
+        model_name = (selected.has_binding(model_name) ? "" : "related_") + model_name;
+        binding = selected.get_binding(model_name);
         binding.refresh_list().then(function (mappings) {
           can.each(mappings, function (mapping) {
             this.scope.attr("mapper.bindings")[mapping.instance.id] = mapping;
