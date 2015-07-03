@@ -216,6 +216,38 @@ text_exp
         }
       };
     }
+  / _* "!~" characters:.*
+    {
+      return {
+        text: characters.join("").trim(),
+        op: 'exclude_text_search',
+        keys: [],
+        evaluate: function(values, keys){
+           keys = keys || Object.keys(values);
+
+          function comparator(a, b){
+            return a.toUpperCase().indexOf(b.toUpperCase()) == -1
+          }
+
+          return keys.reduce(function(result, key){
+            if (!result) return result;
+            if (values.hasOwnProperty(key)){
+              var value = values[key];
+              if (jQuery.type(value) === "string" ){
+                return comparator(value, this.text);
+              } else if (jQuery.type(value) === "array") {
+                return value.reduce(function(result, val){
+                  return result || this.evaluate(val);
+                }.bind(this), false);
+              } else if (jQuery.type(value) === "object"){
+                return this.evaluate(value);
+              }
+            }
+            return result;
+          }.bind(this), true);
+        }
+      };
+    }
 
 paren_exp
   = LEFT_P or_exp:or_exp RIGHT_P
