@@ -480,6 +480,14 @@
         add_item_view: GGRC.mustache_path + "/sections/tree_add_item.mustache",
         draw_children: true
       },
+      related_objects_child_options = {
+        model: can.Model.Cacheable,
+        mapping: "related_objects",
+        show_view: GGRC.mustache_path + "/base_objects/tree.mustache",
+        footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
+        add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
+        draw_children: true
+      },
       extra_content_controller_options = apply_mixins({
         objectives: {
           Objective: {
@@ -501,34 +509,52 @@
         },
         business_objects: {
           DataAsset: {
-            mapping: "related_data_assets"
+            mapping: "related_data_assets",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Facility: {
-            mapping: "related_facilities"
+            mapping: "related_facilities",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Market: {
-            mapping: "related_markets"
+            mapping: "related_markets",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           OrgGroup: {
-            mapping: "related_org_groups"
+            mapping: "related_org_groups",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Vendor: {
             mapping: "related_vendors"
           },
           Process: {
-            mapping: "related_processes"
+            mapping: "related_processes",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Product: {
-            mapping: "related_products"
+            mapping: "related_products",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Project: {
-            mapping: "related_projects"
+            mapping: "related_projects",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           System: {
-            mapping: "related_systems"
+            mapping: "related_systems",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           ControlAssessment: {
-            mapping: "related_control_assessments"
+            mapping: "related_control_assessments",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Document: {
             mapping: "documents"
@@ -537,14 +563,18 @@
             mapping: "people"
           },
           Program: {
-            mapping: "programs"
+            mapping: "programs",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
         },
         issues: {
           Issue: {
             mapping: "related_issues",
             footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
+            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
+            child_options: [related_objects_child_options],
+            draw_children: true
           }
         },
         governance_objects: {
@@ -803,6 +833,8 @@
           _mixins: ["issues"],
           Program: {
             mapping: "extended_related_programs_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true,
             fetch_post_process: sort_sections
           },
           Regulation: {
@@ -869,40 +901,60 @@
             add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
           },
           Issue: {
-            mapping: "extended_related_issues_via_search"
+            mapping: "extended_related_issues_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           DataAsset: {
-            mapping: "extended_related_data_assets_via_search"
+            mapping: "extended_related_data_assets_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Facility: {
-            mapping: "extended_related_facilities_via_search"
+            mapping: "extended_related_facilities_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Market: {
-            mapping: "extended_related_markets_via_search"
+            mapping: "extended_related_markets_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           OrgGroup: {
-            mapping: "extended_related_org_groups_via_search"
+            mapping: "extended_related_org_groups_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Vendor: {
             mapping: "extended_related_vendors_via_search"
           },
           Process: {
-            mapping: "extended_related_processes_via_search"
+            mapping: "extended_related_processes_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Product: {
-            mapping: "extended_related_products_via_search"
+            mapping: "extended_related_products_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Project: {
-            mapping: "extended_related_projects_via_search"
+            mapping: "extended_related_projects_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           System: {
-            mapping: "extended_related_systems_via_search"
+            mapping: "extended_related_systems_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Document: {
             mapping: "extended_related_documents_via_search"
           },
           ControlAssessment: {
-            mapping: "extended_related_control_assessment_via_search"
+            mapping: "extended_related_control_assessment_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           }
         }
       });

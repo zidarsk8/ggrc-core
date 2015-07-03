@@ -156,7 +156,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , start_expanded : false
     , child_options : [{
         model : can.Model.Cacheable
-      , mapping : "related_and_able_objects"
+      , mapping : "related_objects" //"related_and_able_objects"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , title_plural : "Business Objects"
