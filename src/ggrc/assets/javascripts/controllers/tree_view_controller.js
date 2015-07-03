@@ -799,6 +799,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     console.log("scroll event", el.scrollTop());
     setTimeout(this.draw_visible.bind(this), 0)
   }
+
+  , "{scroll_element} resize": function (el, ev) {
+    console.log("resize event", el.scrollTop());
+    setTimeout(this.draw_visible.bind(this), 0)
+  }
+
   , "{scroll_element} optimizedScroll": function (el, ev) {
     console.log("optimizedScroll");
   }
