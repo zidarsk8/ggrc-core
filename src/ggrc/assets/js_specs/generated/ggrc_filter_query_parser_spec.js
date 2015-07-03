@@ -155,22 +155,23 @@ describe('GGRC.query_parser', function() {
 
     it('works with order by statement', function(){
 
-      expect(GGRC.query_parser.parse('5words ~ just order by some,"name with spaces" desc')).toEqual({
-          expression: {
-            left: '5words',
-            op: { name: '~', evaluate: jasmine.any(Function) },
-            right: 'just',
+      expect(GGRC.query_parser
+          .parse('5words ~ just order by some,"name with spaces" desc'))
+          .toEqual({
+            expression: {
+              left: '5words',
+              op: { name: '~', evaluate: jasmine.any(Function) },
+              right: 'just',
+              evaluate: jasmine.any(Function)
+            },
+            order_by : {
+              keys : ['some', 'name with spaces' ],
+              order : 'desc',
+              compare : jasmine.any(Function)
+            },
+            keys: ['5words'],
             evaluate: jasmine.any(Function)
-          },
-          order_by : {
-            keys : ['some', 'name with spaces' ],
-            order : 'desc',
-            compare : jasmine.any(Function)
-          },
-          keys: ['5words'],
-          evaluate: jasmine.any(Function)
-        });
-
+          });
     });
 
     describe("evaluate", function(){
@@ -203,11 +204,14 @@ describe('GGRC.query_parser', function() {
             .evaluate(values)).toEqual(true);
         expect(GGRC.query_parser.parse('(n = 22 or n = 5)')
             .evaluate(values)).toEqual(true);
-        expect(GGRC.query_parser.parse('(n = 22 and  n = 5) and ("bacon ipsum" !~ bacon)')
+        expect(GGRC.query_parser
+            .parse('(n = 22 and  n = 5) and ("bacon ipsum" !~ bacon)')
             .evaluate(values)).toEqual(false);
-        expect(GGRC.query_parser.parse('("bacon ipsum" ~ bacon) and ("bacon ipsum" !~ bacon)')
+        expect(GGRC.query_parser
+            .parse('("bacon ipsum" ~ bacon) and ("bacon ipsum" !~ bacon)')
             .evaluate(values)).toEqual(false);
-        expect(GGRC.query_parser.parse('(n = 22 or n = 5) and ("bacon ipsum" ~ bacon)')
+        expect(GGRC.query_parser
+            .parse('(n = 22 or n = 5) and ("bacon ipsum" ~ bacon)')
             .evaluate(values)).toEqual(true);
         expect(GGRC.query_parser.parse('n != "something that does not exist"')
             .evaluate(values)).toEqual(true);
@@ -252,6 +256,21 @@ describe('GGRC.query_parser', function() {
         expect(GGRC.query_parser.parse('!~order bacon something ipsum')
             .evaluate(values, all_keys)).toEqual(true);
       });
+
+      it("evaluates expressions that end with a full text search", function(){
+        expect(GGRC.query_parser.parse('hello=worldoo or ~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(true);
+        expect(GGRC.query_parser
+            .parse('(hello=worldoo or n=22 ) and ~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(true);
+        expect(GGRC.query_parser.parse('hello=worldoo and ~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(false);
+        expect(GGRC.query_parser.parse('hello=world and ~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(true);
+        expect(GGRC.query_parser.parse(' !~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(false);
+      });
+
     });
 
   });
