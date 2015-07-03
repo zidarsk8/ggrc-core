@@ -15,8 +15,9 @@ class AnnuallyCycleCalculator(CycleCalculator):
   """
 
   time_delta = relativedelta.relativedelta(years=1)
-  date_domain = set(xrange(31))
-  month_domain = set(xrange(12))
+  # Date domain must be from 1 to 31, range is UP TO AND NOT INCLUDING
+  date_domain = set(xrange(1, 32))
+  month_domain = set(xrange(1, 13))
 
   def __init__(self, workflow, base_date=None):
     if not base_date:

@@ -848,6 +848,7 @@ def start_recurring_cycles():
 
     old_ncsd = workflow.next_cycle_start_date
     new_ncsd = cycle.calculator.next_cycle_start_date(base_date=old_ncsd)
+
     if old_ncsd == new_ncsd:
       base_date = today + cycle.calculator.time_delta
       new_ncsd = cycle.calculator.next_cycle_start_date(base_date)

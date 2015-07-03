@@ -238,7 +238,7 @@ class CycleCalculator(object):
     #
     # This is only relevant when we activate workflow and not afterwards.
     if base_date == today:
-      if min_start > today and max_end > today:
+      if self.adjust_date(min_start) > today and self.adjust_date(max_end) > today:
         base_date = base_date
       else:
         base_date = base_date + self.time_delta
