@@ -401,6 +401,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       selectable_attr_width: display_width / Math.max(attr_count, 1)
     }
     this.options.attr('display_options', display_options);
+
   },
 
   //Displays attribute list for tree-header, Select attribute list drop down
@@ -523,6 +524,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         this._attached_deferred.resolve();
       }
       this.init_display_options(opts);
+      window.ctrl = this;
     }.bind(this));
 
   }
@@ -543,8 +545,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               this.element.before(frag);
               // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
               can.bind.call(
-                  this.element.parent().find('.filter-trigger > a'), 
-                  'click', 
+                  this.element.parent().find('.filter-trigger > a'),
+                  'click',
                   function () {
                     if (this.display_prefs.getFilterHidden()) {
                       this.show_filter();
@@ -558,7 +560,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
                             'click',
                             this.sort.bind(this)
                            );
-              can.bind.call(this.element.parent().find('.set-tree-attrs'), 
+              can.bind.call(this.element.parent().find('.set-tree-attrs'),
                             'click',
                             this.set_tree_attrs.bind(this)
                            );
@@ -707,9 +709,94 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     return v;
   }
 
-  , "{scroll_element} scroll": function (el, ev) {
-    console.log("scroll event");
+  , el_position: function(el) {
+    if (!(el instanceof jQuery)) {
+      el = $(el);
+    }
+    var se = this.options.scroll_element;
+    var se_o = se.offset().top;
+    var se_h = se.outerHeight()
+    var el_o = el.offset().top;
+    var el_h = el.outerHeight();
+    if (el_o + el_h < se_o) {
+      return -1;
+    }
+    if (el_o > se_o + se_h) {
+      return 1;
+    }
+    return 0;
+  }
 
+  , draw_visible: function() {
+    if (window.DONTCOLOR){
+      return
+    }
+    var start = Date.now()
+    var el_position = this.el_position.bind(this);
+    var children = this.element.children();
+    var lo = 0;
+    var hi = children.length - 1;
+    var max = hi;
+
+    var steps = 0;
+    while (steps < 100 && lo < hi) {
+      steps += 1;
+      var mid = (lo + hi) / 2 | 0;
+      var el = children[mid];
+      var pos = el_position(children[mid]);
+      if (pos < 0) {
+        lo = mid;
+        continue;
+      }
+      if (pos > 0) {
+        hi = mid;
+        continue;
+      }
+      lo = mid;
+      hi = mid;
+      break;
+    }
+    while (lo > 0 && el_position(children[lo - 1]) === 0) {
+      lo -= 1;
+    }
+    while (hi < max && el_position(children[hi +1]) === 0) {
+      hi += 1;
+    }
+    var mid = Date.now()
+    console.log("Visible", lo, hi, "| Took:", mid - start);
+
+    var count_red = 0;
+    var count_blue = 0;
+
+    var lo_old = -1;
+    var hi_old = -1;
+    if (this._last_visible) {
+      lo_old = this._last_visible.lo;
+      hi_old = this._last_visible.hi;
+      for (var i = lo_old; i <= hi_old; i++) {
+        if (i < lo || i > hi) {
+          $(children[i]).control().draw_placeholder();
+          count_red++;
+        }
+      }
+    } _
+    this._last_visible = { lo: lo, hi: hi };
+
+    for (var i = lo; i <= hi; i++) {
+      if (!(i >= lo_old && i <= hi_old)) {
+          $(children[i]).control().draw_node();
+        count_blue++;
+      }
+    }
+    var end = Date.now()
+    console.log("Recoloring", end- mid, count_red, count_blue);
+
+  }
+
+  , "{scroll_element} scroll": function (el, ev) {
+    console.log("scroll event", el.scrollTop());
+    window.scroll_element = el;
+    this.draw_visible()
   }
   , "{scroll_element} optimizedScroll": function (el, ev) {
     console.log("optimizedScroll");
@@ -827,7 +914,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       can.map(options_list, function(options) {
         if (!filter || filter.evaluate(options.instance.get_filter_vals())) {
           var $li = $("<li />").cms_controllers_tree_view_node(options);
-          draw_items_dfds.push($li.control()._draw_node_deferred);
+          var control = $li.control();
+          if (control !== undefined) {
+            draw_items_dfds.push(control._draw_node_deferred);
+          } else {
+            debugger
+          }
           $items.push($li[0]);
         }
       });
