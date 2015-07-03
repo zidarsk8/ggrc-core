@@ -24,6 +24,7 @@
                 name: "All Objects",
                 value: "AllObject",
                 plural: "allobjects",
+                table_plural: "allobjects",
                 singular: "AllObject",
                 models: []
               },
@@ -53,6 +54,7 @@
             value: cms_model.shortName,
             singular: cms_model.shortName,
             plural: cms_model.title_plural.toLowerCase().replace(/\s+/, "_"),
+            table_plural: cms_model.table_plural,
             isSelected: cms_model.shortName === this.type
           });
           groups["all_objects"]["models"].push(cms_model.shortName);
@@ -87,21 +89,25 @@
           return;
         }
         var instance = GGRC.page_instance(),
+            mapping = GGRC.Mappings.get_canonical_mapping(this.scope.attr("mapper.object"), this.scope.attr("mapper.type")),
+            Model = CMS.Models[mapping.model_name],
             data = {},
             deffer = [];
 
+        // TODO: Figure what to do with context?
         data["context"] = null;
-        data["source"] = {
+        data[mapping.object_attr] = {
           href: instance.href,
           type: instance.type,
           id: instance.id
         };
+
         this.scope.attr("isLoading", true);
         _.each(this.scope.attr("mapper.selected"), function (desination) {
-          data["destination"] = desination;
-          var model = new CMS.Models.Relationship(data);
+          data[mapping.option_attr] = desination;
+          var modelInstance = new Model(data);
 
-          deffer.push(model.save());
+          deffer.push(modelInstance.save());
         });
         $.when.apply($, deffer).then(function () {
           this.scope.attr("isLoading", false);
@@ -110,12 +116,12 @@
         }.bind(this));
       },
       "setBinding": function () {
-        var model_name = this.scope.attr("mapper.model.plural").toLowerCase(),
+        var table_plural = this.scope.attr("mapper.model.table_plural"),
             selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
             binding;
 
-        model_name = (selected.has_binding(model_name) ? "" : "related_") + model_name;
-        binding = selected.get_binding(model_name);
+        table_plural = (selected.has_binding(table_plural) ? "" : "related_") + table_plural;
+        binding = selected.get_binding(table_plural);
         binding.refresh_list().then(function (mappings) {
           can.each(mappings, function (mapping) {
             this.scope.attr("mapper.bindings")[mapping.instance.id] = mapping;
