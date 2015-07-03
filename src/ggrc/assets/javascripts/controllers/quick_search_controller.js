@@ -1031,14 +1031,9 @@ can.Control("CMS.Controllers.LHN_Search", {
           // Remove filter suffix (ie Workflow_All) from model_name before
           //  checking permissions
           model_name = model_name.split('_')[0];
-          if (Permission.is_allowed('read', model_name, null) && !isNaN(parseInt(count))) {
-            $list
-              .find(self.options.count_selector)
-              .text(count);
-          }
-          else {
-            $list.find(self.options.count_selector).closest('small').remove();
-          }
+          $list
+            .find(self.options.count_selector)
+            .text(count);
         }
       });
     }

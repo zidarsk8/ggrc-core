@@ -32,6 +32,7 @@ permissions = {
         "Relationship"
     ],
     "delete": [
+        "Program",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",

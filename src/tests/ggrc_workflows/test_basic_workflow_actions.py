@@ -12,7 +12,7 @@ from ggrc import db
 from ggrc_workflows.models import Workflow, TaskGroup, CycleTaskGroupObjectTask, Cycle
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 from nose.plugins.skip import SkipTest
 
 
@@ -26,9 +26,9 @@ class TestBasicWorkflowActions(TestCase):
     TestCase.setUp(self)
     self.api = Api()
     self.generator = WorkflowsGenerator()
-    self.ggrc_generator = GgrcGenerator()
+    self.object_generator = ObjectGenerator()
 
-    self.random_objects = self.ggrc_generator.generate_random_objects()
+    self.random_objects = self.object_generator.generate_random_objects()
     self.create_test_cases()
 
   def tearDown(self):

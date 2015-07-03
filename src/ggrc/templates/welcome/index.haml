@@ -17,7 +17,7 @@
                 %a.close{'href': "#", 'data-dismiss': "alert" }
                   x
                 %p
-                  {{message}}
+                  {{message|safe}}
         -#FIXME: Flash messages
         -#flash.each do |type, value|
           -value = [value] unless value.is_a?(Array)

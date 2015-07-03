@@ -1,3 +1,5 @@
+from ggrc_basic_permissions.roles.Creator import _is_owner
+
 scope = "System"
 description = """
   This role grants a user basic, read-only, access permission to a gGRC
@@ -5,6 +7,7 @@ description = """
   """
 permissions = {
     "read": [
+        "Audit",
         "Categorization",
         "Category",
         "ControlCategory",
@@ -61,10 +64,62 @@ permissions = {
             "condition": "is"
         },
     ],
-    "create": [],
+    "create": [
+        "Workflow"
+        "Categorization",
+        "Category",
+        "ControlCategory",
+        "ControlAssertion",
+        "Control",
+        "ControlAssessment",
+        "Issue",
+        "DataAsset",
+        "Directive",
+        "Contract",
+        "Policy",
+        "Regulation",
+        "Standard",
+        "Document",
+        "Facility",
+        "Help",
+        "Market",
+        "Objective",
+        "ObjectDocument",
+        "ObjectPerson",
+        "Option",
+        "OrgGroup",
+        "Vendor",
+        "PopulationSample",
+        "Product",
+        "Project",
+        "Relationship",
+        "RelationshipType",
+        "SectionBase",
+        "Section",
+        "Clause",
+        "SystemOrProcess",
+        "System",
+        "Process",
+        {
+            "type": "ObjectOwner",
+            "terms": {
+                "property_name": "ownable.modified_by",
+                "value": "$current_user"
+            },
+            "condition": "is"
+        },
+        "Person",
+        "Program",
+        "Role",
+        "UserRole",
+        "Request",
+        "Response",
+        "Context",
+        "BackgroundTask",
+    ],
     "view_object_page": [
         "__GGRC_ALL__"
     ],
-    "update": [],
-    "delete": []
+    "update": _is_owner,
+    "delete": _is_owner
 }

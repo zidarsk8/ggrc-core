@@ -17,7 +17,7 @@ from ggrc import notification
 from ggrc_workflows.models import Workflow, TaskGroup, CycleTaskGroupObjectTask, Cycle
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 from nose.plugins.skip import SkipTest
 
 
@@ -35,11 +35,11 @@ class TestOneTimeWorkflowNotification(TestCase):
     TestCase.setUp(self)
     self.api = Api()
     self.wf_generator = WorkflowsGenerator()
-    self.ggrc_generator = GgrcGenerator()
+    self.object_generator = ObjectGenerator()
 
-    self.random_objects = self.ggrc_generator.generate_random_objects()
+    self.random_objects = self.object_generator.generate_random_objects()
     self.random_people = [
-        self.ggrc_generator.generate_person(user_role="gGRC Admin")[1]
+        self.object_generator.generate_person(user_role="gGRC Admin")[1]
         for _ in range(5)]
     self.create_test_cases()
 
@@ -162,17 +162,17 @@ class TestOneTimeWorkflowNotification(TestCase):
     }
 
   def create_users(self):
-    _, self.owner1 = self.ggrc_generator.generate_person(
+    _, self.owner1 = self.object_generator.generate_person(
         # data={"name": "User1 Owner1", "email": "user1.owner1@gmail.com"},
         user_role="gGRC Admin")
-    _, self.tgassignee1 = self.ggrc_generator.generate_person(
+    _, self.tgassignee1 = self.object_generator.generate_person(
         # data={"name": "User2 TGassignee1",
         #       "email": "user2.tgassignee1@gmail.com"},
         user_role="gGRC Admin")
-    _, self.member1 = self.ggrc_generator.generate_person(
+    _, self.member1 = self.object_generator.generate_person(
         # data={"name": "User3 Member1", "email": "user3.member1@gmail.com"},
         user_role="gGRC Admin")
-    _, self.member2 = self.ggrc_generator.generate_person(
+    _, self.member2 = self.object_generator.generate_person(
         # data={"name": "User4 Member2", "email": "user4.member2@gmail.com"},
         user_role="gGRC Admin")
 

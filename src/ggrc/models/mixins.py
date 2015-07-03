@@ -577,7 +577,7 @@ class CustomAttributable(object):
       # av.context_id = cls.context_id
       db.session.add(av)
 
-  _publish_attrs = ['custom_attribute_values', ]
+  _publish_attrs = ['custom_attribute_values']
   _update_attrs = ['custom_attributes']
   _include_links = []
   _aliases = {"custom_attributes": "Custom Attributes"}

@@ -75,12 +75,11 @@
       &nbsp;
     {{else}}
       <label>
-        {{firstnonempty audit_object_object.class.title_singular control_assessment.title_singular audit.object_model.title_singular}}
+        Request Object
         <a href="javascript://" class="field-hide">hide</a>
       </label>
-      <i class="grcicon-{{firstnonempty audit_object_object.class.table_singular control_assessment.table_singular audit.object_model.table_singular}}-color pull-left icon-field"></i>
       <div class="objective-selector">
-        <input tabindex="6" type="text" name="audit_object_object.title" data-lookup="{{firstnonempty audit_object_object.type control_assessment.type audit.object_type}}" class="span10 search-icon" value="{{firstnonempty audit_object_object.title control_assessment.title ''}}" placeholder="Enter text to search for {{audit.object_type}}">
+        <input tabindex="6" type="text" name="audit_object_object.title" data-lookup="Program,Issue,Regulation,Policy,Standard,Contract,Clause,Section,Control,Objective,Person,OrgGroup,Vendor,System,Process,DataAsset,Product,Project,Facility,Market" data-template="/directives/autocomplete_result.mustache" class="span10 search-icon" value="{{firstnonempty audit_object_object.title control_assessment.title ''}}" placeholder="Enter text to search for object">
       </div>
     {{/if_auditor}}
     </div>
