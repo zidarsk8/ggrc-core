@@ -11,6 +11,7 @@
       type: "",
       contact: {},
       term: "",
+      object: "",
       model: {},
       bindings: {},
       isLoading: false,
@@ -272,44 +273,64 @@
           }.bind(this)));
         }.bind(this));
       },
-      "getResults": function () {
-        var model_name = this.scope.attr("type"),
-            contact = this.scope.attr("contact"),
-            join_model = GGRC.Mappings.join_model_name_for(CMS.Models[model_name], model_name),
-            permission_parms = {
-              __permission_type: "read"
-            };
+      "searchFor": function (data) {
+        data.options = data.options || {};
+        var join_model = GGRC.Mappings.join_model_name_for(this.scope.attr("mapper.object"), data.model_name);
 
-        this.scope.attr("page", 0);
-        this.scope.attr("options", []);
-        this.scope.attr("select_all", false);
-
-        if (join_model !== "TaskGroupObject" && model_name === "Program") {
+        if (join_model !== "TaskGroupObject" && data.model_name === "Program") {
           permission_parms = {
             __permission_type: "create",
             __permission_model: join_model
           };
         }
-        if (model_name === "AllObject") {
-          model_name = this.scope.attr("types.all_objects.models");
+        data.options.__permission_type = data.options.__permission_type || "read";
+        data.model_name = _.isString(data.model_name) ? [data.model_name] : data.model_name;
+
+        return GGRC.Models.Search.search_for_types(data.term || "", data.model_name, data.options);
+      },
+      "getResults": function () {
+        var model_name = this.scope.attr("type"),
+            contact = this.scope.attr("contact"),
+            permission_parms = {},
+            deffer = [],
+            search = [];
+
+        this.scope.attr("page", 0);
+        this.scope.attr("options", []);
+        this.scope.attr("select_all", false);
+
+        if (data.model_name === "AllObject") {
+          data.model_name = this.scope.attr("types.all_objects.models");
         }
-        if (contact) {
+        if (!_.isEmpty(contact)) {
           permission_parms.contact_id = contact.id;
         }
 
         this.scope.attr("pageLoading", true);
-        model_name = _.isString(model_name) ? [model_name] : model_name;
-        GGRC.Models.Search
-          .search_for_types(this.scope.attr("term") || "", model_name, permission_parms)
-          .then(function (response) {
-            var entries = _.flatten(_.map(model_name, function (name) {
-                            return response.getResultsForType(name);
-                          }));
+        search.push({
+          term: this.scope.attr("term"),
+          model_name: model_name,
+          options: permission_parms
+        });
+        search.concat(_.map(this.scope.attr("mapper.relevant"), function (relevant) {
+          return {
+            model_name: relevant.model_name,
+            term: relevant.filter.title
+          };
+        }));
 
-            this.scope.attr("entries", entries);
-            this.scope.attr("pageLoading", false);
-            this.drawPage();
-          }.bind(this));
+        $.when.apply($, _.map(search, function (query) {
+          return this.searchFor(query);
+        }.bind(this)))
+        .done(function (response) {
+          var entries = _.flatten(_.map((_.isString(model_name) ? [model_name] : model_name), function (name) {
+                          return response.getResultsForType(name);
+                        }));
+
+          this.scope.attr("entries", entries);
+          this.scope.attr("pageLoading", false);
+          this.drawPage();
+        }.bind(this));
       }
     }
   });
