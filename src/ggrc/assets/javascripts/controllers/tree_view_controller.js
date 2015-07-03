@@ -718,16 +718,16 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var se_h = se.outerHeight()
     var el_o = el.offset().top;
     var el_h = el.outerHeight();
-    if (el_o + el_h < se_o) {
+    if (el_o + el_h < se_o - se_h) {
       return -1;
     }
-    if (el_o > se_o + se_h) {
+    if (el_o > se_o + 2*se_h) {
       return 1;
     }
     return 0;
   }
 
-  , draw_visible: function() {
+  , draw_visible: _.debounce(function() {
     if (window.DONTCOLOR){
       return
     }
@@ -762,8 +762,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     while (hi < max && el_position(children[hi +1]) === 0) {
       hi += 1;
     }
-    var mid = Date.now()
-    console.log("Visible", lo, hi, "| Took:", mid - start);
+    var end = Date.now()
+    console.log("Visible", lo, hi, "| Took:", end - start);
+    start = end;
 
     var count_red = 0;
     var count_blue = 0;
@@ -781,6 +782,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
     } _
     this._last_visible = { lo: lo, hi: hi };
+    var mid = Date.now()
 
     for (var i = lo; i <= hi; i++) {
       if (!(i >= lo_old && i <= hi_old)) {
@@ -789,14 +791,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
     }
     var end = Date.now()
-    console.log("Recoloring", end- mid, count_red, count_blue);
+    console.log("Recoloring", mid-start, end-mid, count_red, count_blue);
 
-  }
+  }, 100, {leading: true})
 
   , "{scroll_element} scroll": function (el, ev) {
     console.log("scroll event", el.scrollTop());
-    window.scroll_element = el;
-    this.draw_visible()
+    setTimeout(this.draw_visible.bind(this), 0)
   }
   , "{scroll_element} optimizedScroll": function (el, ev) {
     console.log("optimizedScroll");
@@ -973,6 +974,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
   , " sortupdate" : function(el, ev, ui) {
+    console.log("event: sortupdate")
     var that = this,
       $item = $(ui.item),
       $before = $item.prev("li.cms_controllers_tree_view_node"),
