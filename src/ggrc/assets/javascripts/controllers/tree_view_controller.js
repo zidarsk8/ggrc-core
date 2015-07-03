@@ -976,6 +976,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           $items.appendTo(this.element);
         }
       }
+      setTimeout(this.draw_visible.bind(this), 0);
       return $.when.apply($, draw_items_dfds);
     }
 
