@@ -307,12 +307,19 @@
           workflow_data = {},
           wfs,              // list of all workflows
           cur_wfs,          // list of workflows with current cycles
-          cur_wfs5;         // list of top 5 workflows with current cycle
+          cur_wfs5,         // list of top 5 workflows with current cycle
+          wf_types;
 
       if (!GGRC.current_user) {
         return;
       }
-      GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
+      if (/objectBrowser/.test(window.location)) {
+        wf_types = GGRC.Models.Search.search_for_types('', ['Workflow'], {});
+      } else {
+        wf_types = GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id});
+      }
+      //GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
+      wf_types
       .then(function(result_set){
           var wf_data = result_set.getResultsForType('Workflow');
           var refresh_queue = new RefreshQueue();
@@ -355,11 +362,17 @@
       if (!GGRC.current_user) {
         return 0;
       }
-
-      GGRC.page_instance().get_binding("open_audit_requests").refresh_count()
-        .then(function(result) {
-          self.scope.attr('audit_requests_count', result());
-      });
+      if (/objectBrowser/.test(window.location)) {
+        GGRC.page_instance().get_binding("all_open_audit_requests").refresh_count()
+          .then(function(result) {
+            self.scope.attr('audit_requests_count', result());
+        });
+      } else {
+        GGRC.page_instance().get_binding("open_audit_requests").refresh_count()
+          .then(function(result) {
+            self.scope.attr('audit_requests_count', result());
+        });
+      }
       return 0;
     },
     update_tasks_for_workflow: function(workflow){

@@ -578,6 +578,12 @@
       }, 'Request'),
       open_audit_requests: CustomFilter('audit_requests', function (result) {
         return result.instance.status !== 'Accepted';
+      }),
+      all_audit_requests: Search(function (binding) {
+        return CMS.Models.Request.findAll({});
+      }),
+      all_open_audit_requests: CustomFilter('all_audit_requests', function (result) {
+        return result.instance.status !== 'Accepted';
       })
     },
     Context: {
