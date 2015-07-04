@@ -1,8 +1,8 @@
 /*
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: miha@reciprocitylabs.com
-    Maintained By: miha@reciprocitylabs.com
+  Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: miha@reciprocitylabs.com
+  Maintained By: miha@reciprocitylabs.com
 */
 
 
@@ -14,10 +14,11 @@ start
         keys: [],
         order_by: only_order_by,
         evaluate: function(values, keys) {
-          // functions evaluates the current expresion tree, with the given values
+          // functions evaluates the current expresion tree, with the given
+          // values
           //
-          // * values, Object with all the keys as in the this keys array,
-          //   with the coresponding values
+          // * values, Object with all the keys as in the keys array, and their
+          //   coresponding values
           return true;
         }
       };
@@ -31,10 +32,11 @@ start
         keys: keys,
         order_by: order_by,
         evaluate: function(values, keys) {
-          // functions evaluates the current expresion tree, with the given values
+          // functions evaluates the current expresion tree, with the given
+          // values
           //
-          // * values, Object with all the keys as in the this keys array,
-          //   with the coresponding values
+          // * values, Object with all the keys as in the keys array, and their
+          //   coresponding values
           try {
             return or_exp.evaluate(values, keys);
           } catch (e) {
@@ -288,22 +290,34 @@ quoted_char
 AND
   = _+ 'AND'i _+
     {
-      return {name: 'AND', evaluate: function(val1, val2) { return val1 && val2; } };
+      return {
+        name: 'AND',
+        evaluate: function(val1, val2) { return val1 && val2; }
+      };
     }
   / _* '&&'   _*
     {
-      return {name: 'AND', evaluate: function(val1, val2) { return val1 && val2; } };
+      return {
+        name: 'AND',
+        evaluate: function(val1, val2) { return val1 && val2; }
+      };
     }
 
 
 OR
   = _+ 'OR'i  _+
     {
-      return {name: 'OR', evaluate: function(val1, val2) { return val1 || val2;} };
+      return {
+        name: 'OR',
+        evaluate: function(val1, val2) { return val1 || val2;}
+      };
     }
   / _* '||'   _*
     {
-      return {name: 'OR', evaluate: function(val1, val2) { return val1 || val2; } };
+      return {
+        name: 'OR',
+        evaluate: function(val1, val2) { return val1 || val2; }
+      };
     }
 
 
