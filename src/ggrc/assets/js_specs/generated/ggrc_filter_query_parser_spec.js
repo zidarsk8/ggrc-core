@@ -175,6 +175,78 @@ describe('GGRC.query_parser', function() {
           });
     });
 
+    it("parses related queries", function(){
+
+      expect(GGRC.query_parser.parse("#SomeClass,1,2,3,4#"))
+          .toEqual({
+            expression: {
+              class_name: 'SomeClass',
+              op: "related",
+              ids: ["1","2","3","4"],
+              evaluate: jasmine.any(Function)
+            },
+            order_by : { keys : [ ], order : '', compare : null },
+            keys: [],
+            evaluate: jasmine.any(Function)
+          });
+
+      expect(GGRC.query_parser.parse("#SomeClass,1,2,3,4# or #A,1# and #B,2#"))
+          .toEqual({
+            expression:{
+               left: {
+                class_name: 'SomeClass',
+                op: "related",
+                ids: ["1","2","3","4"],
+                evaluate: jasmine.any(Function)
+              },
+              op: {name: "OR", evaluate: jasmine.any(Function)},
+              right: {
+                left: {
+                  class_name: "A",
+                  op: "related",
+                  ids: ["1"],
+                  evaluate: jasmine.any(Function)
+                },
+                op: {name: "AND", evaluate: jasmine.any(Function)},
+                right: {
+                  class_name: "B",
+                  op: "related",
+                  ids: ["2"],
+                  evaluate: jasmine.any(Function)
+                },
+                evaluate: jasmine.any(Function)
+              },
+              evaluate: jasmine.any(Function)
+            },
+            order_by : { keys : [ ], order : '', compare : null },
+            keys: [],
+            evaluate: jasmine.any(Function)
+          });
+
+      expect(GGRC.query_parser.parse("#SomeClass,1,2,3,4# or #A,1#"))
+          .toEqual({
+            expression:{
+               left: {
+                class_name: 'SomeClass',
+                op: "related",
+                ids: ["1","2","3","4"],
+                evaluate: jasmine.any(Function)
+              },
+              op: {name: "OR", evaluate: jasmine.any(Function)},
+              right: {
+                class_name: "A",
+                op: "related",
+                ids: ["1"],
+                evaluate: jasmine.any(Function)
+              },
+              evaluate: jasmine.any(Function)
+            },
+            order_by : { keys : [ ], order : '', compare : null },
+            keys: [],
+            evaluate: jasmine.any(Function)
+          });
+    });
+
     describe("evaluate", function(){
 
       it("returns true on an empty query", function(){
