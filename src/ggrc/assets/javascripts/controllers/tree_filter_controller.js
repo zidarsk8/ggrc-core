@@ -13,9 +13,11 @@ can.Control("GGRC.Controllers.TreeFilter", {
   }
 
   , toggle_indicator: function(current_filter){
-      var is_expression = !!current_filter &&
+      var is_expression = 
+            !!current_filter &&
             !!current_filter.expression.op &&
-            current_filter.expression.op != "text_search";
+            current_filter.expression.op != "text_search" &&
+            current_filter.expression.op != "exclude_text_search";
 
       this.element.find('.filter-input').toggleClass("expression", is_expression);
       this.element.find('.filter-input span i')
