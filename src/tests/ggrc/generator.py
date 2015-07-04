@@ -59,7 +59,7 @@ class Generator():
     return result
 
 
-class GgrcGenerator(Generator):
+class ObjectGenerator(Generator):
 
   def generate_object(self, obj_class, obj_name, data={}):
     obj = obj_class(title=self.random_str())

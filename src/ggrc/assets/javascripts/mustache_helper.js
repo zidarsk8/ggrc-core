@@ -1221,8 +1221,9 @@ Mustache.registerHelper("is_allowed", function () {
 
   // Check permissions
   can.each(actions, function (action) {
-    if (resource) {
-      return Permission.is_allowed_for(action, resource);
+    if (resource && Permission.is_allowed_for(action, resource)) {
+      passed = true;
+      return;
     }
     if (context_id !== undefined) {
       passed = passed && Permission.is_allowed(action, resource_type, context_id);

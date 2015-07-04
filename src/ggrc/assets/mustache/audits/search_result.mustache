@@ -17,15 +17,6 @@
 </li>
 {{/list}}
 
-{{#if_helpers '\
-   ^is_allowed' 'read' model.shortName _0_context='any' '\
-   and ^is_allowed' 'create' model.shortName _1_context='any' '\
-   and ^is_allowed' 'read' 'Program' _2_context='any'}}
-<li class="no-access">
-  You do not have access to read this information.
-</li>
-{{/if_helpers}}
-
 {{#list.is_loading}}
   <li class="spinny"  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' }}>
   </li>

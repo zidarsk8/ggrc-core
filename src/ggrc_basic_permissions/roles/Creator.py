@@ -153,7 +153,11 @@ _is_owner = [
         },
         "condition": "contains"
     },
-    "Relationship",
+    {
+        "type": "Relationship",
+        "terms": {},
+        "condition": "relationship",
+    },
     "RelationshipType",
     {
         "type": "SectionBase",

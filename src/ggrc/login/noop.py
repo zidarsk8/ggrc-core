@@ -45,7 +45,7 @@ def login():
     flask_login.login_user(user)
     return redirect(get_next_url(request, default_url=url_for('dashboard')))
   else:
-    flash(u'You do not have access.', 'alert alert-warning')
+    flash(u'You do not have access. Please contact your administrator.', 'alert alert-info')
     return redirect('/')
 
 def logout():

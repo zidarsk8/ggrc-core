@@ -14,7 +14,7 @@ from ggrc import notification
 from ggrc.models import NotificationConfig, Notification, Person
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import GgrcGenerator
+from tests.ggrc.generator import ObjectGenerator
 
 
 if os.environ.get('TRAVIS', False):
@@ -31,11 +31,11 @@ class TestEnableAndDisableNotifications(TestCase):
     TestCase.setUp(self)
     self.api = Api()
     self.wf_generator = WorkflowsGenerator()
-    self.ggrc_generator = GgrcGenerator()
+    self.object_generator = ObjectGenerator()
     Notification.query.delete()
 
-    self.random_objects = self.ggrc_generator.generate_random_objects(2)
-    _, self.user = self.ggrc_generator.generate_person(user_role="gGRC Admin")
+    self.random_objects = self.object_generator.generate_random_objects(2)
+    _, self.user = self.object_generator.generate_person(user_role="gGRC Admin")
     self.create_test_cases()
 
     def init_decorator(init):
@@ -75,7 +75,7 @@ class TestEnableAndDisableNotifications(TestCase):
 
       self.assert200(response)
 
-      self.ggrc_generator.generate_notification_setting(
+      self.object_generator.generate_notification_setting(
         self.user.id, "Email_Digest", False)
 
       user = Person.query.get(self.user.id)
@@ -102,7 +102,7 @@ class TestEnableAndDisableNotifications(TestCase):
       _, notif_data = notification.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
-      self.ggrc_generator.generate_notification_setting(
+      self.object_generator.generate_notification_setting(
         self.user.id, "Email_Digest", True)
 
       user = Person.query.get(self.user.id)
@@ -124,7 +124,7 @@ class TestEnableAndDisableNotifications(TestCase):
       _, notif_data = notification.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
-      self.ggrc_generator.generate_notification_setting(
+      self.object_generator.generate_notification_setting(
         self.user.id, "Email_Digest", True)
 
       user = Person.query.get(self.user.id)
@@ -151,7 +151,7 @@ class TestEnableAndDisableNotifications(TestCase):
       self.assertIn(wf_forced.id, notif_data[user.email]["cycle_starts_in"])
       self.assertIn(wf.id, notif_data[user.email]["cycle_starts_in"])
 
-      self.ggrc_generator.generate_notification_setting(
+      self.object_generator.generate_notification_setting(
         self.user.id, "Email_Digest", False)
 
       user = Person.query.get(self.user.id)

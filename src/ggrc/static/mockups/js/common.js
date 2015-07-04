@@ -982,7 +982,7 @@ function searchFilter() {
   var $this = $(this),
       $field = $this.closest(".lhs-search").find(".widgetsearch"),
       $filter_icon = $this.closest(".lhs-search").find(".filter-off");
-  
+
   $field.addClass("active");
   $filter_icon.addClass("active");
 }
@@ -1048,7 +1048,7 @@ $(".lhn-pin").on("click", function() {
   var $this = $(this),
       $lhn_button = $(".lhn-trigger"),
       $lhn_bar = $(".bar-v");
-  
+
   if ($this.hasClass("active")) {
     $this.removeClass("active");
     $lhn_button.removeClass("disabled");
@@ -1108,7 +1108,7 @@ function resize_areas() {
   objectWidthActive = winWidth - lhsWidth - barWidth;
   objectWidth = winWidth;
   //headerWidth = winWidth - lhsWidth - barWidth - 20;
-  headerWidth = winWidth - 40;
+  headerWidth = winWidth - 30;
   lhnType_width = lhsWidth;
 
   $lhsHolder.css("height",lhsHeight).css("width", lhsWidth);
