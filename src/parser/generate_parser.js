@@ -63,7 +63,7 @@ var parser = peg.buildParser(parser_string);
 var parser_src = peg.buildParser(parser_string, {output: "source"});
 
 console.log('saving parser to js files');
-var ggrc_parser = filter_template.replace('GENERATED_PLACEHOLDER', parser_src);
+var ggrc_parser = filter_template.replace('"GENERATED_PLACEHOLDER"', parser_src);
 
 mkdirp.sync(ggrc_parser_folder);
 fs.writeFileSync(ggrc_parser_folder + ggrc_parser_js_file, ggrc_parser);
