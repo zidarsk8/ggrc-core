@@ -247,7 +247,7 @@ GGRC.query_parser = {
         peg$c29 = function(related) {
               return {
                 class_name: related[0],
-                op: 'related',
+                op: {name: "related"},
                 ids: related.slice(1),
                 keys: [],
                 evaluate: function(values, keys){
@@ -260,7 +260,7 @@ GGRC.query_parser = {
         peg$c32 = function(characters) {
               return {
                 text: characters.join("").trim(),
-                op: 'text_search',
+                op: {name:'text_search'},
                 keys: [],
                 evaluate: function(values, keys){
                    keys = keys || Object.keys(values);
@@ -293,7 +293,7 @@ GGRC.query_parser = {
         peg$c35 = function(characters) {
               return {
                 text: characters.join("").trim(),
-                op: 'exclude_text_search',
+                op: {name: 'exclude_text_search'},
                 keys: [],
                 evaluate: function(values, keys){
                    keys = keys || Object.keys(values);

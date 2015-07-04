@@ -70,7 +70,7 @@ describe('GGRC.query_parser', function() {
         expect(GGRC.query_parser.parse(query_str)).toEqual({
           expression: { 
             text: text, 
-            op: 'exclude_text_search', 
+            op: {name: 'exclude_text_search'}, 
             evaluate: jasmine.any(Function)
           },
           order_by : { keys : [ ], order : '', compare : null },
@@ -102,7 +102,7 @@ describe('GGRC.query_parser', function() {
         expect(GGRC.query_parser.parse(query_str)).toEqual({
           expression: { 
             text: text, 
-            op: 'text_search', 
+            op: {name: 'text_search'}, 
             evaluate: jasmine.any(Function)
           },
           order_by : { keys : [ ], order : '', compare : null },
@@ -181,7 +181,7 @@ describe('GGRC.query_parser', function() {
           .toEqual({
             expression: {
               class_name: 'SomeClass',
-              op: "related",
+              op: {name: "related"},
               ids: ["1","2","3","4"],
               evaluate: jasmine.any(Function)
             },
@@ -195,7 +195,7 @@ describe('GGRC.query_parser', function() {
             expression:{
                left: {
                 class_name: 'SomeClass',
-                op: "related",
+                op: {name: "related"},
                 ids: ["1","2","3","4"],
                 evaluate: jasmine.any(Function)
               },
@@ -203,14 +203,14 @@ describe('GGRC.query_parser', function() {
               right: {
                 left: {
                   class_name: "A",
-                  op: "related",
+                  op: {name: "related"},
                   ids: ["1"],
                   evaluate: jasmine.any(Function)
                 },
                 op: {name: "AND", evaluate: jasmine.any(Function)},
                 right: {
                   class_name: "B",
-                  op: "related",
+                  op: {name: "related"},
                   ids: ["2"],
                   evaluate: jasmine.any(Function)
                 },
@@ -228,14 +228,14 @@ describe('GGRC.query_parser', function() {
             expression:{
                left: {
                 class_name: 'SomeClass',
-                op: "related",
+                op: {name: "related"},
                 ids: ["1","2","3","4"],
                 evaluate: jasmine.any(Function)
               },
               op: {name: "OR", evaluate: jasmine.any(Function)},
               right: {
                 class_name: "A",
-                op: "related",
+                op: {name: "related"},
                 ids: ["1"],
                 evaluate: jasmine.any(Function)
               },

@@ -191,7 +191,7 @@ related_exp
     {
       return {
         class_name: related[0],
-        op: 'related',
+        op: {name: "related"},
         ids: related.slice(1),
         keys: [],
         evaluate: function(values, keys){
@@ -205,7 +205,7 @@ text_exp
     {
       return {
         text: characters.join("").trim(),
-        op: 'text_search',
+        op: {name:'text_search'},
         keys: [],
         evaluate: function(values, keys){
            keys = keys || Object.keys(values);
@@ -237,7 +237,7 @@ text_exp
     {
       return {
         text: characters.join("").trim(),
-        op: 'exclude_text_search',
+        op: {name: 'exclude_text_search'},
         keys: [],
         evaluate: function(values, keys){
            keys = keys || Object.keys(values);
