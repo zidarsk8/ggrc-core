@@ -8,25 +8,26 @@
 describe('GGRC.query_parser', function() {
 
   var values = {
-    'a': 'b',
-    'hello': 'world',
-    'n': '22',
-    '5words': 'These are just 5 words',
-    'bacon ipsum': 'Bacon ipsum dolor amet meatloaf pork loin fatback ball'+
-      'tip chicken frankfurter swine bresaola beef ribs ribeye shankle sho'+
-      'rt ribs drumstick leberkas sirloin. Turducken hamburger drumstick g'+
-      'round round ham biltong. Alcatra turkey brisket pancetta jowl bilto'+
-      'ng meatball, shank pork chop. Flank fatback capicola chuck chicken '+
-      'jerky venison meatball beef drumstick.'
-  };
-
-  var parser_structure = {
-    parse: jasmine.any(Function),
-    generated: {
-      parse: jasmine.any(Function),
-      SyntaxError: jasmine.any(Function)
-    }
-  };
+        'a': 'b',
+        'hello': 'world',
+        'n': '22',
+        '5words': 'These are just 5 words',
+        'bacon ipsum': 'Bacon ipsum dolor amet meatloaf pork loin fatback ball'+
+          'tip chicken frankfurter swine bresaola beef ribs ribeye shankle sho'+
+          'rt ribs drumstick leberkas sirloin. Turducken hamburger drumstick g'+
+          'round round ham biltong. Alcatra turkey brisket pancetta jowl bilto'+
+          'ng meatball, shank pork chop. Flank fatback capicola chuck chicken '+
+          'jerky venison meatball beef drumstick.'
+      },
+      all_keys = Object.keys(values),
+      parser_structure = {
+        parse: jasmine.any(Function),
+        join_queries: jasmine.any(Function),
+        generated: {
+          parse: jasmine.any(Function),
+          SyntaxError: jasmine.any(Function)
+        }
+      };
 
 
   it("should exist", function() {
@@ -217,8 +218,6 @@ describe('GGRC.query_parser', function() {
             .evaluate(values)).toEqual(true);
       });
 
-      var all_keys = ['a', 'hello', 'n', '5words', 'bacon ipsum'];
-
       it("does full text search", function(){
         expect(GGRC.query_parser.parse('b')
             .evaluate(values, ['n'])).toEqual(false);
@@ -270,11 +269,100 @@ describe('GGRC.query_parser', function() {
         expect(GGRC.query_parser.parse(' !~ bacon ipsum')
             .evaluate(values, all_keys)).toEqual(false);
       });
-
     });
 
+    describe("join_queries", function(){
+
+      it("joins two queries with AND by default", function(){
+
+        same_queries = [
+          ["a=b and c=d", "a=b", "c=d"],
+          ["(a=b) and (c=d)", "a=b", "c=d"],
+          ["(a=b or c=A) and (c=d)", "a=b or c=A", "c=d"],
+        ]
+
+        can.each(same_queries, function(queries){
+          expect(
+            JSON.stringify(GGRC.query_parser.parse(queries[0]))
+          ).toEqual(
+            JSON.stringify(
+              GGRC.query_parser.join_queries(
+                GGRC.query_parser.parse(queries[1]),
+                GGRC.query_parser.parse(queries[2])
+              )
+            )
+          );
+        });
+      });
+
+      it("joins two queries with OR", function(){
+
+        same_queries = [
+          ["a=b or c=d", "a=b", "c=d"],
+          ["(a=b) or (c=d)", "a=b", "c=d"],
+          ["(a=b and c=A) or (c=d)", "a=b and c=A", "c=d"],
+        ]
+
+        can.each(same_queries, function(queries){
+          expect(
+            JSON.stringify(GGRC.query_parser.parse(queries[0]))
+          ).toEqual(
+            JSON.stringify(
+              GGRC.query_parser.join_queries(
+                GGRC.query_parser.parse(queries[1]),
+                GGRC.query_parser.parse(queries[2]),
+                "OR"
+              )
+            )
+          );
+        });
+      });
+
+      it("evaluates joined queries correctly", function(){
+
+        queries = [
+          ["(hello=worldoo or n=22 ) and ~ bacon ipsum", 
+            "(hello=worldoo or n=22 )", 
+            "  ~ bacon ipsum"], // should eval to true
+          ["hello=worldoo and ~ bacon ipsum", 
+            "hello=worldoo", 
+            "~ bacon ipsum"], // should eval to false
+        ]
+
+        expect(
+          GGRC.query_parser.parse(queries[0][0]).evaluate(values, all_keys)
+        ).toEqual(true);
+        expect(
+          GGRC.query_parser.parse(queries[0][1]).evaluate(values, all_keys)
+        ).toEqual(true);
+        expect(
+          GGRC.query_parser.parse(queries[0][2]).evaluate(values, all_keys)
+        ).toEqual(true);
+
+        expect(
+          GGRC.query_parser.join_queries(
+            GGRC.query_parser.parse(queries[0][1]),
+            GGRC.query_parser.parse(queries[0][2])
+          ).evaluate(values, all_keys)
+        ).toEqual(true);
+
+        expect(
+          GGRC.query_parser.parse(queries[1][0]).evaluate(values, all_keys)
+        ).toEqual(false);
+        expect(
+          GGRC.query_parser.parse(queries[1][1]).evaluate(values, all_keys)
+        ).toEqual(false);
+        expect(
+          GGRC.query_parser.parse(queries[1][2]).evaluate(values, all_keys)
+        ).toEqual(true);
+
+        expect(
+          GGRC.query_parser.join_queries(
+            GGRC.query_parser.parse(queries[1][1]),
+            GGRC.query_parser.parse(queries[1][2])
+          ).evaluate(values, all_keys)
+        ).toEqual(false);
+      });
+    });
   });
-
 });
-
-
