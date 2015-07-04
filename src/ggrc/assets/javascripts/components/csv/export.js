@@ -76,7 +76,7 @@
           };
         });
 
-        GGRC.Utils({
+        GGRC.Utils.ajax({
           type: "POST",
           url: this.scope.attr("export.url"),
           data: query
