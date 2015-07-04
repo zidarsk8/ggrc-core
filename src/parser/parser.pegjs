@@ -184,6 +184,21 @@ simple_exp
     }
   / paren_exp
   / text_exp
+  / related_exp
+
+related_exp
+  = _* "# [" name:word "] [" ids:word_list "]"
+    {
+      return {
+        class_name: name,
+        op: 'related',
+        ids: ids,
+        keys: [],
+        evaluate: function(values, keys){
+          return true;
+        }
+      };
+    }
 
 text_exp
   = _* "~" characters:.*
