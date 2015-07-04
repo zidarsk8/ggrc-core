@@ -529,7 +529,9 @@
             draw_children: true
           },
           Vendor: {
-            mapping: "related_vendors"
+            mapping: "related_vendors",
+            hild_options: [related_objects_child_options],
+            draw_children: true
           },
           Process: {
             mapping: "related_processes",
@@ -926,7 +928,9 @@
             draw_children: true
           },
           Vendor: {
-            mapping: "extended_related_vendors_via_search"
+            mapping: "extended_related_vendors_via_search",
+            hild_options: [related_objects_child_options],
+            draw_children: true
           },
           Process: {
             mapping: "extended_related_processes_via_search",
