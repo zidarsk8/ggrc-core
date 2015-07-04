@@ -182,17 +182,17 @@ simple_exp
         }
       };
     }
+  / related_exp
   / paren_exp
   / text_exp
-  / related_exp
 
 related_exp
-  = _* "# [" name:word "] [" ids:word_list "]"
+  = _* "#" related:word_list "#"
     {
       return {
-        class_name: name,
+        class_name: related[0],
         op: 'related',
-        ids: ids,
+        ids: related.slice(1),
         keys: [],
         evaluate: function(values, keys){
           return true;
