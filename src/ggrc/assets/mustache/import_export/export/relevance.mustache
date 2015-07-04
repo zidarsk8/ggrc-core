@@ -17,10 +17,9 @@
   <select class="input-small filter-type-selector select-filter{{@index}}"
           can-value="model_name">
     {{#menu}}
-    <option
-      value="{{model_singular}}"
-      label="{{title_singular}}">
-    </option>
+      {{#if title_singular}}
+        <option value="{{model_singular}}" label="{{title_singular}}"></option>
+      {{/if}}
     {{/menu}}
   </select>
   {{#filter}}

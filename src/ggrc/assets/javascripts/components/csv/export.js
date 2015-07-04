@@ -151,14 +151,13 @@
     template: "<content />",
     scope: {
       index: "@",
-      // TODO: filter menu items with mapping rules from business_object.js
-      menu: can.map(["Program", "Regulation", "Policy", "Standard", "Contract",
-                    "Clause", "Section", "Objective", "Control", "Person",
-                    "System", "Process", "DataAsset", "Product", "Project",
-                    "Facility", "Market"],
-                    function (key) {
-                      return CMS.Models[key];
-                    })
+      menu: can.compute(function () {
+        var type = this.attr("type"),
+            mappings = GGRC.Mappings.get_canonical_mappings_for(type);
+        return _.map(_.keys(mappings), function (mapping) {
+          return CMS.Models[mapping];
+        });
+      })
     },
     events: {
       "inserted": function (el, ev) {
