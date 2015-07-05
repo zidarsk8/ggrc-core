@@ -107,9 +107,10 @@ class QueryHelper(object):
 
   def _get_attr(self, object_class, key):
     """ get class attr by attribute name or display name """
-    attr = getattr(object_class, key, None)
+    attr = getattr(object_class, key.lower(), None)
     if attr is None:
-      pass
+      mapped_name = self.attr_name_map[object_class][key.lower()]
+      attr = getattr(object_class, mapped_name, None)
     if attr is None:
       raise Exception("Bad search query: object '{}' does not have "
                       "attribute '{}'.".format(object_class.__name__, key))
@@ -129,14 +130,14 @@ class QueryHelper(object):
         return or_(build_expression(exp["left"]),
                    build_expression(exp["right"]))
       elif exp["op"]["name"] == "=":
-        return getattr(object_class, exp["left"]) == exp["right"]
+        return self._get_attr(object_class, exp["left"]) == exp["right"]
       elif exp["op"]["name"] == "!=":
-        return getattr(object_class, exp["left"]) != exp["right"]
+        return self._get_attr(object_class, exp["left"]) != exp["right"]
       elif exp["op"]["name"] == "~":
-        return getattr(object_class, exp["left"]).ilike(
+        return self._get_attr(object_class, exp["left"]).ilike(
             "%{}%".format(exp["right"]))
       elif exp["op"]["name"] == "!~":
-        return not_(getattr(object_class, exp["left"]).ilike(
+        return not_(self._get_attr(object_class, exp["left"]).ilike(
             "%{}%".format(exp["right"])))
       elif exp["op"]["name"] == "relevant":
         return object_class.id.in_(
@@ -146,7 +147,6 @@ class QueryHelper(object):
                 exp["ids"],
             )
         )
-
       return None
 
     filter_expression = build_expression(expression)
