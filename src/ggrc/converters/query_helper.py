@@ -67,7 +67,8 @@ class QueryHelper(object):
       for key, value in aliases.items():
         if type(value) is dict:
           value = value["display_name"]
-        self.attr_name_map[object_class][value.lower()] = key.lower()
+        if value:
+          self.attr_name_map[object_class][value.lower()] = key.lower()
 
   def clean_query(self, query):
     """ sanitize the query object """
@@ -84,7 +85,7 @@ class QueryHelper(object):
     if slugs:
       ids = expression.get("ids", [])
       ids.extend(self.slugs_to_ids(expression["object_name"], slugs))
-      expression["ids"] = ids
+      expression["ids"] = map(int, ids)
     self.clean_filters(expression.get("left"))
     self.clean_filters(expression.get("right"))
 
@@ -137,26 +138,21 @@ class QueryHelper(object):
       elif exp["op"]["name"] == "!~":
         return not_(getattr(object_class, exp["left"]).ilike(
             "%{}%".format(exp["right"])))
+      elif exp["op"]["name"] == "relevant":
+        return object_class.id.in_(
+            RelationshipHelper.get_ids_related_to(
+                object_name,
+                exp["object_name"],
+                exp["ids"],
+            )
+        )
+
       return None
 
     filter_expression = build_expression(expression)
     objects = object_class.query.filter(filter_expression).all()
     object_ids = [o.id for o in objects]
     return object_ids
-
-  def get_by_relevant_filters(self, object_name, filters):
-    """ get object ids by relevancy filters """
-    results = set()
-    for or_filters in filters:
-      and_results = [RelationshipHelper.get_ids_related_to(
-          object_name,
-          and_filter["object_name"],
-          and_filter["ids"],
-      )for and_filter in or_filters]
-      and_results = map(set, and_results)
-      and_results = reduce(set.intersection, and_results)
-      results |= and_results
-    return results
 
   def slugs_to_ids(self, object_name, slugs):
     object_class = self.object_map.get(object_name)

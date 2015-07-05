@@ -9,6 +9,7 @@ from .mixins import deferred, Base, Described, Mapping
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import or_, and_
 
+
 class Relationship(Mapping, db.Model):
   __tablename__ = 'relationships'
   source_id = db.Column(db.Integer, nullable=False)
@@ -17,7 +18,7 @@ class Relationship(Mapping, db.Model):
   destination_type = db.Column(db.String, nullable=False)
   relationship_type_id = db.Column(db.String)
   # FIXME: Should this be a strict constraint?  If so, a migration is needed.
-  #relationship_type_id = db.Column(
+  # relationship_type_id = db.Column(
   #    db.Integer, db.ForeignKey('relationship_types.id'))
   relationship_type = db.relationship(
       'RelationshipType',
@@ -170,16 +171,18 @@ class RelationshipHelper(object):
     if isinstance(related_ids, (int, long)):
       related_ids = [related_ids]
 
-    by_source = Relationship.query.filter(and_(
-        Relationship.destination_type == object_type,
-        Relationship.source_type == related_type,
-        Relationship.source_id.in_(related_ids),
-    )).all()
-    by_destination = Relationship.query.filter(and_(
-        Relationship.source_type == object_type,
-        Relationship.destination_type == related_type,
-        Relationship.destination_id.in_(related_ids),
-    )).all()
-    destination_ids = [r.destination_id for r in by_source]
-    source_ids = [r.source_id for r in by_destination]
-    return source_ids + destination_ids
+    destination_ids = db.session.query(Relationship.destination_id).filter(
+        and_(
+            Relationship.destination_type == object_type,
+            Relationship.source_type == related_type,
+            Relationship.source_id.in_(related_ids),
+        )
+    )
+    source_ids = db.session.query(Relationship.source_id).filter(
+        and_(
+            Relationship.source_type == object_type,
+            Relationship.destination_type == related_type,
+            Relationship.destination_id.in_(related_ids),
+        )
+    )
+    return source_ids.union(destination_ids)
