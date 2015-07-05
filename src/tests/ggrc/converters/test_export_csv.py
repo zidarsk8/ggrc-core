@@ -300,7 +300,7 @@ class TestExportMultipleObjects(TestCase):
         },
         "fields": ["Code", "title", "description"],
     }, {
-        "object_name": "Contract",  # contract-25, contract-27, contract-40
+        "object_name": "Contract",  # contract-25, contract-27, contract-47
         "filters": {
             "expression": {
                 "op": {"name": "relevant"},
@@ -363,7 +363,7 @@ class TestExportMultipleObjects(TestCase):
     # contracts
     self.assertIn(",con 5,", response.data)
     self.assertIn(",con 15,", response.data)
-    self.assertIn(",con 80,", response.data)
+    self.assertIn(",con 115,", response.data)
     # controls
     self.assertIn(",Startupsum 117,", response.data)
     self.assertIn(",Startupsum 118,", response.data)

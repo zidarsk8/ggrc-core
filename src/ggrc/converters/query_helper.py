@@ -85,7 +85,8 @@ class QueryHelper(object):
     if slugs:
       ids = expression.get("ids", [])
       ids.extend(self.slugs_to_ids(expression["object_name"], slugs))
-      expression["ids"] = map(int, ids)
+      expression["ids"] = ids
+    expression["ids"] = map(int, expression.get("ids", []))
     self.clean_filters(expression.get("left"))
     self.clean_filters(expression.get("right"))
 
@@ -140,13 +141,23 @@ class QueryHelper(object):
         return not_(self._get_attr(object_class, exp["left"]).ilike(
             "%{}%".format(exp["right"])))
       elif exp["op"]["name"] == "relevant":
-        return object_class.id.in_(
-            RelationshipHelper.get_ids_related_to(
-                object_name,
-                exp["object_name"],
-                exp["ids"],
-            )
-        )
+        if exp["object_name"] == "__previous__":
+          query = self.query[exp["ids"][0]]
+          return object_class.id.in_(
+              RelationshipHelper.get_ids_related_to(
+                  object_name,
+                  query["object_name"],
+                  query["ids"],
+              )
+          )
+        else:
+          return object_class.id.in_(
+              RelationshipHelper.get_ids_related_to(
+                  object_name,
+                  exp["object_name"],
+                  exp["ids"],
+              )
+          )
       return None
 
     filter_expression = build_expression(expression)
