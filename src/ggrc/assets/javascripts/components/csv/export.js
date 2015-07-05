@@ -76,7 +76,7 @@
           };
         });
 
-        GGRC.Utils({
+        GGRC.Utils.ajax({
           type: "POST",
           url: this.scope.attr("export.url"),
           data: query
@@ -150,28 +150,21 @@
     tag: "csv-relevance-filter",
     template: "<content />",
     scope: {
-      data_grid: "@",
       index: "@",
-      // TODO: filter menu items with mapping rules from business_object.js
-      menu: can.map(["Program", "Regulation", "Policy", "Standard", "Contract",
-                    "Clause", "Section", "Objective", "Control", "Person",
-                    "System", "Process", "DataAsset", "Product", "Project",
-                    "Facility", "Market"],
-                    function (key) {
-                      return CMS.Models[key];
-                    })
+      menu: can.compute(function () {
+        var type = this.attr("type"),
+            mappings = GGRC.Mappings.get_canonical_mappings_for(type);
+        return _.map(_.keys(mappings), function (mapping) {
+          return CMS.Models[mapping];
+        });
+      })
     },
     events: {
       "inserted": function (el, ev) {
-        // TODO: Should be fixed, we should handle this within the template
-        // and fetched properly?
-        var dataGrid = /true/i.test(this.scope.attr("data_grid")),
-            index = +this.scope.attr("index");
+        var index = +this.scope.attr("panel_number");
 
-        if (dataGrid && index !== 1) {
-          this.element.empty();
-        }
-        if (index === 1 && url.relevant_id && url.relevant_type) {
+        // TODO: This could be probably written nicer e.g. pass parametars in template?
+        if (index === 0 && url.relevant_id && url.relevant_type) {
           var dfd = this.searchByType(url.relevant_id, url.relevant_type),
               que = new RefreshQueue();
 

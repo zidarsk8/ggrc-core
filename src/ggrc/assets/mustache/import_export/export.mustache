@@ -29,7 +29,7 @@
       <div class="relevant-filter-group">
         {{#each panels.items}}
           <div class="new-relevant-block">
-            <export-panel type="{{type}}" item="." panel_number="{{@index}}">
+            <export-panel type="{{type}}" data_grid="export.data_grid" item="." panel_number="{{@index}}">
               <div class="row-fluid">
                 <div class="span4">
                   <h6>Export object type</h6>
@@ -71,9 +71,18 @@
 
               {{> /static/mustache/import_export/export/attribute_selector.mustache}}
               {{> /static/mustache/import_export/export/filter_query.mustache}}
-              <csv-relevance-filter data_grid="{{export.data_grid}}" index="{{_index}}" relevance="item.relevance">
-                {{> /static/mustache/import_export/export/relevance.mustache}}
-              </csv-relevance-filter>
+
+              {{#if export.data_grid}}
+                {{#if_equals panel_number 0}}
+                  <csv-relevance-filter type="export.type" panel_number="panel_number" relevance="item.relevance">
+                    {{> /static/mustache/import_export/export/relevance.mustache}}
+                  </csv-relevance-filter>
+                {{/if}}
+              {{else}}
+                <csv-relevance-filter type="export.type" panel_number="panel_number" relevance="item.relevance">
+                  {{> /static/mustache/import_export/export/relevance.mustache}}
+                </csv-relevance-filter>
+              {{/if}}
             </export-panel>
           </div>
         {{/each}}
