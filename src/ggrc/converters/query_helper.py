@@ -3,11 +3,11 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from werkzeug.exceptions import BadRequest
 from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
 
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import RelationshipHelper
 from ggrc.converters import IMPORTABLE
 
@@ -48,43 +48,51 @@ class QueryHelper(object):
   def __init__(self, query):
     self.object_map = {o.__name__: o for o in IMPORTABLE.values()}
     self.query = self.clean_query(query)
+    self.set_attr_name_map()
+
+  def set_attr_name_map(self):
+    """ build a map for attributes names and display names
+
+    Dict containing all display_name to attr_name mappings
+    for all objects used in the current query
+    Example:
+        { Program: {"Program URL": "url", "Code": "slug", ...} ...}
+    """
+    self.attr_name_map = {}
+    for object_query in self.query:
+      object_name = object_query["object_name"]
+      object_class = self.object_map[object_name]
+      aliases = AttributeInfo.gather_aliases(object_class)
+      self.attr_name_map[object_class] = {}
+      for key, value in aliases.items():
+        if type(value) is dict:
+          value = value["display_name"]
+        self.attr_name_map[object_class][value.lower()] = key.lower()
 
   def clean_query(self, query):
     """ sanitize the query object """
     for object_query in query:
-      self.clean_relevant_filters(object_query.get("filters", {}))
-      self.clean_object_filters(object_query.get("filters", {}))
+      filters = object_query.get("filters", {}).get("expression")
+      self.clean_filters(filters)
     return query
 
-  def clean_object_filters(self, all_filters):
-    pass
-
-  def clean_relevant_filters(self, all_filters):
-    filters = all_filters.get("relevant_filters")
-    if not filters or not filters[0]:
-      all_filters["relevant_filters"] = None
+  def clean_filters(self, expression):
+    """ prepair the filter expression for building the query """
+    if not expression or type(expression) != dict:
       return
-    for or_filter in filters:
-      for and_filter in or_filter:
-        ids = and_filter.get("ids", [])
-        if "slugs" in and_filter:
-          ids.extend(self.slugs_to_ids(and_filter["object_name"],
-                                      and_filter["slugs"]))
-        and_filter["ids"] = ids
+    slugs = expression.get("slugs")
+    if slugs:
+      ids = expression.get("ids", [])
+      ids.extend(self.slugs_to_ids(expression["object_name"], slugs))
+      expression["ids"] = ids
+    self.clean_filters(expression.get("left"))
+    self.clean_filters(expression.get("right"))
 
   def get_ids(self):
     """ get list of objects and their ids according to the query
 
     Returns:
-      list of dicts: The order of dicts is determened by the query.
-          Example:
-              [
-                  {
-                      "object_name": <class_name1>,
-                      "ids": [ id1, id2, ...]
-                  },
-                  ...
-              ]
+      list of dicts: same query as the input with all ids that match the filter
     """
     for object_query in self.query:
       object_query["ids"] = self.get_object_ids(object_query)
@@ -93,32 +101,24 @@ class QueryHelper(object):
   def get_object_ids(self, object_query):
     """ get a set of object ids describideb in the filters """
     object_name = object_query["object_name"]
-    filters = object_query.get("filters", {})
-    relevant_filters = filters.get("relevant_filters")
-    relevant_by_ids = None
-    if relevant_filters:
-      relevant_by_ids = self.get_by_relevant_filters(
-          object_name, relevant_filters)
-    object_filters = filters.get("object_filters")
-    if object_filters:
-      return self.get_filtered_object_ids(
-          object_name, object_filters, relevant_by_ids)
-    if relevant_by_ids:
-      return relevant_by_ids
-    return set()
+    expression = object_query.get("filters", {}).get("expression")
+    return self.evaluate_expression(object_name, expression)
 
-  def get_filtered_object_ids(self, object_name, filters, relevant_ids):
+  def _get_attr(self, object_class, key):
+    """ get class attr by attribute name or display name """
+    attr = getattr(object_class, key, None)
+    if attr is None:
+      pass
+    if attr is None:
+      raise Exception("Bad search query: object '{}' does not have "
+                      "attribute '{}'.".format(object_class.__name__, key))
+    return attr
+
+  def evaluate_expression(self, object_name, expression):
     """ get objects by key filters """
-    expression = filters.get("expression")
-    keys = filters.get("keys")
-    object_class = self.object_map[object_name]
     if not expression:
-      return relevant_ids
-
-    for key in keys:
-      if not hasattr(object_class, key):
-        raise Exception("Bad search query: object '{}' does not have "
-                        "attribute '{}'.".format(object_name, key))
+      return set()
+    object_class = self.object_map[object_name]
 
     def build_expression(exp):
       if exp["op"]["name"] == "AND":
@@ -140,10 +140,6 @@ class QueryHelper(object):
       return None
 
     filter_expression = build_expression(expression)
-    if relevant_ids:
-      filter_expression = and_(object_class.id.in_(relevant_ids),
-                               filter_expression)
-
     objects = object_class.query.filter(filter_expression).all()
     object_ids = [o.id for o in objects]
     return object_ids

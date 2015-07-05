@@ -51,6 +51,7 @@ def get_custom_attributes_definitions(object_class):
         "default": None,
         "unique": False,
         "description": "",
+        "custom": True,
     }
   return definitions
 
