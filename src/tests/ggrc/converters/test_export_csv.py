@@ -5,10 +5,9 @@
 
 from os.path import abspath, dirname, join
 from flask.json import dumps
-from flask.json import loads
 
+from ggrc.app import app
 from tests.ggrc import TestCase
-from tests.ggrc.generator import ObjectGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
@@ -53,202 +52,325 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Org Group", response.data)
 
 
-class TestExportWithObjects(TestCase):
+class TestExportSingleObject(TestCase):
+
+  @classmethod
+  def setUpClass(cls):
+    TestCase.clear_data()
+    cls.tc = app.test_client()
+    cls.tc.get("/login")
+    cls.import_file("data_for_export_testing.csv")
+
+  @classmethod
+  def import_file(cls, filename, dry_run=False):
+    data = {"file": (open(join(CSV_DIR, filename)), filename)}
+    headers = {
+        "X-test-only": "true" if dry_run else "false",
+        "X-requested-by": "gGRC",
+    }
+    cls.tc.post("/_service/import_csv",
+                data=data, headers=headers)
 
   def setUp(self):
-    TestCase.setUp(self)
-    self.generator = ObjectGenerator()
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',
         "X-Requested-By": "gGRC",
         "X-export-view": "blocks",
     }
-    self.import_file("data_for_export_testing.csv")
 
-  def import_file(self, filename, dry_run=False):
+  def export_csv(self, data):
+    return self.client.post("/_service/export_csv", data=dumps(data),
+                            headers=self.headers)
+
+  def test_simple_export_query(self):
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": "Cat ipsum 1",
+            },
+        },
+        "fields": ["Code", "title", "description"],
+    }]
+    response = self.export_csv(data)
+    expected = set([1])
+    for i in range(1, 23):
+      if i in expected:
+        self.assertIn(",Cat ipsum {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Cat ipsum {},".format(i), response.data)
+
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "~"},
+                "right": "1",
+            },
+        },
+        "fields": ["Code", "title", "description"],
+    }]
+    response = self.export_csv(data)
+    expected = set([1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21])
+    for i in range(1, 23):
+      if i in expected:
+        self.assertIn(",Cat ipsum {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Cat ipsum {},".format(i), response.data)
+
+  def test_boolean_query_parameters(self):
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "private",
+                "op": {"name": "="},
+                "right": "1",
+            },
+        },
+        "fields": ["Code", "title", "description"],
+    }]
+    response = self.export_csv(data)
+    expected = set([10, 17, 18, 19, 20, 21, 22])
+    for i in range(1, 23):
+      if i in expected:
+        self.assertIn(",Cat ipsum {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Cat ipsum {},".format(i), response.data)
+
+  def test_and_export_query(self):
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": {
+                    "left": "title",
+                    "op": {"name": "!~"},
+                    "right": "2",
+                },
+                "op": {"name": "AND"},
+                "right": {
+                    "left": "title",
+                    "op": {"name": "~"},
+                    "right": "1",
+                },
+            },
+        },
+        "fields": ["Code", "title", "description"],
+    }]
+    response = self.export_csv(data)
+
+    expected = set([1, 10, 11, 13, 14, 15, 16, 17, 18, 19])
+    for i in range(1, 23):
+      if i in expected:
+        self.assertIn(",Cat ipsum {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Cat ipsum {},".format(i), response.data)
+
+  def test_simple_relevant_query(self):
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Contract",
+                "slugs": ["contract-25", "contract-40"],
+            },
+        },
+        "fields": ["Code", "title", "description"],
+    }]
+    response = self.export_csv(data)
+
+    expected = set([1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 13, 14, 16])
+    for i in range(1, 23):
+      if i in expected:
+        self.assertIn(",Cat ipsum {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Cat ipsum {},".format(i), response.data)
+
+  def test_multiple_relevant_query(self):
+    data = [{
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": {
+                    "op": {"name": "relevant"},
+                    "object_name": "Policy",
+                    "slugs": ["policy-3"],
+                },
+                "op": {"name": "AND"},
+                "right": {
+                    "op": {"name": "relevant"},
+                    "object_name": "Contract",
+                    "slugs": ["contract-25", "contract-40"],
+                },
+            },
+        },
+        "fields": ["Code", "title", "description"],
+    }]
+    response = self.export_csv(data)
+
+    expected = set([1, 2, 4, 8, 10, 11, 13])
+    for i in range(1, 23):
+      if i in expected:
+        self.assertIn(",Cat ipsum {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Cat ipsum {},".format(i), response.data)
+
+
+class TestExportMultipleObjects(TestCase):
+
+  @classmethod
+  def setUpClass(cls):
+    TestCase.clear_data()
+    cls.tc = app.test_client()
+    cls.tc.get("/login")
+    cls.import_file("data_for_export_testing.csv")
+
+  @classmethod
+  def import_file(cls, filename, dry_run=False):
     data = {"file": (open(join(CSV_DIR, filename)), filename)}
     headers = {
         "X-test-only": "true" if dry_run else "false",
         "X-requested-by": "gGRC",
     }
-    response = self.client.post("/_service/import_csv",
-                                data=data, headers=headers)
-    self.assertEqual(response.status_code, 200)
-    return loads(response.data)
+    cls.tc.post("/_service/import_csv",
+                data=data, headers=headers)
 
-  def test_basic_export(self):
+  def setUp(self):
+    self.client.get("/login")
+    self.headers = {
+        'Content-Type': 'application/json',
+        "X-Requested-By": "gGRC",
+        "X-export-view": "blocks",
+    }
+
+  def export_csv(self, data):
+    return self.client.post("/_service/export_csv", data=dumps(data),
+                            headers=self.headers)
+
+  def test_simple_multi_export(self):
     data = [{
-        "object_name": "Program",
+        "object_name": "Program",  # prog-1
         "filters": {
-            "relevant_filters": [[
-                {"object_name": "Contract",
-                 "slugs": ["contract-25", "contract-27"]},
-                {"object_name": "Policy",
-                 "slugs": ["policy-1"]},
-            ]]
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": "cat ipsum 1"
+            },
         },
         "fields": ["Code", "title", "description"],
     }, {
-        "object_name": "Contract",
+        "object_name": "Regulation",  # regulation-9000
         "filters": {
-            "relevant_filters": [[
-                {"object_name": "Program",
-                 "slugs": ["prog-1", "prog2"]},
-            ]]
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": "Hipster ipsum A 1"
+            },
         },
         "fields": ["Code", "title", "description"],
     }]
+    response = self.export_csv(data)
 
-    response = self.client.post("/_service/export_csv",
-                                data=dumps(data), headers=self.headers)
+    self.assertIn(",Cat ipsum 1,", response.data)
+    self.assertIn(",Hipster ipsum A 1,", response.data)
 
-    self.assertIn("contract-25", response.data)
-    self.assertIn("contract-27", response.data)
-    self.assertIn("cat ipsum", response.data)
-    self.assertIn("prog-1", response.data)
-    self.assertIn("prog-2", response.data)
-    self.assertIn("prog-4", response.data)
-    self.assertIn("con 15", response.data)
-    self.assertIn("con 5", response.data)
-
-  def test_object_filters(self):
+  def test_relevant_to_previous_export(self):
     data = [{
-        "object_name": "Program",
+        "object_name": "Program",  # prog-1, prog-23
         "filters": {
-            "relevant_filters": None,
-            "object_filters": {
-                "expression": {
-                    "left": "title",
-                    "op": {"name": "~"},
-                    "right": "cat ipsum 1"
-                },
-                "keys": ["title"],
-                "order_by":{"keys": [], "order":"", "compare":None}
-            }
-        },
-        "fields": ["Code", "title", "description"],
-    }]
-
-    response = self.client.post("/_service/export_csv",
-                                data=dumps(data), headers=self.headers)
-
-    self.assertIn("Cat ipsum 1", response.data)
-    self.assertIn("Cat ipsum 11", response.data)
-    self.assertIn("Cat ipsum 12", response.data)
-    self.assertNotIn("Cat ipsum 2", response.data)
-    self.assertNotIn("Cat ipsum 5", response.data)
-    self.assertIn("prog-1", response.data)
-
-    data = [{
-        "object_name": "Program",
-        "filters": {
-            "relevant_filters": None,
-            "object_filters": {
-                "expression": {
-                    "left": "title",
-                    "op": {"name": "!~"},
-                    "right": "1"
-                },
-                "keys": ["title"],
-                "order_by":{"keys": [], "order":"", "compare":None}
-            }
-        },
-        "fields": ["Code", "title", "description"],
-    }]
-
-    response = self.client.post("/_service/export_csv",
-                                data=dumps(data), headers=self.headers)
-
-    self.assertNotIn("Cat ipsum 1", response.data)
-    self.assertNotIn("Cat ipsum 11", response.data)
-    self.assertNotIn("Cat ipsum 12", response.data)
-    self.assertIn("Cat ipsum 2", response.data)
-    self.assertIn("Cat ipsum 5", response.data)
-
-    data = [{
-        "object_name": "Program",
-        "filters": {
-            "relevant_filters": None,
-            "object_filters": {
-                "expression": {
+            "expression": {
+                "left": {
                     "left": "title",
                     "op": {"name": "="},
                     "right": "cat ipsum 1"
                 },
-                "keys": ["title"],
-                "order_by":{"keys": [], "order":"", "compare":None}
-            }
-        },
-        "fields": ["Code", "title", "description"],
-    }]
-
-    response = self.client.post("/_service/export_csv",
-                                data=dumps(data), headers=self.headers)
-
-    self.assertIn("Cat ipsum 1", response.data)
-    self.assertNotIn("Cat ipsum 11", response.data)
-    self.assertNotIn("Cat ipsum 12", response.data)
-    self.assertNotIn("Cat ipsum 2", response.data)
-    self.assertNotIn("Cat ipsum 5", response.data)
-    self.assertIn("prog-1", response.data)
-
-    data = [{
-        "object_name": "Program",
-        "filters": {
-            "relevant_filters": None,
-            "object_filters": {
-                "expression": {
-                    "left": {
-                        "left": "title",
-                        "op": {"name": "="},
-                        "right": "cat ipsum 1"
-                    },
-                    "op": {"name": "OR"},
-                    "right": {
-                        "left": "title",
-                        "op": {"name": "~"},
-                        "right": "cat ipsum 2"
-                    }
-                },
-                "keys": ["title"],
-                "order_by":{"keys": [], "order":"", "compare":None}
-            }
-        },
-        "fields": ["Code", "title", "description"],
-    }]
-
-    response = self.client.post("/_service/export_csv",
-                                data=dumps(data), headers=self.headers)
-
-    self.assertIn("Cat ipsum 1", response.data)
-    self.assertIn("Cat ipsum 2", response.data)
-    self.assertIn("Cat ipsum 21", response.data)
-    self.assertIn("Cat ipsum 22", response.data)
-    self.assertIn("Cat ipsum 23", response.data)
-    self.assertNotIn("Cat ipsum 11", response.data)
-    self.assertNotIn("Cat ipsum 12", response.data)
-    self.assertNotIn("Cat ipsum 5", response.data)
-
-    data = [{
-        "fields": [],
-        "filters": {
-            "object_filters": {
-                "expression": {
+                "op": {"name": "OR"},
+                "right": {
                     "left": "title",
-                    "op": {"name": "~"},
-                    "right": "1",
+                    "op": {"name": "="},
+                    "right": "cat ipsum 23"
                 },
-                "keys": ["title"],
-                "order_by": {"compare": None, "keys": [], "order": ""},
             },
-            "relevant_filters": [[]],
         },
-        "object_name": "Program",
-    }]
+        "fields": ["Code", "title", "description"],
+    }, {
+        "object_name": "Contract",  # contract-25, contract-27, contract-40
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "__previous__",
+                "ids": ["0"],
+            },
+        },
+        "fields": ["Code", "title", "description"],
+    }, {
+        "object_name": "Control",  # control-3, control-4, control-5
+        "filters": {
+            "expression": {
+                "left": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["0"],
+                },
+                "op": {"name": "AND"},
+                "right": {
+                    "left": {
+                        "left": "code",
+                        "op": {"name": "!~"},
+                        "right": "1"
+                    },
+                    "op": {"name": "AND"},
+                    "right": {
+                        "left": "code",
+                        "op": {"name": "!~"},
+                        "right": "2"
+                    },
+                },
+            },
+        },
+        "fields": ["Code", "title", "description"],
+    }, {
+        "object_name": "Policy",  # policy - 3, 4, 5, 15, 16
+        "filters": {
+            "expression": {
+                "left": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["0"],
+                },
+                "op": {"name": "AND"},
+                "right": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["2"],
+                },
+            },
+        },
+        "fields": ["Code", "title", "description"],
+    }
+    ]
+    response = self.export_csv(data)
 
-    response = self.client.post("/_service/export_csv",
-                                data=dumps(data), headers=self.headers)
-
-    self.assertIn("Cat ipsum 1", response.data)
-    self.assertIn("Cat ipsum 21", response.data)
+    # programs
+    self.assertIn(",Cat ipsum 1,", response.data)
+    self.assertIn(",Cat ipsum 23,", response.data)
+    # contracts
+    self.assertIn(",con 5,", response.data)
+    self.assertIn(",con 15,", response.data)
+    self.assertIn(",con 80,", response.data)
+    # controls
+    self.assertIn(",Startupsum 117,", response.data)
+    self.assertIn(",Startupsum 118,", response.data)
+    self.assertIn(",Startupsum 119,", response.data)
+    # policies
+    self.assertIn(",Cheese ipsum ch 7,", response.data)
+    self.assertIn(",Cheese ipsum ch 8,", response.data)
+    self.assertIn(",Cheese ipsum ch 9,", response.data)
+    self.assertIn(",Cheese ipsum ch 19,", response.data)
+    self.assertIn(",Cheese ipsum ch 20,", response.data)
