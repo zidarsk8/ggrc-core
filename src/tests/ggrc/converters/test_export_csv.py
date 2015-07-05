@@ -97,7 +97,7 @@ class TestExportSingleObject(TestCase):
     }]
     response = self.export_csv(data)
     expected = set([1])
-    for i in range(1, 23):
+    for i in range(1, 24):
       if i in expected:
         self.assertIn(",Cat ipsum {},".format(i), response.data)
       else:
@@ -116,7 +116,7 @@ class TestExportSingleObject(TestCase):
     }]
     response = self.export_csv(data)
     expected = set([1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21])
-    for i in range(1, 23):
+    for i in range(1, 24):
       if i in expected:
         self.assertIn(",Cat ipsum {},".format(i), response.data)
       else:
@@ -136,7 +136,7 @@ class TestExportSingleObject(TestCase):
     }]
     response = self.export_csv(data)
     expected = set([10, 17, 18, 19, 20, 21, 22])
-    for i in range(1, 23):
+    for i in range(1, 24):
       if i in expected:
         self.assertIn(",Cat ipsum {},".format(i), response.data)
       else:
@@ -165,7 +165,7 @@ class TestExportSingleObject(TestCase):
     response = self.export_csv(data)
 
     expected = set([1, 10, 11, 13, 14, 15, 16, 17, 18, 19])
-    for i in range(1, 23):
+    for i in range(1, 24):
       if i in expected:
         self.assertIn(",Cat ipsum {},".format(i), response.data)
       else:
@@ -186,7 +186,7 @@ class TestExportSingleObject(TestCase):
     response = self.export_csv(data)
 
     expected = set([1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 13, 14, 16])
-    for i in range(1, 23):
+    for i in range(1, 24):
       if i in expected:
         self.assertIn(",Cat ipsum {},".format(i), response.data)
       else:
@@ -215,7 +215,7 @@ class TestExportSingleObject(TestCase):
     response = self.export_csv(data)
 
     expected = set([1, 2, 4, 8, 10, 11, 13])
-    for i in range(1, 23):
+    for i in range(1, 24):
       if i in expected:
         self.assertIn(",Cat ipsum {},".format(i), response.data)
       else:
@@ -336,7 +336,7 @@ class TestExportMultipleObjects(TestCase):
         },
         "fields": ["Code", "title", "description"],
     }, {
-        "object_name": "Policy",  # policy - 3, 4, 5, 15, 16
+        "object_name": "Policy",  # policy - 3, 4, 5, 6, 15, 16
         "filters": {
             "expression": {
                 "left": {
@@ -358,19 +358,29 @@ class TestExportMultipleObjects(TestCase):
     response = self.export_csv(data)
 
     # programs
-    self.assertIn(",Cat ipsum 1,", response.data)
-    self.assertIn(",Cat ipsum 23,", response.data)
+    for i in range(1, 24):
+      if i in (1, 23):
+        self.assertIn(",Cat ipsum {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Cat ipsum {},".format(i), response.data)
+
     # contracts
-    self.assertIn(",con 5,", response.data)
-    self.assertIn(",con 15,", response.data)
-    self.assertIn(",con 115,", response.data)
+    for i in range(5, 121, 5):
+      if i in (5, 15, 115):
+        self.assertIn(",con {},".format(i), response.data)
+      else:
+        self.assertNotIn(",con {},".format(i), response.data)
+
     # controls
-    self.assertIn(",Startupsum 117,", response.data)
-    self.assertIn(",Startupsum 118,", response.data)
-    self.assertIn(",Startupsum 119,", response.data)
+    for i in range(115, 140):
+      if i in (117, 118, 119):
+        self.assertIn(",Startupsum {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Startupsum {},".format(i), response.data)
+
     # policies
-    self.assertIn(",Cheese ipsum ch 7,", response.data)
-    self.assertIn(",Cheese ipsum ch 8,", response.data)
-    self.assertIn(",Cheese ipsum ch 9,", response.data)
-    self.assertIn(",Cheese ipsum ch 19,", response.data)
-    self.assertIn(",Cheese ipsum ch 20,", response.data)
+    for i in range(5, 25):
+      if i in (7, 8, 9, 10, 19, 20):
+        self.assertIn(",Cheese ipsum ch {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Cheese ipsum ch {},".format(i), response.data)
