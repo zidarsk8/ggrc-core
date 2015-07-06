@@ -175,13 +175,13 @@ describe('GGRC.query_parser', function() {
           });
     });
 
-    it("parses related queries", function(){
+    it("parses relevant queries", function(){
 
       expect(GGRC.query_parser.parse("#SomeClass,1,2,3,4#"))
           .toEqual({
             expression: {
-              class_name: 'SomeClass',
-              op: {name: "related"},
+              object_name: 'SomeClass',
+              op: {name: "relevant"},
               ids: ["1","2","3","4"],
               evaluate: jasmine.any(Function)
             },
@@ -194,23 +194,23 @@ describe('GGRC.query_parser', function() {
           .toEqual({
             expression:{
                left: {
-                class_name: 'SomeClass',
-                op: {name: "related"},
+                object_name: 'SomeClass',
+                op: {name: "relevant"},
                 ids: ["1","2","3","4"],
                 evaluate: jasmine.any(Function)
               },
               op: {name: "OR", evaluate: jasmine.any(Function)},
               right: {
                 left: {
-                  class_name: "A",
-                  op: {name: "related"},
+                  object_name: "A",
+                  op: {name: "relevant"},
                   ids: ["1"],
                   evaluate: jasmine.any(Function)
                 },
                 op: {name: "AND", evaluate: jasmine.any(Function)},
                 right: {
-                  class_name: "B",
-                  op: {name: "related"},
+                  object_name: "B",
+                  op: {name: "relevant"},
                   ids: ["2"],
                   evaluate: jasmine.any(Function)
                 },
@@ -227,15 +227,15 @@ describe('GGRC.query_parser', function() {
           .toEqual({
             expression:{
                left: {
-                class_name: 'SomeClass',
-                op: {name: "related"},
+                object_name: 'SomeClass',
+                op: {name: "relevant"},
                 ids: ["1","2","3","4"],
                 evaluate: jasmine.any(Function)
               },
               op: {name: "OR", evaluate: jasmine.any(Function)},
               right: {
-                class_name: "A",
-                op: {name: "related"},
+                object_name: "A",
+                op: {name: "relevant"},
                 ids: ["1"],
                 evaluate: jasmine.any(Function)
               },

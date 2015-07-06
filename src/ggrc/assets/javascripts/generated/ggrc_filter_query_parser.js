@@ -250,11 +250,11 @@ GGRC.query_parser = {
             },
         peg$c27 = "#",
         peg$c28 = { type: "literal", value: "#", description: "\"#\"" },
-        peg$c29 = function(related) {
+        peg$c29 = function(relevant) {
               return {
-                class_name: related[0],
-                op: {name: "related"},
-                ids: related.slice(1),
+                object_name: relevant[0],
+                op: {name: "relevant"},
+                ids: relevant.slice(1),
                 keys: [],
                 evaluate: function(values, keys){
                   return true;
@@ -1115,7 +1115,7 @@ GGRC.query_parser = {
         s0 = peg$c0;
       }
       if (s0 === peg$FAILED) {
-        s0 = peg$parserelated_exp();
+        s0 = peg$parserelevant_exp();
         if (s0 === peg$FAILED) {
           s0 = peg$parseparen_exp();
           if (s0 === peg$FAILED) {
@@ -1127,7 +1127,7 @@ GGRC.query_parser = {
       return s0;
     }
 
-    function peg$parserelated_exp() {
+    function peg$parserelevant_exp() {
       var s0, s1, s2, s3, s4;
 
       s0 = peg$currPos;
