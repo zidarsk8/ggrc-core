@@ -328,7 +328,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //example child option :
     // { property : "controls", model : CMS.Models.Control, }
     // { parent_find_param : "system_id" ... }
-    , scroll_page_count: 1
+    , scroll_page_count: 0.5 // pages above and below viewport
   },
   do_not_propagate : [
     'header_view', 'footer_view', 'add_item_view', 'list', 'original_list', 'single_object', 'find_function',
@@ -750,12 +750,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       hi = mid;
       break;
     }
-    // pages above and below viewport
     var page_count = this.options.scroll_page_count;
-    while (lo > 0 && el_position(children[lo - 1]) > (-page_count)) {
+    while (lo > 0 && el_position(children[lo - 1]) >= (-page_count)) {
       lo -= 1;
     }
-    while (hi < max && el_position(children[hi +1]) < page_count) {
+    while (hi < max && el_position(children[hi +1]) <= page_count) {
       hi += 1;
     }
     var end = Date.now()
@@ -764,27 +763,29 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var count_red = 0;
     var count_blue = 0;
 
-    var lo_old = -1;
-    var hi_old = -1;
-    if (this._last_visible) {
-      lo_old = this._last_visible.lo;
-      hi_old = this._last_visible.hi;
-      for (var i = lo_old; i <= hi_old; i++) {
-        if (i < lo || i > hi) {
-          $(children[i]).control().draw_placeholder();
-          count_red++;
-        }
+    var last_visible = this._last_visible || [];
+    console.log("last_visible.length", last_visible.length);
+    var visible = [];
+    for (var i = 0; i < last_visible.length; i++) {
+      var control = last_visible[i];
+      if (Math.abs(this.el_position(control.element)) <= page_count) {
+        visible.push(control);
+      } else {
+        control.draw_placeholder();
+        count_red++;
       }
-    } _
-    this._last_visible = { lo: lo, hi: hi };
+    }
     var mid = Date.now()
 
     for (var i = lo; i <= hi; i++) {
-      if (!(i >= lo_old && i <= hi_old)) {
-        $(children[i]).control().draw_node();
+      var control = $(children[i]).control();
+      if (!_.contains(visible, control)) {
+        visible.push(control);
+        control.draw_node();
         count_blue++;
       }
     }
+    this._last_visible = visible;
     var end = Date.now()
     console.log("Recoloring", mid-start, end-mid, count_red, count_blue);
 
