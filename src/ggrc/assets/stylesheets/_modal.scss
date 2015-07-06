@@ -1226,6 +1226,9 @@ label.second-in-column {
 
 .modal {
   .modal-body {
+    .add-button {
+      margin-bottom: 20px;
+    }
     .relevance-filters {
       margin-top:20px;
       h6 {
@@ -1243,6 +1246,9 @@ label.second-in-column {
         font-weight:bold;
       }
     }
+    &.modal-filter {
+      padding-bottom: 0;
+    }
     .filter-actions {
       margin-bottom: 0;
       border-bottom: 1px solid $itemBorder;
@@ -1251,5 +1257,20 @@ label.second-in-column {
     .single-line-filter {
       margin-bottom:6px;
     }
+  }
+  .wrap-modal-spacing {
+    margin: 0 20px 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid $itemBorder;
+  }
+  .modal-custom-spacing,
+  .results-num {
+    margin: 0 10px;
+  }
+  .results-num {
+    margin-bottom: 30px;
+  }
+  .check-all {
+    margin-right: 15px;
   }
 }
