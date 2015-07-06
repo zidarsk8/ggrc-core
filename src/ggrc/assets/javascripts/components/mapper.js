@@ -148,8 +148,6 @@
         this.scope.attr("mapper.term", "");
         this.scope.attr("mapper.contact", {});
         this.scope.attr("mapper.relevant", []);
-        this.scope.attr("mapper.entries", []);
-        this.scope.attr("mapper.selected", []);
 
         this.setModel();
         this.setBinding();
@@ -189,14 +187,13 @@
       },
       ".modalSearchButton click": "getResults",
       "{scope} type": "getResults",
+      "{scope} entries": "drawPage",
       ".results-wrap scrollNext": "drawPage",
-      ".tree-item .openclose click": function (el, ev) {
-        ev.preventDefault();
-        el.openclose();
-      },
       ".object-check-all change": function (el, ev) {
         var que = new RefreshQueue(),
-            entries = this.scope.attr("entries");
+            entries = _.map(this.scope.attr("entries"), function (entry) {
+              return entry.instance;
+            });
 
         this.scope.attr("select_all", true);
         this.scope.attr("isloading", true);
@@ -244,7 +241,9 @@
             page = this.scope.attr("page"),
             next_page = page + 1,
             per_page = +this.scope.attr("items-per-page"),
-            page_items = this.scope.attr("entries").slice(page * per_page, next_page * per_page),
+            page_items = _.map(this.scope.attr("entries").slice(page * per_page, next_page * per_page), function (entry) {
+              return entry.instance;
+            }),
             options = this.scope.attr("options");
 
         if (!page_items.length) {
@@ -293,14 +292,17 @@
             contact = this.scope.attr("contact"),
             permission_parms = {},
             search = [],
+            list,
             relevant;
 
         this.scope.attr("page", 0);
+        this.scope.attr("entries", []);
+        this.scope.attr("selected", []);
         this.scope.attr("options", []);
         this.scope.attr("select_all", false);
 
-        if (data.model_name === "AllObject") {
-          data.model_name = this.scope.attr("types.all_objects.models");
+        if (model_name === "AllObject") {
+          model_name = this.scope.attr("types.all_objects.models");
         }
         if (!_.isEmpty(contact)) {
           permission_parms.contact_id = contact.id;
@@ -319,20 +321,21 @@
             options: permission_parms
         });
         $.merge(search, relevant);
+        search = _.map(search, function (query) {
+          return new GGRC.ListLoaders.SearchListLoader(function (binding) {
+            return this.searchFor(query).then(function (mappings) {
+              return mappings.entries;
+            });
+          }.bind(this)).attach({});
+        }.bind(this));
 
-        debugger;
-        $.when.apply($, _.map(search, function (query) {
-          return this.searchFor(query);
-        }.bind(this)))
-        .done(function (response) {
-          console.log("SEARCH RESULTS", response, Array.prototype.slice.call(arguments).slice(1));
-          var entries = _.flatten(_.map((_.isString(model_name) ? [model_name] : model_name), function (name) {
-                          return response.getResultsForType(name);
-                        }));
+        list = (search.length > 1) ?
+                  new GGRC.ListLoaders.IntersectingListLoader(search).attach()
+                : search[0];
 
-          this.scope.attr("entries", entries);
+        list.refresh_stubs().then(function (options) {
           this.scope.attr("pageLoading", false);
-          this.drawPage();
+          this.scope.attr("entries", options);
         }.bind(this));
       }
     }
@@ -345,7 +348,6 @@
         var type = this.attr("type") === "AllObject" ? GGRC.page_model.type : this.attr("type"),
             mappings = GGRC.Mappings.get_canonical_mappings_for(type);
         return _.map(_.keys(mappings), function (mapping) {
-          console.log("MENU", CMS.Models[mapping], mapping);
           return CMS.Models[mapping];
         });
       })

@@ -101,10 +101,7 @@
                 </label>
                 <select class="input-small filter-type-selector select-filter{{@index}}" can-value="model_name">
                   {{#menu}}
-                  <option
-                    value="{{model_singular}}"
-                    label="{{title_singular}}">
-                  </option>
+                    {{#if model_singular}}<option value="{{model_singular}}" label="{{title_singular}}"></option>{{/if}}
                   {{/menu}}
                 </select>
                 {{#filter}}
@@ -165,7 +162,7 @@
           </div>
           <div class="span3">
             <div class="pull-right check-all">
-              <label rel="tooltip" data-placement="right" data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria.">
+              <label rel="tooltip" {{#if pageLoading}}class="disabled"{{/if}} data-placement="right" data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria.">
                 Select all
                 <input type="checkbox" can-value="mapper.allSelected" class="object-check-all"
                   {{#if pageLoading}}disabled="true"{{/if}}
