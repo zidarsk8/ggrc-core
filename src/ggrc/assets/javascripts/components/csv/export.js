@@ -59,20 +59,18 @@
         ev.preventDefault();
         var panels = this.scope.attr("export.panels.items");
         query = _.map(panels, function (panel, index) {
+          var relevant_filter = _.reduce(panel.relevance(),  function(query, el){
+                return (query && query+" AND ")+"#"+el.model_name+","+el.filter.id+"#";
+              }, "")
           return {
             object_name: panel.type,
             fields: _.compact(_.map(Object.keys(panel.selected), function (key) {
               return panel.selected[key] === true ? key : null;
             })),
-            filters: {
-              relevant_filters: [_.map(panel.relevance(), function (el) {
-                return {
-                  object_name: el.model_name,
-                  ids: [el.filter.id]
-                };
-              })],
-              object_filters: GGRC.query_parser.parse(panel.filter || "")
-            }
+            filters: GGRC.query_parser.join_queries(
+              GGRC.query_parser.parse(relevant_filter || ""),
+              GGRC.query_parser.parse(panel.filter || "")
+            )
           };
         });
 
