@@ -5,18 +5,26 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-<modal-mapper object="{{object}}" type="{{type}}" join-object-id="{{join-id}}">
+<modal-mapper search-only="{{search-only}}" object="{{object}}" type="{{type}}" join-object-id="{{join-id}}">
   <div class="modal-header">
     <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
       <i class="grcicon-x-grey"></i>
     </a>
-    <h2>Map object {{^if_equals mapper.type "AllObject"}}to {{mapper.type}}{{/if}}</h2>
+    <h2>
+      {{#if mapper.search_only}}
+      Search
+      {{else}}
+      Map object {{^if_equals mapper.type "AllObject"}}to {{mapper.type}}{{/if}}
+      {{/if}}
+    </h2>
   </div>
   <div class="modal-filter modal-body choose-object-wrap">
     <div class="row-fluid add-button">
       <div class="span12">
         <div class="pull-right">
-          {{^if_equals mapper.type "AllObject"}}
+          {{#if_helpers "\
+            ^if_equals" mapper.type "AllObject" "\
+            and ^if" mapper.search_only}}
             <a
                class="btn btn-small btn-draft"
                href="javascript://"
@@ -29,7 +37,7 @@
               <i class="grcicon-add-black"></i>
               Create New {{mapper.type}}
             </a>
-          {{/if}}
+          {{/if_helpers}}
         </div>
       </div>
     </div>
@@ -161,6 +169,7 @@
             </strong>
           </div>
           <div class="span3">
+            {{^if mapper.search_only}}
             <div class="pull-right check-all">
               <label rel="tooltip" {{#if pageLoading}}class="disabled"{{/if}} data-placement="right" data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria.">
                 Select all
@@ -170,12 +179,17 @@
                 >
               </label>
             </div>
+            {{/if}}
           </div>
         </div>
       </div>
       <div class="results-wrap">
         <ul class="result-tree tree-structure new-tree">
-          {{> /static/mustache/selectors/object_selector_option_items.mustache}}
+          {{#if mapper.search_only}}
+            {{> /static/mustache//search/advanced_search_option_items.mustache}}
+          {{else}}
+            {{> /static/mustache/selectors/object_selector_option_items.mustache}}
+          {{/if}}
         </ul>
         {{#if pageLoading}}
           <div class="row-fluid clearfix">
@@ -186,6 +200,7 @@
     </div>
   </mapper-results>
   <div class="modal-footer">
+    {{^if mapper.search_only}}
     <div class="row-fluid">
       <div class="span6">
         <div class="deny-buttons"></div>
@@ -209,5 +224,6 @@
         </div>
       </div>
     </div>
+    {{/if}}
   </div>
 </modal-mapper>

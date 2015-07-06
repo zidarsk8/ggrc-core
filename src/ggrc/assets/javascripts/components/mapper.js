@@ -8,7 +8,7 @@
 (function(can, $) {
   "use strict";
   var MapperModel = can.Map({
-      type: "",
+      type: "Program", // We set default as program
       contact: {},
       term: "",
       object: "",
@@ -16,6 +16,7 @@
       bindings: {},
       isLoading: false,
       allSelected: false,
+      search_only: false,
       selected: new can.List(),
       entries: new can.List(),
       relevant: new can.List(),
@@ -71,13 +72,22 @@
     template: "<content />",
     scope: function (attrs, parentScope, el) {
       var $el = $(el),
-          mapperInst = new MapperModel({
-            type: $el.attr("type"),
-            join_object_id: $el.attr("join-object-id"),
-            object: $el.attr("object"),
-          });
+          data = {};
+
+      if ($el.attr("type")) {
+        data["type"] = $el.attr("type");
+      }
+      if ($el.attr("join-object-id")) {
+        data["join_object_id"] = $el.attr("join-object-id");
+      }
+      if ($el.attr("object")) {
+        data["object"] = $el.attr("object");
+      }
+      if ($el.attr("search-only")) {
+        data["search_only"] =  /true/i.test($el.attr("search-only"));
+      }
       return {
-        mapper: mapperInst
+        mapper: new MapperModel(data)
       };
     },
     events: {
@@ -118,6 +128,9 @@
         }.bind(this));
       },
       "setBinding": function () {
+        if (this.scope.attr("mapper.search_only")) {
+          return;
+        }
         var table_plural = this.scope.attr("mapper.model.table_plural"),
             selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
             binding;
@@ -133,6 +146,7 @@
       "setModel": function () {
         var type = this.scope.attr("mapper.type"),
             types = this.scope.attr("mapper.types");
+
         if (type === "AllObject") {
           return this.scope.attr("mapper.model", types["all_objects"]);
         }
@@ -254,6 +268,14 @@
           this.scope.attr("pageLoading", false);
           this.scope.attr("page", next_page);
           options.push.apply(options, can.map(models, function (model) {
+            if (this.scope.attr("mapper.search_only")) {
+              return {
+                instance: model,
+                selected_object: false,
+                binding: {},
+                mappings: []
+              };
+            }
             var selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
                 binding = selected.get_binding(this.scope.attr("mapper.model.plural").toLowerCase()),
                 bindings = this.scope.attr("mapper.bindings");
@@ -373,17 +395,18 @@
     }
   });
 
-
   $("body").on("click",
   '[data-toggle="modal-selector"], \
    [data-toggle="modal-relationship-selector"], \
    [data-toggle="multitype-object-modal-selector"], \
    [data-toggle="multitype-multiselect-modal-selector"], \
-   [data-toggle="multitype-modal-selector"]',
+   [data-toggle="multitype-modal-selector"], \
+   [data-toggle="multitype-search-modal-selector"]',
   function (ev) {
     ev.preventDefault();
     var btn = $(ev.currentTarget),
-        data = btn.data();
+        data = btn.data(),
+        isSearch = /search-modal/ig.test(data.toggle);
 
     _.each(data, function (val, key) {
       data[can.camelCaseToUnderscore(key)] = val;
@@ -392,7 +415,8 @@
     GGRC.Controllers.ModalSelector.launch($(this), _.extend({
       "object": btn.data("join-object-type"),
       "type": btn.data("join-option-type"),
-      "join-id": btn.data("join-object-id")
+      "join-id": btn.data("join-object-id"),
+      "search-only": isSearch
     }, data));
   });
 })(window.can, window.can.$);

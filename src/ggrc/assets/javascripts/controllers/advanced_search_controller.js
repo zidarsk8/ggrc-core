@@ -419,28 +419,28 @@
   }
 
 
-  $(function() {
-    $('body').on('click', '[data-toggle="multitype-search-modal-selector"]', function(e) {
-      var $this = $(this)
-        , options
-        , data_set = can.extend({}, $this.data())
-        ;
+  // $(function() {
+  //   $('body').on('click', '[data-toggle="multitype-search-modal-selector"]', function(e) {
+  //     var $this = $(this)
+  //       , options
+  //       , data_set = can.extend({}, $this.data())
+  //       ;
 
-      can.each($this.data(), function(v, k) {
-        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
-        if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
-          delete data_set[k];
-      });
+  //     can.each($this.data(), function(v, k) {
+  //       data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+  //       if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+  //         delete data_set[k];
+  //     });
 
-      //set up the options for new multitype Object  modal
-      var column_view = GGRC.mustache_path + "/search/advanced_search_option_column.mustache",
-      item_view =  GGRC.mustache_path + "/search/advanced_search_option_items.mustache" ;
+  //     //set up the options for new multitype Object  modal
+  //     var column_view = GGRC.mustache_path + "/search/advanced_search_option_column.mustache",
+  //     item_view =  GGRC.mustache_path + "/search/advanced_search_option_items.mustache" ;
 
-      options = get_search_multitype_option_set(data_set, column_view, item_view);
+  //     options = get_search_multitype_option_set(data_set, column_view, item_view);
 
-      e.preventDefault();
-      GGRC.Controllers.AdvancedSearchSelector.launch($this, options);
-    });
-  });
+  //     e.preventDefault();
+  //     GGRC.Controllers.AdvancedSearchSelector.launch($this, options);
+  //   });
+  // });
 
 })(window.can, window.can.$);
