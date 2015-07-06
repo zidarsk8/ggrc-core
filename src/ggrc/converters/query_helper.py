@@ -119,11 +119,13 @@ class QueryHelper(object):
 
   def evaluate_expression(self, object_name, expression):
     """ get objects by key filters """
-    if not expression:
+    if expression is None:
       return set()
     object_class = self.object_map[object_name]
 
     def build_expression(exp):
+      if "op" not in exp:
+        return None
       if exp["op"]["name"] == "AND":
         return and_(build_expression(exp["left"]),
                     build_expression(exp["right"]))
@@ -161,7 +163,10 @@ class QueryHelper(object):
       return None
 
     filter_expression = build_expression(expression)
-    objects = object_class.query.filter(filter_expression).all()
+    if filter_expression is None:
+      objects = object_class.query.all()
+    else:
+      objects = object_class.query.filter(filter_expression).all()
     object_ids = [o.id for o in objects]
     return object_ids
 
