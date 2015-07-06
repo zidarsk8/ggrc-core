@@ -351,6 +351,8 @@ describe('GGRC.query_parser', function() {
           ["a=b and c=d", "a=b", "c=d"],
           ["(a=b) and (c=d)", "a=b", "c=d"],
           ["(a=b or c=A) and (c=d)", "a=b or c=A", "c=d"],
+          ["(a=b or c=A) and (c=d)", "(a=b or c=A) and (c=d)", ""],
+          ["(a=b or c=A) and (c=d)", "", "(a=b or c=A) and (c=d)"],
         ]
 
         can.each(same_queries, function(queries){

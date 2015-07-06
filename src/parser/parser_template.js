@@ -26,6 +26,12 @@ GGRC.query_parser = {
     var expression = null,
         op = {},
         keys = jQuery.unique(left.keys.concat(right.keys));
+    if (!left.expression.op){
+      return right;
+    }
+    if (!right.expression.op){
+      return left;
+    }
     if (op_key && op_key == "OR") {
       op = {
         name: "OR",
