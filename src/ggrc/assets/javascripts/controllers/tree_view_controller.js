@@ -328,6 +328,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //example child option :
     // { property : "controls", model : CMS.Models.Control, }
     // { parent_find_param : "system_id" ... }
+    , scroll_page_count: 1
   },
   do_not_propagate : [
     'header_view', 'footer_view', 'add_item_view', 'list', 'original_list', 'single_object', 'find_function',
@@ -707,13 +708,16 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var se_h = se.outerHeight()
     var el_o = el.offset().top;
     var el_h = el.outerHeight();
-    if (el_o + el_h < se_o - se_h) {
-      return -1;
+
+    var above_top = (el_o + el_h - se_o) / se_h ;
+    var below_bottom = (el_o - se_o ) / se_h - 1;
+    if (above_top < 0) {
+      return above_top;
+    } else if (below_bottom > 0) {
+      return below_bottom;
+    } else {
+      return 0;
     }
-    if (el_o > se_o + 2*se_h) {
-      return 1;
-    }
-    return 0;
   }
 
   , draw_visible: _.debounce(function() {
@@ -746,10 +750,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       hi = mid;
       break;
     }
-    while (lo > 0 && el_position(children[lo - 1]) === 0) {
+    // pages above and below viewport
+    var page_count = this.options.scroll_page_count;
+    while (lo > 0 && el_position(children[lo - 1]) > (-page_count)) {
       lo -= 1;
     }
-    while (hi < max && el_position(children[hi +1]) === 0) {
+    while (hi < max && el_position(children[hi +1]) < page_count) {
       hi += 1;
     }
     var end = Date.now()
