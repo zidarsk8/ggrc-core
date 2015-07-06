@@ -100,12 +100,6 @@ class QueryHelper(object):
       object_query["ids"] = self.get_object_ids(object_query)
     return self.query
 
-  def get_object_ids(self, object_query):
-    """ get a set of object ids describideb in the filters """
-    object_name = object_query["object_name"]
-    expression = object_query.get("filters", {}).get("expression")
-    return self.evaluate_expression(object_name, expression)
-
   def _get_attr(self, object_class, key):
     """ get class attr by attribute name or display name """
     attr = getattr(object_class, key.lower(), None)
@@ -117,8 +111,11 @@ class QueryHelper(object):
                       "attribute '{}'.".format(object_class.__name__, key))
     return attr
 
-  def evaluate_expression(self, object_name, expression):
-    """ get objects by key filters """
+  def get_object_ids(self, object_query):
+    """ get a set of object ids describideb in the filters """
+    object_name = object_query["object_name"]
+    expression = object_query.get("filters", {}).get("expression")
+
     if expression is None:
       return set()
     object_class = self.object_map[object_name]
@@ -160,6 +157,13 @@ class QueryHelper(object):
                   exp["ids"],
               )
           )
+      elif exp["op"]["name"] == "text_search":
+        text_exp = None
+        for field in object_query.get("fields", []):
+          text_exp = or_(text_exp, getattr(object_class, field)
+                         .ilike("%{}%".format(exp["text"])))
+        return text_exp
+
       return None
 
     filter_expression = build_expression(expression)
