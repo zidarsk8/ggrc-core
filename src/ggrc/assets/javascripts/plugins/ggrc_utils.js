@@ -23,17 +23,17 @@
       element.click();
       document.body.removeChild(element);
     },
-    ajax: function (data) {
+    export_request: function (request) {
       return $.ajax({
-        type: data.type || "POST",
+        type: "POST",
         dataType: "text",
-        headers: {
+        headers: $.extend({
           "Content-Type": "application/json",
           "X-export-view": "blocks",
           "X-requested-by": "gGRC"
-        },
-        url: data.url,
-        data: JSON.stringify(data.data || {})
+        }, request.headers || {}),
+        url: "/_service/export_csv",
+        data: JSON.stringify(request.data || {})
       });
     }
   };

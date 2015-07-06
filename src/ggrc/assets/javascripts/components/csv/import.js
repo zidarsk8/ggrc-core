@@ -40,10 +40,8 @@
           return;
         }
 
-        GGRC.Utils.ajax({
-          url: this.scope.attr("url"),
-          data: data,
-          type: "POST"
+        GGRC.Utils.export_request({
+          data: data
         }).then(function (data) {
           GGRC.Utils.download("import_template.csv", data);
         }.bind(this))
