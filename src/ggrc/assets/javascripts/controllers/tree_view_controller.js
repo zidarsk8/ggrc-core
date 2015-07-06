@@ -1246,6 +1246,8 @@ can.Control("CMS.Controllers.TreeViewNode", {
       can.view(GGRC.mustache_path + "/base_objects/tree_placeholder.mustache", that.options, this._ifNotRemoved(function(frag) {
         that.replace_element(frag);
         that._draw_node_deferred.resolve();
+        that.expanded = false;
+        delete that._expand_deferred;
       }));
   }
   , should_draw_children : function(){
