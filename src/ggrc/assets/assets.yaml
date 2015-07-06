@@ -92,8 +92,7 @@ dashboard-js-files:
   - models/section.js
   - models/system.js
   - models/join_models.js
-  - controllers/modal_selector_controller.js
-  - controllers/advanced_search_controller.js
+  - controllers/mapper.js
   - pbc/workflow_controller.js
   - models/category.js
   - models/refresh_queue.js
