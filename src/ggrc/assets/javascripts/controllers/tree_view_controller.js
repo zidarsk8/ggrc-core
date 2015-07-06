@@ -720,6 +720,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if (window.DONTCOLOR){
       return
     }
+    console.log("draw visible")
     var start = Date.now()
     var el_position = this.el_position.bind(this);
     var children = this.element.children();
@@ -784,12 +785,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }, 100, {leading: true})
 
   , "{scroll_element} scroll": function (el, ev) {
-    console.log("scroll event", el.scrollTop());
     setTimeout(this.draw_visible.bind(this), 0)
   }
 
   , "{scroll_element} resize": function (el, ev) {
-    console.log("resize event", el.scrollTop());
     setTimeout(this.draw_visible.bind(this), 0)
   }
 
@@ -913,7 +912,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             draw_items_dfds.push(control._draw_node_deferred);
           } else {
             console.log("misfire")
-            //debugger
+            // debugger
           }
           $items.push($li[0]);
         }
@@ -1226,8 +1225,10 @@ can.Control("CMS.Controllers.TreeViewNode", {
         || GGRC.mustache_path + "/base_objects/tree.mustache";
     }
     this._draw_node_deferred = new $.Deferred();
-    this.draw_placeholder();
 
+    // this timeout is required because the invoker will access the control via
+    // the element synchronously so we must not replace the element just yet
+    setTimeout(this.draw_placeholder.bind(this), 0);
   }
 
   , draw_node: function() {
