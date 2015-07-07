@@ -16,6 +16,7 @@ from ggrc.app import app
 from ggrc.app import db
 from ggrc.builder.json import publish
 from ggrc.builder.json import publish_representation
+from ggrc.converters.import_helper import get_object_column_json
 from ggrc.extensions import get_extension_modules
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
@@ -107,6 +108,18 @@ def get_attributes_json():
     published.append(publish_representation(publish(attr)))
   return as_json(published)
 
+def get_all_attributes_json():
+  """Get a list of all attribute definitions
+
+  This exports all attributes related to a given model, including custom
+  attributies and mapping attributes, that are used in csv import and export.
+  """
+  attrs = models.CustomAttributeDefinition.eager_query().all()
+  published = {}
+  for model in all_models.all_models:
+    published[model.__name__] = get_object_column_json(model)
+  return as_json(published)
+
 
 @app.context_processor
 def base_context():
@@ -118,6 +131,7 @@ def base_context():
       config_json=get_config_json,
       current_user_json=get_current_user_json,
       attributes_json=get_attributes_json,
+      all_attributes_json=get_all_attributes_json,
   )
 
 

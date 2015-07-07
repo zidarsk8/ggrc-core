@@ -40,11 +40,13 @@ def get_mapping_definitions(object_class):
 
 def get_custom_attributes_definitions(object_class):
   definitions = {}
+  if not hasattr(object_class, "get_custom_attribute_definitions"):
+    return definitions
   custom_attributes = object_class.get_custom_attribute_definitions()
   for attr in custom_attributes:
     handler = handlers.CustomAttributeColumHandler
     definitions[attr.title] = {
-        "display_name": attr.display_name,
+        "display_name": attr.title,
         "mandatory": attr.mandatory,
         "handler": handler,
         "validator": None,
@@ -99,6 +101,15 @@ def get_object_column_definitions(object_class):
   definitions.update(custom_attr_def)
   definitions.update(mapping_def)
 
+  return definitions
+
+
+def get_object_column_json(object_class):
+  definitions = get_object_column_definitions(object_class)
+  for attr_name, attr_info in definitions.items():
+    for key, value in attr_info.items():
+      if type(value) not in (unicode, str, int, long, bool, None):
+        del definitions[attr_name][key]
   return definitions
 
 
