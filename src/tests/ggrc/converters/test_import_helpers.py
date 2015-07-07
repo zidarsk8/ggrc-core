@@ -275,6 +275,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     display_names = set([val["display_name"] for val in definitions.values()])
     element_names = set([
         "Program",
+        "Code",
         "Title",
         "Description",
         "Internal Audit Lead",
