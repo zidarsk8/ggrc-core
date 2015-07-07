@@ -21,7 +21,7 @@
           return new can.List();
         }),
         columns: function () {
-          return CMS.Models[this.attr("type")].tree_view_options.attr_list;
+          return GGRC.model_attr_defs[this.attr("type")];
         }
       }),
       panelsModel = can.Map({
