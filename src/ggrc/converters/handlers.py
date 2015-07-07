@@ -167,7 +167,9 @@ class DateColumnHandler(ColumnHandler):
 
   def get_value(self):
     date = getattr(self.row_converter.obj, self.key)
-    return date.strftime("%m/%d/%Y")
+    if date:
+      return date.strftime("%m/%d/%Y")
+    return ""
 
 
 class TextColumnHandler(ColumnHandler):
