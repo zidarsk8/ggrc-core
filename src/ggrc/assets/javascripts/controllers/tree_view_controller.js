@@ -724,7 +724,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if (window.DONTCOLOR){
       return
     }
-    console.log("draw visible")
     var start = Date.now()
     var el_position = this.el_position.bind(this);
     var children = this.element.children();
@@ -764,7 +763,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var count_blue = 0;
 
     var last_visible = this._last_visible || [];
-    console.log("last_visible.length", last_visible.length);
     var visible = [];
     for (var i = 0; i < last_visible.length; i++) {
       var control = last_visible[i];
@@ -790,8 +788,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
     this._last_visible = visible;
     var end = Date.now()
-    console.log("Recoloring", mid-start, end-mid, count_red, count_blue);
-
   }, 100, {leading: true})
 
   , "{scroll_element} scroll": function (el, ev) {
@@ -802,11 +798,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     setTimeout(this.draw_visible.bind(this), 0)
   }
 
-  , "{scroll_element} optimizedScroll": function (el, ev) {
-    console.log("optimizedScroll");
-  }
   , "{original_list} add" : function(list, ev, newVals, index) {
-    //console.log("tree_view.{original_list} add");
     var that = this
       , real_add = []
       ;
