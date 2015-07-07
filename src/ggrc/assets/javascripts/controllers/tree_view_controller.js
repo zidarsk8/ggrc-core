@@ -768,6 +768,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var visible = [];
     for (var i = 0; i < last_visible.length; i++) {
       var control = last_visible[i];
+      if (control.element === undefined || control.element === null) {
+        continue; // element was removed
+      }
       if (Math.abs(this.el_position(control.element)) <= page_count) {
         visible.push(control);
       } else {
@@ -954,7 +957,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               $item.appendTo(this.element);
             }
             $existing.splice(0, 0, item);
-        });
+        }.bind(this));
         if (this.options.sortable) {
           $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
         }
@@ -1054,7 +1057,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.get_count_deferred = false;
     this.options.list.replace([]);
     this.element.children('.cms_controllers_tree_view_node').remove();
-    this.fetch_list().then(this.proxy("draw_list"));
+    this.draw_list(this.options.original_list);
     this.init_count();
   },
   "[custom-event] click" : function(el, ev) {
