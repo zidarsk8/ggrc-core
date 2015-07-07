@@ -159,7 +159,7 @@
         }, []);
         this.scope.attr("mapper.model", _.findWhere(types, {value: type}));
       },
-      "{mapper.type} change": function () {
+      "{mapper} type": function () {
         this.scope.attr("mapper.term", "");
         this.scope.attr("mapper.contact", {});
         this.scope.attr("mapper.relevant", []);
