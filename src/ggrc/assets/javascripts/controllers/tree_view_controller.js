@@ -1028,7 +1028,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.init_count();
   },
   "[custom-event] click" : function(el, ev) {
-    console.log("tree_view.[custom-event] click");
     var event_name = el.attr("custom-event");
     if(this.options.events && typeof this.options.events[event_name] === "function") {
       this.options.events[event_name].apply(this, arguments);
