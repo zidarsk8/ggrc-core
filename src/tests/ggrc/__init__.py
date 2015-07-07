@@ -23,11 +23,10 @@ logging.disable(logging.CRITICAL)
 
 class TestCase(BaseTestCase):
 
-  def setUp(self):
-    # this is a horrible hack because db.metadata.sorted_tables does not sort
-    # by dependencies. Events table is before Person table - reversed is bad.
+  @classmethod
+  def clear_data(cls):
     ignore_tables = (
-        "test_model", "roles", "notification_types", "object_types"
+        "test_model", "roles", "notification_types", "object_types", "options"
     )
     tables = set(db.metadata.tables).difference(ignore_tables)
     for _ in range(len(tables)):
@@ -42,6 +41,12 @@ class TestCase(BaseTestCase):
             pass
 
     db.session.commit()
+
+
+  def setUp(self):
+    # this is a horrible hack because db.metadata.sorted_tables does not sort
+    # by dependencies. Events table is before Person table - reversed is bad.
+    self.clear_data()
 
     # if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
     #   from google.appengine.api import memcache

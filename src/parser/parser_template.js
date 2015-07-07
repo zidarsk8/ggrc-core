@@ -22,5 +22,47 @@ GGRC.query_parser = {
       return this.generated.parse("~" + query);
     }
   },
-  generated: GENERATED_PLACEHOLDER
+  join_queries: function(left, right, op_key) {
+    var expression = null,
+        op = {},
+        keys = jQuery.unique(left.keys.concat(right.keys));
+    if (!left.expression.op){
+      return right;
+    }
+    if (!right.expression.op){
+      return left;
+    }
+    if (op_key && op_key == "OR") {
+      op = {
+        name: "OR",
+        evaluate: function(val1, val2) { return val1 || val2; }
+      };
+    } else {
+      op = {
+        name: "AND",
+        evaluate: function(val1, val2) { return val1 && val2; }
+      };
+    }
+    expression = {
+      left: left.expression,
+      op: op,
+      right: right.expression,
+      evaluate: function(values) {
+        return op.evaluate(left.expression.evaluate(values), right.expression.evaluate(values));
+      }
+    }
+    return {
+      expression: expression,
+      keys: keys,
+      order_by: right.order_by,
+      evaluate: function(values, keys) {
+        try {
+          return expression.evaluate(values, keys)
+        } catch (e) {
+          return false;
+        }
+      }
+    }
+  },
+  generated: "GENERATED_PLACEHOLDER"
 };

@@ -57,25 +57,7 @@
     <div class="span1">&nbsp;</div>
     <div class="span4">
       <ul class="tree-action-list">
-        {{#is_allowed 'create' 'update' 'Request' context=parent_instance.context.id}}
-          <li>
-            <a href="/audits/{{parent_instance.id}}/import_pbcs?return_to={{param_current_location}}"
-               rel="tooltip" data-placement="top" title="" data-original-title="Import Requests">
-              <i class="grcicon-imp-exp"></i>
-            </a>
-          </li>
-          <li>
-        {{/is_allowed}}
-        {{#is_allowed 'read' 'Request' context=parent_instance.context.id}}
-        {{#if list.length}}
-          <li>
-            <a href="/audits/{{parent_instance.id}}/export_pbcs?id={{instance_ids list}}"
-               rel="tooltip" data-placement="top" title="" data-original-title="Export Requests">
-              <i class="grcicon-export"></i>
-            </a>
-          </li>
-        {{/if}}
-        {{/is_allowed}}
+        {{{> "/static/mustache/base_objects/export_button.mustache}}}
         {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
         <!-- Temporary hidden. Do not remove this.
         <li>

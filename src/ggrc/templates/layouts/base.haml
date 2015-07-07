@@ -31,6 +31,10 @@
       window.st=Date.now();
       -block extra_javascript
 
+    -assets "dashboard-js-templates"
+      %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
+    -endassets
+
     -assets "dashboard-js"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
@@ -38,10 +42,6 @@
     :javascript
       GGRC.Tracker.timing("dashboard", "exec_scripts", Date.now() - st, "dashboard.js finished executing");
       window.st=Date.now();
-
-    -assets "dashboard-js-templates"
-      %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
-    -endassets
 
     :javascript
       GGRC.Tracker.timing("dashboard", "load_templates", Date.now() - st, "dashboard-templates.js finished loading and executing");

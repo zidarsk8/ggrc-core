@@ -197,11 +197,11 @@
 .import-final,
 .import-progress,
 .import-progress-final {
-  display: none;
+  // display: none;
 }
 
-.export-control {
-  display: none;
+.download-template select[multiple] {
+  min-height: 320px;
 }
 
 // Risk Assessment

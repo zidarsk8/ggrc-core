@@ -8,25 +8,26 @@
 describe('GGRC.query_parser', function() {
 
   var values = {
-    'a': 'b',
-    'hello': 'world',
-    'n': '22',
-    '5words': 'These are just 5 words',
-    'bacon ipsum': 'Bacon ipsum dolor amet meatloaf pork loin fatback ball'+
-      'tip chicken frankfurter swine bresaola beef ribs ribeye shankle sho'+
-      'rt ribs drumstick leberkas sirloin. Turducken hamburger drumstick g'+
-      'round round ham biltong. Alcatra turkey brisket pancetta jowl bilto'+
-      'ng meatball, shank pork chop. Flank fatback capicola chuck chicken '+
-      'jerky venison meatball beef drumstick.'
-  };
-
-  var parser_structure = {
-    parse: jasmine.any(Function),
-    generated: {
-      parse: jasmine.any(Function),
-      SyntaxError: jasmine.any(Function)
-    }
-  };
+        'a': 'b',
+        'hello': 'world',
+        'n': '22',
+        '5words': 'These are just 5 words',
+        'bacon ipsum': 'Bacon ipsum dolor amet meatloaf pork loin fatback ball'+
+          'tip chicken frankfurter swine bresaola beef ribs ribeye shankle sho'+
+          'rt ribs drumstick leberkas sirloin. Turducken hamburger drumstick g'+
+          'round round ham biltong. Alcatra turkey brisket pancetta jowl bilto'+
+          'ng meatball, shank pork chop. Flank fatback capicola chuck chicken '+
+          'jerky venison meatball beef drumstick.'
+      },
+      all_keys = Object.keys(values),
+      parser_structure = {
+        parse: jasmine.any(Function),
+        join_queries: jasmine.any(Function),
+        generated: {
+          parse: jasmine.any(Function),
+          SyntaxError: jasmine.any(Function)
+        }
+      };
 
 
   it("should exist", function() {
@@ -69,7 +70,7 @@ describe('GGRC.query_parser', function() {
         expect(GGRC.query_parser.parse(query_str)).toEqual({
           expression: { 
             text: text, 
-            op: 'exclude_text_search', 
+            op: {name: 'exclude_text_search'}, 
             evaluate: jasmine.any(Function)
           },
           order_by : { keys : [ ], order : '', compare : null },
@@ -101,7 +102,7 @@ describe('GGRC.query_parser', function() {
         expect(GGRC.query_parser.parse(query_str)).toEqual({
           expression: { 
             text: text, 
-            op: 'text_search', 
+            op: {name: 'text_search'}, 
             evaluate: jasmine.any(Function)
           },
           order_by : { keys : [ ], order : '', compare : null },
@@ -155,22 +156,95 @@ describe('GGRC.query_parser', function() {
 
     it('works with order by statement', function(){
 
-      expect(GGRC.query_parser.parse('5words ~ just order by some,"name with spaces" desc')).toEqual({
-          expression: {
-            left: '5words',
-            op: { name: '~', evaluate: jasmine.any(Function) },
-            right: 'just',
+      expect(GGRC.query_parser
+          .parse('5words ~ just order by some,"name with spaces" desc'))
+          .toEqual({
+            expression: {
+              left: '5words',
+              op: { name: '~', evaluate: jasmine.any(Function) },
+              right: 'just',
+              evaluate: jasmine.any(Function)
+            },
+            order_by : {
+              keys : ['some', 'name with spaces' ],
+              order : 'desc',
+              compare : jasmine.any(Function)
+            },
+            keys: ['5words'],
             evaluate: jasmine.any(Function)
-          },
-          order_by : {
-            keys : ['some', 'name with spaces' ],
-            order : 'desc',
-            compare : jasmine.any(Function)
-          },
-          keys: ['5words'],
-          evaluate: jasmine.any(Function)
-        });
+          });
+    });
 
+    it("parses relevant queries", function(){
+
+      expect(GGRC.query_parser.parse("#SomeClass,1,2,3,4#"))
+          .toEqual({
+            expression: {
+              object_name: 'SomeClass',
+              op: {name: "relevant"},
+              ids: ["1","2","3","4"],
+              evaluate: jasmine.any(Function)
+            },
+            order_by : { keys : [ ], order : '', compare : null },
+            keys: [],
+            evaluate: jasmine.any(Function)
+          });
+
+      expect(GGRC.query_parser.parse("#SomeClass,1,2,3,4# or #A,1# and #B,2#"))
+          .toEqual({
+            expression:{
+               left: {
+                object_name: 'SomeClass',
+                op: {name: "relevant"},
+                ids: ["1","2","3","4"],
+                evaluate: jasmine.any(Function)
+              },
+              op: {name: "OR", evaluate: jasmine.any(Function)},
+              right: {
+                left: {
+                  object_name: "A",
+                  op: {name: "relevant"},
+                  ids: ["1"],
+                  evaluate: jasmine.any(Function)
+                },
+                op: {name: "AND", evaluate: jasmine.any(Function)},
+                right: {
+                  object_name: "B",
+                  op: {name: "relevant"},
+                  ids: ["2"],
+                  evaluate: jasmine.any(Function)
+                },
+                evaluate: jasmine.any(Function)
+              },
+              evaluate: jasmine.any(Function)
+            },
+            order_by : { keys : [ ], order : '', compare : null },
+            keys: [],
+            evaluate: jasmine.any(Function)
+          });
+
+      expect(GGRC.query_parser.parse("#SomeClass,1,2,3,4# or #A,1#"))
+          .toEqual({
+            expression:{
+               left: {
+                object_name: 'SomeClass',
+                op: {name: "relevant"},
+                ids: ["1","2","3","4"],
+                evaluate: jasmine.any(Function)
+              },
+              op: {name: "OR", evaluate: jasmine.any(Function)},
+              right: {
+                object_name: "A",
+                op: {name: "relevant"},
+                ids: ["1"],
+                evaluate: jasmine.any(Function)
+              },
+              evaluate: jasmine.any(Function)
+            },
+            order_by : { keys : [ ], order : '', compare : null },
+            keys: [],
+            evaluate: jasmine.any(Function)
+          });
     });
 
     describe("evaluate", function(){
@@ -203,17 +277,18 @@ describe('GGRC.query_parser', function() {
             .evaluate(values)).toEqual(true);
         expect(GGRC.query_parser.parse('(n = 22 or n = 5)')
             .evaluate(values)).toEqual(true);
-        expect(GGRC.query_parser.parse('(n = 22 and  n = 5) and ("bacon ipsum" !~ bacon)')
+        expect(GGRC.query_parser
+            .parse('(n = 22 and  n = 5) and ("bacon ipsum" !~ bacon)')
             .evaluate(values)).toEqual(false);
-        expect(GGRC.query_parser.parse('("bacon ipsum" ~ bacon) and ("bacon ipsum" !~ bacon)')
+        expect(GGRC.query_parser
+            .parse('("bacon ipsum" ~ bacon) and ("bacon ipsum" !~ bacon)')
             .evaluate(values)).toEqual(false);
-        expect(GGRC.query_parser.parse('(n = 22 or n = 5) and ("bacon ipsum" ~ bacon)')
+        expect(GGRC.query_parser
+            .parse('(n = 22 or n = 5) and ("bacon ipsum" ~ bacon)')
             .evaluate(values)).toEqual(true);
         expect(GGRC.query_parser.parse('n != "something that does not exist"')
             .evaluate(values)).toEqual(true);
       });
-
-      var all_keys = ['a', 'hello', 'n', '5words', 'bacon ipsum'];
 
       it("does full text search", function(){
         expect(GGRC.query_parser.parse('b')
@@ -252,10 +327,116 @@ describe('GGRC.query_parser', function() {
         expect(GGRC.query_parser.parse('!~order bacon something ipsum')
             .evaluate(values, all_keys)).toEqual(true);
       });
+
+      it("evaluates expressions that end with a full text search", function(){
+        expect(GGRC.query_parser.parse('hello=worldoo or ~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(true);
+        expect(GGRC.query_parser
+            .parse('(hello=worldoo or n=22 ) and ~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(true);
+        expect(GGRC.query_parser.parse('hello=worldoo and ~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(false);
+        expect(GGRC.query_parser.parse('hello=world and ~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(true);
+        expect(GGRC.query_parser.parse(' !~ bacon ipsum')
+            .evaluate(values, all_keys)).toEqual(false);
+      });
     });
 
+    describe("join_queries", function(){
+
+      it("joins two queries with AND by default", function(){
+
+        same_queries = [
+          ["a=b and c=d", "a=b", "c=d"],
+          ["(a=b) and (c=d)", "a=b", "c=d"],
+          ["(a=b or c=A) and (c=d)", "a=b or c=A", "c=d"],
+          ["(a=b or c=A) and (c=d)", "(a=b or c=A) and (c=d)", ""],
+          ["(a=b or c=A) and (c=d)", "", "(a=b or c=A) and (c=d)"],
+        ]
+
+        can.each(same_queries, function(queries){
+          expect(
+            JSON.stringify(GGRC.query_parser.parse(queries[0]))
+          ).toEqual(
+            JSON.stringify(
+              GGRC.query_parser.join_queries(
+                GGRC.query_parser.parse(queries[1]),
+                GGRC.query_parser.parse(queries[2])
+              )
+            )
+          );
+        });
+      });
+
+      it("joins two queries with OR", function(){
+
+        same_queries = [
+          ["a=b or c=d", "a=b", "c=d"],
+          ["(a=b) or (c=d)", "a=b", "c=d"],
+          ["(a=b and c=A) or (c=d)", "a=b and c=A", "c=d"],
+        ]
+
+        can.each(same_queries, function(queries){
+          expect(
+            JSON.stringify(GGRC.query_parser.parse(queries[0]))
+          ).toEqual(
+            JSON.stringify(
+              GGRC.query_parser.join_queries(
+                GGRC.query_parser.parse(queries[1]),
+                GGRC.query_parser.parse(queries[2]),
+                "OR"
+              )
+            )
+          );
+        });
+      });
+
+      it("evaluates joined queries correctly", function(){
+
+        queries = [
+          ["(hello=worldoo or n=22 ) and ~ bacon ipsum", 
+            "(hello=worldoo or n=22 )", 
+            "  ~ bacon ipsum"], // should eval to true
+          ["hello=worldoo and ~ bacon ipsum", 
+            "hello=worldoo", 
+            "~ bacon ipsum"], // should eval to false
+        ]
+
+        expect(
+          GGRC.query_parser.parse(queries[0][0]).evaluate(values, all_keys)
+        ).toEqual(true);
+        expect(
+          GGRC.query_parser.parse(queries[0][1]).evaluate(values, all_keys)
+        ).toEqual(true);
+        expect(
+          GGRC.query_parser.parse(queries[0][2]).evaluate(values, all_keys)
+        ).toEqual(true);
+
+        expect(
+          GGRC.query_parser.join_queries(
+            GGRC.query_parser.parse(queries[0][1]),
+            GGRC.query_parser.parse(queries[0][2])
+          ).evaluate(values, all_keys)
+        ).toEqual(true);
+
+        expect(
+          GGRC.query_parser.parse(queries[1][0]).evaluate(values, all_keys)
+        ).toEqual(false);
+        expect(
+          GGRC.query_parser.parse(queries[1][1]).evaluate(values, all_keys)
+        ).toEqual(false);
+        expect(
+          GGRC.query_parser.parse(queries[1][2]).evaluate(values, all_keys)
+        ).toEqual(true);
+
+        expect(
+          GGRC.query_parser.join_queries(
+            GGRC.query_parser.parse(queries[1][1]),
+            GGRC.query_parser.parse(queries[1][2])
+          ).evaluate(values, all_keys)
+        ).toEqual(false);
+      });
+    });
   });
-
 });
-
-

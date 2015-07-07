@@ -36,16 +36,18 @@ and run with the test folder
 */
 
 
-var parser_grammar = '/vagrant/src/parser/parser.pegjs';
-var parser_template_file = '/vagrant/src/parser/parser_template.js'; 
-var ggrc_parser_folder = '/vagrant/src/ggrc/assets/javascripts/generated/';
-var ggrc_parser_js_file = 'ggrc_filter_query_parser.js';
-
-var peg = require('pegjs');
-var fs = require('fs');
-var mkdirp = require('mkdirp');
-var parser_string = fs.readFileSync(parser_grammar, 'utf8');
-var filter_template = fs.readFileSync(parser_template_file, 'utf8');
+var parser,
+    parser_src,
+    ggrc_parser,
+    parser_grammar = '/vagrant/src/parser/parser.pegjs',
+    parser_template_file = '/vagrant/src/parser/parser_template.js', 
+    ggrc_parser_folder = '/vagrant/src/ggrc/assets/javascripts/generated/',
+    ggrc_parser_js_file = 'ggrc_filter_query_parser.js',
+    peg = require('pegjs'),
+    fs = require('fs'),
+    mkdirp = require('mkdirp'),
+    parser_string = fs.readFileSync(parser_grammar, 'utf8'),
+    filter_template = fs.readFileSync(parser_template_file, 'utf8');
 
 // dirty way of making the parser work in node.js without jquery
 root.jQuery = {
@@ -59,31 +61,13 @@ root.jQuery = {
 
 
 console.log('building parser');
-var parser = peg.buildParser(parser_string);
-var parser_src = peg.buildParser(parser_string, {output: "source"});
+parser = peg.buildParser(parser_string);
+parser_src = peg.buildParser(parser_string, {output: "source"});
 
 console.log('saving parser to js files');
-var ggrc_parser = filter_template.replace('GENERATED_PLACEHOLDER', parser_src);
+ggrc_parser = filter_template.replace('"GENERATED_PLACEHOLDER"', parser_src);
 
 mkdirp.sync(ggrc_parser_folder);
 fs.writeFileSync(ggrc_parser_folder + ggrc_parser_js_file, ggrc_parser);
-
-// some sanity checks:
-// actual tests are located in src/ggrc/assets/js_specs/generated
-console.log('\nsome sanity tests');
-var p = parser.parse('a="b" and (c=d or dd=something && aoeu=dd)');
-var pp = parser.parse('(a=b and c=d) or dd=something && aoeu=dd');
-
-var vals = {a:'b', c:'d', dd:'something', aoeu:'dd', y:'neki'};
-var vals2 = {a:'bb', c:'d', dd:'something', aoeu:'dd', y:'neki'};
-var vals3 = {a:'bi', c:'d', dd:'something', aoeu:'dd', y:'neki'};
-console.log('true  :', p.evaluate(vals));
-console.log('false :', p.evaluate(vals2));
-console.log('true  :', pp.evaluate(vals2));
-console.log("true  :", parser.parse('~  b  ').evaluate(vals,['a','dd']))
-
-console.log("exp: ", parser.parse('a = oueo order by a,b,"c c"'))
-console.log("exp: ", parser.parse('~ order by  aaa'))
-console.log("exp: ", parser.parse('!~ order by  aaa'))
 
 console.log('\ndone :)');
