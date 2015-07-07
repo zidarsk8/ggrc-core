@@ -66,9 +66,12 @@ class Converter(object):
     for block_converter in self.block_converters:
       csv_header, csv_body = block_converter.to_array()
       # multi block csv must have first column empty
-      [line.insert(0, "") for line in csv_body]
       two_empty_lines = [[], []]
-      csv_data.extend(csv_header + csv_body + two_empty_lines)
+      block_data = csv_header + csv_body + two_empty_lines
+      [line.insert(0, "") for line in block_data]
+      block_data[0][0] = "Object type"
+      block_data[1][0] = block_converter.name
+      csv_data.extend(block_data)
     return csv_data
 
   def to_data_grid(self):

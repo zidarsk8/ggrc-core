@@ -161,9 +161,11 @@ class RowConverter(object):
     for mapping in self.mappings.values():
       mapping.set_obj_attr()
 
-  def to_array(self):
-    slug = self.attrs["slug"].get_value()
-    values = [handler.get_value() for handler in self.attrs.values()]
-    str_values = [v or "" for v in values]
-    mappings = [handler.get_value() for handler in self.mappings.values()]
-    return [slug] + str_values + mappings
+  def to_array(self, fields):
+    row = []
+    for field in fields:
+      if field.startswith("map"):
+        row.append(self.mappings[field].get_value() or "")
+      else:
+        row.append(self.attrs[field].get_value() or "")
+    return row

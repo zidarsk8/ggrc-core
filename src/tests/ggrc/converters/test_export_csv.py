@@ -93,7 +93,7 @@ class TestExportSingleObject(TestCase):
                 "right": "Cat ipsum 1",
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }]
     response = self.export_csv(data)
     expected = set([1])
@@ -112,7 +112,7 @@ class TestExportSingleObject(TestCase):
                 "right": "1",
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }]
     response = self.export_csv(data)
     expected = set([1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21])
@@ -132,7 +132,7 @@ class TestExportSingleObject(TestCase):
                 "right": "1",
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }]
     response = self.export_csv(data)
     expected = set([10, 17, 18, 19, 20, 21, 22])
@@ -160,7 +160,7 @@ class TestExportSingleObject(TestCase):
                 },
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }]
     response = self.export_csv(data)
 
@@ -181,7 +181,7 @@ class TestExportSingleObject(TestCase):
                 "slugs": ["contract-25", "contract-40"],
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }]
     response = self.export_csv(data)
 
@@ -210,7 +210,7 @@ class TestExportSingleObject(TestCase):
                 },
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }]
     response = self.export_csv(data)
 
@@ -263,7 +263,7 @@ class TestExportMultipleObjects(TestCase):
                 "right": "cat ipsum 1"
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }, {
         "object_name": "Regulation",  # regulation-9000
         "filters": {
@@ -273,7 +273,7 @@ class TestExportMultipleObjects(TestCase):
                 "right": "Hipster ipsum A 1"
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }]
     response = self.export_csv(data)
 
@@ -298,7 +298,7 @@ class TestExportMultipleObjects(TestCase):
                 },
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }, {
         "object_name": "Contract",  # contract-25, contract-27, contract-47
         "filters": {
@@ -308,7 +308,7 @@ class TestExportMultipleObjects(TestCase):
                 "ids": ["0"],
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }, {
         "object_name": "Control",  # control-3, control-4, control-5
         "filters": {
@@ -334,7 +334,7 @@ class TestExportMultipleObjects(TestCase):
                 },
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }, {
         "object_name": "Policy",  # policy - 3, 4, 5, 6, 15, 16
         "filters": {
@@ -352,7 +352,7 @@ class TestExportMultipleObjects(TestCase):
                 },
             },
         },
-        "fields": ["Code", "title", "description"],
+        "fields": "all",
     }
     ]
     response = self.export_csv(data)

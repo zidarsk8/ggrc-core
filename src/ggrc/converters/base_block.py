@@ -70,7 +70,7 @@ class BlockConverter(object):
     return block_converter
 
   @classmethod
-  def from_ids(cls, converter, object_class, ids=[], fields="All"):
+  def from_ids(cls, converter, object_class, ids=[], fields="all"):
     block_converter = BlockConverter(converter, object_class=object_class,
                                      fields=fields, ids=ids)
     return block_converter
@@ -94,7 +94,6 @@ class BlockConverter(object):
     self.offset = options.get("offset", 0)
     self.ids = options.get("ids", [])
     self.object_class = options.get("object_class", )
-    self.fields = options.get("fields", "All")
     self.block_errors = []
     self.block_warnings = []
     self.row_errors = []
@@ -109,27 +108,30 @@ class BlockConverter(object):
       self.unique_counts = self.get_unique_counts_dict(self.object_class)
       self.name = self.object_class._inflector.human_singular.title()
       self.ignore = False
+      self.organize_fields(options.get("fields", "all"))
     else:
       self.ignore = True
       self.name = ""
 
+  def organize_fields(self, fields):
+    if not fields or fields == "all":
+      fields = self.object_headers.keys()
+    self.fields = get_column_order(fields)
+
   def generate_csv_header(self):
     """ Generate 2D array with csv headre description """
-    csv_header = generate_2d_array(len(self.object_headers) + 1, 2, value="")
-    csv_header[0][0] = "Object type"
-    csv_header[1][0] = pretty_class_name(self.object_class)
-    column_order = get_column_order(self.object_headers.keys())
-    for index, code in enumerate(column_order):
-      display_name = self.object_headers[code]["display_name"]
-      if self.object_headers[code]["mandatory"]:
+    headers = []
+    for field in self.fields:
+      description = self.object_headers[field]["description"]
+      display_name = self.object_headers[field]["display_name"]
+      if self.object_headers[field]["mandatory"]:
         display_name += "*"
-      csv_header[0][index + 1] = self.object_headers[code]["description"]
-      csv_header[1][index + 1] = display_name
-    return csv_header
+      headers.append([description, display_name])
+    return map(list, zip(*headers))
 
   def generate_csv_body(self):
     """ Generate 2D array populated with object values """
-    return [r.to_array() for r in self.row_converters]
+    return [r.to_array(self.fields) for r in self.row_converters]
 
   def to_array(self):
     csv_header = self.generate_csv_header()
