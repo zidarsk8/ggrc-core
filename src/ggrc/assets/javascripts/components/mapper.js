@@ -366,38 +366,7 @@
       }
     }
   });
-  can.Component.extend({
-    tag: "mapper-filter",
-    template: "<content />",
-    scope: {
-      menu: can.compute(function () {
-        var type = this.attr("type") === "AllObject" ? GGRC.page_model.type : this.attr("type"),
-            mappings = GGRC.Mappings.get_canonical_mappings_for(type);
-        return _.map(_.keys(mappings), function (mapping) {
-          return CMS.Models[mapping];
-        });
-      })
-    },
-    events: {
-      ".add-filter-rule click": function (el, ev) {
-        ev.preventDefault();
-        this.scope.attr("relevant").push({
-          value: "",
-          filter: new can.Map(),
-          model_name: this.scope.attr("menu")[0].model_singular
-        });
-      },
-      ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
-        var index = el.data("index"),
-            panel = this.scope.attr("relevant")[index];
 
-        panel.attr("filter", data.item);
-      },
-      ".remove_filter click": function (el) {
-        this.scope.attr("relevant").splice(el.data("index"), 1);
-      }
-    }
-  });
 
   $("body").on("click",
   '[data-toggle="unified-mapper"], \

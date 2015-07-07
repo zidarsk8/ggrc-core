@@ -106,6 +106,7 @@ dashboard-js-files:
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   - components/link_to_clipboard.js
+  - components/relevant_filters.js
   - components/csv/import.js
   - components/csv/export.js
   - components/mapper.js
@@ -338,8 +339,7 @@ dashboard-js-template-files:
   - import_export/export/object_selector.mustache
   - import_export/export/attribute_selector.mustache
   - import_export/export/filter_query.mustache
-  - import_export/export/relevance.mustache
-
+  - mapper/relevant_filter.mustache
 
 
 dashboard-css-files:
