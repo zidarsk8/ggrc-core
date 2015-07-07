@@ -15,6 +15,7 @@
       model: {},
       bindings: {},
       is_loading: false,
+      is_saving: false,
       all_selected: false,
       search_only: false,
       selected: new can.List(),
@@ -114,7 +115,7 @@
           id: instance.id
         };
 
-        this.scope.attr("isLoading", true);
+        this.scope.attr("mapper.is_saving", true);
         _.each(this.scope.attr("mapper.selected"), function (desination) {
           data[mapping.option_attr] = desination;
           var modelInstance = new Model(data);
@@ -122,7 +123,7 @@
           deffer.push(modelInstance.save());
         });
         $.when.apply($, deffer).then(function () {
-          this.scope.attr("isLoading", false);
+          this.scope.attr("mapper.is_saving", false);
           // TODO: Find proper way to dismiss the modal
           this.element.find(".modal-dismiss").trigger("click");
         }.bind(this));
@@ -192,7 +193,10 @@
       page: 0,
       options: new can.List(),
       select_all: false,
-      page_loading: false
+      page_loading: false,
+      loading_or_saving: can.compute(function () {
+        return this.attr("page_loading") || this.attr("mapper.is_saving");
+      })
     },
     events: {
       "inserted":  function () {
@@ -248,7 +252,7 @@
         }
       },
       "drawPage": function () {
-        if (this.scope.attr("page_loading") || this.scope.attr("lastPage")) {
+        if (this.scope.attr("page_loading")) {
           return;
         }
         var que = new RefreshQueue(),

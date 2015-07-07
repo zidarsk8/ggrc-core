@@ -36,6 +36,8 @@
                     value="{{instance.title}}"
                     data-id="{{instance.id}}"
                     class="object-check-single {{#if isloading}}disabled{{/if}}"
+
+                    {{#if mapper.is_saving}}disabled="true"{{/if}}
                     {{#if select_all}}checked{{/if}}
                     {{#if mappings.length}}
                       {{#result_direct_mappings bindings_compute selected_object}}

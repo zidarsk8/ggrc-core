@@ -171,10 +171,14 @@
           <div class="span3">
             {{^if mapper.search_only}}
             <div class="pull-right check-all">
-              <label rel="tooltip" {{#if page_loading}}class="disabled"{{/if}} data-placement="right" data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria.">
+              <label {{#if loading_or_saving}}class="disabled"{{/if}}
+                rel="tooltip"
+                data-placement="right"
+                data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria."
+              >
                 Select all
                 <input type="checkbox" can-value="mapper.all_selected" class="object-check-all"
-                  {{#if page_loading}}disabled="true"{{/if}}
+                  {{#if loading_or_saving}}disabled="true"{{/if}}
                   {{#if mapper.all_selected}}checked="checked"{{/if}}
                 >
               </label>
@@ -186,7 +190,7 @@
       <div class="results-wrap">
         <ul class="result-tree tree-structure new-tree">
           {{#if mapper.search_only}}
-            {{> /static/mustache//search/advanced_search_option_items.mustache}}
+            {{> /static/mustache/search/advanced_search_option_items.mustache}}
           {{else}}
             {{> /static/mustache/selectors/object_selector_option_items.mustache}}
           {{/if}}
@@ -216,10 +220,19 @@
             objects selected
           </span>
           <a class="
-              {{^if mapper.selected.length}}disabled{{/if}}
-              {{#if is_loading}}disabled{{/if}}
+              {{#if_helpers '\
+                ^if' mapper.selected.length '\
+                or #if' mapper.is_loading '\
+                or #if' mapper.is_saving}}
+                disabled
+              {{/if_helpers}}
               btn-map btn btn-small btn-success preventdoubleclick" href="#">
-            Add Selected
+            {{#if mapper.is_saving}}
+              <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
+              Saving
+            {{else}}
+              Add Selected
+            {{/if}}
           </a>
         </div>
       </div>
