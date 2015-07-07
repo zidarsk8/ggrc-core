@@ -17,7 +17,7 @@
                   {{#if_draw_icon instance}}
                     <i class="grcicon-{{instance.class.table_singular}}-color"></i>
                   {{/if_draw_icon}}
-                  {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
+                  {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}-base-object
                 </div>
               </div>
 
@@ -83,12 +83,12 @@
               </div>
 
               <div class="span{{display_options.action_width}}">
-                {{#child_options}}
-                  {{#if add_item_view}}
-                    {{{renderLive add_item_view}}}
-                  {{/if}}
-                {{/child_options}}
                 <div class="show-details">
+                  {{#child_options}}
+                    {{#if add_item_view}}
+                      {{{renderLive add_item_view}}}
+                    {{/if}}
+                  {{/child_options}}
                   {{#if instance.viewLink}}
                     {{#is_allowed "view_object_page" instance}}
                       <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
