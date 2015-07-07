@@ -364,3 +364,39 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(cycle.start_date, date(2015, 7, 1))
       self.assertEqual(cycle.end_date, date(2015, 8, 7)) # 8/8/2015 is Sat
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 1))
+
+  def test_when_start_date_got_adjusted_to_previous_month(self):
+    """Test quarterly month calculating logic when start date got adjusted to previous month"""
+
+    quarterly_wf = {
+      "title": "quarterly thingy",
+      "description": "start this many a time",
+      "frequency": "quarterly",
+      "task_groups": [{
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 1',
+            "relative_start_day": 1,
+            "relative_start_month": 2,
+            "relative_end_day": 1,
+            "relative_end_month": 1,
+          }],
+        "task_group_objects": self.random_objects
+      },
+      ]
+    }
+    with freeze_time("2015-7-5 13:00"):
+      _, wf = self.generator.generate_workflow(quarterly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 31))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 7, 31))
+      self.assertEqual(cycle.end_date, date(2015, 10, 1))
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 9, 1))
