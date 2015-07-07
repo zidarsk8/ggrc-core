@@ -700,14 +700,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if (!(el instanceof jQuery)) {
       el = $(el);
     }
-    var se = this.options.scroll_element;
-    var se_o = se.offset().top;
-    var se_h = se.outerHeight();
-    var el_o = el.offset().top;
-    var el_h = el.outerHeight();
-
-    var above_top = (el_o + el_h - se_o) / se_h ;
-    var below_bottom = (el_o - se_o ) / se_h - 1;
+    var se = this.options.scroll_element,
+        se_o = se.offset().top,
+        se_h = se.outerHeight(),
+        el_o = el.offset().top,
+        el_h = el.outerHeight(),
+        above_top = (el_o + el_h - se_o) / se_h,
+        below_bottom = (el_o - se_o ) / se_h - 1;
     if (above_top < 0) {
       return above_top;
     } else if (below_bottom > 0) {
@@ -718,18 +717,18 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , draw_visible: _.debounce(function() {
-    var el_position = this.el_position.bind(this);
-    var children = this.element.children();
-    var lo = 0;
-    var hi = children.length - 1;
-    var max = hi;
-
-    var steps = 0;
-    while (steps < 100 && lo < hi) {
+    var MAX_STEPS = 100,
+        el_position = this.el_position.bind(this),
+        children = this.element.children(),
+        lo = 0,
+        hi = children.length - 1,
+        max = hi,
+        steps = 0;
+    while (steps < MAX_STEPS && lo < hi) {
       steps += 1;
-      var mid = (lo + hi) / 2 | 0;
-      var el = children[mid];
-      var pos = el_position(children[mid]);
+      var mid = (lo + hi) / 2 | 0,
+          el = children[mid],
+          pos = el_position(children[mid]);
       if (pos < 0) {
         lo = mid;
         continue;
@@ -740,7 +739,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       lo = mid;
       hi = mid;
-      break;
     }
     var page_count = this.options.scroll_page_count;
     while (lo > 0 && el_position(children[lo - 1]) >= (-page_count)) {
@@ -750,9 +748,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       hi += 1;
     }
 
-    var last_visible = this._last_visible || [];
-    var visible = [];
-    for (var i = 0; i < last_visible.length; i++) {
+    var last_visible = this._last_visible || [],
+        visible = [];
+    for (var i in last_visible) {
       var control = last_visible[i];
       if (control.element === undefined || control.element === null) {
         continue; // element was removed
