@@ -433,8 +433,11 @@ ul.new-tree {
     background: white;
     font-size: 16px;
     height: 29px;
-    padding: 11px 0 0 70px;
+    padding: 11px 60% 0 70px;
     border-bottom: 1px solid #e0e0e0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   li.tree-item {
