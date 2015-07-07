@@ -702,7 +702,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
     var se = this.options.scroll_element;
     var se_o = se.offset().top;
-    var se_h = se.outerHeight()
+    var se_h = se.outerHeight();
     var el_o = el.offset().top;
     var el_h = el.outerHeight();
 
@@ -775,11 +775,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }, 100, {leading: true})
 
   , "{scroll_element} scroll": function (el, ev) {
-    setTimeout(this.draw_visible.bind(this), 0)
+    setTimeout(this.draw_visible.bind(this), 0);
   }
 
   , "{scroll_element} resize": function (el, ev) {
-    setTimeout(this.draw_visible.bind(this), 0)
+    setTimeout(this.draw_visible.bind(this), 0);
   }
 
   , "{original_list} add" : function(list, ev, newVals, index) {
