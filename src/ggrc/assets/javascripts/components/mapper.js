@@ -14,8 +14,8 @@
       object: "",
       model: {},
       bindings: {},
-      isLoading: false,
-      allSelected: false,
+      is_loading: false,
+      all_selected: false,
       search_only: false,
       selected: new can.List(),
       entries: new can.List(),
@@ -178,7 +178,7 @@
         var selected = this.scope.attr("mapper.selected"),
             entries = this.scope.attr("mapper.entries");
 
-        this.scope.attr("mapper.allSelected", selected.length === entries.length);
+        this.scope.attr("mapper.all_selected", selected.length === entries.length);
       },
       "{mapper.entries} length": "allSelected",
       "{mapper.selected} length": "allSelected"
@@ -192,7 +192,7 @@
       page: 0,
       options: new can.List(),
       select_all: false,
-      pageLoading: false
+      page_loading: false
     },
     events: {
       "inserted":  function () {
@@ -248,7 +248,7 @@
         }
       },
       "drawPage": function () {
-        if (this.scope.attr("pageLoading") || this.scope.attr("lastPage")) {
+        if (this.scope.attr("page_loading") || this.scope.attr("lastPage")) {
           return;
         }
         var que = new RefreshQueue(),
@@ -263,9 +263,9 @@
         if (!page_items.length) {
           return;
         }
-        this.scope.attr("pageLoading", true);
+        this.scope.attr("page_loading", true);
         que.enqueue(page_items).trigger().then(function (models) {
-          this.scope.attr("pageLoading", false);
+          this.scope.attr("page_loading", false);
           this.scope.attr("page", next_page);
           options.push.apply(options, can.map(models, function (model) {
             if (this.scope.attr("mapper.search_only")) {
@@ -330,7 +330,7 @@
           permission_parms.contact_id = contact.id;
         }
 
-        this.scope.attr("pageLoading", true);
+        this.scope.attr("page_loading", true);
         relevant = _.map(this.scope.attr("mapper.relevant"), function (relevant) {
           return {
             model_name: relevant.model_name,
@@ -356,7 +356,7 @@
                 : search[0];
 
         list.refresh_stubs().then(function (options) {
-          this.scope.attr("pageLoading", false);
+          this.scope.attr("page_loading", false);
           this.scope.attr("entries", options);
         }.bind(this));
       }

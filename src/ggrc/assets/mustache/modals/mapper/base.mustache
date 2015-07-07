@@ -141,7 +141,7 @@
   </div>
 
   <mapper-results
-      isloading="mapper.isLoading"
+      is-loading="mapper.is_loading"
       object="mapper.object"
       entries="mapper.entries"
       mapper="mapper"
@@ -171,11 +171,11 @@
           <div class="span3">
             {{^if mapper.search_only}}
             <div class="pull-right check-all">
-              <label rel="tooltip" {{#if pageLoading}}class="disabled"{{/if}} data-placement="right" data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria.">
+              <label rel="tooltip" {{#if page_loading}}class="disabled"{{/if}} data-placement="right" data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria.">
                 Select all
-                <input type="checkbox" can-value="mapper.allSelected" class="object-check-all"
-                  {{#if pageLoading}}disabled="true"{{/if}}
-                  {{#if mapper.allSelected}}checked="checked"{{/if}}
+                <input type="checkbox" can-value="mapper.all_selected" class="object-check-all"
+                  {{#if page_loading}}disabled="true"{{/if}}
+                  {{#if mapper.all_selected}}checked="checked"{{/if}}
                 >
               </label>
             </div>
@@ -191,7 +191,7 @@
             {{> /static/mustache/selectors/object_selector_option_items.mustache}}
           {{/if}}
         </ul>
-        {{#if pageLoading}}
+        {{#if page_loading}}
           <div class="row-fluid clearfix">
             <span {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
           </div>
@@ -208,7 +208,7 @@
       <div class="span6">
         <div class="confirm-buttons">
           <span>
-            {{#if mapper.isLoading }}
+            {{#if mapper.is_loading }}
               <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
             {{else}}
               {{mapper.selected.length}}
@@ -217,7 +217,7 @@
           </span>
           <a class="
               {{^if mapper.selected.length}}disabled{{/if}}
-              {{#if isLoading}}disabled{{/if}}
+              {{#if is_loading}}disabled{{/if}}
               btn-map btn btn-small btn-success preventdoubleclick" href="#">
             Add Selected
           </a>
