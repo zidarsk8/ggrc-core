@@ -1452,9 +1452,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
     //  were already created with content, we just used <content> instead of making
     //  new view template files.
     template: '<content/>',
-    scope: {
-      instance: null
-    },
+    scope: {},
     events: {
       init: function () {
         this.scope.attr('controller', this);
@@ -1505,9 +1503,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
     //  were already created with content, we just used <content> instead of making
     //  new view template files.
     template: '<content/>',
-    scope: {
-      instance: null
-    },
+    scope: {},
     events: {
       init : function () {
         this.scope.attr('controller', this);
