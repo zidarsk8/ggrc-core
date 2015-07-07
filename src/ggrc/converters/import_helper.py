@@ -110,7 +110,13 @@ def get_object_column_json(object_class):
     for key, value in attr_info.items():
       if type(value) not in (unicode, str, int, long, bool, None):
         del definitions[attr_name][key]
-  return definitions
+  order = get_column_order(definitions.keys())
+  result = []
+  for key in order:
+    item = definitions[key]
+    item["attr_name"] = key
+    result.append(item)
+  return result
 
 
 def get_column_order(attr_list):
