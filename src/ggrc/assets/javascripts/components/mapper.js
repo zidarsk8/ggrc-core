@@ -396,18 +396,15 @@
   });
 
   $("body").on("click",
-  '[data-toggle="modal-selector"], \
-   [data-toggle="modal-relationship-selector"], \
-   [data-toggle="multitype-object-modal-selector"], \
-   [data-toggle="multitype-multiselect-modal-selector"], \
-   [data-toggle="multitype-modal-selector"], \
-   [data-toggle="multitype-search-modal-selector"]',
+  '[data-toggle="unified-mapper"], \
+   [data-toggle="unified-search"]',
   function (ev) {
     ev.preventDefault();
     var btn = $(ev.currentTarget),
         data = btn.data(),
-        isSearch = /search-modal/ig.test(data.toggle);
+        isSearch = /unified-search/ig.test(data.toggle);
 
+    btn.data("tooltip").hide();
     _.each(data, function (val, key) {
       data[can.camelCaseToUnderscore(key)] = val;
       delete data[key];
