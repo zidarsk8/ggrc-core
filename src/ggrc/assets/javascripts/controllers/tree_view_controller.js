@@ -1380,7 +1380,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
           that.element.trigger("loaded");
           that._expand_deferred.resolve();
         }));
-      }), 5);
+      }), 0);
       return this._expand_deferred;
     }
   , ".openclose:not(.active) click" : function(el, ev) {
