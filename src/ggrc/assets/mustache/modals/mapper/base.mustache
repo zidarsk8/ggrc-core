@@ -47,21 +47,19 @@
         <select class="input-block-level" can-value="mapper.type" name="type-select">
           {{#each mapper.types}}
             {{#if items}}
+              {{#if items.length}}
               <optgroup label="{{name}}">
                 {{#each items}}
-                  <option data-singular="{{singular}}"
-                          data-plural="{{plural}}"
-                          value="{{value}}"
-                          label="{{name}}"
-                  ></option>
+                  {{#if name}}
+                  <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
+                  {{/if}}
                 {{/each}}
               </optgroup>
+              {{/if}}
             {{else}}
-              <option data-singular="{{singular}}"
-                      data-plural="{{plural}}"
-                      value="{{value}}"
-                      label="{{name}}"
-              ></option>
+              {{#if name}}
+              <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
+              {{/if}}
             {{/if}}
           {{/each}}
         </select>

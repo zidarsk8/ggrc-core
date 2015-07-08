@@ -8,7 +8,7 @@
 (function(can, $) {
   "use strict";
   var MapperModel = can.Map({
-      type: "Program", // We set default as program
+      type: "AllObject", // We set default as All Object
       contact: {},
       term: "",
       object: "",
@@ -136,6 +136,9 @@
             selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
             binding;
 
+        if (table_plural === "allobjects") {
+          return;
+        }
         table_plural = (selected.has_binding(table_plural) ? "" : "related_") + table_plural;
         binding = selected.get_binding(table_plural);
         binding.refresh_list().then(function (mappings) {
@@ -148,7 +151,7 @@
         var type = this.scope.attr("mapper.type"),
             types = this.scope.attr("mapper.types");
 
-        if (type === "AllObject") {
+        if (~["All Object", "AllObject"].indexOf("All Object")) {
           return this.scope.attr("mapper.model", types["all_objects"]);
         }
         types = _.reduce(_.values(types), function (memo, val) {
