@@ -27,6 +27,16 @@ class Converter(object):
       "ControlAssessment",
   ]
 
+  def __init__(self, **kwargs):
+    self.dry_run = kwargs.get("dry_run", True)
+    self.csv_data = kwargs.get("csv_data", [])
+    self.ids_by_type = kwargs.get("ids_by_type", [])
+    self.block_converters = []
+    self.new_slugs = defaultdict(set)
+    self.new_emails = {}
+    self.shared_state = {}
+    self.response_data = []
+
   def to_array(self, data_grid=False):
     self.block_converters_from_ids()
     self.handle_row_data()
@@ -64,16 +74,6 @@ class Converter(object):
       grid_blocks.append(csv_body)
     grid_data = [list(chain(*i)) for i in product(*grid_blocks)]
     return [grid_header] + grid_data
-
-  def __init__(self, **kwargs):
-    self.dry_run = kwargs.get("dry_run", True)
-    self.csv_data = kwargs.get("csv_data", [])
-    self.ids_by_type = kwargs.get("ids_by_type", [])
-    self.block_converters = []
-    self.new_slugs = defaultdict(set)
-    self.new_emails = {}
-    self.shared_state = {}
-    self.response_data = []
 
   def import_csv(self):
     self.block_converters_from_csv()
