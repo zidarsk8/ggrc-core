@@ -285,7 +285,7 @@
       "Section": "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Objective": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Control": "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Person": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",
+      "Person": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit Request",
       "OrgGroup": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
       "Vendor": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
       "System": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
@@ -411,6 +411,12 @@
           },
         },
         Control: {
+          Request: {
+            widget_id: "Request",
+            widget_name: "Audit Requests"
+          }
+        },
+        Person: {
           Request: {
             widget_id: "Request",
             widget_name: "Audit Requests"
@@ -775,6 +781,15 @@
         },
         Person: {
           _mixins: ["issues"],
+          Request: {
+            //mapping: "open_audit_requests",
+            mapping: (/^\/objectBrowser\/?$/.test(window.location.pathname)) ?
+              "all_open_audit_requests" : "open_audit_requests",
+            draw_children: true,
+            show_view: GGRC.mustache_path + "/requests/tree.mustache",
+            footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
+            add_item_view: GGRC.mustache_path + "/requests/tree_add_item.mustache"
+          },
           Program: {
             mapping: "extended_related_programs_via_search",
             fetch_post_process: sort_sections
