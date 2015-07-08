@@ -76,7 +76,7 @@ class Converter(object):
   def import_csv(self):
     self.block_converters_from_csv()
     self.handle_priority_blocks()
-    self.generate_row_converters()
+    self.row_converters_from_csv()
     self.import_objects()
     self.gather_new_slugs()
     self.import_mappings()
@@ -88,14 +88,14 @@ class Converter(object):
     while (self.block_converters and
            self.block_converters[0].object_class.__name__ == "Person"):
       person_converter = self.block_converters.pop(0)
-      person_converter.generate_row_converters()
+      person_converter.row_converters_from_csv()
       person_converter.import_objects()
       _, self.new_emails = person_converter.get_new_values("email")
       self.response_data.append(person_converter.get_info())
 
-  def generate_row_converters(self):
+  def row_converters_from_csv(self):
     for converter in self.block_converters:
-      converter.generate_row_converters()
+      converter.row_converters_from_csv()
 
   def block_converters_from_ids(self):
     """ fill the block_converters class variable
@@ -109,7 +109,7 @@ class Converter(object):
       fields = object_data.get("fields")
       block_converter = BlockConverter.from_ids(
           self, object_class, ids=id_list, fields=fields)
-      block_converter.ids_to_row_converters()
+      block_converter.row_converters_from_ids()
       self.block_converters.append(block_converter)
 
   def block_converters_from_csv(self):

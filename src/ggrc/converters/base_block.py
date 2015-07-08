@@ -179,7 +179,7 @@ class BlockConverter(object):
       if len(row) > index:
         row.pop(index)
 
-  def generate_row_converters(self):
+  def row_converters_from_csv(self):
     """ Generate a row converter object for every csv row """
     if self.ignore:
       return
@@ -190,7 +190,7 @@ class BlockConverter(object):
       self.row_converters.append(row)
     self.check_uniq_columns()
 
-  def ids_to_row_converters(self):
+  def row_converters_from_ids(self):
     """ Generate a row converter object for every csv row """
     if self.ignore or not self.object_ids:
       return
