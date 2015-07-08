@@ -134,12 +134,9 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
 });
 
 
-    var $area = $('.area').first()
-      , instance
-      , model_name
-      , extra_page_options
-      , defaults
-      ;
+    var $area = $('.area').first(), instance, model_name,
+        extra_page_options, defaults, object_browser;
+
 
     extra_page_options = {
         Program: {
@@ -161,8 +158,10 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
         }
     };
 
+    object_browser = /^\/objectBrowser\/?$/.test(window.location.pathname);
+
     if (/^\/\w+\/\d+($|\?|\#)/.test(window.location.pathname) || /^\/dashboard/.test(window.location.pathname)
-        || /^\/objectBrowser\/?$/.test(window.location.pathname)) {
+        || object_browser) {
     //if (/\w+\/\d+($|\?|\#)/.test(window.location) || /dashboard/.test(window.location)) {
       instance = GGRC.page_instance();
       model_name = instance.constructor.shortName;
@@ -173,6 +172,12 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
           extension.init_widgets();
       });
       defaults = Object.keys(GGRC.WidgetList.get_widget_list_for(model_name));
+
+      //Remove info and task tabs from object-browser list of tabs
+      if (object_browser) {
+        defaults.splice(defaults.indexOf('info'), 1);
+        defaults.splice(defaults.indexOf('task'), 1);
+      }
 
       $area.cms_controllers_page_object($.extend({
         //model_descriptors: model_descriptors,

@@ -43,8 +43,8 @@
           %i.grcicon-my-work
           My Work ({{current_user.system_wide_role}})
       %li
-        %a{'href': "/objectBrowser#info"}
-          %i.grcicon-dashboard-black
+        %a{'href': "/objectBrowser"}
+          %i.grcicon-search
           Object Browser
       -if permissions.is_allowed_read('/admin', None, 1)
         %li
