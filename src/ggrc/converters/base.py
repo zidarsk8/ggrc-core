@@ -4,12 +4,13 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from collections import defaultdict
-from itertools import product
 from itertools import chain
+from itertools import product
 
 from ggrc.converters import IMPORTABLE
-from ggrc.converters.import_helper import split_array
 from ggrc.converters.base_block import BlockConverter
+from ggrc.converters.import_helper import extract_relevant_data
+from ggrc.converters.import_helper import split_array
 
 
 class Converter(object):
@@ -105,18 +106,22 @@ class Converter(object):
     object_map = {o.__name__: o for o in IMPORTABLE.values()}
     for object_data in self.ids_by_type:
       object_class = object_map[object_data["object_name"]]
-      id_list = object_data.get("ids", [])
+      object_ids = object_data.get("ids", [])
       fields = object_data.get("fields")
-      block_converter = BlockConverter.from_ids(
-          self, object_class, ids=id_list, fields=fields)
+      block_converter = BlockConverter(self, object_class=object_class,
+                                       fields=fields, object_ids=object_ids)
       block_converter.row_converters_from_ids()
       self.block_converters.append(block_converter)
 
   def block_converters_from_csv(self):
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
-      converter = BlockConverter.from_csv(self, data, offset)
-      self.block_converters.append(converter)
+      object_class = IMPORTABLE.get(data[1][0].strip().lower())
+      raw_headers, rows = extract_relevant_data(data)
+      block_converter = BlockConverter(self, object_class=object_class,
+                                       rows=rows, raw_headers=raw_headers,
+                                       offset=offset)
+      self.block_converters.append(block_converter)
 
     order = defaultdict(lambda: len(self.class_order))
     order.update({c: i for i, c in enumerate(self.class_order)})

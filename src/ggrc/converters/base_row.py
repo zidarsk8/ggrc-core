@@ -4,10 +4,10 @@
 # Maintained By: dan@reciprocitylabs.com
 
 
-import ggrc.services
 from ggrc import db
-from ggrc.services.common import Resource
 from ggrc.converters import errors
+from ggrc.services.common import Resource
+import ggrc.services
 
 
 class RowConverter(object):
@@ -26,7 +26,6 @@ class RowConverter(object):
     offset = 3  # 2 header rows and 1 for 0 based index
     self.line = self.index + self.block_converter.offset + offset
     self.headers = options.get("headers", [])
-    self.handle_row_data()
 
   def add_error(self, template, **kwargs):
     message = template.format(line=self.line, **kwargs)
@@ -80,7 +79,7 @@ class RowConverter(object):
                      column_names=", ".join(missing))
 
   def find_by_key(self, key, value):
-    return self.object_class.query.filter_by(**{key:value}).first()
+    return self.object_class.query.filter_by(**{key: value}).first()
 
   def get_value(self, key):
     key_set = self.mappings if key.startswith("map:") else self.attrs
@@ -100,7 +99,6 @@ class RowConverter(object):
     if self.object_class.__name__ == "Person":
       return self.get_object_by_key("email")
     return self.get_object_by_key()
-
 
   def get_object_by_key(self, key="slug"):
     """ Get object if the slug is in the system or return a new object """
