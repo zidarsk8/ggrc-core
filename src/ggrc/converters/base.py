@@ -29,6 +29,7 @@ class Converter(object):
 
   def to_array(self, data_grid=False):
     self.block_converters_from_ids()
+    self.handle_row_data()
     if data_grid:
       return self.to_data_grid()
     return self.to_block_array()
@@ -78,6 +79,7 @@ class Converter(object):
     self.block_converters_from_csv()
     self.handle_priority_blocks()
     self.row_converters_from_csv()
+    self.handle_row_data()
     self.import_objects()
     self.gather_new_slugs()
     self.import_mappings()
@@ -90,9 +92,14 @@ class Converter(object):
            self.block_converters[0].object_class.__name__ == "Person"):
       person_converter = self.block_converters.pop(0)
       person_converter.row_converters_from_csv()
+      person_converter.handle_row_data()
       person_converter.import_objects()
       _, self.new_emails = person_converter.get_new_values("email")
       self.response_data.append(person_converter.get_info())
+
+  def handle_row_data(self):
+    for converter in self.block_converters:
+      converter.handle_row_data()
 
   def row_converters_from_csv(self):
     for converter in self.block_converters:

@@ -164,7 +164,6 @@ class BlockConverter(object):
       row = RowConverter(self, self.object_class, row=row,
                          headers=self.headers, index=i)
       self.row_converters.append(row)
-    self.handle_row_data()
 
   def row_converters_from_ids(self):
     """ Generate a row converter object for every csv row """
@@ -177,9 +176,10 @@ class BlockConverter(object):
       row = RowConverter(self, self.object_class, obj=obj,
                          headers=self.headers, index=i)
       self.row_converters.append(row)
-    self.handle_row_data()
 
   def handle_row_data(self):
+    if self.ignore:
+      return
     for row_converter in self.row_converters:
       row_converter.handle_row_data()
     self.check_uniq_columns()
