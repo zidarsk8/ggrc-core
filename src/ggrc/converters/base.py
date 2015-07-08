@@ -26,28 +26,8 @@ class Converter(object):
       "ControlAssessment",
   ]
 
-  @classmethod
-  def from_ids(cls, data):
-    """ generate the converter form a list of objects and ids
-
-    Args:
-      data (list of tuples): List containing tuples with object_name and
-                             a list of ids for that object
-    """
-    object_map = {o.__name__: o for o in IMPORTABLE.values()}
-    converter = Converter()
-    for object_data in data:
-      object_class = object_map[object_data["object_name"]]
-      id_list = object_data.get("ids", [])
-      fields = object_data.get("fields")
-      block_converter = BlockConverter.from_ids(
-          converter, object_class, ids=id_list, fields=fields)
-      block_converter.ids_to_row_converters()
-      converter.block_converters.append(block_converter)
-
-    return converter
-
   def to_array(self, data_grid=False):
+    self.block_converters_from_ids()
     if data_grid:
       return self.to_data_grid()
     return self.to_block_array()
@@ -86,6 +66,7 @@ class Converter(object):
   def __init__(self, **kwargs):
     self.dry_run = kwargs.get("dry_run", True)
     self.csv_data = kwargs.get("csv_data", [])
+    self.ids_by_type = kwargs.get("ids_by_type", [])
     self.block_converters = []
     self.new_slugs = defaultdict(set)
     self.new_emails = set()
@@ -115,6 +96,21 @@ class Converter(object):
   def generate_row_converters(self):
     for converter in self.block_converters:
       converter.generate_row_converters()
+
+  def block_converters_from_ids(self):
+    """ fill the block_converters class variable
+
+    Generate block converters from a list of tuples with an object name and ids
+    """
+    object_map = {o.__name__: o for o in IMPORTABLE.values()}
+    for object_data in self.ids_by_type:
+      object_class = object_map[object_data["object_name"]]
+      id_list = object_data.get("ids", [])
+      fields = object_data.get("fields")
+      block_converter = BlockConverter.from_ids(
+          self, object_class, ids=id_list, fields=fields)
+      block_converter.ids_to_row_converters()
+      self.block_converters.append(block_converter)
 
   def block_converters_from_csv(self):
     offsets, data_blocks = split_array(self.csv_data)
