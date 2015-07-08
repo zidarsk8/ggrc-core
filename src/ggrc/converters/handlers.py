@@ -100,12 +100,12 @@ class UserColumnHandler(ColumnHandler):
 
   def get_person(self, email):
     new_emails = self.row_converter.block_converter.converter.new_emails
-    if self.dry_run and email in new_emails:
-      return get_current_user()
+    if email in new_emails:
+      return new_emails.get(email)
     return Person.query.filter(Person.email == email).first()
 
   def parse_item(self):
-    email = self.raw_value
+    email = self.raw_value.lower()
     person = self.get_person(email)
     if not person and email != "":
       self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
@@ -125,7 +125,7 @@ class OwnerColumnHandler(UserColumnHandler):
     email_lines = self.raw_value.splitlines()
     owner_emails = filter(unicode.strip, email_lines)  # noqa
     for raw_line in owner_emails:
-      email = raw_line.strip()
+      email = raw_line.strip().lower()
       person = self.get_person(email)
       if person:
         owners.add(person)
@@ -170,6 +170,13 @@ class DateColumnHandler(ColumnHandler):
     if date:
       return date.strftime("%m/%d/%Y")
     return ""
+
+
+class EmailColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    """ emails are case insensitive """
+    return self.raw_value.lower()
 
 
 class TextColumnHandler(ColumnHandler):
@@ -250,9 +257,9 @@ class MappingColumnHandler(ColumnHandler):
     return objects
 
   def set_obj_attr(self):
+    """ Create a new mapping object """
     if not self.value:
       return
-    """ Create a new mapping object """
     current_obj = self.row_converter.obj
     for obj in self.value:
       if not Relationship.find_related(current_obj, obj):
@@ -400,6 +407,7 @@ COLUMN_HANDLERS = {
     "end_date": DateColumnHandler,
     "kind": OptionColumnHandler,
     "link": TextColumnHandler,
+    "email": EmailColumnHandler,
     "means": OptionColumnHandler,
     "notes": TextareaColumnHandler,
     "owners": OwnerColumnHandler,
