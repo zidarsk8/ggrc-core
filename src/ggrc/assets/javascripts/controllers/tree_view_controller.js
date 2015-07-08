@@ -764,6 +764,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     for (var i = lo; i <= hi; i++) {
       var control = $(children[i]).control();
+      if (control === undefined || control === null) {
+        // TODO this should not be necessary
+        // draw_visible is called too soon when controlers are not yet
+        // available and then again when they are. Remove the too soon
+        // invocation and this continue can be dropped too.
+        continue;
+      }
       if (!_.contains(visible, control)) {
         visible.push(control);
         control.draw_node();
