@@ -3,290 +3,152 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-import csv
-from .common import *
-from ggrc import db
-from ggrc.fulltext import get_indexer
-from ggrc.fulltext.recordbuilder import fts_record_for
-from ggrc.services.common import log_event
-from flask import redirect, flash
-from ggrc.services.common import get_modified_objects, update_index
-from ggrc.services.common import update_memcache_before_commit, update_memcache_after_commit
-from ggrc.utils import benchmark
-from ggrc.models import CustomAttributeDefinition
+from collections import defaultdict
+from itertools import product
+from itertools import chain
 
-CACHE_EXPIRY_IMPORT=600
+from ggrc.converters import IMPORTABLE
+from ggrc.converters.import_helper import split_array
+from ggrc.converters.base_block import BlockConverter
 
-class BaseConverter(object):
 
-  def __init__(self, rows_or_objects, **options):
-    self.options = options.copy()
-    if self.options.get('export'):
-      self.objects = rows_or_objects
-      self.rows = []
-    else:
-      self.objects = []
-      self.rows = rows_or_objects[:]
-    self.all_objects = {}
-    self.errors = []
-    self.warnings = []
-    self.slugs = []
-    self.final_results = []
-    self.import_exception = None
-    self.import_slug = None
-    self.total_imported = 0
-    self.objects_created = 0
-    self.objects_updated = 0
-    self.custom_attribute_definitions = {}
+class Converter(object):
 
-    self.create_metadata_map()
-    self.create_object_map()
-
-  def create_metadata_map(self):
-    self.metadata_map = self._metadata_map
-
-  def create_object_map(self):
-    # Moving object_map to an instance attribute rather than a class attribute
-    # because when CustomAttribute definitions change on a type, exports/imports
-    # that occur after the change and before a server restart will have an object_map
-    # that will include the attributes defined before the change merged with the new
-    # attributes. To avoid this we scope the object map to the instance and not to
-    # the class.
-    self.object_map = self._object_map
-    definitions = db.session.query(CustomAttributeDefinition).\
-      filter(CustomAttributeDefinition.definition_type==self.row_converter.model_class.__name__).all()
-    for definition in definitions:
-      # Remember the definition title for use when exporting
-      self.object_map[definition.title] = definition.title
-      # Remember the definition for use when importing.
-      self.custom_attribute_definitions[definition.title] = definition
-
-  def results(self):
-    return self.objects
-
-  def add_slug_to_slugs(self, slug):
-    self.slugs.append(slug)
-
-  def get_slugs(self):
-    return self.slugs
-
-  def find_object(self, model_class, key):
-    all_model_objs = self.all_objects.get(model_class.__class__.__name__)
-    return all_model_objs.get(key) if all_model_objs else None
-
-  def add_object(self, model_class, key, newObject):
-    self.all_objects[model_class.__name__] = self.all_objects.setdefault(model_class.__name__, dict())
-    self.all_objects[model_class.__name__][key] = newObject
-
-  def created_objects(self):
-    return [result for result in self.objects if result.obj.id is None]
-
-  def updated_objects(self):
-    pass
-
-  def changed_objects(self):
-    pass
-
-  def has_errors(self):
-    return bool(self.errors) or self.has_object_errors()
-
-  def has_object_errors(self):
-    return any([obj.has_errors() for obj in self.objects])
-
-  def has_warnings(self):
-    return bool(self.warnings) or self.has_object_warnings()
-
-  def has_object_warnings(self):
-    return any([obj.has_warnings() for obj in self.objects])
+  class_order = [
+      "Person",
+      "Program",
+      "Audit",
+      "Policy",
+      "Regulation",
+      "Standard",
+      "Section",
+      "Control",
+      "ControlAssessment",
+  ]
 
   @classmethod
-  def from_rows(cls, rows, **options):
-    return cls(rows, **options)
+  def from_csv(cls, dry_run, csv_data):
+    converter = Converter(dry_run=dry_run, csv_data=csv_data)
+    return converter
 
-  def import_metadata(self):
-    if len(self.rows) < 6:
-      self.errors.append(u"There is no data to import in this CSV file")
-      raise ImportException("", show_preview=True, converter=self)
+  @classmethod
+  def from_ids(cls, data):
+    """ generate the converter form a list of objects and ids
 
-    optional_metadata = []
-    if hasattr(self, 'optional_metadata'):
-      optional_metadata = self.optional_metadata
+    Args:
+      data (list of tuples): List containing tuples with object_name and
+                             a list of ids for that object
+    """
+    object_map = {o.__name__: o for o in IMPORTABLE.values()}
+    converter = Converter()
+    for object_data in data:
+      object_class = object_map[object_data["object_name"]]
+      id_list = object_data.get("ids", [])
+      fields = object_data.get("fields")
+      block_converter = BlockConverter.from_ids(
+          converter, object_class, ids=id_list, fields=fields)
+      block_converter.ids_to_row_converters()
+      converter.block_converters.append(block_converter)
 
-    headers = self.read_headers(self.metadata_map, self.rows.pop(0),
-                                optional_headers=optional_metadata)
-    values = self.read_values(headers, self.rows.pop(0))
-    self.import_slug = values.get('slug')
-    self.rows.pop(0)
-    self.rows.pop(0)
-    self.validate_metadata(values)
+    return converter
 
-  def read_values(self, headers, row):
-    attrs = dict(zip(headers, row))
-    attrs.pop(None, None) # None key could have been inserted in extreme edge case
-    return attrs
+  def to_array(self, data_grid=False):
+    if data_grid:
+      return self.to_data_grid()
+    return self.to_block_array()
 
-  def get_header_for_column(self, header_map, column_name):
-    for header in header_map:
-      if header_map[header] == column_name:
-        return header
-    return ''
+  def to_block_array(self):
+    """ exporting each in it's own block separated by empty lines
 
-  def get_header_for_object_column(self, column_name):
-    return self.get_header_for_column(self.object_map, column_name)
+    Generate 2d array where each cell represents a cell in a csv file
+    """
+    csv_data = []
+    for block_converter in self.block_converters:
+      csv_header, csv_body = block_converter.to_array()
+      # multi block csv must have first column empty
+      two_empty_lines = [[], []]
+      block_data = csv_header + csv_body + two_empty_lines
+      [line.insert(0, "") for line in block_data]
+      block_data[0][0] = "Object type"
+      block_data[1][0] = block_converter.name
+      csv_data.extend(block_data)
+    return csv_data
 
-  def get_header_for_metadata_column(self, column_name):
-    return self.get_header_for_column(self.metadata_map, column_name)
+  def to_data_grid(self):
+    """ multi join datagrid with all objects in one block
 
-  def read_headers(
-      self, import_map, row, required_headers=[], optional_headers=[]):
-    ignored_colums = []
-    self.trim_list(row)
-    keys = []
-    for heading in row:
-      heading = heading.strip()
-      if heading == "<skip>":
-        continue
-      elif not (heading in import_map):
-        ignored_colums.append(heading)
-        keys.append(None) # Placeholder None to prevent position problems when headers are zipped with values
-        continue
-      elif heading != "start_date" and heading != "end_date": #
-        keys.append(import_map[heading])
+    Generate 2d array where each cell represents a cell in a csv file
+    """
+    grid_blocks = []
+    grid_header = []
+    for block_converter in self.block_converters:
+      csv_header, csv_body = block_converter.to_array()
+      grid_header.extend(csv_header[1][:1])
+      grid_blocks.append(csv_body)
+    grid_data = [list(chain(*i)) for i in product(*grid_blocks)]
+    return [grid_header] + grid_data
 
-    if any(ignored_colums):
-      ignored_text = ", ".join(ignored_colums)
-      self.warnings.append("Ignored column{plural}: {ignored_text}".format(
-        plural='s' if len(ignored_colums) > 1 else '', ignored_text=ignored_text))
+  def __init__(self, **kwargs):
+    self.dry_run = kwargs.get("dry_run", True)
+    self.csv_data = kwargs.get("csv_data", [])
+    self.block_converters = []
+    self.new_slugs = defaultdict(set)
+    self.new_emails = set()
+    self.shared_state = {}
+    self.response_data = []
 
-    missing_columns = import_map.values()
-    [missing_columns.remove(element) for element in keys if element]
+  def import_csv(self):
+    self.generate_converters()
+    self.handle_priority_blocks()
+    self.generate_row_converters()
+    self.import_objects()
+    self.gather_new_slugs()
+    self.import_mappings()
 
-    optional_headers.extend(['created_at', 'updated_at'])
-    missing_columns = [column for column in missing_columns if not (column in optional_headers)]
+  def handle_priority_blocks(self):
+    self.handle_person_blocks()
 
-    for header in required_headers:
-      if header in missing_columns:
-        self.errors.append(u"Missing required column: {}".format(self.get_header_for_column(import_map, header)))
-        missing_columns.remove(header)
+  def handle_person_blocks(self):
+    while (self.block_converters and
+           self.block_converters[0].object_class.__name__ == "Person"):
+      person_converter = self.block_converters.pop(0)
+      person_converter.generate_row_converters()
+      person_converter.import_objects()
+      _, self.new_emails = person_converter.get_new_values("email")
+      self.response_data.append(person_converter.get_info())
 
-    if any(missing_columns):
-      missing_headers = [ self.get_header_for_column(import_map, temp) for temp in missing_columns if temp ]
-      missing_text = ", ".join([missing_header for missing_header in missing_headers if missing_header ])
-      self.warnings.append(u"Missing column{plural}: {missing}".format(
-        plural='s' if len(missing_columns) > 1 else '', missing = missing_text))
+  def generate_row_converters(self):
+    for converter in self.block_converters:
+      converter.generate_row_converters()
 
-    return keys
+  def generate_converters(self):
+    offsets, data_blocks = split_array(self.csv_data)
+    for offset, data in zip(offsets, data_blocks):
+      converter = BlockConverter.from_csv(self, data, offset)
+      self.block_converters.append(converter)
 
-  def trim_list(self, a):
-    while len(a) > 0 and self.is_blank(a[-1]):
-      a.pop()
+    order = defaultdict(lambda: len(self.class_order))
+    order.update({c: i for i, c in enumerate(self.class_order)})
+    self.block_converters.sort(key=lambda x: order[x.name])
 
-  def is_blank(self, string):
-    return not len(string) or string.isspace()
+  def gather_new_slugs(self):
+    for converter in self.block_converters:
+      object_class, slugs = converter.get_new_values("slug")
+      self.new_slugs[object_class].update(slugs)
 
-  def is_blank_row(self, row_attrs):
-    return all(self.is_blank(value) for key, value in row_attrs.iteritems())
+  def import_objects(self):
+    for converter in self.block_converters:
+      converter.import_objects()
 
-  def do_import(self, dry_run = True, **options):
-    self.import_metadata()
-    object_headers = self.read_headers(self.object_map, self.rows.pop(0), required_headers=['title'])
-    row_attrs = self.read_objects(object_headers, self.rows)
-    for index, row_attrs in enumerate(row_attrs):
-      if self.is_blank_row(row_attrs):
-        continue  # ignore blank lines entirely
-      row = self.row_converter(self, row_attrs, index, **options)
-      row.setup()
-      row.reify()
-      row.reify_custom_attributes()
-      self.objects.append(row)
+  def import_mappings(self):
+    for converter in self.block_converters:
+      converter.import_mappings(self.new_slugs)
 
-    self.set_import_stats()
-    if not dry_run:
-      if self.has_errors():
-        raise ImportException(u"Attempted import with errors")
-      self.save_import()
-    return self
+  def get_info(self):
+    for converter in self.block_converters:
+      converter.import_mappings(self.new_slugs)
+      self.response_data.append(converter.get_info())
+    return self.response_data
 
-  def save_import(self):
-    for row_converter in self.objects:
-      row_converter.save(db.session, **self.options)
-    db.session.flush()
-    for row_converter in self.objects:
-      row_converter.run_after_save_hooks(db.session, **self.options)
-    modified_objects = get_modified_objects(db.session)
-    log_event(db.session)
-    with benchmark("Update memcache before commit for import"):
-      update_memcache_before_commit(self, modified_objects, CACHE_EXPIRY_IMPORT)
-    db.session.commit()
-    with benchmark("Update memcache after commit for import"):
-      update_memcache_after_commit(self)
-    update_index(db.session, modified_objects)
-
-  def set_import_stats(self):
-    self.total_imported = len(self.objects)
-    new_objects = self.created_objects()
-    self.objects_created = len(new_objects)
-    self.objects_updated = self.total_imported - self.objects_created
-
-  def read_objects(self, headers, rows):
-    attrs_collection = []
-    for row in rows:
-      if not len(row):
-        continue
-      attrs_collection.append(self.read_values(headers, row))
-    return attrs_collection
-
-  def validate_metadata(self, attrs):
-    if self.options.get('directive'):
-      self.validate_metadata_type(
-          attrs, self.directive().__class__.__name__)
-      self.validate_code(attrs)
-    elif self.__class__.__name__ == 'SystemsConverter':
-      model_name = "Processes" if self.options.get('is_biz_process') else "Systems"
-      self.validate_metadata_type(attrs, model_name)
-    elif self.__class__.__name__ == "PeopleConverter":
-      self.validate_metadata_type(attrs, "People")
-
-  def validate_code(self, attrs):
-    if not attrs.get('slug'):
-      self.errors.append(u'Missing "{}" Code heading'.format(self.directive().kind))
-    elif attrs['slug'] != self.directive().slug:
-      self.errors.append(u'{} Code must be {}'.format(self.directive().kind, self.directive().slug))
-
-  def validate_metadata_type(self, attrs, required_type):
-    if attrs.get('type') is None:
-      self.errors.append(u'Missing "Type" heading')
-    elif attrs['type'] != required_type:
-      self.errors.append(u'Type must be "{}"'.format(required_type))
-
-  def do_export(self, csv_writer):
-    for i,obj in enumerate(self.objects):
-      row = self.row_converter(self, obj, i, export = True)
-      row.setup()
-      row.reify()
-      row.reify_custom_attributes()
-      if row and any(row.attrs.values()):
-        self.rows.append(row.attrs)
-    row_header_map = self.object_map
-    for row in self.rows:
-      csv_row = []
-      for key in row_header_map.keys():
-        field = row_header_map[key]
-        field_val = row.get(field, '')
-        # Ensure non-basestrings are rendered on export
-        if not isinstance(field_val, basestring):
-          if field_val is None:
-            field_val = ''
-          else:
-            field_val = str(field_val)
-        csv_row.append(field_val)
-      csv_writer.writerow([ele.encode("utf-8") if ele else ''.encode("utf-8") for ele in csv_row])
-
-  def metadata_map(self):
-    return self.metadata_map
-
-  def object_map(self):
-    return self.object_map
-
-  def row_converter(self):
-    return self.row_converter
+  def get_object_names(self):
+    return [c.object_class.__name__ for c in self.block_converters]
