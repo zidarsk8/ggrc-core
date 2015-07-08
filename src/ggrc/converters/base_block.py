@@ -254,8 +254,12 @@ class BlockConverter(object):
     self.block_warnings.append(message)
 
   def get_new_values(self, key):
-    slugs = set([row.get_value(key) for row in self.row_converters])
-    return self.object_class, slugs
+    values = set([row.get_value(key) for row in self.row_converters])
+    return self.object_class, values
+
+  def get_new_objects(self):
+    objects = set([row.obj for row in self.row_converters])
+    return self.object_class, objects
 
   def generate_unique_counts(self):
     unique = [key for key, header in self.headers.items() if header["unique"]]

@@ -17,6 +17,7 @@ class RowConverter(object):
     self.options = options.copy()
     self.object_class = object_class
     self.obj = options.get("obj")
+    self.from_ids = self.obj is not None
     self.is_new = True
     self.ignore = False
     self.index = options.get("index", -1)
@@ -42,7 +43,7 @@ class RowConverter(object):
       raise Exception("Error: element count does not match header count")
     handle_fields = self.headers if field_list is None else field_list
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
-      if attr_name not in handle_fields:
+      if attr_name not in handle_fields or attr_name in self.attrs:
         continue
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
@@ -53,6 +54,7 @@ class RowConverter(object):
         self.attrs[attr_name] = item
       if attr_name in ("slug", "email"):
         self.obj = self.get_or_generate_object()
+        item.set_obj_attr()
 
   def handle_obj_row_data(self):
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
@@ -64,7 +66,7 @@ class RowConverter(object):
         self.attrs[attr_name] = item
 
   def handle_row_data(self, field_list=None):
-    if self.obj:
+    if self.from_ids:
       self.handle_obj_row_data()
     else:
       self.handle_csv_row_data(field_list)
@@ -100,7 +102,12 @@ class RowConverter(object):
     Person object is the only exception here since it does not have a slug
     field."""
     if self.object_class.__name__ == "Person":
-      return self.get_object_by_key("email")
+      value = self.get_value("email")
+      if value in self.block_converter.converter.new_emails:
+        return self.block_converter.converter.new_emails[value]
+      obj = self.get_object_by_key("email")
+      self.block_converter.converter.new_emails[value] = obj
+      return obj
     return self.get_object_by_key()
 
   def get_object_by_key(self, key="slug"):

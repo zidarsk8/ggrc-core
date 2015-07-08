@@ -71,28 +71,22 @@ class Converter(object):
     self.ids_by_type = kwargs.get("ids_by_type", [])
     self.block_converters = []
     self.new_slugs = defaultdict(set)
-    self.new_emails = set()
+    self.new_emails = {}
     self.shared_state = {}
     self.response_data = []
 
   def import_csv(self):
     self.block_converters_from_csv()
-    self.handle_priority_blocks()
     self.row_converters_from_csv()
+    self.handle_priority_columns()
     self.handle_row_data()
     self.import_objects()
     self.gather_new_slugs()
     self.import_mappings()
 
-  def handle_priority_blocks(self):
-    self.handle_person_blocks()
-
-  def handle_person_blocks(self):
-    self.new_emails = []
+  def handle_priority_columns(self):
     for block_converter in self.block_converters:
       block_converter.handle_row_data("email")
-      _, emails = block_converter.get_new_values("email")
-      self.new_emails.extend(emails)
 
   def handle_row_data(self):
     for converter in self.block_converters:
