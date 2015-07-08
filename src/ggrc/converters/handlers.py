@@ -99,9 +99,9 @@ class UserColumnHandler(ColumnHandler):
   """ Handler for primary and secondary contacts """
 
   def get_person(self, email):
-    new_emails = self.row_converter.block_converter.converter.new_emails
-    if email in new_emails:
-      return new_emails.get(email)
+    new_objects = self.row_converter.block_converter.converter.new_objects
+    if email in new_objects[Person]:
+      return new_objects[Person].get(email)
     return Person.query.filter(Person.email == email).first()
 
   def parse_item(self):
@@ -237,7 +237,7 @@ class MappingColumnHandler(ColumnHandler):
     self.default = options.get("default")
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
-    self.new_slugs = row_converter.block_converter.converter.new_slugs[
+    self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
     self.dry_run = row_converter.block_converter.converter.dry_run
 

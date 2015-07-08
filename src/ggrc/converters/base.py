@@ -27,13 +27,17 @@ class Converter(object):
       "ControlAssessment",
   ]
 
+  priortiy_colums = [
+      "email",
+      "slug",
+  ]
+
   def __init__(self, **kwargs):
     self.dry_run = kwargs.get("dry_run", True)
     self.csv_data = kwargs.get("csv_data", [])
     self.ids_by_type = kwargs.get("ids_by_type", [])
     self.block_converters = []
-    self.new_slugs = defaultdict(set)
-    self.new_emails = {}
+    self.new_objects = defaultdict(dict)
     self.shared_state = {}
     self.response_data = []
 
@@ -81,12 +85,12 @@ class Converter(object):
     self.handle_priority_columns()
     self.handle_row_data()
     self.import_objects()
-    self.gather_new_slugs()
     self.import_mappings()
 
   def handle_priority_columns(self):
-    for block_converter in self.block_converters:
-      block_converter.handle_row_data("email")
+    for attr_name in self.priortiy_colums:
+      for block_converter in self.block_converters:
+        block_converter.handle_row_data(attr_name)
 
   def handle_row_data(self):
     for converter in self.block_converters:
@@ -125,22 +129,17 @@ class Converter(object):
     order.update({c: i for i, c in enumerate(self.class_order)})
     self.block_converters.sort(key=lambda x: order[x.name])
 
-  def gather_new_slugs(self):
-    for converter in self.block_converters:
-      object_class, slugs = converter.get_new_values("slug")
-      self.new_slugs[object_class].update(slugs)
-
   def import_objects(self):
     for converter in self.block_converters:
       converter.import_objects()
 
   def import_mappings(self):
     for converter in self.block_converters:
-      converter.import_mappings(self.new_slugs)
+      converter.import_mappings(self.new_objects)
 
   def get_info(self):
     for converter in self.block_converters:
-      converter.import_mappings(self.new_slugs)
+      converter.import_mappings(self.new_objects)
       self.response_data.append(converter.get_info())
     return self.response_data
 

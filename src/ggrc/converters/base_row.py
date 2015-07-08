@@ -53,7 +53,7 @@ class RowConverter(object):
         item.set_value()
         self.attrs[attr_name] = item
       if attr_name in ("slug", "email"):
-        self.obj = self.get_or_generate_object()
+        self.obj = self.get_or_generate_object(attr_name)
         item.set_obj_attr()
 
   def handle_obj_row_data(self):
@@ -96,19 +96,19 @@ class RowConverter(object):
   def set_ignore(self, ignore=True):
     self.ignore = ignore
 
-  def get_or_generate_object(self):
+  def get_or_generate_object(self, attr_name):
     """ fetch existing object if possible or create and return a new one
 
     Person object is the only exception here since it does not have a slug
     field."""
-    if self.object_class.__name__ == "Person":
-      value = self.get_value("email")
-      if value in self.block_converter.converter.new_emails:
-        return self.block_converter.converter.new_emails[value]
-      obj = self.get_object_by_key("email")
-      self.block_converter.converter.new_emails[value] = obj
-      return obj
-    return self.get_object_by_key()
+    value = self.get_value(attr_name)
+    new_objects = self.block_converter.converter.new_objects[self.object_class]
+    if value in new_objects:
+      return new_objects[value]
+    obj = self.get_object_by_key(attr_name)
+    if value:
+      new_objects[value] = obj
+    return obj
 
   def get_object_by_key(self, key="slug"):
     """ Get object if the slug is in the system or return a new object """
