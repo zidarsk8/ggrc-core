@@ -42,6 +42,8 @@ class RowConverter(object):
       raise Exception("Error: element count does not match header count")
     handle_fields = self.headers if field_list is None else field_list
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
+      if attr_name not in handle_fields:
+        continue
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
       if attr_name.startswith("map:"):

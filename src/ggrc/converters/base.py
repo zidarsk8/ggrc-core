@@ -88,14 +88,11 @@ class Converter(object):
     self.handle_person_blocks()
 
   def handle_person_blocks(self):
-    while (self.block_converters and
-           self.block_converters[0].object_class.__name__ == "Person"):
-      person_converter = self.block_converters.pop(0)
-      person_converter.row_converters_from_csv()
-      person_converter.handle_row_data()
-      person_converter.import_objects()
-      _, self.new_emails = person_converter.get_new_values("email")
-      self.response_data.append(person_converter.get_info())
+    self.new_emails = []
+    for block_converter in self.block_converters:
+      block_converter.handle_row_data("email")
+      _, emails = block_converter.get_new_values("email")
+      self.new_emails.extend(emails)
 
   def handle_row_data(self):
     for converter in self.block_converters:
