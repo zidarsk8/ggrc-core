@@ -37,9 +37,9 @@ class BlockConverter(object):
     block_warnings (list of str): list containing blokc level import warnings
     row_errors (list of str): list containing row errors
     row_warnings (list of str): list containing row warnings
-    ids (list of int): list containing all ids for the converted objects
+    object_ids (list of int): list containing all ids for the converted objects
     rows (list of list of str): 2D array containg csv data
-    row_objects (list of RowConverter): list of row convertor objects with
+    row_converters (list of RowConverter): list of row convertor objects with
       data from the coresponding row in rows attribute
     headers (dict): A dictionary containing csv headers with additional
       information. Keys are object attributes such as "title", "slug"...
@@ -72,7 +72,7 @@ class BlockConverter(object):
   @classmethod
   def from_ids(cls, converter, object_class, ids=[], fields="all"):
     block_converter = BlockConverter(converter, object_class=object_class,
-                                     fields=fields, ids=ids)
+                                     fields=fields, object_ids=ids)
     return block_converter
 
   def get_unique_counts_dict(self, object_class):
@@ -90,15 +90,14 @@ class BlockConverter(object):
 
   def __init__(self, converter, **options):
     self.converter = converter
+    self.object_class = options.get("object_class", )
     self.rows = options.get("rows", [])
     self.offset = options.get("offset", 0)
-    self.ids = options.get("ids", [])
-    self.object_class = options.get("object_class", )
+    self.object_ids = options.get("object_ids", [])
     self.block_errors = []
     self.block_warnings = []
     self.row_errors = []
     self.row_warnings = []
-    self.row_objects = []
     self.row_converters = []
     if self.object_class:
       self.object_headers = get_object_column_definitions(self.object_class)
@@ -193,11 +192,11 @@ class BlockConverter(object):
 
   def ids_to_row_converters(self):
     """ Generate a row converter object for every csv row """
-    if self.ignore or not self.ids:
+    if self.ignore or not self.object_ids:
       return
     self.row_converters = []
     objects = self.object_class.query.filter(
-        self.object_class.id.in_(self.ids)).all()
+        self.object_class.id.in_(self.object_ids)).all()
     for i, obj in enumerate(objects):
       row = RowConverter(self, self.object_class, obj=obj,
                          headers=self.headers, index=i)
