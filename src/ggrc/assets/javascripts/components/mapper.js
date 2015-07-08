@@ -21,8 +21,17 @@
       selected: new can.List(),
       entries: new can.List(),
       relevant: new can.List(),
+      model_from_type: function (type) {
+        var types = _.reduce(_.values(this.types()), function (memo, val) {
+          if (val.items) {
+            return memo.concat(val.items);
+          }
+          return memo;
+        }, []);
+        return _.findWhere(types, {value: type});
+      },
       types: can.compute(function () {
-        var selector_list = GGRC.Mappings.get_canonical_mappings_for(GGRC.page_model.type),
+        var selector_list = GGRC.Mappings.get_canonical_mappings_for(this.object),
             groups = {
               "all_objects": {
                 name: "All Objects",
@@ -75,11 +84,9 @@
       var $el = $(el),
           data = {};
 
+      data["join_object_id"] = $el.attr("join-object-id") || GGRC.page_instance().id;
       if ($el.attr("type")) {
         data["type"] = $el.attr("type");
-      }
-      if ($el.attr("join-object-id")) {
-        data["join_object_id"] = $el.attr("join-object-id");
       }
       if ($el.attr("object")) {
         data["object"] = $el.attr("object");
@@ -154,13 +161,7 @@
         if (~["All Object", "AllObject"].indexOf("All Object")) {
           return this.scope.attr("mapper.model", types["all_objects"]);
         }
-        types = _.reduce(_.values(types), function (memo, val) {
-          if (val.items) {
-            return memo.concat(val.items);
-          }
-          return memo;
-        }, []);
-        this.scope.attr("mapper.model", _.findWhere(types, {value: type}));
+        this.scope.attr("mapper.model", this.scope.mapper.model_from_type(type));
       },
       "{mapper} type": function () {
         this.scope.attr("mapper.term", "");
@@ -262,16 +263,14 @@
             page = this.scope.attr("page"),
             next_page = page + 1,
             per_page = +this.scope.attr("items-per-page"),
-            page_items = _.map(this.scope.attr("entries").slice(page * per_page, next_page * per_page), function (entry) {
-              return entry.instance;
-            }),
+            page_items = this.scope.attr("entries").slice(page * per_page, next_page * per_page),
             options = this.scope.attr("options");
 
         if (!page_items.length) {
           return;
         }
-        this.scope.attr("page_loading", true);
-        que.enqueue(page_items).trigger().then(function (models) {
+
+        que.enqueue(_.pluck(page_items, "instance")).trigger().then(function (models) {
           this.scope.attr("page_loading", false);
           this.scope.attr("page", next_page);
           options.push.apply(options, can.map(models, function (model) {
@@ -284,7 +283,8 @@
               };
             }
             var selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
-                binding = selected.get_binding(this.scope.attr("mapper.model.plural").toLowerCase()),
+                mapper = this.scope.mapper.model_from_type(model.type),
+                binding = selected.get_binding(mapper.plural.toLowerCase()),
                 bindings = this.scope.attr("mapper.bindings");
 
             if (bindings[model.id]) {
