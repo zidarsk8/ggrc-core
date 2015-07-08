@@ -27,11 +27,6 @@ class Converter(object):
   ]
 
   @classmethod
-  def from_csv(cls, dry_run, csv_data):
-    converter = Converter(dry_run=dry_run, csv_data=csv_data)
-    return converter
-
-  @classmethod
   def from_ids(cls, data):
     """ generate the converter form a list of objects and ids
 
@@ -98,7 +93,7 @@ class Converter(object):
     self.response_data = []
 
   def import_csv(self):
-    self.generate_converters()
+    self.block_converters_from_csv()
     self.handle_priority_blocks()
     self.generate_row_converters()
     self.import_objects()
@@ -121,7 +116,7 @@ class Converter(object):
     for converter in self.block_converters:
       converter.generate_row_converters()
 
-  def generate_converters(self):
+  def block_converters_from_csv(self):
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
       converter = BlockConverter.from_csv(self, data, offset)

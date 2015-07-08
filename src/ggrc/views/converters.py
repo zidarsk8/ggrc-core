@@ -83,7 +83,7 @@ def parse_import_request():
 
 def handle_import_request():
   dry_run, csv_data = parse_import_request()
-  converter = Converter.from_csv(dry_run, csv_data)
+  converter = Converter(dry_run=dry_run, csv_data=csv_data)
   converter.import_csv()
   response_data = converter.get_info()
   response_json = json.dumps(response_data)
