@@ -83,7 +83,12 @@ class Ownable(object):
       PublishOnly('object_owners'),
   ]
   _include_links = []
-  _aliases = {"owners": "Owner"}
+  _aliases = {
+      "owners": {
+          "display_name": "Owner",
+          "mandatory": True,
+      }
+  }
 
   @classmethod
   def eager_query(cls):

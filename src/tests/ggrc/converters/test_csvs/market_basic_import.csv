@@ -1,0 +1,12 @@
+Object type,,,,,,
+market,code,title,description,owner,map:org group,map:facility
+,MARKET-OC,Oceania,"Core territories are the Western Hemisphere, the British Isles, Australasia, and Southern Africa.",predrag@reciprocitylabs.com,"MOPE
+MOPL
+MOL
+MOT
+r101",
+,MARKET-EU,Eurasia,"Core territories are Continental Europe and Russia, including Siberia.",predrag@reciprocitylabs.com,r101,HOME-3
+,MARKET-EA,Eastasia,"Core territories are China, Japan, Korea, and Indochina.",predrag@reciprocitylabs.com,r101,"HOME-2
+HOME-3"
+,MARKET-A1,Airstrip one,"(formerly known as Great Britain), a province of the superstate Oceania in a world of perpetual war, omnipresent government surveillance and public manipulation, dictated by a political system euphemisticallynamed English Socialism (or Ingsoc in the government's invented language, Newspeak) under the control of a privileged Inner Party elite, that persecutes individualism and independent thinking as ""thoughtcrimes"".[3]",predrag@reciprocitylabs.com,"r101
+MOPE",

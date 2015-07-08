@@ -1,0 +1,5 @@
+Object type,required,required,required,required
+policy,code,title,owner,state
+,"p1",some weird policy,user@example.com,Draft
+,p2,another weird policy,user@example.com,Draft
+,,Who let the dogs out,user@example.com,Draft

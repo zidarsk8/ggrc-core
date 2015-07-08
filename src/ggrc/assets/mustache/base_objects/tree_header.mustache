@@ -21,37 +21,8 @@
 
     <div class="span{{display_options.action_width}}">
         <ul class="tree-action-list">
-        {{#if_helpers '\
-           #if_instance_of' parent_instance 'Regulation' '\
-           and #if_in' model.shortName 'Section, Control, Objective' '\
-           or #if_instance_of' parent_instance 'Contract' '\
-           and #if_in' model.shortName 'Clause, Control, Objective' '\
-           or #if_instance_of' parent_instance 'Policy' '\
-           and #if_in' model.shortName 'Section, Control, Objective' '\
-           or #if_instance_of' parent_instance 'Standard' '\
-           and #if_in' model.shortName 'Section, Control, Objective' '\
-           or #if_instance_of' parent_instance 'Program' '\
-           and #if_in' model.shortName 'Control, Objective, System'}}
-            {{#if allow_creating}}
-              {{#is_allowed 'create' model.shortName context=null}}
-                <li>
-                  <a href="{{parent_instance.viewLink}}/import_{{model.table_plural}}?return_to={{param_current_location}}" class="section-import" rel="tooltip" data-placement="left" title="" data-original-title="Import {{model.model_plural}}">
-                      <i class="grcicon-imp-exp"></i>
-                  </a>
-                </li>
 
-              {{/is_allowed}}
-            {{/if}}
-
-            {{#if list.length}}
-              <li>
-                <a href="{{parent_instance.viewLink}}/export_{{model.table_plural}}?ids={{instance_ids list}}" class="section-import" rel="tooltip" data-placement="left" title="" data-original-title="Export {{model.model_plural}}">
-                    <i class="grcicon-export"></i>
-                </a>
-              </li>
-            {{/if}}
-        {{/if_helpers}}
-
+        {{{> "/static/mustache/base_objects/export_button.mustache}}}
         <assessment-generator-button audit="parent_instance"></assessment-generator-button>
         {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
         {{{> "/static/mustache/base_objects/tree_column_selector.mustache"}}}

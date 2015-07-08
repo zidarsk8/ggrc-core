@@ -4,15 +4,19 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from datetime import date, timedelta
-from ggrc.services.common import Resource
-from ggrc.models import *
-from ggrc_basic_permissions.models import *
-from ggrc.app import app
-from ggrc import db
-from tests.ggrc.api_helper import Api
-import string
-import random
 import names
+import random
+import string
+
+from ggrc import db
+from ggrc.app import app
+from ggrc.models import (
+  Person, Policy, Control, Objective, Standard, System, NotificationConfig,
+  CustomAttributeDefinition
+)
+from ggrc.services.common import Resource
+from ggrc_basic_permissions.models import UserRole, Role
+from tests.ggrc.api_helper import Api
 
 
 class Generator():
@@ -71,7 +75,6 @@ class ObjectGenerator(Generator):
     }]})
     obj_dict[obj_name].update(data)
     return self.generate(obj_class, obj_name, obj_dict)
-
 
   def generate_policy(self, data={}):
     obj_name = "policy"
@@ -171,3 +174,23 @@ class ObjectGenerator(Generator):
         }
     }
     return self.generate(NotificationConfig, obj_name, data)
+
+  def generate_custom_attribute(self, definition_type, **kwargs):
+    obj_name = "custom_attribute_definition"
+    data = {
+        obj_name: {
+            "title": kwargs.get("title", self.random_str()),
+            "custom_attribute_definitions": [],
+            "custom_attributes": {},
+            "definition_type": definition_type,
+            "modal_title": kwargs.get("modal_title", self.random_str()),
+            "attribute_type": kwargs.get("attribute_type", "Text"),
+            "mandatory": kwargs.get("mandatory", False),
+            "helptext": kwargs.get("helptext", False),
+            "placeholder": kwargs.get("placeholder", False),
+            "context": {"id": None},
+            "multi_choice_options": kwargs.get("options", False),
+        }
+    }
+    data[obj_name].update(kwargs)
+    self.generate(CustomAttributeDefinition, obj_name, data)

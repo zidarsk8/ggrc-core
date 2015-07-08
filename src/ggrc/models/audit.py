@@ -76,7 +76,6 @@ class Audit(
           "display_name": "Internal Audit Lead",
           "mandatory": True
       },
-      "slug": None,
       "secondary_contact": None,
       "notes": None,
       "url": None,

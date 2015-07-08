@@ -1428,22 +1428,6 @@ can.each({
   });
 });
 
-Mustache.registerHelper("instance_ids", function (list, options) {
-  //  `instance_ids` is used only to extract a comma-separated list of
-  //  instance `id` values for use by `Export Controls` link in
-  //  `assets/mustache/controls/tree_footer.mustache`
-  var ids;
-  list = resolve_computed(Mustache.resolve(list));
-  if (list) {
-    list.attr("length");
-    ids = can.map(list, function (result) { return result.attr("instance.id"); });
-  }
-  else {
-    ids = [];
-  }
-  return ids.join(",");
-});
-
 Mustache.registerHelper("local_time_range", function (value, start, end, options) {
   var tokens = [];
   var sod;

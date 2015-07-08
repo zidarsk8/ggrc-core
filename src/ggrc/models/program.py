@@ -35,7 +35,6 @@ class Program(HasObjectState, CustomAttributable, Documentable,
   _include_links = []
   _aliases = {
     "url": "Program URL",
-    "kind": "Kind/Type",
     "private": "Privacy",
   }
 
