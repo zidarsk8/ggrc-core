@@ -36,10 +36,11 @@ class RowConverter(object):
     message = template.format(line=self.line, **kwargs)
     self.block_converter.row_warnings.append(message)
 
-  def handle_csv_row_data(self):
+  def handle_csv_row_data(self, field_list=None):
     """ Pack row data with handlers """
     if len(self.headers) != len(self.row):
       raise Exception("Error: element count does not match header count")
+    handle_fields = self.headers if field_list is None else field_list
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
@@ -48,8 +49,8 @@ class RowConverter(object):
       else:
         item.set_value()
         self.attrs[attr_name] = item
-    self.obj = self.get_or_generate_object()
-    self.chect_mandatory_fields()
+      if attr_name in ("slug", "email"):
+        self.obj = self.get_or_generate_object()
 
   def handle_obj_row_data(self):
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
@@ -60,11 +61,11 @@ class RowConverter(object):
       else:
         self.attrs[attr_name] = item
 
-  def handle_row_data(self):
+  def handle_row_data(self, field_list=None):
     if self.obj:
       self.handle_obj_row_data()
     else:
-      self.handle_csv_row_data()
+      self.handle_csv_row_data(field_list)
 
   def chect_mandatory_fields(self):
     if not self.is_new:

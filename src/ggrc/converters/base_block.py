@@ -177,12 +177,18 @@ class BlockConverter(object):
                          headers=self.headers, index=i)
       self.row_converters.append(row)
 
-  def handle_row_data(self):
+  def handle_row_data(self, field_list=None):
     if self.ignore:
       return
     for row_converter in self.row_converters:
-      row_converter.handle_row_data()
-    self.check_uniq_columns()
+      row_converter.handle_row_data(field_list)
+    if field_list is None:
+      self.check_mandatory_fields()
+      self.check_uniq_columns()
+
+  def check_mandatory_fields(self, counts=None):
+    for row_converter in self.row_converters:
+      row_converter.chect_mandatory_fields()
 
   def check_uniq_columns(self, counts=None):
     self.generate_unique_counts()
