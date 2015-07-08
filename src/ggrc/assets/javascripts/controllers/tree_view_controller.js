@@ -961,20 +961,20 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       });
 
       if (sort_prop || sort_function) {
+        if (!sort_function) {
+          sort_function = function(old_item, new_item) {
+            return GGRC.Math.string_less_than(
+              old_item[sort_prop],
+              new_item[sort_prop]
+            );
+          }
+        }
         $items.each(function(i, item) {
             var j, $item = $(item), compare;
             for(j = $existing.length - 1; j >= 0; j--) {
               var old_item = $existing.eq(j).control().options.instance,
                   new_item = $item.control().options.instance;
-              if (sort_function){
-                compare = sort_function(old_item, new_item);
-              }
-              else {
-                compare = GGRC.Math.string_less_than(
-                    old_item[sort_prop],
-                    new_item[sort_prop]
-                );
-              }
+              compare = sort_function(old_item, new_item);
               if (compare) {
                 $item.insertAfter($existing.eq(j));
                 $existing.splice(j + 1, 0, item);
