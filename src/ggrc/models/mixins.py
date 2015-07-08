@@ -411,7 +411,13 @@ class Slugged(Base):
   _publish_attrs = ['slug']
   _fulltext_attrs = ['slug']
   _sanitize_html = ['slug']
-  _aliases = {"slug": "Code"}
+  _aliases = {
+      "slug": {
+          "display_name": "Code",
+          "description": ("Must be unique. Can be left empty for autogeneration."
+                          " If updating or deleting, code is required"),
+      }
+  }
 
   @classmethod
   def generate_slug_for(cls, obj):
@@ -580,7 +586,6 @@ class CustomAttributable(object):
   _publish_attrs = ['custom_attribute_values']
   _update_attrs = ['custom_attributes']
   _include_links = []
-  _aliases = {"custom_attributes": "Custom Attributes"}
 
   @declared_attr
   def custom_attribute_definitions(cls):

@@ -1,0 +1,10 @@
+Object type,,,,,,,,,
+facility,code,map:facility,unmap:facility,map:facility,unmap:facility,map:facility,unmap:facility,map:facility,unmap:facility
+,HOUSE-1,HOUSE-4,,,,,,,HOUSE-2
+,HOUSE-1,,HOUSE-4,,,,,HOUSE-2,
+,HOUSE-1,,,HOUSE-4,,,HOUSE-2,,
+,HOUSE-1,,,,HOUSE-4,HOUSE-2,,,
+,HOUSE-1,,,,HOUSE-2,HOUSE-4,,,
+,HOUSE-1,,,HOUSE-2,,,HOUSE-4,,
+,HOUSE-1,,HOUSE-2,,,,,HOUSE-4,
+,HOUSE-1,HOUSE-2,,,,,,,HOUSE-4

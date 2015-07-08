@@ -260,7 +260,7 @@ can.Control("CMS.Controllers.TreeLoader", {
     }
 
   , enqueue_items: function(items) {
-      var that = this, i, processChunk, filtered_items = [], 
+      var that = this, i, filtered_items = [],
           child_tree_display_list = [];
 
       if (!items || items.length === 0) {
@@ -297,34 +297,15 @@ can.Control("CMS.Controllers.TreeLoader", {
         this._loading_started();
       }
 
-      this._pending_items.push.apply(this._pending_items, filtered_items);
-      this._pending_items_ms = Date.now();
-
-      processChunk = function() {
-        if (!that._pending_items) {
-          return;
-        }
-        var chunk = that._pending_items.splice(0, 5);
-
-        that.insert_items(chunk);
-        if (that._pending_items && that._pending_items.length > 0) {
-          setTimeout(that._ifNotRemoved(processChunk), 10);
-        }
-        else {
-          that._pending_items = null;
-          setTimeout(that._ifNotRemoved(function() {
-            if (!that._pending_items) {
-              that._loading_finished();
-            }
-          }), 200);
-        }
-      };
-      $.when.apply($, can.map(this._pending_items, function(item) {
+      $.when.apply($, can.map(filtered_items, function(item) {
         var instance = item.instance || item;
         if (instance.custom_attribute_values) {
           return instance.refresh_all('custom_attribute_values');
         }
-      })).then(this._ifNotRemoved(processChunk));
+      })).then(function(){
+        that.insert_items(filtered_items);
+        that._loading_finished();
+      });
       return this._loading_deferred;
     }
 
@@ -377,6 +358,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //example child option :
     // { property : "controls", model : CMS.Models.Control, }
     // { parent_find_param : "system_id" ... }
+    , scroll_page_count: 0.5 // pages above and below viewport
   },
   do_not_propagate : [
     'header_view', 'footer_view', 'add_item_view', 'list', 'original_list', 'single_object', 'find_function',
@@ -566,6 +548,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           this.options.allow_mapping || this.options.allow_creating);
       }
 
+      if(!this.options.scroll_element) {
+        this.options.attr("scroll_element", $(".object-area"));
+      }
+
       // Override nested child options for allow_* properties
       var allowed = {};
       this.options.each(function(item, prop) {
@@ -602,8 +588,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               this.element.before(frag);
               // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
               can.bind.call(
-                  this.element.parent().find('.filter-trigger > a'), 
-                  'click', 
+                  this.element.parent().find('.filter-trigger > a'),
+                  'click',
                   function () {
                     if (this.display_prefs.getFilterHidden()) {
                       this.show_filter();
@@ -617,7 +603,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
                             'click',
                             this.sort.bind(this)
                            );
-              can.bind.call(this.element.parent().find('.set-tree-attrs'), 
+              can.bind.call(this.element.parent().find('.set-tree-attrs'),
                             'click',
                             this.set_tree_attrs.bind(this)
                            );
@@ -767,6 +753,90 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     return v;
   }
 
+  , el_position: function(el) {
+    if (!(el instanceof jQuery)) {
+      el = $(el);
+    }
+    var se = this.options.scroll_element,
+        se_o = se.offset().top,
+        se_h = se.outerHeight(),
+        el_o = el.offset().top,
+        el_h = el.outerHeight(),
+        above_top = (el_o + el_h - se_o) / se_h,
+        below_bottom = (el_o - se_o ) / se_h - 1;
+    if (above_top < 0) {
+      return above_top;
+    } else if (below_bottom > 0) {
+      return below_bottom;
+    } else {
+      return 0;
+    }
+  }
+
+  , draw_visible: _.debounce(function() {
+    var MAX_STEPS = 100,
+        el_position = this.el_position.bind(this),
+        children = this.element.children(),
+        lo = 0,
+        hi = children.length - 1,
+        max = hi,
+        steps = 0;
+    while (steps < MAX_STEPS && lo < hi) {
+      steps += 1;
+      var mid = (lo + hi) / 2 | 0,
+          el = children[mid],
+          pos = el_position(children[mid]);
+      if (pos < 0) {
+        lo = mid;
+        continue;
+      }
+      if (pos > 0) {
+        hi = mid;
+        continue;
+      }
+      lo = mid;
+      hi = mid;
+    }
+    var page_count = this.options.scroll_page_count;
+    while (lo > 0 && el_position(children[lo - 1]) >= (-page_count)) {
+      lo -= 1;
+    }
+    while (hi < max && el_position(children[hi +1]) <= page_count) {
+      hi += 1;
+    }
+
+    var last_visible = this._last_visible || [],
+        visible = [];
+    for (var i in last_visible) {
+      var control = last_visible[i];
+      if (control.element === undefined || control.element === null) {
+        continue; // element was removed
+      }
+      if (Math.abs(this.el_position(control.element)) <= page_count) {
+        visible.push(control);
+      } else {
+        control.draw_placeholder();
+      }
+    }
+
+    for (var i = lo; i <= hi; i++) {
+      var control = $(children[i]).control();
+      if (!_.contains(visible, control)) {
+        visible.push(control);
+        control.draw_node();
+      }
+    }
+    this._last_visible = visible;
+  }, 100, {leading: true})
+
+  , "{scroll_element} scroll": function (el, ev) {
+    setTimeout(this.draw_visible.bind(this), 0);
+  }
+
+  , "{scroll_element} resize": function (el, ev) {
+    setTimeout(this.draw_visible.bind(this), 0);
+  }
+
   , "{original_list} add" : function(list, ev, newVals, index) {
     var that = this
       , real_add = []
@@ -912,7 +982,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               $item.appendTo(this.element);
             }
             $existing.splice(0, 0, item);
-        });
+        }.bind(this));
         if (this.options.sortable) {
           $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
         }
@@ -923,7 +993,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           $items.appendTo(this.element);
         }
       }
-      return $.when.apply($, draw_items_dfds);
+      var res = $.when.apply($, draw_items_dfds);
+      res.then(function(){setTimeout(that.draw_visible.bind(that), 0)});
+      return res;
     }
 
   , " sortupdate" : function(el, ev, ui) {
@@ -1009,7 +1081,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.get_count_deferred = false;
     this.options.list.replace([]);
     this.element.children('.cms_controllers_tree_view_node').remove();
-    this.fetch_list().then(this.proxy("draw_list"));
+    this.draw_list(this.options.original_list);
     this.init_count();
   },
   "[custom-event] click" : function(el, ev) {
@@ -1221,7 +1293,10 @@ can.Control("CMS.Controllers.TreeViewNode", {
         || GGRC.mustache_path + "/base_objects/tree.mustache";
     }
     this._draw_node_deferred = new $.Deferred();
-    setTimeout(this._ifNotRemoved(this.proxy("draw_node")), 20);
+
+    // this timeout is required because the invoker will access the control via
+    // the element synchronously so we must not replace the element just yet
+    setTimeout(this.draw_placeholder.bind(this), 0);
   }
 
   , draw_node: function() {
@@ -1233,6 +1308,15 @@ can.Control("CMS.Controllers.TreeViewNode", {
         that._draw_node_deferred.resolve();
       }));
     //}, 20);
+  }
+  , draw_placeholder: function() {
+      var that = this;
+      can.view(GGRC.mustache_path + "/base_objects/tree_placeholder.mustache", that.options, this._ifNotRemoved(function(frag) {
+        that.replace_element(frag);
+        that._draw_node_deferred.resolve();
+        that.expanded = false;
+        delete that._expand_deferred;
+      }));
   }
   , should_draw_children : function(){
     var draw_children = this.options.draw_children;
@@ -1388,10 +1472,9 @@ can.Control("CMS.Controllers.TreeViewNode", {
           that.element.trigger("loaded");
           that._expand_deferred.resolve();
         }));
-      }), 500);
+      }), 0);
       return this._expand_deferred;
     }
-
   , ".openclose:not(.active) click" : function(el, ev) {
     // Ignore unless it's a direct child
     if (el.closest('.' + this.constructor._fullName).is(this.element))

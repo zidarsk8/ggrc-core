@@ -19,11 +19,10 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+        'src/ggrc/assets/js_specs/spec_setup.js',
+        'src/ggrc/static/dashboard-templates.js',
         'src/ggrc/static/dashboard.js',
         'src/ggrc/static/dashboard-spec-helpers.js',
-        'src/ggrc/static/dashboard-templates.js',
-
-        'src/ggrc/assets/js_specs/spec_setup.js',
         'src/**/*_spec.js'
     ],
 
