@@ -55,6 +55,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Stop Date', attr_name: 'end_date'}
       ])
+      , child_tree_display_list : ['Control']
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , link_buttons : true
       , child_options : [{

@@ -18,6 +18,11 @@ function _firstElementChild(el) {
   }
 }
 
+if (!GGRC.tree_view) {
+  GGRC.tree_view = {};
+}
+GGRC.tree_view.basic_model_list = new can.Observe.List([]);
+GGRC.tree_view.sub_tree_for = {};
 
 function _display_tree_subpath(el, path, attempt_counter) {
   attempt_counter || (attempt_counter = 0);
@@ -255,10 +260,36 @@ can.Control("CMS.Controllers.TreeLoader", {
     }
 
   , enqueue_items: function(items) {
-      var that = this;
+      var that = this, i, filtered_items = [],
+          child_tree_display_list = [];
 
-      if (!items || items.length == 0) {
+      if (!items || items.length === 0) {
         return new $.Deferred().resolve();
+      }
+
+      //Debug: No filter
+      //filtered_items = items;
+
+      //find current widget model and check if first layer tree
+      if (this.options.parent) { //this is a second label tree
+        var parent_model_name = this.options.parent.options.model.shortName;
+        child_tree_display_list = GGRC.tree_view.sub_tree_for[parent_model_name].display_list;
+
+        //check if all objects selected, then skip filter
+        if (child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
+          //skip filter
+          filtered_items = items;
+        } else if (child_tree_display_list.length === 0) { //no item is selected to filter, so just return
+          return new $.Deferred().resolve();
+        } else {
+          for (i = 0; i < items.length; i++) {
+            if (child_tree_display_list.indexOf(items[i].instance.class.model_singular) !== -1) {
+              filtered_items.push(items[i]);
+            }
+          }
+        }
+      } else {
+        filtered_items = items;
       }
 
       if (!this._pending_items) {
@@ -266,13 +297,13 @@ can.Control("CMS.Controllers.TreeLoader", {
         this._loading_started();
       }
 
-      $.when.apply($, can.map(items, function(item) {
+      $.when.apply($, can.map(filtered_items, function(item) {
         var instance = item.instance || item;
         if (instance.custom_attribute_values) {
           return instance.refresh_all('custom_attribute_values');
         }
       })).then(function(){
-        that.insert_items(items);
+        that.insert_items(filtered_items);
         that._loading_finished();
       });
       return this._loading_deferred;
@@ -398,6 +429,28 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.options.attr('display_options', display_options);
   },
 
+  init_child_tree_display: function (model) {
+    //Set child tree options
+    var model_name = model.model_singular,
+        child_tree_model_list = [], w_list, sub_tree,
+        valid_models = Object.keys(GGRC.tree_view.base_widgets_by_type);
+
+    w_list = GGRC.tree_view.base_widgets_by_type[model_name]; //possible widget/mapped model_list
+    if (w_list === undefined) {
+      child_tree_model_list = GGRC.tree_view.basic_model_list;
+      GGRC.tree_view.sub_tree_for[model_name] = {
+        model_list: child_tree_model_list,
+        display_list: valid_models
+      };
+    }
+
+    sub_tree = GGRC.tree_view.sub_tree_for[model_name];
+    this.options.attr('child_tree_model_list', sub_tree.model_list);
+    this.options.attr('selected_child_tree_model_list', sub_tree.model_list);
+    this.options.attr('select_model_list', GGRC.tree_view.basic_model_list);
+    this.options.attr('selected_model_name', model_name);
+  },
+
   //Displays attribute list for tree-header, Select attribute list drop down
   //Gets default and custom attribute list for each model, and sets upthe display-list
   init_display_options: function (opts) {
@@ -469,7 +522,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.options.attr('select_attr_list', select_attr_list);
     this.options.attr('display_attr_list', display_attr_list);
     this.setup_column_width();
-
+    this.init_child_tree_display(model);
   },
 
   init : function(el, opts) {
@@ -553,6 +606,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               can.bind.call(this.element.parent().find('.set-tree-attrs'),
                             'click',
                             this.set_tree_attrs.bind(this)
+                           );
+              can.bind.call(this.element.parent().find('.set-display-object-list'),
+                            'click',
+                            this.set_tree_display_list.bind(this)
                            );
             }.bind(this))));
       }
@@ -1161,6 +1218,41 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       this.reload_list();
     }
+
+  , set_tree_display_list : function (ev) {
+    var model_name,// = this.options.model.model_singular,
+        $check = this.element.parent().find('.model-checkbox'),
+        $selected = $check.filter(':checked'),
+        selected_items=[];
+
+    model_name = this.element.parent().find('.object-type-selector').val();
+
+    //save the list
+    $selected.each( function(index) {
+      selected_items.push(this.value);
+    });
+    //update GGRC.tree_view
+    GGRC.tree_view.sub_tree_for[model_name].display_list = selected_items;
+
+    //save in local storage
+    this.display_prefs.setChildTreeDisplayList(model_name, selected_items);
+
+    //check if any inner tree is open
+    var i, el = this.element, open_items, control, tview_el;
+    if (el.hasClass('tree-open')) {
+      //find the inner tree and reload it
+      open_items = el.find('.item-open .cms_controllers_tree_view');
+
+      for (i = 0; i < open_items.length; i++) {
+        tview_el = $(open_items[i]);
+        control = tview_el.control();
+        if (control) {
+          control.reload_list();
+        }
+      }
+    }
+  }
+
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
@@ -1398,8 +1490,8 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , ".select:not(.disabled) click": function(el, ev) {
     var tree = el.closest('.cms_controllers_tree_view_node'),
         node = tree.control();
-
-    node.select();
+    if (node)
+      node.select();
   }
   , select: function () {
     var $tree = this.element;
@@ -1443,16 +1535,14 @@ can.Control("CMS.Controllers.TreeViewNode", {
 });
 
 (function (can, $) {
-    can.Component.extend ({
+  can.Component.extend ({
     tag: 'tree-header-selector',
     // <content> in a component template will be replaced with whatever is contained
     //  within the component tag.  Since the views for the original uses of these components
     //  were already created with content, we just used <content> instead of making
     //  new view template files.
     template: '<content/>',
-    scope: {
-      instance: null
-    },
+    scope: {},
     events: {
       init: function () {
         this.scope.attr('controller', this);
@@ -1491,6 +1581,68 @@ can.Control("CMS.Controllers.TreeViewNode", {
       },
 
       '.set-tree-attrs,.close-dropdown click' : function(el, ev) {
+        this.element.find('.dropdown-menu').closest('li').removeClass('open');
+      }
+    }
+  });
+
+  can.Component.extend ({
+    tag: 'tree-type-selector',
+    // <content> in a component template will be replaced with whatever is contained
+    //  within the component tag.  Since the views for the original uses of these components
+    //  were already created with content, we just used <content> instead of making
+    //  new view template files.
+    template: '<content/>',
+    scope: {},
+    events: {
+      init : function () {
+        this.scope.attr('controller', this);
+      },
+
+      'input.model-checkbox click' : function (el, ev) {
+        ev.stopPropagation();
+      },
+
+      '.dropdown-menu-form click' : function (el, ev) {
+        ev.stopPropagation();
+      },
+
+      update_check_boxes : function (el, ev) {
+        //change checkboxes based on the model_type
+        //get the closest tree_view controller, change the options to reload the checkboxes.
+        var i, select_el = this.element.find('.object-type-selector'),
+            model_name = select_el.val(),
+            sec_el = select_el.closest('section'),
+            tree_view_el = sec_el.find('.cms_controllers_tree_view'),
+            control = tree_view_el.control(),
+            display_list = GGRC.tree_view.sub_tree_for[model_name].display_list,
+            select_model_list = GGRC.tree_view.sub_tree_for[model_name].model_list;
+
+        //set up display status for UI
+        for (i = 0; i < select_model_list.length; i++) {
+          var obj = select_model_list[i];
+          obj.display_status = display_list.indexOf(obj.model_name) !== -1;
+        }
+        control.options.attr('selected_child_tree_model_list', select_model_list);
+      },
+
+      'select.object-type-selector change' : 'update_check_boxes',
+
+      '.tview-type-toggle click' : 'update_check_boxes',
+
+      'a.select-all click' : function (el, ev) {
+        var $check = this.element.find('.model-checkbox');
+
+        $check.prop('checked', true);
+      },
+
+      'a.select-none click' : function (el, ev) {
+        var $check = this.element.find('.model-checkbox');
+
+        $check.prop('checked', false);
+      },
+
+      '.set-display-object-list,.close-dropdown click' : function(el, ev) {
         this.element.find('.dropdown-menu').closest('li').removeClass('open');
       }
     }

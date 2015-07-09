@@ -91,6 +91,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
+    , child_tree_display_list : ['Objective']
     , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
     , child_options : [{
         model : can.Model.Cacheable
@@ -147,10 +148,11 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
     , attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
+    , child_tree_display_list : ['Objective']
     , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
     , child_options: [{
         model: can.Model.Cacheable
-      , mapping: "related_and_able_objects"
+      , mapping: "related_objects" //"related_and_able_objects"
       , title_plural: "Business Objects"
       , draw_children: function(){
           return this.instance.type === "Objective";

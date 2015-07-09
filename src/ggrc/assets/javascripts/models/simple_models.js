@@ -67,6 +67,7 @@ can.Model.Cacheable("CMS.Models.Program", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
+    , child_tree_display_list : ['Standard', 'Regulation', 'Policy', 'Contract']
     , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     }
   , links_to : {
@@ -148,13 +149,14 @@ can.Model.Cacheable("CMS.Models.Objective", {
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
+    , child_tree_display_list : ['Control']
     , add_item_view : GGRC.mustache_path + "/objectives/tree_add_item.mustache"
     , create_link : true
     //, draw_children : true
     , start_expanded : false
     , child_options : [{
         model : can.Model.Cacheable
-      , mapping : "related_and_able_objects"
+      , mapping : "related_objects" //"related_and_able_objects"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , title_plural : "Business Objects"
