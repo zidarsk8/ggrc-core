@@ -13,17 +13,7 @@
           <div class="row-fluid">
             <div class="span12">
               <ul>
-                <li class="active task-tab">
-                  <a href="javascript://">
-                    My Tasks ({{task_count}})
-                  </a>
-                </li>
-                <li class="audit-tab">
-                  <a href="javascript://">
-                    Audit Requests ({{audit_requests_count}})
-                  </a>
-                </li>
-                <li class="workflow-tab">
+                <li class="active workflow-tab">
                   <a href="javascript://">
                     My Workflows ({{workflow_count}})
                   </a>
@@ -33,19 +23,10 @@
           </div>
         </header>
         <section class="content">
-          {{#tasks_loaded}}
-            {{> /static/mustache/dashboard/info/task_filters.mustache}}
-          {{/tasks_loaded}}
-          {{{ renderLive task_view }}}
-          {{{ renderLive audit_requests_view }}}
-          {{#if workflow_view}}
-            <div class="workflow-wrap-main">
-              {{{ renderLive workflow_view }}}
-              {{#workflow_show_all}}
-                <a href="javascript://" class="workflow-trigger show-all">Show all my workflows</a>
-              {{/workflow_show_all}}
-            </div>
-          {{/if}}
+          {{{ renderLive workflow_view }}}
+          {{#workflow_show_all}}
+            <a href="javascript://" class="workflow-trigger show-all">Show all my workflows</a>
+          {{/workflow_show_all}}
         </section>
       </section><!-- Widget end -->
 
