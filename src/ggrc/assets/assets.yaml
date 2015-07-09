@@ -158,6 +158,7 @@ dashboard-js-template-files:
   - base_objects/notes_and_code.mustache
   - base_objects/modal_contact_fields.mustache
   - base_objects/open_close.mustache
+  - base_objects/sub_tree_type_selector.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache

@@ -20,6 +20,7 @@ can.Control("CMS.Controllers.Dashboard", {
       CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
         this.display_prefs = prefs;
 
+        this.init_tree_view_settings();
         this.init_page_title();
         this.init_page_help();
         this.init_page_header();
@@ -37,6 +38,18 @@ can.Control("CMS.Controllers.Dashboard", {
         this.init_info_pin();
       }.bind(this));
     }
+
+  , init_tree_view_settings: function () {
+    var valid_models = Object.keys(GGRC.tree_view.base_widgets_by_type),
+        saved_child_tree_display_list;
+    //only change the display list
+    can.each(valid_models, function (m_name) {
+      saved_child_tree_display_list = this.display_prefs.getChildTreeDisplayList(m_name);
+      if (saved_child_tree_display_list !== null) {
+        GGRC.tree_view.sub_tree_for[m_name].display_list = saved_child_tree_display_list;
+      }
+    }.bind(this));
+  }
 
   , init_page_title: function() {
       var page_title = null;
