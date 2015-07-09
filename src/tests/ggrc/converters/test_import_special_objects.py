@@ -10,6 +10,7 @@ from os.path import dirname
 from os.path import join
 from flask import json
 
+from ggrc.models import Audit
 from ggrc.models import Program
 from tests.ggrc import TestCase
 
@@ -36,10 +37,16 @@ class TestSpecialObjects(TestCase):
   def tearDown(self):
     pass
 
-  def test_program_audit(self):
+  def test_audit_imports(self):
+    """ this tests if the audit gets imported with a mapped program """
 
     filename = "program_audit.csv"
     response = self.import_file(filename)
+    self.assertEquals(2, Audit.query.count())
+    audit = Audit.query.filter(Audit.slug == "Aud-1").first()
+    program = Program.query.filter(Program.slug == "prog-1").first()
+    self.assertEquals(audit.program_id, program.id)
+
 
   def import_file(self, filename, dry_run=False):
     data = {"file": (open(join(CSV_DIR, filename)), filename)}

@@ -17,6 +17,7 @@ from ggrc.models import CustomAttributeValue
 from ggrc.models import CustomAttributeDefinition
 from ggrc.models import Option
 from ggrc.models import Person
+from ggrc.models import Program
 from ggrc.models import Relationship
 from ggrc.models.relationship import RelationshipHelper
 
@@ -400,6 +401,33 @@ class CheckboxColumnHandler(ColumnHandler):
     val = getattr(self.row_converter.obj, self.key, False)
     return "true" if val else "false"
 
+
+class ProgramColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    """ get a program from slugs """
+    new_objects = self.row_converter.block_converter.converter.new_objects
+    new_programs = new_objects[Program]
+    if self.raw_value == "":
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+      return None
+    slug = self.raw_value
+    if slug in new_programs:
+      program = new_programs[slug]
+    else:
+      program = Program.query.filter(Program.slug == slug).first()
+
+    if program is None:
+      self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
+
+    return program.id
+
+  def get_value(self):
+    val = getattr(self.row_converter.obj, self.key, False)
+    return "true" if val else "false"
+
+
+
 COLUMN_HANDLERS = {
     "contact": UserColumnHandler,
     "description": TextareaColumnHandler,
@@ -422,4 +450,5 @@ COLUMN_HANDLERS = {
     "test_plan": TextareaColumnHandler,
     "title": RequiredTextColumnHandler,
     "verify_frequency": OptionColumnHandler,
+    "program_id": ProgramColumnHandler,
 }

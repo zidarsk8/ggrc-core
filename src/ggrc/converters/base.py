@@ -83,7 +83,6 @@ class Converter(object):
     self.block_converters_from_csv()
     self.row_converters_from_csv()
     self.handle_priority_columns()
-    self.handle_row_data()
     self.import_objects()
     self.import_mappings()
 
@@ -131,6 +130,7 @@ class Converter(object):
 
   def import_objects(self):
     for converter in self.block_converters:
+      converter.handle_row_data()
       converter.import_objects()
 
   def import_mappings(self):
