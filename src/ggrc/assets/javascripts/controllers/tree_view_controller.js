@@ -206,7 +206,10 @@ can.Control("CMS.Controllers.TreeLoader", {
       return;
 
     var that = this
-      , refresh_queue = new RefreshQueue();
+      , refresh_queue = new RefreshQueue()
+      , sort_function
+      , original_function
+      , sort_prop;
 
     if(list) {
       list = list.length == null ? new can.Observe.List([list]) : list;
@@ -231,6 +234,24 @@ can.Control("CMS.Controllers.TreeLoader", {
         refresh_queue.enqueue(v.instance);
       }
     });
+
+    if (this.options.sort_property || this.options.sort_function) {
+      if (this.options.sort_function) {
+        original_function = this.options.sort_function;
+        sort_function = function(old_item, new_item) {
+          return original_function(old_item.instance, new_item.instance);
+        };
+      } else {
+        sort_prop = this.options.sort_property;
+        sort_function = function(old_item, new_item) {
+          return GGRC.Math.string_less_than(
+            old_item.instance[sort_prop],
+            new_item.instance[sort_prop]
+          );
+        };
+      }
+      temp_list.sort(sort_function);
+    }
 
     temp_list = can.map(temp_list, function(o) { if (o.instance.selfLink) return o; });
     this._draw_list_deferred = this.enqueue_items(temp_list);
@@ -961,21 +982,22 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       });
 
       if (sort_prop || sort_function) {
+        if (!sort_function) {
+          sort_function = function(old_item, new_item) {
+            return GGRC.Math.string_less_than(
+              old_item[sort_prop],
+              new_item[sort_prop]
+            );
+          }
+        }
+
         $items.each(function(i, item) {
-            var j, $item = $(item), compare;
+            var j, $item = $(item), compare,
+                new_item = $item.control().options.instance;
             for(j = $existing.length - 1; j >= 0; j--) {
               var old_item = $existing.eq(j).control().options.instance,
-                  new_item = $item.control().options.instance;
-              if (sort_function){
-                compare = sort_function(old_item, new_item);
-              }
-              else {
-                compare = GGRC.Math.string_less_than(
-                    old_item[sort_prop],
-                    new_item[sort_prop]
-                );
-              }
-              if (compare) {
+                  compare = sort_function(old_item, new_item);
+              if (compare < 0) {
                 $item.insertAfter($existing.eq(j));
                 $existing.splice(j + 1, 0, item);
                 return;
@@ -1199,11 +1221,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options.sort_function = function (val1, val2) {
         var a = val1.get_deep_property(key),
             b = val2.get_deep_property(key);
-
-        if (a !== b){
-          return (a < b) ^ (order !== 'asc');
+        if (a === b) {
+          return 0;
+        } else {
+          return ((a < b) ^ (order !== 'asc')) ? -1 : 1;
         }
-        return false;
       };
 
       this.options.sort_direction = order;
