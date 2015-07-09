@@ -71,6 +71,7 @@
       if (!GGRC.current_user) {
         return;
       }
+
       GGRC.Models.Search.search_for_types('', ['Workflow'], {contact_id: GGRC.current_user.id})
       .then(function(result_set){
           var wf_data = result_set.getResultsForType('Workflow');

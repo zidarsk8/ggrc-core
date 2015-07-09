@@ -7,7 +7,7 @@
 
 <h1 class="entities">
   {{#if_equals model.table_singular 'person'}}
-    {{#is_dashboard}}
+    {{#is_dashboard_or_all}}
       {{^system_role 'No Access'}}
         <button class="lhn-trigger">
           <span class="icon-bar"></span>
@@ -15,7 +15,11 @@
           <span class="icon-bar"></span>
         </button>
       {{/system_role}}
-      My Work
+      {{#is_dashboard}}
+        My Work
+      {{else}}
+        Object Browser
+      {{/is_dashboard}}
     {{else}}
       {{^system_role 'No Access'}}
         <button class="lhn-trigger pull-left">
@@ -28,7 +32,7 @@
         <i class="grciconlarge-{{model.table_singular}}"></i>
         {{firstnonempty instance.name instance.email}}
       </span>
-    {{/is_dashboard}}
+    {{/is_dashboard_or_all}}
   {{/if_equals}}
 
   {{^if_equals model.table_singular 'person'}}
@@ -85,6 +89,12 @@
         <a href="/dashboard">
           <i class="grcicon-my-work"></i>
           My Work ({{current_user.system_wide_role}})
+        </a>
+      </li>
+      <li>
+        <a href="/objectBrowser">
+          <i class="grcicon-search"></i>
+          Object Browser
         </a>
       </li>
       {{#current_user_is_admin}}

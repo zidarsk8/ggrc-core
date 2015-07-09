@@ -9,7 +9,7 @@
 
 <header class="header sticky tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
   <div class="row-fluid">
-    <div class="span4">
+    <div class="span{{display_options.title_width}}">
       <div class="title-heading oneline">
         <span class="widget-col-title" data-field="title">
           Task Title
@@ -20,7 +20,7 @@
 
     {{{> "/static/mustache/base_objects/tree_column_names.mustache"}}}
 
-    <div class="span4">
+    <div class="span{{display_options.action_width}}">
       <ul class="tree-action-list">
         <li class="filter-trigger">
           <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>

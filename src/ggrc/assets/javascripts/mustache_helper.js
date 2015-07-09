@@ -1787,6 +1787,13 @@ Mustache.registerHelper("is_dashboard", function (options) {
     return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("is_dashboard_or_all", function (options) {
+  if (/dashboard/.test(window.location) || /objectBrowser/.test(window.location))
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
 Mustache.registerHelper("is_profile", function (parent_instance, options) {
   var instance;
   if (options)

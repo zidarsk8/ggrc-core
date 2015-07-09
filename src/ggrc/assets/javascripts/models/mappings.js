@@ -536,13 +536,19 @@
           "Market", "OrgGroup", "Vendor", "Audit", "Issue", "ControlAssessment" //, "Request", "Response"
         ];
 
+        //checkfor window.location
+        if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
+          return GGRC.Models.Search.search_for_types("", types, {})
+            .pipe(function (mappings) {
+              return mappings.entries;
+            });
+        }
         return GGRC.Models.Search.search_for_types(
           "", types, {
             contact_id: binding.instance.id
-          }
-        ).pipe(function (mappings) {
-          return mappings.entries;
-        });
+          }).pipe(function (mappings) {
+            return mappings.entries;
+          });
       }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,ControlAssessment"),
       extended_related_programs_via_search: TypeFilter("related_objects_via_search", "Program"),
       extended_related_regulations_via_search: TypeFilter("related_objects_via_search", "Regulation"),
@@ -571,6 +577,12 @@
         });
       }, 'Request'),
       open_audit_requests: CustomFilter('audit_requests', function (result) {
+        return result.instance.status !== 'Accepted';
+      }),
+      all_audit_requests: Search(function (binding) {
+        return CMS.Models.Request.findAll({});
+      }),
+      all_open_audit_requests: CustomFilter('all_audit_requests', function (result) {
         return result.instance.status !== 'Accepted';
       })
     },
