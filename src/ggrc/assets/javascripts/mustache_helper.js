@@ -1704,11 +1704,7 @@ Mustache.registerHelper("infer_roles", function (instance, options) {
   }
   else {
     if (state.attr('roles').attr('length')) {
-      var result = [];
-      can.each(state.attr('roles'), function (role) {
-        result.push(options.fn(role));
-      });
-      return result.join('');
+      return options.fn(options.contexts.add(state.attr('roles').join(', ')));
     }
   }
 });
