@@ -85,11 +85,10 @@ class StatusColumnHandler(ColumnHandler):
     # TODO: check if mandatory and replace with default if it's wrong
     value = self.raw_value.lower()
     status = self.state_mappings.get(value)
-    if not status:
+    if status is None:
       self.add_warning(errors.WRONG_REQUIRED_VALUE,
                        value=value[:20],
                        column_name=self.display_name)
-    else:
       status = self.get_default()
     return status
 
