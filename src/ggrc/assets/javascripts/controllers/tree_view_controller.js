@@ -547,6 +547,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   },
 
   init : function(el, opts) {
+    this.element.closest(".widget").on("widget_hidden", this.widget_hidden.bind(this));
+    this.element.closest(".widget").on("widget_shown", this.widget_shown.bind(this));
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       this.display_prefs = display_prefs;
       this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
@@ -795,6 +797,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , draw_visible: _.debounce(function() {
+    if (this.element === null) {
+      return;
+    }
     var MAX_STEPS = 100,
         el_position = this.el_position.bind(this),
         children = this.element.children(),
@@ -1096,6 +1101,22 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.element.trigger('updateCount', this.options.list.length);
     }
 */
+
+  , widget_hidden: function(event) {
+    if (this.options.original_list) {
+      this.element.children('.cms_controllers_tree_view_node').remove();
+    }
+    return false;
+  }
+
+  , widget_shown: function(event) {
+    if (this.options.original_list) {
+      setTimeout(this.reload_list.bind(this), 0);
+    }
+    return false;
+  }
+
+
   , ".edit-object modal:success" : function(el, ev, data) {
     var model = el.closest("[data-model]").data("model");
     model.attr(data[model.constructor.root_object] || data);
@@ -1109,6 +1130,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.find_all_deferred = false;
     this.get_count_deferred = false;
     this.options.list.replace([]);
+    this._last_visible = [];
     this.element.children('.cms_controllers_tree_view_node').remove();
     this.draw_list(this.options.original_list);
     this.init_count();
