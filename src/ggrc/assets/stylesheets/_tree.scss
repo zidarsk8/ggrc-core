@@ -938,6 +938,11 @@ ul.new-tree {
 .inner-tree {
   ul.new-tree {
     margin-bottom: 0;
+    .tree-item-placeholder {
+      font-size: 13px;
+      height: 25px;
+      padding: 4px 60% 0 84px;
+    }
     li.tree-item {
       line-height: 28px;
       .generated-link {
