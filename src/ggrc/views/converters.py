@@ -45,7 +45,7 @@ def handle_export_request():
 
   data_grid, data = parse_export_request()
   query_helper = QueryHelper(data)
-  converter = Converter.from_ids(query_helper.get_ids())
+  converter = Converter(ids_by_type=query_helper.get_ids())
   csv_data = converter.to_array(data_grid)
   csv_string = generate_csv_string(csv_data)
 
@@ -83,7 +83,7 @@ def parse_import_request():
 
 def handle_import_request():
   dry_run, csv_data = parse_import_request()
-  converter = Converter.from_csv(dry_run, csv_data)
+  converter = Converter(dry_run=dry_run, csv_data=csv_data)
   converter.import_csv()
   response_data = converter.get_info()
   response_json = json.dumps(response_data)

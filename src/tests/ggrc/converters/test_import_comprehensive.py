@@ -186,11 +186,11 @@ class TestComprehensiveSheets(TestCase):
     # general numbers check
     for name, data in expected.items():
       current = indexed[name]
-      self.assertEquals(current["rows"], data["rows"])
-      self.assertEquals(current["ignored"], data["ignored"])
-      self.assertEquals(current["created"], data["created"])
-      self.assertEquals(len(current["row_errors"]), data["row_errors"])
-      self.assertEquals(len(current["row_warnings"]), data["row_warnings"])
+      self.assertEquals(current["rows"], data["rows"], name)
+      self.assertEquals(current["ignored"], data["ignored"], name)
+      self.assertEquals(current["created"], data["created"], name)
+      self.assertEquals(len(current["row_errors"]), data["row_errors"], name)
+      self.assertEquals(len(current["row_warnings"]), data["row_warnings"], name)
 
     prog = Program.query.filter_by(slug="prog-8").first()
     self.assertTrue(prog.private)

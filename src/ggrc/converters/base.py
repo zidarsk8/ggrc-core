@@ -4,12 +4,13 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from collections import defaultdict
-from itertools import product
 from itertools import chain
+from itertools import product
 
 from ggrc.converters import IMPORTABLE
-from ggrc.converters.import_helper import split_array
 from ggrc.converters.base_block import BlockConverter
+from ggrc.converters.import_helper import extract_relevant_data
+from ggrc.converters.import_helper import split_array
 
 
 class Converter(object):
@@ -26,33 +27,23 @@ class Converter(object):
       "ControlAssessment",
   ]
 
-  @classmethod
-  def from_csv(cls, dry_run, csv_data):
-    converter = Converter(dry_run=dry_run, csv_data=csv_data)
-    return converter
+  priortiy_colums = [
+      "email",
+      "slug",
+  ]
 
-  @classmethod
-  def from_ids(cls, data):
-    """ generate the converter form a list of objects and ids
-
-    Args:
-      data (list of tuples): List containing tuples with object_name and
-                             a list of ids for that object
-    """
-    object_map = {o.__name__: o for o in IMPORTABLE.values()}
-    converter = Converter()
-    for object_data in data:
-      object_class = object_map[object_data["object_name"]]
-      id_list = object_data.get("ids", [])
-      fields = object_data.get("fields")
-      block_converter = BlockConverter.from_ids(
-          converter, object_class, ids=id_list, fields=fields)
-      block_converter.ids_to_row_converters()
-      converter.block_converters.append(block_converter)
-
-    return converter
+  def __init__(self, **kwargs):
+    self.dry_run = kwargs.get("dry_run", True)
+    self.csv_data = kwargs.get("csv_data", [])
+    self.ids_by_type = kwargs.get("ids_by_type", [])
+    self.block_converters = []
+    self.new_objects = defaultdict(dict)
+    self.shared_state = {}
+    self.response_data = []
 
   def to_array(self, data_grid=False):
+    self.block_converters_from_ids()
+    self.handle_row_data()
     if data_grid:
       return self.to_data_grid()
     return self.to_block_array()
@@ -88,65 +79,67 @@ class Converter(object):
     grid_data = [list(chain(*i)) for i in product(*grid_blocks)]
     return [grid_header] + grid_data
 
-  def __init__(self, **kwargs):
-    self.dry_run = kwargs.get("dry_run", True)
-    self.csv_data = kwargs.get("csv_data", [])
-    self.block_converters = []
-    self.new_slugs = defaultdict(set)
-    self.new_emails = set()
-    self.shared_state = {}
-    self.response_data = []
-
   def import_csv(self):
-    self.generate_converters()
-    self.handle_priority_blocks()
-    self.generate_row_converters()
+    self.block_converters_from_csv()
+    self.row_converters_from_csv()
+    self.handle_priority_columns()
     self.import_objects()
-    self.gather_new_slugs()
     self.import_mappings()
 
-  def handle_priority_blocks(self):
-    self.handle_person_blocks()
+  def handle_priority_columns(self):
+    for attr_name in self.priortiy_colums:
+      for block_converter in self.block_converters:
+        block_converter.handle_row_data(attr_name)
 
-  def handle_person_blocks(self):
-    while (self.block_converters and
-           self.block_converters[0].object_class.__name__ == "Person"):
-      person_converter = self.block_converters.pop(0)
-      person_converter.generate_row_converters()
-      person_converter.import_objects()
-      _, self.new_emails = person_converter.get_new_values("email")
-      self.response_data.append(person_converter.get_info())
-
-  def generate_row_converters(self):
+  def handle_row_data(self):
     for converter in self.block_converters:
-      converter.generate_row_converters()
+      converter.handle_row_data()
 
-  def generate_converters(self):
+  def row_converters_from_csv(self):
+    for converter in self.block_converters:
+      converter.row_converters_from_csv()
+
+  def block_converters_from_ids(self):
+    """ fill the block_converters class variable
+
+    Generate block converters from a list of tuples with an object name and ids
+    """
+    object_map = {o.__name__: o for o in IMPORTABLE.values()}
+    for object_data in self.ids_by_type:
+      object_class = object_map[object_data["object_name"]]
+      object_ids = object_data.get("ids", [])
+      fields = object_data.get("fields")
+      block_converter = BlockConverter(self, object_class=object_class,
+                                       fields=fields, object_ids=object_ids)
+      block_converter.row_converters_from_ids()
+      self.block_converters.append(block_converter)
+
+  def block_converters_from_csv(self):
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
-      converter = BlockConverter.from_csv(self, data, offset)
-      self.block_converters.append(converter)
+      object_class = IMPORTABLE.get(data[1][0].strip().lower())
+      raw_headers, rows = extract_relevant_data(data)
+      block_converter = BlockConverter(self, object_class=object_class,
+                                       rows=rows, raw_headers=raw_headers,
+                                       offset=offset)
+      self.block_converters.append(block_converter)
 
     order = defaultdict(lambda: len(self.class_order))
     order.update({c: i for i, c in enumerate(self.class_order)})
     self.block_converters.sort(key=lambda x: order[x.name])
 
-  def gather_new_slugs(self):
-    for converter in self.block_converters:
-      object_class, slugs = converter.get_new_values("slug")
-      self.new_slugs[object_class].update(slugs)
-
   def import_objects(self):
     for converter in self.block_converters:
+      converter.handle_row_data()
       converter.import_objects()
 
   def import_mappings(self):
     for converter in self.block_converters:
-      converter.import_mappings(self.new_slugs)
+      converter.import_mappings(self.new_objects)
 
   def get_info(self):
     for converter in self.block_converters:
-      converter.import_mappings(self.new_slugs)
+      converter.import_mappings(self.new_objects)
       self.response_data.append(converter.get_info())
     return self.response_data
 

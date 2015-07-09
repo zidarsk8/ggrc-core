@@ -8,19 +8,15 @@ from collections import OrderedDict
 from flask import current_app
 
 from ggrc import db
-from ggrc.converters import IMPORTABLE
-from ggrc.converters.base_row import RowConverter
-from ggrc.converters.import_helper import get_object_column_definitions
-from ggrc.converters.import_helper import get_column_order
-from ggrc.converters.import_helper import extract_relevant_data
-from ggrc.converters.import_helper import generate_2d_array
-from ggrc.converters.utils import pretty_class_name
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
+from ggrc.converters.base_row import RowConverter
+from ggrc.converters.import_helper import get_column_order
+from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.services.common import get_modified_objects
 from ggrc.services.common import update_index
-from ggrc.services.common import update_memcache_before_commit
 from ggrc.services.common import update_memcache_after_commit
+from ggrc.services.common import update_memcache_before_commit
 
 
 CACHE_EXPIRY_IMPORT = 600
@@ -37,9 +33,9 @@ class BlockConverter(object):
     block_warnings (list of str): list containing blokc level import warnings
     row_errors (list of str): list containing row errors
     row_warnings (list of str): list containing row warnings
-    ids (list of int): list containing all ids for the converted objects
+    object_ids (list of int): list containing all ids for the converted objects
     rows (list of list of str): 2D array containg csv data
-    row_objects (list of RowConverter): list of row convertor objects with
+    row_converters (list of RowConverter): list of row convertor objects with
       data from the coresponding row in rows attribute
     headers (dict): A dictionary containing csv headers with additional
       information. Keys are object attributes such as "title", "slug"...
@@ -54,26 +50,6 @@ class BlockConverter(object):
             "valid_values": "list of valid values"
 
   """
-
-  @classmethod
-  def from_csv(cls, converter, csv_data, offset=0):
-    object_class = IMPORTABLE.get(csv_data[1][0].strip().lower())
-    if not object_class:
-      block_converter = BlockConverter(converter)
-      block_converter.add_errors(errors.WRONG_OBJECT_TYPE, line=offset + 2)
-      return block_converter
-    raw_headers, rows = extract_relevant_data(csv_data)
-    block_converter = BlockConverter(converter, object_class=object_class,
-                                     rows=rows, raw_headers=raw_headers,
-                                     offset=offset)
-
-    return block_converter
-
-  @classmethod
-  def from_ids(cls, converter, object_class, ids=[], fields="all"):
-    block_converter = BlockConverter(converter, object_class=object_class,
-                                     fields=fields, ids=ids)
-    return block_converter
 
   def get_unique_counts_dict(self, object_class):
     """ get a the varible for storing unique counts
@@ -90,28 +66,27 @@ class BlockConverter(object):
 
   def __init__(self, converter, **options):
     self.converter = converter
-    self.rows = options.get("rows", [])
     self.offset = options.get("offset", 0)
-    self.ids = options.get("ids", [])
-    self.object_class = options.get("object_class", )
+    self.object_class = options.get("object_class")
+    self.rows = options.get("rows", [])
+    self.object_ids = options.get("object_ids", [])
     self.block_errors = []
     self.block_warnings = []
     self.row_errors = []
     self.row_warnings = []
-    self.row_objects = []
     self.row_converters = []
-    if self.object_class:
-      self.object_headers = get_object_column_definitions(self.object_class)
-      all_header_names = map(unicode, self.get_header_names().keys())  # noqa
-      raw_headers = options.get("raw_headers", all_header_names)
-      self.headers = self.clean_headers(raw_headers)
-      self.unique_counts = self.get_unique_counts_dict(self.object_class)
-      self.name = self.object_class._inflector.human_singular.title()
-      self.ignore = False
-      self.organize_fields(options.get("fields", "all"))
-    else:
-      self.ignore = True
+    self.ignore = False
+    if not self.object_class:
+      self.add_errors(errors.WRONG_OBJECT_TYPE, line=self.offset + 2)
       self.name = ""
+      return
+    self.object_headers = get_object_column_definitions(self.object_class)
+    all_header_names = map(unicode, self.get_header_names().keys())  # noqa
+    raw_headers = options.get("raw_headers", all_header_names)
+    self.headers = self.clean_headers(raw_headers)
+    self.unique_counts = self.get_unique_counts_dict(self.object_class)
+    self.name = self.object_class._inflector.human_singular.title()
+    self.organize_fields(options.get("fields", "all"))
 
   def organize_fields(self, fields):
     if not fields or fields == "all":
@@ -180,7 +155,7 @@ class BlockConverter(object):
       if len(row) > index:
         row.pop(index)
 
-  def generate_row_converters(self):
+  def row_converters_from_csv(self):
     """ Generate a row converter object for every csv row """
     if self.ignore:
       return
@@ -189,20 +164,31 @@ class BlockConverter(object):
       row = RowConverter(self, self.object_class, row=row,
                          headers=self.headers, index=i)
       self.row_converters.append(row)
-    self.check_uniq_columns()
 
-  def ids_to_row_converters(self):
+  def row_converters_from_ids(self):
     """ Generate a row converter object for every csv row """
-    if self.ignore or not self.ids:
+    if self.ignore or not self.object_ids:
       return
     self.row_converters = []
     objects = self.object_class.query.filter(
-        self.object_class.id.in_(self.ids)).all()
+        self.object_class.id.in_(self.object_ids)).all()
     for i, obj in enumerate(objects):
       row = RowConverter(self, self.object_class, obj=obj,
                          headers=self.headers, index=i)
       self.row_converters.append(row)
-    self.check_uniq_columns()
+
+  def handle_row_data(self, field_list=None):
+    if self.ignore:
+      return
+    for row_converter in self.row_converters:
+      row_converter.handle_row_data(field_list)
+    if field_list is None:
+      self.check_mandatory_fields()
+      self.check_uniq_columns()
+
+  def check_mandatory_fields(self, counts=None):
+    for row_converter in self.row_converters:
+      row_converter.chect_mandatory_fields()
 
   def check_uniq_columns(self, counts=None):
     self.generate_unique_counts()
@@ -268,8 +254,12 @@ class BlockConverter(object):
     self.block_warnings.append(message)
 
   def get_new_values(self, key):
-    slugs = set([row.get_value(key) for row in self.row_converters])
-    return self.object_class, slugs
+    values = set([row.get_value(key) for row in self.row_converters])
+    return self.object_class, values
+
+  def get_new_objects(self):
+    objects = set([row.obj for row in self.row_converters])
+    return self.object_class, objects
 
   def generate_unique_counts(self):
     unique = [key for key, header in self.headers.items() if header["unique"]]

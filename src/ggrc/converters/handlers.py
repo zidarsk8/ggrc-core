@@ -17,6 +17,7 @@ from ggrc.models import CustomAttributeValue
 from ggrc.models import CustomAttributeDefinition
 from ggrc.models import Option
 from ggrc.models import Person
+from ggrc.models import Program
 from ggrc.models import Relationship
 from ggrc.models.relationship import RelationshipHelper
 
@@ -85,11 +86,10 @@ class StatusColumnHandler(ColumnHandler):
     # TODO: check if mandatory and replace with default if it's wrong
     value = self.raw_value.lower()
     status = self.state_mappings.get(value)
-    if not status:
+    if status is None:
       self.add_warning(errors.WRONG_REQUIRED_VALUE,
                        value=value[:20],
                        column_name=self.display_name)
-    else:
       status = self.get_default()
     return status
 
@@ -99,13 +99,13 @@ class UserColumnHandler(ColumnHandler):
   """ Handler for primary and secondary contacts """
 
   def get_person(self, email):
-    new_emails = self.row_converter.block_converter.converter.new_emails
-    if self.dry_run and email in new_emails:
-      return get_current_user()
+    new_objects = self.row_converter.block_converter.converter.new_objects
+    if email in new_objects[Person]:
+      return new_objects[Person].get(email)
     return Person.query.filter(Person.email == email).first()
 
   def parse_item(self):
-    email = self.raw_value
+    email = self.raw_value.lower()
     person = self.get_person(email)
     if not person and email != "":
       self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
@@ -125,7 +125,7 @@ class OwnerColumnHandler(UserColumnHandler):
     email_lines = self.raw_value.splitlines()
     owner_emails = filter(unicode.strip, email_lines)  # noqa
     for raw_line in owner_emails:
-      email = raw_line.strip()
+      email = raw_line.strip().lower()
       person = self.get_person(email)
       if person:
         owners.add(person)
@@ -170,6 +170,13 @@ class DateColumnHandler(ColumnHandler):
     if date:
       return date.strftime("%m/%d/%Y")
     return ""
+
+
+class EmailColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    """ emails are case insensitive """
+    return self.raw_value.lower()
 
 
 class TextColumnHandler(ColumnHandler):
@@ -230,7 +237,7 @@ class MappingColumnHandler(ColumnHandler):
     self.default = options.get("default")
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
-    self.new_slugs = row_converter.block_converter.converter.new_slugs[
+    self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
     self.dry_run = row_converter.block_converter.converter.dry_run
 
@@ -250,9 +257,9 @@ class MappingColumnHandler(ColumnHandler):
     return objects
 
   def set_obj_attr(self):
+    """ Create a new mapping object """
     if not self.value:
       return
-    """ Create a new mapping object """
     current_obj = self.row_converter.obj
     for obj in self.value:
       if not Relationship.find_related(current_obj, obj):
@@ -394,12 +401,40 @@ class CheckboxColumnHandler(ColumnHandler):
     val = getattr(self.row_converter.obj, self.key, False)
     return "true" if val else "false"
 
+
+class ProgramColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    """ get a program from slugs """
+    new_objects = self.row_converter.block_converter.converter.new_objects
+    new_programs = new_objects[Program]
+    if self.raw_value == "":
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+      return None
+    slug = self.raw_value
+    if slug in new_programs:
+      program = new_programs[slug]
+    else:
+      program = Program.query.filter(Program.slug == slug).first()
+
+    if program is None:
+      self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
+
+    return program.id
+
+  def get_value(self):
+    val = getattr(self.row_converter.obj, self.key, False)
+    return "true" if val else "false"
+
+
+
 COLUMN_HANDLERS = {
     "contact": UserColumnHandler,
     "description": TextareaColumnHandler,
     "end_date": DateColumnHandler,
     "kind": OptionColumnHandler,
     "link": TextColumnHandler,
+    "email": EmailColumnHandler,
     "means": OptionColumnHandler,
     "notes": TextareaColumnHandler,
     "owners": OwnerColumnHandler,
@@ -415,4 +450,5 @@ COLUMN_HANDLERS = {
     "test_plan": TextareaColumnHandler,
     "title": RequiredTextColumnHandler,
     "verify_frequency": OptionColumnHandler,
+    "program_id": ProgramColumnHandler,
 }
