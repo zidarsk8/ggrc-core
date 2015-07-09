@@ -253,10 +253,6 @@ can.Control("CMS.Controllers.TreeLoader", {
         this._loading_deferred = null;
         loading_deferred.resolve();
       }
-
-      // change inner tree title span4 into span8 class
-      $(".inner-tree > .tree-structure > .tree-item > .item-main").find(".row-fluid").find("[class*=span]:last").attr("class", "span8");
-
     }
 
   , enqueue_items: function(items) {
@@ -412,6 +408,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var display_options,
         display_width = 12,
         attr_count = this.options.display_attr_list.length,
+        nested = this.options.parent !== null,
         widths = {
           defaults: [4, 4, 4],
           0: [7, 1, 4],
@@ -419,6 +416,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           4: [3, 6, 3],
         },
         selected_widths = widths[attr_count] || widths.defaults;
+        if (nested) {
+          selected_widths[selected_widths.length - 1] = 8;
+        }
 
     display_options = {
       title_width: selected_widths[0],
