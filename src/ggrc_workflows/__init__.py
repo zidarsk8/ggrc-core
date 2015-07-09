@@ -183,23 +183,14 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
     current_user = get_current_user()
     workflow = obj.workflow
     obj.calculator = get_cycle_calculator(workflow)
-    old_ncsd = workflow.next_cycle_start_date
 
     if workflow.next_cycle_start_date:
-      base_date = old_ncsd
+      base_date = workflow.next_cycle_start_date
     else:
       base_date = date.today()
     build_cycle(obj, current_user=current_user, base_date=base_date)
 
-    # If start date falls into previous month (because 1/2 were
-    # weekend/holidays) we might might get back the same date - we therefore
-    # "force" base_date one time unit forward
-    new_ncsd = obj.calculator.next_cycle_start_date(base_date)
-    if workflow.recurrences and new_ncsd == old_ncsd:
-      base_date = base_date + obj.calculator.time_delta
-      new_ncsd = obj.calculator.next_cycle_start_date(base_date)
-
-    workflow.next_cycle_start_date = new_ncsd
+    adjust_next_cycle_start_date(obj.calculator, workflow)
     db.session.add(workflow)
 
 
@@ -592,17 +583,13 @@ def update_workflow_state(workflow):
       build_cycle(cycle, None, base_date=workflow.next_cycle_start_date)
       notification.handle_cycle_created(None, obj=cycle)
 
-    # If start date falls into previous month (because 1/2 were
-    # weekend/holidays) we might might get back the same date - we therefore
-    # "force" base_date one time unit forward
+    # If cycles were not generated already, recalculate start date with
+    # fresh start.
+    if not workflow.cycles:
+      workflow.next_cycle_start_date = None
+      workflow.non_adjusted_next_cycle_start_date = None
+    adjust_next_cycle_start_date(calculator, workflow)
 
-    old_ncsd = workflow.next_cycle_start_date
-    new_ncsd = calculator.next_cycle_start_date()
-    if old_ncsd == new_ncsd:
-      base_date = today + calculator.time_delta
-      new_ncsd = calculator.next_cycle_start_date(base_date)
-
-    workflow.next_cycle_start_date = new_ncsd
     db.session.add(workflow)
     db.session.flush()
     return
@@ -841,19 +828,8 @@ def start_recurring_cycles():
 
     # Update the workflow next_cycle_start_date to push it ahead based on the
     # frequency.
+    adjust_next_cycle_start_date(cycle.calculator, workflow)
 
-    # If start date falls into previous month (because 1/2 were
-    # weekend/holidays) we might might get back the same date - we therefore
-    # "force" base_date one time unit forward
-
-    old_ncsd = workflow.next_cycle_start_date
-    new_ncsd = cycle.calculator.next_cycle_start_date(base_date=old_ncsd)
-
-    if old_ncsd == new_ncsd:
-      base_date = today + cycle.calculator.time_delta
-      new_ncsd = cycle.calculator.next_cycle_start_date(base_date)
-
-    workflow.next_cycle_start_date = new_ncsd
     db.session.add(workflow)
 
     notification.handle_workflow_modify(None, workflow)
@@ -862,6 +838,20 @@ def start_recurring_cycles():
   db.session.commit()
   db.session.flush()
 
+
+def adjust_next_cycle_start_date(calculator, workflow, base_date=None):
+  """Sets new cycle start date
+
+  Args:
+    calculator: Calculator that should be used for calculations
+    workflow: Workflow that will have non adjusted and adjusted next cycle
+              start date adjusted.
+  """
+  if workflow.recurrences:
+    non_adjusted_ncsd = calculator.non_adjusted_next_cycle_start_date(
+      base_date=workflow.non_adjusted_next_cycle_start_date)
+    workflow.non_adjusted_next_cycle_start_date = non_adjusted_ncsd
+    workflow.next_cycle_start_date = calculator.adjust_date(non_adjusted_ncsd)
 
 class WorkflowRoleContributions(RoleContributions):
   contributions = {

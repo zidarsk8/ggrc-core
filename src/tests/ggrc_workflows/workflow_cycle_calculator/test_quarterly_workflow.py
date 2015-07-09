@@ -365,7 +365,7 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(cycle.end_date, date(2015, 8, 7)) # 8/8/2015 is Sat
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 1))
 
-  def test_when_start_date_got_adjusted_to_previous_month(self):
+  def test_start_date_got_adjusted_to_previous_month(self):
     """Test quarterly month calculating logic when start date got adjusted to previous month"""
 
     quarterly_wf = {
@@ -399,4 +399,17 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(cycle.end_date, date(2015, 10, 1))
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 9, 1))
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 30))
+
+    with freeze_time("2015-10-30 13:00"):
+      start_recurring_cycles()
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 2, 1))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id,
+        Cycle.start_date == date(2015, 10, 30)).one()
+
+      self.assertEqual(cycle.start_date, date(2015, 10, 30))
+      self.assertEqual(cycle.end_date, date(2015, 12, 30))

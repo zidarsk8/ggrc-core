@@ -134,6 +134,10 @@ class CycleCalculator(object):
     return min(tasks_start_dates), max(tasks_end_dates)
 
   def task_date_range(self, task, base_date=None):
+    start_date, end_date = self.non_adjusted_task_date_range(task, base_date)
+    return self.adjust_date(start_date), self.adjust_date(end_date)
+
+  def non_adjusted_task_date_range(self, task, base_date=None):
     """Calculates individual task's start and end date based on base_date.
 
     Taking base_date into account calculates individual task's start and
@@ -167,15 +171,17 @@ class CycleCalculator(object):
       end_day = end_day + self.time_delta
 
     # If both start day and end day have already happened we are
-    # operating on time unit.
+    # operating on next time unit.
     if start_day <= end_day < base_date:
       start_day = start_day + self.time_delta
       end_day = end_day + self.time_delta
 
-    # Before returning date object we adjust for holidays and weekends.
-    return self.adjust_date(start_day), self.adjust_date(end_day)
+    return start_day, end_day
 
   def next_cycle_start_date(self, base_date=None):
+    return self.adjust_date(self.non_adjusted_next_cycle_start_date(base_date))
+
+  def non_adjusted_next_cycle_start_date(self, base_date=None):
     """Calculates workflow's next cycle start date.
 
     Calculates workflow's next cycle start date based based on the minimum
@@ -238,13 +244,13 @@ class CycleCalculator(object):
     #
     # This is only relevant when we activate workflow and not afterwards.
     if base_date == today:
-      if self.adjust_date(min_start) > today and self.adjust_date(max_end) > today:
+      if min_start > today and max_end > today:
         base_date = base_date
       else:
         base_date = base_date + self.time_delta
     else:
       base_date = base_date + self.time_delta
 
-    return self.adjust_date(self.relative_day_to_date(
+    return self.relative_day_to_date(
       relative_day=min_rsd, relative_month=min_rsm,
-      base_date=base_date))
+      base_date=base_date)

@@ -14,7 +14,7 @@ class OneTimeCycleCalculator(CycleCalculator):
   we can return all values in their raw format (we don't need to adjust for
   holidays).
   """
-  def __init__(self, workflow):
+  def __init__(self, workflow, base_date=None):
     super(OneTimeCycleCalculator, self).__init__(workflow)
     self.tasks.sort(key=lambda t: self._date_normalizer(t.start_date))
 
