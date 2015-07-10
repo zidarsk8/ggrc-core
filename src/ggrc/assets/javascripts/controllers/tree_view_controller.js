@@ -707,6 +707,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
 
       if (this.options.mapping) {
+        if (this.options.parent_instance === undefined) {
+          // TODO investigate why is this method sometimes called twice
+          return; // not ready, will try again
+        }
         this.find_all_deferred =
           this.options.parent_instance.get_list_loader(this.options.mapping);
       } else if (this.options.list_loader) {
