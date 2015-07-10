@@ -154,11 +154,15 @@
         }, this);
 
         this.scope.attr("mapper.is_saving", true);
-        $.when.apply($, deffer).then(function () {
-          this.scope.attr("mapper.is_saving", false);
-          // TODO: Find proper way to dismiss the modal
-          this.element.find(".modal-dismiss").trigger("click");
-        }.bind(this));
+        $.when.apply($, deffer)
+          .fail(function (response, message) {
+            $("body").trigger("ajax:flash", {"error": message});
+          }.bind(this))
+          .always(function () {
+            this.scope.attr("mapper.is_saving", false);
+            // TODO: Find proper way to dismiss the modal
+            this.element.find(".modal-dismiss").trigger("click");
+          }.bind(this));
       },
       "setBinding": function () {
         if (this.scope.attr("mapper.search_only")) {
