@@ -469,7 +469,8 @@ can.Control("CMS.Controllers.InnerNav", {
 
     if (widget.length) {
       dashboard_controller.show_widget_area();
-      widget.siblings(':visible').hide().end().show();
+      widget.siblings(':visible').hide().trigger('widget_hidden');
+      widget.show().trigger('widget_shown');
       $("[href=" + panel_selector + "]")
         .closest("li").addClass("active")
         .siblings().removeClass("active");
