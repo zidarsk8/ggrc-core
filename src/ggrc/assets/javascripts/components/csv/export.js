@@ -17,7 +17,7 @@
         models: null,
         type: "Program",
         filter: "",
-        relevance: can.compute(function () {
+        relevant: can.compute(function () {
           return new can.List();
         }),
         columns: function () {
@@ -68,7 +68,7 @@
                   relevant_filter += " AND #__previous__,"+(index-2)+"#";
                 }
               } else {
-                relevant_filter = _.reduce(panel.relevance(),  function(query, el){
+                relevant_filter = _.reduce(panel.relevant(),  function(query, el){
                   return (query && query+" AND ")+"#"+el.model_name+","+el.filter.id+"#";
                 }, "")
               }
@@ -144,7 +144,29 @@
     tag: "export-panel",
     template: "<content></content>",
     scope: {
-      panel_number: "@"
+      panel_number: "@",
+      fetch_relevant_data: function (id, type) {
+        var dfd = GGRC.Models.Search.search_for_types(id, [type]),
+            que = new RefreshQueue();
+
+        dfd.then(function (response) {
+          var result = response.getResultsFor(url.relevant_type)[0];
+          que.enqueue(result).trigger().then(function (item) {
+            this.attr("item.relevant").push(new filterModel({
+              model_name: url.relevant_type,
+              value: url.relevant_id,
+              filter: result
+            }));
+          }.bind(this));
+        }.bind(this));
+      }
+    },
+    events: {
+      inserted: function () {
+        if (!+this.scope.attr("panel_number") && url.relevant_id && url.relevant_type) {
+          this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
+        }
+      }
     },
     helpers: {
       first_panel: function (options) {
@@ -156,63 +178,5 @@
     }
   });
 
-  can.Component.extend({
-    tag: "csv-relevance-filter",
-    template: "<content />",
-    scope: {
-      index: "@",
-      menu: can.compute(function () {
-        var type = this.attr("type"),
-            mappings = GGRC.Mappings.get_canonical_mappings_for(type);
-        return _.map(_.keys(mappings), function (mapping) {
-          return CMS.Models[mapping];
-        });
-      })
-    },
-    events: {
-      "inserted": function (el, ev) {
-        var index = +this.scope.attr("panel_number");
-
-        // TODO: This could be probably written nicer e.g. pass parametars in template?
-        if (index === 0 && url.relevant_id && url.relevant_type) {
-          var dfd = this.searchByType(url.relevant_id, url.relevant_type),
-              que = new RefreshQueue();
-
-          dfd.then(function (response) {
-            var result = response.getResultsFor(url.relevant_type)[0];
-            que.enqueue(result).trigger().then(function (item) {
-              this.scope.attr("relevance").push(new filterModel({
-                model_name: url.relevant_type,
-                value: url.relevant_id,
-                filter: result
-              }));
-            }.bind(this));
-          }.bind(this));
-        }
-      },
-      "searchByType": function (id, type) {
-        return GGRC.Models.Search.search_for_types(id, [type]);
-      },
-      ".add-filter-rule click": function (el, ev) {
-        ev.preventDefault();
-        this.scope.attr("relevance").push(new filterModel({
-          value: "",
-          filter: new can.Map(),
-          model_name: this.scope.attr("menu")[0].model_singular
-        }));
-      },
-      ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
-        var index = el.data("index"),
-            panel = this.scope.attr("relevance")[index];
-
-        panel.attr("filter", data.item);
-      },
-      ".remove_filter click": function (el) {
-        this.scope.attr("relevance").splice(el.data("index"), 1);
-      }
-    }
-  });
-
-  $("#csv_export").html(can.view(GGRC.mustache_path +
-                                 "/import_export/export.mustache", {}));
+  $("#csv_export").html(can.view(GGRC.mustache_path + "/import_export/export.mustache", {}));
 })(window.can, window.can.$);

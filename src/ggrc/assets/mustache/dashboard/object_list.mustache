@@ -37,7 +37,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
 
@@ -49,7 +49,7 @@
             </a>
           </div>
         </div>
-        
+
         {{#description}}
         <div class="show-description">
           <div class="row-fluid">
@@ -62,7 +62,7 @@
           </div>
         </div>
         {{/description}}
-        
+
         {{{render '/static/mustache/base_objects/contacts.mustache' instance=this}}}
         {{#url}}
         <div class="row-fluid">
@@ -90,7 +90,7 @@
         href="javascript://"
         rel="tooltip"
         data-placement="left"
-        data-toggle="modal-relationship-selector"
+        data-toggle="unified-mapper"
         data-modal-class="modal-wide"
         data-modal-reset="reset"
         data-original-title="Map {{model.title_singular}} to this {{parent_instance.class.shortName}}"

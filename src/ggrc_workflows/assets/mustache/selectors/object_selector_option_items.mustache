@@ -22,30 +22,33 @@
                       <i class="grcicon-private"></i>
                     </span>
                   {{/if_helpers}}
-                  {{instance.title}}
+                  {{firstexist instance.name instance.title}}
                   <span class="url-link">
-                    {{instance.link}}
+                    {{firstexist instance.email instance.link}}
                   </span>
                 </div>
               </div>
 
               <div class="span1">
                 <div class="object-check" align="left">
-                  {{#if mappings.length}}
-                    {{#has_pending_removal selected_object instance}}
-                      <input type="checkbox" value="{{instance.title}}" class="object-check-single">
+                  <input
+                    type="checkbox"
+                    value="{{instance.title}}"
+                    data-id="{{instance.id}}"
+                    class="object-check-single {{#if isloading}}disabled{{/if}}"
+
+                    {{#if mapper.is_saving}}disabled="true"{{/if}}
+                    {{#if select_all}}checked{{/if}}
+                    {{#if mappings.length}}
+                      {{#result_direct_mappings bindings_compute selected_object}}
+                        checked disabled="true"
+                      {{/result_direct_mappings}}
                     {{else}}
-                    {{#result_direct_mappings bindings_compute selected_object}}
-                      <input type="checkbox" value="{{instance.title}}" checked="checked" disabled="true" class="object-check-single">
-                    {{/result_direct_mappings}}
-                    {{/has_pending_addition}}
-                  {{else}}
-                    {{#has_pending_addition selected_object instance}}
-                      <input type="checkbox" value="{{instance.title}}" checked="checked" disabled="true" class="object-check-single">
-                    {{else}}
-                      <input type="checkbox" value="{{instance.title}}" class="object-check-single">
-                    {{/has_pending_addition}}
-                  {{/if}}
+                      {{#has_pending_addition selected_object instance}}
+                        checked disabled="true"
+                      {{/has_pending_addition}}
+                    {{/if}}
+                  >
                 </div>
               </div>
             </div>

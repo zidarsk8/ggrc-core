@@ -19,17 +19,9 @@
             <div class="span8">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-                {{#if instance.name}}
-                  {{instance.name}}
-                {{else}}
-                  {{instance.title}}
-                {{/if}}
+                {{firstexist instance.name instance.title}}
                 <span class="url-link">
-                {{#if instance.email}}
-                  {{instance.email}}
-                {{else}}
-                  {{instance.link}}
-                {{/if}}
+                {{firstexist instance.email instance.link}}
                 </span>
               </div>
             </div> <!-- span8 end -->

@@ -142,27 +142,26 @@
         {{^list.length}}
           <span class="gray"><em>No mapped objects</em></span>
         {{/list.length}}
-        {{#prune_context}}
-          <div class="objective-selector">
-            <div style="clear:both">
-              <br>
-               <a class="section-add section-sticky btn btn-small btn-draft"
-                 href="javascript://" rel="tooltip"
-                 {{#instance}}{{data 'join-object'}}{{/instance}}
-                 data-placement="left"
-                 data-toggle="multitype-object-modal-selector"
-                 data-deferred="true"
-                 data-object-source="true"
-                 data-join-mapping="business_objects"
-                 data-join-object-id="{{instance.id}}"
-                 data-join-object-type="{{instance.class.model_singular}}"
-                 {{#if_instance_of instance 'DocumentationResponse'}}data-exclude-option-types="Document"{{/if_instance_of}}
-                 data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6">
-                Map Objects
-              </a>
-            </div>
+
+        <div class="objective-selector">
+          <div style="clear:both">
+            <br>
+             <a class="section-add section-sticky btn btn-small btn-draft"
+               href="javascript://" rel="tooltip"
+               {{data "deferred_to"}}
+               data-placement="left"
+               data-toggle="unified-mapper"
+               data-deferred="true"
+               data-object-source="true"
+               data-join-mapping="business_objects"
+               data-join-object-id="{{instance.id}}"
+               data-join-object-type="{{instance.class.model_singular}}"
+               {{#if_instance_of instance 'DocumentationResponse'}}data-exclude-option-types="Document"{{/if_instance_of}}
+               data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6">
+              Map Objects
+            </a>
           </div>
-        {{/prune_context}}
+        </div>
       </ggrc-modal-connector>
     </div>
   </div>

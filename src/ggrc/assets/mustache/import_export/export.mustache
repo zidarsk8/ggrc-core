@@ -74,14 +74,10 @@
 
               {{#if export.data_grid}}
                 {{#if_equals panel_number 0}}
-                  <csv-relevance-filter type="export.type" panel_number="panel_number" relevance="item.relevance">
-                    {{> /static/mustache/import_export/export/relevance.mustache}}
-                  </csv-relevance-filter>
+                  <relevant-filter type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
                 {{/if}}
               {{else}}
-                <csv-relevance-filter type="export.type" panel_number="panel_number" relevance="item.relevance">
-                  {{> /static/mustache/import_export/export/relevance.mustache}}
-                </csv-relevance-filter>
+                <relevant-filter type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
               {{/if}}
             </export-panel>
           </div>

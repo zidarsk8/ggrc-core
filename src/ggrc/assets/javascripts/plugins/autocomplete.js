@@ -119,26 +119,24 @@
 
         select: function(ev, ui) {
           var original_event,
-            that = this,
-            $this = $(this),
-            ctl = $this.data($this.data("autocomplete-widget-name")).options.controller
-          ;
+              $this = $(this),
+              ctl = $this.data($this.data("autocomplete-widget-name")).options.controller;
 
           if (ui.item) {
             $this.trigger("autocomplete:select", [ui]);
             if (ctl.scope && ctl.scope.autocomplete_select) {
-              return ctl.scope.autocomplete_select($(this), ev, ui);
+              return ctl.scope.autocomplete_select($this, ev, ui);
             } else if (ctl.autocomplete_select) {
-              return ctl.autocomplete_select($(this), ev, ui);
+              return ctl.autocomplete_select($this, ev, ui);
             }
 
           } else {
             original_event = ev;
             $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
-              ctl.autocomplete_select($(that), original_event, {
+              ctl.autocomplete_select($this, original_event, {
                 item: new_obj
               });
-              $(that).trigger("modal:success", new_obj);
+              $this.trigger("modal:success", new_obj);
             }).one("hidden", function() {
               setTimeout(function() {
                 $(this).off(".autocomplete");

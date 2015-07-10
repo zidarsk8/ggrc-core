@@ -92,8 +92,7 @@ dashboard-js-files:
   - models/section.js
   - models/system.js
   - models/join_models.js
-  - controllers/modal_selector_controller.js
-  - controllers/advanced_search_controller.js
+  - controllers/mapper.js
   - pbc/workflow_controller.js
   - models/category.js
   - models/refresh_queue.js
@@ -107,8 +106,10 @@ dashboard-js-files:
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   - components/link_to_clipboard.js
+  - components/relevant_filters.js
   - components/csv/import.js
   - components/csv/export.js
+  - components/mapper.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -215,6 +216,8 @@ dashboard-js-template-files:
   - modals/save_cancel_buttons.mustache
   - modals/save_cancel_delete_buttons.mustache
   - modals/unmap_cancel_buttons.mustache
+  - modals/mapper/component.mustache
+  - modals/mapper/base.mustache
   - objectives/info.mustache
   - objectives/list_popover.mustache
   - objectives/modal_content.mustache
@@ -337,8 +340,7 @@ dashboard-js-template-files:
   - import_export/export/object_selector.mustache
   - import_export/export/attribute_selector.mustache
   - import_export/export/filter_query.mustache
-  - import_export/export/relevance.mustache
-
+  - mapper/relevant_filter.mustache
 
 
 dashboard-css-files:
