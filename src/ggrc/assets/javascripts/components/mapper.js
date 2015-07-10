@@ -34,6 +34,7 @@
       },
       types: can.compute(function () {
         var selector_list = GGRC.Mappings.get_canonical_mappings_for(this.object),
+            forbidden = ["workflow", "taskgroup", "gdrivefolder", "context"],
             groups = {
               "all_objects": {
                 name: "All Objects",
@@ -58,7 +59,7 @@
             };
 
         can.each(selector_list, function (model, model_name) {
-          if (!model_name || ~["workflow"].indexOf(model_name.toLowerCase())) {
+          if (!model_name || ~forbidden.indexOf(model_name.toLowerCase())) {
             return;
           }
           var cms_model = CMS.Models[model_name],
