@@ -216,6 +216,7 @@ dashboard-js-template-files:
   - modals/save_cancel_buttons.mustache
   - modals/save_cancel_delete_buttons.mustache
   - modals/unmap_cancel_buttons.mustache
+  - modals/mapper/component.mustache
   - modals/mapper/base.mustache
   - objectives/info.mustache
   - objectives/list_popover.mustache

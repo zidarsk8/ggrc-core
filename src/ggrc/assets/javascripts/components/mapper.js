@@ -10,6 +10,8 @@
   var MapperModel = can.Map({
       type: "AllObject", // We set default as All Object
       contact: {},
+      deferred: "@",
+      deferred_to: "@",
       term: "",
       object: "",
       model: {},
@@ -79,7 +81,7 @@
 
   can.Component.extend({
     tag: "modal-mapper",
-    template: "<content />",
+    template: can.view(GGRC.mustache_path + "/modals/mapper/base.mustache"),
     scope: function (attrs, parentScope, el) {
       var $el = $(el),
           data = {};
@@ -103,11 +105,32 @@
         this.setModel();
         this.setBinding();
       },
+      "defferedSave": function () {
+        var data = {
+              multi_map: true,
+              arr: _.map(this.scope.attr("mapper.selected"), function (desination) {
+                    var inst = _.find(this.scope.attr("mapper.entries"), function (entry) {
+                      return entry.instance.id === desination.id;
+                    });
+                    if (inst) {
+                      return inst.instance;
+                    }
+                  }.bind(this))
+            };
+        this.scope.attr("deferred_to").controller.element.trigger("deffer:add", [data, {map_and_save: true}]);
+        // TODO: Find proper way to dismiss the modal
+        this.element.find(".modal-dismiss").trigger("click");
+      },
       ".modal-footer .btn-map click": function (el, ev) {
         ev.preventDefault();
         if (el.hasClass("disabled")) {
           return;
         }
+        // TODO: Figure out nicer / proper way to handle deferred save
+        if (this.scope.attr("deferred")) {
+          return this.defferedSave();
+        }
+
         var instance = GGRC.page_instance(),
             mapping = GGRC.Mappings.get_canonical_mapping(this.scope.attr("mapper.object"), this.scope.attr("mapper.type")),
             Model = CMS.Models[mapping.model_name],
@@ -122,13 +145,14 @@
           id: instance.id
         };
 
-        this.scope.attr("mapper.is_saving", true);
         _.each(this.scope.attr("mapper.selected"), function (desination) {
+          var modelInstance;
           data[mapping.option_attr] = desination;
-          var modelInstance = new Model(data);
-
+          modelInstance = new Model(data);
           deffer.push(modelInstance.save());
-        });
+        }, this);
+
+        this.scope.attr("mapper.is_saving", true);
         $.when.apply($, deffer).then(function () {
           this.scope.attr("mapper.is_saving", false);
           // TODO: Find proper way to dismiss the modal
@@ -284,9 +308,11 @@
             }
             var selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
                 mapper = this.scope.mapper.model_from_type(model.type),
-                binding = selected.get_binding(mapper.plural.toLowerCase()),
-                bindings = this.scope.attr("mapper.bindings");
+                binding, bindings = this.scope.attr("mapper.bindings");
 
+            if (selected.has_binding(mapper.plural.toLowerCase())) {
+              binding = selected.get_binding(mapper.plural.toLowerCase());
+            }
             if (bindings[model.id]) {
               return _.extend(bindings[model.id], {
                 selected_object: selected
@@ -377,15 +403,15 @@
   function (ev) {
     ev.preventDefault();
     var btn = $(ev.currentTarget),
-        data = btn.data(),
+        data = {},
         isSearch = /unified-search/ig.test(data.toggle);
 
     btn.data("tooltip").hide();
-    _.each(data, function (val, key) {
+    _.each(btn.data(), function (val, key) {
       data[can.camelCaseToUnderscore(key)] = val;
-      delete data[key];
     });
-    GGRC.Controllers.ModalSelector.launch($(this), _.extend({
+
+    GGRC.Controllers.MapperModal.launch($(this), _.extend({
       "object": btn.data("join-object-type"),
       "type": btn.data("join-option-type"),
       "join-id": btn.data("join-object-id"),

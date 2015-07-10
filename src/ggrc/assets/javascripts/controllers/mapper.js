@@ -6,9 +6,9 @@
 */
 
 (function(can, $) {
-  can.Control("GGRC.Controllers.ModalSelector", {
+  can.Control("GGRC.Controllers.MapperModal", {
     defaults: {
-      base_modal_view: GGRC.mustache_path + "/modals/mapper/base.mustache"
+      component: GGRC.mustache_path + "/modals/mapper/component.mustache"
     },
     launch: function ($trigger, options) {
       var href = $trigger.attr("data-href") || $trigger.attr("href"),
@@ -21,9 +21,7 @@
     }
   }, {
     init: function() {
-      can.view(this.options.base_modal_view, this.options, function (frag) {
-        $(this.element).html(frag);
-      }.bind(this));
+      this.element.html(can.view(this.options.component, this.options));
     }
   });
 

@@ -163,7 +163,6 @@
     },
     events: {
       inserted: function () {
-        console.log("THIS SCOPE", this);
         if (!+this.scope.attr("panel_number") && url.relevant_id && url.relevant_type) {
           this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }

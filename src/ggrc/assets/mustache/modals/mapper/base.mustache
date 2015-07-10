@@ -5,199 +5,197 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-<modal-mapper search-only="{{search-only}}" object="{{object}}" type="{{type}}" join-object-id="{{join-id}}">
-  <div class="modal-header">
-    <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
-      <i class="grcicon-x-grey"></i>
-    </a>
-    <h2>
-      {{#if mapper.search_only}}
-      Search
-      {{else}}
-      Map object {{^if_equals mapper.type "AllObject"}}to {{mapper.type}}{{/if}}
-      {{/if}}
-    </h2>
-  </div>
-  <div class="modal-filter modal-body choose-object-wrap">
-    <div class="row-fluid add-button">
-      <div class="span12">
-        <div class="pull-right">
-          {{#if_helpers "\
-            ^if_equals" mapper.type "AllObject" "\
-            and ^if" mapper.search_only}}
-            <a
-               class="btn btn-small btn-draft"
-               href="javascript://"
-               data-toggle="modal-ajax-form"
-               data-modal-class="modal-wide"
-               data-object-singular="{{mapper.model.singular}}"
-               data-object-plural="{{mapper.model.plural}}"
-               data-join-object-id="{{mapper.join_object_id}}"
-            >
-              <i class="grcicon-add-black"></i>
-              Create New {{mapper.type}}
-            </a>
-          {{/if_helpers}}
-        </div>
-      </div>
-    </div>
-    <div class="row-fluid">
-      <div class="span4">
-        <h6>Object type</h6>
-        <select class="input-block-level" can-value="mapper.type" name="type-select">
-          {{#each mapper.types}}
-            {{#if items}}
-              {{#if items.length}}
-              <optgroup label="{{name}}">
-                {{#each items}}
-                  {{#if name}}
-                  <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
-                  {{/if}}
-                {{/each}}
-              </optgroup>
-              {{/if}}
-            {{else}}
-              {{#if name}}
-              <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
-              {{/if}}
-            {{/if}}
-          {{/each}}
-        </select>
-      </div>
-      <div class="span4">
-        <div class="modal-search">
-          <h6>Matching terms</h6>
-          <div class="modal-search objective-selector">
-            <input id="search" class="input-block-level" placeholder="Enter text to search..." can-value="mapper.term" type="text" autofocus>
-          </div>
-        </div>
-      </div>
-      <div class="span4">
-        <h6>Filter by owner or contact</h6>
-        <div class="modal-search objective-selector">
-            {{#mapper.contact}}
-            <input
-              id="search-by-owner"
-              class="search-by-owner input-block-level"
-              placeholder="Find owner or contact"
-              type="text"
-              name="contact"
-              value="{{firstnonempty name email title}}"
-              data-lookup="Person"
-              data-template="/people/autocomplete_result.mustache"
-              null-if-empty="null-if-empty"
-              {{ autocomplete_select }}
-            >
-            {{/mapper.contact}}
-        </div>
-      </div>
-    </div>
-    <div class="relevance-filters">
-      <div class="row-fluid">
-        <div class="span12">
-          <relevant-filter type="mapper.type" relevant="mapper.relevant"></relevant-filter>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <mapper-results
-      is-loading="mapper.is_loading"
-      object="mapper.object"
-      entries="mapper.entries"
-      mapper="mapper"
-      types="mapper.types"
-      type="mapper.type"
-      selected="mapper.selected"
-      contact="mapper.contact"
-      term="mapper.term"
-    items-per-page="20">
-    <div class="filter-actions wrap-modal-spacing">
-      <div class="row-fluid">
-        <div class="span12">
-          <a class="btn btn-small btn-info pull-right modalSearchButton" href="javascript://">
-            Search
-          </a>
-        </div>
-      </div>
-    </div>
-    <div class="results modal-custom-spacing">
-      <div class="results-num">
-        <div class="row-fluid">
-          <div class="span9">
-            <strong>
-              {{ entries.length }} Objects found
-            </strong>
-          </div>
-          <div class="span3">
-            {{^if mapper.search_only}}
-            <div class="pull-right check-all">
-              <label {{#if loading_or_saving}}class="disabled"{{/if}}
-                rel="tooltip"
-                data-placement="right"
-                data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria."
-              >
-                Select all
-                <input type="checkbox" can-value="mapper.all_selected" class="object-check-all"
-                  {{#if loading_or_saving}}disabled="true"{{/if}}
-                  {{#if mapper.all_selected}}checked="checked"{{/if}}
-                >
-              </label>
-            </div>
-            {{/if}}
-          </div>
-        </div>
-      </div>
-      <div class="results-wrap">
-        <ul class="result-tree tree-structure new-tree">
-          {{#if mapper.search_only}}
-            {{> /static/mustache/search/advanced_search_option_items.mustache}}
-          {{else}}
-            {{> /static/mustache/selectors/object_selector_option_items.mustache}}
-          {{/if}}
-        </ul>
-        {{#if page_loading}}
-          <div class="row-fluid clearfix">
-            <span {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
-          </div>
-        {{/if}}
-      </div>
-    </div>
-  </mapper-results>
-  <div class="modal-footer">
-    {{^if mapper.search_only}}
-    <div class="row-fluid">
-      <div class="span6">
-        <div class="deny-buttons"></div>
-      </div>
-      <div class="span6">
-        <div class="confirm-buttons">
-          <span>
-            {{#if mapper.is_loading }}
-              <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
-            {{else}}
-              {{mapper.selected.length}}
-            {{/if}}
-            objects selected
-          </span>
-          <a class="
-              {{#if_helpers '\
-                ^if' mapper.selected.length '\
-                or #if' mapper.is_loading '\
-                or #if' mapper.is_saving}}
-                disabled
-              {{/if_helpers}}
-              btn-map btn btn-small btn-success preventdoubleclick" href="#">
-            {{#if mapper.is_saving}}
-              <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
-              Saving
-            {{else}}
-              Add Selected
-            {{/if}}
-          </a>
-        </div>
-      </div>
-    </div>
+<div class="modal-header">
+  <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
+    <i class="grcicon-x-grey"></i>
+  </a>
+  <h2>
+    {{#if mapper.search_only}}
+    Search
+    {{else}}
+    Map object{{^if_equals mapper.type "AllObject"}} to {{mapper.type}}{{/if}}
     {{/if}}
+  </h2>
+</div>
+<div class="modal-filter modal-body choose-object-wrap">
+  <div class="row-fluid add-button">
+    <div class="span12">
+      <div class="pull-right">
+        {{#if_helpers "\
+          ^if_equals" mapper.type "AllObject" "\
+          and ^if" mapper.search_only}}
+          <a
+             class="btn btn-small btn-draft"
+             href="javascript://"
+             data-toggle="modal-ajax-form"
+             data-modal-class="modal-wide"
+             data-object-singular="{{mapper.model.singular}}"
+             data-object-plural="{{mapper.model.plural}}"
+             data-join-object-id="{{mapper.join_object_id}}"
+          >
+            <i class="grcicon-add-black"></i>
+            Create New {{mapper.type}}
+          </a>
+        {{/if_helpers}}
+      </div>
+    </div>
   </div>
-</modal-mapper>
+  <div class="row-fluid">
+    <div class="span4">
+      <h6>Object type</h6>
+      <select class="input-block-level" can-value="mapper.type" name="type-select">
+        {{#each mapper.types}}
+          {{#if items}}
+            {{#if items.length}}
+            <optgroup label="{{name}}">
+              {{#each items}}
+                {{#if name}}
+                <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
+                {{/if}}
+              {{/each}}
+            </optgroup>
+            {{/if}}
+          {{else}}
+            {{#if name}}
+            <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
+            {{/if}}
+          {{/if}}
+        {{/each}}
+      </select>
+    </div>
+    <div class="span4">
+      <div class="modal-search">
+        <h6>Matching terms</h6>
+        <div class="modal-search objective-selector">
+          <input id="search" class="input-block-level" placeholder="Enter text to search..." can-value="mapper.term" type="text" autofocus>
+        </div>
+      </div>
+    </div>
+    <div class="span4">
+      <h6>Filter by owner or contact</h6>
+      <div class="modal-search objective-selector">
+          {{#mapper.contact}}
+          <input
+            id="search-by-owner"
+            class="search-by-owner input-block-level"
+            placeholder="Find owner or contact"
+            type="text"
+            name="contact"
+            value="{{firstnonempty name email title}}"
+            data-lookup="Person"
+            data-template="/people/autocomplete_result.mustache"
+            null-if-empty="null-if-empty"
+            {{ autocomplete_select }}
+          >
+          {{/mapper.contact}}
+      </div>
+    </div>
+  </div>
+  <div class="relevance-filters">
+    <div class="row-fluid">
+      <div class="span12">
+        <relevant-filter type="mapper.type" relevant="mapper.relevant"></relevant-filter>
+      </div>
+    </div>
+  </div>
+</div>
+
+<mapper-results
+    is-loading="mapper.is_loading"
+    object="mapper.object"
+    entries="mapper.entries"
+    mapper="mapper"
+    types="mapper.types"
+    type="mapper.type"
+    selected="mapper.selected"
+    contact="mapper.contact"
+    term="mapper.term"
+  items-per-page="20">
+  <div class="filter-actions wrap-modal-spacing">
+    <div class="row-fluid">
+      <div class="span12">
+        <a class="btn btn-small btn-info pull-right modalSearchButton" href="javascript://">
+          Search
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="results modal-custom-spacing">
+    <div class="results-num">
+      <div class="row-fluid">
+        <div class="span9">
+          <strong>
+            {{ entries.length }} Objects found
+          </strong>
+        </div>
+        <div class="span3">
+          {{^if mapper.search_only}}
+          <div class="pull-right check-all">
+            <label {{#if loading_or_saving}}class="disabled"{{/if}}
+              rel="tooltip"
+              data-placement="right"
+              data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria."
+            >
+              Select all
+              <input type="checkbox" can-value="mapper.all_selected" class="object-check-all"
+                {{#if loading_or_saving}}disabled="true"{{/if}}
+                {{#if mapper.all_selected}}checked="checked"{{/if}}
+              >
+            </label>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+    <div class="results-wrap">
+      <ul class="result-tree tree-structure new-tree">
+        {{#if mapper.search_only}}
+          {{> /static/mustache/search/advanced_search_option_items.mustache}}
+        {{else}}
+          {{> /static/mustache/selectors/object_selector_option_items.mustache}}
+        {{/if}}
+      </ul>
+      {{#if page_loading}}
+        <div class="row-fluid clearfix">
+          <span {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</mapper-results>
+<div class="modal-footer">
+  {{^if mapper.search_only}}
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="deny-buttons"></div>
+    </div>
+    <div class="span6">
+      <div class="confirm-buttons">
+        <span>
+          {{#if mapper.is_loading }}
+            <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
+          {{else}}
+            {{mapper.selected.length}}
+          {{/if}}
+          objects selected
+        </span>
+        <a class="
+            {{#if_helpers '\
+              ^if' mapper.selected.length '\
+              or #if' mapper.is_loading '\
+              or #if' mapper.is_saving}}
+              disabled
+            {{/if_helpers}}
+            btn-map btn btn-small btn-success preventdoubleclick" href="#">
+          {{#if mapper.is_saving}}
+            <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
+            Saving
+          {{else}}
+            Add Selected
+          {{/if}}
+        </a>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+</div>
