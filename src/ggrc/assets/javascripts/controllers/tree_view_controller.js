@@ -955,25 +955,35 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var that = this
       , current_list = can.makeArray(list)
       , list_window = []
-      , all_draw_items_dfds = []
       , final_dfd
+      , queue = []
+      , op_id = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1
       ;
-
-    //Recursively define tree views anywhere we have subtree configs.
-    function queue_window(list_window) {
-      all_draw_items_dfds.push(that.draw_items(list_window));
-    }
 
     can.each(current_list, function(item) {
       list_window.push(item);
       if (list_window.length >= 20) {
-        queue_window(list_window);
+        queue.push(list_window);
         list_window = [];
       }
     });
-    if (list_window.length > 0)
-      queue_window(list_window);
-    final_dfd = $.when.apply($, all_draw_items_dfds);
+    if (list_window.length > 0) {
+      queue.push(list_window);
+    }
+
+    final_dfd = _.foldl(queue, function(dfd, list_window) {
+      return dfd.then(function (all_draw_items) {
+        if (that._add_child_lists_id !== op_id) {
+          return dfd;
+        }
+        var res = $.Deferred();
+        setTimeout(function(){
+          res.resolve(that.draw_items(list_window));
+        }, 0);
+        return res;
+      });
+    }, new $.Deferred().resolve());
+
     final_dfd.done(this._ifNotRemoved(function() {
       this.element.parent().find(".sticky").Stickyfill();
     }.bind(this)));
