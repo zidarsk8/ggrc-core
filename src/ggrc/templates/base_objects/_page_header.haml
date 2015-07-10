@@ -36,6 +36,12 @@
       %i.grcicon-imp-exp
       %span
         Import
+  %li
+    %a{ 'href': '/objectBrowser' }
+      %i.grcicon-search
+      %span
+        All Objects
+
   %li.user.dropdown
     %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
       %i.grcicon-user-black
@@ -50,7 +56,7 @@
       %li
         %a{'href': "/objectBrowser"}
           %i.grcicon-search
-          Object Browser
+          All Objects
       -if permissions.is_allowed_read('/admin', None, 1)
         %li
           %a{'href': "/admin#people_list_widget"}
