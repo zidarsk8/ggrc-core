@@ -172,10 +172,10 @@
             selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
             binding;
 
-        if (table_plural === "allobjects") {
+        table_plural = (selected.has_binding(table_plural) ? "" : "related_") + table_plural;
+        if (!selected.has_binding(table_plural)) {
           return;
         }
-        table_plural = (selected.has_binding(table_plural) ? "" : "related_") + table_plural;
         binding = selected.get_binding(table_plural);
         binding.refresh_list().then(function (mappings) {
           can.each(mappings, function (mapping) {
@@ -187,7 +187,7 @@
         var type = this.scope.attr("mapper.type"),
             types = this.scope.attr("mapper.types");
 
-        if (~["All Object", "AllObject"].indexOf("All Object")) {
+        if (~["All Object", "AllObject"].indexOf(type)) {
           return this.scope.attr("mapper.model", types["all_objects"]);
         }
         this.scope.attr("mapper.model", this.scope.mapper.model_from_type(type));
@@ -315,13 +315,13 @@
                 mapper = this.scope.mapper.model_from_type(model.type),
                 binding, bindings = this.scope.attr("mapper.bindings");
 
-            if (selected.has_binding(mapper.plural.toLowerCase())) {
-              binding = selected.get_binding(mapper.plural.toLowerCase());
-            }
             if (bindings[model.id]) {
               return _.extend(bindings[model.id], {
                 selected_object: selected
               });
+            }
+            if (selected.has_binding(mapper.plural.toLowerCase())) {
+              binding = selected.get_binding(mapper.plural.toLowerCase());
             }
             return {
               instance: model,
