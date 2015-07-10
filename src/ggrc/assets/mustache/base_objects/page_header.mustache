@@ -18,7 +18,7 @@
       {{#is_dashboard}}
         My Work
       {{else}}
-        Object Browser
+        All Objects
       {{/is_dashboard}}
     {{else}}
       {{^system_role 'No Access'}}
@@ -78,6 +78,14 @@
       </span>
     </a>
   </li>
+  <li>
+    <a href="/objectBrowser">
+      <i class="grcicon-search"></i>
+      <span>
+        All Objects
+      </span>
+    </a>
+  </li>
   <li class="user user-dropdown dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
       <i class="grcicon-user-black"></i>
@@ -94,7 +102,7 @@
       <li>
         <a href="/objectBrowser">
           <i class="grcicon-search"></i>
-          Object Browser
+          All Objects
         </a>
       </li>
       {{#current_user_is_admin}}
