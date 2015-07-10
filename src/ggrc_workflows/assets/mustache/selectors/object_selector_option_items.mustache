@@ -22,17 +22,9 @@
                       <i class="grcicon-private"></i>
                     </span>
                   {{/if_helpers}}
-                  {{#if instance.name}}
-                    {{instance.name}}
-                  {{else}}
-                    {{instance.title}}
-                  {{/if}}
+                  {{firstexist instance.name instance.title}}
                   <span class="url-link">
-                    {{#if instance.email}}
-                      {{instance.email}}
-                    {{else}}
-                      {{instance.link}}
-                    {{/if}}
+                    {{firstexist instance.email instance.link}}
                   </span>
                 </div>
               </div>
