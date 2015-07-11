@@ -39,8 +39,6 @@ class RowConverter(object):
 
   def handle_csv_row_data(self, field_list=None):
     """ Pack row data with handlers """
-    if len(self.headers) != len(self.row):
-      raise Exception("Error: element count does not match header count")
     handle_fields = self.headers if field_list is None else field_list
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
       if attr_name not in handle_fields or attr_name in self.attrs:
@@ -51,7 +49,6 @@ class RowConverter(object):
         self.objects[attr_name] = item
       else:
         self.attrs[attr_name] = item
-        item.set_value()
       if attr_name in ("slug", "email"):
         self.obj = self.get_or_generate_object(attr_name)
         item.set_obj_attr()
