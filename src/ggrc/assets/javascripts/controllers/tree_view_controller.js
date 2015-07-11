@@ -451,6 +451,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   },
 
   init_child_tree_display: function (model) {
+    if (!GGRC.page_object) //Admin dashboard
+      return;
+
     //Set child tree options
     var model_name = model.model_singular,
         child_tree_model_list = [], w_list, sub_tree,

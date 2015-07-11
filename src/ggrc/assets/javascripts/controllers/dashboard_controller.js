@@ -40,6 +40,9 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , init_tree_view_settings: function () {
+    if (!GGRC.page_object) //Admin dashboard
+      return;
+
     var valid_models = Object.keys(GGRC.tree_view.base_widgets_by_type),
         saved_child_tree_display_list;
     //only change the display list
