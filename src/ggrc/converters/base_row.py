@@ -45,7 +45,7 @@ class RowConverter(object):
         continue
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
-      if attr_name.startswith("map:"):
+      if header_dict.get("type") is not None:
         self.objects[attr_name] = item
       else:
         self.attrs[attr_name] = item
@@ -57,7 +57,7 @@ class RowConverter(object):
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, **header_dict)
-      if attr_name.startswith("map:"):
+      if header_dict.get("type") is not None:
         self.objects[attr_name] = item
       else:
         self.attrs[attr_name] = item
@@ -168,7 +168,7 @@ class RowConverter(object):
   def to_array(self, fields):
     row = []
     for field in fields:
-      if field.startswith("map"):
+      if self.headers[field].get("type") is not None:
         row.append(self.objects[field].get_value() or "")
       else:
         row.append(self.attrs[field].get_value() or "")
