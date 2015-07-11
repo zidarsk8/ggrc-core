@@ -257,6 +257,9 @@ class MappingColumnHandler(ColumnHandler):
     return objects
 
   def set_obj_attr(self):
+    self.set_value()
+
+  def insert_object(self):
     """ Create a new mapping object """
     if not self.value:
       return

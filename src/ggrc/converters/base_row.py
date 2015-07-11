@@ -23,7 +23,7 @@ class RowConverter(object):
     self.index = options.get("index", -1)
     self.row = options.get("row", [])
     self.attrs = {}
-    self.mappings = {}
+    self.objects = {}
     offset = 3  # 2 header rows and 1 for 0 based index
     self.line = self.index + self.block_converter.offset + offset
     self.headers = options.get("headers", [])
@@ -48,10 +48,10 @@ class RowConverter(object):
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
       if attr_name.startswith("map:"):
-        self.mappings[attr_name] = item
+        self.objects[attr_name] = item
       else:
-        item.set_value()
         self.attrs[attr_name] = item
+        item.set_value()
       if attr_name in ("slug", "email"):
         self.obj = self.get_or_generate_object(attr_name)
         item.set_obj_attr()
@@ -61,7 +61,7 @@ class RowConverter(object):
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, **header_dict)
       if attr_name.startswith("map:"):
-        self.mappings[attr_name] = item
+        self.objects[attr_name] = item
       else:
         self.attrs[attr_name] = item
 
@@ -87,8 +87,7 @@ class RowConverter(object):
     return self.object_class.query.filter_by(**{key: value}).first()
 
   def get_value(self, key):
-    key_set = self.mappings if key.startswith("map:") else self.attrs
-    item = key_set.get(key)
+    item = self.attrs.get(key) or self.objects.get(key)
     if item:
       return item.value
     return None
@@ -126,11 +125,11 @@ class RowConverter(object):
 
     return obj
 
-  def setup_mappings(self, slugs_dict):
+  def setup_secondary_objects(self, slugs_dict):
     if not self.obj or self.ignore:
       return
-    for mapping in self.mappings.values():
-      mapping.set_value()
+    for mapping in self.objects.values():
+      mapping.set_obj_attr()
 
   def setup_object(self):
     """ Set the object values or relate object values
@@ -163,17 +162,17 @@ class RowConverter(object):
     for handler in self.attrs.values():
       handler.insert_object()
 
-  def insert_mapping(self):
+  def insert_secondary_objecs(self):
     if not self.obj or self.ignore:
       return
-    for mapping in self.mappings.values():
-      mapping.set_obj_attr()
+    for mapping in self.objects.values():
+      mapping.insert_object()
 
   def to_array(self, fields):
     row = []
     for field in fields:
       if field.startswith("map"):
-        row.append(self.mappings[field].get_value() or "")
+        row.append(self.objects[field].get_value() or "")
       else:
         row.append(self.attrs[field].get_value() or "")
     return row
