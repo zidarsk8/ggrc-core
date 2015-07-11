@@ -31,3 +31,4 @@ COMMIT_MSG
 \.diff$
 .*\.swp$
 .*\.pyc
+node_modules
