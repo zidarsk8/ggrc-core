@@ -12,6 +12,8 @@ from flask import json
 
 from ggrc.models import Audit
 from ggrc.models import Program
+from ggrc.models import Person
+from ggrc_basic_permissions.models import UserRole
 from tests.ggrc import TestCase
 
 THIS_ABS_PATH = abspath(dirname(__file__))
@@ -41,12 +43,26 @@ class TestSpecialObjects(TestCase):
     """ this tests if the audit gets imported with a mapped program """
 
     filename = "program_audit.csv"
-    response = self.import_file(filename)
+    self.import_file(filename)
     self.assertEquals(2, Audit.query.count())
     audit = Audit.query.filter(Audit.slug == "Aud-1").first()
     program = Program.query.filter(Program.slug == "prog-1").first()
     self.assertEquals(audit.program_id, program.id)
 
+  def test_program_roles_imports(self):
+    """ this tests if the audit gets imported with a mapped program """
+
+    filename = "program_audit.csv"
+    self.import_file(filename)
+    self.assertEquals(2, Program.query.count())
+    program = Program.query.filter(Program.slug == "prog-1").first()
+    p1_roles = UserRole.query.filter_by(context_id=program.context_id,
+                                        role_id=1).all()  # 1 = ProgramOwner
+    owner_ids = [r.person_id for r in p1_roles]
+    owners = Person.query.filter(Person.id.in_(owner_ids)).all()
+    owner_emails = set([o.email for o in owners])
+    expected_owners = set(["user1@example.com", "user11@example.com"])
+    self.assertEqual(owner_emails, expected_owners)
 
   def import_file(self, filename, dry_run=False):
     data = {"file": (open(join(CSV_DIR, filename)), filename)}

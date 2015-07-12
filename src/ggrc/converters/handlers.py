@@ -253,7 +253,7 @@ class MappingColumnHandler(ColumnHandler):
 
   def insert_object(self):
     """ Create a new mapping object """
-    if not self.value:
+    if self.dry_run or not self.value:
       return
     current_obj = self.row_converter.obj
     for obj in self.value:
@@ -305,7 +305,7 @@ class CustomAttributeColumHandler(TextColumnHandler):
       self.row_converter.obj.custom_attribute_values.append(self.value)
 
   def insert_object(self):
-    if self.value is None:
+    if self.dry_run or self.value is None:
       return
     self.value.attributable_type = self.row_converter.obj.__class__.__name__
     self.value.attributable_id = self.row_converter.obj.id
@@ -425,6 +425,80 @@ class ProgramColumnHandler(ColumnHandler):
     return "true" if val else "false"
 
 
+class ProgramOwnerColumnHandler(UserColumnHandler):
+
+  def parse_item(self):
+    owners = set()
+    email_lines = self.raw_value.splitlines()
+    owner_emails = filter(unicode.strip, email_lines)  # noqa
+    for raw_line in owner_emails:
+      email = raw_line.strip().lower()
+      person = self.get_person(email)
+      if person:
+        owners.add(person)
+      else:
+        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+
+    if not owners:
+      self.add_warning(errors.OWNER_MISSING)
+      owners.add(get_current_user())
+
+    return list(owners)
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    emails = [owner.email for owner in self.row_converter.obj.owners]
+    return "\n".join(emails)
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    from ggrc_basic_permissions.models import UserRole
+    from ggrc_basic_permissions.models import Role
+    role = Role.query.filter_by(name="ProgramOwner").one()
+    UserRole.query.filter_by(
+      role_id=role.id, context_id=self.row_converter.obj.context_id).delete()
+    for owner in self.value:
+      user_role = UserRole(
+        role_id=role.id,
+        context_id=self.row_converter.obj.context_id,
+        person_id=owner.id
+      )
+      db.session.add(user_role)
+    db.session.flush()
+
+
+
+class ProgramEditorColumnHandler(UserColumnHandler):
+
+  def parse_item(self):
+    pass
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    pass
+
+  def insert_object(self):
+    pass
+
+class ProgramReaderColumnHandler(UserColumnHandler):
+
+  def parse_item(self):
+    pass
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    pass
+
+  def insert_object(self):
+    pass
+
 COLUMN_HANDLERS = {
     "contact": UserColumnHandler,
     "description": TextareaColumnHandler,
@@ -435,7 +509,9 @@ COLUMN_HANDLERS = {
     "means": OptionColumnHandler,
     "notes": TextareaColumnHandler,
     "owners": OwnerColumnHandler,
-    "program_owner": OwnerColumnHandler,
+    "program_owner": ProgramOwnerColumnHandler,
+    "program_editor": ProgramEditorColumnHandler,
+    "program_reader": ProgramReaderColumnHandler,
     "private": CheckboxColumnHandler,
     "report_end_date": DateColumnHandler,
     "report_start_date": DateColumnHandler,

@@ -162,8 +162,8 @@ class RowConverter(object):
   def insert_secondary_objecs(self):
     if not self.obj or self.ignore:
       return
-    for mapping in self.objects.values():
-      mapping.insert_object()
+    for secondery_object in self.objects.values():
+      secondery_object.insert_object()
 
   def to_array(self, fields):
     row = []
