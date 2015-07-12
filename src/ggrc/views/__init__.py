@@ -42,6 +42,8 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
 
 # Needs to be secured as we are removing @login_required
+
+
 @app.route("/_background_tasks/reindex", methods=["POST"])
 @queued_task
 def reindex(_):
@@ -108,13 +110,13 @@ def get_attributes_json():
     published.append(publish_representation(publish(attr)))
   return as_json(published)
 
+
 def get_all_attributes_json():
   """Get a list of all attribute definitions
 
   This exports all attributes related to a given model, including custom
   attributies and mapping attributes, that are used in csv import and export.
   """
-  attrs = models.CustomAttributeDefinition.eager_query().all()
   published = {}
   for model in all_models.all_models:
     published[model.__name__] = get_object_column_json(model)
@@ -160,12 +162,14 @@ def dashboard():
   """
   return render_template("dashboard/index.haml")
 
+
 @app.route("/objectBrowser")
 @login_required
 def objectBrowser():
   """The object Browser page
   """
   return render_template("dashboard/index.haml")
+
 
 def generate_query_chunks(query):
   """Generate query chunks used by pagination"""
@@ -252,10 +256,12 @@ def all_object_views():
 
 def init_extra_views(_):
   """Init any extra views needed by the app
-     Currently, init_extra_views is only used by
-     extensions, but this is here for completeness.
+
+  This should be used for any views that might use extension modules.
   """
-  pass
+  mockups.init_mockup_views()
+  filters.init_filter_views()
+  converters.init_converter_views()
 
 
 def init_all_views(app):
@@ -282,8 +288,3 @@ def user_permissions():
      logged in user
   '''
   return get_permissions_json()
-
-
-mockups.init_mockup_views()
-filters.init_filter_views()
-converters.init_converter_views()
