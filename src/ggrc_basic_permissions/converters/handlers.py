@@ -62,17 +62,23 @@ class UserRoleColumnHandler(UserColumnHandler):
 
 class ProgramOwnerColumnHandler(UserRoleColumnHandler):
 
-  role_id = Role.query.filter_by(name="ProgramOwner").one().id
+  def __init__(self, row_converter, key, **options):
+    self.role_id = Role.query.filter_by(name="ProgramOwner").one().id
+    super(self.__class__, self).__init__(row_converter, key, **options)
 
 
 class ProgramEditorColumnHandler(UserRoleColumnHandler):
 
-  role_id = Role.query.filter_by(name="ProgramEditor").one().id
+  def __init__(self, row_converter, key, **options):
+    self.role_id = Role.query.filter_by(name="ProgramEditor").one().id
+    super(self.__class__, self).__init__(row_converter, key, **options)
 
 
 class ProgramReaderColumnHandler(UserRoleColumnHandler):
 
-  role_id = Role.query.filter_by(name="ProgramReader").one().id
+  def __init__(self, row_converter, key, **options):
+    self.role_id = Role.query.filter_by(name="ProgramReader").one().id
+    super(self.__class__, self).__init__(row_converter, key, **options)
 
 
 COLUMN_HANDLERS = {
