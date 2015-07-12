@@ -24,6 +24,7 @@ class RowConverter(object):
     self.row = options.get("row", [])
     self.attrs = {}
     self.objects = {}
+    self.id_key = ""
     offset = 3  # 2 header rows and 1 for 0 based index
     self.line = self.index + self.block_converter.offset + offset
     self.headers = options.get("headers", [])
@@ -31,6 +32,10 @@ class RowConverter(object):
   def add_error(self, template, **kwargs):
     message = template.format(line=self.line, **kwargs)
     self.block_converter.row_errors.append(message)
+    new_objects = self.block_converter.converter.new_objects[self.object_class]
+    key = self.get_value(self.id_key)
+    if key in new_objects:
+      del new_objects[key]
     self.ignore = True
 
   def add_warning(self, template, **kwargs):
@@ -50,6 +55,7 @@ class RowConverter(object):
       else:
         self.attrs[attr_name] = item
       if attr_name in ("slug", "email"):
+        self.id_key = attr_name
         self.obj = self.get_or_generate_object(attr_name)
         item.set_obj_attr()
 

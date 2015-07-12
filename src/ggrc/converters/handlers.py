@@ -417,9 +417,10 @@ class ProgramColumnHandler(ColumnHandler):
 
     if program is None:
       self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
+      return None
 
     return program.id
 
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
-    return "true" if val else "false"
+    return val.slug
