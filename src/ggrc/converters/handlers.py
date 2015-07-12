@@ -435,6 +435,7 @@ COLUMN_HANDLERS = {
     "means": OptionColumnHandler,
     "notes": TextareaColumnHandler,
     "owners": OwnerColumnHandler,
+    "program_owner": OwnerColumnHandler,
     "private": CheckboxColumnHandler,
     "report_end_date": DateColumnHandler,
     "report_start_date": DateColumnHandler,
