@@ -59,12 +59,6 @@ def get_custom_attributes_definitions(object_class):
   return definitions
 
 
-def update_definition(definition, values_dict):
-  for key, value in values_dict.items():
-    if key in definition:
-      definition[key] = value
-
-
 def get_unique_constraints(object_class):
   """ Return a set of attribute names for single unique columns """
   constraints = object_class.__table__.constraints
@@ -94,7 +88,7 @@ def get_object_column_definitions(object_class):
         "description": "",
     }
     if type(value) is dict:
-      update_definition(definition, value)
+      definition.update(value)
     definitions[key] = definition
 
   custom_attr_def = get_custom_attributes_definitions(object_class)
