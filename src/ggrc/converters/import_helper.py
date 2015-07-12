@@ -9,9 +9,9 @@ from StringIO import StringIO
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc.utils import get_mapping_rules
-from ggrc.converters.handlers import COLUMN_HANDLERS
 from ggrc.converters import COLUMN_ORDER
 from ggrc.converters import handlers
+from ggrc.converters.column_handlers import COLUMN_HANDLERS
 from ggrc.converters.utils import pretty_name
 from ggrc.models.reflection import AttributeInfo
 
@@ -33,6 +33,7 @@ def get_mapping_definitions(object_class):
         "default": None,
         "unique": False,
         "description": "",
+        "type": "mapping",
     }
 
   return definitions
@@ -53,15 +54,9 @@ def get_custom_attributes_definitions(object_class):
         "default": None,
         "unique": False,
         "description": "",
-        "custom": True,
+        "type": "custom",
     }
   return definitions
-
-
-def update_definition(definition, values_dict):
-  for key, value in values_dict.items():
-    if key in definition:
-      definition[key] = value
 
 
 def get_unique_constraints(object_class):
@@ -93,7 +88,7 @@ def get_object_column_definitions(object_class):
         "description": "",
     }
     if type(value) is dict:
-      update_definition(definition, value)
+      definition.update(value)
     definitions[key] = definition
 
   custom_attr_def = get_custom_attributes_definitions(object_class)
@@ -108,7 +103,7 @@ def get_object_column_json(object_class):
   definitions = get_object_column_definitions(object_class)
   for attr_name, attr_info in definitions.items():
     for key, value in attr_info.items():
-      if type(value) not in (unicode, str, int, long, bool, None):
+      if type(value) not in (unicode, str, int, long, bool, None):  # noqa
         del definitions[attr_name][key]
   order = get_column_order(definitions.keys())
   result = []
@@ -156,7 +151,7 @@ def generate_csv_string(csv_data):
 
 def extract_relevant_data(csv_data):
   """ Split csv data into data and metadata """
-  striped_data = [map(unicode.strip, line) for line in csv_data]
+  striped_data = [map(unicode.strip, line) for line in csv_data]  # noqa
   transpose_data = zip(*striped_data[1:])
   non_empty = filter(any, transpose_data)
   data = zip(*non_empty[1:])

@@ -6,10 +6,10 @@
 
 import json
 from flask import render_template, request, flash, redirect
-from ggrc.views import base_context
 
 
 def gdrive_context():
+  from ggrc.views import base_context
   ctx = base_context()
   def instance_json():
     return "null"

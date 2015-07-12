@@ -208,6 +208,8 @@ class TestCustomAttributesDefinitions(TestCase):
         "Notes",
         "Privacy",
         "Owner",
+        "Reader",
+        "Editor",
         "Primary Contact",
         "Secondary Contact",
         "Program URL",
@@ -252,6 +254,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Notes",
         "Privacy",
         "Owner",
+        "Reader",
+        "Editor",
         "Primary Contact",
         "Secondary Contact",
         "Program URL",
@@ -267,6 +271,8 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["mandatory"])
     self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
+    self.assertIn("type", vals["Owner"])
+    self.assertEquals(vals["Owner"]["type"], "user_role")
 
   def test_audit_definitions(self):
     """ test default headers for Audit """

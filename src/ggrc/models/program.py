@@ -34,8 +34,22 @@ class Program(HasObjectState, CustomAttributable, Documentable,
   ]
   _include_links = []
   _aliases = {
-    "url": "Program URL",
-    "private": "Privacy",
+      "url": "Program URL",
+      "private": "Privacy",
+      "owners": None,
+      "program_owner": {
+          "display_name": "Owner",
+          "mandatory": True,
+          "type": "user_role",
+      },
+      "program_editor": {
+          "display_name": "Editor",
+          "type": "user_role",
+      },
+      "program_reader": {
+          "display_name": "Reader",
+          "type": "user_role",
+      }
   }
 
   @classmethod

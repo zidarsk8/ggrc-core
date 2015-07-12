@@ -84,7 +84,7 @@ class Converter(object):
     self.row_converters_from_csv()
     self.handle_priority_columns()
     self.import_objects()
-    self.import_mappings()
+    self.import_secondary_objects()
 
   def handle_priority_columns(self):
     for attr_name in self.priortiy_colums:
@@ -133,13 +133,13 @@ class Converter(object):
       converter.handle_row_data()
       converter.import_objects()
 
-  def import_mappings(self):
+  def import_secondary_objects(self):
     for converter in self.block_converters:
-      converter.import_mappings(self.new_objects)
+      converter.import_secondary_objects(self.new_objects)
 
   def get_info(self):
     for converter in self.block_converters:
-      converter.import_mappings(self.new_objects)
+      converter.import_secondary_objects(self.new_objects)
       self.response_data.append(converter.get_info())
     return self.response_data
 

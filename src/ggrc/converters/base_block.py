@@ -211,13 +211,13 @@ class BlockConverter(object):
 
     return info
 
-  def import_mappings(self, slugs_dict):
+  def import_secondary_objects(self, slugs_dict):
     for row_converter in self.row_converters:
-      row_converter.setup_mappings(slugs_dict)
+      row_converter.setup_secondary_objects(slugs_dict)
 
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
-        row_converter.insert_mapping()
+        row_converter.insert_secondary_objecs()
       self.save_import()
 
   def import_objects(self):

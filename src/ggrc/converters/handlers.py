@@ -35,6 +35,7 @@ class ColumnHandler(object):
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
     self.dry_run = row_converter.block_converter.converter.dry_run
+    self.set_value()
 
   def set_value(self):
     self.value = self.parse_item()
@@ -228,18 +229,9 @@ class MappingColumnHandler(ColumnHandler):
     self.key = key
     self.mapping_name = key[4:]  # remove "map:" prefix
     self.mapping_object = IMPORTABLE.get(self.mapping_name)
-    self.row_converter = row_converter
-    self.key = key
-    self.value = None
-    self.raw_value = options.get("raw_value")
-    self.validator = options.get("validator")
-    self.mandatory = options.get("mandatory", False)
-    self.default = options.get("default")
-    self.description = options.get("description", "")
-    self.display_name = options.get("display_name", "")
     self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
-    self.dry_run = row_converter.block_converter.converter.dry_run
+    super(MappingColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
@@ -257,8 +249,11 @@ class MappingColumnHandler(ColumnHandler):
     return objects
 
   def set_obj_attr(self):
+    self.value = self.parse_item()
+
+  def insert_object(self):
     """ Create a new mapping object """
-    if not self.value:
+    if self.dry_run or not self.value:
       return
     current_obj = self.row_converter.obj
     for obj in self.value:
@@ -278,6 +273,9 @@ class MappingColumnHandler(ColumnHandler):
           self.mapping_object.id.in_(related_ids))
       related_slugs = [o.slug for o in related_objects]
     return "\n".join(related_slugs)
+
+  def set_value(self):
+    pass
 
 
 types = CustomAttributeDefinition.ValidTypes
@@ -307,7 +305,7 @@ class CustomAttributeColumHandler(TextColumnHandler):
       self.row_converter.obj.custom_attribute_values.append(self.value)
 
   def insert_object(self):
-    if self.value is None:
+    if self.dry_run or self.value is None:
       return
     self.value.attributable_type = self.row_converter.obj.__class__.__name__
     self.value.attributable_id = self.row_converter.obj.id
@@ -425,30 +423,3 @@ class ProgramColumnHandler(ColumnHandler):
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
     return "true" if val else "false"
-
-
-
-COLUMN_HANDLERS = {
-    "contact": UserColumnHandler,
-    "description": TextareaColumnHandler,
-    "end_date": DateColumnHandler,
-    "kind": OptionColumnHandler,
-    "link": TextColumnHandler,
-    "email": EmailColumnHandler,
-    "means": OptionColumnHandler,
-    "notes": TextareaColumnHandler,
-    "owners": OwnerColumnHandler,
-    "private": CheckboxColumnHandler,
-    "report_end_date": DateColumnHandler,
-    "report_start_date": DateColumnHandler,
-    "secondary_contact": UserColumnHandler,
-    "secondary_assessor": UserColumnHandler,
-    "principal_assessor": UserColumnHandler,
-    "slug": SlugColumnHandler,
-    "start_date": DateColumnHandler,
-    "status": StatusColumnHandler,
-    "test_plan": TextareaColumnHandler,
-    "title": RequiredTextColumnHandler,
-    "verify_frequency": OptionColumnHandler,
-    "program_id": ProgramColumnHandler,
-}
