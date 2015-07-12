@@ -8,9 +8,13 @@ from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters.handlers import UserColumnHandler
 from ggrc.login import get_current_user
+from ggrc_basic_permissions.models import Role
+from ggrc_basic_permissions.models import UserRole
 
 
-class ProgramOwnerColumnHandler(UserColumnHandler):
+class UserRoleColumnHandler(UserColumnHandler):
+
+  role_id = -1
 
   def parse_item(self):
     owners = set()
@@ -37,17 +41,18 @@ class ProgramOwnerColumnHandler(UserColumnHandler):
     emails = [owner.email for owner in self.row_converter.obj.owners]
     return "\n".join(emails)
 
+  def remove_current_roles(self):
+    UserRole.query.filter_by(
+        role_id=self.role_id,
+        context_id=self.row_converter.obj.context_id).delete()
+
   def insert_object(self):
     if self.dry_run or not self.value:
       return
-    from ggrc_basic_permissions.models import UserRole
-    from ggrc_basic_permissions.models import Role
-    role = Role.query.filter_by(name="ProgramOwner").one()
-    UserRole.query.filter_by(
-        role_id=role.id, context_id=self.row_converter.obj.context_id).delete()
+    self.remove_current_roles()
     for owner in self.value:
       user_role = UserRole(
-          role_id=role.id,
+          role_id=self.role_id,
           context_id=self.row_converter.obj.context_id,
           person_id=owner.id
       )
@@ -55,34 +60,20 @@ class ProgramOwnerColumnHandler(UserColumnHandler):
     db.session.flush()
 
 
-class ProgramEditorColumnHandler(UserColumnHandler):
+class ProgramOwnerColumnHandler(UserRoleColumnHandler):
 
-  def parse_item(self):
-    pass
-
-  def set_obj_attr(self):
-    pass
-
-  def get_value(self):
-    pass
-
-  def insert_object(self):
-    pass
+  role_id = Role.query.filter_by(name="ProgramOwner").one().id
 
 
-class ProgramReaderColumnHandler(UserColumnHandler):
+class ProgramEditorColumnHandler(UserRoleColumnHandler):
 
-  def parse_item(self):
-    pass
+  role_id = Role.query.filter_by(name="ProgramEditor").one().id
 
-  def set_obj_attr(self):
-    pass
 
-  def get_value(self):
-    pass
+class ProgramReaderColumnHandler(UserRoleColumnHandler):
 
-  def insert_object(self):
-    pass
+  role_id = Role.query.filter_by(name="ProgramReader").one().id
+
 
 COLUMN_HANDLERS = {
     "program_owner": ProgramOwnerColumnHandler,

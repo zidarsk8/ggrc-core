@@ -56,13 +56,23 @@ class TestSpecialObjects(TestCase):
     self.import_file(filename)
     self.assertEquals(2, Program.query.count())
     program = Program.query.filter(Program.slug == "prog-1").first()
-    p1_roles = UserRole.query.filter_by(context_id=program.context_id,
-                                        role_id=1).all()  # 1 = ProgramOwner
-    owner_ids = [r.person_id for r in p1_roles]
-    owners = Person.query.filter(Person.id.in_(owner_ids)).all()
-    owner_emails = set([o.email for o in owners])
+    p1_roles = UserRole.query.filter_by(context_id=program.context_id).all()
+    self.assertEquals(4, len(p1_roles))
+    owner_ids = [r.person_id for r in p1_roles if r.role_id == 1]
+    editor_ids = [r.person_id for r in p1_roles if r.role_id == 2]
+    reader_ids = [r.person_id for r in p1_roles if r.role_id == 3]
+    owner_emails = [p.email for p in
+                    Person.query.filter(Person.id.in_(owner_ids)).all()]
+    editor_emails = [p.email for p in
+                     Person.query.filter(Person.id.in_(editor_ids)).all()]
+    reader_emails = [p.email for p in
+                     Person.query.filter(Person.id.in_(reader_ids)).all()]
     expected_owners = set(["user1@example.com", "user11@example.com"])
-    self.assertEqual(owner_emails, expected_owners)
+    expected_editors = set(["user11@example.com"])
+    expected_readers = set(["user12@example.com"])
+    self.assertEqual(set(owner_emails), expected_owners)
+    self.assertEqual(set(editor_emails), expected_editors)
+    self.assertEqual(set(reader_emails), expected_readers)
 
   def import_file(self, filename, dry_run=False):
     data = {"file": (open(join(CSV_DIR, filename)), filename)}
