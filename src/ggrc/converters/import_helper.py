@@ -9,9 +9,9 @@ from StringIO import StringIO
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc.utils import get_mapping_rules
-from ggrc.converters.handlers import COLUMN_HANDLERS
 from ggrc.converters import COLUMN_ORDER
 from ggrc.converters import handlers
+from ggrc.converters.column_handlers import COLUMN_HANDLERS
 from ggrc.converters.utils import pretty_name
 from ggrc.models.reflection import AttributeInfo
 
