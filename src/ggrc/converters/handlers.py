@@ -4,6 +4,7 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from dateutil.parser import parse
+from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import or_
 import re
@@ -63,7 +64,11 @@ class ColumnHandler(object):
   def set_obj_attr(self):
     if not self.value:
       return
-    setattr(self.row_converter.obj, self.key, self.value)
+    try:
+      setattr(self.row_converter.obj, self.key, self.value)
+    except Exception as e:
+      current_app.logger.error("Import failed with: {}".format(e.message))
+      self.row_converter.add_error(errors.UNKNOWN_ERROR)
 
   def get_default(self):
     if callable(self.default):
@@ -417,9 +422,10 @@ class ProgramColumnHandler(ColumnHandler):
 
     if program is None:
       self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
+      return None
 
     return program.id
 
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
-    return "true" if val else "false"
+    return val.slug

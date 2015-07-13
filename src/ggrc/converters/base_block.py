@@ -233,16 +233,23 @@ class BlockConverter(object):
           row_converter.insert_object()
           db.session.flush()
         except Exception as e:
+          db.session.rollback()
           current_app.logger.error("Import failed with: {}".format(e.message))
-          row_converter.add_error(errors.UNKNOWN_ROW_ERROR)
+          row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
 
   def save_import(self):
-    modified_objects = get_modified_objects(db.session)
-    update_memcache_before_commit(self, modified_objects, CACHE_EXPIRY_IMPORT)
-    db.session.commit()
-    update_memcache_after_commit(self)
-    update_index(db.session, modified_objects)
+    try:
+      modified_objects = get_modified_objects(db.session)
+      update_memcache_before_commit(
+          self, modified_objects, CACHE_EXPIRY_IMPORT)
+      db.session.commit()
+      update_memcache_after_commit(self)
+      update_index(db.session, modified_objects)
+    except Exception as e:
+      db.session.rollback()
+      current_app.logger.error("Import failed with: {}".format(e.message))
+      self.add_errors(errors.UNKNOWN_ERROR, line=self.offset + 2)
 
   def add_errors(self, template, **kwargs):
     message = template.format(**kwargs)

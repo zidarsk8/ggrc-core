@@ -4,10 +4,12 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from collections import defaultdict
+from flask import current_app
 from itertools import chain
 from itertools import product
 
 from ggrc.converters import IMPORTABLE
+from ggrc.converters import errors
 from ggrc.converters.base_block import BlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import split_array
@@ -130,8 +132,12 @@ class Converter(object):
 
   def import_objects(self):
     for converter in self.block_converters:
-      converter.handle_row_data()
-      converter.import_objects()
+      try:
+        converter.handle_row_data()
+        converter.import_objects()
+      except Exception as e:
+        current_app.logger.error("Import failed with: {}".format(e.message))
+        converter.add_errors(errors.UNKNOWN_ERROR, line=converter.offset + 2)
 
   def import_secondary_objects(self):
     for converter in self.block_converters:

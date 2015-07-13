@@ -62,7 +62,6 @@ class UserRoleColumnHandler(UserColumnHandler):
           person_id=owner.id
       )
       db.session.add(user_role)
-    db.session.flush()
 
 
 class ProgramOwnerColumnHandler(UserRoleColumnHandler):

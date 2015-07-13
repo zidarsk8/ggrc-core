@@ -202,6 +202,11 @@ class TestComprehensiveSheets(TestCase):
     expected_custom_vals = ['0', 'a', '2015-12-12 00:00:00', 'test1']
     self.assertEquals(set(custom_vals), set(expected_custom_vals))
 
+  def test_full_good_import_no_warnings(self):
+    filename = "full_good_import_no_warnings.csv"
+    response = self.import_file(filename)
+
+
   def create_custom_attributes(self):
     gen = self.generator.generate_custom_attribute
     gen("control", title="my custom text", mandatory=True)

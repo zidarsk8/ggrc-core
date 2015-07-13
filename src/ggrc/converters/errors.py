@@ -63,4 +63,4 @@ PERMISSION_ERROR = ("Line {line}: You don't have permission to update/delete"
 MAPPING_PERMISSION_ERROR = ("Line {line}: You don't have permission to update"
                             " mappings for {object_type}: {title} ({slug}).")
 
-UNKNOWN_ROW_ERROR = "Line {line}: Import failed due to unknown error."
+UNKNOWN_ERROR = "Line {line}: Import failed due to unknown error."
