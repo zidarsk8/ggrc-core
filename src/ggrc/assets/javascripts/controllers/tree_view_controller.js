@@ -574,6 +574,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           this.options.allow_mapping || this.options.allow_creating);
       }
 
+      if (this.element.parent().length === 0) {
+        // element not attached
+        this.options.disable_lazy_loading = true;
+      }
       if(!this.options.scroll_element) {
         this.options.attr("scroll_element", $(".object-area"));
       }
@@ -804,7 +808,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , draw_visible: _.debounce(function() {
-    if (this.element === null) {
+    if (this.options.disable_lazy_loading || this.element === null) {
       return;
     }
     var MAX_STEPS = 100,
@@ -987,6 +991,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       options_list = can.makeArray(options_list);
       can.map(options_list, function(options) {
         if (!filter || filter.evaluate(options.instance.get_filter_vals())) {
+          if (that.options.disable_lazy_loading) {
+            options.disable_lazy_loading = true;
+          }
           var $li = $("<li />").cms_controllers_tree_view_node(options);
           draw_items_dfds.push($li.control()._draw_node_deferred);
           $items.push($li[0]);
@@ -1343,18 +1350,23 @@ can.Control("CMS.Controllers.TreeViewNode", {
     }
   }
   , init : function(el, opts) {
-    var that = this;
-    if(that.options.instance && !that.options.show_view) {
-      that.options.show_view =
-        that.options.instance.constructor[that.options.options_property].show_view
-        || that.options.model[that.options.options_property].show_view
+    if(this.options.instance && !this.options.show_view) {
+      this.options.show_view =
+        this.options.instance.constructor[this.options.options_property].show_view
+        || this.options.model[this.options.options_property].show_view
         || GGRC.mustache_path + "/base_objects/tree.mustache";
     }
     this._draw_node_deferred = new $.Deferred();
 
     // this timeout is required because the invoker will access the control via
     // the element synchronously so we must not replace the element just yet
-    setTimeout(this.draw_placeholder.bind(this), 0);
+    setTimeout(function() {
+     if (this.options.disable_lazy_loading) {
+       this.draw_node();
+     } else {
+       this.draw_placeholder();
+     }
+    }.bind(this), 0);
   }
 
   , draw_node: function() {
