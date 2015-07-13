@@ -55,7 +55,7 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   ]
   _sanitize_html = ['notes']
   _include_links = []
-  _aliases = {"directive_id": "Policy / Regulation / Standard"}
+  _aliases = {"directive": "Policy / Regulation / Standard"}
 
   @validates('type')
   def validates_type(self, key, value):
@@ -112,5 +112,5 @@ class Clause(CustomAttributable, Documentable, Personable, Ownable,
   _aliases = {
       "url": "Clause URL",
       "description": "Text of Clause",
-      "directive_id": None,
+      "directive": None,
   }

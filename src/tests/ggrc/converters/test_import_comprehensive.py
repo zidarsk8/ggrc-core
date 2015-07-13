@@ -33,16 +33,15 @@ class TestComprehensiveSheets(TestCase):
   def setUp(self):
     TestCase.setUp(self)
     self.generator = ObjectGenerator()
-    self.create_custom_attributes()
-    self.create_people()
     self.client.get("/login")
     pass
 
   def tearDown(self):
     pass
 
-  def test_policy_basic_import(self):
-
+  def test_comprehensive_sheet1_with_custom_attributes(self):
+    self.create_custom_attributes()
+    self.create_people()
     filename = "comprehensive_sheet1.csv"
     response = self.import_file(filename)
     indexed = {r["name"]: r for r in response}
@@ -190,7 +189,8 @@ class TestComprehensiveSheets(TestCase):
       self.assertEquals(current["ignored"], data["ignored"], name)
       self.assertEquals(current["created"], data["created"], name)
       self.assertEquals(len(current["row_errors"]), data["row_errors"], name)
-      self.assertEquals(len(current["row_warnings"]), data["row_warnings"], name)
+      self.assertEquals(
+          len(current["row_warnings"]), data["row_warnings"], name)
 
     prog = Program.query.filter_by(slug="prog-8").first()
     self.assertTrue(prog.private)
@@ -204,7 +204,7 @@ class TestComprehensiveSheets(TestCase):
 
   def test_full_good_import_no_warnings(self):
     filename = "full_good_import_no_warnings.csv"
-    response = self.import_file(filename)
+    self.import_file(filename)
 
 
   def create_custom_attributes(self):

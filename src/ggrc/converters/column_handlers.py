@@ -31,6 +31,7 @@ _column_handlers = {
     "verify_frequency": handlers.OptionColumnHandler,
     "network_zone": handlers.OptionColumnHandler,
     "program_id": handlers.ProgramColumnHandler,
+    "directive": handlers.SectionDirectiveColumnHandler,
 }
 
 

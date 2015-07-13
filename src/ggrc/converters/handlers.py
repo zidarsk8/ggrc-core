@@ -19,6 +19,9 @@ from ggrc.models import CustomAttributeDefinition
 from ggrc.models import Option
 from ggrc.models import Person
 from ggrc.models import Program
+from ggrc.models import Policy
+from ggrc.models import Regulation
+from ggrc.models import Standard
 from ggrc.models import Relationship
 from ggrc.models.relationship import RelationshipHelper
 
@@ -36,6 +39,7 @@ class ColumnHandler(object):
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
     self.dry_run = row_converter.block_converter.converter.dry_run
+    self.new_objects = self.row_converter.block_converter.converter.new_objects
     self.set_value()
 
   def set_value(self):
@@ -409,8 +413,7 @@ class ProgramColumnHandler(ColumnHandler):
 
   def parse_item(self):
     """ get a program from slugs """
-    new_objects = self.row_converter.block_converter.converter.new_objects
-    new_programs = new_objects[Program]
+    new_programs = self.new_objects[Program]
     if self.raw_value == "":
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
       return None
@@ -429,3 +432,29 @@ class ProgramColumnHandler(ColumnHandler):
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
     return val.slug
+
+
+class SectionDirectiveColumnHandler(ColumnHandler):
+
+  def get_directive_from_slug(self, directive_class, slug):
+    if slug in self.new_objects[directive_class]:
+      return self.new_objects[directive_class][slug]
+    return directive_class.query.filter_by(slug=slug).first()
+
+  def parse_item(self):
+    """ get a program from slugs """
+    allowed_directives = [Policy, Regulation, Standard]
+    if self.raw_value == "":
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+      return None
+    slug = self.raw_value
+    for directive_class in allowed_directives:
+      directive = self.get_directive_from_slug(directive_class, slug)
+      if directive is not None:
+        return directive
+    self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
+    return None
+
+  def get_value(self):
+    directive = getattr(self.row_converter.obj, self.key, False)
+    return directive.slug

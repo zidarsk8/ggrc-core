@@ -133,7 +133,6 @@ class BlockConverter(object):
     """
 
     headers = [self._sanitize_header(val) for val in raw_headers]
-
     clean_headers = OrderedDict()
     header_names = self.get_header_names()
     removed_count = 0
