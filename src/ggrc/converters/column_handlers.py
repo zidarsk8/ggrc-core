@@ -29,6 +29,7 @@ _column_handlers = {
     "test_plan": handlers.TextareaColumnHandler,
     "title": handlers.RequiredTextColumnHandler,
     "verify_frequency": handlers.OptionColumnHandler,
+    "network_zone": handlers.OptionColumnHandler,
     "program_id": handlers.ProgramColumnHandler,
 }
 
