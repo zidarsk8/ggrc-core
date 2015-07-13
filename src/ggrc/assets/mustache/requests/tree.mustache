@@ -4,6 +4,7 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
+{{log this}}
 <li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "rq-" instance.status}}>
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <div class="item-wrap">
@@ -11,7 +12,7 @@
       <div class="select">
         <div class="item-data">
           <div class="row-fluid">
-            <div class="span3">
+            <div class="span{{display_options.title_width}}">
               <div class="title tree-title-area">
                 {{#if_draw_icon instance}}
                   <i class="grcicon-{{instance.request_type}}"></i>
@@ -19,71 +20,67 @@
                 <span>{{strip_html_tags instance.description}}</span>
               </div>
             </div>
-            <div class="span2">
+            <div class="span{{display_options.selectable_width}}">
               <div class="row-fluid">
-                <div class="span6">
-                  <div class="tree-title-area">
-                    {{#using audit=instance.audit}}
-                    {{#with_mapping "audit_object_object" instance}}
-                      {{#if audit_object_object.0.instance}}
-                        {{#is_allowed "view_object_page" audit_object_object.0.instance}}
-                          <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
-                        {{else}}
-                          <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
-                        {{/is_allowed}}
-                      {{else}}
-                        {{#with_mapping "authorizations" audit}}
-                        {{#if_helpers "\
-                          ^if_equals" instance.status "Accepted" "\
-                          and ^if_auditor" instance _1_include_admin=false}}
-                          No Control Assessment
-                        {{/if_helpers}}
-                        {{/with_mapping}}
-                      {{/if}}
-                    {{/with_mapping}}
-                    {{/using}}
+                {{#display_attr_list}}
+                  <div class="span{{display_options.selectable_attr_width}}">
+                    {{#if_equals attr_type 'custom'}}
+                      <div class="custom tree-title-area">
+                        {{get_custom_attr_value this instance}}
+                      </div>
+                    {{else}}
+                      <div class="owner tree-title-area">
+                        {{#switch attr_name}}
+                          {{#case 'audit_object'}}
+                            {{#using audit=instance.audit}}
+                              {{#with_mapping "audit_object_object" instance}}
+                                {{#if audit_object_object.0.instance}}
+                                  {{#is_allowed "view_object_page" audit_object_object.0.instance}}
+                                    <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
+                                  {{else}}
+                                    <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
+                                  {{/is_allowed}}
+                                {{else}}
+                                  {{#with_mapping "authorizations" audit}}
+                                    {{#if_helpers "\
+                                      ^if_equals" instance.status "Accepted" "\
+                                      and ^if_auditor" instance _1_include_admin=false}}
+                                      None
+                                    {{/if_helpers}}
+                                  {{/with_mapping}}
+                                {{/if}}
+                              {{/with_mapping}}
+                            {{/using}}
+                          {{/case}}
+                          {{#case 'assignee'}}
+                            {{#using assignee=instance.assignee}}
+                              {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
+                            {{/using}}
+                          {{/case}}
+                          {{#case 'mapped_responses'}}
+                            <i rel="tooltip" data-placement="right" {{#if_equals instance.request_type "documentation"}}data-original-title="# of attached documents" class="grcicon-directive-black"{{else}}data-original-title="# of attached meetings" class="grcicon-interview"{{/if_equals}}></i>
+                            <span class="counter">
+                              {{#child_options}}
+                                {{#with_mapping_count instance mapping}}
+                                  {{count}}
+                                {{/with_mapping_count}}
+                              {{/child_options}}
+                            </span>
+                          {{/case}}
+                          {{#default}}
+                            {{#instance}}
+                              {{get_default_attr_value attr_name instance}}
+                            {{/instance}}
+                          {{/default}}
+                        {{/switch}}
+                      </div>
+                    {{/if_equals}}
                   </div>
-                </div>
-                <div class="span6">
-                <div class="owner tree-title-area">
-                  {{#using assignee=instance.assignee}}
-                    {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
-                  {{/using}}
-                </div>
-                </div>
+                {{/display_attr_list}}
               </div>
             </div>
-            {{#instance}}
-              <div class="span2">
-                <div class="row-fluid">
-                  <div class="span5">
-                    <div class="gray tree-title-area">
-                      {{#if due_on}}
-                        {{localize_date due_on}}
-                      {{/if}}
-                    </div>
-                  </div>
-                  <div class="span7">
-                    <div class="oneline">
-                      <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {{/instance}}
-            <div class="span1">
-              <div class="counter-wrap">
-                <i rel="tooltip" data-placement="right" {{#if_equals instance.request_type "documentation"}}data-original-title="# of attached documents" class="grcicon-directive-black"{{else}}data-original-title="# of attached meetings" class="grcicon-interview"{{/if_equals}}></i>
-                <span class="counter">
-                  {{#child_options}}
-                    {{#with_mapping_count instance mapping}}
-                      {{count}}
-                    {{/with_mapping_count}}
-                  {{/child_options}}
-                </span>
-              </div>
-            </div>
-            <div class="span4">
+
+            <div class="span{{display_options.action_width}}">
               <ul class="tree-action-list" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
                 {{#if allow_creating}}
                 {{^if_equals instance.status "Accepted"}}
@@ -175,7 +172,8 @@
                   {{/if_equals}}
                   {{#instance._undo.0}}
                     <li>
-                      <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
+                      <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo
+                      </a>
                     </li>
                   {{/instance._undo.0}}
                 {{/with_mapping}}

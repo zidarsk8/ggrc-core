@@ -3041,10 +3041,10 @@ Mustache.registerHelper('get_default_attr_value', function (attr_name, instance)
   attr_name = Mustache.resolve(attr_name);
 
   if (instance[attr_name]) {
-    if (['slug', 'status', 'url', 'reference_url', 'kind'].indexOf(attr_name) !== -1) {
+    if (['slug', 'status', 'url', 'reference_url', 'kind', 'request_type'].indexOf(attr_name) !== -1) {
       return instance[attr_name];
     }
-    if (['start_date', 'end_date', 'updated_at'].indexOf(attr_name) !== -1) {
+    if (['start_date', 'end_date', 'updated_at', 'requested_on', 'due_on'].indexOf(attr_name) !== -1) {
       //convert to localize date
       return moment(instance[attr_name]).format('MM/DD/YYYY');
     }

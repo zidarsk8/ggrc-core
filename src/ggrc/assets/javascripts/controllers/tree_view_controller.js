@@ -438,7 +438,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         },
         selected_widths = widths[attr_count] || widths.defaults;
         if (nested) {
-          selected_widths[selected_widths.length - 1] = 8;
+          selected_widths[0] = 4;
+          selected_widths[2] = 8;
         }
 
     display_options = {

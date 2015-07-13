@@ -9,7 +9,7 @@
 
 <header class="header sticky tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
   <div class="row-fluid">
-    <div class="span3">
+    <div class="span{{display_options.title_width}}">
       <div class="title-heading oneline">
         <span class="widget-col-title" data-field="description">
           {{model.title_singular}} Title
@@ -17,83 +17,12 @@
         </span>
       </div>
     </div>
-    <div class="span2">
-      <div class="row-fluid">
-        <div class="span6">
-          <div class="oneline">
-            Object
-          </div>
-        </div>
-        <div class="span6">
-          <div class="oneline">
-            <span class="widget-col-title" data-field="assignee.name|email">
-              Assignee
-              <i class="grcicon-carot"></i>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="span2">
-      <div class="row-fluid">
-        <div class="span5">
-          <div class="oneline">
-            <span class="widget-col-title" data-field="due_on">
-              Due Date
-              <i class="grcicon-carot"></i>
-            </span>
-          </div>
-        </div>
-        <div class="span7">
-          <div class="oneline">
-            <span class="widget-col-title" data-field="status">
-              State
-              <i class="grcicon-carot"></i>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="span1">&nbsp;</div>
-    <div class="span4">
+    {{{> "/static/mustache/base_objects/tree_column_names.mustache"}}}
+    <div class="span{{display_options.action_width}}">
       <ul class="tree-action-list">
         {{{> "/static/mustache/base_objects/export_button.mustache}}}
         {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
-        <!-- Temporary hidden. Do not remove this.
-        <li>
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-          <div class="dropdown-menu dropdown-menu-form">
-            <h5>Set visible fields</h5>
-            <ul class="attr-list">
-              <li class="disabled">
-                <label class="checkbox-inline">
-                  <input type="checkbox" checked="" disabled="">
-                  Name
-                </label>
-              </li>
-              <li class=" disabled">
-                <label class="checkbox-inline">
-                  <input type="checkbox" checked="" disabled="">
-                  Email
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox" checked="">
-                  Authorizations
-                </label>
-              </li>
-              <li>
-                <label class="checkbox-inline">
-                  <input type="checkbox">
-                  Company
-                </label>
-              </li>
-            </ul>
-            <button class="btn btn-small btn-info">Set fields</button>
-          </div>
-        </li>
-        -->
+        {{{> "/static/mustache/base_objects/tree_column_selector.mustache"}}}
         {{#if add_item_view}}
           <li>
             {{{renderLive add_item_view}}}
