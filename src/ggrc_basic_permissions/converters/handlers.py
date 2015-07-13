@@ -8,6 +8,7 @@ from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters.handlers import UserColumnHandler
 from ggrc.login import get_current_user
+from ggrc.models import Person
 from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
 
@@ -17,28 +18,32 @@ class UserRoleColumnHandler(UserColumnHandler):
   role_id = -1
 
   def parse_item(self):
-    owners = set()
+    users = set()
     email_lines = self.raw_value.splitlines()
     owner_emails = filter(unicode.strip, email_lines)  # noqa
     for raw_line in owner_emails:
       email = raw_line.strip().lower()
       person = self.get_person(email)
       if person:
-        owners.add(person)
+        users.add(person)
       else:
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
-    if not owners:
+    if not users:
       self.add_warning(errors.OWNER_MISSING)
-      owners.add(get_current_user())
+      users.add(get_current_user())
 
-    return list(owners)
+    return list(users)
 
   def set_obj_attr(self):
     pass
 
   def get_value(self):
-    emails = [owner.email for owner in self.row_converter.obj.owners]
+    user_role_ids = db.session.query(UserRole.person_id).filter_by(
+        role_id=self.role_id,
+        context_id=self.row_converter.obj.context_id)
+    users = Person.query.filter(Person.id.in_(user_role_ids))
+    emails = [user.email for user in users]
     return "\n".join(emails)
 
   def remove_current_roles(self):
