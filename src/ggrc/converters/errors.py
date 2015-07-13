@@ -12,8 +12,7 @@ MISSING_COLUMN = ("Line {line}: Missing mandatory column{s} {column_names},"
 MISSING_CUSTOM_ATTRIBUTE_COLUMN = ("Line {line}: Missing custom column"
                                    " {column_name}, when adding object.")
 
-WRONG_OBJECT_TYPE = ("Line {line}: Object type in your CSV file is not set or"
-                     " does not exist. Please fill it in.")
+WRONG_OBJECT_TYPE = "Line {line}: Unknown object type '{object_name}'"
 
 UNKNOWN_COLUMN = ("Line {line}: Attribute '{column_name}' does not"
                   " exist. Column will be ignored.")

@@ -108,22 +108,25 @@ class Converter(object):
     """
     object_map = {o.__name__: o for o in IMPORTABLE.values()}
     for object_data in self.ids_by_type:
-      object_class = object_map[object_data["object_name"]]
+      class_name = object_data["object_name"]
+      object_class = object_map[class_name]
       object_ids = object_data.get("ids", [])
       fields = object_data.get("fields")
       block_converter = BlockConverter(self, object_class=object_class,
-                                       fields=fields, object_ids=object_ids)
+                                       fields=fields, object_ids=object_ids,
+                                       class_name=class_name)
       block_converter.row_converters_from_ids()
       self.block_converters.append(block_converter)
 
   def block_converters_from_csv(self):
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
-      object_class = IMPORTABLE.get(data[1][0].strip().lower())
+      class_name = data[1][0].strip().lower()
+      object_class = IMPORTABLE.get(class_name)
       raw_headers, rows = extract_relevant_data(data)
       block_converter = BlockConverter(self, object_class=object_class,
                                        rows=rows, raw_headers=raw_headers,
-                                       offset=offset)
+                                       offset=offset, class_name=class_name)
       self.block_converters.append(block_converter)
 
     order = defaultdict(lambda: len(self.class_order))
