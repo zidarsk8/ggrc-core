@@ -768,10 +768,10 @@ can.Control("GGRC.Controllers.Modals", {
         // If this was an Objective created directly from a Section, create a join
         var params = that.options.object_params;
         if (obj instanceof CMS.Models.Objective && params && params.section) {
-          new CMS.Models.SectionObjective({
-            objective: obj
-            , section: CMS.Models.Section.findInCacheById(params.section.id)
-            , context: { id: null }
+          new CMS.Models.Relationship({
+            source: obj,
+            destination: CMS.Models.Section.findInCacheById(params.section.id),
+            context: { id: null }
           }).save()
           .fail(that.save_error.bind(that))
           .done(function(){
