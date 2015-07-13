@@ -111,5 +111,6 @@ class Clause(CustomAttributable, Documentable, Personable, Ownable,
   _table_plural = 'clauses'
   _aliases = {
       "url": "Clause URL",
+      "description": "Text of Clause",
       "directive_id": None,
   }
