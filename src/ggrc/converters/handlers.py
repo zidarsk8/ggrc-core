@@ -149,9 +149,12 @@ class OwnerColumnHandler(UserColumnHandler):
     return list(owners)
 
   def set_obj_attr(self):
-    if self.value:
+    try:
       for owner in self.value:
         self.row_converter.obj.owners.append(owner)
+    except Exception as e:
+      current_app.logger.error("Import failed with: {}".format(e.message))
+      self.row_converter.add_error(errors.UNKNOWN_ERROR)
 
   def get_value(self):
     emails = [owner.email for owner in self.row_converter.obj.owners]
