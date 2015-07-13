@@ -584,6 +584,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Name",
         "Email",
         "Company",
+        "Role",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
