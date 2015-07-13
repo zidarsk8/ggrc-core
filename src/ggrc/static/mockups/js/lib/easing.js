@@ -1,4 +1,11 @@
 /*
+ * Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: ivan@reciprocitylabs.com
+ * Maintained By: ivan@reciprocitylabs.com
+ */
+
+/*
  * jQuery Easing v1.3 - http://gsgd.co.uk/sandbox/jquery/easing/
  *
  * Uses the built in easing capabilities added In jQuery 1.1
