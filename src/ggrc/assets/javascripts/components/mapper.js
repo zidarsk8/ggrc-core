@@ -59,7 +59,7 @@
             };
 
         can.each(selector_list, function (model, model_name) {
-          if (!model_name || ~forbidden.indexOf(model_name.toLowerCase())) {
+          if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name.toLowerCase())) {
             return;
           }
           var cms_model = CMS.Models[model_name],
