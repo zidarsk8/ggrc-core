@@ -10,7 +10,7 @@ from sqlalchemy import or_
 import re
 
 from ggrc import db
-from ggrc.converters import IMPORTABLE
+from ggrc.converters import get_importables
 from ggrc.converters import errors
 from ggrc.converters.utils import pretty_class_name
 from ggrc.login import get_current_user
@@ -240,7 +240,8 @@ class MappingColumnHandler(ColumnHandler):
   def __init__(self, row_converter, key, **options):
     self.key = key
     self.mapping_name = key[4:]  # remove "map:" prefix
-    self.mapping_object = IMPORTABLE.get(self.mapping_name)
+    importable = get_importables()
+    self.mapping_object = importable.get(self.mapping_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
     super(MappingColumnHandler, self).__init__(row_converter, key, **options)

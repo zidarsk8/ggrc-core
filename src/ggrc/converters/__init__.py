@@ -3,6 +3,7 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+from ggrc.extensions import get_extension_modules
 from ggrc.models import (
     Audit, Control, ControlAssessment, DataAsset, Directive, Contract,
     Policy, Regulation, Standard, Facility, Market, Objective, Option,
@@ -43,7 +44,7 @@ def get_allowed_mappings():
   return mapping_rules
 
 
-IMPORTABLE = {
+_importable = {
     "audit": Audit,
     "control": Control,
     "control assessment": ControlAssessment,
@@ -116,3 +117,15 @@ COLUMN_ORDER = (
     "company",
     "_custom_attributes",
 )
+
+
+def get_importables():
+  importable = _importable
+  for extension_module in get_extension_modules():
+    contributed_handlers = getattr(
+        extension_module, "contributed_importables", None)
+    if callable(contributed_handlers):
+      importable.update(contributed_handlers())
+    elif type(contributed_handlers) == dict:
+      importable.update(contributed_handlers)
+  return importable
