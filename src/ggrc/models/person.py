@@ -68,7 +68,7 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
           "unique": True,
       },
       "company": "Company",
-      "user_rolo": {
+      "user_role": {
           "display_name": "Role",
           "type": "user_role",
       },
