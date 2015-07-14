@@ -56,6 +56,33 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed, Base,
       'response_options'
   ]
   _sanitize_html = []
+  _aliases = {
+      "title": "Summary",
+      "description": "Task Description",
+      "contact": {
+          "display_name": "Assignee",
+          "mandatory": True,
+      },
+      "secondary_contact": None,
+      "start_date": None,
+      "end_date": None,
+      "task_group": {
+          "display_name": "Task Group",
+          "mandatory": True,
+      },
+      "relative_start_date": {
+          "display_name": "Start",
+          "mandatory": True,
+      },
+      "relative_end_date": {
+          "display_name": "End",
+          "mandatory": True,
+      },
+      "task_type": {
+          "display_name": "Task Type",
+          "mandatory": True,
+      }
+  }
 
   @classmethod
   def eager_query(cls):

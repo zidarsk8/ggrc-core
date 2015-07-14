@@ -5,10 +5,10 @@
 
 
 from ggrc import db
+from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
     Titled, Slugged, Described, Timeboxed, WithContact
 )
-from ggrc.models.associationproxy import association_proxy
 from ggrc.models.reflection import PublishOnly
 
 
@@ -46,6 +46,22 @@ class TaskGroup(
       # Intentionally do not include `cycle_task_groups`
       # 'cycle_task_groups',
   ]
+
+  _aliases = {
+      "title": "Summary",
+      "description": "Details",
+      "contact": {
+          "display_name": "Assignee",
+          "mandatory": True,
+      },
+      "secondary_contact": None,
+      "start_date": None,
+      "end_date": None,
+      "workflow": {
+          "display_name": "Workflow",
+          "mandatory": True,
+      }
+  }
 
   def copy(self, _other=None, **kwargs):
     columns = [

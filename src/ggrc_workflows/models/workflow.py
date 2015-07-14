@@ -101,6 +101,27 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       PublishOnly('workflow_state'),
   ]
 
+  _aliases = {
+      "frequency": {
+          "display_name": "Frequency",
+          "mandatory": True,
+      },
+      "notify_custom_message": "Custom email message",
+      "notify_on_change": "Force real-time email updates",
+      "workflow_owner": {
+          "display_name": "Owner",
+          "type": "workflow_role",
+          "mandatory": True,
+      },
+      "workflow_member": {
+          "display_name": "Member",
+          "type": "workflow_role",
+      },
+      "status": None,
+      "start_date": None,
+      "end_date": None,
+  }
+
   def copy(self, _other=None, **kwargs):
     columns = [
         'title', 'description', 'notify_on_change', 'notify_custom_message',
