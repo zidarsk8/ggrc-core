@@ -8,6 +8,7 @@ from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import or_
 import re
+import traceback
 
 from ggrc import db
 from ggrc.converters import get_importables
@@ -70,9 +71,12 @@ class ColumnHandler(object):
       return
     try:
       setattr(self.row_converter.obj, self.key, self.value)
-    except Exception as e:
-      current_app.logger.error("Import failed with: {}".format(e.message))
+    except:
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
+      trace = traceback.format_exc()
+      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
+          self.row_converter.obj, self.key, self.value, trace)
+      current_app.logger.error(error)
 
   def get_default(self):
     if callable(self.default):
@@ -152,9 +156,12 @@ class OwnerColumnHandler(UserColumnHandler):
     try:
       for owner in self.value:
         self.row_converter.obj.owners.append(owner)
-    except Exception as e:
-      current_app.logger.error("Import failed with: {}".format(e.message))
+    except:
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
+      trace = traceback.format_exc()
+      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
+          self.row_converter.obj, self.key, self.value, trace)
+      current_app.logger.error(error)
 
   def get_value(self):
     emails = [owner.email for owner in self.row_converter.obj.owners]
