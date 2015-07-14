@@ -10,7 +10,10 @@ from os.path import dirname
 from os.path import join
 from flask import json
 
+from ggrc import db
 from ggrc.models import Program
+from ggrc_basic_permissions import Role
+from ggrc_basic_permissions import UserRole
 from tests.ggrc import TestCase
 from tests.ggrc.generator import ObjectGenerator
 
@@ -204,8 +207,20 @@ class TestComprehensiveSheets(TestCase):
 
   def test_full_good_import_no_warnings(self):
     filename = "full_good_import_no_warnings.csv"
-    self.import_file(filename)
+    response = self.import_file(filename)
+    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
+    for message in messages:  # response[0] = Person block
+      self.assertEquals(response[0][message], [])
+    ggrc_admin = db.session.query(Role.id).filter(Role.name == "gGRC Admin")
+    reader = db.session.query(Role.id).filter(Role.name == "Reader")
+    creator = db.session.query(Role.id).filter(Role.name == "Creator")
+    ggrc_admins = UserRole.query.filter(UserRole.role_id == ggrc_admin).all()
+    readers = UserRole.query.filter(UserRole.role_id == reader).all()
+    creators = UserRole.query.filter(UserRole.role_id == creator).all()
+    self.assertEquals(len(ggrc_admins), 12)
+    self.assertEquals(len(readers), 5)
+    self.assertEquals(len(creators), 6)
 
   def create_custom_attributes(self):
     gen = self.generator.generate_custom_attribute
