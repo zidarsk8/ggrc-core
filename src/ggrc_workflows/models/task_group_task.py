@@ -3,19 +3,18 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-from ggrc import db
+from sqlalchemy import orm
 from sqlalchemy.orm import validates
-from ggrc.models.mixins import (
-  Base, Titled, Described, WithContact
-    )
+
+from ggrc import db
 from ggrc.login import get_current_user
+from ggrc.models.mixins import Base, Titled, Described, WithContact
 from ggrc.models.types import JsonType
 from ggrc_workflows.models.mixins import RelativeTimeboxed
 
 
-class TaskGroupTask(
-    WithContact, Titled, Described, RelativeTimeboxed, Base,
-    db.Model):
+class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed, Base,
+                    db.Model):
   __tablename__ = 'task_group_tasks'
   _title_uniqueness = False
 
@@ -45,14 +44,6 @@ class TaskGroupTask(
       raise ValueError(message)
     return value
 
-  @staticmethod
-  def _extra_table_args(cls):
-    return (
-        #db.UniqueConstraint('task_group_id', 'task_id'),
-        #db.Index('ix_task_group_id', 'task_group_id'),
-        #db.Index('ix_task_id', 'task_id'),
-        )
-
   _publish_attrs = [
       'task_group',
       'sort_index',
@@ -63,17 +54,15 @@ class TaskGroupTask(
       'object_approval',
       'task_type',
       'response_options'
-      ]
+  ]
   _sanitize_html = []
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(TaskGroupTask, cls).eager_query()
     return query.options(
         orm.subqueryload('task_group'),
-        )
+    )
 
   def _display_name(self):
     return self.title + '<->' + self.task_group.display_name
@@ -87,7 +76,7 @@ class TaskGroupTask(
         'start_date', 'end_date',
         'contact', 'modified_by',
         'task_type', 'response_options',
-        ]
+    ]
 
     contact = None
     if(kwargs.get('clone_people', False)):
