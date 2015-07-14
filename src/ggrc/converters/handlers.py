@@ -273,6 +273,7 @@ class MappingColumnHandler(ColumnHandler):
         mapping = Relationship(source=current_obj, destination=obj)
         db.session.add(mapping)
     db.session.flush()
+    self.dry_run = True
 
   def get_value(self):
     related_slugs = []
@@ -322,6 +323,7 @@ class CustomAttributeColumHandler(TextColumnHandler):
     self.value.attributable_type = self.row_converter.obj.__class__.__name__
     self.value.attributable_id = self.row_converter.obj.id
     db.session.add(self.value)
+    self.dry_run = True
 
   def get_ca_definition(self):
     for definition in self.row_converter.object_class\
