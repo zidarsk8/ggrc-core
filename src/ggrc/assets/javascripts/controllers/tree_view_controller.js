@@ -1257,6 +1257,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   , sort: function (event) {
       var $el = $(event.currentTarget),
           key = $el.data("field");
+          key_fields = key.split("|");
 
       if (key !== this.options.sort_by) {
           this.options.sort_direction = null;
@@ -1264,16 +1265,22 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       var order = this.options.sort_direction === "asc"
               ? "desc"
-              : "asc";
+              : "asc",
+          order_factor = this.options.sort_direction === "asc" ? -1 : 1;
 
       this.options.sort_function = function (val1, val2) {
-        var a = val1.get_deep_property(key),
-            b = val2.get_deep_property(key);
-        if (a === b) {
-          return 0;
-        } else {
-          return ((a < b) ^ (order !== 'asc')) ? -1 : 1;
+        var a,b,i;
+        for (i = 0; i < key_fields.length; i++) {
+          a = val1[key_fields[i]];
+          b = val2[key_fields[i]];
+          if (a > b) {
+            return order_factor;
+          }
+          if (b > a) {
+            return -order_factor;
+          }
         }
+        return 0;
       };
 
       this.options.sort_direction = order;
