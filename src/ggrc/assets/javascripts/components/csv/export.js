@@ -146,18 +146,13 @@
     scope: {
       panel_number: "@",
       fetch_relevant_data: function (id, type) {
-        var dfd = GGRC.Models.Search.search_for_types(id, [type]),
-            que = new RefreshQueue();
-
-        dfd.then(function (response) {
-          var result = response.getResultsFor(url.relevant_type)[0];
-          que.enqueue(result).trigger().then(function (item) {
-            this.attr("item.relevant").push(new filterModel({
-              model_name: url.relevant_type,
-              value: url.relevant_id,
-              filter: result
-            }));
-          }.bind(this));
+        var dfd = CMS.Models[type].findOne({id: id})
+        dfd.then(function (result) {
+          this.attr("item.relevant").push(new filterModel({
+            model_name: url.relevant_type,
+            value: url.relevant_id,
+            filter: result
+          }));
         }.bind(this));
       }
     },
