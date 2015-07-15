@@ -227,13 +227,20 @@ can.Control("CMS.Controllers.TreeLoader", {
     this.on();
 
     var temp_list = [];
-    can.each(list, function(v, i) {
-      var item = that.prepare_child_options(v);
-      temp_list.push(item);
-      if(!item.instance.selfLink) {
-        refresh_queue.enqueue(v.instance);
-      }
-    });
+    if (!list._prepared) {
+      list.each(function(v) {
+        var item = that.prepare_child_options(v);
+        temp_list.push(item);
+         if(!item.instance.selfLink) {
+           refresh_queue.enqueue(v.instance);
+         }
+      });
+      list._prepared = true;
+    } else {
+      list.each(function(v) {
+        temp_list.push(v);
+      });
+    }
 
     if (this.options.sort_property || this.options.sort_function) {
       if (this.options.sort_function) {
