@@ -107,8 +107,8 @@ dashboard-js-files:
   - jquery.remotipart-patched.js
   - components/link_to_clipboard.js
   - components/relevant_filters.js
-  - components/csv/import.js
   - components/csv/export.js
+  - components/csv/import.js
   - components/mapper.js
   #- d3.v2.js
   #- related_graph.js
