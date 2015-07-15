@@ -119,9 +119,6 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
-  , links_to : {
-      "Section" : "SectionObjective"
-  }
   , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"

@@ -20,6 +20,7 @@
       is_saving: false,
       all_selected: false,
       search_only: false,
+      join_object_id: "",
       selected: new can.List(),
       entries: new can.List(),
       relevant: new can.List(),
@@ -59,7 +60,7 @@
             };
 
         can.each(selector_list, function (model, model_name) {
-          if (!model_name || ~forbidden.indexOf(model_name.toLowerCase())) {
+          if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name.toLowerCase())) {
             return;
           }
           var cms_model = CMS.Models[model_name],
@@ -85,18 +86,21 @@
     template: can.view(GGRC.mustache_path + "/modals/mapper/base.mustache"),
     scope: function (attrs, parentScope, el) {
       var $el = $(el),
-          data = {};
+          data = {},
+          id = +$el.attr("join-object-id"),
+          object = $el.attr("object");
 
-      data["join_object_id"] = $el.attr("join-object-id") || GGRC.page_instance().id;
-      if ($el.attr("type")) {
-        data["type"] = $el.attr("type");
-      }
-      if ($el.attr("object")) {
-        data["object"] = $el.attr("object");
+      data["type"] = id === GGRC.page_instance().id ?
+                     $el.attr("type")
+                     : GGRC.tree_view.sub_tree_for[object].display_list[0];
+
+      if (object) {
+        data["object"] = object;
       }
       if ($el.attr("search-only")) {
         data["search_only"] =  /true/i.test($el.attr("search-only"));
       }
+      data["join_object_id"] = id || GGRC.page_instance().id;
       return {
         mapper: new MapperModel(data)
       };
@@ -131,38 +135,42 @@
         if (this.scope.attr("deferred")) {
           return this.defferedSave();
         }
-
-        var instance = GGRC.page_instance(),
-            mapping = GGRC.Mappings.get_canonical_mapping(this.scope.attr("mapper.object"), this.scope.attr("mapper.type")),
+        var type = this.scope.attr("mapper.type"),
+            object = this.scope.attr("mapper.object"),
+            instance = CMS.Models[object].findInCacheById(this.scope.attr("mapper.join_object_id")),
+            mapping = GGRC.Mappings.get_canonical_mapping(this.scope.attr("mapper.object"), type),
             Model = CMS.Models[mapping.model_name],
             data = {},
-            deffer = [];
-
-        // TODO: Figure what to do with context?
-        data["context"] = null;
-        data[mapping.object_attr] = {
-          href: instance.href,
-          type: instance.type,
-          id: instance.id
-        };
-
-        _.each(this.scope.attr("mapper.selected"), function (desination) {
-          var modelInstance;
-          data[mapping.option_attr] = desination;
-          modelInstance = new Model(data);
-          deffer.push(modelInstance.save());
-        }, this);
+            deffer = [],
+            que = new RefreshQueue();
 
         this.scope.attr("mapper.is_saving", true);
-        $.when.apply($, deffer)
-          .fail(function (response, message) {
-            $("body").trigger("ajax:flash", {"error": message});
-          }.bind(this))
-          .always(function () {
-            this.scope.attr("mapper.is_saving", false);
-            // TODO: Find proper way to dismiss the modal
-            this.element.find(".modal-dismiss").trigger("click");
-          }.bind(this));
+        que.enqueue(instance).trigger().done(function (inst) {
+          // TODO: Figure what to do with context?
+          data["context"] = null;
+          data[mapping.object_attr] = {
+            href: instance.href,
+            type: instance.type,
+            id: instance.id
+          };
+
+          _.each(this.scope.attr("mapper.selected"), function (desination) {
+            var modelInstance;
+            data[mapping.option_attr] = desination;
+            modelInstance = new Model(data);
+            deffer.push(modelInstance.save());
+          }, this);
+
+          $.when.apply($, deffer)
+            .fail(function (response, message) {
+              $("body").trigger("ajax:flash", {"error": message});
+            }.bind(this))
+            .always(function () {
+              this.scope.attr("mapper.is_saving", false);
+              // TODO: Find proper way to dismiss the modal
+              this.element.find(".modal-dismiss").trigger("click");
+            }.bind(this));
+        }.bind(this));
       },
       "setBinding": function () {
         if (this.scope.attr("mapper.search_only")) {
@@ -303,6 +311,9 @@
           this.scope.attr("page_loading", false);
           this.scope.attr("page", next_page);
           options.push.apply(options, can.map(models, function (model) {
+            if (!model.type) {
+              return;
+            }
             if (this.scope.attr("mapper.search_only")) {
               return {
                 instance: model,
@@ -409,17 +420,20 @@
     ev.preventDefault();
     var btn = $(ev.currentTarget),
         data = {},
-        isSearch = /unified-search/ig.test(data.toggle);
+        isSearch;
 
-    btn.data("tooltip").hide();
     _.each(btn.data(), function (val, key) {
       data[can.camelCaseToUnderscore(key)] = val;
     });
 
+    if (data.tooltip) {
+      data.tooltip.hide();
+    }
+    isSearch = /unified-search/ig.test(data.toggle);
     GGRC.Controllers.MapperModal.launch($(this), _.extend({
       "object": btn.data("join-object-type"),
       "type": btn.data("join-option-type"),
-      "join-id": btn.data("join-object-id"),
+      "join-object-id": btn.data("join-object-id"),
       "search-only": isSearch
     }, data));
   });
