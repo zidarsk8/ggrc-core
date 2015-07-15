@@ -199,6 +199,9 @@ can.Control("CMS.Controllers.TreeLoader", {
       return this._display_deferred;
     }
   , draw_list : function(list, is_reload) {
+    is_reload = is_reload === true;
+    // TODO figure out why this happens and fix the root of the problem
+    if (!list && !this.options.list) return;
     if (this._draw_list_deferred)
       return this._draw_list_deferred;
     this._draw_list_deferred = new $.Deferred();
