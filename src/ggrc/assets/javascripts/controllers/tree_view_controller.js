@@ -1153,6 +1153,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if (this.options.original_list) {
       this.element.children('.cms_controllers_tree_view_node').remove();
     }
+    if (this._add_child_lists_id) {
+      this._add_child_lists_id += 1;
+    }
     return false;
   }
 
