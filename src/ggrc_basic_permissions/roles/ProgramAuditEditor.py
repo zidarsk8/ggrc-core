@@ -99,6 +99,7 @@ permissions = {
         "Relationship",
         "Document",
         "Meeting",
+        "Audit",
         "AuditObject"
     ]
 }
