@@ -17,10 +17,19 @@
         var date_a = +new Date(a.end_date),
             date_b = +new Date(b.end_date);
         if (date_a === date_b) {
-          return a.id < b.id;
+          if (a.id < b.id) {
+            return -1;
+          } else if (a.id > b.id) {
+            return 1;
+          } else {
+            return 0;
+          }
         }
-
-        return date_a < date_b;
+        if (date_a < date_b) {
+          return -1;
+        } else {
+          return 1;
+        }
       };
 
   // Register `workflows` extension with GGRC
