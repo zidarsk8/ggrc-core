@@ -198,7 +198,7 @@ can.Control("CMS.Controllers.TreeLoader", {
 
       return this._display_deferred;
     }
-  , draw_list : function(list) {
+  , draw_list : function(list, is_reload) {
     if (this._draw_list_deferred)
       return this._draw_list_deferred;
     this._draw_list_deferred = new $.Deferred();
@@ -227,7 +227,7 @@ can.Control("CMS.Controllers.TreeLoader", {
     this.on();
 
     var temp_list = [];
-    if (!list._prepared) {
+    if (!is_reload) {
       list.each(function(v) {
         var item = that.prepare_child_options(v);
         temp_list.push(item);
@@ -235,7 +235,6 @@ can.Control("CMS.Controllers.TreeLoader", {
            refresh_queue.enqueue(v.instance);
          }
       });
-      list._prepared = true;
     } else {
       list.each(function(v) {
         temp_list.push(v);
@@ -261,7 +260,7 @@ can.Control("CMS.Controllers.TreeLoader", {
     }
 
     temp_list = can.map(temp_list, function(o) { if (o.instance.selfLink) return o; });
-    this._draw_list_deferred = this.enqueue_items(temp_list);
+    this._draw_list_deferred = this.enqueue_items(temp_list, is_reload);
     return this._draw_list_deferred;
   }
   , _loading_started: function() {
@@ -283,9 +282,11 @@ can.Control("CMS.Controllers.TreeLoader", {
       }
     }
 
-  , enqueue_items: function(items) {
+  , enqueue_items: function(items, is_reload) {
+      is_reload = is_reload === true;
       var that = this, i, filtered_items = [],
-          child_tree_display_list = [];
+          child_tree_display_list = [],
+          refreshed_deferred;
 
       if (!items || items.length === 0) {
         return new $.Deferred().resolve();
@@ -321,12 +322,18 @@ can.Control("CMS.Controllers.TreeLoader", {
         this._loading_started();
       }
 
-      $.when.apply($, can.map(filtered_items, function(item) {
-        var instance = item.instance || item;
-        if (instance.custom_attribute_values) {
-          return instance.refresh_all('custom_attribute_values');
-        }
-      })).then(function(){
+      if (!is_reload) {
+        refreshed_deferred = $.when.apply($,
+          can.map(filtered_items, function(item) {
+            var instance = item.instance || item;
+            if (instance.custom_attribute_values) {
+              return instance.refresh_all('custom_attribute_values');
+            }
+          }));
+      } else {
+        refreshed_deferred = new $.Deferred().resolve();
+      }
+      refreshed_deferred.then(function(){
         that.insert_items(filtered_items);
         that._loading_finished();
       });
@@ -1165,7 +1172,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.options.list.replace([]);
     this._last_visible = [];
     this.element.children('.cms_controllers_tree_view_node').remove();
-    this.draw_list(this.options.original_list);
+    this.draw_list(this.options.original_list, true);
     this.init_count();
   },
   "[custom-event] click" : function(el, ev) {
