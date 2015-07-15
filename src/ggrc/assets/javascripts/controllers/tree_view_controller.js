@@ -242,20 +242,11 @@ can.Control("CMS.Controllers.TreeLoader", {
     }
 
     if (this.options.sort_property || this.options.sort_function) {
-      if (this.options.sort_function) {
-        original_function = this.options.sort_function;
-        sort_function = function(old_item, new_item) {
-          return original_function(old_item.instance, new_item.instance);
-        };
-      } else {
-        sort_prop = this.options.sort_property;
-        sort_function = function(old_item, new_item) {
-          return GGRC.Math.string_less_than(
-            old_item.instance[sort_prop],
-            new_item.instance[sort_prop]
-          );
-        };
-      }
+      original_function = this.options.sort_function ||
+                          this._sort_property_comparator(this.options.sort_property);
+      sort_function = function(old_item, new_item) {
+        return original_function(old_item.instance, new_item.instance);
+      };
       temp_list.sort(sort_function);
     }
 
@@ -281,6 +272,20 @@ can.Control("CMS.Controllers.TreeLoader", {
         loading_deferred.resolve();
       }
     }
+
+  , _sort_property_comparator: function(property) {
+        return function(old_item, new_item) {
+          var a = old_item[property],
+              b = new_item[property];
+          if (GGRC.Math.string_less_than(a, b)) {
+            return -1;
+          } else if (GGRC.Math.string_less_than(b, a)) {
+            return 1;
+          } else {
+            return 0;
+          }
+        };
+  }
 
   , enqueue_items: function(items, is_reload) {
       is_reload = is_reload === true;
@@ -1032,12 +1037,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       if (sort_prop || sort_function) {
         if (!sort_function) {
-          sort_function = function(old_item, new_item) {
-            return GGRC.Math.string_less_than(
-              old_item[sort_prop],
-              new_item[sort_prop]
-            );
-          }
+          sort_function = this._sort_property_comparator(sort_prop);
         }
 
         $items.each(function(i, item) {
@@ -1046,7 +1046,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             for(j = $existing.length - 1; j >= 0; j--) {
               var old_item = $existing.eq(j).control().options.instance,
                   compare = sort_function(old_item, new_item);
-              if (compare < 0) {
+              if (compare <= 0) {
                 $item.insertAfter($existing.eq(j));
                 $existing.splice(j + 1, 0, item);
                 return;
