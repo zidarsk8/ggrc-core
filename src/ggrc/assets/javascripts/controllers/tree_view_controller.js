@@ -771,7 +771,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //    <model_instance>
     //    { instance: <model instance>, mappings: [...] }
     //    <TreeOptions>
-    var tmp, that = this;
+    var tmp, that = this, original = v;
+    if (v._child_options_prepared) {
+      return v._child_options_prepared;
+    }
     if(!(v instanceof can.Observe.TreeOptions)) {
       tmp = v;
       v = new can.Observe.TreeOptions();
@@ -800,6 +803,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       return total_children;
     }));
+    original._child_options_prepared = v;
     return v;
   }
 
