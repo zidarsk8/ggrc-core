@@ -435,11 +435,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           0: [7, 1, 4],
           3: [3, 5, 4],
           4: [3, 6, 3],
+          nested: [4, 0, 8]
         },
         selected_widths = widths[attr_count] || widths.defaults;
-        if (nested) {
-          selected_widths[selected_widths.length - 1] = 8;
-        }
+
+    if (nested) {
+      selected_widths = widths.nested;
+    }
 
     display_options = {
       title_width: selected_widths[0],
