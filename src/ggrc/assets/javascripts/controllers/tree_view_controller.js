@@ -1008,7 +1008,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       var that = this
         , $footer = this.element.children('.tree-item-add').first()
         , $items = $()
-        , $existing = this.element.children('li.cms_controllers_tree_view_node')
+        , $existing = this.element.children('.cms_controllers_tree_view_node')
         , draw_items_dfds = []
         , sort_prop = this.options.sort_property
         , sort_function = this.options.sort_function
