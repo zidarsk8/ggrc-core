@@ -40,14 +40,50 @@
         data_grid: can.compute(function () {
           return _.has(url, "data_grid");
         })
-      });
+      }),
+      importable = [
+        {model_singular: "Audit", title_plural: "Audits"},
+        {model_singular: "Clause", title_plural: "Clauses"},
+        {model_singular: "Contract", title_plural: "Contracts"},
+        {model_singular: "Control", title_plural: "Controls"},
+        {model_singular: "ControlAssessment", title_plural: "Control Assessments"},
+        {model_singular: "DataAsset", title_plural: "Data Assets"},
+        {model_singular: "Directive", title_plural: "Directives"},
+        {model_singular: "Facility", title_plural: "Facilities"},
+        {model_singular: "Issue", title_plural: "Issues"},
+        {model_singular: "Market", title_plural: "Markets"},
+        {model_singular: "Objective", title_plural: "Objectives"},
+        {model_singular: "Option", title_plural: "Options"},
+        {model_singular: "OrgGroup", title_plural: "Org Groups"},
+        {model_singular: "Person", title_plural: "Persons"},
+        {model_singular: "Policy", title_plural: "Policies"},
+        {model_singular: "Process", title_plural: "Processes"},
+        {model_singular: "Product", title_plural: "Products"},
+        {model_singular: "Program", title_plural: "Programs"},
+        {model_singular: "Project", title_plural: "Projects"},
+        {model_singular: "Regulation", title_plural: "Regulations"},
+        {model_singular: "Request", title_plural: "Requests"},
+        {model_singular: "RiskAssesment", title_plural: "Risk Assesments"},
+        {model_singular: "Section", title_plural: "Sections"},
+        {model_singular: "Standard", title_plural: "Standards"},
+        {model_singular: "System", title_plural: "Systems"},
+        {model_singular: "TaskGroup", title_plural: "Task Groups"},
+        {model_singular: "TaskGroupTask", title_plural: "Tasks"},
+        {model_singular: "Vendor", title_plural: "Vendors"},
+        {model_singular: "Workflow", title_plural: "Workflows"}
+      ];
 
   can.Component.extend({
     tag: "csv-template",
     template: "<content></content>",
     scope: {
       url: "/_service/export_csv",
-      selected: []
+      selected: [],
+      importable: importable
+      // TODO: change importable to a list of model names
+      // importable: _.compact(_.map(importable, function(name){
+      //   return CMS.Models[name];
+      // }))
     },
     events: {
       "#importSelect change": function (el, ev) {
