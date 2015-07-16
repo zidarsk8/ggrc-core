@@ -13,6 +13,7 @@ from ggrc.rbac import permissions
 from ggrc.services.registry import service
 from ggrc_basic_permissions.contributed_roles import RoleContributions
 from ggrc_risk_assessments import models
+from ggrc_risk_assessments import converters
 
 
 # Initialize Flask Blueprint for extension
@@ -95,3 +96,4 @@ class RiskAssessmentRoleContributions(RoleContributions):
   }
 
 ROLE_CONTRIBUTIONS = RiskAssessmentRoleContributions()
+contributed_importables = converters.IMPORTABLE
