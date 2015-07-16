@@ -90,15 +90,16 @@
           id = +$el.attr("join-object-id"),
           object = $el.attr("object");
 
-      data["type"] = id === GGRC.page_instance().id ?
-                     $el.attr("type")
-                     : GGRC.tree_view.sub_tree_for[object].display_list[0];
-
+      if ($el.attr("search-only")) {
+        data["search_only"] =  /true/i.test($el.attr("search-only"));
+      }
       if (object) {
         data["object"] = object;
       }
-      if ($el.attr("search-only")) {
-        data["search_only"] =  /true/i.test($el.attr("search-only"));
+      if (!data["search_only"]) {
+        data["type"] = id === GGRC.page_instance().id ?
+                       $el.attr("type")
+                       : GGRC.tree_view.sub_tree_for[object].display_list[0];
       }
       data["join_object_id"] = id || GGRC.page_instance().id;
       return {
