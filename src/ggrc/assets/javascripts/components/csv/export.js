@@ -238,6 +238,11 @@
     tag: "export-panel",
     template: "<content></content>",
     scope: {
+      importable: importable,
+      // TODO: change importable to a list of model names
+      // importable: _.compact(_.map(importable, function(name){
+      //   return CMS.Models[name];
+      // }))
       panel_number: "@",
       fetch_relevant_data: function (id, type) {
         var dfd = CMS.Models[type].findOne({id: id})
