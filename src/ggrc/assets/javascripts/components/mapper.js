@@ -242,13 +242,11 @@
       ".results-wrap scrollNext": "drawPage",
       ".object-check-all change": function (el, ev) {
         var que = new RefreshQueue(),
-            entries = _.map(this.scope.attr("entries"), function (entry) {
-              return entry.instance;
-            });
+            entries = this.scope.attr("entries");
 
         this.scope.attr("select_all", true);
         this.scope.attr("isloading", true);
-        que.enqueue(entries).trigger().then(function (models) {
+        que.enqueue(_.pluck(entries, "instance")).trigger().then(function (models) {
           this.scope.attr("isloading", false);
           this.scope.attr("selected", _.map(models, function (model) {
             return {
@@ -298,7 +296,7 @@
         if (!page_items.length) {
           return;
         }
-
+        this.scope.attr("page_loading", true);
         que.enqueue(_.pluck(page_items, "instance")).trigger().then(function (models) {
           this.scope.attr("page_loading", false);
           this.scope.attr("page", next_page);
@@ -360,6 +358,7 @@
         this.scope.attr("selected", []);
         this.scope.attr("options", []);
         this.scope.attr("select_all", false);
+        this.scope.attr("mapper.all_selected", false);
 
         if (model_name === "AllObject") {
           model_name = this.scope.attr("types.all_objects.models");
@@ -376,9 +375,9 @@
           };
         });
         search.push({
-            term: this.scope.attr("term"),
-            model_name: model_name,
-            options: permission_parms
+          term: this.scope.attr("term"),
+          model_name: model_name,
+          options: permission_parms
         });
         $.merge(search, relevant);
         search = _.map(search, function (query) {
