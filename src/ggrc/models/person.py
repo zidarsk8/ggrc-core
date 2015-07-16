@@ -134,10 +134,9 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
 
     ROLE_HIERARCHY = {
         u'gGRC Admin': 0,
-        u'ProgramCreator': 1,
-        u'Editor': 2,
-        u'Reader': 3,
-        u'Creator': 4,
+        u'Editor': 1,
+        u'Reader': 2,
+        u'Creator': 3,
     }
     system_wide_roles = ROLE_HIERARCHY.keys()
     unique_roles = set([
