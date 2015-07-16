@@ -139,9 +139,11 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
         u'Reader': 3,
         u'Creator': 4,
     }
+    system_wide_roles = ROLE_HIERARCHY.keys()
     unique_roles = set([
         user_role.role.name
-        for user_role in self.user_roles if not user_role.context_id
+        for user_role in self.user_roles
+        if user_role.role.name in system_wide_roles
     ])
     if len(unique_roles) == 0:
       return u"No Access"
