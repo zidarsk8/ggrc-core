@@ -99,7 +99,7 @@
          dates_are_valid = true;
 
 
-        if (!(GGRC.page_instance() instanceof CMS.Models.Workflow))
+        if (!(workflow instanceof CMS.Models.Workflow))
           return;
 
         // Handle cases of a workflow with start and end dates
