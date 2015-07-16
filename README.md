@@ -2,6 +2,7 @@ gGRC-Core
 =========
 
 [![Travis status](https://travis-ci.org/google/ggrc-core.svg?branch=develop)](https://travis-ci.org/google/ggrc-core)
+[![Code Climate](https://codeclimate.com/github/google/ggrc-core/badges/gpa.svg)](https://codeclimate.com/github/google/ggrc-core)
 
 Google Governance, Risk and Compliance. Migrated from [Google](https://code.google.com/p/compliance-management/)
 [Code](https://code.google.com/p/ggrc-core).
