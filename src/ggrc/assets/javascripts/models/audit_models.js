@@ -49,7 +49,7 @@ function update_program_authorizations(programs, person) {
         }).save();
       });
     }
-  });
+  }).then(Permission.refresh());
 }
 
 can.Model.Cacheable("CMS.Models.Audit", {
@@ -153,9 +153,10 @@ can.Model.Cacheable("CMS.Models.Audit", {
 
     var that = this;
     // Make sure the context is always set to the parent program
-    if(this.context == null || this.context.id == null){
+    if (this.context == null || this.context.id == null) {
       this.attr('context', this.program.reify().context);
     }
+
 
     return this._super.apply(this, arguments);
   },

@@ -147,7 +147,7 @@ can.Construct("Permission", {
   }
 
   , refresh : function() {
-    $.ajax({
+    return $.ajax({
       url : "/permissions"
       , type : "get"
       , dataType : "json"
