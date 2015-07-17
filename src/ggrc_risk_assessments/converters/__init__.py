@@ -6,7 +6,7 @@
 from ggrc_risk_assessments import models
 
 IMPORTABLE = {
-  "RiskAssessment": models.RiskAssessment,
-  "Risk_Assessment": models.RiskAssessment,
-  "Risk Assessment": models.RiskAssessment,
+  "riskassessment": models.RiskAssessment,
+  "risk_assessment": models.RiskAssessment,
+  "risk assessment": models.RiskAssessment,
 }
