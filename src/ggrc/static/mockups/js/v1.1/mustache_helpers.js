@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By:
+ * Maintained By:
+ */
+
 Mustache.registerHelper("if_equals", function(val1, val2, options) {
   var that = this, _val1, _val2;
   function exec() {

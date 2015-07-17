@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By:
+ * Maintained By:
+ */
+
 window.GGRC = window.GGRC || {};
 GGRC.config = GGRC.config || {};
 GGRC.config.GAPI_ADMIN_GROUP = GGRC.config.GAPI_ADMIN_GROUP || "admins@example.com";
