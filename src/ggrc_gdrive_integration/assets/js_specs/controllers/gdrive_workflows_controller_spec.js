@@ -1,10 +1,3 @@
-/*
- * Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: ivan@reciprocitylabs.com
- * Maintained By: ivan@reciprocitylabs.com
- */
-
 window.GGRC = window.GGRC || {};
 GGRC.config = GGRC.config || {};
 GGRC.config.GAPI_ADMIN_GROUP = GGRC.config.GAPI_ADMIN_GROUP || "admins@example.com";
