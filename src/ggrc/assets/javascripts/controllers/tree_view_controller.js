@@ -1004,6 +1004,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         }
         var res = $.Deferred();
         setTimeout(function(){
+          if (that._add_child_lists_id !== op_id) {
+            return;
+          }
           res.resolve(that.draw_items(list_window));
         }, 0);
         return res;
@@ -1290,7 +1293,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       var order = this.options.sort_direction === "asc"
               ? "desc"
               : "asc",
-          order_factor = this.options.sort_direction === "asc" ? -1 : 1;
+          order_factor = order === "asc" ? 1 : -1;
 
       this.options.sort_function = function (val1, val2) {
         var a,b,i;
