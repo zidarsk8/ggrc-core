@@ -8,12 +8,12 @@ from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.login import get_current_user
-from ggrc.models.mixins import Base, Titled, Described, WithContact
+from ggrc.models.mixins import Base, Slugged, Titled, Described, WithContact
 from ggrc.models.types import JsonType
 from ggrc_workflows.models.mixins import RelativeTimeboxed
 
 
-class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed, Base,
+class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed, Base,
                     db.Model):
   __tablename__ = 'task_group_tasks'
   _title_uniqueness = False
@@ -21,6 +21,10 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed, Base,
   @classmethod
   def default_task_type(cls):
     return "text"
+
+  @classmethod
+  def generate_slug_prefix_for(cls, obj):
+    return "TASK"
 
   task_group_id = db.Column(
       db.Integer, db.ForeignKey('task_groups.id'), nullable=False)

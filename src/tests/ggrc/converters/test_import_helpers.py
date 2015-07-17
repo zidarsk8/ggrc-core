@@ -9,6 +9,7 @@ from random import shuffle
 
 from ggrc import models
 from ggrc_workflows import models as wf_models
+from ggrc_risk_assessments import models as ra_models
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import split_array
@@ -831,7 +832,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["unique"])
 
 
-
 class TestGetWorkflowObjectColumnDefinitions(TestCase):
 
   """
@@ -890,6 +890,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Start",
         "End",
         "Task Group",
+        "Code",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
@@ -898,3 +899,30 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
 
 
 
+
+
+class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
+
+  """
+  Test default column difinitions for risk assessment objcts
+  """
+
+  def test_risk_assessemnt_definitions(self):
+    """ test default headers for Workflow """
+    definitions = get_object_column_definitions(ra_models.RiskAssessment)
+    display_names = set([val["display_name"] for val in definitions.values()])
+    expected_names = set([
+        "Title",
+        "Description",
+        "Notes",
+        "Start Date",
+        "End Date",
+        "Risk Manager",
+        "Risk Counsel",
+        "Code",
+    ])
+    self.assertEquals(expected_names, display_names)
+    vals = {val["display_name"]: val for val in definitions.values()}
+    self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Start Date"]["mandatory"])
+    self.assertTrue(vals["End Date"]["mandatory"])

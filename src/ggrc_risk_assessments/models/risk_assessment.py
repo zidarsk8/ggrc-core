@@ -4,36 +4,53 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from ggrc import db
-from ggrc.models.mixins import deferred, Base, Titled, Described, Timeboxed, Noted
+from ggrc.models.mixins import (
+    deferred, Base, Titled, Described, Timeboxed, Noted, Slugged
+)
 from ggrc.models.object_document import Documentable
 
-class RiskAssessment(Documentable, Timeboxed, Noted, Described, Titled, Base, db.Model):
+
+class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
+                     Titled, Base, db.Model):
   __tablename__ = 'risk_assessments'
   _title_uniqueness = False
 
   ra_manager_id = deferred(
-    db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
+      db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
   ra_manager = db.relationship(
-    'Person', uselist=False, foreign_keys='RiskAssessment.ra_manager_id')
+      'Person', uselist=False, foreign_keys='RiskAssessment.ra_manager_id')
 
   ra_counsel_id = deferred(
-    db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
+      db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
   ra_counsel = db.relationship(
-    'Person', uselist=False, foreign_keys='RiskAssessment.ra_counsel_id')
+      'Person', uselist=False, foreign_keys='RiskAssessment.ra_counsel_id')
 
   program_id = deferred(
-    db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False), 'RiskAssessment')
+      db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False),
+      'RiskAssessment')
   program = db.relationship(
-    'Program',
-    backref='risk_assessments',
-    uselist=False,
-    foreign_keys='RiskAssessment.program_id')
+      'Program',
+      backref='risk_assessments',
+      uselist=False,
+      foreign_keys='RiskAssessment.program_id')
 
-  _fulltext_attrs = [
-    ]
+  _fulltext_attrs = []
 
   _publish_attrs = [
-    'ra_manager',
-    'ra_counsel',
-    'program',
-    ]
+      'ra_manager',
+      'ra_counsel',
+      'program',
+  ]
+
+  _aliases = {
+      "ra_manager": "Risk Manager",
+      "ra_counsel": "Risk Counsel",
+      "start_date": {
+          "display_name": "Start Date",
+          "mandatory": True,
+      },
+      "end_date": {
+          "display_name": "End Date",
+          "mandatory": True,
+      },
+  }
