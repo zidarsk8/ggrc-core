@@ -501,14 +501,13 @@
         new_widget_descriptors.current = current_widget_descriptor;
 
         new GGRC.WidgetList("ggrc_workflows", {Workflow: new_widget_descriptors});
-
         // Setup extra refresh required due to automatic creation of permissions
         // on creation of WorkflowPerson
         CMS.Models.WorkflowPerson.bind("created", function(ev, instance) {
-      if (instance instanceof CMS.Models.WorkflowPerson) {
-        instance.context.reify().refresh();
-      }
-    });
+          if (instance instanceof CMS.Models.WorkflowPerson) {
+            instance.context && instance.context.reify().refresh();
+          }
+        });
       };
 
   WorkflowExtension.init_widgets_for_person_page =
