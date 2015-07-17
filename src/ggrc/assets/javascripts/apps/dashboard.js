@@ -178,13 +178,6 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
         defaults.splice(defaults.indexOf('info'), 1);
         defaults.splice(defaults.indexOf('task'), 1);
       }
-      //Change All object link to My Work
-      if (object_browser) {
-        setTimeout(function () {
-          $("#allObjectView").hide();
-          $("#myWorkView").show();
-        }, 3000);
-      }
 
       $area.cms_controllers_page_object($.extend({
         //model_descriptors: model_descriptors,
