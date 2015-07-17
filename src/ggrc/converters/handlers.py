@@ -13,7 +13,6 @@ import traceback
 from ggrc import db
 from ggrc.converters import get_importables
 from ggrc.converters import errors
-from ggrc.converters.utils import pretty_class_name
 from ggrc.login import get_current_user
 from ggrc.models import CustomAttributeValue
 from ggrc.models import CustomAttributeDefinition
@@ -265,7 +264,8 @@ class MappingColumnHandler(ColumnHandler):
         objects.append(obj)
       elif not (slug in self.new_slugs and self.dry_run):
         self.add_warning(errors.UNKNOWN_OBJECT,
-                         object_type=pretty_class_name(class_), slug=slug)
+                         object_type=class_._inflector.human_singular.title(),
+                         slug=slug)
     return objects
 
   def set_obj_attr(self):
