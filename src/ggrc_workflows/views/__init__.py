@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
-# Maintained By: miha@reciprocitylabs.com
+# Maintained By: urban@reciprocitylabs.com
 
 from datetime import date, datetime
 from flask import render_template, redirect, url_for, current_app
@@ -131,6 +131,7 @@ def start_unstarted_cycles():
   workflows = _get_unstarted_workflows()
   for workflow in workflows:
     workflow.next_cycle_start_date = date.today()
+    workflow.non_adjusted_next_cycle_start_date = date.today()
     db.session.add(workflow)
   db.session.commit()
   run_job(start_recurring_cycles)
