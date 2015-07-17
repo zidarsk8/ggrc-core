@@ -32,4 +32,3 @@ COMMIT_MSG
 .*\.swp$
 .*\.pyc
 node_modules
-src/ggrc/static/mockups/js/lib/
