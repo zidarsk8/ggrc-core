@@ -1283,8 +1283,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
   , sort: function (event) {
       var $el = $(event.currentTarget),
-          key = $el.data("field");
-          key_fields = key.split("|");
+          key = $el.data("field"),
+          key_tree, fetch;
 
       if (key !== this.options.sort_by) {
           this.options.sort_direction = null;
@@ -1295,19 +1295,47 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               : "asc",
           order_factor = order === "asc" ? 1 : -1;
 
-      this.options.sort_function = function (val1, val2) {
-        var a,b,i;
-        for (i = 0; i < key_fields.length; i++) {
-          a = val1[key_fields[i]];
-          b = val2[key_fields[i]];
-          if (a > b) {
-            return order_factor;
+      key_tree = _.map(key.split("."), function (part) {
+        return part.split("|");
+      });
+
+      fetch = function(val) {
+        var i, j, part, field, found, tmp;
+        for (i = 0; i < key_tree.length; i++) {
+          part = key_tree[i];
+          if (val.instance) {
+            val = val.instance;
           }
-          if (b > a) {
-            return -order_factor;
+          found = false;
+          for (j = 0; j < part.length; j++) {
+            field = part[j];
+            tmp = val[field];
+            if (tmp !== undefined && tmp !== null) {
+              val = tmp;
+              if (typeof val.reify === "function") {
+                val = val.reify();
+              }
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            return null;
           }
         }
-        return 0;
+        return val;
+      };
+
+      this.options.sort_function = function (val1, val2) {
+        var a = fetch(val1),
+            b = fetch(val2);
+         if (a > b) {
+           return order_factor;
+         }
+         if (b > a) {
+           return -order_factor;
+         }
+         return 0;
       };
 
       this.options.sort_direction = order;
