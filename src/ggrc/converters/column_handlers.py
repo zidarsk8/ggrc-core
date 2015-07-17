@@ -42,6 +42,8 @@ def get_all_column_handlers():
         extension_module, "contributed_column_handlers", None)
     if callable(contributed_handlers):
       extension_handlers.update(contributed_handlers())
+    elif type(contributed_handlers) == dict:
+      extension_handlers.update(contributed_handlers)
   return extension_handlers
 
 

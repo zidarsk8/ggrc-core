@@ -920,6 +920,7 @@ class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
         "Risk Manager",
         "Risk Counsel",
         "Code",
+        "Program",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}

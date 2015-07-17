@@ -20,6 +20,7 @@ class Converter(object):
   class_order = [
       "Person",
       "Program",
+      "RiskAssessment",
       "Audit",
       "Policy",
       "Regulation",

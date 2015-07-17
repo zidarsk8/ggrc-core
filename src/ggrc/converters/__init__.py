@@ -122,10 +122,10 @@ COLUMN_ORDER = (
 def get_importables():
   importable = _importable
   for extension_module in get_extension_modules():
-    contributed_handlers = getattr(
+    contributed_importables = getattr(
         extension_module, "contributed_importables", None)
-    if callable(contributed_handlers):
-      importable.update(contributed_handlers())
-    elif type(contributed_handlers) == dict:
-      importable.update(contributed_handlers)
+    if callable(contributed_importables):
+      importable.update(contributed_importables())
+    elif type(contributed_importables) == dict:
+      importable.update(contributed_importables)
   return importable
