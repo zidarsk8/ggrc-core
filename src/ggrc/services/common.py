@@ -1016,10 +1016,6 @@ class Resource(ModelView):
     elif 'context' not in src:
       raise BadRequest('context MUST be specified.')
 
-    else:
-      if not permissions.is_allowed_create(
-        self.model.__name__, None, self.get_context_id_from_json(src)):
-        raise Forbidden()
     with benchmark("Deserialize object"):
       self.json_create(obj, src)
     with benchmark("Query create permissions"):

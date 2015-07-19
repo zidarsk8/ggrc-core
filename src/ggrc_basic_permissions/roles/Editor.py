@@ -95,7 +95,7 @@ permissions = {
         "SystemOrProcess",
         "System",
         "Process",
-        "ObjectOwner"
+        "ObjectOwner",
         "Person",
         "Program",
         "Role",
@@ -152,7 +152,7 @@ permissions = {
         "SystemOrProcess",
         "System",
         "Process",
-        "ObjectOwner"
+        "ObjectOwner",
         "Program",
         "Role",
         "UserRole",
@@ -205,7 +205,7 @@ permissions = {
         "SystemOrProcess",
         "System",
         "Process",
-        "ObjectOwner"
+        "ObjectOwner",
         "Program",
         "Role",
         "UserRole",

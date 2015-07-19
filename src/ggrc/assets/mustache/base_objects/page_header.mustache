@@ -71,12 +71,21 @@
     </a>
   </li>
   <li>
-    <a href="/objectBrowser">
-      <i class="grcicon-search"></i>
-      <span>
-        All Objects
-      </span>
-    </a>
+    {{#is_allobjectview}}
+      <a id="myWorkView" href="/dashboard">
+        <i class="grcicon-search"></i>
+        <span>
+          My Work
+        </span>
+      </a>
+    {{else}}
+      <a id="allObjectView" href="/objectBrowser">
+        <i class="grcicon-search"></i>
+        <span>
+          All Objects
+        </span>
+      </a>
+    {{/is_allobjectview}}
   </li>
   <li class="user user-dropdown dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
@@ -89,12 +98,6 @@
         <a href="/dashboard">
           <i class="grcicon-my-work"></i>
           My Work ({{current_user.system_wide_role}})
-        </a>
-      </li>
-      <li>
-        <a href="/objectBrowser">
-          <i class="grcicon-search"></i>
-          All Objects
         </a>
       </li>
       {{#current_user_is_admin}}

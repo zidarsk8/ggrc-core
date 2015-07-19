@@ -231,10 +231,7 @@ class TestCreatorProgram(TestCase):
           # reset sesion:
           db.session.commit()
           func = getattr(self, action)
-          if test_case == 'ProgramEditor' and action == "delete":
-            res = func(self.objects[obj])
-          else:
-            res = func(self.objects[obj])
+          res = func(self.objects[obj])
           if res != actions[action]:
             errors.append(
                 "{}: Tried {} on {}, but received {} instead of {}".format(
