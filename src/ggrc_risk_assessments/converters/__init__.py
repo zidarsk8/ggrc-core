@@ -3,8 +3,10 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import re
+from ggrc_risk_assessments import models
 
-def pretty_name(name):
-  """ Add spaces to camel case strings """
-  return " ".join(re.findall('[A-Z][^A-Z]*', name))
+IMPORTABLE = {
+  "riskassessment": models.RiskAssessment,
+  "risk_assessment": models.RiskAssessment,
+  "risk assessment": models.RiskAssessment,
+}

@@ -31,6 +31,7 @@ _column_handlers = {
     "verify_frequency": handlers.OptionColumnHandler,
     "network_zone": handlers.OptionColumnHandler,
     "program_id": handlers.ProgramColumnHandler,
+    "directive": handlers.SectionDirectiveColumnHandler,
 }
 
 
@@ -41,6 +42,8 @@ def get_all_column_handlers():
         extension_module, "contributed_column_handlers", None)
     if callable(contributed_handlers):
       extension_handlers.update(contributed_handlers())
+    elif type(contributed_handlers) == dict:
+      extension_handlers.update(contributed_handlers)
   return extension_handlers
 
 

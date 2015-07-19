@@ -4,6 +4,8 @@
 # Maintained By: miha@reciprocitylabs.com
 
 
+from sqlalchemy import and_
+
 from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters.handlers import UserColumnHandler
@@ -13,7 +15,7 @@ from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
 
 
-class UserRoleColumnHandler(UserColumnHandler):
+class ProgramRoleColumnHandler(UserColumnHandler):
 
   role_id = -1
 
@@ -62,31 +64,75 @@ class UserRoleColumnHandler(UserColumnHandler):
           person_id=owner.id
       )
       db.session.add(user_role)
+    self.dry_run = True
 
 
-class ProgramOwnerColumnHandler(UserRoleColumnHandler):
+class ProgramOwnerColumnHandler(ProgramRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role_id = Role.query.filter_by(name="ProgramOwner").one().id
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
-class ProgramEditorColumnHandler(UserRoleColumnHandler):
+class ProgramEditorColumnHandler(ProgramRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role_id = Role.query.filter_by(name="ProgramEditor").one().id
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
-class ProgramReaderColumnHandler(UserRoleColumnHandler):
+class ProgramReaderColumnHandler(ProgramRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role_id = Role.query.filter_by(name="ProgramReader").one().id
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
+class UserRoleColumnHandler(UserColumnHandler):
+
+  _role_map = {
+    "admin": "ggrc admin"
+  }
+
+  _allowed_roles = [
+      "Reader",
+      "Editor",
+      "gGRC Admin",
+  ]
+
+  def parse_item(self):
+    value = self.raw_value.lower()
+    name = self._role_map.get(value, value)
+    return Role.query.filter_by(name=name).first()
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    return ""
+
+  def remove_current_roles(self):
+    allowed_role_ids = db.session.query(Role.id).filter(
+        Role.name.in_(self._allowed_roles))
+    UserRole.query.filter(and_(
+        UserRole.role_id.in_(allowed_role_ids),
+        UserRole.person_id == self.row_converter.obj.id)
+    ).delete(synchronize_session="fetch")
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    self.remove_current_roles()
+    user_role = UserRole(
+        role_id=self.value.id,
+        person_id=self.row_converter.obj.id
+    )
+    db.session.add(user_role)
+    self.dry_run = True
+
 COLUMN_HANDLERS = {
     "program_owner": ProgramOwnerColumnHandler,
     "program_editor": ProgramEditorColumnHandler,
     "program_reader": ProgramReaderColumnHandler,
+    "user_role": UserRoleColumnHandler,
 }

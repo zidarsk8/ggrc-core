@@ -3,8 +3,9 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import re
+from ggrc.converters.handlers import UserColumnHandler
 
-def pretty_name(name):
-  """ Add spaces to camel case strings """
-  return " ".join(re.findall('[A-Z][^A-Z]*', name))
+COLUMN_HANDLERS = {
+    "ra_counsel": UserColumnHandler,
+    "ra_manager": UserColumnHandler,
+}

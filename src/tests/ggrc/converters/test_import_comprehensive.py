@@ -10,7 +10,10 @@ from os.path import dirname
 from os.path import join
 from flask import json
 
+from ggrc import db
 from ggrc.models import Program
+from ggrc_basic_permissions import Role
+from ggrc_basic_permissions import UserRole
 from tests.ggrc import TestCase
 from tests.ggrc.generator import ObjectGenerator
 
@@ -33,16 +36,15 @@ class TestComprehensiveSheets(TestCase):
   def setUp(self):
     TestCase.setUp(self)
     self.generator = ObjectGenerator()
-    self.create_custom_attributes()
-    self.create_people()
     self.client.get("/login")
     pass
 
   def tearDown(self):
     pass
 
-  def test_policy_basic_import(self):
-
+  def test_comprehensive_sheet1_with_custom_attributes(self):
+    self.create_custom_attributes()
+    self.create_people()
     filename = "comprehensive_sheet1.csv"
     response = self.import_file(filename)
     indexed = {r["name"]: r for r in response}
@@ -190,7 +192,8 @@ class TestComprehensiveSheets(TestCase):
       self.assertEquals(current["ignored"], data["ignored"], name)
       self.assertEquals(current["created"], data["created"], name)
       self.assertEquals(len(current["row_errors"]), data["row_errors"], name)
-      self.assertEquals(len(current["row_warnings"]), data["row_warnings"], name)
+      self.assertEquals(
+          len(current["row_warnings"]), data["row_warnings"], name)
 
     prog = Program.query.filter_by(slug="prog-8").first()
     self.assertTrue(prog.private)
@@ -205,7 +208,36 @@ class TestComprehensiveSheets(TestCase):
   def test_full_good_import_no_warnings(self):
     filename = "full_good_import_no_warnings.csv"
     response = self.import_file(filename)
+    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
+    for message in messages:  # response[0] = Person block
+      self.assertEquals(response[0][message], [])
+    ggrc_admin = db.session.query(Role.id).filter(Role.name == "gGRC Admin")
+    reader = db.session.query(Role.id).filter(Role.name == "Reader")
+    creator = db.session.query(Role.id).filter(Role.name == "Creator")
+    ggrc_admins = UserRole.query.filter(UserRole.role_id == ggrc_admin).all()
+    readers = UserRole.query.filter(UserRole.role_id == reader).all()
+    creators = UserRole.query.filter(UserRole.role_id == creator).all()
+    self.assertEquals(len(ggrc_admins), 12)
+    self.assertEquals(len(readers), 5)
+    self.assertEquals(len(creators), 6)
+
+    broken_imports = set([
+        "Control Assessment",
+        "Task Group Task",
+        "Task Group",
+        "Workflow",
+    ])
+
+    for block in response:
+      if block["name"] in broken_imports:
+        continue
+      self.assertEquals(set(), set(block["block_errors"]))
+      self.assertEquals(set(), set(block["block_warnings"]))
+      self.assertEquals(set(), set(block["row_errors"]))
+      self.assertEquals(set(), set(block["row_warnings"]))
+
+    # print(json.dumps(response, indent=2, sort_keys=True))
 
   def create_custom_attributes(self):
     gen = self.generator.generate_custom_attribute

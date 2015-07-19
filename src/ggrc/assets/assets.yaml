@@ -107,8 +107,8 @@ dashboard-js-files:
   - jquery.remotipart-patched.js
   - components/link_to_clipboard.js
   - components/relevant_filters.js
-  - components/csv/import.js
   - components/csv/export.js
+  - components/csv/import.js
   - components/mapper.js
   #- d3.v2.js
   #- related_graph.js
@@ -124,7 +124,6 @@ dashboard-js-template-files:
   - base_objects/description.mustache
   - base_objects/test_plan.mustache
   - base_objects/extended_info.mustache
-  - base_objects/export_button.mustache
   - base_objects/urls.mustache
   - base_objects/notes.mustache
   - base_objects/info.mustache
@@ -331,6 +330,7 @@ dashboard-js-template-files:
   - search/advanced_search_option_column.mustache
   - search/advanced_search_option_items.mustache
   - search/advanced_search_people_items.mustache
+  - import_export/import_export_buttons.mustache
   - import_export/create_template.mustache
   - import_export/import_test_result.mustache
   - import_export/complete.mustache

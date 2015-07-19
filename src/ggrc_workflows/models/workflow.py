@@ -1,38 +1,47 @@
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
+
+from datetime import date
+from collections import OrderedDict
+from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.models.associationproxy import association_proxy
-from ggrc.models.mixins import (
-    deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful, CustomAttributable
-    )
-from ggrc.models.reflection import PublishOnly
-from ggrc.models.context import HasOwnContext
 from ggrc.login import get_current_user
-from sqlalchemy.orm import validates
+from ggrc.models.associationproxy import association_proxy
 from ggrc.models.computed_property import computed_property
-from .cycle import Cycle
-from collections import OrderedDict
-from datetime import date
+from ggrc.models.context import HasOwnContext
+from ggrc.models.mixins import (
+    deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful,
+    CustomAttributable
+)
+from ggrc.models.reflection import PublishOnly
+from ggrc_gdrive_integration.models.object_folder import Folderable
+from ggrc_workflows.models.cycle import Cycle
 
 
-class Workflow(
-    CustomAttributable, HasOwnContext, Timeboxed, Described, Titled, Slugged, Stateful, Base, db.Model):
+class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
+               Slugged, Stateful, Base, db.Model):
   __tablename__ = 'workflows'
   _title_uniqueness = False
 
   VALID_STATES = [u"Draft", u"Active", u"Inactive"]
 
-  VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually"]
+  VALID_FREQUENCIES = [
+      "one_time",
+      "weekly",
+      "monthly",
+      "quarterly",
+      "annually"
+  ]
 
   @classmethod
   def default_frequency(cls):
     return 'one_time'
 
-  @validates('frequency')
+  @orm.validates('frequency')
   def validate_frequency(self, key, value):
     if value is None:
       value = self.default_frequency()
@@ -47,12 +56,12 @@ class Workflow(
       db.Column(db.Text, nullable=True), 'Workflow')
 
   frequency = deferred(
-    db.Column(db.String, nullable=True, default=default_frequency),
-    'Workflow'
-    )
+      db.Column(db.String, nullable=True, default=default_frequency),
+      'Workflow'
+  )
 
   object_approval = deferred(
-    db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
+      db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
 
   recurrences = db.Column(db.Boolean, default=False, nullable=False)
 
@@ -76,7 +85,7 @@ class Workflow(
 
   _sanitize_html = [
       'notify_custom_message',
-      ]
+  ]
 
   _publish_attrs = [
       'workflow_people',
@@ -90,31 +99,54 @@ class Workflow(
       'recurrences',
       PublishOnly('next_cycle_start_date'),
       PublishOnly('workflow_state'),
-      ]
+  ]
+
+  _aliases = {
+      "frequency": {
+          "display_name": "Frequency",
+          "mandatory": True,
+      },
+      "notify_custom_message": "Custom email message",
+      "notify_on_change": "Force real-time email updates",
+      "workflow_owner": {
+          "display_name": "Owner",
+          "type": "workflow_role",
+          "mandatory": True,
+      },
+      "workflow_member": {
+          "display_name": "Member",
+          "type": "workflow_role",
+      },
+      "status": None,
+      "start_date": None,
+      "end_date": None,
+  }
 
   def copy(self, _other=None, **kwargs):
     columns = [
         'title', 'description', 'notify_on_change', 'notify_custom_message',
         'frequency', 'end_date', 'start_date'
-        ]
+    ]
     target = self.copy_into(_other, columns, **kwargs)
     return target
 
   def copy_task_groups(self, target, **kwargs):
     for task_group in self.task_groups:
       obj = task_group.copy(
-        workflow=target,
-        context=target.context,
-        clone_people=kwargs.get("clone_people", False),
-        clone_objects=kwargs.get("clone_objects", False),
-        modified_by=get_current_user(),
-        )
+          workflow=target,
+          context=target.context,
+          clone_people=kwargs.get("clone_people", False),
+          clone_objects=kwargs.get("clone_objects", False),
+          modified_by=get_current_user(),
+      )
       target.task_groups.append(obj)
 
       if(kwargs.get("clone_tasks", False)):
-        task_group.copy_tasks(obj,
-                              clone_people=kwargs.get("clone_people", False),
-                              clone_objects=kwargs.get("clone_objects", True))
+        task_group.copy_tasks(
+            obj,
+            clone_people=kwargs.get("clone_people", False),
+            clone_objects=kwargs.get("clone_objects", True)
+        )
 
     return target
 
@@ -128,12 +160,12 @@ class WorkflowState(object):
   @classmethod
   def get_state(cls, objs):
     priority_states = OrderedDict([
-      # The first True state will be returned
-      ("Overdue", False),
-      ("InProgress", False),
-      ("Finished", False),
-      ("Assigned", False),
-      ("Verified", False)
+        # The first True state will be returned
+        ("Overdue", False),
+        ("InProgress", False),
+        ("Finished", False),
+        ("Assigned", False),
+        ("Verified", False)
     ])
 
     for obj in objs:
@@ -162,17 +194,15 @@ class WorkflowState(object):
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
 
     query = super(WorkflowState, cls).eager_query()
     return query.options(
-        orm.subqueryload('cycle_task_group_objects')\
-            .undefer_group('CycleTaskGroupObject_complete'),
+        orm.subqueryload('cycle_task_group_objects')
+        .undefer_group('CycleTaskGroupObject_complete'),
         orm.subqueryload_all('cycle_task_group_objects.cycle'),
-        )
+    )
 
 
 # TODO: This makes the Workflow module dependant on Gdrive. It is not pretty.
-from ggrc_gdrive_integration.models.object_folder import Folderable
 Workflow.__bases__ = (Folderable,) + Workflow.__bases__
 Workflow.late_init_folderable()

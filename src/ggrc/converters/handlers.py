@@ -8,17 +8,20 @@ from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import or_
 import re
+import traceback
 
 from ggrc import db
-from ggrc.converters import IMPORTABLE
+from ggrc.converters import get_importables
 from ggrc.converters import errors
-from ggrc.converters.utils import pretty_class_name
 from ggrc.login import get_current_user
 from ggrc.models import CustomAttributeValue
 from ggrc.models import CustomAttributeDefinition
 from ggrc.models import Option
 from ggrc.models import Person
 from ggrc.models import Program
+from ggrc.models import Policy
+from ggrc.models import Regulation
+from ggrc.models import Standard
 from ggrc.models import Relationship
 from ggrc.models.relationship import RelationshipHelper
 
@@ -36,6 +39,7 @@ class ColumnHandler(object):
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")
     self.dry_run = row_converter.block_converter.converter.dry_run
+    self.new_objects = self.row_converter.block_converter.converter.new_objects
     self.set_value()
 
   def set_value(self):
@@ -66,9 +70,12 @@ class ColumnHandler(object):
       return
     try:
       setattr(self.row_converter.obj, self.key, self.value)
-    except Exception as e:
-      current_app.logger.error("Import failed with: {}".format(e.message))
+    except:
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
+      trace = traceback.format_exc()
+      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
+          self.row_converter.obj, self.key, self.value, trace)
+      current_app.logger.error(error)
 
   def get_default(self):
     if callable(self.default):
@@ -145,9 +152,15 @@ class OwnerColumnHandler(UserColumnHandler):
     return list(owners)
 
   def set_obj_attr(self):
-    if self.value:
+    try:
       for owner in self.value:
         self.row_converter.obj.owners.append(owner)
+    except:
+      self.row_converter.add_error(errors.UNKNOWN_ERROR)
+      trace = traceback.format_exc()
+      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
+          self.row_converter.obj, self.key, self.value, trace)
+      current_app.logger.error(error)
 
   def get_value(self):
     emails = [owner.email for owner in self.row_converter.obj.owners]
@@ -233,7 +246,8 @@ class MappingColumnHandler(ColumnHandler):
   def __init__(self, row_converter, key, **options):
     self.key = key
     self.mapping_name = key[4:]  # remove "map:" prefix
-    self.mapping_object = IMPORTABLE.get(self.mapping_name)
+    importable = get_importables()
+    self.mapping_object = importable.get(self.mapping_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
     super(MappingColumnHandler, self).__init__(row_converter, key, **options)
@@ -250,7 +264,8 @@ class MappingColumnHandler(ColumnHandler):
         objects.append(obj)
       elif not (slug in self.new_slugs and self.dry_run):
         self.add_warning(errors.UNKNOWN_OBJECT,
-                         object_type=pretty_class_name(class_), slug=slug)
+                         object_type=class_._inflector.human_singular.title(),
+                         slug=slug)
     return objects
 
   def set_obj_attr(self):
@@ -266,6 +281,7 @@ class MappingColumnHandler(ColumnHandler):
         mapping = Relationship(source=current_obj, destination=obj)
         db.session.add(mapping)
     db.session.flush()
+    self.dry_run = True
 
   def get_value(self):
     related_slugs = []
@@ -315,6 +331,7 @@ class CustomAttributeColumHandler(TextColumnHandler):
     self.value.attributable_type = self.row_converter.obj.__class__.__name__
     self.value.attributable_id = self.row_converter.obj.id
     db.session.add(self.value)
+    self.dry_run = True
 
   def get_ca_definition(self):
     for definition in self.row_converter.object_class\
@@ -409,8 +426,7 @@ class ProgramColumnHandler(ColumnHandler):
 
   def parse_item(self):
     """ get a program from slugs """
-    new_objects = self.row_converter.block_converter.converter.new_objects
-    new_programs = new_objects[Program]
+    new_programs = self.new_objects[Program]
     if self.raw_value == "":
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
       return None
@@ -429,3 +445,29 @@ class ProgramColumnHandler(ColumnHandler):
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
     return val.slug
+
+
+class SectionDirectiveColumnHandler(ColumnHandler):
+
+  def get_directive_from_slug(self, directive_class, slug):
+    if slug in self.new_objects[directive_class]:
+      return self.new_objects[directive_class][slug]
+    return directive_class.query.filter_by(slug=slug).first()
+
+  def parse_item(self):
+    """ get a program from slugs """
+    allowed_directives = [Policy, Regulation, Standard]
+    if self.raw_value == "":
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+      return None
+    slug = self.raw_value
+    for directive_class in allowed_directives:
+      directive = self.get_directive_from_slug(directive_class, slug)
+      if directive is not None:
+        return directive
+    self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
+    return None
+
+  def get_value(self):
+    directive = getattr(self.row_converter.obj, self.key, False)
+    return directive.slug
