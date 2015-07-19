@@ -76,12 +76,15 @@
         </label>
       </div>
     {{/data_grid}}
-    <div class="save-template">
-      <div class="btn-group pull-right">
-        <button type="submit" class="btn btn-success btn-small">
+    <div class="btn-group pull-right">
+      {{^export.loading}}
+        <button type="submit" id="export-csv-button" class="btn btn-success btn-small">
           <i class="grcicon-export-white"></i> Export Data
         </button>
-      </div>
+      {{/loading }}
+      {{#export.loading}}
+        <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+      {{/loading }}
     </div>
   </div>
 </div>

@@ -29,6 +29,7 @@
       }),
       exportModel = can.Map({
         panels: new panelsModel(),
+        loading: false,
         url: "/_service/export_csv",
         type: url.model_type || "Program",
         edit_filename: false,
@@ -149,8 +150,9 @@
         ev.preventDefault();
         this.scope.attr("export.edit_filename", !this.scope.attr("export.edit_filename"));
       },
-      ".save-template .btn-success click": function (el, ev) {
+      "#export-csv-button click": function (el, ev) {
         ev.preventDefault();
+        this.scope.attr("export.loading", true)
         var panels = this.scope.attr("export.panels.items"),
             data_grid = this.scope.attr("export.data_grid"),
             only_relevant= this.scope.attr("export.only_relevant"),
@@ -189,6 +191,9 @@
         }.bind(this))
         .fail(function (data) {
           $("body").trigger("ajax:flash", {"error": data});
+        }.bind(this))
+        .always(function () {
+          this.scope.attr("export.loading", false)
         }.bind(this));
       }
     }

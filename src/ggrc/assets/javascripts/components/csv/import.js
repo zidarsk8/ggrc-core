@@ -21,7 +21,7 @@
         var state = this.attr("state") || "select",
             states = {
               select: {class: "btn-success", text: "Choose CSV file to import"},
-              analyse: {class: "btn-draft", text: "Analysing", isDisabled: true},
+              analysing: {class: "btn-draft", text: "Analysing", isDisabled: true},
               import: {class: "btn-primary", text: "Import data"},
               importing: {class: "btn-draft", text: "Importing", isDisabled: true},
               success: {class: "btn-success", text: "<i class=\"grcicon-check-white\"></i> Import successful"}
