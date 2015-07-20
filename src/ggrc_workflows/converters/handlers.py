@@ -7,6 +7,7 @@
 
 from ggrc.converters.handlers import ColumnHandler
 from ggrc.converters import errors
+from ggrc_workflows.models import Workflow
 
 
 class FrequencyColumnHandler(ColumnHandler):
@@ -36,6 +37,34 @@ class FrequencyColumnHandler(ColumnHandler):
     return reverse_map.get(value, value)
 
 
+class WorkflowColumnHandler(ColumnHandler):
+
+  """ handler for task group to workflow mapping column """
+
+  def parse_item(self):
+    """ get parent workflow id """
+    new_workflows = self.new_objects[Workflows]
+    if self.raw_value == "":
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+      return None
+    slug = self.raw_value
+    if slug in new_workflows:
+      workflow = new_workflows[slug]
+    else:
+      workflow = Workflow.query.filter(Workflow.slug == slug).first()
+
+    if workflow is None:
+      self.add_error(errors.UNKNOWN_OBJECT, object_type="Workflow", slug=slug)
+      return None
+
+    return workflow.id
+
+  def get_value(self):
+    val = getattr(self.row_converter.obj, self.key, False)
+    return val.slug
+
+
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
+    "workflow_id": WorkflowColumnHandler,
 }

@@ -24,6 +24,7 @@ class TaskGroup(
 
   task_group_objects = db.relationship(
       'TaskGroupObject', backref='task_group', cascade='all, delete-orphan')
+
   objects = association_proxy(
       'task_group_objects', 'object', 'TaskGroupObject')
 
@@ -57,7 +58,7 @@ class TaskGroup(
       "secondary_contact": None,
       "start_date": None,
       "end_date": None,
-      "workflow": {
+      "workflow_id": {
           "display_name": "Workflow",
           "mandatory": True,
       }
