@@ -250,7 +250,27 @@ can.Control("CMS.Controllers.TreeLoader", {
       sort_function = function(old_item, new_item) {
         return original_function(old_item.instance, new_item.instance);
       };
-      temp_list.sort(sort_function);
+      if (original_function.fetch_key && original_function.order_factor) {
+        _.each(temp_list, function (v) {
+          v.__sort_key = original_function.fetch_key(v);
+        });
+        temp_list.sort(function(old_item, new_item) {
+          var a = old_item.__sort_key,
+              b = new_item.__sort_key;
+          if (a === b) {
+            return 0;
+          } else if (a < b) {
+            return -original_function.order_factor;
+          } else {
+            return original_function.order_factor;
+          }
+        });
+        _.each(temp_list, function (v) {
+          delete v.__sort_key;
+        });
+      } else {
+        temp_list.sort(sort_function);
+      }
     }
 
     temp_list = can.map(temp_list, function(o) { if (o.instance.selfLink) return o; });
@@ -1337,6 +1357,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
          }
          return 0;
       };
+
+      this.options.sort_function.fetch_key = fetch;
+      this.options.sort_function.order_factor = order_factor;
 
       this.options.sort_direction = order;
       this.options.sort_by = key;
