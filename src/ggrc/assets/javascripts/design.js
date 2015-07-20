@@ -101,10 +101,10 @@ jQuery(function ($) {
       $('#programinformationUnlocked').tab('show');
   });
 
-  for (i=0;i<=50;i++) {
+  for (var i=0;i<=50;i++) {
     $('#tooltip' + i).tooltip();
   }
-  
+
 //if includes a xpander we need to toggle it.
 $('body').on('click', '.grcicon-more', function(e) {
   //bootstrap data toggle opens this one up, but ...
