@@ -324,7 +324,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       //filtered_items = items;
 
       //find current widget model and check if first layer tree
-      if (this.options.parent) { //this is a second label tree
+      if (GGRC.page_object && this.options.parent) { //this is a second label tree
         var parent_model_name = this.options.parent.options.model.shortName;
         child_tree_display_list = GGRC.tree_view.sub_tree_for[parent_model_name].display_list;
 
