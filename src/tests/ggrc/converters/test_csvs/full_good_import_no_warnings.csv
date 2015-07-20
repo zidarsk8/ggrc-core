@@ -55,7 +55,7 @@ Object type,"Must be unique.  Can be left empty for autogeneration.  If updating
 Rich Text
 Drop Down
 Checkboxes",MM/DD/YYYY,MM/DD/YYYY,,,,,,,,,
-Task,code*,summary*,task group,task description,assignee*,task type,start date*,stop date*,relative start day,relative end day,relative start month,relative end month,,,,,
+Task,code*,summary*,task group,task description,assignee*,task type,start*,end*,,,,,,,,,
 ,task-1,task for wf-1,tg-1,test,user1@ggrc.com,One time,7/1/2015,7/15/2015,,,,,,,,,
 ,task-2,task for wf-2,tg-2,test,user1@ggrc.com,Weekly,7/1/2015,7/15/2015,,,,,,,,,
 ,task-3,task for wf-3,tg-3,test,user1@ggrc.com,Monthly,7/1/2015,7/15/2015,,,,,,,,,
