@@ -57,26 +57,29 @@
       </div><!-- item-wrap end -->
     </div><!-- item-main end -->
 
+
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
-        {{!#pack instance=this}}
-          {{#find_template 'tier2_content' instance}}
-            {{#instance.class.table_singular}}
-              {{{renderLive template}}}
-            {{/instance}}
-          {{else}}
-            <div class="show-description">
-              <div class="row-fluid">
-                <div class="span12">
-                  <div class="tree-description short">
-                    {{{instance.description}}}
+        <lazy-openclose>
+          {{#show}}
+            {{#find_template 'tier2_content' instance}}
+              {{#instance.class.table_singular}}
+                {{{renderLive template}}}
+              {{/instance}}
+            {{else}}
+              <div class="show-description">
+                <div class="row-fluid">
+                  <div class="span12">
+                    <div class="tree-description short">
+                      {{{instance.description}}}
+                    </div>
+                    {{{show_long}}}
                   </div>
-                  {{{show_long}}}
                 </div>
               </div>
-            </div>
-          {{/find_template}}
-        {{!/pack}}
+            {{/find_template}}
+          {{/show}}
+        </lazy-openclose>
       </div>
     </div>
 </li>
