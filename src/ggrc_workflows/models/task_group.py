@@ -58,7 +58,7 @@ class TaskGroup(
       "secondary_contact": None,
       "start_date": None,
       "end_date": None,
-      "workflow_id": {
+      "workflow": {
           "display_name": "Workflow",
           "mandatory": True,
       }

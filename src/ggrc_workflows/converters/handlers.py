@@ -6,6 +6,7 @@
 """ Module for all special column handlers for workflow objects """
 
 from ggrc.converters.handlers import ColumnHandler
+from ggrc.converters.handlers import CheckboxColumnHandler
 from ggrc.converters import errors
 from ggrc_workflows.models import Workflow
 
@@ -27,7 +28,7 @@ class FrequencyColumnHandler(ColumnHandler):
       return None
     value = self.raw_value.lower()
     frequency = self.frequency_map.get(value, value)
-    if value not in self.row_converter.object_class.VALID_FREQUENCIES:
+    if frequency not in self.row_converter.object_class.VALID_FREQUENCIES:
       self.add_error(errors.WRONG_VALUE, column_name=self.display_name)
     return frequency
 
@@ -37,34 +38,43 @@ class FrequencyColumnHandler(ColumnHandler):
     return reverse_map.get(value, value)
 
 
-class WorkflowColumnHandler(ColumnHandler):
+class ParentColumnHandler(ColumnHandler):
 
-  """ handler for task group to workflow mapping column """
+  """ handler for directly mapped columns """
+
+  parent = None
+
+  def __init__(self, row_converter, key, **options):
+    super(ParentColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
     """ get parent workflow id """
-    new_workflows = self.new_objects[Workflows]
     if self.raw_value == "":
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
       return None
     slug = self.raw_value
-    if slug in new_workflows:
-      workflow = new_workflows[slug]
-    else:
-      workflow = Workflow.query.filter(Workflow.slug == slug).first()
-
-    if workflow is None:
-      self.add_error(errors.UNKNOWN_OBJECT, object_type="Workflow", slug=slug)
-      return None
-
-    return workflow.id
+    obj = self.new_objects.get(self.parent, {}).get(slug)
+    if obj is None:
+      obj = self.parent.query.filter(self.parent.slug == slug).first()
+    if obj is None:
+      self.add_error(errors.UNKNOWN_OBJECT,
+                     object_type=self.parent._inflector.human_singular.title(),
+                     slug=slug)
+    return obj
 
   def get_value(self):
-    val = getattr(self.row_converter.obj, self.key, False)
-    return val.slug
+    return self.value.slug
+
+
+class WorkflowColumnHandler(ParentColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.parent = Workflow
+    super(WorkflowColumnHandler, self).__init__(row_converter, key, **options)
 
 
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
-    "workflow_id": WorkflowColumnHandler,
+    "workflow": WorkflowColumnHandler,
+    "notify_on_change": CheckboxColumnHandler,
 }
