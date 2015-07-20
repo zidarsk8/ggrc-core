@@ -1088,7 +1088,7 @@ can.Component.extend({
       that.scope.attr("attributes", {});
     },
     "a[data-object-source] modal:success": "addMapings",
-    "deffer:add": "addMapings",
+    "defer:add": "addMapings",
     "addMapings": function(el, ev, data) {
       ev.stopPropagation();
       var mapping;
