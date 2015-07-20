@@ -136,28 +136,29 @@
         if (this.scope.attr("deferred")) {
           return this.defferedSave();
         }
+
         var type = this.scope.attr("mapper.type"),
             object = this.scope.attr("mapper.object"),
+            isAllObject = type === "AllObject",
             instance = CMS.Models[object].findInCacheById(this.scope.attr("mapper.join_object_id")),
-            mapping = GGRC.Mappings.get_canonical_mapping(this.scope.attr("mapper.object"), type),
-            Model = CMS.Models[mapping.model_name],
-            data = {},
-            deffer = [],
+            mapping, Model, data = {}, deffer = [],
             que = new RefreshQueue();
 
         this.scope.attr("mapper.is_saving", true);
         que.enqueue(instance).trigger().done(function (inst) {
-          // TODO: Figure what to do with context?
           data["context"] = null;
-          data[mapping.object_attr] = {
-            href: instance.href,
-            type: instance.type,
-            id: instance.id
-          };
-
           _.each(this.scope.attr("mapper.selected"), function (desination) {
             var modelInstance;
+
+            mapping = GGRC.Mappings.get_canonical_mapping(object, isAllObject ? desination.type : type);
+            Model = CMS.Models[mapping.model_name];
+            data[mapping.object_attr] = {
+              href: instance.href,
+              type: instance.type,
+              id: instance.id
+            };
             data[mapping.option_attr] = desination;
+
             modelInstance = new Model(data);
             deffer.push(modelInstance.save());
           }, this);
