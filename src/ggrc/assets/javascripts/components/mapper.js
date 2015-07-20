@@ -153,8 +153,19 @@
           data["context"] = null;
           _.each(this.scope.attr("mapper.selected"), function (desination) {
             var modelInstance;
+            type = isAllObject ? desination.type : type;
+            mapping = GGRC.Mappings.get_canonical_mapping(object, type);
 
-            mapping = GGRC.Mappings.get_canonical_mapping(object, isAllObject ? desination.type : type);
+            // TODO: Exception, we need to move section under Relationship table
+            //       and handle this in backend
+            if (~["Section", "Clause"].indexOf(type)) {
+              mapping = {
+                model_name: "Relationship",
+                object_attr: "source",
+                object_join_attr: "related_destinations",
+                option_attr: "destination"
+              };
+            }
             Model = CMS.Models[mapping.model_name];
             data[mapping.object_attr] = {
               href: instance.href,
