@@ -88,7 +88,9 @@
       var $el = $(el),
           data = {},
           id = +$el.attr("join-object-id"),
-          object = $el.attr("object");
+          object = $el.attr("object"),
+          type = $el.attr("type"),
+          tree_view = GGRC.tree_view.sub_tree_for[object];
 
       if ($el.attr("search-only")) {
         data["search_only"] =  /true/i.test($el.attr("search-only"));
@@ -97,9 +99,11 @@
         data["object"] = object;
       }
       if (!data["search_only"]) {
-        data["type"] = id === GGRC.page_instance().id ?
-                       $el.attr("type")
-                       : GGRC.tree_view.sub_tree_for[object].display_list[0];
+        if (id === GGRC.page_instance().id || !tree_view) {
+          data["type"] = GGRC.Models[type] ? type : "AllObject";
+        } else {
+          data["type"] = tree_view.display_list[0];
+        }
       }
       data["join_object_id"] = id || GGRC.page_instance().id;
       return {
