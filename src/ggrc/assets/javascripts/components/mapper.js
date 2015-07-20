@@ -115,7 +115,7 @@
         this.setModel();
         this.setBinding();
       },
-      "defferedSave": function () {
+      "deferedSave": function () {
         var data = {
               multi_map: true,
               arr: _.map(this.scope.attr("mapper.selected"), function (desination) {
@@ -127,7 +127,7 @@
                     }
                   }.bind(this))
             };
-        this.scope.attr("deferred_to").controller.element.trigger("deffer:add", [data, {map_and_save: true}]);
+        this.scope.attr("deferred_to").controller.element.trigger("defer:add", [data, {map_and_save: true}]);
         // TODO: Find proper way to dismiss the modal
         this.element.find(".modal-dismiss").trigger("click");
       },
@@ -138,14 +138,14 @@
         }
         // TODO: Figure out nicer / proper way to handle deferred save
         if (this.scope.attr("deferred")) {
-          return this.defferedSave();
+          return this.deferedSave();
         }
 
         var type = this.scope.attr("mapper.type"),
             object = this.scope.attr("mapper.object"),
             isAllObject = type === "AllObject",
             instance = CMS.Models[object].findInCacheById(this.scope.attr("mapper.join_object_id")),
-            mapping, Model, data = {}, deffer = [],
+            mapping, Model, data = {}, defer = [],
             que = new RefreshQueue();
 
         this.scope.attr("mapper.is_saving", true);
@@ -164,10 +164,10 @@
             data[mapping.option_attr] = desination;
 
             modelInstance = new Model(data);
-            deffer.push(modelInstance.save());
+            defer.push(modelInstance.save());
           }, this);
 
-          $.when.apply($, deffer)
+          $.when.apply($, defer)
             .fail(function (response, message) {
               $("body").trigger("ajax:flash", {"error": message});
             }.bind(this))
