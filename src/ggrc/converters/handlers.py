@@ -57,14 +57,6 @@ class ColumnHandler(object):
   def parse_item(self):
     return self.raw_value
 
-  def validate(self):
-    if callable(self.validator):
-      try:
-        self.validator(self.row_converter.obj, self.key, self.value)
-      except ValueError:
-        self.add_error("invalid status '{}'".format(self.value))
-    return True
-
   def set_obj_attr(self):
     if not self.value:
       return
