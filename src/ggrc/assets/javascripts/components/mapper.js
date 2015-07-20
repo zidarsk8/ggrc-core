@@ -115,7 +115,7 @@
         this.setModel();
         this.setBinding();
       },
-      "deferedSave": function () {
+      "deferredSave": function () {
         var data = {
               multi_map: true,
               arr: _.map(this.scope.attr("mapper.selected"), function (desination) {
@@ -138,7 +138,7 @@
         }
         // TODO: Figure out nicer / proper way to handle deferred save
         if (this.scope.attr("deferred")) {
-          return this.deferedSave();
+          return this.deferredSave();
         }
 
         var type = this.scope.attr("mapper.type"),
