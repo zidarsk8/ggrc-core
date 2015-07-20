@@ -9,7 +9,7 @@
 
 function _firstElementChild(el) {
   if (el.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-    for (i=0; i<el.childNodes.length; i++) {
+    for (var i=0; i<el.childNodes.length; i++) {
       if (el.childNodes[i].nodeType !== Node.TEXT_NODE)
         return el.childNodes[i];
     }

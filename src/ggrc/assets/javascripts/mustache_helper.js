@@ -1902,7 +1902,7 @@ Mustache.registerHelper("with_review_task", function (options) {
   var tasks = options.contexts.attr('approval_tasks');
   tasks = Mustache.resolve(tasks);
   if (tasks) {
-    for (i = 0; i < tasks.length; i++) {
+    for (var i = 0; i < tasks.length; i++) {
       return options.fn(options.contexts.add({review_task: tasks[i].instance}));
     }
   }
