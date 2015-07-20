@@ -100,7 +100,7 @@
       }
       if (!data["search_only"]) {
         if (id === GGRC.page_instance().id || !tree_view) {
-          data["type"] = GGRC.Models[type] ? type : "AllObject";
+          data["type"] = CMS.Models[type] ? type : "AllObject";
         } else {
           data["type"] = tree_view.display_list[0];
         }
