@@ -319,7 +319,9 @@ Mustache.registerHelper("firstexist", function () {
   var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)
   for (var i = 0; i < args.length; i++) {
     var v = resolve_computed(args[i]);
-    if (v != null) return v.toString();
+    if (v && v.length) {
+      return v.toString();
+    }
   }
   return "";
 });
