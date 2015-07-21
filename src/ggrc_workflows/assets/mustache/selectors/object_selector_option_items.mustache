@@ -38,7 +38,11 @@
                     class="object-check-single {{#if isloading}}disabled{{/if}}"
 
                     {{#if mapper.is_saving}}disabled="true"{{/if}}
-                    {{#if select_all}}checked{{/if}}
+                    {{#if_helpers '\
+                      #if' select_all '\
+                      or #if' appended}}
+                      checked
+                    {{/if_helpers}}
                     {{#if mappings.length}}
                       {{#result_direct_mappings bindings_compute selected_object}}
                         checked disabled="true"
