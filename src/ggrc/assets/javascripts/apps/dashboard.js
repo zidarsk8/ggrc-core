@@ -59,6 +59,7 @@ var admin_list_descriptors = {
   , "custom_attributes" : {
     parent_instance: CMS.Models.CustomAttributable,
     model: CMS.Models.CustomAttributable,
+    header_view: GGRC.mustache_path + "/custom_attribute_definitions/tree_header.mustache",
     show_view: GGRC.mustache_path + "/custom_attribute_definitions/tree.mustache",
     sortable: false,
     list_loader: function(instance) {

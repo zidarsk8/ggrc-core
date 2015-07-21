@@ -180,6 +180,7 @@ dashboard-js-template-files:
   - custom_attribute_definitions/modal_content.mustache
   - custom_attribute_definitions/tree.mustache
   - custom_attribute_definitions/subtree.mustache
+  - custom_attribute_definitions/tree_header.mustache
   - dashboard/internav_list.mustache
   - dashboard/info/info.mustache
   - dashboard/info/get_started.mustache
