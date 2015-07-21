@@ -66,18 +66,18 @@ if not settings.AUTOBUILD_ASSETS:
 environment.url = '/static'
 environment.directory = os.path.join(settings.MODULE_DIR, 'static')
 
-environment.load_path = [settings.THIRD_PARTY_DIR]
+environment.load_path = [settings.THIRD_PARTY_DIR, settings.BOWER_DIR]
 
 _per_module_load_suffixes = [
-  'assets/javascripts',
-  'assets/mustache',
-  'assets/vendor/javascripts',
-  'assets/vendor/bootstrap-sass/vendor/assets/javascripts',
-  'assets/vendor/remoteipart/vendor/assets/javascripts',
-  'assets/stylesheets',
-  'assets/vendor/stylesheets',
-  'assets/js_specs',
-  ]
+    'assets/javascripts',
+    'assets/mustache',
+    'assets/vendor/javascripts',
+    'assets/vendor/bootstrap-sass/vendor/assets/javascripts',
+    'assets/vendor/remoteipart/vendor/assets/javascripts',
+    'assets/stylesheets',
+    'assets/vendor/stylesheets',
+    'assets/js_specs',
+]
 
 for module_load_base in module_load_paths:
   module_load_paths = [

@@ -19,6 +19,7 @@ BASE_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
 MODULE_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 SETTINGS_DIR = os.path.join(BASE_DIR, 'ggrc', 'settings')
 THIRD_PARTY_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'third_party'))
+BOWER_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'bower_components'))
 
 from default import *
 
