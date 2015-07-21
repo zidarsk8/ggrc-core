@@ -4,33 +4,33 @@
 # Maintained By: dan@reciprocitylabs.com
 
 dashboard-js-files:
-  # 3rd party:
   - tracker.js
-  - jquery/jquery.js
-  - lodash/lodash.js
-  - jquery/jquery-ui.js
-  - bootstrap/bootstrap-alert.js
-  - bootstrap/bootstrap-collapse.js
-  - bootstrap/bootstrap-dropdown.js
-  - bootstrap/bootstrap-modal.js
-  - bootstrap/bootstrap-tab.js
-  - bootstrap/bootstrap-tooltip.js
-  - bootstrap/bootstrap-popover.js
-  - zeroclipboard/ZeroClipboard.min.js
+  # 3rd party:
+  - jquery/dist/jquery.min.js
+  - lodash/lodash.min.js
+  - jquery-ui/jquery-ui.min.js
+  - bootstrap/js/bootstrap-alert.js
+  - bootstrap/js/bootstrap-collapse.js
+  - bootstrap/js/bootstrap-dropdown.js
+  - bootstrap/js/bootstrap-modal.js
+  - bootstrap/js/bootstrap-tab.js
+  - bootstrap/js/bootstrap-tooltip.js
+  - bootstrap/js/bootstrap-popover.js
+  - zeroclipboard/dist/ZeroClipboard.min.js
   - stickyfill/stickyfill.js
   - mousetrap/mousetrap.min.js
-  - can/can.jquery.js
-  - can/can.construct.super.js
-  - can/can.map.validations.js
-  - can/can.control.plugin.js
-  - can/can.construct.proxy.js
-  - can/can.map.attributes.js
-  - can/can.map.backup.js
+  - canjs/can.jquery.js
+  - canjs/can.construct.super.js
+  - canjs/can.map.validations.js
+  - canjs/can.control.plugin.js
+  - canjs/can.construct.proxy.js
+  - canjs/can.map.attributes.js
+  - canjs/can.map.backup.js
   - wysihtml5/advanced.js
   - wysihtml5/wysihtml5-0.4.0pre.js
   - wysihtml5/bootstrap-wysihtml5-0.0.2.js
-  - moment/moment.js
-  - spin/spin.min.js
+  - moment/min/moment.min.js
+  - spinjs/spin.js
   # end 3rd party
   - bootstrap/wysihtml5.js
   - bootstrap/sticky-popover.js
@@ -355,22 +355,19 @@ dashboard-js-spec-files:
   - models/cacheable_spec.js
 
 dashboard-js-spec-helpers:
-  - jasmine/jasmine-fixture.js
+  - jasmine-fixture/dist/jasmine-fixture.min.js
   - spec_helpers.js
 
 mockup-js-files:
   # 3rd party
-  - jquery/jquery.js
-  - jquery/jquery-ui.js
-  - jquery/easing.js
-  - jquery/jquery.event.drag-2.2.js
-  - affix/affix.js
-  - bootstrap/bootstrap-modal.js
-  - bootstrap/bootstrap-collapse.js
-  - bootstrap/bootstrap-dropdown.js
-  - bootstrap/bootstrap-tooltip.js
-  - bootstrap/bootstrap-popover.js
-  - bootstrap/bootstrap-transition.js
-  - can/can.jquery.js
-  - can/can.object.js
+  - jquery/dist/jquery.js
+  - jquery-ui/jquery-ui.js
+  - bootstrap/js/bootstrap-modal.js
+  - bootstrap/js/bootstrap-collapse.js
+  - bootstrap/js/bootstrap-dropdown.js
+  - bootstrap/js/bootstrap-tooltip.js
+  - bootstrap/js/bootstrap-popover.js
+  - bootstrap/js/bootstrap-transition.js
+  - canjs/can.jquery.js
+  - canjs/can.object.js
   # 3rd party end
