@@ -3098,7 +3098,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
       audit, programs, program, control, json;
 
   if (!audits.length) {
-    return "{}";
+    return "";
   }
 
   audit = audits[0].instance.reify();
