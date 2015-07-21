@@ -919,7 +919,7 @@ can.Model("can.Model.Cacheable", {
     if(!this._pending_refresh) {
       this._pending_refresh = {
         dfd : new $.Deferred()
-        , fn : $.throttle(1000, true, function() {
+        , fn : _.throttle(function() {
           var dfd = that._pending_refresh.dfd;
           can.ajax({
             url : href
@@ -939,7 +939,7 @@ can.Model("can.Model.Cacheable", {
           .fail(function() {
             dfd.reject.apply(dfd, arguments);
           });
-        })
+        }, 1000, {trailing: false})
       };
     }
     dfd = this._pending_refresh.dfd
