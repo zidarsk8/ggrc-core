@@ -85,7 +85,6 @@ for module_load_base in module_load_paths:
         for load_suffix in _per_module_load_suffixes]
   environment.load_path.extend(module_load_paths)
 
-print environment.load_path
 
 def path_without_assets_base(path):
   steps = path.split(os.path.sep)
