@@ -28,11 +28,16 @@ class Converter(object):
       "Section",
       "Control",
       "ControlAssessment",
+      "Workflow",
+      "TaskGroup",
+      "TaskGroupTask",
   ]
 
   priortiy_colums = [
       "email",
       "slug",
+      "workflow",
+      "task_group",
   ]
 
   def __init__(self, **kwargs):

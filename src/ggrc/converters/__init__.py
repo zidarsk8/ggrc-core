@@ -67,6 +67,9 @@ GGRC_IMPORTABLE = {
 
 COLUMN_ORDER = (
     "slug",
+    "task_group",
+    "workflow",
+    "program_id",
     "title",
     "description",
     "test_plan",
@@ -92,7 +95,6 @@ COLUMN_ORDER = (
     "operationally",
     "principal_assessor",
     "private",
-    "program_id",
     "secondary_assessor",
     "secondary_contact",
     "status",
