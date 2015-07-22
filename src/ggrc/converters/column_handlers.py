@@ -30,7 +30,7 @@ _column_handlers = {
     "title": handlers.RequiredTextColumnHandler,
     "verify_frequency": handlers.OptionColumnHandler,
     "network_zone": handlers.OptionColumnHandler,
-    "program_id": handlers.ProgramColumnHandler,
+    "program": handlers.ProgramColumnHandler,
     "directive": handlers.SectionDirectiveColumnHandler,
     "control": handlers.ControlColumnHandler,
     "audit": handlers.AuditColumnHandler,

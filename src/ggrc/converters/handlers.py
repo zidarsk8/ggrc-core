@@ -432,7 +432,7 @@ class ProgramColumnHandler(ColumnHandler):
       self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
       return None
 
-    return program.id
+    return program
 
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
