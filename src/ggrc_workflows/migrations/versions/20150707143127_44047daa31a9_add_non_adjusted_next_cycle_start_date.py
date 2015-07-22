@@ -21,7 +21,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
 from datetime import date
-from ggrc import settings, db, logger
+from ggrc.app import app
+from ggrc import settings, db
 import ggrc_workflows.models as models
 
 def upgrade():
@@ -58,7 +59,7 @@ def upgrade():
         # We must skip tasks that don't have start days and end days defined
         if ((not all(tasks_start_days) and not all(tasks_end_days)) or
             (not tasks_start_days and not tasks_end_days)):
-            logger.info(
+            app.logger.info(
                 "Skipping workflow {0} (ID: {1}) because it doesn't "
                 "have relative start and end days specified".format(
                     workflow.title,
@@ -85,7 +86,7 @@ def upgrade():
             start_dates = ["{}/{}".format(task.relative_start_month, task.relative_start_day) for tg in workflow.task_groups for task in tg.task_group_tasks]
             end_dates = ["{}/{}".format(task.relative_end_month, task.relative_end_day) for tg in workflow.task_groups for task in tg.task_group_tasks]
 
-            logger.info("ID: {}, freq: {}, PRE: {}, POST: {}, NON: {}, tasks start: {}, tasks end: {}".format(
+            app.logger.info("Fixed next cycle start date for Workflow with ID: {}; Freq: {}, PRE: {}, POST: {}, NON: {}, tasks start: {}, tasks end: {}".format(
                 workflow.id,
                 workflow.frequency[:2],
                 pre_compute_ncsd,
