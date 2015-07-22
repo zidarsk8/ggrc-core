@@ -768,10 +768,10 @@ can.Control("GGRC.Controllers.Modals", {
         // If this was an Objective created directly from a Section, create a join
         var params = that.options.object_params;
         if (obj instanceof CMS.Models.Objective && params && params.section) {
-          new CMS.Models.SectionObjective({
-            objective: obj
-            , section: CMS.Models.Section.findInCacheById(params.section.id)
-            , context: { id: null }
+          new CMS.Models.Relationship({
+            source: obj,
+            destination: CMS.Models.Section.findInCacheById(params.section.id),
+            context: { id: null }
           }).save()
           .fail(that.save_error.bind(that))
           .done(function(){
@@ -903,6 +903,7 @@ can.Component.extend({
     source_mapping_source: '@',
     mapping: '@',
     attributes: {},
+    list: [],
     // the following are just for the case when we have no object to start with,
     changes: []
   },
@@ -912,7 +913,6 @@ can.Component.extend({
           key;
 
       this.scope.attr("controller", this);
-
       if (!this.scope.instance) {
         this.scope.attr("deferred", true);
       } else if (this.scope.instance.reify) {
@@ -989,7 +989,6 @@ can.Component.extend({
     // descendant class objects.
     autocomplete_select : function(el, event, ui) {
       var mapping, extra_attrs;
-
       extra_attrs = can.reduce(this.element.find("input:not([data-mapping], [data-lookup])").get(), function(attrs, el) {
         attrs[$(el).attr("name")] = $(el).val();
         return attrs;
@@ -1088,21 +1087,21 @@ can.Component.extend({
       that.scope.list.push(obj);
       that.scope.attr("attributes", {});
     },
-    "a[data-object-source] modal:success": function(el, ev, data) {
-      var mapping,
-          that = this;
+    "a[data-object-source] modal:success": "addMapings",
+    "defer:add": "addMapings",
+    "addMapings": function(el, ev, data) {
       ev.stopPropagation();
+      var mapping;
 
       can.each(data.arr || [data], function(obj) {
-
-        if (that.scope.deferred) {
-          that.scope.changes.push({ what: obj, how: "add" });
+        if (this.scope.deferred) {
+          this.scope.changes.push({ what: obj, how: "add" });
         } else {
-          mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);
-          that.scope.instance.mark_for_addition(mapping, obj);
+          mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, obj.constructor.shortName);
+          this.scope.instance.mark_for_addition(mapping, obj);
         }
-        that.scope.list.push(obj);
-      });
+        this.scope.list.push(obj);
+      }, this);
     },
     ".ui-autocomplete-input modal:success" : function(el, ev, data, options) {
       var that = this,

@@ -47,7 +47,6 @@ dashboard-js-files:
   - plugins/tooltip.js
   - plugins/popover.js
   - plugins/popover_template.js
-  - plugins/popover_template_child_node.js
   - application.js
   - jquerypp.custom.js
   - spin.min.js
@@ -93,8 +92,7 @@ dashboard-js-files:
   - models/section.js
   - models/system.js
   - models/join_models.js
-  - controllers/modal_selector_controller.js
-  - controllers/advanced_search_controller.js
+  - controllers/mapper.js
   - pbc/workflow_controller.js
   - models/category.js
   - models/refresh_queue.js
@@ -108,6 +106,10 @@ dashboard-js-files:
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   - components/link_to_clipboard.js
+  - components/relevant_filters.js
+  - components/csv/export.js
+  - components/csv/import.js
+  - components/mapper.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -135,6 +137,7 @@ dashboard-js-template-files:
   - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
   - base_objects/tree.mustache
+  - base_objects/tree_placeholder.mustache
   - base_objects/tree_footer_no_access.mustache
   - base_objects/tree_footer_zero.mustache
   - base_objects/tree_header.mustache
@@ -155,6 +158,7 @@ dashboard-js-template-files:
   - base_objects/notes_and_code.mustache
   - base_objects/modal_contact_fields.mustache
   - base_objects/open_close.mustache
+  - base_objects/sub_tree_type_selector.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
@@ -176,6 +180,7 @@ dashboard-js-template-files:
   - custom_attribute_definitions/modal_content.mustache
   - custom_attribute_definitions/tree.mustache
   - custom_attribute_definitions/subtree.mustache
+  - custom_attribute_definitions/tree_header.mustache
   - dashboard/internav_list.mustache
   - dashboard/info/info.mustache
   - dashboard/info/get_started.mustache
@@ -211,6 +216,8 @@ dashboard-js-template-files:
   - modals/save_cancel_buttons.mustache
   - modals/save_cancel_delete_buttons.mustache
   - modals/unmap_cancel_buttons.mustache
+  - modals/mapper/component.mustache
+  - modals/mapper/base.mustache
   - objectives/info.mustache
   - objectives/list_popover.mustache
   - objectives/modal_content.mustache
@@ -324,7 +331,17 @@ dashboard-js-template-files:
   - search/advanced_search_option_column.mustache
   - search/advanced_search_option_items.mustache
   - search/advanced_search_people_items.mustache
-
+  - import_export/import_export_buttons.mustache
+  - import_export/create_template.mustache
+  - import_export/import_test_result.mustache
+  - import_export/complete.mustache
+  - import_export/faq.mustache
+  - import_export/import.mustache
+  - import_export/export.mustache
+  - import_export/export/object_selector.mustache
+  - import_export/export/attribute_selector.mustache
+  - import_export/export/filter_query.mustache
+  - mapper/relevant_filter.mustache
 
 
 dashboard-css-files:

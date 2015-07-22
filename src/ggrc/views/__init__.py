@@ -1,36 +1,49 @@
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
-
-"""ggrc.views
-Handle non-RESTful views, e.g. routes which return HTML rather than JSON
-"""
+# Maintained By: miha@reciprocitylabs.com
 
 import json
 from flask import flash
 from flask import g
 from flask import render_template
 from flask import url_for
+from werkzeug.exceptions import Forbidden
+
+from ggrc import models
 from ggrc import settings
-from ggrc.extensions import get_extension_modules
 from ggrc.app import app
-from ggrc.rbac import permissions
+from ggrc.app import db
+from ggrc.builder.json import publish
+from ggrc.builder.json import publish_representation
+from ggrc.converters.import_helper import get_object_column_json
+from ggrc.extensions import get_extension_modules
+from ggrc.fulltext import get_indexer
+from ggrc.fulltext.recordbuilder import fts_record_for
+from ggrc.fulltext.recordbuilder import model_is_indexed
 from ggrc.login import get_current_user
 from ggrc.login import login_required
-from ggrc.services.common import as_json, inclusion_filter
-from ggrc.builder.json import publish, publish_representation
-from ggrc.views.converters import *  # necessary for import endpoints
-from werkzeug.exceptions import Forbidden
-from . import filters
-from .registry import object_view
-from ggrc.models.background_task import (
-    queued_task, create_task, make_task_response
-)
-from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+from ggrc.models import all_models
+from ggrc.models.background_task import create_task
+from ggrc.models.background_task import make_task_response
+from ggrc.models.background_task import queued_task
+from ggrc.rbac import permissions
+from ggrc.services.common import as_json
+from ggrc.services.common import inclusion_filter
+from ggrc.views import filters
+from ggrc.views import mockups
+from ggrc.views import converters
+from ggrc.views.common import RedirectedPolymorphView
+from ggrc.views.registry import object_view
 
+
+"""ggrc.views
+Handle non-RESTful views, e.g. routes which return HTML rather than JSON
+"""
 
 # Needs to be secured as we are removing @login_required
+
+
 @app.route("/_background_tasks/reindex", methods=["POST"])
 @queued_task
 def reindex(_):
@@ -38,14 +51,8 @@ def reindex(_):
   Web hook to update the full text search index
   """
 
-  from ggrc.fulltext import get_indexer
-  from ggrc.fulltext.recordbuilder import fts_record_for, model_is_indexed
-
   indexer = get_indexer()
   indexer.delete_all_records(False)
-
-  from ggrc.models import all_models
-  from ggrc.app import db
 
   # Find all models then remove base classes
   #   (If we don't remove base classes, we get duplicates in the index.)
@@ -97,25 +104,38 @@ def get_current_user_json():
 
 def get_attributes_json():
   """Get a list of all custom attribute definitions"""
-  attrs = CustomAttributeDefinition.eager_query().all()
+  attrs = models.CustomAttributeDefinition.eager_query().all()
   published = []
   for attr in attrs:
     published.append(publish_representation(publish(attr)))
   return as_json(published)
 
 
+def get_all_attributes_json():
+  """Get a list of all attribute definitions
+
+  This exports all attributes related to a given model, including custom
+  attributies and mapping attributes, that are used in csv import and export.
+  """
+  published = {}
+  for model in all_models.all_models:
+    published[model.__name__] = get_object_column_json(model)
+  return as_json(published)
+
+
 @app.context_processor
 def base_context():
   """Gets the base context"""
-  from ggrc.models import get_model
   return dict(
-      get_model=get_model,
+      get_model=models.get_model,
       permissions_json=get_permissions_json,
       permissions=permissions,
       config_json=get_config_json,
       current_user_json=get_current_user_json,
       attributes_json=get_attributes_json,
+      all_attributes_json=get_all_attributes_json,
   )
+
 
 # Actual HTML-producing routes
 #
@@ -139,6 +159,14 @@ def index():
 @login_required
 def dashboard():
   """The dashboard page
+  """
+  return render_template("dashboard/index.haml")
+
+
+@app.route("/objectBrowser")
+@login_required
+def objectBrowser():
+  """The object Browser page
   """
   return render_template("dashboard/index.haml")
 
@@ -182,8 +210,6 @@ def get_task_response(id_task):
 
 def contributed_object_views():
   """Contributed object views"""
-  from ggrc import models
-  from .common import RedirectedPolymorphView
 
   return [
       object_view(models.BackgroundTask),
@@ -230,10 +256,12 @@ def all_object_views():
 
 def init_extra_views(_):
   """Init any extra views needed by the app
-     Currently, init_extra_views is only used by
-     extensions, but this is here for completeness.
+
+  This should be used for any views that might use extension modules.
   """
-  pass
+  mockups.init_mockup_views()
+  filters.init_filter_views()
+  converters.init_converter_views()
 
 
 def init_all_views(app):
@@ -251,247 +279,6 @@ def init_all_views(app):
     ext_extra_views = getattr(extension_module, "init_extra_views", None)
     if ext_extra_views:
       ext_extra_views(app)
-
-
-# Mockups HTML pages are listed here
-@app.route("/mockups/v1.0/program.html")
-@login_required
-def mockup():
-  """The mockup program guide page
-  """
-  return render_template("mockups/v1.0/program.html")
-
-
-@app.route("/mockups/v1.0/assessment.html")
-@login_required
-def assessments():
-  """The assessments guide page
-  """
-  return render_template("mockups/v1.0/assessment.html")
-
-
-@app.route("/mockups/v1.0/assessment-start.html")
-@login_required
-def assessments_start():
-  """The assessment start guide page
-  """
-  return render_template("mockups/v1.0/assessment-start.html")
-
-
-@app.route("/mockups/v1.0/object.html")
-@login_required
-def assessments_object():
-  """The assessment object guide page
-  """
-  return render_template("mockups/v1.0/object.html")
-
-
-@app.route("/mockups/v1.0/object-final.html")
-@login_required
-def assessments_object_final():
-  """The assessment object final guide page
-  """
-  return render_template("mockups/v1.0/object-final.html")
-
-
-@app.route("/mockups/v1.0/my-work.html")
-@login_required
-def assessments_my_work():
-  """The assessment my work guide page
-  """
-  return render_template("mockups/v1.0/my-work.html")
-
-
-@app.route("/mockups/assessments_grid")
-@login_required
-def assessments_grid():
-  """The assessments grid guide page
-  """
-  return render_template("mockups/assessments-grid.html")
-
-
-@app.route("/mockups/v1.1/index.html")
-@login_required
-def workflow_assessment():
-  """The workflow assessment guide page
-  """
-  return render_template("mockups/v1.1/index.html")
-
-
-@app.route("/mockups/v1.1/workflow.html")
-@login_required
-def workflow_info():
-  """The workflow info guide page
-  """
-  return render_template("mockups/v1.1/workflow.html")
-
-
-@app.route("/mockups/rapid-data-entry/index.html")
-@login_required
-def rapid_data_entry():
-  """Rapid data entry mockup
-  """
-  return render_template("mockups/rapid-data-entry/index.html")
-
-
-@app.route("/mockups/custom-attributes/index.html")
-@login_required
-def custom_attributes():
-  """Custom attributes mockup
-  """
-  return render_template("mockups/custom-attributes/index.html")
-
-
-@app.route("/mockups/data-grid/")
-@login_required
-def reporting():
-  """Reporting mockup
-  """
-  return render_template("mockups/data-grid/index.html")
-
-
-@app.route("/mockups/dashboard-ui/index.html")
-@login_required
-def dashboard_ui():
-  """Dashboard UI UX mockup
-  """
-  return render_template("mockups/dashboard-ui/index.html")
-
-
-@app.route("/mockups/dashboard-ui/object.html")
-@login_required
-def object_ui():
-  """Object UI UX mockup
-  """
-  return render_template("mockups/dashboard-ui/object.html")
-
-
-@app.route("/mockups/dashboard-ui/tree.html")
-@login_required
-def tree_ui():
-  """Tree UI UX mockup
-  """
-  return render_template("/mockups/dashboard-ui/tree.html")
-
-
-@app.route("/mockups/dashboard-ui/workflow.html")
-@login_required
-def workflow_ui():
-  """Workflow UI UX mockup
-  """
-  return render_template("/mockups/dashboard-ui/workflow.html")
-
-
-@app.route("/mockups/dashboard-ui/workflow-info.html")
-@login_required
-def workflow_info_ui():
-  """Workflow info UI UX mockup
-  """
-  return render_template("/mockups/dashboard-ui/workflow-info.html")
-
-
-@app.route("/mockups/dashboard-ui/workflow-people.html")
-@login_required
-def workflow_people_ui():
-  """Workflow people UI UX mockup
-  """
-  return render_template("/mockups/dashboard-ui/workflow-people.html")
-
-
-@app.route("/mockups/dashboard-ui/audit.html")
-@login_required
-def audit_ui():
-  """Audit UI UX mockup
-  """
-  return render_template("/mockups/dashboard-ui/audit.html")
-
-
-@app.route("/mockups/dashboard-ui/audit-info.html")
-@login_required
-def audit_info_ui():
-  """Audit info UI UX mockup
-  """
-  return render_template("/mockups/dashboard-ui/audit-info.html")
-
-
-@app.route("/mockups/dashboard-ui/audit-people.html")
-@login_required
-def audit_people_ui():
-  """Audit people UI UX mockup
-  """
-  return render_template("/mockups/dashboard-ui/audit-people.html")
-
-
-@app.route("/mockups/audit-revamp/info.html")
-@login_required
-def audit_info_revamp():
-  """Audit info revamp mockup
-  """
-  return render_template("/mockups/audit-revamp/info.html")
-
-
-@app.route("/mockups/audit-revamp/issues.html")
-@login_required
-def audit_info_issues_revamp():
-  """Audit info issues revamp mockup
-  """
-  return render_template("/mockups/audit-revamp/issues.html")
-
-
-@app.route("/mockups/audit-3.0/")
-@login_required
-def audit_3_0():
-  """Audit 3.0 mockup
-  """
-  return render_template("/mockups/audit-3.0/info.html")
-
-
-@app.route("/mockups/audit-3.0/control-assessment.html")
-@login_required
-def audit_3_0_ca():
-  """Audit 3.0 CA mockup
-  """
-  return render_template("/mockups/audit-3.0/control-assessment.html")
-
-
-@app.route("/mockups/import/")
-@login_required
-def import_redesign():
-  """Import prototype
-  """
-  return render_template("/mockups/import/index.html")
-
-
-@app.route("/mockups/export/")
-@login_required
-def export_redesign():
-  """Export prototype
-  """
-  return render_template("/mockups/export/index.html")
-
-
-@app.route("/mockups/export-object/")
-@login_required
-def export_object_redesign():
-  """Export object prototype
-  """
-  return render_template("/mockups/export/object.html")
-
-
-@app.route("/mockups/data-grid/export-object.html")
-@login_required
-def data_grid_export_object():
-  """Data grid export object mockup
-  """
-  return render_template("mockups/data-grid/export-object.html")
-
-
-@app.route("/mockups/risk-assessment")
-@login_required
-def risk_assessment_redesign():
-  """Risk Assessment mockup
-  """
-  return render_template("/mockups/risk-assessment/index.html")
 
 
 @app.route("/permissions")

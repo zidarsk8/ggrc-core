@@ -16,6 +16,9 @@ class Vendor(HasObjectState, CustomAttributable, Documentable, Personable,
              Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'vendors'
 
-  _aliases = {"url": "Vendor URL"}
+  _aliases = {
+      "url": "Vendor URL",
+      "reference_url": "Reference URL",
+  }
 
 track_state_for_class(Vendor)

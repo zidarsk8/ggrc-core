@@ -309,6 +309,20 @@ can.Model.Cacheable("CMS.Models.Request", {
     , header_view : GGRC.mustache_path + "/requests/tree_header.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
     , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
+    , attr_list : [
+      {attr_title: 'Title', attr_name: 'description'},
+      {attr_title: 'Request Object', attr_name: 'audit_object'},
+      {attr_title: 'Assignee', attr_name: 'assignee'},
+      {attr_title: 'Status', attr_name: 'status'},
+      {attr_title: 'Last Updated', attr_name: 'updated_at'},
+      {attr_title: 'Request Date', attr_name: 'requested_on', attr_sort_field: 'report_start_date'},
+      {attr_title: 'Due Date', attr_name: 'due_on', attr_sort_field: 'due_on'},
+      {attr_title: 'Request Type', attr_name: 'request_type'},
+      {attr_title: 'Code', attr_name: 'slug'},
+      {attr_title: 'Responses', attr_name: 'mapped_responses'}
+    ]
+    , display_attr_names : ['description', 'audit_object', 'assignee', 'due_on', 'status']
+    , mandatory_attr_names : ['description']
     , draw_children : true
     , child_options : [{
       model : "Response"

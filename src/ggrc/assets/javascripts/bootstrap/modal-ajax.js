@@ -222,6 +222,7 @@
       , model = CMS.Models[$trigger.attr("data-object-singular")] || CMS.ModelHelpers[$trigger.attr("data-object-singular")]
       , mapping = $trigger.data('mapping')
       , instance;
+
       if($trigger.attr('data-object-id') === "page") {
         instance = GGRC.page_instance();
       } else {
@@ -492,8 +493,13 @@
           , toggle_type = $(this).data('toggle')
           , modal_id, target, $target, option, href, new_target, modal_type;
 
-        if(e.type === "keydown" && e.which !== 13)
+
+        if ($this.hasClass("disabled")) {
+          return;
+        }
+        if (e.type === "keydown" && e.which !== 13) {
           return;  //activate for keydown on Enter/Return only.
+        }
 
         href = $this.attr('data-href') || $this.attr('href');
         modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '');

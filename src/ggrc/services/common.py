@@ -525,21 +525,6 @@ class ModelView(View):
   def not_found_response(self):
     return current_app.make_response((self.not_found_message(), 404, []))
 
-  def etag(self, last_modified):
-    """Generate the etag given a datetime for the last time the resource was
-    modified. This isn't as good as an etag generated off of a hash of the
-    representation, but, it doesn't require the representation in order to be
-    calculated. An alternative would be to keep an etag on the stored
-    representation, but this will do for now.
-
-    .. note::
-
-       Using the datetime implies the need for some care - the resolution of
-       the time object needs to be sufficient such that you don't end up with
-       the same etag due to two updates performed in rapid succession.
-    """
-    return '"{0}"'.format(hashlib.sha1(str(last_modified)).hexdigest())
-
   def collection_last_modified(self):
     """Calculate the last time a member of the collection was modified. This
     method relies on the fact that the collection table has an `updated_at` or
@@ -704,10 +689,10 @@ class Resource(ModelView):
       object_for_json = self.object_for_json(obj)
 
     if 'If-None-Match' in self.request.headers and \
-        self.request.headers['If-None-Match'] == self.etag(object_for_json):
+        self.request.headers['If-None-Match'] == etag(object_for_json):
       with benchmark("Make response"):
         return current_app.make_response(
-            ('', 304, [('Etag', self.etag(object_for_json))]))
+            ('', 304, [('Etag', etag(object_for_json))]))
     with benchmark("Make response"):
       return self.json_success_response(
         object_for_json, self.modified_at(obj))
@@ -721,7 +706,7 @@ class Resource(ModelView):
           ('required headers: ' + ', '.join(missing_headers),
            428, [('Content-Type', 'text/plain')]))
 
-    if request.headers['If-Match'] != self.etag(self.object_for_json(obj)) or \
+    if request.headers['If-Match'] != etag(self.object_for_json(obj)) or \
         request.headers['If-Unmodified-Since'] != \
           self.http_timestamp(self.modified_at(obj)):
       return current_app.make_response((
@@ -937,9 +922,9 @@ class Resource(ModelView):
             objs, extras=extras)
 
       if 'If-None-Match' in self.request.headers and \
-          self.request.headers['If-None-Match'] == self.etag(collection):
+          self.request.headers['If-None-Match'] == etag(collection):
         return current_app.make_response((
-            '', 304, [('Etag', self.etag(collection))]))
+            '', 304, [('Etag', etag(collection))]))
 
       with benchmark("Make response"):
         return self.json_success_response(
@@ -1031,10 +1016,6 @@ class Resource(ModelView):
     elif 'context' not in src:
       raise BadRequest('context MUST be specified.')
 
-    else:
-      if not permissions.is_allowed_create(
-        self.model.__name__, None, self.get_context_id_from_json(src)):
-        raise Forbidden()
     with benchmark("Deserialize object"):
       self.json_create(obj, src)
     with benchmark("Query create permissions"):
@@ -1186,7 +1167,7 @@ class Resource(ModelView):
       self, response_object, last_modified, status=200, id=None, cache_op=None):
     headers = [
         ('Last-Modified', self.http_timestamp(last_modified)),
-        ('Etag', self.etag(response_object)),
+        ('Etag', etag(response_object)),
         ('Content-Type', 'application/json'),
         ]
     if id is not None:
@@ -1257,3 +1238,19 @@ def filter_resource(resource, depth=0, user_permissions=None):
       return resource
   else:
     assert False, "Non-object passed to filter_resource"
+
+
+def etag(last_modified):
+  """Generate the etag given a datetime for the last time the resource was
+  modified. This isn't as good as an etag generated off of a hash of the
+  representation, but, it doesn't require the representation in order to be
+  calculated. An alternative would be to keep an etag on the stored
+  representation, but this will do for now.
+
+  .. note::
+
+      Using the datetime implies the need for some care - the resolution of
+      the time object needs to be sufficient such that you don't end up with
+      the same etag due to two updates performed in rapid succession.
+  """
+  return '"{0}"'.format(hashlib.sha1(str(last_modified)).hexdigest())

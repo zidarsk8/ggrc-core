@@ -16,6 +16,18 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , findAll : "/api/directives"
   , findOne : "/api/directives/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
+    , attr_list : can.Model.Cacheable.attr_list.concat([
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
+    ])
+    , child_tree_display_list : ['Section', 'Clause']
+    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
+    }
 
   , model : function(params) {
       if (this.shortName !== 'Directive')
@@ -40,7 +52,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }
 
   , attributes : {
-      context : "CMS.Models.Context.stub"
+    context : "CMS.Models.Context.stub"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
@@ -71,7 +83,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
 });
 
 CMS.Models.Directive("CMS.Models.Standard", {
-    root_object : "standard"
+  root_object : "standard"
   , root_collection : "standards"
   , model_plural : "Standards"
   , table_plural : "standards"
@@ -87,17 +99,6 @@ CMS.Models.Directive("CMS.Models.Standard", {
   , defaults : {
     kind : "Standard"
   }
-  , tree_view_options : {
-      list_view : GGRC.mustache_path + "/directives/tree.mustache"
-    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
-    , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date'}
-    ])
-    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
-    }
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [ "Standard" ]
@@ -125,17 +126,6 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , defaults : {
     kind : "Regulation"
   }
-  , tree_view_options : {
-      list_view : GGRC.mustache_path + "/directives/tree.mustache"
-    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
-    , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date'}
-    ])
-    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
-    }
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [ "Regulation" ]
@@ -163,22 +153,19 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , defaults : {
       kind : null
     }
-  , tree_view_options : {
-      list_view : GGRC.mustache_path + "/directives/tree.mustache"
-    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
-    , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'Type', attr_name: 'kind', attr_sort_field: 'kind.title'},
-      {attr_title: 'Effective Date', attr_name: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date'}
-    ])
-    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
-    }
+  , tree_view_options : {}
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
   , init : function() {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
+    can.extend(this.tree_view_options, CMS.Models.Directive.tree_view_options);
+    this.tree_view_options.attr_list = can.Model.Cacheable.attr_list.concat([
+      {attr_title: 'Type', attr_name: 'kind', attr_sort_field: 'kind.title'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
+    ]);
     this._super.apply(this, arguments);
   }
 }, {});
@@ -200,17 +187,6 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , defaults : {
     kind : "Contract"
   }
-  , tree_view_options : {
-      list_view : GGRC.mustache_path + "/directives/tree.mustache"
-    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
-    , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date'}
-    ])
-    , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
-    }
   , is_custom_attributable: true
   , attributes : {
   }

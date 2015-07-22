@@ -1,5 +1,11 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
 
-  <div class="sticky filter-holder" {{#filter_is_hidden}}style="height: 0px; margin-bottom: 0px;"{{/filter_is_hidden}} data-height="42" data-margin-bottom="25">
+  <div class="sticky sticky-header filter-holder" {{#filter_is_hidden}}style="height: 0px; margin-bottom: 0px;"{{/filter_is_hidden}} data-height="42" data-margin-bottom="25">
     <div class="sticky-filter inner-filter-sticky">
       <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
         <div class="row-fluid">
@@ -26,8 +32,8 @@
               <a id="page-help" class="popover-template" data-get-template="help/filters_helper_content" href="javascript://">
                 <i class="grcicon-help-black"></i>
               </a>
-              <input type="reset" class="btn btn-small btn-draft" name="" id="" value="Reset">
-              <input type="submit" class="btn btn-small btn-info" name="" id="" value="Filter">
+              <input type="reset" class="btn btn-small btn-draft" name="" value="Reset">
+              <input type="submit" class="btn btn-small btn-info" name="" value="Filter">
             </div>
           </div>
         </div>

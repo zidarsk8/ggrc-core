@@ -319,7 +319,9 @@ Mustache.registerHelper("firstexist", function () {
   var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)
   for (var i = 0; i < args.length; i++) {
     var v = resolve_computed(args[i]);
-    if (v != null) return v.toString();
+    if (v && v.length) {
+      return v.toString();
+    }
   }
   return "";
 });
@@ -1026,8 +1028,7 @@ Mustache.registerHelper("with_direct_mappings_as",
   return options.fn(options.contexts.add(frame));
 });
 
-Mustache.registerHelper("result_direct_mappings", function (
-    bindings, parent_instance, options) {
+Mustache.registerHelper("result_direct_mappings", function (bindings, parent_instance, options) {
   bindings = Mustache.resolve(bindings);
   bindings = resolve_computed(bindings);
   parent_instance = Mustache.resolve(parent_instance);
@@ -1047,9 +1048,11 @@ Mustache.registerHelper("result_direct_mappings", function (
       }
     }
   }
+
   mappings_type = has_direct_mappings ?
       (has_external_mappings ? "Dir & Ext" : "Dir") : "Ext";
   options.context.mappings_type = mappings_type;
+
   return options.fn(options.contexts);
 });
 
@@ -1428,22 +1431,6 @@ can.each({
   });
 });
 
-Mustache.registerHelper("instance_ids", function (list, options) {
-  //  `instance_ids` is used only to extract a comma-separated list of
-  //  instance `id` values for use by `Export Controls` link in
-  //  `assets/mustache/controls/tree_footer.mustache`
-  var ids;
-  list = resolve_computed(Mustache.resolve(list));
-  if (list) {
-    list.attr("length");
-    ids = can.map(list, function (result) { return result.attr("instance.id"); });
-  }
-  else {
-    ids = [];
-  }
-  return ids.join(",");
-});
-
 Mustache.registerHelper("local_time_range", function (value, start, end, options) {
   var tokens = [];
   var sod;
@@ -1720,11 +1707,7 @@ Mustache.registerHelper("infer_roles", function (instance, options) {
   }
   else {
     if (state.attr('roles').attr('length')) {
-      var result = [];
-      can.each(state.attr('roles'), function (role) {
-        result.push(options.fn(role));
-      });
-      return result.join('');
+      return options.fn(options.contexts.add(state.attr('roles').join(', ')));
     }
   }
 });
@@ -1802,6 +1785,20 @@ Mustache.registerHelper("global_count", function (model_type, options) {
 
 Mustache.registerHelper("is_dashboard", function (options) {
   if (/dashboard/.test(window.location))
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("is_allobjectview", function (options) {
+  if (/objectBrowser/.test(window.location))
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("is_dashboard_or_all", function (options) {
+  if (/dashboard/.test(window.location) || /objectBrowser/.test(window.location))
     return options.fn(options.contexts);
   else
     return options.inverse(options.contexts);
@@ -1905,7 +1902,7 @@ Mustache.registerHelper("with_review_task", function (options) {
   var tasks = options.contexts.attr('approval_tasks');
   tasks = Mustache.resolve(tasks);
   if (tasks) {
-    for (i = 0; i < tasks.length; i++) {
+    for (var i = 0; i < tasks.length; i++) {
       return options.fn(options.contexts.add({review_task: tasks[i].instance}));
     }
   }
@@ -3053,10 +3050,10 @@ Mustache.registerHelper('get_default_attr_value', function (attr_name, instance)
   attr_name = Mustache.resolve(attr_name);
 
   if (instance[attr_name]) {
-    if (['slug', 'status', 'url', 'reference_url', 'kind'].indexOf(attr_name) !== -1) {
+    if (['slug', 'status', 'url', 'reference_url', 'kind', 'request_type'].indexOf(attr_name) !== -1) {
       return instance[attr_name];
     }
-    if (['start_date', 'end_date', 'updated_at'].indexOf(attr_name) !== -1) {
+    if (['start_date', 'end_date', 'updated_at', 'requested_on', 'due_on'].indexOf(attr_name) !== -1) {
       //convert to localize date
       return moment(instance[attr_name]).format('MM/DD/YYYY');
     }
@@ -3101,7 +3098,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
       audit, programs, program, control, json;
 
   if (!audits.length) {
-    return "{}";
+    return "";
   }
 
   audit = audits[0].instance.reify();

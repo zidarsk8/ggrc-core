@@ -63,8 +63,15 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
   _include_links = []
   _aliases = {
       "name": "Name",
-      "email": "Email",
+      "email": {
+          "display_name": "Email",
+          "unique": True,
+      },
       "company": "Company",
+      "user_role": {
+          "display_name": "Role",
+          "type": "user_role",
+      },
   }
 
   # Methods required by Flask-Login
@@ -78,7 +85,7 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
     return False
 
   def get_id(self):
-    return unicode(self.id)
+    return unicode(self.id)  # noqa
 
   @validates('language')
   def validate_person_options(self, key, option):
@@ -131,14 +138,15 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
 
     ROLE_HIERARCHY = {
         u'gGRC Admin': 0,
-        u'ProgramCreator': 1,
-        u'Editor': 2,
-        u'Reader': 3,
-        u'Creator': 4,
+        u'Editor': 1,
+        u'Reader': 2,
+        u'Creator': 3,
     }
+    system_wide_roles = ROLE_HIERARCHY.keys()
     unique_roles = set([
         user_role.role.name
-        for user_role in self.user_roles if not user_role.context_id
+        for user_role in self.user_roles
+        if user_role.role.name in system_wide_roles
     ])
     if len(unique_roles) == 0:
       return u"No Access"

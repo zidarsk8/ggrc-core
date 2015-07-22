@@ -7,7 +7,7 @@
 
 {{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
 
-<header class="header sticky tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+<header class="header sticky sticky-header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
   <div class="row-fluid">
     <div class="span{{display_options.title_width}}">
       <div class="title-heading oneline">
@@ -24,6 +24,7 @@
       <ul class="tree-action-list">
         {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
         {{{> "/static/mustache/base_objects/tree_column_selector.mustache"}}}
+        {{{> "/static/mustache/base_objects/sub_tree_type_selector.mustache"}}}
         {{#if add_item_view}}
           <li>
             {{{renderLive add_item_view}}}

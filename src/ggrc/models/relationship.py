@@ -9,6 +9,7 @@ from .mixins import deferred, Base, Described, Mapping
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import or_, and_
 
+
 class Relationship(Mapping, db.Model):
   __tablename__ = 'relationships'
   source_id = db.Column(db.Integer, nullable=False)
@@ -17,19 +18,22 @@ class Relationship(Mapping, db.Model):
   destination_type = db.Column(db.String, nullable=False)
   relationship_type_id = db.Column(db.String)
   # FIXME: Should this be a strict constraint?  If so, a migration is needed.
-  #relationship_type_id = db.Column(
+  # relationship_type_id = db.Column(
   #    db.Integer, db.ForeignKey('relationship_types.id'))
   relationship_type = db.relationship(
       'RelationshipType',
-      primaryjoin='foreign(RelationshipType.relationship_type) == Relationship.relationship_type_id',
-      uselist=False)
-  automapping_id = db.Column(db.Integer,
-                             db.ForeignKey('relationships.id', ondelete='SET NULL'),
-                             nullable=True,
-                             )
+      primaryjoin='foreign(RelationshipType.relationship_type) =='
+      ' Relationship.relationship_type_id',
+      uselist=False
+  )
+  automapping_id = db.Column(
+      db.Integer,
+      db.ForeignKey('relationships.id', ondelete='SET NULL'),
+      nullable=True,
+  )
   automapping = db.relationship(
       lambda: Relationship,
-      remote_side= lambda: Relationship.id
+      remote_side=lambda: Relationship.id
   )
 
   @property
@@ -65,10 +69,10 @@ class Relationship(Mapping, db.Model):
   def find_related(cls, object1, object2):
     def predicate(src, dst):
       return and_(
-          Relationship.source_type==src.type,
-          Relationship.source_id==src.id,
-          Relationship.destination_type==dst.type,
-          Relationship.destination_id==dst.id
+          Relationship.source_type == src.type,
+          Relationship.source_id == src.id,
+          Relationship.destination_type == dst.type,
+          Relationship.destination_id == dst.id
       )
     return Relationship.query.filter(
         or_(predicate(object1, object2), predicate(object2, object1))
@@ -78,24 +82,24 @@ class Relationship(Mapping, db.Model):
   def _extra_table_args(cls):
     return (
         db.UniqueConstraint(
-          'source_id', 'source_type', 'destination_id', 'destination_type'),
+            'source_id', 'source_type', 'destination_id', 'destination_type'),
         db.Index(
-          'ix_relationships_source',
-          'source_type', 'source_id'),
+            'ix_relationships_source',
+            'source_type', 'source_id'),
         db.Index(
-          'ix_relationships_destination',
-          'destination_type', 'destination_id'),
-        )
+            'ix_relationships_destination',
+            'destination_type', 'destination_id'),
+    )
 
   _publish_attrs = [
       'source',
       'destination',
       'relationship_type_id',
-      'automapping',
-      ]
+  ]
 
   def _display_name(self):
     return self.source.display_name + '<->' + self.destination.display_name
+
 
 class RelationshipType(Described, Base, db.Model):
   __tablename__ = 'relationship_types'
@@ -109,13 +113,15 @@ class RelationshipType(Described, Base, db.Model):
       'forward_phrase',
       'backward_phrase',
       'symmetric',
-      ]
+  ]
+
 
 class Relatable(object):
+
   @declared_attr
   def related_sources(cls):
     joinstr = 'and_(remote(Relationship.destination_id) == {type}.id, '\
-                    'remote(Relationship.destination_type) == "{type}")'
+        'remote(Relationship.destination_type) == "{type}")'
     joinstr = joinstr.format(type=cls.__name__)
     return db.relationship(
         'Relationship',
@@ -127,7 +133,7 @@ class Relatable(object):
   @declared_attr
   def related_destinations(cls):
     joinstr = 'and_(remote(Relationship.source_id) == {type}.id, '\
-                    'remote(Relationship.source_type) == "{type}")'
+        'remote(Relationship.source_type) == "{type}")'
     joinstr = joinstr.format(type=cls.__name__)
     return db.relationship(
         'Relationship',
@@ -139,12 +145,9 @@ class Relatable(object):
   _publish_attrs = [
       'related_sources',
       'related_destinations'
-      ]
+  ]
 
-  _include_links = [
-      #'related_sources',
-      #'related_destinations'
-      ]
+  _include_links = []
 
   @classmethod
   def eager_query(cls):
@@ -154,3 +157,32 @@ class Relatable(object):
     return cls.eager_inclusions(query, Relatable._include_links).options(
         orm.subqueryload('related_sources'),
         orm.subqueryload('related_destinations'))
+
+
+class RelationshipHelper(object):
+
+  @classmethod
+  def get_ids_related_to(cls, object_type, related_type, related_ids=[]):
+    """ get ids of objects
+
+    Get a list of all ids for object with object_type, that are related to any
+    of the objects with type related_type and id in related_ids
+    """
+    if isinstance(related_ids, (int, long)):
+      related_ids = [related_ids]
+
+    destination_ids = db.session.query(Relationship.destination_id).filter(
+        and_(
+            Relationship.destination_type == object_type,
+            Relationship.source_type == related_type,
+            Relationship.source_id.in_(related_ids),
+        )
+    )
+    source_ids = db.session.query(Relationship.source_id).filter(
+        and_(
+            Relationship.source_type == object_type,
+            Relationship.destination_type == related_type,
+            Relationship.destination_id.in_(related_ids),
+        )
+    )
+    return source_ids.union(destination_ids)

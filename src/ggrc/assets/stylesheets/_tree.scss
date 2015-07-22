@@ -429,6 +429,17 @@ ul.new-tree {
     }
   }
 
+  .tree-item-placeholder {
+    background: white;
+    font-size: 16px;
+    height: 29px;
+    padding: 11px 60% 0 70px;
+    border-bottom: 1px solid #e0e0e0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
   li.tree-item {
     @include transition(all 0.18s cubic-bezier(.55,0,.1,1));
     min-height: 30px;
@@ -927,6 +938,11 @@ ul.new-tree {
 .inner-tree {
   ul.new-tree {
     margin-bottom: 0;
+    .tree-item-placeholder {
+      font-size: 13px;
+      height: 25px;
+      padding: 4px 60% 0 84px;
+    }
     li.tree-item {
       line-height: 28px;
       .generated-link {

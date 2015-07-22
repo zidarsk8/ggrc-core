@@ -274,7 +274,7 @@
 
     var base_widgets_by_type = {
       "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Audit": "Issue ControlAssessment Request history Person program program_controls",
+      "Audit": "Issue ControlAssessment Request history Person Program Control",
       "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",
       "ControlAssessment": "Issue Objective Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
       "Regulation": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
@@ -285,7 +285,7 @@
       "Section": "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Objective": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Control": "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Person": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",
+      "Person": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit Request",
       "OrgGroup": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
       "Vendor": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
       "System": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
@@ -300,6 +300,32 @@
       function (conf) {
         return conf.split(' ');
       });
+
+    //Update GGRC.base_widgets_by_type for tree_view of each widget type
+    if (!GGRC.tree_view) {
+      GGRC.tree_view = {};
+    }
+    GGRC.tree_view.base_widgets_by_type = base_widgets_by_type;
+
+    var model_names = Object.keys(base_widgets_by_type);
+    model_names.sort();
+    var possible_model_type = model_names.slice();
+    possible_model_type.push("Request"); //Missing model-type by selection
+    can.each(model_names, function (name) {
+      GGRC.tree_view.basic_model_list.push({model_name: name, display_name: CMS.Models[name].title_singular});
+      //Initialize child_model_list, and child_display_list each model_type
+      var w_list  = base_widgets_by_type[name], child_model_list = [];
+      w_list.sort();
+      can.each(w_list, function (item) {
+        if (possible_model_type.indexOf(item) !== -1) {
+          child_model_list.push({model_name: item, display_name: CMS.Models[item].title_singular});
+        }
+      });
+      GGRC.tree_view.sub_tree_for[name] = {
+        model_list: child_model_list,
+        display_list : CMS.Models[name].tree_view_options.child_tree_display_list || w_list
+      };
+    });
 
     function sort_sections(sections) {
       return can.makeArray(sections).sort(window.natural_comparator);
@@ -399,7 +425,7 @@
             widget_name: "Complete",
             widget_icon: "history"
           },
-          program_controls: {
+          Control: {
             widget_id: "control",
             widget_name: "In Scope Controls",
             widget_icon: "control"
@@ -411,6 +437,12 @@
           },
         },
         Control: {
+          Request: {
+            widget_id: "Request",
+            widget_name: "Audit Requests"
+          }
+        },
+        Person: {
           Request: {
             widget_id: "Request",
             widget_name: "Audit Requests"
@@ -454,6 +486,14 @@
         add_item_view: GGRC.mustache_path + "/sections/tree_add_item.mustache",
         draw_children: true
       },
+      related_objects_child_options = {
+        model: can.Model.Cacheable,
+        mapping: "related_objects",
+        show_view: GGRC.mustache_path + "/base_objects/tree.mustache",
+        footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
+        add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
+        draw_children: true
+      },
       extra_content_controller_options = apply_mixins({
         objectives: {
           Objective: {
@@ -475,34 +515,54 @@
         },
         business_objects: {
           DataAsset: {
-            mapping: "related_data_assets"
+            mapping: "related_data_assets",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Facility: {
-            mapping: "related_facilities"
+            mapping: "related_facilities",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Market: {
-            mapping: "related_markets"
+            mapping: "related_markets",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           OrgGroup: {
-            mapping: "related_org_groups"
+            mapping: "related_org_groups",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Vendor: {
-            mapping: "related_vendors"
+            mapping: "related_vendors",
+            hild_options: [related_objects_child_options],
+            draw_children: true
           },
           Process: {
-            mapping: "related_processes"
+            mapping: "related_processes",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Product: {
-            mapping: "related_products"
+            mapping: "related_products",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Project: {
-            mapping: "related_projects"
+            mapping: "related_projects",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           System: {
-            mapping: "related_systems"
+            mapping: "related_systems",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           ControlAssessment: {
-            mapping: "related_control_assessments"
+            mapping: "related_control_assessments",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Document: {
             mapping: "documents"
@@ -511,14 +571,18 @@
             mapping: "people"
           },
           Program: {
-            mapping: "programs"
+            mapping: "programs",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
         },
         issues: {
           Issue: {
             mapping: "related_issues",
             footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
+            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
+            child_options: [related_objects_child_options],
+            draw_children: true
           }
         },
         governance_objects: {
@@ -615,7 +679,7 @@
             allow_mapping: false,
             allow_creating: false
           },
-          program_controls: {
+          Control: {
             mapping: "program_controls",
             parent_instance: GGRC.page_instance(),
             draw_children: true,
@@ -626,7 +690,7 @@
             allow_mapping: false,
             allow_creating: false
           },
-          program: {
+          Program: {
             mapping: "_program",
             parent_instance: GGRC.page_instance(),
             draw_children: false,
@@ -775,8 +839,19 @@
         },
         Person: {
           _mixins: ["issues"],
+          Request: {
+            //mapping: "open_audit_requests",
+            mapping: (/^\/objectBrowser\/?$/.test(window.location.pathname)) ?
+              "all_open_audit_requests" : "open_audit_requests",
+            draw_children: true,
+            show_view: GGRC.mustache_path + "/requests/tree.mustache",
+            footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
+            add_item_view: GGRC.mustache_path + "/requests/tree_add_item.mustache"
+          },
           Program: {
             mapping: "extended_related_programs_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true,
             fetch_post_process: sort_sections
           },
           Regulation: {
@@ -843,40 +918,62 @@
             add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
           },
           Issue: {
-            mapping: "extended_related_issues_via_search"
+            mapping: "extended_related_issues_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           DataAsset: {
-            mapping: "extended_related_data_assets_via_search"
+            mapping: "extended_related_data_assets_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Facility: {
-            mapping: "extended_related_facilities_via_search"
+            mapping: "extended_related_facilities_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Market: {
-            mapping: "extended_related_markets_via_search"
+            mapping: "extended_related_markets_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           OrgGroup: {
-            mapping: "extended_related_org_groups_via_search"
+            mapping: "extended_related_org_groups_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Vendor: {
-            mapping: "extended_related_vendors_via_search"
+            mapping: "extended_related_vendors_via_search",
+            hild_options: [related_objects_child_options],
+            draw_children: true
           },
           Process: {
-            mapping: "extended_related_processes_via_search"
+            mapping: "extended_related_processes_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Product: {
-            mapping: "extended_related_products_via_search"
+            mapping: "extended_related_products_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Project: {
-            mapping: "extended_related_projects_via_search"
+            mapping: "extended_related_projects_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           System: {
-            mapping: "extended_related_systems_via_search"
+            mapping: "extended_related_systems_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           },
           Document: {
             mapping: "extended_related_documents_via_search"
           },
           ControlAssessment: {
-            mapping: "extended_related_control_assessment_via_search"
+            mapping: "extended_related_control_assessment_via_search",
+            child_options: [related_objects_child_options],
+            draw_children: true
           }
         }
       });
@@ -936,6 +1033,7 @@
 
       widget_list.add_widget(object.constructor.shortName, widget_id, descriptor);
     });
+
   });
 
 })(window.can, window.can.$);

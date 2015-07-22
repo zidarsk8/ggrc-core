@@ -1,0 +1,6 @@
+Object type,,
+facility,code,unmap:facility
+,HOUSE-1,HOUSE-2
+,HOUSE-2,HOUSE-3
+,HOUSE-3,HOUSE-4
+,HOUSE-4,HOUSE-1

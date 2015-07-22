@@ -13,7 +13,7 @@
         <div class="openclose">
           <div class="row-fluid">
             <div class="span12">
-              
+
               <ul class="tree-action-list">
                 {{#if roles.length}}
                   <li>
@@ -52,7 +52,7 @@
                   </li>
                 {{/if}}
               </ul>
-              
+
               <div class="item-data">
                 <div class="tree-title-area">
                   {{{render '/static/mustache/people/popover.mustache' person=this}}}
@@ -63,7 +63,7 @@
                   {{/if_match}}
                 </div>
               </div>
-              
+
             </div>
           </div>
         </div>
@@ -173,7 +173,7 @@
           href="javascript://"
           rel="tooltip"
           data-placement="left"
-          data-toggle="multitype-multiselect-modal-selector"
+          data-toggle="unified-mapper"
           data-join-mapping="{{mapping}}"
           data-join-option-type="{{model.shortName}}"
           data-join-object-id="{{parent_instance.id}}"

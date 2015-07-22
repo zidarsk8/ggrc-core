@@ -17,10 +17,19 @@
         var date_a = +new Date(a.end_date),
             date_b = +new Date(b.end_date);
         if (date_a === date_b) {
-          return a.id < b.id;
+          if (a.id < b.id) {
+            return -1;
+          } else if (a.id > b.id) {
+            return 1;
+          } else {
+            return 0;
+          }
         }
-
-        return date_a < date_b;
+        if (date_a < date_b) {
+          return -1;
+        } else {
+          return 1;
+        }
       };
 
   // Register `workflows` extension with GGRC
@@ -501,14 +510,13 @@
         new_widget_descriptors.current = current_widget_descriptor;
 
         new GGRC.WidgetList("ggrc_workflows", {Workflow: new_widget_descriptors});
-
         // Setup extra refresh required due to automatic creation of permissions
         // on creation of WorkflowPerson
         CMS.Models.WorkflowPerson.bind("created", function(ev, instance) {
-      if (instance instanceof CMS.Models.WorkflowPerson) {
-        instance.context.reify().refresh();
-      }
-    });
+          if (instance instanceof CMS.Models.WorkflowPerson) {
+            instance.context && instance.context.reify().refresh();
+          }
+        });
       };
 
   WorkflowExtension.init_widgets_for_person_page =

@@ -1,0 +1,49 @@
+{{!
+  Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: miha@reciprocitylabs.com
+  Maintained By: miha@reciprocitylabs.com
+}}
+
+<csv-import>
+  <div class="info">
+    <div class="row-fluid wrap-row">
+      <div class="span8 import">
+        <p>
+          Here you are able to import all gGRC objects.
+          Please make sure you have your CSV file ready, or
+          download one of the predefined templates.
+        </p>
+        <div class="clearfix">
+          <input type="file" data-file-upload class="csv-upload" name="upload" style="visibility: hidden; width: 1px; height: 1px" />
+          {{#states}}
+            <button id="import_btn" {{#isDisabled}}disabled{{/isDisabled}} class="btn btn-large btn-fixed state-{{state}} {{class}}">{{{text}}}</button>
+            {{^if_equals state "select"}}
+              {{#isDisabled}}
+                <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+              {{/isDisabled}}
+              {{^isDisabled}}
+                <button class="btn btn-small state-reset">Reset</button>
+              {{/isDisabled}}
+            {{/if}}
+          {{/states}}
+        </div>
+        {{#if_equals state "import"}}
+          {{> /static/mustache/import_export/import_test_result.mustache}}
+        {{/if_equals}}
+
+        {{#if_equals state "success"}}
+          {{> /static/mustache/import_export/complete.mustache}}
+        {{/if_equals}}
+
+        {{> /static/mustache/import_export/faq.mustache}}
+      </div>
+      <div class="span4">
+        <csv-template>
+        {{> /static/mustache/import_export/create_template.mustache}}
+        </csv-template>
+      </div>
+    </div>
+    <div id="results-container"></div>
+  </div>
+</csv-import>

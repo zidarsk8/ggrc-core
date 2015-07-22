@@ -25,6 +25,8 @@ from ggrc.services.common import Resource
 from . import basic_roles
 from .contributed_roles import lookup_role_implications
 from .models import Role, UserRole, ContextImplication
+from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
+
 
 blueprint = Blueprint(
     'permissions',
@@ -607,6 +609,10 @@ def contributed_object_views():
   return [
       object_view(Role)
       ]
+
+
+def contributed_column_handlers():
+  return COLUMN_HANDLERS
 
 
 from .contributed_roles import BasicRoleDeclarations, BasicRoleImplications

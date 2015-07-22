@@ -142,6 +142,64 @@
               }
             }
           }
+          .dropdown-menu2 {
+            @include border-radius(0);
+            right: -12px;
+            left: auto;
+            top: 20px;
+            padding: 14px 30px 20px 30px;
+            min-width: 440px;
+            text-align: left;
+            h5 {
+              font-size: 16px;
+              font-weight: normal;
+              text-transform: none;
+              line-height: 24px;
+              vertical-align: top;
+            }
+            label {
+              font-size: 12px;
+            }
+            .model-list {
+              margin-top: 11px;
+              margin-bottom: 14px;
+              li {
+                margin: 0;
+                text-transform: none;
+                label {
+                  display: inline-block;
+                  cursor: pointer;
+                }
+                &.disabled {
+                  color: $gray;
+                  label {
+                    cursor: not-allowed;
+                  }
+                }
+              }
+            }
+            .select-clear-all {
+              margin-top: 5px;
+              margin-bottom: 5px;
+              li {
+                margin: 0;
+                text-transform: none;
+                float: right;
+                width: 20%;
+                a {
+                  margin: 0;
+                  text-decoration: underline;
+                  text-align: right;
+                  cursor: pointer;
+                  color: #505050;
+                  &:hover {
+                    text-decoration: none;
+                    background-color: #eeeeee;
+                  }
+                }
+              }
+            }
+          }
           &.filter-trigger {
             .active {
               i {
@@ -1388,6 +1446,32 @@ ul.attr-list {
     }
   }
 }
+ul.model-list {
+  @extend %reset-list;
+  @include clearfix();
+  margin-top: 20px;
+  margin-bottom: 10px;
+  .attribute-wrap & {
+    margin: 0;
+  }
+  li {
+    float: left;
+    width: 25%;
+    .attribute-wrap & {
+      width: auto;
+      margin-right: 15px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+    input {
+      margin-top: -3px;
+    }
+    &.disabled {
+      color: $lightGray;
+    }
+  }
+}
 
 .popover {
   @include border-radius($default-border-radius);
@@ -1775,7 +1859,7 @@ ul.attr-list {
 }
 
 .report-title-change {
-  display: none;
+  display: block;
   height: 30px;
   input {
     margin-bottom: 0;

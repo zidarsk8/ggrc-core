@@ -42,10 +42,13 @@
 
 
   // Turn camelSpace strings into Camel Space strings
-  can.spaceCamelCase = function(string) {
+  can.spaceCamelCase = function (string) {
     return can.underscore(string)
       .split("_")
       .map(can.capitalize)
       .join(" ");
+  };
+  can.camelCaseToUnderscore = function (string) {
+    return string.replace(/([A-Z])/g, "_$1").toLowerCase();
   };
 })(jQuery, can);

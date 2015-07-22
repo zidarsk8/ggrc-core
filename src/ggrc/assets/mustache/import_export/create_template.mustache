@@ -1,0 +1,36 @@
+{{!
+  Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: ivan@reciprocitylabs.com
+  Maintained By: ivan@reciprocitylabs.com
+}}
+
+<div class="download-template">
+  <h3>Create a CSV template</h3>
+  <p>
+    Don't have a CSV template ready? We'll <strong>create template</strong> for you right now.
+  </p>
+  <p>
+    Select which <strong>type of objects</strong> you want to import, and we'll
+    generate CSV template, with all fields and instructions.
+  </p>
+  <label>I'm importing/updating...</label>
+  <select id="importSelect" class="input-block-level" multiple>
+    {{#importable}}
+      <option value="{{model_singular}}" label="{{title_plural}}"></option>
+    {{/importable}}
+  </select>
+  <p>CSV template will be generated for following object types:</p>
+  <ul class="import-list">
+    {{#each selected}}
+      <li><a data-index="{{@index}}" href="#"><i class="grcicon-deleted"></i></a> {{name}}</li>
+    {{/each}}
+  </ul>
+  <div class="center-block">
+    <a href="import_controls_template" class="btn btn-primary btn-large import-button">
+      <i class="grcicon-imp-exp-white"></i>
+      Import template
+    </a>
+    <small>Click to download</small>
+  </div>
+</div>
