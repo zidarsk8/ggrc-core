@@ -121,6 +121,9 @@ class TaskStartColumnHandler(TaskDateColumnHandler):
     """ set all possible start date attributes """
     frequency = self.row_converter.obj.task_group.workflow.frequency
     if frequency == "one_time":
+      if len(self.value) != 3:
+        self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
+        return
       self.row_converter.obj.start_date = date(*self.value[::-1])
     self.row_converter.obj.relative_start_day = self.value[0]
     self.row_converter.obj.relative_start_month = self.value[1]
@@ -139,6 +142,7 @@ class TaskEndColumnHandler(TaskDateColumnHandler):
     if frequency == "one_time":
       if len(self.value) != 3:
         self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
+        return
       self.row_converter.obj.end_date = date(*self.value[::-1])
     self.row_converter.obj.relative_end_day = self.value[0]
     self.row_converter.obj.relative_end_month = self.value[1]

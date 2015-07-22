@@ -224,7 +224,6 @@ class TestComprehensiveSheets(TestCase):
 
     broken_imports = set([
         "Control Assessment",
-        "Task Group Task",
     ])
 
     for block in response:
