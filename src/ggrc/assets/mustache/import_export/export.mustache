@@ -18,7 +18,13 @@
             </div>
           {{else}}
             <h2 class="title">
-              {{export.filename}} <a class="btn-title-change report-title-trigger" href="#"><i class="grcicon-edit"></i></a>
+              {{#export.data_grid}}
+                Data Grid
+              {{/export.data_grid}}
+              {{^export.data_grid}}
+                Export Objects
+              {{/export.data_grid}}
+              <a class="btn-title-change report-title-trigger" href="#"><i class="grcicon-edit"></i></a>
             </h2>
           {{/if}}
         </div>
