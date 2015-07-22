@@ -121,6 +121,7 @@ can.Model("can.Model.Cacheable", {
     "start date": "start_date",
     "created date": "created_at",
     "updated date": "updated_at",
+    "modified date": "updated_at",
     "code": "slug",
     "state": "status"
   }
@@ -1114,8 +1115,13 @@ can.Model("can.Model.Cacheable", {
               email: owner.email
             });
           });
-        } else if ($.type(val) === 'string'){
-          values[key] = val;
+        } else {
+          if ($.type(val) === 'date') {
+            val = val.toISOString().substring(0, 10);
+          }
+          if ($.type(val) === 'string'){
+            values[key] = val;
+          }
         }
       }
     }.bind(this));
