@@ -5,6 +5,8 @@
 
 """ Module for all special column handlers for workflow objects """
 
+from datetime import date
+
 from ggrc.converters.handlers import ColumnHandler
 from ggrc.converters.handlers import CheckboxColumnHandler
 from ggrc.converters import errors
@@ -50,6 +52,7 @@ class ParentColumnHandler(ColumnHandler):
 
   def parse_item(self):
     """ get parent workflow id """
+    # pylint: disable=protected-access
     if self.raw_value == "":
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
       return None
@@ -69,35 +72,79 @@ class ParentColumnHandler(ColumnHandler):
 
 class WorkflowColumnHandler(ParentColumnHandler):
 
+  """ handler for workflow column in task groups """
+
   def __init__(self, row_converter, key, **options):
+    """ init workflow handler """
     self.parent = Workflow
     super(WorkflowColumnHandler, self).__init__(row_converter, key, **options)
 
 
 class TaskGroupColumnHandler(ParentColumnHandler):
 
+  """ handler for task group column in task group tasks """
+
   def __init__(self, row_converter, key, **options):
+    """ init task group handler """
     self.parent = TaskGroup
     super(TaskGroupColumnHandler, self).__init__(row_converter, key, **options)
 
 
 class TaskDateColumnHandler(ColumnHandler):
 
-  def __init__(self, row_converter, key, **options):
-    self.parent = Workflow
-    super(TaskDateColumnHandler, self).__init__(row_converter, key, **options)
-  pass
+  """ handler for start and end columns in task group tasks """
+
+  def parse_item(self):
+    """ parse start and end columns fow workflow tasks
+
+    Parsed item will be in d, m, y order, with possible missisg y.
+    """
+    try:
+      value = [int(v) for v in self.raw_value.split("/")]
+      if len(value) > 1:
+        tmp = value[0]
+        value[0] = value[1]
+        value[1] = tmp
+      else:
+        value.append(0)
+      return value
+    except ValueError:
+      self.add_error(errors.WRONG_VALUE, column_name=self.display_name)
+    return None
 
 
 class TaskStartColumnHandler(TaskDateColumnHandler):
-  pass
+
+  """ handler for start column in task group tasks """
+
+  def set_obj_attr(self):
+    """ set all possible start date attributes """
+    frequency = self.row_converter.obj.task_group.workflow.frequency
+    if frequency == "one_time":
+      self.row_converter.obj.start_date = date(*self.value[::-1])
+    self.row_converter.obj.relative_start_day = self.value[0]
+    self.row_converter.obj.relative_start_month = self.value[1]
 
 
 class TaskEndColumnHandler(TaskDateColumnHandler):
-  pass
+
+  """ handler for end column in task group tasks """
+
+  def set_obj_attr(self):
+    """ set all possible end date attributes """
+    frequency = self.row_converter.obj.task_group.workflow.frequency
+    if self.value is None:
+      return
+    frequency = self.row_converter.obj.task_group.workflow.frequency
+    if frequency == "one_time":
+      self.row_converter.obj.end_date = date(*self.value[::-1])
+    self.row_converter.obj.relative_end_day = self.value[0]
+    self.row_converter.obj.relative_end_month = self.value[1]
 
 
 class TaskTypeColumnHandler(ColumnHandler):
+
+  """ handler for task type column in task group tasks """
 
   type_map = {
       "rich text": "text",
@@ -106,6 +153,7 @@ class TaskTypeColumnHandler(ColumnHandler):
   }
 
   def parse_item(self):
+    """ parse task type column value """
     if self.raw_value == "":
       return None
     value = self.type_map.get(self.raw_value.lower())
@@ -115,7 +163,6 @@ class TaskTypeColumnHandler(ColumnHandler):
                        column_name=self.display_name)
       value = self.row_converter.obj.default_task_type()
     return value
-
 
 
 COLUMN_HANDLERS = {
