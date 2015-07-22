@@ -12,4 +12,4 @@ Task Group,code*,Summary*,details,assignee,workflow*,,,
 ,,,,,,,,
 Object type,,,,,,,,
 Task,code*,summary*,task group,task description,assignee*,task type,start,end
-,t-1,task for wf-1,tg-1,test,user1@ggrc.com,One time,7/1/2015,7/15/2015
+,t-1,task for wf-1,tg-1,test,user1@ggrc.com,Rich text,7/1/2015,7/15/2015
