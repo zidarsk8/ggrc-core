@@ -9,6 +9,7 @@ from ggrc.converters.handlers import ColumnHandler
 from ggrc.converters.handlers import CheckboxColumnHandler
 from ggrc.converters import errors
 from ggrc_workflows.models import Workflow
+from ggrc_workflows.models import TaskGroup
 
 
 class FrequencyColumnHandler(ColumnHandler):
@@ -73,8 +74,30 @@ class WorkflowColumnHandler(ParentColumnHandler):
     super(WorkflowColumnHandler, self).__init__(row_converter, key, **options)
 
 
+class TaskGroupColumnHandler(ParentColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.parent = TaskGroup
+    super(TaskGroupColumnHandler, self).__init__(row_converter, key, **options)
+
+class TaskDateColumnHandler(ColumnHandler):
+  def __init__(self, row_converter, key, **options):
+    self.parent = Workflow
+    super(TaskDateColumnHandler, self).__init__(row_converter, key, **options)
+  pass
+
+
+class TaskStartColumnHandler(TaskDateColumnHandler):
+  pass
+
+class TaskEndColumnHandler(TaskDateColumnHandler):
+  pass
+
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
     "workflow": WorkflowColumnHandler,
+    "task_group": TaskGroupColumnHandler,
     "notify_on_change": CheckboxColumnHandler,
+    "relative_start_date": TaskStartColumnHandler,
+    "relative_end_date": TaskEndColumnHandler,
 }
