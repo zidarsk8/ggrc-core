@@ -132,7 +132,9 @@
         // TODO: Find proper way to dismiss the modal
         this.element.find(".modal-dismiss").trigger("click");
       },
-      ".add-button .btn modal:success": function (el, ev, model) {
+      ".add-button .btn modal:added": "addNew",
+      ".add-button .btn modal:success": "addNew",
+      "addNew": function (el, ev, model) {
         var entries = this.scope.attr("mapper.entries"),
             entry = entries[0],
             binding = entry.binding,
