@@ -28,9 +28,9 @@ class Converter(object):
       "Section",
       "Control",
       "ControlAssessment",
-      "TaskGroupTask",
-      "TaskGroup",
       "Workflow",
+      "TaskGroup",
+      "TaskGroupTask",
   ]
 
   priortiy_colums = [
