@@ -500,6 +500,22 @@ describe("can.Model.Cacheable", function() {
     });
   });
 
+  describe("::parse_deep_property_descriptor", function() {
+    it("produces an immutable descriptor", function() {
+      var desc = can.Model.Cacheable.parse_deep_property_descriptor("foo.bar|baz|quux"),
+          zero = desc[0][0];
+          one = desc[1];
+
+      try {
+        desc[0][0] = 0;
+        desc[1] = 0;
+      } catch (err) {
+        // we may get an error trying to modify an immutable object
+      }
+      expect(desc[0][0]).toEqual(zero);
+      expect(desc[1]).toEqual(one);
+    });
+  });
 
   describe("#get_deep_property", function() {
     var get = function (key, value) {

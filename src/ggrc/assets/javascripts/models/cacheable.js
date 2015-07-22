@@ -679,9 +679,9 @@ can.Model("can.Model.Cacheable", {
   // owners.0.name|email ->
   // firstnonempty this.owners[0].reify().name this.owners[0].reify().email
   , parse_deep_property_descriptor: function(deep_property_string) {
-      return _.map(deep_property_string.split("."), function (part) {
-        return part.split("|");
-      });
+      return Object.freeze(_.map(deep_property_string.split("."), function (part) {
+        return Object.freeze(part.split("|"));
+      }));
   }
 }, {
   init : function() {
