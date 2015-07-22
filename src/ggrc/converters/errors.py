@@ -48,6 +48,8 @@ OWNER_MISSING = ("Line {line}: Owner field does not contain a valid owner."
 
 WRONG_VALUE = ("Line {line}: {column_name} contains invalid data. The value"
                " will be ignored.")
+WRONG_VALUE_ERROR = ("Line {line}: {column_name} contains invalid data. The"
+                     " line will be ignored.")
 
 WRONG_REQUIRED_VALUE = ("Line {line}: Required field {column_name} contains"
                         " invalid data '{value}'. The default value will be"
