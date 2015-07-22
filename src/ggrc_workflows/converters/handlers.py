@@ -106,7 +106,6 @@ class TaskTypeColumnHandler(ColumnHandler):
   }
 
   def parse_item(self):
-    import ipdb; ipdb.set_trace()
     if self.raw_value == "":
       return None
     value = self.type_map.get(self.raw_value.lower())
