@@ -32,6 +32,8 @@ _column_handlers = {
     "network_zone": handlers.OptionColumnHandler,
     "program_id": handlers.ProgramColumnHandler,
     "directive": handlers.SectionDirectiveColumnHandler,
+    "control": handlers.ControlColumnHandler,
+    "audit": handlers.AuditColumnHandler,
 }
 
 

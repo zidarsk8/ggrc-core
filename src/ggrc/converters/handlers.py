@@ -463,3 +463,23 @@ class SectionDirectiveColumnHandler(ColumnHandler):
   def get_value(self):
     directive = getattr(self.row_converter.obj, self.key, False)
     return directive.slug
+
+
+class ControlColumnHandler(MappingColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    key = "map:control"
+    super(ControlColumnHandler, self).__init__(row_converter, key, **options)
+
+  def set_obj_attr(self):
+    self.value = self.parse_item()
+    if len(self.value) != 1:
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name="Control")
+      return
+    self.row_converter.obj.control = self.value[0]
+
+class AuditColumnHandler(MappingColumnHandler):
+  def __init__(self, row_converter, key, **options):
+    key = "map:audit"
+    super(AuditColumnHandler, self).__init__(row_converter, key, **options)
+
