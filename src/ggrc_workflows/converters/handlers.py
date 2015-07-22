@@ -80,7 +80,9 @@ class TaskGroupColumnHandler(ParentColumnHandler):
     self.parent = TaskGroup
     super(TaskGroupColumnHandler, self).__init__(row_converter, key, **options)
 
+
 class TaskDateColumnHandler(ColumnHandler):
+
   def __init__(self, row_converter, key, **options):
     self.parent = Workflow
     super(TaskDateColumnHandler, self).__init__(row_converter, key, **options)
@@ -90,8 +92,32 @@ class TaskDateColumnHandler(ColumnHandler):
 class TaskStartColumnHandler(TaskDateColumnHandler):
   pass
 
+
 class TaskEndColumnHandler(TaskDateColumnHandler):
   pass
+
+
+class TaskTypeColumnHandler(ColumnHandler):
+
+  type_map = {
+      "rich text": "text",
+      "drop down": "menu",
+      "checkboxes": "checkbox",
+  }
+
+  def parse_item(self):
+    import ipdb; ipdb.set_trace()
+    if self.raw_value == "":
+      return None
+    value = self.type_map.get(self.raw_value.lower())
+    if value is None:
+      self.add_warning(errors.WRONG_REQUIRED_VALUE,
+                       value=self.raw_value,
+                       column_name=self.display_name)
+      value = self.row_converter.obj.default_task_type()
+    return value
+
+
 
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
@@ -100,4 +126,5 @@ COLUMN_HANDLERS = {
     "notify_on_change": CheckboxColumnHandler,
     "relative_start_date": TaskStartColumnHandler,
     "relative_end_date": TaskEndColumnHandler,
+    "task_type": TaskTypeColumnHandler,
 }
