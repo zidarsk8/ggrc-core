@@ -1027,7 +1027,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           if (that._add_child_lists_id !== op_id) {
             return;
           }
-          res.resolve(that.draw_items(list_window));
+          var draw = that._ifNotRemoved(that.draw_items.bind(that));
+          res.resolve(draw(list_window));
         }, 0);
         return res;
       });
