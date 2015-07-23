@@ -518,9 +518,16 @@ describe("can.Model.Cacheable", function() {
   });
 
   describe("#get_deep_property", function() {
+    var equip = function (value) {
+      if (typeof value === "object") {
+        value.get_deep_property = can.Model.Cacheable.prototype.get_deep_property;
+        _.each(value, equip);
+      }
+      return value;
+    };
     var get = function (key, value) {
        var desc = can.Model.Cacheable.parse_deep_property_descriptor(key);
-       return can.Model.Cacheable.prototype.get_deep_property.call(value, desc);
+       return equip(value).get_deep_property(desc);
     };
 
     it("gets a simple property", function() {
@@ -578,6 +585,29 @@ describe("can.Model.Cacheable", function() {
         }
       }
       expect(get("foo.bar", value)).toBe("baz");
+    });
+
+    it("does a multi-get for GET_ALL", function() {
+      var value = {
+        foo: [
+            { bar: 1 },
+            { bar: 2 },
+            { baz: 3 }
+          ]
+      };
+      expect(get("foo.GET_ALL.bar|baz", value)).toEqual([1,2,3]);
+    });
+
+    it("produces a tree for nested multi-get", function() {
+      var value = {
+        foo: [
+            { bar : [{y: 1}, {x: 2}, {x: 3}] },
+            { bar : [{x: 4}, {x: 5}, {y: 6}] },
+            { baz : [{y: 7}, {x: 8}, {x: 9}] },
+          ]
+      };
+      expect(get("foo.GET_ALL.bar|baz.GET_ALL.x|y", value)).
+        toEqual([[1,2,3], [4,5,6], [7,8,9]]);
     });
   });
 
