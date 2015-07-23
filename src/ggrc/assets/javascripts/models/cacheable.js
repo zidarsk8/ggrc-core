@@ -673,6 +673,17 @@ can.Model("can.Model.Cacheable", {
         return mapper;
       }
     }
+
+  // This this is the parsing part of the easy accessor for deep properties.
+  // Use the result of this with instance.get_deep_property
+  // owners.0.name -> this.owners[0].reify().name
+  // owners.0.name|email ->
+  // firstnonempty this.owners[0].reify().name this.owners[0].reify().email
+  , parse_deep_property_descriptor: function(deep_property_string) {
+      return Object.freeze(_.map(deep_property_string.split("."), function (part) {
+        return Object.freeze(part.split("|"));
+      }));
+  }
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
@@ -1136,6 +1147,36 @@ can.Model("can.Model.Cacheable", {
 
     return [type,
             this.id].join('/');
+  },
+
+  // Returns a deep property as specified in the descriptor built
+  // by Cacheable.parse_deep_property_descriptor
+  get_deep_property: function(property_descriptor) {
+    var i, j, part, field, found, tmp,
+        val = this;
+    for (i = 0; i < property_descriptor.length; i++) {
+      part = property_descriptor[i];
+      if (val.instance) {
+        val = val.instance;
+      }
+      found = false;
+      for (j = 0; j < part.length; j++) {
+        field = part[j];
+        tmp = val[field];
+        if (tmp !== undefined && tmp !== null) {
+          val = tmp;
+          if (typeof val.reify === "function") {
+            val = val.reify();
+          }
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        return null;
+      }
+    }
+    return val;
   },
 
 });

@@ -250,9 +250,9 @@ can.Control("CMS.Controllers.TreeLoader", {
       sort_function = function(old_item, new_item) {
         return original_function(old_item.instance, new_item.instance);
       };
-      if (original_function.fetch_key && original_function.order_factor) {
+      if (original_function.deep_property && original_function.order_factor) {
         _.each(temp_list, function (v) {
-          v.__sort_key = original_function.fetch_key(v);
+          v.__sort_key = v.instance.get_deep_property(original_function.deep_property);
         });
         temp_list.sort(function(old_item, new_item) {
           var a = old_item.__sort_key,
@@ -1305,7 +1305,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   , sort: function (event) {
       var $el = $(event.currentTarget),
           key = $el.data("field"),
-          key_tree, fetch;
+          key_tree = can.Model.Cacheable.parse_deep_property_descriptor(key);
 
       if (key !== this.options.sort_by) {
           this.options.sort_direction = null;
@@ -1316,40 +1316,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               : "asc",
           order_factor = order === "asc" ? 1 : -1;
 
-      key_tree = _.map(key.split("."), function (part) {
-        return part.split("|");
-      });
-
-      fetch = function(val) {
-        var i, j, part, field, found, tmp;
-        for (i = 0; i < key_tree.length; i++) {
-          part = key_tree[i];
-          if (val.instance) {
-            val = val.instance;
-          }
-          found = false;
-          for (j = 0; j < part.length; j++) {
-            field = part[j];
-            tmp = val[field];
-            if (tmp !== undefined && tmp !== null) {
-              val = tmp;
-              if (typeof val.reify === "function") {
-                val = val.reify();
-              }
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            return null;
-          }
-        }
-        return val;
-      };
-
       this.options.sort_function = function (val1, val2) {
-        var a = fetch(val1),
-            b = fetch(val2);
+        var a = val1.get_deep_property(key_tree),
+            b = val2.get_deep_property(key_tree);
          if (a > b) {
            return order_factor;
          }
@@ -1359,7 +1328,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
          return 0;
       };
 
-      this.options.sort_function.fetch_key = fetch;
+      this.options.sort_function.deep_property = key_tree;
       this.options.sort_function.order_factor = order_factor;
 
       this.options.sort_direction = order;
