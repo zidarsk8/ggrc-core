@@ -758,6 +758,9 @@ can.Control("GGRC.Controllers.Modals", {
         function finish() {
           delete that.disable_hide;
           if (that.options.add_more) {
+            if (that.options.$trigger) {
+              that.options.$trigger.trigger("modal:added", [obj]);
+            }
             that.new_instance();
           } else {
             that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
