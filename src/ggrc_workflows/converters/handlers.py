@@ -7,11 +7,15 @@
 
 from datetime import date
 
+from ggrc import db
+from ggrc.models import Person
 from ggrc.converters.handlers import ColumnHandler
+from ggrc.converters.handlers import UserColumnHandler
 from ggrc.converters.handlers import CheckboxColumnHandler
 from ggrc.converters import errors
-from ggrc_workflows.models import Workflow
 from ggrc_workflows.models import TaskGroup
+from ggrc_workflows.models import Workflow
+from ggrc_workflows.models import WorkflowPerson
 
 
 class FrequencyColumnHandler(ColumnHandler):
@@ -172,6 +176,37 @@ class TaskTypeColumnHandler(ColumnHandler):
     return value
 
 
+class WorkflowPersonColumnHandler(UserColumnHandler):
+
+  def parse_item(self):
+    return self.get_users_list()
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    workflow_person = db.session.query(WorkflowPerson.person_id).filter_by(
+        workflow_id=self.row_converter.obj.id,)
+    users = Person.query.filter(Person.id.in_(workflow_person))
+    emails = [user.email for user in users]
+    return "\n".join(emails)
+
+  def remove_current_people(self):
+    WorkflowPerson.query.filter_by(
+        workflow_id=self.row_converter.obj.id).delete()
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    self.remove_current_people()
+    for owner in self.value:
+      workflow_person = WorkflowPerson(
+          workflow_id=self.row_converter.obj.id,
+          person_id=owner.id
+      )
+      db.session.add(workflow_person)
+    self.dry_run = True
+
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
     "workflow": WorkflowColumnHandler,
@@ -180,4 +215,5 @@ COLUMN_HANDLERS = {
     "relative_start_date": TaskStartColumnHandler,
     "relative_end_date": TaskEndColumnHandler,
     "task_type": TaskTypeColumnHandler,
+    "workflow_mapped": WorkflowPersonColumnHandler,
 }

@@ -850,6 +850,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Custom email message",
         "Owner",
         "Member",
+        "Mapped",
         "Frequency",
         "Force real-time email updates",
         "Code",
