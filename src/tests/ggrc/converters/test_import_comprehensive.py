@@ -223,10 +223,8 @@ class TestComprehensiveSheets(TestCase):
     self.assertEquals(len(creators), 6)
 
     for block in response:
-      self.assertEquals(set(), set(block["block_errors"]))
-      self.assertEquals(set(), set(block["block_warnings"]))
-      self.assertEquals(set(), set(block["row_errors"]))
-      self.assertEquals(set(), set(block["row_warnings"]))
+      for message in messages:  # response[0] = Person block
+        self.assertEquals(set(), set(block[message]))
 
   def create_custom_attributes(self):
     gen = self.generator.generate_custom_attribute

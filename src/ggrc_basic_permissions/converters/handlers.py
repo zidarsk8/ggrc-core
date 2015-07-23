@@ -15,9 +15,10 @@ from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
 
 
-class ProgramRoleColumnHandler(UserColumnHandler):
+class ObjectRoleColumnHandler(UserColumnHandler):
 
   role_id = -1
+  owner_columns = ("program_owner")
 
   def parse_item(self):
     users = set()
@@ -31,7 +32,7 @@ class ProgramRoleColumnHandler(UserColumnHandler):
       else:
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
-    if not users and self.key == "program_owner":
+    if not users and self.key in self.owner_columns:
       self.add_warning(errors.OWNER_MISSING)
       users.add(get_current_user())
 
@@ -67,24 +68,38 @@ class ProgramRoleColumnHandler(UserColumnHandler):
     self.dry_run = True
 
 
-class ProgramOwnerColumnHandler(ProgramRoleColumnHandler):
+class ProgramOwnerColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role_id = Role.query.filter_by(name="ProgramOwner").one().id
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
-class ProgramEditorColumnHandler(ProgramRoleColumnHandler):
+class ProgramEditorColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role_id = Role.query.filter_by(name="ProgramEditor").one().id
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
-class ProgramReaderColumnHandler(ProgramRoleColumnHandler):
+class ProgramReaderColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role_id = Role.query.filter_by(name="ProgramReader").one().id
+    super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class WorkflowOwnerColumnHandler(ObjectRoleColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.role_id = Role.query.filter_by(name="WorkflowOwner").one().id
+    super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class WorkflowMemberColumnHandler(ObjectRoleColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.role_id = Role.query.filter_by(name="WorkflowMember").one().id
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
@@ -134,5 +149,7 @@ COLUMN_HANDLERS = {
     "program_owner": ProgramOwnerColumnHandler,
     "program_editor": ProgramEditorColumnHandler,
     "program_reader": ProgramReaderColumnHandler,
+    "workflow_owner": WorkflowOwnerColumnHandler,
+    "workflow_member": WorkflowMemberColumnHandler,
     "user_role": UserRoleColumnHandler,
 }
