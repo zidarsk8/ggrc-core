@@ -53,7 +53,7 @@ class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
           "display_name": "End Date",
           "mandatory": True,
       },
-      "program_id": {
+      "program": {
           "display_name": "Program",
           "mandatory": True,
       }

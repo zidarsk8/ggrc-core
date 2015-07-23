@@ -28,6 +28,9 @@ class Converter(object):
       "Section",
       "Control",
       "ControlAssessment",
+      "Workflow",
+      "TaskGroup",
+      "TaskGroupTask",
   ]
 
   priortiy_colums = [
@@ -137,12 +140,8 @@ class Converter(object):
 
   def import_objects(self):
     for converter in self.block_converters:
-      try:
-        converter.handle_row_data()
-        converter.import_objects()
-      except Exception as e:
-        current_app.logger.error("Import failed with: {}".format(e.message))
-        converter.add_errors(errors.UNKNOWN_ERROR, line=converter.offset + 2)
+      converter.handle_row_data()
+      converter.import_objects()
 
   def import_secondary_objects(self):
     for converter in self.block_converters:

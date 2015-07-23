@@ -57,14 +57,6 @@ class ColumnHandler(object):
   def parse_item(self):
     return self.raw_value
 
-  def validate(self):
-    if callable(self.validator):
-      try:
-        self.validator(self.row_converter.obj, self.key, self.value)
-      except ValueError:
-        self.add_error("invalid status '{}'".format(self.value))
-    return True
-
   def set_obj_attr(self):
     if not self.value:
       return
@@ -440,7 +432,7 @@ class ProgramColumnHandler(ColumnHandler):
       self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
       return None
 
-    return program.id
+    return program
 
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
@@ -471,3 +463,23 @@ class SectionDirectiveColumnHandler(ColumnHandler):
   def get_value(self):
     directive = getattr(self.row_converter.obj, self.key, False)
     return directive.slug
+
+
+class ControlColumnHandler(MappingColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    key = "map:control"
+    super(ControlColumnHandler, self).__init__(row_converter, key, **options)
+
+  def set_obj_attr(self):
+    self.value = self.parse_item()
+    if len(self.value) != 1:
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name="Control")
+      return
+    self.row_converter.obj.control = self.value[0]
+
+class AuditColumnHandler(MappingColumnHandler):
+  def __init__(self, row_converter, key, **options):
+    key = "map:audit"
+    super(AuditColumnHandler, self).__init__(row_converter, key, **options)
+
