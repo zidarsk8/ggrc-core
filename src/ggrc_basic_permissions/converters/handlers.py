@@ -21,21 +21,10 @@ class ObjectRoleColumnHandler(UserColumnHandler):
   owner_columns = ("program_owner")
 
   def parse_item(self):
-    users = set()
-    email_lines = self.raw_value.splitlines()
-    owner_emails = filter(unicode.strip, email_lines)  # noqa
-    for raw_line in owner_emails:
-      email = raw_line.strip().lower()
-      person = self.get_person(email)
-      if person:
-        users.add(person)
-      else:
-        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
-
+    users = self.get_users_list()
     if not users and self.key in self.owner_columns:
       self.add_warning(errors.OWNER_MISSING)
-      users.add(get_current_user())
-
+      users.append(get_current_user())
     return list(users)
 
   def set_obj_attr(self):
@@ -106,7 +95,7 @@ class WorkflowMemberColumnHandler(ObjectRoleColumnHandler):
 class UserRoleColumnHandler(UserColumnHandler):
 
   _role_map = {
-    "admin": "ggrc admin"
+      "admin": "ggrc admin"
   }
 
   _allowed_roles = [

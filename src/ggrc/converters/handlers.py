@@ -16,6 +16,7 @@ from ggrc.converters import errors
 from ggrc.login import get_current_user
 from ggrc.models import CustomAttributeValue
 from ggrc.models import CustomAttributeDefinition
+from ggrc.models import ObjectPerson
 from ggrc.models import Option
 from ggrc.models import Person
 from ggrc.models import Program
@@ -102,6 +103,19 @@ class StatusColumnHandler(ColumnHandler):
 class UserColumnHandler(ColumnHandler):
 
   """ Handler for primary and secondary contacts """
+
+  def get_users_list(self):
+    users = set()
+    email_lines = self.raw_value.splitlines()
+    owner_emails = filter(unicode.strip, email_lines)  # noqa
+    for raw_line in owner_emails:
+      email = raw_line.strip().lower()
+      person = self.get_person(email)
+      if person:
+        users.add(person)
+      else:
+        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+    return list(users)
 
   def get_person(self, email):
     new_objects = self.row_converter.block_converter.converter.new_objects
@@ -478,8 +492,44 @@ class ControlColumnHandler(MappingColumnHandler):
       return
     self.row_converter.obj.control = self.value[0]
 
+
 class AuditColumnHandler(MappingColumnHandler):
+
   def __init__(self, row_converter, key, **options):
     key = "map:audit"
     super(AuditColumnHandler, self).__init__(row_converter, key, **options)
 
+
+class ObjectPersonColumnHandler(UserColumnHandler):
+
+  def parse_item(self):
+    return self.get_users_list()
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    object_person = db.session.query(ObjectPerson.person_id).filter_by(
+        personable_id=self.row_converter.obj.id,
+        personable_type=self.row_converter.obj.__class__.__name__)
+    users = Person.query.filter(Person.id.in_(object_person))
+    emails = [user.email for user in users]
+    return "\n".join(emails)
+
+  def remove_current_people(self):
+    ObjectPerson.query.filter_by(
+        personable_id=self.row_converter.obj.id,
+        personable_type=self.row_converter.obj.__class__.__name__).delete()
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    self.remove_current_people()
+    for owner in self.value:
+      user_role = ObjectPerson(
+          personable_id=self.row_converter.obj.id,
+          personable_type=self.row_converter.obj.__class__.__name__,
+          person_id=owner.id
+      )
+      db.session.add(user_role)
+    self.dry_run = True
