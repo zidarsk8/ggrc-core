@@ -72,6 +72,7 @@
             singular: cms_model.shortName,
             plural: cms_model.title_plural.toLowerCase().replace(/\s+/, "_"),
             table_plural: cms_model.table_plural,
+            title_singular: cms_model.title_singular,
             isSelected: cms_model.shortName === this.type
           });
           groups["all_objects"]["models"].push(cms_model.shortName);
