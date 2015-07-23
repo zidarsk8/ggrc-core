@@ -363,7 +363,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       }
       refreshed_deferred.then(function(){
         that.insert_items(filtered_items, force_prepare_chilren);
-        that._loading_finished();
+        that._ifNotRemoved(that._loading_finished).call(that);
       });
       return this._loading_deferred;
     }
