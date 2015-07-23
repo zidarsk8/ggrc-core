@@ -31,7 +31,7 @@ class ProgramRoleColumnHandler(UserColumnHandler):
       else:
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
-    if not users:
+    if not users and self.key == "program_owner":
       self.add_warning(errors.OWNER_MISSING)
       users.add(get_current_user())
 
