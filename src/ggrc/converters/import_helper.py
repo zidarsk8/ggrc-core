@@ -25,9 +25,9 @@ def get_mapping_definitions(object_class):
 
   for mapping_class in mapping_rules[object_class.__name__]:
     class_name = pretty_name(mapping_class)
-    mapping_name = "map:{}".format(class_name)
+    mapping_name = "{}{}".format(handlers.MAPPING_PREFIX, class_name)
     definitions[mapping_name.lower()] = {
-        "display_name": mapping_name,
+        "display_name": "map:{}".format(class_name),
         "mandatory": False,
         "handler": handlers.MappingColumnHandler,
         "validator": None,
@@ -47,11 +47,11 @@ def get_custom_attr_definitions(object_class):
     return definitions
   custom_attributes = object_class.get_custom_attribute_definitions()
   for attr in custom_attributes:
-    handler = handlers.CustomAttributeColumHandler
-    definitions[attr.title] = {
+    attr_name = "{}{}".format(handlers.CUSTOM_ATTR_PREFIX, attr.id)
+    definitions[attr_name] = {
         "display_name": attr.title,
         "mandatory": attr.mandatory,
-        "handler": handler,
+        "handler": handlers.CustomAttributeColumHandler,
         "validator": None,
         "default": None,
         "unique": False,

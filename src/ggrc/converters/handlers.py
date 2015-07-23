@@ -26,6 +26,10 @@ from ggrc.models import Relationship
 from ggrc.models.relationship import RelationshipHelper
 
 
+MAPPING_PREFIX = "__mapping__:"
+CUSTOM_ATTR_PREFIX = "__custom__:"
+
+
 class ColumnHandler(object):
 
   def __init__(self, row_converter, key, **options):
@@ -237,7 +241,7 @@ class MappingColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
-    self.mapping_name = key[4:]  # remove "map:" prefix
+    self.mapping_name = key[len(MAPPING_PREFIX):]
     importable = get_importables()
     self.mapping_object = importable.get(self.mapping_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
@@ -328,7 +332,7 @@ class CustomAttributeColumHandler(TextColumnHandler):
   def get_ca_definition(self):
     for definition in self.row_converter.object_class\
             .get_custom_attribute_definitions():
-      if definition.title == self.key:
+      if definition.title == self.display_name:
         return definition
     return None
 
@@ -468,7 +472,7 @@ class SectionDirectiveColumnHandler(ColumnHandler):
 class ControlColumnHandler(MappingColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    key = "map:control"
+    key = "{}control".format(MAPPING_PREFIX)
     super(ControlColumnHandler, self).__init__(row_converter, key, **options)
 
   def set_obj_attr(self):
@@ -480,6 +484,6 @@ class ControlColumnHandler(MappingColumnHandler):
 
 class AuditColumnHandler(MappingColumnHandler):
   def __init__(self, row_converter, key, **options):
-    key = "map:audit"
+    key = "{}audit".format(MAPPING_PREFIX)
     super(AuditColumnHandler, self).__init__(row_converter, key, **options)
 
