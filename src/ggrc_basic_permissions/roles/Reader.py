@@ -44,7 +44,14 @@ permissions = {
         "ProgramControl",
         "ProgramDirective",
         "Project",
-        "Relationship",
+        {
+            "type": "Relationship",
+            "terms": {
+                "property_name": "source,destination",
+                "action": "update"
+            },
+            "condition": "relationship",
+        },
         "RelationshipType",
         "SectionBase",
         "Section",
