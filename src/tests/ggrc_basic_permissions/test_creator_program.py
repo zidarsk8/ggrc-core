@@ -177,7 +177,6 @@ class TestCreatorProgram(TestCase):
 
   def map(self, dest):
     """ Map src to dest """
-    print "MAPPING"
     response = self.api.post(all_models.Relationship, {
         "relationship": {"source": {
             "id": self.objects["program"].id,
@@ -212,6 +211,15 @@ class TestCreatorProgram(TestCase):
       self.assertEquals(response.status_code, 201)
       system_id = response.json.get("system").get("id")
       self.objects[obj] = all_models.System.query.get(system_id)
+      # Become the owner
+      response = self.api.post(all_models.ObjectOwner, {"object_owner": {
+          "person": {
+              "id": creator.id,
+              "type": "Person",
+          }, "ownable": {
+              "id": system_id,
+              "type": "System"
+          }, "context": None}})
     # Map Object to Program
     response = self.api.post(all_models.Relationship, {
         "relationship": {"source": {

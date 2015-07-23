@@ -7,6 +7,7 @@ from collections import namedtuple
 from flask import g
 from flask.ext.login import current_user
 from .user_permissions import UserPermissions
+from ggrc.rbac.permissions import permissions_for as find_permissions
 from ggrc.models import get_model
 
 Permission = namedtuple('Permission', 'action resource_type resource_id context_id')
@@ -92,7 +93,11 @@ def in_condition(instance, value, property_name):
   return property_value in value
 
 
-def relationship_condition(instance):
+def relationship_condition(instance, action, property_name):
+  for prop in property_name.split(','):
+    obj = getattr(instance, prop)
+    if not find_permissions()._is_allowed_for(obj, action):
+      return False
   return True
 
 """
@@ -164,8 +169,6 @@ class DefaultUserPermissions(UserPermissions):
 
   def _is_allowed(self, permission):
     permissions = self._permissions()
-    if permission.context_id and self._is_allowed(permission._replace(context_id=None)):
-      return True
     if self._permission_match(permission, permissions):
       return True
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
