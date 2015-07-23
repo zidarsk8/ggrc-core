@@ -67,7 +67,8 @@ class ParentColumnHandler(ColumnHandler):
     return obj
 
   def get_value(self):
-    return self.value.slug
+    value = getattr(self.row_converter.obj, self.key, self.value)
+    return value.slug
 
 
 class WorkflowColumnHandler(ParentColumnHandler):
