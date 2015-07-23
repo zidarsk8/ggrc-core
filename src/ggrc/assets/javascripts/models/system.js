@@ -58,20 +58,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , child_tree_display_list : ['Control']
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , link_buttons : true
-      , child_options : [{
-        model : CMS.Models.Control
-        , show_view : "/static/mustache/controls/tree.mustache"
-        , parent_find_param : "system_controls.system_id"
-        , link_buttons : true
-        , draw_children : false
-      },{
-        model : null ///filled in after init.
-        , show_view : "/static/mustache/base_objects/tree.mustache"
-        , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-        , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
-        , parent_find_param : "super_system_systems.parent_id"
-        , link_buttons: true
-      }]
+      , child_options : []
     }
     , links_to : {
         "System" : {}
@@ -134,7 +121,6 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
               "/systems/tree_add_item.mustache"
             : "/base_objects/tree_add_item.mustache")
     });
-    this.tree_view_options.child_options[1].model = this;
     this.validateNonBlank("title");
   } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {
@@ -169,7 +155,6 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
     can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
     this._super && this._super.apply(this, arguments);
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);
-    this.tree_view_options.child_options[1].model = this;
     this.validateNonBlank("title");
   } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {
