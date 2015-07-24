@@ -5,7 +5,7 @@
 
 from datetime import datetime, date
 from flask import Blueprint
-from sqlalchemy import inspect, and_
+from sqlalchemy import inspect, and_, orm
 
 from ggrc import db
 from ggrc.login import get_current_user
@@ -119,7 +119,6 @@ def _get_min_end_date(timeboxed_objects, exclude_statuses=DONE_STATUSES):
       if obj_end_date is not None:
         if end_date is None or end_date > obj_end_date:
           end_date = obj_end_date
-
   return end_date
 
 
@@ -140,16 +139,14 @@ def _get_date_range(timeboxed_objects):
     if obj_end_date is not None:
       if end_date is None or end_date < obj_end_date:
         end_date = obj_end_date
-
-  return (start_date, end_date)
+  return start_date, end_date
 
 
 def update_cycle_dates(cycle):
-  import sqlalchemy.orm
   if cycle.id:
     # If `cycle` is already in the database, then eager load required objects
     cycle = models.Cycle.query.filter_by(id=cycle.id).\
-        options(sqlalchemy.orm.joinedload_all(
+        options(orm.joinedload_all(
             'cycle_task_groups.'
             'cycle_task_group_objects.'
             'cycle_task_group_object_tasks')).one()
@@ -507,6 +504,10 @@ def set_internal_object_state(task_group_object, object_state, status):
 
   db.session.add(task_group_object)
 
+@Resource.model_deleted.connect_via(models.CycleTaskGroupObjectTask)
+def handle_cycle_task_group_object_task_delete(sender, obj=None, src=None, service=None):
+  db.session.flush()
+  update_cycle_dates(obj.cycle)
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
@@ -865,7 +866,7 @@ def adjust_next_cycle_start_date(calculator, workflow, base_date=None, move_forw
 
     # In an edge case where we unwinded into the past for editing and
     # the next cycle start date returned back is less than or equal today,
-    # we obviously shouldn't have unwinded - therefore, we recalculate with
+    # we shouldn't have unwinded - therefore, we recalculate with
     # original value.
     if non_adjusted_ncsd <= date.today():
       workflow.non_adjusted_next_cycle_start_date = workflow.non_adjusted_next_cycle_start_date + calculator.time_delta
