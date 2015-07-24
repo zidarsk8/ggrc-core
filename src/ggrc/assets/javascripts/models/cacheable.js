@@ -679,8 +679,14 @@ can.Model("can.Model.Cacheable", {
   // owners.0.name -> this.owners[0].reify().name
   // owners.0.name|email ->
   // firstnonempty this.owners[0].reify().name this.owners[0].reify().email
+  //
+  // owners.GET_ALL.name ->
+  // [this.owners[0].reify().name, this.owners[1].reify().name...]
   , parse_deep_property_descriptor: function(deep_property_string) {
       return Object.freeze(_.map(deep_property_string.split("."), function (part) {
+        if (part === "GET_ALL") {
+          return part;
+        }
         return Object.freeze(part.split("|"));
       }));
   }
@@ -1160,20 +1166,26 @@ can.Model("can.Model.Cacheable", {
         val = val.instance;
       }
       found = false;
-      for (j = 0; j < part.length; j++) {
-        field = part[j];
-        tmp = val[field];
-        if (tmp !== undefined && tmp !== null) {
-          val = tmp;
-          if (typeof val.reify === "function") {
-            val = val.reify();
+      if (part === "GET_ALL") {
+        return _.map(val, function(element) {
+          return element.get_deep_property(property_descriptor.slice(i+1));
+        });
+      } else {
+        for (j = 0; j < part.length; j++) {
+          field = part[j];
+          tmp = val[field];
+          if (tmp !== undefined && tmp !== null) {
+            val = tmp;
+            if (typeof val.reify === "function") {
+              val = val.reify();
+            }
+            found = true;
+            break;
           }
-          found = true;
-          break;
         }
-      }
-      if (!found) {
-        return null;
+        if (!found) {
+          return null;
+        }
       }
     }
     return val;
