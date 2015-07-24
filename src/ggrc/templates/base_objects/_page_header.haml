@@ -44,10 +44,7 @@
         %a{'href': "/dashboard"}
           %i.grcicon-my-work
           My Work ({{current_user.system_wide_role}})
-      %li
-        %a{'href': "/objectBrowser"}
-          %i.grcicon-search
-          All Objects
+
       -if permissions.is_allowed_read('/admin', None, 1)
         %li
           %a{'href': "/admin#people_list_widget"}
