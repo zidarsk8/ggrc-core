@@ -325,11 +325,17 @@ can.Control("CMS.Controllers.TreeLoader", {
 
       //find current widget model and check if first layer tree
       if (GGRC.page_object && this.options.parent) { //this is a second label tree
-        var parent_model_name = this.options.parent.options.model.shortName;
-        child_tree_display_list = GGRC.tree_view.sub_tree_for[parent_model_name].display_list;
+        var parent_model_name = this.options.parent.options.model.shortName,
+            parent_instance_type = this.options.parent.options.instance.type;
+        child_tree_display_list =
+          (GGRC.tree_view.sub_tree_for[parent_model_name] ||
+           GGRC.tree_view.sub_tree_for[parent_instance_type] ||
+           {} // all hope is lost, skip filtering
+          ).display_list;
 
         //check if all objects selected, then skip filter
-        if (child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
+        if (child_tree_display_list === undefined ||
+            child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
           //skip filter
           filtered_items = items;
         } else if (child_tree_display_list.length === 0) { //no item is selected to filter, so just return
