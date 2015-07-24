@@ -4,6 +4,7 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import datetime
+import re
 import json
 import sys
 import time
@@ -145,7 +146,8 @@ def get_mapping_rules():
     Request has a direct mapping to Audit with audit_id
     Response has a direct mapping to Request with request_id
     DocumentationResponse has a direct mapping to Request with request_id
-    DocumentationResponse has normal mappings with all other objects in maping modal
+    DocumentationResponse has normal mappings with all other objects in
+    maping modal
     Section has a direct mapping to Standard/Regulation/Poicy with directive_id
     Anything can be mapped to a request, frotent show audit insted
 
@@ -181,12 +183,17 @@ def get_mapping_rules():
     "Facility" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
     "Market" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit"  # noqa
   }
-
   split_rules = {k: v.split() for k, v in business_object_rules.items()}
-
   filtered_rules = {k: filter(v) for k, v in split_rules.items()}
-
   return filtered_rules
+
+
+def underscore_from_camelcase(name):
+  return "_".join(re.findall('[A-Z][^A-Z]*', name)).lower()
+
+
+def title_from_camelcase(name):
+  return " ".join(re.findall('[A-Z][^A-Z]*', name))
 
 
 class BenchmarkContextManager(object):

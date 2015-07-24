@@ -147,7 +147,7 @@ class AttributeInfo(object):
   def get_mapping_definitions(cls, object_class):
     from ggrc.utils import get_mapping_rules
     from ggrc.converters import handlers
-    from ggrc.converters.utils import pretty_name
+    from ggrc.utils import title_from_camelcase
     """ Get column definitions for allowed mappings for object_class """
     definitions = {}
     mapping_rules = get_mapping_rules()
@@ -155,7 +155,7 @@ class AttributeInfo(object):
       return {}
 
     for mapping_class in mapping_rules[object_class.__name__]:
-      class_name = pretty_name(mapping_class)
+      class_name = title_from_camelcase(mapping_class)
       mapping_name = "{}{}".format(handlers.MAPPING_PREFIX, class_name)
       definitions[mapping_name.lower()] = {
           "display_name": "map:{}".format(class_name),
