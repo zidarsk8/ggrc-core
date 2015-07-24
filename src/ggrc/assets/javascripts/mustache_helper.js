@@ -1028,6 +1028,19 @@ Mustache.registerHelper("with_direct_mappings_as",
   return options.fn(options.contexts.add(frame));
 });
 
+Mustache.registerHelper("has_mapped_objects", function (selected, instance, options) {
+  selected = resolve_computed(selected);
+  instance = resolve_computed(instance);
+  if (!selected.objects) {
+    options.inverse(options.contexts);
+  }
+  var isMapped = _.some(selected.objects, function (el) {
+        return el.id === instance.id && el.type === instance.type;
+      });
+  console.log("Is mapped", isMapped);
+  return options[isMapped ? "fn" : "inverse"](options.contexts);
+});
+
 Mustache.registerHelper("result_direct_mappings", function (bindings, parent_instance, options) {
   bindings = Mustache.resolve(bindings);
   bindings = resolve_computed(bindings);

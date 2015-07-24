@@ -51,6 +51,9 @@
                       {{#has_pending_addition selected_object instance}}
                         checked disabled="true"
                       {{/has_pending_addition}}
+                      {{#has_mapped_objects selected_object instance}}
+                        checked disabled="true"
+                      {{/has_mapped_objects}}
                     {{/if}}
                   >
                 </div>
