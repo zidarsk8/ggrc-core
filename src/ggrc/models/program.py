@@ -49,7 +49,11 @@ class Program(HasObjectState, CustomAttributable, Documentable,
       "program_reader": {
           "display_name": "Reader",
           "type": "user_role",
-      }
+      },
+      "program_mapped": {
+          "display_name": "Mapped",
+          "type": "user_role",
+      },
   }
 
   @classmethod

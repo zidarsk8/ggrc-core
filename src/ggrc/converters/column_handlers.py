@@ -34,6 +34,7 @@ _column_handlers = {
     "directive": handlers.SectionDirectiveColumnHandler,
     "control": handlers.ControlColumnHandler,
     "audit": handlers.AuditColumnHandler,
+    "program_mapped": handlers.ObjectPersonColumnHandler,
 }
 
 
