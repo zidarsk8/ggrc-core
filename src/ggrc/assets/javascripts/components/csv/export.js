@@ -267,6 +267,11 @@
         if (!panel_number && url.relevant_id && url.relevant_type) {
           this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }
+      },
+      "{scope.item} type": function () {
+        this.scope.attr("item.selected", {});
+        this.scope.attr("item.relevant", []);
+        this.scope.attr("item.filter", "");
       }
     },
     helpers: {
