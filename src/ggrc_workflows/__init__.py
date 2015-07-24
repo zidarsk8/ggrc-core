@@ -191,7 +191,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
       base_date = date.today()
     build_cycle(obj, current_user=current_user, base_date=base_date)
 
-    adjust_next_cycle_start_date(obj.calculator, workflow)
+    adjust_next_cycle_start_date(obj.calculator, workflow, move_forward=True)
     db.session.add(workflow)
 
 
@@ -584,11 +584,6 @@ def update_workflow_state(workflow):
       build_cycle(cycle, None, base_date=workflow.next_cycle_start_date)
       notification.handle_cycle_created(None, obj=cycle)
 
-    # If cycles were not generated already, recalculate start date with
-    # fresh start.
-    if not workflow.cycles:
-      workflow.next_cycle_start_date = None
-      workflow.non_adjusted_next_cycle_start_date = None
     adjust_next_cycle_start_date(calculator, workflow)
 
     db.session.add(workflow)
@@ -597,6 +592,7 @@ def update_workflow_state(workflow):
 
   if not calculator.tasks:
     workflow.next_cycle_start_date = None
+    workflow.non_adjusted_next_cycle_start_date = None
     return
 
   for cycle in workflow.cycles:
@@ -829,7 +825,7 @@ def start_recurring_cycles():
 
     # Update the workflow next_cycle_start_date to push it ahead based on the
     # frequency.
-    adjust_next_cycle_start_date(cycle.calculator, workflow)
+    adjust_next_cycle_start_date(cycle.calculator, workflow, move_forward=True)
 
     db.session.add(workflow)
 
@@ -840,8 +836,10 @@ def start_recurring_cycles():
   db.session.flush()
 
 
-def adjust_next_cycle_start_date(calculator, workflow, base_date=None):
-  """Sets new cycle start date
+def adjust_next_cycle_start_date(calculator, workflow, base_date=None, move_forward=False):
+  """Sets new cycle start date - it either recalculates a start date or moves
+  it forward one interval if manual cycle start was requested or cycle
+  was generated on a certain day.
 
   Args:
     calculator: Calculator that should be used for calculations
@@ -849,8 +847,31 @@ def adjust_next_cycle_start_date(calculator, workflow, base_date=None):
               start date adjusted.
   """
   if workflow.recurrences:
+    # If cycles were not generated already, recalculate start date with
+    # fresh start.
+    if not workflow.cycles:
+      workflow.next_cycle_start_date = None
+      workflow.non_adjusted_next_cycle_start_date = None
+
+    # Unless we are moving forward one interval we just want to recalculate
+    # the next_cycle_start_date to reflect the latest changes to the
+    # task(s) - therefore, we just unwind one time unit backward and calculate
+    # new next cycle start date.
+    if not move_forward and workflow.non_adjusted_next_cycle_start_date:
+      workflow.non_adjusted_next_cycle_start_date = workflow.non_adjusted_next_cycle_start_date - calculator.time_delta
+
     non_adjusted_ncsd = calculator.non_adjusted_next_cycle_start_date(
       base_date=workflow.non_adjusted_next_cycle_start_date)
+
+    # In an edge case where we unwinded into the past for editing and
+    # the next cycle start date returned back is less than or equal today,
+    # we obviously shouldn't have unwinded - therefore, we recalculate with
+    # original value.
+    if non_adjusted_ncsd <= date.today():
+      workflow.non_adjusted_next_cycle_start_date = workflow.non_adjusted_next_cycle_start_date + calculator.time_delta
+      non_adjusted_ncsd = calculator.non_adjusted_next_cycle_start_date(
+        base_date=workflow.non_adjusted_next_cycle_start_date)
+
     workflow.non_adjusted_next_cycle_start_date = non_adjusted_ncsd
     workflow.next_cycle_start_date = calculator.adjust_date(non_adjusted_ncsd)
 
