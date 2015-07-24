@@ -10,7 +10,8 @@ from datetime import date, datetime
 
 import os
 from ggrc import db
-from ggrc_workflows.models import Workflow, Cycle, TaskGroupTask, TaskGroup
+from ggrc_workflows.models import Workflow, Cycle, TaskGroupTask, TaskGroup, \
+  CycleTaskGroupObjectTask
 from ggrc_workflows import start_recurring_cycles
 from tests.ggrc_workflows.generator import WorkflowsGenerator
 from tests.ggrc.api_helper import Api
@@ -654,3 +655,58 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
 
         self.assertEqual(cycle.start_date, date(2015, 4, 29))
         self.assertEqual(cycle.end_date, date(2015, 4, 30))
+
+  def test_changing_end_date_when_tasks_deleted(self):
+    """Test that deleting cycle task correctly adjusts cycle end date"""
+    monthly_workflow = {
+      "title": "monthly test wf",
+      "description": "start this many a time",
+      "frequency": "monthly",
+      "task_groups": [
+        {
+          "title": "task group 1",
+          'task_group_tasks': [
+            {
+              'title': 'monthly task 1',
+              "relative_start_day": 15,
+              "relative_start_month": None,
+              "relative_end_day": 20,
+              "relative_end_month": None,
+            }, {
+              'title': 'monthly task 2',
+              "relative_start_day": 18,
+              "relative_start_month": None,
+              "relative_end_day": 25,
+              "relative_end_month": None,
+            }],
+          "task_group_objects": []
+        },
+      ]
+    }
+    with freeze_time("2015-07-15 13:00"):
+      _, wf = self.generator.generate_workflow(monthly_workflow)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 8, 14))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id,
+        Cycle.start_date == date(2015, 7, 15)).one()
+      self.assertEqual(cycle.start_date, date(2015, 7, 15))
+      self.assertEqual(cycle.end_date, date(2015, 7, 24))
+
+      cycle_task = db.session.query(CycleTaskGroupObjectTask).filter(
+        CycleTaskGroupObjectTask.cycle_id == cycle.id,
+        CycleTaskGroupObjectTask.title == "monthly task 2"
+      ).one()
+
+      response = self.generator.api.delete(cycle_task, cycle_task.id)
+      self.assert200(response)
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id).one()
+      self.assertEqual(cycle.start_date, date(2015, 7, 15))
+      self.assertEqual(cycle.end_date, date(2015, 7, 20))
