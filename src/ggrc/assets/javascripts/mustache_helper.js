@@ -1037,7 +1037,6 @@ Mustache.registerHelper("has_mapped_objects", function (selected, instance, opti
   var isMapped = _.some(selected.objects, function (el) {
         return el.id === instance.id && el.type === instance.type;
       });
-  console.log("Is mapped", isMapped);
   return options[isMapped ? "fn" : "inverse"](options.contexts);
 });
 
