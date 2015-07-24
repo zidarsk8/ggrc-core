@@ -143,6 +143,141 @@ class AttributeInfo(object):
   def gather_include_links(cls, tgt_class):
     return cls.gather_attrs(tgt_class, ['_include_links'])
 
+  @classmethod
+  def get_mapping_definitions(cls, object_class):
+    from ggrc.utils import get_mapping_rules
+    from ggrc.converters import handlers
+    from ggrc.converters.utils import pretty_name
+    """ Get column definitions for allowed mappings for object_class """
+    definitions = {}
+    mapping_rules = get_mapping_rules()
+    if object_class.__name__ not in mapping_rules:
+      return {}
+
+    for mapping_class in mapping_rules[object_class.__name__]:
+      class_name = pretty_name(mapping_class)
+      mapping_name = "{}{}".format(handlers.MAPPING_PREFIX, class_name)
+      definitions[mapping_name.lower()] = {
+          "display_name": "map:{}".format(class_name),
+          "mandatory": False,
+          "handler": handlers.MappingColumnHandler,
+          "validator": None,
+          "default": None,
+          "unique": False,
+          "description": "",
+          "type": "mapping",
+      }
+
+    return definitions
+
+  @classmethod
+  def get_custom_attr_definitions(cls, object_class):
+    from ggrc.converters import handlers
+    """ Get column definitions for custom attributes on object_class """
+    definitions = {}
+    if not hasattr(object_class, "get_custom_attribute_definitions"):
+      return definitions
+    custom_attributes = object_class.get_custom_attribute_definitions()
+    for attr in custom_attributes:
+      attr_name = "{}{}".format(handlers.CUSTOM_ATTR_PREFIX, attr.id)
+      definitions[attr_name] = {
+          "display_name": attr.title,
+          "mandatory": attr.mandatory,
+          "handler": handlers.CustomAttributeColumHandler,
+          "validator": None,
+          "default": None,
+          "unique": False,
+          "description": "",
+          "type": "custom",
+      }
+    return definitions
+
+  @classmethod
+  def get_unique_constraints(cls, object_class):
+    from sqlalchemy.sql.schema import UniqueConstraint
+    """ Return a set of attribute names for single unique columns """
+    constraints = object_class.__table__.constraints
+    unique = filter(lambda x: isinstance(x, UniqueConstraint), constraints)
+    # we only handle single column unique constraints
+    unique_columns = [u.columns.keys() for u in unique if len(u.columns) == 1]
+    return set(sum(unique_columns, []))
+
+  @classmethod
+  def get_object_attr_definitions(cls, object_class):
+    from ggrc.models.reflection import AttributeInfo
+    from ggrc.converters import handlers
+    from ggrc.converters.column_handlers import COLUMN_HANDLERS
+    """ get all column definitions for object_class
+
+    This function joins custm attribute definitions, mapping definitions and
+    the extra delete column.
+    """
+    definitions = {}
+
+    aliases = AttributeInfo.gather_aliases(object_class)
+    filtered_aliases = [(k, v) for k, v in aliases.items() if v is not None]
+
+    unique_columns = cls.get_unique_constraints(object_class)
+
+    for key, value in filtered_aliases:
+      column = object_class.__table__.columns.get(key)
+      definition = {
+          "display_name": value,
+          "mandatory": False if column is None else not column.nullable,
+          "default": getattr(object_class, "default_{}".format(key), None),
+          "validator": getattr(object_class, "validate_{}".format(key), None),
+          "handler": COLUMN_HANDLERS.get(key, handlers.ColumnHandler),
+          "unique": key in unique_columns,
+          "description": "",
+      }
+      if type(value) is dict:
+        definition.update(value)
+      definitions[key] = definition
+
+    custom_attr_def = cls.get_custom_attr_definitions(object_class)
+    mapping_def = cls.get_mapping_definitions(object_class)
+    definitions.update(custom_attr_def)
+    definitions.update(mapping_def)
+
+    return definitions
+
+  @classmethod
+  def get_object_column_json(cls, object_class):
+    """ get all column definitions containing only json serializable data """
+    definitions = cls.get_object_column_definitions(object_class)
+    for attr_name, attr_info in definitions.items():
+      for key, value in attr_info.items():
+        if type(value) not in (unicode, str, int, long, bool, None):  # noqa
+          del definitions[attr_name][key]
+    order = cls.get_column_order(definitions.keys())
+    result = []
+    for key in order:
+      item = definitions[key]
+      item["attr_name"] = key
+      result.append(item)
+    return result
+
+  @classmethod
+  def get_column_order(cls, attr_list):
+    from ggrc.converters import COLUMN_ORDER
+    """ Sort attribute list
+
+    Attribute list should be sorted with 3 rules:
+      - attributes in COLUMN_ORDER variable must be fist and in the same
+        order as defined in that variable.
+      - Custom Attributes are sorted alphabetically after default attributes
+      - mapping attributes are sorted alphabetically and placed last
+    """
+    attr_set = set(attr_list)
+    default_attrs = [v for v in COLUMN_ORDER if v in attr_set]
+    default_set = set(default_attrs)
+    other_attrs = [v for v in attr_list if v not in default_set]
+    custom_attrs = [v for v in other_attrs if not v.lower().startswith("map:")]
+    mapping_attrs = [v for v in other_attrs if v.lower().startswith("map:")]
+    custom_attrs.sort(key=lambda x: x.lower())
+    mapping_attrs.sort(key=lambda x: x.lower())
+    return default_attrs + custom_attrs + mapping_attrs
+
 
 class SanitizeHtmlInfo(AttributeInfo):
 

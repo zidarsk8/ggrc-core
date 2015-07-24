@@ -16,7 +16,6 @@ from ggrc.app import app
 from ggrc.app import db
 from ggrc.builder.json import publish
 from ggrc.builder.json import publish_representation
-from ggrc.converters.import_helper import get_object_column_json
 from ggrc.extensions import get_extension_modules
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
@@ -24,6 +23,7 @@ from ggrc.fulltext.recordbuilder import model_is_indexed
 from ggrc.login import get_current_user
 from ggrc.login import login_required
 from ggrc.models import all_models
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.background_task import create_task
 from ggrc.models.background_task import make_task_response
 from ggrc.models.background_task import queued_task
@@ -119,7 +119,7 @@ def get_all_attributes_json():
   """
   published = {}
   for model in all_models.all_models:
-    published[model.__name__] = get_object_column_json(model)
+    published[model.__name__] = AttributeInfo.get_object_column_json(model)
   return as_json(published)
 
 
