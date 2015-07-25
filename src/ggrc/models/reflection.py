@@ -6,6 +6,57 @@
 """Utilties to deal with introspecting gGRC models for publishing, creation,
 and update from resource format representations, such as JSON."""
 
+from sqlalchemy.sql.schema import UniqueConstraint
+
+from ggrc.utils import get_mapping_rules
+from ggrc.utils import title_from_camelcase
+
+
+ATTRIBUTE_ORDER = (
+    "slug",
+    "audit",
+    "control",
+    "program",
+    "task_group",
+    "workflow",
+    "title",
+    "description",
+    "notes",
+    "test_plan",
+    "owners",
+    "task_type",
+    "start_date",
+    "end_date",
+    "report_start_date",
+    "report_end_date",
+    "relative_start_date",
+    "relative_end_date",
+    "status",
+    "assertions",
+    "categories",
+    "contact",
+    "design",
+    "directive_id",
+    "fraud_related",
+    "key_control",
+    "kind",
+    "link",
+    "private",
+    "means",
+    "network_zone",
+    "operationally",
+    "principal_assessor",
+    "secondary_assessor",
+    "secondary_contact",
+    "url",
+    "reference_url",
+    "verify_frequency",
+    "name",
+    "email",
+    "is_enabled",
+    "company",
+)
+
 
 class DontPropagate(object):
 
@@ -52,6 +103,16 @@ class AttributeInfo(object):
   caches a list of the publishing properties for a class by walking the
   class inheritance tree.
   """
+
+  MAPPING_PREFIX = "__mapping__:"
+  CUSTOM_ATTR_PREFIX = "__custom__:"
+
+  class Type(object):
+    PROPERTY = "property"
+    MAPPING = "mapping"
+    CUSTOM = "custom"
+    USER_ROLE = "user_role"
+
 
   def __init__(self, tgt_class):
     self._publish_attrs = AttributeInfo.gather_publish_attrs(tgt_class)
@@ -145,9 +206,6 @@ class AttributeInfo(object):
 
   @classmethod
   def get_mapping_definitions(cls, object_class):
-    from ggrc.utils import get_mapping_rules
-    from ggrc.converters import handlers
-    from ggrc.utils import title_from_camelcase
     """ Get column definitions for allowed mappings for object_class """
     definitions = {}
     mapping_rules = get_mapping_rules()
@@ -156,45 +214,39 @@ class AttributeInfo(object):
 
     for mapping_class in mapping_rules[object_class.__name__]:
       class_name = title_from_camelcase(mapping_class)
-      mapping_name = "{}{}".format(handlers.MAPPING_PREFIX, class_name)
+      mapping_name = "{}{}".format(cls.MAPPING_PREFIX, class_name)
       definitions[mapping_name.lower()] = {
           "display_name": "map:{}".format(class_name),
+          "attr_name": mapping_class,
           "mandatory": False,
-          "handler": handlers.MappingColumnHandler,
-          "validator": None,
-          "default": None,
           "unique": False,
           "description": "",
-          "type": "mapping",
+          "type": cls.Type.MAPPING,
       }
 
     return definitions
 
   @classmethod
   def get_custom_attr_definitions(cls, object_class):
-    from ggrc.converters import handlers
     """ Get column definitions for custom attributes on object_class """
     definitions = {}
     if not hasattr(object_class, "get_custom_attribute_definitions"):
       return definitions
     custom_attributes = object_class.get_custom_attribute_definitions()
     for attr in custom_attributes:
-      attr_name = "{}{}".format(handlers.CUSTOM_ATTR_PREFIX, attr.id)
+      attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.id)
       definitions[attr_name] = {
           "display_name": attr.title,
+          "attr_name": attr.title,
           "mandatory": attr.mandatory,
-          "handler": handlers.CustomAttributeColumHandler,
-          "validator": None,
-          "default": None,
           "unique": False,
           "description": "",
-          "type": "custom",
+          "type": cls.Type.CUSTOM,
       }
     return definitions
 
   @classmethod
   def get_unique_constraints(cls, object_class):
-    from sqlalchemy.sql.schema import UniqueConstraint
     """ Return a set of attribute names for single unique columns """
     constraints = object_class.__table__.constraints
     unique = filter(lambda x: isinstance(x, UniqueConstraint), constraints)
@@ -204,9 +256,6 @@ class AttributeInfo(object):
 
   @classmethod
   def get_object_attr_definitions(cls, object_class):
-    from ggrc.models.reflection import AttributeInfo
-    from ggrc.converters import handlers
-    from ggrc.converters.column_handlers import COLUMN_HANDLERS
     """ get all column definitions for object_class
 
     This function joins custm attribute definitions, mapping definitions and
@@ -223,12 +272,11 @@ class AttributeInfo(object):
       column = object_class.__table__.columns.get(key)
       definition = {
           "display_name": value,
+          "attr_name": key,
           "mandatory": False if column is None else not column.nullable,
-          "default": getattr(object_class, "default_{}".format(key), None),
-          "validator": getattr(object_class, "validate_{}".format(key), None),
-          "handler": COLUMN_HANDLERS.get(key, handlers.ColumnHandler),
           "unique": key in unique_columns,
           "description": "",
+          "type": cls.Type.PROPERTY,
       }
       if type(value) is dict:
         definition.update(value)
@@ -245,31 +293,25 @@ class AttributeInfo(object):
   def get_object_column_json(cls, object_class):
     """ get all column definitions containing only json serializable data """
     definitions = cls.get_object_column_definitions(object_class)
-    for attr_name, attr_info in definitions.items():
-      for key, value in attr_info.items():
-        if type(value) not in (unicode, str, int, long, bool, None):  # noqa
-          del definitions[attr_name][key]
     order = cls.get_column_order(definitions.keys())
     result = []
     for key in order:
       item = definitions[key]
-      item["attr_name"] = key
       result.append(item)
     return result
 
   @classmethod
   def get_column_order(cls, attr_list):
-    from ggrc.converters import COLUMN_ORDER
     """ Sort attribute list
 
     Attribute list should be sorted with 3 rules:
-      - attributes in COLUMN_ORDER variable must be fist and in the same
+      - attributes in ATTRIBUTE_ORDER variable must be fist and in the same
         order as defined in that variable.
       - Custom Attributes are sorted alphabetically after default attributes
       - mapping attributes are sorted alphabetically and placed last
     """
     attr_set = set(attr_list)
-    default_attrs = [v for v in COLUMN_ORDER if v in attr_set]
+    default_attrs = [v for v in ATTRIBUTE_ORDER if v in attr_set]
     default_set = set(default_attrs)
     other_attrs = [v for v in attr_list if v not in default_set]
     custom_attrs = [v for v in other_attrs if not v.lower().startswith("map:")]

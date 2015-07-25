@@ -118,12 +118,12 @@ class TestCulumnOrder(TestCase):
         "slug",
         "title",
         "description",
-        "test_plan",
         "notes",
+        "test_plan",
         "owners",
         "start_date",
-        "kind",
         "status",
+        "kind",
         "url",
         "reference_url",
         "name",
@@ -862,8 +862,8 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Frequency"]["mandatory"])
     self.assertIn("type", vals["Owner"])
     self.assertIn("type", vals["Member"])
-    self.assertEquals(vals["Owner"]["type"], "workflow_role")
-    self.assertEquals(vals["Member"]["type"], "workflow_role")
+    self.assertEquals(vals["Owner"]["type"], "user_role")
+    self.assertEquals(vals["Member"]["type"], "user_role")
 
   def test_task_group_definitions(self):
     """ test default headers for Task Group """

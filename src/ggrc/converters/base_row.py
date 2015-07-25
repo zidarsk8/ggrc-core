@@ -6,6 +6,7 @@
 """ This module is used for handling a single line from a csv file """
 
 from ggrc import db
+from ggrc.models.reflection import AttributeInfo
 from ggrc.converters import errors
 from ggrc.services.common import Resource
 import ggrc.services
@@ -51,10 +52,10 @@ class RowConverter(object):
         continue
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
-      if header_dict.get("type") is not None:
-        self.objects[attr_name] = item
-      else:
+      if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
         self.attrs[attr_name] = item
+      else:
+        self.objects[attr_name] = item
       if attr_name in ("slug", "email"):
         self.id_key = attr_name
         self.obj = self.get_or_generate_object(attr_name)
@@ -64,10 +65,10 @@ class RowConverter(object):
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, **header_dict)
-      if header_dict.get("type") is not None:
-        self.objects[attr_name] = item
-      else:
+      if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
         self.attrs[attr_name] = item
+      else:
+        self.objects[attr_name] = item
 
   def handle_row_data(self, field_list=None):
     if self.from_ids:
@@ -175,8 +176,8 @@ class RowConverter(object):
   def to_array(self, fields):
     row = []
     for field in fields:
-      if self.headers[field].get("type") is not None:
-        row.append(self.objects[field].get_value() or "")
-      else:
+      if self.headers[field].get("type") == AttributeInfo.Type.PROPERTY:
         row.append(self.attrs[field].get_value() or "")
+      else:
+        row.append(self.objects[field].get_value() or "")
     return row

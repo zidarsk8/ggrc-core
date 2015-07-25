@@ -7,13 +7,31 @@ import csv
 import chardet
 from StringIO import StringIO
 from ggrc.models.reflection import AttributeInfo
-
+from ggrc.converters.column_handlers import COLUMN_HANDLERS
+from ggrc.converters import handlers
 
 def get_object_column_definitions(object_class):
-  return AttributeInfo.get_object_attr_definitions(object_class)
+  """ Attach additional info to attribute definitions """
+  attributes = AttributeInfo.get_object_attr_definitions(object_class)
+  for key, attr in attributes.items():
+    handler = COLUMN_HANDLERS.get(key, handlers.ColumnHandler)
+    validator = None
+    default = None
+    if attr["type"] == AttributeInfo.Type.PROPERTY:
+      validator = getattr(object_class, "validate_{}".format(key), None)
+      default = getattr(object_class, "default_{}".format(key), None)
+    elif attr["type"] == AttributeInfo.Type.MAPPING:
+      handler = handlers.MappingColumnHandler
+    elif attr["type"] == AttributeInfo.Type.CUSTOM:
+      handler = handlers.CustomAttributeColumHandler
+    attr["handler"] = attr.get("handler", handler)
+    attr["validator"] = attr.get("validator", validator)
+    attr["default"] = attr.get("default", default)
+  return attributes
 
 def get_column_order(columns):
   return AttributeInfo.get_column_order(columns)
+
 
 def generate_csv_string(csv_data):
   """ Turn 2d string array into a string representing a csv file """
