@@ -34,7 +34,9 @@
         return _.findWhere(types, {value: type});
       },
       types: can.compute(function () {
-        var selector_list = GGRC.Mappings.get_canonical_mappings_for(this.object),
+        var selector_list,
+            canonical = GGRC.Mappings.get_canonical_mappings_for(this.object),
+            list = GGRC.tree_view.base_widgets_by_type[this.object],
             forbidden = ["workflow", "taskgroup", "gdrivefolder", "context"],
             groups = {
               "all_objects": {
@@ -59,7 +61,8 @@
               }
             };
 
-        can.each(selector_list, function (model, model_name) {
+        selector_list = _.intersection(_.keys(canonical), list);
+        can.each(selector_list, function (model_name) {
           if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name.toLowerCase())) {
             return;
           }
