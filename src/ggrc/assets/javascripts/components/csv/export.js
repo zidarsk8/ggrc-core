@@ -152,21 +152,21 @@
       },
       "#export-csv-button click": function (el, ev) {
         ev.preventDefault();
-        this.scope.attr("export.loading", true)
+        this.scope.attr("export.loading", true);
         var panels = this.scope.attr("export.panels.items"),
             data_grid = this.scope.attr("export.data_grid"),
-            only_relevant= this.scope.attr("export.only_relevant"),
+            only_relevant = this.scope.attr("export.only_relevant"),
             query = _.map(panels, function (panel, index) {
               var relevant_filter = "";
               if (data_grid && index > 0) {
-                relevant_filter = "#__previous__,"+(index-1)+"#";
-                if (only_relevant && index > 1){
-                  relevant_filter += " AND #__previous__,"+(index-2)+"#";
+                relevant_filter = "#__previous__," + (index - 1) + "#";
+                if (only_relevant && index > 1) {
+                  relevant_filter += " AND #__previous__," + (index - 2) + "#";
                 }
               } else {
-                relevant_filter = _.reduce(panel.relevant(),  function(query, el){
-                  return (query && query+" AND ")+"#"+el.model_name+","+el.filter.id+"#";
-                }, "")
+                relevant_filter = _.reduce(panel.relevant(), function (query, el) {
+                  return (query && query + " AND ") + "#" + el.model_name + "," + el.filter.id + "#";
+                }, "");
               }
               return {
                 object_name: panel.type,
@@ -193,7 +193,7 @@
           $("body").trigger("ajax:flash", {"error": data});
         }.bind(this))
         .always(function () {
-          this.scope.attr("export.loading", false)
+          this.scope.attr("export.loading", false);
         }.bind(this));
       }
     }
@@ -250,7 +250,7 @@
       // }))
       panel_number: "@",
       fetch_relevant_data: function (id, type) {
-        var dfd = CMS.Models[type].findOne({id: id})
+        var dfd = CMS.Models[type].findOne({id: id});
         dfd.then(function (result) {
           this.attr("item.relevant").push(new filterModel({
             model_name: url.relevant_type,
@@ -262,9 +262,16 @@
     },
     events: {
       inserted: function () {
-        if (!+this.scope.attr("panel_number") && url.relevant_id && url.relevant_type) {
+        var panel_number = +this.scope.attr("panel_number");
+
+        if (!panel_number && url.relevant_id && url.relevant_type) {
           this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }
+      },
+      "{scope.item} type": function () {
+        this.scope.attr("item.selected", {});
+        this.scope.attr("item.relevant", []);
+        this.scope.attr("item.filter", "");
       }
     },
     helpers: {
