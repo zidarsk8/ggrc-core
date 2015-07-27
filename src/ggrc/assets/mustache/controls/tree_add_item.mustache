@@ -7,6 +7,7 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
+    {{^if_instance_of parent_instance "ControlAssessment"}}
     <a
       class="section-add"
       href="javascript://"
@@ -21,5 +22,6 @@
       data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
         <i class="grcicon-add-black"></i>
     </a>
+    {{/if_instance_of}}
 {{/if}}
 {{/is_allowed_to_map}}
