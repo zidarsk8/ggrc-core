@@ -26,7 +26,29 @@ if os.environ.get('TRAVIS', False):
 
 class TestWeeklyWorkflow(BaseWorkflowTestCase):
   def test_relative_to_day(self):
-    rtd = WeeklyCycleCalculator.relative_day_to_date
+    weekly_wf = {
+      "title": "weekly thingy",
+      "description": "start this many a time",
+      "frequency": "weekly",
+      "task_groups": [{
+        "title": "tg_2",
+        "task_group_tasks": [
+          {
+            'title': 'weekly task 1',
+            "relative_start_day": 2, # Tuesday, 9th
+            "relative_start_month": None,
+            "relative_end_day": 4, # Thursday, 11th
+            "relative_end_month": None,
+          }
+        ],
+        "task_group_objects": self.random_objects
+      },
+      ]
+    }
+    _, wf = self.generator.generate_workflow(weekly_wf)
+    active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+
+    rtd = WeeklyCycleCalculator(active_wf).relative_day_to_date
 
     # Test relative day to date conversion at the start of the week
     with freeze_time("2015-6-8 13:00:00"): # Monday, 6/8/2015
@@ -290,7 +312,6 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
       "relative_end_month": None,
     }
 
-
     with freeze_time("2015-7-1 13:00"): # Wed
       _, wf = self.generator.generate_workflow(weekly_wf)
 
@@ -308,3 +329,56 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(cycle.start_date, date(2015, 7, 1))
       self.assertEqual(cycle.end_date, date(2015, 7, 2))
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 8))
+
+  def test_adding_task_with_lesser_start_day_after_activating_workflow(self):
+    """Test if NCSD gets updated correctly if user adds new task with lesser
+    relative start day after workflow has already been activated."""
+
+    weekly_wf = {
+      "title": "weekly thingy",
+      "description": "start this many a time",
+      "frequency": "weekly",
+      "task_groups": [{
+        "title": "tg 1",
+        "task_group_tasks": [
+          {
+            'title': 'weekly task 1',
+            "relative_start_day": 5, # Fri, 31st
+            "relative_start_month": None,
+            "relative_end_day": 3, # Wednesday, August 5th
+            "relative_end_month": None,
+          }],
+        "task_group_objects": []
+      },
+      ]
+    }
+
+    task = {
+      'title': 'weekly task 2',
+      "relative_start_day": 3,
+      "relative_start_month": None,
+      "relative_end_day": 4,
+      "relative_end_month": None,
+    }
+
+    with freeze_time("2015-07-27 13:00"):
+      _, wf = self.generator.generate_workflow(weekly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 31))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 7, 31))
+      self.assertEqual(cycle.end_date, date(2015, 8, 5))
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 8, 7))
+
+      task_group = db.session.query(TaskGroup).filter(
+        TaskGroup.workflow_id == wf.id).one()
+      _, tgt = self.generator.generate_task_group_task(task_group, data=task)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 8, 5))

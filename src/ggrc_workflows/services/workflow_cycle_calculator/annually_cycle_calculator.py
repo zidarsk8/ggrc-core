@@ -20,11 +20,9 @@ class AnnuallyCycleCalculator(CycleCalculator):
   month_domain = set(xrange(1, 13))
 
   def __init__(self, workflow, base_date=None):
-    if not base_date:
-      base_date = datetime.date.today()
-
     super(AnnuallyCycleCalculator, self).__init__(workflow)
 
+    base_date = self.get_base_date(base_date)
     self.reified_tasks = {}
     for task in self.tasks:
       start_date, end_date = self.non_adjusted_task_date_range(task, base_date)
@@ -35,8 +33,7 @@ class AnnuallyCycleCalculator(CycleCalculator):
         'relative_end': (task.relative_end_month, task.relative_end_day)
       }
 
-  @staticmethod
-  def relative_day_to_date(relative_day, relative_month=None, base_date=None):
+  def relative_day_to_date(self, relative_day, relative_month=None, base_date=None):
     """Converts an annual relative day representation to concrete date object
 
     First we ensure that we have both relative_day and relative_month or,
@@ -60,8 +57,7 @@ class AnnuallyCycleCalculator(CycleCalculator):
     if not relative_month in AnnuallyCycleCalculator.month_domain:
       raise ValueError
 
-    if not base_date:
-      base_date = today
+    base_date = self.get_base_date(base_date)
 
     start_month = datetime.date(base_date.year, relative_month, 1)
     ddate = start_month + relativedelta.relativedelta(days=relative_day - 1)

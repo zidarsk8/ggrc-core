@@ -33,8 +33,7 @@ class WeeklyCycleCalculator(CycleCalculator):
         'relative_end': task.relative_end_day
       }
 
-  @staticmethod
-  def relative_day_to_date(relative_day, relative_month=None, base_date=None):
+  def relative_day_to_date(self, relative_day, relative_month=None, base_date=None):
     """Converts a weekly representation of a day into concrete date object.
 
     Weekly relative days are represented as days in the week (1 Monday,

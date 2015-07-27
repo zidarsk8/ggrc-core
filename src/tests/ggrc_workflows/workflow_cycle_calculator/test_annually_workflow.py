@@ -188,3 +188,57 @@ class TestAnnuallyWorkflow(BaseWorkflowTestCase):
 
       calculator = get_cycle_calculator(active_wf)
       self.assertEqual([2, 3, 8, 11, 21, 2], [task.relative_start_day for task in calculator.tasks])
+
+  def test_adding_task_with_lesser_start_day_after_activating_workflow(self):
+    """Test if NCSD gets updated correctly if user adds new task with lesser
+    relative start day after workflow has already been activated."""
+
+    quarterly_wf = {
+      "title": "annually thingy",
+      "description": "start this many a time",
+      "frequency": "annually",
+      "task_groups": [{
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'annually task 1',
+            "relative_start_day": 30,
+            "relative_start_month": 7,
+            "relative_end_day": 7,
+            "relative_end_month": 8,
+          }],
+        "task_group_objects": []
+      },
+      ]
+    }
+
+    task = {
+      'title': 'annually task 2',
+      "relative_start_day": 20,
+      "relative_start_month": 7,
+      "relative_end_day": 22,
+      "relative_end_month": 7,
+    }
+
+    with freeze_time("2015-07-27 13:00"):
+      _, wf = self.generator.generate_workflow(quarterly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 30))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 7, 30))
+      self.assertEqual(cycle.end_date, date(2015, 8, 7))
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 7, 29))
+
+      # We add another task that starts on 20th
+      task_group = db.session.query(TaskGroup).filter(
+        TaskGroup.workflow_id == wf.id).one()
+      _, tgt = self.generator.generate_task_group_task(task_group, data=task)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 7, 20))

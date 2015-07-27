@@ -46,7 +46,7 @@ class CycleCalculator(object):
   HOLIDAYS = GoogleHolidays()
 
   @abstractmethod
-  def relative_day_to_date(self):
+  def relative_day_to_date(self, relative_day, relative_month=None, base_date=None):
     raise NotImplementedError("Converting from relative to concrete date"
                               "must be done in concrete classes.")
 
@@ -78,7 +78,7 @@ class CycleCalculator(object):
     self.holidays = holidays
     self.tasks = [
       task for task_group in self.workflow.task_groups
-      for task in task_group.task_group_tasks]
+           for task in task_group.task_group_tasks]
     self.tasks.sort(key=lambda t: (t.relative_start_month, t.relative_start_day))
 
   def is_work_day(self, ddate):
@@ -121,6 +121,15 @@ class CycleCalculator(object):
     if not self.is_work_day(ddate):
       return self.adjust_date(ddate)
     return ddate
+
+  def get_base_date(self, base_date=None):
+    if not base_date:
+      base_date = datetime.date.today()
+
+    return datetime.date(
+      base_date.year,
+      base_date.month,
+      min([t.relative_start_day for t in self.tasks] + [base_date.day]))
 
   def workflow_date_range(self):
     """Calculates the min start date and max end date across all tasks.
