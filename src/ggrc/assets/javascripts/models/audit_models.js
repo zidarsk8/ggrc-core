@@ -772,6 +772,9 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
     start_date: "date",
     end_date: "date"
   },
+  tree_view_options : {
+    add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
+  },
   init : function() {
     this._super && this._super.apply(this, arguments);
     this.validatePresenceOf("control");
