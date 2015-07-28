@@ -401,8 +401,7 @@
         "related_object", "personable", "ownable"
       ],
       _canonical: {
-        "sections": "Section",
-        "clauses": "Clause",
+        "sections": "Section"
       },
       sections: Direct("Section", "directive", "sections"),
       orphaned_objects: Multi([
