@@ -35,6 +35,8 @@ _column_handlers = {
     "control": handlers.ControlColumnHandler,
     "audit": handlers.AuditColumnHandler,
     "program_mapped": handlers.ObjectPersonColumnHandler,
+    "categories": handlers.ControlCategoryColumnHandler,
+    "assertions": handlers.ControlAssertionColumnHandler,
 }
 
 
