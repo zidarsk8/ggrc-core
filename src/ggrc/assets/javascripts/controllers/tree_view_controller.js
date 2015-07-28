@@ -316,13 +316,6 @@ can.Control("CMS.Controllers.TreeLoader", {
           child_tree_display_list = [],
           refreshed_deferred;
 
-      if (!items || items.length === 0) {
-        return new $.Deferred().resolve();
-      }
-
-      //Debug: No filter
-      //filtered_items = items;
-
       //find current widget model and check if first layer tree
       if (GGRC.page_object && this.options.parent) { //this is a second label tree
         var parent_model_name = this.options.parent.options.model.shortName,
