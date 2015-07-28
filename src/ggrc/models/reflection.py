@@ -290,9 +290,9 @@ class AttributeInfo(object):
     return definitions
 
   @classmethod
-  def get_object_column_json(cls, object_class):
+  def get_attr_definitions_array(cls, object_class):
     """ get all column definitions containing only json serializable data """
-    definitions = cls.get_object_column_definitions(object_class)
+    definitions = cls.get_object_attr_definitions(object_class)
     order = cls.get_column_order(definitions.keys())
     result = []
     for key in order:

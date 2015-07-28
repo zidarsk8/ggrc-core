@@ -119,7 +119,7 @@ def get_all_attributes_json():
   """
   published = {}
   for model in all_models.all_models:
-    published[model.__name__] = AttributeInfo.get_object_column_json(model)
+    published[model.__name__] = AttributeInfo.get_attr_definitions_array(model)
   return as_json(published)
 
 
