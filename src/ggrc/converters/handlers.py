@@ -544,10 +544,17 @@ class CategoryColumnHandler(ColumnHandler):
 
   def parse_item(self):
     names = [v.strip() for v in self.raw_value.split("\n")]
-    return CategoryBase.query.filter(and_(
+    categories = CategoryBase.query.filter(and_(
         CategoryBase.name.in_(names),
         CategoryBase.type == self.category_base_type
     )).all()
+    category_names = set([c.name for c in categories])
+    for name in names:
+      if name not in category_names:
+        self.add_warning(errors.WRONG_MULTI_VALUE,
+                         column_name=self.display_name,
+                         value=name)
+    return categories
 
   def set_obj_attr(self):
     if self.value is None:
