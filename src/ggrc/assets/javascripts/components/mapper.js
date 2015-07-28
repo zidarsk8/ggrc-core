@@ -82,7 +82,6 @@
       })
     });
 
-
   can.Component.extend({
     tag: "modal-mapper",
     template: can.view(GGRC.mustache_path + "/modals/mapper/base.mustache"),
@@ -239,21 +238,76 @@
         var selected = this.scope.attr("mapper.selected"),
             entries = this.scope.attr("mapper.entries");
 
+        if (!entries.length && !selected.length) {
+          return;
+        }
         this.scope.attr("mapper.all_selected", selected.length === entries.length);
       },
       "{mapper.entries} length": "allSelected",
       "{mapper.selected} length": "allSelected"
     }
   });
+
+  can.Component.extend({
+    tag: "mapper-checkbox",
+    template: "<content />",
+    scope: {
+      "instance_id": "@",
+      "is_mapped": "@",
+      "checkbox": can.compute(function (status) {
+        return /true/gi.test(this.attr("is_mapped")) || this.attr("select_state") || this.attr("appended");
+      })
+    },
+    events: {
+      "{scope} selected": function () {
+        this.element.find(".object-check-single").prop("checked", _.findWhere(this.scope.attr("selected"), {
+          id: +this.scope.attr("instance_id")
+        }));
+      },
+      ".object-check-single change": function (el, ev) {
+        if (el.prop("disabled")) {
+          return;
+        }
+        var scope = this.scope,
+            uid = +scope.attr("instance_id"),
+            item = _.find(scope.attr("options"), function (option) {
+              return option.instance.id === uid;
+            }),
+            status = el.prop("checked"),
+            selected = this.scope.attr("selected"),
+            needle = {id: item.instance.id},
+            index;
+
+        if (!status) {
+          index = _.findIndex(selected, needle);
+          selected.splice(index, 1);
+        } else {
+          _.findWhere(selected, needle) || selected.push({
+            id: item.instance.id,
+            type: item.instance.type,
+            href: item.instance.href
+          });
+        }
+      }
+    },
+    helpers: {
+      "is_disabled": function (options) {
+        if (/true/gi.test(this.attr("is_mapped"))) {
+          return options.fn();
+        }
+        return options.inverse();
+      }
+    }
+  });
+
   can.Component.extend({
     tag: "mapper-results",
     template: "<content />",
     scope: {
       "items-per-page": "@",
       page: 0,
-
-      select_all: false,
       page_loading: false,
+      select_state: false,
       loading_or_saving: can.compute(function () {
         return this.attr("page_loading") || this.attr("mapper.is_saving");
       })
@@ -281,11 +335,16 @@
         });
       },
       ".results-wrap scrollNext": "drawPage",
-      ".object-check-all change": function (el, ev) {
+      ".object-check-all click": function (el, ev) {
+        ev.preventDefault();
+        if (el.hasClass("disabled")) {
+          return;
+        }
         var que = new RefreshQueue(),
             entries = this.scope.attr("entries");
 
-        this.scope.attr("select_all", true);
+        this.scope.attr("select_state", true);
+        this.scope.attr("mapper.all_selected", true);
         this.scope.attr("isloading", true);
         que.enqueue(_.pluck(entries, "instance")).trigger().then(function (models) {
           this.scope.attr("isloading", false);
@@ -297,31 +356,6 @@
             };
           }));
         }.bind(this));
-      },
-      ".tree-item .object-check-single change": function (el, ev) {
-        if (el.hasClass("disabled")) {
-          return;
-        }
-
-        var uid = el.closest(".tree-item").data("id"),
-            isChecked = el.prop("checked"),
-            item = _.find(this.scope.attr("options"), function (option) {
-                return option.instance.id === uid;
-              }),
-            selected = this.scope.attr("selected"),
-            needle = {id: item.instance.id},
-            index;
-
-        if (!_.findWhere(selected, needle)) {
-          selected.push({
-            id: item.instance.id,
-            type: item.instance.type,
-            href: item.instance.href
-          });
-        } else {
-          index = _.findIndex(selected, needle);
-          selected.splice(index, 1);
-        }
       },
       "getItem": function (model) {
         if (!model.type) {
@@ -405,6 +439,7 @@
         this.scope.attr("selected", []);
         this.scope.attr("options", []);
         this.scope.attr("select_all", false);
+        this.scope.attr("select_state", false);
         this.scope.attr("mapper.all_selected", false);
 
         if (model_name === "AllObject") {

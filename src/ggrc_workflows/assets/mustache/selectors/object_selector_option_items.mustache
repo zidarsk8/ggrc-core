@@ -31,31 +31,34 @@
 
               <div class="span1">
                 <div class="object-check" align="left">
-                  <input
-                    type="checkbox"
-                    value="{{instance.title}}"
-                    data-id="{{instance.id}}"
-                    class="object-check-single {{#if isloading}}disabled{{/if}}"
+                  <mapper-checkbox
+                    is_mapped="{{#if_helpers '\
+                                  #if' mappings.length '\
+                                  and #result_direct_mappings' bindings_compute selected_object '\
+                                  or #has_pending_addition' selected_object instance '\
+                                  or #has_mapped_objects' selected_object instance}}
+                                  true
+                                {{else}}
+                                  false
+                                {{/if_helpers}}"
+                    appended="appended"
+                    instance_id="{{instance.id}}"
+                    isloading="isloading"
+                    options="options"
+                    select_state="select_state"
+                    all_selected="mapper.all_selected"
+                    selected="mapper.selected"
+                    is_saving="mapper.is_saving">
+                    <input
+                      type="checkbox"
+                      class="object-check-single {{#if isloading}}disabled{{/if}}"
+                      can-value="checkbox"
 
-                    {{#if mapper.is_saving}}disabled="true"{{/if}}
-                    {{#if_helpers '\
-                      #if' select_all '\
-                      or #if' appended}}
-                      checked
-                    {{/if_helpers}}
-                    {{#if mappings.length}}
-                      {{#result_direct_mappings bindings_compute selected_object}}
-                        checked disabled="true"
-                      {{/result_direct_mappings}}
-                    {{else}}
-                      {{#has_pending_addition selected_object instance}}
-                        checked disabled="true"
-                      {{/has_pending_addition}}
-                      {{#has_mapped_objects selected_object instance}}
-                        checked disabled="true"
-                      {{/has_mapped_objects}}
-                    {{/if}}
-                  >
+                      {{#is_disabled}}
+                        disabled="disabled"
+                      {{/is_disabled}}
+                    >
+                  </mapper-checkbox>
                 </div>
               </div>
             </div>
