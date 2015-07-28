@@ -544,6 +544,9 @@ class CategoryColumnHandler(ColumnHandler):
 
   def parse_item(self):
     names = [v.strip() for v in self.raw_value.split("\n")]
+    names = [name for name in names if name != ""]
+    if not names:
+      return None
     categories = CategoryBase.query.filter(and_(
         CategoryBase.name.in_(names),
         CategoryBase.type == self.category_base_type
