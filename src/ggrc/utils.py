@@ -188,12 +188,18 @@ def get_mapping_rules():
   return filtered_rules
 
 
+def _prefix_camelcase(name, prefix):
+  name = name[:1].lower() + name[1:]
+  callback = lambda pat: prefix + pat.group(0).lower()
+  return re.sub(r'[A-Z]', callback, name)
+
+
 def underscore_from_camelcase(name):
-  return "_".join(re.findall('[A-Z][^A-Z]*', name)).lower()
+  return _prefix_camelcase(name, "_")
 
 
 def title_from_camelcase(name):
-  return " ".join(re.findall('[A-Z][^A-Z]*', name))
+  return _prefix_camelcase(name, " ")
 
 
 class BenchmarkContextManager(object):
