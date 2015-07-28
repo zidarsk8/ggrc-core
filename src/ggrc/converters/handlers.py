@@ -548,7 +548,7 @@ class CategoryColumnHandler(ColumnHandler):
         CategoryBase.name.in_(names),
         CategoryBase.type == self.category_base_type
     )).all()
-    category_names = set([c.name for c in categories])
+    category_names = set([c.name.strip() for c in categories])
     for name in names:
       if name not in category_names:
         self.add_warning(errors.WRONG_MULTI_VALUE,
