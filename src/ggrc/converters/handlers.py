@@ -163,8 +163,12 @@ class OwnerColumnHandler(UserColumnHandler):
 
   def set_obj_attr(self):
     try:
-      for owner in self.value:
-        self.row_converter.obj.owners.append(owner)
+      for person in self.row_converter.obj.owners:
+        if person not in self.value:
+          self.row_converter.obj.owners.remove(person)
+      for person in self.value:
+        if person not in self.row_converter.obj.owners:
+          self.row_converter.obj.owners.append(person)
     except:
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
       trace = traceback.format_exc()
