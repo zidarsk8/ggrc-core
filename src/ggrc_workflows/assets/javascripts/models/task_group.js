@@ -128,6 +128,15 @@
           instance._refresh_workflow_people();
         }
       });
+
+      this.bind("destroyed", function(ev, instance) {
+        if (instance instanceof that) {
+          if (instance.task_group.reify().selfLink) {
+            instance.task_group.reify().refresh();
+            instance._refresh_workflow_people();
+          }
+        }
+      });
     }
   }, {
     init : function() {
