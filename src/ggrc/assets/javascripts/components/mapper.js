@@ -164,8 +164,12 @@
         que.enqueue(instance).trigger().done(function (inst) {
           data["context"] = null;
           _.each(this.scope.attr("mapper.selected"), function (desination) {
-            var modelInstance;
+            var modelInstance,
+                isMapped = GGRC.Utils.is_mapped(instance, desination);
 
+            if (isMapped) {
+              return;
+            }
             mapping = GGRC.Mappings.get_canonical_mapping(object, isAllObject ? desination.type : type);
             Model = CMS.Models[mapping.model_name];
             data[mapping.object_attr] = {
@@ -174,7 +178,6 @@
               id: instance.id
             };
             data[mapping.option_attr] = desination;
-
             modelInstance = new Model(data);
             defer.push(modelInstance.save());
           }, this);
@@ -265,8 +268,8 @@
         }));
       },
       ".object-check-single change": function (el, ev) {
-        if (el.prop("disabled")) {
-          return;
+        if (el.prop("disabled") || el.hasClass("disabled")) {
+          return false;
         }
         var scope = this.scope,
             uid = +scope.attr("instance_id"),
@@ -291,8 +294,11 @@
       }
     },
     helpers: {
+      "is_shown": function (options) {
+        return options.fn();
+      },
       "is_disabled": function (options) {
-        if (/true/gi.test(this.attr("is_mapped"))) {
+        if (/true/gi.test(this.attr("is_mapped")) || this.attr("is_saving") || this.attr("is_loading")) {
           return options.fn();
         }
         return options.inverse();
@@ -345,9 +351,9 @@
 
         this.scope.attr("select_state", true);
         this.scope.attr("mapper.all_selected", true);
-        this.scope.attr("isloading", true);
+        this.scope.attr("is_loading", true);
         que.enqueue(_.pluck(entries, "instance")).trigger().then(function (models) {
-          this.scope.attr("isloading", false);
+          this.scope.attr("is_loading", false);
           this.scope.attr("selected", _.map(models, function (model) {
             return {
               id: model.id,

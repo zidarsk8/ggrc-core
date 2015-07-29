@@ -14,7 +14,7 @@
         return false;
       });
     },
-    download: function(filename, text) {
+    download: function (filename, text) {
       var element = document.createElement('a');
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
       element.setAttribute('download', filename);
@@ -35,6 +35,15 @@
         url: "/_service/export_csv",
         data: JSON.stringify(request.data || {})
       });
+    },
+    is_mapped: function (target, destination) {
+      var bindings = target.get_binding(CMS.Models[destination.type].table_plural);
+
+      if (bindings.list && bindings.list.length) {
+        return _.find(bindings.list, function (item) {
+          return item.instance.id === destination.id;
+        });
+      }
     }
   };
 })(jQuery, window.GGRC = window.GGRC || {});
