@@ -43,6 +43,11 @@ permissions = {
         "Person",
         "Program",
         "Role",
+        "Request",
+        "Response",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
         "Context",
         {
             "type": "BackgroundTask",
@@ -97,6 +102,9 @@ permissions = {
         "UserRole",
         "Request",
         "Response",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
         "Context",
         {
             "type": "BackgroundTask",
@@ -153,6 +161,9 @@ permissions = {
         "UserRole",
         "Request",
         "Response",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
         "Context",
         {
             "type": "BackgroundTask",
@@ -206,6 +217,9 @@ permissions = {
         "UserRole",
         "Request",
         "Response",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
         "Context",
         {
             "type": "BackgroundTask",
