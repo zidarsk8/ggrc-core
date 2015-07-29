@@ -38,10 +38,14 @@
     },
     is_mapped: function (target, destination) {
       var bindings = target.get_binding(CMS.Models[destination.type].table_plural);
-
-      if (bindings.list && bindings.list.length) {
+      if (bindings && bindings.list && bindings.list.length) {
         return _.find(bindings.list, function (item) {
           return item.instance.id === destination.id;
+        });
+      }
+      if (target.objects && target.objects.length) {
+        return _.find(target.objects, function (item) {
+          return item.id === destination.id && item.type === destination.type;
         });
       }
     }
