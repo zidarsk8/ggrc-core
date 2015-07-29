@@ -129,6 +129,7 @@ class DefaultUserPermissions(UserPermissions):
 
   def _permission_match(self, permission, permissions):
     """Check if the user has the given permission"""
+
     has_conditions = permissions\
         .get(permission.action, {})\
         .get(permission.resource_type, {})\
@@ -239,6 +240,7 @@ class DefaultUserPermissions(UserPermissions):
   def _get_resources_for(self, action, resource_type):
     """Get resources resources (object ids) for a given action and resource_type"""
     permissions = self._permissions()
+
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
       return None
 
@@ -259,6 +261,7 @@ class DefaultUserPermissions(UserPermissions):
     # FIXME: (Security) When applicable, we should explicitly assert that no
     #   permissions are expected (e.g. that every user has ADMIN_PERMISSION).
     permissions = self._permissions()
+
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
       return None
 
@@ -279,6 +282,8 @@ class DefaultUserPermissions(UserPermissions):
             .get(self.ADMIN_PERMISSION.resource_type, {})\
             .get('contexts', ()))
     ret.extend(admin_list)
+    if None in ret:
+      return None
     return ret
 
   def create_contexts_for(self, resource_type):
