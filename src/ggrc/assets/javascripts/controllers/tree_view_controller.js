@@ -250,9 +250,9 @@ can.Control("CMS.Controllers.TreeLoader", {
       sort_function = function(old_item, new_item) {
         return original_function(old_item.instance, new_item.instance);
       };
-      if (original_function.fetch_key && original_function.order_factor) {
+      if (original_function.deep_property && original_function.order_factor) {
         _.each(temp_list, function (v) {
-          v.__sort_key = original_function.fetch_key(v);
+          v.__sort_key = v.instance.get_deep_property(original_function.deep_property);
         });
         temp_list.sort(function(old_item, new_item) {
           var a = old_item.__sort_key,
@@ -325,11 +325,17 @@ can.Control("CMS.Controllers.TreeLoader", {
 
       //find current widget model and check if first layer tree
       if (GGRC.page_object && this.options.parent) { //this is a second label tree
-        var parent_model_name = this.options.parent.options.model.shortName;
-        child_tree_display_list = GGRC.tree_view.sub_tree_for[parent_model_name].display_list;
+        var parent_model_name = this.options.parent.options.model.shortName,
+            parent_instance_type = this.options.parent.options.instance.type;
+        child_tree_display_list =
+          (GGRC.tree_view.sub_tree_for[parent_model_name] ||
+           GGRC.tree_view.sub_tree_for[parent_instance_type] ||
+           {} // all hope is lost, skip filtering
+          ).display_list;
 
         //check if all objects selected, then skip filter
-        if (child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
+        if (child_tree_display_list === undefined ||
+            child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
           //skip filter
           filtered_items = items;
         } else if (child_tree_display_list.length === 0) { //no item is selected to filter, so just return
@@ -363,7 +369,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       }
       refreshed_deferred.then(function(){
         that.insert_items(filtered_items, force_prepare_chilren);
-        that._loading_finished();
+        that._ifNotRemoved(that._loading_finished).call(that);
       });
       return this._loading_deferred;
     }
@@ -1305,7 +1311,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   , sort: function (event) {
       var $el = $(event.currentTarget),
           key = $el.data("field"),
-          key_tree, fetch;
+          key_tree = can.Model.Cacheable.parse_deep_property_descriptor(key);
 
       if (key !== this.options.sort_by) {
           this.options.sort_direction = null;
@@ -1316,40 +1322,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               : "asc",
           order_factor = order === "asc" ? 1 : -1;
 
-      key_tree = _.map(key.split("."), function (part) {
-        return part.split("|");
-      });
-
-      fetch = function(val) {
-        var i, j, part, field, found, tmp;
-        for (i = 0; i < key_tree.length; i++) {
-          part = key_tree[i];
-          if (val.instance) {
-            val = val.instance;
-          }
-          found = false;
-          for (j = 0; j < part.length; j++) {
-            field = part[j];
-            tmp = val[field];
-            if (tmp !== undefined && tmp !== null) {
-              val = tmp;
-              if (typeof val.reify === "function") {
-                val = val.reify();
-              }
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            return null;
-          }
-        }
-        return val;
-      };
-
       this.options.sort_function = function (val1, val2) {
-        var a = fetch(val1),
-            b = fetch(val2);
+        var a = val1.get_deep_property(key_tree),
+            b = val2.get_deep_property(key_tree);
          if (a > b) {
            return order_factor;
          }
@@ -1359,7 +1334,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
          return 0;
       };
 
-      this.options.sort_function.fetch_key = fetch;
+      this.options.sort_function.deep_property = key_tree;
       this.options.sort_function.order_factor = order_factor;
 
       this.options.sort_direction = order;

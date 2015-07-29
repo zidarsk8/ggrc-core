@@ -16,6 +16,7 @@ from ggrc.converters import errors
 from ggrc.login import get_current_user
 from ggrc.models import CustomAttributeValue
 from ggrc.models import CustomAttributeDefinition
+from ggrc.models import ObjectPerson
 from ggrc.models import Option
 from ggrc.models import Person
 from ggrc.models import Program
@@ -24,6 +25,10 @@ from ggrc.models import Regulation
 from ggrc.models import Standard
 from ggrc.models import Relationship
 from ggrc.models.relationship import RelationshipHelper
+
+
+MAPPING_PREFIX = "__mapping__:"
+CUSTOM_ATTR_PREFIX = "__custom__:"
 
 
 class ColumnHandler(object):
@@ -56,14 +61,6 @@ class ColumnHandler(object):
 
   def parse_item(self):
     return self.raw_value
-
-  def validate(self):
-    if callable(self.validator):
-      try:
-        self.validator(self.row_converter.obj, self.key, self.value)
-      except ValueError:
-        self.add_error("invalid status '{}'".format(self.value))
-    return True
 
   def set_obj_attr(self):
     if not self.value:
@@ -110,6 +107,19 @@ class StatusColumnHandler(ColumnHandler):
 class UserColumnHandler(ColumnHandler):
 
   """ Handler for primary and secondary contacts """
+
+  def get_users_list(self):
+    users = set()
+    email_lines = self.raw_value.splitlines()
+    owner_emails = filter(unicode.strip, email_lines)  # noqa
+    for raw_line in owner_emails:
+      email = raw_line.strip().lower()
+      person = self.get_person(email)
+      if person:
+        users.add(person)
+      else:
+        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+    return list(users)
 
   def get_person(self, email):
     new_objects = self.row_converter.block_converter.converter.new_objects
@@ -245,7 +255,7 @@ class MappingColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
-    self.mapping_name = key[4:]  # remove "map:" prefix
+    self.mapping_name = key[len(MAPPING_PREFIX):]
     importable = get_importables()
     self.mapping_object = importable.get(self.mapping_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
@@ -336,7 +346,7 @@ class CustomAttributeColumHandler(TextColumnHandler):
   def get_ca_definition(self):
     for definition in self.row_converter.object_class\
             .get_custom_attribute_definitions():
-      if definition.title == self.key:
+      if definition.title == self.display_name:
         return definition
     return None
 
@@ -440,7 +450,7 @@ class ProgramColumnHandler(ColumnHandler):
       self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
       return None
 
-    return program.id
+    return program
 
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
@@ -471,3 +481,59 @@ class SectionDirectiveColumnHandler(ColumnHandler):
   def get_value(self):
     directive = getattr(self.row_converter.obj, self.key, False)
     return directive.slug
+
+
+class ControlColumnHandler(MappingColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    key = "{}control".format(MAPPING_PREFIX)
+    super(ControlColumnHandler, self).__init__(row_converter, key, **options)
+
+  def set_obj_attr(self):
+    self.value = self.parse_item()
+    if len(self.value) != 1:
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name="Control")
+      return
+    self.row_converter.obj.control = self.value[0]
+
+
+class AuditColumnHandler(MappingColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    key = "{}audit".format(MAPPING_PREFIX)
+    super(AuditColumnHandler, self).__init__(row_converter, key, **options)
+
+
+class ObjectPersonColumnHandler(UserColumnHandler):
+
+  def parse_item(self):
+    return self.get_users_list()
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    object_person = db.session.query(ObjectPerson.person_id).filter_by(
+        personable_id=self.row_converter.obj.id,
+        personable_type=self.row_converter.obj.__class__.__name__)
+    users = Person.query.filter(Person.id.in_(object_person))
+    emails = [user.email for user in users]
+    return "\n".join(emails)
+
+  def remove_current_people(self):
+    ObjectPerson.query.filter_by(
+        personable_id=self.row_converter.obj.id,
+        personable_type=self.row_converter.obj.__class__.__name__).delete()
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    self.remove_current_people()
+    for owner in self.value:
+      user_role = ObjectPerson(
+          personable_id=self.row_converter.obj.id,
+          personable_type=self.row_converter.obj.__class__.__name__,
+          person_id=owner.id
+      )
+      db.session.add(user_role)
+    self.dry_run = True

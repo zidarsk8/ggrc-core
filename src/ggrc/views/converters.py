@@ -53,8 +53,8 @@ def handle_export_request():
   filename = "{}.csv".format(object_names)
 
   headers = [
-      ('Content-Type', 'text/csv'),
-      ('Content-Disposition', 'attachment; filename="{}"'.format(filename)),
+      ("Content-Type", "text/csv"),
+      ("Content-Disposition", "attachment; filename='{}'".format(filename)),
   ]
   return current_app.make_response((csv_string, 200, headers))
 
@@ -87,17 +87,17 @@ def handle_import_request():
   converter.import_csv()
   response_data = converter.get_info()
   response_json = json.dumps(response_data)
-  headers = [('Content-Type', 'application/json')]
+  headers = [("Content-Type", "application/json")]
   return current_app.make_response((response_json, 200, headers))
 
 
 def init_converter_views():
-  @app.route("/_service/export_csv", methods=['POST'])
+  @app.route("/_service/export_csv", methods=["POST"])
   @login_required
   def handle_export_csv():
     return handle_export_request()
 
-  @app.route("/_service/import_csv", methods=['POST'])
+  @app.route("/_service/import_csv", methods=["POST"])
   @login_required
   def handle_import_csv():
     return handle_import_request()
@@ -110,4 +110,5 @@ def init_converter_views():
   @app.route("/export")
   @login_required
   def export_view():
-    return render_template("import_export/export.haml")
+    data_grid = request.args.get("data_grid", "").lower() == "true"
+    return render_template("import_export/export.haml", data_grid=data_grid)

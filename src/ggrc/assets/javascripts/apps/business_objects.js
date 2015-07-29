@@ -480,7 +480,7 @@
       },
       clause_child_options = {
         model: CMS.Models.Clause,
-        mapping: "clauses",
+        mapping: "related_objects",
         show_view: GGRC.mustache_path + "/sections/tree.mustache",
         footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache",
         add_item_view: GGRC.mustache_path + "/sections/tree_add_item.mustache",

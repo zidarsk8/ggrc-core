@@ -14,7 +14,8 @@ from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import Resource
 from ggrc.services.registry import service
 from ggrc_workflows import models, notification
-from ggrc_workflows import converters
+from ggrc_workflows.converters import IMPORTABLE
+from ggrc_workflows.converters.handlers import COLUMN_HANDLERS
 from ggrc_workflows.services.common import Signals
 from ggrc_workflows.services.workflow_cycle_calculator import get_cycle_calculator
 from ggrc_workflows.roles import (
@@ -938,4 +939,5 @@ ROLE_IMPLICATIONS = WorkflowRoleImplications()
 
 notification.register_listeners()
 contributed_notifications = notification.contributed_notifications
-contributed_importables = converters.IMPORTABLE
+contributed_importables = IMPORTABLE
+contributed_column_handlers = COLUMN_HANDLERS

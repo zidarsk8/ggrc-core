@@ -3,6 +3,7 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
+from sqlalchemy import orm
 from sqlalchemy.orm import validates
 
 from ggrc import db
@@ -73,10 +74,8 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
 
     query = super(ControlAssessment, cls).eager_query()
-    return query.options(
-        orm.subqueryload('control'))
+    return query.options(orm.subqueryload('control'))
 
 track_state_for_class(ControlAssessment)

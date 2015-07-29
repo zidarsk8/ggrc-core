@@ -24,6 +24,7 @@ class TaskGroup(
 
   task_group_objects = db.relationship(
       'TaskGroupObject', backref='task_group', cascade='all, delete-orphan')
+
   objects = association_proxy(
       'task_group_objects', 'object', 'TaskGroupObject')
 

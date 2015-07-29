@@ -271,7 +271,6 @@ permissions = {
             },
             "condition": "is"
         },
-        "Person",
         "Program",
         "Role",
         "UserRole",

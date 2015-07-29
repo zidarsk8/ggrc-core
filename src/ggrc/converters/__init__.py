@@ -65,48 +65,6 @@ GGRC_IMPORTABLE = {
     "issue": Issue,
 }
 
-COLUMN_ORDER = (
-    "slug",
-    "title",
-    "description",
-    "test_plan",
-    "notes",
-    "owners",
-    "start_date",
-    "end_date",
-    "report_end_date",
-    "report_start_date",
-    "assertions",
-    "audit",
-    "categories",
-    "contact",
-    "control",
-    "design",
-    "directive_id",
-    "fraud_related",
-    "key_control",
-    "kind",
-    "link",
-    "means",
-    "network_zone",
-    "operationally",
-    "principal_assessor",
-    "private",
-    "program_id",
-    "secondary_assessor",
-    "secondary_contact",
-    "status",
-    "url",
-    "reference_url",
-    "_user_role_auditor",
-    "verify_frequency",
-    "name",
-    "email",
-    "is_enabled",
-    "company",
-    "_custom_attributes",
-)
-
 
 def get_importables():
   """ Get a dict of all importable objects from all modules """

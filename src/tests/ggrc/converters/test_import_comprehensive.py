@@ -211,7 +211,7 @@ class TestComprehensiveSheets(TestCase):
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
     for message in messages:  # response[0] = Person block
-      self.assertEquals(response[0][message], [])
+      self.assertEquals(set(response[0][message]), set())
     ggrc_admin = db.session.query(Role.id).filter(Role.name == "gGRC Admin")
     reader = db.session.query(Role.id).filter(Role.name == "Reader")
     creator = db.session.query(Role.id).filter(Role.name == "Creator")
@@ -222,22 +222,9 @@ class TestComprehensiveSheets(TestCase):
     self.assertEquals(len(readers), 5)
     self.assertEquals(len(creators), 6)
 
-    broken_imports = set([
-        "Control Assessment",
-        "Task Group Task",
-        "Task Group",
-        "Workflow",
-    ])
-
     for block in response:
-      if block["name"] in broken_imports:
-        continue
-      self.assertEquals(set(), set(block["block_errors"]))
-      self.assertEquals(set(), set(block["block_warnings"]))
-      self.assertEquals(set(), set(block["row_errors"]))
-      self.assertEquals(set(), set(block["row_warnings"]))
-
-    # print(json.dumps(response, indent=2, sort_keys=True))
+      for message in messages:  # response[0] = Person block
+        self.assertEquals(set(), set(block[message]))
 
   def create_custom_attributes(self):
     gen = self.generator.generate_custom_attribute
