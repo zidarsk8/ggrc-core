@@ -3,26 +3,12 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
-import os
-from os.path import abspath
-from os.path import dirname
-from os.path import join
-from flask import json
-
 from ggrc import db
 from ggrc.models import Program
 from ggrc_basic_permissions import Role
 from ggrc_basic_permissions import UserRole
-from tests.ggrc import TestCase
+from tests.ggrc.converters import TestCase
 from tests.ggrc.generator import ObjectGenerator
-
-THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
-
-
-if os.environ.get("TRAVIS", False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 class TestComprehensiveSheets(TestCase):
@@ -248,14 +234,3 @@ class TestComprehensiveSheets(TestCase):
           "name": email.split("@")[0].title(),
           "email": email,
       }, "gGRC Admin")
-
-  def import_file(self, filename, dry_run=False):
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {
-        "X-test-only": "true" if dry_run else "false",
-        "X-requested-by": "gGRC",
-    }
-    response = self.client.post("/_service/import_csv",
-                                data=data, headers=headers)
-    self.assert200(response)
-    return json.loads(response.data)
