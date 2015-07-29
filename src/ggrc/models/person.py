@@ -141,7 +141,7 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
     }
     unique_roles = set([
         user_role.role.name
-        for user_role in self.user_roles if not user_role.context_id
+        for user_role in self.user_roles if user_role.role.name in ROLE_HIERARCHY.keys()
     ])
     if len(unique_roles) == 0:
       return u"No Access"
