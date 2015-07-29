@@ -43,7 +43,7 @@
                                 {{/if_helpers}}"
                     appended="appended"
                     instance_id="{{instance.id}}"
-                    isloading="isloading"
+                    is_loading="is_loading"
                     options="options"
                     select_state="select_state"
                     all_selected="mapper.all_selected"
@@ -51,12 +51,9 @@
                     is_saving="mapper.is_saving">
                     <input
                       type="checkbox"
-                      class="object-check-single {{#if isloading}}disabled{{/if}}"
+                      class="object-check-single"
                       can-value="checkbox"
-
-                      {{#is_disabled}}
-                        disabled="disabled"
-                      {{/is_disabled}}
+                      {{#is_disabled}}disabled="disabled"{{/is_disabled}}
                     >
                   </mapper-checkbox>
                 </div>
