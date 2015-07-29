@@ -8,64 +8,6 @@
 (function(can, $) {
 
   can.Component.extend({
-    tag: "csv-template",
-    template: "<content></content>",
-    scope: {
-      url: "/_service/export_csv",
-      selected: []
-    },
-    events: {
-      "#importSelect change": function (el, ev) {
-        var $items = el.find(":selected"),
-            selected = this.scope.attr("selected");
-
-        $items.each(function () {
-          var $item = $(this);
-          if (_.findWhere(selected, {value: $item.val()})) {
-            return;
-          }
-          return selected.push({
-            name: $item.attr("label"),
-            value: $item.val()
-          });
-        });
-      },
-      ".import-button click": function (el, ev) {
-        ev.preventDefault();
-        var data = _.map(this.scope.attr("selected"), function (el) {
-              return {object_name: el.value};
-            });
-
-        if (!data.length) {
-          return;
-        }
-
-        GGRC.Utils.export_request({
-          data: data
-        }).then(function (data) {
-          GGRC.Utils.download("import_template.csv", data);
-        }.bind(this))
-        .fail(function (data) {
-          $("body").trigger("ajax:flash", {"error": data});
-        }.bind(this));
-      },
-      ".import-list a click": function (el, ev) {
-        ev.preventDefault();
-
-        var index = el.data("index"),
-            item = this.scope.attr("selected").splice(index, 1)[0];
-
-        this.element.find("#importSelect option:selected").each(function () {
-          var $item = $(this);
-          if ($item.val() === item.value) {
-            $item.prop("selected", false);
-          }
-        });
-      }
-    }
-  });
-
-  can.Component.extend({
     tag: "csv-import",
     template: "<content></content>",
     requestData: null,
@@ -79,7 +21,7 @@
         var state = this.attr("state") || "select",
             states = {
               select: {class: "btn-success", text: "Choose CSV file to import"},
-              analyse: {class: "btn-draft", text: "Analysing", isDisabled: true},
+              analysing: {class: "btn-draft", text: "Analysing", isDisabled: true},
               import: {class: "btn-primary", text: "Import data"},
               importing: {class: "btn-draft", text: "Importing", isDisabled: true},
               success: {class: "btn-success", text: "<i class=\"grcicon-check-white\"></i> Import successful"}

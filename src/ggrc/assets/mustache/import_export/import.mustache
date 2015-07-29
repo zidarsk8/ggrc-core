@@ -19,7 +19,12 @@
           {{#states}}
             <button id="import_btn" {{#isDisabled}}disabled{{/isDisabled}} class="btn btn-large btn-fixed state-{{state}} {{class}}">{{{text}}}</button>
             {{^if_equals state "select"}}
-              <button {{#isDisabled}}disabled{{/isDisabled}} class="btn btn-small state-reset">Reset</button>
+              {{#isDisabled}}
+                <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+              {{/isDisabled}}
+              {{^isDisabled}}
+                <button class="btn btn-small state-reset">Reset</button>
+              {{/isDisabled}}
             {{/if}}
           {{/states}}
         </div>

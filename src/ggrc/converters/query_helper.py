@@ -9,7 +9,7 @@ from sqlalchemy import or_
 
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import RelationshipHelper
-from ggrc.converters import IMPORTABLE
+from ggrc.converters import get_importables
 
 
 class QueryHelper(object):
@@ -46,7 +46,8 @@ class QueryHelper(object):
   """
 
   def __init__(self, query):
-    self.object_map = {o.__name__: o for o in IMPORTABLE.values()}
+    importable = get_importables()
+    self.object_map = {o.__name__: o for o in importable.values()}
     self.query = self.clean_query(query)
     self.set_attr_name_map()
 

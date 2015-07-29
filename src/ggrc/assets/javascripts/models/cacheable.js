@@ -121,6 +121,7 @@ can.Model("can.Model.Cacheable", {
     "start date": "start_date",
     "created date": "created_at",
     "updated date": "updated_at",
+    "modified date": "updated_at",
     "code": "slug",
     "state": "status"
   }
@@ -672,6 +673,23 @@ can.Model("can.Model.Cacheable", {
         return mapper;
       }
     }
+
+  // This this is the parsing part of the easy accessor for deep properties.
+  // Use the result of this with instance.get_deep_property
+  // owners.0.name -> this.owners[0].reify().name
+  // owners.0.name|email ->
+  // firstnonempty this.owners[0].reify().name this.owners[0].reify().email
+  //
+  // owners.GET_ALL.name ->
+  // [this.owners[0].reify().name, this.owners[1].reify().name...]
+  , parse_deep_property_descriptor: function(deep_property_string) {
+      return Object.freeze(_.map(deep_property_string.split("."), function (part) {
+        if (part === "GET_ALL") {
+          return part;
+        }
+        return Object.freeze(part.split("|"));
+      }));
+  }
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
@@ -1114,8 +1132,13 @@ can.Model("can.Model.Cacheable", {
               email: owner.email
             });
           });
-        } else if ($.type(val) === 'string'){
-          values[key] = val;
+        } else {
+          if ($.type(val) === 'date') {
+            val = val.toISOString().substring(0, 10);
+          }
+          if ($.type(val) === 'string'){
+            values[key] = val;
+          }
         }
       }
     }.bind(this));
@@ -1132,80 +1155,42 @@ can.Model("can.Model.Cacheable", {
             this.id].join('/');
   },
 
-  // easier accessor for deep properties
-  // owners.0.name -> this.owners[0].reify().name
-  // owners.0.name|email ->
-  //  firstnonempty this.owners[0].reify().name this.owners[0].reify().email
-  get_deep_property: function get_deep_property (descriptor, val) {
-    val = typeof val === "undefined" ? this : val;
-
-    if (!descriptor || !descriptor.length) {
-      return undefined;
-    } else if (val[descriptor]) {
-      return val[descriptor];
-    } else if (descriptor.match(/^custom:/)) {
-      return this.get_deep_property(
-          this._find_custom_attr(descriptor),
-          val);
-    } else {
-      var d = descriptor.split('.'),
-          keys = d.shift().split('|'),
-          rest = d.join('.');
-
+  // Returns a deep property as specified in the descriptor built
+  // by Cacheable.parse_deep_property_descriptor
+  get_deep_property: function(property_descriptor) {
+    var i, j, part, field, found, tmp,
+        val = this;
+    for (i = 0; i < property_descriptor.length; i++) {
+      part = property_descriptor[i];
       if (val.instance) {
         val = val.instance;
       }
-
-      return _.reduce(keys, function (res, key) {
-        if (res && res.length) return res;
-
-        var binding = val.get_binding && val.has_binding(key)
-                ? val.get_binding(key)
-                : null;
-
-        if (binding && binding.list && binding.list.length) {
-          val = binding.list;
-
-          return rest.length
-                ? get_deep_property(rest, val)
-                : val;
-        } else if (typeof val[key] === "undefined") {
-          return undefined;
-        } else if (val[key] === null) {
-          return null;
-        } else {
-          if (typeof val[key].reify === "function") {
-            val[key] = val[key].reify();
+      found = false;
+      if (part === "GET_ALL") {
+        return _.map(val, function(element) {
+          return element.get_deep_property(property_descriptor.slice(i+1));
+        });
+      } else {
+        for (j = 0; j < part.length; j++) {
+          field = part[j];
+          tmp = val[field];
+          if (tmp !== undefined && tmp !== null) {
+            val = tmp;
+            if (typeof val.reify === "function") {
+              val = val.reify();
+            }
+            found = true;
+            break;
           }
-
-          return rest.length
-                ? get_deep_property(rest, val[key])
-                : val[key];
         }
-      }, "");
+        if (!found) {
+          return null;
+        }
+      }
     }
+    return val;
   },
 
-  // finds path descriptors for custom fields
-  // something like custom:Custom field
-  // becomes custom_attribute_values.1.attribute_value
-  // the index is what we're looking for
-  _find_custom_attr: function (descriptor, val) {
-    descriptor = descriptor.replace(/^custom:/, '');
-    val = typeof val === "undefined" ? this : val;
-
-    var needle = _.find(GGRC.custom_attr_defs, function (attr) {
-      return attr.definition_type === val.class.table_singular &&
-            attr.title === descriptor;
-    });
-
-    var index = _.findIndex(val.custom_attribute_values, function (attr) {
-      attr = attr.reify();
-      return attr.custom_attribute_id === needle.id;
-    });
-
-    return 'custom_attribute_values.'+index+'.attribute_value';
-  }
 });
 
 _old_attr = can.Observe.prototype.attr;

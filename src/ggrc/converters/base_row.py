@@ -3,6 +3,7 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+""" This module is used for handling a single line from a csv file """
 
 from ggrc import db
 from ggrc.converters import errors

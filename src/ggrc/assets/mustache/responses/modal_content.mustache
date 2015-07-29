@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 {{!div class="modal-body"}}
 <div class="hideable-holder">
 {{#instance}}
@@ -130,11 +137,7 @@
           </a>
           {{#update_link .}}
           <a class="url" href="{{schemed_url link}}" target="_blank">
-            {{#if name}}
-              {{name}}
-            {{else}}
-              {{title}}
-            {{/if}}
+            {{firstexist title name email link}}
           </a>
           {{/update_link}}
         </div>

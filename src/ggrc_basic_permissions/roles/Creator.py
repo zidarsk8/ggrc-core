@@ -1,3 +1,8 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
 scope = "System"
 description = """
   This role grants a user basic object creation and editing permission.
@@ -266,7 +271,6 @@ permissions = {
             },
             "condition": "is"
         },
-        "Person",
         "Program",
         "Role",
         "UserRole",

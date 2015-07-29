@@ -17,6 +17,7 @@ from ggrc.models.reflection import AttributeInfo
 
 
 def get_mapping_definitions(object_class):
+  """ Get column definitions for allowed mappings for object_class """
   definitions = {}
   mapping_rules = get_mapping_rules()
   if object_class.__name__ not in mapping_rules:
@@ -24,9 +25,9 @@ def get_mapping_definitions(object_class):
 
   for mapping_class in mapping_rules[object_class.__name__]:
     class_name = pretty_name(mapping_class)
-    mapping_name = "map:{}".format(class_name)
+    mapping_name = "{}{}".format(handlers.MAPPING_PREFIX, class_name)
     definitions[mapping_name.lower()] = {
-        "display_name": mapping_name,
+        "display_name": "map:{}".format(class_name),
         "mandatory": False,
         "handler": handlers.MappingColumnHandler,
         "validator": None,
@@ -39,17 +40,18 @@ def get_mapping_definitions(object_class):
   return definitions
 
 
-def get_custom_attributes_definitions(object_class):
+def get_custom_attr_definitions(object_class):
+  """ Get column definitions for custom attributes on object_class """
   definitions = {}
   if not hasattr(object_class, "get_custom_attribute_definitions"):
     return definitions
   custom_attributes = object_class.get_custom_attribute_definitions()
   for attr in custom_attributes:
-    handler = handlers.CustomAttributeColumHandler
-    definitions[attr.title] = {
+    attr_name = "{}{}".format(handlers.CUSTOM_ATTR_PREFIX, attr.id)
+    definitions[attr_name] = {
         "display_name": attr.title,
         "mandatory": attr.mandatory,
-        "handler": handler,
+        "handler": handlers.CustomAttributeColumHandler,
         "validator": None,
         "default": None,
         "unique": False,
@@ -69,6 +71,11 @@ def get_unique_constraints(object_class):
 
 
 def get_object_column_definitions(object_class):
+  """ get all column definitions for object_class
+
+  This function joins custm attribute definitions, mapping definitions and
+  the extra delete column.
+  """
   definitions = {}
 
   aliases = AttributeInfo.gather_aliases(object_class)
@@ -91,7 +98,7 @@ def get_object_column_definitions(object_class):
       definition.update(value)
     definitions[key] = definition
 
-  custom_attr_def = get_custom_attributes_definitions(object_class)
+  custom_attr_def = get_custom_attr_definitions(object_class)
   mapping_def = get_mapping_definitions(object_class)
   definitions.update(custom_attr_def)
   definitions.update(mapping_def)
@@ -100,6 +107,7 @@ def get_object_column_definitions(object_class):
 
 
 def get_object_column_json(object_class):
+  """ get all column definitions containing only json serializable data """
   definitions = get_object_column_definitions(object_class)
   for attr_name, attr_info in definitions.items():
     for key, value in attr_info.items():
@@ -135,6 +143,7 @@ def get_column_order(attr_list):
 
 
 def generate_csv_string(csv_data):
+  """ Turn 2d string array into a string representing a csv file """
   output_buffer = StringIO()
   writer = csv.writer(output_buffer)
 
@@ -195,12 +204,14 @@ def generate_2d_array(width, height, value=None):
 
 
 def csv_reader(csv_data, dialect=csv.excel, **kwargs):
+  """ Reader for csv files """
   reader = csv.reader(utf_8_encoder(csv_data), dialect=dialect, **kwargs)
   for row in reader:
     yield [unicode(cell, 'utf-8') for cell in row]  # noqa
 
 
 def read_csv_file(csv_file):
+  """ Get full string representation of the csv file """
   if isinstance(csv_file, basestring):  # noqa
     csv_file = open(csv_file, 'rbU')
   return [row for row in csv_reader(csv_file)]

@@ -758,6 +758,9 @@ can.Control("GGRC.Controllers.Modals", {
         function finish() {
           delete that.disable_hide;
           if (that.options.add_more) {
+            if (that.options.$trigger) {
+              that.options.$trigger.trigger("modal:added", [obj]);
+            }
             that.new_instance();
           } else {
             that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
@@ -1088,7 +1091,7 @@ can.Component.extend({
       that.scope.attr("attributes", {});
     },
     "a[data-object-source] modal:success": "addMapings",
-    "deffer:add": "addMapings",
+    "defer:add": "addMapings",
     "addMapings": function(el, ev, data) {
       ev.stopPropagation();
       var mapping;

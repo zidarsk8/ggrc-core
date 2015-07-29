@@ -22,7 +22,7 @@
                       <i class="grcicon-private"></i>
                     </span>
                   {{/if_helpers}}
-                  {{firstexist instance.name instance.title}}
+                  {{firstexist instance.name instance.title instance.link}}
                   <span class="url-link">
                     {{firstexist instance.email instance.link}}
                   </span>
@@ -38,7 +38,11 @@
                     class="object-check-single {{#if isloading}}disabled{{/if}}"
 
                     {{#if mapper.is_saving}}disabled="true"{{/if}}
-                    {{#if select_all}}checked{{/if}}
+                    {{#if_helpers '\
+                      #if' select_all '\
+                      or #if' appended}}
+                      checked
+                    {{/if_helpers}}
                     {{#if mappings.length}}
                       {{#result_direct_mappings bindings_compute selected_object}}
                         checked disabled="true"
@@ -47,6 +51,9 @@
                       {{#has_pending_addition selected_object instance}}
                         checked disabled="true"
                       {{/has_pending_addition}}
+                      {{#has_mapped_objects selected_object instance}}
+                        checked disabled="true"
+                      {{/has_mapped_objects}}
                     {{/if}}
                   >
                 </div>
@@ -57,26 +64,29 @@
       </div><!-- item-wrap end -->
     </div><!-- item-main end -->
 
+
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
-        {{!#pack instance=this}}
-          {{#find_template 'tier2_content' instance}}
-            {{#instance.class.table_singular}}
-              {{{renderLive template}}}
-            {{/instance}}
-          {{else}}
-            <div class="show-description">
-              <div class="row-fluid">
-                <div class="span12">
-                  <div class="tree-description short">
-                    {{{instance.description}}}
+        <lazy-openclose>
+          {{#show}}
+            {{#find_template 'tier2_content' instance}}
+              {{#instance.class.table_singular}}
+                {{{renderLive template}}}
+              {{/instance}}
+            {{else}}
+              <div class="show-description">
+                <div class="row-fluid">
+                  <div class="span12">
+                    <div class="tree-description short">
+                      {{{instance.description}}}
+                    </div>
+                    {{{show_long}}}
                   </div>
-                  {{{show_long}}}
                 </div>
               </div>
-            </div>
-          {{/find_template}}
-        {{!/pack}}
+            {{/find_template}}
+          {{/show}}
+        </lazy-openclose>
       </div>
     </div>
 </li>

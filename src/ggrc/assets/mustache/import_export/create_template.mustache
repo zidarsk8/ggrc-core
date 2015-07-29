@@ -16,31 +16,9 @@
   </p>
   <label>I'm importing/updating...</label>
   <select id="importSelect" class="input-block-level" multiple>
-    <optgroup label="Governance">
-      <option value="Regulation" label="Regulations">Regulations</option>
-      <option value="Contract" label="Contracts">Contracts</option>
-      <option value="Policy" label="Policies">Policies</option>
-      <option value="Standard" label="Standards">Standards</option>
-      <option value="Program" label="Programs">Programs</option>
-      <option value="Objective" label="Objectives">Objectives</option>
-      <option value="Control" label="Controls">Controls</option>
-      <option value="Section" label="Sections">Sections</option>
-      <option value="Clause" label="Clauses">Clauses</option>
-    </optgroup>
-    <optgroup label="People/Groups">
-      <option value="Person" label="People">People</option>
-      <option value="OrgGroup" label="Org Groups">Org Groups</option>
-      <option value="Vendor" label="Vendors">Vendors</option>
-    </optgroup>
-    <optgroup label="Assets/Business">
-      <option value="DataAsset" label="Data Assets">Data Assets</option>
-      <option value="Facility" label="Facilities">Facilities</option>
-      <option value="Market" label="Markets">Markets</option>
-      <option value="Process" label="Processes">Processes</option>
-      <option value="Product" label="Products">Products</option>
-      <option value="Project" label="Projects">Projects</option>
-      <option value="System" label="Systems">Systems</option>
-    </optgroup>
+    {{#importable}}
+      <option value="{{model_singular}}" label="{{title_plural}}"></option>
+    {{/importable}}
   </select>
   <p>CSV template will be generated for following object types:</p>
   <ul class="import-list">

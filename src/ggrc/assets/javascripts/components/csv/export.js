@@ -29,6 +29,7 @@
       }),
       exportModel = can.Map({
         panels: new panelsModel(),
+        loading: false,
         url: "/_service/export_csv",
         type: url.model_type || "Program",
         edit_filename: false,
@@ -40,7 +41,101 @@
         data_grid: can.compute(function () {
           return _.has(url, "data_grid");
         })
-      });
+      }),
+      importable = [
+        {model_singular: "Audit", title_plural: "Audits"},
+        {model_singular: "Clause", title_plural: "Clauses"},
+        {model_singular: "Contract", title_plural: "Contracts"},
+        {model_singular: "Control", title_plural: "Controls"},
+        {model_singular: "ControlAssessment", title_plural: "Control Assessments"},
+        {model_singular: "DataAsset", title_plural: "Data Assets"},
+        {model_singular: "Directive", title_plural: "Directives"},
+        {model_singular: "Facility", title_plural: "Facilities"},
+        {model_singular: "Issue", title_plural: "Issues"},
+        {model_singular: "Market", title_plural: "Markets"},
+        {model_singular: "Objective", title_plural: "Objectives"},
+        {model_singular: "Option", title_plural: "Options"},
+        {model_singular: "OrgGroup", title_plural: "Org Groups"},
+        {model_singular: "Person", title_plural: "Persons"},
+        {model_singular: "Policy", title_plural: "Policies"},
+        {model_singular: "Process", title_plural: "Processes"},
+        {model_singular: "Product", title_plural: "Products"},
+        {model_singular: "Program", title_plural: "Programs"},
+        {model_singular: "Project", title_plural: "Projects"},
+        {model_singular: "Regulation", title_plural: "Regulations"},
+        {model_singular: "Request", title_plural: "Requests"},
+        {model_singular: "RiskAssessment", title_plural: "Risk Assessments"},
+        {model_singular: "Section", title_plural: "Sections"},
+        {model_singular: "Standard", title_plural: "Standards"},
+        {model_singular: "System", title_plural: "Systems"},
+        {model_singular: "TaskGroup", title_plural: "Task Groups"},
+        {model_singular: "TaskGroupTask", title_plural: "Tasks"},
+        {model_singular: "Vendor", title_plural: "Vendors"},
+        {model_singular: "Workflow", title_plural: "Workflows"}
+      ];
+
+  can.Component.extend({
+    tag: "csv-template",
+    template: "<content></content>",
+    scope: {
+      url: "/_service/export_csv",
+      selected: [],
+      importable: importable
+      // TODO: change importable to a list of model names
+      // importable: _.compact(_.map(importable, function(name){
+      //   return CMS.Models[name];
+      // }))
+    },
+    events: {
+      "#importSelect change": function (el, ev) {
+        var $items = el.find(":selected"),
+            selected = this.scope.attr("selected");
+
+        $items.each(function () {
+          var $item = $(this);
+          if (_.findWhere(selected, {value: $item.val()})) {
+            return;
+          }
+          return selected.push({
+            name: $item.attr("label"),
+            value: $item.val()
+          });
+        });
+      },
+      ".import-button click": function (el, ev) {
+        ev.preventDefault();
+        var data = _.map(this.scope.attr("selected"), function (el) {
+              return {object_name: el.value};
+            });
+
+        if (!data.length) {
+          return;
+        }
+
+        GGRC.Utils.export_request({
+          data: data
+        }).then(function (data) {
+          GGRC.Utils.download("import_template.csv", data);
+        }.bind(this))
+        .fail(function (data) {
+          $("body").trigger("ajax:flash", {"error": data});
+        }.bind(this));
+      },
+      ".import-list a click": function (el, ev) {
+        ev.preventDefault();
+
+        var index = el.data("index"),
+            item = this.scope.attr("selected").splice(index, 1)[0];
+
+        this.element.find("#importSelect option:selected").each(function () {
+          var $item = $(this);
+          if ($item.val() === item.value) {
+            $item.prop("selected", false);
+          }
+        });
+      }
+    }
+  });
 
   can.Component.extend({
     tag: "csv-export",
@@ -55,22 +150,23 @@
         ev.preventDefault();
         this.scope.attr("export.edit_filename", !this.scope.attr("export.edit_filename"));
       },
-      ".save-template .btn-success click": function (el, ev) {
+      "#export-csv-button click": function (el, ev) {
         ev.preventDefault();
+        this.scope.attr("export.loading", true);
         var panels = this.scope.attr("export.panels.items"),
             data_grid = this.scope.attr("export.data_grid"),
-            only_relevant= this.scope.attr("export.only_relevant"),
+            only_relevant = this.scope.attr("export.only_relevant"),
             query = _.map(panels, function (panel, index) {
               var relevant_filter = "";
               if (data_grid && index > 0) {
-                relevant_filter = "#__previous__,"+(index-1)+"#";
-                if (only_relevant && index > 1){
-                  relevant_filter += " AND #__previous__,"+(index-2)+"#";
+                relevant_filter = "#__previous__," + (index - 1) + "#";
+                if (only_relevant && index > 1) {
+                  relevant_filter += " AND #__previous__," + (index - 2) + "#";
                 }
               } else {
-                relevant_filter = _.reduce(panel.relevant(),  function(query, el){
-                  return (query && query+" AND ")+"#"+el.model_name+","+el.filter.id+"#";
-                }, "")
+                relevant_filter = _.reduce(panel.relevant(), function (query, el) {
+                  return (query && query + " AND ") + "#" + el.model_name + "," + el.filter.id + "#";
+                }, "");
               }
               return {
                 object_name: panel.type,
@@ -95,6 +191,9 @@
         }.bind(this))
         .fail(function (data) {
           $("body").trigger("ajax:flash", {"error": data});
+        }.bind(this))
+        .always(function () {
+          this.scope.attr("export.loading", false);
         }.bind(this));
       }
     }
@@ -144,28 +243,35 @@
     tag: "export-panel",
     template: "<content></content>",
     scope: {
+      importable: importable,
+      // TODO: change importable to a list of model names
+      // importable: _.compact(_.map(importable, function(name){
+      //   return CMS.Models[name];
+      // }))
       panel_number: "@",
       fetch_relevant_data: function (id, type) {
-        var dfd = GGRC.Models.Search.search_for_types(id, [type]),
-            que = new RefreshQueue();
-
-        dfd.then(function (response) {
-          var result = response.getResultsFor(url.relevant_type)[0];
-          que.enqueue(result).trigger().then(function (item) {
-            this.attr("item.relevant").push(new filterModel({
-              model_name: url.relevant_type,
-              value: url.relevant_id,
-              filter: result
-            }));
-          }.bind(this));
+        var dfd = CMS.Models[type].findOne({id: id});
+        dfd.then(function (result) {
+          this.attr("item.relevant").push(new filterModel({
+            model_name: url.relevant_type,
+            value: url.relevant_id,
+            filter: result
+          }));
         }.bind(this));
       }
     },
     events: {
       inserted: function () {
-        if (!+this.scope.attr("panel_number") && url.relevant_id && url.relevant_type) {
+        var panel_number = +this.scope.attr("panel_number");
+
+        if (!panel_number && url.relevant_id && url.relevant_type) {
           this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }
+      },
+      "{scope.item} type": function () {
+        this.scope.attr("item.selected", {});
+        this.scope.attr("item.relevant", []);
+        this.scope.attr("item.filter", "");
       }
     },
     helpers: {

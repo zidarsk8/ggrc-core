@@ -68,6 +68,10 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
           "unique": True,
       },
       "company": "Company",
+      "user_role": {
+          "display_name": "Role",
+          "type": "user_role",
+      },
   }
 
   # Methods required by Flask-Login
@@ -134,14 +138,15 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
 
     ROLE_HIERARCHY = {
         u'gGRC Admin': 0,
-        u'ProgramCreator': 1,
-        u'Editor': 2,
-        u'Reader': 3,
-        u'Creator': 4,
+        u'Editor': 1,
+        u'Reader': 2,
+        u'Creator': 3,
     }
+    system_wide_roles = ROLE_HIERARCHY.keys()
     unique_roles = set([
         user_role.role.name
-        for user_role in self.user_roles if user_role.role.name in ROLE_HIERARCHY.keys()
+        for user_role in self.user_roles
+        if user_role.role.name in system_wide_roles
     ])
     if len(unique_roles) == 0:
       return u"No Access"

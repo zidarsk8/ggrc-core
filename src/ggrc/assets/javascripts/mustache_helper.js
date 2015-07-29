@@ -319,7 +319,9 @@ Mustache.registerHelper("firstexist", function () {
   var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)
   for (var i = 0; i < args.length; i++) {
     var v = resolve_computed(args[i]);
-    if (v != null) return v.toString();
+    if (v && v.length) {
+      return v.toString();
+    }
   }
   return "";
 });
@@ -1024,6 +1026,18 @@ Mustache.registerHelper("with_direct_mappings_as",
   });
 
   return options.fn(options.contexts.add(frame));
+});
+
+Mustache.registerHelper("has_mapped_objects", function (selected, instance, options) {
+  selected = resolve_computed(selected);
+  instance = resolve_computed(instance);
+  if (!selected.objects) {
+    options.inverse(options.contexts);
+  }
+  var isMapped = _.some(selected.objects, function (el) {
+        return el.id === instance.id && el.type === instance.type;
+      });
+  return options[isMapped ? "fn" : "inverse"](options.contexts);
 });
 
 Mustache.registerHelper("result_direct_mappings", function (bindings, parent_instance, options) {
@@ -1788,6 +1802,13 @@ Mustache.registerHelper("is_dashboard", function (options) {
     return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("is_allobjectview", function (options) {
+  if (/objectBrowser/.test(window.location))
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
 Mustache.registerHelper("is_dashboard_or_all", function (options) {
   if (/dashboard/.test(window.location) || /objectBrowser/.test(window.location))
     return options.fn(options.contexts);
@@ -1893,7 +1914,7 @@ Mustache.registerHelper("with_review_task", function (options) {
   var tasks = options.contexts.attr('approval_tasks');
   tasks = Mustache.resolve(tasks);
   if (tasks) {
-    for (i = 0; i < tasks.length; i++) {
+    for (var i = 0; i < tasks.length; i++) {
       return options.fn(options.contexts.add({review_task: tasks[i].instance}));
     }
   }
@@ -3094,7 +3115,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
       audit, programs, program, control, json;
 
   if (!audits.length) {
-    return "{}";
+    return "";
   }
 
   audit = audits[0].instance.reify();

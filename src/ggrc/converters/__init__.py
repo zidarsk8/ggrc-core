@@ -3,13 +3,15 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+""" This module is used for import and export of data with csv files """
+
+from ggrc.extensions import get_extension_modules
 from ggrc.models import (
     Audit, Control, ControlAssessment, DataAsset, Directive, Contract,
     Policy, Regulation, Standard, Facility, Market, Objective, Option,
     OrgGroup, Vendor, Person, Product, Program, Project, Request, Response,
     Section, Clause, System, Process, Issue,
 )
-from ggrc.utils import get_mapping_rules
 
 
 def get_shared_unique_rules():
@@ -31,19 +33,7 @@ def get_shared_unique_rules():
   return rules
 
 
-def get_allowed_mappings():
-  """ get all mapping rules with lowercase names
-
-  import export is case insensitive so we use lower case names for all
-  comparisons.
-  """
-  mapping_rules = get_mapping_rules()
-  for object_mappings in mapping_rules.values():
-    map(str.lower, object_mappings)
-  return mapping_rules
-
-
-IMPORTABLE = {
+GGRC_IMPORTABLE = {
     "audit": Audit,
     "control": Control,
     "control assessment": ControlAssessment,
@@ -77,15 +67,21 @@ IMPORTABLE = {
 
 COLUMN_ORDER = (
     "slug",
+    "task_group",
+    "workflow",
+    "program_id",
     "title",
     "description",
     "test_plan",
     "notes",
     "owners",
+    "task_type",
     "start_date",
     "end_date",
-    "report_end_date",
     "report_start_date",
+    "report_end_date",
+    "relative_start_date",
+    "relative_end_date",
     "assertions",
     "audit",
     "categories",
@@ -102,7 +98,6 @@ COLUMN_ORDER = (
     "operationally",
     "principal_assessor",
     "private",
-    "program_id",
     "secondary_assessor",
     "secondary_contact",
     "status",
@@ -116,3 +111,16 @@ COLUMN_ORDER = (
     "company",
     "_custom_attributes",
 )
+
+
+def get_importables():
+  """ Get a dict of all importable objects from all modules """
+  importable = GGRC_IMPORTABLE
+  for extension_module in get_extension_modules():
+    contributed_importables = getattr(
+        extension_module, "contributed_importables", None)
+    if callable(contributed_importables):
+      importable.update(contributed_importables())
+    elif isinstance(contributed_importables, dict):
+      importable.update(contributed_importables)
+  return importable

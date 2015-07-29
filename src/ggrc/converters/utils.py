@@ -6,10 +6,5 @@
 import re
 
 def pretty_name(name):
+  """ Add spaces to camel case strings """
   return " ".join(re.findall('[A-Z][^A-Z]*', name))
-
-
-def pretty_class_name(cls):
-  return pretty_name(cls.__name__)
-
-
