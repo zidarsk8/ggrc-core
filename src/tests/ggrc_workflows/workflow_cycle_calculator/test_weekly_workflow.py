@@ -375,7 +375,7 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 8, 5))
 
-  def test_start__workflow_mid_cycle_with_task_before_and_after(self):
+  def test_start_workflow_mid_cycle_with_task_before_and_after(self):
     """Test that workflows get triggered correctly if we are in the middle of
     the cycle and there are tasks with start dates before and after."""
     weekly_wf = {
