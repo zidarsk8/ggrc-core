@@ -4,6 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
+from ggrc.models.reflection import AttributeInfo
 from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
 from .object_document import Documentable
 from .object_owner import Ownable
@@ -40,16 +41,20 @@ class Program(HasObjectState, CustomAttributable, Documentable,
       "program_owner": {
           "display_name": "Owner",
           "mandatory": True,
-          "type": "user_role",
+          "type": AttributeInfo.Type.USER_ROLE,
       },
       "program_editor": {
           "display_name": "Editor",
-          "type": "user_role",
+          "type": AttributeInfo.Type.USER_ROLE,
       },
       "program_reader": {
           "display_name": "Reader",
-          "type": "user_role",
-      }
+          "type": AttributeInfo.Type.USER_ROLE,
+      },
+      "program_mapped": {
+          "display_name": "Mapped",
+          "type": AttributeInfo.Type.USER_ROLE,
+      },
   }
 
   @classmethod

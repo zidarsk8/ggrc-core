@@ -401,8 +401,7 @@
         "related_object", "personable", "ownable"
       ],
       _canonical: {
-        "sections": "Section",
-        "clauses": "Clause",
+        "sections": "Section"
       },
       sections: Direct("Section", "directive", "sections"),
       orphaned_objects: Multi([
@@ -737,7 +736,7 @@
       },
       _mixins: ["response"],
       meetings: Direct("Meeting", "response", "meetings"),
-      business_objects: Multi(["related_objects", "controls", "documents", "sections", "clauses"])
+      business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"])
     },
     PopulationSampleResponse: {
       _canonical: {

@@ -8,17 +8,17 @@ Not Launched
 In Scope
 Not in Scope
 Deprecated",,,,MM/DD/YYYY,MM/DD/YYYY,,,,,,,
-program,code*,title*,description ,owner,state,Privacy*,primary contact,secondary contact,effective date,stop date,notes,program url,reference url,editor,reader,,
-,prog-1,program 1,test,user1@ggrc.com,Draft,no,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,,
-,prog-2,program 2,test,user1@ggrc.com,Final,yes,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user11@example.com,user12@example.com,,
-,prog-3,program 3,test,user1@ggrc.com,Effective,no,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,,
-,prog-4,program 4,test,user1@ggrc.com,Ineffective,yes,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,,
-,prog-5,program 5,test,user1@ggrc.com,Launched,no,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,,
-,prog-6,program 6,test,user1@ggrc.com,Not Launched,yes,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,,
-,prog-7,program 7,test,user1@ggrc.com,In Scope,no,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,,
-,prog-8,program 8,test,user1@ggrc.com,Not in Scope,yes,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,,
-,prog-9,program 9,test,user1@ggrc.com,Deprecated,no,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,,
-,prog-10,program 10,test,user1@ggrc.com,Draft,yes,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,,
+program,code*,title*,description ,owner,state,Privacy*,primary contact,secondary contact,effective date,stop date,notes,program url,reference url,editor,reader,mapped,
+,prog-1,program 1,test,user1@ggrc.com,Draft,no,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,user20@ggrc.com,
+,prog-2,program 2,test,user1@ggrc.com,Final,yes,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user11@example.com,user12@example.com,user20@ggrc.com,
+,prog-3,program 3,test,user1@ggrc.com,Effective,no,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,user20@ggrc.com,
+,prog-4,program 4,test,user1@ggrc.com,Ineffective,yes,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,user20@ggrc.com,
+,prog-5,program 5,test,user1@ggrc.com,Launched,no,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,user20@ggrc.com,
+,prog-6,program 6,test,user1@ggrc.com,Not Launched,yes,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,user20@ggrc.com,
+,prog-7,program 7,test,user1@ggrc.com,In Scope,no,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,user20@ggrc.com,
+,prog-8,program 8,test,user1@ggrc.com,Not in Scope,yes,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,user20@ggrc.com,
+,prog-9,program 9,test,user1@ggrc.com,Deprecated,no,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,user20@ggrc.com,
+,prog-10,program 10,test,user1@ggrc.com,Draft,yes,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,this is a note,google.com,ggrc.com,user10@example.com,user12@example.com,user20@ggrc.com,
 ,,,,,,,,,,,,,,,,,
 Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",Mandatory field,,,"Accepted values are:
 One time
@@ -26,17 +26,17 @@ Weekly
 Monthly
 Quarterly
 Annually",,,,,,,,,,,,
-Workflow,code*,title*,description ,owner,frequency,force real-time email updates,custom email message,,,,,,,,,,
-,wf-1,wf-1,test,user1@ggrc.com,One time,no,this is super custom ,,,,,,,,,,
-,wf-2,wf-2,test,user1@ggrc.com,Weekly,yes,this is super custom ,,,,,,,,,,
-,wf-3,wf-3,test,user1@ggrc.com,Monthly,no,this is super custom ,,,,,,,,,,
-,wf-4,wf-4,test,user1@ggrc.com,Quarterly,yes,this is super custom ,,,,,,,,,,
-,wf-5,wf-5,test,user1@ggrc.com,Annually,no,this is super custom ,,,,,,,,,,
-,wf-6,wf-6,test,user1@ggrc.com,Monthly,yes,this is super custom ,,,,,,,,,,
-,wf-7,wf-7,test,user1@ggrc.com,Monthly,no,this is super custom ,,,,,,,,,,
-,wf-8,wf-8,test,user1@ggrc.com,Monthly,yes,this is super custom ,,,,,,,,,,
-,wf-9,wf-9,test,user1@ggrc.com,Monthly,no,not so custom ,,,,,,,,,,
-,wf-10,wf-10,test,user1@ggrc.com,Monthly,yes,,,,,,,,,,,
+Workflow,code*,title*,description ,owner,frequency,force real-time email updates,custom email message,member,mapped,,,,,,,,
+,wf-1,wf-1,test,user1@ggrc.com,One time,no,this is super custom ,user2@ggrc.com,user20@ggrc.com,,,,,,,,
+,wf-2,wf-2,test,user1@ggrc.com,Weekly,yes,this is super custom ,user2@ggrc.com,user20@ggrc.com,,,,,,,,
+,wf-3,wf-3,test,user1@ggrc.com,Monthly,no,this is super custom ,user2@ggrc.com,user20@ggrc.com,,,,,,,,
+,wf-4,wf-4,test,user1@ggrc.com,Quarterly,yes,this is super custom ,user2@ggrc.com,user20@ggrc.com,,,,,,,,
+,wf-5,wf-5,test,user1@ggrc.com,Annually,no,this is super custom ,user2@ggrc.com,user20@ggrc.com,,,,,,,,
+,wf-6,wf-6,test,user1@ggrc.com,Monthly,yes,this is super custom ,user2@ggrc.com,user20@ggrc.com,,,,,,,,
+,wf-7,wf-7,test,user1@ggrc.com,Monthly,no,this is super custom ,user2@ggrc.com,user20@ggrc.com,,,,,,,,
+,wf-8,wf-8,test,user1@ggrc.com,Monthly,yes,this is super custom ,user2@ggrc.com,user20@ggrc.com,,,,,,,,
+,wf-9,wf-9,test,user1@ggrc.com,Monthly,no,not so custom ,user2@ggrc.com,user20@ggrc.com,,,,,,,,
+,wf-10,wf-10,test,user1@ggrc.com,Monthly,yes,,user2@ggrc.com,user20@ggrc.com,,,,,,,,
 ,,,,,,,,,,,,,,,,,
 Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",Mandatory field,,,This field is mandatory. Each task group must be associated with some workflow.,,,,,,,,,,,,
 Task Group,code*,Summary*,details,assignee,workflow*,,,,,,,,,,,,
@@ -278,17 +278,17 @@ Not Launched
 In Scope
 Not in Scope
 Deprecated",,,,MM/DD/YYYY,MM/DD/YYYY,,,,,,,
-control,code*,title*,description,owner,state,notes,primary contact,secondary contact,effective date,stop date,control url,reference url,test plan,principal assessor,secondary assessor,,
-,control-1,control-1,test,user1@ggrc.com,Draft,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,,
-,control-2,control-2,test,user1@ggrc.com,Final,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,,
-,control-3,control 3,test,user1@ggrc.com,Effective,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,,
-,control-4,control-4,test,user1@ggrc.com,Ineffective,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,,
-,control-5,control-5,test,user1@ggrc.com,Launched,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,,
-,control-6,control-6,test,user1@ggrc.com,Not Launched,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,,
-,control-7,control-7,test,user1@ggrc.com,In Scope,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,,
-,control-8,control 8,test,user1@ggrc.com,Not in Scope,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,,
-,control-9,control-9,test,user1@ggrc.com,Deprecated,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,,
-,control-10,control-10,test,user1@ggrc.com,Draft,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,,
+control,code*,title*,description,owner,state,notes,primary contact,secondary contact,effective date,stop date,control url,reference url,test plan,principal assessor,secondary assessor,Assertions,Categories
+,control-1,control-1,test,user1@ggrc.com,Draft,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,Privacy,Data Centers
+,control-2,control-2,test,user1@ggrc.com,Final,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,Security,Disaster Recovery
+,control-3,control 3,test,user1@ggrc.com,Effective,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,Availability,Logical Access/ Access Control
+,control-4,control-4,test,user1@ggrc.com,Ineffective,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,Integrity,Sites
+,control-5,control-5,test,user1@ggrc.com,Launched,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,Confidentiality,Training
+,control-6,control-6,test,user1@ggrc.com,Not Launched,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,Privacy,Policies & Procedures
+,control-7,control-7,test,user1@ggrc.com,In Scope,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,Security,Package Verification and Code release
+,control-8,control 8,test,user1@ggrc.com,Not in Scope,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,Availability,Org and Admin/Governance
+,control-9,control-9,test,user1@ggrc.com,Deprecated,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,Integrity,Segregation of Duties
+,control-10,control-10,test,user1@ggrc.com,Draft,this is a note,user1@ggrc.com,user2@ggrc.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan,user1@ggrc.com,user2@ggrc.com,Confidentiality,Monitoring
 ,,,,,,,,,,,,,,,,,
 Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",,,"if owner is not provided, current user will be reated as owner of the object","Default value 'draft' is selected
 Other values are:

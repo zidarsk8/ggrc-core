@@ -14,8 +14,10 @@ from ggrc import db
 from ggrc.converters import get_importables
 from ggrc.converters import errors
 from ggrc.login import get_current_user
+from ggrc.models import CategoryBase
 from ggrc.models import CustomAttributeValue
 from ggrc.models import CustomAttributeDefinition
+from ggrc.models import ObjectPerson
 from ggrc.models import Option
 from ggrc.models import Person
 from ggrc.models import Program
@@ -24,6 +26,10 @@ from ggrc.models import Regulation
 from ggrc.models import Standard
 from ggrc.models import Relationship
 from ggrc.models.relationship import RelationshipHelper
+
+
+MAPPING_PREFIX = "__mapping__:"
+CUSTOM_ATTR_PREFIX = "__custom__:"
 
 
 class ColumnHandler(object):
@@ -102,6 +108,19 @@ class StatusColumnHandler(ColumnHandler):
 class UserColumnHandler(ColumnHandler):
 
   """ Handler for primary and secondary contacts """
+
+  def get_users_list(self):
+    users = set()
+    email_lines = self.raw_value.splitlines()
+    owner_emails = filter(unicode.strip, email_lines)  # noqa
+    for raw_line in owner_emails:
+      email = raw_line.strip().lower()
+      person = self.get_person(email)
+      if person:
+        users.add(person)
+      else:
+        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+    return list(users)
 
   def get_person(self, email):
     new_objects = self.row_converter.block_converter.converter.new_objects
@@ -237,7 +256,7 @@ class MappingColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
-    self.mapping_name = key[4:]  # remove "map:" prefix
+    self.mapping_name = key[len(MAPPING_PREFIX):]
     importable = get_importables()
     self.mapping_object = importable.get(self.mapping_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
@@ -328,7 +347,7 @@ class CustomAttributeColumHandler(TextColumnHandler):
   def get_ca_definition(self):
     for definition in self.row_converter.object_class\
             .get_custom_attribute_definitions():
-      if definition.title == self.key:
+      if definition.title == self.display_name:
         return definition
     return None
 
@@ -468,7 +487,7 @@ class SectionDirectiveColumnHandler(ColumnHandler):
 class ControlColumnHandler(MappingColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    key = "map:control"
+    key = "{}control".format(MAPPING_PREFIX)
     super(ControlColumnHandler, self).__init__(row_converter, key, **options)
 
   def set_obj_attr(self):
@@ -478,8 +497,88 @@ class ControlColumnHandler(MappingColumnHandler):
       return
     self.row_converter.obj.control = self.value[0]
 
+
 class AuditColumnHandler(MappingColumnHandler):
+
   def __init__(self, row_converter, key, **options):
-    key = "map:audit"
+    key = "{}audit".format(MAPPING_PREFIX)
     super(AuditColumnHandler, self).__init__(row_converter, key, **options)
 
+
+class ObjectPersonColumnHandler(UserColumnHandler):
+
+  def parse_item(self):
+    return self.get_users_list()
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    object_person = db.session.query(ObjectPerson.person_id).filter_by(
+        personable_id=self.row_converter.obj.id,
+        personable_type=self.row_converter.obj.__class__.__name__)
+    users = Person.query.filter(Person.id.in_(object_person))
+    emails = [user.email for user in users]
+    return "\n".join(emails)
+
+  def remove_current_people(self):
+    ObjectPerson.query.filter_by(
+        personable_id=self.row_converter.obj.id,
+        personable_type=self.row_converter.obj.__class__.__name__).delete()
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    self.remove_current_people()
+    for owner in self.value:
+      user_role = ObjectPerson(
+          personable_id=self.row_converter.obj.id,
+          personable_type=self.row_converter.obj.__class__.__name__,
+          person_id=owner.id
+      )
+      db.session.add(user_role)
+    self.dry_run = True
+
+
+class CategoryColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    names = [v.strip() for v in self.raw_value.split("\n")]
+    names = [name for name in names if name != ""]
+    if not names:
+      return None
+    categories = CategoryBase.query.filter(and_(
+        CategoryBase.name.in_(names),
+        CategoryBase.type == self.category_base_type
+    )).all()
+    category_names = set([c.name.strip() for c in categories])
+    for name in names:
+      if name not in category_names:
+        self.add_warning(errors.WRONG_MULTI_VALUE,
+                         column_name=self.display_name,
+                         value=name)
+    return categories
+
+  def set_obj_attr(self):
+    if self.value is None:
+      return
+    setattr(self.row_converter.obj, self.key, self.value)
+
+  def get_value(self):
+    categories = getattr(self.row_converter.obj, self.key, self.value)
+    categorie_names = [c.name for c in categories]
+    return "\n".join(categorie_names)
+
+
+class ControlCategoryColumnHandler(CategoryColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.category_base_type = "ControlCategory"
+    super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class ControlAssertionColumnHandler(CategoryColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.category_base_type = "ControlAssertion"
+    super(self.__class__, self).__init__(row_converter, key, **options)
