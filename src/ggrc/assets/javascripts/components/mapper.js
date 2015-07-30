@@ -34,9 +34,19 @@
         }, []);
         return _.findWhere(types, {value: type});
       },
+      get_forbidden: function (type) {
+        var forbidden = {
+          "program": ["audit"],
+          "audit": ["request", "controlassessment"],
+          "controlassessment": ["audit", "control"]
+        };
+        return forbidden[type] ? forbidden[type] : [];
+      },
       types: can.compute(function () {
-        var selector_list = GGRC.Mappings.get_canonical_mappings_for(this.object),
-            forbidden = ["workflow", "taskgroup", "gdrivefolder", "context"],
+        var selector_list,
+            canonical = GGRC.Mappings.get_canonical_mappings_for(this.object),
+            list = GGRC.tree_view.base_widgets_by_type[this.object],
+            forbidden = this.get_forbidden(this.object),
             groups = {
               "all_objects": {
                 name: "All Objects",
