@@ -44,14 +44,7 @@ permissions = {
         "ProgramControl",
         "ProgramDirective",
         "Project",
-        {
-            "type": "Relationship",
-            "terms": {
-                "property_name": "source,destination",
-                "action": "update"
-            },
-            "condition": "relationship",
-        },
+        "Relationship",
         "RelationshipType",
         "SectionBase",
         "Section",
@@ -104,7 +97,14 @@ permissions = {
         "PopulationSample",
         "Product",
         "Project",
-        "Relationship",
+        {
+            "type": "Relationship",
+            "terms": {
+                "property_name": "source,destination",
+                "action": "update"
+            },
+            "condition": "relationship",
+        },
         "RelationshipType",
         "SectionBase",
         "Section",
@@ -133,5 +133,5 @@ permissions = {
         "__GGRC_ALL__"
     ],
     "update": _is_owner,
-    "delete": _is_owner
+    "delete": _is_owner,
 }
