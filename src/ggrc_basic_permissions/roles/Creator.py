@@ -8,7 +8,7 @@ description = """
   This role grants a user basic object creation and editing permission.
   """
 
-_is_owner = [
+owner_base = [
     "Categorization",
     {
         "type": "Category",
@@ -158,7 +158,6 @@ _is_owner = [
         },
         "condition": "contains"
     },
-    "Relationship",
     "RelationshipType",
     {
         "type": "SectionBase",
@@ -220,9 +219,30 @@ _is_owner = [
     "Response",
     "Person"
 ]
+owner_read = owner_base + [
+    {
+        "type": "Relationship",
+        "terms": {
+            "property_name": "source,destination",
+            "action": "read"
+        },
+        "condition": "relationship",
+    },
+]
+
+owner_update = owner_base + [
+    {
+        "type": "Relationship",
+        "terms": {
+            "property_name": "source,destination",
+            "action": "update"
+        },
+        "condition": "relationship",
+    },
+]
 
 permissions = {
-    "read": _is_owner,
+    "read": owner_read,
     "create": [
         "Workflow"
         "Categorization",
@@ -289,7 +309,7 @@ permissions = {
             "condition": "is"
         },
     ],
-    "view_object_page": _is_owner,
-    "update": _is_owner,
-    "delete": _is_owner,
+    "view_object_page": owner_read,
+    "update": owner_update,
+    "delete": owner_update,
 }

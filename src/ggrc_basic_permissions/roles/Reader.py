@@ -3,7 +3,7 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
-from ggrc_basic_permissions.roles.Creator import _is_owner
+from ggrc_basic_permissions.roles.Creator import owner_update
 
 scope = "System"
 description = """
@@ -132,6 +132,6 @@ permissions = {
     "view_object_page": [
         "__GGRC_ALL__"
     ],
-    "update": _is_owner,
-    "delete": _is_owner,
+    "update": owner_update,
+    "delete": owner_update,
 }
