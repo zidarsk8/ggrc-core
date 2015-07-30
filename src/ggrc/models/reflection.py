@@ -209,10 +209,9 @@ class AttributeInfo(object):
     """ Get column definitions for allowed mappings for object_class """
     definitions = {}
     mapping_rules = get_mapping_rules()
-    if object_class.__name__ not in mapping_rules:
-      return {}
+    object_mapping_rules = mapping_rules.get(object_class.__name__, [])
 
-    for mapping_class in mapping_rules[object_class.__name__]:
+    for mapping_class in object_mapping_rules:
       class_name = title_from_camelcase(mapping_class)
       mapping_name = "{}{}".format(cls.MAPPING_PREFIX, class_name)
       definitions[mapping_name.lower()] = {

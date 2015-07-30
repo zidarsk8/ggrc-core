@@ -160,7 +160,7 @@ def get_mapping_rules():
   # these rules are copy pasted from
   # src/ggrc/assets/javascripts/apps/business_objects.js line: 276
   business_object_rules = {
-    "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
+    "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",  # noqa # removed Person because Programs have a "Mapped" attribute for people mappings
     "Audit": "Issue ControlAssessment Request history Person program program_controls",  # noqa
     "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",  # noqa
     "ControlAssessment": "Issue Objective Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
