@@ -88,7 +88,8 @@ def upgrade():
         calculator = get_cycle_calculator(workflow, base_date=start_date)
         adjust_next_cycle_start_date(calculator, workflow)
         post_compute_ncsd = workflow.next_cycle_start_date
-        if pre_compute_ncsd != post_compute_ncsd:
+        if (pre_compute_ncsd != post_compute_ncsd and
+                post_compute_ncsd not in [c.start_date for c in workflow.cycles]):
             start_dates = ["{}/{}".format(task.relative_start_month, task.relative_start_day) for tg in workflow.task_groups for task in tg.task_group_tasks]
             end_dates = ["{}/{}".format(task.relative_end_month, task.relative_end_day) for tg in workflow.task_groups for task in tg.task_group_tasks]
 
