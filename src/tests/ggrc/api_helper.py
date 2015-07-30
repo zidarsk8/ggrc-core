@@ -73,7 +73,6 @@ class Api():
     logging.info("request json" + json_data)
 
     response = request(api_link, data=json_data, headers=headers.items())
-    db.session.expunge_all()
     return self.data_to_json(response)
 
   def put(self, obj, data):
