@@ -138,8 +138,8 @@ class CycleCalculator(object):
       tuple({datetime.date, datetime.date}): First start date and
       last end date.
     """
-    tasks_start_dates = [v['start_date'] for _, v in self.reified_tasks.items()]
-    tasks_end_dates = [v['end_date'] for _, v in self.reified_tasks.items()]
+    tasks_start_dates = [v['start_date'] for v in self.reified_tasks.values()]
+    tasks_end_dates = [v['end_date'] for v in self.reified_tasks.values()]
     return min(tasks_start_dates), max(tasks_end_dates)
 
   def task_date_range(self, task, base_date=None):
@@ -177,12 +177,6 @@ class CycleCalculator(object):
     # If the end_day is before start_day, end_date is overflowing
     # to next time unit.
     if end_day < start_day:
-      end_day = end_day + self.time_delta
-
-    # If both start day and end day have already happened we are
-    # operating on next time unit.
-    if start_day <= end_day < base_date:
-      start_day = start_day + self.time_delta
       end_day = end_day + self.time_delta
 
     return start_day, end_day

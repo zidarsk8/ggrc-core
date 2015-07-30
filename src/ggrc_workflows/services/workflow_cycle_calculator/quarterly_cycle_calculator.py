@@ -70,7 +70,11 @@ class QuarterlyCycleCalculator(CycleCalculator):
     # on which we select the month domain. Month is then the LARGEST
     # number from all the months that were before base_date.month
     month_domain = self.date_domain[relative_month]
-    month = max(filter(lambda x: x <= base_date.month, month_domain))
+    domain = filter(lambda x: x <= base_date.month, month_domain)
+    if len(domain):
+      month = max(filter(lambda x: x <= base_date.month, month_domain))
+    else:
+      month = min(month_domain)
 
     start_month = datetime.date(base_date.year, month, 1)
     ddate = start_month + relativedelta.relativedelta(days=relative_day - 1)

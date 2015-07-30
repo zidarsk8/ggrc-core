@@ -55,10 +55,10 @@ class WeeklyCycleCalculator(CycleCalculator):
     if not base_date:
       base_date = today
 
-    # If somebody is working during weekend we don't want to calculate
-    # for previous week but for the next week.
-    if base_date == today and base_date.isoweekday() >= 6:
-      base_date = base_date + WeeklyCycleCalculator.time_delta
+    # We want to calculate relative to Monday (1) and not relative to base_date
+    # (which could be in the middle of the week)
+    # We can use `weekday` method because it's 0-based method (0-6)
+    base_date = base_date - relativedelta.relativedelta(days=base_date.weekday())
 
     return base_date + relativedelta.relativedelta(
-      days=relative_day - base_date.isoweekday())
+      days=relative_day - 1)  # -1 because we are counting from 1

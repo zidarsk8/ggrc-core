@@ -474,8 +474,7 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 5)) # 10/5/2015 Mon
 
   def test_editing_activated_workflow_when_dates_changed_after_manually_starting(self):
-    """Test editing activated workflow - it should never set a next cycle start date
-    in the past
+    """Test editing activated workflow - it should never set a next cycle start date in the past
 
     After editing a task and manually starting two cycles, we re-edit the task
     and verify that the new next cycle start date is NOT reset.

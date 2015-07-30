@@ -183,8 +183,8 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
     workflow = obj.workflow
     obj.calculator = get_cycle_calculator(workflow)
 
-    if workflow.next_cycle_start_date:
-      base_date = workflow.next_cycle_start_date
+    if workflow.non_adjusted_next_cycle_start_date:
+      base_date = workflow.non_adjusted_next_cycle_start_date
     else:
       base_date = date.today()
     build_cycle(obj, current_user=current_user, base_date=base_date)
@@ -573,7 +573,7 @@ def update_workflow_state(workflow):
   calculator = get_cycle_calculator(workflow)
 
   # Start the first cycle if min_start_date < today < max_end_date
-  if workflow.recurrences and calculator.tasks:
+  if workflow.status == "Active" and workflow.recurrences and calculator.tasks:
     start_date, end_date = calculator.workflow_date_range()
     # Only create the cycle if we're mid-cycle
     if (start_date <= today <= end_date) \
@@ -822,8 +822,13 @@ def start_recurring_cycles():
     # Flag the cycle to be saved
     db.session.add(cycle)
 
+    if workflow.non_adjusted_next_cycle_start_date:
+      base_date = workflow.non_adjusted_next_cycle_start_date
+    else:
+      base_date = date.today()
+
     # Create the cycle (including all child objects)
-    build_cycle(cycle, base_date=date.today())
+    build_cycle(cycle, base_date=base_date)
 
     # Update the workflow next_cycle_start_date to push it ahead based on the
     # frequency.

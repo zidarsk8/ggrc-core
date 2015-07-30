@@ -68,14 +68,6 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(rtd("4"), date(2015, 6, 11))
       self.assertEqual(rtd("5"), date(2015, 6, 12))
 
-    # Test that we correctly adjust if we run on the weekend
-    with freeze_time("2015-6-14 13:00:00"): # Sunday, 6/14/2015
-      self.assertEqual(rtd("1"), date(2015, 6, 15))
-      self.assertEqual(rtd("2"), date(2015, 6, 16))
-      self.assertEqual(rtd("3"), date(2015, 6, 17))
-      self.assertEqual(rtd("4"), date(2015, 6, 18))
-      self.assertEqual(rtd("5"), date(2015, 6, 19))
-
   def test_future_cycle(self):
     """Future cycle workflow
 
@@ -382,3 +374,86 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 8, 5))
+
+  def test_start__workflow_mid_cycle_with_task_before_and_after(self):
+    """Test that workflows get triggered correctly if we are in the middle of
+    the cycle and there are tasks with start dates before and after."""
+    weekly_wf = {
+      "title": "weekly thingy",
+      "description": "start this many a time",
+      "frequency": "weekly",
+      "task_groups": [{
+        "title": "tg 1",
+        "task_group_tasks": [
+          {
+            'title': 'weekly task 1',
+            "relative_start_day": 1,
+            "relative_end_day": 1,
+          }, {
+            'title': 'weekly task 2',
+            "relative_start_day": 2,
+            "relative_end_day": 2,
+          }, {
+            'title': 'weekly task 3',
+            "relative_start_day": 3,
+            "relative_end_day": 3,
+          }, {
+            'title': 'weekly task 4',
+            "relative_start_day": 4,
+            "relative_end_day": 4,
+          }, {
+            'title': 'weekly task 5',
+            "relative_start_day": 5,
+            "relative_end_day": 5,
+          }, ],
+        "task_group_objects": []
+      },
+      ]
+    }
+    with freeze_time("2015-07-29 13:00"): # Wed
+      _, wf = self.generator.generate_workflow(weekly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 8, 3))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id).one()
+      self.assertEqual(cycle.start_date, date(2015, 7, 27))
+      self.assertEqual(cycle.end_date, date(2015, 7, 31))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 8, 3))
+      self.assertEqual(cycle.end_date, date(2015, 8, 7))
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 8, 10))
+
+  def test_workflow_created_on_weekend_is_scheduled_activate_next_week(self):
+    """Test that workflow created during weekend will activate next week"""
+    weekly_wf = {
+      "title": "weekly thingy",
+      "description": "start this many a time",
+      "frequency": "weekly",
+      "task_groups": [{
+        "title": "tg 1",
+        "task_group_tasks": [
+          {
+            'title': 'weekly task 1',
+            "relative_start_day": 1,
+            "relative_start_month": None,
+            "relative_end_day": 3,
+            "relative_end_month": None,
+          }],
+        "task_group_objects": []
+      },
+      ]
+    }
+    with freeze_time("2015-07-25 13:00"): # Sat
+      _, wf = self.generator.generate_workflow(weekly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 27))
