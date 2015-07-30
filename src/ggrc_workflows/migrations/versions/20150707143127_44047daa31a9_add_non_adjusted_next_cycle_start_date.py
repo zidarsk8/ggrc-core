@@ -73,11 +73,17 @@ def upgrade():
         # to date manually to avoid  and instantiate a new calculator with base date
         # on that date.
         calculator = get_cycle_calculator(workflow)
-        start_month, start_day = min(
-            v['relative_start'] for v in calculator.reified_tasks.values())
-        start_date = calculator.relative_day_to_date(
-            relative_day=start_day,
-            relative_month=start_month)
+        if workflow.frequency in {"weekly", "monthly"}:
+            start_day = min(
+                v['relative_start'] for v in calculator.reified_tasks.values())
+            start_date = calculator.relative_day_to_date(
+                relative_day=start_day)
+        else:
+            start_month, start_day = min(
+                v['relative_start'] for v in calculator.reified_tasks.values())
+            start_date = calculator.relative_day_to_date(
+                relative_day=start_day,
+                relative_month=start_month)
 
         calculator = get_cycle_calculator(workflow, base_date=start_date)
         adjust_next_cycle_start_date(calculator, workflow)
