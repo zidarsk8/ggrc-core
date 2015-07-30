@@ -40,7 +40,7 @@
           "audit": ["request", "controlassessment"],
           "controlassessment": ["audit", "control"]
         };
-        return forbidden[type] ? forbidden[type] : [];
+        return forbidden[type.toLowerCase()] ? forbidden[type.toLowerCase()] : [];
       },
       types: can.compute(function () {
         var selector_list,
