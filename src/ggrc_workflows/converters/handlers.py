@@ -201,8 +201,8 @@ class WorkflowPersonColumnHandler(UserColumnHandler):
     self.remove_current_people()
     for owner in self.value:
       workflow_person = WorkflowPerson(
-          workflow_id=self.row_converter.obj.id,
-          person_id=owner.id
+          workflow=self.row_converter.obj,
+          person=owner
       )
       db.session.add(workflow_person)
     self.dry_run = True

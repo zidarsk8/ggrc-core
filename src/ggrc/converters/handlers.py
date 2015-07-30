@@ -164,8 +164,12 @@ class OwnerColumnHandler(UserColumnHandler):
 
   def set_obj_attr(self):
     try:
-      for owner in self.value:
-        self.row_converter.obj.owners.append(owner)
+      for person in self.row_converter.obj.owners:
+        if person not in self.value:
+          self.row_converter.obj.owners.remove(person)
+      for person in self.value:
+        if person not in self.row_converter.obj.owners:
+          self.row_converter.obj.owners.append(person)
     except:
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
       trace = traceback.format_exc()
@@ -532,9 +536,8 @@ class ObjectPersonColumnHandler(UserColumnHandler):
     self.remove_current_people()
     for owner in self.value:
       user_role = ObjectPerson(
-          personable_id=self.row_converter.obj.id,
-          personable_type=self.row_converter.obj.__class__.__name__,
-          person_id=owner.id
+          personable=self.row_converter.obj,
+          person=owner
       )
       db.session.add(user_role)
     self.dry_run = True
