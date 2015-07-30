@@ -67,7 +67,18 @@ def objects_via_relationships_query(user_id, context_not_role=False):
   _relationship = aliased(all_models.Relationship, name="rl")
   _user_role = aliased(all_models.UserRole, name="ur")
 
-  return db.session.query(
+  def _add_relationship_join(query):
+    return query.join(_program, or_(
+        and_(_relationship.source_type == 'Program',
+             _program.id == _relationship.source_id),
+        and_(_relationship.destination_type == 'Program',
+             _program.id == _relationship.destination_id))).\
+        join(_user_role, _program.context_id == _user_role.context_id).\
+        join(_role, _user_role.role_id == _role.id).\
+        filter(and_(_user_role.person_id == user_id, _role.name.in_(
+            ('ProgramEditor', 'ProgramOwner', 'ProgramReader'))))
+
+  objects = _add_relationship_join(db.session.query(
       case([
           (_relationship.destination_type == "Program",
            _relationship.source_id.label('id'))
@@ -76,16 +87,11 @@ def objects_via_relationships_query(user_id, context_not_role=False):
           (_relationship.destination_type == "Program",
            _relationship.source_type.label('type'))
       ], else_=_relationship.destination_type.label('id')),
-      literal(None).label('context_id') if context_not_role else _role.name).\
-      join(_program, or_(
-          and_(_relationship.source_type == 'Program',
-               _program.id == _relationship.source_id),
-          and_(_relationship.destination_type == 'Program',
-               _program.id == _relationship.destination_id))).\
-      join(_user_role, _program.context_id == _user_role.context_id).\
-      join(_role, _user_role.role_id == _role.id).\
-      filter(and_(_user_role.person_id == user_id, _role.name.in_(
-          ('ProgramEditor', 'ProgramOwner', 'ProgramReader'))))
+      literal(None).label('context_id') if context_not_role else _role.name))
+
+  # We also need to return relationships themselves:
+  relationships = _add_relationship_join(db.session.query(_relationship.id, literal("Relationship"), _relationship.context_id))
+  return objects.union(relationships)
 
 
 

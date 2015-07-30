@@ -23,6 +23,8 @@ logging.disable(logging.CRITICAL)
 
 class TestCase(BaseTestCase):
 
+  maxDiff = None
+
   @classmethod
   def clear_data(cls):
     ignore_tables = (
