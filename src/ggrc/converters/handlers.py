@@ -535,9 +535,8 @@ class ObjectPersonColumnHandler(UserColumnHandler):
     self.remove_current_people()
     for owner in self.value:
       user_role = ObjectPerson(
-          personable_id=self.row_converter.obj.id,
-          personable_type=self.row_converter.obj.__class__.__name__,
-          person_id=owner.id
+          personable=self.row_converter.obj,
+          person=owner
       )
       db.session.add(user_role)
     self.dry_run = True
