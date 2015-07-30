@@ -31,6 +31,13 @@
 
               <div class="span1">
                 <div class="object-check" align="left">
+
+                  <label
+                    {{^is_allowed_to_map selected_object instance}}
+                      data-original-title="You are not allowed to map this object"
+                      rel="tooltip"
+                      data-placement="left"
+                    {{/is_allowed_to_map}}>
                   <input
                     type="checkbox"
                     value="{{instance.title}}"
@@ -55,7 +62,11 @@
                         checked disabled="true"
                       {{/has_mapped_objects}}
                     {{/if}}
+                    {{^is_allowed_to_map selected_object instance}}
+                      disabled="true"
+                    {{/is_allowed_to_map}}
                   >
+                  </label>
                 </div>
               </div>
             </div>

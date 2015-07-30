@@ -13,7 +13,7 @@ from ggrc_risk_assessments import models as ra_models
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import split_array
-from ggrc.converters.import_helper import pretty_name
+from ggrc.utils import title_from_camelcase
 from ggrc.utils import get_mapping_rules
 from tests.ggrc import TestCase
 from tests.ggrc.generator import ObjectGenerator
@@ -23,7 +23,7 @@ CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
 
 def get_mapping_names(class_name):
   mapping_rules = get_mapping_rules()[class_name]
-  pretty_rules = map(pretty_name, mapping_rules)
+  pretty_rules = map(title_from_camelcase, mapping_rules)
   mapping_names = set(["map:{}".format(name) for name in pretty_rules])
   return mapping_names
 
@@ -118,12 +118,12 @@ class TestCulumnOrder(TestCase):
         "slug",
         "title",
         "description",
-        "test_plan",
         "notes",
+        "test_plan",
         "owners",
         "start_date",
-        "kind",
         "status",
+        "kind",
         "url",
         "reference_url",
         "name",
@@ -862,8 +862,8 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Frequency"]["mandatory"])
     self.assertIn("type", vals["Owner"])
     self.assertIn("type", vals["Member"])
-    self.assertEquals(vals["Owner"]["type"], "workflow_role")
-    self.assertEquals(vals["Member"]["type"], "workflow_role")
+    self.assertEquals(vals["Owner"]["type"], "user_role")
+    self.assertEquals(vals["Member"]["type"], "user_role")
 
   def test_task_group_definitions(self):
     """ test default headers for Task Group """

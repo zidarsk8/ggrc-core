@@ -70,6 +70,7 @@ permissions = {
     ],
     "delete": [
         "UserRole",
+        "Request",
         "ControlAssessment",
         "Issue",
         "ObjectControl",

@@ -8,7 +8,7 @@
 * can override based on model class variables
 """
 
-import re
+from ggrc import utils
 
 def with_model_override(func):
   model_property_name = "_{0}".format(func.__name__)
@@ -55,7 +55,7 @@ class ModelInflector(object):
 
   @property
   def table_singular(self):
-    return self.underscore_from_camelcase(self.model_singular)
+    return utils.underscore_from_camelcase(self.model_singular)
 
   @property
   @with_model_override
@@ -72,22 +72,11 @@ class ModelInflector(object):
 
   @property
   def title_singular(self):
-    return self.titleize_from_camelcase(self.model.__name__)
+    return utils.title_from_camelcase(self.model.__name__)
 
   @property
   def title_plural(self):
     return self.table_plural.replace('_', ' ').title()
-
-  # Helpers
-  @classmethod
-  def underscore_from_camelcase(cls, s):
-    s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', s)
-    return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
-
-  @classmethod
-  def titleize_from_camelcase(cls, s):
-    s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1 \2', s)
-    return re.sub(r'([a-z0-9])([A-Z])', r'\1 \2', s1)
 
   def __repr__(self):
     return (

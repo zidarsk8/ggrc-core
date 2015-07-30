@@ -14,6 +14,7 @@ from ggrc import db
 from ggrc.converters import get_importables
 from ggrc.converters import errors
 from ggrc.login import get_current_user
+from ggrc.models import CategoryBase
 from ggrc.models import CustomAttributeValue
 from ggrc.models import CustomAttributeDefinition
 from ggrc.models import ObjectPerson
@@ -163,8 +164,12 @@ class OwnerColumnHandler(UserColumnHandler):
 
   def set_obj_attr(self):
     try:
-      for owner in self.value:
-        self.row_converter.obj.owners.append(owner)
+      for person in self.row_converter.obj.owners:
+        if person not in self.value:
+          self.row_converter.obj.owners.remove(person)
+      for person in self.value:
+        if person not in self.row_converter.obj.owners:
+          self.row_converter.obj.owners.append(person)
     except:
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
       trace = traceback.format_exc()
@@ -531,9 +536,52 @@ class ObjectPersonColumnHandler(UserColumnHandler):
     self.remove_current_people()
     for owner in self.value:
       user_role = ObjectPerson(
-          personable_id=self.row_converter.obj.id,
-          personable_type=self.row_converter.obj.__class__.__name__,
-          person_id=owner.id
+          personable=self.row_converter.obj,
+          person=owner
       )
       db.session.add(user_role)
     self.dry_run = True
+
+
+class CategoryColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    names = [v.strip() for v in self.raw_value.split("\n")]
+    names = [name for name in names if name != ""]
+    if not names:
+      return None
+    categories = CategoryBase.query.filter(and_(
+        CategoryBase.name.in_(names),
+        CategoryBase.type == self.category_base_type
+    )).all()
+    category_names = set([c.name.strip() for c in categories])
+    for name in names:
+      if name not in category_names:
+        self.add_warning(errors.WRONG_MULTI_VALUE,
+                         column_name=self.display_name,
+                         value=name)
+    return categories
+
+  def set_obj_attr(self):
+    if self.value is None:
+      return
+    setattr(self.row_converter.obj, self.key, self.value)
+
+  def get_value(self):
+    categories = getattr(self.row_converter.obj, self.key, self.value)
+    categorie_names = [c.name for c in categories]
+    return "\n".join(categorie_names)
+
+
+class ControlCategoryColumnHandler(CategoryColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.category_base_type = "ControlCategory"
+    super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class ControlAssertionColumnHandler(CategoryColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.category_base_type = "ControlAssertion"
+    super(self.__class__, self).__init__(row_converter, key, **options)

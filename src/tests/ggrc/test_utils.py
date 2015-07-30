@@ -3,8 +3,6 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from nose.plugins.skip import SkipTest
-
 from ggrc.utils import merge_dicts
 from ggrc.utils import merge_dict
 from ggrc.utils import get_mapping_rules
@@ -17,7 +15,6 @@ class TestUtilsDictFunctions(TestCase):
     """ Test that all mappings go both ways """
     mappings = get_mapping_rules()
     verificationErrors = []
-    self.maxDiff = None
 
     # Special cases in mappings as defined in utils.py:
     audit_mappings = ["Control", "DataAsset", "Facility", "Market", "OrgGroup",

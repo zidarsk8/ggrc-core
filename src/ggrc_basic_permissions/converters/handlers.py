@@ -17,7 +17,7 @@ from ggrc_basic_permissions.models import UserRole
 
 class ObjectRoleColumnHandler(UserColumnHandler):
 
-  role_id = -1
+  role = -1
   owner_columns = ("program_owner")
 
   def parse_item(self):
@@ -32,7 +32,7 @@ class ObjectRoleColumnHandler(UserColumnHandler):
 
   def get_value(self):
     user_role_ids = db.session.query(UserRole.person_id).filter_by(
-        role_id=self.role_id,
+        role=self.role,
         context_id=self.row_converter.obj.context_id)
     users = Person.query.filter(Person.id.in_(user_role_ids))
     emails = [user.email for user in users]
@@ -40,7 +40,7 @@ class ObjectRoleColumnHandler(UserColumnHandler):
 
   def remove_current_roles(self):
     UserRole.query.filter_by(
-        role_id=self.role_id,
+        role=self.role,
         context_id=self.row_converter.obj.context_id).delete()
 
   def insert_object(self):
@@ -49,9 +49,9 @@ class ObjectRoleColumnHandler(UserColumnHandler):
     self.remove_current_roles()
     for owner in self.value:
       user_role = UserRole(
-          role_id=self.role_id,
+          role=self.role,
           context_id=self.row_converter.obj.context_id,
-          person_id=owner.id
+          person=owner
       )
       db.session.add(user_role)
     self.dry_run = True
@@ -60,35 +60,35 @@ class ObjectRoleColumnHandler(UserColumnHandler):
 class ProgramOwnerColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role_id = Role.query.filter_by(name="ProgramOwner").one().id
+    self.role = Role.query.filter_by(name="ProgramOwner").one()
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
 class ProgramEditorColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role_id = Role.query.filter_by(name="ProgramEditor").one().id
+    self.role = Role.query.filter_by(name="ProgramEditor").one()
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
 class ProgramReaderColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role_id = Role.query.filter_by(name="ProgramReader").one().id
+    self.role = Role.query.filter_by(name="ProgramReader").one()
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
 class WorkflowOwnerColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role_id = Role.query.filter_by(name="WorkflowOwner").one().id
+    self.role = Role.query.filter_by(name="WorkflowOwner").one()
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
 class WorkflowMemberColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role_id = Role.query.filter_by(name="WorkflowMember").one().id
+    self.role = Role.query.filter_by(name="WorkflowMember").one()
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
@@ -128,8 +128,8 @@ class UserRoleColumnHandler(UserColumnHandler):
       return
     self.remove_current_roles()
     user_role = UserRole(
-        role_id=self.value.id,
-        person_id=self.row_converter.obj.id
+        role=self.value,
+        person=self.row_converter.obj
     )
     db.session.add(user_role)
     self.dry_run = True

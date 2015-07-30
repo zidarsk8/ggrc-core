@@ -13,6 +13,7 @@ from ggrc.login import get_current_user
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.mixins import (
     deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful,
     CustomAttributable
@@ -110,16 +111,16 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       "notify_on_change": "Force real-time email updates",
       "workflow_owner": {
           "display_name": "Owner",
-          "type": "workflow_role",
+          "type": AttributeInfo.Type.USER_ROLE,
           "mandatory": True,
       },
       "workflow_member": {
           "display_name": "Member",
-          "type": "workflow_role",
+          "type": AttributeInfo.Type.USER_ROLE,
       },
       "workflow_mapped": {
           "display_name": "Mapped",
-          "type": "workflow_role",
+          "type": AttributeInfo.Type.USER_ROLE,
       },
       "status": None,
       "start_date": None,
