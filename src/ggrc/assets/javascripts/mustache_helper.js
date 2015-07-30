@@ -2340,6 +2340,7 @@ Mustache.registerHelper("remove_space", function (str, options) {
 Mustache.registerHelper("if_auditor", function (instance, options) {
   var audit, auditors_dfd, auditors
     , admin = Permission.is_allowed("__GGRC_ADMIN__")
+    , editor = GGRC.current_user.system_wide_role === "Editor"
     , include_admin = !options.hash || options.hash.include_admin !== false;
 
   instance = Mustache.resolve(instance);
@@ -2358,7 +2359,7 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
   audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
   auditors = audit.findAuditors(true); // immediate-mode findAuditors
 
-  if ((include_admin && admin) ||
+  if ((include_admin && (admin|| editor)) ||
       can.map(
           auditors,
           function (auditor) {
@@ -2378,6 +2379,7 @@ can.each({
     program_editor_states: ["Requested", "Amended Request"],
     predicate: function(options) {
       return options.admin
+          || options.editor
           || options.can_assignee_edit
           || options.can_program_editor_edit
           || options.can_auditor_edit
@@ -2394,6 +2396,7 @@ can.each({
     program_editor_states: ["Requested", "Amended Request"],
     predicate: function(options) {
       return options.admin
+          || options.editor
           || options.can_auditor_edit
           || options.can_assignee_edit
           || options.can_program_editor_edit
@@ -2407,7 +2410,7 @@ can.each({
     assignee_states: ["Requested", "Amended Request"],
     program_editor_states: ["Requested", "Amended Request"],
     predicate: function(options) {
-      return (!options.draft && options.admin)
+      return (!options.draft && (options.admin || options.editor))
           || options.can_assignee_edit
           || options.can_program_editor_edit
           || (!options.accepted
@@ -2422,7 +2425,8 @@ can.each({
   Mustache.registerHelper(name, function(instance, options){
 
       var audit, auditors_dfd, accepted, prog_roles_dfd,
-          admin = Permission.is_allowed("__GGRC_ADMIN__");
+          admin = Permission.is_allowed("__GGRC_ADMIN__"),
+          editor = GGRC.current_user.system_wide_role === "Editor";
 
       instance = resolve_computed(instance);
       instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
@@ -2487,6 +2491,7 @@ can.each({
 
         if(fn_opts.predicate({
           admin: admin,
+          editor: editor,
           can_auditor_edit: can_auditor_edit,
           can_assignee_edit: can_assignee_edit,
           can_program_editor_edit: can_program_editor_edit,
