@@ -42,7 +42,7 @@ _workflow_object_types = [
     "Regulation", "Standard", "Policy", "Contract",
     "Objective", "Control", "Section", "Clause",
     "System", "Process",
-    "DataAsset", "Facility", "Market", "Product", "Project"
+    "DataAsset", "Facility", "Market", "Product", "Project", "Issue"
 ]
 
 for type_ in _workflow_object_types:
