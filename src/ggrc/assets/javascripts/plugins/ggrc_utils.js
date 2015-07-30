@@ -37,7 +37,9 @@
       });
     },
     is_mapped: function (target, destination) {
-      var bindings = target.get_binding(CMS.Models[destination.type].table_plural);
+      var table_plural = CMS.Models[destination.type].table_plural,
+          bindings = target.get_binding((target.has_binding(table_plural) ? "" : "related_") + table_plural);
+
       if (bindings && bindings.list && bindings.list.length) {
         return _.find(bindings.list, function (item) {
           return item.instance.id === destination.id;
