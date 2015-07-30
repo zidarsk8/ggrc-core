@@ -192,7 +192,6 @@ class TestAnnuallyWorkflow(BaseWorkflowTestCase):
   def test_adding_task_with_lesser_start_day_after_activating_workflow(self):
     """Test if NCSD gets updated correctly if user adds new task with lesser
     relative start day after workflow has already been activated."""
-
     annually_wf = {
       "title": "annually thingy",
       "description": "start this many a time",
@@ -202,7 +201,7 @@ class TestAnnuallyWorkflow(BaseWorkflowTestCase):
         "task_group_tasks": [
           {
             'title': 'annually task 1',
-            "relative_start_day": 1,
+            "relative_start_day": 30,
             "relative_start_month": 7,
             "relative_end_day": 7,
             "relative_end_month": 8,
@@ -210,6 +209,14 @@ class TestAnnuallyWorkflow(BaseWorkflowTestCase):
         "task_group_objects": []
       },
       ]
+    }
+
+    task = {
+      'title': 'annually task 2',
+      "relative_start_day": 20,
+      "relative_start_month": 7,
+      "relative_end_day": 22,
+      "relative_end_month": 7,
     }
 
     with freeze_time("2015-07-27 13:00"):

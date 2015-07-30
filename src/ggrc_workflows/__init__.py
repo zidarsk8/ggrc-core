@@ -592,7 +592,7 @@ def update_workflow_state(workflow):
     db.session.flush()
     return
 
-  if not calculator.tasks:
+  if not calculator.tasks and not workflow.cycles:
     workflow.next_cycle_start_date = None
     workflow.non_adjusted_next_cycle_start_date = None
     return
