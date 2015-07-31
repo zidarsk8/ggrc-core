@@ -617,8 +617,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           this.options.allow_mapping || this.options.allow_creating);
       }
 
-      if (this.element.parent().length === 0) {
-        // element not attached
+      if (this.element.parent().length === 0 // element not attached
+        || this.element.hasClass("entry-list")) { // comment list
         this.options.disable_lazy_loading = true;
       }
       if(!this.options.scroll_element) {
