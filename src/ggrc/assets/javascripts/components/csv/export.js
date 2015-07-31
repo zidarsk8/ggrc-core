@@ -105,9 +105,11 @@
       ".import-button click": function (el, ev) {
         ev.preventDefault();
         var data = _.map(this.scope.attr("selected"), function (el) {
-              return {object_name: el.value};
+              return {
+                object_name: el.value,
+                fields: "all"
+              };
             });
-
         if (!data.length) {
           return;
         }
