@@ -1,0 +1,4 @@
+Object type,required,required,required,required
+policy,code,title,owner,state
+,"p1",Edited policy,user@example.com,Draft
+,p2,another Edited y,user@example.com,Draft

@@ -36,7 +36,8 @@
                                   #if' mappings.length '\
                                   and #result_direct_mappings' bindings_compute selected_object '\
                                   or #has_pending_addition' selected_object instance '\
-                                  or #has_mapped_objects' selected_object instance}}
+                                  or #has_mapped_objects' selected_object instance '\
+                                  or #is_allowed_to_map' selected_object instance}}
                                   true
                                 {{else}}
                                   false

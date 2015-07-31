@@ -1020,6 +1020,9 @@ class Resource(ModelView):
       self.json_create(obj, src)
     with benchmark("Query create permissions"):
       if not permissions.is_allowed_create_for(obj):
+        # json_create sometimes adds objects to session, so we need to
+        # make sure the session is cleared
+        db.session.expunge_all()
         raise Forbidden()
     with benchmark("Send model POSTed event"):
       self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)

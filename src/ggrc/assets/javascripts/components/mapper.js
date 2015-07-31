@@ -70,7 +70,8 @@
               }
             };
 
-        can.each(selector_list, function (model, model_name) {
+        selector_list = _.intersection(_.keys(canonical), list);
+        can.each(selector_list, function (model_name) {
           if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name.toLowerCase())) {
             return;
           }
