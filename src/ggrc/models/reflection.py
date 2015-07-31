@@ -302,6 +302,7 @@ class AttributeInfo(object):
     result = []
     for key in order:
       item = definitions[key]
+      item["key"] = key
       result.append(item)
     return result
 

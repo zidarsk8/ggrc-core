@@ -268,6 +268,20 @@
           this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }
       },
+      "[data-action=attribute_select_toggle] click": function (el, ev){
+        var items = GGRC.model_attr_defs[this.scope.attr("item.type")]
+            split_items = {
+              mappings: _.filter(items, function(el){
+                return el.type == "mapping";
+              }),
+              attributes: _.filter(items, function(el){
+                return el.type != "mapping";
+              })
+            };
+        _.map(split_items[el.data("type")], function(attr){
+          this.scope.attr("item.selected."+attr.key, el.data("value"))
+        }.bind(this));
+      },
       "{scope.item} type": function () {
         this.scope.attr("item.selected", {});
         this.scope.attr("item.relevant", []);
