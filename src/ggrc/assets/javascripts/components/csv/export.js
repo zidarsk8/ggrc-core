@@ -105,9 +105,11 @@
       ".import-button click": function (el, ev) {
         ev.preventDefault();
         var data = _.map(this.scope.attr("selected"), function (el) {
-              return {object_name: el.value};
+              return {
+                object_name: el.value,
+                fields: "all"
+              };
             });
-
         if (!data.length) {
           return;
         }
@@ -267,6 +269,20 @@
         if (!panel_number && url.relevant_id && url.relevant_type) {
           this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }
+      },
+      "[data-action=attribute_select_toggle] click": function (el, ev){
+        var items = GGRC.model_attr_defs[this.scope.attr("item.type")]
+            split_items = {
+              mappings: _.filter(items, function(el){
+                return el.type == "mapping";
+              }),
+              attributes: _.filter(items, function(el){
+                return el.type != "mapping";
+              })
+            };
+        _.map(split_items[el.data("type")], function(attr){
+          this.scope.attr("item.selected."+attr.key, el.data("value"))
+        }.bind(this));
       },
       "{scope.item} type": function () {
         this.scope.attr("item.selected", {});

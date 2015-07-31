@@ -10,12 +10,18 @@
     <h6>
       Select attributes to show in report
     </h6>
+    Attributes:
+    <a data-action="attribute_select_toggle" data-value="true" data-type="attributes" href="javascript://">all</a> /
+    <a data-action="attribute_select_toggle" data-value="false" data-type="attributes" href="javascript://">none</a>
+    Mappings:
+    <a data-action="attribute_select_toggle" data-value="true" data-type="mappings" href="javascript://">all</a> /
+    <a data-action="attribute_select_toggle" data-value="false" data-type="mappings" href="javascript://">none</a>
     <div class="attribute-wrap">
       <ul class="attr-list">
         {{#columns}}
         <li>
           <label>
-            <input can-value="selected.{{attr_name}}" type="checkbox" name="{{attr_name}}" checked>
+            <input can-value="selected.{{key}}" type="checkbox" name="{{key}}" checked>
             {{display_name}}
           </label>
         </li>
