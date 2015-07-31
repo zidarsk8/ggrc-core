@@ -268,6 +268,7 @@
     scope: {
       "instance_id": "@",
       "is_mapped": "@",
+      "is_allowed_to_map": "@",
       "checkbox": can.compute(function (status) {
         return /true/gi.test(this.attr("is_mapped")) || this.attr("select_state") || this.attr("appended");
       })
@@ -305,11 +306,17 @@
       }
     },
     helpers: {
-      "is_shown": function (options) {
-        return options.fn();
+      "not_allowed_to_map": function (options) {
+        if (/false/gi.test(this.attr("is_allowed_to_map"))) {
+          return options.fn();
+        }
+        return options.inverse();
       },
       "is_disabled": function (options) {
-        if (/true/gi.test(this.attr("is_mapped")) || this.attr("is_saving") || this.attr("is_loading")) {
+        if (/true/gi.test(this.attr("is_mapped"))
+            || this.attr("is_saving")
+            || this.attr("is_loading")
+            || /false/gi.test(this.attr("is_allowed_to_map"))) {
           return options.fn();
         }
         return options.inverse();

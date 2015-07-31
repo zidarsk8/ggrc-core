@@ -36,12 +36,12 @@
                                   #if' mappings.length '\
                                   and #result_direct_mappings' bindings_compute selected_object '\
                                   or #has_pending_addition' selected_object instance '\
-                                  or #has_mapped_objects' selected_object instance '\
-                                  or #is_allowed_to_map' selected_object instance}}
+                                  or #has_mapped_objects' selected_object instance}}
                                   true
                                 {{else}}
                                   false
                                 {{/if_helpers}}"
+                    is_allowed_to_map="{{#is_allowed_to_map selected_object instance}}true{{else}}false{{/is_allowed_to_map}}"
                     appended="appended"
                     instance_id="{{instance.id}}"
                     is_loading="is_loading"
@@ -51,11 +51,11 @@
                     selected="mapper.selected"
                     is_saving="mapper.is_saving">
                     <label
-                      {{^is_allowed_to_map selected_object instance}}
+                      {{#not_allowed_to_map}}
                       data-original-title="You are not allowed to map this object"
                       rel="tooltip"
                       data-placement="left"
-                      {{/is_allowed_to_map}}
+                      {{/not_allowed_to_map}}
                     >
                       <input
                         type="checkbox"
