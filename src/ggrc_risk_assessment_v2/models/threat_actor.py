@@ -8,16 +8,13 @@
 
 from ggrc import db
 from ggrc.models.mixins import CustomAttributable, BusinessObject, Timeboxed
-from ggrc.models.object_control import Controllable
 from ggrc.models.object_document import Documentable
-from ggrc.models.object_objective import Objectiveable
 from ggrc.models.object_person import Personable
 from ggrc.models.object_owner import Ownable
-from ggrc.models.object_section import Sectionable
 from ggrc.models.relationship import Relatable
 
 
 class ThreatActor(
-    CustomAttributable, Documentable, Personable, Objectiveable, Controllable,
-    Sectionable, Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
+    CustomAttributable, Documentable, Personable,
+    Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'threat_actors'
