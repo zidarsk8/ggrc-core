@@ -17,6 +17,7 @@ from ggrc.login import get_current_user
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
 import ggrc_risk_assessment_v2.models as models
+from ggrc_basic_permissions.contributed_roles import RoleContributions
 
 
 # Initialize signal handler for status changes
@@ -84,3 +85,22 @@ import ggrc_risk_assessment_v2.views
 
 def init_extra_views(app):
   ggrc_risk_assessment_v2.views.init_extra_views(app)
+
+
+class RiskRoleContributions(RoleContributions):
+  contributions = {
+      'Creator': {
+          'read': [],
+          'create': ['ThreatActor', 'Risk'],
+      },
+      'Editor': {
+          'read': ['ThreatActor', 'Risk'],
+          'create': ['ThreatActor', 'Risk'],
+      },
+      'Reader': {
+          'read': ['ThreatActor', 'Risk'],
+          'create': ['ThreatActor', 'Risk'],
+      },
+  }
+
+ROLE_CONTRIBUTIONS = RiskRoleContributions()
