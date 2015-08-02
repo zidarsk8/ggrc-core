@@ -62,7 +62,6 @@
       related_objects: {
         _canonical: {
           "related_objects_as_source": _risk_object_types,
-          related_objectives: "Objective"
         },
         related_programs: TypeFilter("related_objects", "Program"),
         related_data_assets: TypeFilter("related_objects", "DataAsset"),
@@ -80,8 +79,7 @@
         related_contracts: TypeFilter("related_objects", "Contract"),
         related_policies: TypeFilter("related_objects", "Policy"),
         related_standards: TypeFilter("related_objects", "Standard"),
-        related_objectives: Proxy(
-          "Objective", "objective", "ObjectObjective", "objectiveable", "object_objectives")
+        related_objectives: TypeFilter("related_objects", "Objective"),
       },
       related_risk: {
         _canonical: {
@@ -110,26 +108,12 @@
     };
 
     can.each(_risk_object_types, function (type) {
-      if (["Control", "Section", "Objective"].indexOf(type) > -1) {
-        var related_and_able_objects = GGRC.Mappings.modules.ggrc_core[type].related_and_able_objects.sources;
-        mappings[type] = {
-          _canonical: {
-            "related_objects": ['Risk', 'RiskObject', 'ThreatActor']
-          },
-          related_risks:            TypeFilter("related_objects", "Risk"),
-          related_threat_actors:    TypeFilter("related_objects", "ThreatActor"),
-          risks:                    TypeFilter("related_objects", "Risk"),
-          risk_objects:             TypeFilter("related_objects", "RiskObject"),
-          related_and_able_objects: Multi(related_and_able_objects.concat(["risks"])),
-        };
-      } else {
         mappings[type] = {
           _canonical: {
             "related_objects_as_source": ['Risk', 'ThreatActor']
           },
           _mixins: ['related', 'related_risk', 'related_threat_actor'],
         };
-      }
     });
     new GGRC.Mappings("ggrc_risk_assessment_v2", mappings);
   };
