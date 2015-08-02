@@ -21,7 +21,4 @@ def risk_admin():
 
 
 def init_extra_views(app):
-  app.add_url_rule(
-      "/risk_admin", "risk_admin",
-      view_func=login_required(risk_admin))
-  converters.init_extra_views(app)
+  pass
