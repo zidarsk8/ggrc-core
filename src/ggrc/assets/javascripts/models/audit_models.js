@@ -736,22 +736,20 @@ can.Model.Cacheable("CMS.Models.Meeting", {
   }
 }, {
   init : function () {
-      var that = this;
       this._super && this._super.apply(this, arguments);
-
-      this.each(function(value, name) {
-        if (value === null)
+      this.each(function (value, name) {
+        if (value === null) {
           that.removeAttr(name);
-      });
-        that.bind("change", function(){
-          if(typeof that.response !== "undefined" && !that._preloaded_people){
-            that._preloaded_people = true;
-
-            can.map(that.response.reify().people, function(person){
-              that.mark_for_addition("people", person);
-            });
-          }
-        });
+        }
+      }.bind(this));
+      this.bind("change", function () {
+        if (typeof this.response !== "undefined" && !this._preloaded_people) {
+          this._preloaded_people = true;
+          _.map(this.response.reify().people, function (person) {
+            this.mark_for_addition("people", person);
+          }.bind(this));
+        }
+      }.bind(this));
   }
 
 });
