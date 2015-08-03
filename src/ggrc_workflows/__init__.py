@@ -582,7 +582,6 @@ def update_workflow_state(workflow):
       cycle.workflow = workflow
       cycle.calculator = calculator
       # Other cycle attributes will be set in build_cycle.
-      # So, no need to set them here.
       build_cycle(cycle, None, base_date=workflow.next_cycle_start_date)
       notification.handle_cycle_created(None, obj=cycle)
 
@@ -592,7 +591,7 @@ def update_workflow_state(workflow):
     db.session.flush()
     return
 
-  if not calculator.tasks and not workflow.cycles:
+  if not calculator.tasks:
     workflow.next_cycle_start_date = None
     workflow.non_adjusted_next_cycle_start_date = None
     return
@@ -859,6 +858,19 @@ def adjust_next_cycle_start_date(calculator, workflow, base_date=None, move_forw
     if not workflow.cycles:
       workflow.next_cycle_start_date = None
       workflow.non_adjusted_next_cycle_start_date = None
+    else:
+      if not workflow.non_adjusted_next_cycle_start_date:
+        last_cycle_start_date = max([c.start_date for c in workflow.cycles])
+        first_task = calculator.tasks[0]
+
+        if last_cycle_start_date.day > first_task.relative_start_day:
+          last_cycle_start_date = last_cycle_start_date + calculator.time_delta
+
+        workflow.non_adjusted_next_cycle_start_date = calculator.relative_day_to_date(
+            relative_day=first_task.relative_start_day,
+            relative_month=first_task.relative_start_month,
+            base_date=last_cycle_start_date
+        )
 
     # Unless we are moving forward one interval we just want to recalculate
     # the next_cycle_start_date to reflect the latest changes to the
