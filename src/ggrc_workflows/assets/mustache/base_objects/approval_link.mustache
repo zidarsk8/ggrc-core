@@ -68,11 +68,13 @@
             {{#is_allowed "read" "Workflow" context="any"}}
               {{#with_mapping_count instance 'current_approval_cycles'}}
                 {{#if_equals count 0}}
-                  {{#is_allowed "create" "Workflow" context="any"}}
+                  {{#is_allowed "update" instance}}
                     <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{instance.class.model_singular}}" data-object-id="{{instance.id}}">
                       <i class="grcicon-review"></i>
                       Submit For Review
                     </a>
+                  {{else}}
+                    <i>No review in progress</i>
                   {{/is_allowed}}
                 {{else}}
                   <i class="grcicon-review"></i>
