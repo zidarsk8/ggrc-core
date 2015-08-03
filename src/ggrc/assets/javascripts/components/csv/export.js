@@ -72,7 +72,12 @@
         {model_singular: "TaskGroupTask", title_plural: "Tasks"},
         {model_singular: "Vendor", title_plural: "Vendors"},
         {model_singular: "Workflow", title_plural: "Workflows"}
-      ];
+      ],
+      exportable = importable.concat([
+        {model_singular: "CycleTaskGroup", title_plural: "Cycle Task Groups"},
+        {model_singular: "CycleTaskGroupObjectTask", title_plural: "Cycle Tasks"}
+      ]);
+
 
   can.Component.extend({
     tag: "csv-template",
@@ -245,7 +250,7 @@
     tag: "export-panel",
     template: "<content></content>",
     scope: {
-      importable: importable,
+      importable: exportable,
       // TODO: change importable to a list of model names
       // importable: _.compact(_.map(importable, function(name){
       //   return CMS.Models[name];
