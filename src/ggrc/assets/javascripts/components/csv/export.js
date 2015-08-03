@@ -54,7 +54,6 @@
         {model_singular: "Issue", title_plural: "Issues"},
         {model_singular: "Market", title_plural: "Markets"},
         {model_singular: "Objective", title_plural: "Objectives"},
-        {model_singular: "Option", title_plural: "Options"},
         {model_singular: "OrgGroup", title_plural: "Org Groups"},
         {model_singular: "Person", title_plural: "Persons"},
         {model_singular: "Policy", title_plural: "Policies"},
