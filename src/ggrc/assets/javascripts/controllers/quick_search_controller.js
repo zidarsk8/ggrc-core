@@ -346,8 +346,8 @@ can.Control("CMS.Controllers.LHN", {
           ;
 
         this.options.display_prefs = prefs;
-
-        checked = true;
+        //set default to all objects
+        checked = false; //false: all objects, true: my_work only
         if (typeof prefs.getLHNState().my_work !== "undefined") {
           checked = !!prefs.getLHNState().my_work;
         }
