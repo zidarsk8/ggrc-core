@@ -15,8 +15,8 @@ class MonthlyCycleCalculator(CycleCalculator):
   to be in the same month if there are not enough days in the month.
   """
   time_delta = relativedelta.relativedelta(months=1)
-  # Date domain must be from 1 to 31, range is UP TO AND NOT INCLUDING
-  date_domain = set(range(1, 32))
+  date_domain = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}
 
   def __init__(self, workflow, base_date=None):
     super(MonthlyCycleCalculator, self).__init__(workflow)

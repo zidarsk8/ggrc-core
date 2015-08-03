@@ -10,7 +10,7 @@ from datetime import date, datetime
 
 import os
 from ggrc import db
-from ggrc_workflows.models import Workflow, Cycle, TaskGroup
+from ggrc_workflows.models import Workflow, Cycle, TaskGroup, TaskGroupTask
 from ggrc_workflows import start_recurring_cycles
 from ggrc_workflows.services.workflow_cycle_calculator.weekly_cycle_calculator import WeeklyCycleCalculator
 
@@ -602,3 +602,63 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 9))
+
+  def test_cycle_start_date_after_task_start_date_moves_backward(self):
+    weekly_wf = {
+      "title": "weekly thingy",
+      "description": "start this many a time",
+      "frequency": "weekly",
+      "task_groups": [{
+        "title": "tg 1",
+        "task_group_tasks": [
+          {
+            'title': 'weekly task 1',
+            "relative_start_day": 5,
+            "relative_start_month": None,
+            "relative_end_day": 4,
+            "relative_end_month": None,
+          }],
+        "task_group_objects": []
+      },
+      ]
+    }
+    with freeze_time("2015-7-30 13:00:00"):  # Thu, 7/30/2015
+      _, wf = self.generator.generate_workflow(weekly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 31))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 7, 31))
+      self.assertEqual(cycle.end_date, date(2015, 8, 6))
+
+      _, cycle = self.generator.generate_cycle(wf) # 2015-8-7
+      _, cycle = self.generator.generate_cycle(wf) # 2015-8-14
+      _, cycle = self.generator.generate_cycle(wf) # 2015-8-21
+      _, cycle = self.generator.generate_cycle(wf) # 2015-8-28
+      self.assertEqual(cycle.start_date, date(2015, 8, 28))
+      self.assertEqual(cycle.end_date, date(2015, 9, 3))
+
+      task_group = db.session.query(TaskGroup).filter(
+        TaskGroup.workflow_id == wf.id).one()
+      task = db.session.query(TaskGroupTask).filter(
+        TaskGroupTask.task_group_id == task_group.id).one()
+
+      self.generator.modify_object(task, {
+        "relative_start_day": 1,
+        "relative_end_day": 4
+      })
+
+      _, cycle = self.generator.generate_cycle(wf) # 2015-8-31
+      self.assertEqual(cycle.start_date, date(2015, 8, 31))
+      self.assertEqual(cycle.end_date, date(2015, 9, 3))
+
+      _, cycle = self.generator.generate_cycle(wf) # 2015-9-7 is Labour day in US
+      self.assertEqual(cycle.start_date, date(2015, 9, 4))
+      self.assertEqual(cycle.end_date, date(2015, 9, 10))
+
+      _, cycle = self.generator.generate_cycle(wf) # 2015-9-14
+      self.assertEqual(cycle.start_date, date(2015, 9, 14))
+      self.assertEqual(cycle.end_date, date(2015, 9, 17))

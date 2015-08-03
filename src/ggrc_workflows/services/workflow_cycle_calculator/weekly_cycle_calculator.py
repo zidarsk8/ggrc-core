@@ -15,7 +15,7 @@ class WeeklyCycleCalculator(CycleCalculator):
   calculations are based on relative_start_day and relative_end_day.
   """
   time_delta = datetime.timedelta(weeks=1)
-  date_domain = set({1,2,3,4,5})
+  date_domain = {1,2,3,4,5}
 
   def __init__(self, workflow, base_date=None):
     if not base_date:
