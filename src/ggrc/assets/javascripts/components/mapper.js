@@ -273,8 +273,15 @@
       },
       "{mapper.entries} length": "allSelected",
       "{mapper.selected} length": "allSelected"
+    },
+    helpers: {
+      "get_title": function (options) {
+        var instance = this.attr("mapper.get_instance");
+        return instance && instance.title ? instance.title : this.attr("mapper.object");
+      }
     }
   });
+
   can.Component.extend({
     tag: "mapper-results",
     template: "<content />",
