@@ -130,14 +130,15 @@
       "deferredSave": function () {
         var data = {
               multi_map: true,
-              arr: _.map(this.scope.attr("mapper.selected"), function (desination) {
-                    var inst = _.find(this.scope.attr("mapper.entries"), function (entry) {
-                      return entry.instance.id === desination.id;
-                    });
-                    if (inst) {
+              arr: _.compact(_.map(this.scope.attr("mapper.selected"), function (desination) {
+                    var isAllowed = GGRC.Utils.allowed_to_map(this.scope.attr("mapper.object"), desination),
+                        inst = _.find(this.scope.attr("mapper.entries"), function (entry) {
+                          return entry.instance.id === desination.id;
+                        });
+                    if (inst && isAllowed) {
                       return inst.instance;
                     }
-                  }.bind(this))
+                  }.bind(this)))
             };
         this.scope.attr("deferred_to").controller.element.trigger("defer:add", [data, {map_and_save: true}]);
         // TODO: Find proper way to dismiss the modal
@@ -176,9 +177,10 @@
           data["context"] = null;
           _.each(this.scope.attr("mapper.selected"), function (desination) {
             var modelInstance,
-                isMapped = GGRC.Utils.is_mapped(instance, desination);
+                isMapped = GGRC.Utils.is_mapped(instance, desination),
+                isAllowed = GGRC.Utils.allowed_to_map(instance, desination);
 
-            if (isMapped) {
+            if (isMapped || !isAllowed) {
               return;
             }
             mapping = GGRC.Mappings.get_canonical_mapping(object, isAllObject ? desination.type : type);

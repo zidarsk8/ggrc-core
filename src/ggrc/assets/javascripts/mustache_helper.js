@@ -1343,7 +1343,7 @@ Mustache.registerHelper("is_allowed_to_map", function (source, target, options) 
      || resource_type === "Relationship") {
     can_map = Permission.is_allowed_for('update', source);
     if (target instanceof can.Model) {
-      can_map &= Permission.is_allowed_for('update', target);
+      can_map = Permission.is_allowed_for('update', target);
     }
   } else {
     // We should only map objects that have join models
