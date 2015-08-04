@@ -25,6 +25,12 @@
       entries: new can.List(),
       options: new can.List(),
       relevant: new can.List(),
+      get_instance: can.compute(function () {
+        return CMS.Models.get_instance(this.attr("object"), this.attr("join_object_id"));
+      }),
+      get_plural: function (instance, plural) {
+        return (instance.has_binding(plural) ? "" : "related_") + plural;
+      },
       model_from_type: function (type) {
         var types = _.reduce(_.values(this.types()), function (memo, val) {
           if (val.items) {
@@ -140,9 +146,19 @@
       ".add-button .btn modal:success": "addNew",
       "addNew": function (el, ev, model) {
         var entries = this.scope.attr("mapper.entries"),
-            entry = entries[0],
-            binding = entry.binding,
-            item = new GGRC.ListLoaders.MappingResult(model, entry.mappings, entry.binding);
+            len = entries.length,
+            get_plural = this.scope.attr("mapper").get_plural,
+            binding, mapping, selected, item;
+
+        if (!len) {
+          selected = this.scope.attr("mapper.get_instance");
+          binding = selected.get_binding(get_plural(selected, model.constructor.table_plural));
+          mapping = [];
+        } else {
+          binding = entries[0].binding;
+          mapping = entries[0].mapping;
+        }
+        item = new GGRC.ListLoaders.MappingResult(model, mapping, binding);
 
         item.append = true;
         entries.unshift(item);
@@ -209,11 +225,11 @@
         if (this.scope.attr("mapper.search_only")) {
           return;
         }
-        var table_plural = this.scope.attr("mapper.model.table_plural"),
-            selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
+        var get_plural = this.scope.attr("mapper").get_plural,
+            selected = this.scope.attr("mapper.get_instance"),
+            table_plural = get_plural(selected, this.scope.attr("mapper.model.table_plural")),
             binding;
 
-        table_plural = (selected.has_binding(table_plural) ? "" : "related_") + table_plural;
         if (!selected.has_binding(table_plural)) {
           return;
         }
@@ -349,7 +365,7 @@
             mappings: []
           };
         }
-        var selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
+        var selected = this.scope.attr("mapper.get_instance"),
             mapper = this.scope.mapper.model_from_type(model.type),
             binding, bindings = this.scope.attr("mapper.bindings");
 
