@@ -74,6 +74,7 @@
         {model_singular: "Workflow", title_plural: "Workflows"}
       ],
       exportable = _.sortBy(importable.concat([
+        {model_singular: "Cycle", title_plural: "Cycles"},
         {model_singular: "CycleTaskGroup", title_plural: "Cycle Task Groups"},
         {model_singular: "CycleTaskGroupObjectTask", title_plural: "Cycle Tasks"}
       ]), "title_plural");
