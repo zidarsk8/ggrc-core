@@ -739,7 +739,7 @@ can.Model.Cacheable("CMS.Models.Meeting", {
       this._super && this._super.apply(this, arguments);
       this.each(function (value, name) {
         if (value === null) {
-          that.removeAttr(name);
+          this.removeAttr(name);
         }
       }.bind(this));
       this.bind("change", function () {
