@@ -1697,28 +1697,8 @@ can.Control("CMS.Controllers.TreeViewNode", {
       },
 
       minimize_info_pane: function () {//bug#1899
-        var $win = $(window),
-            win_height = $win.height(),
-            options = {
-              duration: 800,
-              easing: "easeOutExpo"
-            },
-            $info = $(".info"),
-            $elm = $(".pin-content"),
-            size = 75;
-
-        $elm.find(".pin-action i").css({"opacity": 0.25});
-        if (size < $info.height()) {
-          options.start = function () {
-            $win.trigger("resize", size);
-          };
-        } else {
-          options.complete = function () {
-            $win.trigger("resize");
-          };
-        }
-
-        $elm.animate({height: size}, options);
+        var minimize_link = $.find('.info .pin-action .min');
+        $(minimize_link).click();
       },
 
       'input.attr-checkbox click' : function (el, ev) {
