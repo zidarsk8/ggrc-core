@@ -215,9 +215,11 @@ owner_base = [
         },
         "condition": "contains"
     },
+    "CustomAttributeDefinition",
+    "CustomAttributeValue",
     "Request",
     "Response",
-    "Person"
+    "Person",
 ]
 owner_read = owner_base + [
     {
