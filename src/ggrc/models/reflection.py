@@ -61,6 +61,7 @@ ATTRIBUTE_ORDER = (
     "email",
     "is_enabled",
     "company",
+    "user_role",
 )
 
 

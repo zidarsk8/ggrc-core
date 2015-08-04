@@ -48,7 +48,6 @@ GGRC_IMPORTABLE = {
     "facility": Facility,
     "market": Market,
     "objective": Objective,
-    "option": Option,
     "org group": OrgGroup,
     "org_group": OrgGroup,
     "vendor": Vendor,
