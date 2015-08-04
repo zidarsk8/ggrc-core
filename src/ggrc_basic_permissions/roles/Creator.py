@@ -1,9 +1,14 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
 scope = "System"
 description = """
   This role grants a user basic object creation and editing permission.
   """
 
-_is_owner = [
+owner_base = [
     "Categorization",
     {
         "type": "Category",
@@ -153,11 +158,6 @@ _is_owner = [
         },
         "condition": "contains"
     },
-    {
-        "type": "Relationship",
-        "terms": {},
-        "condition": "relationship",
-    },
     "RelationshipType",
     {
         "type": "SectionBase",
@@ -219,9 +219,30 @@ _is_owner = [
     "Response",
     "Person"
 ]
+owner_read = owner_base + [
+    {
+        "type": "Relationship",
+        "terms": {
+            "property_name": "source,destination",
+            "action": "read"
+        },
+        "condition": "relationship",
+    },
+]
+
+owner_update = owner_base + [
+    {
+        "type": "Relationship",
+        "terms": {
+            "property_name": "source,destination",
+            "action": "update"
+        },
+        "condition": "relationship",
+    },
+]
 
 permissions = {
-    "read": _is_owner,
+    "read": owner_read,
     "create": [
         "Workflow"
         "Categorization",
@@ -250,7 +271,14 @@ permissions = {
         "PopulationSample",
         "Product",
         "Project",
-        "Relationship",
+        {
+            "type": "Relationship",
+            "terms": {
+                "property_name": "source,destination",
+                "action": "update"
+            },
+            "condition": "relationship",
+        },
         "RelationshipType",
         "SectionBase",
         "Section",
@@ -266,7 +294,6 @@ permissions = {
             },
             "condition": "is"
         },
-        "Person",
         "Program",
         "Role",
         "UserRole",
@@ -282,7 +309,7 @@ permissions = {
             "condition": "is"
         },
     ],
-    "view_object_page": _is_owner,
-    "update": _is_owner,
-    "delete": _is_owner,
+    "view_object_page": owner_read,
+    "update": owner_update,
+    "delete": owner_update,
 }

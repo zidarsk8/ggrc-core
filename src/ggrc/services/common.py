@@ -1016,14 +1016,13 @@ class Resource(ModelView):
     elif 'context' not in src:
       raise BadRequest('context MUST be specified.')
 
-    else:
-      if not permissions.is_allowed_create(
-        self.model.__name__, None, self.get_context_id_from_json(src)):
-        raise Forbidden()
     with benchmark("Deserialize object"):
       self.json_create(obj, src)
     with benchmark("Query create permissions"):
       if not permissions.is_allowed_create_for(obj):
+        # json_create sometimes adds objects to session, so we need to
+        # make sure the session is cleared
+        db.session.expunge_all()
         raise Forbidden()
     with benchmark("Send model POSTed event"):
       self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)

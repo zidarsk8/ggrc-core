@@ -43,8 +43,14 @@ class TestCreatorProgram(TestCase):
                     "get": 403,
                     "put": 403,
                     "delete": 403
+                },
+                "unrelated": {
+                    "get": 403,
+                    "put": 403,
+                    "delete": 403,
+                    "map": 403,
                 }
-            }
+            },
         },
         "mapped": {
             "objects": {
@@ -57,6 +63,12 @@ class TestCreatorProgram(TestCase):
                     "get": 403,
                     "put": 403,
                     "delete": 403
+                },
+                "unrelated": {
+                    "get": 403,
+                    "put": 403,
+                    "delete": 403,
+                    "map": 403,
                 }
             }
         },
@@ -72,6 +84,12 @@ class TestCreatorProgram(TestCase):
                     "get": 200,
                     "put": 403,
                     "delete": 403
+                },
+                "unrelated": {
+                    "get": 403,
+                    "put": 403,
+                    "delete": 403,
+                    "map": 403,
                 }
             }
         },
@@ -87,6 +105,12 @@ class TestCreatorProgram(TestCase):
                     "get": 200,
                     "put": 200,
                     "delete": 200,
+                },
+                "unrelated": {
+                    "get": 403,
+                    "put": 403,
+                    "delete": 403,
+                    "map": 403,
                 }
             }
         },
@@ -102,6 +126,12 @@ class TestCreatorProgram(TestCase):
                     "get": 200,
                     "put": 200,
                     "delete": 200
+                },
+                "unrelated": {
+                    "get": 403,
+                    "put": 403,
+                    "delete": 403,
+                    "map": 403,
                 }
             }
         },
@@ -145,6 +175,19 @@ class TestCreatorProgram(TestCase):
     else:
       return response.status_code
 
+  def map(self, dest):
+    """ Map src to dest """
+    response = self.api.post(all_models.Relationship, {
+        "relationship": {"source": {
+            "id": self.objects["program"].id,
+            "type": self.objects["program"].type,
+        }, "destination": {
+            "id": dest.id,
+            "type": dest.type
+        }, "context": None},
+    })
+    return response.status_code
+
   def init_objects(self, test_case_name):
     """ Create a Program and a Mapped object for a given test case """
     # Create a program
@@ -160,19 +203,30 @@ class TestCreatorProgram(TestCase):
     program_id = response.json.get("program").get("id")
     self.objects["program"] = all_models.Program.query.get(program_id)
     # Create an object:
-    response = self.api.post(all_models.System, {
-        "system": {"title": random_title, "context": None},
-    })
-    self.assertEquals(response.status_code, 201)
-    system_id = response.json.get("system").get("id")
-    self.objects["mapped_object"] = all_models.System.query.get(system_id)
+    for obj in ("mapped_object", "unrelated"):
+      random_title = self.object_generator.random_str()
+      response = self.api.post(all_models.System, {
+          "system": {"title": random_title, "context": None},
+      })
+      self.assertEquals(response.status_code, 201)
+      system_id = response.json.get("system").get("id")
+      self.objects[obj] = all_models.System.query.get(system_id)
+      # Become the owner
+      response = self.api.post(all_models.ObjectOwner, {"object_owner": {
+          "person": {
+              "id": creator.id,
+              "type": "Person",
+          }, "ownable": {
+              "id": system_id,
+              "type": "System"
+          }, "context": None}})
     # Map Object to Program
     response = self.api.post(all_models.Relationship, {
         "relationship": {"source": {
             "id": program_id,
             "type": "Program"
         }, "destination": {
-            "id": system_id,
+            "id": self.objects["mapped_object"].id,
             "type": "System"
         }, "context": None},
     })
@@ -225,18 +279,18 @@ class TestCreatorProgram(TestCase):
       person = self.people.get(test_case)
       objects = self.test_cases.get(test_case).get('objects')
       self.api.set_user(person)
-      for obj in ("mapped_object", "program"):
+      for obj in ("unrelated", "mapped_object", "program"):
         actions = objects[obj]
-        for action in ("get", "put", "delete"):
+        for action in ("map", "get", "put", "delete"):
           # reset sesion:
           db.session.commit()
+          if action not in actions:
+            continue
           func = getattr(self, action)
-          if test_case == 'ProgramEditor' and action == "delete":
-            res = func(self.objects[obj])
-          else:
-            res = func(self.objects[obj])
+          res = func(self.objects[obj])
           if res != actions[action]:
             errors.append(
                 "{}: Tried {} on {}, but received {} instead of {}".format(
                     test_case, action, obj, res, actions[action]))
+      # Try mapping
     self.assertEquals(errors, [])

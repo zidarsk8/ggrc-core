@@ -7,13 +7,18 @@ from flask import g
 from flask.ext.login import current_user
 from ggrc.extensions import get_extension_instance
 
+
 def get_permissions_provider():
   return get_extension_instance(
       'USER_PERMISSIONS_PROVIDER',
       'ggrc.rbac.permissions_provider.DefaultUserPermissionsProvider')
 
-def permissions_for(user):
+
+def permissions_for(user=None):
+  if user is None:
+    user = get_user()
   return get_permissions_provider().permissions_for(user)
+
 
 def get_user():
   if hasattr(g, 'user'):
@@ -22,6 +27,7 @@ def get_user():
     return current_user
   return None
 
+
 def is_allowed_create(resource_type, resource_id, context_id):
   """Whether or not the user is allowed to create a resource of the specified
   type in the context.
@@ -29,11 +35,13 @@ def is_allowed_create(resource_type, resource_id, context_id):
   return permissions_for(get_user()).is_allowed_create(
       resource_type, resource_id, context_id)
 
+
 def is_allowed_create_for(instance):
   """Whether or not the user is allowed to create this particular resource
   instance.
   """
   return permissions_for(get_user()).is_allowed_create_for(instance)
+
 
 def is_allowed_read(resource_type, resource_id, context_id):
   """Whether or not the user is allowed to read a resource of the specified
@@ -41,11 +49,13 @@ def is_allowed_read(resource_type, resource_id, context_id):
   """
   return permissions_for(get_user()).is_allowed_read(resource_type, resource_id, context_id)
 
+
 def is_allowed_read_for(instance):
   """Whether or not the user is allowed to read this particular resource
   instance.
   """
   return permissions_for(get_user()).is_allowed_read_for(instance)
+
 
 def is_allowed_update(resource_type, resource_id, context_id):
   """Whether or not the user is allowed to update a resource of the specified

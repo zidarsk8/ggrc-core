@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
 <div data-object-id="{{instance.id}}"
     data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}>
   {{#if_equals instance.status 'Final'}}
@@ -61,11 +68,13 @@
             {{#is_allowed "read" "Workflow" context="any"}}
               {{#with_mapping_count instance 'current_approval_cycles'}}
                 {{#if_equals count 0}}
-                  {{#is_allowed "create" "Workflow" context="any"}}
+                  {{#is_allowed "update" instance}}
                     <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{instance.class.model_singular}}" data-object-id="{{instance.id}}">
                       <i class="grcicon-review"></i>
                       Submit For Review
                     </a>
+                  {{else}}
+                    <i>No review in progress</i>
                   {{/is_allowed}}
                 {{else}}
                   <i class="grcicon-review"></i>

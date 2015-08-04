@@ -8,10 +8,12 @@ from os.path import abspath, dirname, join
 from random import shuffle
 
 from ggrc import models
+from ggrc_workflows import models as wf_models
+from ggrc_risk_assessments import models as ra_models
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import split_array
-from ggrc.converters.import_helper import pretty_name
+from ggrc.utils import title_from_camelcase
 from ggrc.utils import get_mapping_rules
 from tests.ggrc import TestCase
 from tests.ggrc.generator import ObjectGenerator
@@ -21,7 +23,7 @@ CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
 
 def get_mapping_names(class_name):
   mapping_rules = get_mapping_rules()[class_name]
-  pretty_rules = map(pretty_name, mapping_rules)
+  pretty_rules = map(title_from_camelcase, mapping_rules)
   mapping_names = set(["map:{}".format(name) for name in pretty_rules])
   return mapping_names
 
@@ -116,12 +118,12 @@ class TestCulumnOrder(TestCase):
         "slug",
         "title",
         "description",
-        "test_plan",
         "notes",
+        "test_plan",
         "owners",
         "start_date",
-        "kind",
         "status",
+        "kind",
         "url",
         "reference_url",
         "name",
@@ -210,6 +212,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "Owner",
         "Reader",
         "Editor",
+        "Mapped",
         "Primary Contact",
         "Secondary Contact",
         "Program URL",
@@ -256,6 +259,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Owner",
         "Reader",
         "Editor",
+        "Mapped",
         "Primary Contact",
         "Secondary Contact",
         "Program URL",
@@ -471,7 +475,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     display_names = set([val["display_name"] for val in definitions.values()])
     element_names = set([
         "Title",
-        "Description",
+        "Text of Clause",
         "Notes",
         "Owner",
         "Primary Contact",
@@ -584,6 +588,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Name",
         "Email",
         "Company",
+        "Role",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -827,3 +832,101 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["mandatory"])
     self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
+
+
+class TestGetWorkflowObjectColumnDefinitions(TestCase):
+
+  """
+  Test default column difinitions for workflow objcts
+  """
+
+  def test_workflow_definitions(self):
+    """ test default headers for Workflow """
+    definitions = get_object_column_definitions(wf_models.Workflow)
+    display_names = set([val["display_name"] for val in definitions.values()])
+    expected_names = set([
+        "Title",
+        "Description",
+        "Custom email message",
+        "Owner",
+        "Member",
+        "Mapped",
+        "Frequency",
+        "Force real-time email updates",
+        "Code",
+    ])
+    self.assertEquals(expected_names, display_names)
+    vals = {val["display_name"]: val for val in definitions.values()}
+    self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
+    self.assertTrue(vals["Frequency"]["mandatory"])
+    self.assertIn("type", vals["Owner"])
+    self.assertIn("type", vals["Member"])
+    self.assertEquals(vals["Owner"]["type"], "user_role")
+    self.assertEquals(vals["Member"]["type"], "user_role")
+
+  def test_task_group_definitions(self):
+    """ test default headers for Task Group """
+    definitions = get_object_column_definitions(wf_models.TaskGroup)
+    display_names = set([val["display_name"] for val in definitions.values()])
+    expected_names = set([
+        "Summary",
+        "Details",
+        "Assignee",
+        "Code",
+        "Workflow",
+    ])
+    self.assertEquals(expected_names, display_names)
+    vals = {val["display_name"]: val for val in definitions.values()}
+    self.assertTrue(vals["Summary"]["mandatory"])
+    self.assertTrue(vals["Assignee"]["mandatory"])
+
+  def test_task_group_task_definitions(self):
+    """ test default headers for Task Group Task """
+    definitions = get_object_column_definitions(wf_models.TaskGroupTask)
+    display_names = set([val["display_name"] for val in definitions.values()])
+    expected_names = set([
+        "Summary",
+        "Task Type",
+        "Assignee",
+        "Task Description",
+        "Start",
+        "End",
+        "Task Group",
+        "Code",
+    ])
+    self.assertEquals(expected_names, display_names)
+    vals = {val["display_name"]: val for val in definitions.values()}
+    self.assertTrue(vals["Summary"]["mandatory"])
+    self.assertTrue(vals["Assignee"]["mandatory"])
+
+
+
+
+
+class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
+
+  """
+  Test default column difinitions for risk assessment objcts
+  """
+
+  def test_risk_assessemnt_definitions(self):
+    """ test default headers for Workflow """
+    definitions = get_object_column_definitions(ra_models.RiskAssessment)
+    display_names = set([val["display_name"] for val in definitions.values()])
+    expected_names = set([
+        "Title",
+        "Description",
+        "Notes",
+        "Start Date",
+        "End Date",
+        "Risk Manager",
+        "Risk Counsel",
+        "Code",
+        "Program",
+    ])
+    self.assertEquals(expected_names, display_names)
+    vals = {val["display_name"]: val for val in definitions.values()}
+    self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Start Date"]["mandatory"])
+    self.assertTrue(vals["End Date"]["mandatory"])

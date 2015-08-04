@@ -77,7 +77,9 @@ class BlockConverter(object):
     self.row_converters = []
     self.ignore = False
     if not self.object_class:
-      self.add_errors(errors.WRONG_OBJECT_TYPE, line=self.offset + 2)
+      class_name = options.get("class_name", "")
+      self.add_errors(errors.WRONG_OBJECT_TYPE, line=self.offset + 2,
+                      object_name=class_name)
       self.name = ""
       return
     self.object_headers = get_object_column_definitions(self.object_class)
@@ -86,10 +88,10 @@ class BlockConverter(object):
     self.headers = self.clean_headers(raw_headers)
     self.unique_counts = self.get_unique_counts_dict(self.object_class)
     self.name = self.object_class._inflector.human_singular.title()
-    self.organize_fields(options.get("fields", "all"))
+    self.organize_fields(options.get("fields", []))
 
   def organize_fields(self, fields):
-    if not fields or fields == "all":
+    if fields == "all":
       fields = self.object_headers.keys()
     self.fields = get_column_order(fields)
 
@@ -133,7 +135,6 @@ class BlockConverter(object):
     """
 
     headers = [self._sanitize_header(val) for val in raw_headers]
-
     clean_headers = OrderedDict()
     header_names = self.get_header_names()
     removed_count = 0

@@ -8,7 +8,7 @@ from flask import current_app
 from itertools import chain
 from itertools import product
 
-from ggrc.converters import IMPORTABLE
+from ggrc.converters import get_importables
 from ggrc.converters import errors
 from ggrc.converters.base_block import BlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
@@ -20,6 +20,7 @@ class Converter(object):
   class_order = [
       "Person",
       "Program",
+      "RiskAssessment",
       "Audit",
       "Policy",
       "Regulation",
@@ -27,6 +28,9 @@ class Converter(object):
       "Section",
       "Control",
       "ControlAssessment",
+      "Workflow",
+      "TaskGroup",
+      "TaskGroupTask",
   ]
 
   priortiy_colums = [
@@ -42,6 +46,7 @@ class Converter(object):
     self.new_objects = defaultdict(dict)
     self.shared_state = {}
     self.response_data = []
+    self.importable = get_importables()
 
   def to_array(self, data_grid=False):
     self.block_converters_from_ids()
@@ -106,24 +111,27 @@ class Converter(object):
 
     Generate block converters from a list of tuples with an object name and ids
     """
-    object_map = {o.__name__: o for o in IMPORTABLE.values()}
+    object_map = {o.__name__: o for o in self.importable.values()}
     for object_data in self.ids_by_type:
-      object_class = object_map[object_data["object_name"]]
+      class_name = object_data["object_name"]
+      object_class = object_map[class_name]
       object_ids = object_data.get("ids", [])
       fields = object_data.get("fields")
       block_converter = BlockConverter(self, object_class=object_class,
-                                       fields=fields, object_ids=object_ids)
+                                       fields=fields, object_ids=object_ids,
+                                       class_name=class_name)
       block_converter.row_converters_from_ids()
       self.block_converters.append(block_converter)
 
   def block_converters_from_csv(self):
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
-      object_class = IMPORTABLE.get(data[1][0].strip().lower())
+      class_name = data[1][0].strip().lower()
+      object_class = self.importable.get(class_name)
       raw_headers, rows = extract_relevant_data(data)
       block_converter = BlockConverter(self, object_class=object_class,
                                        rows=rows, raw_headers=raw_headers,
-                                       offset=offset)
+                                       offset=offset, class_name=class_name)
       self.block_converters.append(block_converter)
 
     order = defaultdict(lambda: len(self.class_order))
@@ -132,12 +140,8 @@ class Converter(object):
 
   def import_objects(self):
     for converter in self.block_converters:
-      try:
-        converter.handle_row_data()
-        converter.import_objects()
-      except Exception as e:
-        current_app.logger.error("Import failed with: {}".format(e.message))
-        converter.add_errors(errors.UNKNOWN_ERROR, line=converter.offset + 2)
+      converter.handle_row_data()
+      converter.import_objects()
 
   def import_secondary_objects(self):
     for converter in self.block_converters:

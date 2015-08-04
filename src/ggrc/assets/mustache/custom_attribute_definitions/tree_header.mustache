@@ -1,0 +1,31 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita@google.com
+    Maintained By: sasmita@google.com
+}}
+
+{{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
+<header class="header sticky sticky-header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+  <div class="row-fluid">
+    <div class="span{{display_options.title_width}}">
+      <div class="title-heading oneline">
+        <span class="widget-col-title" data-field="title|description_inline|name|email">
+          Object Type
+          <i class="grcicon-carrot"></i>
+        </span>
+      </div>
+    </div>
+    
+    <div class="span{{display_options.selectable_width}}">
+      &nbsp;
+    </div>
+
+    <div class="span{{display_options.action_width}}">
+      <ul class="tree-action-list">
+        {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
+      </ul>
+    </div>
+  </div>
+</header>
+<div class="clearfix"></div>

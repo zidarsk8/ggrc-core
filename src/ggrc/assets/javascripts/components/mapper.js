@@ -23,6 +23,7 @@
       join_object_id: "",
       selected: new can.List(),
       entries: new can.List(),
+      options: new can.List(),
       relevant: new can.List(),
       model_from_type: function (type) {
         var types = _.reduce(_.values(this.types()), function (memo, val) {
@@ -34,7 +35,9 @@
         return _.findWhere(types, {value: type});
       },
       types: can.compute(function () {
-        var selector_list = GGRC.Mappings.get_canonical_mappings_for(this.object),
+        var selector_list,
+            canonical = GGRC.Mappings.get_canonical_mappings_for(this.object),
+            list = GGRC.tree_view.base_widgets_by_type[this.object],
             forbidden = ["workflow", "taskgroup", "gdrivefolder", "context"],
             groups = {
               "all_objects": {
@@ -59,7 +62,8 @@
               }
             };
 
-        can.each(selector_list, function (model, model_name) {
+        selector_list = _.intersection(_.keys(canonical), list);
+        can.each(selector_list, function (model_name) {
           if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name.toLowerCase())) {
             return;
           }
@@ -72,6 +76,7 @@
             singular: cms_model.shortName,
             plural: cms_model.title_plural.toLowerCase().replace(/\s+/, "_"),
             table_plural: cms_model.table_plural,
+            title_singular: cms_model.title_singular,
             isSelected: cms_model.shortName === this.type
           });
           groups["all_objects"]["models"].push(cms_model.shortName);
@@ -88,17 +93,22 @@
       var $el = $(el),
           data = {},
           id = +$el.attr("join-object-id"),
-          object = $el.attr("object");
+          object = $el.attr("object"),
+          type = $el.attr("type"),
+          tree_view = GGRC.tree_view.sub_tree_for[object];
 
-      data["type"] = id === GGRC.page_instance().id ?
-                     $el.attr("type")
-                     : GGRC.tree_view.sub_tree_for[object].display_list[0];
-
+      if ($el.attr("search-only")) {
+        data["search_only"] =  /true/i.test($el.attr("search-only"));
+      }
       if (object) {
         data["object"] = object;
       }
-      if ($el.attr("search-only")) {
-        data["search_only"] =  /true/i.test($el.attr("search-only"));
+      if (!data["search_only"]) {
+        if (id === GGRC.page_instance().id || !tree_view) {
+          data["type"] = CMS.Models[type] ? type : "AllObject";
+        } else {
+          data["type"] = tree_view.display_list[0];
+        }
       }
       data["join_object_id"] = id || GGRC.page_instance().id;
       return {
@@ -110,7 +120,7 @@
         this.setModel();
         this.setBinding();
       },
-      "defferedSave": function () {
+      "deferredSave": function () {
         var data = {
               multi_map: true,
               arr: _.map(this.scope.attr("mapper.selected"), function (desination) {
@@ -122,9 +132,20 @@
                     }
                   }.bind(this))
             };
-        this.scope.attr("deferred_to").controller.element.trigger("deffer:add", [data, {map_and_save: true}]);
+        this.scope.attr("deferred_to").controller.element.trigger("defer:add", [data, {map_and_save: true}]);
         // TODO: Find proper way to dismiss the modal
         this.element.find(".modal-dismiss").trigger("click");
+      },
+      ".add-button .btn modal:added": "addNew",
+      ".add-button .btn modal:success": "addNew",
+      "addNew": function (el, ev, model) {
+        var entries = this.scope.attr("mapper.entries"),
+            entry = entries[0],
+            binding = entry.binding,
+            item = new GGRC.ListLoaders.MappingResult(model, entry.mappings, entry.binding);
+
+        item.append = true;
+        entries.unshift(item);
       },
       ".modal-footer .btn-map click": function (el, ev) {
         ev.preventDefault();
@@ -133,35 +154,47 @@
         }
         // TODO: Figure out nicer / proper way to handle deferred save
         if (this.scope.attr("deferred")) {
-          return this.defferedSave();
+          return this.deferredSave();
         }
+
         var type = this.scope.attr("mapper.type"),
             object = this.scope.attr("mapper.object"),
+            isAllObject = type === "AllObject",
             instance = CMS.Models[object].findInCacheById(this.scope.attr("mapper.join_object_id")),
-            mapping = GGRC.Mappings.get_canonical_mapping(this.scope.attr("mapper.object"), type),
-            Model = CMS.Models[mapping.model_name],
-            data = {},
-            deffer = [],
+            mapping, Model, data = {}, defer = [],
             que = new RefreshQueue();
 
         this.scope.attr("mapper.is_saving", true);
         que.enqueue(instance).trigger().done(function (inst) {
-          // TODO: Figure what to do with context?
           data["context"] = null;
-          data[mapping.object_attr] = {
-            href: instance.href,
-            type: instance.type,
-            id: instance.id
-          };
-
           _.each(this.scope.attr("mapper.selected"), function (desination) {
             var modelInstance;
+            type = isAllObject ? desination.type : type;
+            mapping = GGRC.Mappings.get_canonical_mapping(object, type);
+
+            // TODO: Exception, we need to move section under Relationship table
+            //       and handle this in backend
+            if (~["Section", "Clause"].indexOf(type)) {
+              mapping = {
+                model_name: "Relationship",
+                object_attr: "source",
+                object_join_attr: "related_destinations",
+                option_attr: "destination"
+              };
+            }
+            Model = CMS.Models[mapping.model_name];
+            data[mapping.object_attr] = {
+              href: instance.href,
+              type: instance.type,
+              id: instance.id
+            };
             data[mapping.option_attr] = desination;
+
             modelInstance = new Model(data);
-            deffer.push(modelInstance.save());
+            defer.push(modelInstance.save());
           }, this);
 
-          $.when.apply($, deffer)
+          $.when.apply($, defer)
             .fail(function (response, message) {
               $("body").trigger("ajax:flash", {"error": message});
             }.bind(this))
@@ -232,7 +265,7 @@
     scope: {
       "items-per-page": "@",
       page: 0,
-      options: new can.List(),
+
       select_all: false,
       page_loading: false,
       loading_or_saving: can.compute(function () {
@@ -246,17 +279,29 @@
       },
       ".modalSearchButton click": "getResults",
       "{scope} type": "getResults",
-      "{scope} entries": "drawPage",
+      "{scope.entries} add": function (list, ev, added) {
+        // TODO: I'm assuming we are adding only one item manually
+        if (!added[0].append) {
+          return;
+        }
+        var instance = added[0].instance,
+            option = this.getItem(instance);
+        option.appended = true;
+        this.scope.attr("options").unshift(option);
+        this.scope.attr("selected").push({
+          id: instance.id,
+          type: instance.type,
+          href: instance.href
+        });
+      },
       ".results-wrap scrollNext": "drawPage",
       ".object-check-all change": function (el, ev) {
         var que = new RefreshQueue(),
-            entries = _.map(this.scope.attr("entries"), function (entry) {
-              return entry.instance;
-            });
+            entries = this.scope.attr("entries");
 
         this.scope.attr("select_all", true);
         this.scope.attr("isloading", true);
-        que.enqueue(entries).trigger().then(function (models) {
+        que.enqueue(_.pluck(entries, "instance")).trigger().then(function (models) {
           this.scope.attr("isloading", false);
           this.scope.attr("selected", _.map(models, function (model) {
             return {
@@ -292,55 +337,58 @@
           selected.splice(index, 1);
         }
       },
+      "getItem": function (model) {
+        if (!model.type) {
+          return;
+        }
+        if (this.scope.attr("mapper.search_only")) {
+          return {
+            instance: model,
+            selected_object: false,
+            binding: {},
+            mappings: []
+          };
+        }
+        var selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
+            mapper = this.scope.mapper.model_from_type(model.type),
+            binding, bindings = this.scope.attr("mapper.bindings");
+
+        if (bindings[model.id]) {
+          return _.extend(bindings[model.id], {
+            selected_object: selected
+          });
+        }
+        if (selected.has_binding(mapper.plural.toLowerCase())) {
+          binding = selected.get_binding(mapper.plural.toLowerCase());
+        }
+        return {
+          instance: model,
+          selected_object: selected,
+          binding: binding,
+          mappings: []
+        };
+      },
       "drawPage": function () {
         if (this.scope.attr("page_loading")) {
           return;
         }
-        var que = new RefreshQueue(),
-            page = this.scope.attr("page"),
+        var page = this.scope.attr("page"),
             next_page = page + 1,
             per_page = +this.scope.attr("items-per-page"),
             page_items = this.scope.attr("entries").slice(page * per_page, next_page * per_page),
-            options = this.scope.attr("options");
+            options = this.scope.attr("options"),
+            que = new RefreshQueue();
 
         if (!page_items.length) {
           return;
         }
+        this.scope.attr("page_loading", true);
 
-        que.enqueue(_.pluck(page_items, "instance")).trigger().then(function (models) {
+        return que.enqueue(_.pluck(page_items, "instance")).trigger().then(function (models) {
           this.scope.attr("page_loading", false);
           this.scope.attr("page", next_page);
-          options.push.apply(options, can.map(models, function (model) {
-            if (!model.type) {
-              return;
-            }
-            if (this.scope.attr("mapper.search_only")) {
-              return {
-                instance: model,
-                selected_object: false,
-                binding: {},
-                mappings: []
-              };
-            }
-            var selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
-                mapper = this.scope.mapper.model_from_type(model.type),
-                binding, bindings = this.scope.attr("mapper.bindings");
 
-            if (bindings[model.id]) {
-              return _.extend(bindings[model.id], {
-                selected_object: selected
-              });
-            }
-            if (selected.has_binding(mapper.plural.toLowerCase())) {
-              binding = selected.get_binding(mapper.plural.toLowerCase());
-            }
-            return {
-              instance: model,
-              selected_object: selected,
-              binding: binding,
-              mappings: []
-            };
-          }.bind(this)));
+          options.push.apply(options, can.map(models, this.getItem.bind(this)));
         }.bind(this));
       },
       "searchFor": function (data) {
@@ -371,6 +419,7 @@
         this.scope.attr("selected", []);
         this.scope.attr("options", []);
         this.scope.attr("select_all", false);
+        this.scope.attr("mapper.all_selected", false);
 
         if (model_name === "AllObject") {
           model_name = this.scope.attr("types.all_objects.models");
@@ -387,9 +436,9 @@
           };
         });
         search.push({
-            term: this.scope.attr("term"),
-            model_name: model_name,
-            options: permission_parms
+          term: this.scope.attr("term"),
+          model_name: model_name,
+          options: permission_parms
         });
         $.merge(search, relevant);
         search = _.map(search, function (query) {
@@ -407,6 +456,7 @@
         list.refresh_stubs().then(function (options) {
           this.scope.attr("page_loading", false);
           this.scope.attr("entries", options);
+          this.drawPage();
         }.bind(this));
       }
     }

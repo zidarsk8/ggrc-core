@@ -59,6 +59,9 @@ can.Construct("Permission", {
   , _is_allowed : function(permissions, permission) {
     if (!permissions)
       return false; //?
+    if (this._permission_match(permissions, new Permission(permission.action, permission.resource_type, null))){
+      return true;
+    }
     if (this._permission_match(permissions, permission))
       return true;
     if (this._permission_match(permissions,
@@ -106,11 +109,14 @@ can.Construct("Permission", {
     if (~resources.indexOf(instance.id)) {
       return true;
     }
+    if (this._is_allowed(permissions,
+        new Permission(action, instance_type, null))) {
+      return true;
+    }
     if (!this._is_allowed(permissions,
         new Permission(action, instance_type, context.id))) {
       return false;
     }
-
     // Check any conditions applied per instance
     if (conditions.length === 0) return true;
     for (var i = 0; i < conditions.length; i++) {
@@ -119,7 +125,6 @@ can.Construct("Permission", {
         return true;
       }
     }
-
     return false;
   }
 
@@ -147,7 +152,7 @@ can.Construct("Permission", {
   }
 
   , refresh : function() {
-    $.ajax({
+    return $.ajax({
       url : "/permissions"
       , type : "get"
       , dataType : "json"

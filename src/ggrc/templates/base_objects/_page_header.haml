@@ -15,10 +15,6 @@
       %i.grciconlarge-dashboard
       Admin Dashboard
 
-    -if import_kind
-      %i.grciconlarge-import
-      Import {{import_kind}}
-
 %ul.menu
   %li
     %a{ 'href': 'javascript://', 'data-toggle': 'multitype-search-modal-selector', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
@@ -31,11 +27,6 @@
       %span
         My Tasks
         %span.task-count
-  %li
-    %a#page-help{ 'href': "/import" }
-      %i.grcicon-imp-exp
-      %span
-        Import
   %li
     %a{ 'href': '/objectBrowser' }
       %i.grcicon-search
@@ -53,10 +44,7 @@
         %a{'href': "/dashboard"}
           %i.grcicon-my-work
           My Work ({{current_user.system_wide_role}})
-      %li
-        %a{'href': "/objectBrowser"}
-          %i.grcicon-search
-          All Objects
+
       -if permissions.is_allowed_read('/admin', None, 1)
         %li
           %a{'href': "/admin#people_list_widget"}
@@ -81,6 +69,9 @@
               'value': 'Email_Now'
             }
             Real-time email updates
+      %li
+        %a{'href': "/import"}
+          Data import
       %li
         %a{'href': "/export"}
           Data export

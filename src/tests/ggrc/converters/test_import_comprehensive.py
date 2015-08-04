@@ -3,23 +3,12 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
-import os
-from os.path import abspath
-from os.path import dirname
-from os.path import join
-from flask import json
-
+from ggrc import db
 from ggrc.models import Program
-from tests.ggrc import TestCase
+from ggrc_basic_permissions import Role
+from ggrc_basic_permissions import UserRole
+from tests.ggrc.converters import TestCase
 from tests.ggrc.generator import ObjectGenerator
-
-THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
-
-
-if os.environ.get("TRAVIS", False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 class TestComprehensiveSheets(TestCase):
@@ -33,16 +22,15 @@ class TestComprehensiveSheets(TestCase):
   def setUp(self):
     TestCase.setUp(self)
     self.generator = ObjectGenerator()
-    self.create_custom_attributes()
-    self.create_people()
     self.client.get("/login")
     pass
 
   def tearDown(self):
     pass
 
-  def test_policy_basic_import(self):
-
+  def test_comprehensive_sheet1_with_custom_attributes(self):
+    self.create_custom_attributes()
+    self.create_people()
     filename = "comprehensive_sheet1.csv"
     response = self.import_file(filename)
     indexed = {r["name"]: r for r in response}
@@ -190,7 +178,8 @@ class TestComprehensiveSheets(TestCase):
       self.assertEquals(current["ignored"], data["ignored"], name)
       self.assertEquals(current["created"], data["created"], name)
       self.assertEquals(len(current["row_errors"]), data["row_errors"], name)
-      self.assertEquals(len(current["row_warnings"]), data["row_warnings"], name)
+      self.assertEquals(
+          len(current["row_warnings"]), data["row_warnings"], name)
 
     prog = Program.query.filter_by(slug="prog-8").first()
     self.assertTrue(prog.private)
@@ -205,7 +194,23 @@ class TestComprehensiveSheets(TestCase):
   def test_full_good_import_no_warnings(self):
     filename = "full_good_import_no_warnings.csv"
     response = self.import_file(filename)
+    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
+    for message in messages:  # response[0] = Person block
+      self.assertEquals(set(response[0][message]), set())
+    ggrc_admin = db.session.query(Role.id).filter(Role.name == "gGRC Admin")
+    reader = db.session.query(Role.id).filter(Role.name == "Reader")
+    creator = db.session.query(Role.id).filter(Role.name == "Creator")
+    ggrc_admins = UserRole.query.filter(UserRole.role_id == ggrc_admin).all()
+    readers = UserRole.query.filter(UserRole.role_id == reader).all()
+    creators = UserRole.query.filter(UserRole.role_id == creator).all()
+    self.assertEquals(len(ggrc_admins), 12)
+    self.assertEquals(len(readers), 5)
+    self.assertEquals(len(creators), 6)
+
+    for block in response:
+      for message in messages:  # response[0] = Person block
+        self.assertEquals(set(), set(block[message]))
 
   def create_custom_attributes(self):
     gen = self.generator.generate_custom_attribute
@@ -229,14 +234,3 @@ class TestComprehensiveSheets(TestCase):
           "name": email.split("@")[0].title(),
           "email": email,
       }, "gGRC Admin")
-
-  def import_file(self, filename, dry_run=False):
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {
-        "X-test-only": "true" if dry_run else "false",
-        "X-requested-by": "gGRC",
-    }
-    response = self.client.post("/_service/import_csv",
-                                data=data, headers=headers)
-    self.assert200(response)
-    return json.loads(response.data)

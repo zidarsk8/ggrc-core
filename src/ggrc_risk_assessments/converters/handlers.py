@@ -3,13 +3,9 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import re
+from ggrc.converters.handlers import UserColumnHandler
 
-def pretty_name(name):
-  return " ".join(re.findall('[A-Z][^A-Z]*', name))
-
-
-def pretty_class_name(cls):
-  return pretty_name(cls.__name__)
-
-
+COLUMN_HANDLERS = {
+    "ra_counsel": UserColumnHandler,
+    "ra_manager": UserColumnHandler,
+}

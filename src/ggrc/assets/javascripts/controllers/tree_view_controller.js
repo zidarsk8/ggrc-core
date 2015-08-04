@@ -9,7 +9,7 @@
 
 function _firstElementChild(el) {
   if (el.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-    for (i=0; i<el.childNodes.length; i++) {
+    for (var i=0; i<el.childNodes.length; i++) {
       if (el.childNodes[i].nodeType !== Node.TEXT_NODE)
         return el.childNodes[i];
     }
@@ -198,7 +198,10 @@ can.Control("CMS.Controllers.TreeLoader", {
 
       return this._display_deferred;
     }
-  , draw_list : function(list) {
+  , draw_list : function(list, is_reload, force_prepare_chilren) {
+    is_reload = is_reload === true;
+    // TODO figure out why this happens and fix the root of the problem
+    if (!list && !this.options.list) return;
     if (this._draw_list_deferred)
       return this._draw_list_deferred;
     this._draw_list_deferred = new $.Deferred();
@@ -227,34 +230,51 @@ can.Control("CMS.Controllers.TreeLoader", {
     this.on();
 
     var temp_list = [];
-    can.each(list, function(v, i) {
-      var item = that.prepare_child_options(v);
-      temp_list.push(item);
-      if(!item.instance.selfLink) {
-        refresh_queue.enqueue(v.instance);
-      }
-    });
+    if (!is_reload) {
+      list.each(function(v) {
+        var item = that.prepare_child_options(v, force_prepare_chilren);
+        temp_list.push(item);
+         if(!item.instance.selfLink) {
+           refresh_queue.enqueue(v.instance);
+         }
+      });
+    } else {
+      list.each(function(v) {
+        temp_list.push(v);
+      });
+    }
 
     if (this.options.sort_property || this.options.sort_function) {
-      if (this.options.sort_function) {
-        original_function = this.options.sort_function;
-        sort_function = function(old_item, new_item) {
-          return original_function(old_item.instance, new_item.instance);
-        };
+      original_function = this.options.sort_function ||
+                          this._sort_property_comparator(this.options.sort_property);
+      sort_function = function(old_item, new_item) {
+        return original_function(old_item.instance, new_item.instance);
+      };
+      if (original_function.deep_property && original_function.order_factor) {
+        _.each(temp_list, function (v) {
+          v.__sort_key = v.instance.get_deep_property(original_function.deep_property);
+        });
+        temp_list.sort(function(old_item, new_item) {
+          var a = old_item.__sort_key,
+              b = new_item.__sort_key;
+          if (a === b) {
+            return 0;
+          } else if (a < b) {
+            return -original_function.order_factor;
+          } else {
+            return original_function.order_factor;
+          }
+        });
+        _.each(temp_list, function (v) {
+          delete v.__sort_key;
+        });
       } else {
-        sort_prop = this.options.sort_property;
-        sort_function = function(old_item, new_item) {
-          return GGRC.Math.string_less_than(
-            old_item.instance[sort_prop],
-            new_item.instance[sort_prop]
-          );
-        };
+        temp_list.sort(sort_function);
       }
-      temp_list.sort(sort_function);
     }
 
     temp_list = can.map(temp_list, function(o) { if (o.instance.selfLink) return o; });
-    this._draw_list_deferred = this.enqueue_items(temp_list);
+    this._draw_list_deferred = this.enqueue_items(temp_list, is_reload, force_prepare_chilren);
     return this._draw_list_deferred;
   }
   , _loading_started: function() {
@@ -276,24 +296,39 @@ can.Control("CMS.Controllers.TreeLoader", {
       }
     }
 
-  , enqueue_items: function(items) {
+  , _sort_property_comparator: function(property) {
+        return function(old_item, new_item) {
+          var a = old_item[property],
+              b = new_item[property];
+          if (GGRC.Math.string_less_than(a, b)) {
+            return -1;
+          } else if (GGRC.Math.string_less_than(b, a)) {
+            return 1;
+          } else {
+            return 0;
+          }
+        };
+  }
+
+  , enqueue_items: function(items, is_reload, force_prepare_chilren) {
+      is_reload = is_reload === true;
       var that = this, i, filtered_items = [],
-          child_tree_display_list = [];
-
-      if (!items || items.length === 0) {
-        return new $.Deferred().resolve();
-      }
-
-      //Debug: No filter
-      //filtered_items = items;
+          child_tree_display_list = [],
+          refreshed_deferred;
 
       //find current widget model and check if first layer tree
-      if (this.options.parent) { //this is a second label tree
-        var parent_model_name = this.options.parent.options.model.shortName;
-        child_tree_display_list = GGRC.tree_view.sub_tree_for[parent_model_name].display_list;
+      if (GGRC.page_object && this.options.parent) { //this is a second label tree
+        var parent_model_name = this.options.parent.options.model.shortName,
+            parent_instance_type = this.options.parent.options.instance.type;
+        child_tree_display_list =
+          (GGRC.tree_view.sub_tree_for[parent_model_name] ||
+           GGRC.tree_view.sub_tree_for[parent_instance_type] ||
+           {} // all hope is lost, skip filtering
+          ).display_list;
 
         //check if all objects selected, then skip filter
-        if (child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
+        if (child_tree_display_list === undefined ||
+            child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
           //skip filter
           filtered_items = items;
         } else if (child_tree_display_list.length === 0) { //no item is selected to filter, so just return
@@ -314,25 +349,31 @@ can.Control("CMS.Controllers.TreeLoader", {
         this._loading_started();
       }
 
-      $.when.apply($, can.map(filtered_items, function(item) {
-        var instance = item.instance || item;
-        if (instance.custom_attribute_values) {
-          return instance.refresh_all('custom_attribute_values');
-        }
-      })).then(function(){
-        that.insert_items(filtered_items);
-        that._loading_finished();
+      if (!is_reload) {
+        refreshed_deferred = $.when.apply($,
+          can.map(filtered_items, function(item) {
+            var instance = item.instance || item;
+            if (instance.custom_attribute_values) {
+              return instance.refresh_all('custom_attribute_values');
+            }
+          }));
+      } else {
+        refreshed_deferred = new $.Deferred().resolve();
+      }
+      refreshed_deferred.then(function(){
+        that.insert_items(filtered_items, force_prepare_chilren);
+        that._ifNotRemoved(that._loading_finished).call(that);
       });
       return this._loading_deferred;
     }
 
-  , insert_items: function(items) {
+  , insert_items: function(items, force_prepare_chilren) {
       var that = this
         , prepped_items = []
         ;
 
       can.each(items, function(item) {
-        var prepped = that.prepare_child_options(item);
+        var prepped = that.prepare_child_options(item, force_prepare_chilren);
         if (prepped.instance.selfLink) {
           prepped_items.push(prepped);
         }
@@ -576,8 +617,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           this.options.allow_mapping || this.options.allow_creating);
       }
 
-      if (this.element.parent().length === 0) {
-        // element not attached
+      if (this.element.parent().length === 0 // element not attached
+        || this.element.hasClass("entry-list")) { // comment list
         this.options.disable_lazy_loading = true;
       }
       if(!this.options.scroll_element) {
@@ -752,12 +793,15 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }.bind(this)));
     }
 
-  , prepare_child_options: function(v) {
+  , prepare_child_options: function(v, force_reload) {
     //  v may be any of:
     //    <model_instance>
     //    { instance: <model instance>, mappings: [...] }
     //    <TreeOptions>
-    var tmp, that = this;
+    var tmp, that = this, original = v;
+    if (v._child_options_prepared && !force_reload) {
+      return v._child_options_prepared;
+    }
     if(!(v instanceof can.Observe.TreeOptions)) {
       tmp = v;
       v = new can.Observe.TreeOptions();
@@ -786,6 +830,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       return total_children;
     }));
+    original._child_options_prepared = v;
     return v;
   }
 
@@ -955,25 +1000,39 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var that = this
       , current_list = can.makeArray(list)
       , list_window = []
-      , all_draw_items_dfds = []
       , final_dfd
+      , queue = []
+      , op_id = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1
       ;
-
-    //Recursively define tree views anywhere we have subtree configs.
-    function queue_window(list_window) {
-      all_draw_items_dfds.push(that.draw_items(list_window));
-    }
 
     can.each(current_list, function(item) {
       list_window.push(item);
-      if (list_window.length >= 20) {
-        queue_window(list_window);
+      if (list_window.length >= 50) {
+        queue.push(list_window);
         list_window = [];
       }
     });
-    if (list_window.length > 0)
-      queue_window(list_window);
-    final_dfd = $.when.apply($, all_draw_items_dfds);
+    if (list_window.length > 0) {
+      queue.push(list_window);
+    }
+
+    final_dfd = _.foldl(queue, function(dfd, list_window) {
+      return dfd.then(function (all_draw_items) {
+        if (that._add_child_lists_id !== op_id) {
+          return dfd;
+        }
+        var res = $.Deferred();
+        setTimeout(function(){
+          if (that._add_child_lists_id !== op_id) {
+            return;
+          }
+          var draw = that._ifNotRemoved(that.draw_items.bind(that));
+          res.resolve(draw(list_window));
+        }, 0);
+        return res;
+      });
+    }, new $.Deferred().resolve());
+
     final_dfd.done(this._ifNotRemoved(function() {
       this.element.parent().find(".sticky").Stickyfill();
     }.bind(this)));
@@ -984,7 +1043,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       var that = this
         , $footer = this.element.children('.tree-item-add').first()
         , $items = $()
-        , $existing = this.element.children('li.cms_controllers_tree_view_node')
+        , $existing = this.element.children('.cms_controllers_tree_view_node')
         , draw_items_dfds = []
         , sort_prop = this.options.sort_property
         , sort_function = this.options.sort_function
@@ -1004,12 +1063,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       if (sort_prop || sort_function) {
         if (!sort_function) {
-          sort_function = function(old_item, new_item) {
-            return GGRC.Math.string_less_than(
-              old_item[sort_prop],
-              new_item[sort_prop]
-            );
-          }
+          sort_function = this._sort_property_comparator(sort_prop);
         }
 
         $items.each(function(i, item) {
@@ -1018,7 +1072,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             for(j = $existing.length - 1; j >= 0; j--) {
               var old_item = $existing.eq(j).control().options.instance,
                   compare = sort_function(old_item, new_item);
-              if (compare < 0) {
+              if (compare <= 0) {
                 $item.insertAfter($existing.eq(j));
                 $existing.splice(j + 1, 0, item);
                 return;
@@ -1122,6 +1176,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if (this.options.original_list) {
       this.element.children('.cms_controllers_tree_view_node').remove();
     }
+    if (this._add_child_lists_id) {
+      this._add_child_lists_id += 1;
+    }
     return false;
   }
 
@@ -1138,7 +1195,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     model.attr(data[model.constructor.root_object] || data);
     ev.stopPropagation();
   },
-  reload_list: function() {
+  reload_list: function(force_reload) {
     if (this.options.list === undefined){
       return;
     }
@@ -1148,7 +1205,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.options.list.replace([]);
     this._last_visible = [];
     this.element.children('.cms_controllers_tree_view_node').remove();
-    this.draw_list(this.options.original_list);
+    this.draw_list(this.options.original_list, true, force_reload);
     this.init_count();
   },
   "[custom-event] click" : function(el, ev) {
@@ -1230,7 +1287,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.options.attr('display_attr_list', this.options.display_attr_list);
     this.setup_column_width();
 
-    this.reload_list();
+    this.reload_list(true);
     //set user preferences for next time
     can.each(this.options.display_attr_list, function (item) {
       attr_to_save.push(item.attr_name);
@@ -1246,7 +1303,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
   , sort: function (event) {
       var $el = $(event.currentTarget),
-          key = $el.data("field");
+          key = $el.data("field"),
+          key_tree = can.Model.Cacheable.parse_deep_property_descriptor(key);
 
       if (key !== this.options.sort_by) {
           this.options.sort_direction = null;
@@ -1254,17 +1312,23 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       var order = this.options.sort_direction === "asc"
               ? "desc"
-              : "asc";
+              : "asc",
+          order_factor = order === "asc" ? 1 : -1;
 
       this.options.sort_function = function (val1, val2) {
-        var a = val1.get_deep_property(key),
-            b = val2.get_deep_property(key);
-        if (a === b) {
-          return 0;
-        } else {
-          return ((a < b) ^ (order !== 'asc')) ? -1 : 1;
-        }
+        var a = val1.get_deep_property(key_tree),
+            b = val2.get_deep_property(key_tree);
+         if (a > b) {
+           return order_factor;
+         }
+         if (b > a) {
+           return -order_factor;
+         }
+         return 0;
       };
+
+      this.options.sort_function.deep_property = key_tree;
+      this.options.sort_function.order_factor = order_factor;
 
       this.options.sort_direction = order;
       this.options.sort_by = key;

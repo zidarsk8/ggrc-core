@@ -12,8 +12,7 @@ MISSING_COLUMN = ("Line {line}: Missing mandatory column{s} {column_names},"
 MISSING_CUSTOM_ATTRIBUTE_COLUMN = ("Line {line}: Missing custom column"
                                    " {column_name}, when adding object.")
 
-WRONG_OBJECT_TYPE = ("Line {line}: Object type in your CSV file is not set or"
-                     " does not exist. Please fill it in.")
+WRONG_OBJECT_TYPE = "Line {line}: Unknown object type '{object_name}'"
 
 UNKNOWN_COLUMN = ("Line {line}: Attribute '{column_name}' does not"
                   " exist. Column will be ignored.")
@@ -47,8 +46,14 @@ UNKNOWN_USER_ERROR = ("Specified user '{email}' does not exist. That user will"
 OWNER_MISSING = ("Line {line}: Owner field does not contain a valid owner."
                  " You will be assigned as object owner.")
 
+WRONG_MULTI_VALUE = ("Line {line}: {column_name} contains invalid line. The"
+                     " value '{value}' will be ignored.")
+
 WRONG_VALUE = ("Line {line}: {column_name} contains invalid data. The value"
                " will be ignored.")
+
+WRONG_VALUE_ERROR = ("Line {line}: {column_name} contains invalid data. The"
+                     " line will be ignored.")
 
 WRONG_REQUIRED_VALUE = ("Line {line}: Required field {column_name} contains"
                         " invalid data '{value}'. The default value will be"

@@ -1,4 +1,9 @@
-from ggrc_basic_permissions.roles.Creator import _is_owner
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
+from ggrc_basic_permissions.roles.Creator import owner_update
 
 scope = "System"
 description = """
@@ -52,6 +57,11 @@ permissions = {
         "ObjectOwner",
         "Person",
         "Program",
+        "Request",
+        "Response",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
         "Role",
         "UserRole",
         "Context",
@@ -92,7 +102,14 @@ permissions = {
         "PopulationSample",
         "Product",
         "Project",
-        "Relationship",
+        {
+            "type": "Relationship",
+            "terms": {
+                "property_name": "source,destination",
+                "action": "update"
+            },
+            "condition": "relationship",
+        },
         "RelationshipType",
         "SectionBase",
         "Section",
@@ -112,14 +129,12 @@ permissions = {
         "Program",
         "Role",
         "UserRole",
-        "Request",
-        "Response",
         "Context",
         "BackgroundTask",
     ],
     "view_object_page": [
         "__GGRC_ALL__"
     ],
-    "update": _is_owner,
-    "delete": _is_owner
+    "update": owner_update,
+    "delete": owner_update,
 }

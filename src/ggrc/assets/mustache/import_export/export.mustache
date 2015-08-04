@@ -18,7 +18,11 @@
             </div>
           {{else}}
             <h2 class="title">
-              {{export.filename}} <a class="btn-title-change report-title-trigger" href="#"><i class="grcicon-edit"></i></a>
+              {{#if export.data_grid}}
+                Data Grid
+              {{else}}
+                Export Objects
+              {{/if}}
             </h2>
           {{/if}}
         </div>
@@ -40,30 +44,9 @@
                       </button>
                     {{/first_panel}}
                     <select can-value="type" class="input-block-level option-type-selector">
-                      <optgroup label="Governance">
-                        <option value="Program">Programs</option>
-                        <option value="Regulation">Regulations</option>
-                        <option value="Standard">Standards</option>
-                        <option value="Policy">Policies</option>
-                        <option value="Contract">Contracts</option>
-                        <option value="Objective">Objectives</option>
-                        <option value="Control">Controls</option>
-                        <option value="Section">Sections</option>
-                        <option value="Clause">Clauses</option>
-                      </optgroup>
-                      <optgroup label="People/Groups">
-                        <option value="People">People</option>
-                        <option value="OrgGroup">Org Groups</option>
-                      </optgroup>
-                      <optgroup label="Assets/Business">
-                        <option value="System">Systems</option>
-                        <option value="Process">Processes</option>
-                        <option value="DataAsset">Data Assets</option>
-                        <option value="Facility">Facilities</option>
-                        <option value="Market">Markets</option>
-                        <option value="Product">Products</option>
-                        <option value="Project">Projects</option>
-                      </optgroup>
+                      {{#importable}}
+                        <option value="{{model_singular}}" label="{{title_plural}}"></option>
+                      {{/importable}}
                     </select>
                   </div>
                 </div>
@@ -84,7 +67,7 @@
         {{/each}}
       </div>
       <div class="add-rule add-object">
-        <a href="#" id="addAnotherObjectType" class="addFilterRule btn btn-small btn-info">Export another object type</a>
+        <a href="#" id="addAnotherObjectType" class="addFilterRule btn btn-small btn-info">Add another object type</a>
       </div>
     </export-group>
   </div>
@@ -97,12 +80,20 @@
         </label>
       </div>
     {{/data_grid}}
-    <div class="save-template">
-      <div class="btn-group pull-right">
-        <button type="submit" class="btn btn-success btn-small">
-          <i class="grcicon-export-white"></i> Export Data
+    <div class="btn-group pull-right">
+      {{^export.loading}}
+        <button type="submit" id="export-csv-button" class="btn btn-success btn-small">
+          <i class="grcicon-export-white"></i>
+          {{#if export.data_grid}}
+            Export Data Grid
+          {{else}}
+            Export Objects
+          {{/if}}
         </button>
-      </div>
+      {{/loading }}
+      {{#export.loading}}
+        <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+      {{/loading }}
     </div>
   </div>
 </div>
