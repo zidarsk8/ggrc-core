@@ -70,7 +70,7 @@ class CycleTaskGroupObjectTask(
       "secondary_contact": None,
       "start_date": "Start Date",
       "end_date": "End Date",
-      "task_group": {
+      "cycle_task_group": {
           "display_name": "Task Group",
           "mandatory": True,
       },
