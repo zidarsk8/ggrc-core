@@ -905,6 +905,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
     definitions = get_object_column_definitions(wf_models.CycleTaskGroupObjectTask)
     display_names = set([val["display_name"] for val in definitions.values()])
     expected_names = set([
+        "Code",
         "Summary",
         "Task Type",
         "Assignee",
