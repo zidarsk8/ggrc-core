@@ -49,7 +49,6 @@
         {model_singular: "Control", title_plural: "Controls"},
         {model_singular: "ControlAssessment", title_plural: "Control Assessments"},
         {model_singular: "DataAsset", title_plural: "Data Assets"},
-        {model_singular: "Directive", title_plural: "Directives"},
         {model_singular: "Facility", title_plural: "Facilities"},
         {model_singular: "Issue", title_plural: "Issues"},
         {model_singular: "Market", title_plural: "Markets"},
