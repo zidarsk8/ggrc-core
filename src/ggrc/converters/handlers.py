@@ -418,7 +418,11 @@ class OptionColumnHandler(ColumnHandler):
 
   def get_value(self):
     option = getattr(self.row_converter.obj, self.key, None)
-    return "" if option is None else option.title
+    if option is None:
+      return ""
+    if callable(option.title):
+      return option.title()
+    return option.title
 
 
 class CheckboxColumnHandler(ColumnHandler):
