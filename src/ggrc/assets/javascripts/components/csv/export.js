@@ -73,10 +73,10 @@
         {model_singular: "Vendor", title_plural: "Vendors"},
         {model_singular: "Workflow", title_plural: "Workflows"}
       ],
-      exportable = importable.concat([
+      exportable = _.sortBy(importable.concat([
         {model_singular: "CycleTaskGroup", title_plural: "Cycle Task Groups"},
         {model_singular: "CycleTaskGroupObjectTask", title_plural: "Cycle Tasks"}
-      ]);
+      ]), "title_plural");
 
 
   can.Component.extend({
