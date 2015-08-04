@@ -59,3 +59,23 @@ class CycleTaskGroupObjectTask(
                         +"<li>Click \"Approve\" to approve the object.</li>"\
                         +"<li>Click \"Decline\" to decline the object.</li>"\
                         +"</ol>"
+
+  _aliases = {
+      "title": "Summary",
+      "description": "Task Details",
+      "contact": {
+          "display_name": "Assignee",
+          "mandatory": True,
+      },
+      "secondary_contact": None,
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "task_group": {
+          "display_name": "Task Group",
+          "mandatory": True,
+      },
+      "task_type": {
+          "display_name": "Task Type",
+          "mandatory": True,
+      }
+  }
