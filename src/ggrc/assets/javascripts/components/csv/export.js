@@ -250,9 +250,9 @@
     tag: "export-panel",
     template: "<content></content>",
     scope: {
-      importable: exportable,
-      // TODO: change importable to a list of model names
-      // importable: _.compact(_.map(importable, function(name){
+      exportable: exportable,
+      // TODO: change exportable to a list of model names
+      // exportable: _.compact(_.map(exportable, function(name){
       //   return CMS.Models[name];
       // }))
       panel_number: "@",
