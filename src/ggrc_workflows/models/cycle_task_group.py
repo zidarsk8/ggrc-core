@@ -15,6 +15,10 @@ class CycleTaskGroup(
   __tablename__ = 'cycle_task_groups'
   _title_uniqueness = False
 
+  @classmethod
+  def generate_slug_prefix_for(cls, obj):
+    return "CYCLEGROUP"
+
   VALID_STATES = (u'Assigned', u'InProgress', u'Finished', u'Verified', u'Declined')
 
   cycle_id = db.Column(
