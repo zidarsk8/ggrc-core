@@ -51,8 +51,9 @@
         });
       }
     },
-    allowed_to_map: function (source, target) {
-      var target_type, source_type, resource_type, context_id, can_map;
+    allowed_to_map: function (source, target, options) {
+      var can_map = false,
+          target_type, source_type, resource_type, context_id;
 
       target_type = target instanceof can.Model ? target.constructor.shortName
                                                 : (target.type || target);
@@ -73,7 +74,9 @@
           can_map = Permission.is_allowed_for("update", target);
         }
       } else {
-        can_map = resource_type && Permission.is_allowed("create", resource_type, context_id);
+        if ((options && !(options.hash && options.hash.join)) || resource_type) {
+          can_map = Permission.is_allowed("create", resource_type, context_id);
+        }
       }
       return can_map;
     }
