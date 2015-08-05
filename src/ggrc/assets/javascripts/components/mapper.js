@@ -36,11 +36,11 @@
       },
       get_forbidden: function (type) {
         var forbidden = {
-          "program": ["audit"],
-          "audit": ["request", "controlassessment"],
-          "controlassessment": ["audit", "control"]
+          "Program": ["Audit"],
+          "Audit": ["Request", "ControlAssessment"],
+          "ControlAssessment": ["Audit", "Control"]
         };
-        return forbidden[type.toLowerCase()] ? forbidden[type.toLowerCase()] : [];
+        return forbidden[type] ? forbidden[type] : [];
       },
       types: can.compute(function () {
         var selector_list,
@@ -72,7 +72,7 @@
 
         selector_list = _.intersection(_.keys(canonical), list);
         can.each(selector_list, function (model_name) {
-          if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name.toLowerCase())) {
+          if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name)) {
             return;
           }
           var cms_model = CMS.Models[model_name],
