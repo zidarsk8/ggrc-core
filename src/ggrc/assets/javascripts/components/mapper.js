@@ -28,7 +28,7 @@
       get_instance: can.compute(function () {
         return CMS.Models.get_instance(this.attr("object"), this.attr("join_object_id"));
       }),
-      get_plural: function (instance, plural) {
+      get_binding_name: function (instance, plural) {
         return (instance.has_binding(plural) ? "" : "related_") + plural;
       },
       model_from_type: function (type) {
@@ -147,12 +147,12 @@
       "addNew": function (el, ev, model) {
         var entries = this.scope.attr("mapper.entries"),
             len = entries.length,
-            get_plural = this.scope.attr("mapper").get_plural,
+            get_binding_name = this.scope.attr("mapper").get_binding_name,
             binding, mapping, selected, item;
 
         if (!len) {
           selected = this.scope.attr("mapper.get_instance");
-          binding = selected.get_binding(get_plural(selected, model.constructor.table_plural));
+          binding = selected.get_binding(get_binding_name(selected, model.constructor.table_plural));
           mapping = [];
         } else {
           binding = entries[0].binding;
@@ -225,9 +225,9 @@
         if (this.scope.attr("mapper.search_only")) {
           return;
         }
-        var get_plural = this.scope.attr("mapper").get_plural,
+        var get_binding_name = this.scope.attr("mapper").get_binding_name,
             selected = this.scope.attr("mapper.get_instance"),
-            table_plural = get_plural(selected, this.scope.attr("mapper.model.table_plural")),
+            table_plural = get_binding_name(selected, this.scope.attr("mapper.model.table_plural")),
             binding;
 
         if (!selected.has_binding(table_plural)) {
