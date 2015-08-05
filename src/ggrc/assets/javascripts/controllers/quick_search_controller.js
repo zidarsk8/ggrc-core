@@ -340,18 +340,16 @@ can.Control("CMS.Controllers.LHN", {
 
   , init_lhn: function() {
       CMS.Models.DisplayPrefs.getSingleton().done(function(prefs) {
-        var checked,
-            $lhs = $("#lhs"),
+        var $lhs = $("#lhs"),
             lhn_search_dfd,
             my_work_tab = false;
 
         this.options.display_prefs = prefs;
-        checked = my_work_tab;
 
         if (typeof prefs.getLHNState().my_work !== "undefined") {
-          checked = !!prefs.getLHNState().my_work;
+          my_work_tab = !!prefs.getLHNState().my_work;
         }
-        this.obs.attr("my_work", checked);
+        this.obs.attr("my_work", my_work_tab);
 
         lhn_search_dfd = $lhs
           .cms_controllers_lhn_search({
