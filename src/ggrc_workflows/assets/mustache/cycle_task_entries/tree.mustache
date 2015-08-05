@@ -26,12 +26,13 @@
         </small>
       {{else}}
         <div class="oneline">
-          <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach supporting file" link_class="entry-attachment tree-item-add" click_event="trigger_upload_parent">
-          </ggrc-gdrive-picker-launcher>
-          {{^if workflowFolder}}
-          <small class="error-inline">
-            <strong>Warning:</strong> Workflow folder is not set. Files will be placed in your Gdrive root folder.
-          </small>
+          {{#if workflowFolder}}
+            <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach supporting file" link_class="entry-attachment tree-item-add" click_event="trigger_upload_parent">
+            </ggrc-gdrive-picker-launcher>
+          {{else}}
+            <small class="error-inline">
+              <strong>Warning:</strong> Workflow folder is not set. Please select a folder before uploading files.
+            </small>
           {{/if}}
         </div>
       {{/need_permission}}
