@@ -101,17 +101,6 @@ class QueryHelper(object):
       object_query["ids"] = self.get_object_ids(object_query)
     return self.query
 
-  def _get_attr(self, object_class, key):
-    """ get class attr by attribute name or display name """
-    attr = getattr(object_class, key.lower(), None)
-    if attr is None:
-      mapped_name = self.attr_name_map[object_class][key.lower()]
-      attr = getattr(object_class, mapped_name, None)
-    if attr is None:
-      raise Exception("Bad search query: object '{}' does not have "
-                      "attribute '{}'.".format(object_class.__name__, key))
-    return attr
-
   def get_object_ids(self, object_query):
     """ get a set of object ids describideb in the filters """
     object_name = object_query["object_name"]
@@ -124,55 +113,55 @@ class QueryHelper(object):
     def build_expression(exp):
       if "op" not in exp:
         return None
-      if exp["op"]["name"] == "AND":
-        return and_(build_expression(exp["left"]),
-                    build_expression(exp["right"]))
-      elif exp["op"]["name"] == "OR":
-        return or_(build_expression(exp["left"]),
-                   build_expression(exp["right"]))
-      elif exp["op"]["name"] == "=":
-        return self._get_attr(object_class, exp["left"]) == exp["right"]
-      elif exp["op"]["name"] == "!=":
-        return self._get_attr(object_class, exp["left"]) != exp["right"]
-      elif exp["op"]["name"] == "~":
-        return self._get_attr(object_class, exp["left"]).ilike(
-            "%{}%".format(exp["right"]))
-      elif exp["op"]["name"] == "!~":
-        return not_(self._get_attr(object_class, exp["left"]).ilike(
-            "%{}%".format(exp["right"])))
-      elif exp["op"]["name"] == "relevant":
-        if exp["object_name"] == "__previous__":
-          query = self.query[exp["ids"][0]]
-          return object_class.id.in_(
-              RelationshipHelper.get_ids_related_to(
-                  object_name,
-                  query["object_name"],
-                  query["ids"],
-              )
-          )
-        else:
-          return object_class.id.in_(
-              RelationshipHelper.get_ids_related_to(
-                  object_name,
-                  exp["object_name"],
-                  exp["ids"],
-              )
-          )
-      elif exp["op"]["name"] == "text_search":
-        text_exp = None
-        for field in object_query.get("fields", []):
-          text_exp = or_(text_exp, getattr(object_class, field)
-                         .ilike("%{}%".format(exp["text"])))
-        return text_exp
+      def relevant():
+        query = (self.query[exp["ids"][0]]
+                 if exp["object_name"] == "__previous__" else exp)
+        return object_class.id.in_(
+            RelationshipHelper.get_ids_related_to(
+                object_name,
+                query["object_name"],
+                query["ids"],
+            )
+        )
 
-      return None
+      text_search = lambda: or_(
+          *(getattr(object_class, field).ilike("%{}%".format(exp["text"]))
+            for field in object_query.get("fields", []))
+      )
 
+      def get_left():
+        key  = exp["left"]
+        attr = getattr(object_class, key.lower(), None)
+        if attr is None:
+          mapped_name = self.attr_name_map[object_class][key.lower()]
+          attr = getattr(object_class, mapped_name, None)
+        if attr is None:
+          raise Exception("Bad search query: object '{}' does not have "
+                          "attribute '{}'.".format(object_class.__name__, key))
+        return attr
+
+      lift_bin = lambda f: f(build_expression(exp["left"]),
+                             build_expression(exp["right"]))
+
+      ops = {
+        "AND": lambda: lift_bin(and_),
+        "OR": lambda: lift_bin(or_),
+        "=": lambda: get_left() == exp["right"],
+        "!=": lambda: get_left() != exp["right"],
+        "~": lambda: get_left().ilike("%{}%".format(exp["right"])),
+        "!~": lambda: not_(get_left().ilike("%{}%".format(exp["right"]))),
+        "relevant": relevant,
+        "text_search": text_search
+      }
+
+      return ops.get(exp["op"]["name"], lambda: None)()
+
+    query = object_class.query
     filter_expression = build_expression(expression)
-    if filter_expression is None:
-      objects = object_class.query.all()
-    else:
-      objects = object_class.query.filter(filter_expression).all()
-    object_ids = [o.id for o in objects]
+    if filter_expression is not None:
+      query = query.filter(filter_expression)
+    objects = query.all()
+    object_ids = [o.id for o in query.all()]
     return object_ids
 
   def slugs_to_ids(self, object_name, slugs):
