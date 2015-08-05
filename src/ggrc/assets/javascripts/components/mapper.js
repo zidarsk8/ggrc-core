@@ -278,6 +278,13 @@
       "get_title": function (options) {
         var instance = this.attr("mapper.get_instance");
         return instance && instance.title ? instance.title : this.attr("mapper.object");
+      },
+      "get_object": function (options) {
+        var type = CMS.Models[this.attr("mapper.type")];
+        if (type && type.title_plural) {
+          return type.title_plural;
+        }
+        return "Objects";
       }
     }
   });
