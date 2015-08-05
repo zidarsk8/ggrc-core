@@ -209,11 +209,11 @@ class WorkflowPersonColumnHandler(UserColumnHandler):
 
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
-    "workflow": WorkflowColumnHandler,
-    "task_group": TaskGroupColumnHandler,
     "notify_on_change": CheckboxColumnHandler,
-    "relative_start_date": TaskStartColumnHandler,
     "relative_end_date": TaskEndColumnHandler,
+    "relative_start_date": TaskStartColumnHandler,
+    "task_group": TaskGroupColumnHandler,
     "task_type": TaskTypeColumnHandler,
+    "workflow": WorkflowColumnHandler,
     "workflow_mapped": WorkflowPersonColumnHandler,
 }
