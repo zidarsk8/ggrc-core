@@ -133,6 +133,10 @@ can.Control("CMS.Controllers.Dashboard", {
     }
   }
 
+    , ".nav-logout click": function (el, ev) {
+      can.Model.LocalStorage.clearAll();
+    }
+
   , open_nav: function (el) {
     el || (el = $(".nav-trigger"));
     var options = {
