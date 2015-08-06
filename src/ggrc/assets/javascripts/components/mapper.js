@@ -17,6 +17,7 @@
       model: {},
       bindings: {},
       is_loading: false,
+      page_loading: false,
       is_saving: false,
       all_selected: false,
       search_only: false,
@@ -285,6 +286,12 @@
           return type.title_plural;
         }
         return "Objects";
+      },
+      "loading_or_saving": function (options) {
+        if (this.attr("mapper.page_loading") || this.attr("mapper.is_saving")) {
+          return options.fn();
+        }
+        return options.inverse();
       }
     }
   });
@@ -295,12 +302,7 @@
     scope: {
       "items-per-page": "@",
       page: 0,
-
-      select_all: false,
-      page_loading: false,
-      loading_or_saving: can.compute(function () {
-        return this.attr("page_loading") || this.attr("mapper.is_saving");
-      })
+      select_all: false
     },
     events: {
       "inserted":  function () {
@@ -399,7 +401,7 @@
         };
       },
       "drawPage": function () {
-        if (this.scope.attr("page_loading")) {
+        if (this.scope.attr("mapper.page_loading")) {
           return;
         }
         var page = this.scope.attr("page"),
@@ -412,10 +414,10 @@
         if (!page_items.length) {
           return;
         }
-        this.scope.attr("page_loading", true);
+        this.scope.attr("mapper.page_loading", true);
 
         return que.enqueue(_.pluck(page_items, "instance")).trigger().then(function (models) {
-          this.scope.attr("page_loading", false);
+          this.scope.attr("mapper.page_loading", false);
           this.scope.attr("page", next_page);
 
           options.push.apply(options, can.map(models, this.getItem.bind(this)));
@@ -437,6 +439,9 @@
         return GGRC.Models.Search.search_for_types(data.term || "", data.model_name, data.options);
       },
       "getResults": function () {
+        if (this.scope.attr("mapper.page_loading") || this.scope.attr("mapper.is_saving")) {
+          return;
+        }
         var model_name = this.scope.attr("type"),
             contact = this.scope.attr("contact"),
             permission_parms = {},
@@ -458,7 +463,7 @@
           permission_parms.contact_id = contact.id;
         }
 
-        this.scope.attr("page_loading", true);
+        this.scope.attr("mapper.page_loading", true);
         relevant = _.map(this.scope.attr("mapper.relevant"), function (relevant) {
           return {
             model_name: relevant.model_name,
@@ -484,7 +489,7 @@
                 : search[0];
 
         list.refresh_stubs().then(function (options) {
-          this.scope.attr("page_loading", false);
+          this.scope.attr("mapper.page_loading", false);
           this.scope.attr("entries", options);
           this.drawPage();
         }.bind(this));
