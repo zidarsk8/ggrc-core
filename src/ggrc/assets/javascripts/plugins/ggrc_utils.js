@@ -14,7 +14,7 @@
         return false;
       });
     },
-    download: function(filename, text) {
+    download: function (filename, text) {
       var element = document.createElement('a');
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
       element.setAttribute('download', filename);
@@ -35,6 +35,50 @@
         url: "/_service/export_csv",
         data: JSON.stringify(request.data || {})
       });
+    },
+    is_mapped: function (target, destination) {
+      var table_plural = CMS.Models[destination.type].table_plural,
+          bindings = target.get_binding((target.has_binding(table_plural) ? "" : "related_") + table_plural);
+
+      if (bindings && bindings.list && bindings.list.length) {
+        return _.find(bindings.list, function (item) {
+          return item.instance.id === destination.id;
+        });
+      }
+      if (target.objects && target.objects.length) {
+        return _.find(target.objects, function (item) {
+          return item.id === destination.id && item.type === destination.type;
+        });
+      }
+    },
+    allowed_to_map: function (source, target, options) {
+      var can_map = false,
+          target_type, source_type, resource_type, context_id;
+
+      target_type = target instanceof can.Model ? target.constructor.shortName
+                                                : (target.type || target);
+      source_type = source.constructor.shortName || source;
+      context_id = source.context ? source.context.id : null;
+      resource_type = GGRC.Mappings.join_model_name_for(source_type, target_type);
+
+      if (!(source instanceof CMS.Models.Program)
+        && target instanceof CMS.Models.Program) {
+        context_id = target.context ? target.context.id : null;
+      }
+
+      if ((!resource_type && target_type === "Cacheable")
+          || resource_type === "Relationship") {
+
+        can_map = Permission.is_allowed_for("update", source);
+        if (target instanceof can.Model) {
+          can_map = Permission.is_allowed_for("update", target);
+        }
+      } else {
+        if ((options && !(options.hash && options.hash.join)) || resource_type) {
+          can_map = Permission.is_allowed("create", resource_type, context_id);
+        }
+      }
+      return can_map;
     }
   };
 })(jQuery, window.GGRC = window.GGRC || {});

@@ -13,6 +13,7 @@ from ggrc.converters.handlers import ColumnHandler
 from ggrc.converters.handlers import UserColumnHandler
 from ggrc.converters.handlers import CheckboxColumnHandler
 from ggrc.converters import errors
+from ggrc_workflows.models import CycleTaskGroup
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import Workflow
 from ggrc_workflows.models import WorkflowPerson
@@ -93,6 +94,16 @@ class TaskGroupColumnHandler(ParentColumnHandler):
     """ init task group handler """
     self.parent = TaskGroup
     super(TaskGroupColumnHandler, self).__init__(row_converter, key, **options)
+
+
+class CycleTaskGroupColumnHandler(ParentColumnHandler):
+
+  """ handler for task group column in task group tasks """
+
+  def __init__(self, row_converter, key, **options):
+    """ init task group handler """
+    self.parent = CycleTaskGroup
+    super(CycleTaskGroupColumnHandler, self).__init__(row_converter, key, **options)
 
 
 class TaskDateColumnHandler(ColumnHandler):
@@ -209,6 +220,7 @@ class WorkflowPersonColumnHandler(UserColumnHandler):
 
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
+    "cycle_task_group": CycleTaskGroupColumnHandler,
     "notify_on_change": CheckboxColumnHandler,
     "relative_end_date": TaskEndColumnHandler,
     "relative_start_date": TaskStartColumnHandler,

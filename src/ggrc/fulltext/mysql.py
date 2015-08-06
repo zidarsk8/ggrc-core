@@ -67,14 +67,22 @@ class MysqlIndexer(SqlIndexer):
       if permission_type == 'read':
         contexts = permissions.read_contexts_for(
             permission_model or model_name)
+        resources = permissions.read_resources_for(
+            permission_model or model_name)
       elif permission_type == 'create':
         contexts = permissions.create_contexts_for(
+            permission_model or model_name)
+        resources = permissions.create_resources_for(
             permission_model or model_name)
       elif permission_type == 'update':
         contexts = permissions.update_contexts_for(
             permission_model or model_name)
+        resources = permissions.update_resources_for(
+            permission_model or model_name)
       elif permission_type == 'delete':
         contexts = permissions.delete_contexts_for(
+            permission_model or model_name)
+        resources = permissions.delete_resources_for(
             permission_model or model_name)
 
       if permission_model and contexts:
@@ -83,11 +91,15 @@ class MysqlIndexer(SqlIndexer):
 
       if contexts is not None:
         # Don't filter out None contexts here
-        if None not in contexts:
+        if None not in contexts and permission_type == "read":
           contexts.append(None)
-        type_query = and_(
+
+        type_query = or_(and_(
             MysqlRecordProperty.type == model_name,
-            context_query_filter(MysqlRecordProperty.context_id, contexts))
+            context_query_filter(MysqlRecordProperty.context_id, contexts)),
+            and_(
+                MysqlRecordProperty.type == model_name,
+                MysqlRecordProperty.key.in_(resources)))
         type_queries.append(type_query)
 
     return and_(

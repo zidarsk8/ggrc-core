@@ -16,4 +16,7 @@ IMPORTABLE = {
     "task_group_task": models.TaskGroupTask,
     "taskgrouptask": models.TaskGroupTask,
     "task": models.TaskGroupTask,
+    "cycle": models.Cycle,
+    "cycle_task_group": models.CycleTaskGroup,
+    "cycle_task_group_object_task": models.CycleTaskGroupObjectTask,
 }
