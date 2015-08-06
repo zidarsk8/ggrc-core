@@ -130,15 +130,17 @@ class QueryHelper(object):
       )
 
       def with_left(p):
-        key  = exp["left"]
-        attr = getattr(object_class, key.lower(), None)
-        if attr is None:
-          mapped_name = self.attr_name_map[object_class][key.lower()]
-          attr = getattr(object_class, mapped_name, None)
-        if attr is None:
-          raise Exception("Bad search query: object '{}' does not have "
-                          "attribute '{}'.".format(object_class.__name__, key))
-        return p(attr)
+        key = exp["left"].lower()
+        key = self.attr_name_map[object_class].get(key, key)
+        filter_by = getattr(object_class, "_filter_by_"+key, None)
+        if hasattr(filter_by, "__call__"):
+          return filter_by(p)
+        else:
+          attr = getattr(object_class, key, None)
+          if attr is None:
+            raise Exception("Bad search query: object '{}' does not have "
+                            "attribute '{}'.".format(object_class.__name__, key))
+          return p(attr)
 
       lift_bin = lambda f: f(build_expression(exp["left"]),
                              build_expression(exp["right"]))
