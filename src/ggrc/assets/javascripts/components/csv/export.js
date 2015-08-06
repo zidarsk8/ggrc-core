@@ -20,9 +20,9 @@
         relevant: can.compute(function () {
           return new can.List();
         }),
-        columns: function () {
+        columns: can.compute(function () {
           return GGRC.model_attr_defs[this.attr("type")];
-        }
+        })
       }),
       panelsModel = can.Map({
         items: new can.List()
@@ -268,6 +268,7 @@
         if (!panel_number && url.relevant_id && url.relevant_type) {
           this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }
+        this.setSelected();
       },
       "[data-action=attribute_select_toggle] click": function (el, ev) {
         var items = GGRC.model_attr_defs[this.scope.attr("item.type")],
@@ -283,10 +284,17 @@
           this.scope.attr("item.selected." + attr.key, el.data("value"));
         }.bind(this));
       },
+      "setSelected": function () {
+        this.scope.attr("item.selected", _.reduce(this.scope.attr("item.columns"), function (memo, data) {
+          memo[data.key] = true;
+          return memo;
+        }, {}));
+      },
       "{scope.item} type": function () {
         this.scope.attr("item.selected", {});
         this.scope.attr("item.relevant", []);
         this.scope.attr("item.filter", "");
+        this.setSelected();
       }
     },
     helpers: {
