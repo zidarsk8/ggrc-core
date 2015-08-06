@@ -66,10 +66,15 @@ class QueryHelper(object):
       aliases = AttributeInfo.gather_aliases(object_class)
       self.attr_name_map[object_class] = {}
       for key, value in aliases.items():
+        filter_by = None
         if type(value) is dict:
+          filter_name = value.get("filter_by", None)
+          if filter_name is not None:
+            filter_by = getattr(object_class, filter_name, None)
           value = value["display_name"]
         if value:
-          self.attr_name_map[object_class][value.lower()] = key.lower()
+          self.attr_name_map[object_class][value.lower()] = (key.lower(),
+                                                             filter_by)
 
   def clean_query(self, query):
     """ sanitize the query object """
@@ -131,8 +136,7 @@ class QueryHelper(object):
 
       def with_left(p):
         key = exp["left"].lower()
-        key = self.attr_name_map[object_class].get(key, key)
-        filter_by = getattr(object_class, "_filter_by_"+key, None)
+        key, filter_by = self.attr_name_map[object_class].get(key, (key, None))
         if hasattr(filter_by, "__call__"):
           return filter_by(p)
         else:

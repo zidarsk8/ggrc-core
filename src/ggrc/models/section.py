@@ -56,7 +56,12 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   ]
   _sanitize_html = ['notes']
   _include_links = []
-  _aliases = {"directive": "Policy / Regulation / Standard"}
+  _aliases = {
+     "directive": {
+       "display_name": "Policy / Regulation / Standard",
+       "filter_by": "_filter_by_directive",
+     }
+  }
 
   @classmethod
   def _filter_by_directive(cls, predicate):

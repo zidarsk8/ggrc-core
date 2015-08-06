@@ -89,6 +89,7 @@ class Ownable(object):
       "owners": {
           "display_name": "Owner",
           "mandatory": True,
+          "filter_by": "_filter_by_owners",
       }
   }
 

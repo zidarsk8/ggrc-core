@@ -66,7 +66,10 @@ class Audit(
   _include_links = []
 
   _aliases = {
-      "program": "Program",
+      "program": {
+        "display_name": "Program",
+        "filter_by": "_filter_by_program",
+      },
       "user_role:Auditor": "Auditors",
       "status": "Status",
       "start_date": "Planned Start Date",
