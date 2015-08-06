@@ -260,9 +260,9 @@ class MappingColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
-    self.mapping_name = key[len(MAPPING_PREFIX):]
     importable = get_importables()
-    self.mapping_object = importable.get(self.mapping_name)
+    self.attr_name = options.get("attr_name", "")
+    self.mapping_object = importable.get(self.attr_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
     super(MappingColumnHandler, self).__init__(row_converter, key, **options)
