@@ -77,11 +77,9 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
   cycles = db.relationship(
       'Cycle', backref='workflow', cascade='all, delete-orphan')
 
-  next_cycle_start_date = deferred(
-      db.Column(db.Date, nullable=True), 'Workflow')
+  next_cycle_start_date = db.Column(db.Date, nullable=True)
 
-  non_adjusted_next_cycle_start_date = deferred(
-      db.Column(db.Date, nullable=True), 'Workflow')
+  non_adjusted_next_cycle_start_date = db.Column(db.Date, nullable=True)
 
   @computed_property
   def workflow_state(self):

@@ -12,7 +12,6 @@ Create Date: 2015-07-07 14:31:27.780564
 """
 
 # revision identifiers, used by Alembic.
-
 revision = '44047daa31a9'
 down_revision = '3605dca868e4'
 
@@ -24,22 +23,20 @@ from datetime import date
 from ggrc.app import app
 from ggrc import settings, db
 import ggrc_workflows.models as models
+from ggrc_workflows import adjust_next_cycle_start_date
+from ggrc_workflows.services.workflow_cycle_calculator import \
+    get_cycle_calculator
+
 
 def upgrade():
-    op.add_column('workflows', sa.Column('non_adjusted_next_cycle_start_date', sa.Date(), nullable=True))
+    op.add_column('workflows',
+                  sa.Column('non_adjusted_next_cycle_start_date',
+                  sa.Date(), nullable=True))
 
-    from ggrc_workflows import adjust_next_cycle_start_date
-    from ggrc_workflows.services.workflow_cycle_calculator import get_cycle_calculator
-
-
-    # Get all active workflows that have:
-    # 1. next_cycle_start_date_set,
-    # 2. are non-one time
-    # 3. are active
-    # 4. it's tasks have relative days set OR has any tasks at all
     workflows = db.session.query(models.Workflow) \
         .filter(
         models.Workflow.next_cycle_start_date != None,
+        models.Workflow.non_adjusted_next_cycle_start_date == None,
         models.Workflow.recurrences == True,
         models.Workflow.status == 'Active',
         models.Workflow.next_cycle_start_date >= date.today()
@@ -54,8 +51,6 @@ def upgrade():
                             for tg in workflow.task_groups
                             for task in tg.task_group_tasks]
 
-        pre_compute_ncsd = workflow.next_cycle_start_date
-
         # We must skip tasks that don't have start days and end days defined
         if ((not all(tasks_start_days) and not all(tasks_end_days)) or
             (not tasks_start_days and not tasks_end_days)):
@@ -66,37 +61,76 @@ def upgrade():
                     workflow.id))
             continue
 
-        # We want to calculate values as if we are on the date of
-        # next cycle start date (either in the past or in the future).
-        #
-        # That is why we first get the minimum relative start, convert
-        # to date manually to avoid  and instantiate a new calculator with base date
-        # on that date.
-        calculator = get_cycle_calculator(workflow)
-        if workflow.frequency in {"weekly", "monthly"}:
-            start_day = min(
-                v['relative_start'] for v in calculator.reified_tasks.values())
-            start_date = calculator.relative_day_to_date(
-                relative_day=start_day)
+        pre_compute_ncsd = workflow.next_cycle_start_date
+        last_cycle_start_date = None
+        if workflow.cycles:
+            last_cycle_start_date = max([c.start_date for c in workflow.cycles])
+
+        if last_cycle_start_date:
+            base_date = last_cycle_start_date
         else:
-            start_month, start_day = min(
+            base_date = base_date.today()
+
+        base_date = max(base_date, workflow.next_cycle_start_date)
+        calculator = get_cycle_calculator(workflow, base_date=base_date)
+
+        if workflow.frequency in {"weekly", "monthly"}:
+            nancsd_day = min(
                 v['relative_start'] for v in calculator.reified_tasks.values())
-            start_date = calculator.relative_day_to_date(
-                relative_day=start_day,
-                relative_month=start_month)
+            nancsd_month = None
+        else:
+            nancsd_month, nancsd_day = min(
+                v['relative_start'] for v in calculator.reified_tasks.values())
 
-        calculator = get_cycle_calculator(workflow, base_date=start_date)
-        adjust_next_cycle_start_date(calculator, workflow)
+        nancsd_date = calculator.relative_day_to_date(
+            relative_day=nancsd_day,
+            relative_month=nancsd_month,
+            base_date=base_date)
+
+        if last_cycle_start_date:
+            while calculator.adjust_date(nancsd_date) <= last_cycle_start_date:
+                base_date = base_date + calculator.time_delta
+                nancsd_date = calculator.relative_day_to_date(
+                    relative_day=nancsd_day,
+                    relative_month=nancsd_month,
+                    base_date=base_date
+                )
+        else:
+            base_date = base_date - calculator.time_delta
+            while calculator.adjust_date(nancsd_date) <= pre_compute_ncsd:
+                base_date = base_date + calculator.time_delta
+                nancsd_date = calculator.relative_day_to_date(
+                    relative_day=nancsd_day,
+                    relative_month=nancsd_month,
+                    base_date=base_date
+                )
+
+        workflow.non_adjusted_next_cycle_start_date = nancsd_date
+        workflow.next_cycle_start_date = calculator.adjust_date(nancsd_date)
         post_compute_ncsd = workflow.next_cycle_start_date
-        if (pre_compute_ncsd != post_compute_ncsd and
-                post_compute_ncsd not in [c.start_date for c in workflow.cycles]):
-            start_dates = ["{}/{}".format(task.relative_start_month, task.relative_start_day) for tg in workflow.task_groups for task in tg.task_group_tasks]
-            end_dates = ["{}/{}".format(task.relative_end_month, task.relative_end_day) for tg in workflow.task_groups for task in tg.task_group_tasks]
 
-            app.logger.info("Fixed next cycle start date for Workflow with ID: {}; Freq: {}, PRE: {}, POST: {}, NON: {}, tasks start: {}, tasks end: {}".format(
+        start_dates = ["{}/{}".format(
+            task.relative_start_month,
+            task.relative_start_day) for tg in workflow.task_groups
+                                     for task in tg.task_group_tasks]
+        end_dates = ["{}/{}".format(
+            task.relative_end_month,
+            task.relative_end_day) for tg in workflow.task_groups
+                                   for task in tg.task_group_tasks]
+
+        diff_mark = ""
+        if pre_compute_ncsd != post_compute_ncsd:
+            diff_mark = "!! ADJUSTED !! "
+
+        app.logger.info(
+            "{}Workflow with ID: "
+            "{}; Freq: {}, PRE: {}, Last cycle: {}, POST: {}, NON: {},"
+            "tasks start: {}, tasks end: {},".format(
+                diff_mark,
                 workflow.id,
                 workflow.frequency[:2],
                 pre_compute_ncsd,
+                last_cycle_start_date,
                 post_compute_ncsd,
                 workflow.non_adjusted_next_cycle_start_date,
                 start_dates,

@@ -852,47 +852,49 @@ def adjust_next_cycle_start_date(calculator, workflow, base_date=None, move_forw
     workflow: Workflow that will have non adjusted and adjusted next cycle
               start date adjusted.
   """
-  if workflow.recurrences:
-    # If cycles were not generated already, recalculate start date with
-    # fresh start.
-    if not workflow.cycles:
-      workflow.next_cycle_start_date = None
-      workflow.non_adjusted_next_cycle_start_date = None
-    else:
-      if not workflow.non_adjusted_next_cycle_start_date:
-        last_cycle_start_date = max([c.start_date for c in workflow.cycles])
-        first_task = calculator.tasks[0]
+  if not workflow.recurrences:
+    return
 
-        if last_cycle_start_date.day > first_task.relative_start_day:
-          last_cycle_start_date = last_cycle_start_date + calculator.time_delta
+  # If cycles were not generated already, recalculate start date with
+  # fresh start.
+  if not workflow.cycles:
+    workflow.next_cycle_start_date = None
+    workflow.non_adjusted_next_cycle_start_date = None
+  else:
+    if not workflow.non_adjusted_next_cycle_start_date:
+      last_cycle_start_date = max([c.start_date for c in workflow.cycles])
+      first_task = calculator.tasks[0]
 
-        workflow.non_adjusted_next_cycle_start_date = calculator.relative_day_to_date(
-            relative_day=first_task.relative_start_day,
-            relative_month=first_task.relative_start_month,
-            base_date=last_cycle_start_date
-        )
+      if last_cycle_start_date.day > first_task.relative_start_day:
+        last_cycle_start_date = last_cycle_start_date + calculator.time_delta
 
-    # Unless we are moving forward one interval we just want to recalculate
-    # the next_cycle_start_date to reflect the latest changes to the
-    # task(s) - therefore, we just unwind one time unit backward and calculate
-    # new next cycle start date.
-    if not move_forward and workflow.non_adjusted_next_cycle_start_date:
-      workflow.non_adjusted_next_cycle_start_date = workflow.non_adjusted_next_cycle_start_date - calculator.time_delta
+      workflow.non_adjusted_next_cycle_start_date = calculator.relative_day_to_date(
+          relative_day=first_task.relative_start_day,
+          relative_month=first_task.relative_start_month,
+          base_date=last_cycle_start_date
+      )
 
+  # Unless we are moving forward one interval we just want to recalculate
+  # the next_cycle_start_date to reflect the latest changes to the
+  # task(s) - therefore, we just unwind one time unit backward and calculate
+  # new next cycle start date.
+  if not move_forward and workflow.non_adjusted_next_cycle_start_date:
+    workflow.non_adjusted_next_cycle_start_date = workflow.non_adjusted_next_cycle_start_date - calculator.time_delta
+
+  non_adjusted_ncsd = calculator.non_adjusted_next_cycle_start_date(
+    base_date=workflow.non_adjusted_next_cycle_start_date)
+
+  # In an edge case where we unwinded into the past for editing and
+  # the next cycle start date returned back is less than or equal today,
+  # we shouldn't have unwinded - therefore, we recalculate with
+  # original value.
+  if non_adjusted_ncsd <= date.today():
+    workflow.non_adjusted_next_cycle_start_date = workflow.non_adjusted_next_cycle_start_date + calculator.time_delta
     non_adjusted_ncsd = calculator.non_adjusted_next_cycle_start_date(
       base_date=workflow.non_adjusted_next_cycle_start_date)
 
-    # In an edge case where we unwinded into the past for editing and
-    # the next cycle start date returned back is less than or equal today,
-    # we shouldn't have unwinded - therefore, we recalculate with
-    # original value.
-    if non_adjusted_ncsd <= date.today():
-      workflow.non_adjusted_next_cycle_start_date = workflow.non_adjusted_next_cycle_start_date + calculator.time_delta
-      non_adjusted_ncsd = calculator.non_adjusted_next_cycle_start_date(
-        base_date=workflow.non_adjusted_next_cycle_start_date)
-
-    workflow.non_adjusted_next_cycle_start_date = non_adjusted_ncsd
-    workflow.next_cycle_start_date = calculator.adjust_date(non_adjusted_ncsd)
+  workflow.non_adjusted_next_cycle_start_date = non_adjusted_ncsd
+  workflow.next_cycle_start_date = calculator.adjust_date(non_adjusted_ncsd)
 
 class WorkflowRoleContributions(RoleContributions):
   contributions = {

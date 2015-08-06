@@ -24,28 +24,8 @@ from ggrc_workflows.models import *
 from ggrc_workflows.models.mixins import RelativeTimeboxed
 
 def upgrade():
-  
-  today = date.today()
-  
-  # Get all active workflows with no next_cycle_start_date
-  workflows = db.session.query(models.Workflow)\
-    .filter(
-        models.Workflow.next_cycle_start_date == None,
-        models.Workflow.recurrences == True,
-        models.Workflow.status == 'Active'
-        ).all()
-
-  from ggrc_workflows.services.workflow_cycle_calculator import get_cycle_calculator
-  # Update all workflows.
-  for workflow in workflows:
-    base_date = date.today()
-    calculator = get_cycle_calculator(workflow)
-    workflow.next_cycle_start_date = \
-      calculator.nearest_start_date_after_basedate(base_date)
-    db.session.add(workflow)
-
-  # Save
-  db.session.commit()
+  # Upgrade is no longer needed for fresh instances
+  pass
 
 def downgrade():
     pass
