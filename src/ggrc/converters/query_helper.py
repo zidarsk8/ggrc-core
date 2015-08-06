@@ -149,9 +149,9 @@ class QueryHelper(object):
         "AND": lambda: lift_bin(and_),
         "OR": lambda: lift_bin(or_),
         "=": lambda: with_left(lambda l: l == exp["right"]),
-        "!=": lambda: with_left(lambda l: l != exp["right"]),
+        "!=": lambda: not_(with_left(lambda l: l == exp["right"])),
         "~": lambda: with_left(lambda l: l.ilike("%{}%".format(exp["right"]))),
-        "!~": lambda: with_left(lambda l: not_(l.ilike("%{}%".format(exp["right"])))),
+        "!~": lambda: not_(with_left(lambda l: l.ilike("%{}%".format(exp["right"])))),
         "relevant": relevant,
         "text_search": text_search
       }
