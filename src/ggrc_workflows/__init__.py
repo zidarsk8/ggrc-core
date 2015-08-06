@@ -890,7 +890,6 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
       ('Workflow', None): {
           'WorkflowOwner': ['WorkflowBasicReader'],
           'WorkflowMember': ['WorkflowBasicReader'],
-          'Creator': ['WorkflowBasicReader'],
       },
   }
 
