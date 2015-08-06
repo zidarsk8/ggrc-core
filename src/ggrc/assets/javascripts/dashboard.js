@@ -582,5 +582,11 @@ jQuery(function($) {
 
 });
 
+jQuery(function() {
+  $('body').on('click', "a[href='/logout']", function (e) {
+    can.Model.LocalStorage.clearAll();
+  });
+});
+
 jQuery(window).on("load", resize_areas);
 jQuery(window).on("resize", resize_areas);
