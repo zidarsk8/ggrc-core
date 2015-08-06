@@ -112,36 +112,10 @@
           </select>
         </div>
       </div>
-      {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
 
       <div class="row-fluid wrap-row">
         <div class="span6">
-          {{#using person=contact}}
-          <h6>Primary Contact</h6>
-          <p class="oneline">
-            {{#if person}}
-              {{>'/static/mustache/people/popover.mustache'}}
-            {{else}}
-              <span class="error">
-                Not Assigned
-              </span>
-            {{/if}}
-          </p>
-          {{/using}}
-          {{#using person=secondary_contact}}
-          {{#if person}}
-          <h6>Secondary Contact</h6>
-          <p class="oneline">
-            {{#if person}}
-              {{>'/static/mustache/people/popover.mustache'}}
-            {{else}}
-              <span class="error">
-                Not Assigned
-              </span>
-            {{/if}}
-          </p>
-          {{/if}}
-          {{/using}}
+          {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
         </div>
         <div class="span6">
           <ul class="repeated-utility">
@@ -164,7 +138,7 @@
           </ul>
         </div>
       </div>
-
+      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/urls.mustache' is_program=true instance=instance}}}
 
       <div class="custom-attr-wrap">

@@ -6,14 +6,18 @@
 
 from ggrc import db
 from ggrc.models.mixins import (
-    Base, Titled, Described, Timeboxed, Stateful, WithContact
+    Base, Titled, Described, Timeboxed, Slugged, Stateful, WithContact
     )
 
 
 class CycleTaskGroup(
-    WithContact, Stateful, Timeboxed, Described, Titled, Base, db.Model):
+    WithContact, Stateful, Slugged, Timeboxed, Described, Titled, Base, db.Model):
   __tablename__ = 'cycle_task_groups'
   _title_uniqueness = False
+
+  @classmethod
+  def generate_slug_prefix_for(cls, obj):
+    return "CYCLEGROUP"
 
   VALID_STATES = (u'Assigned', u'InProgress', u'Finished', u'Verified', u'Declined')
 

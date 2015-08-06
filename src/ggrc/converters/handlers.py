@@ -90,7 +90,7 @@ class StatusColumnHandler(ColumnHandler):
   def __init__(self, row_converter, key, **options):
     self.key = key
     valid_states = row_converter.object_class.VALID_STATES
-    self.state_mappings = {s.lower(): s for s in valid_states}
+    self.state_mappings = {str(s).lower(): s for s in valid_states}
     super(StatusColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
