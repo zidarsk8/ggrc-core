@@ -237,8 +237,12 @@ class ObjectsColumnHandler(ColumnHandler):
     self.value = self.parse_item()
 
   def get_value(self):
-
-    pass
+    task_group_objects = TaskGroupObject.query.filter_by(
+        task_group_id=self.row_converter.obj.id).all()
+    lines = ["{}: {}".format(t.object._inflector.title_singular.title(),
+                             t.object.slug)
+             for t in task_group_objects]
+    return "\n".join(lines)
 
   def insert_object(self):
     for object_ in self.value:
