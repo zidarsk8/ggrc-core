@@ -113,6 +113,7 @@
     selected="mapper.selected"
     contact="mapper.contact"
     term="mapper.term"
+    options="mapper.options"
   items-per-page="20">
   <div class="filter-actions wrap-modal-spacing">
     <div class="row-fluid">
@@ -134,16 +135,16 @@
         <div class="span3">
           {{^if mapper.search_only}}
           <div class="pull-right check-all">
-            <label {{#if loading_or_saving}}class="disabled"{{/if}}
-              rel="tooltip"
-              data-placement="right"
-              data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria."
-            >
-              Select all
-              <input type="checkbox" can-value="mapper.all_selected" class="object-check-all"
-                {{#if loading_or_saving}}disabled="true"{{/if}}
-                {{#if mapper.all_selected}}checked="checked"{{/if}}
-              >
+              <a
+                href="#"
+                rel="tooltip"
+                class="object-check-all
+                  {{#if_helpers '\
+                    #if' loading_or_saving '\
+                    or #if' mapper.all_selected}}disabled{{/if}}"
+                data-placement="right"
+                data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria."
+                >Select all</a>
             </label>
           </div>
           {{/if}}
