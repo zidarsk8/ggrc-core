@@ -472,7 +472,6 @@
 
         if (join_model !== "TaskGroupObject" && data.model_name === "Program") {
           data.options.permission_parms = {
-            __permission_type: "create",
             __permission_model: join_model
           };
         }
