@@ -49,12 +49,10 @@
         {model_singular: "Control", title_plural: "Controls"},
         {model_singular: "ControlAssessment", title_plural: "Control Assessments"},
         {model_singular: "DataAsset", title_plural: "Data Assets"},
-        {model_singular: "Directive", title_plural: "Directives"},
         {model_singular: "Facility", title_plural: "Facilities"},
         {model_singular: "Issue", title_plural: "Issues"},
         {model_singular: "Market", title_plural: "Markets"},
         {model_singular: "Objective", title_plural: "Objectives"},
-        {model_singular: "Option", title_plural: "Options"},
         {model_singular: "OrgGroup", title_plural: "Org Groups"},
         {model_singular: "Person", title_plural: "Persons"},
         {model_singular: "Policy", title_plural: "Policies"},
@@ -105,9 +103,11 @@
       ".import-button click": function (el, ev) {
         ev.preventDefault();
         var data = _.map(this.scope.attr("selected"), function (el) {
-              return {object_name: el.value};
+              return {
+                object_name: el.value,
+                fields: "all"
+              };
             });
-
         if (!data.length) {
           return;
         }
@@ -267,6 +267,20 @@
         if (!panel_number && url.relevant_id && url.relevant_type) {
           this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }
+      },
+      "[data-action=attribute_select_toggle] click": function (el, ev){
+        var items = GGRC.model_attr_defs[this.scope.attr("item.type")]
+            split_items = {
+              mappings: _.filter(items, function(el){
+                return el.type == "mapping";
+              }),
+              attributes: _.filter(items, function(el){
+                return el.type != "mapping";
+              })
+            };
+        _.map(split_items[el.data("type")], function(attr){
+          this.scope.attr("item.selected."+attr.key, el.data("value"))
+        }.bind(this));
       },
       "{scope.item} type": function () {
         this.scope.attr("item.selected", {});

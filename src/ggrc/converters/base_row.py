@@ -163,7 +163,8 @@ class RowConverter(object):
     if self.ignore:
       return
     self.send_signals()
-    db.session.add(self.obj)
+    if self.is_new:
+      db.session.add(self.obj)
     for handler in self.attrs.values():
       handler.insert_object()
 

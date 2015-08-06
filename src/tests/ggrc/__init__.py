@@ -23,10 +23,13 @@ logging.disable(logging.CRITICAL)
 
 class TestCase(BaseTestCase):
 
+  maxDiff = None
+
   @classmethod
   def clear_data(cls):
     ignore_tables = (
-        "test_model", "roles", "notification_types", "object_types", "options"
+        "test_model", "roles", "notification_types", "object_types", "options",
+        "categories",
     )
     tables = set(db.metadata.tables).difference(ignore_tables)
     for _ in range(len(tables)):

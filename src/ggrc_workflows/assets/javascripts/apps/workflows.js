@@ -11,7 +11,7 @@
         'Program Regulation Policy Standard Contract Clause Section'.split(' '),
         'Control Objective'.split(' '),
         'OrgGroup Vendor'.split(' '),
-        'System Process DataAsset Product Project Facility Market'.split(' ')
+        'System Process DataAsset Product Project Facility Market Issue'.split(' ')
       ),
       _task_sort_function = function(a, b) {
         var date_a = +new Date(a.end_date),

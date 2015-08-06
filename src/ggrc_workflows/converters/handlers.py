@@ -201,19 +201,19 @@ class WorkflowPersonColumnHandler(UserColumnHandler):
     self.remove_current_people()
     for owner in self.value:
       workflow_person = WorkflowPerson(
-          workflow_id=self.row_converter.obj.id,
-          person_id=owner.id
+          workflow=self.row_converter.obj,
+          person=owner
       )
       db.session.add(workflow_person)
     self.dry_run = True
 
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
-    "workflow": WorkflowColumnHandler,
-    "task_group": TaskGroupColumnHandler,
     "notify_on_change": CheckboxColumnHandler,
-    "relative_start_date": TaskStartColumnHandler,
     "relative_end_date": TaskEndColumnHandler,
+    "relative_start_date": TaskStartColumnHandler,
+    "task_group": TaskGroupColumnHandler,
     "task_type": TaskTypeColumnHandler,
+    "workflow": WorkflowColumnHandler,
     "workflow_mapped": WorkflowPersonColumnHandler,
 }

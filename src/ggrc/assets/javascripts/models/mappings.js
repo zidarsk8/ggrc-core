@@ -736,7 +736,7 @@
       },
       _mixins: ["response"],
       meetings: Direct("Meeting", "response", "meetings"),
-      business_objects: Multi(["related_objects", "controls", "documents", "sections", "clauses"])
+      business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"])
     },
     PopulationSampleResponse: {
       _canonical: {

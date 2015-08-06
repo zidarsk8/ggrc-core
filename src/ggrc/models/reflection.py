@@ -24,6 +24,12 @@ ATTRIBUTE_ORDER = (
     "notes",
     "test_plan",
     "owners",
+    "program_owner",
+    "program_editor",
+    "program_reader",
+    "program_mapped",
+    "workflow_owner",
+    "workflow_member",
     "task_type",
     "start_date",
     "end_date",
@@ -36,7 +42,7 @@ ATTRIBUTE_ORDER = (
     "categories",
     "contact",
     "design",
-    "directive_id",
+    "directive",
     "fraud_related",
     "key_control",
     "kind",
@@ -55,6 +61,7 @@ ATTRIBUTE_ORDER = (
     "email",
     "is_enabled",
     "company",
+    "user_role",
 )
 
 
@@ -209,10 +216,9 @@ class AttributeInfo(object):
     """ Get column definitions for allowed mappings for object_class """
     definitions = {}
     mapping_rules = get_mapping_rules()
-    if object_class.__name__ not in mapping_rules:
-      return {}
+    object_mapping_rules = mapping_rules.get(object_class.__name__, [])
 
-    for mapping_class in mapping_rules[object_class.__name__]:
+    for mapping_class in object_mapping_rules:
       class_name = title_from_camelcase(mapping_class)
       mapping_name = "{}{}".format(cls.MAPPING_PREFIX, class_name)
       definitions[mapping_name.lower()] = {
@@ -297,6 +303,7 @@ class AttributeInfo(object):
     result = []
     for key in order:
       item = definitions[key]
+      item["key"] = key
       result.append(item)
     return result
 

@@ -56,7 +56,7 @@
                   prev[key] += curr[key] || 0;
                 });
                 return prev;
-              }, {inserted: 0, updated: 0, deleted: 0, ignored: 0});
+              }, {created: 0, updated: 0, deleted: 0, ignored: 0});
 
           this.scope.attr("state", "success");
           this.scope.attr("data", [result_count]);
