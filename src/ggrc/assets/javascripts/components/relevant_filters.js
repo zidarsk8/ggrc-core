@@ -10,21 +10,38 @@
     tag: "relevant-filter",
     template: can.view(GGRC.mustache_path + "/mapper/relevant_filter.mustache"),
     scope: {
+      relevant_menu_item: "@",
+      has_parent: false,
       menu: can.compute(function () {
         var type = this.attr("type") === "AllObject" ? GGRC.page_model.type : this.attr("type"),
-            mappings = GGRC.Mappings.get_canonical_mappings_for(type);
-        return _.map(_.keys(mappings), function (mapping) {
-          return CMS.Models[mapping];
-        });
+            mappings = GGRC.Mappings.get_canonical_mappings_for(type),
+            menu = _.map(_.keys(mappings), function (mapping) {
+              return CMS.Models[mapping];
+            });
+        return menu;
       })
     },
     events: {
+      "{scope.relevant} change": function (list, ev, item, which, state, prevState) {
+        this.scope.attr("has_parent", _.findWhere(this.scope.attr("relevant"), {model_name: "parent"}));
+      },
       ".add-filter-rule click": function (el, ev) {
         ev.preventDefault();
+        var menu = this.scope.attr("menu");
+
+        if (this.scope.attr("relevant_menu_item") === "parent"
+            && +this.scope.attr("panel_number") !== 0
+            && !this.scope.attr("has_parent")) {
+          menu.unshift({
+            title_singular: "Parent object",
+            model_singular: "parent"
+          });
+        }
         this.scope.attr("relevant").push({
           value: "",
           filter: new can.Map(),
-          model_name: this.scope.attr("menu")[0].model_singular
+          menu: menu,
+          model_name: menu[0].model_singular
         });
       },
       ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
