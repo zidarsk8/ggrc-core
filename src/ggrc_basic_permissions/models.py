@@ -16,7 +16,7 @@ from .contributed_roles import DECLARED_ROLE, get_declared_role
 class Role(Base, Described, db.Model):
   """A user role. All roles have a unique name. This name could be a simple
   string, an email address, or some other form of string identifier.
-  
+
   :permissions:
     example -
       { 'create': ['Program', 'Control'],
@@ -30,6 +30,7 @@ class Role(Base, Described, db.Model):
   name = db.Column(db.String(128), nullable=False)
   permissions_json = db.Column(db.Text(), nullable=False)
   scope = db.Column(db.String(64), nullable=True)
+  role_order = db.Column(db.Integer(), nullable=True)
 
   @simple_property
   def permissions(self):
@@ -48,7 +49,7 @@ class Role(Base, Described, db.Model):
   def permissions(self, value):
     self.permissions_json = json.dumps(value)
 
-  _publish_attrs = ['name', 'permissions', 'scope']
+  _publish_attrs = ['name', 'permissions', 'scope', 'role_order']
 
   def _display_name(self):
     return self.name
