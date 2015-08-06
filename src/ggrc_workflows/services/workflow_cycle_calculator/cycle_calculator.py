@@ -24,16 +24,16 @@ class CycleCalculator(object):
   needed by workflows, namely task_date_range, workflow_date_range and
   next_cycle_start_date.
 
-  Each concrete class has to implement it's own
-  relative_day_to_date method that calculates the concrete date based on
+  Each implementation of a class has to implement it's own
+  relative_day_to_date method that calculates the real date based on
   the base_date provided to the method and taking into account the specifics
   of the frequency. relative_day_to_date SHOULD NOT adjust dates but
   should only convert them to datetime.date objects.
 
   Attributes:
-    date_domain: Concrete class's domain in which values passed to it are
+    date_domain: Class implementation's domain in which values passed to it are
                  to be found
-    time_delta: Concrete class's atomic unit by which addition/subtraction
+    time_delta: Class implementation's atomic unit by which addition/subtraction
                 will take place during calculations.
     HOLIDAYS: Official holidays with the addition of several days that Google
               observes. See file google_holidays.py for details.
@@ -47,8 +47,8 @@ class CycleCalculator(object):
 
   @abstractmethod
   def relative_day_to_date(self, relative_day, relative_month=None, base_date=None):
-    raise NotImplementedError("Converting from relative to concrete date"
-                              "must be done in concrete classes.")
+    raise NotImplementedError("Converting from relative to real date"
+                              "must be done on an instance.")
 
 
   def __init__(self, workflow, holidays=HOLIDAYS):
@@ -56,10 +56,10 @@ class CycleCalculator(object):
 
     Generates a flat list of all the tasks in all task groups.
 
-    Concrete classes have to sort tasks based on relative
+    Instances have to sort tasks based on relative
     start days (DD or MM/DD) and generate a dictionary self.reified_tasks
     where each key is task.id and values are dictionaries with
-    relative_start, relative_end and concrete start_date and end_date
+    relative_start, relative_end and calculated start_date and end_date
     values. Example:
 
       self.reified_tasks[task.id] = {
@@ -151,12 +151,12 @@ class CycleCalculator(object):
 
     Taking base_date into account calculates individual task's start and
     end date with relative_day_to_date function provided by a specific
-    concrete class.
+    implementation of a class.
 
     Args:
       task: Task object for which we are calculating start and end date
       base_date: Date based on which we convert from relative day to
-                 concrete date.
+                 real date.
     Returns:
       tuple({datetime.date, datetime.date}): Weekend and holiday
         adjusted start and end date.

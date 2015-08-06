@@ -502,9 +502,9 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 6, 17))
 
       _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2015, 6, 24))
+      self.assertEqual(cycle.start_date, date(2015, 6, 17))
       _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2015, 6, 14))
+      self.assertEqual(cycle.start_date, date(2015, 6, 24))
       _, cycle = self.generator.generate_cycle(wf)
       self.assertEqual(cycle.start_date, date(2015, 7, 1))
       _, cycle = self.generator.generate_cycle(wf)
@@ -529,7 +529,7 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
 
       _, cycle = self.generator.generate_cycle(wf)
       self.assertEqual(cycle.start_date, date(2015, 7, 14))
-      self.assertEqual(cycle.end_date, date(2015, 7, 21))
+      self.assertEqual(cycle.end_date, date(2015, 7, 20))
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 21))
