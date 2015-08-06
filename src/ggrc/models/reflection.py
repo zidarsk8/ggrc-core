@@ -117,6 +117,7 @@ class AttributeInfo(object):
   class Type(object):
     PROPERTY = "property"
     MAPPING = "mapping"
+    SPECIAL_MAPPING = "special_mapping"
     CUSTOM = "custom"
     USER_ROLE = "user_role"
 
