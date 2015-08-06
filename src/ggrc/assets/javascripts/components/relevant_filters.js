@@ -11,8 +11,17 @@
     template: can.view(GGRC.mustache_path + "/mapper/relevant_filter.mustache"),
     scope: {
       menu: can.compute(function () {
-        var type = this.attr("type") === "AllObject" ? GGRC.page_model.type : this.attr("type"),
-            mappings = GGRC.Mappings.get_canonical_mappings_for(type);
+        var type = this.attr("type"),
+            isAll = type === "AllObject",
+            mappings;
+
+        if (this.attr("search_only") && isAll) {
+          mappings = GGRC.tree_view.base_widgets_by_type;
+        } else {
+          type = isAll ? GGRC.page_model.type : this.attr("type");
+          mappings = GGRC.Mappings.get_canonical_mappings_for(type);
+        }
+
         return _.map(_.keys(mappings), function (mapping) {
           return CMS.Models[mapping];
         });
