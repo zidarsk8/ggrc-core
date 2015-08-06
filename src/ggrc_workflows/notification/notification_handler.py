@@ -93,7 +93,7 @@ def add_cycle_task_reassigned_notification(obj):
   if result.count() == 0:
     return
 
-  notif_type = get_notification_type("cycle_task_reassigned"),
+  notif_type = get_notification_type("cycle_task_reassigned")
   add_notif(obj, notif_type)
 
 
