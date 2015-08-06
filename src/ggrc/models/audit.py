@@ -12,6 +12,7 @@ from .relationship import Relatable
 from .object_person import Personable
 from .context import HasOwnContext
 from .reflection import PublishOnly
+from .program import Program
 
 
 class Audit(
@@ -81,6 +82,13 @@ class Audit(
       "url": None,
       "reference_url": None,
   }
+
+  @classmethod
+  def _filter_by_program(cls, predicate):
+    return Program.query.filter(
+        (Program.id == Audit.program_id) &
+        (predicate(Program.slug) | predicate(Program.title))
+    ).exists()
 
   @classmethod
   def eager_query(cls):
