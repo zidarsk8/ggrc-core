@@ -102,7 +102,7 @@ class QueryHelper(object):
     return self.query
 
   def get_object_ids(self, object_query):
-    """ get a set of object ids describideb in the filters """
+    """ get a set of object ids described in the filters """
     object_name = object_query["object_name"]
     expression = object_query.get("filters", {}).get("expression")
 
