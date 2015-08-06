@@ -129,7 +129,7 @@ class QueryHelper(object):
             for field in object_query.get("fields", []))
       )
 
-      def get_left():
+      def with_left(p):
         key  = exp["left"]
         attr = getattr(object_class, key.lower(), None)
         if attr is None:
@@ -138,7 +138,7 @@ class QueryHelper(object):
         if attr is None:
           raise Exception("Bad search query: object '{}' does not have "
                           "attribute '{}'.".format(object_class.__name__, key))
-        return attr
+        return p(attr)
 
       lift_bin = lambda f: f(build_expression(exp["left"]),
                              build_expression(exp["right"]))
@@ -146,10 +146,10 @@ class QueryHelper(object):
       ops = {
         "AND": lambda: lift_bin(and_),
         "OR": lambda: lift_bin(or_),
-        "=": lambda: get_left() == exp["right"],
-        "!=": lambda: get_left() != exp["right"],
-        "~": lambda: get_left().ilike("%{}%".format(exp["right"])),
-        "!~": lambda: not_(get_left().ilike("%{}%".format(exp["right"]))),
+        "=": lambda: with_left(lambda l: l == exp["right"]),
+        "!=": lambda: with_left(lambda l: l != exp["right"]),
+        "~": lambda: with_left(lambda l: l.ilike("%{}%".format(exp["right"]))),
+        "!~": lambda: with_left(lambda l: not_(l.ilike("%{}%".format(exp["right"])))),
         "relevant": relevant,
         "text_search": text_search
       }
