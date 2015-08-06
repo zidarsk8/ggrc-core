@@ -11,6 +11,7 @@ from ggrc.models.mixins import (
     deferred, Hierarchical, Noted, Described, Hyperlinked, WithContact,
     Titled, Slugged, CustomAttributable, Stateful, Timeboxed
 )
+from ggrc.models.directive import Directive
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
@@ -56,6 +57,13 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   _sanitize_html = ['notes']
   _include_links = []
   _aliases = {"directive": "Policy / Regulation / Standard"}
+
+  @classmethod
+  def _filter_by_directive(cls, predicate):
+    return Directive.query.filter(
+        (Directive.id == cls.directive_id) &
+        (predicate(Directive.slug) | predicate(Directive.title))
+    ).exists()
 
   @validates('type')
   def validates_type(self, key, value):
