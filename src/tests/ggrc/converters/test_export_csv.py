@@ -24,7 +24,7 @@ class TestExportEmptyTemplate(TestCase):
     }
 
   def test_basic_policy_template(self):
-    data = [{"object_name": "Policy"}]
+    data = [{"object_name": "Policy", "fields": "all"}]
 
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
@@ -34,11 +34,11 @@ class TestExportEmptyTemplate(TestCase):
 
   def test_multiple_empty_objects(self):
     data = [
-        {"object_name": "Policy"},
-        {"object_name": "Regulation"},
-        {"object_name": "Clause"},
-        {"object_name": "OrgGroup"},
-        {"object_name": "Contract"},
+        {"object_name": "Policy", "fields": "all"},
+        {"object_name": "Regulation", "fields": "all"},
+        {"object_name": "Clause", "fields": "all"},
+        {"object_name": "OrgGroup", "fields": "all"},
+        {"object_name": "Contract", "fields": "all"},
     ]
 
     response = self.client.post("/_service/export_csv",

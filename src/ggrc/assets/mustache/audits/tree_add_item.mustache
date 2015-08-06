@@ -7,7 +7,7 @@
 {{#if allow_mapping_or_creating}}
 {{#if_instance_of parent_instance 'Program'}}
 {{#if allow_creating}}
-{{#is_allowed 'create' model.shortName context=parent_instance.context.id}}
+{{#is_allowed 'update' parent_instance}}
   <a href="javascript://" class="section-create" rel="tooltip" data-placement="left" data-original-title="Create {{model.title_singular}}" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" }, "context": { "id" : {{firstexist parent_instance.context.id "null"}}, "href" : "{{parent_instance.context.href}}", "type" : "{{parent_instance.context.type}}" } }'>
     <i class="grcicon-add-black"></i>
   </a>

@@ -250,20 +250,12 @@ can.Control("CMS.Controllers.TreeLoader", {
       sort_function = function(old_item, new_item) {
         return original_function(old_item.instance, new_item.instance);
       };
-      if (original_function.deep_property && original_function.order_factor) {
+      if (original_function.deep_property && original_function.comparator) {
         _.each(temp_list, function (v) {
           v.__sort_key = v.instance.get_deep_property(original_function.deep_property);
         });
-        temp_list.sort(function(old_item, new_item) {
-          var a = old_item.__sort_key,
-              b = new_item.__sort_key;
-          if (a === b) {
-            return 0;
-          } else if (a < b) {
-            return -original_function.order_factor;
-          } else {
-            return original_function.order_factor;
-          }
+        temp_list.sort(function(a, b) {
+          return original_function.comparator(a.__sort_key, b.__sort_key);
         });
         _.each(temp_list, function (v) {
           delete v.__sort_key;
@@ -617,8 +609,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           this.options.allow_mapping || this.options.allow_creating);
       }
 
-      if (this.element.parent().length === 0) {
-        // element not attached
+      if (this.element.parent().length === 0 // element not attached
+        || this.element.hasClass("entry-list")) { // comment list
         this.options.disable_lazy_loading = true;
       }
       if(!this.options.scroll_element) {
@@ -1315,20 +1307,29 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               : "asc",
           order_factor = order === "asc" ? 1 : -1;
 
+      var comparator = function (a, b) {
+        if (typeof a === "string") {
+          a = a.toLowerCase();
+        };
+        if (typeof b === "string") {
+          b = b.toLowerCase();
+        };
+        if (a > b) {
+          return order_factor;
+        }
+        if (b > a) {
+          return -order_factor;
+        }
+        return 0;
+      };
       this.options.sort_function = function (val1, val2) {
         var a = val1.get_deep_property(key_tree),
             b = val2.get_deep_property(key_tree);
-         if (a > b) {
-           return order_factor;
-         }
-         if (b > a) {
-           return -order_factor;
-         }
-         return 0;
+        return comparator(a,b);
       };
 
       this.options.sort_function.deep_property = key_tree;
-      this.options.sort_function.order_factor = order_factor;
+      this.options.sort_function.comparator = comparator;
 
       this.options.sort_direction = order;
       this.options.sort_by = key;

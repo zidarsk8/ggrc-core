@@ -88,10 +88,10 @@ class BlockConverter(object):
     self.headers = self.clean_headers(raw_headers)
     self.unique_counts = self.get_unique_counts_dict(self.object_class)
     self.name = self.object_class._inflector.human_singular.title()
-    self.organize_fields(options.get("fields", "all"))
+    self.organize_fields(options.get("fields", []))
 
   def organize_fields(self, fields):
-    if not fields or fields == "all":
+    if fields == "all":
       fields = self.object_headers.keys()
     self.fields = get_column_order(fields)
 

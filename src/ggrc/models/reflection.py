@@ -42,7 +42,7 @@ ATTRIBUTE_ORDER = (
     "categories",
     "contact",
     "design",
-    "directive_id",
+    "directive",
     "fraud_related",
     "key_control",
     "kind",
@@ -61,6 +61,7 @@ ATTRIBUTE_ORDER = (
     "email",
     "is_enabled",
     "company",
+    "user_role",
 )
 
 
@@ -302,6 +303,7 @@ class AttributeInfo(object):
     result = []
     for key in order:
       item = definitions[key]
+      item["key"] = key
       result.append(item)
     return result
 

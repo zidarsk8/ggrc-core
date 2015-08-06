@@ -42,7 +42,6 @@ def parse_export_request():
 
 
 def handle_export_request():
-
   data_grid, data = parse_export_request()
   query_helper = QueryHelper(data)
   converter = Converter(ids_by_type=query_helper.get_ids())
