@@ -19,6 +19,7 @@ from .audit_object import Auditable
 from .reflection import PublishOnly
 from .utils import validate_option
 from .relationship import Relatable
+from .option import Option
 
 from .track_object_state import HasObjectState, track_state_for_class
 
@@ -51,7 +52,16 @@ class ControlCategorized(Categorizable):
 
   _include_links = []
 
-  _aliases = {"categories": "Categories"}
+  _aliases = {
+      "categories": {
+        "display_name": "Categories",
+        "filter_by": "_filter_by_categories",
+      },
+  }
+
+  @classmethod
+  def _filter_by_categories(cls, predicate):
+    return cls._filter_by_category("ControlCategory", predicate)
 
   @classmethod
   def eager_query(cls):
@@ -74,7 +84,16 @@ class AssertionCategorized(Categorizable):
       PublishOnly('assertations'),
   ]
   _include_links = []
-  _aliases = {"assertions": "Assertions"}
+  _aliases = {
+      "assertions": {
+        "display_name": "Assertions",
+        "filter_by": "_filter_by_assertions",
+      },
+  }
+
+  @classmethod
+  def _filter_by_assertions(cls, predicate):
+    return cls._filter_by_category("ControlAssertion", predicate)
 
   @classmethod
   def eager_query(cls):
@@ -162,8 +181,14 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
 
   _aliases = {
       "url": "Control URL",
-      "kind": "Kind/Nature",
-      "means": "Type/Means",
+      "kind": {
+        "display_name": "Kind/Nature",
+        "filter_by": "_filter_by_kind",
+      },
+      "means": {
+        "display_name": "Type/Means",
+        "filter_by": "_filter_by_means",
+      },
       "verify_frequency": "Frequency",
       "fraud_related": "Fraud Related",
       "principal_assessor": "Principal Assessor",
@@ -175,6 +200,18 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
   def validate_control_options(self, key, option):
     desired_role = key if key == 'verify_frequency' else 'control_' + key
     return validate_option(self.__class__.__name__, key, option, desired_role)
+
+  @classmethod
+  def _filter_by_kind(cls, predicate):
+    return Option.query.filter(
+      (Option.id == cls.kind_id) & predicate(Option.title)
+    ).exists()
+
+  @classmethod
+  def _filter_by_means(cls, predicate):
+    return Option.query.filter(
+      (Option.id == cls.means_id) & predicate(Option.title)
+    ).exists()
 
   @classmethod
   def eager_query(cls):
