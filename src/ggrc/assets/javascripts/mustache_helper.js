@@ -3115,4 +3115,21 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   return options.fn(options.contexts.add({'create_issue_json': JSON.stringify(json)}));
 });
 
+Mustache.registerHelper("pretty_role_name", function (name) {
+  name = Mustache.resolve(name);
+  var ROLE_LIST = {
+    "ProgramOwner": "Program Manager",
+    "ProgramEditor": "Program Editor",
+    "ProgramReader": "Program Reader",
+    "WorkflowOwner": "Workflow Manager",
+    "WorkflowMember": "Workflow Member",
+    "Mapped": "No Access",
+    "Owner": "Manager",
+  };
+  if (ROLE_LIST[name]) {
+    return ROLE_LIST[name];
+  }
+  return name;
+});
+
 })(this, jQuery, can);
