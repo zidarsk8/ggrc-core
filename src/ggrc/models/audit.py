@@ -78,7 +78,8 @@ class Audit(
       "report_end_date": "Planned Report Period to",
       "contact": {
           "display_name": "Internal Audit Lead",
-          "mandatory": True
+          "mandatory": True,
+          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
       "notes": None,
