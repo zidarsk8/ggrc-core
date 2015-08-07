@@ -23,7 +23,7 @@
     },
     events: {
       "{scope.relevant} change": function (list, ev, item, which, state, prevState) {
-        this.scope.attr("has_parent", _.findWhere(this.scope.attr("relevant"), {model_name: "parent"}));
+        this.scope.attr("has_parent", _.findWhere(this.scope.attr("relevant"), {model_name: "__previous__"}));
       },
       ".add-filter-rule click": function (el, ev) {
         ev.preventDefault();
@@ -33,8 +33,8 @@
             && +this.scope.attr("panel_number") !== 0
             && !this.scope.attr("has_parent")) {
           menu.unshift({
-            title_singular: "Parent object",
-            model_singular: "parent"
+            title_singular: "Previous objects",
+            model_singular: "__previous__"
           });
         }
         this.scope.attr("relevant").push({
