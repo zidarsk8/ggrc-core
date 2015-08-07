@@ -163,7 +163,7 @@
               if (data_grid && index > 0) {
                 relevant_filter = "#__previous__," + (index - 1) + "#";
                 if (only_relevant && index > 1) {
-                  relevant_filter += " AND #__previous__," + (index - 2) + "#";
+                  relevant_filter += " AND #__previous__,0#";
                 }
               } else {
                 predicates = _.map(panel.relevant(), function (query, el) {
