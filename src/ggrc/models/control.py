@@ -190,7 +190,10 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
         "display_name": "Type/Means",
         "filter_by": "_filter_by_means",
       },
-      "verify_frequency": "Frequency",
+      "verify_frequency": {
+        "display_name": "Frequency",
+        "filter_by": "_filter_by_verify_frequency",
+      },
       "fraud_related": "Fraud Related",
       "principal_assessor": {
         "display_name": "Principal Assessor",
@@ -232,6 +235,12 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
     return Person.query.filter(
         (Person.id == cls.secondary_assessor_id) &
         (predicate(Person.name) | predicate(Person.email))
+    ).exists()
+
+  @classmethod
+  def _filter_by_verify_frequency(cls, predicate):
+    return Option.query.filter(
+        (Option.id == cls.verify_frequency_id) & predicate(Option.title)
     ).exists()
 
   @classmethod
