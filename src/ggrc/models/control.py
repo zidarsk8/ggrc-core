@@ -18,6 +18,7 @@ from .object_person import Personable
 from .audit_object import Auditable
 from .reflection import PublishOnly
 from .utils import validate_option
+from .person import Person
 from .relationship import Relatable
 from .option import Option
 
@@ -191,8 +192,14 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
       },
       "verify_frequency": "Frequency",
       "fraud_related": "Fraud Related",
-      "principal_assessor": "Principal Assessor",
-      "secondary_assessor": "Secondary Assessor",
+      "principal_assessor": {
+        "display_name": "Principal Assessor",
+        "filter_by": "_filter_by_principal_assessor",
+      },
+      "secondary_assessor": {
+        "display_name": "Secondary Assessor",
+        "filter_by": "_filter_by_secondary_assessor",
+      },
       "key_control": "Significance",
   }
 
@@ -211,6 +218,20 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
   def _filter_by_means(cls, predicate):
     return Option.query.filter(
       (Option.id == cls.means_id) & predicate(Option.title)
+    ).exists()
+
+  @classmethod
+  def _filter_by_principal_assessor(cls, predicate):
+    return Person.query.filter(
+        (Person.id == cls.principal_assessor_id) &
+        (predicate(Person.name) | predicate(Person.email))
+    ).exists()
+
+  @classmethod
+  def _filter_by_secondary_assessor(cls, predicate):
+    return Person.query.filter(
+        (Person.id == cls.secondary_assessor_id) &
+        (predicate(Person.name) | predicate(Person.email))
     ).exists()
 
   @classmethod
