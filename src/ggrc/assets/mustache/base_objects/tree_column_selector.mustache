@@ -17,7 +17,7 @@
     <ul class="attr-list">
       {{#select_attr_list}}
       <li class="{{#if mandatory}}disabled{{/if_equals}}">
-        <label class="checkbox-inline">
+        <label class="checkbox-inline" title="{{attr_title}}">
           <input type="checkbox"
             {{#if display_status}}checked="checked"{{/if}}
             {{#if mandatory}}disabled{{/if_equals}}

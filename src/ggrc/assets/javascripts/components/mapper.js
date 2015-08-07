@@ -17,6 +17,7 @@
       model: {},
       bindings: {},
       is_loading: false,
+      page_loading: false,
       is_saving: false,
       all_selected: false,
       search_only: false,
@@ -40,11 +41,19 @@
         }, []);
         return _.findWhere(types, {value: type});
       },
+      get_forbidden: function (type) {
+        var forbidden = {
+          "Program": ["Audit"],
+          "Audit": ["Request", "ControlAssessment"],
+          "ControlAssessment": ["Audit", "Control"]
+        };
+        return forbidden[type] ? forbidden[type] : [];
+      },
       types: can.compute(function () {
         var selector_list,
             canonical = GGRC.Mappings.get_canonical_mappings_for(this.object),
             list = GGRC.tree_view.base_widgets_by_type[this.object],
-            forbidden = ["workflow", "taskgroup", "gdrivefolder", "context"],
+            forbidden = this.get_forbidden(this.object),
             groups = {
               "all_objects": {
                 name: "All Objects",
@@ -70,7 +79,7 @@
 
         selector_list = _.intersection(_.keys(canonical), list);
         can.each(selector_list, function (model_name) {
-          if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name.toLowerCase())) {
+          if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name)) {
             return;
           }
           var cms_model = CMS.Models[model_name],
@@ -90,7 +99,6 @@
         return groups;
       })
     });
-
 
   can.Component.extend({
     tag: "modal-mapper",
@@ -129,14 +137,15 @@
       "deferredSave": function () {
         var data = {
               multi_map: true,
-              arr: _.map(this.scope.attr("mapper.selected"), function (desination) {
-                    var inst = _.find(this.scope.attr("mapper.entries"), function (entry) {
-                      return entry.instance.id === desination.id;
-                    });
-                    if (inst) {
+              arr: _.compact(_.map(this.scope.attr("mapper.selected"), function (desination) {
+                    var isAllowed = GGRC.Utils.allowed_to_map(this.scope.attr("mapper.object"), desination),
+                        inst = _.find(this.scope.attr("mapper.entries"), function (entry) {
+                          return entry.instance.id === desination.id;
+                        });
+                    if (inst && isAllowed) {
                       return inst.instance;
                     }
-                  }.bind(this))
+                  }.bind(this)))
             };
         this.scope.attr("deferred_to").controller.element.trigger("defer:add", [data, {map_and_save: true}]);
         // TODO: Find proper way to dismiss the modal
@@ -184,20 +193,14 @@
         que.enqueue(instance).trigger().done(function (inst) {
           data["context"] = null;
           _.each(this.scope.attr("mapper.selected"), function (desination) {
-            var modelInstance;
-            type = isAllObject ? desination.type : type;
-            mapping = GGRC.Mappings.get_canonical_mapping(object, type);
+            var modelInstance,
+                isMapped = GGRC.Utils.is_mapped(instance, desination),
+                isAllowed = GGRC.Utils.allowed_to_map(instance, desination);
 
-            // TODO: Exception, we need to move section under Relationship table
-            //       and handle this in backend
-            if (~["Section", "Clause"].indexOf(type)) {
-              mapping = {
-                model_name: "Relationship",
-                object_attr: "source",
-                object_join_attr: "related_destinations",
-                option_attr: "destination"
-              };
+            if (isMapped || !isAllowed) {
+              return;
             }
+            mapping = GGRC.Mappings.get_canonical_mapping(object, isAllObject ? desination.type : type);
             Model = CMS.Models[mapping.model_name];
             data[mapping.object_attr] = {
               href: instance.href,
@@ -205,7 +208,6 @@
               id: instance.id
             };
             data[mapping.option_attr] = desination;
-
             modelInstance = new Model(data);
             defer.push(modelInstance.save());
           }, this);
@@ -269,6 +271,9 @@
         var selected = this.scope.attr("mapper.selected"),
             entries = this.scope.attr("mapper.entries");
 
+        if (!entries.length && !selected.length) {
+          return;
+        }
         this.scope.attr("mapper.all_selected", selected.length === entries.length);
       },
       "{mapper.entries} length": "allSelected",
@@ -285,6 +290,74 @@
           return type.title_plural;
         }
         return "Objects";
+      },
+      "loading_or_saving": function (options) {
+        if (this.attr("mapper.page_loading") || this.attr("mapper.is_saving")) {
+          return options.fn();
+        }
+        return options.inverse();
+      }
+    }
+  });
+
+  can.Component.extend({
+    tag: "mapper-checkbox",
+    template: "<content />",
+    scope: {
+      "instance_id": "@",
+      "is_mapped": "@",
+      "is_allowed_to_map": "@",
+      "checkbox": can.compute(function (status) {
+        return /true/gi.test(this.attr("is_mapped")) || this.attr("select_state") || this.attr("appended");
+      })
+    },
+    events: {
+      "{scope} selected": function () {
+        this.element.find(".object-check-single").prop("checked", _.findWhere(this.scope.attr("selected"), {
+          id: +this.scope.attr("instance_id")
+        }));
+      },
+      ".object-check-single change": function (el, ev) {
+        if (el.prop("disabled") || el.hasClass("disabled")) {
+          return false;
+        }
+        var scope = this.scope,
+            uid = +scope.attr("instance_id"),
+            item = _.find(scope.attr("options"), function (option) {
+              return option.instance.id === uid;
+            }),
+            status = el.prop("checked"),
+            selected = this.scope.attr("selected"),
+            needle = {id: item.instance.id},
+            index;
+
+        if (!status) {
+          index = _.findIndex(selected, needle);
+          selected.splice(index, 1);
+        } else {
+          _.findWhere(selected, needle) || selected.push({
+            id: item.instance.id,
+            type: item.instance.type,
+            href: item.instance.href
+          });
+        }
+      }
+    },
+    helpers: {
+      "not_allowed_to_map": function (options) {
+        if (/false/gi.test(this.attr("is_allowed_to_map"))) {
+          return options.fn();
+        }
+        return options.inverse();
+      },
+      "is_disabled": function (options) {
+        if (/true/gi.test(this.attr("is_mapped"))
+            || this.attr("is_saving")
+            || this.attr("is_loading")
+            || /false/gi.test(this.attr("is_allowed_to_map"))) {
+          return options.fn();
+        }
+        return options.inverse();
       }
     }
   });
@@ -295,9 +368,8 @@
     scope: {
       "items-per-page": "@",
       page: 0,
-
-      select_all: false,
       page_loading: false,
+      select_state: false,
       loading_or_saving: can.compute(function () {
         return this.attr("page_loading") || this.attr("mapper.is_saving");
       })
@@ -325,14 +397,19 @@
         });
       },
       ".results-wrap scrollNext": "drawPage",
-      ".object-check-all change": function (el, ev) {
+      ".object-check-all click": function (el, ev) {
+        ev.preventDefault();
+        if (el.hasClass("disabled")) {
+          return;
+        }
         var que = new RefreshQueue(),
             entries = this.scope.attr("entries");
 
-        this.scope.attr("select_all", true);
-        this.scope.attr("isloading", true);
+        this.scope.attr("select_state", true);
+        this.scope.attr("mapper.all_selected", true);
+        this.scope.attr("is_loading", true);
         que.enqueue(_.pluck(entries, "instance")).trigger().then(function (models) {
-          this.scope.attr("isloading", false);
+          this.scope.attr("is_loading", false);
           this.scope.attr("selected", _.map(models, function (model) {
             return {
               id: model.id,
@@ -341,31 +418,6 @@
             };
           }));
         }.bind(this));
-      },
-      ".tree-item .object-check-single change": function (el, ev) {
-        if (el.hasClass("disabled")) {
-          return;
-        }
-
-        var uid = el.closest(".tree-item").data("id"),
-            isChecked = el.prop("checked"),
-            item = _.find(this.scope.attr("options"), function (option) {
-                return option.instance.id === uid;
-              }),
-            selected = this.scope.attr("selected"),
-            needle = {id: item.instance.id},
-            index;
-
-        if (!_.findWhere(selected, needle)) {
-          selected.push({
-            id: item.instance.id,
-            type: item.instance.type,
-            href: item.instance.href
-          });
-        } else {
-          index = _.findIndex(selected, needle);
-          selected.splice(index, 1);
-        }
       },
       "getItem": function (model) {
         if (!model.type) {
@@ -399,7 +451,7 @@
         };
       },
       "drawPage": function () {
-        if (this.scope.attr("page_loading")) {
+        if (this.scope.attr("mapper.page_loading")) {
           return;
         }
         var page = this.scope.attr("page"),
@@ -412,10 +464,10 @@
         if (!page_items.length) {
           return;
         }
-        this.scope.attr("page_loading", true);
+        this.scope.attr("mapper.page_loading", true);
 
         return que.enqueue(_.pluck(page_items, "instance")).trigger().then(function (models) {
-          this.scope.attr("page_loading", false);
+          this.scope.attr("mapper.page_loading", false);
           this.scope.attr("page", next_page);
 
           options.push.apply(options, can.map(models, this.getItem.bind(this)));
@@ -431,12 +483,15 @@
             __permission_model: join_model
           };
         }
-        data.options.__permission_type = data.options.__permission_type || "read";
+        data.options.__permission_type = data.options.__permission_type || "update";
         data.model_name = _.isString(data.model_name) ? [data.model_name] : data.model_name;
 
         return GGRC.Models.Search.search_for_types(data.term || "", data.model_name, data.options);
       },
       "getResults": function () {
+        if (this.scope.attr("mapper.page_loading") || this.scope.attr("mapper.is_saving")) {
+          return;
+        }
         var model_name = this.scope.attr("type"),
             contact = this.scope.attr("contact"),
             permission_parms = {},
@@ -448,7 +503,7 @@
         this.scope.attr("entries", []);
         this.scope.attr("selected", []);
         this.scope.attr("options", []);
-        this.scope.attr("select_all", false);
+        this.scope.attr("select_state", false);
         this.scope.attr("mapper.all_selected", false);
 
         if (model_name === "AllObject") {
@@ -458,7 +513,7 @@
           permission_parms.contact_id = contact.id;
         }
 
-        this.scope.attr("page_loading", true);
+        this.scope.attr("mapper.page_loading", true);
         relevant = _.map(this.scope.attr("mapper.relevant"), function (relevant) {
           return {
             model_name: relevant.model_name,
@@ -484,7 +539,7 @@
                 : search[0];
 
         list.refresh_stubs().then(function (options) {
-          this.scope.attr("page_loading", false);
+          this.scope.attr("mapper.page_loading", false);
           this.scope.attr("entries", options);
           this.drawPage();
         }.bind(this));
@@ -518,4 +573,3 @@
     }, data));
   });
 })(window.can, window.can.$);
-
