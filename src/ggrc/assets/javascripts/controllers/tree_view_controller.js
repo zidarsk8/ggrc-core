@@ -1696,11 +1696,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
         }
       },
 
-      minimize_info_pane: function () {//bug#1899
-        var minimize_link = $.find('.info .pin-action .min');
-        $(minimize_link).click();
-      },
-
       'input.attr-checkbox click' : function (el, ev) {
         this.disable_attrs(el, ev);
         ev.stopPropagation();
@@ -1712,7 +1707,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
 
       '.tview-dropdown-toggle click' : function (el, ev) {
         this.disable_attrs(el, ev);
-        this.minimize_info_pane();
       },
 
       '.set-tree-attrs,.close-dropdown click' : function(el, ev) {
