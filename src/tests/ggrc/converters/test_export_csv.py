@@ -7,6 +7,8 @@ from os.path import abspath, dirname, join
 from flask.json import dumps
 
 from ggrc.app import app
+from ggrc.converters import get_importables
+from ggrc.models.reflection import AttributeInfo
 from tests.ggrc import TestCase
 
 THIS_ABS_PATH = abspath(dirname(__file__))
@@ -337,6 +339,32 @@ class TestExportSingleObject(TestCase):
         self.assertIn(",Cat ipsum {},".format(i), response.data)
       else:
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
+
+  def test_query_all_aliases(self):
+    data = lambda obj_type, field: [{
+      "object_name": obj_type,
+      "fields": "all",
+      "filters": {
+        "expression": {
+          "left": field,
+          "op": { "name": "=" },
+          "right": "test"
+        },
+      }
+    }]
+
+    failed = set()
+    for model in set(get_importables().values()):
+      for attr, field in AttributeInfo(model)._aliases.items():
+        if field is None:
+          continue
+        try:
+         field = field["display_name"] if type(field) is dict else field
+         res = self.export_csv(data(model.__name__, field))
+         self.assertEqual(res.status_code, 200)
+        except Exception as e:
+          failed.add((model, attr, field))
+    self.assertEqual(sorted(failed), [])
 
 
 class TestExportMultipleObjects(TestCase):
