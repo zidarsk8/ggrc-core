@@ -875,6 +875,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Assignee",
         "Code",
         "Workflow",
+        "Objects",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
