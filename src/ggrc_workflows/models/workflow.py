@@ -115,10 +115,12 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
           "display_name": "Manager",
           "type": AttributeInfo.Type.USER_ROLE,
           "mandatory": True,
+          "filter_by": "_filter_by_workflow_owner",
       },
       "workflow_member": {
           "display_name": "Member",
           "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_workflow_member",
       },
       "workflow_mapped": {
           "display_name": "No Access",
@@ -128,6 +130,14 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       "start_date": None,
       "end_date": None,
   }
+
+  @classmethod
+  def _filter_by_workflow_owner(cls, predicate):
+    return cls._filter_by_role("WorkflowOwner", predicate)
+
+  @classmethod
+  def _filter_by_workflow_member(cls, predicate):
+    return cls._filter_by_role("WorkflowMember", predicate)
 
   def copy(self, _other=None, **kwargs):
     columns = [

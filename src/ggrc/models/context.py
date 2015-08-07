@@ -8,7 +8,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from ggrc import db
 from ggrc.models.mixins import deferred, Base, Described
 
-
 class Context(Base, db.Model):
   __tablename__ = 'contexts'
 
@@ -93,3 +92,13 @@ class HasOwnContext(object):
       new_context = self.build_object_context(*args, **kwargs)
       self.contexts.append(new_context)
     return self.contexts[0]
+
+  @classmethod
+  def _filter_by_role(cls, role, predicate):
+    from ggrc_basic_permissions.models import Role, UserRole
+    from ggrc.models.person import Person
+    return Person.query.join(UserRole, Role).filter(
+      (UserRole.context_id == cls.context_id) &
+      (Role.name == role) &
+      (predicate(Person.name) | predicate(Person.email))
+    ).exists()
