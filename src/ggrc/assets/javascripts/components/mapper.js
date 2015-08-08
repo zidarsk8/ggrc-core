@@ -485,6 +485,7 @@
             contact = this.scope.attr("contact"),
             permission_parms = {},
             search = [],
+            filters,
             list,
             relevant;
 
@@ -496,6 +497,25 @@
         this.scope.attr("select_state", false);
         this.scope.attr("mapper.all_selected", false);
 
+        filters = _.map(this.scope.attr("mapper.relevant"), function (relevant) {
+          if (!relevant.filter) {
+            return;
+          }
+          var mappings, Loader;
+          if (model_name === "AllObject") {
+            Loader = GGRC.ListLoaders.MultiListLoader;
+            mappings = _.compact(_.map(GGRC.Mappings.get_mappings_for(relevant.filter.constructor.shortName), function (mapping) {
+              if (mapping instanceof GGRC.ListLoaders.DirectListLoader
+                  || mapping instanceof GGRC.ListLoaders.ProxyListLoader) {
+                return mapping;
+              }
+            }));
+          } else {
+            Loader = GGRC.ListLoaders.TypeFilteredListLoader;
+            mappings = GGRC.Mappings.get_canonical_mapping_name(relevant.model_name, model_name);
+          }
+          return new Loader(mappings, [model_name]).attach(relevant.filter);
+        });
         if (model_name === "AllObject") {
           model_name = this.scope.attr("types.all_objects.models");
         }
@@ -507,7 +527,8 @@
         relevant = _.map(this.scope.attr("mapper.relevant"), function (relevant) {
           return {
             model_name: relevant.model_name,
-            term: relevant.filter.title
+            term: relevant.filter.title,
+            filter: relevant.filter
           };
         });
         search.push({
@@ -515,15 +536,16 @@
           model_name: model_name,
           options: permission_parms
         });
-        $.merge(search, relevant);
-        search = _.map(search, function (query) {
+
+        search = _.map(search.concat(relevant), function (query) {
           return new GGRC.ListLoaders.SearchListLoader(function (binding) {
             return this.searchFor(query).then(function (mappings) {
               return mappings.entries;
             });
           }.bind(this)).attach({});
         }.bind(this));
-
+        search = filters.concat(search);
+        console.log("SEARCH", search);
         list = (search.length > 1) ?
                   new GGRC.ListLoaders.IntersectingListLoader(search).attach()
                 : search[0];
