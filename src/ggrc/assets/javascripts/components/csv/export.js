@@ -158,16 +158,21 @@
             data_grid = this.scope.attr("export.data_grid"),
             only_relevant = this.scope.attr("export.only_relevant"),
             query = _.map(panels, function (panel, index) {
-              var relevant_filter = "";
+              var relevant_filter = "",
+                  predicates;
               if (data_grid && index > 0) {
                 relevant_filter = "#__previous__," + (index - 1) + "#";
                 if (only_relevant && index > 1) {
-                  relevant_filter += " AND #__previous__," + (index - 2) + "#";
+                  relevant_filter += " AND #__previous__,0#";
                 }
               } else {
-                relevant_filter = _.reduce(panel.relevant(), function (query, el) {
-                  return (query && query + " AND ") + "#" + el.model_name + "," + el.filter.id + "#";
-                }, "");
+                predicates = _.map(panel.attr("relevant"), function (el) {
+                  var id = el.model_name === "__previous__" ? index - 1 : el.filter.id;
+                  return "#" + el.model_name + "," + id + "#";
+                });
+                relevant_filter = _.reduce(predicates, function (p1, p2) {
+                  return p1 + " AND " + p2;
+                });
               }
               return {
                 object_name: panel.type,
