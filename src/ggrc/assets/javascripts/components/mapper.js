@@ -486,8 +486,7 @@
             permission_parms = {},
             search = [],
             filters,
-            list,
-            relevant;
+            list;
 
         this.scope.attr("page", 0);
         this.scope.attr("entries", []);
@@ -524,28 +523,17 @@
         }
 
         this.scope.attr("page_loading", true);
-        relevant = _.map(this.scope.attr("mapper.relevant"), function (relevant) {
-          return {
-            model_name: relevant.model_name,
-            term: relevant.filter.title,
-            filter: relevant.filter
-          };
-        });
-        search.push({
-          term: this.scope.attr("term"),
-          model_name: model_name,
-          options: permission_parms
-        });
-
-        search = _.map(search.concat(relevant), function (query) {
-          return new GGRC.ListLoaders.SearchListLoader(function (binding) {
-            return this.searchFor(query).then(function (mappings) {
+        search = new GGRC.ListLoaders.SearchListLoader(function (binding) {
+            return this.searchFor({
+              term: this.scope.attr("term"),
+              model_name: model_name,
+              options: permission_parms
+            }).then(function (mappings) {
               return mappings.entries;
             });
           }.bind(this)).attach({});
-        }.bind(this));
+
         search = filters.concat(search);
-        console.log("SEARCH", search);
         list = (search.length > 1) ?
                   new GGRC.ListLoaders.IntersectingListLoader(search).attach()
                 : search[0];
