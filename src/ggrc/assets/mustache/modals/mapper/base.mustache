@@ -45,7 +45,7 @@
   <div class="row-fluid">
     <div class="span4">
       <h6>Object type</h6>
-      <select class="input-block-level" can-value="mapper.type" name="type-select">
+      <select {{#loading_or_saving}}disabled{{/loading_or_saving}} class="input-block-level" can-value="mapper.type" name="type-select">
         {{#each mapper.types}}
           {{#if items}}
             {{#if items.length}}
@@ -106,7 +106,8 @@
     is-loading="mapper.is_loading"
     object="mapper.object"
     entries="mapper.entries"
-    entries="mapper.options"
+    options="mapper.options"
+    page_loading="mapper.page_loading"
     mapper="mapper"
     types="mapper.types"
     type="mapper.type"
@@ -118,7 +119,7 @@
   <div class="filter-actions wrap-modal-spacing">
     <div class="row-fluid">
       <div class="span12">
-        <a class="btn btn-small btn-info pull-right modalSearchButton" href="javascript://">
+        <a class="btn btn-small btn-info pull-right modalSearchButton {{#loading_or_saving}}disabled{{/loading_or_saving}}" href="javascript://">
           Search
         </a>
       </div>
@@ -192,8 +193,7 @@
             {{/if_helpers}}
             btn-map btn btn-small btn-success preventdoubleclick" href="#">
           {{#if mapper.is_saving}}
-            <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
-            Saving
+            Saving, please wait...
           {{else}}
             Add Selected
           {{/if}}
