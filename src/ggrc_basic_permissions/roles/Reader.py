@@ -19,6 +19,8 @@ permissions = {
         "ControlAssertion",
         "Control",
         "ControlAssessment",
+        "CustomAttributeDefinition",
+        "CustomAttributeValue",
         "Issue",
         "ControlControl",
         "DataAsset",
