@@ -24,17 +24,21 @@ can.Component.extend({
           controls_list = this.scope.audit.get_binding("program_controls").list,
           assessments_dfd = this._refresh(assessments_list),
           controls_dfd = this._refresh(controls_list),
-          ignore_controls, dfd;
+          ignore_controls, dfd, inner_dfd = new $.Deferred().resolve();
 
       dfd = $.when(assessments_dfd, controls_dfd).then(function (assessments, controls) {
         ignore_controls = _.map(assessments, function(ca) {
           return ca.control.id;
         });
+
         return $.when.apply($, can.map(controls, function(control) {
           if (_.includes(ignore_controls, control.id)) {
             return;
           }
-          return this._generate(control);
+          // We are rewriting inner_dfd to make sure _generate calls are
+          // daisy chained
+          inner_dfd = this._generate(control, inner_dfd);
+          return  inner_dfd;
         }.bind(this)));
       }.bind(this));
       this._enter_loading_state(dfd);
@@ -49,20 +53,20 @@ can.Component.extend({
       return refresh_queue.trigger();
     },
 
-    _generate: function (control) {
+    _generate: function (control, dfd) {
       var assessment,
           index,
-          title = control.title + ' assessment',
+          title = control.title + ' assessment for ' + this.scope.audit.title,
           data = {
             audit: this.scope.audit,
             control: control.stub(),
             context: this.scope.audit.context,
             owners: [CMS.Models.Person.findInCacheById(GGRC.current_user.id)],
             test_plan: control.test_plan
-          },
-          dfd = GGRC.Models.Search.counts_for_types(title, ['ControlAssessment']);
-
-      return dfd.then(function (result) {
+          };
+      return dfd.then(function() {
+        return GGRC.Models.Search.counts_for_types(title, ['ControlAssessment']);
+      }).then(function (result) {
         index = result.getCountFor('ControlAssessment') + 1;
         data.title = title + ' ' + index;
         return new CMS.Models.ControlAssessment(data).save();

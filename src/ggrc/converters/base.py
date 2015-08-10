@@ -81,8 +81,9 @@ class Converter(object):
     grid_header = []
     for block_converter in self.block_converters:
       csv_header, csv_body = block_converter.to_array()
-      grid_header.extend(csv_header[1][:1])
-      grid_blocks.append(csv_body)
+      grid_header.extend(csv_header[1])
+      if csv_body:
+        grid_blocks.append(csv_body)
     grid_data = [list(chain(*i)) for i in product(*grid_blocks)]
     return [grid_header] + grid_data
 

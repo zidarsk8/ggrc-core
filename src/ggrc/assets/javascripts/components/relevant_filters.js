@@ -12,12 +12,20 @@
     scope: {
       relevant_menu_item: "@",
       menu: can.compute(function () {
-        var type = this.attr("type") === "AllObject" ? GGRC.page_model.type : this.attr("type"),
-            mappings = GGRC.Mappings.get_canonical_mappings_for(type),
-            menu = _.map(_.keys(mappings), function (mapping) {
-              return CMS.Models[mapping];
-            });
-        return menu;
+        var type = this.attr("type"),
+            isAll = type === "AllObject",
+            mappings;
+
+        if (this.attr("search_only") && isAll) {
+          mappings = GGRC.tree_view.base_widgets_by_type;
+        } else {
+          type = isAll ? GGRC.page_model.type : this.attr("type");
+          mappings = GGRC.Mappings.get_canonical_mappings_for(type);
+        }
+
+        return _.map(_.keys(mappings), function (mapping) {
+          return CMS.Models[mapping];
+        });
       })
     },
     events: {
@@ -52,6 +60,12 @@
       },
       ".remove_filter click": function (el) {
         this.scope.attr("relevant").splice(el.data("index"), 1);
+      },
+      "{scope.relevant}  change": function (list, item, which, type, val, oldVal) {
+        if (!/model_name/gi.test(which)) {
+          return;
+        }
+        item.target.attr("filter", new can.Map());
       }
     }
   });
