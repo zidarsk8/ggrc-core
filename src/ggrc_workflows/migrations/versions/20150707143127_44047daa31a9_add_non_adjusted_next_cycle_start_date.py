@@ -54,11 +54,20 @@ def upgrade():
         # We must skip tasks that don't have start days and end days defined
         if ((not all(tasks_start_days) and not all(tasks_end_days)) or
             (not tasks_start_days and not tasks_end_days)):
+            append_msg = ""
+            if workflow.next_cycle_start_date:
+                workflow.next_cycle_start_date = None
+                append_msg += (" Removing existing next cycle start date "
+                               "because none are configured.")
+                db.session.add(workflow)
+
             app.logger.info(
                 "Skipping workflow {0} (ID: {1}) because it doesn't "
-                "have relative start and end days specified".format(
+                "have relative start and end days specified.{2}".format(
                     workflow.title,
-                    workflow.id))
+                    workflow.id,
+                    append_msg
+                ))
             continue
 
         pre_compute_ncsd = workflow.next_cycle_start_date
