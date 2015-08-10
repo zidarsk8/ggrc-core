@@ -11,7 +11,6 @@
     template: can.view(GGRC.mustache_path + "/mapper/relevant_filter.mustache"),
     scope: {
       relevant_menu_item: "@",
-      has_parent: false,
       menu: can.compute(function () {
         var type = this.attr("type") === "AllObject" ? GGRC.page_model.type : this.attr("type"),
             mappings = GGRC.Mappings.get_canonical_mappings_for(type),
@@ -37,6 +36,7 @@
             model_singular: "__previous__"
           });
         }
+
         this.scope.attr("relevant").push({
           value: "",
           filter: new can.Map(),

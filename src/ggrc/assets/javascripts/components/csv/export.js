@@ -255,6 +255,7 @@
       //   return CMS.Models[name];
       // }))
       panel_number: "@",
+      has_parent: false,
       fetch_relevant_data: function (id, type) {
         var dfd = CMS.Models[type].findOne({id: id});
         dfd.then(function (result) {
@@ -299,6 +300,8 @@
         this.scope.attr("item.selected", {});
         this.scope.attr("item.relevant", []);
         this.scope.attr("item.filter", "");
+        this.scope.attr("item.has_parent", false);
+
         this.setSelected();
       }
     },
