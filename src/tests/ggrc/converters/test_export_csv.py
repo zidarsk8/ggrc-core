@@ -213,10 +213,7 @@ class TestExportSingleObject(TestCase):
             },
         },
         "fields": "all",
-    },
-
-
-    ]
+    }]
     response = self.export_csv(data)
 
     self.assertIn(",Cat ipsum 1,", response.data)
@@ -226,6 +223,91 @@ class TestExportSingleObject(TestCase):
         self.assertIn(",Audit {},".format(i), response.data)
       else:
         self.assertNotIn(",Audit {},".format(i), response.data)
+
+  def test_section_policy_relevant_query(self):
+    data = [{ # sec-1
+        "object_name": "Section",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Policy",
+                "slugs": ["p1"],
+            },
+        },
+        "fields": "all",
+      },{ # p3
+        "object_name": "Policy",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Section",
+                "slugs": ["sec-3"],
+            },
+        },
+        "fields": "all",
+    },{ # sec-8
+        "object_name": "Section",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Standard",
+                "slugs": ["std-1"],
+            },
+        },
+        "fields": "all",
+    },{ # std-3
+        "object_name": "Standard",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Section",
+                "slugs": ["sec-10"],
+            },
+        },
+        "fields": "all",
+    },{ # sec-5
+        "object_name": "Section",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Regulation",
+                "slugs": ["reg-2"],
+            },
+        },
+        "fields": "all",
+    },{ # reg-1
+        "object_name": "Regulation",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Section",
+                "slugs": ["sec-4"],
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(data)
+
+    sections = set([1, 5, 8])
+    titles = [",mapped section {},".format(i) for i in range(1, 11)]
+    titles.extend([",mapped reg {},".format(i) for i in range(1, 11)])
+    titles.extend([",mapped policy {},".format(i) for i in range(1, 11)])
+    titles.extend([",mapped standard {},".format(i) for i in range(1, 11)])
+
+    expected = set([
+      ",mapped section 1,",
+      ",mapped section 5,",
+      ",mapped section 8,",
+      ",mapped reg 1,",
+      ",mapped standard 3,",
+      ",mapped policy 3,",
+    ])
+
+    for title in titles:
+      if title in expected:
+        self.assertIn(title, response.data, "'{}' not found".format(title))
+      else:
+        self.assertNotIn(title, response.data, "'{}' was found".format(title))
 
   def test_multiple_relevant_query(self):
     data = [{
