@@ -3,7 +3,6 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-import ggrc.models
 from ggrc import db
 from .mixins import deferred, Base, Described, Mapping
 from sqlalchemy.ext.declarative import declared_attr
@@ -157,32 +156,3 @@ class Relatable(object):
     return cls.eager_inclusions(query, Relatable._include_links).options(
         orm.subqueryload('related_sources'),
         orm.subqueryload('related_destinations'))
-
-
-class RelationshipHelper(object):
-
-  @classmethod
-  def get_ids_related_to(cls, object_type, related_type, related_ids=[]):
-    """ get ids of objects
-
-    Get a list of all ids for object with object_type, that are related to any
-    of the objects with type related_type and id in related_ids
-    """
-    if isinstance(related_ids, (int, long)):
-      related_ids = [related_ids]
-
-    destination_ids = db.session.query(Relationship.destination_id).filter(
-        and_(
-            Relationship.destination_type == object_type,
-            Relationship.source_type == related_type,
-            Relationship.source_id.in_(related_ids),
-        )
-    )
-    source_ids = db.session.query(Relationship.source_id).filter(
-        and_(
-            Relationship.source_type == object_type,
-            Relationship.destination_type == related_type,
-            Relationship.destination_id.in_(related_ids),
-        )
-    )
-    return source_ids.union(destination_ids)

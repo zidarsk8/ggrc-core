@@ -8,7 +8,7 @@ from sqlalchemy import not_
 from sqlalchemy import or_
 
 from ggrc.models.reflection import AttributeInfo
-from ggrc.models.relationship import RelationshipHelper
+from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_importables
 
 
