@@ -159,16 +159,12 @@
             get_binding_name = this.scope.attr("mapper").get_binding_name,
             binding, mapping, selected, item;
 
-        if (!len) {
-          selected = this.scope.attr("mapper.get_instance");
-          binding = selected.get_binding(get_binding_name(selected, model.constructor.table_plural));
-          mapping = [];
-        } else {
-          binding = entries[0].binding;
-          mapping = entries[0].mapping;
-        }
-        item = new GGRC.ListLoaders.MappingResult(model, mapping, binding);
+        selected = this.scope.attr("mapper.get_instance");
+        binding = selected.get_binding(get_binding_name(selected, model.constructor.table_plural));
+        mapping = GGRC.Mappings.get_canonical_mapping_name(selected.type, model.type);
+        mapping = model.get_mapping(mapping);
 
+        item = new GGRC.ListLoaders.MappingResult(model, mapping, binding);
         item.append = true;
         entries.unshift(item);
       },
