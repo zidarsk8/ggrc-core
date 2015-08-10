@@ -65,6 +65,7 @@
             can.trigger(tgt, "destroyed");
             can.trigger(tgt.constructor, "destroyed", tgt);
           });
+          inst.refresh_all_force('workflow', 'context');
         }
       });
     }
