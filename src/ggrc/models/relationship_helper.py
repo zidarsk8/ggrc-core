@@ -8,13 +8,29 @@ from sqlalchemy import and_
 from ggrc import db
 from ggrc.extensions import get_extension_modules
 from ggrc.models import Audit
+from ggrc.models import Section
 from ggrc.models.relationship import Relationship
 
 
 class RelationshipHelper(object):
 
   @classmethod
-  def program_audit(cls, object_type, related_type, related_ids=[]):
+  def section_directive(cls, object_type, related_type, related_ids):
+    directives = {"Policy", "Regulation", "Standard"}
+    if not related_ids:
+      return None
+
+    if object_type == "Section" and related_type in directives:
+      return db.session.query(Section.id).filter(
+        Section.directive_id.in_(related_ids))
+    elif related_type == "Section" and object_type in directives:
+      return db.session.query(Section.directive_id).filter(
+        Section.id.in_(related_ids))
+
+    return None
+
+  @classmethod
+  def program_audit(cls, object_type, related_type, related_ids):
     if {object_type, related_type} != {"Program", "Audit"} or not related_ids:
       return None
 
@@ -28,7 +44,8 @@ class RelationshipHelper(object):
   @classmethod
   def get_special_mappings(cls, object_type, related_type, related_ids):
     return [
-        cls.program_audit(object_type, related_type, related_ids)
+        cls.program_audit(object_type, related_type, related_ids),
+        cls.section_directive(object_type, related_type, related_ids),
     ]
 
   @classmethod
