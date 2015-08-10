@@ -582,7 +582,7 @@ def update_workflow_state(workflow):
       cycle.workflow = workflow
       cycle.calculator = calculator
       # Other cycle attributes will be set in build_cycle.
-      build_cycle(cycle, None, base_date=workflow.next_cycle_start_date)
+      build_cycle(cycle, None, base_date=workflow.non_adjusted_next_cycle_start_date)
       notification.handle_cycle_created(None, obj=cycle)
 
     adjust_next_cycle_start_date(calculator, workflow)
@@ -864,8 +864,13 @@ def adjust_next_cycle_start_date(calculator, workflow, base_date=None, move_forw
     if not workflow.non_adjusted_next_cycle_start_date:
       last_cycle_start_date = max([c.start_date for c in workflow.cycles])
       first_task = calculator.tasks[0]
+      first_task_reified = calculator.relative_day_to_date(
+        relative_day=first_task.relative_start_day,
+        relative_month=first_task.relative_start_month,
+        base_date=last_cycle_start_date
+      )
 
-      if last_cycle_start_date.day > first_task.relative_start_day:
+      if last_cycle_start_date >= first_task_reified:
         last_cycle_start_date = last_cycle_start_date + calculator.time_delta
 
       workflow.non_adjusted_next_cycle_start_date = calculator.relative_day_to_date(
