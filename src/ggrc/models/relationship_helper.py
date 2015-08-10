@@ -6,18 +6,40 @@
 from sqlalchemy import and_
 
 from ggrc import db
+from ggrc.extensions import get_extension_modules
+from ggrc.models import Audit
 from ggrc.models.relationship import Relationship
 
 
 class RelationshipHelper(object):
 
   @classmethod
-  def get_special_mappings(cls, object_type, related_type, related_ids=[]):
-    return []
+  def program_audit(cls, object_type, related_type, related_ids=[]):
+    if {object_type, related_type} != {"Program", "Audit"} or not related_ids:
+      return None
+
+    if object_type == "Program":
+      return db.session.query(Audit.program_id).filter(
+          Audit.id.in_(related_ids))
+    else:
+      return db.session.query(Audit.id).filter(
+          Audit.program_id.in_(related_ids))
 
   @classmethod
-  def get_extension_mappings(cls, object_type, related_type, related_ids=[]):
-    return []
+  def get_special_mappings(cls, object_type, related_type, related_ids):
+    return [
+        cls.program_audit(object_type, related_type, related_ids)
+    ]
+
+  @classmethod
+  def get_extension_mappings(cls, object_type, related_type, related_ids):
+    queries = []
+    for extension in get_extension_modules():
+      get_ids = getattr(extension, "contributed_get_ids_related_to", None)
+      if callable(get_ids):
+        queries.append(get_ids(object_type, related_type, related_ids))
+
+    return queries
 
   @classmethod
   def _array_union(cls, queries):
