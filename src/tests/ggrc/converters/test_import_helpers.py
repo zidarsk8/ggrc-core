@@ -914,6 +914,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Start Date",
         "End Date",
         "Task Group",
+        "Cycle Object",
         "State",
     ])
     self.assertEquals(expected_names, display_names)
