@@ -192,6 +192,41 @@ class TestExportSingleObject(TestCase):
       else:
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
+  def test_program_audit_relevant_query(self):
+    data = [{ # should return just program prog-1
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Audit",
+                "slugs": ["au-1"],
+            },
+        },
+        "fields": "all",
+      },{ # Audits : au-1, au-3, au-5, au-7,
+        "object_name": "Audit",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "__previous__",
+                "ids": ["0"],
+            },
+        },
+        "fields": "all",
+    },
+
+
+    ]
+    response = self.export_csv(data)
+
+    self.assertIn(",Cat ipsum 1,", response.data)
+    expected = set([1, 3, 5, 7])
+    for i in range(1, 14):
+      if i in expected:
+        self.assertIn(",Audit {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Audit {},".format(i), response.data)
+
   def test_multiple_relevant_query(self):
     data = [{
         "object_name": "Program",
