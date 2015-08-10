@@ -3,6 +3,7 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+import traceback
 from datetime import date, datetime
 from flask import render_template, redirect, url_for, current_app
 from ggrc.rbac import permissions
@@ -32,8 +33,9 @@ def send_error_notification(message):
 def run_job(job):
   try:
     job()
-  except Exception as e:
-    message = "job '{}' failed with: \n{}".format(job.__name__, e.message)
+  except:
+    message = "job '{}' failed with: \n{}".format(job.__name__,
+                                                  traceback.format_exc())
     current_app.logger.error(message)
     send_error_notification(message)
 
