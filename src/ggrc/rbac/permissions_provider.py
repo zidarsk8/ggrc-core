@@ -187,21 +187,28 @@ class DefaultUserPermissions(UserPermissions):
     if self._permission_match(self.ADMIN_PERMISSION, self._permissions()):
       return True
     permissions = self._permissions()
+
     if not permissions.get(action) or not permissions[action].get(instance._inflector.model_singular):
       return False
     resources = self._permissions()\
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('resources', [])
+    contexts = self._permissions()\
+        .setdefault(action, {})\
+        .setdefault(instance._inflector.model_singular, {})\
+        .setdefault('contexts', [])
+
     if instance.id in resources:
       return True
+
     conditions = self._permissions()\
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('conditions', {})\
         .setdefault(instance.context_id, [])
     # Check any conditions applied per resource
-    if not conditions:
+    if instance.context_id in contexts and not conditions:
       return True
     for condition in conditions:
       func = _CONDITIONS_MAP[str(condition['condition'])]

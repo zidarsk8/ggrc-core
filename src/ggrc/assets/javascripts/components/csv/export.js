@@ -49,7 +49,6 @@
         {model_singular: "Control", title_plural: "Controls"},
         {model_singular: "ControlAssessment", title_plural: "Control Assessments"},
         {model_singular: "DataAsset", title_plural: "Data Assets"},
-        {model_singular: "Directive", title_plural: "Directives"},
         {model_singular: "Facility", title_plural: "Facilities"},
         {model_singular: "Issue", title_plural: "Issues"},
         {model_singular: "Market", title_plural: "Markets"},
@@ -71,7 +70,13 @@
         {model_singular: "TaskGroupTask", title_plural: "Tasks"},
         {model_singular: "Vendor", title_plural: "Vendors"},
         {model_singular: "Workflow", title_plural: "Workflows"}
-      ];
+      ],
+      exportable = _.sortBy(importable.concat([
+        {model_singular: "Cycle", title_plural: "Cycles"},
+        {model_singular: "CycleTaskGroup", title_plural: "Cycle Task Groups"},
+        {model_singular: "CycleTaskGroupObjectTask", title_plural: "Cycle Tasks"}
+      ]), "title_plural");
+
 
   can.Component.extend({
     tag: "csv-template",
@@ -249,9 +254,9 @@
     tag: "export-panel",
     template: "<content></content>",
     scope: {
-      importable: importable,
-      // TODO: change importable to a list of model names
-      // importable: _.compact(_.map(importable, function(name){
+      exportable: exportable,
+      // TODO: change exportable to a list of model names
+      // exportable: _.compact(_.map(exportable, function(name){
       //   return CMS.Models[name];
       // }))
       panel_number: "@",

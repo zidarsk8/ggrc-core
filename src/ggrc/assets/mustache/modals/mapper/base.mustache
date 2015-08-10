@@ -13,7 +13,7 @@
     {{#if mapper.search_only}}
     Search
     {{else}}
-    Map object{{^if_equals mapper.type "AllObject"}} to {{mapper.type}}{{/if}}
+    Map {{get_object}} to {{get_title}}
     {{/if}}
   </h2>
 </div>
@@ -45,7 +45,7 @@
   <div class="row-fluid">
     <div class="span4">
       <h6>Object type</h6>
-      <select class="input-block-level" can-value="mapper.type" name="type-select">
+      <select {{#loading_or_saving}}disabled{{/loading_or_saving}} class="input-block-level" can-value="mapper.type" name="type-select">
         {{#each mapper.types}}
           {{#if items}}
             {{#if items.length}}
@@ -106,18 +106,20 @@
     is-loading="mapper.is_loading"
     object="mapper.object"
     entries="mapper.entries"
-    entries="mapper.options"
+    options="mapper.options"
+    page_loading="mapper.page_loading"
     mapper="mapper"
     types="mapper.types"
     type="mapper.type"
     selected="mapper.selected"
     contact="mapper.contact"
     term="mapper.term"
+    options="mapper.options"
   items-per-page="20">
   <div class="filter-actions wrap-modal-spacing">
     <div class="row-fluid">
       <div class="span12">
-        <a class="btn btn-small btn-info pull-right modalSearchButton" href="javascript://">
+        <a class="btn btn-small btn-info pull-right modalSearchButton {{#loading_or_saving}}disabled{{/loading_or_saving}}" href="javascript://">
           Search
         </a>
       </div>
@@ -134,16 +136,16 @@
         <div class="span3">
           {{^if mapper.search_only}}
           <div class="pull-right check-all">
-            <label {{#if loading_or_saving}}class="disabled"{{/if}}
-              rel="tooltip"
-              data-placement="right"
-              data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria."
-            >
-              Select all
-              <input type="checkbox" can-value="mapper.all_selected" class="object-check-all"
-                {{#if loading_or_saving}}disabled="true"{{/if}}
-                {{#if mapper.all_selected}}checked="checked"{{/if}}
-              >
+              <a
+                href="#"
+                rel="tooltip"
+                class="object-check-all
+                  {{#if_helpers '\
+                    #if' loading_or_saving '\
+                    or #if' mapper.all_selected}}disabled{{/if}}"
+                data-placement="right"
+                data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria."
+                >Select all</a>
             </label>
           </div>
           {{/if}}
@@ -191,8 +193,7 @@
             {{/if_helpers}}
             btn-map btn btn-small btn-success preventdoubleclick" href="#">
           {{#if mapper.is_saving}}
-            <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
-            Saving
+            Saving, please wait...
           {{else}}
             Add Selected
           {{/if}}

@@ -20,17 +20,17 @@ class Converter(object):
   class_order = [
       "Person",
       "Program",
-      "RiskAssessment",
+      "Risk Assessment",
       "Audit",
       "Policy",
       "Regulation",
       "Standard",
       "Section",
       "Control",
-      "ControlAssessment",
+      "Control Assessment",
       "Workflow",
-      "TaskGroup",
-      "TaskGroupTask",
+      "Task Group",
+      "Task Group Task",
   ]
 
   priortiy_colums = [
@@ -134,8 +134,9 @@ class Converter(object):
                                        offset=offset, class_name=class_name)
       self.block_converters.append(block_converter)
 
-    order = defaultdict(lambda: len(self.class_order))
+    order = defaultdict(int)
     order.update({c: i for i, c in enumerate(self.class_order)})
+    order["Person"] = -1
     self.block_converters.sort(key=lambda x: order[x.name])
 
   def import_objects(self):
@@ -149,7 +150,6 @@ class Converter(object):
 
   def get_info(self):
     for converter in self.block_converters:
-      converter.import_secondary_objects(self.new_objects)
       self.response_data.append(converter.get_info())
     return self.response_data
 

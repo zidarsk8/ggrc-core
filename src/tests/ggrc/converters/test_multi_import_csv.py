@@ -37,12 +37,18 @@ class TestCsvImport(TestCase):
     filename = "multi_basic_policy_orggroup_product.csv"
     response_json = self.import_file(filename)
 
-    object_counts = [(4, 0, 0), (4, 0, 0), (5, 0, 0)]
-    for i, (created, updated, ignored) in enumerate(object_counts):
-      self.assertEqual(created, response_json[i]["created"])
-      self.assertEqual(updated, response_json[i]["updated"])
-      self.assertEqual(ignored, response_json[i]["ignored"])
-      self.assertEqual(set(), set(response_json[i]["row_warnings"]))
+    object_counts = {
+        "Org Group": (4, 0, 0),
+        "Policy": (4, 0, 0),
+        "Product": (5, 0, 0),
+    }
+
+    for row in response_json:
+      created, updated, ignored = object_counts[row["name"]]
+      self.assertEqual(created, row["created"])
+      self.assertEqual(updated, row["updated"])
+      self.assertEqual(ignored, row["ignored"])
+      self.assertEqual(set(), set(row["row_warnings"]))
 
     self.assertEqual(Policy.query.count(), 4)
     self.assertEqual(OrgGroup.query.count(), 4)
@@ -54,13 +60,18 @@ class TestCsvImport(TestCase):
     response_json = self.import_file(filename)
 
     row_messages = []
-    object_counts = [(3, 0, 2), (0, 0, 4), (5, 0, 2)]
-    for i, (created, updated, ignored) in enumerate(object_counts):
-      self.assertEqual(created, response_json[i]["created"])
-      self.assertEqual(updated, response_json[i]["updated"])
-      self.assertEqual(ignored, response_json[i]["ignored"])
-      row_messages.extend(response_json[i]["row_warnings"])
-      row_messages.extend(response_json[i]["row_errors"])
+    object_counts = {
+      "Policy": (3, 0, 2),
+      "Org Group": (0, 0, 4),
+      "Product": (5, 0, 2),
+    }
+    for row in response_json:
+      created, updated, ignored = object_counts[row["name"]]
+      self.assertEqual(created, row["created"])
+      self.assertEqual(updated, row["updated"])
+      self.assertEqual(ignored, row["ignored"])
+      row_messages.extend(row["row_warnings"])
+      row_messages.extend(row["row_errors"])
 
     expected_warnings = set([
         errors.DUPLICATE_VALUE_IN_CSV.format(
@@ -100,12 +111,17 @@ class TestCsvImport(TestCase):
     filename = "multi_basic_policy_orggroup_product_with_mappings.csv"
     response_json = self.import_file(filename)
 
-    object_counts = [(4, 0, 0), (4, 0, 0), (5, 0, 0)]
-    for i, (created, updated, ignored) in enumerate(object_counts):
-      self.assertEqual(created, response_json[i]["created"])
-      self.assertEqual(updated, response_json[i]["updated"])
-      self.assertEqual(ignored, response_json[i]["ignored"])
-      self.assertEqual(set(), set(response_json[i]["row_warnings"]))
+    object_counts = {
+      "Policy": (4, 0, 0),
+      "Org Group": (4, 0, 0),
+      "Product": (5, 0, 0),
+    }
+    for row in response_json:
+      created, updated, ignored = object_counts[row["name"]]
+      self.assertEqual(created, row["created"])
+      self.assertEqual(updated, row["updated"])
+      self.assertEqual(ignored, row["ignored"])
+      self.assertEqual(set(), set(row["row_warnings"]))
 
     self.assertEqual(Policy.query.count(), 4)
     self.assertEqual(OrgGroup.query.count(), 4)

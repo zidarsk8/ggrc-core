@@ -290,7 +290,7 @@
         $.extend(params, this.option_query),
         function(options) {
           var scope = params.scope || "System";
-          options = can.makeArray(options).sort(function(a,b){return a.id-b.id;});
+          options = can.makeArray(_.sortBy(options, "role_order"))
           if (params.scope == "Private Program") {
             description = "A person with the No Access role will not be able to see this Private Program.";
           }
