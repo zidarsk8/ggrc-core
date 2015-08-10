@@ -63,7 +63,7 @@
         }.bind(this))
         .fail(function (data) {
           this.scope.attr("state", "select");
-          $("body").trigger("ajax:flash", {"error": data});
+          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
         }.bind(this))
         .always(function () {
           this.scope.attr("isLoading", false);
@@ -113,7 +113,7 @@
         }.bind(this))
         .fail(function (data) {
           this.scope.attr("state", "select");
-          $("body").trigger("ajax:flash", {"error": data});
+          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
         }.bind(this))
         .always(function () {
           this.scope.attr("isLoading", false);
