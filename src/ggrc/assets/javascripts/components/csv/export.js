@@ -20,9 +20,9 @@
         relevant: can.compute(function () {
           return new can.List();
         }),
-        columns: function () {
+        columns: can.compute(function () {
           return GGRC.model_attr_defs[this.attr("type")];
-        }
+        })
       }),
       panelsModel = can.Map({
         items: new can.List()
@@ -124,7 +124,7 @@
           GGRC.Utils.download("import_template.csv", data);
         }.bind(this))
         .fail(function (data) {
-          $("body").trigger("ajax:flash", {"error": data});
+          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
         }.bind(this));
       },
       ".import-list a click": function (el, ev) {
@@ -163,16 +163,21 @@
             data_grid = this.scope.attr("export.data_grid"),
             only_relevant = this.scope.attr("export.only_relevant"),
             query = _.map(panels, function (panel, index) {
-              var relevant_filter = "";
+              var relevant_filter = "",
+                  predicates;
               if (data_grid && index > 0) {
                 relevant_filter = "#__previous__," + (index - 1) + "#";
                 if (only_relevant && index > 1) {
-                  relevant_filter += " AND #__previous__," + (index - 2) + "#";
+                  relevant_filter += " AND #__previous__,0#";
                 }
               } else {
-                relevant_filter = _.reduce(panel.relevant(), function (query, el) {
-                  return (query && query + " AND ") + "#" + el.model_name + "," + el.filter.id + "#";
-                }, "");
+                predicates = _.map(panel.attr("relevant"), function (el) {
+                  var id = el.model_name === "__previous__" ? index - 1 : el.filter.id;
+                  return "#" + el.model_name + "," + id + "#";
+                });
+                relevant_filter = _.reduce(predicates, function (p1, p2) {
+                  return p1 + " AND " + p2;
+                });
               }
               return {
                 object_name: panel.type,
@@ -196,7 +201,7 @@
           GGRC.Utils.download(this.scope.attr("export.get_filename"), data);
         }.bind(this))
         .fail(function (data) {
-          $("body").trigger("ajax:flash", {"error": data});
+          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
         }.bind(this))
         .always(function () {
           this.scope.attr("export.loading", false);
@@ -255,6 +260,7 @@
       //   return CMS.Models[name];
       // }))
       panel_number: "@",
+      has_parent: false,
       fetch_relevant_data: function (id, type) {
         var dfd = CMS.Models[type].findOne({id: id});
         dfd.then(function (result) {
@@ -273,25 +279,35 @@
         if (!panel_number && url.relevant_id && url.relevant_type) {
           this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }
+        this.setSelected();
       },
-      "[data-action=attribute_select_toggle] click": function (el, ev){
-        var items = GGRC.model_attr_defs[this.scope.attr("item.type")]
+      "[data-action=attribute_select_toggle] click": function (el, ev) {
+        var items = GGRC.model_attr_defs[this.scope.attr("item.type")],
             split_items = {
-              mappings: _.filter(items, function(el){
+              mappings: _.filter(items, function (el) {
                 return el.type == "mapping";
               }),
-              attributes: _.filter(items, function(el){
+              attributes: _.filter(items, function (el) {
                 return el.type != "mapping";
               })
             };
-        _.map(split_items[el.data("type")], function(attr){
-          this.scope.attr("item.selected."+attr.key, el.data("value"))
+        _.map(split_items[el.data("type")], function (attr) {
+          this.scope.attr("item.selected." + attr.key, el.data("value"));
         }.bind(this));
+      },
+      "setSelected": function () {
+        this.scope.attr("item.selected", _.reduce(this.scope.attr("item.columns"), function (memo, data) {
+          memo[data.key] = true;
+          return memo;
+        }, {}));
       },
       "{scope.item} type": function () {
         this.scope.attr("item.selected", {});
         this.scope.attr("item.relevant", []);
         this.scope.attr("item.filter", "");
+        this.scope.attr("item.has_parent", false);
+
+        this.setSelected();
       }
     },
     helpers: {
