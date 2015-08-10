@@ -10,6 +10,7 @@
     tag: "relevant-filter",
     template: can.view(GGRC.mustache_path + "/mapper/relevant_filter.mustache"),
     scope: {
+      relevant_menu_item: "@",
       menu: can.compute(function () {
         var type = this.attr("type"),
             isAll = type === "AllObject",
@@ -28,12 +29,27 @@
       })
     },
     events: {
+      "{scope.relevant} change": function (list, ev, item, which, state, prevState) {
+        this.scope.attr("has_parent", _.findWhere(this.scope.attr("relevant"), {model_name: "__previous__"}));
+      },
       ".add-filter-rule click": function (el, ev) {
         ev.preventDefault();
+        var menu = this.scope.attr("menu");
+
+        if (this.scope.attr("relevant_menu_item") === "parent"
+            && +this.scope.attr("panel_number") !== 0
+            && !this.scope.attr("has_parent")) {
+          menu.unshift({
+            title_singular: "Previous objects",
+            model_singular: "__previous__"
+          });
+        }
+
         this.scope.attr("relevant").push({
           value: "",
           filter: new can.Map(),
-          model_name: this.scope.attr("menu")[0].model_singular
+          menu: menu,
+          model_name: menu[0].model_singular
         });
       },
       ".ui-autocomplete-input autocomplete:select": function (el, ev, data) {
