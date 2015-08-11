@@ -4,6 +4,7 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from sqlalchemy import and_
+from sqlalchemy import sql
 
 from ggrc import db
 from ggrc.extensions import get_extension_modules
@@ -80,6 +81,9 @@ class RelationshipHelper(object):
 
     if isinstance(related_ids, (int, long)):
       related_ids = [related_ids]
+
+    if not related_ids:
+      return db.session.query(Relationship.source_id).filter(sql.false())
 
     destination_ids = db.session.query(Relationship.destination_id).filter(
         and_(
