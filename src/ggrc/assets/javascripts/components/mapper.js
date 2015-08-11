@@ -501,8 +501,8 @@
         this.scope.attr("select_state", false);
         this.scope.attr("mapper.all_selected", false);
 
-        filters = _.map(this.scope.attr("mapper.relevant"), function (relevant) {
-          if (!relevant.filter) {
+        filters = _.compact(_.map(this.scope.attr("mapper.relevant"), function (relevant) {
+          if (!relevant.value) {
             return;
           }
           var mappings, Loader;
@@ -519,7 +519,7 @@
             mappings = GGRC.Mappings.get_canonical_mapping_name(relevant.model_name, model_name);
           }
           return new Loader(mappings, [model_name]).attach(relevant.filter);
-        });
+        }));
         if (model_name === "AllObject") {
           model_name = this.scope.attr("types.all_objects.models");
         }
