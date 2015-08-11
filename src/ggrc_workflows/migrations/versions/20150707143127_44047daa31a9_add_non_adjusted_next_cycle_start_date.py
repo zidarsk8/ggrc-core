@@ -33,6 +33,36 @@ def upgrade():
                   sa.Column('non_adjusted_next_cycle_start_date',
                   sa.Date(), nullable=True))
 
+    # If somebody deleted all the tasks we must clear the next cycle start
+    # date
+    workflows = db.session.query(models.Workflow) \
+        .filter(
+        models.Workflow.next_cycle_start_date != None,
+        models.Workflow.recurrences == True,
+        models.Workflow.status == 'Active',
+        models.Workflow.next_cycle_start_date < date.today()
+    ).all()
+
+    for workflow in workflows:
+        tasks_start_days = [task.relative_start_day
+                            for tg in workflow.task_groups
+                            for task in tg.task_group_tasks]
+
+        tasks_end_days = [task.relative_end_day
+                          for tg in workflow.task_groups
+                          for task in tg.task_group_tasks]
+
+        if ((not all(tasks_start_days) and not all(tasks_end_days)) or
+                (not tasks_start_days and not tasks_end_days)):
+            app.logger.warning(
+                "Removing NCSD from expired WF {} because no tasks are "
+                "set up. Current NCSD: {}".format(
+                    workflow.id,
+                    workflow.next_cycle_start_date
+                ))
+            workflow.next_cycle_start_date = None
+            db.session.add(workflow)
+
     workflows = db.session.query(models.Workflow) \
         .filter(
         models.Workflow.next_cycle_start_date != None,
@@ -42,8 +72,6 @@ def upgrade():
         models.Workflow.next_cycle_start_date >= date.today()
     ).all()
 
-    app.logger.info("Setting up non-adjusted next cycle start date and "
-                    "adjusting existing NCSD...")
     for workflow in workflows:
         tasks_start_days = [task.relative_start_day
                                 for tg in workflow.task_groups
@@ -63,10 +91,9 @@ def upgrade():
                                "because none are configured.")
                 db.session.add(workflow)
 
-            app.logger.info(
-                "Skipping workflow {0} (ID: {1}) because it doesn't "
-                "have relative start and end days specified.{2}".format(
-                    workflow.title,
+            app.logger.warning(
+                "Skipping active WF {0} because no tasks "
+                "are set up.{1}".format(
                     workflow.id,
                     append_msg
                 ))
@@ -129,56 +156,20 @@ def upgrade():
             task.relative_end_day) for tg in workflow.task_groups
                                    for task in tg.task_group_tasks]
 
-        diff_mark = ""
         if pre_compute_ncsd != post_compute_ncsd:
-            diff_mark = "!! ADJUSTED !! "
-
-        app.logger.info(
-            "{}Workflow with ID: "
-            "{}; Freq: {}, PRE: {}, Last cycle: {}, POST: {}, NON: {},"
-            "tasks start: {}, tasks end: {},".format(
-                diff_mark,
-                workflow.id,
-                workflow.frequency[:2],
-                pre_compute_ncsd,
-                last_cycle_start_date,
-                post_compute_ncsd,
-                workflow.non_adjusted_next_cycle_start_date,
-                start_dates,
-                end_dates))
+            app.logger.warning(
+                "Adjusted NCSD for workflow {}. "
+                "Freq: {}, PRE: {}, Last cycle: {}, POST: {}, NON: {},"
+                "tasks start: {}, tasks end: {},".format(
+                    workflow.id,
+                    workflow.frequency[:2],
+                    pre_compute_ncsd,
+                    last_cycle_start_date,
+                    post_compute_ncsd,
+                    workflow.non_adjusted_next_cycle_start_date,
+                    start_dates,
+                    end_dates))
         db.session.add(workflow)
-    app.logger.info("Finished setting up non-adjusted next cycle start date.")
-
-    # If somebody deleted all the tasks we should clear the next cycle start
-    # date
-    workflows = db.session.query(models.Workflow) \
-        .filter(
-        models.Workflow.next_cycle_start_date != None,
-        models.Workflow.recurrences == True,
-        models.Workflow.status == 'Active',
-        models.Workflow.next_cycle_start_date < date.today()
-    ).all()
-
-    app.logger.info("Removing next cycle start date from tasks that have no "
-                    "tasks set up...")
-    for workflow in workflows:
-        tasks_start_days = [task.relative_start_day
-                            for tg in workflow.task_groups
-                            for task in tg.task_group_tasks]
-
-        tasks_end_days = [task.relative_end_day
-                          for tg in workflow.task_groups
-                          for task in tg.task_group_tasks]
-
-        if ((not all(tasks_start_days) and not all(tasks_end_days)) or
-                (not tasks_start_days and not tasks_end_days)):
-            app.logger.info("Removing NCSD from Workflow: {}. Current NCSD: {}".format(
-                workflow.id,
-                workflow.next_cycle_start_date
-            ))
-            workflow.next_cycle_start_date = None
-            db.session.add(workflow)
-    app.logger.info("Finished removing next cycle start date.")
 
     # Save
     db.session.commit()
