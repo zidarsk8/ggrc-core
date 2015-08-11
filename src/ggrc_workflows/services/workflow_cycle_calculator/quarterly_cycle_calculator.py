@@ -38,7 +38,8 @@ class QuarterlyCycleCalculator(CycleCalculator):
         'relative_end': (task.relative_start_month, task.relative_end_day)
       }
 
-  def relative_day_to_date(self, relative_day, relative_month=None, base_date=None):
+  def relative_day_to_date(self, relative_day, relative_month=None,
+                           base_date=None):
     """Converts a quarterly representation of a day into concrete date object.
 
     Relative month is not the best description, but we have to standardize on
@@ -58,9 +59,6 @@ class QuarterlyCycleCalculator(CycleCalculator):
     Afterwards we repeat the math similar to monthly cycle calculator and
     ensure that the day is not overflowing to the next month.
     """
-
-    # If we don't get relative month as argument, get month information from
-    # relative day.
     relative_day = int(relative_day)
     relative_month = int(relative_month)
 
@@ -68,7 +66,9 @@ class QuarterlyCycleCalculator(CycleCalculator):
 
     # relative_month is 1, 2 or 3 and represents quarterly option, based
     # on which we select the month domain. Month is then the LARGEST
-    # number from all the months that were before base_date.month
+    # number from all the months that were before base_date.month - except
+    # at the end of the year when quarter can overflow to next year. In such
+    # case it is the MINIMUM.
     month_domain = self.date_domain[relative_month]
     domain = filter(lambda x: x <= base_date.month, month_domain)
     if len(domain):

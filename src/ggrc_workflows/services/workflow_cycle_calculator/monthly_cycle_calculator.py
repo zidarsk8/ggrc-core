@@ -24,7 +24,8 @@ class MonthlyCycleCalculator(CycleCalculator):
     base_date = self.get_base_date(base_date)
     self.reified_tasks = {}
     for task in self.tasks:
-      start_date, end_date = self.non_adjusted_task_date_range(task, base_date=base_date)
+      start_date, end_date = self.non_adjusted_task_date_range(
+        task, base_date=base_date)
       self.reified_tasks[task.id] = {
         'start_date': start_date,
         'end_date': end_date,
@@ -32,7 +33,8 @@ class MonthlyCycleCalculator(CycleCalculator):
         'relative_end': task.relative_end_day
       }
 
-  def relative_day_to_date(self, relative_day, relative_month=None, base_date=None):
+  def relative_day_to_date(self, relative_day, relative_month=None,
+                           base_date=None):
     """Converts a monthly representation of a day into concrete date object.
 
     Monthly relative days are represented as days of the month; we calculate
@@ -60,7 +62,8 @@ class MonthlyCycleCalculator(CycleCalculator):
 
     if not base_date:
       base_date = datetime.date(today.year, today.month, 1)
-    ddate = base_date + relativedelta.relativedelta(days=relative_day - base_date.day)
+    ddate = base_date + relativedelta.relativedelta(
+      days=relative_day - base_date.day)
 
     # We want to go up to the end of the month and not over.
     if ddate.month != base_date.month:

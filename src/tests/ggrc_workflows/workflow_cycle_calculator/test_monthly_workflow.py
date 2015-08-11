@@ -597,7 +597,6 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
       self.assertEqual(active_wf.status, "Active")
 
-      # First cycle should start on 10th
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 1, 29))
 
     # January

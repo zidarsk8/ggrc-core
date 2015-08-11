@@ -379,3 +379,63 @@ class TestAnnuallyWorkflow(BaseWorkflowTestCase):
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
       self.assertEqual(active_wf.next_cycle_start_date, date(2019, 7, 12))
+
+  def test_workflow_mid_cycle_verify(self):
+    annually_wf = {
+      "title": "annually thingy",
+      "description": "start this many a time",
+      "frequency": "annually",
+      "task_groups": [{
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'annual task 1',
+            "relative_start_day": 1,
+            "relative_start_month": 8,
+            "relative_end_day": 4,
+            "relative_end_month": 8,
+          },
+          {
+            'title': 'annual task 2',
+            "relative_start_day": 5,
+            "relative_start_month": 8,
+            "relative_end_day": 8,
+            "relative_end_month": 8,
+          },
+          {
+            'title': 'annual task 3',
+            "relative_start_day": 9,
+            "relative_start_month": 8,
+            "relative_end_day": 15,
+            "relative_end_month": 8,
+          },
+          {
+            'title': 'annual task 4',
+            "relative_start_day": 16,
+            "relative_start_month": 8,
+            "relative_end_day": 19,
+            "relative_end_month": 8,
+          },
+          {
+            'title': 'annual task 5',
+            "relative_start_day": 20,
+            "relative_start_month": 8,
+            "relative_end_day": 23,
+            "relative_end_month": 8,
+          }],
+        "task_group_objects": []
+      },
+      ]
+    }
+    with freeze_time("2015-8-10 13:00"):
+      _, wf = self.generator.generate_workflow(annually_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 8, 1))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id).one()
+      self.assertEqual(cycle.start_date, date(2015, 7, 31))
+      self.assertEqual(cycle.end_date, date(2015, 8, 21))

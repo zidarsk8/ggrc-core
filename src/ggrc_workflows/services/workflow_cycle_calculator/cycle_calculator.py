@@ -46,7 +46,8 @@ class CycleCalculator(object):
   HOLIDAYS = GoogleHolidays()
 
   @abstractmethod
-  def relative_day_to_date(self, relative_day, relative_month=None, base_date=None):
+  def relative_day_to_date(self, relative_day, relative_month=None,
+                           base_date=None):
     raise NotImplementedError("Converting from relative to real date"
                               "must be done on an instance.")
 
@@ -79,7 +80,8 @@ class CycleCalculator(object):
     self.tasks = [
       task for task_group in self.workflow.task_groups
            for task in task_group.task_group_tasks]
-    self.tasks.sort(key=lambda t: (t.relative_start_month, t.relative_start_day))
+    self.tasks.sort(key=lambda t: (t.relative_start_month,
+                                   t.relative_start_day))
 
   def is_work_day(self, ddate):
     """Check whether specific ddate is workday or if it's a holiday/weekend.
@@ -123,6 +125,9 @@ class CycleCalculator(object):
     return ddate
 
   def get_base_date(self, base_date=None):
+    """Base date from which we will calculate must be less than or equal to the
+    first tasks' relative day to ensure consistent calculation across different
+    tasks."""
     if not base_date:
       base_date = datetime.date.today()
 

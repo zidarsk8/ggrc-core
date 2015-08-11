@@ -32,8 +32,10 @@ class OneTimeCycleCalculator(CycleCalculator):
     return d
 
   def workflow_date_range(self):
-    tasks_start_dates = [self._date_normalizer(task.start_date) for task in self.tasks]
-    tasks_end_dates = [self._date_normalizer(task.end_date) for task in self.tasks]
+    tasks_start_dates = [
+      self._date_normalizer(task.start_date) for task in self.tasks]
+    tasks_end_dates = [
+      self._date_normalizer(task.end_date) for task in self.tasks]
     return min(tasks_start_dates), max(tasks_end_dates)
 
   def next_cycle_start_date(self, base_date=None):
