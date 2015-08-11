@@ -52,7 +52,7 @@ class Program(HasObjectState, CustomAttributable, Documentable,
           "type": AttributeInfo.Type.USER_ROLE,
       },
       "program_mapped": {
-          "display_name": "Mapped",
+          "display_name": "No Access",
           "type": AttributeInfo.Type.USER_ROLE,
       },
   }
