@@ -81,7 +81,7 @@ class TestExportMultipleObjects(TestCase):
     gen = WorkflowsGenerator()
 
     # generate cycle for the only one time wf
-    wf1 = Workflow.query.filter_by(status="Draft", title="wf-1").first()
+    wf1 = Workflow.query.filter_by(status="Draft", slug="wf-1").first()
     if wf1:
       gen.generate_cycle(wf1)
 
@@ -105,6 +105,7 @@ class TestExportMultipleObjects(TestCase):
     return response
 
   def test_workflow_task_group_mapping(self):
+    """ test workflow and task group mappings """
     data = [
         {
             "object_name": "Workflow",  # wf-1
@@ -129,11 +130,42 @@ class TestExportMultipleObjects(TestCase):
         },
     ]
     response = self.export_csv(data).data
-    self.assertEquals(4, response.count("wf-1"))  # 2 for wf and 1 on each tg
+    self.assertEquals(3, response.count("wf-1"))  # 1 for wf and 1 on each tg
     self.assertIn("tg-1", response)
     self.assertIn("tg-6", response)
 
+  def test_tg_task(self):
+    """ test task group and task mappings """
+    data = [
+        {
+            "object_name": "TaskGroupTask",  # task-1, task-7
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "TaskGroup",
+                    "slugs": ["tg-1"],
+                },
+            },
+            "fields": "all",
+        }, {
+            "object_name": "TaskGroup",  # tg-1, tg-2
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["0"],
+                },
+            },
+            "fields": "all",
+        },
+    ]
+    response = self.export_csv(data).data
+    self.assertEquals(3, response.count("tg-1"))  # 2 for tasks and 1 for tg
+    self.assertIn("task-1", response)
+    self.assertIn("task-7", response)
+
   def test_workflow_cycle_mapping(self):
+    """ test workflow and cycle mappings """
     data = [
         {
             "object_name": "Cycle",  # cycle with title wf-1
@@ -158,8 +190,5 @@ class TestExportMultipleObjects(TestCase):
         },
     ]
     response = self.export_csv(data).data
-    print response
-    self.assertEquals(3, response.count("wf-1"))  # 1 for cycle and 2 for wf
+    self.assertEquals(2, response.count("wf-1"))  # 1 for cycle and 1 for wf
     self.assertIn("CYCLE-", response)
-
-
