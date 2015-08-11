@@ -901,8 +901,8 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Summary"]["mandatory"])
     self.assertTrue(vals["Assignee"]["mandatory"])
 
-  def test_cycle_task_group_task_definitions(self):
-    """ test default headers for Cycle Task Group Task """
+  def test_cycle_taskdefinitions(self):
+    """ test default headers for Cycle Task Group Object Task """
     definitions = get_object_column_definitions(wf_models.CycleTaskGroupObjectTask)
     display_names = set([val["display_name"] for val in definitions.values()])
     expected_names = set([
@@ -921,7 +921,6 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Summary"]["mandatory"])
     self.assertTrue(vals["Assignee"]["mandatory"])
-
 
 
 class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
