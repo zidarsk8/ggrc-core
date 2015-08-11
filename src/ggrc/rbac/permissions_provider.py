@@ -215,7 +215,7 @@ class DefaultUserPermissions(UserPermissions):
         .setdefault(context_id, [])
 
     # Check any conditions applied per resource
-    if context_id in contexts and not conditions:
+    if (None in contexts or context_id in contexts) and not conditions:
       return True
     for condition in conditions:
       func = _CONDITIONS_MAP[str(condition['condition'])]
