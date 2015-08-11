@@ -55,7 +55,7 @@ class RelationshipHelper(object):
     for extension in get_extension_modules():
       get_ids = getattr(extension, "contributed_get_ids_related_to", None)
       if callable(get_ids):
-        queries.extend(get_ids(object_type, related_type, related_ids))
+        queries.append(get_ids(object_type, related_type, related_ids))
     return queries
 
   @classmethod

@@ -136,17 +136,17 @@ class TestExportMultipleObjects(TestCase):
   def test_workflow_cycle_mapping(self):
     data = [
         {
-            "object_name": "Workflow",  # wf-1
+            "object_name": "Cycle",  # cycle with title wf-1
             "filters": {
                 "expression": {
                     "op": {"name": "relevant"},
-                    "object_name": "Cycle",
-                    "slugs": ["tg-1"],
+                    "object_name": "Workflow",
+                    "slugs": ["wf-1"],
                 },
             },
             "fields": "all",
         }, {
-            "object_name": "Cycle",  # wf-1
+            "object_name": "Workflow",  # wf-1
             "filters": {
                 "expression": {
                     "op": {"name": "relevant"},
@@ -158,7 +158,8 @@ class TestExportMultipleObjects(TestCase):
         },
     ]
     response = self.export_csv(data).data
-    self.assertEquals(2, response.count("wf-1"))  # 1 for cycle and wf
+    print response
+    self.assertEquals(3, response.count("wf-1"))  # 1 for cycle and 2 for wf
     self.assertIn("CYCLE-", response)
 
 
