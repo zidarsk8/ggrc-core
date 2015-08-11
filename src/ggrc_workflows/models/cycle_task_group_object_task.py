@@ -7,14 +7,18 @@
 from ggrc import db
 from ggrc.models.types import JsonType
 from ggrc.models.mixins import (
-    Base, Titled, Described, Timeboxed, Stateful, WithContact
+    Base, Titled, Described, Timeboxed, Slugged, Stateful, WithContact
     )
 
 
 class CycleTaskGroupObjectTask(
-    WithContact, Stateful, Timeboxed, Described, Titled, Base, db.Model):
+    WithContact, Stateful, Slugged, Timeboxed, Described, Titled, Base, db.Model):
   __tablename__ = 'cycle_task_group_object_tasks'
   _title_uniqueness = False
+
+  @classmethod
+  def generate_slug_prefix_for(cls, obj):
+    return "CYCLETASK"
 
   VALID_STATES = (None, 'InProgress', 'Assigned', 'Finished', 'Declined', 'Verified')
 
@@ -59,3 +63,26 @@ class CycleTaskGroupObjectTask(
                         +"<li>Click \"Approve\" to approve the object.</li>"\
                         +"<li>Click \"Decline\" to decline the object.</li>"\
                         +"</ol>"
+
+  _aliases = {
+      "title": "Summary",
+      "description": "Task Details",
+      "contact": {
+          "display_name": "Assignee",
+          "mandatory": True,
+      },
+      "secondary_contact": None,
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "cycle_task_group": {
+          "display_name": "Task Group",
+          "mandatory": True,
+      },
+      "task_type": {
+          "display_name": "Task Type",
+          "mandatory": True,
+      },
+      "cycle_object": {
+          "display_name": "Cycle Object",
+      },
+  }

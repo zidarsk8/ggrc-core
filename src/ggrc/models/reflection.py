@@ -117,6 +117,7 @@ class AttributeInfo(object):
   class Type(object):
     PROPERTY = "property"
     MAPPING = "mapping"
+    SPECIAL_MAPPING = "special_mapping"
     CUSTOM = "custom"
     USER_ROLE = "user_role"
 
@@ -223,7 +224,7 @@ class AttributeInfo(object):
       mapping_name = "{}{}".format(cls.MAPPING_PREFIX, class_name)
       definitions[mapping_name.lower()] = {
           "display_name": "map:{}".format(class_name),
-          "attr_name": mapping_class,
+          "attr_name": mapping_class.lower(),
           "mandatory": False,
           "unique": False,
           "description": "",

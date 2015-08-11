@@ -1272,5 +1272,11 @@ label.second-in-column {
   }
   .check-all {
     margin-right: 15px;
+    .disabled {
+      color: $gray;
+      &:hover {
+        text-decoration: none;
+      }
+    }
   }
 }

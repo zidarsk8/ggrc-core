@@ -26,7 +26,7 @@
         </select>
       </h5>
 
-      <ul class="model-list select-clear-all">
+      <ul class="select-clear-all">
         <li>
           <a href="javascript://" class="select-all">Select all </a>
         </li>
@@ -38,7 +38,7 @@
       <ul class="model-list">
         {{#selected_child_tree_model_list}}
         <li>
-          <label class="checkbox-inline">
+          <label class="checkbox-inline" title="{{display_name}}">
             <input type="checkbox"
               {{#if display_status}}checked="checked"{{/if}}
               value="{{model_name}}"

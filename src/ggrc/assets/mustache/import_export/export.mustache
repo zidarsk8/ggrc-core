@@ -44,9 +44,9 @@
                       </button>
                     {{/first_panel}}
                     <select can-value="type" class="input-block-level option-type-selector">
-                      {{#importable}}
+                      {{#exportable}}
                         <option value="{{model_singular}}" label="{{title_plural}}"></option>
-                      {{/importable}}
+                      {{/exportable}}
                     </select>
                   </div>
                 </div>
@@ -60,7 +60,7 @@
                   <relevant-filter type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
                 {{/if}}
               {{else}}
-                <relevant-filter type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
+                <relevant-filter has_parent="item.has_parent" relevant_menu_item="parent" type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
               {{/if}}
             </export-panel>
           </div>

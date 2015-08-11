@@ -8,12 +8,15 @@
 from datetime import date
 
 from ggrc import db
-from ggrc.models import Person
+from ggrc.converters import errors
+from ggrc.converters import get_importables
+from ggrc.converters.handlers import CheckboxColumnHandler
 from ggrc.converters.handlers import ColumnHandler
 from ggrc.converters.handlers import UserColumnHandler
-from ggrc.converters.handlers import CheckboxColumnHandler
-from ggrc.converters import errors
+from ggrc.models import Person
+from ggrc_workflows.models import CycleTaskGroup
 from ggrc_workflows.models import TaskGroup
+from ggrc_workflows.models import TaskGroupObject
 from ggrc_workflows.models import Workflow
 from ggrc_workflows.models import WorkflowPerson
 
@@ -93,6 +96,16 @@ class TaskGroupColumnHandler(ParentColumnHandler):
     """ init task group handler """
     self.parent = TaskGroup
     super(TaskGroupColumnHandler, self).__init__(row_converter, key, **options)
+
+
+class CycleTaskGroupColumnHandler(ParentColumnHandler):
+
+  """ handler for task group column in task group tasks """
+
+  def __init__(self, row_converter, key, **options):
+    """ init task group handler """
+    self.parent = CycleTaskGroup
+    super(CycleTaskGroupColumnHandler, self).__init__(row_converter, key, **options)
 
 
 class TaskDateColumnHandler(ColumnHandler):
@@ -207,8 +220,79 @@ class WorkflowPersonColumnHandler(UserColumnHandler):
       db.session.add(workflow_person)
     self.dry_run = True
 
+
+class ObjectsColumnHandler(ColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.mappable = get_importables()
+    self.new_slugs = row_converter.block_converter.converter.new_objects
+    super(ObjectsColumnHandler, self).__init__(row_converter, key, **options)
+
+  def parse_item(self):
+    lines = [line.split(":", 1) for line in self.raw_value.splitlines()]
+    objects = []
+    for object_class, slug in lines:
+      slug = slug.strip()
+      class_ = self.mappable.get(object_class.strip().lower())
+      new_object_slugs = self.new_slugs[class_]
+      obj = class_.query.filter(class_.slug == slug).first()
+      if obj:
+        objects.append(obj)
+      elif not (slug in new_object_slugs and self.dry_run):
+        self.add_warning(errors.UNKNOWN_OBJECT,
+                         object_type=class_._inflector.human_singular.title(),
+                         slug=slug)
+    return objects
+
+  def set_obj_attr(self):
+    self.value = self.parse_item()
+
+  def get_value(self):
+    task_group_objects = TaskGroupObject.query.filter_by(
+        task_group_id=self.row_converter.obj.id).all()
+    lines = ["{}: {}".format(t.object._inflector.title_singular.title(),
+                             t.object.slug)
+             for t in task_group_objects]
+    return "\n".join(lines)
+
+  def insert_object(self):
+    for object_ in self.value:
+      tgo = TaskGroupObject(
+          task_group=self.row_converter.obj,
+          object=object_,
+      )
+      db.session.add(tgo)
+    db.session.flush()
+
+  def set_value(self):
+    pass
+
+class CycleObjectColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    pass
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    obj = self.row_converter.obj.cycle_task_group_object
+    if not obj or not obj.object:
+      return ""
+    return "{}: {}".format(obj.object._inflector.human_singular.title(),
+                           obj.object.slug)
+
+  def insert_object(self):
+    pass
+
+  def set_value(self):
+    pass
+
+
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
+    "cycle_task_group": CycleTaskGroupColumnHandler,
+    "cycle_object": CycleObjectColumnHandler,
     "notify_on_change": CheckboxColumnHandler,
     "relative_end_date": TaskEndColumnHandler,
     "relative_start_date": TaskStartColumnHandler,
@@ -216,4 +300,5 @@ COLUMN_HANDLERS = {
     "task_type": TaskTypeColumnHandler,
     "workflow": WorkflowColumnHandler,
     "workflow_mapped": WorkflowPersonColumnHandler,
+    "task_group_objects": ObjectsColumnHandler,
 }
