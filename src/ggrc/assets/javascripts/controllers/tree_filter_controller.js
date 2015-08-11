@@ -20,7 +20,7 @@ can.Control("GGRC.Controllers.TreeFilter", {
   }
 
   , toggle_indicator: function(current_filter){
-      var is_expression = 
+      var is_expression =
             !!current_filter &&
             !!current_filter.expression.op &&
             current_filter.expression.op.name != "text_search" &&
