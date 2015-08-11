@@ -39,7 +39,7 @@ class Program(HasObjectState, CustomAttributable, Documentable,
       "private": "Privacy",
       "owners": None,
       "program_owner": {
-          "display_name": "Owner",
+          "display_name": "Manager",
           "mandatory": True,
           "type": AttributeInfo.Type.USER_ROLE,
       },
