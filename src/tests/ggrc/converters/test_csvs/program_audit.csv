@@ -1,5 +1,5 @@
 "Object type","Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required","Mandatory field",,"if owner is not provided, current user will be reated as owner of the object","Default value 'draft' is selected Other values are: Final Effective Ineffective Launched Not Launched In Scope Not in Scope Deprecated",,,,MM/DD/YYYY,MM/DD/YYYY,,,,,
-program,code*,title*,description,owner,state,Privacy*,"primary contact","secondary contact","effective date","stop date",notes,"program url","reference url",editor,reader
+program,code*,title*,description,Manager,state,Privacy*,"primary contact","secondary contact","effective date","stop date",notes,"program url","reference url",Editor,Reader
 ,prog-1,"program 1",test,"user1@example.com
 user11@example.com",Draft,no,user1@example.com,user2@example.com,2015/07/01,2015/07/15,"this is a note",google.com,ggrc.com,user11@example.com,user12@example.com
 ,prog-2,"program 2",test,user1@example.com,Final,yes,user1@example.com,user2@example.com,2015/07/01,2015/07/15,"this is a note",google.com,ggrc.com,"user11@example.com
