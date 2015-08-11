@@ -187,7 +187,7 @@
 
         this.scope.attr("mapper.is_saving", true);
         que.enqueue(instance).trigger().done(function (inst) {
-          data["context"] = null;
+          data["context"] = instance.context || null;
           _.each(this.scope.attr("mapper.selected"), function (desination) {
             var modelInstance,
                 isMapped = GGRC.Utils.is_mapped(instance, desination),
