@@ -59,8 +59,8 @@ class WeeklyCycleCalculator(CycleCalculator):
     # We want to calculate relative to Monday (1) and not relative to base_date
     # (which could be in the middle of the week)
     # We can use `weekday` method because it's 0-based method (0-6)
-    base_date = base_date - relativedelta.relativedelta(days=
-                                                          base_date.weekday())
+    base_date = base_date - relativedelta.relativedelta(
+      days=base_date.weekday())
 
     return base_date + relativedelta.relativedelta(
       days=relative_day - 1)  # -1 because we are counting from 1
