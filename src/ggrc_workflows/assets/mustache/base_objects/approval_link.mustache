@@ -28,7 +28,7 @@
             {{^if is_reviewer}}
               {{#if_equals review_task.status 'Declined'}}
                 {{#with_most_recent_declining_task_entry review_task}}
-                  <div>Review was declined on {{#date most_recent_declining_task_entry.instance.created_at}}{{/date}}.</div>
+                  <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
                 {{/with_most_recent_declining_task_entry}}
               {{/if_equals}}
             {{/if}}
@@ -36,7 +36,7 @@
           {{#if is_reviewer}}
             {{#if_equals review_task.status 'Declined'}}
               {{#with_most_recent_declining_task_entry review_task}}
-                <div>Review was declined on {{#date most_recent_declining_task_entry.instance.created_at}}{{/date}}.</div>
+                <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
               {{/with_most_recent_declining_task_entry}}
             {{/if_equals}}
             <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>

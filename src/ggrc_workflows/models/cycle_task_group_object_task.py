@@ -81,5 +81,8 @@ class CycleTaskGroupObjectTask(
       "task_type": {
           "display_name": "Task Type",
           "mandatory": True,
-      }
+      },
+      "cycle_object": {
+          "display_name": "Cycle Object",
+      },
   }
