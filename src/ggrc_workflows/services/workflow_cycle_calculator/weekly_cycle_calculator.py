@@ -15,18 +15,17 @@ class WeeklyCycleCalculator(CycleCalculator):
   calculations are based on relative_start_day and relative_end_day.
   """
   time_delta = datetime.timedelta(weeks=1)
-  date_domain = set({1,2,3,4,5})
+  date_domain = {1,2,3,4,5}
 
   def __init__(self, workflow, base_date=None):
     if not base_date:
       base_date = datetime.date.today()
 
     super(WeeklyCycleCalculator, self).__init__(workflow)
-    self.tasks.sort(key=lambda t: t.relative_start_day)
 
     self.reified_tasks = {}
     for task in self.tasks:
-      start_date, end_date = self.task_date_range(task, base_date)
+      start_date, end_date = self.non_adjusted_task_date_range(task, base_date)
       self.reified_tasks[task.id] = {
         'start_date': start_date,
         'end_date': end_date,
@@ -34,8 +33,8 @@ class WeeklyCycleCalculator(CycleCalculator):
         'relative_end': task.relative_end_day
       }
 
-  @staticmethod
-  def relative_day_to_date(relative_day, relative_month=None, base_date=None):
+  def relative_day_to_date(self, relative_day, relative_month=None,
+                           base_date=None):
     """Converts a weekly representation of a day into concrete date object.
 
     Weekly relative days are represented as days in the week (1 Monday,
@@ -57,10 +56,11 @@ class WeeklyCycleCalculator(CycleCalculator):
     if not base_date:
       base_date = today
 
-    # If somebody is working during weekend we don't want to calculate
-    # for previous week but for the next week.
-    if base_date == today and base_date.isoweekday() >= 6:
-      base_date = base_date + WeeklyCycleCalculator.time_delta
+    # We want to calculate relative to Monday (1) and not relative to base_date
+    # (which could be in the middle of the week)
+    # We can use `weekday` method because it's 0-based method (0-6)
+    base_date = base_date - relativedelta.relativedelta(
+      days=base_date.weekday())
 
     return base_date + relativedelta.relativedelta(
-      days=relative_day - base_date.isoweekday())
+      days=relative_day - 1)  # -1 because we are counting from 1

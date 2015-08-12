@@ -66,17 +66,9 @@
         context_id = target.context ? target.context.id : null;
       }
 
-      if ((!resource_type && target_type === "Cacheable")
-          || resource_type === "Relationship") {
-
-        can_map = Permission.is_allowed_for("update", source);
-        if (target instanceof can.Model) {
-          can_map = Permission.is_allowed_for("update", target);
-        }
-      } else {
-        if ((options && !(options.hash && options.hash.join)) || resource_type) {
-          can_map = Permission.is_allowed("create", resource_type, context_id);
-        }
+      can_map = Permission.is_allowed_for("update", source);
+      if (target instanceof can.Model) {
+        can_map = Permission.is_allowed_for("update", target);
       }
       return can_map;
     }

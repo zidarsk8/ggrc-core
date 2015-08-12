@@ -24,18 +24,26 @@ from ggrc_workflows.models import *
 from ggrc_workflows.models.mixins import RelativeTimeboxed
 
 def upgrade():
-  
-  today = date.today()
-  
-  # Get all active workflows with no next_cycle_start_date
-  workflows = db.session.query(models.Workflow)\
-    .filter(
-        models.Workflow.next_cycle_start_date == None,
-        models.Workflow.recurrences == True,
-        models.Workflow.status == 'Active'
-        ).all()
+  # New instances don't need this migration so we can skip this.
+  # All product instances already had this migration applied and therefore
+  # don't need this.
+  # In case this migration IS needed - FIRST upgrade to grapes release, THEN
+  # upgrade to plum and beyond...
 
-  from ggrc_workflows.services.workflow_cycle_calculator import get_cycle_calculator
+  return
+
+  today = date.today()
+
+  # Get all active workflows with no next_cycle_start_date
+  workflows = db.session.query(models.Workflow) \
+    .filter(
+    models.Workflow.next_cycle_start_date == None,
+    models.Workflow.recurrences == True,
+    models.Workflow.status == 'Active'
+  ).all()
+
+  from ggrc_workflows.services.workflow_cycle_calculator import \
+    get_cycle_calculator
   # Update all workflows.
   for workflow in workflows:
     base_date = date.today()

@@ -26,12 +26,6 @@ if os.environ.get('TRAVIS', False):
   random.seed(1)  # so we can reproduce the tests if needed
 
 class TestCycleCalculator(BaseWorkflowTestCase):
-
-  def test_rel_to_str(self):
-    rts = CycleCalculator._rel_to_str
-    self.assertEqual(rts("5"), "5")
-    self.assertEqual(rts("12", "5"), "5/12")
-
   def test_weekend_holiday_adjustment(self):
     """Test weekend adjustments
 

@@ -56,7 +56,7 @@ a
 b
 c
 d",MM/DD/YYYY,,,
-program,code*,title*,description ,owner,state,Privacy*,my_text*,my_dropdown,my_date,my_checkbox,non-existent-attribute,
+program,code*,title*,description ,Manager,state,Privacy*,my_text*,my_dropdown,my_date,my_checkbox,non-existent-attribute,
 ,prog-1,program 1,test,user1@ggrc.com,Draft,no,test,,12/12/2015,yes,,
 ,prog-2,program 2,test,user1@ggrc.com,Draft,,test,,12/12/2015,no,,
 ,prog-3,program 3,test,user1@ggrc.com,Draft,FALSE,test,,12/12/2015,yes,,
@@ -99,7 +99,7 @@ Policy,code*,title*,owner,state,description,non-existent-attribute,,,,,,
 ,p1,policy 1,user@example.com,draft,,,,,,,,
 ,p2,policy 2,user@example.com,draft,,,,,,,,
 ,,Who let the dogs out,user@example.com,draft,,,,,,,,
-,p3,policy 3,user@example.com,Draft,"This is still 
+,p3,policy 3,user@example.com,Draft,"This is still
 a single
 line description",,,,,,,
 ,p4,policy 4,miha@policy.com,Draft,"This should<br>
@@ -117,7 +117,7 @@ be in two lines",,,,,,,
 ,owner-is-missing,some weird policy,,draft,,,,,,,,
 ,owner-is-non-existent,another weird policy,nonexist@nonexit.com,draft,,,,,,,,
 ,state-is-invalid,another weird policy,user@example.com,invalid,,,,,,,,
-,title-is-missing,,user@example.com,draft,"This is still 
+,title-is-missing,,user@example.com,draft,"This is still
 a single
 line description",,,,,,,
 ,,,,,,,,,,,,

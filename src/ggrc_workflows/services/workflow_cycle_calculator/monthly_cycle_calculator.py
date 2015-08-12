@@ -15,19 +15,17 @@ class MonthlyCycleCalculator(CycleCalculator):
   to be in the same month if there are not enough days in the month.
   """
   time_delta = relativedelta.relativedelta(months=1)
-  date_domain = set(xrange(31))
+  date_domain = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}
 
   def __init__(self, workflow, base_date=None):
     super(MonthlyCycleCalculator, self).__init__(workflow)
 
-    if not base_date:
-      base_date = datetime.date.today()
-
-    self.tasks.sort(key=lambda t: t.relative_start_day)
-
+    base_date = self.get_base_date(base_date)
     self.reified_tasks = {}
     for task in self.tasks:
-      start_date, end_date = self.task_date_range(task, base_date=base_date)
+      start_date, end_date = self.non_adjusted_task_date_range(
+        task, base_date=base_date)
       self.reified_tasks[task.id] = {
         'start_date': start_date,
         'end_date': end_date,
@@ -35,8 +33,8 @@ class MonthlyCycleCalculator(CycleCalculator):
         'relative_end': task.relative_end_day
       }
 
-  @staticmethod
-  def relative_day_to_date(relative_day, relative_month=None, base_date=None):
+  def relative_day_to_date(self, relative_day, relative_month=None,
+                           base_date=None):
     """Converts a monthly representation of a day into concrete date object.
 
     Monthly relative days are represented as days of the month; we calculate
@@ -64,7 +62,8 @@ class MonthlyCycleCalculator(CycleCalculator):
 
     if not base_date:
       base_date = datetime.date(today.year, today.month, 1)
-    ddate = base_date + relativedelta.relativedelta(days=relative_day - base_date.day)
+    ddate = base_date + relativedelta.relativedelta(
+      days=relative_day - base_date.day)
 
     # We want to go up to the end of the month and not over.
     if ddate.month != base_date.month:
