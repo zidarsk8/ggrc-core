@@ -58,7 +58,7 @@ can.Model.Cacheable("CMS.Models.Program", {
       show_view : GGRC.mustache_path + "/programs/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : [
-      {attr_title: 'Owner', attr_name: 'owner', attr_sort_field: 'authorizations.0.person.name|email'}
+      {attr_title: 'Manager', attr_name: 'owner', attr_sort_field: 'authorizations.0.person.name|email'}
     ].concat(can.Model.Cacheable.attr_list.filter(function (d) {
       return d.attr_name != 'owner';
     })).concat([
