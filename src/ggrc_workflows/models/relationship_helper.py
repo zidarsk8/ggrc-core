@@ -4,9 +4,10 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from ggrc import db
+from ggrc_workflows.models import Cycle
+from ggrc_workflows.models import CycleTaskGroup
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupTask
-from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
 
 
@@ -46,11 +47,23 @@ def tg_tgo(object_type, related_type, related_ids):
   """ relationships between Task Groups and Objects """
   pass
 
+def cycle_ctg(object_type, related_type, related_ids):
+  """ relationships between Cycle and Cycle Task Group """
+
+  if object_type == "Cycle":
+    return db.session.query(CycleTaskGroup.cycle_id).filter(
+        CycleTaskGroup.id.in_(related_ids))
+  else:
+    return db.session.query(CycleTaskGroup.id).filter(
+        CycleTaskGroup.cycle_id.in_(related_ids))
+
+
 _function_map = {
     ("TaskGroup", "Workflow"): workflow_tg,
     ("TaskGroup", "TGO"): tg_tgo,
     ("TaskGroup", "TaskGroupTask"): tg_task,
     ("Cycle", "Workflow"): cycle_workflow,
+    ("Cycle", "CycleTaskGroup"): cycle_ctg,
 }
 
 
