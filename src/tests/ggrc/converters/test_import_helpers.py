@@ -901,7 +901,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Summary"]["mandatory"])
     self.assertTrue(vals["Assignee"]["mandatory"])
 
-  def test_cycle_taskdefinitions(self):
+  def test_cycle_task_definitions(self):
     """ test default headers for Cycle Task Group Object Task """
     definitions = get_object_column_definitions(wf_models.CycleTaskGroupObjectTask)
     display_names = set([val["display_name"] for val in definitions.values()])
