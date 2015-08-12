@@ -219,7 +219,6 @@ owner_base = [
     "CustomAttributeValue",
     "Request",
     "Response",
-    "Person",
 ]
 owner_read = owner_base + [
     {
@@ -230,6 +229,7 @@ owner_read = owner_base + [
         },
         "condition": "relationship",
     },
+    "Person",
 ]
 
 owner_update = owner_base + [
