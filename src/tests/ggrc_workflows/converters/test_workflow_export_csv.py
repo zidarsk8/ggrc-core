@@ -56,6 +56,10 @@ class TestExportEmptyTemplate(TestCase):
 
 class TestExportMultipleObjects(TestCase):
 
+  """ Test data is found in the google sheet:
+  https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=2035742544
+  """
+
   @classmethod
   def setUpClass(cls):
     TestCase.clear_data()
