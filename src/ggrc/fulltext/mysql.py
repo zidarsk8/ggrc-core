@@ -112,7 +112,9 @@ class MysqlIndexer(SqlIndexer):
       else:
         type_queries.append(MysqlRecordProperty.type == model_name)
 
-    return or_(*type_queries)
+    return and_(
+        MysqlRecordProperty.type.in_(model_names),
+        or_(*type_queries))
 
   def _get_filter_query(self, terms):
     whitelist = or_(
