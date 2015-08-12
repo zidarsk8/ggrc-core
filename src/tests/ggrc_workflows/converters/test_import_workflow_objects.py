@@ -8,11 +8,12 @@ from os.path import abspath
 from os.path import dirname
 from os.path import join
 
-from ggrc_workflows.models import TaskGroup
-from ggrc_workflows.models import TaskGroupObject
-from ggrc_workflows.models import TaskGroupTask
-from ggrc_workflows.models import Workflow
 from tests.ggrc.converters import TestCase
+
+from ggrc_workflows.models.task_group import TaskGroup
+from ggrc_workflows.models.task_group_object import TaskGroupObject
+from ggrc_workflows.models.task_group_task import TaskGroupTask
+from ggrc_workflows.models.workflow import Workflow
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 
