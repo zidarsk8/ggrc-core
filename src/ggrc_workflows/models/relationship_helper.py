@@ -48,11 +48,6 @@ def workflow_tg(object_type, related_type, related_ids):
         TaskGroup.workflow_id.in_(related_ids))
 
 
-def tg_tgo(object_type, related_type, related_ids):
-  """ relationships between Task Groups and Objects """
-  pass
-
-
 def cycle_ctg(object_type, related_type, related_ids):
   """ relationships between Cycle and Cycle Task Group """
 
@@ -88,23 +83,21 @@ def ctgot_wot(object_type, related_type, related_ids):
 
 _function_map = {
     ("TaskGroup", "Workflow"): workflow_tg,
-    ("TaskGroup", "WOT"): tg_tgo,
     ("TaskGroup", "TaskGroupTask"): tg_task,
     ("Cycle", "Workflow"): cycle_workflow,
     ("Cycle", "CycleTaskGroup"): cycle_ctg,
     ("CycleTaskGroup", "CycleTaskGroupObjectTask"): ctg_ctgot,
-    ("CycleTaskGroupObjectTask", "WOT"): ctgot_wot,
 }
+
+# add mappings for cycle tasks and cycle task objects
+for wot in WORKFLOW_OBJECT_TYPES:
+  obj = "CycleTaskGroupObjectTask"
+  key = tuple(sorted([obj, wot]))
+  _function_map[key] = ctgot_wot
 
 
 def get_ids_related_to(object_type, related_type, related_ids):
-  if object_type in WORKFLOW_OBJECT_TYPES:
-    key = tuple(sorted(["WOT", related_type]))
-  elif related_type in WORKFLOW_OBJECT_TYPES:
-    key = tuple(sorted([object_type, "WOT"]))
-  else:
-    key = tuple(sorted([object_type, related_type]))
-
+  key = tuple(sorted([object_type, related_type]))
   query_function = _function_map.get(key)
   if callable(query_function):
     return query_function(object_type, related_type, related_ids)
