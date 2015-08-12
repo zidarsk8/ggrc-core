@@ -1324,32 +1324,8 @@ Mustache.registerHelper("is_allowed_to_map", function (source, target, options) 
 
   source = resolve_computed(source);
   target = resolve_computed(target);
+  can_map = GGRC.Utils.allowed_to_map(source, target, options);
 
-  if (target instanceof can.Model)
-    target_type = target.constructor.shortName;
-  else
-    target_type = target;
-
-  context_id = source.context ? source.context.id : null;
-
-  resource_type = GGRC.Mappings.join_model_name_for(
-      source.constructor.shortName, target_type);
-
-  if (!(source instanceof CMS.Models.Program)
-      && target instanceof CMS.Models.Program)
-    context_id = target.context ? target.context.id : null;
-
-  if ((!resource_type && target_type === 'Cacheable')
-     || resource_type === "Relationship") {
-    can_map = Permission.is_allowed_for('update', source);
-    if (target instanceof can.Model) {
-      can_map &= Permission.is_allowed_for('update', target);
-    }
-  } else {
-    // We should only map objects that have join models
-    can_map = (!(options.hash && options.hash.join) || resource_type)
-      && Permission.is_allowed('create', resource_type, context_id);
-  }
   if (can_map) {
     return options.fn(options.contexts || this);
   }
@@ -3113,6 +3089,23 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   };
 
   return options.fn(options.contexts.add({'create_issue_json': JSON.stringify(json)}));
+});
+
+Mustache.registerHelper("pretty_role_name", function (name) {
+  name = Mustache.resolve(name);
+  var ROLE_LIST = {
+    "ProgramOwner": "Program Manager",
+    "ProgramEditor": "Program Editor",
+    "ProgramReader": "Program Reader",
+    "WorkflowOwner": "Workflow Manager",
+    "WorkflowMember": "Workflow Member",
+    "Mapped": "No Access",
+    "Owner": "Manager",
+  };
+  if (ROLE_LIST[name]) {
+    return ROLE_LIST[name];
+  }
+  return name;
 });
 
 })(this, jQuery, can);

@@ -7,7 +7,7 @@
 
 from ggrc.extensions import get_extension_modules
 from ggrc.models import (
-    Audit, Control, ControlAssessment, DataAsset, Directive, Contract,
+    Audit, Control, ControlAssessment, DataAsset, Contract,
     Policy, Regulation, Standard, Facility, Market, Objective, Option,
     OrgGroup, Vendor, Person, Product, Program, Project, Request, Response,
     Section, Clause, System, Process, Issue,
@@ -38,9 +38,10 @@ GGRC_IMPORTABLE = {
     "control": Control,
     "control assessment": ControlAssessment,
     "control_assessment": ControlAssessment,
+    "controlassessment": ControlAssessment,
     "data asset": DataAsset,
     "data_asset": DataAsset,
-    "directive": Directive,
+    "dataasset": DataAsset,
     "contract": Contract,
     "policy": Policy,
     "regulation": Regulation,
@@ -48,9 +49,9 @@ GGRC_IMPORTABLE = {
     "facility": Facility,
     "market": Market,
     "objective": Objective,
-    "option": Option,
     "org group": OrgGroup,
     "org_group": OrgGroup,
+    "orggroup": OrgGroup,
     "vendor": Vendor,
     "person": Person,
     "product": Product,

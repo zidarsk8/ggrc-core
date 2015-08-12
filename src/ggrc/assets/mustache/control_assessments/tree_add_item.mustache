@@ -17,7 +17,7 @@
       data-object-singular="ControlAssessment"
       data-object-plural="control_assessments"
       data-object-singular-override=""
-      data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "type": "{{parent_instance.type}}", "title" : "{{parent_instance.title}}" }, "context": { "id" : {{firstexist parent_instance.context.id "null"}}, "href" : "{{parent_instance.context.href}}", "type" : "{{parent_instance.context.type}}" } }'
+      data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "type": "{{parent_instance.type}}", "title" : "{{parent_instance.title}}" }, "context": { "id" : {{firstnonempty parent_instance.context.id "null"}}, "href" : "{{parent_instance.context.href}}", "type" : "{{parent_instance.context.type}}" } }'
       data-original-title="Map Control Assessment to this Audit"
       data-target="#ajax-modal-javascript:--"
       >

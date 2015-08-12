@@ -9,6 +9,7 @@
 {{#if_instance_of parent_instance 'Directive'}}
 {{#if allow_creating}}
 {{#is_allowed 'create' model.shortName context=null}}
+{{#is_allowed 'update' parent_instance}}
 {{#if_instance_of parent_instance 'Contract|Standard|Policy|Regulation'}}
     {{#if_instance_of parent_instance 'Contract'}}
     <a
@@ -43,6 +44,7 @@
     </a>
     {{/if_instance_of}}
 {{/if_match}}
+{{/is_allowed}}
 {{/is_allowed}}
 {{/if}}
 

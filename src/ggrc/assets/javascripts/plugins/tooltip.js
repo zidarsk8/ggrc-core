@@ -13,6 +13,10 @@
       container_width = document.width,
       tip_pos, $arrow, offset, return_value;
 
+    if (!this.hasContent() || !this.enabled) {
+      return; // because _tooltip_show will do this too
+    }
+
     _tooltip_show.apply(this);
 
     return_value = this.$tip.css({

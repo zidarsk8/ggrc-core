@@ -10,7 +10,7 @@ from datetime import date, datetime
 
 import os
 from ggrc import db
-from ggrc_workflows.models import Workflow, Cycle
+from ggrc_workflows.models import Workflow, Cycle, CycleTaskGroupObjectTask
 
 from tests.ggrc_workflows.workflow_cycle_calculator.base_workflow_test_case import BaseWorkflowTestCase
 
@@ -181,3 +181,53 @@ class TestOneTimeWorkflow(BaseWorkflowTestCase):
       self.assertEqual(active_wf.status, "Active")
       self.assertEqual(cycle.start_date, date(2014, 3, 1))
       self.assertEqual(cycle.end_date, date(2015, 5, 27))
+
+  def test_adjust_end_date_when_tasks_get_deleted(self):
+    """Test that deleting a longer running task updates cycle end date."""
+    one_time_wf = {
+      "title": "one time wf test",
+      "description": "some test workflow",
+      "task_groups": [{
+        "title": "tg 1",
+        "task_group_tasks": [
+          {
+            'title': 'one time task 1',
+            'start_date': date(2015, 7, 1),
+            'end_date': date(2015, 7, 8)
+          },
+          {
+            'title': 'one time task 2',
+            'start_date': date(2015, 7, 5),
+            'end_date': date(2015, 7, 11)
+          }]
+      }]
+    }
+    with freeze_time("2015-07-01"):
+      _, wf = self.generator.generate_workflow(one_time_wf)
+      _, cycle = self.generator.generate_cycle(wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id).one()
+
+      # First verify that the entire cycle window is covered
+      self.assertEqual(cycle.start_date, date(2015, 7, 1))
+      self.assertEqual(cycle.end_date, date(2015, 7, 11))
+
+
+      cycle_task = db.session.query(CycleTaskGroupObjectTask).filter(
+        CycleTaskGroupObjectTask.cycle_id == cycle.id,
+        CycleTaskGroupObjectTask.title == "one time task 2"
+      ).one()
+
+      response = self.generator.api.delete(cycle_task, cycle_task.id)
+      self.assert200(response)
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id).one()
+
+      self.assertEqual(cycle.start_date, date(2015, 7, 1))
+      self.assertEqual(cycle.end_date, date(2015, 7, 8))

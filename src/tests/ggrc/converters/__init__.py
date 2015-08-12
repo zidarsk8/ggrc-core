@@ -12,13 +12,14 @@ from tests import ggrc
 
 
 THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
 
 
 class TestCase(ggrc.TestCase):
 
+  CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
+
   def import_file(self, filename, dry_run=False):
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
+    data = {"file": (open(join(self.CSV_DIR, filename)), filename)}
     headers = {
         "X-test-only": "true" if dry_run else "false",
         "X-requested-by": "gGRC",

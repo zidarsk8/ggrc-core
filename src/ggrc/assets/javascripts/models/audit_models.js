@@ -279,11 +279,13 @@ can.Model.Cacheable("CMS.Models.Request", {
   filter_keys : ["assignee", "code", "company", "control",
                  "due date", "due", "name", "notes", "request",
                  "requested on", "status", "test", "title", "request_type",
-                 "type", "request type", "due_on"
+                 "type", "request type", "due_on", "request_object", "request object", "request title"
   ],
   filter_mappings: {
     "type": "request_type",
-    "request type": "request_type"
+    "request type": "request_type",
+    "request title": "description",
+    "request object": "request_object"
   },
   root_collection : "requests"
   , create : "POST /api/requests"
@@ -448,21 +450,23 @@ can.Model.Cacheable("CMS.Models.Request", {
           "title": "description",
           "state": "status",
           "due date": "due_on",
-          "due": "due_on"
+          "due": "due_on",
+          "request object": "request_object"
         }),
         keys, vals;
 
     keys = _.union(this.class.filter_keys, ["state"], _.keys(mappings));
     vals = filter_vals.call(this, keys, mappings);
-
     try {
       vals["due_on"] = moment(this["due_on"]).format("YYYY-MM-DD");
       vals["due"] = vals["due date"] = vals["due_on"];
-      if (this.assignee){
+      if (this.assignee) {
         vals["assignee"] = filter_vals.apply(this.assignee.reify(), []);
       }
-      vals["control"] = this.audit_object.reify().auditable.reify().title;
+      vals["control"] = this.audit_object ? this.audit_object.reify().auditable.reify().title : "None";
+      vals["request_object"] = vals["request object"] = vals["control"];
     } catch (e) {}
+
     return vals;
   }
 

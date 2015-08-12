@@ -176,6 +176,9 @@
         };
       }
     }
+    , clearAll : function() {
+      window.localStorage.clear();
+    }
   }, {
     removeAttr : function(attr) {
       this._super(attr);

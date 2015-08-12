@@ -135,10 +135,10 @@ class UserRoleColumnHandler(UserColumnHandler):
     self.dry_run = True
 
 COLUMN_HANDLERS = {
-    "program_owner": ProgramOwnerColumnHandler,
     "program_editor": ProgramEditorColumnHandler,
+    "program_owner": ProgramOwnerColumnHandler,
     "program_reader": ProgramReaderColumnHandler,
-    "workflow_owner": WorkflowOwnerColumnHandler,
-    "workflow_member": WorkflowMemberColumnHandler,
     "user_role": UserRoleColumnHandler,
+    "workflow_member": WorkflowMemberColumnHandler,
+    "workflow_owner": WorkflowOwnerColumnHandler,
 }

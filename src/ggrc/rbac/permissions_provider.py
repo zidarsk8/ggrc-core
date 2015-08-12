@@ -187,21 +187,35 @@ class DefaultUserPermissions(UserPermissions):
     if self._permission_match(self.ADMIN_PERMISSION, self._permissions()):
       return True
     permissions = self._permissions()
+
     if not permissions.get(action) or not permissions[action].get(instance._inflector.model_singular):
       return False
     resources = self._permissions()\
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('resources', [])
+    contexts = self._permissions()\
+        .setdefault(action, {})\
+        .setdefault(instance._inflector.model_singular, {})\
+        .setdefault('contexts', [])
+
+    # We can't use instance.context_id, because it requires the
+    # object <-> context mapping to be created,
+    # which isn't the case when creating objects
+    context_id = None
+    if hasattr(instance, 'context') and hasattr(instance.context, 'id'):
+      context_id = instance.context.id
     if instance.id in resources:
       return True
+
     conditions = self._permissions()\
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('conditions', {})\
-        .setdefault(instance.context_id, [])
+        .setdefault(context_id, [])
+
     # Check any conditions applied per resource
-    if not conditions:
+    if (None in contexts or context_id in contexts) and not conditions:
       return True
     for condition in conditions:
       func = _CONDITIONS_MAP[str(condition['condition'])]

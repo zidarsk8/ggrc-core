@@ -9,6 +9,7 @@ from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
     Titled, Slugged, Described, Timeboxed, WithContact
 )
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import PublishOnly
 
 
@@ -61,7 +62,11 @@ class TaskGroup(
       "workflow": {
           "display_name": "Workflow",
           "mandatory": True,
-      }
+      },
+      "task_group_objects": {
+          "display_name": "Objects",
+          "type": AttributeInfo.Type.SPECIAL_MAPPING,
+      },
   }
 
   def copy(self, _other=None, **kwargs):

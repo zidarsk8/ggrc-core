@@ -24,7 +24,7 @@ class TestExportEmptyTemplate(TestCase):
     }
 
   def test_basic_policy_template(self):
-    data = [{"object_name": "Policy"}]
+    data = [{"object_name": "Policy", "fields": "all"}]
 
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
@@ -34,11 +34,11 @@ class TestExportEmptyTemplate(TestCase):
 
   def test_multiple_empty_objects(self):
     data = [
-        {"object_name": "Policy"},
-        {"object_name": "Regulation"},
-        {"object_name": "Clause"},
-        {"object_name": "OrgGroup"},
-        {"object_name": "Contract"},
+        {"object_name": "Policy", "fields": "all"},
+        {"object_name": "Regulation", "fields": "all"},
+        {"object_name": "Clause", "fields": "all"},
+        {"object_name": "OrgGroup", "fields": "all"},
+        {"object_name": "Contract", "fields": "all"},
     ]
 
     response = self.client.post("/_service/export_csv",
@@ -191,6 +191,123 @@ class TestExportSingleObject(TestCase):
         self.assertIn(",Cat ipsum {},".format(i), response.data)
       else:
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
+
+  def test_program_audit_relevant_query(self):
+    data = [{ # should return just program prog-1
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Audit",
+                "slugs": ["au-1"],
+            },
+        },
+        "fields": "all",
+      },{ # Audits : au-1, au-3, au-5, au-7,
+        "object_name": "Audit",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "__previous__",
+                "ids": ["0"],
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(data)
+
+    self.assertIn(",Cat ipsum 1,", response.data)
+    expected = set([1, 3, 5, 7])
+    for i in range(1, 14):
+      if i in expected:
+        self.assertIn(",Audit {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Audit {},".format(i), response.data)
+
+  def test_section_policy_relevant_query(self):
+    data = [{ # sec-1
+        "object_name": "Section",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Policy",
+                "slugs": ["p1"],
+            },
+        },
+        "fields": "all",
+      },{ # p3
+        "object_name": "Policy",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Section",
+                "slugs": ["sec-3"],
+            },
+        },
+        "fields": "all",
+    },{ # sec-8
+        "object_name": "Section",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Standard",
+                "slugs": ["std-1"],
+            },
+        },
+        "fields": "all",
+    },{ # std-3
+        "object_name": "Standard",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Section",
+                "slugs": ["sec-10"],
+            },
+        },
+        "fields": "all",
+    },{ # sec-5
+        "object_name": "Section",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Regulation",
+                "slugs": ["reg-2"],
+            },
+        },
+        "fields": "all",
+    },{ # reg-1
+        "object_name": "Regulation",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Section",
+                "slugs": ["sec-4"],
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(data)
+
+    sections = set([1, 5, 8])
+    titles = [",mapped section {},".format(i) for i in range(1, 11)]
+    titles.extend([",mapped reg {},".format(i) for i in range(1, 11)])
+    titles.extend([",mapped policy {},".format(i) for i in range(1, 11)])
+    titles.extend([",mapped standard {},".format(i) for i in range(1, 11)])
+
+    expected = set([
+      ",mapped section 1,",
+      ",mapped section 5,",
+      ",mapped section 8,",
+      ",mapped reg 1,",
+      ",mapped standard 3,",
+      ",mapped policy 3,",
+    ])
+
+    for title in titles:
+      if title in expected:
+        self.assertIn(title, response.data, "'{}' not found".format(title))
+      else:
+        self.assertNotIn(title, response.data, "'{}' was found".format(title))
 
   def test_multiple_relevant_query(self):
     data = [{

@@ -77,8 +77,9 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
   cycles = db.relationship(
       'Cycle', backref='workflow', cascade='all, delete-orphan')
 
-  next_cycle_start_date = deferred(
-      db.Column(db.Date, nullable=True), 'Workflow')
+  next_cycle_start_date = db.Column(db.Date, nullable=True)
+
+  non_adjusted_next_cycle_start_date = db.Column(db.Date, nullable=True)
 
   @computed_property
   def workflow_state(self):
@@ -99,6 +100,7 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       'object_approval',
       'recurrences',
       PublishOnly('next_cycle_start_date'),
+      PublishOnly('non_adjusted_next_cycle_start_date'),
       PublishOnly('workflow_state'),
   ]
 
@@ -110,7 +112,7 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       "notify_custom_message": "Custom email message",
       "notify_on_change": "Force real-time email updates",
       "workflow_owner": {
-          "display_name": "Owner",
+          "display_name": "Manager",
           "type": AttributeInfo.Type.USER_ROLE,
           "mandatory": True,
       },
@@ -119,7 +121,7 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
           "type": AttributeInfo.Type.USER_ROLE,
       },
       "workflow_mapped": {
-          "display_name": "Mapped",
+          "display_name": "No Access",
           "type": AttributeInfo.Type.USER_ROLE,
       },
       "status": None,

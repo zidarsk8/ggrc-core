@@ -25,7 +25,7 @@ from ggrc.models import Policy
 from ggrc.models import Regulation
 from ggrc.models import Standard
 from ggrc.models import Relationship
-from ggrc.models.relationship import RelationshipHelper
+from ggrc.models.relationship_helper import RelationshipHelper
 
 
 MAPPING_PREFIX = "__mapping__:"
@@ -90,7 +90,7 @@ class StatusColumnHandler(ColumnHandler):
   def __init__(self, row_converter, key, **options):
     self.key = key
     valid_states = row_converter.object_class.VALID_STATES
-    self.state_mappings = {s.lower(): s for s in valid_states}
+    self.state_mappings = {str(s).lower(): s for s in valid_states}
     super(StatusColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
@@ -260,9 +260,9 @@ class MappingColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
-    self.mapping_name = key[len(MAPPING_PREFIX):]
     importable = get_importables()
-    self.mapping_object = importable.get(self.mapping_name)
+    self.attr_name = options.get("attr_name", "")
+    self.mapping_object = importable.get(self.attr_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
     super(MappingColumnHandler, self).__init__(row_converter, key, **options)
@@ -418,7 +418,11 @@ class OptionColumnHandler(ColumnHandler):
 
   def get_value(self):
     option = getattr(self.row_converter.obj, self.key, None)
-    return "" if option is None else option.title
+    if option is None:
+      return ""
+    if callable(option.title):
+      return option.title()
+    return option.title
 
 
 class CheckboxColumnHandler(ColumnHandler):
@@ -428,13 +432,30 @@ class CheckboxColumnHandler(ColumnHandler):
     if self.raw_value == "":
       return False
     value = self.raw_value.lower() in ("yes", "true")
-    if self.raw_value.lower() not in ("yes", "true", "no", "false"):
+    if self.raw_value == "--":
+      value = None
+    if self.raw_value.lower() not in ("yes", "true", "no", "false", "--"):
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
     return value
 
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
+    if val is None:
+      return "--"
     return "true" if val else "false"
+
+  def set_obj_attr(self):
+    """ handle set object for boolean values
+
+    This is the only handler that will allow setting a None value"""
+    try:
+      setattr(self.row_converter.obj, self.key, self.value)
+    except:
+      self.row_converter.add_error(errors.UNKNOWN_ERROR)
+      trace = traceback.format_exc()
+      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
+          self.row_converter.obj, self.key, self.value, trace)
+      current_app.logger.error(error)
 
 
 class ProgramColumnHandler(ColumnHandler):
