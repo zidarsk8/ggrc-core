@@ -79,6 +79,7 @@
     {{#if_instance_of instance "InterviewResponse"}}
     <div class="span6 hidable">
       <ggrc-modal-connector
+        parent_instance="instance"
         instance="instance"
         source_mapping="meetings"
         mapping="meetings"
@@ -121,6 +122,7 @@
 
     <div class="span6 hidable">
       <ggrc-modal-connector
+        parent_instance="instance"
         instance="instance"
         source_mapping="business_objects"
         deferred="true"
