@@ -300,6 +300,11 @@ class CycleWorkflowColumnHandler(ExportOnlyColumnHandler):
   def get_value(self):
     return self.row_converter.obj.workflow.slug
 
+class CycleColumnHandler(ExportOnlyColumnHandler):
+
+  def get_value(self):
+    return self.row_converter.obj.cycle.slug
+
 
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
@@ -312,6 +317,7 @@ COLUMN_HANDLERS = {
     "task_type": TaskTypeColumnHandler,
     "workflow": WorkflowColumnHandler,
     "cycle_workflow": CycleWorkflowColumnHandler,
+    "cycle": CycleColumnHandler,
     "workflow_mapped": WorkflowPersonColumnHandler,
     "task_group_objects": ObjectsColumnHandler,
 }
