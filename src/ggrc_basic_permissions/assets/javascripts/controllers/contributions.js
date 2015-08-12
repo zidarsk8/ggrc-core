@@ -378,7 +378,7 @@
       var self = this
         , el = $(".people-selector").find("input[type=radio]:checked")
         , li = el.closest('li')
-        , clicked_option = li.data('option')
+        , clicked_option = li.data('option') || {}
         , join
         ;
 
