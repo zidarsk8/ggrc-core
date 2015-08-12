@@ -53,18 +53,11 @@
     },
     allowed_to_map: function (source, target, options) {
       var can_map = false,
-          target_type, source_type, resource_type, context_id;
+          target_type, source_type;
 
       target_type = target instanceof can.Model ? target.constructor.shortName
                                                 : (target.type || target);
       source_type = source.constructor.shortName || source;
-      context_id = source.context ? source.context.id : null;
-      resource_type = GGRC.Mappings.join_model_name_for(source_type, target_type);
-
-      if (!(source instanceof CMS.Models.Program)
-        && target instanceof CMS.Models.Program) {
-        context_id = target.context ? target.context.id : null;
-      }
 
       can_map = Permission.is_allowed_for("update", source);
       if (target instanceof can.Model) {
