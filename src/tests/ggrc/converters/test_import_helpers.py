@@ -25,7 +25,8 @@ def get_mapping_names(class_name):
   mapping_rules = get_mapping_rules()[class_name]
   pretty_rules = map(title_from_camelcase, mapping_rules)
   mapping_names = set(["map:{}".format(name) for name in pretty_rules])
-  return mapping_names
+  unmapping_names = set(["unmap:{}".format(name) for name in pretty_rules])
+  return mapping_names.union(unmapping_names)
 
 class TestSplitArry(TestCase):
 

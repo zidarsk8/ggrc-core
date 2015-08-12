@@ -112,6 +112,7 @@ class AttributeInfo(object):
   """
 
   MAPPING_PREFIX = "__mapping__:"
+  UNMAPPING_PREFIX = "__unmapping__:"
   CUSTOM_ATTR_PREFIX = "__custom__:"
 
   class Type(object):
@@ -231,6 +232,16 @@ class AttributeInfo(object):
           "type": cls.Type.MAPPING,
       }
 
+      unmapping_name = "{}{}".format(cls.UNMAPPING_PREFIX, class_name)
+      definitions[unmapping_name.lower()] = {
+          "display_name": "unmap:{}".format(class_name),
+          "attr_name": mapping_class.lower(),
+          "mandatory": False,
+          "unique": False,
+          "description": "",
+          "type": cls.Type.MAPPING,
+      }
+
     return definitions
 
   @classmethod
@@ -289,10 +300,8 @@ class AttributeInfo(object):
         definition.update(value)
       definitions[key] = definition
 
-    custom_attr_def = cls.get_custom_attr_definitions(object_class)
-    mapping_def = cls.get_mapping_definitions(object_class)
-    definitions.update(custom_attr_def)
-    definitions.update(mapping_def)
+    definitions.update(cls.get_custom_attr_definitions(object_class))
+    definitions.update(cls.get_mapping_definitions(object_class))
 
     return definitions
 
