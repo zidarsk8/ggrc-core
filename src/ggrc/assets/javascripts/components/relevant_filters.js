@@ -46,7 +46,7 @@
         }
 
         this.scope.attr("relevant").push({
-          value: "",
+          value: false,
           filter: new can.Map(),
           menu: menu,
           model_name: menu[0].model_singular
@@ -57,15 +57,17 @@
             panel = this.scope.attr("relevant")[index];
 
         panel.attr("filter", data.item);
+        panel.attr("value", true);
       },
       ".remove_filter click": function (el) {
         this.scope.attr("relevant").splice(el.data("index"), 1);
       },
-      "{scope.relevant}  change": function (list, item, which, type, val, oldVal) {
+      "{scope.relevant} change": function (list, item, which, type, val, oldVal) {
         if (!/model_name/gi.test(which)) {
           return;
         }
         item.target.attr("filter", new can.Map());
+        item.target.attr("value", false);
       }
     }
   });
