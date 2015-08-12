@@ -65,7 +65,7 @@
         context_id = target.context ? target.context.id : null;
       }
 
-      can_map = Permission[_.isString(source) ? "is_allowed" : "is_allowed_for"]("update", source, context_id);
+      can_map = Permission.is_allowed("update", source);
       if (target instanceof can.Model) {
         can_map = Permission.is_allowed_for("update", target);
       }
