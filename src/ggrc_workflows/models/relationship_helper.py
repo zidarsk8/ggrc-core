@@ -6,6 +6,7 @@
 from ggrc import db
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroup
+from ggrc_workflows.models import CycleTaskGroupObjectTask as CycleTask
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupTask
 from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
@@ -58,12 +59,22 @@ def cycle_ctg(object_type, related_type, related_ids):
         CycleTaskGroup.cycle_id.in_(related_ids))
 
 
+def ctg_ctgot(object_type, related_type, related_ids):
+  """ relationships between Cycle Task Groups and Cycle Tasks """
+  if object_type == "CycleTaskGroup":
+    return db.session.query(CycleTask.cycle_task_group_id).filter(
+        CycleTask.id.in_(related_ids))
+  else:
+    return db.session.query(CycleTask.id).filter(
+        CycleTask.cycle_task_group_id.in_(related_ids))
+
 _function_map = {
     ("TaskGroup", "Workflow"): workflow_tg,
     ("TaskGroup", "TGO"): tg_tgo,
     ("TaskGroup", "TaskGroupTask"): tg_task,
     ("Cycle", "Workflow"): cycle_workflow,
     ("Cycle", "CycleTaskGroup"): cycle_ctg,
+    ("CycleTaskGroup", "CycleTaskGroupObjectTask"): ctg_ctgot,
 }
 
 

@@ -211,9 +211,32 @@ class TestExportMultipleObjects(TestCase):
                 },
             },
             "fields": "all",
+        }, {
+            # Task mapped to any of the two task groups, 11 tasks
+            "object_name": "CycleTaskGroupObjectTask",
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["2"],
+                },
+            },
+            "fields": "all",
+        }, {
+            "object_name": "CycleTaskGroup",  # two cycle groups
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["4"],
+                },
+            },
+            "fields": "all",
         },
     ]
     response = self.export_csv(data).data
     self.assertEquals(3, response.count("wf-1"))  # 2 for cycles and 1 for wf
-    self.assertEquals(2, response.count("CYCLEGROUP-"))
-    self.assertIn("CYCLE-", response)
+    # 3rd block = 2, 5th block = 11, 6th block = 2.
+    self.assertEquals(15, response.count("CYCLEGROUP-"))
+    self.assertEquals(6, response.count("CYCLE-"))
+    self.assertEquals(11, response.count("CYCLETASK-"))
