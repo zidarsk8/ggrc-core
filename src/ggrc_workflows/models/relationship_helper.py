@@ -3,10 +3,13 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+from sqlalchemy import and_
+
 from ggrc import db
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroup
 from ggrc_workflows.models import CycleTaskGroupObjectTask as CycleTask
+from ggrc_workflows.models import CycleTaskGroupObject
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupTask
 from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
@@ -44,9 +47,11 @@ def workflow_tg(object_type, related_type, related_ids):
     return db.session.query(TaskGroup.id).filter(
         TaskGroup.workflow_id.in_(related_ids))
 
+
 def tg_tgo(object_type, related_type, related_ids):
   """ relationships between Task Groups and Objects """
   pass
+
 
 def cycle_ctg(object_type, related_type, related_ids):
   """ relationships between Cycle and Cycle Task Group """
@@ -68,21 +73,35 @@ def ctg_ctgot(object_type, related_type, related_ids):
     return db.session.query(CycleTask.id).filter(
         CycleTask.cycle_task_group_id.in_(related_ids))
 
+
+def ctgot_wot(object_type, related_type, related_ids):
+  """ relationships between Cycle Task and Cycle Task Objects """
+  if object_type == "CycleTaskGroupObjectTask":
+    return db.session.query(CycleTask.id).join(CycleTaskGroupObject).filter(
+        and_(
+            CycleTaskGroupObject.object_type == related_type,
+            CycleTaskGroupObject.object_id.in_(related_ids)
+        ))
+  else:
+    return db.session.query(CycleTaskGroupObject.object_id).join(CycleTask)\
+        .filter(CycleTask.id.in_(related_ids))
+
 _function_map = {
     ("TaskGroup", "Workflow"): workflow_tg,
-    ("TaskGroup", "TGO"): tg_tgo,
+    ("TaskGroup", "WOT"): tg_tgo,
     ("TaskGroup", "TaskGroupTask"): tg_task,
     ("Cycle", "Workflow"): cycle_workflow,
     ("Cycle", "CycleTaskGroup"): cycle_ctg,
     ("CycleTaskGroup", "CycleTaskGroupObjectTask"): ctg_ctgot,
+    ("CycleTaskGroupObjectTask", "WOT"): ctgot_wot,
 }
 
 
 def get_ids_related_to(object_type, related_type, related_ids):
   if object_type in WORKFLOW_OBJECT_TYPES:
-    key = tuple(sorted(["TGO", related_type]))
+    key = tuple(sorted(["WOT", related_type]))
   elif related_type in WORKFLOW_OBJECT_TYPES:
-    key = tuple(sorted([object_type, "TGO"]))
+    key = tuple(sorted([object_type, "WOT"]))
   else:
     key = tuple(sorted([object_type, related_type]))
 

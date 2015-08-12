@@ -240,3 +240,33 @@ class TestExportMultipleObjects(TestCase):
     self.assertEquals(15, response.count("CYCLEGROUP-"))
     self.assertEquals(6, response.count("CYCLE-"))
     self.assertEquals(11, response.count("CYCLETASK-"))
+
+  def test_cycle_taks_objects(self):
+    """ test cycle task and various objects """
+    data = [
+        {
+            "object_name": "CycleTaskGroupObjectTask",  #
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "Policy",
+                    "slugs": ["p1"],
+                },
+            },
+            "fields": "all",
+        }, {
+            "object_name": "Policy",  #
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["0"],
+                },
+            },
+            "fields": ["slug", "title"],
+        },
+    ]
+    response = self.export_csv(data).data
+    self.assertEquals(2, response.count("CYCLETASK-"))
+    self.assertEquals(2, response.count("Policy: p1"))
+    self.assertIn(",p1,", response)
