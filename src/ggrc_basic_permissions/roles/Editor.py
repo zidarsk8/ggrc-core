@@ -148,6 +148,7 @@ permissions = {
         "Objective",
         "ObjectDocument",
         "ObjectPerson",
+        "Person",
         "Option",
         "OrgGroup",
         "Vendor",
