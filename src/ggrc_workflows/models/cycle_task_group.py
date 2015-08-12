@@ -7,11 +7,11 @@
 from ggrc import db
 from ggrc.models.mixins import (
     Base, Titled, Described, Timeboxed, Slugged, Stateful, WithContact
-    )
+)
 
 
-class CycleTaskGroup(
-    WithContact, Stateful, Slugged, Timeboxed, Described, Titled, Base, db.Model):
+class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
+                     Titled, Base, db.Model):
   __tablename__ = 'cycle_task_groups'
   _title_uniqueness = False
 
@@ -19,7 +19,8 @@ class CycleTaskGroup(
   def generate_slug_prefix_for(cls, obj):
     return "CYCLEGROUP"
 
-  VALID_STATES = (u'Assigned', u'InProgress', u'Finished', u'Verified', u'Declined')
+  VALID_STATES = (
+      u'Assigned', u'InProgress', u'Finished', u'Verified', u'Declined')
 
   cycle_id = db.Column(
       db.Integer, db.ForeignKey('cycles.id'), nullable=False)
@@ -29,12 +30,12 @@ class CycleTaskGroup(
       'CycleTaskGroupObject',
       backref='cycle_task_group',
       cascade='all, delete-orphan'
-      )
+  )
   cycle_task_group_tasks = db.relationship(
       'CycleTaskGroupObjectTask',
       backref='cycle_task_group',
       cascade='all, delete-orphan'
-      )
+  )
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
   next_due_date = db.Column(db.Date)
@@ -46,4 +47,8 @@ class CycleTaskGroup(
       'cycle_task_group_tasks',
       'sort_index',
       'next_due_date',
-      ]
+  ]
+
+  _aliases = {
+      "cycle": "Cycle",
+  }

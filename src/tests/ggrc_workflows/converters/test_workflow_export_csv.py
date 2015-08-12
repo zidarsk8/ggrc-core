@@ -191,8 +191,82 @@ class TestExportMultipleObjects(TestCase):
                 },
             },
             "fields": "all",
+        }, {
+            "object_name": "CycleTaskGroup",  # two cycle groups
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["0"],
+                },
+            },
+            "fields": "all",
+        }, {
+            "object_name": "Cycle",  # sholud be same cycle as in first block
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["2"],
+                },
+            },
+            "fields": "all",
+        }, {
+            # Task mapped to any of the two task groups, 11 tasks
+            "object_name": "CycleTaskGroupObjectTask",
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["2"],
+                },
+            },
+            "fields": "all",
+        }, {
+            "object_name": "CycleTaskGroup",  # two cycle groups
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["4"],
+                },
+            },
+            "fields": "all",
         },
     ]
     response = self.export_csv(data).data
-    self.assertEquals(2, response.count("wf-1"))  # 1 for cycle and 1 for wf
-    self.assertIn("CYCLE-", response)
+    self.assertEquals(3, response.count("wf-1"))  # 2 for cycles and 1 for wf
+    # 3rd block = 2, 5th block = 11, 6th block = 2.
+    self.assertEquals(15, response.count("CYCLEGROUP-"))
+    self.assertEquals(6, response.count("CYCLE-"))
+    self.assertEquals(11, response.count("CYCLETASK-"))
+
+  def test_cycle_taks_objects(self):
+    """ test cycle task and various objects """
+    data = [
+        {
+            "object_name": "CycleTaskGroupObjectTask",  #
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "Policy",
+                    "slugs": ["p1"],
+                },
+            },
+            "fields": "all",
+        }, {
+            "object_name": "Policy",  #
+            "filters": {
+                "expression": {
+                    "op": {"name": "relevant"},
+                    "object_name": "__previous__",
+                    "ids": ["0"],
+                },
+            },
+            "fields": ["slug", "title"],
+        },
+    ]
+    response = self.export_csv(data).data
+    self.assertEquals(2, response.count("CYCLETASK-"))
+    self.assertEquals(2, response.count("Policy: p1"))
+    self.assertIn(",p1,", response)
