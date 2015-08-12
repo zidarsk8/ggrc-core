@@ -135,10 +135,11 @@
         this.setBinding();
       },
       "deferredSave": function () {
-        var data = {
+        var source = this.scope.attr("deferred_to").instance || this.scope.attr("mapper.object"),
+            data = {
               multi_map: true,
               arr: _.compact(_.map(this.scope.attr("mapper.selected"), function (desination) {
-                    var isAllowed = GGRC.Utils.allowed_to_map(this.scope.attr("mapper.object"), desination),
+                    var isAllowed = GGRC.Utils.allowed_to_map(source, desination),
                         inst = _.find(this.scope.attr("mapper.entries"), function (entry) {
                           return entry.instance.id === desination.id;
                         });
