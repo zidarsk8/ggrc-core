@@ -50,6 +50,7 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
   _aliases = {
       "control": {
           "display_name": "Control",
+          "type": "mapping",
           "mandatory": True,
       },
       "audit": {

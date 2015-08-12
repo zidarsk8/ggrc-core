@@ -7,12 +7,11 @@
 from ggrc import db
 from ggrc.models.mixins import (
     Slugged, Titled, Described, Timeboxed, Stateful, WithContact
-    )
-from sqlalchemy import event
+)
 
 
-class Cycle(
-    WithContact, Stateful, Timeboxed, Described, Titled, Slugged, db.Model):
+class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
+            db.Model):
   __tablename__ = 'cycles'
   _title_uniqueness = False
 
@@ -25,7 +24,8 @@ class Cycle(
   cycle_task_group_objects = db.relationship(
       'CycleTaskGroupObject', backref='cycle', cascade='all, delete-orphan')
   cycle_task_group_object_tasks = db.relationship(
-      'CycleTaskGroupObjectTask', backref='cycle', cascade='all, delete-orphan')
+      'CycleTaskGroupObjectTask', backref='cycle',
+      cascade='all, delete-orphan')
   cycle_task_entries = db.relationship(
       'CycleTaskEntry', backref='cycle', cascade='all, delete-orphan')
   is_current = db.Column(db.Boolean, default=True, nullable=False)
@@ -43,4 +43,8 @@ class Cycle(
       'cycle_task_groups',
       'is_current',
       'next_due_date',
-      ]
+  ]
+
+  _aliases = {
+      "cycle_workflow": "Workflow"
+  }

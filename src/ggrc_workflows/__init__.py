@@ -14,6 +14,8 @@ from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import Resource
 from ggrc.services.registry import service
 from ggrc_workflows import models, notification
+from ggrc_workflows.models import relationship_helper
+from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
 from ggrc_workflows.converters import IMPORTABLE
 from ggrc_workflows.converters.handlers import COLUMN_HANDLERS
 from ggrc_workflows.services.common import Signals
@@ -37,15 +39,7 @@ blueprint = Blueprint(
 )
 
 
-_workflow_object_types = [
-    "Program", "Vendor", "OrgGroup",
-    "Regulation", "Standard", "Policy", "Contract",
-    "Objective", "Control", "Section", "Clause",
-    "System", "Process",
-    "DataAsset", "Facility", "Market", "Product", "Project", "Issue"
-]
-
-for type_ in _workflow_object_types:
+for type_ in WORKFLOW_OBJECT_TYPES:
   model = getattr(all_models, type_)
   model.__bases__ = (
       # models.workflow_object.Workflowable,
@@ -989,3 +983,4 @@ notification.register_listeners()
 contributed_notifications = notification.contributed_notifications
 contributed_importables = IMPORTABLE
 contributed_column_handlers = COLUMN_HANDLERS
+contributed_get_ids_related_to = relationship_helper.get_ids_related_to

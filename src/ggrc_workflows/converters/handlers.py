@@ -267,7 +267,7 @@ class ObjectsColumnHandler(ColumnHandler):
   def set_value(self):
     pass
 
-class CycleObjectColumnHandler(ColumnHandler):
+class ExportOnlyColumnHandler(ColumnHandler):
 
   def parse_item(self):
     pass
@@ -276,17 +276,29 @@ class CycleObjectColumnHandler(ColumnHandler):
     pass
 
   def get_value(self):
-    obj = self.row_converter.obj.cycle_task_group_object
-    if not obj or not obj.object:
-      return ""
-    return "{}: {}".format(obj.object._inflector.human_singular.title(),
-                           obj.object.slug)
+    return ""
 
   def insert_object(self):
     pass
 
   def set_value(self):
     pass
+
+
+class CycleObjectColumnHandler(ExportOnlyColumnHandler):
+
+  def get_value(self):
+    obj = self.row_converter.obj.cycle_task_group_object
+    if not obj or not obj.object:
+      return ""
+    return "{}: {}".format(obj.object._inflector.human_singular.title(),
+                           obj.object.slug)
+
+
+class CycleWorkflowColumnHandler(ExportOnlyColumnHandler):
+
+  def get_value(self):
+    return self.row_converter.obj.workflow.slug
 
 
 COLUMN_HANDLERS = {
@@ -299,6 +311,7 @@ COLUMN_HANDLERS = {
     "task_group": TaskGroupColumnHandler,
     "task_type": TaskTypeColumnHandler,
     "workflow": WorkflowColumnHandler,
+    "cycle_workflow": CycleWorkflowColumnHandler,
     "workflow_mapped": WorkflowPersonColumnHandler,
     "task_group_objects": ObjectsColumnHandler,
 }

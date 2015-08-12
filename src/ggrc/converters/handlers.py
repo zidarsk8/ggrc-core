@@ -25,7 +25,7 @@ from ggrc.models import Policy
 from ggrc.models import Regulation
 from ggrc.models import Standard
 from ggrc.models import Relationship
-from ggrc.models.relationship import RelationshipHelper
+from ggrc.models.relationship_helper import RelationshipHelper
 
 
 MAPPING_PREFIX = "__mapping__:"
