@@ -26,6 +26,7 @@ from ggrc.models import Regulation
 from ggrc.models import Standard
 from ggrc.models import Relationship
 from ggrc.models.relationship_helper import RelationshipHelper
+from ggrc.models.reflection import AttributeInfo
 
 
 MAPPING_PREFIX = "__mapping__:"
@@ -265,6 +266,7 @@ class MappingColumnHandler(ColumnHandler):
     self.mapping_object = importable.get(self.attr_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
+    self.unmap = self.key.startswith(AttributeInfo.UNMAPPING_PREFIX)
     super(MappingColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
@@ -292,13 +294,19 @@ class MappingColumnHandler(ColumnHandler):
       return
     current_obj = self.row_converter.obj
     for obj in self.value:
-      if not Relationship.find_related(current_obj, obj):
+      mapping = Relationship.find_related(current_obj, obj)
+      if not self.unmap and not mapping:
         mapping = Relationship(source=current_obj, destination=obj)
         db.session.add(mapping)
+      elif self.unmap and mapping:
+        db.session.delete(mapping)
     db.session.flush()
     self.dry_run = True
 
   def get_value(self):
+    if self.unmap:
+      return ""
+
     related_slugs = []
     related_ids = RelationshipHelper.get_ids_related_to(
         self.mapping_object.__name__,
