@@ -11,21 +11,22 @@ import re
 import traceback
 
 from ggrc import db
-from ggrc.converters import get_importables
 from ggrc.converters import errors
+from ggrc.converters import get_importables
 from ggrc.login import get_current_user
 from ggrc.models import CategoryBase
-from ggrc.models import CustomAttributeValue
 from ggrc.models import CustomAttributeDefinition
+from ggrc.models import CustomAttributeValue
 from ggrc.models import ObjectPerson
 from ggrc.models import Option
 from ggrc.models import Person
-from ggrc.models import Program
 from ggrc.models import Policy
+from ggrc.models import Program
 from ggrc.models import Regulation
-from ggrc.models import Standard
 from ggrc.models import Relationship
+from ggrc.models import Standard
 from ggrc.models.relationship_helper import RelationshipHelper
+from ggrc.rbac import permissions
 
 
 MAPPING_PREFIX = "__mapping__:"
@@ -276,7 +277,10 @@ class MappingColumnHandler(ColumnHandler):
     for slug in slugs:
       obj = class_.query.filter(class_.slug == slug).first()
       if obj:
-        objects.append(obj)
+        if permissions.is_allowed_update_for(obj):
+          objects.append(obj)
+        else:
+          self.add_warning(errors.MAPPING_PERMISSION_ERROR, value=slug)
       elif not (slug in self.new_slugs and self.dry_run):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
