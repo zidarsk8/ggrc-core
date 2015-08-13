@@ -775,6 +775,11 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
     start_date: "date",
     end_date: "date"
   },
+  filter_keys : ["operationally", "operational", "design"
+  ],
+  filter_mappings: {
+    "operational": "operationally"
+  },
   tree_view_options : {
     add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
   },
