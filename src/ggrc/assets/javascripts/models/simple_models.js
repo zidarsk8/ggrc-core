@@ -316,18 +316,22 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   return instance;
 };
 
-CMS.Models.get_stub = function(object) {
-  return CMS.Models.get_instance(object).stub();
-}
+CMS.Models.get_stub = function (object) {
+  var instance = CMS.Models.get_instance(object);
+  if (!instance) {
+    return;
+  }
+  return instance.stub();
+};
 
-CMS.Models.get_stubs = function(objects) {
+CMS.Models.get_stubs = function (objects) {
   return new can.Stub.List(can.map(CMS.Models.get_instances(objects), function(o) {
     return o.stub();
   }));
 };
 
-CMS.Models.get_instances = function(objects) {
-  var i, instances = []
+CMS.Models.get_instances = function (objects) {
+  var i, instances = [];
   if (!objects)
     return [];
   for (i=0; i<objects.length; i++) {
