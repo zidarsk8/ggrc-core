@@ -977,7 +977,6 @@ can.Component.extend({
         changes,
         function(item) {
           var mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, item.what.constructor.shortName);
-
           if (item.how === "add") {
             that.scope.instance.mark_for_addition(mapping, item.what, item.extra);
           } else {
