@@ -28,3 +28,12 @@ class TestCase(ggrc.TestCase):
                                 data=data, headers=headers)
     self.assert200(response)
     return json.loads(response.data)
+
+  def export_csv(self, data):
+    headers = {
+        'Content-Type': 'application/json',
+        "X-requested-by": "gGRC",
+        "X-export-view": "blocks",
+    }
+    return self.client.post("/_service/export_csv", data=json.dumps(data),
+                            headers=headers)

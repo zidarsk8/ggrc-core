@@ -11,6 +11,7 @@ import re
 import traceback
 
 from ggrc import db
+from ggrc.automapper import AutomapperGenerator
 from ggrc.converters import get_importables
 from ggrc.converters import errors
 from ggrc.login import get_current_user
@@ -291,11 +292,15 @@ class MappingColumnHandler(ColumnHandler):
     if self.dry_run or not self.value:
       return
     current_obj = self.row_converter.obj
+    relationships = []
     for obj in self.value:
       if not Relationship.find_related(current_obj, obj):
         mapping = Relationship(source=current_obj, destination=obj)
+        relationships.append(mapping)
         db.session.add(mapping)
     db.session.flush()
+    for relationship in relationships:
+      AutomapperGenerator(relationship).generate_automappings()
     self.dry_run = True
 
   def get_value(self):
