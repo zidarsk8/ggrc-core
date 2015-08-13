@@ -50,7 +50,7 @@ class ObjectRoleColumnHandler(UserColumnHandler):
     for owner in self.value:
       user_role = UserRole(
           role=self.role,
-          context_id=self.row_converter.obj.context_id,
+          context=self.row_converter.obj.context,
           person=owner
       )
       db.session.add(user_role)
