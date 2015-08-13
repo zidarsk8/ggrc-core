@@ -311,6 +311,6 @@ class BlockConverter(object):
 
   def _sanitize_header(self, header):
     header = header.strip("*").lower()
-    if header.startswith("map:"):
+    if header.startswith("map:") or header.startswith("unmap:"):
       header = ":".join(map(unicode.strip, header.split(":")))  # noqa
     return header
