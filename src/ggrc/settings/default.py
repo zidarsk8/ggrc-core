@@ -56,3 +56,7 @@ CALENDAR_MECHANISM = False
 MAX_INSTANCES = os.environ.get('MAX_INSTANCES', '3')
 
 exports = ['VERSION', 'MAX_INSTANCES']
+
+# Users with authorized domains will automatically get Creator role.
+# Can set multiple domains separated by comma, e.g. "exaone.com, exatwo.com"
+AUTHORIZED_DOMAINS = None
