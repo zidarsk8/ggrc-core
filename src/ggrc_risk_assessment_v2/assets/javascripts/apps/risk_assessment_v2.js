@@ -134,7 +134,11 @@
         return;
       }
 
-      var model = CMS.Models[model_name];
+      var model = CMS.Models[model_name],
+          widgets_by_type = GGRC.tree_view.base_widgets_by_type;
+
+      widgets_by_type[model_name] = widgets_by_type[model_name].concat(["Risk", "ThreatActor"]);
+
       related_object_descriptors[model_name] = {
         content_controller: CMS.Controllers.TreeView,
         content_controller_selector: "ul",
