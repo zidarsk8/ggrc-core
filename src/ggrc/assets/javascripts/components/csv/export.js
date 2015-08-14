@@ -21,7 +21,9 @@
           return new can.List();
         }),
         columns: can.compute(function () {
-          return GGRC.model_attr_defs[this.attr("type")];
+          return _.filter(GGRC.model_attr_defs[this.attr("type")], function(el) { 
+            return el.display_name.indexOf("unmap:") == -1; 
+          });
         })
       }),
       panelsModel = can.Map({
