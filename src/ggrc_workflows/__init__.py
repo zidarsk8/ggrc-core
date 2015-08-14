@@ -146,7 +146,7 @@ def update_cycle_dates(cycle):
             'cycle_task_group_objects.'
             'cycle_task_group_object_tasks')).one()
 
-  if not len(cycle.cycle_task_group_object_tasks):
+  if not cycle.cycle_task_group_object_tasks:
     cycle.start_date, cycle.end_date = None, None
     cycle.next_due_date = None
     cycle.is_current = False
@@ -854,15 +854,9 @@ def start_recurring_cycles():
 
 def get_cycles(workflow):
   def is_valid_cycle(cycle):
-    return (bool(len([ct for ct in cycle.cycle_task_group_object_tasks])) and
-            (isinstance(cycle.start_date, date) or
-             isinstance(cycle.start_date, datetime)))
-
-  if not workflow.cycles:
-    return None
-
+    return ([ct for ct in cycle.cycle_task_group_object_tasks] and
+            isinstance(cycle.start_date, (date, datetime)))
   return [c for c in workflow.cycles if is_valid_cycle(c)]
-
 
 def adjust_next_cycle_start_date(
     calculator,

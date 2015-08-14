@@ -347,11 +347,7 @@
       this.validateContact(["_transient.contact", "contact"]);
 
       this.validate(['start_date', 'end_date'], function (newVal, prop) {
-        dates_are_valid =
-            this.start_date && 0 < this.start_date.length
-            && this.end_date && 0 < this.end_date.length;
-
-        if (!dates_are_valid) {
+        if (!(this.start_date && this.end_date)) {
           return "Start and/or end date is invalid";
         }
       });
