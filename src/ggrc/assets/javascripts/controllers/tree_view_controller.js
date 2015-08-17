@@ -1451,7 +1451,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
         this.replace_element(frag);
         this._draw_node_deferred.resolve();
       }.bind(this)));
-    }.bind(this), 2);
+    }.bind(this), 2); // We give the browser a 2ms pause for scrolling
   }
   , draw_placeholder: function() {
       var that = this;
