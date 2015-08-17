@@ -927,6 +927,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     setTimeout(this.draw_visible.bind(this), 0);
   }
 
+  , ".tree-item-placeholder mouseenter": function(el, ev) {
+    el.control().draw_node();
+  }
+
   , "{original_list} add" : function(list, ev, newVals, index) {
     var that = this
       , real_add = []
@@ -1445,12 +1449,17 @@ can.Control("CMS.Controllers.TreeViewNode", {
   }
 
   , draw_node: function() {
+    if (this._draw_node_in_progress) {
+      return;
+    }
+    this._draw_node_in_progress = true;
     this.add_child_lists_to_child();
     setTimeout(function() {
       can.view(this.options.show_view, this.options, this._ifNotRemoved(function(frag) {
         this.replace_element(frag);
         this._draw_node_deferred.resolve();
       }.bind(this)));
+      this._draw_node_in_progress = false;
     }.bind(this), 2);
   }
   , draw_placeholder: function() {
