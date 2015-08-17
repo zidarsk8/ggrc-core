@@ -898,6 +898,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
 
     for (i = lo; i <= hi; i++) {
+      index = this._is_scrolling_up ? (hi - (i - lo)) : i;
       control = $(children[index]).control();
       if (control === undefined || control === null) {
         // TODO this should not be necessary
@@ -913,9 +914,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
     this._last_visible = visible;
   }, 100, {leading: true})
+  , _last_scroll_top : 0
+  , _is_scrolling_up : false
 
   , "{scroll_element} scroll": function (el, ev) {
-    setTimeout(this.draw_visible.bind(this), 0);
+    this._is_scrolling_up = this._last_scroll_top > el.scrollTop();
+    this._last_scroll_top = el.scrollTop();
+    this.draw_visible();
   }
 
   , "{scroll_element} resize": function (el, ev) {
@@ -1194,6 +1199,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       return;
     }
     this._draw_list_deferred = false;
+    this._is_scrolling_up = false;
     this.find_all_deferred = false;
     this.get_count_deferred = false;
     this.options.list.replace([]);
@@ -1440,13 +1446,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
 
   , draw_node: function() {
     this.add_child_lists_to_child();
-    //setTimeout(function() {
-      var that = this;
-      can.view(that.options.show_view, that.options, this._ifNotRemoved(function(frag) {
-        that.replace_element(frag);
-        that._draw_node_deferred.resolve();
-      }));
-    //}, 20);
+    setTimeout(function() {
+      can.view(this.options.show_view, this.options, this._ifNotRemoved(function(frag) {
+        this.replace_element(frag);
+        this._draw_node_deferred.resolve();
+      }.bind(this)));
+    }.bind(this), 2);
   }
   , draw_placeholder: function() {
       var that = this;
