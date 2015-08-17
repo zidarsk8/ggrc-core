@@ -856,12 +856,16 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         lo = 0,
         hi = children.length - 1,
         max = hi,
-        steps = 0;
+        steps = 0,
+        last_visible = this._last_visible || [],
+        visible = [],
+        i, control, index, page_count, mid, el, pos;
+
     while (steps < MAX_STEPS && lo < hi) {
       steps += 1;
-      var mid = (lo + hi) / 2 | 0,
-          el = children[mid],
-          pos = el_position(children[mid]);
+      mid = (lo + hi) / 2 | 0;
+      el = children[mid];
+      pos = el_position(children[mid]);
       if (pos < 0) {
         lo = mid;
         continue;
@@ -873,7 +877,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       lo = mid;
       hi = mid;
     }
-    var page_count = this.options.scroll_page_count;
+    page_count = this.options.scroll_page_count;
     while (lo > 0 && el_position(children[lo - 1]) >= (-page_count)) {
       lo -= 1;
     }
@@ -881,10 +885,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       hi += 1;
     }
 
-    var last_visible = this._last_visible || [],
-        visible = [];
-    for (var i in last_visible) {
-      var control = last_visible[i];
+    for (i in last_visible) {
+      control = last_visible[i];
       if (control.element === undefined || control.element === null) {
         continue; // element was removed
       }
@@ -895,8 +897,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
     }
 
-    for (var i = lo; i <= hi; i++) {
-      var control = $(children[i]).control();
+    for (i = lo; i <= hi; i++) {
+      control = $(children[index]).control();
       if (control === undefined || control === null) {
         // TODO this should not be necessary
         // draw_visible is called too soon when controlers are not yet
