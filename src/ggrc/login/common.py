@@ -60,13 +60,11 @@ def find_or_create_user_by_email(email, **kwargs):
   user = find_user_by_email(email)
   if not user:
     user = create_user(email, **kwargs)
-    authorized_domains = getattr(settings, "AUTHORIZED_DOMAINS", False)
-    if authorized_domains:
-      authorized_domains = {d.strip() for d in authorized_domains.split(",")}
-      # Email can have multiple @, but last one separates local and domain part
-      user_domain = user.email.split("@")[-1]
-      if user_domain in authorized_domains:
-        add_creator_role(user)
+    authorized_domains = getattr(settings, "AUTHORIZED_DOMAINS", {})
+    # Email can have multiple @, but last one separates local and domain part
+    user_domain = user.email.split("@")[-1]
+    if user_domain in authorized_domains:
+      add_creator_role(user)
   return user
 
 def get_next_url(request, default_url):

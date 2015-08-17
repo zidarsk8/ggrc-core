@@ -58,5 +58,5 @@ MAX_INSTANCES = os.environ.get('MAX_INSTANCES', '3')
 exports = ['VERSION', 'MAX_INSTANCES']
 
 # Users with authorized domains will automatically get Creator role.
-# Can set multiple domains separated by comma, e.g. "exaone.com, exatwo.com"
-AUTHORIZED_DOMAINS = None
+# Set of strings: {"example1.com", "example2.com"}
+AUTHORIZED_DOMAINS = {}
