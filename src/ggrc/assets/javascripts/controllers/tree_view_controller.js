@@ -857,8 +857,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         hi = children.length - 1,
         max = hi,
         steps = 0,
-        last_visible = this._last_visible || [],
         visible = [],
+        already_visible = _.filter(this.element[0].children, function(e) {
+          // doing this manualy is 10x faster than a jQuery selector and performance
+          // here matters since it runs on every scroll event on a potentialy long
+          // list of items
+          return e.tagName == "LI";
+        }),
         i, control, index, page_count, mid, el, pos;
 
     while (steps < MAX_STEPS && lo < hi) {
@@ -885,11 +890,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       hi += 1;
     }
 
-    for (i in last_visible) {
-      control = last_visible[i];
-      if (control.element === undefined || control.element === null) {
-        continue; // element was removed
-      }
+    for (i in already_visible) {
+      control = $(already_visible[i]).control();
       if (Math.abs(this.el_position(control.element)) <= page_count) {
         visible.push(control);
       } else {
@@ -912,7 +914,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         control.draw_node();
       }
     }
-    this._last_visible = visible;
   }, 100, {leading: true})
   , _last_scroll_top : 0
   , _is_scrolling_up : false
@@ -1206,7 +1207,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.find_all_deferred = false;
     this.get_count_deferred = false;
     this.options.list.replace([]);
-    this._last_visible = [];
     this.element.children('.cms_controllers_tree_view_node').remove();
     this.draw_list(this.options.original_list, true, force_reload);
     this.init_count();
