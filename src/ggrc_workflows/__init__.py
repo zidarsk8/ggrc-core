@@ -150,6 +150,7 @@ def update_cycle_dates(cycle):
     cycle.start_date, cycle.end_date = None, None
     cycle.next_due_date = None
     cycle.is_current = False
+    db.session.add(cycle)
     return
 
   for ctg in cycle.cycle_task_groups:
