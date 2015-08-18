@@ -7,7 +7,7 @@ import logging
 from collections import namedtuple
 
 from sqlalchemy import or_, and_
-
+from datetime import datetime
 from ggrc import models
 from ggrc.models.relationship import Relationship
 from ggrc.services.common import Resource
@@ -15,6 +15,7 @@ from ggrc import db
 from ggrc.automapper.rules import rules
 from ggrc.utils import benchmark
 from ggrc.rbac.permissions import is_allowed_update
+from ggrc.login import get_current_user
 
 
 class Stub(namedtuple("Stub", ["type", "id"])):
@@ -89,15 +90,32 @@ class AutomapperGenerator(object):
     return is_allowed_update(obj.type, obj.id, self.relationship.context)
 
   def _flush(self):
+    if len(self.auto_mappings) == 0:
+      return
     with benchmark("Automapping flush"):
-      db.session.add_all(Relationship(
-          source_type=src.type,
-          source_id=src.id,
-          destination_type=dst.type,
-          destination_id=dst.id,
-          automapping_id=self.relationship.id
-      ) for src, dst in self.auto_mappings)
-      db.session.flush()
+      current_user = get_current_user()
+      now = datetime.now()
+      # We are doing an INSERT IGNORE INTO here to mitigate a race condition
+      # that happens when multiple simultaneous requests create the same
+      # automapping. If a relationship object fails our unique constraint
+      # it means that the mapping was already created by another request
+      # and we can safely ignore it.
+      inserter = Relationship.__table__.insert().prefix_with("IGNORE")
+      print inserter
+      db.session.execute(inserter.values([{
+          "id": None,
+          "modified_by_id": current_user.id,
+          "created_at": now,
+          "updated_at": now,
+          "source_id": src.id,
+          "source_type": src.type,
+          "destination_id": dst.id,
+          "destination_type": dst.type,
+          "relationship_type_id": None,
+          "context_id": None,
+          "status": None,
+          "automapping_id": self.relationship.id}
+          for src, dst in self.auto_mappings]))
 
   def _step(self, src, dst):
       explicit, implicit = rules[src.type, dst.type]
