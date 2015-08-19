@@ -309,7 +309,7 @@ class MappingColumnHandler(ColumnHandler):
         db.session.delete(mapping)
     db.session.flush()
     for relationship in relationships:
-      AutomapperGenerator(relationship).generate_automappings()
+      AutomapperGenerator(relationship, False).generate_automappings()
     self.dry_run = True
 
   def get_value(self):
