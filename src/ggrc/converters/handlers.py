@@ -549,6 +549,9 @@ class AuditColumnHandler(MappingColumnHandler):
 
 class RequestAuditColumnHandler(ColumnHandler):
 
+  def __init__(self, row_converter, key, **options):
+    super(RequestAuditColumnHandler, self).__init__(row_converter, "audit", **options)
+
   def get_audit_from_slug(self, slug):
     if slug in self.new_objects[Audit]:
       return self.new_objects[Audit][slug]
