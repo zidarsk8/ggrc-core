@@ -40,6 +40,15 @@ class Request(Titled, Slugged, Described, Base, db.Model):
   def title(cls):
     return deferred(db.Column(db.String, nullable=True), cls.__name__)
 
+  # this property is needed to ovverride the import/export handler
+  @property
+  def request_audit(self):
+    return self.audit
+
+  @request_audit.setter
+  def request_audit(self, value):
+    self.audit = value
+
   _publish_attrs = [
     'assignee',
     'requestor',
@@ -60,6 +69,18 @@ class Request(Titled, Slugged, Described, Base, db.Model):
     'notes',
     'description',
   ]
+
+  _aliases = {
+    "assignee": "Assignee",
+    "request_audit": "Audit",
+    "due_on": "Due On",
+    "notes": "Notes",
+    "request_type": "Request Type",
+    "requested_on": "Requested On",
+    "status": "Status",
+    "test": "Test",
+    "title": None,
+  }
 
   def _display_name(self):
     if len(self.description) > 32:

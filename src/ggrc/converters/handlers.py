@@ -15,6 +15,7 @@ from ggrc.automapper import AutomapperGenerator
 from ggrc.converters import get_importables
 from ggrc.converters import errors
 from ggrc.login import get_current_user
+from ggrc.models import Audit
 from ggrc.models import CategoryBase
 from ggrc.models import CustomAttributeDefinition
 from ggrc.models import CustomAttributeValue
@@ -544,6 +545,29 @@ class AuditColumnHandler(MappingColumnHandler):
   def __init__(self, row_converter, key, **options):
     key = "{}audit".format(MAPPING_PREFIX)
     super(AuditColumnHandler, self).__init__(row_converter, key, **options)
+
+
+class RequestAuditColumnHandler(ColumnHandler):
+
+  def get_audit_from_slug(self, slug):
+    if slug in self.new_objects[Audit]:
+      return self.new_objects[Audit][slug]
+    return Audit.query.filter_by(slug=slug).first()
+
+  def parse_item(self):
+    if self.raw_value == "":
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+      return None
+    slug = self.raw_value
+    audit = self.get_audit_from_slug(slug)
+    if audit is not None:
+      return audit
+    self.add_error(errors.UNKNOWN_OBJECT, object_type="Audit", slug=slug)
+    return None
+
+  def get_value(self):
+    audit = getattr(self.row_converter.obj, self.key, False)
+    return audit.slug
 
 
 class ObjectPersonColumnHandler(UserColumnHandler):
