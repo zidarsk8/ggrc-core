@@ -80,8 +80,24 @@ class RelationshipHelper(object):
       return None
 
   @classmethod
+  def person_object(cls, object_type, related_type, related_ids):
+    if "Person" not in [object_type, related_type]:
+      return None
+    if object_type == "Person":
+      return db.session.query(models.ObjectPerson.person_id).filter(
+          (models.ObjectPerson.personable_type == related_type) &
+          (models.ObjectPerson.personable_id.in_(related_ids))
+      )
+    else:
+      return db.session.query(models.ObjectPerson.personable_id).filter(
+          (models.ObjectPerson.personable_type == object_type) &
+          (models.ObjectPerson.person_id.in_(related_ids))
+      )
+
+  @classmethod
   def get_special_mappings(cls, object_type, related_type, related_ids):
     return [
+        cls.person_object(object_type, related_type, related_ids),
         cls.person_ownable(object_type, related_type, related_ids),
         cls.person_withcontact(object_type, related_type, related_ids),
         cls.program_audit(object_type, related_type, related_ids),
