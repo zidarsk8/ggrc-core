@@ -67,8 +67,22 @@ class RelationshipHelper(object):
       return None
 
   @classmethod
+  def person_ownable(cls, object_type, related_type, related_ids):
+    if object_type == "Person":
+      return db.session.query(models.ObjectOwner.person_id).filter(
+          (models.ObjectOwner.ownable_type == related_type) &
+          (models.ObjectOwner.ownable_id.in_(related_ids)))
+    elif related_type == "Person":
+      return db.session.query(models.ObjectOwner.ownable_id).filter(
+          (models.ObjectOwner.ownable_type == object_type) &
+          (models.ObjectOwner.person_id.in_(related_ids)))
+    else:
+      return None
+
+  @classmethod
   def get_special_mappings(cls, object_type, related_type, related_ids):
     return [
+        cls.person_ownable(object_type, related_type, related_ids),
         cls.person_withcontact(object_type, related_type, related_ids),
         cls.program_audit(object_type, related_type, related_ids),
         cls.section_directive(object_type, related_type, related_ids),
