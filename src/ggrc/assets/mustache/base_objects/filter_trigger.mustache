@@ -5,6 +5,7 @@
   Maintained By: Swizec@reciprocitylabs.com
 }}
 
+{{^if_page_type "admin"}}
 <li class="filter-trigger">
 {{^filter_is_hidden}}
   <a href="javascript://" class="active">
@@ -20,3 +21,4 @@
   </a>
 {{/filter_is_hidden}}
 </li>
+{{/if_page_type}}

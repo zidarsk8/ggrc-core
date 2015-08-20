@@ -25,7 +25,8 @@ def get_mapping_names(class_name):
   mapping_rules = get_mapping_rules()[class_name]
   pretty_rules = map(title_from_camelcase, mapping_rules)
   mapping_names = set(["map:{}".format(name) for name in pretty_rules])
-  return mapping_names
+  unmapping_names = set(["unmap:{}".format(name) for name in pretty_rules])
+  return mapping_names.union(unmapping_names)
 
 class TestSplitArry(TestCase):
 
@@ -209,10 +210,10 @@ class TestCustomAttributesDefinitions(TestCase):
         "Description",
         "Notes",
         "Privacy",
-        "Owner",
+        "Manager",
         "Reader",
         "Editor",
-        "Mapped",
+        "No Access",
         "Primary Contact",
         "Secondary Contact",
         "Program URL",
@@ -229,7 +230,7 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Owner"]["mandatory"])
+    self.assertTrue(vals["Manager"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Mandatory Attribute"]["mandatory"])
     self.assertTrue(vals["Choose"]["mandatory"])
@@ -256,10 +257,10 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Privacy",
-        "Owner",
+        "Manager",
         "Reader",
         "Editor",
-        "Mapped",
+        "No Access",
         "Primary Contact",
         "Secondary Contact",
         "Program URL",
@@ -273,10 +274,10 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Owner"]["mandatory"])
+    self.assertTrue(vals["Manager"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
-    self.assertIn("type", vals["Owner"])
-    self.assertEquals(vals["Owner"]["type"], "user_role")
+    self.assertIn("type", vals["Manager"])
+    self.assertEquals(vals["Manager"]["type"], "user_role")
 
   def test_audit_definitions(self):
     """ test default headers for Audit """
@@ -848,9 +849,9 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Title",
         "Description",
         "Custom email message",
-        "Owner",
+        "Manager",
         "Member",
-        "Mapped",
+        "No Access",
         "Frequency",
         "Force real-time email updates",
         "Code",
@@ -858,11 +859,11 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Owner"]["mandatory"])
+    self.assertTrue(vals["Manager"]["mandatory"])
     self.assertTrue(vals["Frequency"]["mandatory"])
-    self.assertIn("type", vals["Owner"])
+    self.assertIn("type", vals["Manager"])
     self.assertIn("type", vals["Member"])
-    self.assertEquals(vals["Owner"]["type"], "user_role")
+    self.assertEquals(vals["Manager"]["type"], "user_role")
     self.assertEquals(vals["Member"]["type"], "user_role")
 
   def test_task_group_definitions(self):
@@ -901,8 +902,8 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Summary"]["mandatory"])
     self.assertTrue(vals["Assignee"]["mandatory"])
 
-  def test_cycle_task_group_task_definitions(self):
-    """ test default headers for Cycle Task Group Task """
+  def test_cycle_task_definitions(self):
+    """ test default headers for Cycle Task Group Object Task """
     definitions = get_object_column_definitions(wf_models.CycleTaskGroupObjectTask)
     display_names = set([val["display_name"] for val in definitions.values()])
     expected_names = set([
@@ -914,13 +915,13 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Start Date",
         "End Date",
         "Task Group",
+        "Cycle Object",
         "State",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Summary"]["mandatory"])
     self.assertTrue(vals["Assignee"]["mandatory"])
-
 
 
 class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):

@@ -6,8 +6,9 @@
 """ This module is used for handling a single line from a csv file """
 
 from ggrc import db
-from ggrc.models.reflection import AttributeInfo
 from ggrc.converters import errors
+from ggrc.models.reflection import AttributeInfo
+from ggrc.rbac import permissions
 from ggrc.services.common import Resource
 import ggrc.services
 
@@ -127,6 +128,9 @@ class RowConverter(object):
     if not obj:
       obj = self.object_class()
       self.is_new = True
+    elif not permissions.is_allowed_update_for(obj):
+      self.ignore = True
+      self.add_error(errors.PERMISSION_ERROR)
 
     return obj
 

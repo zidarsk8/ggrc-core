@@ -65,6 +65,7 @@
             can.trigger(tgt, "destroyed");
             can.trigger(tgt.constructor, "destroyed", tgt);
           });
+          inst.refresh_all_force('workflow', 'context');
         }
       });
     }
@@ -126,6 +127,15 @@
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
           instance._refresh_workflow_people();
+        }
+      });
+
+      this.bind("destroyed", function(ev, instance) {
+        if (instance instanceof that) {
+          if (instance.task_group && instance.task_group.reify().selfLink) {
+            instance.task_group.reify().refresh();
+            instance._refresh_workflow_people();
+          }
         }
       });
     }

@@ -15,6 +15,7 @@ from ggrc_basic_permissions import objects_via_relationships_query
 from ggrc.rbac import permissions, context_query_filter
 from sqlalchemy import \
     event, and_, or_, literal, union, alias, case, func, distinct
+from sqlalchemy.sql import false
 from sqlalchemy.schema import DDL
 from sqlalchemy.ext.declarative import declared_attr
 from .sql import SqlIndexer
@@ -94,13 +95,22 @@ class MysqlIndexer(SqlIndexer):
         if None not in contexts and permission_type == "read":
           contexts.append(None)
 
-        type_query = or_(and_(
-            MysqlRecordProperty.type == model_name,
-            context_query_filter(MysqlRecordProperty.context_id, contexts)),
+        if resources:
+          resource_sql = and_(
+                MysqlRecordProperty.type == model_name,
+                MysqlRecordProperty.key.in_(resources))
+        else:
+          resource_sql = false()
+
+        type_query = or_(
             and_(
                 MysqlRecordProperty.type == model_name,
-                MysqlRecordProperty.key.in_(resources)))
+                context_query_filter(MysqlRecordProperty.context_id, contexts)
+            ),
+            resource_sql)
         type_queries.append(type_query)
+      else:
+        type_queries.append(MysqlRecordProperty.type == model_name)
 
     return and_(
         MysqlRecordProperty.type.in_(model_names),

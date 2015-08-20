@@ -901,10 +901,11 @@ can.Component.extend({
   scope: {
     parent_instance: null,
     instance: null,
-    instance_attr: '@',
-    source_mapping: '@',
-    source_mapping_source: '@',
-    mapping: '@',
+    instance_attr: "@",
+    source_mapping: "@",
+    source_mapping_source: "@",
+    mapping: "@",
+    deferred: "@",
     attributes: {},
     list: [],
     // the following are just for the case when we have no object to start with,
@@ -976,7 +977,6 @@ can.Component.extend({
         changes,
         function(item) {
           var mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, item.what.constructor.shortName);
-
           if (item.how === "add") {
             that.scope.instance.mark_for_addition(mapping, item.what, item.extra);
           } else {
@@ -996,7 +996,7 @@ can.Component.extend({
         attrs[$(el).attr("name")] = $(el).val();
         return attrs;
       }, {});
-      if (this.scope.deferred) {
+      if (this.scope.attr("deferred")) {
         this.scope.changes.push({ what: ui.item, how: "add", extra: extra_attrs });
       } else {
         mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, ui.item.constructor.shortName);
@@ -1024,7 +1024,7 @@ can.Component.extend({
             len = this.scope.list.length,
             mapping;
 
-        if (this.scope.deferred) {
+        if (this.scope.attr("deferred")) {
           this.scope.changes.push({ what: obj, how: "remove" });
         } else {
           mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, obj.constructor.shortName);
@@ -1081,7 +1081,7 @@ can.Component.extend({
         obj = new CMS.Models[binding.loader.option_model_name](extra_attrs);
       }
 
-      if (that.scope.deferred) {
+      if (that.scope.attr("deferred")) {
         that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
       } else {
         mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);
@@ -1097,7 +1097,7 @@ can.Component.extend({
       var mapping;
 
       can.each(data.arr || [data], function(obj) {
-        if (this.scope.deferred) {
+        if (this.scope.attr("deferred")) {
           this.scope.changes.push({ what: obj, how: "add" });
         } else {
           mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, obj.constructor.shortName);
@@ -1123,7 +1123,7 @@ can.Component.extend({
 
       can.each(data.arr || [data], function(obj) {
         var mapping;
-        if (that.scope.deferred) {
+        if (that.scope.attr("deferred")) {
           that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
         } else {
           mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);

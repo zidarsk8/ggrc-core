@@ -30,3 +30,11 @@ register_model(CycleTaskEntry)
 register_model(CycleTaskGroup)
 register_model(CycleTaskGroupObject)
 register_model(CycleTaskGroupObjectTask)
+
+WORKFLOW_OBJECT_TYPES = {
+    "Program", "Vendor", "OrgGroup",
+    "Regulation", "Standard", "Policy", "Contract",
+    "Objective", "Control", "Section", "Clause",
+    "System", "Process",
+    "DataAsset", "Facility", "Market", "Product", "Project", "Issue"
+}

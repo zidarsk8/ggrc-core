@@ -16,7 +16,7 @@
             <div class="span4">
               <div class="title tree-title-area">
                 {{#using object=instance.object}}
-                  {{#if object}}
+                  {{#if object.title}}
                     <div class="span11">
                       <i class="grcicon-{{object.class.table_singular}}-black"></i>
                       {{#if_helpers '\
@@ -29,7 +29,7 @@
                       {{object.title}}
                     </div>
                   {{else}}
-                    <span class="gray">[deleted]</span> {{instance.title}}
+                    {{instance.title}} <span class="gray">Sorry, you do not have access</span>
                   {{/if}}
                 {{/using}}
               </div>

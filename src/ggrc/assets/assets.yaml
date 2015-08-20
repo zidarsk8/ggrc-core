@@ -175,6 +175,7 @@ dashboard-js-template-files:
   - control_assessments/info.mustache
   - issues/modal_content.mustache
   - issues/info.mustache
+  - issues/remediation_plan.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache

@@ -24,8 +24,8 @@
       {{#using owner=instance.owners.0 model_singular=model.model_singular}}
       {{#with_current_user_as 'current_user'}}
         <label>
-          Owner
-          <i class="grcicon-help-black" rel="tooltip" title="Workflow ownership is managed in the People widget."></i>
+          Manager
+          <i class="grcicon-help-black" rel="tooltip" title="Workflow Managers are managed in the People widget."></i>
           <a data-id="hide_owner_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <input data-id="owner_txtbx"  type="hidden" name="owners.0.email" data-lookup="Person" value="" />
@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <div class="span4 hide-wrap hidable">      
+    <div class="span4 hide-wrap hidable">
       <div class="row-fluid inner-hide">
         <div data-id="frequency_hidden" class="span12 hidable">
           <label>
@@ -69,7 +69,7 @@
             Email preferences
             <i class="grcicon-help-black" rel="tooltip" title="This setting will override user email preferences"></i>
             <a data-id="hide_email_preferences_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-          </label>      
+          </label>
           <input data-id="email_preferences_chkbx" type="checkbox" name="notify_on_change" {{#if instance.notify_on_change}}checked="checked"{{/if}} tabindex="5">
           Force real-time email updates
         </div>
@@ -122,4 +122,4 @@
   </div>
 
 </form>
-</div> 
+</div>

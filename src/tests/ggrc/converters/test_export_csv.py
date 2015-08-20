@@ -192,6 +192,123 @@ class TestExportSingleObject(TestCase):
       else:
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
+  def test_program_audit_relevant_query(self):
+    data = [{  # should return just program prog-1
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Audit",
+                "slugs": ["au-1"],
+            },
+        },
+        "fields": "all",
+    }, {  # Audits : au-1, au-3, au-5, au-7,
+        "object_name": "Audit",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "__previous__",
+                "ids": ["0"],
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(data)
+
+    self.assertIn(",Cat ipsum 1,", response.data)
+    expected = set([1, 3, 5, 7])
+    for i in range(1, 14):
+      if i in expected:
+        self.assertIn(",Audit {},".format(i), response.data)
+      else:
+        self.assertNotIn(",Audit {},".format(i), response.data)
+
+  def test_section_policy_relevant_query(self):
+    data = [{  # sec-1
+        "object_name": "Section",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Policy",
+                "slugs": ["p1"],
+            },
+        },
+        "fields": "all",
+    }, {  # p3
+        "object_name": "Policy",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Section",
+                "slugs": ["sec-3"],
+            },
+        },
+        "fields": "all",
+    }, {  # sec-8
+        "object_name": "Section",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Standard",
+                "slugs": ["std-1"],
+            },
+        },
+        "fields": "all",
+    }, {  # std-3
+        "object_name": "Standard",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Section",
+                "slugs": ["sec-10"],
+            },
+        },
+        "fields": "all",
+    }, {  # sec-5
+        "object_name": "Section",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Regulation",
+                "slugs": ["reg-2"],
+            },
+        },
+        "fields": "all",
+    }, {  # reg-1
+        "object_name": "Regulation",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": "Section",
+                "slugs": ["sec-4"],
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(data)
+
+    sections = set([1, 5, 8])
+    titles = [",mapped section {},".format(i) for i in range(1, 11)]
+    titles.extend([",mapped reg {},".format(i) for i in range(1, 11)])
+    titles.extend([",mapped policy {},".format(i) for i in range(1, 11)])
+    titles.extend([",mapped standard {},".format(i) for i in range(1, 11)])
+
+    expected = set([
+        ",mapped section 1,",
+        ",mapped section 5,",
+        ",mapped section 8,",
+        ",mapped reg 1,",
+        ",mapped standard 3,",
+        ",mapped policy 3,",
+    ])
+
+    for title in titles:
+      if title in expected:
+        self.assertIn(title, response.data, "'{}' not found".format(title))
+      else:
+        self.assertNotIn(title, response.data, "'{}' was found".format(title))
+
   def test_multiple_relevant_query(self):
     data = [{
         "object_name": "Program",
@@ -298,7 +415,7 @@ class TestExportMultipleObjects(TestCase):
                 },
             },
         },
-        "fields": "all",
+        "fields": ["slug", "title", "description"],
     }, {
         "object_name": "Contract",  # contract-25, contract-27, contract-47
         "filters": {
@@ -308,7 +425,7 @@ class TestExportMultipleObjects(TestCase):
                 "ids": ["0"],
             },
         },
-        "fields": "all",
+        "fields": ["slug", "title", "description"],
     }, {
         "object_name": "Control",  # control-3, control-4, control-5
         "filters": {
@@ -334,7 +451,7 @@ class TestExportMultipleObjects(TestCase):
                 },
             },
         },
-        "fields": "all",
+        "fields": ["slug", "title", "description"],
     }, {
         "object_name": "Policy",  # policy - 3, 4, 5, 6, 15, 16
         "filters": {
@@ -352,7 +469,7 @@ class TestExportMultipleObjects(TestCase):
                 },
             },
         },
-        "fields": "all",
+        "fields": ["slug", "title", "description"],
     }
     ]
     response = self.export_csv(data)
@@ -373,14 +490,14 @@ class TestExportMultipleObjects(TestCase):
 
     # controls
     for i in range(115, 140):
-      if i in (117, 118, 119):
+      if i in (117, 118, 119) + (121, 122):
         self.assertIn(",Startupsum {},".format(i), response.data)
       else:
         self.assertNotIn(",Startupsum {},".format(i), response.data)
 
     # policies
     for i in range(5, 25):
-      if i in (7, 8, 9, 10, 19, 20):
+      if i in (7, 8, 9, 10, 19, 20) + (11, 12, 13, 14, 15, 16, 17, 18, 19):
         self.assertIn(",Cheese ipsum ch {},".format(i), response.data)
       else:
         self.assertNotIn(",Cheese ipsum ch {},".format(i), response.data)

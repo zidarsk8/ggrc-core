@@ -267,15 +267,57 @@ class ObjectsColumnHandler(ColumnHandler):
   def set_value(self):
     pass
 
+class ExportOnlyColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    pass
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    return ""
+
+  def insert_object(self):
+    pass
+
+  def set_value(self):
+    pass
+
+
+class CycleObjectColumnHandler(ExportOnlyColumnHandler):
+
+  def get_value(self):
+    obj = self.row_converter.obj.cycle_task_group_object
+    if not obj or not obj.object:
+      return ""
+    return "{}: {}".format(obj.object._inflector.human_singular.title(),
+                           obj.object.slug)
+
+
+class CycleWorkflowColumnHandler(ExportOnlyColumnHandler):
+
+  def get_value(self):
+    return self.row_converter.obj.workflow.slug
+
+class CycleColumnHandler(ExportOnlyColumnHandler):
+
+  def get_value(self):
+    return self.row_converter.obj.cycle.slug
+
+
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
     "cycle_task_group": CycleTaskGroupColumnHandler,
+    "cycle_object": CycleObjectColumnHandler,
     "notify_on_change": CheckboxColumnHandler,
     "relative_end_date": TaskEndColumnHandler,
     "relative_start_date": TaskStartColumnHandler,
     "task_group": TaskGroupColumnHandler,
     "task_type": TaskTypeColumnHandler,
     "workflow": WorkflowColumnHandler,
+    "cycle_workflow": CycleWorkflowColumnHandler,
+    "cycle": CycleColumnHandler,
     "workflow_mapped": WorkflowPersonColumnHandler,
     "task_group_objects": ObjectsColumnHandler,
 }

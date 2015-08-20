@@ -11,21 +11,24 @@ import re
 import traceback
 
 from ggrc import db
+from ggrc.automapper import AutomapperGenerator
 from ggrc.converters import get_importables
 from ggrc.converters import errors
 from ggrc.login import get_current_user
 from ggrc.models import CategoryBase
-from ggrc.models import CustomAttributeValue
 from ggrc.models import CustomAttributeDefinition
+from ggrc.models import CustomAttributeValue
 from ggrc.models import ObjectPerson
 from ggrc.models import Option
 from ggrc.models import Person
-from ggrc.models import Program
 from ggrc.models import Policy
+from ggrc.models import Program
 from ggrc.models import Regulation
-from ggrc.models import Standard
 from ggrc.models import Relationship
-from ggrc.models.relationship import RelationshipHelper
+from ggrc.models import Standard
+from ggrc.models.relationship_helper import RelationshipHelper
+from ggrc.rbac import permissions
+from ggrc.models.reflection import AttributeInfo
 
 
 MAPPING_PREFIX = "__mapping__:"
@@ -265,6 +268,7 @@ class MappingColumnHandler(ColumnHandler):
     self.mapping_object = importable.get(self.attr_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
+    self.unmap = self.key.startswith(AttributeInfo.UNMAPPING_PREFIX)
     super(MappingColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
@@ -276,7 +280,10 @@ class MappingColumnHandler(ColumnHandler):
     for slug in slugs:
       obj = class_.query.filter(class_.slug == slug).first()
       if obj:
-        objects.append(obj)
+        if permissions.is_allowed_update_for(obj):
+          objects.append(obj)
+        else:
+          self.add_warning(errors.MAPPING_PERMISSION_ERROR, value=slug)
       elif not (slug in self.new_slugs and self.dry_run):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
@@ -291,14 +298,23 @@ class MappingColumnHandler(ColumnHandler):
     if self.dry_run or not self.value:
       return
     current_obj = self.row_converter.obj
+    relationships = []
     for obj in self.value:
-      if not Relationship.find_related(current_obj, obj):
+      mapping = Relationship.find_related(current_obj, obj)
+      if not self.unmap and not mapping:
         mapping = Relationship(source=current_obj, destination=obj)
+        relationships.append(mapping)
         db.session.add(mapping)
+      elif self.unmap and mapping:
+        db.session.delete(mapping)
     db.session.flush()
+    for relationship in relationships:
+      AutomapperGenerator(relationship).generate_automappings()
     self.dry_run = True
 
   def get_value(self):
+    if self.unmap:
+      return ""
     related_slugs = []
     related_ids = RelationshipHelper.get_ids_related_to(
         self.mapping_object.__name__,

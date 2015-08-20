@@ -785,8 +785,11 @@ can.Model("can.Model.Cacheable", {
 
   , get_mapping: function(name) {
       var binding = this.get_binding(name);
-      binding.refresh_list();
-      return binding.list;
+      if (binding) {
+        binding.refresh_list();
+        return binding.list;
+      }
+      return [];
     }
 
   // This retrieves the potential orphan stats for a given instance

@@ -193,8 +193,14 @@ class TestComprehensiveSheets(TestCase):
 
   def test_full_good_import_no_warnings(self):
     filename = "full_good_import_no_warnings.csv"
-    response = self.import_file(filename)
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
+
+    response = self.import_file(filename, dry_run=True)
+    for block in response:
+      for message in messages:
+        self.assertEquals(set(), set(block[message]))
+
+    response = self.import_file(filename)
 
     for message in messages:  # response[0] = Person block
       self.assertEquals(set(response[0][message]), set())
@@ -209,7 +215,7 @@ class TestComprehensiveSheets(TestCase):
     self.assertEquals(len(creators), 6)
 
     for block in response:
-      for message in messages:  # response[0] = Person block
+      for message in messages:
         self.assertEquals(set(), set(block[message]))
 
   def create_custom_attributes(self):
