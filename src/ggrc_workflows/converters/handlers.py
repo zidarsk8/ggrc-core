@@ -215,7 +215,8 @@ class WorkflowPersonColumnHandler(UserColumnHandler):
     for owner in self.value:
       workflow_person = WorkflowPerson(
           workflow=self.row_converter.obj,
-          person=owner
+          person=owner,
+          context=self.row_converter.obj.context
       )
       db.session.add(workflow_person)
     self.dry_run = True
