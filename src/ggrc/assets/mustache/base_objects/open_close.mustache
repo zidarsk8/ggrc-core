@@ -9,7 +9,9 @@
     {{#if instance.status}}
       <span class="status-label" {{addclass "status-" instance.status}} {{addclass "status-" instance.overdue}}></span>
     {{else}}
-      <span class="status-label"></span>
+      {{#using p_task=instance.cycle_task_group_object_tasks}}
+        <span class="status-label {{get_task_status p_task 'status'}} {{get_task_status p_task 'overdue'}}"></span>
+      {{/using}}
     {{/if}}
   {{else}}
     {{#if instance.workflow_state}}

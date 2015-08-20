@@ -3060,6 +3060,25 @@ Mustache.registerHelper('get_custom_attr_value', function (attr_info, instance) 
   return value;
 });
 
+Mustache.registerHelper('get_task_status', function (tasks, state) {
+  var task, status = "";
+  tasks = Mustache.resolve(tasks);
+  state = Mustache.resolve(state);
+  if (tasks.length) {
+    task = tasks[0];
+    switch (state) {
+      case "status":
+        status = "status-" + task.status.toLowerCase();
+        break;
+      case "overdue":
+        status = "status-" + task.overdue();
+        break;
+    }
+  }
+
+  return status;
+});
+
 Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   instance = Mustache.resolve(instance);
 
