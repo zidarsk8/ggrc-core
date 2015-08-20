@@ -949,6 +949,7 @@ class WorkflowRoleContributions(RoleContributions):
       },
       'Reader': {
           'read': ['Workflow'],
+          'create': ['Workflow'],
       },
       'ProgramEditor': {
           'read': ['Workflow'],
