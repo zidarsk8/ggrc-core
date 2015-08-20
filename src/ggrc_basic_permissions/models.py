@@ -198,3 +198,34 @@ ggrc.models.all_models.ContextImplication._inflector
 ggrc.models.all_models.all_models.extend([Role, UserRole, ContextImplication])
 ggrc.models.all_models.__all__.extend(
     ["Role", "UserRole", "ContextImplication"])
+
+
+def get_ids_related_to_user_role(object_type, related_type, related_ids):
+  if object_type == "Person":
+    related_model = getattr(ggrc.models.all_models, related_type, None)
+    if not hasattr(related_model, "context_id"):
+      return None
+    return db.session \
+      .query(UserRole.person_id.distinct()) \
+      .join(related_model, related_model.context_id == UserRole.context_id) \
+      .filter(related_model.id.in_(related_ids))
+  elif related_type == "Person":
+    object_model = getattr(ggrc.models.all_models, object_type, None)
+    if not hasattr(object_model, "context_id"):
+      return None
+    return db.session \
+        .query(object_model.id.distinct()) \
+        .join(UserRole, UserRole.context_id == object_model.context_id) \
+        .filter(UserRole.person_id.in_(related_ids))
+  else:
+    return None
+
+
+def get_ids_related_to(object_type, related_type, related_ids):
+  functions = [get_ids_related_to_user_role]
+  queries = (f(object_type, related_type, related_ids) for f in functions)
+  non_empty = [q for q in queries if q ]
+  if len(non_empty) == 0:
+    return None
+  return non_empty.pop().union(*non_empty)
+
