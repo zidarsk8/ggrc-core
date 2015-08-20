@@ -978,7 +978,7 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
   implications = {
       (None, 'Workflow'): {
           'ProgramCreator': ['BasicWorkflowReader'],
-          'Editor': ['BasicWorkflowReader'],
+          'Editor': ['WorkflowOwner'],
           'Reader': ['BasicWorkflowReader'],
           'Creator': ['WorkflowBasicReader'],
       },
