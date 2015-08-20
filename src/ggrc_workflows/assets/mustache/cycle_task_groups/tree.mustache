@@ -33,6 +33,7 @@
                   {{#with_review_task}}
                     {{#using cycle=instance.cycle}}
                       {{#if_equals cycle.is_current true}}
+                      {{#is_allowed 'update' instance}}
                         <div class="request-control"
                           {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); });}}
                           >
@@ -64,6 +65,7 @@
                           {{/instance._undo.0}}
                           -->
                         </div>
+                      {{/is_allowed 'update' instance}}
                       {{/if_equals}}
                     {{/using}}
                   {{/with_review_task}}
