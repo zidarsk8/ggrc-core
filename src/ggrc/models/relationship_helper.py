@@ -8,6 +8,7 @@ from sqlalchemy import sql
 
 from ggrc import db
 from ggrc.extensions import get_extension_modules
+from ggrc import models
 from ggrc.models import Audit
 from ggrc.models import Section
 from ggrc.models.relationship import Relationship
@@ -42,9 +43,33 @@ class RelationshipHelper(object):
       return db.session.query(Audit.id).filter(
           Audit.program_id.in_(related_ids))
 
+
+  @classmethod
+  def person_withcontact(cls, object_type, related_type, related_ids):
+    object_model = getattr(models, object_type, None)
+    related_model = getattr(models, related_type, None)
+    if None in [object_model, related_model]:
+      return None
+    if object_model == models.Person:
+      if issubclass(related_model, models.mixins.WithContact):
+        return db.session.query(related_model.contact_id).filter(
+            related_model.id.in_(related_ids)).union(
+              db.session.query(related_model.secondary_contact_id).filter(
+                related_model.id.in_(related_ids))
+            )
+      else:
+        return None
+    elif related_model == models.Person:
+      return db.session.query(object_model.id).filter(
+          object_model.contact_id.in_(related_ids) |
+          object_model.secondary_contact_id.in_(related_ids))
+    else:
+      return None
+
   @classmethod
   def get_special_mappings(cls, object_type, related_type, related_ids):
     return [
+        cls.person_withcontact(object_type, related_type, related_ids),
         cls.program_audit(object_type, related_type, related_ids),
         cls.section_directive(object_type, related_type, related_ids),
     ]
