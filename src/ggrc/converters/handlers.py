@@ -323,7 +323,7 @@ class MappingColumnHandler(ColumnHandler):
     if related_ids:
       related_objects = self.mapping_object.query.filter(
           self.mapping_object.id.in_(related_ids))
-      related_slugs = [o.slug for o in related_objects]
+      related_slugs = [o.slug for o in related_objects if hasattr(o, "slug")]
     return "\n".join(related_slugs)
 
   def set_value(self):
