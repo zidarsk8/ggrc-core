@@ -352,6 +352,12 @@ class CustomAttributeColumHandler(TextColumnHandler):
       return None
     return value
 
+  def get_value(self):
+    for value in self.row_converter.obj.custom_attribute_values:
+      if value.custom_attribute_id == self.definition.id:
+        return value.attribute_value
+    return None
+
   def set_obj_attr(self):
     if self.value:
       self.row_converter.obj.custom_attribute_values.append(self.value)
