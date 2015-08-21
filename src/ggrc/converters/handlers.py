@@ -16,6 +16,7 @@ from ggrc.converters import get_importables
 from ggrc.converters import errors
 from ggrc.login import get_current_user
 from ggrc.models import Audit
+from ggrc.models import AuditObject
 from ggrc.models import CategoryBase
 from ggrc.models import CustomAttributeDefinition
 from ggrc.models import CustomAttributeValue
@@ -589,6 +590,42 @@ class AuditObjectColumnHandler(ColumnHandler):
     if not slug:
       return ""
     return "{}: {}".format(obj_type, slug[0])
+
+  def parse_item(self):
+    raw = self.raw_value
+    if raw is None:
+      return None
+    parts = [p.strip() for p in raw.split(":")]
+    if len(parts) != 2:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      return None
+    object_type, object_slug = parts
+    model = getattr(all_models, object_type, None)
+    if model is None:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      return None
+    new_objects = self.row_converter.block_converter.converter.new_objects
+    existing = new_objects[model].get(object_slug, None)
+    if existing is None:
+      existing = model.query.filter(model.slug == object_slug).first()
+      if existing is None:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    return existing
+
+  def set_obj_attr(self):
+    if not self.value:
+      return
+    # self.row_converter.obj.audit is not set yet, but it was already parsed
+    audit = self.row_converter.attrs["request_audit"].value
+    audit_object = AuditObject(
+        context=audit.context,
+        audit_id=audit.id,
+        auditable_id=self.value.id,
+        auditable_type=self.value.type
+    )
+    setattr(self.row_converter.obj, self.key, audit_object)
+    if not self.dry_run:
+      db.session.add(audit_object)
 
 
 class ObjectPersonColumnHandler(UserColumnHandler):
