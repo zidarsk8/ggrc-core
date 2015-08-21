@@ -11,6 +11,7 @@ _column_handlers = {
     "assertions": handlers.ControlAssertionColumnHandler,
     "assignee": handlers.UserColumnHandler,
     "audit": handlers.AuditColumnHandler,
+    "audit_object": handlers.AuditObjectColumnHandler,
     "categories": handlers.ControlCategoryColumnHandler,
     "company": handlers.TextColumnHandler,
     "contact": handlers.UserColumnHandler,

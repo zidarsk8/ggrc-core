@@ -63,6 +63,7 @@ class Request(Titled, Slugged, Described, Base, db.Model):
 
   _aliases = {
     "assignee": "Assignee",
+    "audit_object": "Request Object",
     "request_audit": "Audit",
     "due_on": "Due On",
     "notes": "Notes",

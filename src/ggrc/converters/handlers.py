@@ -27,6 +27,7 @@ from ggrc.models import Program
 from ggrc.models import Regulation
 from ggrc.models import Relationship
 from ggrc.models import Standard
+from ggrc.models import all_models
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.rbac import permissions
 from ggrc.models.reflection import AttributeInfo
@@ -571,6 +572,23 @@ class RequestAuditColumnHandler(ColumnHandler):
   def get_value(self):
     audit = getattr(self.row_converter.obj, self.key, False)
     return audit.slug
+
+
+class AuditObjectColumnHandler(ColumnHandler):
+
+  def get_value(self):
+    audit_object = self.row_converter.obj.audit_object
+    if audit_object is None:
+      return ""
+    obj_type = audit_object.auditable_type
+    obj_id = audit_object.auditable_id
+    model = getattr(all_models, obj_type, None)
+    if model is None or not hasattr(model, "slug"):
+      return ""
+    slug = db.session.query(model.slug).filter(model.id == obj_id).first()
+    if not slug:
+      return ""
+    return "{}: {}".format(obj_type, slug[0])
 
 
 class ObjectPersonColumnHandler(UserColumnHandler):
