@@ -238,7 +238,7 @@ class TestExportMultipleObjects(TestCase):
     self.assertEquals(3, response.count("wf-1"))  # 2 for cycles and 1 for wf
     # 3rd block = 2, 5th block = 11, 6th block = 2.
     self.assertEquals(15, response.count("CYCLEGROUP-"))
-    self.assertEquals(6, response.count("CYCLE-"))
+    self.assertEquals(17, response.count("CYCLE-"))
     self.assertEquals(11, response.count("CYCLETASK-"))
 
   def test_cycle_taks_objects(self):
