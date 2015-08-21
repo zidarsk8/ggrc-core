@@ -231,9 +231,16 @@ class ObjectsColumnHandler(ColumnHandler):
   def parse_item(self):
     lines = [line.split(":", 1) for line in self.raw_value.splitlines()]
     objects = []
-    for object_class, slug in lines:
+    for line in lines:
+      if len(line) != 2:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+        continue
+      object_class, slug = line
       slug = slug.strip()
       class_ = self.mappable.get(object_class.strip().lower())
+      if class_ is None:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+        continue
       new_object_slugs = self.new_slugs[class_]
       obj = class_.query.filter(class_.slug == slug).first()
       if obj:
