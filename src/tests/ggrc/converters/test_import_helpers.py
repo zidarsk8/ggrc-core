@@ -846,6 +846,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Due On",
         "Notes",
+        "Request Object",
         "Request Type",
         "Requested On",
         "Status",
