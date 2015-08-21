@@ -131,7 +131,8 @@ class QueryHelper(object):
 
       text_search = lambda: or_(
           *(getattr(object_class, field).ilike("%{}%".format(exp["text"]))
-            for field in object_query.get("fields", []))
+            for field in object_query.get("fields", [])
+            if hasattr(object_class, field))
       )
 
       def with_left(p):
