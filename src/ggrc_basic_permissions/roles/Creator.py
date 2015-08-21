@@ -229,6 +229,9 @@ owner_read = owner_base + [
         },
         "condition": "relationship",
     },
+    "Role",
+    "UserRole",
+    "Context",
     "Person",
 ]
 
