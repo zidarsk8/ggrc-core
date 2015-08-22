@@ -43,9 +43,13 @@ class AutomapperGenerator(object):
   def related(self, obj):
     if obj in self.cache:
       return self.cache[obj]
-    relationships = Relationship.query.filter(or_(
+    # Union is here to convince mysql to use two separate indices and
+    # merge te results. Just using `or` results in a full-table scan
+    relationships = Relationship.query.filter(
         and_(Relationship.source_type == obj.type,
              Relationship.source_id == obj.id),
+    ).union_all(
+      Relationship.query.filter(
         and_(Relationship.destination_type == obj.type,
              Relationship.destination_id == obj.id),
     )).all()
