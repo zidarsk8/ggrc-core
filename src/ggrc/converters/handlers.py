@@ -580,7 +580,8 @@ class ObjectPersonColumnHandler(UserColumnHandler):
     for owner in self.value:
       user_role = ObjectPerson(
           personable=self.row_converter.obj,
-          person=owner
+          person=owner,
+          context=self.row_converter.obj.context
       )
       db.session.add(user_role)
     self.dry_run = True
