@@ -25,6 +25,8 @@ from ggrc.models import Policy
 from ggrc.models import Program
 from ggrc.models import Regulation
 from ggrc.models import Relationship
+from ggrc.models import Request
+from ggrc.models import Response
 from ggrc.models import Standard
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.rbac import permissions
@@ -629,3 +631,30 @@ class ControlAssertionColumnHandler(CategoryColumnHandler):
   def __init__(self, row_converter, key, **options):
     self.category_base_type = "ControlAssertion"
     super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class RequestColumnHandler(ColumnHandler):
+
+  def get_value(self):
+    return self.row_converter.obj.request.slug
+
+  def parse_item(self):
+    slug = self.raw_value
+    new_objects = self.row_converter.block_converter.converter.new_objects
+    request = new_objects[Request].get(slug)
+    if request is None:
+      request = Request.query.filter(Request.slug == slug).first()
+    if request is None:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+    return request
+
+
+class ResponseTypeColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    value = self.raw_value.lower().strip()
+    if value not in Response.VALID_TYPES:
+      self.add_error(errors.WRONG_MULTI_VALUE,
+                     column_name=self.display_name,
+                     value=value)
+    return value
