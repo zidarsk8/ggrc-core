@@ -109,7 +109,6 @@ class AutomapperGenerator(object):
       # it means that the mapping was already created by another request
       # and we can safely ignore it.
       inserter = Relationship.__table__.insert().prefix_with("IGNORE")
-      print inserter
       db.session.execute(inserter.values([{
           "id": None,
           "modified_by_id": current_user.id,
