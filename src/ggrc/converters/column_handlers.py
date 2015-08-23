@@ -37,6 +37,8 @@ _column_handlers = {
     "reference_url": handlers.TextColumnHandler,
     "report_end_date": handlers.DateColumnHandler,
     "report_start_date": handlers.DateColumnHandler,
+    "request": handlers.RequestColumnHandler,
+    "response_type": handlers.ResponseTypeColumnHandler,
     "secondary_assessor": handlers.UserColumnHandler,
     "secondary_contact": handlers.UserColumnHandler,
     "slug": handlers.SlugColumnHandler,
