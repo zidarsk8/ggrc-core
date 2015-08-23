@@ -6,7 +6,8 @@
 import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from ggrc import db
-from ggrc.models.mixins import deferred, Base, Described
+from ggrc.models.mixins import deferred, Base
+
 
 class Context(Base, db.Model):
   __tablename__ = 'contexts'
@@ -43,12 +44,12 @@ class Context(Base, db.Model):
   def _extra_table_args(cls):
     return (
         db.Index(
-          'ix_context_related_object',
-          'related_object_type', 'related_object_id'),
-        )
+            'ix_context_related_object',
+            'related_object_type', 'related_object_id'),
+    )
 
-  _publish_attrs = ['name', 'related_object','description',]
-  _sanitize_html = ['name','description',]
+  _publish_attrs = ['name', 'related_object', 'description']
+  _sanitize_html = ['name', 'description']
   _include_links = []
 
 
@@ -59,22 +60,22 @@ class HasOwnContext(object):
   @declared_attr
   def contexts(cls):
     joinstr = 'and_(foreign(Context.related_object_id) == {type}.id, '\
-                   'foreign(Context.related_object_type) == "{type}")'
+              'foreign(Context.related_object_type) == "{type}")'
     joinstr = joinstr.format(type=cls.__name__)
     return db.relationship(
         'Context',
         primaryjoin=joinstr,
-        #foreign_keys='Context.related_object_id',
-        #cascade='all, delete-orphan',
+        # foreign_keys='Context.related_object_id',
+        # cascade='all, delete-orphan',
         backref='{0}_related_object'.format(cls.__name__),
         order_by='Context.id',
         post_update=True)
 
   def build_object_context(self, context, name=None, description=None):
     if name is None:
-      name='{object_type} Context {timestamp}'.format(
-        object_type=self.__class__.__name__,
-        timestamp=datetime.datetime.now()),
+      name = '{object_type} Context {timestamp}'.format(
+          object_type=self.__class__.__name__,
+          timestamp=datetime.datetime.now()),
     if description is None:
       description = ''
     new_context = Context(
@@ -98,7 +99,7 @@ class HasOwnContext(object):
     from ggrc_basic_permissions.models import Role, UserRole
     from ggrc.models.person import Person
     return Person.query.join(UserRole, Role).filter(
-      (UserRole.context_id == cls.context_id) &
-      (Role.name == role) &
-      (predicate(Person.name) | predicate(Person.email))
+        (UserRole.context_id == cls.context_id) &
+        (Role.name == role) &
+        (predicate(Person.name) | predicate(Person.email))
     ).exists()
