@@ -38,6 +38,14 @@
         this.validateNonBlank("start_date");
         this.validateNonBlank("end_date");
       }
-  }, {});
+  }, {
+    save: function() {
+      // Make sure the context is always set to the parent program
+      if (this.context == null || this.context.id == null) {
+        this.attr('context', this.program.reify().context);
+      }
+      return this._super.apply(this, arguments);
+    }
+  });
 
 })(window.can);
