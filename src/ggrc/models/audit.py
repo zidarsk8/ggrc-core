@@ -8,11 +8,11 @@ from .mixins import (
     deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact,
     Titled, Slugged, CustomAttributable
 )
-from .relationship import Relatable
-from .object_person import Personable
-from .context import HasOwnContext
-from .reflection import PublishOnly
-from .program import Program
+from ggrc.models.relationship import Relatable
+from ggrc.models.object_person import Personable
+from ggrc.models.context import HasOwnContext
+from ggrc.models.reflection import PublishOnly
+from ggrc.models.program import Program
 
 
 class Audit(
