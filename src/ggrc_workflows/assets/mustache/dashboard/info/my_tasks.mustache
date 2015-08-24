@@ -32,6 +32,7 @@
                   </li>
                   {{#using cycle=instance.cycle}}
                     {{#if_equals cycle.is_current true}}
+                    {{#is_allowed 'update' instance}}
                     <li> <!-- buttons -->
                       <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }); }}>
                         {{#if_equals instance.status 'Assigned'}}
@@ -57,6 +58,7 @@
                         {{/instance._undo.0}}
                       </div>
                     </li>
+                    {{/is_allowed 'update' instance}}
                     {{/if_equals}}
                   {{/using}}
                 </ul>

@@ -949,6 +949,7 @@ class WorkflowRoleContributions(RoleContributions):
       },
       'Reader': {
           'read': ['Workflow'],
+          'create': ['Workflow'],
       },
       'ProgramEditor': {
           'read': ['Workflow'],
@@ -978,7 +979,7 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
   implications = {
       (None, 'Workflow'): {
           'ProgramCreator': ['BasicWorkflowReader'],
-          'Editor': ['BasicWorkflowReader'],
+          'Editor': ['WorkflowOwner'],
           'Reader': ['BasicWorkflowReader'],
           'Creator': ['WorkflowBasicReader'],
       },
