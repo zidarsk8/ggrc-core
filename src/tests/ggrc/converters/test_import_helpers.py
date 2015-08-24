@@ -908,6 +908,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
     display_names = set([val["display_name"] for val in definitions.values()])
     expected_names = set([
         "Code",
+        "Cycle",
         "Summary",
         "Task Type",
         "Assignee",

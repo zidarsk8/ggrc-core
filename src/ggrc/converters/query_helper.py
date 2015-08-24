@@ -66,10 +66,15 @@ class QueryHelper(object):
       aliases = AttributeInfo.gather_aliases(object_class)
       self.attr_name_map[object_class] = {}
       for key, value in aliases.items():
+        filter_by = None
         if type(value) is dict:
+          filter_name = value.get("filter_by", None)
+          if filter_name is not None:
+            filter_by = getattr(object_class, filter_name, None)
           value = value["display_name"]
         if value:
-          self.attr_name_map[object_class][value.lower()] = key.lower()
+          self.attr_name_map[object_class][value.lower()] = (key.lower(),
+                                                             filter_by)
 
   def clean_query(self, query):
     """ sanitize the query object """
@@ -101,19 +106,8 @@ class QueryHelper(object):
       object_query["ids"] = self.get_object_ids(object_query)
     return self.query
 
-  def _get_attr(self, object_class, key):
-    """ get class attr by attribute name or display name """
-    attr = getattr(object_class, key.lower(), None)
-    if attr is None:
-      mapped_name = self.attr_name_map[object_class][key.lower()]
-      attr = getattr(object_class, mapped_name, None)
-    if attr is None:
-      raise Exception("Bad search query: object '{}' does not have "
-                      "attribute '{}'.".format(object_class.__name__, key))
-    return attr
-
   def get_object_ids(self, object_query):
-    """ get a set of object ids describideb in the filters """
+    """ get a set of object ids described in the filters """
     object_name = object_query["object_name"]
     expression = object_query.get("filters", {}).get("expression")
 
@@ -124,57 +118,57 @@ class QueryHelper(object):
     def build_expression(exp):
       if "op" not in exp:
         return None
-      if exp["op"]["name"] == "AND":
-        return and_(build_expression(exp["left"]),
-                    build_expression(exp["right"]))
-      elif exp["op"]["name"] == "OR":
-        return or_(build_expression(exp["left"]),
-                   build_expression(exp["right"]))
-      elif exp["op"]["name"] == "=":
-        return self._get_attr(object_class, exp["left"]) == exp["right"]
-      elif exp["op"]["name"] == "!=":
-        return self._get_attr(object_class, exp["left"]) != exp["right"]
-      elif exp["op"]["name"] == "~":
-        return self._get_attr(object_class, exp["left"]).ilike(
-            "%{}%".format(exp["right"]))
-      elif exp["op"]["name"] == "!~":
-        return not_(self._get_attr(object_class, exp["left"]).ilike(
-            "%{}%".format(exp["right"])))
-      elif exp["op"]["name"] == "relevant":
-        if exp["object_name"] == "__previous__":
-          query = self.query[exp["ids"][0]]
-          return object_class.id.in_(
-              RelationshipHelper.get_ids_related_to(
-                  object_name,
-                  query["object_name"],
-                  query["ids"],
-              )
-          )
+      def relevant():
+        query = (self.query[exp["ids"][0]]
+                 if exp["object_name"] == "__previous__" else exp)
+        return object_class.id.in_(
+            RelationshipHelper.get_ids_related_to(
+                object_name,
+                query["object_name"],
+                query["ids"],
+            )
+        )
+
+      text_search = lambda: or_(
+          *(getattr(object_class, field).ilike("%{}%".format(exp["text"]))
+            for field in object_query.get("fields", [])
+            if hasattr(object_class, field))
+      )
+
+      def with_left(p):
+        key = exp["left"].lower()
+        key, filter_by = self.attr_name_map[object_class].get(key, (key, None))
+        if hasattr(filter_by, "__call__"):
+          return filter_by(p)
         else:
-          return object_class.id.in_(
-              RelationshipHelper.get_ids_related_to(
-                  object_name,
-                  exp["object_name"],
-                  exp["ids"],
-              )
-          )
-      elif exp["op"]["name"] == "text_search":
-        text_exp = None
-        for field in object_query.get("fields", []):
-          if not hasattr(object_class, field):
-            continue
-          text_exp = or_(text_exp, getattr(object_class, field)
-                         .ilike("%{}%".format(exp["text"])))
-        return text_exp
+          attr = getattr(object_class, key, None)
+          if attr is None:
+            raise Exception("Bad search query: object '{}' does not have "
+                            "attribute '{}'.".format(object_class.__name__, key))
+          return p(attr)
 
-      return None
+      lift_bin = lambda f: f(build_expression(exp["left"]),
+                             build_expression(exp["right"]))
 
+      ops = {
+        "AND": lambda: lift_bin(and_),
+        "OR": lambda: lift_bin(or_),
+        "=": lambda: with_left(lambda l: l == exp["right"]),
+        "!=": lambda: not_(with_left(lambda l: l == exp["right"])),
+        "~": lambda: with_left(lambda l: l.ilike("%{}%".format(exp["right"]))),
+        "!~": lambda: not_(with_left(lambda l: l.ilike("%{}%".format(exp["right"])))),
+        "relevant": relevant,
+        "text_search": text_search
+      }
+
+      return ops.get(exp["op"]["name"], lambda: None)()
+
+    query = object_class.query
     filter_expression = build_expression(expression)
-    if filter_expression is None:
-      objects = object_class.query.all()
-    else:
-      objects = object_class.query.filter(filter_expression).all()
-    object_ids = [o.id for o in objects]
+    if filter_expression is not None:
+      query = query.filter(filter_expression)
+    objects = query.all()
+    object_ids = [o.id for o in query.all()]
     return object_ids
 
   def slugs_to_ids(self, object_name, slugs):

@@ -18,7 +18,9 @@ from .object_person import Personable
 from .audit_object import Auditable
 from .reflection import PublishOnly
 from .utils import validate_option
+from .person import Person
 from .relationship import Relatable
+from .option import Option
 
 from .track_object_state import HasObjectState, track_state_for_class
 
@@ -51,7 +53,16 @@ class ControlCategorized(Categorizable):
 
   _include_links = []
 
-  _aliases = {"categories": "Categories"}
+  _aliases = {
+      "categories": {
+        "display_name": "Categories",
+        "filter_by": "_filter_by_categories",
+      },
+  }
+
+  @classmethod
+  def _filter_by_categories(cls, predicate):
+    return cls._filter_by_category("ControlCategory", predicate)
 
   @classmethod
   def eager_query(cls):
@@ -74,7 +85,16 @@ class AssertionCategorized(Categorizable):
       PublishOnly('assertations'),
   ]
   _include_links = []
-  _aliases = {"assertions": "Assertions"}
+  _aliases = {
+      "assertions": {
+        "display_name": "Assertions",
+        "filter_by": "_filter_by_assertions",
+      },
+  }
+
+  @classmethod
+  def _filter_by_assertions(cls, predicate):
+    return cls._filter_by_category("ControlAssertion", predicate)
 
   @classmethod
   def eager_query(cls):
@@ -162,12 +182,27 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
 
   _aliases = {
       "url": "Control URL",
-      "kind": "Kind/Nature",
-      "means": "Type/Means",
-      "verify_frequency": "Frequency",
+      "kind": {
+        "display_name": "Kind/Nature",
+        "filter_by": "_filter_by_kind",
+      },
+      "means": {
+        "display_name": "Type/Means",
+        "filter_by": "_filter_by_means",
+      },
+      "verify_frequency": {
+        "display_name": "Frequency",
+        "filter_by": "_filter_by_verify_frequency",
+      },
       "fraud_related": "Fraud Related",
-      "principal_assessor": "Principal Assessor",
-      "secondary_assessor": "Secondary Assessor",
+      "principal_assessor": {
+        "display_name": "Principal Assessor",
+        "filter_by": "_filter_by_principal_assessor",
+      },
+      "secondary_assessor": {
+        "display_name": "Secondary Assessor",
+        "filter_by": "_filter_by_secondary_assessor",
+      },
       "key_control": "Significance",
   }
 
@@ -175,6 +210,38 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
   def validate_control_options(self, key, option):
     desired_role = key if key == 'verify_frequency' else 'control_' + key
     return validate_option(self.__class__.__name__, key, option, desired_role)
+
+  @classmethod
+  def _filter_by_kind(cls, predicate):
+    return Option.query.filter(
+      (Option.id == cls.kind_id) & predicate(Option.title)
+    ).exists()
+
+  @classmethod
+  def _filter_by_means(cls, predicate):
+    return Option.query.filter(
+      (Option.id == cls.means_id) & predicate(Option.title)
+    ).exists()
+
+  @classmethod
+  def _filter_by_principal_assessor(cls, predicate):
+    return Person.query.filter(
+        (Person.id == cls.principal_assessor_id) &
+        (predicate(Person.name) | predicate(Person.email))
+    ).exists()
+
+  @classmethod
+  def _filter_by_secondary_assessor(cls, predicate):
+    return Person.query.filter(
+        (Person.id == cls.secondary_assessor_id) &
+        (predicate(Person.name) | predicate(Person.email))
+    ).exists()
+
+  @classmethod
+  def _filter_by_verify_frequency(cls, predicate):
+    return Option.query.filter(
+        (Option.id == cls.verify_frequency_id) & predicate(Option.title)
+    ).exists()
 
   @classmethod
   def eager_query(cls):
