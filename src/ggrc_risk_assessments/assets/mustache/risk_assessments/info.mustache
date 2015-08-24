@@ -9,37 +9,13 @@
   {{#is_info_pin}}
   <div class="clearfix">
     {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-    <div class="tier-content pin">
+    <div class="tier-content">
       {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
     </div>
   </div>
   {{/is_info_pin}}
 
-  <div class="details-wrap">
-    <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-    <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-      {{#is_allowed 'update'}}
-        <li>
-          <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
-            <i class="grcicon-edit"></i>
-            <span>Edit risk assessment</span>
-          </a>
-        </li>
-      {{/is_allowed}}
-      <li>
-        <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-      </li>
-
-      {{#is_allowed 'delete' instance}}
-        <li>
-          <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-            <i class="grcicon-deleted"></i>
-            Delete
-          </a>
-        </li>
-      {{/is_allowed}}
-    </ul>
-  </div>
+  {{> /static/mustache/base_objects/dropdown_menu.mustache}}
 
   <div class="tier-content">
     {{^is_info_pin}}
