@@ -9,6 +9,8 @@ from ggrc.models.types import JsonType
 from ggrc.models.mixins import (
     Base, Titled, Described, Timeboxed, Slugged, Stateful, WithContact
     )
+from ggrc_workflows.models.cycle import Cycle
+from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
 
 
 class CycleTaskGroupObjectTask(
@@ -70,13 +72,19 @@ class CycleTaskGroupObjectTask(
       "contact": {
           "display_name": "Assignee",
           "mandatory": True,
+          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
       "start_date": "Start Date",
       "end_date": "End Date",
+      "cycle": {
+        "display_name": "Cycle",
+        "filter_by": "_filter_by_cycle",
+      },
       "cycle_task_group": {
           "display_name": "Task Group",
           "mandatory": True,
+          "filter_by": "_filter_by_cycle_task_group",
       },
       "task_type": {
           "display_name": "Task Type",
@@ -84,5 +92,20 @@ class CycleTaskGroupObjectTask(
       },
       "cycle_object": {
           "display_name": "Cycle Object",
+          "filter_by": "_filter_by_cycle_object",
       },
   }
+
+  @classmethod
+  def _filter_by_cycle(cls, predicate):
+    return Cycle.query.filter(
+      (Cycle.id == cls.cycle_id) &
+      (predicate(Cycle.slug) | predicate(Cycle.title))
+    ).exists()
+
+  @classmethod
+  def _filter_by_cycle_task_group(cls, predicate):
+    return CycleTaskGroup.query.filter(
+      (CycleTaskGroup.id == cls.cycle_id) &
+      (predicate(CycleTaskGroup.slug) | predicate(CycleTaskGroup.title))
+    ).exists()

@@ -21,7 +21,9 @@
           return new can.List();
         }),
         columns: can.compute(function () {
-          return GGRC.model_attr_defs[this.attr("type")];
+          return _.filter(GGRC.model_attr_defs[this.attr("type")], function(el) { 
+            return el.display_name.indexOf("unmap:") == -1; 
+          });
         })
       }),
       panelsModel = can.Map({
@@ -62,6 +64,7 @@
         {model_singular: "Project", title_plural: "Projects"},
         {model_singular: "Regulation", title_plural: "Regulations"},
         {model_singular: "Request", title_plural: "Requests"},
+        {model_singular: "Response", title_plural: "Responses"},
         {model_singular: "RiskAssessment", title_plural: "Risk Assessments"},
         {model_singular: "Section", title_plural: "Sections"},
         {model_singular: "Standard", title_plural: "Standards"},

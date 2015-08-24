@@ -46,5 +46,16 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
   ]
 
   _aliases = {
-      "cycle_workflow": "Workflow"
+      "cycle_workflow": {
+        "display_name": "Workflow",
+        "filter_by": "_filter_by_cycle_workflow",
+      },
   }
+
+  @classmethod
+  def _filter_by_cycle_workflow(cls, predicate):
+    from ggrc_workflows.models.workflow import Workflow
+    return Workflow.query.filter(
+      (Workflow.id == cls.workflow_id) &
+      (predicate(Workflow.slug) | predicate(Workflow.title))
+    ).exists()

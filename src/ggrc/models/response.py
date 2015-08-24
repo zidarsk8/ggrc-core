@@ -75,6 +75,23 @@ class Response(Noted, Described, Hyperlinked, WithContact,
       'description',
   ]
 
+  _aliases = {
+      "description": "Response",
+      "request": {
+        "display_name": "Request",
+        "mandatory": True,
+      },
+      "response_type": {
+        "display_name": "Response Type",
+        "mandatory": True,
+      },
+      "status": "Status",
+      "title": None,
+      "secondary_contact": None,
+      "notes": None,
+
+  }
+
   def _display_name(self):
     return u'Response with id={0} for Audit "{1}"'.format(
         self.id, self.request.audit.display_name)

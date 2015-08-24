@@ -726,7 +726,7 @@ can.Model("can.Model.Cacheable", {
       return;
     }
     definitions = can.map(GGRC.custom_attr_defs, function(def) {
-      if (def.definition_type === this.constructor.table_singular) {
+      if (def.definition_type && def.definition_type === this.constructor.table_singular) {
         return def;
       }
     }.bind(this));
@@ -745,6 +745,7 @@ can.Model("can.Model.Cacheable", {
     can.each(this.custom_attribute_definitions, function(definition) {
       if (definition.mandatory) {
         if (definition.attribute_type === 'Checkbox') {
+
           self.class.validate('custom_attributes.' + definition.id, function(val){
             return !val;
           });

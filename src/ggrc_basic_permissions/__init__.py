@@ -26,6 +26,7 @@ from . import basic_roles
 from .contributed_roles import lookup_role_implications
 from .models import Role, UserRole, ContextImplication
 from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
+from ggrc_basic_permissions.models import get_ids_related_to
 
 
 blueprint = Blueprint(
@@ -317,6 +318,8 @@ def load_permissions_for(user):
   # Now aggregate permissions resulting from these roles
   for implied_context_id, implied_rolenames \
       in implied_context_to_implied_roles.items():
+    if implied_context_id is None:
+      continue
     for implied_rolename in implied_rolenames:
       implied_role = all_implied_roles_by_name[implied_rolename]
       collect_permissions(
@@ -624,3 +627,5 @@ def contributed_column_handlers():
 from .contributed_roles import BasicRoleDeclarations, BasicRoleImplications
 ROLE_DECLARATIONS = BasicRoleDeclarations()
 ROLE_IMPLICATIONS = BasicRoleImplications()
+
+contributed_get_ids_related_to = get_ids_related_to

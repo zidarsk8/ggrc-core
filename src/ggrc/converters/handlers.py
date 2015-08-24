@@ -11,9 +11,12 @@ import re
 import traceback
 
 from ggrc import db
-from ggrc.converters import errors
+from ggrc.automapper import AutomapperGenerator
 from ggrc.converters import get_importables
+from ggrc.converters import errors
 from ggrc.login import get_current_user
+from ggrc.models import Audit
+from ggrc.models import AuditObject
 from ggrc.models import CategoryBase
 from ggrc.models import CustomAttributeDefinition
 from ggrc.models import CustomAttributeValue
@@ -24,7 +27,10 @@ from ggrc.models import Policy
 from ggrc.models import Program
 from ggrc.models import Regulation
 from ggrc.models import Relationship
+from ggrc.models import Request
+from ggrc.models import Response
 from ggrc.models import Standard
+from ggrc.models import all_models
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.rbac import permissions
 from ggrc.models.reflection import AttributeInfo
@@ -297,14 +303,18 @@ class MappingColumnHandler(ColumnHandler):
     if self.dry_run or not self.value:
       return
     current_obj = self.row_converter.obj
+    relationships = []
     for obj in self.value:
       mapping = Relationship.find_related(current_obj, obj)
       if not self.unmap and not mapping:
         mapping = Relationship(source=current_obj, destination=obj)
+        relationships.append(mapping)
         db.session.add(mapping)
       elif self.unmap and mapping:
         db.session.delete(mapping)
     db.session.flush()
+    for relationship in relationships:
+      AutomapperGenerator(relationship, False).generate_automappings()
     self.dry_run = True
 
   def get_value(self):
@@ -318,7 +328,9 @@ class MappingColumnHandler(ColumnHandler):
     if related_ids:
       related_objects = self.mapping_object.query.filter(
           self.mapping_object.id.in_(related_ids))
-      related_slugs = [o.slug for o in related_objects]
+      related_slugs = (getattr(o, "slug", getattr(o, "email", None))
+                       for o in related_objects)
+      related_slugs = [slug for slug in related_slugs if slug is not None]
     return "\n".join(related_slugs)
 
   def set_value(self):
@@ -346,6 +358,12 @@ class CustomAttributeColumHandler(TextColumnHandler):
     if value.attribute_value is None:
       return None
     return value
+
+  def get_value(self):
+    for value in self.row_converter.obj.custom_attribute_values:
+      if value.custom_attribute_id == self.definition.id:
+        return value.attribute_value
+    return None
 
   def set_obj_attr(self):
     if self.value:
@@ -541,6 +559,85 @@ class AuditColumnHandler(MappingColumnHandler):
     super(AuditColumnHandler, self).__init__(row_converter, key, **options)
 
 
+class RequestAuditColumnHandler(ColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    super(RequestAuditColumnHandler, self).__init__(row_converter, "audit", **options)
+
+  def get_audit_from_slug(self, slug):
+    if slug in self.new_objects[Audit]:
+      return self.new_objects[Audit][slug]
+    return Audit.query.filter_by(slug=slug).first()
+
+  def parse_item(self):
+    if self.raw_value == "":
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+      return None
+    slug = self.raw_value
+    audit = self.get_audit_from_slug(slug)
+    if audit is not None:
+      return audit
+    self.add_error(errors.UNKNOWN_OBJECT, object_type="Audit", slug=slug)
+    return None
+
+  def get_value(self):
+    audit = getattr(self.row_converter.obj, self.key, False)
+    return audit.slug
+
+
+class AuditObjectColumnHandler(ColumnHandler):
+
+  def get_value(self):
+    audit_object = self.row_converter.obj.audit_object
+    if audit_object is None:
+      return ""
+    obj_type = audit_object.auditable_type
+    obj_id = audit_object.auditable_id
+    model = getattr(all_models, obj_type, None)
+    if model is None or not hasattr(model, "slug"):
+      return ""
+    slug = db.session.query(model.slug).filter(model.id == obj_id).first()
+    if not slug:
+      return ""
+    return "{}: {}".format(obj_type, slug[0])
+
+  def parse_item(self):
+    raw = self.raw_value
+    if raw is None or raw == "":
+      return None
+    parts = [p.strip() for p in raw.split(":")]
+    if len(parts) != 2:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      return None
+    object_type, object_slug = parts
+    model = getattr(all_models, object_type, None)
+    if model is None:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      return None
+    new_objects = self.row_converter.block_converter.converter.new_objects
+    existing = new_objects[model].get(object_slug, None)
+    if existing is None:
+      existing = model.query.filter(model.slug == object_slug).first()
+      if existing is None:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    return existing
+
+  def set_obj_attr(self):
+    if not self.value:
+      return
+    # self.row_converter.obj.audit is not set yet, but it was already parsed
+    audit = self.row_converter.attrs["request_audit"].value
+    audit_object = AuditObject(
+        context=audit.context,
+        audit_id=audit.id,
+        auditable_id=self.value.id,
+        auditable_type=self.value.type
+    )
+    setattr(self.row_converter.obj, self.key, audit_object)
+    if not self.dry_run:
+      db.session.add(audit_object)
+
+
 class ObjectPersonColumnHandler(UserColumnHandler):
 
   def parse_item(self):
@@ -569,7 +666,8 @@ class ObjectPersonColumnHandler(UserColumnHandler):
     for owner in self.value:
       user_role = ObjectPerson(
           personable=self.row_converter.obj,
-          person=owner
+          person=owner,
+          context=self.row_converter.obj.context
       )
       db.session.add(user_role)
     self.dry_run = True
@@ -617,3 +715,30 @@ class ControlAssertionColumnHandler(CategoryColumnHandler):
   def __init__(self, row_converter, key, **options):
     self.category_base_type = "ControlAssertion"
     super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class RequestColumnHandler(ColumnHandler):
+
+  def get_value(self):
+    return self.row_converter.obj.request.slug
+
+  def parse_item(self):
+    slug = self.raw_value
+    new_objects = self.row_converter.block_converter.converter.new_objects
+    request = new_objects[Request].get(slug)
+    if request is None:
+      request = Request.query.filter(Request.slug == slug).first()
+    if request is None:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+    return request
+
+
+class ResponseTypeColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    value = self.raw_value.lower().strip()
+    if value not in Response.VALID_TYPES:
+      self.add_error(errors.WRONG_MULTI_VALUE,
+                     column_name=self.display_name,
+                     value=value)
+    return value

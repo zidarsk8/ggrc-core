@@ -8,8 +8,10 @@ from sqlalchemy import sql
 
 from ggrc import db
 from ggrc.extensions import get_extension_modules
+from ggrc import models
 from ggrc.models import Audit
 from ggrc.models import Section
+from ggrc.models import Request
 from ggrc.models.relationship import Relationship
 
 
@@ -42,10 +44,90 @@ class RelationshipHelper(object):
       return db.session.query(Audit.id).filter(
           Audit.program_id.in_(related_ids))
 
+
+  @classmethod
+  def person_withcontact(cls, object_type, related_type, related_ids):
+    object_model = getattr(models, object_type, None)
+    related_model = getattr(models, related_type, None)
+    if None in [object_model, related_model]:
+      return None
+    if object_model == models.Person:
+      if issubclass(related_model, models.mixins.WithContact):
+        return db.session.query(related_model.contact_id).filter(
+            related_model.id.in_(related_ids)).union(
+              db.session.query(related_model.secondary_contact_id).filter(
+                related_model.id.in_(related_ids))
+            )
+      else:
+        return None
+    elif related_model == models.Person:
+      return db.session.query(object_model.id).filter(
+          object_model.contact_id.in_(related_ids) |
+          object_model.secondary_contact_id.in_(related_ids))
+    else:
+      return None
+
+  @classmethod
+  def person_ownable(cls, object_type, related_type, related_ids):
+    if object_type == "Person":
+      return db.session.query(models.ObjectOwner.person_id).filter(
+          (models.ObjectOwner.ownable_type == related_type) &
+          (models.ObjectOwner.ownable_id.in_(related_ids)))
+    elif related_type == "Person":
+      return db.session.query(models.ObjectOwner.ownable_id).filter(
+          (models.ObjectOwner.ownable_type == object_type) &
+          (models.ObjectOwner.person_id.in_(related_ids)))
+    else:
+      return None
+
+  @classmethod
+  def person_object(cls, object_type, related_type, related_ids):
+    if "Person" not in [object_type, related_type]:
+      return None
+    if object_type == "Person":
+      return db.session.query(models.ObjectPerson.person_id).filter(
+          (models.ObjectPerson.personable_type == related_type) &
+          (models.ObjectPerson.personable_id.in_(related_ids))
+      )
+    else:
+      return db.session.query(models.ObjectPerson.personable_id).filter(
+          (models.ObjectPerson.personable_type == object_type) &
+          (models.ObjectPerson.person_id.in_(related_ids))
+      )
+
+  @classmethod
+  def audit_request(cls, object_type, related_type, related_ids):
+    if {object_type, related_type} != {"Audit", "Request"} or not related_ids:
+      return None
+
+    if object_type == "Audit":
+      return db.session.query(Request.audit_id).filter(
+          Request.id.in_(related_ids))
+    else:
+      return db.session.query(Request.id).filter(
+          Request.audit_id.in_(related_ids))
+
+  @classmethod
+  def request_assignee(cls, object_type, related_type, related_ids):
+    if {object_type, related_type} != {"Person", "Request"} or not related_ids:
+      return None
+
+    if object_type == "Person":
+      return db.session.query(Request.assignee_id).filter(
+          Request.id.in_(related_ids))
+    else:
+      return db.session.query(Request.id).filter(
+          Request.assignee_id.in_(related_ids))
+
   @classmethod
   def get_special_mappings(cls, object_type, related_type, related_ids):
     return [
+        cls.audit_request(object_type, related_type, related_ids),
+        cls.person_object(object_type, related_type, related_ids),
+        cls.person_ownable(object_type, related_type, related_ids),
+        cls.person_withcontact(object_type, related_type, related_ids),
         cls.program_audit(object_type, related_type, related_ids),
+        cls.request_assignee(object_type, related_type, related_ids),
         cls.section_directive(object_type, related_type, related_ids),
     ]
 

@@ -81,3 +81,12 @@ class Categorizable(object):
           type=cls.__name__, category_type=category_type),
         cascade='all, delete-orphan',
         )
+
+  @classmethod
+  def _filter_by_category(cls, category_type, predicate):
+    from ggrc.models.category import CategoryBase
+    return Categorization.query.join(CategoryBase).filter(
+        (Categorization.categorizable_type == cls.__name__) &
+        (Categorization.categorizable_id == cls.id) &
+        predicate(CategoryBase.name)
+    ).exists()

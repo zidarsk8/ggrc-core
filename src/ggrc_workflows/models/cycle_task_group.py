@@ -8,7 +8,7 @@ from ggrc import db
 from ggrc.models.mixins import (
     Base, Titled, Described, Timeboxed, Slugged, Stateful, WithContact
 )
-
+from ggrc_workflows.models.cycle import Cycle
 
 class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
                      Titled, Base, db.Model):
@@ -50,5 +50,15 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
   ]
 
   _aliases = {
-      "cycle": "Cycle",
+      "cycle": {
+        "display_name": "Cycle",
+        "filter_by": "_filter_by_cycle",
+      },
   }
+
+  @classmethod
+  def _filter_by_cycle(cls, predicate):
+    return Cycle.query.filter(
+      (Cycle.id == cls.cycle_id) &
+      (predicate(Cycle.slug) | predicate(Cycle.title))
+    ).exists()

@@ -55,6 +55,7 @@ class TaskGroup(
       "contact": {
           "display_name": "Assignee",
           "mandatory": True,
+          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
       "start_date": None,
@@ -62,6 +63,7 @@ class TaskGroup(
       "workflow": {
           "display_name": "Workflow",
           "mandatory": True,
+          "filter_by": "_filter_by_workflow",
       },
       "task_group_objects": {
           "display_name": "Objects",
@@ -107,3 +109,11 @@ class TaskGroup(
       ))
 
     return target
+
+  @classmethod
+  def _filter_by_workflow(cls, predicate):
+    from ggrc_workflows.models import Workflow
+    return Workflow.query.filter(
+        (Workflow.id == cls.workflow_id) &
+        (predicate(Workflow.slug) | predicate(Workflow.title))
+    ).exists()

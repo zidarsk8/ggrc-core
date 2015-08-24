@@ -42,20 +42,35 @@ class Program(HasObjectState, CustomAttributable, Documentable,
           "display_name": "Manager",
           "mandatory": True,
           "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_program_owner",
       },
       "program_editor": {
           "display_name": "Editor",
           "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_program_editor",
       },
       "program_reader": {
           "display_name": "Reader",
           "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_program_reader",
       },
       "program_mapped": {
           "display_name": "No Access",
           "type": AttributeInfo.Type.USER_ROLE,
       },
   }
+
+  @classmethod
+  def _filter_by_program_owner(cls, predicate):
+    return cls._filter_by_role("ProgramOwner", predicate)
+
+  @classmethod
+  def _filter_by_program_editor(cls, predicate):
+    return cls._filter_by_role("ProgramEditor", predicate)
+
+  @classmethod
+  def _filter_by_program_reader(cls, predicate):
+    return cls._filter_by_role("ProgramReader", predicate)
 
   @classmethod
   def eager_query(cls):
