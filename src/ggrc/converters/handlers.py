@@ -601,7 +601,7 @@ class AuditObjectColumnHandler(ColumnHandler):
 
   def parse_item(self):
     raw = self.raw_value
-    if raw is None:
+    if raw is None or raw == "":
       return None
     parts = [p.strip() for p in raw.split(":")]
     if len(parts) != 2:
