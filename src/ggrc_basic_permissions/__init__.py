@@ -26,6 +26,7 @@ from . import basic_roles
 from .contributed_roles import lookup_role_implications
 from .models import Role, UserRole, ContextImplication
 from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
+from ggrc_basic_permissions.models import get_ids_related_to
 
 
 blueprint = Blueprint(
@@ -626,3 +627,5 @@ def contributed_column_handlers():
 from .contributed_roles import BasicRoleDeclarations, BasicRoleImplications
 ROLE_DECLARATIONS = BasicRoleDeclarations()
 ROLE_IMPLICATIONS = BasicRoleImplications()
+
+contributed_get_ids_related_to = get_ids_related_to
