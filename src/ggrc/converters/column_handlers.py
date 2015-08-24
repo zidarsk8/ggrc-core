@@ -9,7 +9,9 @@ from ggrc.extensions import get_extension_modules
 
 _column_handlers = {
     "assertions": handlers.ControlAssertionColumnHandler,
+    "assignee": handlers.UserColumnHandler,
     "audit": handlers.AuditColumnHandler,
+    "audit_object": handlers.AuditObjectColumnHandler,
     "categories": handlers.ControlCategoryColumnHandler,
     "company": handlers.TextColumnHandler,
     "contact": handlers.UserColumnHandler,
@@ -17,6 +19,7 @@ _column_handlers = {
     "description": handlers.TextareaColumnHandler,
     "design": handlers.OptionColumnHandler,
     "directive": handlers.SectionDirectiveColumnHandler,
+    "due_on": handlers.DateColumnHandler,
     "email": handlers.EmailColumnHandler,
     "end_date": handlers.DateColumnHandler,
     "fraud_related": handlers.CheckboxColumnHandler,
@@ -38,6 +41,8 @@ _column_handlers = {
     "report_end_date": handlers.DateColumnHandler,
     "report_start_date": handlers.DateColumnHandler,
     "request": handlers.RequestColumnHandler,
+    "request_audit": handlers.RequestAuditColumnHandler,
+    "requested_on": handlers.DateColumnHandler,
     "response_type": handlers.ResponseTypeColumnHandler,
     "secondary_assessor": handlers.UserColumnHandler,
     "secondary_contact": handlers.UserColumnHandler,

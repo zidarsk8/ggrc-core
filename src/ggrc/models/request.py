@@ -61,6 +61,19 @@ class Request(Titled, Slugged, Described, Base, db.Model):
     'description',
   ]
 
+  _aliases = {
+    "assignee": "Assignee",
+    "audit_object": "Request Object",
+    "request_audit": "Audit",
+    "due_on": "Due On",
+    "notes": "Notes",
+    "request_type": "Request Type",
+    "requested_on": "Requested On",
+    "status": "Status",
+    "test": "Test",
+    "title": None,
+  }
+
   def _display_name(self):
     if len(self.description) > 32:
       description_string = self.description[:32] + u'...'

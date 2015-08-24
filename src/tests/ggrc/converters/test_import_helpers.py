@@ -22,7 +22,7 @@ THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
 
 def get_mapping_names(class_name):
-  mapping_rules = get_mapping_rules()[class_name]
+  mapping_rules = get_mapping_rules().get(class_name, set())
   pretty_rules = map(title_from_camelcase, mapping_rules)
   mapping_names = set(["map:{}".format(name) for name in pretty_rules])
   unmapping_names = set(["unmap:{}".format(name) for name in pretty_rules])
@@ -833,6 +833,27 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["mandatory"])
     self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
+
+  def test_request_definitions(self):
+    """ test default headers for Request """
+    definitions = get_object_column_definitions(models.Request)
+    mapping_names = get_mapping_names(models.Request.__name__)
+    display_names = set([val["display_name"] for val in definitions.values()])
+    element_names = set([
+        "Assignee",
+        "Audit",
+        "Code",
+        "Description",
+        "Due On",
+        "Notes",
+        "Request Object",
+        "Request Type",
+        "Requested On",
+        "Status",
+        "Test",
+    ])
+    expected_names = element_names.union(mapping_names)
+    self.assertEquals(expected_names, display_names)
 
 
 class TestGetWorkflowObjectColumnDefinitions(TestCase):
