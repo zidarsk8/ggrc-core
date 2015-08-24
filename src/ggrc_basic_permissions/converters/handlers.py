@@ -113,7 +113,7 @@ class UserRoleColumnHandler(UserColumnHandler):
     pass
 
   def get_value(self):
-    return ""
+    return self.row_converter.obj.system_wide_role
 
   def remove_current_roles(self):
     allowed_role_ids = db.session.query(Role.id).filter(
