@@ -10,14 +10,9 @@ description = """
 
 owner_base = [
     "Categorization",
-    {
-        "type": "Category",
-        "terms": {
-            "list_property": "owners",
-            "value": "$current_user"
-        },
-        "condition": "contains"
-    },
+    "Category",
+    "ControlCategory",
+    "ControlAssertion",
     {
         "type": "Issue",
         "terms": {
@@ -229,6 +224,9 @@ owner_read = owner_base + [
         },
         "condition": "relationship",
     },
+    "Role",
+    "UserRole",
+    "Context",
     "Person",
 ]
 

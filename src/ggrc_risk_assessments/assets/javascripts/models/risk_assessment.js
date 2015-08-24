@@ -30,16 +30,7 @@
       , object_documents: "CMS.Models.ObjectDocument.stubs"
     }
     , tree_view_options: {
-      show_view: _mustache_path + "/tree.mustache",
-      header_view: _mustache_path + "/tree_header.mustache",
-      footer_view: _mustache_path + "/tree_footer.mustache",
-      child_options: [{
-        //0: Documents
-        model: "Document",
-        mapping: "documents",
-        show_view: _mustache_path + "/documents.mustache",
-        footer_view: _mustache_path + "/documents_footer.mustache"
-      }],
+      add_item_view: _mustache_path + "/tree_add_item.mustache",
     }
     , init : function() {
         this._super && this._super.apply(this, arguments);
@@ -47,6 +38,14 @@
         this.validateNonBlank("start_date");
         this.validateNonBlank("end_date");
       }
-  }, {});
+  }, {
+    save: function() {
+      // Make sure the context is always set to the parent program
+      if (this.context == null || this.context.id == null) {
+        this.attr('context', this.program.reify().context);
+      }
+      return this._super.apply(this, arguments);
+    }
+  });
 
 })(window.can);

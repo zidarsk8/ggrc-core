@@ -89,11 +89,23 @@ class RiskAssessmentRoleContributions(RoleContributions):
           'delete': ['RiskAssessment', 'Document'],
       },
       'ProgramEditor': {
-          'read': ['RiskAssessment', 'Document']
+          'create': ['RiskAssessment', 'Document'],
+          'read': ['RiskAssessment', 'Document'],
+          'update': ['RiskAssessment', 'Document'],
+          'delete': ['RiskAssessment', 'Document'],
       },
       'ProgramReader': {
           'read': ['RiskAssessment', 'Document']
-      }
+      },
+      'Reader': {
+          'read': ['RiskAssessment', 'Document']
+      },
+      'Editor': {
+          'create': ['RiskAssessment', 'Document'],
+          'read': ['RiskAssessment', 'Document'],
+          'update': ['RiskAssessment', 'Document'],
+          'delete': ['RiskAssessment', 'Document'],
+      },
   }
 
 ROLE_CONTRIBUTIONS = RiskAssessmentRoleContributions()

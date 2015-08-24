@@ -59,7 +59,7 @@ def handle_export_request():
     return current_app.make_response((csv_string, 200, headers))
   except Exception as e:
     current_app.logger.exception(e)
-  raise BadRequest("Export faild due to server error.")
+  raise BadRequest("Export failed due to server error.")
 
 
 
@@ -96,7 +96,7 @@ def handle_import_request():
     return current_app.make_response((response_json, 200, headers))
   except Exception as e:
     current_app.logger.exception(e)
-  raise BadRequest("Import faild due to server error.")
+  raise BadRequest("Import failed due to server error.")
 
 
 def init_converter_views():

@@ -64,6 +64,7 @@
         {model_singular: "Project", title_plural: "Projects"},
         {model_singular: "Regulation", title_plural: "Regulations"},
         {model_singular: "Request", title_plural: "Requests"},
+        {model_singular: "Response", title_plural: "Responses"},
         {model_singular: "RiskAssessment", title_plural: "Risk Assessments"},
         {model_singular: "Section", title_plural: "Sections"},
         {model_singular: "Standard", title_plural: "Standards"},
