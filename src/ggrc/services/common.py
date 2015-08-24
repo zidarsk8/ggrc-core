@@ -878,7 +878,12 @@ class Resource(ModelView):
         return current_app.make_response((
             'application/json', 406, [('Content-Type', 'text/plain')]))
     with benchmark("dispatch_request > collection_get > Get collection matches"):
-      matches_query = self.get_collection_matches(self.model)
+      # We skip querying by contexts for Creator role and relationship objects,
+      # because it will filter out objects that the Creator can access.
+      # We are doing a special permissions check for these objects
+      # below in the filter_resource method.
+      filter_by_contexts = not (self.model.__name__ == "Relationship" and _is_creator())
+      matches_query = self.get_collection_matches(self.model, filter_by_contexts)
     with benchmark("dispatch_request > collection_get > Query Data"):
       if '__page' in request.args or '__page_only' in request.args:
         with benchmark("Query matches with paging"):
@@ -1224,6 +1229,24 @@ def filter_resource(resource, depth=0, user_permissions=None):
     elif 'context_id' in resource:
       context_id = resource['context_id']
     assert context_id is not False, "No context found for object"
+
+    # In order to avoid loading full instances and using is_allowed_read_for,
+    # we are making a special test for the Creator here. Creator can only
+    # see relationship objects where he has read access on both source and
+    # destination. This is defined in Creator.py:220 file, but is_allowed_read
+    # can not check conditions without the full instance
+    if resource['type'] == "Relationship" and _is_creator():
+      # Make a check for relationship objects that are a special case
+      can_read = True
+      for t in ('source', 'destination'):
+        inst = resource[t]
+        contexts = permissions.read_contexts_for(inst['type']) or []
+        resources = permissions.read_resources_for(inst['type']) or []
+        if None in contexts or inst['context_id'] in contexts or inst['id'] in resources:
+          continue
+        can_read = False
+      if not can_read:
+        return None
     if not user_permissions.is_allowed_read(resource['type'], resource['id'], context_id):
       return None
     else:
@@ -1242,6 +1265,11 @@ def filter_resource(resource, depth=0, user_permissions=None):
   else:
     assert False, "Non-object passed to filter_resource"
 
+
+def _is_creator():
+  current_user = get_current_user()
+  return hasattr(current_user, 'system_wide_role') \
+      and current_user.system_wide_role == "Creator"
 
 def etag(last_modified):
   """Generate the etag given a datetime for the last time the resource was
