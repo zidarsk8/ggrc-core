@@ -468,6 +468,13 @@ can.Model.Cacheable("CMS.Models.Request", {
     } catch (e) {}
 
     return vals;
+  },
+  save: function() {
+      // Make sure the context is always set to the parent audit
+      if (this.context == null || this.context.id == null) {
+        this.attr('context', this.audit.reify().context);
+      }
+      return this._super.apply(this, arguments);
   }
 
 });
