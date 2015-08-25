@@ -15,6 +15,7 @@ from ggrc.models import Section
 from ggrc.models import Request
 from ggrc.models import Response
 from ggrc.models.relationship import Relationship
+from ggrc.models import all_models
 
 
 class RelationshipHelper(object):
@@ -145,6 +146,17 @@ class RelationshipHelper(object):
           Response.request_id.in_(related_ids))
 
   @classmethod
+  def program_risk_assessment(cls, object_type, related_type, related_ids):
+    if {object_type, related_type} != {"Program", "RiskAssessment"} or not related_ids:
+      return None
+    if object_type == "Program":
+      return db.session.query(all_models.RiskAssessment.program_id).filter(
+          all_models.RiskAssessment.id.in_(related_ids))
+    else:
+      return db.session.query(all_models.RiskAssessment.id).filter(
+          all_models.RiskAssessment.program_id.in_(related_ids))
+
+  @classmethod
   def get_special_mappings(cls, object_type, related_type, related_ids):
     return [
         cls.audit_request(object_type, related_type, related_ids),
@@ -152,6 +164,7 @@ class RelationshipHelper(object):
         cls.person_ownable(object_type, related_type, related_ids),
         cls.person_withcontact(object_type, related_type, related_ids),
         cls.program_audit(object_type, related_type, related_ids),
+        cls.program_risk_assessment(object_type, related_type, related_ids),
         cls.request_assignee(object_type, related_type, related_ids),
         cls.request_audit_object(object_type, related_type, related_ids),
         cls.request_response(object_type, related_type, related_ids),
