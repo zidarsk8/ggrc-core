@@ -10,6 +10,7 @@ from ggrc import db
 from ggrc.extensions import get_extension_modules
 from ggrc import models
 from ggrc.models import Audit
+from ggrc.models import AuditObject
 from ggrc.models import Section
 from ggrc.models import Request
 from ggrc.models.relationship import Relationship
@@ -119,6 +120,19 @@ class RelationshipHelper(object):
           Request.assignee_id.in_(related_ids))
 
   @classmethod
+  def request_audit_object(cls, object_type, related_type, related_ids):
+    if object_type == "Request":
+      return db.session.query(Request.id).join(AuditObject).filter(
+          (AuditObject.auditable_type == related_type) &
+          AuditObject.auditable_id.in_(related_ids))
+    elif related_type == "Request":
+      return db.session.query(AuditObject.auditable_id).join(Request).filter(
+          (AuditObject.auditable_type == related_type) &
+          Request.id.in_(related_ids))
+    else:
+      return None
+
+  @classmethod
   def get_special_mappings(cls, object_type, related_type, related_ids):
     return [
         cls.audit_request(object_type, related_type, related_ids),
@@ -127,6 +141,7 @@ class RelationshipHelper(object):
         cls.person_withcontact(object_type, related_type, related_ids),
         cls.program_audit(object_type, related_type, related_ids),
         cls.request_assignee(object_type, related_type, related_ids),
+        cls.request_audit_object(object_type, related_type, related_ids),
         cls.section_directive(object_type, related_type, related_ids),
     ]
 
