@@ -284,6 +284,10 @@ class AttributeInfo(object):
     aliases = AttributeInfo.gather_aliases(object_class)
     filtered_aliases = [(k, v) for k, v in aliases.items() if v is not None]
 
+    # push the extra delete column at the end to override any custom behavior
+    if hasattr(object_class, "slug") or hasattr(object_class, "email"):
+      filtered_aliases.append(("delete", "Delete"))
+
     unique_columns = cls.get_unique_constraints(object_class)
 
     for key, value in filtered_aliases:

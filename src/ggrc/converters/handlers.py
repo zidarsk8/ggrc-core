@@ -93,6 +93,25 @@ class ColumnHandler(object):
     pass
 
 
+class DeleteColumnHandler(ColumnHandler):
+
+  def get_value(self):
+    return ""
+
+  def parse_item(self):
+    return self.raw_value.lower() in ["true", "yes"]
+
+  def set_obj_attr(self):
+    if self.row_converter.is_new:
+      self.add_error(errors.DELETE_NEW_OBJECT_ERROR,
+                     object_type=self.row_converter.obj.type,
+                     slug=self.row_converter.obj.slug)
+      return
+    if self.dry_run:
+      return
+    db.session.delete(self.row_converter.obj)
+
+
 class StatusColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
