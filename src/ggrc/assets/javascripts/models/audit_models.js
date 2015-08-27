@@ -153,7 +153,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
 
     var that = this;
     // Make sure the context is always set to the parent program
-    if (this.context == null || this.context.id == null) {
+    if (!this.context || !this.context.id) {
       this.attr('context', this.program.reify().context);
     }
 
@@ -471,7 +471,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   },
   save: function() {
       // Make sure the context is always set to the parent audit
-      if (this.context == null || this.context.id == null) {
+      if (!this.context || !this.context.id) {
         this.attr('context', this.audit.reify().context);
       }
       return this._super.apply(this, arguments);

@@ -41,7 +41,7 @@
   }, {
     save: function() {
       // Make sure the context is always set to the parent program
-      if (this.context == null || this.context.id == null) {
+      if (!this.context || !this.context.id) {
         this.attr('context', this.program.reify().context);
       }
       return this._super.apply(this, arguments);
