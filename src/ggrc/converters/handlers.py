@@ -99,9 +99,13 @@ class DeleteColumnHandler(ColumnHandler):
     return ""
 
   def parse_item(self):
-    return self.raw_value.lower() in ["true", "yes"]
+    is_delete = self.raw_value.lower() in ["true", "yes"]
+    self.row_converter.is_delete = is_delete
+    return is_delete
 
   def set_obj_attr(self):
+    if not self.value:
+      return
     if self.row_converter.is_new:
       self.add_error(errors.DELETE_NEW_OBJECT_ERROR,
                      object_type=self.row_converter.obj.type,

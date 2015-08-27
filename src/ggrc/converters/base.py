@@ -36,6 +36,7 @@ class Converter(object):
   priortiy_colums = [
       "email",
       "slug",
+      "delete",
   ]
 
   def __init__(self, **kwargs):

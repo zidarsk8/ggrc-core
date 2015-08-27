@@ -138,9 +138,6 @@ class BlockConverter(object):
     headers = [self._sanitize_header(val) for val in raw_headers]
     clean_headers = OrderedDict()
     header_names = self.get_header_names()
-    if 'delete' in headers:
-      header_names = {k: v for (k, v) in header_names.items()
-                      if k in {"code", "delete", "email"}}
     removed_count = 0
     for index, header in enumerate(headers):
       if header in header_names:
