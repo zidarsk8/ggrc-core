@@ -988,6 +988,7 @@ can.Component.extend({
     },
     "{parent_instance} updated": "deferred_update",
     "{parent_instance} created": "deferred_update",
+
     // this works like autocomplete_select on all modal forms and
     // descendant class objects.
     autocomplete_select : function(el, event, ui) {
