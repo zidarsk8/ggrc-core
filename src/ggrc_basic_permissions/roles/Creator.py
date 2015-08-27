@@ -144,7 +144,6 @@ owner_base = [
         },
         "condition": "contains"
     },
-    "PopulationSample",
     {
         "type": "Product",
         "terms": {
@@ -212,8 +211,6 @@ owner_base = [
     },
     "CustomAttributeDefinition",
     "CustomAttributeValue",
-    "Request",
-    "Response",
 ]
 owner_read = owner_base + [
     {
@@ -295,10 +292,6 @@ permissions = {
             "condition": "is"
         },
         "Program",
-        "Role",
-        "UserRole",
-        "Request",
-        "Response",
         "Context",
         {
             "type": "BackgroundTask",
