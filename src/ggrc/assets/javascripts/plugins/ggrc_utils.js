@@ -61,7 +61,7 @@
 
       can_map = Permission.is_allowed_for("update", source);
       if (target instanceof can.Model) {
-        can_map = Permission.is_allowed_for("update", target);
+        can_map = can_map && Permission.is_allowed_for("update", target);
       }
       return can_map;
     }
