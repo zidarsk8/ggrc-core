@@ -12,7 +12,7 @@ from werkzeug.exceptions import BadRequest
 from ggrc.app import app
 from ggrc.login import login_required
 from ggrc.converters.base import Converter
-from ggrc.converters.query_helper import QueryHelper
+from ggrc.converters.query_helper import QueryHelper, BadQueryException
 from ggrc.converters.import_helper import generate_csv_string
 from ggrc.converters.import_helper import read_csv_file
 
@@ -57,10 +57,11 @@ def handle_export_request():
         ("Content-Disposition", "attachment; filename='{}'".format(filename)),
     ]
     return current_app.make_response((csv_string, 200, headers))
+  except BadQueryException as e:
+    raise BadRequest(e.message)
   except Exception as e:
     current_app.logger.exception(e)
   raise BadRequest("Export failed due to server error.")
-
 
 
 def check_import_file():

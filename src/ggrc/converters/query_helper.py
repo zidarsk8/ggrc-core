@@ -11,6 +11,8 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_importables
 
+class BadQueryException(Exception):
+  pass
 
 class QueryHelper(object):
 
@@ -143,8 +145,9 @@ class QueryHelper(object):
         else:
           attr = getattr(object_class, key, None)
           if attr is None:
-            raise Exception("Bad search query: object '{}' does not have "
-                            "attribute '{}'.".format(object_class.__name__, key))
+            raise BadQueryException("Bad query: object '{}' does "
+                                    "not have attribute   '{}'."
+                                    .format(object_class.__name__, key))
           return p(attr)
 
       lift_bin = lambda f: f(build_expression(exp["left"]),
