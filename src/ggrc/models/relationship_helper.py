@@ -25,10 +25,10 @@ class RelationshipHelper(object):
 
     if object_type == "Section" and related_type in directives:
       return db.session.query(Section.id).filter(
-        Section.directive_id.in_(related_ids))
+          Section.directive_id.in_(related_ids))
     elif related_type == "Section" and object_type in directives:
       return db.session.query(Section.directive_id).filter(
-        Section.id.in_(related_ids))
+          Section.id.in_(related_ids))
 
     return None
 
@@ -44,7 +44,6 @@ class RelationshipHelper(object):
       return db.session.query(Audit.id).filter(
           Audit.program_id.in_(related_ids))
 
-
   @classmethod
   def person_withcontact(cls, object_type, related_type, related_ids):
     object_model = getattr(models, object_type, None)
@@ -55,15 +54,15 @@ class RelationshipHelper(object):
       if issubclass(related_model, models.mixins.WithContact):
         return db.session.query(related_model.contact_id).filter(
             related_model.id.in_(related_ids)).union(
-              db.session.query(related_model.secondary_contact_id).filter(
-                related_model.id.in_(related_ids))
-            )
+            db.session.query(related_model.secondary_contact_id).filter(
+                related_model.id.in_(related_ids)))
       else:
         return None
     elif related_model == models.Person:
-      return db.session.query(object_model.id).filter(
-          object_model.contact_id.in_(related_ids) |
-          object_model.secondary_contact_id.in_(related_ids))
+      if issubclass(object_model, models.mixins.WithContact):
+        return db.session.query(object_model.id).filter(
+            object_model.contact_id.in_(related_ids) |
+            object_model.secondary_contact_id.in_(related_ids))
     else:
       return None
 
