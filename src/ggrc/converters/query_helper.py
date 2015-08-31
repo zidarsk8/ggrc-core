@@ -11,8 +11,10 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_importables
 
+
 class BadQueryException(Exception):
   pass
+
 
 class QueryHelper(object):
 
@@ -141,7 +143,7 @@ class QueryHelper(object):
           attr = getattr(object_class, key, None)
           if attr is None:
             raise BadQueryException("Bad query: object '{}' does "
-                                    "not have attribute   '{}'."
+                                    "not have attribute '{}'."
                                     .format(object_class.__name__, key))
           return p(attr)
 
@@ -161,14 +163,17 @@ class QueryHelper(object):
         ))
 
       ops = {
-        "AND": lambda: lift_bin(and_),
-        "OR": lambda: lift_bin(or_),
-        "=": lambda: with_left(lambda l: l == exp["right"]),
-        "!=": lambda: not_(with_left(lambda l: l == exp["right"])),
-        "~": lambda: with_left(lambda l: l.ilike("%{}%".format(exp["right"]))),
-        "!~": lambda: not_(with_left(lambda l: l.ilike("%{}%".format(exp["right"])))),
-        "relevant": relevant,
-        "text_search": text_search
+          "AND": lambda: lift_bin(and_),
+          "OR": lambda: lift_bin(or_),
+          "=": lambda: with_left(lambda l: l == exp["right"]),
+          "!=": lambda: not_(with_left(
+                             lambda l: l == exp["right"])),
+          "~": lambda: with_left(lambda l:
+                                 l.ilike("%{}%".format(exp["right"]))),
+          "!~": lambda: not_(with_left(
+                             lambda l: l.ilike("%{}%".format(exp["right"])))),
+          "relevant": relevant,
+          "text_search": text_search
       }
 
       return ops.get(exp["op"]["name"], lambda: None)()
@@ -177,7 +182,6 @@ class QueryHelper(object):
     filter_expression = build_expression(expression)
     if filter_expression is not None:
       query = query.filter(filter_expression)
-    objects = query.all()
     object_ids = [o.id for o in query.all()]
     return object_ids
 
