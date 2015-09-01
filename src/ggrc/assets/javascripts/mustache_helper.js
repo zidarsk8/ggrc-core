@@ -2393,10 +2393,9 @@ can.each({
 
       audit = audit.reify();
       auditors_dfd = audit.findAuditors();
-      prog_roles_dfd = new RefreshQueue()
-                       .enqueue(audit.attr("program").reify())
-                       .trigger().then(function(progs) {
-                         return progs[0].get_binding("program_authorizations").refresh_instances();
+      prog_roles_dfd = audit.refresh_all('program').then(function(program) {
+                         //debugger;
+                         return program.get_binding("program_authorizations").refresh_instances();
                        }).then(function(user_role_bindings) {
                           var rq = new RefreshQueue();
                           can.each(user_role_bindings, function(urb) {
