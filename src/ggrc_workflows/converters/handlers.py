@@ -194,6 +194,9 @@ class TaskTypeColumnHandler(ColumnHandler):
       return None
     value = self.type_map.get(self.raw_value.lower())
     if value is None:
+      if self.raw_value.lower() in self.type_map.values():
+        value = self.raw_value.lower()
+    if value is None:
       self.add_warning(errors.WRONG_REQUIRED_VALUE,
                        value=self.raw_value,
                        column_name=self.display_name)
