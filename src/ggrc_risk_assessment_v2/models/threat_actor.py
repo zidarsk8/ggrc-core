@@ -12,9 +12,10 @@ from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.relationship import Relatable
+from ggrc.models.track_object_state import HasObjectState, track_state_for_class
 
 
 class ThreatActor(
-    CustomAttributable, Documentable, Personable,
+    HasObjectState, CustomAttributable, Documentable, Personable,
     Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'threat_actors'

@@ -15,9 +15,10 @@ from ggrc.models.object_document import Documentable
 from ggrc.models.mixins import CustomAttributable, Base, Described, Slugged, Titled, WithContact, deferred, Stateful, Timeboxed
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
+from ggrc.models.track_object_state import HasObjectState, track_state_for_class
 
 
-class Risk(CustomAttributable, Stateful, Relatable, Documentable, Described,
+class Risk(HasObjectState, CustomAttributable, Stateful, Relatable, Documentable, Described,
     Ownable, WithContact, Titled, Timeboxed, Slugged, Base, db.Model):
   __tablename__ = 'risks'
 
