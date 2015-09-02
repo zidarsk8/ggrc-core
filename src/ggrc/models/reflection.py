@@ -286,7 +286,10 @@ class AttributeInfo(object):
 
     # push the extra delete column at the end to override any custom behavior
     if hasattr(object_class, "slug") or hasattr(object_class, "email"):
-      filtered_aliases.append(("delete", "Delete"))
+      filtered_aliases.append(("delete", {
+        "display_name": "Delete",
+        "import_only": True,
+      }))
 
     unique_columns = cls.get_unique_constraints(object_class)
 
