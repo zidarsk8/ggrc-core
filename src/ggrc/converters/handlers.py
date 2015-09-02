@@ -116,7 +116,9 @@ class DeleteColumnHandler(ColumnHandler):
     tr = db.session.begin_nested()
     try:
       tr.session.delete(self.row_converter.obj)
-      if len(tr.session.deleted) != 1:
+      deleted = len([o for o in tr.session.deleted
+                    if o.type != "Relationship"])
+      if deleted != 1:
         self.add_error(errors.DELETE_CASCADE_ERROR,
                        object_type=self.row_converter.obj.type,
                        slug=self.row_converter.obj.slug)
