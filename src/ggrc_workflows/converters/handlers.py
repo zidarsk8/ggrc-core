@@ -130,6 +130,18 @@ class TaskDateColumnHandler(ColumnHandler):
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
     return None
 
+  def get_value(self):
+    if "start" in self.key:
+      key = "start_date"
+    elif "end" in self.key:
+      key = "end_date"
+    else:
+      return ""
+    date = getattr(self.row_converter.obj, key, None)
+    if date is None:
+      return ""
+    return "{}/{}/{}".format(date.day, date.month, date.year)
+
 
 class TaskStartColumnHandler(TaskDateColumnHandler):
 
