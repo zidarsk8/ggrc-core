@@ -19,7 +19,7 @@
       "Objective", "Control", "Section", "Clause",
       "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project",
-      "MultitypeSearch"
+      "MultitypeSearch", "Issue"
     ],
     related_object_descriptors = {},
     threat_actor_descriptor, risk_descriptor;
@@ -80,6 +80,7 @@
         related_policies: TypeFilter("related_objects", "Policy"),
         related_standards: TypeFilter("related_objects", "Standard"),
         related_objectives: TypeFilter("related_objects", "Objective"),
+        related_issues: TypeFilter("related_objects", "Issue"),
       },
       related_risk: {
         _canonical: {
