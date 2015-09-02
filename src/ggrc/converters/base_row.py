@@ -150,7 +150,7 @@ class RowConverter(object):
     is in some related object such as "UserRole" it should be added there and
     handled by the handler defined in attrs.
     """
-    if self.ignore or self.is_delete:
+    if self.ignore:
       return
 
     for item_handler in self.attrs.values():
@@ -167,10 +167,8 @@ class RowConverter(object):
           self.object_class, obj=self.obj, src={}, service=service_class)
 
   def insert_object(self):
-    if self.ignore:
+    if self.ignore or self.is_delete:
       return
-    if self.is_delete:
-      db.session.delete(self.obj)
     else:
       self.send_signals()
       if self.is_new:

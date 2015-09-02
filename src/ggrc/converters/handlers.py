@@ -111,9 +111,20 @@ class DeleteColumnHandler(ColumnHandler):
                      object_type=self.row_converter.obj.type,
                      slug=self.row_converter.obj.slug)
       return
-    if self.dry_run:
+    if self.row_converter.ignore:
       return
-    db.session.delete(self.row_converter.obj)
+    tr = db.session.begin_nested()
+    try:
+      tr.session.delete(self.row_converter.obj)
+      if len(tr.session.deleted) != 1:
+        self.add_error(errors.DELETE_CASCADE_ERROR,
+                       object_type=self.row_converter.obj.type,
+                       slug=self.row_converter.obj.slug)
+    finally:
+      if self.dry_run or self.row_converter.ignore:
+        tr.rollback()
+      else:
+        tr.commit()
 
 
 class StatusColumnHandler(ColumnHandler):

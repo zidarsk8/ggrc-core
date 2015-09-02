@@ -75,4 +75,7 @@ MAPPING_PERMISSION_ERROR = ("Line {line}: You don't have permission to update"
 DELETE_NEW_OBJECT_ERROR = ("Line {line}: Tried to create and delete the same"
                            " object {object_type}: {slug} in one import.")
 
+DELETE_CASCADE_ERROR = ("Line {line}: Cannot delete object {object_type}:"
+                        " {slug} without deleting other objects")
+
 UNKNOWN_ERROR = "Line {line}: Import failed due to unknown error."
