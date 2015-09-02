@@ -202,12 +202,23 @@ class BlockConverter(object):
 
   def get_info(self):
     stats = [(r.is_new, r.ignore) for r in self.row_converters]
+    created, updated, ignored, deleted = 0, 0, 0, 0
+    for row in self.row_converters:
+      if row.ignore:
+        ignored += 1
+      elif row.is_delete:
+        deleted += 1
+      elif row.is_new:
+        created += 1
+      else:
+        updated += 1
     info = {
         "name": self.name,
         "rows": len(self.rows),
-        "created": stats.count((True, False)),
-        "updated": stats.count((False, False)),
-        "ignored": stats.count((False, True)) + stats.count((True, True)),
+        "created": created,
+        "updated": updated,
+        "ignored": ignored,
+        "deleted": deleted,
         "block_warnings": self.block_warnings,
         "block_errors": self.block_errors,
         "row_warnings": self.row_warnings,
