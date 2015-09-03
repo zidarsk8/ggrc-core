@@ -124,7 +124,9 @@
           data["type"] = tree_view.display_list[0];
         }
       }
-      data["join_object_id"] = id || GGRC.page_instance().id;
+      if (id || GGRC.page_instance()) {
+        data["join_object_id"] = id || GGRC.page_instance().id;
+      }
       return {
         mapper: new MapperModel(data)
       };
