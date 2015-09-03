@@ -479,7 +479,9 @@
             __permission_model: join_model
           };
         }
-        data.options.__permission_type = data.options.__permission_type || "update";
+        if (join_model !== "ObjectPerson") {
+          data.options.__permission_type = data.options.__permission_type || "update";
+        }
         data.model_name = _.isString(data.model_name) ? [data.model_name] : data.model_name;
 
         return GGRC.Models.Search.search_for_types(data.term || "", data.model_name, data.options);

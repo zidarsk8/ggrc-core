@@ -59,9 +59,9 @@
                                                 : (target.type || target);
       source_type = source.constructor.shortName || source;
 
-      can_map = Permission.is_allowed_for("update", source);
+      can_map = Permission.is_allowed_for("update", source) || source_type === "Person";
       if (target instanceof can.Model) {
-        can_map = can_map && Permission.is_allowed_for("update", target);
+        can_map = can_map && Permission.is_allowed_for("update", target) || target_type === "Person";
       }
       return can_map;
     }
