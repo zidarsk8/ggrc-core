@@ -117,9 +117,13 @@
       if (object) {
         data["object"] = object;
       }
+
+      type = CMS.Models[type] && type;
       if (!data["search_only"]) {
-        if (id === GGRC.page_instance().id || !tree_view) {
-          data["type"] = CMS.Models[type] ? type : "AllObject";
+        if (type) {
+          data["type"] = type;
+        } else if (id === GGRC.page_instance().id || !tree_view) {
+          data["type"] = "AllObject";
         } else {
           data["type"] = tree_view.display_list[0];
         }
