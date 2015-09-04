@@ -264,7 +264,12 @@ class ObjectsColumnHandler(ColumnHandler):
     return "\n".join(lines)
 
   def insert_object(self):
+    obj = self.row_converter.obj
+    existing = set((t.object_type, t.object_id)
+                   for t in self.row_converter.obj.task_group_objects)
     for object_ in self.value:
+      if (object_.type, object_.id) in existing:
+        continue
       tgo = TaskGroupObject(
           task_group=self.row_converter.obj,
           object=object_,
