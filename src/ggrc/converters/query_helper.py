@@ -6,6 +6,7 @@
 from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
+import datetime
 
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
@@ -119,6 +120,21 @@ class QueryHelper(object):
       return set()
     object_class = self.object_map[object_name]
 
+    def autocast(o_key, value):
+      if type(o_key) is not str:
+        return value
+      key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
+      # handle dates
+      if key in ["start_date", "end_date"]:
+        try:
+          month, day, year = map(int, value.split("/"))
+          return datetime.date(year, month, day)
+        except Exception:
+          raise BadQueryException("Field \"{}\" expects a MM/DD/YYYY date"
+                                  .format(o_key))
+      # fallback
+      return value
+
     def build_expression(exp):
       if "op" not in exp:
         return None
@@ -162,16 +178,18 @@ class QueryHelper(object):
             if field in existing_fields
         ))
 
+      rhs = lambda: autocast(exp["left"], exp["right"])
+
       ops = {
           "AND": lambda: lift_bin(and_),
           "OR": lambda: lift_bin(or_),
-          "=": lambda: with_left(lambda l: l == exp["right"]),
+          "=": lambda: with_left(lambda l: l == rhs()),
           "!=": lambda: not_(with_left(
-                             lambda l: l == exp["right"])),
+                             lambda l: l == rhs())),
           "~": lambda: with_left(lambda l:
-                                 l.ilike("%{}%".format(exp["right"]))),
+                                 l.ilike("%{}%".format(rhs()))),
           "!~": lambda: not_(with_left(
-                             lambda l: l.ilike("%{}%".format(exp["right"])))),
+                             lambda l: l.ilike("%{}%".format(rhs())))),
           "relevant": relevant,
           "text_search": text_search
       }
