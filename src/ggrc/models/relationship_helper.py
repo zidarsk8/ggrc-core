@@ -157,6 +157,21 @@ class RelationshipHelper(object):
           all_models.RiskAssessment.program_id.in_(related_ids))
 
   @classmethod
+  def task_group_object(cls, object_type, related_type, related_ids):
+    if not related_ids:
+      return None
+    if object_type == "TaskGroup":
+      return db.session.query(all_models.TaskGroupObject.task_group_id).filter(
+          (all_models.TaskGroupObject.object_type == related_type) &
+          all_models.TaskGroupObject.object_id.in_(related_ids))
+    elif related_type == "TaskGroup":
+      return db.session.query(all_models.TaskGroupObject.object_id).filter(
+          (all_models.TaskGroupObject.object_type == related_type) &
+          all_models.TaskGroupObject.task_group_id.in_(related_ids))
+    else:
+      return None
+
+  @classmethod
   def get_special_mappings(cls, object_type, related_type, related_ids):
     return [
         cls.audit_request(object_type, related_type, related_ids),
@@ -169,6 +184,7 @@ class RelationshipHelper(object):
         cls.request_audit_object(object_type, related_type, related_ids),
         cls.request_response(object_type, related_type, related_ids),
         cls.section_directive(object_type, related_type, related_ids),
+        cls.task_group_object(object_type, related_type, related_ids),
     ]
 
   @classmethod
