@@ -171,7 +171,7 @@
 
         this._super.apply(this, arguments);
         this.options.search_params = {
-          extra_params: search_params,
+          extra_params: search_params
         };
         if (permission) {
           this.options.search_params.__permission_type = permission;
