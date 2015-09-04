@@ -4,12 +4,13 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import (
+from ggrc.models.mixins import (
     deferred, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
 )
-from .relationship import Relatable
-from .object_document import Documentable
-from .object_person import Personable
+from ggrc.models.object_document import Documentable
+from ggrc.models.object_person import Personable
+from ggrc.models.relationship import Relatable
+from ggrc.models.request import Request
 
 
 class Response(Noted, Described, Hyperlinked, WithContact,
@@ -80,6 +81,7 @@ class Response(Noted, Described, Hyperlinked, WithContact,
       "request": {
         "display_name": "Request",
         "mandatory": True,
+        "filter_by": "_filter_by_request",
       },
       "response_type": {
         "display_name": "Response Type",
@@ -95,6 +97,13 @@ class Response(Noted, Described, Hyperlinked, WithContact,
   def _display_name(self):
     return u'Response with id={0} for Audit "{1}"'.format(
         self.id, self.request.audit.display_name)
+
+  @classmethod
+  def _filter_by_request(cls, predicate):
+    return Request.query.filter(
+        (Request.id == cls.request_id) &
+        predicate(Request.slug)
+    ).exists()
 
   @classmethod
   def eager_query(cls):
