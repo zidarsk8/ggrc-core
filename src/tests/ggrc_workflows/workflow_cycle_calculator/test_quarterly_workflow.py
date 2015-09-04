@@ -762,3 +762,481 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
       self.assertEqual(active_wf.next_cycle_start_date, date(2016, 7, 13))
+
+  def test_multiple_task_groups_multiple_tasks_multiple_quarters_future(self):
+    """Test behaviour of multiple task groups with multiple tasks spread across multiple quarters
+
+    Task group  | Tasks | Start day           | End day
+    1           | 1     | Feb/May/Aug/Nov  1  | Feb/May/Aug/Nov  5
+    1           | 2     | Feb/May/Aug/Nov 10  | Feb/May/Aug/Nov 20
+    2           | 3     | Feb/May/Aug/Nov 20  | Feb/May/Aug/Nov 25
+    2           | 4     | Mar/Jun/Sep/Dec  1  | Mar/Jun/Sep/Dec  5
+
+    Cycle should last from:
+    Feb 1 - Mar 5
+    May 1 - Jun 5
+    Aug 1 - Sep 5
+    Nov 1 - Dec 5
+    """
+    quarterly_wf = {
+      "title": "quarterly thingy",
+      "description": "start this many a time",
+      "frequency": "quarterly",
+      "task_groups": [{
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 1',
+            "relative_start_day": 1,
+            "relative_start_month": 2,
+            "relative_end_day": 5,
+            "relative_end_month": 2,
+          }, {
+            'title': 'quarterly task 2',
+            "relative_start_day": 10,
+            "relative_start_month": 2,
+            "relative_end_day": 20,
+            "relative_end_month": 2,
+          }],
+        "task_group_objects": []
+      }, {
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 3',
+            "relative_start_day": 20,
+            "relative_start_month": 2,
+            "relative_end_day": 25,
+            "relative_end_month": 2,
+          }, {
+            'title': 'quarterly task 4',
+            "relative_start_day": 1,
+            "relative_start_month": 3,
+            "relative_end_day": 5,
+            "relative_end_month": 3,
+          }],
+        "task_group_objects": []
+      }]
+    }
+
+    with freeze_time("2015-6-9 13:00:00"):  # Tuesday, 6/9/2015
+      _, wf = self.generator.generate_workflow(quarterly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 31))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 7, 31))
+      self.assertEqual(cycle.end_date, date(2015, 9, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 30))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 10, 30))
+      self.assertEqual(cycle.end_date, date(2015, 12, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 2, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 2, 1))
+      self.assertEqual(cycle.end_date, date(2016, 3, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 4, 29))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 4, 29))
+      self.assertEqual(cycle.end_date, date(2016, 6, 3))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 8, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 8, 1))
+      self.assertEqual(cycle.end_date, date(2016, 9, 2))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 11, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 11, 1))
+      self.assertEqual(cycle.end_date, date(2016, 12, 5))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2017, 2, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2017, 2, 1))
+      self.assertEqual(cycle.end_date, date(2017, 3, 3))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2017, 5, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2017, 5, 1))
+      self.assertEqual(cycle.end_date, date(2017, 6, 5))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2017, 8, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2017, 8, 1))
+      self.assertEqual(cycle.end_date, date(2017, 9, 5))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2017, 11, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2017, 11, 1))
+      self.assertEqual(cycle.end_date, date(2017, 12, 5))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2018, 2, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2018, 2, 1))
+      self.assertEqual(cycle.end_date, date(2018, 3, 5))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2018, 5, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2018, 5, 1))
+      self.assertEqual(cycle.end_date, date(2018, 6, 5))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2018, 8, 1))
+
+  def test_multiple_task_groups_multiple_tasks_multiple_quarters_in_middle(self):
+    """Test behaviour of multiple task groups with multiple tasks spread across multiple quarters
+
+    Task group  | Tasks | Start day           | End day
+    1           | 1     | Feb/May/Aug/Nov  1  | Feb/May/Aug/Nov  5
+    1           | 2     | Feb/May/Aug/Nov 10  | Feb/May/Aug/Nov 20
+    2           | 3     | Feb/May/Aug/Nov 20  | Feb/May/Aug/Nov 25
+    2           | 4     | Mar/Jun/Sep/Dec  1  | Mar/Jun/Sep/Dec  5
+
+    Cycle should last from:
+    Feb 1 - Mar 5
+    May 1 - Jun 5
+    Aug 1 - Sep 5
+    Nov 1 - Dec 5
+    """
+    quarterly_wf = {
+      "title": "quarterly thingy",
+      "description": "start this many a time",
+      "frequency": "quarterly",
+      "task_groups": [{
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 1',
+            "relative_start_day": 1,
+            "relative_start_month": 2,
+            "relative_end_day": 5,
+            "relative_end_month": 2,
+          }, {
+            'title': 'quarterly task 2',
+            "relative_start_day": 10,
+            "relative_start_month": 2,
+            "relative_end_day": 20,
+            "relative_end_month": 2,
+          }],
+        "task_group_objects": []
+      }, {
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 3',
+            "relative_start_day": 20,
+            "relative_start_month": 2,
+            "relative_end_day": 25,
+            "relative_end_month": 2,
+          }, {
+            'title': 'quarterly task 4',
+            "relative_start_day": 1,
+            "relative_start_month": 3,
+            "relative_end_day": 5,
+            "relative_end_month": 3,
+          }],
+        "task_group_objects": []
+      }]
+    }
+    with freeze_time("2015-6-3 13:00:00"):  # Tuesday, 6/3/2015
+      _, wf = self.generator.generate_workflow(quarterly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 31))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id).one()
+      self.assertEqual(cycle.start_date, date(2015, 5, 1))
+      self.assertEqual(cycle.end_date, date(2015, 6, 5))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 7, 31))
+      self.assertEqual(cycle.end_date, date(2015, 9, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 30))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 10, 30))
+      self.assertEqual(cycle.end_date, date(2015, 12, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 2, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 2, 1))
+      self.assertEqual(cycle.end_date, date(2016, 3, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 4, 29))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 4, 29))
+      self.assertEqual(cycle.end_date, date(2016, 6, 3))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 8, 1))
+
+  def test_multiple_task_groups_multiple_tasks_multiple_quarters_last_quarter_middle(self):
+    """Test behaviour of multiple task groups with multiple tasks spread across multiple quarters
+
+    Task group  | Tasks | Start day           | End day
+    1           | 1     | Feb/May/Aug/Nov  1  | Feb/May/Aug/Nov  5
+    1           | 2     | Feb/May/Aug/Nov 10  | Feb/May/Aug/Nov 20
+    2           | 3     | Feb/May/Aug/Nov 20  | Feb/May/Aug/Nov 25
+    2           | 4     | Mar/Jun/Sep/Dec  1  | Mar/Jun/Sep/Dec  5
+
+    Cycle should last from:
+    Feb 1 - Mar 5
+    May 1 - Jun 5
+    Aug 1 - Sep 5
+    Nov 1 - Dec 5
+    """
+    quarterly_wf = {
+      "title": ("quarterly thingy test_multiple_task_groups_multiple_tasks_"
+               "multiple_quarters_last_quarter_middle"),
+      "description": "start this many a time",
+      "frequency": "quarterly",
+      "task_groups": [{
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 1',
+            "relative_start_day": 1,
+            "relative_start_month": 2,
+            "relative_end_day": 5,
+            "relative_end_month": 2,
+          }, {
+            'title': 'quarterly task 2',
+            "relative_start_day": 10,
+            "relative_start_month": 2,
+            "relative_end_day": 20,
+            "relative_end_month": 2,
+          }],
+        "task_group_objects": []
+      }, {
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 3',
+            "relative_start_day": 20,
+            "relative_start_month": 2,
+            "relative_end_day": 25,
+            "relative_end_month": 2,
+          }, {
+            'title': 'quarterly task 4',
+            "relative_start_day": 1,
+            "relative_start_month": 3,
+            "relative_end_day": 5,
+            "relative_end_month": 3,
+          }],
+        "task_group_objects": []
+      }]
+    }
+    with freeze_time("2015-12-01 13:00:00"):  # Tuesday, 12/1/2015
+      _, wf = self.generator.generate_workflow(quarterly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 2, 1))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id).one()
+      self.assertEqual(cycle.start_date, date(2015, 10, 30))
+      self.assertEqual(cycle.end_date, date(2015, 12, 4))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 2, 1))
+      self.assertEqual(cycle.end_date, date(2016, 3, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 4, 29))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 4, 29))
+      self.assertEqual(cycle.end_date, date(2016, 6, 3))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 8, 1))
+
+  def test_multiple_task_groups_multiple_tasks_multiple_quarters_last_quarter_past(self):
+    """Test behaviour of multiple task groups with multiple tasks spread across multiple quarters
+
+    Task group  | Tasks | Start day           | End day
+    1           | 1     | Feb/May/Aug/Nov  1  | Feb/May/Aug/Nov  5
+    1           | 2     | Feb/May/Aug/Nov 10  | Feb/May/Aug/Nov 20
+    2           | 3     | Feb/May/Aug/Nov 20  | Feb/May/Aug/Nov 25
+    2           | 4     | Mar/Jun/Sep/Dec  1  | Mar/Jun/Sep/Dec  5
+
+    Cycle should last from:
+    Feb 1 - Mar 5
+    May 1 - Jun 5
+    Aug 1 - Sep 5
+    Nov 1 - Dec 5
+    """
+    quarterly_wf = {
+      "title": "quarterly thingy",
+      "description": "start this many a time",
+      "frequency": "quarterly",
+      "task_groups": [{
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 1',
+            "relative_start_day": 1,
+            "relative_start_month": 2,
+            "relative_end_day": 5,
+            "relative_end_month": 2,
+          }, {
+            'title': 'quarterly task 2',
+            "relative_start_day": 10,
+            "relative_start_month": 2,
+            "relative_end_day": 20,
+            "relative_end_month": 2,
+          }],
+        "task_group_objects": []
+      }, {
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 3',
+            "relative_start_day": 20,
+            "relative_start_month": 2,
+            "relative_end_day": 25,
+            "relative_end_month": 2,
+          }, {
+            'title': 'quarterly task 4',
+            "relative_start_day": 1,
+            "relative_start_month": 3,
+            "relative_end_day": 5,
+            "relative_end_month": 3,
+          }],
+        "task_group_objects": []
+      }]
+    }
+    with freeze_time("2015-12-7 13:00:00"):  # Mon, 12/7/2015
+      _, wf = self.generator.generate_workflow(quarterly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 2, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 2, 1))
+      self.assertEqual(cycle.end_date, date(2016, 3, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 4, 29))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 4, 29))
+      self.assertEqual(cycle.end_date, date(2016, 6, 3))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 8, 1))
+
+  def test_multiple_task_groups_multiple_tasks_multiple_quarters_tasks_in_reverse_order(self):
+    """Test behaviour of multiple task groups with multiple tasks spread across multiple quarters
+
+    Task group  | Tasks | Start day           | End day
+    2           | 4     | Mar/Jun/Sep/Dec  1  | Mar/Jun/Sep/Dec  5
+    2           | 3     | Feb/May/Aug/Nov 20  | Feb/May/Aug/Nov 25
+    1           | 2     | Feb/May/Aug/Nov 10  | Feb/May/Aug/Nov 20
+    1           | 1     | Feb/May/Aug/Nov  1  | Feb/May/Aug/Nov  5
+
+    Cycle should last from:
+    Feb 1 - Mar 5
+    May 1 - Jun 5
+    Aug 1 - Sep 5
+    Nov 1 - Dec 5
+    """
+    quarterly_wf = {
+      "title": "quarterly thingy",
+      "description": "start this many a time",
+      "frequency": "quarterly",
+      "task_groups": [{
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 4',
+            "relative_start_day": 1,
+            "relative_start_month": 3,
+            "relative_end_day": 5,
+            "relative_end_month": 3,
+          }, {
+            'title': 'quarterly task 3',
+            "relative_start_day": 20,
+            "relative_start_month": 2,
+            "relative_end_day": 25,
+            "relative_end_month": 2,
+          }
+        ],
+        "task_group_objects": []
+      }, {
+        "title": "task group",
+        "task_group_tasks": [
+          {
+            'title': 'quarterly task 2',
+            "relative_start_day": 10,
+            "relative_start_month": 2,
+            "relative_end_day": 20,
+            "relative_end_month": 2,
+          }, {
+            'title': 'quarterly task 1',
+            "relative_start_day": 1,
+            "relative_start_month": 2,
+            "relative_end_day": 5,
+            "relative_end_month": 2,
+          }
+        ],
+        "task_group_objects": []
+      }]
+    }
+    with freeze_time("2015-6-3 13:00:00"):  # Tuesday, 6/3/2015
+      _, wf = self.generator.generate_workflow(quarterly_wf)
+      _, awf = self.generator.activate_workflow(wf)
+
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.status, "Active")
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 31))
+
+      cycle = db.session.query(Cycle).filter(
+        Cycle.workflow_id == wf.id).one()
+      self.assertEqual(cycle.start_date, date(2015, 5, 1))
+      self.assertEqual(cycle.end_date, date(2015, 6, 5))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 7, 31))
+      self.assertEqual(cycle.end_date, date(2015, 9, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 30))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2015, 10, 30))
+      self.assertEqual(cycle.end_date, date(2015, 12, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 2, 1))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 2, 1))
+      self.assertEqual(cycle.end_date, date(2016, 3, 4))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 4, 29))
+
+      _, cycle = self.generator.generate_cycle(wf)
+      self.assertEqual(cycle.start_date, date(2016, 4, 29))
+      self.assertEqual(cycle.end_date, date(2016, 6, 3))
+      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 8, 1))

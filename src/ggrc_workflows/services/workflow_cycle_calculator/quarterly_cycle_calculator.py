@@ -30,7 +30,8 @@ class QuarterlyCycleCalculator(CycleCalculator):
     base_date = self.get_base_date(base_date)
     self.reified_tasks = {}
     for task in self.tasks:
-      start_date, end_date = self.non_adjusted_task_date_range(task, base_date)
+      start_date, end_date = self.non_adjusted_task_date_range(
+        task, base_date, initialisation=True)
       self.reified_tasks[task.id] = {
         'start_date': start_date,
         'end_date': end_date,
