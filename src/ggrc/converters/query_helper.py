@@ -150,6 +150,10 @@ class QueryHelper(object):
             )
         )
 
+      def unknown():
+        raise BadQueryException("Unknown operator \"{}\""
+                                .format(exp["op"]["name"]))
+
       def with_key(key, p):
         key = key.lower()
         key, filter_by = self.attr_name_map[object_class].get(key, (key, None))
@@ -194,7 +198,7 @@ class QueryHelper(object):
           "text_search": text_search
       }
 
-      return ops.get(exp["op"]["name"], lambda: None)()
+      return ops.get(exp["op"]["name"], unknown)()
 
     query = object_class.query
     filter_expression = build_expression(expression)
