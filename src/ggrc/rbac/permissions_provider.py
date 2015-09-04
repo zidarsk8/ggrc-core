@@ -94,8 +94,15 @@ def in_condition(instance, value, property_name):
 
 
 def relationship_condition(instance, action, property_name):
+  context_id = getattr(instance.context, 'id') if getattr(instance, 'context') is not None else None
+  from ggrc.rbac.permissions import is_allowed_create
   for prop in property_name.split(','):
     obj = getattr(instance, prop)
+    if context_id is not None and \
+       getattr(obj, 'context') is not None and \
+       getattr(obj.context, 'id') == context_id and \
+       is_allowed_create('Relationship', None, context_id):
+      return True
     if not find_permissions()._is_allowed_for(obj, action):
       return False
   return True

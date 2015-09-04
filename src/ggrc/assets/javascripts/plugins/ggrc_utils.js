@@ -58,10 +58,13 @@
       target_type = target instanceof can.Model ? target.constructor.shortName
                                                 : (target.type || target);
       source_type = source.constructor.shortName || source;
+      target_context = target.context && target.context.id;
+      source_context = source.context && source.context.id;
+      create_contexts = GGRC.permissions.create && GGRC.permissions.create.Relationship && GGRC.permissions.create.Relationship.contexts;
 
-      can_map = Permission.is_allowed_for("update", source) || source_type === "Person";
+      can_map = Permission.is_allowed_for("update", source) || source_type === "Person" || _.contains(create_contexts, source_context);
       if (target instanceof can.Model) {
-        can_map = can_map && Permission.is_allowed_for("update", target) || target_type === "Person";
+        can_map = can_map && (Permission.is_allowed_for("update", target) || target_type === "Person" || _.contains(create_contexts, target_context));
       }
       return can_map;
     }
