@@ -105,42 +105,70 @@ class CycleTaskGroupColumnHandler(ParentColumnHandler):
   def __init__(self, row_converter, key, **options):
     """ init task group handler """
     self.parent = CycleTaskGroup
-    super(CycleTaskGroupColumnHandler, self).__init__(row_converter, key, **options)
+    super(CycleTaskGroupColumnHandler, self) \
+        .__init__(row_converter, key, **options)
 
 
 class TaskDateColumnHandler(ColumnHandler):
 
   """ handler for start and end columns in task group tasks """
 
+  quarterly_names = {
+      1: "Jan/Apr/Jul/Oct",
+      2: "Feb/May/Aug/Nov",
+      3: "Mar/Jun/Sep/Dec",
+  }
+
   def parse_item(self):
     """ parse start and end columns fow workflow tasks
-
-    Parsed item will be in d, m, y order, with possible missisg y.
     """
+    raw_parts = self.raw_value.lower().split(" ")
+    if len(raw_parts) == 2:
+      quarter_name, day = raw_parts
+      for month, quarter in self.quarterly_names.items():
+        if quarter.lower() == quarter_name:
+          try:
+            return [month, int(day)]
+          except ValueError:
+            self.add_error(errors.WRONG_VALUE_ERROR,
+                           column_name=self.display_name)
+            return
+    raw_parts = self.raw_value.split("/")
     try:
-      value = [int(v) for v in self.raw_value.split("/")]
-      if len(value) > 1:
-        tmp = value[0]
-        value[0] = value[1]
-        value[1] = tmp
-      else:
-        value.append(0)
-      return value
+      return map(int, raw_parts)
     except ValueError:
-      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
-    return None
+      self.add_error(errors.WRONG_VALUE_ERROR,
+                     column_name=self.display_name)
+      return
 
   def get_value(self):
-    if "start" in self.key:
-      key = "start_date"
-    elif "end" in self.key:
-      key = "end_date"
+    start = "start" in self.key
+    obj = self.row_converter.obj
+    freq = obj.task_group.workflow.frequency
+    date = getattr(obj, "start_date" if start else "end_date", None)
+    month = getattr(obj, "relative_start_month" if start
+                    else "relative_end_month", None)
+    day = getattr(obj, "relative_start_day" if start
+                       else "relative_end_day", None)
+    if freq == "one_time":
+      if date is None:
+        return ""
+      return "{}/{}/{}".format(date.month, date.day, date.year)
+    elif freq in ["weekly", "monthly"]:
+      if day is None:
+        return ""
+      return str(day)
+    elif freq == "quarterly":
+      quarter = self.quarterly_names.get(month, None)
+      if None in [day, quarter]:
+        return ""
+      return "{} {}".format(quarter, day)
+    elif freq == "annually":
+      if None in [day, month]:
+        return ""
+      return "{}/{}".format(month, day)
     else:
       return ""
-    date = getattr(self.row_converter.obj, key, None)
-    if date is None:
-      return ""
-    return "{}/{}/{}".format(date.day, date.month, date.year)
 
 
 class TaskStartColumnHandler(TaskDateColumnHandler):
@@ -149,14 +177,30 @@ class TaskStartColumnHandler(TaskDateColumnHandler):
 
   def set_obj_attr(self):
     """ set all possible start date attributes """
-    frequency = self.row_converter.obj.task_group.workflow.frequency
-    if frequency == "one_time":
+    freq = self.row_converter.obj.task_group.workflow.frequency
+    if freq == "one_time":
       if len(self.value) != 3:
-        self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
+        self.add_error(errors.WRONG_VALUE_ERROR,
+                       column_name=self.display_name)
         return
       self.row_converter.obj.start_date = date(*self.value[::-1])
-    self.row_converter.obj.relative_start_day = self.value[0]
-    self.row_converter.obj.relative_start_month = self.value[1]
+    elif freq in ["weekly", "monthly"]:
+      if len(self.value) != 1:
+        self.add_error(errors.WRONG_VALUE_ERROR,
+                       column_name=self.display_name)
+        return
+      self.row_converter.obj.relative_start_day = self.value[0]
+    elif freq in ["quarterly", "annually"]:
+      if len(self.value) != 2:
+        self.add_error(errors.WRONG_VALUE_ERROR,
+                       column_name=self.display_name)
+        return
+      self.row_converter.obj.relative_start_day = self.value[1]
+      self.row_converter.obj.relative_start_month = self.value[0]
+    else:
+      self.add_error(errors.WRONG_VALUE_ERROR,
+                     column_name=self.display_name)
+      return
 
 
 class TaskEndColumnHandler(TaskDateColumnHandler):
@@ -165,17 +209,31 @@ class TaskEndColumnHandler(TaskDateColumnHandler):
 
   def set_obj_attr(self):
     """ set all possible end date attributes """
-    frequency = self.row_converter.obj.task_group.workflow.frequency
-    if self.value is None:
-      return
-    frequency = self.row_converter.obj.task_group.workflow.frequency
-    if frequency == "one_time":
+    freq = self.row_converter.obj.task_group.workflow.frequency
+    if freq == "one_time":
       if len(self.value) != 3:
-        self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
+        self.add_error(errors.WRONG_VALUE_ERROR,
+                       column_name=self.display_name)
         return
-      self.row_converter.obj.end_date = date(*self.value[::-1])
-    self.row_converter.obj.relative_end_day = self.value[0]
-    self.row_converter.obj.relative_end_month = self.value[1]
+      month, day, year = self.value
+      self.row_converter.obj.end_date = date(year, month, day)
+    elif freq in ["weekly", "monthly"]:
+      if len(self.value) != 1:
+        self.add_error(errors.WRONG_VALUE_ERROR,
+                       column_name=self.display_name)
+        return
+      self.row_converter.obj.relative_end_day = self.value[0]
+    elif freq in ["quarterly", "annually"]:
+      if len(self.value) != 2:
+        self.add_error(errors.WRONG_VALUE_ERROR,
+                       column_name=self.display_name)
+        return
+      self.row_converter.obj.relative_end_day = self.value[1]
+      self.row_converter.obj.relative_end_month = self.value[0]
+    else:
+      self.add_error(errors.WRONG_VALUE_ERROR,
+                     column_name=self.display_name)
+      return
 
 
 class TaskTypeColumnHandler(ColumnHandler):
@@ -290,6 +348,7 @@ class ObjectsColumnHandler(ColumnHandler):
   def set_value(self):
     pass
 
+
 class ExportOnlyColumnHandler(ColumnHandler):
 
   def parse_item(self):
@@ -322,6 +381,7 @@ class CycleWorkflowColumnHandler(ExportOnlyColumnHandler):
 
   def get_value(self):
     return self.row_converter.obj.workflow.slug
+
 
 class CycleColumnHandler(ExportOnlyColumnHandler):
 
