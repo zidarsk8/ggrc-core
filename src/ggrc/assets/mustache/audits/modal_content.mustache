@@ -19,7 +19,7 @@
               Program
             <span class="required">*</span>
             </label>
-            <input data-id="program_dd" type="text" class="input-block-level" name="program.id" tabindex="1" {{autocomplete_select}} data-lookup="Program" autofocus/>
+            <input data-id="program_dd" type="text" class="input-block-level" name="program.id" tabindex="1" data-permission-type="update" {{autocomplete_select}} data-lookup="Program" autofocus/>
           </div>
           {{#instance.computed_errors.program}}
             <label class="help-inline warning">
