@@ -39,3 +39,14 @@ class CustomAttributeValue(Base, db.Model):
       'attributable_type',
       'attribute_value'
   ]
+
+  @classmethod
+  def mk_filter_by_custom(cls, obj_class, custom_attribute_id):
+    def filter_by(predicate):
+      return cls.query.filter(
+          (cls.custom_attribute_id == custom_attribute_id) &
+          (cls.attributable_type == obj_class.__name__) &
+          (cls.attributable_id == obj_class.id) &
+          predicate(cls.attribute_value)
+      ).exists()
+    return filter_by
