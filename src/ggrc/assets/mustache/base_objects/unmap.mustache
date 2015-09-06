@@ -7,7 +7,7 @@
 
 {{#if options.allow_mapping}}
   {{#if options.mappings}}
-    {{#is_allowed_all 'delete' options.mappings}}
+    {{#is_allowed_to_map instance page_instance}}
       {{^is_dashboard}}
         <li class="border">
           <a href="javascript://" class="unmap" data-toggle="unmap">
