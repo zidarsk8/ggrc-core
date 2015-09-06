@@ -3073,7 +3073,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   audit = audits[0].instance.reify();
   programs = audit.get_mapping("_program");
   program = programs[0].instance.reify();
-  control = instance.control.reify();
+  control = instance.control ? instance.control.reify() : {};
 
   json = {
     audit: {title: audit.title, id: audit.id, type: audit.type},
