@@ -3,6 +3,7 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+import datetime
 from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
@@ -85,6 +86,7 @@ class QueryHelper(object):
     for object_query in query:
       filters = object_query.get("filters", {}).get("expression")
       self.clean_filters(filters)
+      self.macro_expand_object_query(object_query)
     return query
 
   def clean_filters(self, expression):
@@ -99,6 +101,52 @@ class QueryHelper(object):
     expression["ids"] = map(int, expression.get("ids", []))
     self.clean_filters(expression.get("left"))
     self.clean_filters(expression.get("right"))
+
+  def macro_expand_object_query(self, object_query):
+    def expand_task_dates(exp):
+      if type(exp) is not dict or "op" not in exp:
+        return
+      op = exp["op"]["name"]
+      if op in ["AND", "OR"]:
+        expand_task_dates(exp["left"])
+        expand_task_dates(exp["right"])
+      elif type(exp["left"]) in [str, unicode]:
+        key = exp["left"]
+        if key in ["start", "end"]:
+          parts = exp["right"].split("/")
+          if len(parts) == 3:
+            try:
+              month, day, year = map(int, parts)
+            except Exception:
+              raise BadQueryException("Date must consist of numbers")
+            exp["left"] = key + "_date"
+            exp["right"] = datetime.date(year, month, day)
+          elif len(parts) == 2:
+            month, day = parts
+            exp["op"] = {"name": u"AND"}
+            exp["left"] = {
+                "op": {"name": op},
+                "left": "relative_" + key + "_month",
+                "right": month,
+            }
+            exp["right"] = {
+                "op": {"name": op},
+                "left": "relative_" + key + "_day",
+                "right": day,
+            }
+          elif len(parts) == 1:
+            exp["left"] = "relative_" + key + "_day"
+          else:
+            raise BadQueryException("Field {} should be a date of one of the"
+                                    " following forms: DD, MM/DD, MM/DD/YYYY"
+                                    .format(key))
+
+    if object_query["object_name"] == "TaskGroupTask":
+      filters = object_query.get("filters")
+      if filters is not None:
+        keys = filters.get("keys", [])
+        if "start" in keys or "end" in keys:
+          expand_task_dates(filters.get("expression"))
 
   def get_ids(self):
     """ get list of objects and their ids according to the query
