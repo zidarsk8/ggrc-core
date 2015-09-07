@@ -123,18 +123,13 @@ class TaskDateColumnHandler(ColumnHandler):
     """ parse start and end columns fow workflow tasks
     """
     raw_parts = self.raw_value.lower().split(" ")
-    if len(raw_parts) == 2:
-      quarter_name, day = raw_parts
-      for month, quarter in self.quarterly_names.items():
-        if quarter.lower() == quarter_name:
-          try:
-            return [month, int(day)]
-          except ValueError:
-            self.add_error(errors.WRONG_VALUE_ERROR,
-                           column_name=self.display_name)
-            return
-    raw_parts = self.raw_value.split("/")
     try:
+      if len(raw_parts) == 2:
+        quarter_name, day = raw_parts
+        for month, quarter in self.quarterly_names.items():
+          if quarter.lower() == quarter_name:
+            return [month, int(day)]
+      raw_parts = self.raw_value.split("/")
       return map(int, raw_parts)
     except ValueError:
       self.add_error(errors.WRONG_VALUE_ERROR,
