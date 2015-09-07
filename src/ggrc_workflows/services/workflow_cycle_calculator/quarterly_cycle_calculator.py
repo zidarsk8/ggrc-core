@@ -50,12 +50,31 @@ class QuarterlyCycleCalculator(CycleCalculator):
     First we ensure that we have both relative_day and relative_month or,
     alternatively, that relative_day carries month information as well.
 
-    While task_date_range calls with explicit relative_month, reified_tasks
-    stores relative days as MM/DD and we must first convert these values so
-    that it can sort and get min and max values for tasks.
+    To convert from relative month and day to reified date we use a
+    transformation matrix with another shifting vector to convert from modulo
+    result to the correct column index (because modulo result 1 2 0 shifts to
+    the right to become 0 1 2).
 
-    Afterwards we must the LARGEST month for a specified quarter option that
-    is SMALLER than base_date's month.
+     index:  0  1  2 |  0  1  2 |  0  1  2 |  0  1  2
+     month:  1  2  3 |  4  5  6 |  7  8  9 | 10 11 12
+     x % 3:  1  2  0 |  1  2  0 |  1  2  0 |  1  2  0
+     -------------------- SHIFT ---------------------
+        1:   0 -1 -2 |  0 -1 -2 |  0 -1 -2 |  0 -1 -2
+        2:  -2  0 -1 | -2  0 -1 | -2  0 -1 | -2  0 -1
+        3:  -1 -2  0 | -1 -2  0 | -1 -2  0 | -1 -2  0
+
+    Rows (1, 2, 3) being date domain options and values being number of months
+    to shift depending on the on current date. E.g., for second date domain and
+    value 2/15 on January 6th the reified value is November 15th the year
+    before, that's why we have to subtract two months from today (base date).
+    Because it's actually LESS than today, next cycle start date will be moved
+    to February 15, but that is handled by higher-level logic.
+
+    T = [
+      [0, -1, -2],
+      [-2, 0, -1],
+      [-1, -2, 0]
+    ]
 
     Afterwards we repeat the math similar to monthly cycle calculator and
     ensure that the day is not overflowing to the next month.
@@ -65,22 +84,15 @@ class QuarterlyCycleCalculator(CycleCalculator):
 
     base_date = self.get_base_date(base_date)
 
-    # relative_month is 1, 2 or 3 and represents quarterly option, based
-    # on which we select the month domain. Month is then the LARGEST
-    # number from all the months that were before base_date.month - except
-    # at the end of the year when quarter can overflow to next year. In such
-    # case it is the MINIMUM.
-    month_domain = self.date_domain[relative_month]
-    domain = filter(lambda x: x <= base_date.month, month_domain)
-    if len(domain):
-      month = max(filter(lambda x: x <= base_date.month, month_domain))
-    else:
-      month = min(month_domain)
+    T = [[0, -1, -2], [-2, 0, -1], [-1, -2, 0]]
+    index_T = {0:2, 2:1, 1:0}
+    month_shift = T[relative_month-1][index_T[base_date.month % 3]]
 
-    start_month = datetime.date(base_date.year, month, 1)
-    ddate = start_month + relativedelta.relativedelta(days=relative_day - 1)
+    start_date = (datetime.date(base_date.year, base_date.month, 1) +
+                  relativedelta.relativedelta(months=month_shift))
+    ddate = start_date + relativedelta.relativedelta(days=relative_day - 1)
 
     # We want to go up to the end of the month and not over
-    if ddate.month != start_month.month:
+    if ddate.month != start_date.month:
       ddate = ddate - relativedelta.relativedelta(days=ddate.day)
     return ddate
