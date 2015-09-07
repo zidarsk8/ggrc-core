@@ -8,6 +8,7 @@ from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
 
+from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_importables
@@ -80,6 +81,19 @@ class QueryHelper(object):
         if value:
           self.attr_name_map[object_class][value.lower()] = (key.lower(),
                                                              filter_by)
+      custom_attrs = AttributeInfo.get_custom_attr_definitions(object_class)
+      for key, definition in custom_attrs.items():
+        if not key.startswith("__custom__:") or \
+           "display_name" not in definition:
+          continue
+        try:
+          attr_id = int(key[11:])
+        except Exception:
+          continue
+        filter_by = CustomAttributeValue.mk_filter_by_custom(object_class,
+                                                             attr_id)
+        name = definition["display_name"].lower()
+        self.attr_name_map[object_class][name] = (name, filter_by)
 
   def clean_query(self, query):
     """ sanitize the query object """

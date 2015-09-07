@@ -1115,16 +1115,32 @@ can.Model("can.Model.Cacheable", {
     mappings = mappings || this.class.filter_mappings;
 
     var values = {},
+        custom_attrs = {},
+        custom_attr_ids = {},
         long_title = this.type.toLowerCase() + " title";
+
+    if (!this.custom_attribute_definitions) {
+      this.load_custom_attribute_definitions();
+    }
+    this.custom_attribute_definitions.each(function (definition) {
+      custom_attr_ids[definition.id] = definition.title.toLowerCase();
+    });
+    if (!this.custom_attributes) {
+      this.setup_custom_attributes();
+    }
+    this.custom_attribute_values.each(function (custom_attr) {
+      custom_attr = custom_attr.reify();
+      custom_attrs[custom_attr_ids[custom_attr.custom_attribute_id]] =
+        custom_attr.attribute_value;
+    });
 
     if (!mappings[long_title]){
       mappings[long_title] = "title";
     }
-    keys = _.union(keys, long_title, _.keys(mappings));
+    keys = _.union(keys, long_title, _.keys(mappings), _.keys(custom_attrs));
     $.each(keys, function(index, key) {
-      var val = mappings[key] ?
-        this[mappings[key]] :
-        this[key];
+      var attr_key = mappings[key] || key,
+          val = this[attr_key] || custom_attrs[attr_key];
 
       if (val !== undefined && val !== null){
         if (key == 'owner' || key == 'owners'){
