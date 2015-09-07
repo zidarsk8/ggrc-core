@@ -4,14 +4,15 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
+from ggrc.models.context import HasOwnContext
+from ggrc.models.mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
+from ggrc.models.object_document import Documentable
+from ggrc.models.object_owner import Ownable
+from ggrc.models.object_person import Personable, ObjectPerson
+from ggrc.models.person import Person
 from ggrc.models.reflection import AttributeInfo
-from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
-from .object_document import Documentable
-from .object_owner import Ownable
-from .object_person import Personable
-from .relationship import Relatable
-from .context import HasOwnContext
-from .track_object_state import HasObjectState, track_state_for_class
+from ggrc.models.relationship import Relatable
+from ggrc.models.track_object_state import HasObjectState, track_state_for_class
 
 
 class Program(HasObjectState, CustomAttributable, Documentable,
@@ -57,6 +58,7 @@ class Program(HasObjectState, CustomAttributable, Documentable,
       "program_mapped": {
           "display_name": "No Access",
           "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_program_mapped",
       },
   }
 
@@ -71,6 +73,14 @@ class Program(HasObjectState, CustomAttributable, Documentable,
   @classmethod
   def _filter_by_program_reader(cls, predicate):
     return cls._filter_by_role("ProgramReader", predicate)
+
+  @classmethod
+  def _filter_by_program_mapped(cls, predicate):
+    return ObjectPerson.query.join(Person).filter(
+      (ObjectPerson.personable_type == "Program") &
+      (ObjectPerson.personable_id == cls.id) &
+      (predicate(Person.email) | predicate(Person.name))
+    ).exists()
 
   @classmethod
   def eager_query(cls):

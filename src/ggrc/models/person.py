@@ -3,17 +3,16 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
+import re
+from sqlalchemy.orm import validates
+
 from ggrc.app import app, db
 from ggrc.models.computed_property import computed_property
-
-from sqlalchemy.orm import validates
-from .mixins import deferred, Base, CustomAttributable
-from .reflection import PublishOnly
-from .utils import validate_option
-from .exceptions import ValidationError
-from .context import HasOwnContext
-
-import re
+from ggrc.models.context import HasOwnContext
+from ggrc.models.exceptions import ValidationError
+from ggrc.models.mixins import deferred, Base, CustomAttributable
+from ggrc.models.reflection import PublishOnly
+from ggrc.models.utils import validate_option
 
 
 class Person(CustomAttributable, HasOwnContext, Base, db.Model):
@@ -71,8 +70,18 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
       "user_role": {
           "display_name": "Role",
           "type": "user_role",
+          "filter_by": "_filter_by_user_role",
       },
   }
+
+  @classmethod
+  def _filter_by_user_role(cls, predicate):
+    from ggrc_basic_permissions.models import Role, UserRole
+    return UserRole.query.join(Role).filter(
+        (UserRole.person_id == cls.id) &
+        (UserRole.context_id == None) &
+        predicate(Role.name)
+    ).exists()
 
   # Methods required by Flask-Login
   def is_authenticated(self):
