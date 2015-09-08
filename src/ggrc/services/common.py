@@ -997,61 +997,84 @@ class Resource(ModelView):
     pass
 
   def collection_post(self):
-    if self.request.mimetype != 'application/json':
-      return current_app.make_response((
-          'Content-Type must be application/json', 415, []))
-    obj = self.model()
-    src = UnicodeSafeJsonWrapper(self.request.json)
-    root_attribute = self.model._inflector.table_singular
     try:
-      src = src[root_attribute]
-    except KeyError, e:
-      return current_app.make_response((
-          'Required attribute "{0}" not found'.format(
-              root_attribute), 400, []))
-    with benchmark("Query create permissions"):
-      if not permissions.is_allowed_create(self.model.__name__, None,
-                                           self.get_context_id_from_json(src)):
-        raise Forbidden()
+      if self.request.mimetype != 'application/json':
+        return current_app.make_response((
+            'Content-Type must be application/json', 415, []))
+      obj = self.model()
+      src = UnicodeSafeJsonWrapper(self.request.json)
+      root_attribute = self.model._inflector.table_singular
+      try:
+        src = src[root_attribute]
+      except KeyError, e:
+        return current_app.make_response((
+            'Required attribute "{0}" not found'.format(
+                root_attribute), 400, []))
+      with benchmark("Query create permissions"):
+        if not permissions.is_allowed_create(self.model.__name__, None,
+                                             self.get_context_id_from_json(src)):
+          raise Forbidden()
 
-    if src.get('private') == True and src.get('context') is not None \
-        and src['context'].get('id') is not None:
-      raise BadRequest(
-          'context MUST be "null" when creating a private resource.')
-    elif 'context' not in src:
-      raise BadRequest('context MUST be specified.')
+      if src.get('private') == True and src.get('context') is not None \
+          and src['context'].get('id') is not None:
+        raise BadRequest(
+            'context MUST be "null" when creating a private resource.')
+      elif 'context' not in src:
+        raise BadRequest('context MUST be specified.')
 
-    with benchmark("Deserialize object"):
-      self.json_create(obj, src)
-    with benchmark("Query create permissions"):
-      if not permissions.is_allowed_create_for(obj):
-        # json_create sometimes adds objects to session, so we need to
-        # make sure the session is cleared
-        db.session.expunge_all()
-        raise Forbidden()
-    with benchmark("Send model POSTed event"):
-      self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
-    obj.modified_by_id = get_current_user_id()
-    db.session.add(obj)
-    with benchmark("Get modified objects"):
-      modified_objects = get_modified_objects(db.session)
-    with benchmark("Update custom attribute values"):
-      set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
-    with benchmark("Log event"):
-      log_event(db.session, obj)
-    with benchmark("Update memcache before commit for resource collection POST"):
-      update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
-    with benchmark("Commit"):
-      db.session.commit()
-    with benchmark("Update index"):
-      update_index(db.session, modified_objects)
-    with benchmark("Update memcache after commit for resource collection POST"):
-      update_memcache_after_commit(self.request)
-    with benchmark("Serialize object"):
-      object_for_json = self.object_for_json(obj)
-    with benchmark("Make response"):
-      return self.json_success_response(
-          object_for_json, self.modified_at(obj), id=obj.id, status=201)
+      with benchmark("Deserialize object"):
+        self.json_create(obj, src)
+      with benchmark("Query create permissions"):
+        if not permissions.is_allowed_create_for(obj):
+          # json_create sometimes adds objects to session, so we need to
+          # make sure the session is cleared
+          db.session.expunge_all()
+          raise Forbidden()
+      with benchmark("Send model POSTed event"):
+        self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
+      obj.modified_by_id = get_current_user_id()
+      db.session.add(obj)
+      with benchmark("Get modified objects"):
+        modified_objects = get_modified_objects(db.session)
+      with benchmark("Update custom attribute values"):
+        set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
+      with benchmark("Log event"):
+        log_event(db.session, obj)
+      with benchmark("Update memcache before commit for resource collection POST"):
+        update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
+      with benchmark("Commit"):
+        db.session.commit()
+      with benchmark("Update index"):
+        update_index(db.session, modified_objects)
+      with benchmark("Update memcache after commit for resource collection POST"):
+        update_memcache_after_commit(self.request)
+      with benchmark("Serialize object"):
+        object_for_json = self.object_for_json(obj)
+      with benchmark("Make response"):
+        return self.json_success_response(
+            object_for_json, self.modified_at(obj), id=obj.id, status=201)
+    except IntegrityError as e:
+      msg = e.orig.args[1]
+      if obj.type == "Relationship" and \
+          msg.startswith("Duplicate entry") and \
+          msg.endswith("'uq_relationships'"):
+        R = obj.__class__
+        db.session.rollback()
+        obj = R.query.filter(
+           ((R.source_type==obj.source_type) &
+            (R.source_id==obj.source_id) &
+            (R.destination_type==obj.destination_type) &
+            (R.destination_id==obj.destination_id)) |
+           ((R.source_type==obj.destination_type) &
+            (R.source_id==obj.destination_id) &
+            (R.destination_type==obj.source_type) &
+            (R.destination_id==obj.source_id))
+        ).first()
+        object_for_json = self.object_for_json(obj)
+        return self.json_success_response(object_for_json,
+                                          self.modified_at(obj),
+                                          id=obj.id, status=200)
+      raise e
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):

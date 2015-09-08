@@ -3,13 +3,20 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+import datetime
 from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
+import datetime
 
+from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_importables
+
+
+class BadQueryException(Exception):
+  pass
 
 
 class QueryHelper(object):
@@ -75,12 +82,26 @@ class QueryHelper(object):
         if value:
           self.attr_name_map[object_class][value.lower()] = (key.lower(),
                                                              filter_by)
+      custom_attrs = AttributeInfo.get_custom_attr_definitions(object_class)
+      for key, definition in custom_attrs.items():
+        if not key.startswith("__custom__:") or \
+           "display_name" not in definition:
+          continue
+        try:
+          attr_id = int(key[11:])
+        except Exception:
+          continue
+        filter_by = CustomAttributeValue.mk_filter_by_custom(object_class,
+                                                             attr_id)
+        name = definition["display_name"].lower()
+        self.attr_name_map[object_class][name] = (name, filter_by)
 
   def clean_query(self, query):
     """ sanitize the query object """
     for object_query in query:
       filters = object_query.get("filters", {}).get("expression")
       self.clean_filters(filters)
+      self.macro_expand_object_query(object_query)
     return query
 
   def clean_filters(self, expression):
@@ -95,6 +116,52 @@ class QueryHelper(object):
     expression["ids"] = map(int, expression.get("ids", []))
     self.clean_filters(expression.get("left"))
     self.clean_filters(expression.get("right"))
+
+  def macro_expand_object_query(self, object_query):
+    def expand_task_dates(exp):
+      if type(exp) is not dict or "op" not in exp:
+        return
+      op = exp["op"]["name"]
+      if op in ["AND", "OR"]:
+        expand_task_dates(exp["left"])
+        expand_task_dates(exp["right"])
+      elif type(exp["left"]) in [str, unicode]:
+        key = exp["left"]
+        if key in ["start", "end"]:
+          parts = exp["right"].split("/")
+          if len(parts) == 3:
+            try:
+              month, day, year = map(int, parts)
+            except Exception:
+              raise BadQueryException("Date must consist of numbers")
+            exp["left"] = key + "_date"
+            exp["right"] = datetime.date(year, month, day)
+          elif len(parts) == 2:
+            month, day = parts
+            exp["op"] = {"name": u"AND"}
+            exp["left"] = {
+                "op": {"name": op},
+                "left": "relative_" + key + "_month",
+                "right": month,
+            }
+            exp["right"] = {
+                "op": {"name": op},
+                "left": "relative_" + key + "_day",
+                "right": day,
+            }
+          elif len(parts) == 1:
+            exp["left"] = "relative_" + key + "_day"
+          else:
+            raise BadQueryException("Field {} should be a date of one of the"
+                                    " following forms: DD, MM/DD, MM/DD/YYYY"
+                                    .format(key))
+
+    if object_query["object_name"] == "TaskGroupTask":
+      filters = object_query.get("filters")
+      if filters is not None:
+        keys = filters.get("keys", [])
+        if "start" in keys or "end" in keys:
+          expand_task_dates(filters.get("expression"))
 
   def get_ids(self):
     """ get list of objects and their ids according to the query
@@ -115,9 +182,25 @@ class QueryHelper(object):
       return set()
     object_class = self.object_map[object_name]
 
+    def autocast(o_key, value):
+      if type(o_key) is not str:
+        return value
+      key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
+      # handle dates
+      if key in ["start_date", "end_date"]:
+        try:
+          month, day, year = map(int, value.split("/"))
+          return datetime.date(year, month, day)
+        except Exception:
+          raise BadQueryException("Field \"{}\" expects a MM/DD/YYYY date"
+                                  .format(o_key))
+      # fallback
+      return value
+
     def build_expression(exp):
       if "op" not in exp:
         return None
+
       def relevant():
         query = (self.query[exp["ids"][0]]
                  if exp["object_name"] == "__previous__" else exp)
@@ -129,45 +212,60 @@ class QueryHelper(object):
             )
         )
 
-      text_search = lambda: or_(
-          *(getattr(object_class, field).ilike("%{}%".format(exp["text"]))
-            for field in object_query.get("fields", [])
-            if hasattr(object_class, field))
-      )
+      def unknown():
+        raise BadQueryException("Unknown operator \"{}\""
+                                .format(exp["op"]["name"]))
 
-      def with_left(p):
-        key = exp["left"].lower()
+      def with_key(key, p):
+        key = key.lower()
         key, filter_by = self.attr_name_map[object_class].get(key, (key, None))
         if hasattr(filter_by, "__call__"):
           return filter_by(p)
         else:
           attr = getattr(object_class, key, None)
           if attr is None:
-            raise Exception("Bad search query: object '{}' does not have "
-                            "attribute '{}'.".format(object_class.__name__, key))
+            raise BadQueryException("Bad query: object '{}' does "
+                                    "not have attribute '{}'."
+                                    .format(object_class.__name__, key))
           return p(attr)
+
+      with_left = lambda p: with_key(exp["left"], p)
 
       lift_bin = lambda f: f(build_expression(exp["left"]),
                              build_expression(exp["right"]))
 
+      def text_search():
+        existing_fields = self.attr_name_map[object_class]
+        text = "%{}%".format(exp["text"])
+        p = lambda f: f.ilike(text)
+        return or_(*(
+            with_key(field, p)
+            for field in object_query.get("fields", [])
+            if field in existing_fields
+        ))
+
+      rhs = lambda: autocast(exp["left"], exp["right"])
+
       ops = {
-        "AND": lambda: lift_bin(and_),
-        "OR": lambda: lift_bin(or_),
-        "=": lambda: with_left(lambda l: l == exp["right"]),
-        "!=": lambda: not_(with_left(lambda l: l == exp["right"])),
-        "~": lambda: with_left(lambda l: l.ilike("%{}%".format(exp["right"]))),
-        "!~": lambda: not_(with_left(lambda l: l.ilike("%{}%".format(exp["right"])))),
-        "relevant": relevant,
-        "text_search": text_search
+          "AND": lambda: lift_bin(and_),
+          "OR": lambda: lift_bin(or_),
+          "=": lambda: with_left(lambda l: l == rhs()),
+          "!=": lambda: not_(with_left(
+                             lambda l: l == rhs())),
+          "~": lambda: with_left(lambda l:
+                                 l.ilike("%{}%".format(rhs()))),
+          "!~": lambda: not_(with_left(
+                             lambda l: l.ilike("%{}%".format(rhs())))),
+          "relevant": relevant,
+          "text_search": text_search
       }
 
-      return ops.get(exp["op"]["name"], lambda: None)()
+      return ops.get(exp["op"]["name"], unknown)()
 
     query = object_class.query
     filter_expression = build_expression(expression)
     if filter_expression is not None:
       query = query.filter(filter_expression)
-    objects = query.all()
     object_ids = [o.id for o in query.all()]
     return object_ids
 

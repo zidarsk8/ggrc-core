@@ -117,14 +117,20 @@
       if (object) {
         data["object"] = object;
       }
+
+      type = CMS.Models[type] && type;
       if (!data["search_only"]) {
-        if (id === GGRC.page_instance().id || !tree_view) {
-          data["type"] = CMS.Models[type] ? type : "AllObject";
+        if (type) {
+          data["type"] = type;
+        } else if (id === GGRC.page_instance().id || !tree_view) {
+          data["type"] = "AllObject";
         } else {
           data["type"] = tree_view.display_list[0];
         }
       }
-      data["join_object_id"] = id || GGRC.page_instance().id;
+      if (id || GGRC.page_instance()) {
+        data["join_object_id"] = id || GGRC.page_instance().id;
+      }
       return {
         mapper: new MapperModel(data)
       };
@@ -479,7 +485,9 @@
             __permission_model: join_model
           };
         }
-        data.options.__permission_type = data.options.__permission_type || "update";
+        if (join_model !== "ObjectPerson") {
+          data.options.__permission_type = data.options.__permission_type || "update";
+        }
         data.model_name = _.isString(data.model_name) ? [data.model_name] : data.model_name;
 
         return GGRC.Models.Search.search_for_types(data.term || "", data.model_name, data.options);

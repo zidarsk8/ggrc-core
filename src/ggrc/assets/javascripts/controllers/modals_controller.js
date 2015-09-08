@@ -934,10 +934,10 @@ can.Component.extend({
         .get_binding(this.scope.source_mapping)
         .refresh_instances()
         .then(function (list) {
-          that.scope.attr("list", can.map(list, function (binding) {
-                return binding.instance;
-              }));
-        });
+          this.scope.attr("list", can.map(list, function (binding) {
+            return binding.instance;
+          }));
+        }.bind(this));
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
         key = this.scope.instance_attr + "_" + (this.scope.mapping || this.scope.source_mapping);
@@ -954,10 +954,9 @@ can.Component.extend({
 
       this.options.parent_instance = this.scope.parent_instance;
       this.options.instance = this.scope.instance;
-      setTimeout(this.set_user_as_owner.bind(this), 0);
       this.on();
     },
-    set_user_as_owner: function () {
+    "{scope} list": function () {
       // Workaround so we render pre-defined users.
       if (~['owners'].indexOf(this.scope.mapping) && this.scope.list && !this.scope.list.length) {
         var person = CMS.Models.Person.findInCacheById(GGRC.current_user.id);

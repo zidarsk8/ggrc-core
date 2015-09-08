@@ -5,7 +5,11 @@
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy import and_, or_
 from .mixins import deferred, Base, Described, Titled, Slugged
+from ggrc.models.person import Person
+from ggrc.models.audit import Audit
+from ggrc.models.audit_object import AuditObject
 
 class Request(Titled, Slugged, Described, Base, db.Model):
   __tablename__ = 'requests'
@@ -62,9 +66,18 @@ class Request(Titled, Slugged, Described, Base, db.Model):
   ]
 
   _aliases = {
-    "assignee": "Assignee",
-    "audit_object": "Request Object",
-    "request_audit": "Audit",
+    "assignee": {
+      "display_name": "Assignee",
+      "filter_by": "_filter_by_assignee",
+    },
+    "audit_object": {
+      "display_name": "Request Object",
+      "filter_by": "_filter_by_audit_object",
+    },
+    "request_audit": {
+      "display_name": "Audit",
+      "filter_by": "_filter_by_request_audit",
+    },
     "due_on": "Due On",
     "notes": "Notes",
     "request_type": "Request Type",
@@ -94,3 +107,40 @@ class Request(Titled, Slugged, Described, Base, db.Model):
       orm.joinedload('audit'),
       orm.joinedload('audit_object'),
       orm.subqueryload('responses'))
+
+  @classmethod
+  def _filter_by_assignee(cls, predicate):
+    return cls.query.filter(
+      (Person.id == cls.assignee_id) &
+      (predicate(Person.name) | predicate(Person.email))
+    ).exists()
+
+  @classmethod
+  def _filter_by_request_audit(cls, predicate):
+    return cls.query.filter(
+      (Audit.id == cls.audit_id) &
+      (predicate(Audit.slug) | predicate(Audit.title))
+    ).exists()
+
+  @classmethod
+  def _filter_by_audit_object(cls, predicate):
+    from ggrc.models import all_models
+    queries = []
+    for model_name in all_models.__all__:
+      model = getattr(all_models, model_name)
+      if not hasattr(model, "query"):
+        continue
+      fields = []
+      for field_name in ["slug", "title", "name", "email"]:
+        if hasattr(model, field_name):
+          fields.append(getattr(model, field_name))
+      if len(fields) > 0:
+        queries.append(model.query.filter(
+            (AuditObject.auditable_type == model.__name__) &
+            or_(*map(predicate, fields))
+        ).exists())
+    return AuditObject.query.filter(
+        (AuditObject.id == cls.audit_object_id) &
+        or_(*queries)
+    ).exists()
+

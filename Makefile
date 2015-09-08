@@ -142,7 +142,8 @@ src/app.yaml : src/app.yaml.dist
 		APPENGINE_EMAIL="$(APPENGINE_EMAIL)" \
 		CUSTOM_URL_ROOT="$(CUSTOM_URL_ROOT)" \
 		INSTANCE_CLASS="$(INSTANCE_CLASS)" \
-		MAX_INSTANCES="$(MAX_INSTANCES)"
+		MAX_INSTANCES="$(MAX_INSTANCES)" \
+		AUTHORIZED_DOMAINS="$(AUTHORIZED_DOMAINS)"
 
 deploy : appengine_packages_zip src/ggrc/static/assets.manifest src/app.yaml
 

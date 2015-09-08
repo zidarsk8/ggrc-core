@@ -6,7 +6,7 @@
 }}
 
 {{!div class="modal-body"}}
-<div class="hideable-holder"> 
+<div class="hideable-holder">
 {{#instance}}
 <form action="javascript://">
   {{> /static/mustache/base_objects/form_restore.mustache}}
@@ -30,7 +30,7 @@
           <span class="required">*</span>
           <i class="grcicon-help-black" rel="tooltip" title="Policy / Regulation / Standard containing this Section"></i>
         </label>
-        <input tabindex="2" class="input-block-level" name="directive.title" data-lookup="Policy,Regulation,Standard" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Policy / Regulation / Standard" type="text" value="{{firstexist directive.title ''}}" />
+        <input tabindex="2" class="input-block-level" name="directive.title" data-lookup="Policy,Regulation,Standard" data-permission-type="update" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Policy / Regulation / Standard" type="text" value="{{firstexist directive.title ''}}" />
         {{/using}}
       {{else}}
         &nbsp;
@@ -51,7 +51,7 @@
       </div>
     </div>
 
-    <div class="span6 hide-wrap hidable">      
+    <div class="span6 hide-wrap hidable">
       <div class="row-fluid inner-hide">
         <div data-id="owner_hidden" class="span12 hidable bottom-spacing">
           {{> /static/mustache/people/owners_modal_connector.mustache}}
@@ -60,7 +60,7 @@
       {{> /static/mustache/base_objects/modal_contact_fields.mustache}}
     </div>
   </div>
-  
+
   <div class="row-fluid">
     <div data-id="note_hidden" class="span6 hidable">
       <label>
@@ -96,7 +96,7 @@
     </div>
   </div>
 
-  
+
   <div>
     <div class="row-fluid">
       <div data-id="code_hidden" class="span6 hidable">
@@ -120,7 +120,7 @@
           {{/iterate}}
         </select>
       </div>
-    </div>   
+    </div>
   </div>
 </form>
 {{/instance}}

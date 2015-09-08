@@ -11,11 +11,18 @@
     template: can.view(GGRC.mustache_path + "/mapper/relevant_filter.mustache"),
     scope: {
       relevant_menu_item: "@",
+      show_all: "@",
       menu: can.compute(function () {
         var type = this.attr("type"),
+            showAll = /true/i.test(this.attr("show_all")),
             isAll = type === "AllObject",
             mappings;
 
+        if (showAll) {
+          return _.sortBy(_.compact(_.map(_.toArray(CMS.Models), function (model) {
+            return model.model_singular && model;
+          })), "model_singular");
+        }
         if (this.attr("search_only") && isAll) {
           mappings = GGRC.tree_view.base_widgets_by_type;
         } else {
@@ -23,15 +30,12 @@
           mappings = GGRC.Mappings.get_canonical_mappings_for(type);
         }
 
-        return _.map(_.keys(mappings), function (mapping) {
+        return _.sortBy(_.compact(_.map(_.keys(mappings), function (mapping) {
           return CMS.Models[mapping];
-        });
+        })), "model_singular");
       })
     },
     events: {
-      "{scope.relevant} change": function (list, ev, item, which, state, prevState) {
-        this.scope.attr("has_parent", _.findWhere(this.scope.attr("relevant"), {model_name: "__previous__"}));
-      },
       ".add-filter-rule click": function (el, ev) {
         ev.preventDefault();
         var menu = this.scope.attr("menu");
@@ -63,6 +67,7 @@
         this.scope.attr("relevant").splice(el.data("index"), 1);
       },
       "{scope.relevant} change": function (list, item, which, type, val, oldVal) {
+        this.scope.attr("has_parent", _.findWhere(this.scope.attr("relevant"), {model_name: "__previous__"}));
         if (!/model_name/gi.test(which)) {
           return;
         }

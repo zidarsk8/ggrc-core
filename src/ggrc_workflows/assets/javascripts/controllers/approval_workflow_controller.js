@@ -13,6 +13,7 @@ GGRC.Controllers.Modals("GGRC.Controllers.ApprovalWorkflow", {
     new_object_form: true,
     model: CMS.ModelHelpers.ApprovalWorkflow,
     modal_title: "Submit for review",
+    custom_save_button_text: "Submit",
     content_view: GGRC.mustache_path + "/wf_objects/approval_modal_content.mustache",
     button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
   }
@@ -63,7 +64,7 @@ jQuery(function($){
     var calenderAuthWin = null,
       href = window.location.origin + "/calendar_oauth_request", //"https://ggrc-dev.googleplex.com/calendar_oauth_request"
       name = "Calendar Authentication";
-    
+
     if(calenderAuthWin === null || calenderAuthWin.closed){
       calenderAuthWin = window.open(href, name);
       calenderAuthWin.focus();
@@ -71,5 +72,5 @@ jQuery(function($){
     else{
       calenderAuthWin.focus();
     }
-  }); 
+  });
 });

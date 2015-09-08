@@ -56,3 +56,8 @@ CALENDAR_MECHANISM = False
 MAX_INSTANCES = os.environ.get('MAX_INSTANCES', '3')
 
 exports = ['VERSION', 'MAX_INSTANCES']
+
+# Users with authorized domains will automatically get Creator role.
+# After parsing, AUTHORIZED_DOMAINS must be set of strings.
+AUTHORIZED_DOMAINS = {
+  d.strip() for d in os.environ.get('AUTHORIZED_DOMAINS', "").split(",")}

@@ -11,8 +11,8 @@
           {{#if instance.viewLink}}
             {{#is_allowed "view_object_page" instance}}
               <a href="{{instance.viewLink}}" class="info-action">
-                View {{instance.class.title_singular}}
                 <i class="grcicon-goto"></i>
+                View {{instance.class.title_singular}}
               </a>
             {{/is_allowed}}
           {{/if}}
@@ -32,8 +32,8 @@
           {{/is_allowed_all}}
           {{/if}}
           {{> /static/mustache/base_objects/edit_object_link.mustache}}
-          </div>         
-       
+          </div>
+
         </div>
 
         <!-- description -->
@@ -48,4 +48,4 @@
           </div>
         </div>
         {{/instance.description}}
-        
+

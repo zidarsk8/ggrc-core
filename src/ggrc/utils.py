@@ -9,7 +9,7 @@ import json
 import sys
 import time
 from flask import current_app, request
-from settings import custom_url_root
+from settings import CUSTOM_URL_ROOT
 
 
 class GrcEncoder(json.JSONEncoder):
@@ -133,8 +133,8 @@ def merge_dicts(*args):
 
 
 def get_url_root():
-  if custom_url_root is not None:
-    return custom_url_root
+  if CUSTOM_URL_ROOT is not None:
+    return CUSTOM_URL_ROOT
   return request.url_root
 
 

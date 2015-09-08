@@ -28,7 +28,7 @@
           <span class="required">*</span>
           <i class="grcicon-help-black" rel="tooltip" title="Control for this Control Assessment"></i>
         </label>
-        <input tabindex="2" class="input-block-level" name="control.title" data-lookup="Control" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Control" type="text" value="{{firstexist control.title ''}}" />
+        <input tabindex="2" class="input-block-level" name="control.title" data-permission-type="update" data-lookup="Control" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Control" type="text" value="{{firstexist control.title ''}}" />
     </div>
     <div class="span3">
         <label>
@@ -36,7 +36,7 @@
           <span class="required">*</span>
           <i class="grcicon-help-black" rel="tooltip" title="Audit for this Control Assessment"></i>
         </label>
-        <input tabindex="2" class="input-block-level" name="audit.title" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" value="{{firstexist audit.title ''}}" />
+        <input tabindex="2" class="input-block-level" name="audit.title" data-permission-type="update" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" value="{{firstexist audit.title ''}}" />
     </div>
     {{else}}
       {{#with_mapping "related_controls" instance}}

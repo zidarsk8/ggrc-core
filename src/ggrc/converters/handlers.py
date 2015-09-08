@@ -509,6 +509,8 @@ class ProgramColumnHandler(ColumnHandler):
 
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
+    if not val:
+      return
     return val.slug
 
 

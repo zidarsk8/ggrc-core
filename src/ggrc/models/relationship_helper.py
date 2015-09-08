@@ -10,9 +10,12 @@ from ggrc import db
 from ggrc.extensions import get_extension_modules
 from ggrc import models
 from ggrc.models import Audit
+from ggrc.models import AuditObject
 from ggrc.models import Section
 from ggrc.models import Request
+from ggrc.models import Response
 from ggrc.models.relationship import Relationship
+from ggrc.models import all_models
 
 
 class RelationshipHelper(object):
@@ -25,10 +28,10 @@ class RelationshipHelper(object):
 
     if object_type == "Section" and related_type in directives:
       return db.session.query(Section.id).filter(
-        Section.directive_id.in_(related_ids))
+          Section.directive_id.in_(related_ids))
     elif related_type == "Section" and object_type in directives:
       return db.session.query(Section.directive_id).filter(
-        Section.id.in_(related_ids))
+          Section.id.in_(related_ids))
 
     return None
 
@@ -44,7 +47,6 @@ class RelationshipHelper(object):
       return db.session.query(Audit.id).filter(
           Audit.program_id.in_(related_ids))
 
-
   @classmethod
   def person_withcontact(cls, object_type, related_type, related_ids):
     object_model = getattr(models, object_type, None)
@@ -55,15 +57,15 @@ class RelationshipHelper(object):
       if issubclass(related_model, models.mixins.WithContact):
         return db.session.query(related_model.contact_id).filter(
             related_model.id.in_(related_ids)).union(
-              db.session.query(related_model.secondary_contact_id).filter(
-                related_model.id.in_(related_ids))
-            )
+            db.session.query(related_model.secondary_contact_id).filter(
+                related_model.id.in_(related_ids)))
       else:
         return None
     elif related_model == models.Person:
-      return db.session.query(object_model.id).filter(
-          object_model.contact_id.in_(related_ids) |
-          object_model.secondary_contact_id.in_(related_ids))
+      if issubclass(object_model, models.mixins.WithContact):
+        return db.session.query(object_model.id).filter(
+            object_model.contact_id.in_(related_ids) |
+            object_model.secondary_contact_id.in_(related_ids))
     else:
       return None
 
@@ -120,6 +122,56 @@ class RelationshipHelper(object):
           Request.assignee_id.in_(related_ids))
 
   @classmethod
+  def request_audit_object(cls, object_type, related_type, related_ids):
+    if object_type == "Request":
+      return db.session.query(Request.id).join(AuditObject).filter(
+          (AuditObject.auditable_type == related_type) &
+          AuditObject.auditable_id.in_(related_ids))
+    elif related_type == "Request":
+      return db.session.query(AuditObject.auditable_id).join(Request).filter(
+          (AuditObject.auditable_type == related_type) &
+          Request.id.in_(related_ids))
+    else:
+      return None
+
+  @classmethod
+  def request_response(cls, object_type, related_type, related_ids):
+    if {object_type, related_type} != {"Request", "Response"} or not related_ids:
+      return None
+    if object_type == "Request":
+      return db.session.query(Response.request_id).filter(
+          Response.id.in_(related_ids))
+    else:
+      return db.session.query(Response.id).filter(
+          Response.request_id.in_(related_ids))
+
+  @classmethod
+  def program_risk_assessment(cls, object_type, related_type, related_ids):
+    if {object_type, related_type} != {"Program", "RiskAssessment"} or not related_ids:
+      return None
+    if object_type == "Program":
+      return db.session.query(all_models.RiskAssessment.program_id).filter(
+          all_models.RiskAssessment.id.in_(related_ids))
+    else:
+      return db.session.query(all_models.RiskAssessment.id).filter(
+          all_models.RiskAssessment.program_id.in_(related_ids))
+
+  @classmethod
+  def task_group_object(cls, object_type, related_type, related_ids):
+    if not related_ids:
+      return None
+    if object_type == "TaskGroup":
+      return db.session.query(all_models.TaskGroupObject.task_group_id).filter(
+          (all_models.TaskGroupObject.object_type == related_type) &
+          all_models.TaskGroupObject.object_id.in_(related_ids))
+    elif related_type == "TaskGroup":
+      return db.session.query(all_models.TaskGroupObject.object_id).filter(
+          (all_models.TaskGroupObject.object_type == related_type) &
+          all_models.TaskGroupObject.task_group_id.in_(related_ids))
+    else:
+      return None
+
+  @classmethod
   def get_special_mappings(cls, object_type, related_type, related_ids):
     return [
         cls.audit_request(object_type, related_type, related_ids),
@@ -127,8 +179,12 @@ class RelationshipHelper(object):
         cls.person_ownable(object_type, related_type, related_ids),
         cls.person_withcontact(object_type, related_type, related_ids),
         cls.program_audit(object_type, related_type, related_ids),
+        cls.program_risk_assessment(object_type, related_type, related_ids),
         cls.request_assignee(object_type, related_type, related_ids),
+        cls.request_audit_object(object_type, related_type, related_ids),
+        cls.request_response(object_type, related_type, related_ids),
         cls.section_directive(object_type, related_type, related_ids),
+        cls.task_group_object(object_type, related_type, related_ids),
     ]
 
   @classmethod
