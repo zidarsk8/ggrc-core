@@ -339,4 +339,15 @@
   h1 {
     width: 28%;
   }
+  .header-content {
+    .menu {
+      li {
+        a {
+          span {
+            display: none;
+          }
+        }
+      }
+    }
+  }
 }
