@@ -178,7 +178,8 @@ class TaskStartColumnHandler(TaskDateColumnHandler):
         self.add_error(errors.WRONG_VALUE_ERROR,
                        column_name=self.display_name)
         return
-      self.row_converter.obj.start_date = date(*self.value[::-1])
+      month, day, year = self.value
+      self.row_converter.obj.end_date = date(year, month, day)
     elif freq in ["weekly", "monthly"]:
       if len(self.value) != 1:
         self.add_error(errors.WRONG_VALUE_ERROR,
