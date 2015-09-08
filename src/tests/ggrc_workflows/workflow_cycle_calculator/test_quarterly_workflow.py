@@ -60,136 +60,67 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
 
     # Test first-quarter option conversion
     # 1/1 in first quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 1, 1)),
-                     date(2015, 1, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 2, 1)),
-                     date(2015, 1, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 3, 1)),
-                     date(2015, 1, 1))
-    # 1/1 in second quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 4, 1)),
-                     date(2015, 4, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 5, 1)),
-                     date(2015, 4, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 6, 1)),
-                     date(2015, 4, 1))
-    # 1/1 in third quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 7, 1)),
-                     date(2015, 7, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 8, 1)),
-                     date(2015, 7, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 9, 1)),
-                     date(2015, 7, 1))
-    # 1/1 in fourth quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 10, 1)),
-                     date(2015, 10, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 11, 1)),
-                     date(2015, 10, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=1,
-                         base_date=date(2015, 12, 1)),
-                     date(2015, 10, 1))
+    test_and_expected_dates = [
+      ((2015, 1, 1), (2015, 1, 1)),
+      ((2015, 2, 1), (2015, 1, 1)),
+      ((2015, 3, 1), (2015, 1, 1)),
+      ((2015, 4, 1), (2015, 4, 1)),
+      ((2015, 5, 1), (2015, 4, 1)),
+      ((2015, 6, 1), (2015, 4, 1)),
+      ((2015, 7, 1), (2015, 7, 1)),
+      ((2015, 8, 1), (2015, 7, 1)),
+      ((2015, 9, 1), (2015, 7, 1)),
+      ((2015, 10, 1), (2015, 10, 1)),
+      ((2015, 11, 1), (2015, 10, 1)),
+      ((2015, 12, 1), (2015, 10, 1))
+    ]
+    for test_date, expected_date in test_and_expected_dates:
+      self.assertEqual(
+        rdd(relative_day=1, relative_month=1, base_date=date(*test_date)),
+        date(*expected_date))
+
     #########################################################################
-    # # 2/1 in first quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 1, 1)),
-                     date(2014, 11, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 2, 1)),
-                     date(2015, 2, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 3, 1)),
-                     date(2015, 2, 1))
-    # 2/1 in second quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 4, 1)),
-                     date(2015, 2, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 5, 1)),
-                     date(2015, 5, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 6, 1)),
-                     date(2015, 5, 1))
-    # 2/1 in third quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 7, 1)),
-                     date(2015, 5, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 8, 1)),
-                     date(2015, 8, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 9, 1)),
-                     date(2015, 8, 1))
-    # 2/1 in fourth quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 10, 1)),
-                     date(2015, 8, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 11, 1)),
-                     date(2015, 11, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2015, 12, 1)),
-                     date(2015, 11, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=2,
-                         base_date=date(2016, 1, 1)),
-                     date(2015, 11, 1))
+    test_and_expected_dates = [
+      ((2015, 1, 1), (2014, 11, 1)),
+      ((2015, 2, 1), (2015, 2, 1)),
+      ((2015, 3, 1), (2015, 2, 1)),
+      ((2015, 4, 1), (2015, 2, 1)),
+      ((2015, 5, 1), (2015, 5, 1)),
+      ((2015, 6, 1), (2015, 5, 1)),
+      ((2015, 7, 1), (2015, 5, 1)),
+      ((2015, 8, 1), (2015, 8, 1)),
+      ((2015, 9, 1), (2015, 8, 1)),
+      ((2015, 10, 1), (2015, 8, 1)),
+      ((2015, 11, 1), (2015, 11, 1)),
+      ((2015, 12, 1), (2015, 11, 1)),
+      ((2016, 1, 1), (2015, 11, 1))
+    ]
+    for test_date, expected_date in test_and_expected_dates:
+      self.assertEqual(
+        rdd(relative_day=1, relative_month=2, base_date=date(*test_date)),
+        date(*expected_date))
+
     #########################################################################
-    # 3/1 in first quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 1, 1)),
-                     date(2014, 12, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 2, 1)),
-                     date(2014, 12, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 3, 1)),
-                     date(2015, 3, 1))
-    # 3/1 in second quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 4, 1)),
-                     date(2015, 3, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 5, 1)),
-                     date(2015, 3, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 6, 1)),
-                     date(2015, 6, 1))
-    # 3/1 in third quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 7, 1)),
-                     date(2015, 6, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 8, 1)),
-                     date(2015, 6, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 9, 1)),
-                     date(2015, 9, 1))
-    # 3/1 in fourht quarter
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 10, 1)),
-                     date(2015, 9, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 11, 1)),
-                     date(2015, 9, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2015, 12, 1)),
-                     date(2015, 12, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2016, 1, 1)),
-                     date(2015, 12, 1))
-    self.assertEqual(rdd(relative_day=1, relative_month=3,
-                         base_date=date(2016, 2, 1)),
-                     date(2015, 12, 1))
+    test_and_expected_dates = [
+      ((2015, 1, 1), (2014, 12, 1)),
+      ((2015, 2, 1), (2014, 12, 1)),
+      ((2015, 3, 1), (2015, 3, 1)),
+      ((2015, 4, 1), (2015, 3, 1)),
+      ((2015, 5, 1), (2015, 3, 1)),
+      ((2015, 6, 1), (2015, 6, 1)),
+      ((2015, 7, 1), (2015, 6, 1)),
+      ((2015, 8, 1), (2015, 6, 1)),
+      ((2015, 9, 1), (2015, 9, 1)),
+      ((2015, 10, 1), (2015, 9, 1)),
+      ((2015, 11, 1), (2015, 9, 1)),
+      ((2015, 12, 1), (2015, 12, 1)),
+      ((2016, 1, 1), (2015, 12, 1)),
+      ((2016, 2, 1), (2015, 12, 1))
+    ]
+    for test_date, expected_date in test_and_expected_dates:
+      self.assertEqual(
+        rdd(relative_day=1, relative_month=3, base_date=date(*test_date)),
+        date(*expected_date))
 
   def test_start_wf_1_1(self):
     """Test quarterly WF 1/1 activating through months"""
@@ -207,28 +138,28 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
             "relative_end_day": 1,
             "relative_end_month": 1,
           }],
-        "task_group_objects": self.random_objects
+        "task_group_objects": []
       },
       ]
     }
-    base_dates = [date(2014, 12, 1),
-                  date(2015, 1, 1), date(2015, 2, 1), date(2015, 3, 1),
-                  date(2015, 4, 1), date(2015, 5, 1), date(2015, 6, 1),
-                  date(2015, 7, 1), date(2015, 8, 1), date(2015, 9, 1),
-                  date(2015, 10, 1), date(2015, 11, 1), date(2015, 12, 1)]
-    expected_dates = [date(2015, 1, 1),
-                      date(2015, 4, 1), date(2015, 4, 1), date(2015, 4, 1),
-                      date(2015, 7, 1), date(2015, 7, 1), date(2015, 7, 1),
-                      date(2015, 10, 1), date(2015, 10, 1), date(2015, 10, 1),
-                      date(2016, 1, 1), date(2016, 1, 1), date(2016, 1, 1)]
+    base_dates = [(2014, 12, 1),
+                  (2015, 1, 1), (2015, 2, 1), (2015, 3, 1),
+                  (2015, 4, 1), (2015, 5, 1), (2015, 6, 1),
+                  (2015, 7, 1), (2015, 8, 1), (2015, 9, 1),
+                  (2015, 10, 1), (2015, 11, 1), (2015, 12, 1)]
+    expected_dates = [(2015, 1, 1),
+                      (2015, 4, 1), (2015, 4, 1), (2015, 4, 1),
+                      (2015, 7, 1), (2015, 7, 1), (2015, 7, 1),
+                      (2015, 10, 1), (2015, 10, 1), (2015, 10, 1),
+                      (2016, 1, 1), (2016, 1, 1), (2016, 1, 1)]
 
     for i, bd in enumerate(base_dates):
-      with freeze_time("{} 13:00".format(bd)):
+      with freeze_time("{} 13:00".format(date(*bd))):
         _, wf = self.generator.generate_workflow(quarterly_wf)
         _, awf = self.generator.activate_workflow(wf)
         active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
         self.assertEqual(active_wf.non_adjusted_next_cycle_start_date,
-                         expected_dates[i])
+                         date(*expected_dates[i]))
 
   def test_start_wf_2_1(self):
     """Test quarterly WF 2/1 activating through months"""
@@ -246,28 +177,28 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
             "relative_end_day": 1,
             "relative_end_month": 2,
           }],
-        "task_group_objects": self.random_objects
+        "task_group_objects": []
       },
       ]
     }
-    base_dates = [date(2014, 12, 1),
-                  date(2015, 1, 1), date(2015, 2, 1), date(2015, 3, 1),
-                  date(2015, 4, 1), date(2015, 5, 1), date(2015, 6, 1),
-                  date(2015, 7, 1), date(2015, 8, 1), date(2015, 9, 1),
-                  date(2015, 10, 1), date(2015, 11, 1), date(2015, 12, 1)]
-    expected_dates = [date(2015, 2, 1),
-                      date(2015, 2, 1), date(2015, 5, 1), date(2015, 5, 1),
-                      date(2015, 5, 1), date(2015, 8, 1), date(2015, 8, 1),
-                      date(2015, 8, 1), date(2015, 11, 1), date(2015, 11, 1),
-                      date(2015, 11, 1), date(2016, 2, 1), date(2016, 2, 1)]
+    base_dates = [(2014, 12, 1),
+                  (2015, 1, 1), (2015, 2, 1), (2015, 3, 1),
+                  (2015, 4, 1), (2015, 5, 1), (2015, 6, 1),
+                  (2015, 7, 1), (2015, 8, 1), (2015, 9, 1),
+                  (2015, 10, 1), (2015, 11, 1), (2015, 12, 1)]
+    expected_dates = [(2015, 2, 1),
+                      (2015, 2, 1), (2015, 5, 1), (2015, 5, 1),
+                      (2015, 5, 1), (2015, 8, 1), (2015, 8, 1),
+                      (2015, 8, 1), (2015, 11, 1), (2015, 11, 1),
+                      (2015, 11, 1), (2016, 2, 1), (2016, 2, 1)]
 
     for i, bd in enumerate(base_dates):
-      with freeze_time("{} 13:00".format(bd)):
+      with freeze_time("{} 13:00".format(date(*bd))):
         _, wf = self.generator.generate_workflow(quarterly_wf)
         _, awf = self.generator.activate_workflow(wf)
         active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
         self.assertEqual(active_wf.non_adjusted_next_cycle_start_date,
-                         expected_dates[i])
+                         date(*expected_dates[i]))
 
   def test_start_wf_3_1(self):
     """Test quarterly WF 3/1 activating through months"""
@@ -285,29 +216,29 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
             "relative_end_day": 1,
             "relative_end_month": 3,
           }],
-        "task_group_objects": self.random_objects
+        "task_group_objects": []
       },
       ]
     }
-    base_dates = [date(2014, 12, 1),
-                  date(2015, 1, 1), date(2015, 2, 1), date(2015, 3, 1),
-                  date(2015, 4, 1), date(2015, 5, 1), date(2015, 6, 1),
-                  date(2015, 7, 1), date(2015, 8, 1), date(2015, 9, 1),
-                  date(2015, 10, 1), date(2015, 11, 1), date(2015, 12, 1)]
-    expected_dates = [date(2015, 3, 1),
-                      date(2015, 3, 1), date(2015, 3, 1), date(2015, 6, 1),
-                      date(2015, 6, 1), date(2015, 6, 1), date(2015, 9, 1),
-                      date(2015, 9, 1), date(2015, 9, 1), date(2015, 12, 1),
-                      date(2015, 12, 1), date(2015, 12, 1), date(2016, 3, 1)]
+    base_dates = [(2014, 12, 1),
+                  (2015, 1, 1), (2015, 2, 1), (2015, 3, 1),
+                  (2015, 4, 1), (2015, 5, 1), (2015, 6, 1),
+                  (2015, 7, 1), (2015, 8, 1), (2015, 9, 1),
+                  (2015, 10, 1), (2015, 11, 1), (2015, 12, 1)]
+    expected_dates = [(2015, 3, 1),
+                      (2015, 3, 1), (2015, 3, 1), (2015, 6, 1),
+                      (2015, 6, 1), (2015, 6, 1), (2015, 9, 1),
+                      (2015, 9, 1), (2015, 9, 1), (2015, 12, 1),
+                      (2015, 12, 1), (2015, 12, 1), (2016, 3, 1)]
 
 
     for i, bd in enumerate(base_dates):
-      with freeze_time("{} 13:00".format(bd)):
+      with freeze_time("{} 13:00".format(date(*bd))):
         _, wf = self.generator.generate_workflow(quarterly_wf)
         _, awf = self.generator.activate_workflow(wf)
         active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
         self.assertEqual(active_wf.non_adjusted_next_cycle_start_date,
-                         expected_dates[i])
+                         date(*expected_dates[i]))
 
   def test_equal_month_end_day_before_start_day(self):
     """
@@ -1108,77 +1039,27 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(active_wf.status, "Active")
       self.assertEqual(active_wf.next_cycle_start_date, date(2015, 7, 31))
 
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2015, 7, 31))
-      self.assertEqual(cycle.end_date, date(2015, 9, 4))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 30))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2015, 10, 30))
-      self.assertEqual(cycle.end_date, date(2015, 12, 4))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 2, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2016, 2, 1))
-      self.assertEqual(cycle.end_date, date(2016, 3, 4))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 4, 29))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2016, 4, 29))
-      self.assertEqual(cycle.end_date, date(2016, 6, 3))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 8, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2016, 8, 1))
-      self.assertEqual(cycle.end_date, date(2016, 9, 2))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 11, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2016, 11, 1))
-      self.assertEqual(cycle.end_date, date(2016, 12, 5))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2017, 2, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2017, 2, 1))
-      self.assertEqual(cycle.end_date, date(2017, 3, 3))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2017, 5, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2017, 5, 1))
-      self.assertEqual(cycle.end_date, date(2017, 6, 5))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2017, 8, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2017, 8, 1))
-      self.assertEqual(cycle.end_date, date(2017, 9, 5))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2017, 11, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2017, 11, 1))
-      self.assertEqual(cycle.end_date, date(2017, 12, 5))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2018, 2, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2018, 2, 1))
-      self.assertEqual(cycle.end_date, date(2018, 3, 5))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2018, 5, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2018, 5, 1))
-      self.assertEqual(cycle.end_date, date(2018, 6, 5))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2018, 8, 1))
+      dates = [
+        ((2015, 7, 31), (2015, 9, 4), (2015, 10, 30)),
+        ((2015, 10, 30), (2015, 12, 4), (2016, 2, 1)),
+        ((2016, 2, 1), (2016, 3, 4), (2016, 4, 29)),
+        ((2016, 4, 29), (2016, 6, 3), (2016, 8, 1)),
+        ((2016, 8, 1), (2016, 9, 2), (2016, 11, 1)),
+        ((2016, 11, 1), (2016, 12, 5), (2017, 2, 1)),
+        ((2017, 2, 1), (2017, 3, 3), (2017, 5, 1)),
+        ((2017, 5, 1), (2017, 6, 5), (2017, 8, 1)),
+        ((2017, 8, 1), (2017, 9, 5), (2017, 11, 1)),
+        ((2017, 11, 1), (2017, 12, 5), (2018, 2, 1)),
+        ((2018, 2, 1), (2018, 3, 5), (2018, 5, 1)),
+        ((2018, 5, 1), (2018, 6, 5), (2018, 8, 1)),
+      ]
+      for csd, ced, ncsd in dates:
+        _, cycle = self.generator.generate_cycle(wf)
+        self.assertEqual(cycle.start_date, date(*csd))
+        self.assertEqual(cycle.end_date, date(*ced))
+        active_wf = db.session.query(Workflow).filter(
+          Workflow.id == wf.id).one()
+        self.assertEqual(active_wf.next_cycle_start_date, date(*ncsd))
 
   def test_multiple_task_groups_multiple_tasks_multiple_quarters_in_middle(self):
     """Test behaviour of multiple task groups with multiple tasks spread across multiple quarters
@@ -1248,29 +1129,19 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(cycle.start_date, date(2015, 5, 1))
       self.assertEqual(cycle.end_date, date(2015, 6, 5))
 
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2015, 7, 31))
-      self.assertEqual(cycle.end_date, date(2015, 9, 4))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 30))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2015, 10, 30))
-      self.assertEqual(cycle.end_date, date(2015, 12, 4))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 2, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2016, 2, 1))
-      self.assertEqual(cycle.end_date, date(2016, 3, 4))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 4, 29))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2016, 4, 29))
-      self.assertEqual(cycle.end_date, date(2016, 6, 3))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 8, 1))
+      dates = [
+        ((2015, 7, 31), (2015, 9, 4), (2015, 10, 30)),
+        ((2015, 10, 30), (2015, 12, 4), (2016, 2, 1)),
+        ((2016, 2, 1), (2016, 3, 4), (2016, 4, 29)),
+        ((2016, 4, 29), (2016, 6, 3), (2016, 8, 1)),
+      ]
+      for csd, ced, ncsd in dates:
+        _, cycle = self.generator.generate_cycle(wf)
+        self.assertEqual(cycle.start_date, date(*csd))
+        self.assertEqual(cycle.end_date, date(*ced))
+        active_wf = db.session.query(Workflow).filter(
+          Workflow.id == wf.id).one()
+        self.assertEqual(active_wf.next_cycle_start_date, date(*ncsd))
 
   def test_multiple_task_groups_multiple_tasks_multiple_quarters_last_quarter_middle(self):
     """Test behaviour of multiple task groups with multiple tasks spread across multiple quarters
@@ -1498,26 +1369,17 @@ class TestQuarterlyWorkflow(BaseWorkflowTestCase):
       self.assertEqual(cycle.start_date, date(2015, 5, 1))
       self.assertEqual(cycle.end_date, date(2015, 6, 5))
 
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2015, 7, 31))
-      self.assertEqual(cycle.end_date, date(2015, 9, 4))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2015, 10, 30))
+      dates = [
+        ((2015, 7, 31), (2015, 9, 4), (2015, 10, 30)),
+        ((2015, 10, 30), (2015, 12, 4), (2016, 2, 1)),
+        ((2016, 2, 1), (2016, 3, 4), (2016, 4, 29)),
+        ((2016, 4, 29), (2016, 6, 3), (2016, 8, 1))
+      ]
 
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2015, 10, 30))
-      self.assertEqual(cycle.end_date, date(2015, 12, 4))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 2, 1))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2016, 2, 1))
-      self.assertEqual(cycle.end_date, date(2016, 3, 4))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 4, 29))
-
-      _, cycle = self.generator.generate_cycle(wf)
-      self.assertEqual(cycle.start_date, date(2016, 4, 29))
-      self.assertEqual(cycle.end_date, date(2016, 6, 3))
-      active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
-      self.assertEqual(active_wf.next_cycle_start_date, date(2016, 8, 1))
+      for csd, ced, ncsd in dates:
+        _, cycle = self.generator.generate_cycle(wf)
+        self.assertEqual(cycle.start_date, date(*csd))
+        self.assertEqual(cycle.end_date, date(*ced))
+        active_wf = db.session.query(Workflow).filter(
+          Workflow.id == wf.id).one()
+        self.assertEqual(active_wf.next_cycle_start_date, date(*ncsd))
