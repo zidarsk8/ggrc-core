@@ -55,11 +55,9 @@
 
 .pin-action {
   @extend %reset-list;
-  @include clearfix();
-  margin-bottom: 20px;
   li {
-    float: left;
-    margin-left: 5px;
+    display: block;
+    margin-bottom: 2px;
     a {
       i {
         @include opacity(.25);
@@ -70,9 +68,6 @@
           @include opacity(1);
         }
       }
-    }
-    &:first-child {
-      margin-left: 0;
     }
   }
 }

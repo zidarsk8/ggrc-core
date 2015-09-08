@@ -21,7 +21,7 @@
   background-image: image-url("grcicons/icons.png");
   background-position: -2000px -2000px; // blank default state
   background-repeat: no-repeat;
-  @include background-size(368px 440px);
+  @include background-size(392px 440px);
   &.process-icon {
     margin-top:2px;
     @include opacity(0.5);
