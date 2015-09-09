@@ -13,6 +13,7 @@ from ggrc.converters import errors
 from ggrc.converters.base_block import BlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import split_array
+from ggrc.fulltext import get_indexer
 
 
 class Converter(object):
@@ -48,6 +49,7 @@ class Converter(object):
     self.shared_state = {}
     self.response_data = []
     self.importable = get_importables()
+    self.indexer = get_indexer()
 
   def to_array(self, data_grid=False):
     self.block_converters_from_ids()

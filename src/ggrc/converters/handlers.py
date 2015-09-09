@@ -106,26 +106,30 @@ class DeleteColumnHandler(ColumnHandler):
   def set_obj_attr(self):
     if not self.value:
       return
+    obj = self.row_converter.obj
     if self.row_converter.is_new:
       self.add_error(errors.DELETE_NEW_OBJECT_ERROR,
-                     object_type=self.row_converter.obj.type,
-                     slug=self.row_converter.obj.slug)
+                     object_type=obj.type,
+                     slug=obj.slug)
       return
     if self.row_converter.ignore:
       return
     tr = db.session.begin_nested()
     try:
-      tr.session.delete(self.row_converter.obj)
+      tr.session.delete(obj)
       deleted = len([o for o in tr.session.deleted
                     if o.type != "Relationship"])
       if deleted != 1:
         self.add_error(errors.DELETE_CASCADE_ERROR,
-                       object_type=self.row_converter.obj.type,
-                       slug=self.row_converter.obj.slug)
+                       object_type=obj.type, slug=obj.slug)
     finally:
       if self.dry_run or self.row_converter.ignore:
         tr.rollback()
       else:
+        indexer = self.row_converter.block_converter.converter.indexer
+        if indexer is not None:
+          for o in tr.session.deleted:
+            indexer.delete_record(o.id, o.__class__.__name__, commit=False)
         tr.commit()
 
 
