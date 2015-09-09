@@ -13,7 +13,6 @@ function resize_areas() {
   ,   $lhs
   ,   $lhsHolder
   ,   $area
-  ,   $header
   ,   $footer
   ,   $innerNav
   ,   $objectArea
@@ -31,7 +30,6 @@ function resize_areas() {
   $lhs = $(".lhs");
   $lhsHolder = $(".lhs-holder");
   $footer = $(".footer");
-  $header = $(".header-content");
   $innerNav = $(".inner-nav");
   $objectArea = $(".object-area");
   $area = $(".area");
@@ -52,7 +50,6 @@ function resize_areas() {
   $bar.css("height",lhsHeight);
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);
-  $header.css("width",headerWidth);
   $objectArea
     .css("margin-left",internavWidth)
     .css("height",internavHeight -30)
