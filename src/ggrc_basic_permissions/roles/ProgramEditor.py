@@ -21,6 +21,7 @@ permissions = {
         "Context",
     ],
     "create": [
+        "Audit",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",

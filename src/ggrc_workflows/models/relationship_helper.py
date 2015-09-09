@@ -48,6 +48,41 @@ def workflow_tg(object_type, related_type, related_ids):
         TaskGroup.workflow_id.in_(related_ids))
 
 
+def workflow_tgt(object_type, related_type, related_ids):
+  """ indirect relationships between Workflows and Tasks """
+
+  if object_type == "Workflow":
+    return db.session.query(TaskGroup.workflow_id).join(TaskGroupTask).filter(
+        TaskGroupTask.id.in_(related_ids))
+  else:
+    return db.session.query(TaskGroupTask.id).join(TaskGroup).filter(
+        TaskGroup.workflow_id.in_(related_ids))
+
+
+def workflow_ctg(object_type, related_type, related_ids):
+  """ indirect relationships between Workflows and Cycle Task Groups """
+
+  if object_type == "Workflow":
+    return db.session.query(Cycle.workflow_id).join(CycleTaskGroup).filter(
+        CycleTaskGroup.id.in_(related_ids))
+  else:
+    return db.session.query(CycleTaskGroup.id).join(Cycle).filter(
+        Cycle.workflow_id.in_(related_ids))
+
+
+def workflow_ctgot(object_type, related_type, related_ids):
+  """ indirect relationships between Workflows and Cycle Tasks """
+
+  if object_type == "Workflow":
+    return db.session.query(Cycle.workflow_id) \
+        .join(CycleTaskGroup).join(CycleTask).filter(
+            CycleTask.id.in_(related_ids))
+  else:
+    return db.session.query(CycleTask.id) \
+        .join(CycleTaskGroup).join(Cycle).filter(
+            Cycle.workflow_id.in_(related_ids))
+
+
 def cycle_ctg(object_type, related_type, related_ids):
   """ relationships between Cycle and Cycle Task Group """
 
@@ -57,6 +92,19 @@ def cycle_ctg(object_type, related_type, related_ids):
   else:
     return db.session.query(CycleTaskGroup.id).filter(
         CycleTaskGroup.cycle_id.in_(related_ids))
+
+
+def cycle_ctogt(object_type, related_type, related_ids):
+  """ indirect relationships between Cycle and Cycle Task """
+
+  if object_type == "Workflow":
+    return db.session.query(Cycle.workflow_id) \
+        .join(CycleTaskGroup).join(CycleTask).filter(
+            CycleTask.id.in_(related_ids))
+  else:
+    return db.session.query(CycleTask.id) \
+        .join(CycleTaskGroup).join(Cycle).filter(
+            Cycle.workflow_id.in_(related_ids))
 
 
 def ctg_ctgot(object_type, related_type, related_ids):
@@ -82,11 +130,15 @@ def ctgot_wot(object_type, related_type, related_ids):
         .filter(CycleTask.id.in_(related_ids))
 
 _function_map = {
-    ("TaskGroup", "Workflow"): workflow_tg,
-    ("TaskGroup", "TaskGroupTask"): tg_task,
-    ("Cycle", "Workflow"): cycle_workflow,
     ("Cycle", "CycleTaskGroup"): cycle_ctg,
+    ("Cycle", "CycleTaskGroupObjectTask"): cycle_ctogt,
+    ("Cycle", "Workflow"): cycle_workflow,
     ("CycleTaskGroup", "CycleTaskGroupObjectTask"): ctg_ctgot,
+    ("CycleTaskGroup", "Workflow"): workflow_ctg,
+    ("CycleTaskGroupObjectTask", "Workflow"): workflow_ctgot,
+    ("TaskGroup", "TaskGroupTask"): tg_task,
+    ("TaskGroup", "Workflow"): workflow_tg,
+    ("TaskGroupTask", "Workflow"): workflow_tgt,
 }
 
 # add mappings for cycle tasks and cycle task objects

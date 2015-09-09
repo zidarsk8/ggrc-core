@@ -49,18 +49,13 @@
 .top-inner-nav {
   @include box-shadow(inset 1px 4px 9px -6px rgba(0,0,0,0.4));
   width: 100%;
-  height: 29px;
-  position: fixed;
   z-index: 1;
   top: 48px;
   background: $tabBgnd;
 }
 .object-area {
-  position:fixed;
-  top: 78px;
   overflow-y:auto;
   overflow-x:hidden;
-  height: 493px;
   padding-top: 20px;
   background: $contentBgnd;
   &.import-area {

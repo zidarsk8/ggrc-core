@@ -2393,10 +2393,9 @@ can.each({
 
       audit = audit.reify();
       auditors_dfd = audit.findAuditors();
-      prog_roles_dfd = new RefreshQueue()
-                       .enqueue(audit.attr("program").reify())
-                       .trigger().then(function(progs) {
-                         return progs[0].get_binding("program_authorizations").refresh_instances();
+      prog_roles_dfd = audit.refresh_all('program').then(function(program) {
+                         //debugger;
+                         return program.get_binding("program_authorizations").refresh_instances();
                        }).then(function(user_role_bindings) {
                           var rq = new RefreshQueue();
                           can.each(user_role_bindings, function(urb) {
@@ -3073,7 +3072,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   audit = audits[0].instance.reify();
   programs = audit.get_mapping("_program");
   program = programs[0].instance.reify();
-  control = instance.control.reify();
+  control = instance.control ? instance.control.reify() : {};
 
   json = {
     audit: {title: audit.title, id: audit.id, type: audit.type},
