@@ -2087,7 +2087,7 @@ Mustache.registerHelper("private_program_owner", function (instance, modal_title
   else {
     var loader = resolve_computed(instance).get_binding('authorizations');
     return $.map(loader.list, function (binding) {
-      if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+      if (binding.instance.role && binding.instance.role.reify().attr('name') === 'ProgramOwner') {
         return binding.instance.person.reify().attr('email');
       }
     }).join(', ');
@@ -2105,7 +2105,7 @@ Mustache.registerHelper("if_multi_owner", function (instance, modal_title, optio
 
   var loader = resolve_computed(instance).get_binding('authorizations');
   can.each(loader.list, function(binding){
-    if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+    if (binding.instance.role && binding.instance.role.reify().attr('name') === 'ProgramOwner') {
       owner_count += 1;
     }
   });
