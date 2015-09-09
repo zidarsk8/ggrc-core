@@ -36,6 +36,16 @@ class NotificationConfig(Base, db.Model):
       'Calendar',
   ]
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+      db.Index('ix_notification_config_person_id_type',
+               'person_id',
+               'notif_type',
+               unique=True),
+      db.UniqueConstraint('person_id', 'notif_type')
+    )
+
 
 class NotificationType(Base, db.Model):
   __tablename__ = 'notification_types'
