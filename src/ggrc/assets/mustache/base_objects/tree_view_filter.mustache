@@ -7,9 +7,10 @@
 
   <div class="sticky sticky-header filter-holder" {{#filter_is_hidden}}style="height: 0px; margin-bottom: 0px;"{{/filter_is_hidden}} data-height="42" data-margin-bottom="25">
     <div class="sticky-filter inner-filter-sticky">
-      <div class="inline-filtering" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
+      <div class="inline-filtering clearfix" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
 
-        <div style="width:10%; float:left;">
+        <div class="fluid-wrap">
+          <div class="filter-title-wrap">
             <div class="filter-title">
               <h6>
                 Filter
@@ -18,16 +19,16 @@
                 {{/instance}}
               </h6>
             </div>
-        </div>
-        <div style="width:50%; float:left;">
+          </div>
+          <div class="filter-input-wrap">
             <div class="filter-input">
               <input name="filter_query" type="text" class="input-wide">
               <span class="is-expression">
                 <i class="grcicon-expression-black"></i>
               </span>
             </div>
-        </div>
-        <div style="width:40%; float:left; overflow:hidden; height:36px;">
+          </div>
+          <div class="filter-button-wrap">
             <div class="filter-button">
               <a id="page-help" class="popover-template" data-get-template="help/filters_helper_content" href="javascript://">
                 <i class="grcicon-help-black"></i>
@@ -35,7 +36,9 @@
               <input type="reset" class="btn btn-small btn-draft" name="" value="Reset">
               <input type="submit" class="btn btn-small btn-info" name="" value="Filter">
             </div>
+          </div>
         </div>
+
       </div>
     </div>
   </div>

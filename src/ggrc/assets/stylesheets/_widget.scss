@@ -1203,6 +1203,27 @@
       }
     }
   }
+  .fluid-wrap {
+    position: relative;
+  }
+  .filter-title-wrap,
+  .filter-button-wrap {
+    position: absolute;
+    top: 0;
+  }
+  .filter-title-wrap {
+    width: 45px;
+    left: 0;
+  }
+  .filter-input-wrap {
+    width: auto;
+    margin-right: 164px;
+    margin-left: 45px;
+  }
+  .filter-button-wrap {
+    width: 164px;
+    right: 0;
+  }
   .filter-title {
     h6 {
       @extend %oneline;
