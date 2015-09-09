@@ -487,31 +487,54 @@ class CheckboxColumnHandler(ColumnHandler):
       current_app.logger.error(error)
 
 
-class ProgramColumnHandler(ColumnHandler):
+class ParentColumnHandler(ColumnHandler):
+
+  """ handler for directly mapped columns """
+
+  parent = None
+
+  def __init__(self, row_converter, key, **options):
+    super(ParentColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
-    """ get a program from slugs """
-    new_programs = self.new_objects[Program]
+    """ get parent object """
+    # pylint: disable=protected-access
     if self.raw_value == "":
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
       return None
     slug = self.raw_value
-    if slug in new_programs:
-      program = new_programs[slug]
-    else:
-      program = Program.query.filter(Program.slug == slug).first()
+    obj = self.new_objects.get(self.parent, {}).get(slug)
+    if obj is None:
+      obj = self.parent.query.filter(self.parent.slug == slug).first()
+    if obj is None:
+      self.add_error(errors.UNKNOWN_OBJECT,
+                     object_type=self.parent._inflector.human_singular.title(),
+                     slug=slug)
+    return obj
 
-    if program is None:
-      self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
-      return None
-
-    return program
+  def set_obj_attr(self):
+    super(ParentColumnHandler, self).set_obj_attr()
+    # inherit context
+    obj = self.row_converter.obj
+    parent = getattr(obj, self.key, None)
+    if parent is not None and \
+       hasattr(obj, "context_id") and \
+       hasattr(parent, "context_id") and \
+       parent.context_id is not None:
+      obj.context_id = parent.context_id
 
   def get_value(self):
-    val = getattr(self.row_converter.obj, self.key, False)
-    if not val:
-      return
-    return val.slug
+    value = getattr(self.row_converter.obj, self.key, self.value)
+    if not value:
+      return None
+    return value.slug
+
+
+class ProgramColumnHandler(ParentColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.parent = Program
+    super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
 
 
 class SectionDirectiveColumnHandler(ColumnHandler):
@@ -561,30 +584,12 @@ class AuditColumnHandler(MappingColumnHandler):
     super(AuditColumnHandler, self).__init__(row_converter, key, **options)
 
 
-class RequestAuditColumnHandler(ColumnHandler):
+class RequestAuditColumnHandler(ParentColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    super(RequestAuditColumnHandler, self).__init__(row_converter, "audit", **options)
-
-  def get_audit_from_slug(self, slug):
-    if slug in self.new_objects[Audit]:
-      return self.new_objects[Audit][slug]
-    return Audit.query.filter_by(slug=slug).first()
-
-  def parse_item(self):
-    if self.raw_value == "":
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-      return None
-    slug = self.raw_value
-    audit = self.get_audit_from_slug(slug)
-    if audit is not None:
-      return audit
-    self.add_error(errors.UNKNOWN_OBJECT, object_type="Audit", slug=slug)
-    return None
-
-  def get_value(self):
-    audit = getattr(self.row_converter.obj, self.key, False)
-    return audit.slug
+    self.parent = Audit
+    super(RequestAuditColumnHandler, self) \
+        .__init__(row_converter, "audit", **options)
 
 
 class AuditObjectColumnHandler(ColumnHandler):
@@ -719,20 +724,11 @@ class ControlAssertionColumnHandler(CategoryColumnHandler):
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
-class RequestColumnHandler(ColumnHandler):
+class RequestColumnHandler(ParentColumnHandler):
 
-  def get_value(self):
-    return self.row_converter.obj.request.slug
-
-  def parse_item(self):
-    slug = self.raw_value
-    new_objects = self.row_converter.block_converter.converter.new_objects
-    request = new_objects[Request].get(slug)
-    if request is None:
-      request = Request.query.filter(Request.slug == slug).first()
-    if request is None:
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-    return request
+  def __init__(self, row_converter, key, **options):
+    self.parent = Request
+    super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
 
 
 class ResponseTypeColumnHandler(ColumnHandler):
