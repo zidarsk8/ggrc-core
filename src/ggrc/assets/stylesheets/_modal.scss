@@ -1153,9 +1153,15 @@ p.modal-value {
   ul.new-tree {
     li.tree-item {
       min-height: 24px;
-      line-height: 22px;
+      line-height: 24px;
       margin: 0 10px;
 
+      [class^="grcicon-"] {
+        margin-top: 4px;
+      }
+      .show-details i {
+        margin-top: 0;
+      }
       [class*="span"] {
         min-height: 22px;
       }
