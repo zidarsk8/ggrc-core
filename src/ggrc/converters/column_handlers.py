@@ -16,6 +16,7 @@ _column_handlers = {
     "company": handlers.TextColumnHandler,
     "contact": handlers.UserColumnHandler,
     "control": handlers.ControlColumnHandler,
+    "delete": handlers.DeleteColumnHandler,
     "description": handlers.TextareaColumnHandler,
     "design": handlers.OptionColumnHandler,
     "directive": handlers.SectionDirectiveColumnHandler,

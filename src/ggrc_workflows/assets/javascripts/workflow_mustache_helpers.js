@@ -82,7 +82,7 @@ Mustache.registerHelper("workflow_owner", function(instance, modal_title, option
   else {
     var loader = resolve_computed(instance).get_binding('authorizations');
     return $.map(loader.list, function(binding) {
-      if (binding.instance.role.reify().attr('name') === 'WorkflowOwner') {
+      if (binding.instance.role && binding.instance.role.reify().attr('name') === 'WorkflowOwner') {
         return binding.instance.person.reify().attr('email');
       }
     }).join(', ');

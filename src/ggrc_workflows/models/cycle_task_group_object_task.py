@@ -9,8 +9,12 @@ from ggrc.models.types import JsonType
 from ggrc.models.mixins import (
     Base, Titled, Described, Timeboxed, Slugged, Stateful, WithContact
     )
+from ggrc.models import all_models
 from ggrc_workflows.models.cycle import Cycle
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
+from ggrc_workflows.models.cycle_task_group_object import CycleTaskGroupObject
+
+from sqlalchemy import or_
 
 
 class CycleTaskGroupObjectTask(
@@ -108,4 +112,23 @@ class CycleTaskGroupObjectTask(
     return CycleTaskGroup.query.filter(
       (CycleTaskGroup.id == cls.cycle_id) &
       (predicate(CycleTaskGroup.slug) | predicate(CycleTaskGroup.title))
+    ).exists()
+
+  @classmethod
+  def _filter_by_cycle_object(cls, predicate):
+    parts = []
+    for model_name in all_models.__all__:
+      model = getattr(all_models, model_name)
+      query = getattr(model, "query", None)
+      field = getattr(model, "slug", getattr(model, "email", None))
+      if query is None or field is None or not hasattr(model, "id"):
+        continue
+      parts.append(query.filter(
+          (CycleTaskGroupObject.object_type == model_name) &
+          (model.id == CycleTaskGroupObject.object_id) &
+          predicate(field)
+      ).exists())
+    return CycleTaskGroupObject.query.filter(
+        (CycleTaskGroupObject.id == cls.cycle_task_group_object_id) &
+        or_(*parts)
     ).exists()

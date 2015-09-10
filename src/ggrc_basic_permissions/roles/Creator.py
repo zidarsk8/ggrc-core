@@ -209,6 +209,14 @@ owner_base = [
         },
         "condition": "contains"
     },
+    {
+        "type": "BackgroundTask",
+        "terms": {
+            "property_name": "modified_by",
+            "value": "$current_user"
+        },
+        "condition": "is"
+    },
     "CustomAttributeDefinition",
     "CustomAttributeValue",
 ]
