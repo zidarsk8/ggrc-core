@@ -36,6 +36,8 @@ class FrequencyColumnHandler(ColumnHandler):
     Returning None will set the default frequency to one_time.
     """
     if not self.raw_value:
+      self.add_error(errors.MISSING_COLUMN, s="",
+                     column_names=self.display_name)
       return None
     value = self.raw_value.lower()
     frequency = self.frequency_map.get(value, value)
