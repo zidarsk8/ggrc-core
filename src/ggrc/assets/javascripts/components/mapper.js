@@ -223,6 +223,10 @@
               this.scope.attr("mapper.is_saving", false);
               // TODO: Find proper way to dismiss the modal
               this.element.find(".modal-dismiss").trigger("click");
+              // there is some kind of a race condition when filling the treview with new elements
+              // so many don't get rendered. To solve it, at the end of the loading
+              // we refresh the whole tree view. Other solutions could be to batch add the objects. 
+              $('.cms_controllers_tree_view:visible').control().reload_list();            
             }.bind(this));
         }.bind(this));
       },
