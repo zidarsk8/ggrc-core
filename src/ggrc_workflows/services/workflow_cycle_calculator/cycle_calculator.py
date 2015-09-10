@@ -136,6 +136,32 @@ class CycleCalculator(object):
       base_date.month,
       min([t.relative_start_day for t in self.tasks] + [base_date.day]))
 
+  def get_first_task_relative(self):
+    tasks_start_dates = [
+      (v['start_date'], v['relative_start'])
+      for v in self.reified_tasks.values()]
+    tasks_start_dates.sort(key=lambda x: x[0])
+    _, first_relative_pair = tasks_start_dates[0]
+    return first_relative_pair
+
+  def get_last_task_relative(self):
+    tasks_end_dates = [
+      (v['end_date'], v['relative_end'])
+      for v in self.reified_tasks.values()]
+    tasks_end_dates.sort(key=lambda x: x[0], reverse=True)
+    _, last_relative_pair = tasks_end_dates[0]
+    return last_relative_pair
+
+  def get_month_day_pair_from_relative(self, relative_pair):
+    """Normalize relative pair to tuple"""
+    # relative_pair = (relative_start_month, relative_start_day)
+    if type(relative_pair) is tuple:
+      rm, rd = relative_pair
+    else:
+      rd = relative_pair
+      rm = None
+    return rm, rd
+
   def workflow_date_range(self):
     """Calculates the min start date and max end date across all tasks.
 
@@ -151,7 +177,7 @@ class CycleCalculator(object):
     start_date, end_date = self.non_adjusted_task_date_range(task, base_date)
     return self.adjust_date(start_date), self.adjust_date(end_date)
 
-  def non_adjusted_task_date_range(self, task, base_date=None):
+  def non_adjusted_task_date_range(self, task, base_date=None, initialisation=False):
     """Calculates individual task's start and end date based on base_date.
 
     Taking base_date into account calculates individual task's start and
@@ -169,22 +195,39 @@ class CycleCalculator(object):
     if not base_date:
       base_date = datetime.date.today()
 
-    start_day = self.relative_day_to_date(
+    start_date = self.relative_day_to_date(
       task.relative_start_day,
       relative_month=task.relative_start_month,
       base_date=base_date)
 
-    end_day = self.relative_day_to_date(
+    end_date = self.relative_day_to_date(
       task.relative_end_day,
       relative_month=task.relative_end_month,
       base_date=base_date)
 
+    # On initialisation `reified_tasks` haven't been initialised yet, making
+    # this check unnecessary (and impossible).
+    if not initialisation:
+      min_rsm, min_rsd = self.get_month_day_pair_from_relative(
+        self.get_first_task_relative())
+
+      min_start = self.relative_day_to_date(
+        relative_day=min_rsd, relative_month=min_rsm,
+        base_date=base_date)
+
+      # In certain cases (e.g. quarterly) the calculation of correct time unit
+      # in which we operate can actually put start date of a specific task
+      # BEFORE actual first task - in such case, we have to move start and end
+      # dates one time unit forward.
+      if start_date < min_start:
+        start_date = start_date + self.time_delta
+        end_date = end_date + self.time_delta
+
     # If the end_day is before start_day, end_date is overflowing
     # to next time unit.
-    if end_day < start_day:
-      end_day = end_day + self.time_delta
-
-    return start_day, end_day
+    if end_date < start_date:
+      end_date = end_date + self.time_delta
+    return start_date, end_date
 
   def next_cycle_start_date(self, base_date=None):
     return self.adjust_date(self.non_adjusted_next_cycle_start_date(base_date))
@@ -207,33 +250,14 @@ class CycleCalculator(object):
     if not base_date:
       base_date = today
 
-    tasks_start_dates = [
-      (v['start_date'], v['relative_start'])
-      for v in self.reified_tasks.values()]
-    tasks_start_dates.sort(key=lambda x: x[0])
-
-    tasks_end_dates = [
-      (v['end_date'], v['relative_end'])
-      for v in self.reified_tasks.values()]
-    tasks_end_dates.sort(key=lambda x: x[0], reverse=True)
-
-    min_date, min_rel = tasks_start_dates[0]
-    if type(min_rel) is tuple:
-      min_rsm, min_rsd = min_rel # min_relative_start_month, min_relative_start_day
-    else:
-      min_rsd = min_rel
-      min_rsm = None
+    min_rsm, min_rsd = self.get_month_day_pair_from_relative(
+      self.get_first_task_relative())
+    max_rem, max_red = self.get_month_day_pair_from_relative(
+      self.get_last_task_relative())
 
     min_start = self.relative_day_to_date(
       relative_day=min_rsd, relative_month=min_rsm,
       base_date=base_date)
-
-    max_date, max_rel = tasks_end_dates[0]
-    if type(max_rel) is tuple:
-      max_rem, max_red = max_rel # max_relative_start_month, max_relative_start_day
-    else:
-      max_red = max_rel
-      max_rem = None
 
     max_end = self.relative_day_to_date(
       relative_day=max_red, relative_month=max_rem,
