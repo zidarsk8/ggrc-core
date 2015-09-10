@@ -33,8 +33,9 @@ def upgrade():
     notif_types = {nc[1] for nc in notif_configs}
     to_delete = []
     for type in notif_types:
-        # Get all notifications of the same type
+        # Get all notifications of the same type and sort them by person_id
         notifs = filter(lambda x: x[1] == type, notif_configs)
+        notifs.sort(key=lambda x: x[2])
         # Group by person_id
         grouped = groupby(notifs, lambda x: x[2])
         # Expand the iterable to allow for count
