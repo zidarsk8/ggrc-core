@@ -79,7 +79,7 @@ h4.search-title {
     }
     .widgetsearch-submit {
       @include border-radius(0 4px 4px 0);
-      @include background-size(368px 440px);
+      @include background-size(392px 440px);
       background-color: $lightGray;
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
@@ -598,7 +598,7 @@ h4.search-title {
         }
       }
       .closed {
-        @include background-size(368px 440px);
+        @include background-size(392px 440px);
         background-image: image-url("grcicons/icons.png");
         background-position: -347px -179px;
         background-repeat: no-repeat;

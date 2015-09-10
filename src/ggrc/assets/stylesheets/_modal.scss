@@ -657,7 +657,7 @@
       &:hover {
         .ui-resizable-handle {
           @include opacity(0.8);
-          @include background-size(368px 440px);
+          @include background-size(392px 440px);
           background-color: lighten($lightGray,5%);
           background-repeat:no-repeat;
           background-image: image-url("grcicons/icons.png");
