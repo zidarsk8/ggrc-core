@@ -1153,7 +1153,15 @@ p.modal-value {
   ul.new-tree {
     li.tree-item {
       min-height: 24px;
-      line-height: 22px;
+      line-height: 24px;
+      margin: 0 10px;
+
+      [class^="grcicon-"] {
+        margin-top: 4px;
+      }
+      .show-details i {
+        margin-top: 0;
+      }
       [class*="span"] {
         min-height: 22px;
       }
@@ -1164,23 +1172,31 @@ p.modal-value {
       .url-link {
         display: none;
       }
+      .item-wrap {
+        margin: 0;
+      }
+      > .item-main {
+        background: transparent;
+      }
+      &:nth-child(even) {
+        background: #fafafa;
+      }
     }
     &.tree-open {
       li.tree-item {
         &.item-open {
           @include box-shadow(none);
-          margin: 0;
+          margin: 0 10px;
           > .item-main {
             > .item-wrap {
               border-bottom: 1px solid $itemBorder;
-              margin-bottom: 14px;
             }
           }
         }
       }
       .content-open {
         border-bottom: 2px solid $textGray;
-        margin: 0 10px;
+        padding: 14px 10px 0 10px;
         .tier-2-info-content {
           padding: 0 0 0 32px;
         }
