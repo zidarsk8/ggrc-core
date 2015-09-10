@@ -11,7 +11,7 @@ Create Date: 2015-09-08 17:56:00.151641
 from itertools import groupby
 
 revision = '2d8a46b1e4a4'
-down_revision = '49b2ecde7ad0'
+down_revision = '3046ce611147'
 
 from alembic import op
 
