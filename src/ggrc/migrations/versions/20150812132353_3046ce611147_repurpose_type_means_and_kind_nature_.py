@@ -52,14 +52,17 @@ def upgrade():
     op.execute("UPDATE controls SET kind_id = NULL WHERE kind_id IN (SELECT id FROM options WHERE title in ('Administrative', 'Reactive'));")
 
     # Delete deprecated kinds and means
-    op.execute("DELETE FROM options WHERE role = 'control_kind' AND title IN ('Administrative', 'Reactive');")
-    op.execute("DELETE FROM options WHERE role = 'control_means' AND title IN ( 'Automated', 'Fin - Application', 'Fin - IT-Supported Manual', 'Fin - Manual', 'IT - Automated ITGC', 'IT - IT-Supported ITGC', 'Manual', 'Manual - Segregation of Duties');")
-
+    op.execute("""DELETE FROM options WHERE
+        (role = 'control_kind' AND title IN ('Administrative', 'Reactive')) OR
+        (role = 'control_means' AND title IN ('Automated', 'Fin - Application', 'Fin - IT-Supported Manual', 'Fin - Manual', 'IT - Automated ITGC', 'IT - IT-Supported ITGC', 'Manual', 'Manual - Segregation of Duties'));
+    """)
     # Insert
-    op.execute("INSERT INTO options (role, title) VALUES('control_kind', 'Corrective');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'Technical');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'Administrative');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'Physical');")
+    op.execute("""INSERT INTO options (role, title) VALUES
+      ('control_kind', 'Corrective'),
+      ('control_means', 'Technical'),
+      ('control_means', 'Administrative'),
+      ('control_means', 'Physical');
+    """)
 
 
 def downgrade():
@@ -68,18 +71,24 @@ def downgrade():
     op.execute("UPDATE controls SET kind_id = NULL WHERE kind_id IN (SELECT id FROM options WHERE title in ('Corrective'));")
 
     # Delete deprecated kinds and means
-    op.execute("DELETE FROM options WHERE role = 'control_kind' AND title IN ('Corrective');")
-    op.execute("DELETE FROM options WHERE role = 'control_means' AND title IN ('Technical', 'Administrative', 'Physical');")
+    op.execute("""DELETE FROM options WHERE
+        (role = 'control_kind' AND title IN ('Corrective')) OR
+        (role = 'control_means' AND title IN ('Technical', 'Administrative', 'Physical'));
+    """)
 
     # Insert
-    op.execute("INSERT INTO options (role, title) VALUES('control_kind', 'Administrative');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_kind', 'Reactive');")
+    op.execute("""INSERT INTO options (role, title) VALUES
+      ('control_kind', 'Administrative'),
+      ('control_kind', 'Reactive');
+    """)
 
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'Automated');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'Fin - Application');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'Fin - IT-Supported Manual');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'Fin - Manual');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'IT - Automated ITGC');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'IT - IT-Supported ITGC');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'Manual');")
-    op.execute("INSERT INTO options (role, title) VALUES('control_means', 'Manual - Segregation of Duties');")
+    op.execute("""INSERT INTO options (role, title) VALUES
+      ('control_means', 'Automated'),
+      ('control_means', 'Fin - Application'),
+      ('control_means', 'Fin - IT-Supported Manual'),
+      ('control_means', 'Fin - Manual'),
+      ('control_means', 'IT - Automated ITGC'),
+      ('control_means', 'IT - IT-Supported ITGC'),
+      ('control_means', 'Manual'),
+      ('control_means', 'Manual - Segregation of Duties');
+    """)
