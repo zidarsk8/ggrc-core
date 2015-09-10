@@ -95,6 +95,10 @@ class ColumnHandler(object):
 
 class DeleteColumnHandler(ColumnHandler):
 
+  # this is a white list of objects that can be deleted in a cascade
+  # e.g. deleting a Market can delete the associated ObjectOwner objectect too
+  delete_whitelist = {"Relationship", "ObjectOwner", "ObjectPerson"}
+
   def get_value(self):
     return ""
 
@@ -118,7 +122,7 @@ class DeleteColumnHandler(ColumnHandler):
     try:
       tr.session.delete(obj)
       deleted = len([o for o in tr.session.deleted
-                    if o.type != "Relationship"])
+                    if o.type not in self.delete_whitelist])
       if deleted != 1:
         self.add_error(errors.DELETE_CASCADE_ERROR,
                        object_type=obj.type, slug=obj.slug)
