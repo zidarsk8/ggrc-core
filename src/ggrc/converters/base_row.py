@@ -22,6 +22,7 @@ class RowConverter(object):
     self.obj = options.get("obj")
     self.from_ids = self.obj is not None
     self.is_new = True
+    self.is_delete = False
     self.ignore = False
     self.index = options.get("index", -1)
     self.row = options.get("row", [])
@@ -49,7 +50,9 @@ class RowConverter(object):
     """ Pack row data with handlers """
     handle_fields = self.headers if field_list is None else field_list
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
-      if attr_name not in handle_fields or attr_name in self.attrs:
+      if attr_name not in handle_fields or \
+          attr_name in self.attrs or \
+          self.is_delete:
         continue
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
@@ -78,7 +81,7 @@ class RowConverter(object):
       self.handle_csv_row_data(field_list)
 
   def chect_mandatory_fields(self):
-    if not self.is_new:
+    if not self.is_new or self.is_delete:
       return
     mandatory = [key for key, header in
                  self.block_converter.object_headers.items()
@@ -135,7 +138,7 @@ class RowConverter(object):
     return obj
 
   def setup_secondary_objects(self, slugs_dict):
-    if not self.obj or self.ignore:
+    if not self.obj or self.ignore or self.is_delete:
       return
     for mapping in self.objects.values():
       mapping.set_obj_attr()
@@ -164,16 +167,17 @@ class RowConverter(object):
           self.object_class, obj=self.obj, src={}, service=service_class)
 
   def insert_object(self):
-    if self.ignore:
+    if self.ignore or self.is_delete:
       return
-    self.send_signals()
-    if self.is_new:
-      db.session.add(self.obj)
-    for handler in self.attrs.values():
-      handler.insert_object()
+    else:
+      self.send_signals()
+      if self.is_new:
+        db.session.add(self.obj)
+      for handler in self.attrs.values():
+        handler.insert_object()
 
   def insert_secondary_objecs(self):
-    if not self.obj or self.ignore:
+    if not self.obj or self.ignore or self.is_delete:
       return
     for secondery_object in self.objects.values():
       secondery_object.insert_object()

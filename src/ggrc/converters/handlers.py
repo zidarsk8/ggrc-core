@@ -93,6 +93,50 @@ class ColumnHandler(object):
     pass
 
 
+class DeleteColumnHandler(ColumnHandler):
+
+  # this is a white list of objects that can be deleted in a cascade
+  # e.g. deleting a Market can delete the associated ObjectOwner objectect too
+  delete_whitelist = {"Relationship", "ObjectOwner", "ObjectPerson"}
+
+  def get_value(self):
+    return ""
+
+  def parse_item(self):
+    is_delete = self.raw_value.lower() in ["true", "yes"]
+    self.row_converter.is_delete = is_delete
+    return is_delete
+
+  def set_obj_attr(self):
+    if not self.value:
+      return
+    obj = self.row_converter.obj
+    if self.row_converter.is_new:
+      self.add_error(errors.DELETE_NEW_OBJECT_ERROR,
+                     object_type=obj.type,
+                     slug=obj.slug)
+      return
+    if self.row_converter.ignore:
+      return
+    tr = db.session.begin_nested()
+    try:
+      tr.session.delete(obj)
+      deleted = len([o for o in tr.session.deleted
+                    if o.type not in self.delete_whitelist])
+      if deleted != 1:
+        self.add_error(errors.DELETE_CASCADE_ERROR,
+                       object_type=obj.type, slug=obj.slug)
+    finally:
+      if self.dry_run or self.row_converter.ignore:
+        tr.rollback()
+      else:
+        indexer = self.row_converter.block_converter.converter.indexer
+        if indexer is not None:
+          for o in tr.session.deleted:
+            indexer.delete_record(o.id, o.__class__.__name__, commit=False)
+        tr.commit()
+
+
 class StatusColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):

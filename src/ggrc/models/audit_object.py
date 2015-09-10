@@ -56,7 +56,10 @@ class AuditObject(Base, db.Model):
         orm.subqueryload('audit'))
 
   def _display_name(self):
-    return self.audit.display_name + '<->' + self.auditable.display_name
+    return '{} <-> {} {}'.format(str(self.audit.display_name),
+                                 str(self.auditable_type),
+                                 str(self.auditable_id))
+
 
 class Auditable(object):
   @declared_attr
