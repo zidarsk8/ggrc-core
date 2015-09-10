@@ -14,42 +14,9 @@ permissions = {
         "Request",
         "ControlAssessment",
         "Issue",
-        {
-            "terms": {
-                "property_name": "status",
-                "value": [
-                    "Submitted",
-                    "Accepted",
-                    "Rejected"
-                ]
-            },
-            "type": "DocumentationResponse",
-            "condition": "in"
-        },
-        {
-            "terms": {
-                "property_name": "status",
-                "value": [
-                    "Submitted",
-                    "Accepted",
-                    "Rejected"
-                ]
-            },
-            "type": "InterviewResponse",
-            "condition": "in"
-        },
-        {
-            "terms": {
-                "property_name": "status",
-                "value": [
-                    "Submitted",
-                    "Accepted",
-                    "Rejected"
-                ]
-            },
-            "type": "PopulationSampleResponse",
-            "condition": "in"
-        },
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
         "Meeting",
         "ObjectDocument",
         "ObjectPerson",
@@ -63,6 +30,9 @@ permissions = {
         "Request",
         "ControlAssessment",
         "Issue",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
     ],
     "view_object_page": [
         "__GGRC_ALL__"
@@ -77,5 +47,10 @@ permissions = {
     ],
     "delete": [
         "Request",
+        "ControlAssessment",
+        "Issue",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
     ],
 }

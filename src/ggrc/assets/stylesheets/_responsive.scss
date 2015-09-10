@@ -269,10 +269,6 @@
     text-align:left;
   }
 
-  .content {
-    background: $white;
-  }
-
   .lhs-nav {
     ul.sub-level {
       li {
@@ -317,5 +313,34 @@
     [class*="span"] {
       margin-left: 0;
     }
+  }
+}
+
+@media (max-width: 1200px) {
+  h1 {
+    width: 60%;
+  }
+  .header-content {
+    .menu {
+      li {
+        a {
+          span {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  h1 {
+    width: 40%;
+  }
+}
+
+@media (max-width: 740px) {
+  h1 {
+    width: 25%;
   }
 }

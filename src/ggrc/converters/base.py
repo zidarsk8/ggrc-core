@@ -8,11 +8,14 @@ from flask import current_app
 from itertools import chain
 from itertools import product
 
-from ggrc.converters import get_importables
+from ggrc import settings
+from ggrc.cache.memcache import MemCache
 from ggrc.converters import errors
+from ggrc.converters import get_importables
 from ggrc.converters.base_block import BlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import split_array
+from ggrc.fulltext import get_indexer
 
 
 class Converter(object):
@@ -36,6 +39,7 @@ class Converter(object):
   priortiy_colums = [
       "email",
       "slug",
+      "delete",
   ]
 
   def __init__(self, **kwargs):
@@ -47,6 +51,7 @@ class Converter(object):
     self.shared_state = {}
     self.response_data = []
     self.importable = get_importables()
+    self.indexer = get_indexer()
 
   def to_array(self, data_grid=False):
     self.block_converters_from_ids()
@@ -93,6 +98,7 @@ class Converter(object):
     self.handle_priority_columns()
     self.import_objects()
     self.import_secondary_objects()
+    self.drop_cache()
 
   def handle_priority_columns(self):
     for attr_name in self.priortiy_colums:
@@ -156,3 +162,10 @@ class Converter(object):
 
   def get_object_names(self):
     return [c.object_class.__name__ for c in self.block_converters]
+
+  def drop_cache(self):
+    if not getattr(settings, 'MEMCACHE_MECHANISM', False):
+      return
+    memcache = MemCache()
+    memcache.clean()
+

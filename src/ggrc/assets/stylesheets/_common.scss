@@ -19,7 +19,7 @@ h1 {
   height: 47px;
   font-family: $fontTitle;
   font-weight: normal;
-  width: 40%;
+  width: 38%;
   float: left;
   .lhn-trigger {
     position: absolute;
@@ -448,7 +448,7 @@ small {
 
 // Date input field - To see date icon just add class .date to input field
 input.date {
-  @include background-size(368px 440px);
+  @include background-size(392px 440px);
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
   background-position: -340px -364px;
@@ -705,7 +705,7 @@ select.multiple-selector {
   .ui-datepicker-next {
     top: 4px !important;
     .ui-icon {
-      @include background-size(368px 440px);
+      @include background-size(392px 440px);
       background-image: image-url("grcicons/icons.png");
       background-position: -2000px -2000px;
       background-repeat: no-repeat;

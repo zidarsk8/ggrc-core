@@ -12,6 +12,7 @@ from ggrc.converters import errors
 from ggrc.converters import get_importables
 from ggrc.converters.handlers import CheckboxColumnHandler
 from ggrc.converters.handlers import ColumnHandler
+from ggrc.converters.handlers import ParentColumnHandler
 from ggrc.converters.handlers import UserColumnHandler
 from ggrc.models import Person
 from ggrc_workflows.models import CycleTaskGroup
@@ -35,6 +36,8 @@ class FrequencyColumnHandler(ColumnHandler):
     Returning None will set the default frequency to one_time.
     """
     if not self.raw_value:
+      self.add_error(errors.MISSING_COLUMN, s="",
+                     column_names=self.display_name)
       return None
     value = self.raw_value.lower()
     frequency = self.frequency_map.get(value, value)
@@ -46,36 +49,6 @@ class FrequencyColumnHandler(ColumnHandler):
     reverse_map = {v: k for k, v in self.frequency_map.items()}
     value = getattr(self.row_converter.obj, self.key, self.value)
     return reverse_map.get(value, value)
-
-
-class ParentColumnHandler(ColumnHandler):
-
-  """ handler for directly mapped columns """
-
-  parent = None
-
-  def __init__(self, row_converter, key, **options):
-    super(ParentColumnHandler, self).__init__(row_converter, key, **options)
-
-  def parse_item(self):
-    """ get parent workflow id """
-    # pylint: disable=protected-access
-    if self.raw_value == "":
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-      return None
-    slug = self.raw_value
-    obj = self.new_objects.get(self.parent, {}).get(slug)
-    if obj is None:
-      obj = self.parent.query.filter(self.parent.slug == slug).first()
-    if obj is None:
-      self.add_error(errors.UNKNOWN_OBJECT,
-                     object_type=self.parent._inflector.human_singular.title(),
-                     slug=slug)
-    return obj
-
-  def get_value(self):
-    value = getattr(self.row_converter.obj, self.key, self.value)
-    return value.slug
 
 
 class WorkflowColumnHandler(ParentColumnHandler):
@@ -335,12 +308,12 @@ class ObjectsColumnHandler(ColumnHandler):
   def insert_object(self):
     obj = self.row_converter.obj
     existing = set((t.object_type, t.object_id)
-                   for t in self.row_converter.obj.task_group_objects)
+                   for t in obj.task_group_objects)
     for object_ in self.value:
       if (object_.type, object_.id) in existing:
         continue
       tgo = TaskGroupObject(
-          task_group=self.row_converter.obj,
+          task_group=obj,
           object=object_,
       )
       db.session.add(tgo)

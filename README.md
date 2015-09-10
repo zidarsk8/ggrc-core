@@ -63,6 +63,13 @@ launching the application in the Google App Engine SDK environment is simple:
 launch_gae_ggrc
 ```
 
+This requires `src/app.yaml` with settings. You can generate one for
+development with:
+
+```sh
+deploy_appengine extras/deploy_settings_local.sh
+```
+
 ### Accessing the Application
 
 The application will be accessible via this URL: <http://localhost:8080/>

@@ -39,32 +39,7 @@ permissions = {
     "view_object_page": [
         "__GGRC_ALL__"
     ],
-    "update": [
-        {
-            "terms": {
-                "property_name": "assignee",
-                "value": "$current_user"
-            },
-            "type": "Request",
-            "condition": "is"
-        },
-        {
-            "terms": {
-                "property_name": "contact",
-                "value": "$current_user"
-            },
-            "type": "DocumentationResponse",
-            "condition": "is"
-        },
-        {
-            "terms": {
-                "property_name": "contact",
-                "value": "$current_user"
-            },
-            "type": "InterviewResponse",
-            "condition": "is"
-        },
-    ],
+    "update": [],
     "delete": [
         "ObjectDocument",
         "ObjectPerson",
