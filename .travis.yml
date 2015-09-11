@@ -29,6 +29,7 @@ install:
   - bower install
 before_script:
   - "source bin/init_env"
+  - make bower_components
   - build_compass
   - build_assets
 script:
