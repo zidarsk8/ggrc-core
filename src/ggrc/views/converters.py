@@ -11,6 +11,7 @@ from werkzeug.exceptions import BadRequest
 
 from ggrc.app import app
 from ggrc.login import login_required
+from ggrc.converters import get_importables, get_exportables
 from ggrc.converters.base import Converter
 from ggrc.converters.query_helper import QueryHelper, BadQueryException
 from ggrc.converters.import_helper import generate_csv_string
@@ -100,7 +101,27 @@ def handle_import_request():
   raise BadRequest("Import failed due to server error.")
 
 
+def get_import_types(export_only=False):
+  types = get_exportables if export_only else get_importables
+  data = {}
+  for key, model in types().items():
+    data[key] = model._inflector.title_plural
+  response_json = json.dumps(data)
+  headers = [("Content-Type", "application/json")]
+  return current_app.make_response((response_json, 200, headers))
+
+
 def init_converter_views():
+  @app.route("/_service/export_csv/definitions", methods=["GET"])
+  @login_required
+  def handle_export_csv_definitions():
+    return get_import_types(export_only=True)
+
+  @app.route("/_service/import_csv/definitions", methods=["GET"])
+  @login_required
+  def handle_import_csv_definitions():
+    return get_import_types(export_only=False)
+
   @app.route("/_service/export_csv", methods=["POST"])
   @login_required
   def handle_export_csv():
