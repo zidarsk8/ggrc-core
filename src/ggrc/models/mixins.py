@@ -496,9 +496,33 @@ class WithContact(object):
 
   _publish_attrs = ['contact', 'secondary_contact']
   _aliases = {
-      "contact": "Primary Contact",
-      "secondary_contact": "Secondary Contact",
+      "contact": {
+        "display_name": "Primary Contact",
+        "filter_by": "_filter_by_contact",
+      },
+      "secondary_contact": {
+        "display_name": "Secondary Contact",
+        "filter_by": "_filter_by_secondary_contact",
+      },
   }
+
+  @classmethod
+  def _filter_by_contact(cls, predicate):
+    # dependency cycle mixins.py <~> person.py
+    from ggrc.models.person import Person
+    return Person.query.filter(
+        (Person.id == cls.contact_id) &
+        (predicate(Person.name) | predicate(Person.email))
+    ).exists()
+
+  @classmethod
+  def _filter_by_secondary_contact(cls, predicate):
+    # dependency cycle mixins.py <~> person.py
+    from ggrc.models.person import Person
+    return Person.query.filter(
+        (Person.id == cls.secondary_contact_id) &
+        (predicate(Person.name) | predicate(Person.email))
+    ).exists()
 
 
 class BusinessObject(

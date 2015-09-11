@@ -1028,6 +1028,18 @@ Mustache.registerHelper("with_direct_mappings_as",
   return options.fn(options.contexts.add(frame));
 });
 
+Mustache.registerHelper("has_mapped_objects", function (selected, instance, options) {
+  selected = resolve_computed(selected);
+  instance = resolve_computed(instance);
+  if (!selected.objects) {
+    options.inverse(options.contexts);
+  }
+  var isMapped = _.some(selected.objects, function (el) {
+        return el.id === instance.id && el.type === instance.type;
+      });
+  return options[isMapped ? "fn" : "inverse"](options.contexts);
+});
+
 Mustache.registerHelper("result_direct_mappings", function (bindings, parent_instance, options) {
   bindings = Mustache.resolve(bindings);
   bindings = resolve_computed(bindings);
@@ -1304,68 +1316,20 @@ Mustache.registerHelper("is_allowed_all", function (action, instances, options) 
 });
 
 Mustache.registerHelper("is_allowed_to_map", function (source, target, options) {
-  //  For creating mappings, we only care if the user can create instances of
-  //  the join model.
+  //  For creating mappings, we only care if the user has update permission on
+  //  source and/or target.
   //  - `source` must be a model instance
-  //  - `target` must be the name of the target model
-  //
-  //  FIXME: This should actually iterate through all applicable join models
-  //    and return success if any one matches.
-  var target_type
-    , resource_type
-    , context_id
-    , can_map
-    ;
+  //  - `target` can be the name of the target model or the target instance
+  var target_type, resource_type, context_id, can_map;
 
   source = resolve_computed(source);
   target = resolve_computed(target);
+  can_map = GGRC.Utils.allowed_to_map(source, target, options);
 
-  if (target instanceof can.Model)
-    target_type = target.constructor.shortName;
-  else
-    target_type = target;
-
-  //if (!(source instanceof can.Model)) {
-  //  //  If `source` is not a model instance, assume they want to link to the
-  //  //  page object.
-  //  options = target;
-  //  target = source;
-  //  source = GGRC.page_instance();
-  //}
-
-  context_id = source.context ? source.context.id : null;
-
-  resource_type = GGRC.Mappings.join_model_name_for (
-    source.constructor.shortName, target_type);
-
-  // The special case for `Cacheable` should no longer be necessary given
-  // correct definition of the canonical mapping for Cacheable.
-  if (!resource_type && target_type === 'Cacheable') {
-    //  FIXME: This will *not* work for customizable roles -- this *only* works
-    //    for the limited default roles as of 2013-10-07, and assumes that:
-    //    1.  All `Cacheable` mappings (e.g. where you might map multiple types
-    //        to a single object) are in the `null` context; and
-    //    2.  If a user has permission for creating `Relationship` objects in
-    //        the `null` context, they have permission for creating all mapping
-    //        objects in `null` context.
-    //  UPDATE 2013-03-05: Passing source context solved the issue where user
-    //    with reader sys-wide role and program owner role was unable to map
-    //    objects.
-    can_map = Permission.is_allowed('create', 'Relationship', context_id);
-  }
-  else {
-    if (!(source instanceof CMS.Models.Program)
-        && target instanceof CMS.Models.Program)
-      context_id = target.context ? target.context.id : null;
-
-    // We should only map objects that have join models
-    can_map = (!(options.hash && options.hash.join) || resource_type)
-      && Permission.is_allowed('create', resource_type, context_id);
-  }
-  if (can_map)
+  if (can_map) {
     return options.fn(options.contexts || this);
-  else
-    return options.inverse(options.contexts || this);
+  }
+  return options.inverse(options.contexts || this);
 });
 
 function resolve_computed(maybe_computed, always_resolve) {
@@ -2123,7 +2087,7 @@ Mustache.registerHelper("private_program_owner", function (instance, modal_title
   else {
     var loader = resolve_computed(instance).get_binding('authorizations');
     return $.map(loader.list, function (binding) {
-      if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+      if (binding.instance.role && binding.instance.role.reify().attr('name') === 'ProgramOwner') {
         return binding.instance.person.reify().attr('email');
       }
     }).join(', ');
@@ -2141,7 +2105,7 @@ Mustache.registerHelper("if_multi_owner", function (instance, modal_title, optio
 
   var loader = resolve_computed(instance).get_binding('authorizations');
   can.each(loader.list, function(binding){
-    if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+    if (binding.instance.role && binding.instance.role.reify().attr('name') === 'ProgramOwner') {
       owner_count += 1;
     }
   });
@@ -2328,6 +2292,7 @@ Mustache.registerHelper("remove_space", function (str, options) {
 Mustache.registerHelper("if_auditor", function (instance, options) {
   var audit, auditors_dfd, auditors
     , admin = Permission.is_allowed("__GGRC_ADMIN__")
+    , editor = GGRC.current_user.system_wide_role === "Editor"
     , include_admin = !options.hash || options.hash.include_admin !== false;
 
   instance = Mustache.resolve(instance);
@@ -2346,7 +2311,7 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
   audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
   auditors = audit.findAuditors(true); // immediate-mode findAuditors
 
-  if ((include_admin && admin) ||
+  if ((include_admin && (admin|| editor)) ||
       can.map(
           auditors,
           function (auditor) {
@@ -2366,6 +2331,7 @@ can.each({
     program_editor_states: ["Requested", "Amended Request"],
     predicate: function(options) {
       return options.admin
+          || options.editor
           || options.can_assignee_edit
           || options.can_program_editor_edit
           || options.can_auditor_edit
@@ -2382,6 +2348,7 @@ can.each({
     program_editor_states: ["Requested", "Amended Request"],
     predicate: function(options) {
       return options.admin
+          || options.editor
           || options.can_auditor_edit
           || options.can_assignee_edit
           || options.can_program_editor_edit
@@ -2395,7 +2362,7 @@ can.each({
     assignee_states: ["Requested", "Amended Request"],
     program_editor_states: ["Requested", "Amended Request"],
     predicate: function(options) {
-      return (!options.draft && options.admin)
+      return (!options.draft && (options.admin || options.editor))
           || options.can_assignee_edit
           || options.can_program_editor_edit
           || (!options.accepted
@@ -2410,7 +2377,8 @@ can.each({
   Mustache.registerHelper(name, function(instance, options){
 
       var audit, auditors_dfd, accepted, prog_roles_dfd,
-          admin = Permission.is_allowed("__GGRC_ADMIN__");
+          admin = Permission.is_allowed("__GGRC_ADMIN__"),
+          editor = GGRC.current_user.system_wide_role === "Editor";
 
       instance = resolve_computed(instance);
       instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
@@ -2425,10 +2393,9 @@ can.each({
 
       audit = audit.reify();
       auditors_dfd = audit.findAuditors();
-      prog_roles_dfd = new RefreshQueue()
-                       .enqueue(audit.attr("program").reify())
-                       .trigger().then(function(progs) {
-                         return progs[0].get_binding("program_authorizations").refresh_instances();
+      prog_roles_dfd = audit.refresh_all('program').then(function(program) {
+                         //debugger;
+                         return program.get_binding("program_authorizations").refresh_instances();
                        }).then(function(user_role_bindings) {
                           var rq = new RefreshQueue();
                           can.each(user_role_bindings, function(urb) {
@@ -2475,6 +2442,7 @@ can.each({
 
         if(fn_opts.predicate({
           admin: admin,
+          editor: editor,
           can_auditor_edit: can_auditor_edit,
           can_assignee_edit: can_assignee_edit,
           can_program_editor_edit: can_program_editor_edit,
@@ -3098,18 +3066,19 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
       audit, programs, program, control, json;
 
   if (!audits.length) {
-    return "{}";
+    return "";
   }
 
   audit = audits[0].instance.reify();
   programs = audit.get_mapping("_program");
   program = programs[0].instance.reify();
-  control = instance.control.reify();
+  control = instance.control ? instance.control.reify() : {};
 
   json = {
     audit: {title: audit.title, id: audit.id, type: audit.type},
     program: {title: program.title, id: program.id, type: program.type},
     control: {title: control.title, id: control.id, type: control.type},
+    context: {type: audit.context.type, id: audit.context.id},
     control_assessment: {
       title: instance.title,
       id: instance.id,
@@ -3120,6 +3089,23 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   };
 
   return options.fn(options.contexts.add({'create_issue_json': JSON.stringify(json)}));
+});
+
+Mustache.registerHelper("pretty_role_name", function (name) {
+  name = Mustache.resolve(name);
+  var ROLE_LIST = {
+    "ProgramOwner": "Program Manager",
+    "ProgramEditor": "Program Editor",
+    "ProgramReader": "Program Reader",
+    "WorkflowOwner": "Workflow Manager",
+    "WorkflowMember": "Workflow Member",
+    "Mapped": "No Access",
+    "Owner": "Manager",
+  };
+  if (ROLE_LIST[name]) {
+    return ROLE_LIST[name];
+  }
+  return name;
 });
 
 })(this, jQuery, can);

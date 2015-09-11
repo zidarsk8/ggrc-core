@@ -13,7 +13,7 @@ from ggrc_risk_assessments import models as ra_models
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import split_array
-from ggrc.converters.import_helper import pretty_name
+from ggrc.utils import title_from_camelcase
 from ggrc.utils import get_mapping_rules
 from tests.ggrc import TestCase
 from tests.ggrc.generator import ObjectGenerator
@@ -22,10 +22,11 @@ THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
 
 def get_mapping_names(class_name):
-  mapping_rules = get_mapping_rules()[class_name]
-  pretty_rules = map(pretty_name, mapping_rules)
+  mapping_rules = get_mapping_rules().get(class_name, set())
+  pretty_rules = map(title_from_camelcase, mapping_rules)
   mapping_names = set(["map:{}".format(name) for name in pretty_rules])
-  return mapping_names
+  unmapping_names = set(["unmap:{}".format(name) for name in pretty_rules])
+  return mapping_names.union(unmapping_names)
 
 class TestSplitArry(TestCase):
 
@@ -118,12 +119,12 @@ class TestCulumnOrder(TestCase):
         "slug",
         "title",
         "description",
-        "test_plan",
         "notes",
+        "test_plan",
         "owners",
         "start_date",
-        "kind",
         "status",
+        "kind",
         "url",
         "reference_url",
         "name",
@@ -175,6 +176,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "State",
         "My Attribute",
         "Mandatory Attribute",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -209,9 +211,10 @@ class TestCustomAttributesDefinitions(TestCase):
         "Description",
         "Notes",
         "Privacy",
-        "Owner",
+        "Manager",
         "Reader",
         "Editor",
+        "No Access",
         "Primary Contact",
         "Secondary Contact",
         "Program URL",
@@ -223,12 +226,13 @@ class TestCustomAttributesDefinitions(TestCase):
         "My Attribute",
         "Mandatory Attribute",
         "Choose",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Owner"]["mandatory"])
+    self.assertTrue(vals["Manager"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Mandatory Attribute"]["mandatory"])
     self.assertTrue(vals["Choose"]["mandatory"])
@@ -255,9 +259,10 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Privacy",
-        "Owner",
+        "Manager",
         "Reader",
         "Editor",
+        "No Access",
         "Primary Contact",
         "Secondary Contact",
         "Program URL",
@@ -266,15 +271,16 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Owner"]["mandatory"])
+    self.assertTrue(vals["Manager"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
-    self.assertIn("type", vals["Owner"])
-    self.assertEquals(vals["Owner"]["type"], "user_role")
+    self.assertIn("type", vals["Manager"])
+    self.assertEquals(vals["Manager"]["type"], "user_role")
 
   def test_audit_definitions(self):
     """ test default headers for Audit """
@@ -293,6 +299,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Planned Report Period from",
         "Planned Report Period to",
         "Auditors",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -324,6 +331,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Conclusion: Design",
         "Conclusion: Operation",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -353,6 +361,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -379,6 +388,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -406,6 +416,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -432,6 +443,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -458,6 +470,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -484,6 +497,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -509,6 +523,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Reference URL",
         "Code",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -545,6 +560,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Principal Assessor",
         "Secondary Assessor",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -569,6 +585,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Reference URL",
         "Code",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -587,6 +604,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Email",
         "Company",
         "Role",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -612,6 +630,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -638,6 +657,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -665,6 +685,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -692,6 +713,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -718,6 +740,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -745,6 +768,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -771,6 +795,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -797,6 +822,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -823,6 +849,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -830,6 +857,28 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["mandatory"])
     self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
+
+  def test_request_definitions(self):
+    """ test default headers for Request """
+    definitions = get_object_column_definitions(models.Request)
+    mapping_names = get_mapping_names(models.Request.__name__)
+    display_names = set([val["display_name"] for val in definitions.values()])
+    element_names = set([
+        "Assignee",
+        "Audit",
+        "Code",
+        "Description",
+        "Due On",
+        "Notes",
+        "Request Object",
+        "Request Type",
+        "Requested On",
+        "Status",
+        "Test",
+        "Delete",
+    ])
+    expected_names = element_names.union(mapping_names)
+    self.assertEquals(expected_names, display_names)
 
 
 class TestGetWorkflowObjectColumnDefinitions(TestCase):
@@ -846,21 +895,23 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Title",
         "Description",
         "Custom email message",
-        "Owner",
+        "Manager",
         "Member",
+        "No Access",
         "Frequency",
         "Force real-time email updates",
         "Code",
+        "Delete",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Owner"]["mandatory"])
+    self.assertTrue(vals["Manager"]["mandatory"])
     self.assertTrue(vals["Frequency"]["mandatory"])
-    self.assertIn("type", vals["Owner"])
+    self.assertIn("type", vals["Manager"])
     self.assertIn("type", vals["Member"])
-    self.assertEquals(vals["Owner"]["type"], "workflow_role")
-    self.assertEquals(vals["Member"]["type"], "workflow_role")
+    self.assertEquals(vals["Manager"]["type"], "user_role")
+    self.assertEquals(vals["Member"]["type"], "user_role")
 
   def test_task_group_definitions(self):
     """ test default headers for Task Group """
@@ -872,6 +923,8 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Assignee",
         "Code",
         "Workflow",
+        "Objects",
+        "Delete",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
@@ -891,14 +944,35 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "End",
         "Task Group",
         "Code",
+        "Delete",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Summary"]["mandatory"])
     self.assertTrue(vals["Assignee"]["mandatory"])
 
-
-
+  def test_cycle_task_definitions(self):
+    """ test default headers for Cycle Task Group Object Task """
+    definitions = get_object_column_definitions(wf_models.CycleTaskGroupObjectTask)
+    display_names = set([val["display_name"] for val in definitions.values()])
+    expected_names = set([
+        "Code",
+        "Cycle",
+        "Summary",
+        "Task Type",
+        "Assignee",
+        "Task Details",
+        "Start Date",
+        "End Date",
+        "Task Group",
+        "Cycle Object",
+        "State",
+        "Delete",
+    ])
+    self.assertEquals(expected_names, display_names)
+    vals = {val["display_name"]: val for val in definitions.values()}
+    self.assertTrue(vals["Summary"]["mandatory"])
+    self.assertTrue(vals["Assignee"]["mandatory"])
 
 
 class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
@@ -921,6 +995,7 @@ class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
         "Risk Counsel",
         "Code",
         "Program",
+        "Delete",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}

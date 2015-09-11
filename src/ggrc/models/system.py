@@ -10,6 +10,7 @@ from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
 from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
+from .option import Option
 from .relationship import Relatable
 from .utils import validate_option
 from .track_object_state import HasObjectState, track_state_for_class
@@ -48,12 +49,23 @@ class SystemOrProcess(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'network_zone',
   ]
   _sanitize_html = ['version']
-  _aliases = {"network_zone": "Network Zone"}
+  _aliases = {
+      "network_zone": {
+        "display_name": "Network Zone",
+        "filter_by": "_filter_by_network_zone",
+      },
+  }
 
   @validates('network_zone')
   def validate_system_options(self, key, option):
     return validate_option(
         self.__class__.__name__, key, option, 'network_zone')
+
+  @classmethod
+  def _filter_by_network_zone(cls, predicate):
+    return Option.query.filter(
+        (Option.id == cls.network_zone_id) & predicate(Option.title)
+    ).exists()
 
   @classmethod
   def eager_query(cls):

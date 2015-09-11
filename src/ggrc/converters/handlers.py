@@ -11,19 +11,33 @@ import re
 import traceback
 
 from ggrc import db
+from ggrc.automapper import AutomapperGenerator
 from ggrc.converters import get_importables
 from ggrc.converters import errors
 from ggrc.login import get_current_user
-from ggrc.models import CustomAttributeValue
+from ggrc.models import Audit
+from ggrc.models import AuditObject
+from ggrc.models import CategoryBase
 from ggrc.models import CustomAttributeDefinition
+from ggrc.models import CustomAttributeValue
+from ggrc.models import ObjectPerson
 from ggrc.models import Option
 from ggrc.models import Person
-from ggrc.models import Program
 from ggrc.models import Policy
+from ggrc.models import Program
 from ggrc.models import Regulation
-from ggrc.models import Standard
 from ggrc.models import Relationship
-from ggrc.models.relationship import RelationshipHelper
+from ggrc.models import Request
+from ggrc.models import Response
+from ggrc.models import Standard
+from ggrc.models import all_models
+from ggrc.models.relationship_helper import RelationshipHelper
+from ggrc.rbac import permissions
+from ggrc.models.reflection import AttributeInfo
+
+
+MAPPING_PREFIX = "__mapping__:"
+CUSTOM_ATTR_PREFIX = "__custom__:"
 
 
 class ColumnHandler(object):
@@ -57,14 +71,6 @@ class ColumnHandler(object):
   def parse_item(self):
     return self.raw_value
 
-  def validate(self):
-    if callable(self.validator):
-      try:
-        self.validator(self.row_converter.obj, self.key, self.value)
-      except ValueError:
-        self.add_error("invalid status '{}'".format(self.value))
-    return True
-
   def set_obj_attr(self):
     if not self.value:
       return
@@ -87,12 +93,56 @@ class ColumnHandler(object):
     pass
 
 
+class DeleteColumnHandler(ColumnHandler):
+
+  # this is a white list of objects that can be deleted in a cascade
+  # e.g. deleting a Market can delete the associated ObjectOwner objectect too
+  delete_whitelist = {"Relationship", "ObjectOwner", "ObjectPerson"}
+
+  def get_value(self):
+    return ""
+
+  def parse_item(self):
+    is_delete = self.raw_value.lower() in ["true", "yes"]
+    self.row_converter.is_delete = is_delete
+    return is_delete
+
+  def set_obj_attr(self):
+    if not self.value:
+      return
+    obj = self.row_converter.obj
+    if self.row_converter.is_new:
+      self.add_error(errors.DELETE_NEW_OBJECT_ERROR,
+                     object_type=obj.type,
+                     slug=obj.slug)
+      return
+    if self.row_converter.ignore:
+      return
+    tr = db.session.begin_nested()
+    try:
+      tr.session.delete(obj)
+      deleted = len([o for o in tr.session.deleted
+                    if o.type not in self.delete_whitelist])
+      if deleted != 1:
+        self.add_error(errors.DELETE_CASCADE_ERROR,
+                       object_type=obj.type, slug=obj.slug)
+    finally:
+      if self.dry_run or self.row_converter.ignore:
+        tr.rollback()
+      else:
+        indexer = self.row_converter.block_converter.converter.indexer
+        if indexer is not None:
+          for o in tr.session.deleted:
+            indexer.delete_record(o.id, o.__class__.__name__, commit=False)
+        tr.commit()
+
+
 class StatusColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
     valid_states = row_converter.object_class.VALID_STATES
-    self.state_mappings = {s.lower(): s for s in valid_states}
+    self.state_mappings = {str(s).lower(): s for s in valid_states}
     super(StatusColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
@@ -110,6 +160,19 @@ class StatusColumnHandler(ColumnHandler):
 class UserColumnHandler(ColumnHandler):
 
   """ Handler for primary and secondary contacts """
+
+  def get_users_list(self):
+    users = set()
+    email_lines = self.raw_value.splitlines()
+    owner_emails = filter(unicode.strip, email_lines)  # noqa
+    for raw_line in owner_emails:
+      email = raw_line.strip().lower()
+      person = self.get_person(email)
+      if person:
+        users.add(person)
+      else:
+        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+    return list(users)
 
   def get_person(self, email):
     new_objects = self.row_converter.block_converter.converter.new_objects
@@ -153,8 +216,12 @@ class OwnerColumnHandler(UserColumnHandler):
 
   def set_obj_attr(self):
     try:
-      for owner in self.value:
-        self.row_converter.obj.owners.append(owner)
+      for person in self.row_converter.obj.owners:
+        if person not in self.value:
+          self.row_converter.obj.owners.remove(person)
+      for person in self.value:
+        if person not in self.row_converter.obj.owners:
+          self.row_converter.obj.owners.append(person)
     except:
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
       trace = traceback.format_exc()
@@ -245,11 +312,12 @@ class MappingColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
-    self.mapping_name = key[4:]  # remove "map:" prefix
     importable = get_importables()
-    self.mapping_object = importable.get(self.mapping_name)
+    self.attr_name = options.get("attr_name", "")
+    self.mapping_object = importable.get(self.attr_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
+    self.unmap = self.key.startswith(AttributeInfo.UNMAPPING_PREFIX)
     super(MappingColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
@@ -261,7 +329,10 @@ class MappingColumnHandler(ColumnHandler):
     for slug in slugs:
       obj = class_.query.filter(class_.slug == slug).first()
       if obj:
-        objects.append(obj)
+        if permissions.is_allowed_update_for(obj):
+          objects.append(obj)
+        else:
+          self.add_warning(errors.MAPPING_PERMISSION_ERROR, value=slug)
       elif not (slug in self.new_slugs and self.dry_run):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
@@ -276,14 +347,23 @@ class MappingColumnHandler(ColumnHandler):
     if self.dry_run or not self.value:
       return
     current_obj = self.row_converter.obj
+    relationships = []
     for obj in self.value:
-      if not Relationship.find_related(current_obj, obj):
+      mapping = Relationship.find_related(current_obj, obj)
+      if not self.unmap and not mapping:
         mapping = Relationship(source=current_obj, destination=obj)
+        relationships.append(mapping)
         db.session.add(mapping)
+      elif self.unmap and mapping:
+        db.session.delete(mapping)
     db.session.flush()
+    for relationship in relationships:
+      AutomapperGenerator(relationship, False).generate_automappings()
     self.dry_run = True
 
   def get_value(self):
+    if self.unmap:
+      return ""
     related_slugs = []
     related_ids = RelationshipHelper.get_ids_related_to(
         self.mapping_object.__name__,
@@ -292,7 +372,9 @@ class MappingColumnHandler(ColumnHandler):
     if related_ids:
       related_objects = self.mapping_object.query.filter(
           self.mapping_object.id.in_(related_ids))
-      related_slugs = [o.slug for o in related_objects]
+      related_slugs = (getattr(o, "slug", getattr(o, "email", None))
+                       for o in related_objects)
+      related_slugs = [slug for slug in related_slugs if slug is not None]
     return "\n".join(related_slugs)
 
   def set_value(self):
@@ -321,6 +403,12 @@ class CustomAttributeColumHandler(TextColumnHandler):
       return None
     return value
 
+  def get_value(self):
+    for value in self.row_converter.obj.custom_attribute_values:
+      if value.custom_attribute_id == self.definition.id:
+        return value.attribute_value
+    return None
+
   def set_obj_attr(self):
     if self.value:
       self.row_converter.obj.custom_attribute_values.append(self.value)
@@ -336,7 +424,7 @@ class CustomAttributeColumHandler(TextColumnHandler):
   def get_ca_definition(self):
     for definition in self.row_converter.object_class\
             .get_custom_attribute_definitions():
-      if definition.title == self.key:
+      if definition.title == self.display_name:
         return definition
     return None
 
@@ -403,7 +491,11 @@ class OptionColumnHandler(ColumnHandler):
 
   def get_value(self):
     option = getattr(self.row_converter.obj, self.key, None)
-    return "" if option is None else option.title
+    if option is None:
+      return ""
+    if callable(option.title):
+      return option.title()
+    return option.title
 
 
 class CheckboxColumnHandler(ColumnHandler):
@@ -413,38 +505,80 @@ class CheckboxColumnHandler(ColumnHandler):
     if self.raw_value == "":
       return False
     value = self.raw_value.lower() in ("yes", "true")
-    if self.raw_value.lower() not in ("yes", "true", "no", "false"):
+    if self.raw_value == "--":
+      value = None
+    if self.raw_value.lower() not in ("yes", "true", "no", "false", "--"):
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
     return value
 
   def get_value(self):
     val = getattr(self.row_converter.obj, self.key, False)
+    if val is None:
+      return "--"
     return "true" if val else "false"
 
+  def set_obj_attr(self):
+    """ handle set object for boolean values
 
-class ProgramColumnHandler(ColumnHandler):
+    This is the only handler that will allow setting a None value"""
+    try:
+      setattr(self.row_converter.obj, self.key, self.value)
+    except:
+      self.row_converter.add_error(errors.UNKNOWN_ERROR)
+      trace = traceback.format_exc()
+      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
+          self.row_converter.obj, self.key, self.value, trace)
+      current_app.logger.error(error)
+
+
+class ParentColumnHandler(ColumnHandler):
+
+  """ handler for directly mapped columns """
+
+  parent = None
+
+  def __init__(self, row_converter, key, **options):
+    super(ParentColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
-    """ get a program from slugs """
-    new_programs = self.new_objects[Program]
+    """ get parent object """
+    # pylint: disable=protected-access
     if self.raw_value == "":
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
       return None
     slug = self.raw_value
-    if slug in new_programs:
-      program = new_programs[slug]
-    else:
-      program = Program.query.filter(Program.slug == slug).first()
+    obj = self.new_objects.get(self.parent, {}).get(slug)
+    if obj is None:
+      obj = self.parent.query.filter(self.parent.slug == slug).first()
+    if obj is None:
+      self.add_error(errors.UNKNOWN_OBJECT,
+                     object_type=self.parent._inflector.human_singular.title(),
+                     slug=slug)
+    return obj
 
-    if program is None:
-      self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
-      return None
-
-    return program.id
+  def set_obj_attr(self):
+    super(ParentColumnHandler, self).set_obj_attr()
+    # inherit context
+    obj = self.row_converter.obj
+    parent = getattr(obj, self.key, None)
+    if parent is not None and \
+       hasattr(obj, "context_id") and \
+       hasattr(parent, "context_id") and \
+       parent.context_id is not None:
+      obj.context_id = parent.context_id
 
   def get_value(self):
-    val = getattr(self.row_converter.obj, self.key, False)
-    return val.slug
+    value = getattr(self.row_converter.obj, self.key, self.value)
+    if not value:
+      return None
+    return value.slug
+
+
+class ProgramColumnHandler(ParentColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.parent = Program
+    super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
 
 
 class SectionDirectiveColumnHandler(ColumnHandler):
@@ -471,3 +605,182 @@ class SectionDirectiveColumnHandler(ColumnHandler):
   def get_value(self):
     directive = getattr(self.row_converter.obj, self.key, False)
     return directive.slug
+
+
+class ControlColumnHandler(MappingColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    key = "{}control".format(MAPPING_PREFIX)
+    super(ControlColumnHandler, self).__init__(row_converter, key, **options)
+
+  def set_obj_attr(self):
+    self.value = self.parse_item()
+    if len(self.value) != 1:
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name="Control")
+      return
+    self.row_converter.obj.control = self.value[0]
+
+
+class AuditColumnHandler(MappingColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    key = "{}audit".format(MAPPING_PREFIX)
+    super(AuditColumnHandler, self).__init__(row_converter, key, **options)
+
+
+class RequestAuditColumnHandler(ParentColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.parent = Audit
+    super(RequestAuditColumnHandler, self) \
+        .__init__(row_converter, "audit", **options)
+
+
+class AuditObjectColumnHandler(ColumnHandler):
+
+  def get_value(self):
+    audit_object = self.row_converter.obj.audit_object
+    if audit_object is None:
+      return ""
+    obj_type = audit_object.auditable_type
+    obj_id = audit_object.auditable_id
+    model = getattr(all_models, obj_type, None)
+    if model is None or not hasattr(model, "slug"):
+      return ""
+    slug = db.session.query(model.slug).filter(model.id == obj_id).first()
+    if not slug:
+      return ""
+    return "{}: {}".format(obj_type, slug[0])
+
+  def parse_item(self):
+    raw = self.raw_value
+    if raw is None or raw == "":
+      return None
+    parts = [p.strip() for p in raw.split(":")]
+    if len(parts) != 2:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      return None
+    object_type, object_slug = parts
+    model = getattr(all_models, object_type, None)
+    if model is None:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      return None
+    new_objects = self.row_converter.block_converter.converter.new_objects
+    existing = new_objects[model].get(object_slug, None)
+    if existing is None:
+      existing = model.query.filter(model.slug == object_slug).first()
+      if existing is None:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    return existing
+
+  def set_obj_attr(self):
+    if not self.value:
+      return
+    # self.row_converter.obj.audit is not set yet, but it was already parsed
+    audit = self.row_converter.attrs["request_audit"].value
+    audit_object = AuditObject(
+        context=audit.context,
+        audit_id=audit.id,
+        auditable_id=self.value.id,
+        auditable_type=self.value.type
+    )
+    setattr(self.row_converter.obj, self.key, audit_object)
+    if not self.dry_run:
+      db.session.add(audit_object)
+
+
+class ObjectPersonColumnHandler(UserColumnHandler):
+
+  def parse_item(self):
+    return self.get_users_list()
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    object_person = db.session.query(ObjectPerson.person_id).filter_by(
+        personable_id=self.row_converter.obj.id,
+        personable_type=self.row_converter.obj.__class__.__name__)
+    users = Person.query.filter(Person.id.in_(object_person))
+    emails = [user.email for user in users]
+    return "\n".join(emails)
+
+  def remove_current_people(self):
+    ObjectPerson.query.filter_by(
+        personable_id=self.row_converter.obj.id,
+        personable_type=self.row_converter.obj.__class__.__name__).delete()
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    self.remove_current_people()
+    for owner in self.value:
+      user_role = ObjectPerson(
+          personable=self.row_converter.obj,
+          person=owner,
+          context=self.row_converter.obj.context
+      )
+      db.session.add(user_role)
+    self.dry_run = True
+
+
+class CategoryColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    names = [v.strip() for v in self.raw_value.split("\n")]
+    names = [name for name in names if name != ""]
+    if not names:
+      return None
+    categories = CategoryBase.query.filter(and_(
+        CategoryBase.name.in_(names),
+        CategoryBase.type == self.category_base_type
+    )).all()
+    category_names = set([c.name.strip() for c in categories])
+    for name in names:
+      if name not in category_names:
+        self.add_warning(errors.WRONG_MULTI_VALUE,
+                         column_name=self.display_name,
+                         value=name)
+    return categories
+
+  def set_obj_attr(self):
+    if self.value is None:
+      return
+    setattr(self.row_converter.obj, self.key, self.value)
+
+  def get_value(self):
+    categories = getattr(self.row_converter.obj, self.key, self.value)
+    categorie_names = [c.name for c in categories]
+    return "\n".join(categorie_names)
+
+
+class ControlCategoryColumnHandler(CategoryColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.category_base_type = "ControlCategory"
+    super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class ControlAssertionColumnHandler(CategoryColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.category_base_type = "ControlAssertion"
+    super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class RequestColumnHandler(ParentColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.parent = Request
+    super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
+
+
+class ResponseTypeColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    value = self.raw_value.lower().strip()
+    if value not in Response.VALID_TYPES:
+      self.add_error(errors.WRONG_MULTI_VALUE,
+                     column_name=self.display_name,
+                     value=value)
+    return value

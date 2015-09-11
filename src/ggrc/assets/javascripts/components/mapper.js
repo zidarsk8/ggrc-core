@@ -17,13 +17,21 @@
       model: {},
       bindings: {},
       is_loading: false,
+      page_loading: false,
       is_saving: false,
       all_selected: false,
       search_only: false,
       join_object_id: "",
       selected: new can.List(),
       entries: new can.List(),
+      options: new can.List(),
       relevant: new can.List(),
+      get_instance: can.compute(function () {
+        return CMS.Models.get_instance(this.attr("object"), this.attr("join_object_id"));
+      }),
+      get_binding_name: function (instance, plural) {
+        return (instance.has_binding(plural) ? "" : "related_") + plural;
+      },
       model_from_type: function (type) {
         var types = _.reduce(_.values(this.types()), function (memo, val) {
           if (val.items) {
@@ -33,9 +41,19 @@
         }, []);
         return _.findWhere(types, {value: type});
       },
+      get_forbidden: function (type) {
+        var forbidden = {
+          "Program": ["Audit"],
+          "Audit": ["Request", "ControlAssessment"],
+          "ControlAssessment": ["Audit", "Control"]
+        };
+        return forbidden[type] ? forbidden[type] : [];
+      },
       types: can.compute(function () {
-        var selector_list = GGRC.Mappings.get_canonical_mappings_for(this.object),
-            forbidden = ["workflow", "taskgroup", "gdrivefolder", "context"],
+        var selector_list,
+            canonical = GGRC.Mappings.get_canonical_mappings_for(this.object),
+            list = GGRC.tree_view.base_widgets_by_type[this.object],
+            forbidden = this.get_forbidden(this.object),
             groups = {
               "all_objects": {
                 name: "All Objects",
@@ -59,8 +77,9 @@
               }
             };
 
-        can.each(selector_list, function (model, model_name) {
-          if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name.toLowerCase())) {
+        selector_list = _.intersection(_.keys(canonical), list);
+        can.each(selector_list, function (model_name) {
+          if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name)) {
             return;
           }
           var cms_model = CMS.Models[model_name],
@@ -72,6 +91,7 @@
             singular: cms_model.shortName,
             plural: cms_model.title_plural.toLowerCase().replace(/\s+/, "_"),
             table_plural: cms_model.table_plural,
+            title_singular: cms_model.title_singular,
             isSelected: cms_model.shortName === this.type
           });
           groups["all_objects"]["models"].push(cms_model.shortName);
@@ -79,7 +99,6 @@
         return groups;
       })
     });
-
 
   can.Component.extend({
     tag: "modal-mapper",
@@ -98,14 +117,20 @@
       if (object) {
         data["object"] = object;
       }
+
+      type = CMS.Models[type] && type;
       if (!data["search_only"]) {
-        if (id === GGRC.page_instance().id || !tree_view) {
-          data["type"] = CMS.Models[type] ? type : "AllObject";
+        if (type) {
+          data["type"] = type;
+        } else if (id === GGRC.page_instance().id || !tree_view) {
+          data["type"] = "AllObject";
         } else {
           data["type"] = tree_view.display_list[0];
         }
       }
-      data["join_object_id"] = id || GGRC.page_instance().id;
+      if (id || GGRC.page_instance()) {
+        data["join_object_id"] = id || GGRC.page_instance().id;
+      }
       return {
         mapper: new MapperModel(data)
       };
@@ -116,20 +141,39 @@
         this.setBinding();
       },
       "deferredSave": function () {
-        var data = {
+        var source = this.scope.attr("deferred_to").instance || this.scope.attr("mapper.object"),
+            data = {
               multi_map: true,
-              arr: _.map(this.scope.attr("mapper.selected"), function (desination) {
-                    var inst = _.find(this.scope.attr("mapper.entries"), function (entry) {
-                      return entry.instance.id === desination.id;
-                    });
-                    if (inst) {
+              arr: _.compact(_.map(this.scope.attr("mapper.selected"), function (desination) {
+                    var isAllowed = GGRC.Utils.allowed_to_map(source, desination),
+                        inst = _.find(this.scope.attr("mapper.entries"), function (entry) {
+                          return entry.instance.id === desination.id;
+                        });
+                    if (inst && isAllowed) {
                       return inst.instance;
                     }
-                  }.bind(this))
+                  }.bind(this)))
             };
         this.scope.attr("deferred_to").controller.element.trigger("defer:add", [data, {map_and_save: true}]);
         // TODO: Find proper way to dismiss the modal
         this.element.find(".modal-dismiss").trigger("click");
+      },
+      ".add-button .btn modal:added": "addNew",
+      ".add-button .btn modal:success": "addNew",
+      "addNew": function (el, ev, model) {
+        var entries = this.scope.attr("mapper.entries"),
+            len = entries.length,
+            get_binding_name = this.scope.attr("mapper").get_binding_name,
+            binding, mapping, selected, item;
+
+        selected = this.scope.attr("mapper.get_instance");
+        binding = selected.get_binding(get_binding_name(selected, model.constructor.table_plural));
+        mapping = GGRC.Mappings.get_canonical_mapping_name(selected.type, model.type);
+        mapping = model.get_mapping(mapping);
+
+        item = new GGRC.ListLoaders.MappingResult(model, mapping, binding);
+        item.append = true;
+        entries.unshift(item);
       },
       ".modal-footer .btn-map click": function (el, ev) {
         ev.preventDefault();
@@ -150,10 +194,15 @@
 
         this.scope.attr("mapper.is_saving", true);
         que.enqueue(instance).trigger().done(function (inst) {
-          data["context"] = null;
+          data["context"] = instance.context || null;
           _.each(this.scope.attr("mapper.selected"), function (desination) {
-            var modelInstance;
+            var modelInstance,
+                isMapped = GGRC.Utils.is_mapped(instance, desination),
+                isAllowed = GGRC.Utils.allowed_to_map(instance, desination);
 
+            if (isMapped || !isAllowed) {
+              return;
+            }
             mapping = GGRC.Mappings.get_canonical_mapping(object, isAllObject ? desination.type : type);
             Model = CMS.Models[mapping.model_name];
             data[mapping.object_attr] = {
@@ -162,7 +211,6 @@
               id: instance.id
             };
             data[mapping.option_attr] = desination;
-
             modelInstance = new Model(data);
             defer.push(modelInstance.save());
           }, this);
@@ -175,6 +223,10 @@
               this.scope.attr("mapper.is_saving", false);
               // TODO: Find proper way to dismiss the modal
               this.element.find(".modal-dismiss").trigger("click");
+              // there is some kind of a race condition when filling the treview with new elements
+              // so many don't get rendered. To solve it, at the end of the loading
+              // we refresh the whole tree view. Other solutions could be to batch add the objects. 
+              $('.cms_controllers_tree_view:visible').control().reload_list();            
             }.bind(this));
         }.bind(this));
       },
@@ -182,11 +234,11 @@
         if (this.scope.attr("mapper.search_only")) {
           return;
         }
-        var table_plural = this.scope.attr("mapper.model.table_plural"),
-            selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
+        var get_binding_name = this.scope.attr("mapper").get_binding_name,
+            selected = this.scope.attr("mapper.get_instance"),
+            table_plural = get_binding_name(selected, this.scope.attr("mapper.model.table_plural")),
             binding;
 
-        table_plural = (selected.has_binding(table_plural) ? "" : "related_") + table_plural;
         if (!selected.has_binding(table_plural)) {
           return;
         }
@@ -226,21 +278,105 @@
         var selected = this.scope.attr("mapper.selected"),
             entries = this.scope.attr("mapper.entries");
 
+        if (!entries.length && !selected.length) {
+          return;
+        }
         this.scope.attr("mapper.all_selected", selected.length === entries.length);
       },
       "{mapper.entries} length": "allSelected",
       "{mapper.selected} length": "allSelected"
+    },
+    helpers: {
+      "get_title": function (options) {
+        var instance = this.attr("mapper.get_instance");
+        return instance && instance.title ? instance.title : this.attr("mapper.object");
+      },
+      "get_object": function (options) {
+        var type = CMS.Models[this.attr("mapper.type")];
+        if (type && type.title_plural) {
+          return type.title_plural;
+        }
+        return "Objects";
+      },
+      "loading_or_saving": function (options) {
+        if (this.attr("mapper.page_loading") || this.attr("mapper.is_saving")) {
+          return options.fn();
+        }
+        return options.inverse();
+      }
     }
   });
+
+  can.Component.extend({
+    tag: "mapper-checkbox",
+    template: "<content />",
+    scope: {
+      "instance_id": "@",
+      "is_mapped": "@",
+      "is_allowed_to_map": "@",
+      "checkbox": can.compute(function (status) {
+        return /true/gi.test(this.attr("is_mapped")) || this.attr("select_state") || this.attr("appended");
+      })
+    },
+    events: {
+      "{scope} selected": function () {
+        this.element.find(".object-check-single").prop("checked", _.findWhere(this.scope.attr("selected"), {
+          id: +this.scope.attr("instance_id")
+        }));
+      },
+      ".object-check-single change": function (el, ev) {
+        if (el.prop("disabled") || el.hasClass("disabled")) {
+          return false;
+        }
+        var scope = this.scope,
+            uid = +scope.attr("instance_id"),
+            item = _.find(scope.attr("options"), function (option) {
+              return option.instance.id === uid;
+            }),
+            status = el.prop("checked"),
+            selected = this.scope.attr("selected"),
+            needle = {id: item.instance.id},
+            index;
+
+        if (!status) {
+          index = _.findIndex(selected, needle);
+          selected.splice(index, 1);
+        } else {
+          _.findWhere(selected, needle) || selected.push({
+            id: item.instance.id,
+            type: item.instance.type,
+            href: item.instance.href
+          });
+        }
+      }
+    },
+    helpers: {
+      "not_allowed_to_map": function (options) {
+        if (/false/gi.test(this.attr("is_allowed_to_map"))) {
+          return options.fn();
+        }
+        return options.inverse();
+      },
+      "is_disabled": function (options) {
+        if (/true/gi.test(this.attr("is_mapped"))
+            || this.attr("is_saving")
+            || this.attr("is_loading")
+            || /false/gi.test(this.attr("is_allowed_to_map"))) {
+          return options.fn();
+        }
+        return options.inverse();
+      }
+    }
+  });
+
   can.Component.extend({
     tag: "mapper-results",
     template: "<content />",
     scope: {
       "items-per-page": "@",
       page: 0,
-      options: new can.List(),
-      select_all: false,
       page_loading: false,
+      select_state: false,
       loading_or_saving: can.compute(function () {
         return this.attr("page_loading") || this.attr("mapper.is_saving");
       })
@@ -252,16 +388,35 @@
       },
       ".modalSearchButton click": "getResults",
       "{scope} type": "getResults",
-      "{scope} entries": "drawPage",
+      "{scope.entries} add": function (list, ev, added) {
+        // TODO: I'm assuming we are adding only one item manually
+        if (!added[0].append) {
+          return;
+        }
+        var instance = added[0].instance,
+            option = this.getItem(instance);
+        option.appended = true;
+        this.scope.attr("options").unshift(option);
+        this.scope.attr("selected").push({
+          id: instance.id,
+          type: instance.type,
+          href: instance.href
+        });
+      },
       ".results-wrap scrollNext": "drawPage",
-      ".object-check-all change": function (el, ev) {
+      ".object-check-all click": function (el, ev) {
+        ev.preventDefault();
+        if (el.hasClass("disabled")) {
+          return;
+        }
         var que = new RefreshQueue(),
             entries = this.scope.attr("entries");
 
-        this.scope.attr("select_all", true);
-        this.scope.attr("isloading", true);
+        this.scope.attr("select_state", true);
+        this.scope.attr("mapper.all_selected", true);
+        this.scope.attr("is_loading", true);
         que.enqueue(_.pluck(entries, "instance")).trigger().then(function (models) {
-          this.scope.attr("isloading", false);
+          this.scope.attr("is_loading", false);
           this.scope.attr("selected", _.map(models, function (model) {
             return {
               id: model.id,
@@ -271,80 +426,58 @@
           }));
         }.bind(this));
       },
-      ".tree-item .object-check-single change": function (el, ev) {
-        if (el.hasClass("disabled")) {
+      "getItem": function (model) {
+        if (!model.type) {
           return;
         }
-
-        var uid = el.closest(".tree-item").data("id"),
-            isChecked = el.prop("checked"),
-            item = _.find(this.scope.attr("options"), function (option) {
-                return option.instance.id === uid;
-              }),
-            selected = this.scope.attr("selected"),
-            needle = {id: item.instance.id},
-            index;
-
-        if (!_.findWhere(selected, needle)) {
-          selected.push({
-            id: item.instance.id,
-            type: item.instance.type,
-            href: item.instance.href
-          });
-        } else {
-          index = _.findIndex(selected, needle);
-          selected.splice(index, 1);
+        if (this.scope.attr("mapper.search_only")) {
+          return {
+            instance: model,
+            selected_object: false,
+            binding: {},
+            mappings: []
+          };
         }
+        var selected = this.scope.attr("mapper.get_instance"),
+            mapper = this.scope.mapper.model_from_type(model.type),
+            binding, bindings = this.scope.attr("mapper.bindings");
+
+        if (bindings[model.id]) {
+          return _.extend(bindings[model.id], {
+            selected_object: selected
+          });
+        }
+        if (selected.has_binding(mapper.plural.toLowerCase())) {
+          binding = selected.get_binding(mapper.plural.toLowerCase());
+        }
+        return {
+          instance: model,
+          selected_object: selected,
+          binding: binding,
+          mappings: []
+        };
       },
       "drawPage": function () {
-        if (this.scope.attr("page_loading")) {
+        if (this.scope.attr("mapper.page_loading")) {
           return;
         }
-        var que = new RefreshQueue(),
-            page = this.scope.attr("page"),
+        var page = this.scope.attr("page"),
             next_page = page + 1,
             per_page = +this.scope.attr("items-per-page"),
             page_items = this.scope.attr("entries").slice(page * per_page, next_page * per_page),
-            options = this.scope.attr("options");
+            options = this.scope.attr("options"),
+            que = new RefreshQueue();
 
         if (!page_items.length) {
           return;
         }
-        this.scope.attr("page_loading", true);
-        que.enqueue(_.pluck(page_items, "instance")).trigger().then(function (models) {
-          this.scope.attr("page_loading", false);
-          this.scope.attr("page", next_page);
-          options.push.apply(options, can.map(models, function (model) {
-            if (!model.type) {
-              return;
-            }
-            if (this.scope.attr("mapper.search_only")) {
-              return {
-                instance: model,
-                selected_object: false,
-                binding: {},
-                mappings: []
-              };
-            }
-            var selected = CMS.Models.get_instance(this.scope.attr("mapper.object"), this.scope.attr("mapper.join_object_id")),
-                mapper = this.scope.mapper.model_from_type(model.type),
-                binding, bindings = this.scope.attr("mapper.bindings");
+        this.scope.attr("mapper.page_loading", true);
 
-            if (bindings[model.id]) {
-              return _.extend(bindings[model.id], {
-                selected_object: selected
-              });
-            }
-            if (selected.has_binding(mapper.plural.toLowerCase())) {
-              binding = selected.get_binding(mapper.plural.toLowerCase());
-            }
-            return {
-              instance: model,
-              selected_object: selected,
-              binding: binding,
-              mappings: []
-            };
-          }.bind(this)));
+        return que.enqueue(_.pluck(page_items, "instance")).trigger().then(function (models) {
+          this.scope.attr("mapper.page_loading", false);
+          this.scope.attr("page", next_page);
+
+          options.push.apply(options, can.map(models, this.getItem.bind(this)));
         }.bind(this));
       },
       "searchFor": function (data) {
@@ -353,30 +486,53 @@
 
         if (join_model !== "TaskGroupObject" && data.model_name === "Program") {
           data.options.permission_parms = {
-            __permission_type: "create",
             __permission_model: join_model
           };
         }
-        data.options.__permission_type = data.options.__permission_type || "read";
+        if (join_model !== "ObjectPerson") {
+          data.options.__permission_type = data.options.__permission_type || "update";
+        }
         data.model_name = _.isString(data.model_name) ? [data.model_name] : data.model_name;
 
         return GGRC.Models.Search.search_for_types(data.term || "", data.model_name, data.options);
       },
       "getResults": function () {
+        if (this.scope.attr("mapper.page_loading") || this.scope.attr("mapper.is_saving")) {
+          return;
+        }
         var model_name = this.scope.attr("type"),
             contact = this.scope.attr("contact"),
             permission_parms = {},
             search = [],
-            list,
-            relevant;
+            filters,
+            list;
 
         this.scope.attr("page", 0);
         this.scope.attr("entries", []);
         this.scope.attr("selected", []);
         this.scope.attr("options", []);
-        this.scope.attr("select_all", false);
+        this.scope.attr("select_state", false);
         this.scope.attr("mapper.all_selected", false);
 
+        filters = _.compact(_.map(this.scope.attr("mapper.relevant"), function (relevant) {
+          if (!relevant.value) {
+            return;
+          }
+          var mappings, Loader;
+          if (model_name === "AllObject") {
+            Loader = GGRC.ListLoaders.MultiListLoader;
+            mappings = _.compact(_.map(GGRC.Mappings.get_mappings_for(relevant.filter.constructor.shortName), function (mapping) {
+              if (mapping instanceof GGRC.ListLoaders.DirectListLoader
+                  || mapping instanceof GGRC.ListLoaders.ProxyListLoader) {
+                return mapping;
+              }
+            }));
+          } else {
+            Loader = GGRC.ListLoaders.TypeFilteredListLoader;
+            mappings = GGRC.Mappings.get_canonical_mapping_name(relevant.model_name, model_name);
+          }
+          return new Loader(mappings, [model_name]).attach(relevant.filter);
+        }));
         if (model_name === "AllObject") {
           model_name = this.scope.attr("types.all_objects.models");
         }
@@ -384,34 +540,26 @@
           permission_parms.contact_id = contact.id;
         }
 
-        this.scope.attr("page_loading", true);
-        relevant = _.map(this.scope.attr("mapper.relevant"), function (relevant) {
-          return {
-            model_name: relevant.model_name,
-            term: relevant.filter.title
-          };
-        });
-        search.push({
-          term: this.scope.attr("term"),
-          model_name: model_name,
-          options: permission_parms
-        });
-        $.merge(search, relevant);
-        search = _.map(search, function (query) {
-          return new GGRC.ListLoaders.SearchListLoader(function (binding) {
-            return this.searchFor(query).then(function (mappings) {
+        this.scope.attr("mapper.page_loading", true);
+        search = new GGRC.ListLoaders.SearchListLoader(function (binding) {
+            return this.searchFor({
+              term: this.scope.attr("term"),
+              model_name: model_name,
+              options: permission_parms
+            }).then(function (mappings) {
               return mappings.entries;
             });
           }.bind(this)).attach({});
-        }.bind(this));
 
+        search = filters.concat(search);
         list = (search.length > 1) ?
                   new GGRC.ListLoaders.IntersectingListLoader(search).attach()
                 : search[0];
 
         list.refresh_stubs().then(function (options) {
-          this.scope.attr("page_loading", false);
+          this.scope.attr("mapper.page_loading", false);
           this.scope.attr("entries", options);
+          this.drawPage();
         }.bind(this));
       }
     }
@@ -443,4 +591,3 @@
     }, data));
   });
 })(window.can, window.can.$);
-

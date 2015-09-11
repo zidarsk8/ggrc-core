@@ -210,7 +210,8 @@ def get_cycle_task_data(notification):
 def get_workflow_starts_in_data(notification, workflow):
   if workflow.status != "Active":
     return {}
-  if workflow.next_cycle_start_date < date.today():
+  if (not workflow.next_cycle_start_date or
+     workflow.next_cycle_start_date < date.today()):
     return {}  # this can only be if the cycle has successfully started
   result = {}
 
@@ -241,7 +242,8 @@ def get_workflow_starts_in_data(notification, workflow):
 def get_cycle_start_failed_data(notification, workflow):
   if workflow.status != "Active":
     return {}
-  if workflow.next_cycle_start_date >= date.today():
+  if (not workflow.next_cycle_start_date or
+     workflow.next_cycle_start_date >= date.today()):
     return {}  # this can only be if the cycle has successfully started
 
   result = {}

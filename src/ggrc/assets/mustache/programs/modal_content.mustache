@@ -50,12 +50,12 @@
       </div>
     </div>
 
-    <div class="span6 hide-wrap hidable">      
+    <div class="span6 hide-wrap hidable">
       <div class="row-fluid inner-hide">
         <div data-id="owner_hidden" class="span12 hidable">
           <label>
-            {{#if_multi_owner instance modal_title}}Owners{{else}}Owner{{/if_multi_owner}}
-            <i class="grcicon-help-black" rel="tooltip" title="Program ownership is managed in the People widget."></i>
+            {{#if_multi_owner instance modal_title}}Managers{{else}}Manager{{/if_multi_owner}}
+            <i class="grcicon-help-black" rel="tooltip" title="Program Managers are managed in the People widget."></i>
             <a data-id="hide_owner_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <div tabindex="4">
@@ -105,7 +105,7 @@
   </div>
 
   <!--Code & network block-->
-  
+
   <div class="row-fluid">
     <div data-id="code_hidden" class="span4 hidable">
       <label>
@@ -146,7 +146,7 @@
       </select>
     </div>
   </div>
-  
+
 </form>
 {{/instance}}
 </div>

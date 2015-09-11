@@ -6,7 +6,7 @@
 */
 
 describe("can.Model.Cacheable", function() {
-  
+
   beforeAll(function() {
     can.Model.Mixin("dummyable");
     spyOn(CMS.Models.Mixins.dummyable, "add_to");
@@ -157,7 +157,7 @@ describe("can.Model.Cacheable", function() {
       _obj = new CMS.Models.DummyModel({ id: ++id });
       done();
     });
-    
+
     it("processes args before sending", function(done) {
       var obj = _obj;
       spyOn(CMS.Models.DummyModel, "process_args");
@@ -290,7 +290,7 @@ describe("can.Model.Cacheable", function() {
     });
 
     describe("add case", function() {
-      
+
       var instance, binding, dummy;
       beforeEach(function() {
         dummy = new CMS.Models.DummyModel({id:1});
@@ -387,7 +387,7 @@ describe("can.Model.Cacheable", function() {
       }, failAll(done));
     });
 
-    // NB -- This unit test is brittle.  It's difficult to unit test for 
+    // NB -- This unit test is brittle.  It's difficult to unit test for
     //  things like timing, and it's a bit of a hack to spy on Date.now()
     //  since that function is used in more places than just our modelize function.
     //  -- BM 2015-02-03
@@ -396,7 +396,7 @@ describe("can.Model.Cacheable", function() {
       var dummy_models = [
           {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7}
         ];
-      // Have our modelized instances ready for when 
+      // Have our modelized instances ready for when
       var dummy_insts = CMS.Models.DummyModel.models(dummy_models);
       // we want to see how our observable list gets items over time, so spy on the push method
       spyOn(list, "push").and.callThrough();
@@ -448,7 +448,7 @@ describe("can.Model.Cacheable", function() {
        "No default findPage() exists for subclasses of Cacheable"
       );
     });
-  
+
   });
 
   describe("#refresh", function() {
@@ -500,5 +500,115 @@ describe("can.Model.Cacheable", function() {
     });
   });
 
+  describe("::parse_deep_property_descriptor", function() {
+    it("produces an immutable descriptor", function() {
+      var desc = can.Model.Cacheable.parse_deep_property_descriptor("foo.bar|baz|quux"),
+          zero = desc[0][0];
+          one = desc[1];
+
+      try {
+        desc[0][0] = 0;
+        desc[1] = 0;
+      } catch (err) {
+        // we may get an error trying to modify an immutable object
+      }
+      expect(desc[0][0]).toEqual(zero);
+      expect(desc[1]).toEqual(one);
+    });
+  });
+
+  describe("#get_deep_property", function() {
+    var equip = function (value) {
+      if (typeof value === "object") {
+        value.get_deep_property = can.Model.Cacheable.prototype.get_deep_property;
+        _.each(value, equip);
+      }
+      return value;
+    };
+    var get = function (key, value) {
+       var desc = can.Model.Cacheable.parse_deep_property_descriptor(key);
+       return equip(value).get_deep_property(desc);
+    };
+
+    it("gets a simple property", function() {
+      expect(get("foo", {foo: "bar"})).toBe("bar");
+      expect(get("foo", {foo: 2})).toBe(2);
+      expect(get("foo", {})).toBe(null);
+    });
+
+    it("gets a nested property", function() {
+      var value = {
+        foo: "bar",
+        bar: {
+          foo: 1,
+          bar: "2",
+          baz: { foo: "foo" }
+        }
+      };
+      expect(get("foo", value)).toBe("bar");
+      expect(get("bar", value)).toBe(value.bar);
+      expect(get("bar.foo", value)).toBe(1);
+      expect(get("bar.bar", value)).toBe("2");
+      expect(get("bar.baz.foo", value)).toBe("foo");
+    });
+
+    it("gets and element from an array", function() {
+      expect(get("0.1", [[undefined, 2],[]])).toBe(2);
+      expect(get("a.1", {a:["foo", "bar"]})).toBe("bar");
+    });
+
+    it("chooses first non-empty", function() {
+      var value1 = {
+        foo: {
+          bar: {
+            quux: 3
+          }
+        }
+      };
+      var value2 = {
+        foo: {
+          baz: {
+            quux: 3
+          }
+        }
+      };
+      expect(get("foo.bar|baz.quux", value1)).toBe(3);
+      expect(get("foo.bar|baz.quux", value2)).toBe(3);
+    });
+
+    it("automatically calls reify when available", function() {
+      var value = {
+        foo: {
+          reify: function() {
+            return { bar: "baz" };
+          }
+        }
+      }
+      expect(get("foo.bar", value)).toBe("baz");
+    });
+
+    it("does a multi-get for GET_ALL", function() {
+      var value = {
+        foo: [
+            { bar: 1 },
+            { bar: 2 },
+            { baz: 3 }
+          ]
+      };
+      expect(get("foo.GET_ALL.bar|baz", value)).toEqual([1,2,3]);
+    });
+
+    it("produces a tree for nested multi-get", function() {
+      var value = {
+        foo: [
+            { bar : [{y: 1}, {x: 2}, {x: 3}] },
+            { bar : [{x: 4}, {x: 5}, {y: 6}] },
+            { baz : [{y: 7}, {x: 8}, {x: 9}] },
+          ]
+      };
+      expect(get("foo.GET_ALL.bar|baz.GET_ALL.x|y", value)).
+        toEqual([[1,2,3], [4,5,6], [7,8,9]]);
+    });
+  });
 
 });

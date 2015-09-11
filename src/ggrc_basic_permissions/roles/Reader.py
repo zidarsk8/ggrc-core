@@ -3,7 +3,7 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
-from ggrc_basic_permissions.roles.Creator import _is_owner
+from ggrc_basic_permissions.roles.Creator import owner_update
 
 scope = "System"
 description = """
@@ -19,6 +19,8 @@ permissions = {
         "ControlAssertion",
         "Control",
         "ControlAssessment",
+        "CustomAttributeDefinition",
+        "CustomAttributeValue",
         "Issue",
         "ControlControl",
         "DataAsset",
@@ -57,6 +59,11 @@ permissions = {
         "ObjectOwner",
         "Person",
         "Program",
+        "Request",
+        "Response",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
         "Role",
         "UserRole",
         "Context",
@@ -97,7 +104,14 @@ permissions = {
         "PopulationSample",
         "Product",
         "Project",
-        "Relationship",
+        {
+            "type": "Relationship",
+            "terms": {
+                "property_name": "source,destination",
+                "action": "update"
+            },
+            "condition": "relationship",
+        },
         "RelationshipType",
         "SectionBase",
         "Section",
@@ -117,14 +131,12 @@ permissions = {
         "Program",
         "Role",
         "UserRole",
-        "Request",
-        "Response",
         "Context",
         "BackgroundTask",
     ],
     "view_object_page": [
         "__GGRC_ALL__"
     ],
-    "update": _is_owner,
-    "delete": _is_owner
+    "update": owner_update,
+    "delete": owner_update,
 }

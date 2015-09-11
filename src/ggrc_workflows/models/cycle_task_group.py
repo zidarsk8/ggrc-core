@@ -6,16 +6,21 @@
 
 from ggrc import db
 from ggrc.models.mixins import (
-    Base, Titled, Described, Timeboxed, Stateful, WithContact
-    )
+    Base, Titled, Described, Timeboxed, Slugged, Stateful, WithContact
+)
+from ggrc_workflows.models.cycle import Cycle
 
-
-class CycleTaskGroup(
-    WithContact, Stateful, Timeboxed, Described, Titled, Base, db.Model):
+class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
+                     Titled, Base, db.Model):
   __tablename__ = 'cycle_task_groups'
   _title_uniqueness = False
 
-  VALID_STATES = (u'Assigned', u'InProgress', u'Finished', u'Verified', u'Declined')
+  @classmethod
+  def generate_slug_prefix_for(cls, obj):
+    return "CYCLEGROUP"
+
+  VALID_STATES = (
+      u'Assigned', u'InProgress', u'Finished', u'Verified', u'Declined')
 
   cycle_id = db.Column(
       db.Integer, db.ForeignKey('cycles.id'), nullable=False)
@@ -25,12 +30,12 @@ class CycleTaskGroup(
       'CycleTaskGroupObject',
       backref='cycle_task_group',
       cascade='all, delete-orphan'
-      )
+  )
   cycle_task_group_tasks = db.relationship(
       'CycleTaskGroupObjectTask',
       backref='cycle_task_group',
       cascade='all, delete-orphan'
-      )
+  )
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
   next_due_date = db.Column(db.Date)
@@ -42,4 +47,18 @@ class CycleTaskGroup(
       'cycle_task_group_tasks',
       'sort_index',
       'next_due_date',
-      ]
+  ]
+
+  _aliases = {
+      "cycle": {
+        "display_name": "Cycle",
+        "filter_by": "_filter_by_cycle",
+      },
+  }
+
+  @classmethod
+  def _filter_by_cycle(cls, predicate):
+    return Cycle.query.filter(
+      (Cycle.id == cls.cycle_id) &
+      (predicate(Cycle.slug) | predicate(Cycle.title))
+    ).exists()

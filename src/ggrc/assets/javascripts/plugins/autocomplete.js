@@ -166,12 +166,16 @@
           base_search = $that.data("lookup"),
           from_list = $that.data("from-list"),
           search_params = $that.data("params"),
+          permission = $that.data("permission-type"),
           searchtypes;
 
         this._super.apply(this, arguments);
         this.options.search_params = {
           extra_params: search_params
         };
+        if (permission) {
+          this.options.search_params.__permission_type = permission;
+        }
 
         $that.data("autocomplete-widget-name", this.widgetFullName);
 

@@ -20,9 +20,12 @@
         relevant: can.compute(function () {
           return new can.List();
         }),
-        columns: function () {
-          return GGRC.model_attr_defs[this.attr("type")];
-        }
+        columns: can.compute(function () {
+          return _.filter(GGRC.model_attr_defs[this.attr("type")], function(el) {
+            return (!el.import_only) &&
+                   (el.display_name.indexOf("unmap:") === -1);
+          });
+        })
       }),
       panelsModel = can.Map({
         items: new can.List()
@@ -49,12 +52,10 @@
         {model_singular: "Control", title_plural: "Controls"},
         {model_singular: "ControlAssessment", title_plural: "Control Assessments"},
         {model_singular: "DataAsset", title_plural: "Data Assets"},
-        {model_singular: "Directive", title_plural: "Directives"},
         {model_singular: "Facility", title_plural: "Facilities"},
         {model_singular: "Issue", title_plural: "Issues"},
         {model_singular: "Market", title_plural: "Markets"},
         {model_singular: "Objective", title_plural: "Objectives"},
-        {model_singular: "Option", title_plural: "Options"},
         {model_singular: "OrgGroup", title_plural: "Org Groups"},
         {model_singular: "Person", title_plural: "Persons"},
         {model_singular: "Policy", title_plural: "Policies"},
@@ -64,6 +65,7 @@
         {model_singular: "Project", title_plural: "Projects"},
         {model_singular: "Regulation", title_plural: "Regulations"},
         {model_singular: "Request", title_plural: "Requests"},
+        {model_singular: "Response", title_plural: "Responses"},
         {model_singular: "RiskAssessment", title_plural: "Risk Assessments"},
         {model_singular: "Section", title_plural: "Sections"},
         {model_singular: "Standard", title_plural: "Standards"},
@@ -72,7 +74,13 @@
         {model_singular: "TaskGroupTask", title_plural: "Tasks"},
         {model_singular: "Vendor", title_plural: "Vendors"},
         {model_singular: "Workflow", title_plural: "Workflows"}
-      ];
+      ],
+      exportable = _.sortBy(importable.concat([
+        {model_singular: "Cycle", title_plural: "Cycles"},
+        {model_singular: "CycleTaskGroup", title_plural: "Cycle Task Groups"},
+        {model_singular: "CycleTaskGroupObjectTask", title_plural: "Cycle Tasks"}
+      ]), "title_plural");
+
 
   can.Component.extend({
     tag: "csv-template",
@@ -105,9 +113,11 @@
       ".import-button click": function (el, ev) {
         ev.preventDefault();
         var data = _.map(this.scope.attr("selected"), function (el) {
-              return {object_name: el.value};
+              return {
+                object_name: el.value,
+                fields: "all"
+              };
             });
-
         if (!data.length) {
           return;
         }
@@ -118,7 +128,7 @@
           GGRC.Utils.download("import_template.csv", data);
         }.bind(this))
         .fail(function (data) {
-          $("body").trigger("ajax:flash", {"error": data});
+          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
         }.bind(this));
       },
       ".import-list a click": function (el, ev) {
@@ -152,21 +162,26 @@
       },
       "#export-csv-button click": function (el, ev) {
         ev.preventDefault();
-        this.scope.attr("export.loading", true)
+        this.scope.attr("export.loading", true);
         var panels = this.scope.attr("export.panels.items"),
             data_grid = this.scope.attr("export.data_grid"),
-            only_relevant= this.scope.attr("export.only_relevant"),
+            only_relevant = this.scope.attr("export.only_relevant"),
             query = _.map(panels, function (panel, index) {
-              var relevant_filter = "";
+              var relevant_filter = "",
+                  predicates;
               if (data_grid && index > 0) {
-                relevant_filter = "#__previous__,"+(index-1)+"#";
-                if (only_relevant && index > 1){
-                  relevant_filter += " AND #__previous__,"+(index-2)+"#";
+                relevant_filter = "#__previous__," + (index - 1) + "#";
+                if (only_relevant && index > 1) {
+                  relevant_filter += " AND #__previous__,0#";
                 }
               } else {
-                relevant_filter = _.reduce(panel.relevant(),  function(query, el){
-                  return (query && query+" AND ")+"#"+el.model_name+","+el.filter.id+"#";
-                }, "")
+                predicates = _.map(panel.attr("relevant"), function (el) {
+                  var id = el.model_name === "__previous__" ? index - 1 : el.filter.id;
+                  return "#" + el.model_name + "," + id + "#";
+                });
+                relevant_filter = _.reduce(predicates, function (p1, p2) {
+                  return p1 + " AND " + p2;
+                });
               }
               return {
                 object_name: panel.type,
@@ -190,10 +205,10 @@
           GGRC.Utils.download(this.scope.attr("export.get_filename"), data);
         }.bind(this))
         .fail(function (data) {
-          $("body").trigger("ajax:flash", {"error": data});
+          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
         }.bind(this))
         .always(function () {
-          this.scope.attr("export.loading", false)
+          this.scope.attr("export.loading", false);
         }.bind(this));
       }
     }
@@ -243,14 +258,15 @@
     tag: "export-panel",
     template: "<content></content>",
     scope: {
-      importable: importable,
-      // TODO: change importable to a list of model names
-      // importable: _.compact(_.map(importable, function(name){
+      exportable: exportable,
+      // TODO: change exportable to a list of model names
+      // exportable: _.compact(_.map(exportable, function(name){
       //   return CMS.Models[name];
       // }))
       panel_number: "@",
+      has_parent: false,
       fetch_relevant_data: function (id, type) {
-        var dfd = CMS.Models[type].findOne({id: id})
+        var dfd = CMS.Models[type].findOne({id: id});
         dfd.then(function (result) {
           this.attr("item.relevant").push(new filterModel({
             model_name: url.relevant_type,
@@ -262,9 +278,40 @@
     },
     events: {
       inserted: function () {
-        if (!+this.scope.attr("panel_number") && url.relevant_id && url.relevant_type) {
+        var panel_number = +this.scope.attr("panel_number");
+
+        if (!panel_number && url.relevant_id && url.relevant_type) {
           this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }
+        this.setSelected();
+      },
+      "[data-action=attribute_select_toggle] click": function (el, ev) {
+        var items = GGRC.model_attr_defs[this.scope.attr("item.type")],
+            split_items = {
+              mappings: _.filter(items, function (el) {
+                return el.type == "mapping";
+              }),
+              attributes: _.filter(items, function (el) {
+                return el.type != "mapping";
+              })
+            };
+        _.map(split_items[el.data("type")], function (attr) {
+          this.scope.attr("item.selected." + attr.key, el.data("value"));
+        }.bind(this));
+      },
+      "setSelected": function () {
+        this.scope.attr("item.selected", _.reduce(this.scope.attr("item.columns"), function (memo, data) {
+          memo[data.key] = true;
+          return memo;
+        }, {}));
+      },
+      "{scope.item} type": function () {
+        this.scope.attr("item.selected", {});
+        this.scope.attr("item.relevant", []);
+        this.scope.attr("item.filter", "");
+        this.scope.attr("item.has_parent", false);
+
+        this.setSelected();
       }
     },
     helpers: {

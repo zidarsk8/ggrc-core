@@ -19,32 +19,28 @@ class QuarterlyCycleCalculator(CycleCalculator):
   time_delta = relativedelta.relativedelta(months=3)
 
   date_domain = {
-    "1": set({1, 4, 7, 10}),
-    "2": set({2, 5, 8, 11}),
-    "3": set({3, 6, 9, 12})
+    1: {1, 4, 7, 10}, # Jan/Apr/Jul/Oct
+    2: {2, 5, 8, 11}, # Feb/May/Aug/Nov
+    3: {3, 6, 9, 12}  # Mar/Jun/Sep/Dec
   }
 
   def __init__(self, workflow, base_date=None):
-    if not base_date:
-      base_date = datetime.date.today()
-
     super(QuarterlyCycleCalculator, self).__init__(workflow)
-    self.tasks.sort(key=lambda t: "{0}/{1}".format(
-      t.relative_start_month,
-      t.relative_start_day))
 
+    base_date = self.get_base_date(base_date)
     self.reified_tasks = {}
     for task in self.tasks:
-      start_date, end_date = self.task_date_range(task, base_date)
+      start_date, end_date = self.non_adjusted_task_date_range(
+        task, base_date, initialisation=True)
       self.reified_tasks[task.id] = {
         'start_date': start_date,
         'end_date': end_date,
-        'relative_start': self._rel_to_str(task.relative_start_day, task.relative_start_month),
-        'relative_end': self._rel_to_str(task.relative_end_day, task.relative_end_month)
+        'relative_start': (task.relative_start_month, task.relative_start_day),
+        'relative_end': (task.relative_start_month, task.relative_end_day)
       }
 
-  @staticmethod
-  def relative_day_to_date(relative_day, relative_month=None, base_date=None):
+  def relative_day_to_date(self, relative_day, relative_month=None,
+                           base_date=None):
     """Converts a quarterly representation of a day into concrete date object.
 
     Relative month is not the best description, but we have to standardize on
@@ -54,43 +50,49 @@ class QuarterlyCycleCalculator(CycleCalculator):
     First we ensure that we have both relative_day and relative_month or,
     alternatively, that relative_day carries month information as well.
 
-    While task_date_range calls with explicit relative_month, reified_tasks
-    stores relative days as MM/DD and we must first convert these values so
-    that it can sort and get min and max values for tasks.
+    To convert from relative month and day to reified date we use a
+    transformation matrix with another shifting vector to convert from modulo
+    result to the correct column index (because modulo result 1 2 0 shifts to
+    the right to become 0 1 2).
 
-    Afterwards we must the LARGEST month for a specified quarter option that
-    is SMALLER than base_date's month.
+     index:  0  1  2 |  0  1  2 |  0  1  2 |  0  1  2
+     month:  1  2  3 |  4  5  6 |  7  8  9 | 10 11 12
+     x % 3:  1  2  0 |  1  2  0 |  1  2  0 |  1  2  0
+     -------------------- SHIFT ---------------------
+        1:   0 -1 -2 |  0 -1 -2 |  0 -1 -2 |  0 -1 -2
+        2:  -2  0 -1 | -2  0 -1 | -2  0 -1 | -2  0 -1
+        3:  -1 -2  0 | -1 -2  0 | -1 -2  0 | -1 -2  0
+
+    Rows (1, 2, 3) being date domain options and values being number of months
+    to shift depending on the on current date. E.g., for second date domain and
+    value 2/15 on January 6th the reified value is November 15th the year
+    before, that's why we have to subtract two months from today (base date).
+    Because it's actually LESS than today, next cycle start date will be moved
+    to February 15, but that is handled by higher-level logic.
+
+    T = [
+      [0, -1, -2],
+      [-2, 0, -1],
+      [-1, -2, 0]
+    ]
 
     Afterwards we repeat the math similar to monthly cycle calculator and
     ensure that the day is not overflowing to the next month.
     """
-    today = datetime.date.today()
+    relative_day = int(relative_day)
+    relative_month = int(relative_month)
 
-    # If we don't get relative month as argument, get month information from
-    # relative day.
-    if relative_month:
-      relative_month = str(relative_month)
-    elif relative_day:
-      if "/" in str(relative_day):
-        rs = relative_day.split("/")
-        relative_day = int(rs[1])
-        relative_month = rs[0]
-      else:
-        raise ValueError("Unknown format.")
+    base_date = self.get_base_date(base_date)
 
-    if not base_date:
-      base_date = today
+    T = [[0, -1, -2], [-2, 0, -1], [-1, -2, 0]]
+    index_T = {0:2, 2:1, 1:0}
+    month_shift = T[relative_month-1][index_T[base_date.month % 3]]
 
-    # relative_month is 1, 2 or 3 and represents quarterly option, based
-    # on which we select the month domain. Month is then the LARGEST
-    # number from all the months that were before base_date.month
-    month_domain = QuarterlyCycleCalculator.date_domain[relative_month]
-    month = max(filter(lambda x: x <= base_date.month, month_domain))
-
-    start_month = datetime.date(base_date.year, month, 1)
-    ddate = start_month + relativedelta.relativedelta(days=relative_day - 1)
+    start_date = (datetime.date(base_date.year, base_date.month, 1) +
+                  relativedelta.relativedelta(months=month_shift))
+    ddate = start_date + relativedelta.relativedelta(days=relative_day - 1)
 
     # We want to go up to the end of the month and not over
-    if ddate.month != start_month.month:
+    if ddate.month != start_date.month:
       ddate = ddate - relativedelta.relativedelta(days=ddate.day)
     return ddate

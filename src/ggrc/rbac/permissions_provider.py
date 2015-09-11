@@ -7,6 +7,8 @@ from collections import namedtuple
 from flask import g
 from flask.ext.login import current_user
 from .user_permissions import UserPermissions
+from ggrc.rbac.permissions import permissions_for as find_permissions
+from ggrc.rbac.permissions import is_allowed_create
 from ggrc.models import get_model
 
 Permission = namedtuple('Permission', 'action resource_type resource_id context_id')
@@ -92,7 +94,20 @@ def in_condition(instance, value, property_name):
   return property_value in value
 
 
-def relationship_condition(instance):
+def relationship_condition(instance, action, property_name):
+  if getattr(instance, 'context') is not None:
+    context_id = getattr(instance.context, 'id')
+  else:
+    context_id = None
+  for prop in property_name.split(','):
+    obj = getattr(instance, prop)
+    if context_id is not None and \
+       getattr(obj, 'context') is not None and \
+       getattr(obj.context, 'id') == context_id and \
+       is_allowed_create('Relationship', None, context_id):
+      return True
+    if not find_permissions()._is_allowed_for(obj, action):
+      return False
   return True
 
 """
@@ -129,6 +144,7 @@ class DefaultUserPermissions(UserPermissions):
 
   def _permission_match(self, permission, permissions):
     """Check if the user has the given permission"""
+
     has_conditions = permissions\
         .get(permission.action, {})\
         .get(permission.resource_type, {})\
@@ -164,7 +180,9 @@ class DefaultUserPermissions(UserPermissions):
 
   def _is_allowed(self, permission):
     permissions = self._permissions()
-    if permission.context_id and self._is_allowed(permission._replace(context_id=None)):
+    if permission.resource_type != '/admin' \
+       and permission.context_id \
+       and self._is_allowed(permission._replace(context_id=None)):
       return True
     if self._permission_match(permission, permissions):
       return True
@@ -185,15 +203,32 @@ class DefaultUserPermissions(UserPermissions):
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('resources', [])
+    contexts = self._permissions()\
+        .setdefault(action, {})\
+        .setdefault(instance._inflector.model_singular, {})\
+        .setdefault('contexts', [])
+    # We can't use instance.context_id, because it requires the
+    # object <-> context mapping to be created,
+    # which isn't the case when creating objects
+    context_id = None
+    if hasattr(instance, 'context') and hasattr(instance.context, 'id'):
+      context_id = instance.context.id
     if instance.id in resources:
       return True
-    conditions = self._permissions()\
+    no_context_conditions = self._permissions()\
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('conditions', {})\
-        .setdefault(instance.context_id, [])
+        .setdefault(None, [])
+
+    context_conditions = self._permissions()\
+        .setdefault(action, {})\
+        .setdefault(instance._inflector.model_singular, {})\
+        .setdefault('conditions', {})\
+        .setdefault(context_id, [])
+    conditions = no_context_conditions + context_conditions
     # Check any conditions applied per resource
-    if not conditions:
+    if (None in contexts or context_id in contexts) and not conditions:
       return True
     for condition in conditions:
       func = _CONDITIONS_MAP[str(condition['condition'])]
@@ -241,6 +276,7 @@ class DefaultUserPermissions(UserPermissions):
   def _get_resources_for(self, action, resource_type):
     """Get resources resources (object ids) for a given action and resource_type"""
     permissions = self._permissions()
+
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
       return None
 
@@ -261,6 +297,7 @@ class DefaultUserPermissions(UserPermissions):
     # FIXME: (Security) When applicable, we should explicitly assert that no
     #   permissions are expected (e.g. that every user has ADMIN_PERMISSION).
     permissions = self._permissions()
+
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
       return None
 
@@ -281,6 +318,8 @@ class DefaultUserPermissions(UserPermissions):
             .get(self.ADMIN_PERMISSION.resource_type, {})\
             .get('contexts', ()))
     ret.extend(admin_list)
+    if None in ret:
+      return None
     return ret
 
   def create_contexts_for(self, resource_type):

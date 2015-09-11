@@ -9,7 +9,7 @@ from monthly_cycle_calculator import MonthlyCycleCalculator
 from quarterly_cycle_calculator import QuarterlyCycleCalculator
 from annually_cycle_calculator import AnnuallyCycleCalculator
 
-def get_cycle_calculator(workflow):
+def get_cycle_calculator(workflow, base_date=None):
   """Gets the cycle calculator based on the workflow's frequency.
 
   Args:
@@ -25,4 +25,4 @@ def get_cycle_calculator(workflow):
     "quarterly": QuarterlyCycleCalculator,
     "annually": AnnuallyCycleCalculator
   }
-  return calculators[workflow.frequency](workflow)
+  return calculators[workflow.frequency](workflow, base_date)

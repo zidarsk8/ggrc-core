@@ -11,6 +11,7 @@ from ggrc.login import get_current_user
 from ggrc.models.mixins import Base, Slugged, Titled, Described, WithContact
 from ggrc.models.types import JsonType
 from ggrc_workflows.models.mixins import RelativeTimeboxed
+from ggrc_workflows.models.task_group import TaskGroup
 
 
 class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed, Base,
@@ -66,6 +67,7 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed, 
       "contact": {
           "display_name": "Assignee",
           "mandatory": True,
+          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
       "start_date": None,
@@ -73,6 +75,7 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed, 
       "task_group": {
           "display_name": "Task Group",
           "mandatory": True,
+          "filter_by": "_filter_by_task_group",
       },
       "relative_start_date": {
           "display_name": "Start",
@@ -87,6 +90,13 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed, 
           "mandatory": True,
       }
   }
+
+  @classmethod
+  def _filter_by_task_group(cls, predicate):
+    return TaskGroup.query.filter(
+        (TaskGroup.id == cls.task_group_id) &
+        (predicate(TaskGroup.slug) | predicate(TaskGroup.title))
+    ).exists()
 
   @classmethod
   def eager_query(cls):

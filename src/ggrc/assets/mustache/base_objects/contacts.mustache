@@ -8,9 +8,9 @@
 {{#instance}}
 <div class="row-fluid wrap-row">
   <div class="span6">
-    <h6>Owner</h6>
-    <p class="oneline">
     {{#if is_program}}
+    <h6>Manager</h6>
+    <p class="oneline">
       {{#with_mapping 'authorizations' instance}}
         {{#if authorizations.length}}
           {{#each authorizations}}
@@ -31,6 +31,8 @@
         {{/if}}
       {{/with_mapping}}
     {{else}}
+    <h6>Owner</h6>
+    <p class="oneline">
       {{#if owners.length}}
         {{#using contacts=owners}}
         <ul class="inner-count-list">

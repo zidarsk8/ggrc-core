@@ -12,7 +12,7 @@ from werkzeug.exceptions import BadRequest
 from ggrc.app import app
 from ggrc.login import login_required
 from ggrc.converters.base import Converter
-from ggrc.converters.query_helper import QueryHelper
+from ggrc.converters.query_helper import QueryHelper, BadQueryException
 from ggrc.converters.import_helper import generate_csv_string
 from ggrc.converters.import_helper import read_csv_file
 
@@ -42,21 +42,26 @@ def parse_export_request():
 
 
 def handle_export_request():
+  try:
+    data_grid, data = parse_export_request()
+    query_helper = QueryHelper(data)
+    converter = Converter(ids_by_type=query_helper.get_ids())
+    csv_data = converter.to_array(data_grid)
+    csv_string = generate_csv_string(csv_data)
 
-  data_grid, data = parse_export_request()
-  query_helper = QueryHelper(data)
-  converter = Converter(ids_by_type=query_helper.get_ids())
-  csv_data = converter.to_array(data_grid)
-  csv_string = generate_csv_string(csv_data)
+    object_names = "_".join(converter.get_object_names())
+    filename = "{}.csv".format(object_names)
 
-  object_names = "_".join(converter.get_object_names())
-  filename = "{}.csv".format(object_names)
-
-  headers = [
-      ('Content-Type', 'text/csv'),
-      ('Content-Disposition', 'attachment; filename="{}"'.format(filename)),
-  ]
-  return current_app.make_response((csv_string, 200, headers))
+    headers = [
+        ("Content-Type", "text/csv"),
+        ("Content-Disposition", "attachment; filename='{}'".format(filename)),
+    ]
+    return current_app.make_response((csv_string, 200, headers))
+  except BadQueryException as e:
+    raise BadRequest(e.message)
+  except Exception as e:
+    current_app.logger.exception(e)
+  raise BadRequest("Export failed due to server error.")
 
 
 def check_import_file():
@@ -82,22 +87,26 @@ def parse_import_request():
 
 
 def handle_import_request():
-  dry_run, csv_data = parse_import_request()
-  converter = Converter(dry_run=dry_run, csv_data=csv_data)
-  converter.import_csv()
-  response_data = converter.get_info()
-  response_json = json.dumps(response_data)
-  headers = [('Content-Type', 'application/json')]
-  return current_app.make_response((response_json, 200, headers))
+  try:
+    dry_run, csv_data = parse_import_request()
+    converter = Converter(dry_run=dry_run, csv_data=csv_data)
+    converter.import_csv()
+    response_data = converter.get_info()
+    response_json = json.dumps(response_data)
+    headers = [("Content-Type", "application/json")]
+    return current_app.make_response((response_json, 200, headers))
+  except Exception as e:
+    current_app.logger.exception(e)
+  raise BadRequest("Import failed due to server error.")
 
 
 def init_converter_views():
-  @app.route("/_service/export_csv", methods=['POST'])
+  @app.route("/_service/export_csv", methods=["POST"])
   @login_required
   def handle_export_csv():
     return handle_export_request()
 
-  @app.route("/_service/import_csv", methods=['POST'])
+  @app.route("/_service/import_csv", methods=["POST"])
   @login_required
   def handle_import_csv():
     return handle_import_request()
@@ -110,4 +119,5 @@ def init_converter_views():
   @app.route("/export")
   @login_required
   def export_view():
-    return render_template("import_export/export.haml")
+    data_grid = request.args.get("data_grid", "").lower() == "true"
+    return render_template("import_export/export.haml", data_grid=data_grid)

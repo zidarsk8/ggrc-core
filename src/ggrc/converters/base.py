@@ -8,11 +8,14 @@ from flask import current_app
 from itertools import chain
 from itertools import product
 
-from ggrc.converters import get_importables
+from ggrc import settings
+from ggrc.cache.memcache import MemCache
 from ggrc.converters import errors
+from ggrc.converters import get_importables
 from ggrc.converters.base_block import BlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import split_array
+from ggrc.fulltext import get_indexer
 
 
 class Converter(object):
@@ -20,19 +23,23 @@ class Converter(object):
   class_order = [
       "Person",
       "Program",
-      "RiskAssessment",
+      "Risk Assessment",
       "Audit",
       "Policy",
       "Regulation",
       "Standard",
       "Section",
       "Control",
-      "ControlAssessment",
+      "Control Assessment",
+      "Workflow",
+      "Task Group",
+      "Task Group Task",
   ]
 
   priortiy_colums = [
       "email",
       "slug",
+      "delete",
   ]
 
   def __init__(self, **kwargs):
@@ -44,6 +51,7 @@ class Converter(object):
     self.shared_state = {}
     self.response_data = []
     self.importable = get_importables()
+    self.indexer = get_indexer()
 
   def to_array(self, data_grid=False):
     self.block_converters_from_ids()
@@ -78,8 +86,9 @@ class Converter(object):
     grid_header = []
     for block_converter in self.block_converters:
       csv_header, csv_body = block_converter.to_array()
-      grid_header.extend(csv_header[1][:1])
-      grid_blocks.append(csv_body)
+      grid_header.extend(csv_header[1])
+      if csv_body:
+        grid_blocks.append(csv_body)
     grid_data = [list(chain(*i)) for i in product(*grid_blocks)]
     return [grid_header] + grid_data
 
@@ -89,6 +98,7 @@ class Converter(object):
     self.handle_priority_columns()
     self.import_objects()
     self.import_secondary_objects()
+    self.drop_cache()
 
   def handle_priority_columns(self):
     for attr_name in self.priortiy_colums:
@@ -131,18 +141,15 @@ class Converter(object):
                                        offset=offset, class_name=class_name)
       self.block_converters.append(block_converter)
 
-    order = defaultdict(lambda: len(self.class_order))
+    order = defaultdict(int)
     order.update({c: i for i, c in enumerate(self.class_order)})
+    order["Person"] = -1
     self.block_converters.sort(key=lambda x: order[x.name])
 
   def import_objects(self):
     for converter in self.block_converters:
-      try:
-        converter.handle_row_data()
-        converter.import_objects()
-      except Exception as e:
-        current_app.logger.error("Import failed with: {}".format(e.message))
-        converter.add_errors(errors.UNKNOWN_ERROR, line=converter.offset + 2)
+      converter.handle_row_data()
+      converter.import_objects()
 
   def import_secondary_objects(self):
     for converter in self.block_converters:
@@ -150,9 +157,15 @@ class Converter(object):
 
   def get_info(self):
     for converter in self.block_converters:
-      converter.import_secondary_objects(self.new_objects)
       self.response_data.append(converter.get_info())
     return self.response_data
 
   def get_object_names(self):
     return [c.object_class.__name__ for c in self.block_converters]
+
+  def drop_cache(self):
+    if not getattr(settings, 'MEMCACHE_MECHANISM', False):
+      return
+    memcache = MemCache()
+    memcache.clean()
+

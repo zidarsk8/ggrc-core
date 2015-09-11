@@ -450,8 +450,6 @@ function resize_areas(event, target_info_pin_height) {
   $bar.css("height",lhsHeight);
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);
-  $header.css("width",headerWidth);
-  $topNav.css("width",objectWidth);
   $objectArea
     .css("margin-left",internavWidth)
     .css("height",internavHeight)

@@ -28,8 +28,8 @@ class Api():
 
   def set_user(self, person=None):
     # Refresh the person instance from the db:
-    person = person.__class__.query.get(person.id)
     if person:
+      person = person.__class__.query.get(person.id)
       self.user_headers = {
           "X-ggrc-user": self.resource.as_json({
               "name": person.name,
@@ -71,9 +71,10 @@ class Api():
 
     json_data = self.resource.as_json(data)
     logging.info("request json" + json_data)
-
     response = request(api_link, data=json_data, headers=headers.items())
-
+    if response.status_code == 302:
+      self.set_user()
+      response = request(api_link, data=json_data, headers=headers.items())
     return self.data_to_json(response)
 
   def put(self, obj, data):

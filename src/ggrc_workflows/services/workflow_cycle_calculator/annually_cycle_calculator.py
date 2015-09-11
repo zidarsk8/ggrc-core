@@ -15,30 +15,27 @@ class AnnuallyCycleCalculator(CycleCalculator):
   """
 
   time_delta = relativedelta.relativedelta(years=1)
-  date_domain = set(xrange(31))
-  month_domain = set(xrange(12))
+  date_domain = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}
+  month_domain = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
 
   def __init__(self, workflow, base_date=None):
-    if not base_date:
-      base_date = datetime.date.today()
-
     super(AnnuallyCycleCalculator, self).__init__(workflow)
-    self.tasks.sort(key=lambda t: "{0}/{1}".format(
-      t.relative_start_month,
-      t.relative_start_day))
 
+    base_date = self.get_base_date(base_date)
     self.reified_tasks = {}
     for task in self.tasks:
-      start_date, end_date = self.task_date_range(task, base_date)
+      start_date, end_date = self.non_adjusted_task_date_range(
+        task, base_date, initialisation=True)
       self.reified_tasks[task.id] = {
         'start_date': start_date,
         'end_date': end_date,
-        'relative_start': self._rel_to_str(task.relative_start_day, task.relative_start_month),
-        'relative_end': self._rel_to_str(task.relative_end_day, task.relative_end_month)
+        'relative_start': (task.relative_start_month, task.relative_start_day),
+        'relative_end': (task.relative_end_month, task.relative_end_day)
       }
 
-  @staticmethod
-  def relative_day_to_date(relative_day, relative_month=None, base_date=None):
+  def relative_day_to_date(self, relative_day, relative_month=None,
+                           base_date=None):
     """Converts an annual relative day representation to concrete date object
 
     First we ensure that we have both relative_day and relative_month or,
@@ -52,13 +49,9 @@ class AnnuallyCycleCalculator(CycleCalculator):
     ensure that the day is not overflowing to the next month.
     """
     today = datetime.date.today()
-    if relative_month:
-      relative_month = int(relative_month)
-    if relative_day:
-      if "/" in str(relative_day):
-        rs = relative_day.split("/")
-        relative_day = int(rs[1])
-        relative_month = int(rs[0])
+
+    relative_day = int(relative_day)
+    relative_month = int(relative_month)
 
     if not relative_day in AnnuallyCycleCalculator.date_domain:
       raise ValueError
@@ -66,8 +59,7 @@ class AnnuallyCycleCalculator(CycleCalculator):
     if not relative_month in AnnuallyCycleCalculator.month_domain:
       raise ValueError
 
-    if not base_date:
-      base_date = today
+    base_date = self.get_base_date(base_date)
 
     start_month = datetime.date(base_date.year, relative_month, 1)
     ddate = start_month + relativedelta.relativedelta(days=relative_day - 1)

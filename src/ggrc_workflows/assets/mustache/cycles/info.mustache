@@ -24,8 +24,8 @@
           {{!#is_allowed "view_object_page" instance}}
             <li>
               <a href="{{instance.viewLink}}">
-                View {{instance.class.title_singular}}
                 <i class="grcicon-goto"></i>
+                View {{instance.class.title_singular}}
               </a>
             </li>
           {{!/is_allowed}}
@@ -83,7 +83,7 @@
   <div class="row-fluid">
     <div class="span12">
       {{#using instance=instance.workflow}}
-      <ggrc-gdrive-folder-picker instance="instance" placeholder="If selected, all workflow attachments go here." />
+      <ggrc-gdrive-folder-picker {{^is_allowed 'update' instance}}readonly="true"{{/is_allowed}} instance="instance" placeholder="If selected, all workflow attachments go here." />
       {{/using}}
     </div>
   </div>

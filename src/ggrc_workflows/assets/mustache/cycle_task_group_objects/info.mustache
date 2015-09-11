@@ -12,13 +12,13 @@
       <div class="clearfix">
         {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
         <div class="tier-content pin">
-          {{#if object}}
+          {{#if object.title}}
             {{{render '/static/mustache/base_objects/general_info.mustache' instance=object}}}
           {{else}}
             <div class="row-fluid wrap-row">
               <div class="span6">
                 <h6>Title</h6>
-                <h3><span class="gray">[deleted]</span> {{title}}</h3>
+                <h3>{{title}} <span class="gray">Sorry, you do not have access</span> </h3>
               </div>
             </div>
           {{/if}}
@@ -27,7 +27,7 @@
       {{/is_info_pin}}
 
       <div class="details-wrap no-top">
-        {{#if object}}
+        {{#if object.title}}
           <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
           <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
             {{#is_allowed 'update' object context='for'}}
@@ -45,8 +45,8 @@
               {{#is_allowed "view_object_page" object}}
                 <li>
                   <a href="{{object.viewLink}}">
-                    View {{object.class.title_singular}}
                     <i class="grcicon-goto"></i>
+                    View {{object.class.title_singular}}
                   </a>
                 </li>
               {{/is_allowed}}

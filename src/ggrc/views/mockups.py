@@ -9,6 +9,7 @@ from flask import render_template
 
 
 def init_mockup_views():
+
   @app.route("/mockups/risk-assessment")
   @login_required
   def risk_assessment_redesign():

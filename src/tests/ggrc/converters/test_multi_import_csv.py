@@ -3,11 +3,6 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
-import os
-from os.path import abspath
-from os.path import dirname
-from os.path import join
 from flask import json
 from sqlalchemy import or_, and_
 
@@ -16,15 +11,8 @@ from ggrc.models import OrgGroup
 from ggrc.models import Product
 from ggrc.models import Relationship
 from ggrc.converters import errors
-from tests.ggrc import TestCase
+from tests.ggrc.converters import TestCase
 from tests.ggrc.generator import ObjectGenerator
-
-THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
-
-
-if os.environ.get("TRAVIS", False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 class TestCsvImport(TestCase):
@@ -44,28 +32,23 @@ class TestCsvImport(TestCase):
           "email": "{}@reciprocitylabs.com".format(person),
       }, "gGRC Admin")
 
-  def import_file(self, filename, dry_run=False):
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {
-        "X-test-only": "true" if dry_run else "false",
-        "X-requested-by": "gGRC",
-    }
-    response = self.client.post("/_service/import_csv",
-                                data=data, headers=headers)
-    self.assertEqual(response.status_code, 200)
-    return json.loads(response.data)
-
   def test_multi_basic_policy_orggroup_product(self):
 
     filename = "multi_basic_policy_orggroup_product.csv"
     response_json = self.import_file(filename)
 
-    object_counts = [(4, 0, 0), (4, 0, 0), (5, 0, 0)]
-    for i, (created, updated, ignored) in enumerate(object_counts):
-      self.assertEqual(created, response_json[i]["created"])
-      self.assertEqual(updated, response_json[i]["updated"])
-      self.assertEqual(ignored, response_json[i]["ignored"])
-      self.assertEqual(set(), set(response_json[i]["row_warnings"]))
+    object_counts = {
+        "Org Group": (4, 0, 0),
+        "Policy": (4, 0, 0),
+        "Product": (5, 0, 0),
+    }
+
+    for row in response_json:
+      created, updated, ignored = object_counts[row["name"]]
+      self.assertEqual(created, row["created"])
+      self.assertEqual(updated, row["updated"])
+      self.assertEqual(ignored, row["ignored"])
+      self.assertEqual(set(), set(row["row_warnings"]))
 
     self.assertEqual(Policy.query.count(), 4)
     self.assertEqual(OrgGroup.query.count(), 4)
@@ -77,13 +60,18 @@ class TestCsvImport(TestCase):
     response_json = self.import_file(filename)
 
     row_messages = []
-    object_counts = [(3, 0, 2), (0, 0, 4), (5, 0, 2)]
-    for i, (created, updated, ignored) in enumerate(object_counts):
-      self.assertEqual(created, response_json[i]["created"])
-      self.assertEqual(updated, response_json[i]["updated"])
-      self.assertEqual(ignored, response_json[i]["ignored"])
-      row_messages.extend(response_json[i]["row_warnings"])
-      row_messages.extend(response_json[i]["row_errors"])
+    object_counts = {
+      "Policy": (3, 0, 2),
+      "Org Group": (0, 0, 4),
+      "Product": (5, 0, 2),
+    }
+    for row in response_json:
+      created, updated, ignored = object_counts[row["name"]]
+      self.assertEqual(created, row["created"])
+      self.assertEqual(updated, row["updated"])
+      self.assertEqual(ignored, row["ignored"])
+      row_messages.extend(row["row_warnings"])
+      row_messages.extend(row["row_errors"])
 
     expected_warnings = set([
         errors.DUPLICATE_VALUE_IN_CSV.format(
@@ -123,12 +111,17 @@ class TestCsvImport(TestCase):
     filename = "multi_basic_policy_orggroup_product_with_mappings.csv"
     response_json = self.import_file(filename)
 
-    object_counts = [(4, 0, 0), (4, 0, 0), (5, 0, 0)]
-    for i, (created, updated, ignored) in enumerate(object_counts):
-      self.assertEqual(created, response_json[i]["created"])
-      self.assertEqual(updated, response_json[i]["updated"])
-      self.assertEqual(ignored, response_json[i]["ignored"])
-      self.assertEqual(set(), set(response_json[i]["row_warnings"]))
+    object_counts = {
+      "Policy": (4, 0, 0),
+      "Org Group": (4, 0, 0),
+      "Product": (5, 0, 0),
+    }
+    for row in response_json:
+      created, updated, ignored = object_counts[row["name"]]
+      self.assertEqual(created, row["created"])
+      self.assertEqual(updated, row["updated"])
+      self.assertEqual(ignored, row["ignored"])
+      self.assertEqual(set(), set(row["row_warnings"]))
 
     self.assertEqual(Policy.query.count(), 4)
     self.assertEqual(OrgGroup.query.count(), 4)

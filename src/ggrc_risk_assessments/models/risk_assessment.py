@@ -8,6 +8,8 @@ from ggrc.models.mixins import (
     deferred, Base, Titled, Described, Timeboxed, Noted, Slugged
 )
 from ggrc.models.object_document import Documentable
+from ggrc.models.person import Person
+from ggrc.models.program import Program
 
 
 class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
@@ -43,8 +45,14 @@ class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
   ]
 
   _aliases = {
-      "ra_manager": "Risk Manager",
-      "ra_counsel": "Risk Counsel",
+      "ra_manager": {
+        "display_name": "Risk Manager",
+        "filter_by": "_filter_by_risk_manager",
+      },
+      "ra_counsel": {
+        "display_name": "Risk Counsel",
+        "filter_by": "_filter_by_risk_counsel",
+      },
       "start_date": {
           "display_name": "Start Date",
           "mandatory": True,
@@ -53,8 +61,30 @@ class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
           "display_name": "End Date",
           "mandatory": True,
       },
-      "program_id": {
+      "program": {
           "display_name": "Program",
           "mandatory": True,
+          "filter_by": "_filter_by_program",
       }
   }
+
+  @classmethod
+  def _filter_by_program(cls, predicate):
+    return Program.query.filter(
+        (Program.id == cls.program_id) &
+        (predicate(Program.slug) | predicate(Program.title))
+    ).exists()
+
+  @classmethod
+  def _filter_by_risk_manager(cls, predicate):
+    return Person.query.filter(
+      (Person.id == cls.ra_manager_id) &
+      (predicate(Person.name) | predicate(Person.email))
+    ).exists()
+
+  @classmethod
+  def _filter_by_risk_counsel(cls, predicate):
+    return Person.query.filter(
+      (Person.id == cls.ra_counsel_id) &
+      (predicate(Person.name) | predicate(Person.email))
+    ).exists()

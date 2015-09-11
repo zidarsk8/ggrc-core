@@ -28,7 +28,7 @@
             {{^if is_reviewer}}
               {{#if_equals review_task.status 'Declined'}}
                 {{#with_most_recent_declining_task_entry review_task}}
-                  <div>Review was declined on {{#date most_recent_declining_task_entry.instance.created_at}}{{/date}}.</div>
+                  <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
                 {{/with_most_recent_declining_task_entry}}
               {{/if_equals}}
             {{/if}}
@@ -36,7 +36,7 @@
           {{#if is_reviewer}}
             {{#if_equals review_task.status 'Declined'}}
               {{#with_most_recent_declining_task_entry review_task}}
-                <div>Review was declined on {{#date most_recent_declining_task_entry.instance.created_at}}{{/date}}.</div>
+                <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
               {{/with_most_recent_declining_task_entry}}
             {{/if_equals}}
             <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
@@ -68,11 +68,13 @@
             {{#is_allowed "read" "Workflow" context="any"}}
               {{#with_mapping_count instance 'current_approval_cycles'}}
                 {{#if_equals count 0}}
-                  {{#is_allowed "create" "Workflow" context="any"}}
+                  {{#is_allowed "update" instance}}
                     <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{instance.class.model_singular}}" data-object-id="{{instance.id}}">
                       <i class="grcicon-review"></i>
                       Submit For Review
                     </a>
+                  {{else}}
+                    <i>No review in progress</i>
                   {{/is_allowed}}
                 {{else}}
                   <i class="grcicon-review"></i>

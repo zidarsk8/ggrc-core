@@ -112,7 +112,7 @@
             left: auto;
             top: 20px;
             padding: 14px 30px 20px 30px;
-            min-width: 340px;
+            min-width: 720px;
             text-align: left;
             h5 {
               font-size: 16px;
@@ -130,6 +130,7 @@
                 margin: 0;
                 text-transform: none;
                 label {
+                  @extend %oneline;
                   display: inline-block;
                   cursor: pointer;
                 }
@@ -148,7 +149,7 @@
             left: auto;
             top: 20px;
             padding: 14px 30px 20px 30px;
-            min-width: 440px;
+            min-width: 680px;
             text-align: left;
             h5 {
               font-size: 16px;
@@ -167,6 +168,7 @@
                 margin: 0;
                 text-transform: none;
                 label {
+                  @extend %oneline;
                   display: inline-block;
                   cursor: pointer;
                 }
@@ -179,13 +181,12 @@
               }
             }
             .select-clear-all {
-              margin-top: 5px;
               margin-bottom: 5px;
               li {
                 margin: 0;
                 text-transform: none;
                 float: right;
-                width: 20%;
+                width: 15%;
                 a {
                   margin: 0;
                   text-decoration: underline;
@@ -1202,6 +1203,27 @@
       }
     }
   }
+  .fluid-wrap {
+    position: relative;
+  }
+  .filter-title-wrap,
+  .filter-button-wrap {
+    position: absolute;
+    top: 0;
+  }
+  .filter-title-wrap {
+    width: 45px;
+    left: 0;
+  }
+  .filter-input-wrap {
+    width: auto;
+    margin-right: 164px;
+    margin-left: 45px;
+  }
+  .filter-button-wrap {
+    width: 164px;
+    right: 0;
+  }
   .filter-title {
     h6 {
       @extend %oneline;
@@ -1420,33 +1442,12 @@
   display: none;
 }
 
-ul.attr-list {
+ul.select-clear-all {
   @extend %reset-list;
   @include clearfix();
-  margin-top: 20px;
-  margin-bottom: 10px;
-  .attribute-wrap & {
-    margin: 0;
-  }
-  li {
-    float: left;
-    width: 33.3333%;
-    .attribute-wrap & {
-      width: auto;
-      margin-right: 15px;
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-    input {
-      margin-top: -3px;
-    }
-    &.disabled {
-      color: $lightGray;
-    }
-  }
 }
-ul.model-list {
+
+ul.attr-list, ul.model-list {
   @extend %reset-list;
   @include clearfix();
   margin-top: 20px;
@@ -1456,7 +1457,7 @@ ul.model-list {
   }
   li {
     float: left;
-    width: 25%;
+    width: 16.66%;
     .attribute-wrap & {
       width: auto;
       margin-right: 15px;
@@ -1524,6 +1525,9 @@ ul.model-list {
     .relevant-filter-group & {
       width: 79%;
     }
+  }
+  .objective-selector {
+    display: inline-block;
   }
 }
 

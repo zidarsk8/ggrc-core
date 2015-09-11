@@ -61,6 +61,19 @@
             {{/using}}
           {{/if_cycle_assignee_privileges}}
         </div>
+        <div class="span3">
+            <h6>Start date</h6>
+            <p>
+              {{localize_date instance.start_date}}
+            </p>
+        </div>
+
+        <div class="span3">
+            <h6>End date</h6>
+            <p>
+              {{localize_date instance.end_date }}
+            </p>
+        </div>
       </div>
 
       <div class="row-fluid wrap-row">
@@ -123,14 +136,6 @@
                 {{else}}
                   <h6>No object assigned</h6>
                 {{/if}}
-              </div>
-              <div class="span3">
-                <h6>Start/End dates</h6>
-                <p>
-                  {{localize_date instance.start_date}}
-                  -
-                  {{localize_date instance.end_date}}
-                </p>
               </div>
             </div>
           {{/using}}

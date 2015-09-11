@@ -7,6 +7,8 @@
 
 from ggrc import db
 from ggrc.converters import errors
+from ggrc.models.reflection import AttributeInfo
+from ggrc.rbac import permissions
 from ggrc.services.common import Resource
 import ggrc.services
 
@@ -20,6 +22,7 @@ class RowConverter(object):
     self.obj = options.get("obj")
     self.from_ids = self.obj is not None
     self.is_new = True
+    self.is_delete = False
     self.ignore = False
     self.index = options.get("index", -1)
     self.row = options.get("row", [])
@@ -47,14 +50,16 @@ class RowConverter(object):
     """ Pack row data with handlers """
     handle_fields = self.headers if field_list is None else field_list
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
-      if attr_name not in handle_fields or attr_name in self.attrs:
+      if attr_name not in handle_fields or \
+          attr_name in self.attrs or \
+          self.is_delete:
         continue
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
-      if header_dict.get("type") is not None:
-        self.objects[attr_name] = item
-      else:
+      if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
         self.attrs[attr_name] = item
+      else:
+        self.objects[attr_name] = item
       if attr_name in ("slug", "email"):
         self.id_key = attr_name
         self.obj = self.get_or_generate_object(attr_name)
@@ -64,10 +69,10 @@ class RowConverter(object):
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, **header_dict)
-      if header_dict.get("type") is not None:
-        self.objects[attr_name] = item
-      else:
+      if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
         self.attrs[attr_name] = item
+      else:
+        self.objects[attr_name] = item
 
   def handle_row_data(self, field_list=None):
     if self.from_ids:
@@ -76,7 +81,7 @@ class RowConverter(object):
       self.handle_csv_row_data(field_list)
 
   def chect_mandatory_fields(self):
-    if not self.is_new:
+    if not self.is_new or self.is_delete:
       return
     mandatory = [key for key, header in
                  self.block_converter.object_headers.items()
@@ -126,11 +131,14 @@ class RowConverter(object):
     if not obj:
       obj = self.object_class()
       self.is_new = True
+    elif not permissions.is_allowed_update_for(obj):
+      self.ignore = True
+      self.add_error(errors.PERMISSION_ERROR)
 
     return obj
 
   def setup_secondary_objects(self, slugs_dict):
-    if not self.obj or self.ignore:
+    if not self.obj or self.ignore or self.is_delete:
       return
     for mapping in self.objects.values():
       mapping.set_obj_attr()
@@ -159,15 +167,17 @@ class RowConverter(object):
           self.object_class, obj=self.obj, src={}, service=service_class)
 
   def insert_object(self):
-    if self.ignore:
+    if self.ignore or self.is_delete:
       return
-    self.send_signals()
-    db.session.add(self.obj)
-    for handler in self.attrs.values():
-      handler.insert_object()
+    else:
+      self.send_signals()
+      if self.is_new:
+        db.session.add(self.obj)
+      for handler in self.attrs.values():
+        handler.insert_object()
 
   def insert_secondary_objecs(self):
-    if not self.obj or self.ignore:
+    if not self.obj or self.ignore or self.is_delete:
       return
     for secondery_object in self.objects.values():
       secondery_object.insert_object()
@@ -175,8 +185,8 @@ class RowConverter(object):
   def to_array(self, fields):
     row = []
     for field in fields:
-      if self.headers[field].get("type") is not None:
-        row.append(self.objects[field].get_value() or "")
-      else:
+      if self.headers[field].get("type") == AttributeInfo.Type.PROPERTY:
         row.append(self.attrs[field].get_value() or "")
+      else:
+        row.append(self.objects[field].get_value() or "")
     return row

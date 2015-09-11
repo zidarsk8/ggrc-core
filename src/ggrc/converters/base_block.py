@@ -13,6 +13,7 @@ from ggrc.converters import get_shared_unique_rules
 from ggrc.converters.base_row import RowConverter
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
+from ggrc.rbac import permissions
 from ggrc.services.common import get_modified_objects
 from ggrc.services.common import update_index
 from ggrc.services.common import update_memcache_after_commit
@@ -88,10 +89,10 @@ class BlockConverter(object):
     self.headers = self.clean_headers(raw_headers)
     self.unique_counts = self.get_unique_counts_dict(self.object_class)
     self.name = self.object_class._inflector.human_singular.title()
-    self.organize_fields(options.get("fields", "all"))
+    self.organize_fields(options.get("fields", []))
 
   def organize_fields(self, fields):
-    if not fields or fields == "all":
+    if fields == "all":
       fields = self.object_headers.keys()
     self.fields = get_column_order(fields)
 
@@ -173,6 +174,9 @@ class BlockConverter(object):
     self.row_converters = []
     objects = self.object_class.query.filter(
         self.object_class.id.in_(self.object_ids)).all()
+    # TODO: this needs to be moved to query_helper, but it's here for now,
+    # so we don't have to fetch same objects twice from the database.
+    objects = [o for o in objects if permissions.is_allowed_read_for(o)]
     for i, obj in enumerate(objects):
       row = RowConverter(self, self.object_class, obj=obj,
                          headers=self.headers, index=i)
@@ -198,12 +202,23 @@ class BlockConverter(object):
 
   def get_info(self):
     stats = [(r.is_new, r.ignore) for r in self.row_converters]
+    created, updated, ignored, deleted = 0, 0, 0, 0
+    for row in self.row_converters:
+      if row.ignore:
+        ignored += 1
+      elif row.is_delete:
+        deleted += 1
+      elif row.is_new:
+        created += 1
+      else:
+        updated += 1
     info = {
         "name": self.name,
         "rows": len(self.rows),
-        "created": stats.count((True, False)),
-        "updated": stats.count((False, False)),
-        "ignored": stats.count((False, True)) + stats.count((True, True)),
+        "created": created,
+        "updated": updated,
+        "ignored": ignored,
+        "deleted": deleted,
         "block_warnings": self.block_warnings,
         "block_errors": self.block_errors,
         "row_warnings": self.row_warnings,
@@ -307,6 +322,6 @@ class BlockConverter(object):
 
   def _sanitize_header(self, header):
     header = header.strip("*").lower()
-    if header.startswith("map:"):
+    if header.startswith("map:") or header.startswith("unmap:"):
       header = ":".join(map(unicode.strip, header.split(":")))  # noqa
     return header

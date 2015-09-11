@@ -121,6 +121,7 @@ can.Model("can.Model.Cacheable", {
     "start date": "start_date",
     "created date": "created_at",
     "updated date": "updated_at",
+    "modified date": "updated_at",
     "code": "slug",
     "state": "status"
   }
@@ -672,6 +673,23 @@ can.Model("can.Model.Cacheable", {
         return mapper;
       }
     }
+
+  // This this is the parsing part of the easy accessor for deep properties.
+  // Use the result of this with instance.get_deep_property
+  // owners.0.name -> this.owners[0].reify().name
+  // owners.0.name|email ->
+  // firstnonempty this.owners[0].reify().name this.owners[0].reify().email
+  //
+  // owners.GET_ALL.name ->
+  // [this.owners[0].reify().name, this.owners[1].reify().name...]
+  , parse_deep_property_descriptor: function(deep_property_string) {
+      return Object.freeze(_.map(deep_property_string.split("."), function (part) {
+        if (part === "GET_ALL") {
+          return part;
+        }
+        return Object.freeze(part.split("|"));
+      }));
+  }
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
@@ -708,7 +726,7 @@ can.Model("can.Model.Cacheable", {
       return;
     }
     definitions = can.map(GGRC.custom_attr_defs, function(def) {
-      if (def.definition_type === this.constructor.table_singular) {
+      if (def.definition_type && def.definition_type === this.constructor.table_singular) {
         return def;
       }
     }.bind(this));
@@ -727,6 +745,7 @@ can.Model("can.Model.Cacheable", {
     can.each(this.custom_attribute_definitions, function(definition) {
       if (definition.mandatory) {
         if (definition.attribute_type === 'Checkbox') {
+
           self.class.validate('custom_attributes.' + definition.id, function(val){
             return !val;
           });
@@ -767,8 +786,11 @@ can.Model("can.Model.Cacheable", {
 
   , get_mapping: function(name) {
       var binding = this.get_binding(name);
-      binding.refresh_list();
-      return binding.list;
+      if (binding) {
+        binding.refresh_list();
+        return binding.list;
+      }
+      return [];
     }
 
   // This retrieves the potential orphan stats for a given instance
@@ -1093,16 +1115,32 @@ can.Model("can.Model.Cacheable", {
     mappings = mappings || this.class.filter_mappings;
 
     var values = {},
+        custom_attrs = {},
+        custom_attr_ids = {},
         long_title = this.type.toLowerCase() + " title";
+
+    if (!this.custom_attribute_definitions) {
+      this.load_custom_attribute_definitions();
+    }
+    this.custom_attribute_definitions.each(function (definition) {
+      custom_attr_ids[definition.id] = definition.title.toLowerCase();
+    });
+    if (!this.custom_attributes) {
+      this.setup_custom_attributes();
+    }
+    this.custom_attribute_values.each(function (custom_attr) {
+      custom_attr = custom_attr.reify();
+      custom_attrs[custom_attr_ids[custom_attr.custom_attribute_id]] =
+        custom_attr.attribute_value;
+    });
 
     if (!mappings[long_title]){
       mappings[long_title] = "title";
     }
-    keys = _.union(keys, long_title, _.keys(mappings));
+    keys = _.union(keys, long_title, _.keys(mappings), _.keys(custom_attrs));
     $.each(keys, function(index, key) {
-      var val = mappings[key] ?
-        this[mappings[key]] :
-        this[key];
+      var attr_key = mappings[key] || key,
+          val = this[attr_key] || custom_attrs[attr_key];
 
       if (val !== undefined && val !== null){
         if (key == 'owner' || key == 'owners'){
@@ -1114,8 +1152,13 @@ can.Model("can.Model.Cacheable", {
               email: owner.email
             });
           });
-        } else if ($.type(val) === 'string'){
-          values[key] = val;
+        } else {
+          if ($.type(val) === 'date') {
+            val = val.toISOString().substring(0, 10);
+          }
+          if ($.type(val) === 'string'){
+            values[key] = val;
+          }
         }
       }
     }.bind(this));
@@ -1130,6 +1173,42 @@ can.Model("can.Model.Cacheable", {
 
     return [type,
             this.id].join('/');
+  },
+
+  // Returns a deep property as specified in the descriptor built
+  // by Cacheable.parse_deep_property_descriptor
+  get_deep_property: function(property_descriptor) {
+    var i, j, part, field, found, tmp,
+        val = this;
+    for (i = 0; i < property_descriptor.length; i++) {
+      part = property_descriptor[i];
+      if (val.instance) {
+        val = val.instance;
+      }
+      found = false;
+      if (part === "GET_ALL") {
+        return _.map(val, function(element) {
+          return element.get_deep_property(property_descriptor.slice(i+1));
+        });
+      } else {
+        for (j = 0; j < part.length; j++) {
+          field = part[j];
+          tmp = val[field];
+          if (tmp !== undefined && tmp !== null) {
+            val = tmp;
+            if (typeof val.reify === "function") {
+              val = val.reify();
+            }
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          return null;
+        }
+      }
+    }
+    return val;
   },
 
 });

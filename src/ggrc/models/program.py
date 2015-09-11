@@ -4,13 +4,15 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
-from .object_document import Documentable
-from .object_owner import Ownable
-from .object_person import Personable
-from .relationship import Relatable
-from .context import HasOwnContext
-from .track_object_state import HasObjectState, track_state_for_class
+from ggrc.models.context import HasOwnContext
+from ggrc.models.mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
+from ggrc.models.object_document import Documentable
+from ggrc.models.object_owner import Ownable
+from ggrc.models.object_person import Personable, ObjectPerson
+from ggrc.models.person import Person
+from ggrc.models.reflection import AttributeInfo
+from ggrc.models.relationship import Relatable
+from ggrc.models.track_object_state import HasObjectState, track_state_for_class
 
 
 class Program(HasObjectState, CustomAttributable, Documentable,
@@ -38,19 +40,47 @@ class Program(HasObjectState, CustomAttributable, Documentable,
       "private": "Privacy",
       "owners": None,
       "program_owner": {
-          "display_name": "Owner",
+          "display_name": "Manager",
           "mandatory": True,
-          "type": "user_role",
+          "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_program_owner",
       },
       "program_editor": {
           "display_name": "Editor",
-          "type": "user_role",
+          "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_program_editor",
       },
       "program_reader": {
           "display_name": "Reader",
-          "type": "user_role",
-      }
+          "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_program_reader",
+      },
+      "program_mapped": {
+          "display_name": "No Access",
+          "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_program_mapped",
+      },
   }
+
+  @classmethod
+  def _filter_by_program_owner(cls, predicate):
+    return cls._filter_by_role("ProgramOwner", predicate)
+
+  @classmethod
+  def _filter_by_program_editor(cls, predicate):
+    return cls._filter_by_role("ProgramEditor", predicate)
+
+  @classmethod
+  def _filter_by_program_reader(cls, predicate):
+    return cls._filter_by_role("ProgramReader", predicate)
+
+  @classmethod
+  def _filter_by_program_mapped(cls, predicate):
+    return ObjectPerson.query.join(Person).filter(
+      (ObjectPerson.personable_type == "Program") &
+      (ObjectPerson.personable_id == cls.id) &
+      (predicate(Person.email) | predicate(Person.name))
+    ).exists()
 
   @classmethod
   def eager_query(cls):

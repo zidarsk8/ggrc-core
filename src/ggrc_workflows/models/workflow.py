@@ -13,6 +13,7 @@ from ggrc.login import get_current_user
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.mixins import (
     deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful,
     CustomAttributable
@@ -76,8 +77,9 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
   cycles = db.relationship(
       'Cycle', backref='workflow', cascade='all, delete-orphan')
 
-  next_cycle_start_date = deferred(
-      db.Column(db.Date, nullable=True), 'Workflow')
+  next_cycle_start_date = db.Column(db.Date, nullable=True)
+
+  non_adjusted_next_cycle_start_date = db.Column(db.Date, nullable=True)
 
   @computed_property
   def workflow_state(self):
@@ -98,6 +100,7 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       'object_approval',
       'recurrences',
       PublishOnly('next_cycle_start_date'),
+      PublishOnly('non_adjusted_next_cycle_start_date'),
       PublishOnly('workflow_state'),
   ]
 
@@ -109,18 +112,32 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       "notify_custom_message": "Custom email message",
       "notify_on_change": "Force real-time email updates",
       "workflow_owner": {
-          "display_name": "Owner",
-          "type": "workflow_role",
+          "display_name": "Manager",
+          "type": AttributeInfo.Type.USER_ROLE,
           "mandatory": True,
+          "filter_by": "_filter_by_workflow_owner",
       },
       "workflow_member": {
           "display_name": "Member",
-          "type": "workflow_role",
+          "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_workflow_member",
+      },
+      "workflow_mapped": {
+          "display_name": "No Access",
+          "type": AttributeInfo.Type.USER_ROLE,
       },
       "status": None,
       "start_date": None,
       "end_date": None,
   }
+
+  @classmethod
+  def _filter_by_workflow_owner(cls, predicate):
+    return cls._filter_by_role("WorkflowOwner", predicate)
+
+  @classmethod
+  def _filter_by_workflow_member(cls, predicate):
+    return cls._filter_by_role("WorkflowMember", predicate)
 
   def copy(self, _other=None, **kwargs):
     columns = [

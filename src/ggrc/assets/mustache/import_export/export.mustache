@@ -18,7 +18,11 @@
             </div>
           {{else}}
             <h2 class="title">
-              {{export.filename}} <a class="btn-title-change report-title-trigger" href="#"><i class="grcicon-edit"></i></a>
+              {{#if export.data_grid}}
+                Data Grid
+              {{else}}
+                Export Objects
+              {{/if}}
             </h2>
           {{/if}}
         </div>
@@ -40,9 +44,9 @@
                       </button>
                     {{/first_panel}}
                     <select can-value="type" class="input-block-level option-type-selector">
-                      {{#importable}}
+                      {{#exportable}}
                         <option value="{{model_singular}}" label="{{title_plural}}"></option>
-                      {{/importable}}
+                      {{/exportable}}
                     </select>
                   </div>
                 </div>
@@ -53,17 +57,17 @@
 
               {{#if export.data_grid}}
                 {{#if_equals panel_number 0}}
-                  <relevant-filter type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
+                  <relevant-filter show_all="true" type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
                 {{/if}}
               {{else}}
-                <relevant-filter type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
+                <relevant-filter show_all="true" has_parent="item.has_parent" relevant_menu_item="parent" type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
               {{/if}}
             </export-panel>
           </div>
         {{/each}}
       </div>
       <div class="add-rule add-object">
-        <a href="#" id="addAnotherObjectType" class="addFilterRule btn btn-small btn-info">Export another object type</a>
+        <a href="#" id="addAnotherObjectType" class="addFilterRule btn btn-small btn-info">Add another object type</a>
       </div>
     </export-group>
   </div>
@@ -79,7 +83,12 @@
     <div class="btn-group pull-right">
       {{^export.loading}}
         <button type="submit" id="export-csv-button" class="btn btn-success btn-small">
-          <i class="grcicon-export-white"></i> Export Data
+          <i class="grcicon-export-white"></i>
+          {{#if export.data_grid}}
+            Export Data Grid
+          {{else}}
+            Export Objects
+          {{/if}}
         </button>
       {{/loading }}
       {{#export.loading}}

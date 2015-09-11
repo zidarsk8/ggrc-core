@@ -17,7 +17,7 @@
 
 %ul.menu
   %li
-    %a{ 'href': 'javascript://', 'data-toggle': 'multitype-search-modal-selector', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
+    %a{ 'href': 'javascript://', 'data-toggle': 'unified-search', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
       %i.grcicon-search
       %span
         Search
@@ -44,10 +44,7 @@
         %a{'href': "/dashboard"}
           %i.grcicon-my-work
           My Work ({{current_user.system_wide_role}})
-      %li
-        %a{'href': "/objectBrowser"}
-          %i.grcicon-search
-          All Objects
+
       -if permissions.is_allowed_read('/admin', None, 1)
         %li
           %a{'href': "/admin#people_list_widget"}

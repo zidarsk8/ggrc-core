@@ -3,13 +3,17 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from sqlalchemy import or_
 
 from ggrc import db
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
     Titled, Slugged, Described, Timeboxed, WithContact
 )
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import PublishOnly
+from ggrc.models import all_models
+from ggrc_workflows.models.task_group_object import TaskGroupObject
 
 
 class TaskGroup(
@@ -24,6 +28,7 @@ class TaskGroup(
 
   task_group_objects = db.relationship(
       'TaskGroupObject', backref='task_group', cascade='all, delete-orphan')
+
   objects = association_proxy(
       'task_group_objects', 'object', 'TaskGroupObject')
 
@@ -53,6 +58,7 @@ class TaskGroup(
       "contact": {
           "display_name": "Assignee",
           "mandatory": True,
+          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
       "start_date": None,
@@ -60,7 +66,13 @@ class TaskGroup(
       "workflow": {
           "display_name": "Workflow",
           "mandatory": True,
-      }
+          "filter_by": "_filter_by_workflow",
+      },
+      "task_group_objects": {
+          "display_name": "Objects",
+          "type": AttributeInfo.Type.SPECIAL_MAPPING,
+          "filter_by": "_filter_by_objects",
+      },
   }
 
   def copy(self, _other=None, **kwargs):
@@ -101,3 +113,30 @@ class TaskGroup(
       ))
 
     return target
+
+  @classmethod
+  def _filter_by_workflow(cls, predicate):
+    from ggrc_workflows.models import Workflow
+    return Workflow.query.filter(
+        (Workflow.id == cls.workflow_id) &
+        (predicate(Workflow.slug) | predicate(Workflow.title))
+    ).exists()
+
+  @classmethod
+  def _filter_by_objects(cls, predicate):
+    parts = []
+    for model_name in all_models.__all__:
+      model = getattr(all_models, model_name)
+      query = getattr(model, "query", None)
+      field = getattr(model, "slug", getattr(model, "email", None))
+      if query is None or field is None or not hasattr(model, "id"):
+        continue
+      parts.append(query.filter(
+          (TaskGroupObject.object_type == model_name) &
+          (model.id == TaskGroupObject.object_id) &
+          predicate(field)
+      ).exists())
+    return TaskGroupObject.query.filter(
+        (TaskGroupObject.task_group_id == cls.id) &
+        or_(*parts)
+    ).exists()

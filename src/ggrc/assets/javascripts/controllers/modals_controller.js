@@ -758,6 +758,9 @@ can.Control("GGRC.Controllers.Modals", {
         function finish() {
           delete that.disable_hide;
           if (that.options.add_more) {
+            if (that.options.$trigger) {
+              that.options.$trigger.trigger("modal:added", [obj]);
+            }
             that.new_instance();
           } else {
             that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
@@ -898,10 +901,11 @@ can.Component.extend({
   scope: {
     parent_instance: null,
     instance: null,
-    instance_attr: '@',
-    source_mapping: '@',
-    source_mapping_source: '@',
-    mapping: '@',
+    instance_attr: "@",
+    source_mapping: "@",
+    source_mapping_source: "@",
+    mapping: "@",
+    deferred: "@",
     attributes: {},
     list: [],
     // the following are just for the case when we have no object to start with,
@@ -930,10 +934,10 @@ can.Component.extend({
         .get_binding(this.scope.source_mapping)
         .refresh_instances()
         .then(function (list) {
-          that.scope.attr("list", can.map(list, function (binding) {
-                return binding.instance;
-              }));
-        });
+          this.scope.attr("list", can.map(list, function (binding) {
+            return binding.instance;
+          }));
+        }.bind(this));
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
         key = this.scope.instance_attr + "_" + (this.scope.mapping || this.scope.source_mapping);
@@ -950,10 +954,9 @@ can.Component.extend({
 
       this.options.parent_instance = this.scope.parent_instance;
       this.options.instance = this.scope.instance;
-      setTimeout(this.set_user_as_owner.bind(this), 0);
       this.on();
     },
-    set_user_as_owner: function () {
+    "{scope} list": function () {
       // Workaround so we render pre-defined users.
       if (~['owners'].indexOf(this.scope.mapping) && this.scope.list && !this.scope.list.length) {
         var person = CMS.Models.Person.findInCacheById(GGRC.current_user.id);
@@ -973,7 +976,6 @@ can.Component.extend({
         changes,
         function(item) {
           var mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, item.what.constructor.shortName);
-
           if (item.how === "add") {
             that.scope.instance.mark_for_addition(mapping, item.what, item.extra);
           } else {
@@ -985,6 +987,7 @@ can.Component.extend({
     },
     "{parent_instance} updated": "deferred_update",
     "{parent_instance} created": "deferred_update",
+
     // this works like autocomplete_select on all modal forms and
     // descendant class objects.
     autocomplete_select : function(el, event, ui) {
@@ -993,7 +996,7 @@ can.Component.extend({
         attrs[$(el).attr("name")] = $(el).val();
         return attrs;
       }, {});
-      if (this.scope.deferred) {
+      if (this.scope.attr("deferred")) {
         this.scope.changes.push({ what: ui.item, how: "add", extra: extra_attrs });
       } else {
         mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, ui.item.constructor.shortName);
@@ -1021,7 +1024,7 @@ can.Component.extend({
             len = this.scope.list.length,
             mapping;
 
-        if (this.scope.deferred) {
+        if (this.scope.attr("deferred")) {
           this.scope.changes.push({ what: obj, how: "remove" });
         } else {
           mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, obj.constructor.shortName);
@@ -1078,7 +1081,7 @@ can.Component.extend({
         obj = new CMS.Models[binding.loader.option_model_name](extra_attrs);
       }
 
-      if (that.scope.deferred) {
+      if (that.scope.attr("deferred")) {
         that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
       } else {
         mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);
@@ -1094,7 +1097,7 @@ can.Component.extend({
       var mapping;
 
       can.each(data.arr || [data], function(obj) {
-        if (this.scope.deferred) {
+        if (this.scope.attr("deferred")) {
           this.scope.changes.push({ what: obj, how: "add" });
         } else {
           mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, obj.constructor.shortName);
@@ -1120,7 +1123,7 @@ can.Component.extend({
 
       can.each(data.arr || [data], function(obj) {
         var mapping;
-        if (that.scope.deferred) {
+        if (that.scope.attr("deferred")) {
           that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
         } else {
           mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);

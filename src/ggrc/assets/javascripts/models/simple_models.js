@@ -58,7 +58,7 @@ can.Model.Cacheable("CMS.Models.Program", {
       show_view : GGRC.mustache_path + "/programs/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : [
-      {attr_title: 'Owner', attr_name: 'owner', attr_sort_field: 'authorizations.0.person.name|email'}
+      {attr_title: 'Manager', attr_name: 'owner', attr_sort_field: 'authorizations.0.person.name|email'}
     ].concat(can.Model.Cacheable.attr_list.filter(function (d) {
       return d.attr_name != 'owner';
     })).concat([
@@ -316,18 +316,22 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   return instance;
 };
 
-CMS.Models.get_stub = function(object) {
-  return CMS.Models.get_instance(object).stub();
-}
+CMS.Models.get_stub = function (object) {
+  var instance = CMS.Models.get_instance(object);
+  if (!instance) {
+    return;
+  }
+  return instance.stub();
+};
 
-CMS.Models.get_stubs = function(objects) {
+CMS.Models.get_stubs = function (objects) {
   return new can.Stub.List(can.map(CMS.Models.get_instances(objects), function(o) {
     return o.stub();
   }));
 };
 
-CMS.Models.get_instances = function(objects) {
-  var i, instances = []
+CMS.Models.get_instances = function (objects) {
+  var i, instances = [];
   if (!objects)
     return [];
   for (i=0; i<objects.length; i++) {

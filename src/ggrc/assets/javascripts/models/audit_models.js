@@ -49,7 +49,7 @@ function update_program_authorizations(programs, person) {
         }).save();
       });
     }
-  });
+  }).then(Permission.refresh());
 }
 
 can.Model.Cacheable("CMS.Models.Audit", {
@@ -153,9 +153,10 @@ can.Model.Cacheable("CMS.Models.Audit", {
 
     var that = this;
     // Make sure the context is always set to the parent program
-    if(this.context == null || this.context.id == null){
+    if (!this.context || !this.context.id) {
       this.attr('context', this.program.reify().context);
     }
+
 
     return this._super.apply(this, arguments);
   },
@@ -278,11 +279,13 @@ can.Model.Cacheable("CMS.Models.Request", {
   filter_keys : ["assignee", "code", "company", "control",
                  "due date", "due", "name", "notes", "request",
                  "requested on", "status", "test", "title", "request_type",
-                 "type", "request type", "due_on"
+                 "type", "request type", "due_on", "request_object", "request object", "request title"
   ],
   filter_mappings: {
     "type": "request_type",
-    "request type": "request_type"
+    "request type": "request_type",
+    "request title": "description",
+    "request object": "request_object"
   },
   root_collection : "requests"
   , create : "POST /api/requests"
@@ -447,22 +450,31 @@ can.Model.Cacheable("CMS.Models.Request", {
           "title": "description",
           "state": "status",
           "due date": "due_on",
-          "due": "due_on"
+          "due": "due_on",
+          "request object": "request_object"
         }),
         keys, vals;
 
     keys = _.union(this.class.filter_keys, ["state"], _.keys(mappings));
     vals = filter_vals.call(this, keys, mappings);
-
     try {
       vals["due_on"] = moment(this["due_on"]).format("YYYY-MM-DD");
       vals["due"] = vals["due date"] = vals["due_on"];
-      if (this.assignee){
+      if (this.assignee) {
         vals["assignee"] = filter_vals.apply(this.assignee.reify(), []);
       }
-      vals["control"] = this.audit_object.reify().auditable.reify().title;
+      vals["control"] = this.audit_object ? this.audit_object.reify().auditable.reify().title : "None";
+      vals["request_object"] = vals["request object"] = vals["control"];
     } catch (e) {}
+
     return vals;
+  },
+  save: function() {
+      // Make sure the context is always set to the parent audit
+      if (!this.context || !this.context.id) {
+        this.attr('context', this.audit.reify().context);
+      }
+      return this._super.apply(this, arguments);
   }
 
 });
@@ -735,22 +747,20 @@ can.Model.Cacheable("CMS.Models.Meeting", {
   }
 }, {
   init : function () {
-      var that = this;
       this._super && this._super.apply(this, arguments);
-
-      this.each(function(value, name) {
-        if (value === null)
-          that.removeAttr(name);
-      });
-        that.bind("change", function(){
-          if(typeof that.response !== "undefined" && !that._preloaded_people){
-            that._preloaded_people = true;
-
-            can.map(that.response.reify().people, function(person){
-              that.mark_for_addition("people", person);
-            });
-          }
-        });
+      this.each(function (value, name) {
+        if (value === null) {
+          this.removeAttr(name);
+        }
+      }.bind(this));
+      this.bind("change", function () {
+        if (typeof this.response !== "undefined" && !this._preloaded_people) {
+          this._preloaded_people = true;
+          _.map(this.response.reify().people, function (person) {
+            this.mark_for_addition("people", person);
+          }.bind(this));
+        }
+      }.bind(this));
   }
 
 });
@@ -771,6 +781,14 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
     custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
     start_date: "date",
     end_date: "date"
+  },
+  filter_keys : ["operationally", "operational", "design"
+  ],
+  filter_mappings: {
+    "operational": "operationally"
+  },
+  tree_view_options : {
+    add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
   },
   init : function() {
     this._super && this._super.apply(this, arguments);

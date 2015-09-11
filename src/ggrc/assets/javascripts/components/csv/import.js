@@ -56,14 +56,14 @@
                   prev[key] += curr[key] || 0;
                 });
                 return prev;
-              }, {inserted: 0, updated: 0, deleted: 0, ignored: 0});
+              }, {created: 0, updated: 0, deleted: 0, ignored: 0});
 
           this.scope.attr("state", "success");
           this.scope.attr("data", [result_count]);
         }.bind(this))
         .fail(function (data) {
           this.scope.attr("state", "select");
-          $("body").trigger("ajax:flash", {"error": data});
+          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
         }.bind(this))
         .always(function () {
           this.scope.attr("isLoading", false);
@@ -113,7 +113,7 @@
         }.bind(this))
         .fail(function (data) {
           this.scope.attr("state", "select");
-          $("body").trigger("ajax:flash", {"error": data});
+          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
         }.bind(this))
         .always(function () {
           this.scope.attr("isLoading", false);

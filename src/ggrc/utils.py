@@ -4,11 +4,12 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import datetime
+import re
 import json
 import sys
 import time
 from flask import current_app, request
-from settings import custom_url_root
+from settings import CUSTOM_URL_ROOT
 
 
 class GrcEncoder(json.JSONEncoder):
@@ -132,8 +133,8 @@ def merge_dicts(*args):
 
 
 def get_url_root():
-  if custom_url_root is not None:
-    return custom_url_root
+  if CUSTOM_URL_ROOT is not None:
+    return CUSTOM_URL_ROOT
   return request.url_root
 
 
@@ -145,7 +146,8 @@ def get_mapping_rules():
     Request has a direct mapping to Audit with audit_id
     Response has a direct mapping to Request with request_id
     DocumentationResponse has a direct mapping to Request with request_id
-    DocumentationResponse has normal mappings with all other objects in maping modal
+    DocumentationResponse has normal mappings with all other objects in
+    maping modal
     Section has a direct mapping to Standard/Regulation/Poicy with directive_id
     Anything can be mapped to a request, frotent show audit insted
 
@@ -158,7 +160,7 @@ def get_mapping_rules():
   # these rules are copy pasted from
   # src/ggrc/assets/javascripts/apps/business_objects.js line: 276
   business_object_rules = {
-    "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
+    "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",  # noqa # removed Person because Programs have a "Mapped" attribute for people mappings
     "Audit": "Issue ControlAssessment Request history Person program program_controls",  # noqa
     "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",  # noqa
     "ControlAssessment": "Issue Objective Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
@@ -170,7 +172,7 @@ def get_mapping_rules():
     "Section" : "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",  # noqa
     "Objective" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",  # noqa
     "Control" : "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "Person" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",  # noqa
+    "Person" : "Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit",  # noqa
     "OrgGroup" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
     "Vendor" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
     "System" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
@@ -181,12 +183,23 @@ def get_mapping_rules():
     "Facility" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
     "Market" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit"  # noqa
   }
-
   split_rules = {k: v.split() for k, v in business_object_rules.items()}
-
   filtered_rules = {k: filter(v) for k, v in split_rules.items()}
-
   return filtered_rules
+
+
+def _prefix_camelcase(name, prefix):
+  name = name[:1].lower() + name[1:]
+  callback = lambda pat: prefix + pat.group(0).lower()
+  return re.sub(r'[A-Z]', callback, name)
+
+
+def underscore_from_camelcase(name):
+  return _prefix_camelcase(name, "_")
+
+
+def title_from_camelcase(name):
+  return _prefix_camelcase(name, " ")
 
 
 class BenchmarkContextManager(object):
@@ -201,4 +214,18 @@ class BenchmarkContextManager(object):
     end = time.time()
     current_app.logger.info("{:.4f} {}".format(end - self.start, self.message))
 
+
+class WithNop(object):
+
+  def __init__(self, message):
+    pass
+
+  def __enter__(self):
+    pass
+
+  def __exit__(self, exc_type, exc_value, exc_trace):
+    pass
+
+
 benchmark = BenchmarkContextManager
+with_nop = WithNop

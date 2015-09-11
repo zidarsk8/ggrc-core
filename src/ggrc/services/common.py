@@ -878,7 +878,12 @@ class Resource(ModelView):
         return current_app.make_response((
             'application/json', 406, [('Content-Type', 'text/plain')]))
     with benchmark("dispatch_request > collection_get > Get collection matches"):
-      matches_query = self.get_collection_matches(self.model)
+      # We skip querying by contexts for Creator role and relationship objects,
+      # because it will filter out objects that the Creator can access.
+      # We are doing a special permissions check for these objects
+      # below in the filter_resource method.
+      filter_by_contexts = not (self.model.__name__ == "Relationship" and _is_creator())
+      matches_query = self.get_collection_matches(self.model, filter_by_contexts)
     with benchmark("dispatch_request > collection_get > Query Data"):
       if '__page' in request.args or '__page_only' in request.args:
         with benchmark("Query matches with paging"):
@@ -992,58 +997,84 @@ class Resource(ModelView):
     pass
 
   def collection_post(self):
-    if self.request.mimetype != 'application/json':
-      return current_app.make_response((
-          'Content-Type must be application/json', 415, []))
-    obj = self.model()
-    src = UnicodeSafeJsonWrapper(self.request.json)
-    root_attribute = self.model._inflector.table_singular
     try:
-      src = src[root_attribute]
-    except KeyError, e:
-      return current_app.make_response((
-          'Required attribute "{0}" not found'.format(
-              root_attribute), 400, []))
-    with benchmark("Query create permissions"):
-      if not permissions.is_allowed_create(self.model.__name__, None,
-                                           self.get_context_id_from_json(src)):
-        raise Forbidden()
+      if self.request.mimetype != 'application/json':
+        return current_app.make_response((
+            'Content-Type must be application/json', 415, []))
+      obj = self.model()
+      src = UnicodeSafeJsonWrapper(self.request.json)
+      root_attribute = self.model._inflector.table_singular
+      try:
+        src = src[root_attribute]
+      except KeyError, e:
+        return current_app.make_response((
+            'Required attribute "{0}" not found'.format(
+                root_attribute), 400, []))
+      with benchmark("Query create permissions"):
+        if not permissions.is_allowed_create(self.model.__name__, None,
+                                             self.get_context_id_from_json(src)):
+          raise Forbidden()
 
-    if src.get('private') == True and src.get('context') is not None \
-        and src['context'].get('id') is not None:
-      raise BadRequest(
-          'context MUST be "null" when creating a private resource.')
-    elif 'context' not in src:
-      raise BadRequest('context MUST be specified.')
+      if src.get('private') == True and src.get('context') is not None \
+          and src['context'].get('id') is not None:
+        raise BadRequest(
+            'context MUST be "null" when creating a private resource.')
+      elif 'context' not in src:
+        raise BadRequest('context MUST be specified.')
 
-    with benchmark("Deserialize object"):
-      self.json_create(obj, src)
-    with benchmark("Query create permissions"):
-      if not permissions.is_allowed_create_for(obj):
-        raise Forbidden()
-    with benchmark("Send model POSTed event"):
-      self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
-    obj.modified_by_id = get_current_user_id()
-    db.session.add(obj)
-    with benchmark("Get modified objects"):
-      modified_objects = get_modified_objects(db.session)
-    with benchmark("Update custom attribute values"):
-      set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
-    with benchmark("Log event"):
-      log_event(db.session, obj)
-    with benchmark("Update memcache before commit for resource collection POST"):
-      update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
-    with benchmark("Commit"):
-      db.session.commit()
-    with benchmark("Update index"):
-      update_index(db.session, modified_objects)
-    with benchmark("Update memcache after commit for resource collection POST"):
-      update_memcache_after_commit(self.request)
-    with benchmark("Serialize object"):
-      object_for_json = self.object_for_json(obj)
-    with benchmark("Make response"):
-      return self.json_success_response(
-          object_for_json, self.modified_at(obj), id=obj.id, status=201)
+      with benchmark("Deserialize object"):
+        self.json_create(obj, src)
+      with benchmark("Query create permissions"):
+        if not permissions.is_allowed_create_for(obj):
+          # json_create sometimes adds objects to session, so we need to
+          # make sure the session is cleared
+          db.session.expunge_all()
+          raise Forbidden()
+      with benchmark("Send model POSTed event"):
+        self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
+      obj.modified_by_id = get_current_user_id()
+      db.session.add(obj)
+      with benchmark("Get modified objects"):
+        modified_objects = get_modified_objects(db.session)
+      with benchmark("Update custom attribute values"):
+        set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
+      with benchmark("Log event"):
+        log_event(db.session, obj)
+      with benchmark("Update memcache before commit for resource collection POST"):
+        update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
+      with benchmark("Commit"):
+        db.session.commit()
+      with benchmark("Update index"):
+        update_index(db.session, modified_objects)
+      with benchmark("Update memcache after commit for resource collection POST"):
+        update_memcache_after_commit(self.request)
+      with benchmark("Serialize object"):
+        object_for_json = self.object_for_json(obj)
+      with benchmark("Make response"):
+        return self.json_success_response(
+            object_for_json, self.modified_at(obj), id=obj.id, status=201)
+    except IntegrityError as e:
+      msg = e.orig.args[1]
+      if obj.type == "Relationship" and \
+          msg.startswith("Duplicate entry") and \
+          msg.endswith("'uq_relationships'"):
+        R = obj.__class__
+        db.session.rollback()
+        obj = R.query.filter(
+           ((R.source_type==obj.source_type) &
+            (R.source_id==obj.source_id) &
+            (R.destination_type==obj.destination_type) &
+            (R.destination_id==obj.destination_id)) |
+           ((R.source_type==obj.destination_type) &
+            (R.source_id==obj.destination_id) &
+            (R.destination_type==obj.source_type) &
+            (R.destination_id==obj.source_id))
+        ).first()
+        object_for_json = self.object_for_json(obj)
+        return self.json_success_response(object_for_json,
+                                          self.modified_at(obj),
+                                          id=obj.id, status=200)
+      raise e
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
@@ -1221,6 +1252,24 @@ def filter_resource(resource, depth=0, user_permissions=None):
     elif 'context_id' in resource:
       context_id = resource['context_id']
     assert context_id is not False, "No context found for object"
+
+    # In order to avoid loading full instances and using is_allowed_read_for,
+    # we are making a special test for the Creator here. Creator can only
+    # see relationship objects where he has read access on both source and
+    # destination. This is defined in Creator.py:220 file, but is_allowed_read
+    # can not check conditions without the full instance
+    if resource['type'] == "Relationship" and _is_creator():
+      # Make a check for relationship objects that are a special case
+      can_read = True
+      for t in ('source', 'destination'):
+        inst = resource[t]
+        contexts = permissions.read_contexts_for(inst['type']) or []
+        resources = permissions.read_resources_for(inst['type']) or []
+        if None in contexts or inst['context_id'] in contexts or inst['id'] in resources:
+          continue
+        can_read = False
+      if not can_read:
+        return None
     if not user_permissions.is_allowed_read(resource['type'], resource['id'], context_id):
       return None
     else:
@@ -1239,6 +1288,11 @@ def filter_resource(resource, depth=0, user_permissions=None):
   else:
     assert False, "Non-object passed to filter_resource"
 
+
+def _is_creator():
+  current_user = get_current_user()
+  return hasattr(current_user, 'system_wide_role') \
+      and current_user.system_wide_role == "Creator"
 
 def etag(last_modified):
   """Generate the etag given a datetime for the last time the resource was

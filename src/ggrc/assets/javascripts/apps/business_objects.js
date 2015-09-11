@@ -245,33 +245,6 @@
       object_table = object_class && object_class.table_plural,
       object = GGRC.page_instance();
 
-    if (!GGRC.page_object)
-      return;
-
-    // Info widgets display the object information instead of listing connected
-    //  objects.
-    var info_widget_views = {
-      'programs': GGRC.mustache_path + "/programs/info.mustache",
-      'audits': GGRC.mustache_path + "/audits/info.mustache",
-      'people': GGRC.mustache_path + "/people/info.mustache",
-      'policies': GGRC.mustache_path + "/policies/info.mustache",
-      'sections': GGRC.mustache_path + "/sections/info.mustache",
-      'objectives': GGRC.mustache_path + "/objectives/info.mustache",
-      'controls': GGRC.mustache_path + "/controls/info.mustache",
-      'systems': GGRC.mustache_path + "/systems/info.mustache",
-      'processes': GGRC.mustache_path + "/processes/info.mustache",
-      'products': GGRC.mustache_path + "/products/info.mustache",
-      'control_assessments': GGRC.mustache_path + "/control_assessments/info.mustache",
-      'issues': GGRC.mustache_path + "/issues/info.mustache",
-
-    };
-    widget_list.add_widget(object.constructor.shortName, "info", {
-      widget_id: "info",
-      content_controller: GGRC.Controllers.InfoWidget,
-      instance: object,
-      widget_view: info_widget_views[object_table]
-    });
-
     var base_widgets_by_type = {
       "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
       "Audit": "Issue ControlAssessment Request history Person Program Control",
@@ -298,14 +271,40 @@
     };
     base_widgets_by_type = _.mapValues(base_widgets_by_type,
       function (conf) {
-        return conf.split(' ');
+        return conf.split(" ");
       });
-
     //Update GGRC.base_widgets_by_type for tree_view of each widget type
     if (!GGRC.tree_view) {
       GGRC.tree_view = {};
     }
     GGRC.tree_view.base_widgets_by_type = base_widgets_by_type;
+
+    // TODO: Really ugly way to avoid executing IIFE - needs cleanup
+    if (!GGRC.page_object) {
+      return;
+    }
+    // Info widgets display the object information instead of listing connected
+    //  objects.
+    var info_widget_views = {
+      'programs': GGRC.mustache_path + "/programs/info.mustache",
+      'audits': GGRC.mustache_path + "/audits/info.mustache",
+      'people': GGRC.mustache_path + "/people/info.mustache",
+      'policies': GGRC.mustache_path + "/policies/info.mustache",
+      'sections': GGRC.mustache_path + "/sections/info.mustache",
+      'objectives': GGRC.mustache_path + "/objectives/info.mustache",
+      'controls': GGRC.mustache_path + "/controls/info.mustache",
+      'systems': GGRC.mustache_path + "/systems/info.mustache",
+      'processes': GGRC.mustache_path + "/processes/info.mustache",
+      'products': GGRC.mustache_path + "/products/info.mustache",
+      'control_assessments': GGRC.mustache_path + "/control_assessments/info.mustache",
+      'issues': GGRC.mustache_path + "/issues/info.mustache",
+    };
+    widget_list.add_widget(object.constructor.shortName, "info", {
+      widget_id: "info",
+      content_controller: GGRC.Controllers.InfoWidget,
+      instance: object,
+      widget_view: info_widget_views[object_table]
+    });
 
     var model_names = Object.keys(base_widgets_by_type);
     model_names.sort();
@@ -480,7 +479,7 @@
       },
       clause_child_options = {
         model: CMS.Models.Clause,
-        mapping: "clauses",
+        mapping: "related_objects",
         show_view: GGRC.mustache_path + "/sections/tree.mustache",
         footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache",
         add_item_view: GGRC.mustache_path + "/sections/tree_add_item.mustache",

@@ -13,13 +13,13 @@
       <div class="select">
         <div class="item-data">
           <div class="row-fluid">
-            <div class="span4">
+            <div class="span6">
               <div class="title tree-title-area">
                 <i class="grcicon-task_group-color"></i>
                 {{instance.title}}
               </div>
             </div>
-            <div class="span4">
+            <div class="span6">
               <ul class="tree-action-list">
                 {{#with_mapping_count instance 'cycle_task_group_tasks'}}
                   <li>
@@ -33,6 +33,7 @@
                   {{#with_review_task}}
                     {{#using cycle=instance.cycle}}
                       {{#if_equals cycle.is_current true}}
+                      {{#is_allowed 'update' instance}}
                         <div class="request-control"
                           {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); });}}
                           >
@@ -64,6 +65,7 @@
                           {{/instance._undo.0}}
                           -->
                         </div>
+                      {{/is_allowed 'update' instance}}
                       {{/if_equals}}
                     {{/using}}
                   {{/with_review_task}}

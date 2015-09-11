@@ -24,16 +24,16 @@ class CycleCalculator(object):
   needed by workflows, namely task_date_range, workflow_date_range and
   next_cycle_start_date.
 
-  Each concrete class has to implement it's own
-  relative_day_to_date method that calculates the concrete date based on
+  Each implementation of a class has to implement it's own
+  relative_day_to_date method that calculates the real date based on
   the base_date provided to the method and taking into account the specifics
   of the frequency. relative_day_to_date SHOULD NOT adjust dates but
   should only convert them to datetime.date objects.
 
   Attributes:
-    date_domain: Concrete class's domain in which values passed to it are
+    date_domain: Class implementation's domain in which values passed to it are
                  to be found
-    time_delta: Concrete class's atomic unit by which addition/subtraction
+    time_delta: Class implementation's atomic unit by which addition/subtraction
                 will take place during calculations.
     HOLIDAYS: Official holidays with the addition of several days that Google
               observes. See file google_holidays.py for details.
@@ -46,9 +46,10 @@ class CycleCalculator(object):
   HOLIDAYS = GoogleHolidays()
 
   @abstractmethod
-  def relative_day_to_date(self):
-    raise NotImplementedError("Converting from relative to concrete date"
-                              "must be done in concrete classes.")
+  def relative_day_to_date(self, relative_day, relative_month=None,
+                           base_date=None):
+    raise NotImplementedError("Converting from relative to real date"
+                              "must be done on an instance.")
 
 
   def __init__(self, workflow, holidays=HOLIDAYS):
@@ -56,10 +57,10 @@ class CycleCalculator(object):
 
     Generates a flat list of all the tasks in all task groups.
 
-    Concrete classes have to sort tasks based on relative
+    Instances have to sort tasks based on relative
     start days (DD or MM/DD) and generate a dictionary self.reified_tasks
     where each key is task.id and values are dictionaries with
-    relative_start, relative_end and concrete start_date and end_date
+    relative_start, relative_end and calculated start_date and end_date
     values. Example:
 
       self.reified_tasks[task.id] = {
@@ -78,24 +79,9 @@ class CycleCalculator(object):
     self.holidays = holidays
     self.tasks = [
       task for task_group in self.workflow.task_groups
-      for task in task_group.task_group_tasks]
-
-  @staticmethod
-  def _rel_to_str(relative_day, relative_month=None):
-    """Get string representation of relative day and month
-
-    Args:
-      relative_day: Relative day of the task
-      relative_month: Relative month of the task
-
-    Returns:
-      String: A number ("5") representing relative day or a string in
-              format "MM/DD" representing both relative month and
-              relative day.
-    """
-    if not relative_month:
-      return str(relative_day)
-    return "{0}/{1}".format(relative_month, relative_day)
+           for task in task_group.task_group_tasks]
+    self.tasks.sort(key=lambda t: (t.relative_start_month,
+                                   t.relative_start_day))
 
   def is_work_day(self, ddate):
     """Check whether specific ddate is workday or if it's a holiday/weekend.
@@ -138,6 +124,44 @@ class CycleCalculator(object):
       return self.adjust_date(ddate)
     return ddate
 
+  def get_base_date(self, base_date=None):
+    """Base date from which we will calculate must be less than or equal to the
+    first tasks' relative day to ensure consistent calculation across different
+    tasks."""
+    if not base_date:
+      base_date = datetime.date.today()
+
+    return datetime.date(
+      base_date.year,
+      base_date.month,
+      min([t.relative_start_day for t in self.tasks] + [base_date.day]))
+
+  def get_first_task_relative(self):
+    tasks_start_dates = [
+      (v['start_date'], v['relative_start'])
+      for v in self.reified_tasks.values()]
+    tasks_start_dates.sort(key=lambda x: x[0])
+    _, first_relative_pair = tasks_start_dates[0]
+    return first_relative_pair
+
+  def get_last_task_relative(self):
+    tasks_end_dates = [
+      (v['end_date'], v['relative_end'])
+      for v in self.reified_tasks.values()]
+    tasks_end_dates.sort(key=lambda x: x[0], reverse=True)
+    _, last_relative_pair = tasks_end_dates[0]
+    return last_relative_pair
+
+  def get_month_day_pair_from_relative(self, relative_pair):
+    """Normalize relative pair to tuple"""
+    # relative_pair = (relative_start_month, relative_start_day)
+    if type(relative_pair) is tuple:
+      rm, rd = relative_pair
+    else:
+      rd = relative_pair
+      rm = None
+    return rm, rd
+
   def workflow_date_range(self):
     """Calculates the min start date and max end date across all tasks.
 
@@ -145,21 +169,25 @@ class CycleCalculator(object):
       tuple({datetime.date, datetime.date}): First start date and
       last end date.
     """
-    tasks_start_dates = [v['start_date'] for _, v in self.reified_tasks.items()]
-    tasks_end_dates = [v['end_date'] for _, v in self.reified_tasks.items()]
+    tasks_start_dates = [v['start_date'] for v in self.reified_tasks.values()]
+    tasks_end_dates = [v['end_date'] for v in self.reified_tasks.values()]
     return min(tasks_start_dates), max(tasks_end_dates)
 
   def task_date_range(self, task, base_date=None):
+    start_date, end_date = self.non_adjusted_task_date_range(task, base_date)
+    return self.adjust_date(start_date), self.adjust_date(end_date)
+
+  def non_adjusted_task_date_range(self, task, base_date=None, initialisation=False):
     """Calculates individual task's start and end date based on base_date.
 
     Taking base_date into account calculates individual task's start and
     end date with relative_day_to_date function provided by a specific
-    concrete class.
+    implementation of a class.
 
     Args:
       task: Task object for which we are calculating start and end date
       base_date: Date based on which we convert from relative day to
-                 concrete date.
+                 real date.
     Returns:
       tuple({datetime.date, datetime.date}): Weekend and holiday
         adjusted start and end date.
@@ -167,31 +195,44 @@ class CycleCalculator(object):
     if not base_date:
       base_date = datetime.date.today()
 
-    start_day = self.relative_day_to_date(
+    start_date = self.relative_day_to_date(
       task.relative_start_day,
       relative_month=task.relative_start_month,
       base_date=base_date)
 
-    end_day = self.relative_day_to_date(
+    end_date = self.relative_day_to_date(
       task.relative_end_day,
       relative_month=task.relative_end_month,
       base_date=base_date)
 
+    # On initialisation `reified_tasks` haven't been initialised yet, making
+    # this check unnecessary (and impossible).
+    if not initialisation:
+      min_rsm, min_rsd = self.get_month_day_pair_from_relative(
+        self.get_first_task_relative())
+
+      min_start = self.relative_day_to_date(
+        relative_day=min_rsd, relative_month=min_rsm,
+        base_date=base_date)
+
+      # In certain cases (e.g. quarterly) the calculation of correct time unit
+      # in which we operate can actually put start date of a specific task
+      # BEFORE actual first task - in such case, we have to move start and end
+      # dates one time unit forward.
+      if start_date < min_start:
+        start_date = start_date + self.time_delta
+        end_date = end_date + self.time_delta
+
     # If the end_day is before start_day, end_date is overflowing
     # to next time unit.
-    if end_day < start_day:
-      end_day = end_day + self.time_delta
-
-    # If both start day and end day have already happened we are
-    # operating on time unit.
-    if start_day <= end_day < base_date:
-      start_day = start_day + self.time_delta
-      end_day = end_day + self.time_delta
-
-    # Before returning date object we adjust for holidays and weekends.
-    return self.adjust_date(start_day), self.adjust_date(end_day)
+    if end_date < start_date:
+      end_date = end_date + self.time_delta
+    return start_date, end_date
 
   def next_cycle_start_date(self, base_date=None):
+    return self.adjust_date(self.non_adjusted_next_cycle_start_date(base_date))
+
+  def non_adjusted_next_cycle_start_date(self, base_date=None):
     """Calculates workflow's next cycle start date.
 
     Calculates workflow's next cycle start date based based on the minimum
@@ -209,22 +250,17 @@ class CycleCalculator(object):
     if not base_date:
       base_date = today
 
-    tasks_start_dates = [
-      (v['start_date'], v['relative_start'])
-      for v in self.reified_tasks.values()]
-    tasks_start_dates.sort(key=lambda x: x[0])
-
-    tasks_end_dates = [
-      (v['end_date'], v['relative_end'])
-      for v in self.reified_tasks.values()]
-    tasks_end_dates.sort(key=lambda x: x[0], reverse=True)
+    min_rsm, min_rsd = self.get_month_day_pair_from_relative(
+      self.get_first_task_relative())
+    max_rem, max_red = self.get_month_day_pair_from_relative(
+      self.get_last_task_relative())
 
     min_start = self.relative_day_to_date(
-      tasks_start_dates[0][1],
+      relative_day=min_rsd, relative_month=min_rsm,
       base_date=base_date)
 
     max_end = self.relative_day_to_date(
-      tasks_end_dates[0][1],
+      relative_day=max_red, relative_month=max_rem,
       base_date=base_date)
 
     if max_end < min_start:
@@ -247,6 +283,6 @@ class CycleCalculator(object):
     else:
       base_date = base_date + self.time_delta
 
-    return self.adjust_date(self.relative_day_to_date(
-      tasks_start_dates[0][1],
-      base_date=base_date))
+    return self.relative_day_to_date(
+      relative_day=min_rsd, relative_month=min_rsm,
+      base_date=base_date)
