@@ -15,7 +15,6 @@ from ggrc import settings, db
 from ggrc.login import get_current_user
 #from ggrc.rbac import permissions
 from ggrc.services.registry import service
-from ggrc.views.registry import object_view
 import ggrc_risk_assessment_v2.models as models
 from ggrc_basic_permissions.contributed_roles import RoleContributions
 
@@ -74,7 +73,7 @@ def contributed_services():
 
 def contributed_object_views():
   from . import models
-
+  from ggrc.views.registry import object_view
   return [
       object_view(models.Risk),
       object_view(models.ThreatActor),
