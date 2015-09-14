@@ -10,8 +10,8 @@ from ggrc.converters.base import *
 from ggrc.models.all_models import OrgGroup, Person, Relationship
 from ggrc.models.mixins import BusinessObject
 from ggrc.converters.base_row import *
-from ggrc_risk_assessment_v2.models import Risk
-from ggrc_risk_assessment_v2.converters.base_row import *
+from ggrc_risks.models import Risk
+from ggrc_risks.converters.base_row import *
 from collections import OrderedDict
 
 class RiskRowConverter(BaseRowConverter):

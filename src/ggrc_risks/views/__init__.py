@@ -8,7 +8,7 @@
 
 from ggrc.app import app
 from ggrc.login import login_required
-from ggrc_risk_assessment_v2.views import converters
+from ggrc_risks.views import converters
 
 from flask import render_template
 

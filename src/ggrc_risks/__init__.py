@@ -15,7 +15,7 @@ from ggrc import settings, db
 from ggrc.login import get_current_user
 #from ggrc.rbac import permissions
 from ggrc.services.registry import service
-import ggrc_risk_assessment_v2.models as models
+import ggrc_risks.models as models
 from ggrc_basic_permissions.contributed_roles import RoleContributions
 
 
@@ -31,11 +31,11 @@ status_change = signals.signal(
 
 # Initialize Flask Blueprint for extension
 blueprint = Blueprint(
-  'ggrc_risk_assessment_v2',
+  'ggrc_risks',
   __name__,
   template_folder='templates',
   static_folder='static',
-  static_url_path='/static/ggrc_risk_assessment_v2',
+  static_url_path='/static/ggrc_risks',
 )
 
 
@@ -80,10 +80,10 @@ def contributed_object_views():
       ]
 
 # Initialize non-RESTful views
-import ggrc_risk_assessment_v2.views
+import ggrc_risks.views
 
 def init_extra_views(app):
-  ggrc_risk_assessment_v2.views.init_extra_views(app)
+  ggrc_risks.views.init_extra_views(app)
 
 
 class RiskRoleContributions(RoleContributions):

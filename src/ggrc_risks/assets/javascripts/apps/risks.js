@@ -10,7 +10,7 @@
 
 
 (function ($, CMS, GGRC) {
-  var RiskAssessmentV2Extension = {};
+  var RisksExtension = {};
 
   // Insert risk mappings to all gov/business object types
   var _risk_object_types = [
@@ -24,21 +24,21 @@
     related_object_descriptors = {},
     threat_actor_descriptor, risk_descriptor;
 
-  // Register `risk_assessment_v2` extension with GGRC
-  GGRC.extensions.push(RiskAssessmentV2Extension);
+  // Register `risks` extension with GGRC
+  GGRC.extensions.push(RisksExtension);
 
-  RiskAssessmentV2Extension.name = "risk_assessment_v2";
+  RisksExtension.name = "risks";
 
   // Register Risk Assessment models for use with `infer_object_type`
-  RiskAssessmentV2Extension.object_type_decision_tree = function () {
+  RisksExtension.object_type_decision_tree = function () {
     return {
       "risk": CMS.Models.Risk,
       "threat_actor": CMS.Models.ThreatActor
     };
   };
 
-  // Configure mapping extensions for ggrc_risk_assessment_v2
-  RiskAssessmentV2Extension.init_mappings = function init_mappings() {
+  // Configure mapping extensions for ggrc_risks
+  RisksExtension.init_mappings = function init_mappings() {
     var Proxy = GGRC.MapperHelpers.Proxy,
       Direct = GGRC.MapperHelpers.Direct,
       Cross = GGRC.MapperHelpers.Cross,
@@ -117,12 +117,12 @@
           _mixins: ['related', 'related_risk', 'related_threat_actor'],
         };
     });
-    new GGRC.Mappings("ggrc_risk_assessment_v2", mappings);
+    new GGRC.Mappings("ggrc_risks", mappings);
   };
 
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for risk page
-  RiskAssessmentV2Extension.init_widgets = function init_widgets() {
+  RisksExtension.init_widgets = function init_widgets() {
     var page_instance = GGRC.page_instance(),
         is_my_work = function is_my_work() {
           return page_instance.type === "Person";
@@ -191,41 +191,41 @@
     };
 
     if (page_instance instanceof CMS.Models.Risk) {
-      RiskAssessmentV2Extension.init_widgets_for_risk_page();
+      RisksExtension.init_widgets_for_risk_page();
     } else if (page_instance instanceof CMS.Models.ThreatActor) {
-      RiskAssessmentV2Extension.init_widgets_for_threat_actor_page();
+      RisksExtension.init_widgets_for_threat_actor_page();
     } else if (page_instance instanceof CMS.Models.Person) {
-      RiskAssessmentV2Extension.init_widgets_for_person_page();
+      RisksExtension.init_widgets_for_person_page();
     } else {
-      RiskAssessmentV2Extension.init_widgets_for_other_pages();
+      RisksExtension.init_widgets_for_other_pages();
     }
   };
 
-  RiskAssessmentV2Extension.init_widgets_for_risk_page =
+  RisksExtension.init_widgets_for_risk_page =
     function init_widgets_for_risk_page() {
       var risk_descriptors = $.extend({},
         related_object_descriptors, {
           ThreatActor: threat_actor_descriptor
         }
       );
-      new GGRC.WidgetList("ggrc_risk_assessment_v2", {
+      new GGRC.WidgetList("ggrc_risks", {
         Risk: risk_descriptors
       });
   };
 
-  RiskAssessmentV2Extension.init_widgets_for_threat_actor_page =
+  RisksExtension.init_widgets_for_threat_actor_page =
     function init_widgets_for_threat_actor_page() {
       var threat_actor_descriptors = $.extend({},
         related_object_descriptors, {
           Risk: risk_descriptor
         }
       );
-      new GGRC.WidgetList("ggrc_risk_assessment_v2", {
+      new GGRC.WidgetList("ggrc_risks", {
         ThreatActor: threat_actor_descriptors
       });
   };
 
-  RiskAssessmentV2Extension.init_widgets_for_person_page =
+  RisksExtension.init_widgets_for_person_page =
     function init_widgets_for_person_page() {
       var people_widgets = $.extend({}, {
           ThreatActor: threat_actor_descriptor
@@ -234,12 +234,12 @@
         }
       );
 
-      new GGRC.WidgetList("ggrc_risk_assessment_v2", {
+      new GGRC.WidgetList("ggrc_risks", {
         Person: people_widgets,
       });
   };
 
-  RiskAssessmentV2Extension.init_widgets_for_other_pages =
+  RisksExtension.init_widgets_for_other_pages =
     function init_widgets_for_other_pages() {
       var descriptor = {},
           page_instance = GGRC.page_instance();
@@ -249,13 +249,13 @@
           threat_actor: threat_actor_descriptor,
         };
       }
-      new GGRC.WidgetList("ggrc_risk_assessment_v2", descriptor);
+      new GGRC.WidgetList("ggrc_risks", descriptor);
   };
 
 
 
-  GGRC.register_hook("LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_risk_assessment_v2");
+  GGRC.register_hook("LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_risks");
 
-  RiskAssessmentV2Extension.init_mappings();
+  RisksExtension.init_mappings();
 
 })(this.can.$, this.CMS, this.GGRC);

@@ -10,8 +10,8 @@ import re
 
 from ggrc import db
 from ggrc.converters.base_row import LinksHandler
-from ggrc_risk_assessment_v2 import _risk_object_types
-from ggrc_risk_assessment_v2.models import RiskObject
+from ggrc_risks import _risk_object_types
+from ggrc_risks.models import RiskObject
 
 
 class RiskObjectsHandler(LinksHandler):

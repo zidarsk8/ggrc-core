@@ -6,4 +6,4 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
-EXTENSIONS = ['ggrc_risk_assessment_v2']
+EXTENSIONS = ['ggrc_risks']
