@@ -14,7 +14,7 @@
   }
 
   // Setup the object page:
-  var mockup = new CMS.Controllers.MockupHelper($('body'), {
+  var mockup = new CMS.Controllers.MockupHelper($("body"), {
     // Object:
     object: {
       icon: "grciconlarge-audit",

@@ -14,7 +14,7 @@
   }
 
   // Setup the object page:
-  var mockup = new CMS.Controllers.MockupHelper($('body'), {
+  var mockup = new CMS.Controllers.MockupHelper($("body"), {
     // Object:
     object: {
       icon: "grciconlarge-program",
@@ -37,8 +37,8 @@
         }),
         events: {
           // Events that can trigger updates on the template:
-          "button click": function() {
-            this.scope.attr('count', this.scope.count + 1)
+          "button click": function () {
+            this.scope.attr("count", this.scope.count + 1);
           }
         }
       }
