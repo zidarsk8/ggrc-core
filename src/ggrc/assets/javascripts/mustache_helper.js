@@ -764,6 +764,17 @@ Mustache.registerHelper("get_permalink", function () {
   return window.location.href;
 });
 
+Mustache.registerHelper("get_view_link", function (instance, options) {
+  function finish(link) {
+    return "<a href=" + link.viewLink + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
+  }
+  instance = resolve_computed(instance);
+  if (instance && instance.type !== "Request") {
+    return finish(instance);
+  }
+  var audit = new CMS.Models.Audit(instance.audit);
+  return defer_render("a", finish, audit.refresh());
+});
 
 Mustache.registerHelper("schemed_url", function (url) {
   var domain, max_label, url_split;
