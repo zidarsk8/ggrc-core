@@ -315,6 +315,7 @@ class ObjectsColumnHandler(ColumnHandler):
       tgo = TaskGroupObject(
           task_group=obj,
           object=object_,
+          context=obj.context,
       )
       db.session.add(tgo)
     db.session.flush()
