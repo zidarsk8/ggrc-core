@@ -714,13 +714,28 @@ class ObjectPersonColumnHandler(UserColumnHandler):
     if self.dry_run or not self.value:
       return
     self.remove_current_people()
-    for owner in self.value:
-      user_role = ObjectPerson(
+    for person in self.value:
+      object_person = ObjectPerson(
           personable=self.row_converter.obj,
-          person=owner,
+          person=person,
           context=self.row_converter.obj.context
       )
-      db.session.add(user_role)
+      db.session.add(object_person)
+    self.dry_run = True
+
+
+class PersonMappingColumnHandler(ObjectPersonColumnHandler):
+
+  def remove_current_people(self):
+    pass
+
+
+class PersonUnmappingColumnHandler(ObjectPersonColumnHandler):
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    self.remove_current_people()
     self.dry_run = True
 
 
