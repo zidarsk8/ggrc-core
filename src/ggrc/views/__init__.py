@@ -115,11 +115,12 @@ def get_attributes_json():
 def get_import_types(export_only=False):
   types = get_exportables if export_only else get_importables
   data = []
-  for key, model in types().items():
+  for model in set(types().values()):
     data.append({
-      "model_singular": key,
+      "model_singular": model.__name__,
       "title_plural": model._inflector.title_plural
     })
+  data.sort()
   response_json = json.dumps(data)
   return response_json
 
