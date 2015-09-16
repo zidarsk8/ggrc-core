@@ -20,6 +20,9 @@ UNKNOWN_COLUMN = (u"Line {line}: Attribute '{column_name}' does not"
 DELETE_UNKNOWN_OBJECT = (u"Line {line}: Object '{slug}' does not exist, so it"
                          " can't be deleted.")
 
+DUPLICATE_COLUMN = (u"Line {line}: Duplicate columns found {duplicates}."
+                   " Object block will be ignored.")
+
 DUPLICATE_VALUE = (u"Line {line}: {column_name} '{title}' already exists."
                    "Record will be ignored.")
 
