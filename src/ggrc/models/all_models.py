@@ -47,7 +47,8 @@ from .issue import Issue
 
 # TODO: This isn't currently used
 # from .relationship_type import RelationshipType
-from .section import SectionBase, Section, Clause
+from .section import Section
+from .clause import Clause
 from .system import SystemOrProcess, System, Process
 
 from .revision import Revision
@@ -94,7 +95,6 @@ all_models = [
     DocumentationResponse,
     InterviewResponse,
     PopulationSampleResponse,
-    SectionBase,
     Section,
     Clause,
     SystemOrProcess,
