@@ -85,6 +85,7 @@ can.Model.Cacheable("CMS.Models.Section", {
   , is_custom_attributable: true
   , mixins : ["ownable", "contactable"]
 
+
   , attributes : {
       context : "CMS.Models.Context.stub"
     , owners: "CMS.Models.Person.stubs"
