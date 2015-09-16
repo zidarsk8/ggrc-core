@@ -122,7 +122,7 @@ class DeleteColumnHandler(ColumnHandler):
     try:
       tr.session.delete(obj)
       deleted = len([o for o in tr.session.deleted
-                    if o.type not in self.delete_whitelist])
+                     if o.type not in self.delete_whitelist])
       if deleted != 1:
         self.add_error(errors.DELETE_CASCADE_ERROR,
                        object_type=obj.type, slug=obj.slug)
@@ -150,10 +150,11 @@ class StatusColumnHandler(ColumnHandler):
     value = self.raw_value.lower()
     status = self.state_mappings.get(value)
     if status is None:
-      self.add_warning(errors.WRONG_REQUIRED_VALUE,
-                       value=value[:20],
-                       column_name=self.display_name)
       status = self.get_default()
+      if value:
+        self.add_warning(errors.WRONG_REQUIRED_VALUE,
+                         value=value[:20],
+                         column_name=self.display_name)
     return status
 
 
