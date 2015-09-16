@@ -1017,6 +1017,13 @@ ul.new-tree {
   padding:9px 0;
 }
 
+.bottom-space {
+  padding-bottom: 25px;
+  p {
+    margin-bottom: 0;
+  }
+}
+
 .show-description {
   position:relative;
   padding-top:16px;

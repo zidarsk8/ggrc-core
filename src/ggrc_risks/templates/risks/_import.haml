@@ -1,0 +1,43 @@
+-# Copyright (C) 2015 Reciprocity, Inc - All Rights Reserved
+-# Unauthorized use, copying, distribution, displaying, or public performance
+-# of this file, via any medium, is strictly prohibited. All information
+-# contained herein is proprietary and confidential and may not be shared
+-# with any third party without the express written consent of Reciprocity, Inc.
+-# Created By: anze@reciprocitylabs.com
+-# Maintained By: anze@reciprocitylabs.com
+
+-extends "layouts/_widget_box.haml"
+
+-block widget_help
+  import
+
+-block widget_id
+  import_{{import_kind|underscore}}_widget
+
+-block widget_buttons
+
+-block widget_title
+  Import from file
+
+-block main
+  %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'}
+    .import-interface
+      .row-fluid
+        .span8
+          %h3
+            Choose CSV file to upload
+        .span4
+          .download-template
+            %a.section-import{"href": 'import_template'}
+              %i.grcicon-imp-exp
+              Download Import {{import_kind}} template
+      .row-fluid
+        .span12
+          %input{ 'name': 'file', 'value': 'choose file' , 'type': 'file' }
+          .import-buttons
+            %input{ 'value': 'Upload and Review', 'class': 'btn btn-primary', 'type': 'submit' }
+            -#%a{ 'href': 'javascript://', 'class': 'import-help', 'data-toggle': 'modal-ajax', 'data-original-title': 'help', 'data-modal-type': 'help-form' }
+              -#View Help
+    -if exception_message is defined and not exception_message.show_preview
+      -include 'risks/import_errors.haml'
+    #results-container
