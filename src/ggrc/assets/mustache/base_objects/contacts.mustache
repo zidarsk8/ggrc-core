@@ -55,16 +55,18 @@
   </div>
     <div class="span6">
       {{#using person=contact}}
-      <h6>Primary Contact</h6>
-      <p class="oneline">
-        {{#if person}}
-          {{>'/static/mustache/people/popover.mustache'}}
-        {{else}}
-          <span class="error">
-            Not Assigned
-          </span>
-        {{/if}}
-      </p>
+      <div class="bottom-space">
+        <h6>Primary Contact</h6>
+        <p class="oneline">
+          {{#if person}}
+            {{>'/static/mustache/people/popover.mustache'}}
+          {{else}}
+            <span class="error">
+              Not Assigned
+            </span>
+          {{/if}}
+        </p>
+      </div>
       {{/using}}
       {{#using person=secondary_contact}}
       <h6>Secondary Contact</h6>
