@@ -57,7 +57,7 @@ def reindex(_):
   # Find all models then remove base classes
   #   (If we don't remove base classes, we get duplicates in the index.)
   inheritance_base_models = [
-      all_models.Directive, all_models.SectionBase, all_models.SystemOrProcess,
+      all_models.Directive, all_models.SystemOrProcess,
       all_models.Response
   ]
   models = set(all_models.all_models) - set(inheritance_base_models)

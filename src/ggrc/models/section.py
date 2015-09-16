@@ -60,10 +60,4 @@ class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   def validates_type(self, key, value):
     return self.__class__.__name__
 
-  def log_json(self):
-    out_json = super(Section, self).log_json()
-    # so that event log can refer to deleted directive
-    out_json["mapped_directive"] = self.directive.display_name
-    return out_json
-
 track_state_for_class(Section)
