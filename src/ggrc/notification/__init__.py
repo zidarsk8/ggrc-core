@@ -114,7 +114,9 @@ def should_receive(notif, force_notif, person_id, nightly_cron=True):
       return notif_type == "Email_Digest"
     return result.one().enable_flag
 
-  has_instant = force_notif or is_enabled("Email_Now")
+  # TODO: has_instant is not used at the moment but will be used when we
+  # implement instant notifications
+  # has_instant = force_notif or is_enabled("Email_Now")
   has_digest = force_notif or is_enabled("Email_Digest")
 
   return has_digest
