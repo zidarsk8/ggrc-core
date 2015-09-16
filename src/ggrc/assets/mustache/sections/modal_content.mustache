@@ -26,11 +26,10 @@
         and ^if' object_params.directive}}
         {{#using directive=instance.directive}}
         <label>
-          Policy / Regulation / Standard
-          <span class="required">*</span>
-          <i class="grcicon-help-black" rel="tooltip" title="Policy / Regulation / Standard containing this Section"></i>
+          Policy / Regulation / Standard / Contract
+          <i class="grcicon-help-black" rel="tooltip" title="Policy / Regulation / Standard / Contract containing this Section"></i>
         </label>
-        <input tabindex="2" class="input-block-level" name="directive.title" data-lookup="Policy,Regulation,Standard" data-permission-type="update" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Policy / Regulation / Standard" type="text" value="{{firstexist directive.title ''}}" />
+        <input tabindex="2" class="input-block-level" name="directive.title" data-lookup="Policy,Regulation,Standard,Contract" data-permission-type="update" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Policy / Regulation / Standard / Contract" type="text" value="{{firstexist directive.title ''}}" />
         {{/using}}
       {{else}}
         &nbsp;
