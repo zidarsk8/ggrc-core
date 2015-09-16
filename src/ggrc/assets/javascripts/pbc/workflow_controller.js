@@ -39,6 +39,22 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
     instance.delay_resolving_save_until($.when(audit_dfd, control_dfd));
 
   },
+  "{CMS.Models.Section} created": function(model, ev, instance) {
+
+    if(!(instance instanceof CMS.Models.Section)) {
+      return;
+    }
+
+    if(!(instance.directive instanceof CMS.Models.Directive)) {
+      return;
+    }
+
+    var directive_dfd;
+
+    directive_dfd = this._create_relationship(instance, instance.directive);
+    instance.delay_resolving_save_until($.when(section_dfd, directive_dfd));
+
+  },
   _create_relationship: function(source, destination) {
 
     if (!destination) {
