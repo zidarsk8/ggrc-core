@@ -57,7 +57,7 @@ WRONG_VALUE_ERROR = (u"Line {line}: {column_name} contains invalid data. The"
 
 WRONG_REQUIRED_VALUE = (u"Line {line}: Required field {column_name} contains"
                         " invalid data '{value}'. The default value will be"
-                        "used.")
+                        " used.")
 
 MISSING_VALUE_ERROR = (u"Line {line}: Field {column_name} is required. The line"
                        " will be ignored.")
