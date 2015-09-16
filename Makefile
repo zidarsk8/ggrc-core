@@ -164,4 +164,4 @@ clean_deploy :
 	rm -f src/ggrc/static/dashboard-*.* src/ggrc/static/assets.manifest
 	rm -f src/app.yaml
 
-clean : clean_deploy
+clean : clean_deploy clean_bower_components
