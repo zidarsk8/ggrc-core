@@ -4,6 +4,7 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from ggrc import db
+from ggrc.models import AccessGroup
 from ggrc.models import Program
 from ggrc_basic_permissions import Role
 from ggrc_basic_permissions import UserRole
@@ -210,9 +211,11 @@ class TestComprehensiveSheets(TestCase):
     ggrc_admins = UserRole.query.filter(UserRole.role_id == ggrc_admin).all()
     readers = UserRole.query.filter(UserRole.role_id == reader).all()
     creators = UserRole.query.filter(UserRole.role_id == creator).all()
+    access_groups = db.session.query(AccessGroup).all()
     self.assertEquals(len(ggrc_admins), 12)
     self.assertEquals(len(readers), 5)
     self.assertEquals(len(creators), 6)
+    self.assertEquals(len(access_groups), 10)
 
     for block in response:
       for message in messages:

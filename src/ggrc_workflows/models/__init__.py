@@ -36,5 +36,6 @@ WORKFLOW_OBJECT_TYPES = {
     "Regulation", "Standard", "Policy", "Contract",
     "Objective", "Control", "Section", "Clause",
     "System", "Process",
-    "DataAsset", "Facility", "Market", "Product", "Project", "Issue"
+    "DataAsset", "Facility", "Market", "Product", "Project", "Issue",
+    "AccessGroup"
 }

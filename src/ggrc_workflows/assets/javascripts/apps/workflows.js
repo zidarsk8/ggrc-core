@@ -10,7 +10,7 @@
       _workflow_object_types = Array.prototype.concat.call([],
         'Program Regulation Policy Standard Contract Clause Section'.split(' '),
         'Control Objective'.split(' '),
-        'OrgGroup Vendor'.split(' '),
+        'OrgGroup Vendor AccessGroup'.split(' '),
         'System Process DataAsset Product Project Facility Market Issue'.split(' ')
       ),
       _task_sort_function = function(a, b) {

@@ -1703,7 +1703,7 @@ Mustache.registerHelper("global_count", function (model_type, options) {
         , "Section", "Objective", "Control"
         , "System", "Process"
         , "DataAsset", "Product", "Project", "Facility", "OrgGroup"
-        , "Audit"
+        , "Audit", "AccessGroup"
         ];
       GGRC._search_cache_deferred = GGRC.Models.Search.counts_for_types(null, models);
     }

@@ -7,6 +7,7 @@
 
 # TODO: Implement with Authentication
 # from .account import Account
+from .access_group import AccessGroup
 from .audit import Audit
 from .audit_object import AuditObject
 from .categorization import Categorization
@@ -53,6 +54,7 @@ from .system import SystemOrProcess, System, Process
 from .revision import Revision
 from .event import Event
 all_models = [
+    AccessGroup,
     Audit,
     AuditObject,
     Categorization,

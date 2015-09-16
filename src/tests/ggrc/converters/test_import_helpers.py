@@ -749,6 +749,33 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
+  def test_access_group_definitions(self):
+    """ test default headers for DataAsset """
+    definitions = get_object_column_definitions(models.AccessGroup)
+    mapping_names = get_mapping_names(models.AccessGroup.__name__)
+    display_names = set([val["display_name"] for val in definitions.values()])
+    element_names = set([
+        "Title",
+        "Description",
+        "Notes",
+        "Owner",
+        "Primary Contact",
+        "Secondary Contact",
+        "Access Group URL",
+        "Reference URL",
+        "Code",
+        "Effective Date",
+        "Stop Date",
+        "State",
+        "Delete",
+    ])
+    expected_names = element_names.union(mapping_names)
+    self.assertEquals(expected_names, display_names)
+    vals = {val["display_name"]: val for val in definitions.values()}
+    self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Owner"]["mandatory"])
+    self.assertTrue(vals["Title"]["unique"])
+
   def test_product_definitions(self):
     """ test default headers for Product """
     definitions = get_object_column_definitions(models.Product)

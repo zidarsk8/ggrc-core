@@ -17,6 +17,7 @@ def contributed_services():
 
   return [
       service('background_tasks', models.BackgroundTask),
+      service('access_groups', models.AccessGroup),
       service('audits', models.Audit),
       service('audit_objects', models.AuditObject),
       service('categorizations', models.Categorization),

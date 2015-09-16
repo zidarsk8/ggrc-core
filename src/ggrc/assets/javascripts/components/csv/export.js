@@ -46,6 +46,7 @@
         })
       }),
       importable = [
+        {model_singular: "AccessGroup", title_plural: "Access Groups"},
         {model_singular: "Audit", title_plural: "Audits"},
         {model_singular: "Clause", title_plural: "Clauses"},
         {model_singular: "Contract", title_plural: "Contracts"},
