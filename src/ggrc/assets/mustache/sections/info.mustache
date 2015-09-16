@@ -22,20 +22,6 @@
       {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
     {{/is_info_pin}}
 
-      {{#using directive=instance.directive}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Part of</h6>
-            <p>
-              <a href="{{directive.viewLink}}">
-                <i class="grcicon-{{directive.class.table_singular}}-color"></i>
-                {{directive.title}}
-              </a>
-            </p>
-          </div>
-        </div>
-      {{/using}}
-
       <div class="row-fluid wrap-row">
         <div class="span12">
           <h6>Description</h6>
