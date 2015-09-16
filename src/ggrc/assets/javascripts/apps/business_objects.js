@@ -255,7 +255,7 @@
       "Standard": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Contract": "Program Issue ControlAssessment Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Clause": "Contract Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Section": "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+      "Section": "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Policy Regulation Standard Contract",
       "Objective": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Control": "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
       "Person": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit Request",

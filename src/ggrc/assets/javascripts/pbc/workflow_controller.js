@@ -45,14 +45,10 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
       return;
     }
 
-    if(!(instance.directive instanceof CMS.Models.Directive)) {
-      return;
-    }
-
     var directive_dfd;
 
     directive_dfd = this._create_relationship(instance, instance.directive);
-    instance.delay_resolving_save_until($.when(section_dfd, directive_dfd));
+    instance.delay_resolving_save_until($.when(directive_dfd));
 
   },
   _create_relationship: function(source, destination) {
