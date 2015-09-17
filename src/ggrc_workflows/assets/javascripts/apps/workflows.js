@@ -11,7 +11,7 @@
         'Program Regulation Policy Standard Contract Clause Section'.split(' '),
         'Control Objective'.split(' '),
         'OrgGroup Vendor'.split(' '),
-        'System Process DataAsset Product Project Facility Market Issue'.split(' ')
+        'System Process DataAsset Product Project Facility Market Issue ControlAssessment'.split(' ')
       ),
       _task_sort_function = function(a, b) {
         var date_a = +new Date(a.end_date),
@@ -66,7 +66,7 @@
     var mappings = {
         TaskGroup: {
           _canonical: {
-            objects: _workflow_object_types.concat(["Cacheable"])
+            objects: _workflow_object_types.concat(["Cacheable", "ControlAssessment"])
           },
           task_group_tasks: Direct(
             "TaskGroupTask", "task_group", "task_group_tasks"),
