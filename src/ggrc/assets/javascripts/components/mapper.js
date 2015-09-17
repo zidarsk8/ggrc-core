@@ -49,18 +49,11 @@
         };
         return forbidden[type] ? forbidden[type] : [];
       },
-      get_allowed: function (type) {
-        var allowed = {
-          "TaskGroup": ["ControlAssessment"]
-        };
-        return allowed[type] ? allowed[type] : [];
-      },
       types: can.compute(function () {
         var selector_list,
             canonical = GGRC.Mappings.get_canonical_mappings_for(this.object),
             list = GGRC.tree_view.base_widgets_by_type[this.object],
             forbidden = this.get_forbidden(this.object),
-            allowed = this.get_allowed(this.object),
             groups = {
               "all_objects": {
                 name: "All Objects",
@@ -84,7 +77,7 @@
               }
             };
 
-        selector_list = _.union(_.intersection(_.keys(canonical), list), allowed);
+        selector_list = _.intersection(_.keys(canonical), list);
         can.each(selector_list, function (model_name) {
           if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name)) {
             return;
