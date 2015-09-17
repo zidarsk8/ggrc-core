@@ -17,185 +17,57 @@
     {{/is_info_pin}}
 
     {{> /static/mustache/base_objects/dropdown_menu.mustache}}
-    <a href="javascript://" class="btn btn-small btn-primary right-button">Complete</a>
-
     <div class="tier-content">
       {{^is_info_pin}}
-        <div class="row-fluid wrap-row">
-          <div class="span6">
-            <h6>Title</h6>
-            <h3>My new request</h3>
-          </div>
-        </div>
+        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       {{/is_info_pin}}
+      {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/urls.mustache' instance=instance}}}
 
-      <div class="row-fluid">
-        <div class="span9">
-
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>Description</h6>
-              <div class="rtf-block">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae ante dapibus lacus dictum vestibulum. Nullam finibus semper convallis. Ut libero mauris, viverra nec augue eget, congue viverra felis. Aenean ut arcu vel tortor rhoncus dictum id vel urna. Sed a enim laoreet diam lacinia euismod.
-              </div>
-            </div>
-            <ul>
-              <li><i class="grcicon-file-pdf"></i></li>
-              <li><i class="grcicon-file-doc"></i></li>
-              <li><i class="grcicon-file-xls"></i></li>
-              <li><i class="grcicon-file-gdrive"></i></li>
-              <li><i class="grcicon-file"></i></li>
-            </ul>
-          </div>
-        </div>
-        <div class="span3">
-
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>State</h6>
-              <div class="side-content">
-                <span class="state-value state-inprogress">In progress</span>
-              </div>
+      <div class="custom-attr-wrap">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="info-expand">
+              <a class="show-hidden-fields info-show-hide" href="javascript://">
+                <span class="out">
+                  <i class="grcicon-arrow-right"></i>
+                  Show
+                </span>
+                <span class="in">
+                  <i class="grcicon-arrow-bottom"></i>
+                  Hide
+                </span>
+                Advanced
+              </a>
             </div>
           </div>
-
+        </div><!-- row-fluid end -->
+        <div class="hidden-fields-area" style="display:none;">
           <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>People</h6>
-              <div class="side-content">
-                <ul class="label-list">
-                  <li>
-                    <label>
-                      Assignee
-                    </label>
-                    <a href="javascript://">Martin L.K.</a>
-                    <a href="javascript://"><i class="grcicon-edit"></i></a>
-                  </li>
-                  <li>
-                    <label>
-                      Requester
-                    </label>
-                    <a href="javascript://">Josh Smith</a>
-                    <a href="javascript://"><i class="grcicon-edit"></i></a>
-                  </li>
-                  <li>
-                    <label>
-                      Verifier
-                    </label>
-                    <a href="javascript://">Prasanna V.</a>
-                    <a href="javascript://"><i class="grcicon-edit"></i></a>
-                  </li>
-                </ul>
-              </div>
+            <div class="span4">
+              <h6>Code</h6>
+              <p>
+                {{slug}}
+              </p>
             </div>
-          </div>
-
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>Dates</h6>
-              <div class="side-content">
-                <ul class="label-list">
-                  <li>
-                    <label>
-                      Created on
-                    </label>
-                    12/03/14
-                  </li>
-                  <li>
-                    <label>
-                      Due on
-                    </label>
-                    12/31/15
-                  </li>
-                </ul>
-              </div>
+            <div class="span4">
+              <h6>Effective Date</h6>
+              <p>
+                {{localize_date start_date}}
+              </p>
             </div>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="tabs-wrap">
-        <ul class="nav nav-tabs">
-          <li class="active"><a href="#tab1" data-toggle="tab">
-            Comments and attachments (3)
-          </a></li>
-          <li><a href="#tab2" data-toggle="tab">
-            Request log
-          </a></li>
-        </ul>
-
-        <div class="tab-content">
-          <div class="tab-pane fade in active" id="tab1">
-            <ul class="entry-list">
-              <li>
-                <span class="person-label assignee"></span>
-                <div class="w-status">
-                  <span class="entry-author">
-                    <a href="javascript://">Albert Chan</a>
-                    added a comment - 09/18/2015 05:31:02am PDT
-                  </span>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus.
-                  <ul class="attachment-list"></ul>
-                </div>
-              </li>
-              <li>
-                <span class="person-label requester"></span>
-                <div class="w-status">
-                  <span class="entry-author">
-                    <a href="javascript://">Jost Novljan</a>
-                    added a comment - 09/18/2015 05:31:02am PDT
-                  </span>
-                  See usecase here: <a href="javascript://">https://docs.google.com/document/d/1kU6DgyJBOxbPX5eDhphq97dcMhg-b-LpzTJT27XlHYk/edit#heading=h.9wrhlxa3ye2d</a>.
-                  <ul class="attachment-list"></ul>
-                </div>
-              </li>
-              <li>
-                <span class="person-label verifier"></span>
-                <div class="w-status">
-                  <span class="entry-author">
-                    <a href="javascript://">Prasanna V.</a>
-                    added a comment - 09/18/2015 05:31:02am PDT
-                  </span>
-                  Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus.
-                  <ul class="attachment-list"></ul>
-                </div>
-              </li>
-              <li>
-                <span class="person-label assignee"></span>
-                <div class="w-status">
-                  <span class="entry-author">
-                    <a href="javascript://">Albert Chan</a>
-                    added a comment and attachment - 09/18/2015 05:31:02am PDT
-                  </span>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus.
-                  <ul class="attachment-list">
-                    <li>
-                      <a href="javascript://" target="_blank">
-                        <i class="grcicon-attach"></i>
-                        <span>canjs-observe-bug.txt</span>
-                      </a>
-                      <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-                        <span class="result"></span>
-                        <i class="grcicon-deleted"></i>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              <li class="tree-footer tree-item-add inner-tree-footer non-stick">
-                <a href="javascript://" class="btn btn-primary btn-mini section-create">
-                  Add Comment
-                </a>
-              </li>
-            </ul>
-
-          </div>
-          <div class="tab-pane fade" id="tab2">
-            tab 2
-          </div>
-        </div>
-      </div>
+            <div class="span4">
+              <h6>Stop Date</h6>
+              <p>
+              {{localize_date end_date}}
+              </p>
+            </div>
+          </div><!-- row-fluid end -->
+        </div><!-- hidden-fields-area end -->
+      </div><!-- custom-attr-wrap end -->
+>>>>>>> 03eb0ad... Setup Request objects mockup
     </div><!-- tier-content end -->
 
   {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
