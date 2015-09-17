@@ -250,10 +250,10 @@
       "Audit": "Issue ControlAssessment Request history Person Program Control",
       "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",
       "ControlAssessment": "Issue Objective Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Regulation": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Policy": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Standard": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Contract": "Program Issue ControlAssessment Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+      "Regulation": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+      "Policy": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+      "Standard": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+      "Contract": "Program Issue ControlAssessment Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Section",
       "Clause": "Contract Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Section Policy Regulation Standard",
       "Section": "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Policy Regulation Standard Contract Clause",
       "Objective": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
@@ -711,23 +711,21 @@
         directive: {
           _mixins: [
             "objectives", "controls", "business_objects"
-          ]
+          ],
+          Section: section_child_options,
+          Clause: clause_child_options
         },
         Regulation: {
           _mixins: ["directive", "issues"],
-          Section: section_child_options
         },
         Standard: {
           _mixins: ["directive", "issues"],
-          Section: section_child_options
         },
         Policy: {
           _mixins: ["directive", "issues"],
-          Section: section_child_options
         },
         Contract: {
           _mixins: ["directive", "issues"],
-          Clause: clause_child_options
         },
         extended_audits: {
           Audit: {
