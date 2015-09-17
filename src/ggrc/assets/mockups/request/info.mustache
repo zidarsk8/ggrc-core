@@ -24,7 +24,7 @@
         <div class="row-fluid wrap-row">
           <div class="span6">
             <h6>Title</h6>
-            <h3>{{info_title}}</h3>
+            <h3>My new request</h3>
           </div>
         </div>
       {{/is_info_pin}}
@@ -36,54 +36,8 @@
             <div class="span12">
               <h6>Description</h6>
               <div class="rtf-block">
-                {{description}}
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae ante dapibus lacus dictum vestibulum. Nullam finibus semper convallis. Ut libero mauris, viverra nec augue eget, congue viverra felis. Aenean ut arcu vel tortor rhoncus dictum id vel urna. Sed a enim laoreet diam lacinia euismod.
               </div>
-            </div>
-          </div>
-
-          <div class="row-fluid wrap-row">
-            <h6>Evidence</h6>
-            <div class="file-list-wrap">
-              <ul class="file-list">
-                <li>
-                  <i class="grcicon-file-pdf"></i>
-                  MTV_001_SIGNED_LoginAccess_List.pdf
-                  <a href="javascript://"><i class="grcicon-edit"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-                <li>
-                  <i class="grcicon-file-doc"></i>
-                  Simple_Word_document.doc
-                  <a href="javascript://"><i class="grcicon-edit"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-                <li>
-                  <i class="grcicon-file-xls"></i>
-                  Simple_Excel_document.xls
-                  <a href="javascript://"><i class="grcicon-edit"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-                <li>
-                  <i class="grcicon-file-gdrive"></i>
-                  Some_file_from_Google_Drive.pdf
-                  <a href="javascript://"><i class="grcicon-edit"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-                <li>
-                  <i class="grcicon-file"></i>
-                  Image_of_nature.png
-                  <a href="javascript://"><i class="grcicon-edit"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-                <li>
-                  <i class="grcicon-file"></i>
-                  canjs-observe-bug.txt
-                  <a href="javascript://"><i class="grcicon-edit"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-              </ul>
-
-              <a href="javascript://" class="btn btn-draft btn-small">+ Add evidence</a>
             </div>
             <ul>
               <li><i class="grcicon-file-pdf"></i></li>
@@ -93,7 +47,6 @@
               <li><i class="grcicon-file"></i></li>
             </ul>
           </div>
-
         </div>
         <div class="span3">
 
@@ -101,7 +54,7 @@
             <div class="span12">
               <h6>State</h6>
               <div class="side-content">
-                <span class="state-value state-inprogress">{{state}}</span>
+                <span class="state-value state-inprogress">In progress</span>
               </div>
             </div>
           </div>
@@ -115,21 +68,21 @@
                     <label>
                       Assignee
                     </label>
-                    <a href="javascript://">{{people_assignee}}</a>
+                    <a href="javascript://">Martin L.K.</a>
                     <a href="javascript://"><i class="grcicon-edit"></i></a>
                   </li>
                   <li>
                     <label>
                       Requester
                     </label>
-                    <a href="javascript://">{{people_requester}}</a>
+                    <a href="javascript://">Josh Smith</a>
                     <a href="javascript://"><i class="grcicon-edit"></i></a>
                   </li>
                   <li>
                     <label>
                       Verifier
                     </label>
-                    <a href="javascript://">{{people_verifier}}</a>
+                    <a href="javascript://">Prasanna V.</a>
                     <a href="javascript://"><i class="grcicon-edit"></i></a>
                   </li>
                 </ul>
@@ -146,13 +99,13 @@
                     <label>
                       Created on
                     </label>
-                    {{created_on}}
+                    12/03/14
                   </li>
                   <li>
                     <label>
                       Due on
                     </label>
-                    {{due_on}}
+                    12/31/15
                   </li>
                 </ul>
               </div>
@@ -243,7 +196,6 @@
           </div>
         </div>
       </div>
-
     </div><!-- tier-content end -->
 
   {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
