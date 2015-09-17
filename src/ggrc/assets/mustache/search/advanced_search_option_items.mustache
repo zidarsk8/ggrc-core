@@ -29,11 +29,9 @@
             </div> <!-- span8 end -->
             <div class="span4">
               <div class="show-details">
-                {{#if instance.viewLink}}
-                  {{#is_allowed "view_object_page" instance}}
-                    {{{get_view_link instance}}}
-                  {{/is_allowed}}
-                {{/if}}
+                {{#is_allowed "view_object_page" instance}}
+                  {{{get_view_link instance}}}
+                {{/is_allowed}}
               </div>
             </div>
           </div> <!-- row-fluid end -->

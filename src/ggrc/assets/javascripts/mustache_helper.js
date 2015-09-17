@@ -768,12 +768,37 @@ Mustache.registerHelper("get_view_link", function (instance, options) {
   function finish(link) {
     return "<a href=" + link.viewLink + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
   }
+  function refreshInstance(prop) {
+    return function (inst) {
+      return inst.refresh_all(prop).promise();
+    };
+  }
   instance = resolve_computed(instance);
-  if (instance && instance.type !== "Request") {
+  var props = {
+      "Request": "audit",
+      "TaskGroupTask": "task_group:workflow",
+      "TaskGroup": "workflow",
+      "CycleTaskGroupObjectTask": "cycle:workflow",
+      "InterviewResponse": "request:audit",
+      "DocumentationResponse": "request:audit"
+    },
+    hasProp = _.has(props, instance.type),
+    types, promise;
+
+  if (!instance.viewLink && !hasProp) {
+    return "";
+  }
+  if (instance && !hasProp) {
     return finish(instance);
   }
-  var audit = new CMS.Models.Audit(instance.audit);
-  return defer_render("a", finish, audit.refresh());
+  // TODO: Surely there is a way to write this nicer, but currently I don't see how.
+  types = props[instance.type].split(":");
+  if (types.length > 1) {
+    promise = refreshInstance(types[0])(instance).then(refreshInstance(types[1]));
+  } else {
+    promise = refreshInstance(types[0])(instance);
+  }
+  return defer_render("a", finish, promise);
 });
 
 Mustache.registerHelper("schemed_url", function (url) {
