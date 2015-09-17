@@ -51,6 +51,16 @@ def reindex(_):
   Web hook to update the full text search index
   """
 
+  do_reindex()
+
+  return app.make_response((
+      'success', 200, [('Content-Type', 'text/html')]))
+
+def do_reindex():
+  """
+  update the full text search index
+  """
+
   indexer = get_indexer()
   indexer.delete_all_records(False)
 
@@ -72,9 +82,6 @@ def reindex(_):
       for instance in query_chunk:
         indexer.create_record(fts_record_for(instance), False)
       db.session.commit()
-
-  return app.make_response((
-      'success', 200, [('Content-Type', 'text/html')]))
 
 
 def get_permissions_json():
