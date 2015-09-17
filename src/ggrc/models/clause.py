@@ -46,7 +46,6 @@ class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   }
 
 
-  type = db.Column(db.String)
   na = deferred(db.Column(db.Boolean, default=False, nullable=False),
                 'Clause')
   notes = deferred(db.Column(db.Text), 'Clause')
@@ -57,9 +56,5 @@ class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   ]
   _sanitize_html = ['notes']
   _include_links = []
-
-  @validates('type')
-  def validates_type(self, key, value):
-    return self.__class__.__name__
 
 track_state_for_class(Clause)
