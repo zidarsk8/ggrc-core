@@ -147,7 +147,7 @@
               arr: _.compact(_.map(this.scope.attr("mapper.selected"), function (desination) {
                     var isAllowed = GGRC.Utils.allowed_to_map(source, desination),
                         inst = _.find(this.scope.attr("mapper.entries"), function (entry) {
-                          return entry.instance.id === desination.id;
+                          return entry.instance.id === desination.id && entry.instance.type === desination.type;
                         });
                     if (inst && isAllowed) {
                       return inst.instance;
@@ -195,22 +195,22 @@
         this.scope.attr("mapper.is_saving", true);
         que.enqueue(instance).trigger().done(function (inst) {
           data["context"] = instance.context || null;
-          _.each(this.scope.attr("mapper.selected"), function (desination) {
+          _.each(this.scope.attr("mapper.selected"), function (destination) {
             var modelInstance,
-                isMapped = GGRC.Utils.is_mapped(instance, desination),
-                isAllowed = GGRC.Utils.allowed_to_map(instance, desination);
+                isMapped = GGRC.Utils.is_mapped(instance, destination),
+                isAllowed = GGRC.Utils.allowed_to_map(instance, destination);
 
             if (isMapped || !isAllowed) {
               return;
             }
-            mapping = GGRC.Mappings.get_canonical_mapping(object, isAllObject ? desination.type : type);
+            mapping = GGRC.Mappings.get_canonical_mapping(object, isAllObject ? destination.type : type);
             Model = CMS.Models[mapping.model_name];
             data[mapping.object_attr] = {
               href: instance.href,
               type: instance.type,
               id: instance.id
             };
-            data[mapping.option_attr] = desination;
+            data[mapping.option_attr] = destination;
             modelInstance = new Model(data);
             defer.push(modelInstance.save());
           }, this);
@@ -225,8 +225,8 @@
               this.element.find(".modal-dismiss").trigger("click");
               // there is some kind of a race condition when filling the treview with new elements
               // so many don't get rendered. To solve it, at the end of the loading
-              // we refresh the whole tree view. Other solutions could be to batch add the objects. 
-              $('.cms_controllers_tree_view:visible').control().reload_list();            
+              // we refresh the whole tree view. Other solutions could be to batch add the objects.
+              $(".cms_controllers_tree_view:visible").control().reload_list();
             }.bind(this));
         }.bind(this));
       },
@@ -312,6 +312,7 @@
     template: "<content />",
     scope: {
       "instance_id": "@",
+      "instance_type": "@",
       "is_mapped": "@",
       "is_allowed_to_map": "@",
       "checkbox": can.compute(function (status) {
@@ -330,12 +331,13 @@
         }
         var scope = this.scope,
             uid = +scope.attr("instance_id"),
+            type = scope.attr("instance_type"),
             item = _.find(scope.attr("options"), function (option) {
-              return option.instance.id === uid;
+              return option.instance.id === uid && option.instance.type === type;
             }),
             status = el.prop("checked"),
             selected = this.scope.attr("selected"),
-            needle = {id: item.instance.id},
+            needle = {id: item.instance.id, type: item.instance.type},
             index;
 
         if (!status) {
