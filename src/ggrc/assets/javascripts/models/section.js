@@ -10,62 +10,6 @@
 //= require models/cacheable
 
 // this model doesn't exist anymore, can we get rid of it?
-/*
-can.Model.Cacheable("CMS.Models.SectionBase", {
-    root_object: "section_base"
-  , root_collection: "section_bases"
-  , model_plural: "SectionBases"
-  , table_plural: "section_bases"
-  , title_plural: "Section Bases"
-  , model_singular: "SectionBase"
-  , title_singular: "Section Base"
-  , table_singular: "section_base"
-  , category: "governance"
-  , root_model: "SectionBase"
-  , findAll: "GET /api/section_bases"
-  , findOne: "GET /api/section_bases/{id}"
-  , create: "POST /api/section_bases"
-  , update: "PUT /api/section_bases/{id}"
-  , destroy: "DELETE /api/section_bases/{id}"
-  , mixins : ["ownable", "contactable"]
-
-  , model: function(params) {
-      if (this.shortName !== 'SectionBase')
-        return this._super(params);
-      if (!params)
-        return params;
-      params = this.object_from_resource(params);
-      if (!params.selfLink) {
-        if (params.type !== 'SectionBase')
-          return CMS.Models[params.type].model(params);
-      }
-      console.debug("Invalid SectionBase:", params);
-    }
-
-  , attributes: {
-      context : "CMS.Models.Context.stub"
-    , owners: "CMS.Models.Person.stubs"
-    , modified_by: "CMS.Models.Person.stub"
-    , object_people: "CMS.Models.ObjectPerson.stubs"
-    , people: "CMS.Models.Person.stubs"
-    , object_documents: "CMS.Models.ObjectDocument.stubs"
-    , documents: "CMS.Models.Document.stubs"
-    , directive: "CMS.Models.get_stub"
-    , children: "CMS.Models.get_stubs"
-    , directive_sections: "CMS.Models.DirectiveSection.stubs"
-    , directives: "CMS.Models.get_stubs"
-    , objectives: "CMS.Models.Objective.stubs"
-    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
-  }
-
-  , init: function() {
-    this._super.apply(this, arguments);
-    this.validateNonBlank("title");
-  }
-}, {
-});
-*/
-
 can.Model.Cacheable("CMS.Models.Section", {
   root_object : "section"
   , root_collection : "sections"
@@ -101,7 +45,6 @@ can.Model.Cacheable("CMS.Models.Section", {
     , objectives: "CMS.Models.Objective.stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
-  // are these okay?
   , tree_view_options : {
       show_view : "/static/mustache/sections/tree.mustache"
     , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
