@@ -134,7 +134,7 @@ class TestBasicCsvImport(TestCase):
         self.assertEquals(set(), set(response_block[message]))
 
     ca = ControlAssessment.query.filter_by(slug="CA.PCI 1.1").first()
-    au =Audit.query.filter_by(slug="AUDIT-Consolidated").first()
+    au = Audit.query.filter_by(slug="AUDIT-Consolidated").first()
     self.assertEquals(len(ca.owners), 1)
     self.assertEquals(ca.owners[0].email, "danny@reciprocitylabs.com")
     self.assertEquals(ca.contact.email, "danny@reciprocitylabs.com")
@@ -148,7 +148,7 @@ class TestBasicCsvImport(TestCase):
         self.assertEquals(set(), set(response_block[message]))
 
     ca = ControlAssessment.query.filter_by(slug="CA.PCI 1.1").first()
-    au =Audit.query.filter_by(slug="AUDIT-Consolidated").first()
+    au = Audit.query.filter_by(slug="AUDIT-Consolidated").first()
     self.assertEquals(ca.owners[0].email, "miha@reciprocitylabs.com")
     self.assertEquals(ca.contact.email, "albert@reciprocitylabs.com")
     self.assertIsNotNone(Relationship.find_related(ca, au))

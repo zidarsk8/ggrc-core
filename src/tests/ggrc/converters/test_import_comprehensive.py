@@ -238,9 +238,6 @@ class TestComprehensiveSheets(TestCase):
             ])
         }
     ]
-    block_warnings = set()
-    row_errors = set()
-    row_warnings = set()
     self.assertEquals(dry_response, response)
 
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
