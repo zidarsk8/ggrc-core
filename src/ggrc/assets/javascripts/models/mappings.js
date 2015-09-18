@@ -699,6 +699,7 @@
         "control": "Control",
       },
       control: Direct("Control", "controls", "control_assessment"),
+      requests: Cross("related_audits", "requests")
     },
     Issue: {
       _mixins: [
