@@ -40,7 +40,6 @@ permissions = {
         "Project",
         "Relationship",
         "RelationshipType",
-        "SectionBase",
         "Section",
         "Clause",
         "SystemOrProcess",
