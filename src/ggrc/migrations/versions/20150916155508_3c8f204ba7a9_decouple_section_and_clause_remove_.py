@@ -15,7 +15,12 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 from ggrc.models.background_task import create_task
-from ggrc.views import do_reindex
+from ggrc.fulltext import get_indexer
+from ggrc.fulltext.recordbuilder import fts_record_for
+from ggrc.fulltext.recordbuilder import model_is_indexed
+from ggrc.models import all_models
+from ggrc.app import db
+from ggrc.views import generate_query_chunks
 
 
 def upgrade():
@@ -95,7 +100,26 @@ def upgrade():
     op.drop_column('sections', 'directive_id')
 
     op.drop_column('sections', 'type')
-    do_reindex()
+
+    indexer = get_indexer()
+    indexer.delete_records_by_type('Clause', False)
+    indexer.delete_records_by_type('Section', False)
+    models = [
+        all_models.Section,
+        all_models.Clause
+    ]
+    models = [model for model in models if model_is_indexed(model)]
+
+    for model in models:
+        mapper_class = model._sa_class_manager.mapper.base_mapper.class_
+        query = model.query.options(
+            db.undefer_group(mapper_class.__name__ + '_complete'),
+        )
+        for query_chunk in generate_query_chunks(query):
+            for instance in query_chunk:
+                indexer.create_record(fts_record_for(instance), False)
+        db.session.commit()
+
 
 def downgrade():
     op.add_column('sections', sa.Column('type', mysql.VARCHAR(length=250), nullable=True))
