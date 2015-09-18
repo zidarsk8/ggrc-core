@@ -27,20 +27,17 @@ class ModelFactory(factory.Factory):
     return instance
 
 
-class SlugFactory(factory.Factory):
-  slug = factory.LazyAttribute(lambda m: random_string('slug'))
+class TitledFactory(factory.Factory):
   title = factory.LazyAttribute(lambda m: random_string('title'))
 
 
-class DirectiveFactory(ModelFactory):
+class DirectiveFactory(ModelFactory, TitledFactory):
 
   class Meta:
     model = models.Directive
 
-  title = factory.LazyAttribute(lambda m: random_string('title'))
 
-
-class ControlFactory(ModelFactory, SlugFactory):
+class ControlFactory(ModelFactory, TitledFactory):
 
   class Meta:
     model = models.Control
@@ -54,6 +51,14 @@ class ControlFactory(ModelFactory, SlugFactory):
   key_control = None
   active = None
   notes = None
+
+
+class ControlAssessmentFactory(ModelFactory, TitledFactory):
+
+  class Meta:
+    model = models.ControlAssessment
+
+  control = factory.SubFactory(ControlFactory)
 
 
 class ControlCategoryFactory(ModelFactory):
