@@ -21,8 +21,9 @@
           return new can.List();
         }),
         columns: can.compute(function () {
-          return _.filter(GGRC.model_attr_defs[this.attr("type")], function(el) { 
-            return el.display_name.indexOf("unmap:") == -1; 
+          return _.filter(GGRC.model_attr_defs[this.attr("type")], function(el) {
+            return (!el.import_only) &&
+                   (el.display_name.indexOf("unmap:") === -1);
           });
         })
       }),

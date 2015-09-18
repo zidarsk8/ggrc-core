@@ -8,6 +8,7 @@ from flask import g
 from flask.ext.login import current_user
 from .user_permissions import UserPermissions
 from ggrc.rbac.permissions import permissions_for as find_permissions
+from ggrc.rbac.permissions import is_allowed_create
 from ggrc.models import get_model
 
 Permission = namedtuple('Permission', 'action resource_type resource_id context_id')
@@ -94,8 +95,17 @@ def in_condition(instance, value, property_name):
 
 
 def relationship_condition(instance, action, property_name):
+  if getattr(instance, 'context') is not None:
+    context_id = getattr(instance.context, 'id')
+  else:
+    context_id = None
   for prop in property_name.split(','):
     obj = getattr(instance, prop)
+    if context_id is not None and \
+       getattr(obj, 'context') is not None and \
+       getattr(obj.context, 'id') == context_id and \
+       is_allowed_create('Relationship', None, context_id):
+      return True
     if not find_permissions()._is_allowed_for(obj, action):
       return False
   return True

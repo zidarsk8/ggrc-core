@@ -2087,7 +2087,7 @@ Mustache.registerHelper("private_program_owner", function (instance, modal_title
   else {
     var loader = resolve_computed(instance).get_binding('authorizations');
     return $.map(loader.list, function (binding) {
-      if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+      if (binding.instance.role && binding.instance.role.reify().attr('name') === 'ProgramOwner') {
         return binding.instance.person.reify().attr('email');
       }
     }).join(', ');
@@ -2105,7 +2105,7 @@ Mustache.registerHelper("if_multi_owner", function (instance, modal_title, optio
 
   var loader = resolve_computed(instance).get_binding('authorizations');
   can.each(loader.list, function(binding){
-    if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+    if (binding.instance.role && binding.instance.role.reify().attr('name') === 'ProgramOwner') {
       owner_count += 1;
     }
   });
@@ -2393,10 +2393,9 @@ can.each({
 
       audit = audit.reify();
       auditors_dfd = audit.findAuditors();
-      prog_roles_dfd = new RefreshQueue()
-                       .enqueue(audit.attr("program").reify())
-                       .trigger().then(function(progs) {
-                         return progs[0].get_binding("program_authorizations").refresh_instances();
+      prog_roles_dfd = audit.refresh_all('program').then(function(program) {
+                         //debugger;
+                         return program.get_binding("program_authorizations").refresh_instances();
                        }).then(function(user_role_bindings) {
                           var rq = new RefreshQueue();
                           can.each(user_role_bindings, function(urb) {
@@ -3079,6 +3078,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
     audit: {title: audit.title, id: audit.id, type: audit.type},
     program: {title: program.title, id: program.id, type: program.type},
     control: {title: control.title, id: control.id, type: control.type},
+    context: {type: audit.context.type, id: audit.context.id},
     control_assessment: {
       title: instance.title,
       id: instance.id,

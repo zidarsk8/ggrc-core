@@ -1,0 +1,98 @@
+-# Copyright (C) 2015 Reciprocity, Inc - All Rights Reserved
+-# Unauthorized use, copying, distribution, displaying, or public performance
+-# of this file, via any medium, is strictly prohibited. All information
+-# contained herein is proprietary and confidential and may not be shared
+-# with any third party without the express written consent of Reciprocity, Inc.
+-# Created By: anze@reciprocitylabs.com
+-# Maintained By: anze@reciprocitylabs.com
+
+-extends "layouts/dashboard.haml"
+
+-block title
+  Admin Dashboard with risks
+
+-block extra_javascript
+  =super()
+
+-block header
+  %h1.dashboard-title
+    %i.grciconlarge-dashboard
+    Admin Dashboard with risks
+
+-block subheader_extras
+  %ul.actions.pull-right
+    %li.btn-group
+      %a.dropdown-toggle{ 'href': '#', 'data-toggle': 'dropdown' }
+        %i.grcicon-imp-exp
+        %span Import/Export
+        %span.caret
+      %ul.dropdown-menu
+        %li.title
+          Risks
+        %li
+          %a{ 'href': "/risks/import" }
+            %i.grcicon-risk-color
+            %span Import Risks
+        %li
+          %a.export-link{ 'href': "/admin/export/risk" }
+            %i.grcicon-risk-color
+            %span Export Risks
+        %li.divider
+        %li.title
+          Systems
+        %li
+          %a{ 'href': "/systems/import" }
+            %i.grcicon-system-color
+            %span Import Systems
+        %li
+          %a.export-link{ 'href': "/admin/export/system" }
+            %i.grcicon-system-color
+            %span Export Systems
+        %li.divider
+        %li.title
+          Processes
+        %li
+          %a{ 'href': "/processes/import" }
+            %i.grcicon-process-color
+            %span Import Processes
+        %li
+          %a.export-link{ 'href': "/admin/export/process" }
+            %i.grcicon-process-color
+            %span Export Processes
+        %li.divider
+        %li.title
+          People
+        %li
+          %a{ 'href': "/admin/import/people" }
+            %i.grcicon-user-black
+            %span Import People
+        %li
+          %a.export-link{ 'href': "/admin/export/people" }
+            %i.grcicon-user-black
+            %span Export People
+            
+        %li.divider
+        %li.title
+          Help
+        %li
+          %a{ 'href': "/admin/import/help" }
+            %i.grcicon-help-black
+            %span Import Help
+        %li
+          %a.export-link{ 'href': "/admin/export/help" }
+            %i.grcicon-help-black
+            %span Export Help
+
+        -#%li.title
+          risks
+        -#%li
+          %a{ 'href': "/risks/import" }
+            %i.grcicon-risk-color
+            %span import risks
+        -#%li
+          %a{ "data-toggle": "modal-ajax", 'href': "/risks/export.html" }
+            %i.grcicon-risk-color
+            %span export risks
+
+-block widget_area
+-#FIXME: not rendering widgets for some reason

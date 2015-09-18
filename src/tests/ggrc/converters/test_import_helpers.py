@@ -176,6 +176,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "State",
         "My Attribute",
         "Mandatory Attribute",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -225,6 +226,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "My Attribute",
         "Mandatory Attribute",
         "Choose",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -269,6 +271,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -296,6 +299,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Planned Report Period from",
         "Planned Report Period to",
         "Auditors",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -327,6 +331,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Conclusion: Design",
         "Conclusion: Operation",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -356,6 +361,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -382,6 +388,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -409,6 +416,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -435,6 +443,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -461,6 +470,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -487,6 +497,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -512,6 +523,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Reference URL",
         "Code",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -548,6 +560,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Principal Assessor",
         "Secondary Assessor",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -572,6 +585,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Reference URL",
         "Code",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -590,6 +604,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Email",
         "Company",
         "Role",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -615,6 +630,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -641,6 +657,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -668,6 +685,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -695,6 +713,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -721,6 +740,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -748,6 +768,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -774,6 +795,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -800,6 +822,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -826,6 +849,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -851,6 +875,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Requested On",
         "Status",
         "Test",
+        "Delete",
     ])
     expected_names = element_names.union(mapping_names)
     self.assertEquals(expected_names, display_names)
@@ -876,6 +901,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Frequency",
         "Force real-time email updates",
         "Code",
+        "Delete",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
@@ -898,6 +924,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Code",
         "Workflow",
         "Objects",
+        "Delete",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
@@ -917,6 +944,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "End",
         "Task Group",
         "Code",
+        "Delete",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
@@ -939,6 +967,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Task Group",
         "Cycle Object",
         "State",
+        "Delete",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
@@ -966,6 +995,7 @@ class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
         "Risk Counsel",
         "Code",
         "Program",
+        "Delete",
     ])
     self.assertEquals(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
