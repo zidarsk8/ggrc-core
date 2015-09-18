@@ -44,7 +44,7 @@
       get_forbidden: function (type) {
         var forbidden = {
           "Program": ["Audit"],
-          "Audit": ["Request", "ControlAssessment"],
+          "Audit": ["Request"],
           "ControlAssessment": ["Audit", "Control"]
         };
         return forbidden[type] ? forbidden[type] : [];
