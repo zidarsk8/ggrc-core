@@ -768,11 +768,6 @@ Mustache.registerHelper("get_view_link", function (instance, options) {
   function finish(link) {
     return "<a href=" + link.viewLink + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
   }
-  function refreshInstance(prop) {
-    return function (inst) {
-      return inst.refresh_all(prop).promise();
-    };
-  }
   instance = resolve_computed(instance);
   var props = {
       "Request": "audit",
@@ -782,8 +777,7 @@ Mustache.registerHelper("get_view_link", function (instance, options) {
       "InterviewResponse": "request:audit",
       "DocumentationResponse": "request:audit"
     },
-    hasProp = _.has(props, instance.type),
-    types, promise;
+    hasProp = _.has(props, instance.type);
 
   if (!instance.viewLink && !hasProp) {
     return "";
@@ -791,14 +785,7 @@ Mustache.registerHelper("get_view_link", function (instance, options) {
   if (instance && !hasProp) {
     return finish(instance);
   }
-  // TODO: Surely there is a way to write this nicer, but currently I don't see how.
-  types = props[instance.type].split(":");
-  if (types.length > 1) {
-    promise = refreshInstance(types[0])(instance).then(refreshInstance(types[1]));
-  } else {
-    promise = refreshInstance(types[0])(instance);
-  }
-  return defer_render("a", finish, promise);
+  return defer_render("a", finish, instance.refresh_all.apply(instance, props[instance.type].split(":")));
 });
 
 Mustache.registerHelper("schemed_url", function (url) {
