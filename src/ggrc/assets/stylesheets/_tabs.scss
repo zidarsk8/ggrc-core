@@ -1,0 +1,87 @@
+/*
+ * Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.tabs-wrap {
+	margin-top: 20px;
+}
+
+.nav-tabs {
+	padding-left: 12px;
+	border-bottom: 1px solid darken($itemBorder,10%);
+	li {
+		margin-right: -1px;
+		a {
+			@include border-radius(0);
+			border: 1px solid darken($itemBorder,10%);
+			background: $itemBorder;
+			color: $text;
+			margin: 0;
+			padding: 4px 20px;
+			&:hover {
+				border: 1px solid darken($itemBorder,10%);
+			}
+		}
+	}
+	.active {
+		a {
+			background: $white;
+			border: 1px solid darken($itemBorder,10%);
+			border-bottom-color: transparent;
+			&:hover {
+				border-color: darken($itemBorder,10%);
+				border-bottom-color: transparent;
+			}
+		}
+	}
+}
+
+.tab-pane {
+	padding: 20px 0 0 32px;
+	width: 90%;
+	box-sizing: border-box;
+}
+
+.person-label {
+	@include border-radius(50%);
+	width: 35px;
+	height: 35px;
+	float: left;
+	margin-right: 10px;
+	color: $white;
+	text-align: center;
+	line-height: 36px;
+	font-size: 14px;
+	&.assignee {
+		background: $olive;
+		&:after {
+			content: "A";
+		}
+	}
+	&.requester {
+		background: $purple;
+		&:after {
+			content: "R";
+		}
+	}
+	&.verifier {
+		background: $orange;
+		&:after {
+			content: "V";
+		}
+	}
+}
+
+.third-col {
+	float: left;
+	width: 30%;
+	margin-right: 3.33%
+}
+
+.instruction {
+	margin-bottom: 10px;
+	font-weight: bold;
+}
