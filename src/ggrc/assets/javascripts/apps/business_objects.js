@@ -701,6 +701,7 @@
           ControlAssessment: {
             mapping: "related_control_assessments",
             parent_instance: GGRC.page_instance(),
+            allow_mapping: false,
             draw_children: true,
             model: CMS.Models.ControlAssessment,
             show_view: GGRC.mustache_path + "/control_assessments/tree.mustache",
@@ -768,8 +769,9 @@
             mapping: "related_audits",
             draw_children: true,
             allow_creating: false,
-            allow_mapping: false,
-            show_view: GGRC.mustache_path + "/audits/tree.mustache"
+            allow_mapping: true,
+            show_view: GGRC.mustache_path + "/audits/tree.mustache",
+            add_item_view: GGRC.mustache_path + "/audits/tree_add_item.mustache"
           },
           Section: {
             _mixins: ["directive"],

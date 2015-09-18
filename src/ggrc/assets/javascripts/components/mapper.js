@@ -45,7 +45,7 @@
         var forbidden = {
           "Program": ["Audit"],
           "Audit": ["Request"],
-          "ControlAssessment": ["Audit", "Control"]
+          "ControlAssessment": ["Control"]
         };
         return forbidden[type] ? forbidden[type] : [];
       },
