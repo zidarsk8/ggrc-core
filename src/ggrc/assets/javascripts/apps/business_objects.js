@@ -249,7 +249,7 @@
       "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
       "Audit": "Issue ControlAssessment Request history Person Program Control",
       "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",
-      "ControlAssessment": "Issue Objective Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
+      "ControlAssessment": "Issue Objective Program Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit Request",
       "Regulation": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Policy": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Standard": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
@@ -783,6 +783,13 @@
             child_options: [clause_child_options],
             footer_view: GGRC.mustache_path + "/clauses/tree_footer.mustache",
             add_item_view: GGRC.mustache_path + "/clauses/tree_add_item.mustache"
+          },
+          Request: {
+            mapping: "requests",
+            draw_children: true,
+            show_view: GGRC.mustache_path + "/requests/tree.mustache",
+            footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
+            add_item_view: GGRC.mustache_path + "/requests/tree_add_item.mustache"
           }
         },
         Issue: {
