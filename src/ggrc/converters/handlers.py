@@ -590,7 +590,7 @@ class SectionDirectiveColumnHandler(ColumnHandler):
 
   def parse_item(self):
     """ get a program from slugs """
-    allowed_directives = [Policy, Regulation, Standard]
+    allowed_directives = [Policy, Regulation, Standard, Contract]
     if self.raw_value == "":
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
       return None
