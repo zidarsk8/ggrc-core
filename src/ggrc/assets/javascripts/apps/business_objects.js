@@ -250,7 +250,7 @@
       "Audit": "Issue ControlAssessment Request history Person Program Control",
       "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue",
       "ControlAssessment": "Issue Objective Program Clause Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit Request",
-      "Regulation": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+      "Regulation": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Policy": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Standard": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Contract": "Program Issue ControlAssessment Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Section",
@@ -290,6 +290,7 @@
       'audits': GGRC.mustache_path + "/audits/info.mustache",
       'people': GGRC.mustache_path + "/people/info.mustache",
       'policies': GGRC.mustache_path + "/policies/info.mustache",
+      'sections': GGRC.mustache_path + "/sections/info.mustache",
       'objectives': GGRC.mustache_path + "/objectives/info.mustache",
       'controls': GGRC.mustache_path + "/controls/info.mustache",
       'systems': GGRC.mustache_path + "/systems/info.mustache",
@@ -468,6 +469,22 @@
           PopulationSampleResponse: false
         }
       },
+      section_child_options = {
+        model: CMS.Models.Section,
+        mapping: "sections",
+        show_view: GGRC.mustache_path + "/sections/tree.mustache",
+        footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache",
+        add_item_view: GGRC.mustache_path + "/sections/tree_add_item.mustache",
+        draw_children: true
+      },
+      clause_child_options = {
+        model: CMS.Models.Clause,
+        mapping: "related_objects",
+        show_view: GGRC.mustache_path + "/sections/tree.mustache",
+        footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache",
+        add_item_view: GGRC.mustache_path + "/sections/tree_add_item.mustache",
+        draw_children: true
+      },
       related_objects_child_options = {
         model: can.Model.Cacheable,
         mapping: "related_objects",
@@ -571,7 +588,7 @@
           Regulation: {
             mapping: "regulations",
             draw_children: true,
-            child_options: [related_objects_child_options],
+            child_options: [section_child_options],
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache",
             footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache",
@@ -580,7 +597,7 @@
           Contract: {
             mapping: "contracts",
             draw_children: true,
-            child_options: [related_objects_child_options],
+            child_options: [clause_child_options],
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache",
             footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache",
@@ -589,7 +606,7 @@
           Policy: {
             mapping: "policies",
             draw_children: true,
-            child_options: [related_objects_child_options],
+            child_options: [section_child_options],
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache",
             footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache",
@@ -598,7 +615,7 @@
           Standard: {
             mapping: "standards",
             draw_children: true,
-            child_options: [related_objects_child_options],
+            child_options: [section_child_options],
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache",
             footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache",
@@ -696,29 +713,23 @@
         directive: {
           _mixins: [
             "objectives", "controls", "business_objects"
-          ],
-          Section: {
-            mapping: "sections",
-            child_options: [related_objects_child_options],
-            draw_children: true
-          },
-          Clause: {
-            mapping: "clauses",
-            child_options: [related_objects_child_options],
-            draw_children: true
-          }
+          ]
         },
         Regulation: {
           _mixins: ["directive", "issues"],
+          Section: section_child_options
         },
         Standard: {
           _mixins: ["directive", "issues"],
+          Section: section_child_options
         },
         Policy: {
           _mixins: ["directive", "issues"],
+          Section: section_child_options
         },
         Contract: {
           _mixins: ["directive", "issues"],
+          Clause: clause_child_options
         },
         extended_audits: {
           Audit: {
@@ -765,13 +776,13 @@
           Section: {
             _mixins: ["directive"],
             mapping: "related_sections",
-            child_options: [related_objects_child_options],
+            child_options: [section_child_options],
             footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
           },
           Clause: {
             _mixins: ["directive"],
             mapping: "related_clauses",
-            child_options: [related_objects_child_options],
+            child_options: [clause_child_options],
             footer_view: GGRC.mustache_path + "/clauses/tree_footer.mustache",
             add_item_view: GGRC.mustache_path + "/clauses/tree_add_item.mustache"
           },
@@ -854,28 +865,28 @@
           Regulation: {
             mapping: "extended_related_regulations_via_search",
             draw_children: true,
-            child_options: [related_objects_child_options],
+            child_options: [section_child_options],
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache"
           },
           Contract: {
             mapping: "extended_related_contracts_via_search",
             draw_children: true,
-            child_options: [related_objects_child_options],
+            child_options: [clause_child_options],
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache"
           },
           Standard: {
             mapping: "extended_related_standards_via_search",
             draw_children: true,
-            child_options: [related_objects_child_options],
+            child_options: [section_child_options],
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache"
           },
           Policy: {
             mapping: "extended_related_policies_via_search",
             draw_children: true,
-            child_options: [related_objects_child_options],
+            child_options: [section_child_options],
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache"
           },
