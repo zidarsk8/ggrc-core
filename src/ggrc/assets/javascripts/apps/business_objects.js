@@ -701,6 +701,7 @@
           ControlAssessment: {
             mapping: "related_control_assessments",
             parent_instance: GGRC.page_instance(),
+            child_options: [related_objects_child_options],
             draw_children: true,
             model: CMS.Models.ControlAssessment,
             show_view: GGRC.mustache_path + "/base_objects/tree.mustache",
