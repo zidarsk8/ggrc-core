@@ -36,6 +36,7 @@ dashboard-js-files:
   - bootstrap/wysihtml5.js
   - moment.js
   - permission.js
+  - plugins/lodash_helpers.js
   - plugins/persistent_notifier.js
   - ggrc_base.js
   - plugins/ggrc_utils.js
