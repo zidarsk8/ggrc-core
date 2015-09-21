@@ -37,8 +37,8 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
   audit = {}  # we add this for the sake of client side error checking
 
   VALID_CONCLUSIONS = frozenset([
-      "Effective", "Material weakness", "Needs improvement",
-      "Significant deficiency", "Not Applicable"
+      "Effective", "Ineffective", "Needs improvement",
+      "Not Applicable"
   ])
 
   # REST properties
