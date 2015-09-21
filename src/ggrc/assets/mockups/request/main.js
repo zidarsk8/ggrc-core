@@ -37,10 +37,6 @@
         type_a: "assignee",
         type_r: "requester",
         type_v: "verifier"
-      }, {
-        title: "Audits",
-        icon: "grcicon-audit-color",
-        template: "/base_objects/tree.mustache"
       }
     ]
   });
