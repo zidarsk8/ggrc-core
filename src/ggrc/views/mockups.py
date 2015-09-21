@@ -12,7 +12,10 @@ def init_mockup_views():
 
   @app.route("/mockups/risk-assessment")
   @login_required
-  def risk_assessment_redesign():
-    """Risk Assessment mockup
-    """
-    return render_template("/mockups/risk-assessment/index.html")
+  def mockup_request():
+    return render_template("mockups/base.haml")
+
+  @app.route("/mockups/request-info-pane")
+  @login_required
+  def mockup_request_info_pane():
+    return render_template("mockups/base-widget-area.haml")

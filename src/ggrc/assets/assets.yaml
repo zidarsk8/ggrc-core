@@ -376,3 +376,12 @@ mockup-js-files:
   - canjs/can.jquery.js
   - canjs/can.object.js
   # 3rd party end
+  - mockuphelper_controller.js
+  - sample/main.js
+  - request/main.js
+  - request-info-pane/main.js
+
+mockup-js-template-files:
+  - title.mustache
+  - sample/sample.mustache
+  - request/info.mustache
