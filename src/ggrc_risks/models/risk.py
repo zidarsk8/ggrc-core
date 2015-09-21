@@ -12,14 +12,16 @@ from ggrc import db
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_document import Documentable
-from ggrc.models.mixins import CustomAttributable, Base, Described, Slugged, Titled, WithContact, deferred, Stateful, Timeboxed
+from ggrc.models.mixins import Base, CustomAttributable, Described, Noted, \
+    Slugged, Stateful, Timeboxed, Titled, WithContact, deferred
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
-from ggrc.models.track_object_state import HasObjectState, track_state_for_class
+from ggrc.models.track_object_state import HasObjectState
 
 
-class Risk(HasObjectState, CustomAttributable, Stateful, Relatable, Documentable, Described,
-    Ownable, WithContact, Titled, Timeboxed, Slugged, Base, db.Model):
+class Risk(HasObjectState, CustomAttributable, Stateful, Relatable,
+           Documentable, Described, Ownable, WithContact, Titled, Timeboxed,
+           Slugged, Base, db.Model, Noted):
   __tablename__ = 'risks'
 
   VALID_STATES = [
@@ -32,7 +34,7 @@ class Risk(HasObjectState, CustomAttributable, Stateful, Relatable, Documentable
       'In Scope',
       'Not in Scope',
       'Deprecated',
-      ]
+  ]
 
   # Overriding mixin to make mandatory
   @declared_attr
@@ -47,4 +49,4 @@ class Risk(HasObjectState, CustomAttributable, Stateful, Relatable, Documentable
   _publish_attrs = [
       'risk_objects',
       PublishOnly('objects'),
-      ]
+  ]
