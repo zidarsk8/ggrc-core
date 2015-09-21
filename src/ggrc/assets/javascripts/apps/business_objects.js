@@ -607,7 +607,7 @@
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache",
             footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/directives/tree_add_item.mustache"
+            add_item_view: GGRC.mustache_path + "/business_objects/tree_add_item.mustache"
           },
           Policy: {
             mapping: "policies",
@@ -707,10 +707,12 @@
           ControlAssessment: {
             mapping: "related_control_assessments",
             parent_instance: GGRC.page_instance(),
+            allow_mapping: true,
+            child_options: [related_objects_child_options],
             draw_children: true,
             model: CMS.Models.ControlAssessment,
-            show_view: GGRC.mustache_path + "/control_assessments/tree.mustache",
-            header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache",
+            show_view: GGRC.mustache_path + "/base_objects/tree.mustache",
+            header_view: GGRC.mustache_path + "/base_objects/tree_header.mustache",
             footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache",
             add_item_view: GGRC.mustache_path + "/control_assessments/tree_add_item.mustache"
           }
@@ -774,8 +776,9 @@
             mapping: "related_audits",
             draw_children: true,
             allow_creating: false,
-            allow_mapping: false,
-            show_view: GGRC.mustache_path + "/audits/tree.mustache"
+            allow_mapping: true,
+            show_view: GGRC.mustache_path + "/audits/tree.mustache",
+            add_item_view: GGRC.mustache_path + "/audits/tree_add_item.mustache"
           },
           Section: {
             _mixins: ["directive"],
