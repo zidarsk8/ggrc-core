@@ -303,6 +303,8 @@ dashboard-js-template-files:
   - requests/tree_add_item.mustache
   - requests/tree_header.mustache
   - requests/modal_content.mustache
+  - requests/tier2_content.mustache
+  - requests/general_info.mustache
   - objectives/autocomplete_result.mustache
   - responses/confirm_delete_evidence.mustache
   - responses/tree.mustache

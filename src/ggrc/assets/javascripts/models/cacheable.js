@@ -1300,17 +1300,19 @@ can.Observe.List.prototype.stubs = function() {
 can.Observe.prototype.reify = function() {
   var type, model;
 
-  if (this instanceof can.Model)
+  if (this instanceof can.Model) {
     return this;
-  if (!(this instanceof can.Stub))
+  }
+  if (!(this instanceof can.Stub)) {
     console.debug("`reify()` called on non-stub, non-instance object", this);
+  }
 
   type = this.type;
   model = CMS.Models[type] || GGRC.Models[type];
 
-  if (!model)
+  if (!model) {
     console.debug("`reify()` called with unrecognized type", this);
-
+  }
   return model.model(this);
 };
 

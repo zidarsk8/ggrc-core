@@ -2767,7 +2767,6 @@ Mustache.registerHelper("find_template", function (base_name, instance, options)
     //binding result case
     instance = instance.instance;
   }
-
   if (GGRC.Templates[instance.constructor.table_plural + "/" + base_name]) {
     tmpl = "/static/mustache/" + instance.constructor.table_plural + "/" + base_name + ".mustache";
   } else if (GGRC.Templates["base_objects/" + base_name]) {
