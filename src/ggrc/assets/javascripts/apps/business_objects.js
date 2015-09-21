@@ -254,8 +254,8 @@
       "Policy": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Standard": "Program Issue ControlAssessment Section Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Contract": "Program Issue ControlAssessment Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Clause": "Contract Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
-      "Section": "Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+      "Clause": "Contract Objective ControlAssessment Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
+      "Section": "Objective Control ControlAssessment System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Objective": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person",
       "Control": "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
       "Person": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit Request",
@@ -601,7 +601,7 @@
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache",
             footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/directives/tree_add_item.mustache"
+            add_item_view: GGRC.mustache_path + "/business_objects/tree_add_item.mustache"
           },
           Policy: {
             mapping: "policies",
@@ -701,6 +701,7 @@
           ControlAssessment: {
             mapping: "related_control_assessments",
             parent_instance: GGRC.page_instance(),
+            allow_mapping: true,
             draw_children: true,
             model: CMS.Models.ControlAssessment,
             show_view: GGRC.mustache_path + "/control_assessments/tree.mustache",
@@ -768,8 +769,9 @@
             mapping: "related_audits",
             draw_children: true,
             allow_creating: false,
-            allow_mapping: false,
-            show_view: GGRC.mustache_path + "/audits/tree.mustache"
+            allow_mapping: true,
+            show_view: GGRC.mustache_path + "/audits/tree.mustache",
+            add_item_view: GGRC.mustache_path + "/audits/tree_add_item.mustache"
           },
           Section: {
             _mixins: ["directive"],
