@@ -703,8 +703,8 @@
             parent_instance: GGRC.page_instance(),
             draw_children: true,
             model: CMS.Models.ControlAssessment,
-            show_view: GGRC.mustache_path + "/control_assessments/tree.mustache",
-            header_view: GGRC.mustache_path + "/control_assessments/tree_header.mustache",
+            show_view: GGRC.mustache_path + "/base_objects/tree.mustache",
+            header_view: GGRC.mustache_path + "/base_objects/tree_header.mustache",
             footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache",
             add_item_view: GGRC.mustache_path + "/control_assessments/tree_add_item.mustache"
           }
