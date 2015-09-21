@@ -52,9 +52,6 @@
     -# Google Web Font(s)
     -#NOTE: This resource occasionally hangs and prevents page from rendering, so loaded after the fact via jquery
     :javascript
-      jQuery(function($) {
-        $("head").append("<link href='https://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'></link>");
-      });
       (function (win, doc, GGRC, $) {
         var originalError = win.onerror;
         win.onerror = function (message, url, linenumber) {
