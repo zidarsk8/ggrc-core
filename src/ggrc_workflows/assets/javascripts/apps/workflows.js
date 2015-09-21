@@ -11,7 +11,7 @@
         'Program Regulation Policy Standard Contract Clause Section'.split(' '),
         'Control Objective'.split(' '),
         'OrgGroup Vendor'.split(' '),
-        'System Process DataAsset Product Project Facility Market Issue'.split(' '),
+        'System Process DataAsset Product Project Facility Market Issue ControlAssessment'.split(' '),
         'Risk ThreatActor'.split(' ')
       ),
       _task_sort_function = function(a, b) {
@@ -46,7 +46,6 @@
       'cycle_task_group': CMS.Models.CycleTaskGroup,
       'cycle_task_group_object': CMS.Models.CycleTaskGroupObject,
       'cycle_task_group_object_task': CMS.Models.CycleTaskGroupObjectTask,
-
       'task_group': CMS.Models.TaskGroup,
       'workflow': CMS.Models.Workflow
     };
