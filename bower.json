@@ -9,8 +9,8 @@
   "dependencies": {
     "canjs": "2.0.7",
     "bootstrap": "2.0.4",
-    "jquery-ui": "1.11.0",
-    "jquery": "1.11.0",
+    "jquery-ui": "1.11.4",
+    "jquery": "1.11.3",
     "lodash": "3.10.0",
     "mousetrap": "1.5.3",
     "moment": "2.10.3",

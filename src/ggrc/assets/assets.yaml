@@ -366,7 +366,7 @@ dashboard-js-spec-helpers:
 mockup-js-files:
   # 3rd party
   - jquery/dist/jquery.js
-  - jquery-ui/jquery-ui.js
+  - jquery-ui/jquery-ui.min.js
   - bootstrap/js/bootstrap-modal.js
   - bootstrap/js/bootstrap-collapse.js
   - bootstrap/js/bootstrap-dropdown.js
