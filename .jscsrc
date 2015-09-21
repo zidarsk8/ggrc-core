@@ -100,4 +100,5 @@
         "else"
     ],
     "disallowNewlineBeforeBlockStatements": true,
+    "disallowSpaceBeforeComma": true
 }
