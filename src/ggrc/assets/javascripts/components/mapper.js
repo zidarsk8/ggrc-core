@@ -85,7 +85,8 @@
               }
             };
 
-        selector_list = _.union(_.intersection(_.keys(canonical), list), whitelist);
+        selector_list = _.intersection.apply(_, _.compact([_.keys(canonical), list]));
+        selector_list = _.union(selector_list, whitelist);
         can.each(selector_list, function (model_name) {
           if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name)) {
             return;
