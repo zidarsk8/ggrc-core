@@ -365,16 +365,6 @@ dashboard-js-spec-helpers:
 
 mockup-js-files:
   # 3rd party
-  - jquery/dist/jquery.js
-  - jquery-ui/jquery-ui.min.js
-  - bootstrap/js/bootstrap-modal.js
-  - bootstrap/js/bootstrap-collapse.js
-  - bootstrap/js/bootstrap-dropdown.js
-  - bootstrap/js/bootstrap-tooltip.js
-  - bootstrap/js/bootstrap-popover.js
-  - bootstrap/js/bootstrap-transition.js
-  - canjs/can.jquery.js
-  - canjs/can.object.js
   # 3rd party end
   - mockuphelper_controller.js
   - sample/main.js
@@ -384,5 +374,4 @@ mockup-js-files:
 mockup-js-template-files:
   - title.mustache
   - sample/sample.mustache
-  - request/request.mustache
   - request/info.mustache
