@@ -22,11 +22,6 @@ def init_mockup_views():
 
   @app.route("/mockups/new_mockup")
   @login_required
-  def mockup_request():
-    return render_template("mockups/base.haml")
-
-  @app.route("/mockups/request-info-pane")
-  @login_required
   def mockup_sample2():
     return render_template("mockups/base.haml")
 
@@ -34,3 +29,8 @@ def init_mockup_views():
   @login_required
   def mockup_request():
     return render_template("mockups/base.haml")
+
+  @app.route("/mockups/request-info-pane")
+  @login_required
+  def mockup_request_info_pane():
+    return render_template("mockups/base-widget-area.haml")
