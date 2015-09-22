@@ -67,6 +67,7 @@ def objects_via_relationships_query(user_id, context_not_role=False):
   _program = aliased(all_models.Program, name="p")
   _relationship = aliased(all_models.Relationship, name="rl")
   _user_role = aliased(all_models.UserRole, name="ur")
+  _context_implications = aliased(all_models.ContextImplication, name="ci")
 
   def _add_relationship_join(query):
     return query.join(_program, or_(
@@ -74,10 +75,18 @@ def objects_via_relationships_query(user_id, context_not_role=False):
              _program.id == _relationship.source_id),
         and_(_relationship.destination_type == 'Program',
              _program.id == _relationship.destination_id))).\
-        join(_user_role, _program.context_id == _user_role.context_id).\
+        outerjoin(_context_implications, and_(
+            _context_implications.source_context_id == _program.context_id,
+            _context_implications.source_context_scope == 'Program',
+            _context_implications.context_scope == 'Audit',
+        )).\
+        join(_user_role, _user_role.context_id.in_([
+            _program.context_id,
+            _context_implications.context_id
+        ])).\
         join(_role, _user_role.role_id == _role.id).\
         filter(and_(_user_role.person_id == user_id, _role.name.in_(
-            ('ProgramEditor', 'ProgramOwner', 'ProgramReader'))))
+            ('ProgramEditor', 'ProgramOwner', 'ProgramReader', 'Auditor'))))
 
   objects = _add_relationship_join(db.session.query(
       case([
