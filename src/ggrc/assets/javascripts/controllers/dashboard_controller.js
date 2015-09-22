@@ -221,7 +221,7 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , get_active_widget_elements: function() {
-      return this.element.find("section.widget[id]:not([id=])").toArray();
+      return this.element.find("section.widget[id]:not([id=''])").toArray();
     }
 
   , add_widget_from_descriptor: function() {
