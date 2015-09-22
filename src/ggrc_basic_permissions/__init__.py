@@ -100,9 +100,10 @@ def objects_via_relationships_query(user_id, context_not_role=False):
       literal(None).label('context_id') if context_not_role else _role.name))
 
   # We also need to return relationships themselves:
-  relationships = _add_relationship_join(db.session.query(_relationship.id, literal("Relationship"), _relationship.context_id))
+  query = db.session.query(_relationship.id, literal("Relationship"),
+                           _relationship.context_id)
+  relationships = _add_relationship_join(query)
   return objects.union(relationships)
-
 
 
 class CompletePermissionsProvider(object):
