@@ -124,9 +124,17 @@
   @extend %reset-list;
   label {
     display: inline-block;
-    width: 80px;
+    width: 90px;
     text-transform: uppercase;
     font-size: 10px;
+    line-height: 16px;
+    .person-label {
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+      line-height: 16px;
+      font-size: 10px;
+    }
   }
 }
 
@@ -156,5 +164,13 @@
     .entry-list & {
       @extend %oneline;
     }
+  }
+}
+
+.mapped-list {
+  @extend %reset-list;
+  li {
+    @extend %oneline;
+    margin-bottom: 5px;
   }
 }

@@ -251,6 +251,16 @@
           new_value: [{
             text: ""
           }]
+        }],
+        mapped_objects: [{
+          icon: "objective",
+          title: "090.7068 objective 1"
+        }, {
+          icon: "control",
+          title: "Access to the Private Network with expired Key v0906984"
+        }, {
+          icon: "regulation",
+          title: "a regulation object"
         }]
       }, {
         title: "Audits",

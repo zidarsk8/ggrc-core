@@ -79,6 +79,7 @@
                 <ul class="label-list">
                   <li>
                     <label>
+                      <span class="person-label {{type_a}}"></span>
                       Assignee
                     </label>
                     <a href="javascript://">{{people_assignee}}</a>
@@ -86,6 +87,7 @@
                   </li>
                   <li>
                     <label>
+                      <span class="person-label {{type_r}}"></span>
                       Requester
                     </label>
                     <a href="javascript://">{{people_requester}}</a>
@@ -93,6 +95,7 @@
                   </li>
                   <li>
                     <label>
+                      <span class="person-label {{type_v}}"></span>
                       Verifier
                     </label>
                     <a href="javascript://">{{people_verifier}}</a>
@@ -120,6 +123,22 @@
                     </label>
                     {{due_on}}
                   </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="row-fluid wrap-row">
+            <div class="span12">
+              <h6>Mapped objects</h6>
+              <div class="side-content">
+                <ul class="mapped-list">
+                  {{#mapped_objects}}
+                    <li>
+                      <i class="grcicon-{{icon}}-color"></i>
+                      <a target="_blank" href="javascript://">{{title}}</a>
+                    </li>
+                  {{/mapped_objects}}
                 </ul>
               </div>
             </div>
