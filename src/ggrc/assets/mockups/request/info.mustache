@@ -45,48 +45,15 @@
             <h6>Evidence</h6>
             <div class="file-list-wrap">
               <ul class="file-list">
-                <li>
-                  <i class="grcicon-file-pdf"></i>
-                  <span class="date">04/05/2010</span>
-                  MTV_001_SIGNED_LoginAccess_List.pdf
-                  <a target="_blank" href="javascript://"><i class="grcicon-external"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-                <li>
-                  <i class="grcicon-file-doc"></i>
-                  <span class="date">04/15/2014</span>
-                  Simple_Word_document.doc
-                  <a target="_blank" href="javascript://"><i class="grcicon-external"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-                <li>
-                  <i class="grcicon-file-xls"></i>
-                  <span class="date">04/18/2015</span>
-                  Simple_Excel_document.xls
-                  <a target="_blank" href="javascript://"><i class="grcicon-external"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-                <li>
-                  <i class="grcicon-file-gdrive"></i>
-                  <span class="date">09/19/2015</span>
-                  Some_file_from_Google_Drive.pdf
-                  <a target="_blank" href="javascript://"><i class="grcicon-external"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-                <li>
-                  <i class="grcicon-file"></i>
-                  <span class="date">09/19/2015</span>
-                  Image_of_nature.png
-                  <a target="_blank" href="javascript://"><i class="grcicon-external"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
-                <li>
-                  <i class="grcicon-file"></i>
-                  <span class="date">09/21/2015</span>
-                  canjs-observe-bug.txt
-                  <a target="_blank" href="javascript://"><i class="grcicon-external"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                </li>
+                {{#files}}
+                  <li>
+                    <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                    <span class="date">{{date}}</span>
+                    {{name}}
+                    <a target="_blank" href="{{url}}"><i class="grcicon-external"></i></a>
+                    <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                  </li>
+                {{/files}}
               </ul>
 
               <a href="javascript://" class="btn btn-draft btn-small">+ Add evidence</a>

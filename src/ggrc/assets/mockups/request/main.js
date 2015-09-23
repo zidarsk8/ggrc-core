@@ -36,7 +36,33 @@
         due_on: "12/31/15",
         type_a: "assignee",
         type_r: "requester",
-        type_v: "verifier"
+        type_v: "verifier",
+        files: [{
+          icon: "pdf",
+          date: "04/05/2010",
+          name: "MTV_001_SIGNED_LoginAccess_List.pdf",
+          url: "http://google.com/"
+        }, {
+          icon: "doc",
+          date: "04/15/2014",
+          name: "Simple_Word_document.doc",
+          url: "http://google.com/"
+        }, {
+          icon: "xls",
+          date: "04/18/2015",
+          name: "Simple_Excel_document.xls",
+          url: "http://google.com/"
+        }, {
+          icon: "image",
+          date: "09/19/2015",
+          name: "Image_of_nature.png",
+          url: "http://google.com/"
+        }, {
+          icon: "",
+          date: "09/21/2015",
+          name: "canjs-observe-bug.txt",
+          url: "http://google.com/"
+        }]
       }, {
         title: "Audits",
         icon: "grcicon-audit-color",
