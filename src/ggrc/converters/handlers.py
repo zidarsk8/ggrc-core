@@ -12,8 +12,8 @@ import traceback
 
 from ggrc import db
 from ggrc.automapper import AutomapperGenerator
-from ggrc.converters import get_importables
 from ggrc.converters import errors
+from ggrc.converters import get_importables
 from ggrc.login import get_current_user
 from ggrc.models import Audit
 from ggrc.models import AuditObject
@@ -28,12 +28,12 @@ from ggrc.models import Program
 from ggrc.models import Regulation
 from ggrc.models import Relationship
 from ggrc.models import Request
-from ggrc.models import Response
 from ggrc.models import Standard
 from ggrc.models import all_models
+from ggrc.models import response
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.rbac import permissions
-from ggrc.models.reflection import AttributeInfo
 
 
 MAPPING_PREFIX = "__mapping__:"
@@ -824,8 +824,83 @@ class ResponseTypeColumnHandler(ColumnHandler):
 
   def parse_item(self):
     value = self.raw_value.lower().strip()
-    if value not in Response.VALID_TYPES:
+    if value not in response.Response.VALID_TYPES:
       self.add_error(errors.WRONG_MULTI_VALUE,
                      column_name=self.display_name,
                      value=value)
     return value
+
+
+class ResponseMappedObjectsColumnHandler(ColumnHandler):
+
+  res_types = {v.__mapper_args__.get("polymorphic_identity", None): v.__name__
+               for v in response.__dict__.values()
+               if isinstance(v, type) and issubclass(v, response.Response)}
+
+  def __init__(self, row_converter, key, **options):
+    self.mappable = get_importables()
+    self.new_slugs = row_converter.block_converter.converter.new_objects
+    super(ResponseMappedObjectsColumnHandler, self) \
+        .__init__(row_converter, key, **options)
+
+  def parse_item(self):
+    lines = [line.split(":", 1) for line in self.raw_value.splitlines()]
+    objects = []
+    for line in lines:
+      if len(line) != 2:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+        continue
+      object_class, slug = line
+      slug = slug.strip()
+      class_ = self.mappable.get(object_class.strip().lower())
+      if class_ is None:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+        continue
+      new_object_slugs = self.new_slugs[class_]
+      obj = class_.query.filter(class_.slug == slug).first()
+      if obj:
+        objects.append(obj)
+      elif not (slug in new_object_slugs and self.dry_run):
+        self.add_warning(errors.UNKNOWN_OBJECT,
+                         object_type=class_._inflector.human_singular.title(),
+                         slug=slug)
+    return objects
+
+  def _mapped_objects(self):
+    obj = self.row_converter.obj
+    rels = Relationship.query.filter(
+        ((Relationship.source_type == obj.type) &
+         Relationship.source_id == obj.id) |
+        ((Relationship.destination_type == obj.type) &
+         Relationship.destination_id == obj.id)).all()
+    return [r.source if r.source != obj else r.destination for r in rels]
+
+  def get_value(self):
+    lines = ["{}: {}".format(o._inflector.title_singular.title(), o.slug)
+             for o in self._mapped_objects()]
+    return "\n".join(lines)
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    obj = self.row_converter.obj
+    obj_type = self.res_types[obj.response_type]
+    existing = set((o.type, o.id) for o in self._mapped_objects())
+    new_relationships = []
+    for object_ in self.value:
+      if (object_.type, object_.id) in existing:
+        continue
+      rel = Relationship(
+          source_type=obj_type,
+          source_id=obj.id,
+          destination=object_
+      )
+      new_relationships.append(rel)
+      db.session.add(rel)
+    db.session.flush()
+    for rel in new_relationships:
+      AutomapperGenerator(rel, False).generate_automappings()
+    self.dry_run = True
+
+  def set_obj_attr(self):
+    pass

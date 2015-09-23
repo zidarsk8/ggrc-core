@@ -9,6 +9,7 @@ from ggrc.models.mixins import (
 )
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
 from ggrc.models.request import Request
 
@@ -79,18 +80,22 @@ class Response(Noted, Described, Hyperlinked, WithContact,
   _aliases = {
       "description": "Response",
       "request": {
-        "display_name": "Request",
-        "mandatory": True,
-        "filter_by": "_filter_by_request",
+          "display_name": "Request",
+          "mandatory": True,
+          "filter_by": "_filter_by_request",
       },
       "response_type": {
-        "display_name": "Response Type",
-        "mandatory": True,
+          "display_name": "Response Type",
+          "mandatory": True,
       },
       "status": "Status",
       "title": None,
       "secondary_contact": None,
       "notes": None,
+      "mapped_objects": {
+          "display_name": "Mapped Objects",
+          "type": AttributeInfo.Type.SPECIAL_MAPPING,
+      }
 
   }
 
