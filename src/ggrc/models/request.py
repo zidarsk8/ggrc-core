@@ -68,6 +68,7 @@ class Request(Titled, Slugged, Described, Base, db.Model):
   _aliases = {
     "assignee": {
       "display_name": "Assignee",
+      "mandatory": True,
       "filter_by": "_filter_by_assignee",
     },
     "audit_object": {

@@ -183,8 +183,11 @@ class UserColumnHandler(ColumnHandler):
   def parse_item(self):
     email = self.raw_value.lower()
     person = self.get_person(email)
-    if not person and email != "":
-      self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+    if not person:
+      if email != "":
+        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+      elif self.mandatory:
+        self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.key)
     return person
 
   def get_value(self):
