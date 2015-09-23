@@ -817,7 +817,7 @@ class RequestColumnHandler(ParentColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.parent = Request
-    super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
+    super(RequestColumnHandler, self).__init__(row_converter, key, **options)
 
 
 class ResponseTypeColumnHandler(ColumnHandler):
