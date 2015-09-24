@@ -1291,13 +1291,10 @@ ul.new-tree {
   margin-top: -4px;
   position: relative;
   .pin-content & {
-    margin-top: -54px;
+    margin-top: 4px;
   }
   a {
     display: block;
-  }
-  &.no-top {
-    margin-top: -4px;
   }
   &.pin {
     margin-left: 0;

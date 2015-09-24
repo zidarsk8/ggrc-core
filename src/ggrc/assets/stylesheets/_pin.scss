@@ -61,7 +61,6 @@
     a {
       i {
         @include opacity(.25);
-        @include transition(opacity .2s ease);
       }
       &:hover {
         i {
