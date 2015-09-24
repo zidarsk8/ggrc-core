@@ -27,6 +27,8 @@ have the prerequisite software installed. Here are the steps:
 
 * clone the repo
 * cd to the project directory
+* make sure your ansible installation is up-to-date i.e. version 1.9.3 or higher (if it's not in the repositories, you can
+install it via pip)
 * run the following:
 
     ```sh
