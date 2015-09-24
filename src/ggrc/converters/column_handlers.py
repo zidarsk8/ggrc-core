@@ -20,6 +20,7 @@ _column_handlers = {
     "description": handlers.TextareaColumnHandler,
     "design": handlers.OptionColumnHandler,
     "directive": handlers.SectionDirectiveColumnHandler,
+    "documents": handlers.DocumentsColumnHandler,
     "due_on": handlers.DateColumnHandler,
     "email": handlers.EmailColumnHandler,
     "end_date": handlers.DateColumnHandler,

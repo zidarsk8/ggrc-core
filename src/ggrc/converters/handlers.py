@@ -886,14 +886,28 @@ class ResponseMappedObjectsColumnHandler(ColumnHandler):
     obj = self.row_converter.obj
     obj_type = self.res_types[obj.response_type]
     existing = set((o.type, o.id) for o in self._mapped_objects())
+    desired = set((o.type, o.id) for o in self.value)
+    to_delete = existing - desired
+    if len(to_delete) > 0:
+      Relationship.query.filter(
+          or_(*[(((Relationship.source_type == obj_type) &
+                  (Relationship.source_id == obj.id) &
+                  (Relationship.destination_type == o_type) &
+                  (Relationship.destination_id == o_id)) |
+                 ((Relationship.destination_type == obj_type) &
+                  (Relationship.destination_id == obj.id) &
+                  (Relationship.source_type == o_type) &
+                  (Relationship.source_id == o_id)))
+                for o_type, o_id in to_delete])
+      ).delete()
+
     new_relationships = []
-    for object_ in self.value:
-      if (object_.type, object_.id) in existing:
-        continue
+    for relevant_type, relevant_id in desired - existing:
       rel = Relationship(
           source_type=obj_type,
           source_id=obj.id,
-          destination=object_
+          destination_type=relevant_type,
+          destination_id=relevant_id
       )
       new_relationships.append(rel)
       db.session.add(rel)
@@ -904,3 +918,32 @@ class ResponseMappedObjectsColumnHandler(ColumnHandler):
 
   def set_obj_attr(self):
     pass
+
+
+class DocumentsColumnHandler(ColumnHandler):
+
+  def get_value(self):
+    lines = ["{} {}".format(d.title, d.link)
+             for d in self.row_converter.obj.documents]
+    return "\n".join(lines)
+
+  def parse_item(self):
+    lines = [line.rsplit(" ", 1) for line in self.raw_value.splitlines()]
+    documents = []
+    for line in lines:
+      if len(line) != 2:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+        continue
+      title, link = line
+      documents.append(
+          all_models.Document(title=title.strip(), link=link.strip()))
+    return documents
+
+  def set_obj_attr(self):
+    pass
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    self.row_converter.obj.documents = self.value
+    self.dry_run = True
