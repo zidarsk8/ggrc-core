@@ -1,0 +1,64 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+<li class="tree-item cms_controllers_tree_view_node" data-object-id="3" data-object-type="audit">
+    <div class="item-main" data-model="true">
+        <div class="item-wrap">
+            <div class="openclose">
+                <span class="status-label"></span>
+                <i class="grcicon-arrow-right"></i>
+            </div>
+            <div class="select">
+                <div class="item-data">
+                    <div class="row-fluid">
+                        <div class="span4">
+                            <div class="title tree-title-area" rel="tooltip" data-placement="left" title="" data-original-title="2015: a programmm - Audit 2">
+                                {{title}}
+                            </div>
+                        </div>
+                        <div class="span4">
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    <div class="owner tree-title-area">
+                                        {{status}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span4">
+                            <div class="show-details">
+                                <a href="/audits/3" target="_blank"><i class="grcicon-to-right"></i></a>
+                            </div>
+                            <ul class="tree-action-list">
+                                <li>
+                                    <i class="grcicon-person-black" rel="tooltip" data-placement="left" data-original-title="Audit Lead, Request Assignee "></i>
+                                </li>
+                                <li>
+                                    <div class="counter">
+                                        <i class="grcicon-object-black"></i>
+                                        3
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div><!-- item-data end -->
+            </div><!-- select end -->
+        </div><!-- item-wrap end -->
+    </div><!-- item-main end -->
+    <div class="tier-2-info item-content content-open" style="display: block;">
+        <div class="tier-2-info-content">
+            <div class="inner-tree">
+                <ul class="tree-structure new-tree cms_controllers_tree_view">
+                    {{#children}}
+                        {{> /static/mockups/base_templates/tree_item.mustache }}
+                    {{/children}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</li>
