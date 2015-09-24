@@ -380,3 +380,4 @@ mockup-js-template-files:
   - base_templates/tree_item.mustache
   - base_templates/info_panel.mustache
   - base_templates/filter.mustache
+  - base_templates/nav_item.mustache
