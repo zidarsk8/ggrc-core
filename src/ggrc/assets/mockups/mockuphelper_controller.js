@@ -58,7 +58,7 @@
         scope: view.scope
       }));
       if (view.children) {
-        new CMS.Controllers.MockupTreeView(this.element.find(".tree-view-wrapper"), view.children);
+        new CMS.Controllers.MockupTreeView(this.element.find(".tree-view-wrapper"), view);
       }
     }
   });
