@@ -267,30 +267,54 @@
         template: "/request/audit.mustache",
         children: [{
           title: "Some title",
+          type: "audit",
+          id: "2",
           children: [{
-            title: "Other title"
+            title: "Other title",
+            type: "process",
+            id: "23"
           }, {
-            title: "YOLO"
+            title: "YOLO",
+            type: "issue",
+            id: "24"
           }, {
-            title: "R U Talking to me"
+            title: "R U Talking to me",
+            type: "system",
+            id: "12"
           }]
         }, {
-          title: "Some title 2",
-          children: [{
-            title: "Other title 23"
-          }, {
-            title: "YOLO 23"
-          }, {
-            title: "R U Talking to me 24"
-          }]
+          title: "Some title 23",
+          type: "issue",
+          id: "3",
+          children: []
         }, {
-          title: "Some title 3",
+          title: "Some title 5",
+          type: "audit",
+          id: "5",
           children: [{
-            title: "Other title 33"
+            title: "Other title",
+            type: "process",
+            id: "63"
           }, {
-            title: "YOLO 34"
+            title: "YOLO",
+            type: "issue",
+            id: "344"
           }, {
-            title: "R U Talking to me 35"
+            title: "R U Talking to me",
+            type: "system",
+            id: "342"
+          }, {
+            title: "Other title",
+            type: "process",
+            id: "33"
+          }, {
+            title: "YOLO",
+            type: "issue",
+            id: "54"
+          }, {
+            title: "R U Talking to me",
+            type: "system",
+            id: "62"
           }]
         }]
       }

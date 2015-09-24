@@ -8,7 +8,7 @@
 
 (function (can, $) {
   can.route(":tab", {tab: "Info"});
-  can.route(":tab/:id");
+  can.route(":tab/:item");
 
   // Activate router
   $(document).ready(can.route.ready);
@@ -20,14 +20,16 @@
     }
   }, {
     init: function (el, opts) {
-      var options = {
-        views: this.options.views
-      };
+      var views = new can.List(this.options.views),
+          options = {
+            views: views
+          };
       new CMS.Controllers.MockupNav(this.element.find(".internav"), options);
       new CMS.Controllers.MockupView(this.element.find(".inner-content"), options);
       new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), options);
 
       this.element.find(".title-content").html(can.view(this.options.title_view, opts.object));
+      this.options.views = views;
     },
     "{can.route} tab": function (router, ev, tab) {
       _.each(this.options.views, function (view) {
@@ -53,32 +55,75 @@
   }, {
     "{can.route} tab": function () {
       var view = _.findWhere(this.options.views, {active: true});
-      this.element.html(can.view(GGRC.mustache_path + view.template, {
-        instance: new can.Model.Cacheable(view),
-        scope: view.scope
-      }));
+      console.log("VIEW", view, this.options.views);
+      this.element.html(can.view(GGRC.mustache_path + view.template));
       if (view.children) {
-        new CMS.Controllers.MockupTreeView(this.element.find(".tree-view-wrapper"), view);
+        new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), view);
       }
     }
   });
 
   can.Control("CMS.Controllers.MockupTreeView", {
-    defaults: {
-      view: "/static/mockups/base_templates/tree.mustache"
-    }
   }, {
     init: function (el, opts) {
-      this.element.html(can.view(this.options.view, this.options));
+      _.each(this.options.children, function (child) {
+        var $item = $("<li/>", {class: "tree-item"});
+        new CMS.Controllers.MockupTreeItem($item, {
+          item: child
+        });
+        this.element.append($item);
+      }, this);
+    },
+    "{can.route} item": function (router, ev, item) {
+      item = item.split("-");
+      var view = _.findWhere(this.options.children, {
+            type: item[0],
+            id: item[1]
+          });
+      view.attr("active", true);
+    },
+    "{children} change": function (list, ev, which, type, status) {
+      which = which.split(".");
+      var index = +which[0],
+          prop = which[1];
+
+      if (!status) {
+        return;
+      }
+      _.each(this.options.children, function (child, i) {
+        var isActive = index === i;
+        child.attr("active", isActive);
+        if (isActive) {
+          can.route.attr("item", child.type + "-" + child.id);
+        }
+      });
     }
   });
+
+  can.Control("CMS.Controllers.MockupTreeItem", {
+    defaults: {
+      view: "/static/mockups/base_templates/tree_item.mustache"
+    }
+  }, {
+    init: function (el, options) {
+      this.element.html(can.view(this.options.view, options.item));
+    },
+    ".select click": function (el, ev) {
+      var status = !this.options.item.active;
+      this.options.item.attr("active", status);
+    },
+    "{item} change": function (list, ev, which, type, status) {
+      this.element.toggleClass("active", status);
+    }
+  });
+
 
   can.Control("CMS.Controllers.MockupInfoPanel", {
     defaults: {
       view: "/static/mockups/base_templates/info_panel.mustache"
     }
   }, {
-    "{can.route} id": function () {
+    "{can.route} active": function () {
       // TODO: We need to render via item-id, not title ^_^
       this.element.html(can.view(this.options.view, this.options));
     }
