@@ -263,13 +263,19 @@
         }],
         mapped_objects: [{
           icon: "objective",
-          title: "090.7068 objective 1"
+          title: "090.7068 objective 1",
+          state: "Draft",
+          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
         }, {
           icon: "control",
-          title: "Access to the Private Network with expired Key v0906984"
+          title: "Access to the Private Network with expired Key v0906984",
+          state: "In Progress",
+          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
         }, {
           icon: "regulation",
-          title: "a regulation object"
+          title: "a regulation object",
+          state: "In Progress",
+          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
         }]
       }, {
         title: "Objectives",

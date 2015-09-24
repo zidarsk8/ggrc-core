@@ -126,6 +126,11 @@
     margin-bottom: 10px;
     @include clearfix();
   }
+  &.dates {
+    > li {
+      margin-bottom: 0;
+    }
+  }
   label {
     float: left;
     width: 40%;
