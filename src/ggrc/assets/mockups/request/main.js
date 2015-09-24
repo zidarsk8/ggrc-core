@@ -37,6 +37,16 @@
         type_r: "requester",
         type_v: "verifier",
         files: [{
+          icon: "zip",
+          date: "09/24/2015",
+          name: "Compressed_files.zip",
+          url: "https://github.com/Compressed_files.zip"
+        }, {
+          icon: "url",
+          date: "09/23/2015",
+          name: "https://github.com/",
+          url: "https://github.com/"
+        }, {
           icon: "",
           date: "09/22/2015",
           name: "simple_file.reg",
@@ -262,9 +272,17 @@
           title: "a regulation object"
         }]
       }, {
-        title: "Audits",
-        icon: "grcicon-audit-color",
-        template: "/request/audit.mustache"
+        title: "Objectives",
+        icon: "grcicon-objective-color",
+        template: "request/info.mustache"
+      }, {
+        title: "Controls",
+        icon: "grcicon-controls-color",
+        template: "request/info.mustache"
+      }, {
+        title: "Regulation",
+        icon: "grcicon-regulation-color",
+        template: "request/info.mustache"
       }
     ]
   });
