@@ -25,6 +25,8 @@
       };
       new CMS.Controllers.MockupNav(this.element.find(".internav"), options);
       new CMS.Controllers.MockupView(this.element.find(".inner-content"), options);
+      new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), options);
+
       this.element.find(".title-content").html(can.view(this.options.title_view, opts.object));
     },
     "{can.route} tab": function (router, ev, tab) {
@@ -55,12 +57,30 @@
         instance: new can.Model.Cacheable(view),
         scope: view.scope
       }));
+      if (view.children) {
+        new CMS.Controllers.MockupTreeView(this.element.find(".tree-view-wrapper"), view.children);
+      }
     }
   });
 
   can.Control("CMS.Controllers.MockupTreeView", {
+    defaults: {
+      view: "/static/mockups/base_templates/tree.mustache"
+    }
   }, {
     init: function (el, opts) {
+      this.element.html(can.view(this.options.view, this.options));
+    }
+  });
+
+  can.Control("CMS.Controllers.MockupInfoPanel", {
+    defaults: {
+      view: "/static/mockups/base_templates/info_panel.mustache"
+    }
+  }, {
+    "{can.route} id": function () {
+      // TODO: We need to render via item-id, not title ^_^
+      this.element.html(can.view(this.options.view, this.options));
     }
   });
 })(this.can, this.can.$);

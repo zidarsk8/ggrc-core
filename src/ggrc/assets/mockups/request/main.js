@@ -264,7 +264,35 @@
       }, {
         title: "Audits",
         icon: "grcicon-audit-color",
-        template: "/request/audit.mustache"
+        template: "/request/audit.mustache",
+        children: [{
+          title: "Some title",
+          children: [{
+            title: "Other title"
+          }, {
+            title: "YOLO"
+          }, {
+            title: "R U Talking to me"
+          }]
+        }, {
+          title: "Some title 2",
+          children: [{
+            title: "Other title 23"
+          }, {
+            title: "YOLO 23"
+          }, {
+            title: "R U Talking to me 24"
+          }]
+        }, {
+          title: "Some title 3",
+          children: [{
+            title: "Other title 33"
+          }, {
+            title: "YOLO 34"
+          }, {
+            title: "R U Talking to me 35"
+          }]
+        }]
       }
     ]
   });
