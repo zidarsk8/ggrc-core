@@ -375,3 +375,8 @@ mockup-js-template-files:
   - title.mustache
   - sample/sample.mustache
   - request/info.mustache
+  - request/audit.mustache
+  - base_templates/tree.mustache
+  - base_templates/tree_item.mustache
+  - base_templates/info_panel.mustache
+  - base_templates/filter.mustache

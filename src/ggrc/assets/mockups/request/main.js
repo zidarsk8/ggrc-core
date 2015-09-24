@@ -14,7 +14,7 @@
   }
 
   // Setup the object page:
-  var mockup = new CMS.Controllers.MockupHelper($('body'), {
+  var mockup = new CMS.Controllers.MockupHelper($("body"), {
     // Object:
     object: {
       icon: "grciconlarge-audit",
@@ -22,7 +22,6 @@
     },
     // Views:
     views: [{
-        // Example on how to use an existing template:
         title: "Info",
         icon: "grcicon-info",
         template: "/request/info.mustache",
@@ -40,7 +39,7 @@
       }, {
         title: "Audits",
         icon: "grcicon-audit-color",
-        template: "/base_objects/tree.mustache"
+        template: "/request/audit.mustache"
       }
     ]
   });

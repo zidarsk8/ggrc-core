@@ -29,7 +29,7 @@
     },
     initViews: function (views, el) {
       var inner_content = $(".inner-content");
-      _.forEach(views, function(view) {
+      _.forEach(views, function (view) {
         var placeholder = $("<div />"),
             viewInst = new CMS.Controllers.MockupView(placeholder, view);
         inner_content.append(placeholder);
@@ -37,7 +37,7 @@
       }.bind(this));
     },
     '.internav > li click': function (el, ev) {
-      _.forEach(this.options.object_views, function(view) {
+      _.forEach(this.options.object_views, function (view) {
         view.element.hide();
       });
       var href = el.find("a").attr("href").replace("#", "");
@@ -76,6 +76,17 @@
       this.element.show();
       this.tab.siblings().removeClass("active");
       this.tab.addClass("active");
+    }
+  });
+
+  can.Control("CMS.Controllers.MockupTreeView", {
+    defaults: {
+      title_view: GGRC.mustache_path + "/title.mustache",
+    }
+  }, {
+    init: function (el, opts) {
+      this.initTab(opts);
+      this.initContent(el, opts);
     }
   });
 })(this.can, this.can.$);
