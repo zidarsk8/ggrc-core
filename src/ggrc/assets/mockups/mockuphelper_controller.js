@@ -124,13 +124,22 @@
   }, {
     init: function (el, options) {
       this.element.html(can.view(this.options.view, options.item));
+      _.each(options.item.children, function (child) {
+        var $item = $("<li/>", {class: "tree-item"});
+        new CMS.Controllers.MockupTreeItem($item, {
+          item: child
+        });
+        this.element.find(".tree-structure").append($item);
+      }, this);
     },
     ".select click": function (el, ev) {
       var status = !this.options.item.active;
       this.options.item.attr("active", status);
     },
     "{item} change": function (list, ev, which, type, status) {
-      this.element.toggleClass("active", status);
+      if (which === "active") {
+        this.element.toggleClass("active", status);
+      }
     }
   });
 
