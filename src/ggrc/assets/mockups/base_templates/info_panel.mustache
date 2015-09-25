@@ -16,6 +16,8 @@
     {{> /static/mustache/base_objects/dropdown_menu.mustache}}
 
     <div class="tier-content">
+        <h2>{{title}} - {{type}}</h2>
+
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
         {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
         {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
