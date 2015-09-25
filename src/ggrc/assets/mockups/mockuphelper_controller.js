@@ -25,16 +25,23 @@
             views: views
           };
       new CMS.Controllers.MockupNav(this.element.find(".internav"), options);
-      new CMS.Controllers.MockupView(this.element.find(".inner-content"), options);
       new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), options);
 
       this.element.find(".title-content").html(can.view(this.options.title_view, opts.object));
+      this.options._views = this.options.views;
       this.options.views = views;
     },
     "{can.route} tab": function (router, ev, tab) {
       _.each(this.options.views, function (view) {
-        view.active = view.title === tab;
-      });
+        var isActive = view.title === tab;
+        view.attr("active", isActive);
+        if (isActive) {
+          new CMS.Controllers.MockupView(this.element.find(".inner-content"), {
+            view: view,
+            original: _.findWhere(this.options._views, {title: view.title})
+          });
+        }
+      }, this);
     }
   });
 
@@ -43,8 +50,13 @@
       view: "/static/mockups/base_templates/nav_item.mustache"
     }
   }, {
-    "{can.route} tab": function () {
-      this.element.html(can.view(this.options.view, this.options));
+    "{views} change": function (list, ev, which, type, status) {
+      which = which.split(".");
+      var index = +which[0],
+          prop = which[1];
+      if (prop === "active" && status) {
+        this.element.html(can.view(this.options.view, this.options));
+      }
     }
   });
 
@@ -53,11 +65,14 @@
       title_view: GGRC.mustache_path + "/title.mustache"
     }
   }, {
-    "{can.route} tab": function () {
-      var view = _.findWhere(this.options.views, {active: true});
-      this.element.html(can.view(GGRC.mustache_path + view.template));
-      if (view.children) {
-        new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), view);
+    init: function (el, options) {
+      this.element.html(can.view(GGRC.mustache_path + options.view.template, {
+        scope: options.view,
+        // TODO: Figure out why we cannot pass in Obesrvable into Model
+        instance: new can.Model.Cacheable(options.original)
+      }));
+      if (options.view.children) {
+        new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
       }
     }
   });
