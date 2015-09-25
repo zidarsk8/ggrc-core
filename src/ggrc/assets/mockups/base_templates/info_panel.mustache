@@ -5,65 +5,335 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-<section class="info">
-    <div class="clearfix">
-            {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-        <div class="tier-content">
-            {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-        </div>
-    </div>
+<section class="info" style="height: 242px !important;">
 
-    {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+  {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+  <a href="javascript://" class="btn btn-small btn-primary right-button">Complete</a>
+
+  <div class="clearfix">
+    <!-- COMMENTED TEMPORARY UNTIL PR IS MERGED INTO DEVELOP
+    {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+    -->
+
+    <div class="details-wrap pin">
+      <ul class="pin-action">
+        <li>
+          <a href="javascript://" data-size="deselect" class="close-pane"><i class="grcicon-x-grey" rel="tooltip" data-placement="left" title="Close info pane"></i></a>
+        </li>
+        <li>
+          <a href="javascript://" data-size="max" class="max"><i class="grcicon-maximize" rel="tooltip" data-placement="left" title="Maximize height"></i></a>
+        </li>
+        <li>
+          <a href="javascript://" data-size="normal" class="normal"><i class="grcicon-default" style="opacity:1.0" rel="tooltip" data-placement="left" title="Default height"></i></a>
+        </li>
+        <li>
+          <a href="javascript://" data-size="min" class="min"><i class="grcicon-minimize" rel="tooltip" data-placement="left" title="Minimize height"></i></a>
+        </li>
+      </ul><!-- pin-action end -->
+    </div><!-- details-wrap pin end -->
 
     <div class="tier-content">
-        <h2>{{title}} - {{type}}</h2>
+      <div class="row-fluid wrap-row">
+        <div class="span6">
+          <h6>Title</h6>
+          <h3>{{info_title}}</h3>
+        </div>
+        <div class="span6">
+          <h6>State</h6>
+          <span class="state-value state-{{state}}">{{state}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-        {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
-        {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
-        {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-        {{{render '/static/mustache/base_objects/urls.mustache' instance=instance}}}
+  <div class="tier-content">
+    <div class="row-fluid">
+      <div class="span9">
 
-      <div class="custom-attr-wrap">
-        <div class="row-fluid">
+        <div class="row-fluid wrap-row">
           <div class="span12">
-            <div class="info-expand">
-              <a class="show-hidden-fields info-show-hide" href="javascript://">
-                <span class="out">
-                  <i class="grcicon-arrow-right"></i>
-                  Show
-                </span>
-                <span class="in">
-                  <i class="grcicon-arrow-bottom"></i>
-                  Hide
-                </span>
-                Advanced
+            <h6>Description</h6>
+            <div class="rtf-block">
+              {{description}}
+            </div>
+          </div>
+        </div>
+
+        <div class="row-fluid wrap-row">
+          <h6>Evidence / Attachments</h6>
+          <div class="file-list-wrap">
+            <ul class="file-list">
+              {{#files}}
+                <li>
+                  <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                  <span class="date">{{date}}</span>
+                  {{name}}
+                  <a target="_blank" href="{{url}}"><i class="grcicon-external"></i></a>
+                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                </li>
+              {{/files}}
+            </ul>
+
+            <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Add evidence / URL</a>
+          </div>
+        </div>
+
+      </div>
+      <div class="span3">
+
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>State</h6>
+            <div class="side-content">
+              <span class="state-value state-inprogress">{{state}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>People</h6>
+            <div class="side-content">
+              <ul class="label-list">
+                <li>
+                  <label>
+                    <span class="person-label {{type_a}}"></span>
+                    Assignee
+                  </label>
+                  <ul>
+                    <li>
+                      <a href="javascript://">{{people_assignee}}</a>
+                      <a href="javascript://"><i class="grcicon-edit"></i></a>
+                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                    </li>
+                    <li>
+                      <a href="javascript://">{{people_assignee}}</a>
+                      <a href="javascript://"><i class="grcicon-edit"></i></a>
+                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                    </li>
+                    <li>
+                      <a href="javascript://">{{people_assignee}}</a>
+                      <a href="javascript://"><i class="grcicon-edit"></i></a>
+                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <label>
+                    <span class="person-label {{type_r}}"></span>
+                    Requester
+                  </label>
+                  <ul>
+                    <li>
+                      <a href="javascript://">{{people_requester}}</a>
+                      <a href="javascript://"><i class="grcicon-edit"></i></a>
+                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                    </li>
+                    <li>
+                      <a href="javascript://">{{people_requester}}</a>
+                      <a href="javascript://"><i class="grcicon-edit"></i></a>
+                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <label>
+                    <span class="person-label {{type_v}}"></span>
+                    Verifier
+                  </label>
+                  <ul>
+                    <li>
+                      <a href="javascript://">{{people_verifier}}</a>
+                      <a href="javascript://"><i class="grcicon-edit"></i></a>
+                      <a class="disabled" href="javascript://"><i class="grcicon-deleted"></i></a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Dates</h6>
+            <div class="side-content">
+              <ul class="label-list dates">
+                <li class="gray">
+                  <label>
+                    Created on
+                  </label>
+                  {{created_on}}
+                </li>
+                <li>
+                  <label>
+                    Due on
+                  </label>
+                  {{due_on}}
+                  <a href="javascript://"><i class="grcicon-edit"></i></a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Mapped objects</h6>
+            <div class="side-content">
+              <ul class="mapped-list">
+                {{#mapped_objects}}
+                  <li>
+                    <i class="grcicon-{{icon}}-color"></i>
+                    <span class="person-holder">
+                      <a href='mailto:{{email}}' target="_blank">
+                        <span class="person-tooltip-trigger" data-placement="top">
+                          {{title}}
+                        </span>
+                      </a>
+
+                      <div class="custom-popover-content">
+                        <div class="preview-container person-preview">
+                          <div class="row-fluid">
+                            <div class="span12">
+                              <div class="profile-info">
+                                <div class="row-fluid wrap-row">
+                                  <div class="span8">
+                                    <h6>Title</h6>
+                                    <h5 class="oneline"><i class="grcicon-{{icon}}-color"></i> {{title}}</h5>
+                                  </div>
+                                  <div class="span4">
+                                    <h6>Status</h6>
+                                    {{state}}
+                                  </div>
+                                </div>
+                                <div class="row-fluid wrap-row">
+                                  <div class="span12">
+                                    <h6>Description</h6>
+                                    {{description}}
+                                  </div>
+                                </div>
+
+                                {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </span>
+                  </li>
+                {{/mapped_objects}}
+              </ul>
+              <a class="btn btn-primary btn-small" href="javascript://">
+                Map objects to this Request
               </a>
             </div>
           </div>
-        </div><!-- row-fluid end -->
-        <div class="hidden-fields-area" style="display:none;">
-          <div class="row-fluid wrap-row">
-            <div class="span4">
-              <h6>Code</h6>
-              <p>
-                {{slug}}
-              </p>
-            </div>
-            <div class="span4">
-              <h6>Effective Date</h6>
-              <p>
-                {{localize_date start_date}}
-              </p>
-            </div>
-            <div class="span4">
-              <h6>Stop Date</h6>
-              <p>
-              {{localize_date end_date}}
-              </p>
-            </div>
-          </div><!-- row-fluid end -->
-        </div><!-- hidden-fields-area end -->
-      </div><!-- custom-attr-wrap end -->
-    </div><!-- tier-content end -->
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tabs-wrap">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab1" data-toggle="tab">
+          Comments and attachments (3)
+        </a></li>
+        <li><a href="#tab2" data-toggle="tab">
+          Request log
+        </a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane fade in active" id="tab1">
+          <ul class="entry-list">
+            <li class="tree-footer tree-item-add inner-tree-footer non-stick">
+              <a href="javascript://" class="btn btn-primary btn-mini section-create">
+                Add Comment
+              </a>
+            </li>
+            {{#comments}}
+              <li>
+                <span class="person-label {{type}}"></span>
+                <div class="w-status">
+                  <span class="entry-author">
+                    <a href="javascript://">{{author}}</a>
+                    added a comment - {{date}}
+                  </span>
+                  {{text}}
+                  {{#attachments}}
+                    <ul class="attachment-list">
+                      <li>
+                        <a href="{{url}}" target="_blank">
+                          <i class="grcicon-attach"></i>
+                          <span>{{title}}</span>
+                        </a>
+                        <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+                          <span class="result"></span>
+                          <i class="grcicon-deleted"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  {{/attachments}}
+                </div>
+              </li>
+            {{/comments}}
+          </ul>
+
+        </div>
+        <div class="tab-pane fade" id="tab2">
+          <ul class="entry-list">
+            {{#logs}}
+              <li>
+                <span class="person-label {{type}}"></span>
+                <div class="w-status">
+                  <span class="entry-author">
+                    <a href="javascript://">{{author}}</a>
+                    {{log_status}} - {{date}}
+                  </span>
+                  <div class="clearfix">
+                    <div class="third-col">
+                      <p class="instruction">Field</p>
+                      {{field}}
+                    </div>
+                    <div class="third-col">
+                      <p class="instruction">Original value</p>
+                      {{#original_value}}
+                        {{text}}
+                        {{#file_list}}
+                          <ul class="file-list">
+                            <li>
+                              <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                              {{file_name}}
+                            </li>
+                          </ul>
+                        {{/file_list}}
+                      {{/original_value}}
+                    </div>
+                    <div class="third-col">
+                      <p class="instruction">New value</p>
+                      {{#new_value}}
+                        {{text}}
+                        {{#file_list}}
+                          <ul class="file-list">
+                            <li>
+                              <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                              {{file_name}}
+                            </li>
+                          </ul>
+                        {{/file_list}}
+                      {{/new_value}}
+                    </div>
+                  </div>
+                </div>
+              </li>
+            {{/logs}}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- tier-content end -->
+
 </section>
