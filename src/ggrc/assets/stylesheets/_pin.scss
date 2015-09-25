@@ -6,7 +6,8 @@
  */
 
 // Pin content
-.pin-content {
+.pin-content,
+.info-pin {
   @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   position: fixed;
   bottom: 40px;
