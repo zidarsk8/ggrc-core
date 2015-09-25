@@ -361,7 +361,7 @@ class TestExportSingleObject(TestCase):
           continue
         try:
          field = field["display_name"] if type(field) is dict else field
-         res = self.export_csv(data(model.__name__, field))
+         res = self.export_csv(data(model.__name__, field.lower()))
          self.assertEqual(res.status_code, 200)
         except Exception as e:
           failed.add((model, attr, field))
