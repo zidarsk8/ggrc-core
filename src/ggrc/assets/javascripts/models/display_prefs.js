@@ -212,7 +212,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   }
 
   , setModalState : function (model_name, display_state) {
-    var path = "modals", hdr = this.getObject(path, MODAL_STATE), obj = {};
+    var path = null, hdr = this.getObject(path, MODAL_STATE), obj = {};
 
     if (!hdr) {
       hdr = this.makeObject(path, MODAL_STATE);
@@ -226,7 +226,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   }
 
   , getModalState : function (model_name) {
-    var value = this.getObject("modals", MODAL_STATE);
+    var value = this.getObject(null, MODAL_STATE);
 
     if (!value || !value[model_name]) {
       return null;
