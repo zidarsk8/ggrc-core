@@ -21,7 +21,10 @@ class ThreatActor(
   __tablename__ = 'threat_actors'
 
   _aliases = {
-      "contact": "Contact",
+      "contact": {
+          "display_name": "Contact",
+          "filter_by": "_filter_by_contact",
+      },
       "secondary_contact": None,
       "url": "Threat Actor URL",
   }
