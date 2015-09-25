@@ -74,18 +74,23 @@ can.Control("GGRC.Controllers.Modals", {
     if (content) {
       this.element.html(content);
     }
-    this.options.attr("$header", this.element.find(".modal-header"));
-    this.options.attr("$content", this.element.find(".modal-body"));
-    this.options.attr("$footer", this.element.find(".modal-footer"));
-    this.on();
-    this.fetch_all()
-      .then(this.proxy("apply_object_params"))
-      .then(this.proxy("serialize_form"))
-      .then(function() {
-        // If the modal is closed early, the element no longer exists
-        that.element && that.element.trigger('preload');
-      })
-      .then(this.proxy("autocomplete"));
+    CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
+      this.display_prefs = display_prefs;
+
+      this.options.attr("$header", this.element.find(".modal-header"));
+      this.options.attr("$content", this.element.find(".modal-body"));
+      this.options.attr("$footer", this.element.find(".modal-footer"));
+      this.on();
+      this.fetch_all()
+        .then(this.proxy("apply_object_params"))
+        .then(this.proxy("serialize_form"))
+        .then(function() {
+          // If the modal is closed early, the element no longer exists
+          that.element && that.element.trigger('preload');
+        })
+        .then(this.proxy("autocomplete"))
+        .then(this.restore_ui_status_from_storage());
+      }.bind(this));
   }
 
   , apply_object_params: function () {
@@ -286,7 +291,7 @@ can.Control("GGRC.Controllers.Modals", {
         hidable_tabs++;
     }
     //ui_array index is used as the tab_order, Add extra space for skipped numbers
-    var storable_ui = hidable_tabs + 10;
+    var storable_ui = hidable_tabs + 20;
     for (var i = 0; i < storable_ui; i++) {
       //When we start, all the ui elements are visible
       this.options.ui_array.push(0);
@@ -574,7 +579,35 @@ can.Control("GGRC.Controllers.Modals", {
     return false
   }
 
-  , save_ui_status : function(){}
+  , save_ui_status : function(){
+    var model_name = this.options.model.model_singular,
+        reset_visible = this.options.reset_visible ? this.options.reset_visible : false,
+        ui_array = this.options.ui_array ? this.options.ui_array : [],
+        display_state = {
+          reset_visible : reset_visible,
+          ui_array : ui_array
+        };
+
+    this.display_prefs.setModalState(model_name, display_state);
+    this.display_prefs.save();
+
+  }
+
+  , restore_ui_status_from_storage : function() {
+    var model_name = this.options.model.model_singular,
+        display_state = this.display_prefs.getModalState(model_name);
+
+    //set up reset_visible and ui_array
+    if (display_state !== null) {
+      if (display_state.reset_visible) {
+        this.options.reset_visible = display_state.reset_visible;
+      }
+      if (display_state.ui_array) {
+        this.options.ui_array = display_state.ui_array;
+      }
+    }
+    this.restore_ui_status();
+  }
 
   , restore_ui_status : function(){
     //walk through the ui_array, for the one values,
@@ -806,6 +839,7 @@ can.Control("GGRC.Controllers.Modals", {
         }
         delete that.disable_hide;
       });
+      this.save_ui_status();
       return ajd;
   }
 

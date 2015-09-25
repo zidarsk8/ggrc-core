@@ -24,6 +24,7 @@ var COLLAPSE = "collapse"
 , TREE_VIEW_HEADERS = "tree_view_headers"
 , TREE_VIEW = "tree_view"
 , CHILD_TREE_DISPLAY_LIST = "child_tree_display_list"
+, MODAL_STATE = "modal_state"
 , path = window.location.pathname.replace(/\./g, "/");
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
@@ -208,6 +209,30 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     }
 
     return value[model_name].display_list;
+  }
+
+  , setModalState : function (model_name, display_state) {
+    var path = "modals", hdr = this.getObject(path, MODAL_STATE), obj = {};
+
+    if (!hdr) {
+      hdr = this.makeObject(path, MODAL_STATE);
+    }
+
+    obj.display_state = display_state;
+    hdr.attr(model_name, obj);
+
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getModalState : function (model_name) {
+    var value = this.getObject("modals", MODAL_STATE);
+
+    if (!value || !value[model_name]) {
+      return null;
+    }
+
+    return value[model_name].display_state;
   }
 
   , setChildTreeDisplayList : function (model_name, display_list) {
