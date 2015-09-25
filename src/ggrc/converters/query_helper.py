@@ -124,6 +124,16 @@ class QueryHelper(object):
     self.clean_filters(expression.get("left"))
     self.clean_filters(expression.get("right"))
 
+  def expression_keys(self, exp):
+      op = exp["op"]["name"]
+      if op in ["AND", "OR"]:
+        return expression_keys(exp["left"]) | expression_keys(exp["right"])
+      left = exp.get("left", None)
+      if left is None:
+        return set()
+      else:
+        return set([left])
+
   def macro_expand_object_query(self, object_query):
     def expand_task_dates(exp):
       if type(exp) is not dict or "op" not in exp:
@@ -166,9 +176,10 @@ class QueryHelper(object):
     if object_query["object_name"] == "TaskGroupTask":
       filters = object_query.get("filters")
       if filters is not None:
-        keys = filters.get("keys", [])
+        exp = filters["expression"]
+        keys = self.expression_keys(exp)
         if "start" in keys or "end" in keys:
-          expand_task_dates(filters.get("expression"))
+          expand_task_dates(exp)
 
   def get_ids(self):
     """ get list of objects and their ids according to the query
