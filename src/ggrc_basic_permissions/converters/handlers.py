@@ -92,6 +92,13 @@ class WorkflowMemberColumnHandler(ObjectRoleColumnHandler):
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
+class AuditAuditorColumnHandler(ObjectRoleColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.role = Role.query.filter_by(name="Auditor").one()
+    super(self.__class__, self).__init__(row_converter, key, **options)
+
+
 class UserRoleColumnHandler(UserColumnHandler):
 
   _role_map = {
@@ -139,6 +146,7 @@ COLUMN_HANDLERS = {
     "program_owner": ProgramOwnerColumnHandler,
     "program_reader": ProgramReaderColumnHandler,
     "user_role": UserRoleColumnHandler,
+    "user_role:Auditor": AuditAuditorColumnHandler,
     "workflow_member": WorkflowMemberColumnHandler,
     "workflow_owner": WorkflowOwnerColumnHandler,
 }
