@@ -123,18 +123,40 @@
 
 .label-list {
   @extend %reset-list;
+  > li {
+    margin-bottom: 10px;
+    @include clearfix();
+  }
+  &.dates {
+    > li {
+      margin-bottom: 0;
+    }
+  }
   label {
-    display: inline-block;
-    width: 90px;
+    float: left;
+    width: 40%;
     text-transform: uppercase;
     font-size: 10px;
     line-height: 16px;
+    margin-top: 1px;
     .person-label {
       width: 16px;
       height: 16px;
       margin-right: 4px;
       line-height: 16px;
       font-size: 10px;
+    }
+  }
+  .disabled {
+    cursor: default;
+    @include opacity(.3);
+  }
+  ul {
+    @extend %reset-list;
+    float: left;
+    width: 60%;
+    li {
+      margin-bottom: 3px;
     }
   }
 }

@@ -37,6 +37,16 @@
         type_r: "requester",
         type_v: "verifier",
         files: [{
+          icon: "zip",
+          date: "09/24/2015",
+          name: "Compressed_files.zip",
+          url: "https://github.com/Compressed_files.zip"
+        }, {
+          icon: "url",
+          date: "09/23/2015",
+          name: "https://github.com/",
+          url: "https://github.com/"
+        }, {
           icon: "",
           date: "09/22/2015",
           name: "simple_file.reg",
@@ -253,13 +263,19 @@
         }],
         mapped_objects: [{
           icon: "objective",
-          title: "090.7068 objective 1"
+          title: "090.7068 objective 1",
+          state: "Draft",
+          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
         }, {
           icon: "control",
-          title: "Access to the Private Network with expired Key v0906984"
+          title: "Access to the Private Network with expired Key v0906984",
+          state: "In Progress",
+          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
         }, {
           icon: "regulation",
-          title: "a regulation object"
+          title: "a regulation object",
+          state: "In Progress",
+          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
         }]
       }, {
         title: "Audits",
