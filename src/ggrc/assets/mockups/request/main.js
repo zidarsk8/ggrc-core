@@ -284,6 +284,7 @@
         children: [{
           title: "Some title",
           type: "audit",
+          status: "Draft",
           id: "2",
           children: [{
             title: "Other title",
