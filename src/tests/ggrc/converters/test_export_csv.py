@@ -341,7 +341,6 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_query_all_aliases(self):
-    return # TODO re-enable
     data = lambda obj_type, field: [{
       "object_name": obj_type,
       "fields": "all",
