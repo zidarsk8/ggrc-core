@@ -15,22 +15,7 @@ def init_mockup_views():
   if settings.PRODUCTION:
     return
 
-  @app.route("/mockups/sample")
-  @login_required
-  def mockup_sample():
-    return render_template("mockups/sample.haml")
-
-  @app.route("/mockups/new_mockup")
-  @login_required
-  def mockup_sample2():
-    return render_template("mockups/base.haml")
-
   @app.route("/mockups/request")
   @login_required
   def mockup_request():
     return render_template("mockups/base.haml")
-
-  @app.route("/mockups/request-info-pane")
-  @login_required
-  def mockup_request_info_pane():
-    return render_template("mockups/base-widget-area.haml")
