@@ -367,13 +367,10 @@ mockup-js-files:
   # 3rd party
   # 3rd party end
   - mockuphelper_controller.js
-  - sample/main.js
   - request/main.js
-  - request-info-pane/main.js
 
 mockup-js-template-files:
   - title.mustache
-  - sample/sample.mustache
   - request/info.mustache
   - request/audit.mustache
   - base_templates/tree.mustache
