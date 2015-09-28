@@ -41,7 +41,7 @@ class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   _aliases = {
       "url": "Section URL",
       "description": "Text of Section",
-      "directive": None
+      "directive": "Policy / Regulation / Standard / Contract",
   }
 
 
