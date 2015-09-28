@@ -176,22 +176,22 @@ class TestComprehensiveSheets(TestCase):
     # general numbers check
     for name, data in expected.items():
       current = indexed[name]
-      self.assertEquals(current["rows"], data["rows"], name)
-      self.assertEquals(current["ignored"], data["ignored"], name)
-      self.assertEquals(current["created"], data["created"], name)
-      self.assertEquals(len(current["row_errors"]), data["row_errors"], name)
-      self.assertEquals(
+      self.assertEqual(current["rows"], data["rows"], name)
+      self.assertEqual(current["ignored"], data["ignored"], name)
+      self.assertEqual(current["created"], data["created"], name)
+      self.assertEqual(len(current["row_errors"]), data["row_errors"], name)
+      self.assertEqual(
           len(current["row_warnings"]), data["row_warnings"], name)
 
     prog = Program.query.filter_by(slug="prog-8").first()
     self.assertTrue(prog.private)
-    self.assertEquals(prog.title, "program 8")
-    self.assertEquals(prog.status, "Draft")
-    self.assertEquals(prog.description, "test")
+    self.assertEqual(prog.title, "program 8")
+    self.assertEqual(prog.status, "Draft")
+    self.assertEqual(prog.description, "test")
 
     custom_vals = [v.attribute_value for v in prog.custom_attribute_values]
     expected_custom_vals = ['0', 'a', '2015-12-12 00:00:00', 'test1']
-    self.assertEquals(set(custom_vals), set(expected_custom_vals))
+    self.assertEqual(set(custom_vals), set(expected_custom_vals))
 
   def test_full_good_import_no_warnings(self):
     filename = "full_good_import_no_warnings.csv"
@@ -200,12 +200,12 @@ class TestComprehensiveSheets(TestCase):
     response = self.import_file(filename, dry_run=True)
     for block in response:
       for message in messages:
-        self.assertEquals(set(), set(block[message]))
+        self.assertEqual(set(), set(block[message]))
 
     response = self.import_file(filename)
 
     for message in messages:  # response[0] = Person block
-      self.assertEquals(set(response[0][message]), set())
+      self.assertEqual(set(response[0][message]), set())
     ggrc_admin = db.session.query(Role.id).filter(Role.name == "gGRC Admin")
     reader = db.session.query(Role.id).filter(Role.name == "Reader")
     creator = db.session.query(Role.id).filter(Role.name == "Creator")
@@ -213,14 +213,14 @@ class TestComprehensiveSheets(TestCase):
     readers = UserRole.query.filter(UserRole.role_id == reader).all()
     creators = UserRole.query.filter(UserRole.role_id == creator).all()
     access_groups = db.session.query(AccessGroup).all()
-    self.assertEquals(len(ggrc_admins), 12)
-    self.assertEquals(len(readers), 5)
-    self.assertEquals(len(creators), 6)
-    self.assertEquals(len(access_groups), 10)
+    self.assertEqual(len(ggrc_admins), 12)
+    self.assertEqual(len(readers), 5)
+    self.assertEqual(len(creators), 6)
+    self.assertEqual(len(access_groups), 10)
 
     for block in response:
       for message in messages:
-        self.assertEquals(set(), set(block[message]))
+        self.assertEqual(set(), set(block[message]))
 
   def test_errors_and_warnings(self):
     """
@@ -241,13 +241,13 @@ class TestComprehensiveSheets(TestCase):
             ])
         }
     ]
-    self.assertEquals(dry_response, response)
+    self.assertEqual(dry_response, response)
 
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
     for message_block, response_block in zip(block_messages, response):
       for message in messages:
-        self.assertEquals(
+        self.assertEqual(
             message_block.get(message, set()),
             set(response_block[message])
         )
