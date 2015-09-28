@@ -318,16 +318,16 @@
           }]
         }]
       }, {
-        title: "Audits",
+        title: "Requests",
         icon: "grcicon-audit-color",
         template: "/request/audit.mustache",
         children: [{
-          title: "Some title",
+          title: "My new request",
           info_title: "My new request",
           description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae ante dapibus lacus dictum vestibulum. Nullam finibus semper convallis. Ut libero mauris, viverra nec augue eget, congue viverra felis. Aenean ut arcu vel tortor rhoncus dictum id vel urna. Sed a enim laoreet diam lacinia euismod.",
           state: "In Progress",
           type: "audit",
-          status: "Draft",
+          status: "In Progress",
           id: "2",
           files: [{
             icon: "zip",
@@ -632,14 +632,16 @@
             id: "12"
           }]
         }, {
-          title: "Some title 23",
+          title: "Simple Request for Programs",
           type: "issue",
           id: "3",
+          status: "Draft",
           children: []
         }, {
-          title: "Some title 5",
+          title: "Request made for Sections inspection",
           type: "audit",
           id: "5",
+          status: "Draft",
           children: [{
             title: "Other title",
             type: "process",
