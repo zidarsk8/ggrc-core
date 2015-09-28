@@ -40,6 +40,8 @@ handlers:
     secure: always
 
 libraries:
+  - name: MySQLdb
+    version: "latest"
   - name: jinja2
     version: "2.6"
 
