@@ -141,19 +141,26 @@ class StatusColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
-    valid_states = row_converter.object_class.VALID_STATES
-    self.state_mappings = {str(s).lower(): s for s in valid_states}
+    self.valid_states = row_converter.object_class.VALID_STATES
+    self.state_mappings = {str(s).lower(): s for s in self.valid_states}
     super(StatusColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
-    # TODO: check if mandatory and replace with default if it's wrong
     value = self.raw_value.lower()
     status = self.state_mappings.get(value)
     if status is None:
-      self.add_warning(errors.WRONG_REQUIRED_VALUE,
-                       value=value[:20],
-                       column_name=self.display_name)
-      status = self.get_default()
+      if self.mandatory:
+        if len(self.valid_states) > 0:
+          self.add_warning(errors.WRONG_REQUIRED_VALUE,
+                           value=value[:20],
+                           column_name=self.display_name)
+          status = self.valid_states[0]
+        else:
+          self.add_error(errors.MISSING_VALUE_ERROR,
+                         column_name=self.display_name)
+          return
+      elif value != "":
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
     return status
 
 
