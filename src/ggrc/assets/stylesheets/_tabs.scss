@@ -107,15 +107,28 @@
 			border-bottom: none;
 		}
 	}
+	.goto-link {
+		float: right;
+	}
 	.small-col {
 		float: left;
 		width: 10%;
-		&.goto-link {
-			text-align: right;
-		}
 	}
 	.medium-col {
 		float: left;
 		width: 35%;
+	}
+	.large-col {
+		float: left;
+		width: 55%;
+	}
+}
+
+.past-file-list {
+	@extend %reset-list;
+	label {
+		display: inline-block;
+		@extend %oneline;
+		width: 71%;
 	}
 }
