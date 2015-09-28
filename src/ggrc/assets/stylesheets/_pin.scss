@@ -19,6 +19,9 @@
   .info {
     @include box-shadow(none);
     padding: 15px 20px 20px 20px;
+    &.temp-class-to-manipulate-with {
+      margin-top: -15px;
+    }
     .small-info {
       i {
         @include opacity(.25);
@@ -194,5 +197,24 @@
       width: 77%;
       display: inline-block;
     }
+  }
+}
+
+.sticky-pane-header {
+  position: fixed;
+  left: 52px;
+  right: 52px;
+  height: 52px;
+  background: $white;
+  border-bottom: 1px solid $lightGray;
+  padding-top: 15px;
+  margin-bottom: 10px;
+  z-index: 9999;
+}
+
+
+.tier-content {
+  &.bottom-content {
+    margin-top: 77px;
   }
 }
