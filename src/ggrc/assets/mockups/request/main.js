@@ -578,8 +578,46 @@
               text: ""
             }]
           }],
-
-
+          past_requests: [{
+            date: "26/09/2015",
+            title: "My new request",
+            past_requests_files: [{
+              icon: "pdf",
+              file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+            }, {
+              icon: "pdf",
+              file_title: "MTV_aug_SIGNED_LoginAccess_List.pdf"
+            }, {
+              icon: "pdf",
+              file_title: "MTV_sep_SIGNED_LoginAccess_List.pdf"
+            }]
+          }, {
+            date: "20/09/2015",
+            title: "My new request",
+            past_requests_files: [{
+              icon: "pdf",
+              file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+            }, {
+              icon: "pdf",
+              file_title: "MTV_aug_SIGNED_LoginAccess_List.pdf"
+            }, {
+              icon: "pdf",
+              file_title: "MTV_sep_SIGNED_LoginAccess_List.pdf"
+            }]
+          }, {
+            date: "10/09/2015",
+            title: "My new request",
+            past_requests_files: [{
+              icon: "pdf",
+              file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+            }, {
+              icon: "pdf",
+              file_title: "MTV_aug_SIGNED_LoginAccess_List.pdf"
+            }, {
+              icon: "pdf",
+              file_title: "MTV_sep_SIGNED_LoginAccess_List.pdf"
+            }]
+          }],
           children: [{
             title: "Other title",
             type: "process",

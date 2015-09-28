@@ -222,6 +222,7 @@
                         </div>
                       </div>
                     </span>
+                    <a href="javascript://"><i class="grcicon-deleted"></i></a>
                   </li>
                 {{/mapped_objects}}
               </ul>
@@ -242,6 +243,9 @@
         </a></li>
         <li><a href="#tab2" data-toggle="tab">
           Request log
+        </a></li>
+        <li><a href="#tab3" data-toggle="tab">
+          Past requests
         </a></li>
       </ul>
 
@@ -280,8 +284,8 @@
               </li>
             {{/comments}}
           </ul>
-
         </div>
+
         <div class="tab-pane fade" id="tab2">
           <ul class="entry-list">
             {{#logs}}
@@ -331,6 +335,73 @@
             {{/logs}}
           </ul>
         </div>
+
+        <div class="tab-pane fade" id="tab3">
+          <ul class="past-items-list">
+            <li class="clearfix list-title">
+              <div class="small-col">
+                <h6>Date</h6>
+              </div>
+              <div class="medium-col">
+                <h6>Request title</h6>
+              </div>
+              <div class="medium-col">
+                <h6>Evidence</h6>
+              </div>
+              <div class="small-col">
+                <a href="javascript://" class="btn btn-small btn-full btn-primary">Reuse</a>
+              </div>
+              <div class="small-col">&nbsp;</div>
+            </li>
+            {{#past_requests}}
+              <li class="clearfix">
+                <div class="small-col">
+                  {{date}}
+                </div>
+                <div class="medium-col">
+                  {{title}}
+                </div>
+                <div class="medium-col">
+                  <ul class="file-list">
+                    {{#past_requests_files}}
+                      <li>
+                        <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                        {{file_title}}
+                      </li>
+                    {{/past_requests_files}}
+                  </ul>
+                </div>
+                <div class="small-col centered">
+                  <ul class="file-list">
+                    <li>
+                      <input type="checkbox">
+                    </li>
+                    <li>
+                      <input type="checkbox">
+                    </li>
+                    <li>
+                      <input type="checkbox">
+                    </li>
+                  </ul>
+                </div>
+                <div class="small-col goto-link">
+                  <ul class="file-list">
+                    <li>
+                      <a href="javascript://"><i class="grcicon-goto"></i></a>
+                    </li>
+                    <li>
+                      <a href="javascript://"><i class="grcicon-goto"></i></a>
+                    </li>
+                    <li>
+                      <a href="javascript://"><i class="grcicon-goto"></i></a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            {{/past_requests}}
+          </ul>
+        </div>
+
       </div>
     </div>
 
