@@ -214,3 +214,17 @@ class TestAutomappings(TestCase):
             (regulation, objective2),
         ]
     )
+
+  def test_mapping_nested_controls(self):
+    objective = self.create_object(Objective, {
+        'title': next('Test Objective')
+    })
+    controlP = self.create_object(Control, {'title': next('Test control')})
+    control1 = self.create_object(Control, {'title': next('Test control')})
+    control2 = self.create_object(Control, {'title': next('Test control')})
+    self.assert_mapping_implication(
+        to_create=[(objective, controlP),
+                   (controlP, control1),
+                   (controlP, control2)],
+        implied=[(objective, control1), (objective, control2)]
+    )
