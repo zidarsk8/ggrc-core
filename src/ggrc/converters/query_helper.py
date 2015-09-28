@@ -190,7 +190,7 @@ class QueryHelper(object):
     object_class = self.object_map[object_name]
 
     def autocast(o_key, value):
-      if type(o_key) is not str:
+      if type(o_key) not in [str, unicode]:
         return value
       key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
       # handle dates
@@ -263,6 +263,8 @@ class QueryHelper(object):
                                  l.ilike("%{}%".format(rhs()))),
           "!~": lambda: not_(with_left(
                              lambda l: l.ilike("%{}%".format(rhs())))),
+          "<": lambda: with_left(lambda l: l < rhs()),
+          ">": lambda: with_left(lambda l: l > rhs()),
           "relevant": relevant,
           "text_search": text_search
       }
