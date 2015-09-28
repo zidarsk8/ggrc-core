@@ -27,9 +27,10 @@
       #page-header
         -block header
 
-    .top-inner-nav
-      .object-nav
-        %ul.nav{ 'class': "internav" }
+    -block nav
+      .top-inner-nav
+        .object-nav
+          %ul.nav{ 'class': "internav" }
 
     %section.content
       .flash

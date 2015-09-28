@@ -37,9 +37,13 @@
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 
+    -block extra_templates
+
     -assets "dashboard-js"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
+
+    -block extra_assets
 
     :javascript
       GGRC.Tracker.timing("dashboard", "exec_scripts", Date.now() - st, "dashboard.js finished executing");
