@@ -96,7 +96,33 @@ class AuditAuditorColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role = Role.query.filter_by(name="Auditor").one()
+    self.reader = Role.query.filter_by(name="ProgramReader").one()
     super(self.__class__, self).__init__(row_converter, key, **options)
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    super(self.__class__, self).insert_object()
+    user_roles = set(map(lambda ur: ur.person_id, self.get_program_roles()))
+    context = self.row_converter.obj.program.context
+    for auditor in self.value:
+      # Check if the role already exists in the database or in the session:
+      if auditor.id in user_roles or any(o for o in db.session.new if
+                                         isinstance(o, UserRole) and
+                                         o.context.id == context.id and
+                                         o.person.id == auditor.id):
+        continue
+      user_role = UserRole(
+          role=self.reader,
+          context=context,
+          person=auditor
+      )
+      db.session.add(user_role)
+
+  def get_program_roles(self):
+    context_id = self.row_converter.obj.program.context.id
+    return db.session.query(UserRole).filter(
+        UserRole.context_id == context_id).all()
 
 
 class UserRoleColumnHandler(UserColumnHandler):
