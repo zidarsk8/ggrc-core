@@ -343,40 +343,20 @@
                   <div class="medium-col">
                     {{title}}
                   </div>
-                  <div class="medium-col">
-                    <ul class="file-list">
+                  <div class="large-col">
+                    <ul class="past-file-list">
                       {{#past_requests_files}}
                         <li>
-                          <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                          {{file_title}}
+                          <label>
+                            <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                            {{file_title}}
+                          </label>
+
+                          <input type="checkbox">
+
+                          <a class="goto-link" href="javascript://"><i class="grcicon-goto"></i></a>
                         </li>
                       {{/past_requests_files}}
-                    </ul>
-                  </div>
-                  <div class="small-col centered">
-                    <ul class="file-list">
-                      <li>
-                        <input type="checkbox">
-                      </li>
-                      <li>
-                        <input type="checkbox">
-                      </li>
-                      <li>
-                        <input type="checkbox">
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="small-col goto-link">
-                    <ul class="file-list">
-                      <li>
-                        <a href="javascript://"><i class="grcicon-goto"></i></a>
-                      </li>
-                      <li>
-                        <a href="javascript://"><i class="grcicon-goto"></i></a>
-                      </li>
-                      <li>
-                        <a href="javascript://"><i class="grcicon-goto"></i></a>
-                      </li>
                     </ul>
                   </div>
                 </li>
