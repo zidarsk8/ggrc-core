@@ -16,7 +16,8 @@
   can.Control("CMS.Controllers.MockupHelper", {
     defaults: {
       title_view: GGRC.mustache_path + "/title.mustache",
-      object_views: {}
+      object_views: {},
+      cached: null
     }
   }, {
     init: function (el, opts) {
@@ -36,7 +37,10 @@
         var isActive = view.title === tab;
         view.attr("active", isActive);
         if (isActive) {
-          new CMS.Controllers.MockupView(this.element.find(".inner-content"), {
+          if (this.cached) {
+            this.cached.destroy();
+          }
+          this.cached = new CMS.Controllers.MockupView(this.element.find(".inner-content"), {
             view: view
           });
         }
@@ -65,28 +69,30 @@
     }
   }, {
     init: function (el, options) {
-      this.element.html(can.view(GGRC.mustache_path + options.view.template, {
+      this.element.html(can.view(GGRC.mustache_path + options.view.template, _.extend(this.options, {
         instance: options.view
-      }));
+      })));
       if (options.view.children) {
         new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
       }
-    },
-    "{files} add": function () {
-      console.log("FILES ADDED", arguments);
     },
     ".js-trigger-reuse click": function (el, ev) {
       var view = this.options.view,
           checked = _.reduce(view.past_requests, function (val, memo) {
             return val.concat(_.filter(memo.past_requests_files, function (file) {
-              return file.checked;
+              var status = file.checked;
+              file.attr("checked", false);
+              return status;
             }));
           }, []);
+      this.element.find(".past-items-list .js-trigger-pastfile").prop("checked", false);
       view.files.push.apply(view.files, checked);
     },
     ".js-trigger-pastfile change": function (el, ev) {
-      var data = el.data("item");
-      data.attr("checked", el.prop("checked"));
+      var data = el.data("item"),
+          isChecked = el.prop("checked");
+
+      data.attr("checked", isChecked);
     }
   });
 
@@ -175,7 +181,7 @@
 
       el.find("i").css("opacity", 1).closest("li").siblings().find("i").css("opacity", 0.25);
       this.element
-        .show()
+        .show().height(0)
         .animate({
           height: heights[size]
         }, {
@@ -188,6 +194,9 @@
             }
           }.bind(this)
         });
+    },
+    "{can.route} tab": function (router, ev, tab) {
+      this.element.hide();
     },
     "{can.route} item": function (router, ev, item) {
       // TODO: Simplify this
