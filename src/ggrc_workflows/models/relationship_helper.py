@@ -27,6 +27,21 @@ def tg_task(object_type, related_type, related_ids):
         TaskGroupTask.task_group_id.in_(related_ids))
 
 
+def task_tgo(object_type, related_type, related_ids):
+  """ relationships between Tasks and Task Group Objects """
+
+  if related_type == "TaskGroupTask":
+    return db.session.query(TaskGroupObject.object_id) \
+        .filter(TaskGroupObject.object_type == object_type) \
+        .join(TaskGroup, TaskGroupTask) \
+        .filter(TaskGroupTask.id.in_(related_ids))
+  else:
+    return db.session.query(TaskGroupTask.id) \
+        .join(TaskGroup, TaskGroupObject) \
+        .filter((TaskGroupObject.object_type == related_type) &
+                (TaskGroupObject.object_id.in_(related_ids)))
+
+
 def tg_tgo(object_type, related_type, related_ids):
   """ relationships between TaskGroups and objects via Task Group Object """
 
@@ -158,7 +173,8 @@ _function_map = {
 # add mappings for cycle tasks and cycle task objects
 for wot in WORKFLOW_OBJECT_TYPES:
   for f, obj in [(ctgot_wot, "CycleTaskGroupObjectTask"),
-                 (tg_tgo, "TaskGroup")]:
+                 (tg_tgo, "TaskGroup"),
+                 (task_tgo, "TaskGroupTask")]:
     key = tuple(sorted([obj, wot]))
     _function_map[key] = f
 
