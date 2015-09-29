@@ -19,7 +19,6 @@ _column_handlers = {
     "delete": handlers.DeleteColumnHandler,
     "description": handlers.TextareaColumnHandler,
     "design": handlers.OptionColumnHandler,
-    "directive": handlers.SectionDirectiveColumnHandler,
     "due_on": handlers.DateColumnHandler,
     "email": handlers.EmailColumnHandler,
     "end_date": handlers.DateColumnHandler,

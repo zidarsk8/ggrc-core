@@ -16,6 +16,7 @@ from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.track_object_state import track_state_for_class
 from ggrc.models.track_object_state import HasObjectState
 
@@ -39,9 +40,12 @@ class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   _table_plural = 'sections'
   _title_uniqueness = False
   _aliases = {
-      "url": "Section URL",
-      "description": "Text of Section",
-      "directive": "Policy / Regulation / Standard / Contract",
+    "url": "Section URL",
+    "description": "Text of Section",
+    "directive": {
+      "display_name": "Policy / Regulation / Standard / Contract",
+      "type": AttributeInfo.Type.MAPPING
+    }
   }
 
 
