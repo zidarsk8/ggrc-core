@@ -127,9 +127,13 @@
 
 .past-file-list {
 	@extend %reset-list;
+	width: 65%;
 	label {
 		display: inline-block;
 		@extend %oneline;
-		width: 62%;
+		width: 85%;
+	}
+	input[type="checkbox"] {
+		float: right;
 	}
 }
