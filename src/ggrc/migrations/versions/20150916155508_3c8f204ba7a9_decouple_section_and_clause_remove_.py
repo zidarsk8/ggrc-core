@@ -2,14 +2,14 @@
 """Decouple section and clause, remove directive foreign key, remove type
 
 Revision ID: 3c8f204ba7a9
-Revises: 2d8a46b1e4a4
+Revises: 29dca3ce0556
 Create Date: 2015-09-16 15:55:08.889667
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '3c8f204ba7a9'
-down_revision = '2d8a46b1e4a4'
+down_revision = '29dca3ce0556'
 
 from alembic import op
 import sqlalchemy as sa
