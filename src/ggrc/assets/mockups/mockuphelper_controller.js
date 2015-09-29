@@ -16,32 +16,35 @@
   can.Control("CMS.Controllers.MockupHelper", {
     defaults: {
       title_view: GGRC.mustache_path + "/title.mustache",
-      object_views: {}
+      object_views: {},
+      cached: null
     }
   }, {
     init: function (el, opts) {
-      var views = new can.List(this.options.views),
+      var views = new can.Map(_.map(opts.views, function (view) {
+            return new can.Model.Cacheable(view);
+          })),
           options = {
             views: views
           };
       new CMS.Controllers.MockupNav(this.element.find(".internav"), options);
       new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), options);
-
       this.element.find(".title-content").html(can.view(this.options.title_view, opts.object));
-      this.options._views = this.options.views;
       this.options.views = views;
     },
     "{can.route} tab": function (router, ev, tab) {
-      _.each(this.options.views, function (view) {
+      this.options.views.each(function (view) {
         var isActive = view.title === tab;
         view.attr("active", isActive);
         if (isActive) {
-          new CMS.Controllers.MockupView(this.element.find(".inner-content"), {
-            view: view,
-            original: _.findWhere(this.options._views, {title: view.title})
+          if (this.cached) {
+            this.cached.destroy();
+          }
+          this.cached = new CMS.Controllers.MockupView(this.element.find(".inner-content"), {
+            view: view
           });
         }
-      }, this);
+      }.bind(this));
     }
   });
 
@@ -66,14 +69,30 @@
     }
   }, {
     init: function (el, options) {
-      this.element.html(can.view(GGRC.mustache_path + options.view.template, {
-        scope: options.view,
-        // TODO: Figure out why we cannot pass in Obesrvable into Model
-        instance: new can.Model.Cacheable(options.original)
-      }));
+      this.element.html(can.view(GGRC.mustache_path + options.view.template, _.extend(this.options, {
+        instance: options.view
+      })));
       if (options.view.children) {
         new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
       }
+    },
+    ".js-trigger-reuse click": function (el, ev) {
+      var view = this.options.view,
+          checked = _.reduce(view.past_requests, function (val, memo) {
+            return val.concat(_.filter(memo.past_requests_files, function (file) {
+              var status = file.checked;
+              file.attr("checked", false);
+              return status;
+            }));
+          }, []);
+      this.element.find(".past-items-list .js-trigger-pastfile").prop("checked", false);
+      view.files.push.apply(view.files, checked);
+    },
+    ".js-trigger-pastfile change": function (el, ev) {
+      var data = el.data("item"),
+          isChecked = el.prop("checked");
+
+      data.attr("checked", isChecked);
     }
   });
 
@@ -162,7 +181,7 @@
 
       el.find("i").css("opacity", 1).closest("li").siblings().find("i").css("opacity", 0.25);
       this.element
-        .show()
+        .show().height(0)
         .animate({
           height: heights[size]
         }, {
@@ -175,6 +194,9 @@
             }
           }.bind(this)
         });
+    },
+    "{can.route} tab": function (router, ev, tab) {
+      this.element.hide();
     },
     "{can.route} item": function (router, ev, item) {
       // TODO: Simplify this

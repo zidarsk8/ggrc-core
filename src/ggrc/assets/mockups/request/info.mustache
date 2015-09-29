@@ -331,7 +331,7 @@
                   <h6>Evidence</h6>
                 </div>
                 <div class="small-col">
-                  <a href="javascript://" class="btn btn-small btn-full btn-primary">Reuse</a>
+                  <a href="javascript://" class="btn btn-small btn-full btn-primary js-trigger-reuse">Reuse</a>
                 </div>
                 <div class="small-col">&nbsp;</div>
               </li>
@@ -349,12 +349,10 @@
                         <li>
                           <label>
                             <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                            {{file_title}}
+                            {{name}}
                           </label>
-
-                          <input type="checkbox">
-
-                          <a class="goto-link" href="javascript://"><i class="grcicon-goto"></i></a>
+                          <input type="checkbox" class="js-trigger-pastfile" {{{data "item"}}} />
+                          <a class="goto-link" href="{{#if url}}{{url}}{{else}}javascript://{{/if}}"><i class="grcicon-goto"></i></a>
                         </li>
                       {{/past_requests_files}}
                     </ul>
