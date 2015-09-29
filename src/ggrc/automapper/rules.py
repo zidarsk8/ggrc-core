@@ -156,4 +156,11 @@ rules = RuleSet(count_limit=10000, rule_list=[
         {'Objective'},
         {'Objective', 'Control'},
     ),
+
+    Rule(
+        'mapping nested controls',
+        {'Objective'},
+        {'Control'},
+        {'Control'},
+    ),
 ])
