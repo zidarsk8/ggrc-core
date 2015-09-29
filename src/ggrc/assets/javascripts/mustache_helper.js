@@ -21,8 +21,8 @@ $.ajaxPrefilter(function ( options, originalOptions, jqXHR ) {
 
 function get_template_path(url) {
   var match;
-  match = url.match(/\/static\/mustache\/(.*)\.mustache/);
-  return match && match[1];
+  match = url.match(/\/static\/(mustache|mockups)\/(.*)\.mustache/);
+  return match && match[2];
 }
 
 // Check if the template is available in "GGRC.Templates", and if so,
@@ -31,7 +31,6 @@ function get_template_path(url) {
 $.ajaxTransport("text", function (options, _originalOptions, _jqXHR) {
   var template_path = get_template_path(options.url),
       template = template_path && GGRC.Templates[template_path];
-
   if (template) {
     return {
       send: function (headers, completeCallback) {

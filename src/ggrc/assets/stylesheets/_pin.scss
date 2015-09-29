@@ -1,12 +1,13 @@
 /*
  * Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: brad@reciprocitylabs.com
- * Maintained By: brad@reciprocitylabs.com
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
  */
 
 // Pin content
-.pin-content {
+.pin-content,
+.info-pin {
   @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   position: fixed;
   bottom: 40px;
@@ -55,11 +56,9 @@
 
 .pin-action {
   @extend %reset-list;
-  @include clearfix();
-  margin-bottom: 20px;
   li {
-    float: left;
-    margin-left: 5px;
+    display: block;
+    margin-bottom: 2px;
     a {
       i {
         @include opacity(.25);
@@ -70,9 +69,6 @@
           @include opacity(1);
         }
       }
-    }
-    &:first-child {
-      margin-left: 0;
     }
   }
 }
@@ -112,6 +108,91 @@
     margin-right: 10px;
     &:last-child {
       margin-right: 0;
+    }
+  }
+}
+
+.side-content {
+  margin-left: 20px;
+}
+
+.label-list {
+  @extend %reset-list;
+  > li {
+    margin-bottom: 10px;
+    @include clearfix();
+  }
+  &.dates {
+    > li {
+      margin-bottom: 0;
+    }
+  }
+  label {
+    float: left;
+    width: 40%;
+    text-transform: uppercase;
+    font-size: 10px;
+    line-height: 16px;
+    margin-top: 1px;
+    .person-label {
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+      line-height: 16px;
+      font-size: 10px;
+    }
+  }
+  .disabled {
+    cursor: default;
+    @include opacity(.3);
+  }
+  ul {
+    @extend %reset-list;
+    float: left;
+    width: 60%;
+    li {
+      margin-bottom: 3px;
+    }
+  }
+}
+
+.right-button {
+  float: right;
+  margin-top: -4px;
+}
+
+.file-list-wrap {
+  margin: 5px 0 0 12px;
+}
+
+.file-list {
+  @extend %reset-list;
+  font-size: 16px;
+  .date {
+    color: $gray;
+    font-size: 11px;
+    font-style: italic;
+    display: inline-block;
+    margin-right: 4px;
+    line-height: 18px;
+    vertical-align: top;
+  }
+  li {
+    margin-bottom: 10px;
+    .entry-list & {
+      @extend %oneline;
+    }
+  }
+}
+
+.mapped-list {
+  @extend %reset-list;
+  li {
+    margin-bottom: 5px;
+    .person-holder {
+      @extend %oneline;
+      width: 77%;
+      display: inline-block;
     }
   }
 }
