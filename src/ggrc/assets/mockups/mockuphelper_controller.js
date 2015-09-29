@@ -69,9 +69,9 @@
     }
   }, {
     init: function (el, options) {
-      this.element.html(can.view(GGRC.mustache_path + options.view.template, {
+      this.element.html(can.view(GGRC.mustache_path + options.view.template, _.extend(this.options, {
         instance: options.view
-      }));
+      })));
       if (options.view.children) {
         new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
       }
@@ -80,14 +80,19 @@
       var view = this.options.view,
           checked = _.reduce(view.past_requests, function (val, memo) {
             return val.concat(_.filter(memo.past_requests_files, function (file) {
-              return file.checked;
+              var status = file.checked;
+              file.attr("checked", false);
+              return status;
             }));
           }, []);
+      this.element.find(".past-items-list .js-trigger-pastfile").prop("checked", false);
       view.files.push.apply(view.files, checked);
     },
     ".js-trigger-pastfile change": function (el, ev) {
-      var data = el.data("item");
-      data.attr("checked", el.prop("checked"));
+      var data = el.data("item"),
+          isChecked = el.prop("checked");
+
+      data.attr("checked", isChecked);
     }
   });
 
