@@ -5,11 +5,11 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-{{#views}}
+{{#each views}}
 <li {{#active}}class="active"{{/active}}>
     <a href="#{{title}}">
         <i class="{{icon}}"></i>
         {{title}}
     </a>
 </li>
-{{/views}}
+{{/each}}

@@ -282,39 +282,57 @@
           title: "My new request",
           past_requests_files: [{
             icon: "pdf",
-            file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+            name: "MTV_001_SIGNED_LoginAccess_List.pdf",
+            date: "10/09/2015",
+            url: "http://www.happy-day.com"
           }, {
             icon: "pdf",
-            file_title: "MTV_aug_SIGNED_LoginAccess_List.pdf"
+            name: "MTV_aug_SIGNED_LoginAccess_List.pdf",
+            date: "10/09/2015",
+            url: "http://www.happy-day.com"
           }, {
             icon: "pdf",
-            file_title: "MTV_sep_SIGNED_LoginAccess_List.pdf"
+            name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
+            date: "10/09/2015",
+            url: "http://www.happy-day.com"
           }]
         }, {
           date: "20/09/2015",
           title: "My new request",
           past_requests_files: [{
             icon: "pdf",
-            file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+            name: "MTV_001_SIGNED_LoginAccess_List.pdf",
+            date: "10/09/2015",
+            url: "http://www.happy-day.com"
           }, {
             icon: "pdf",
-            file_title: "MTV_aug_SIGNED_LoginAccess_List.pdf"
+            name: "MTV_aug_SIGNED_LoginAccess_List.pdf",
+            date: "10/09/2015",
+            url: "http://www.happy-day.com"
           }, {
             icon: "pdf",
-            file_title: "MTV_sep_SIGNED_LoginAccess_List.pdf"
+            name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
+            date: "10/09/2015",
+            url: "http://www.happy-day.com"
           }]
         }, {
           date: "10/09/2015",
           title: "My new request",
           past_requests_files: [{
             icon: "pdf",
-            file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+            name: "MTV_001_SIGNED_LoginAccess_List.pdf",
+            date: "10/09/2015",
+            url: "http://www.happy-day.com"
           }, {
             icon: "pdf",
-            file_title: "MTV_aug_SIGNED_LoginAccess_List.pdf"
+            name: "MTV_aug_SIGNED_LoginAccess_List.pdf",
+            date: "10/09/2015",
+            url: "http://www.happy-day.com"
           }, {
             icon: "pdf",
-            file_title: "MTV_sep_SIGNED_LoginAccess_List.pdf"
+            name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
+            date: "10/09/2015",
+            url: "http://www.happy-day.com"
           }]
         }]
       }, {
@@ -583,39 +601,57 @@
             title: "My new request",
             past_requests_files: [{
               icon: "pdf",
-              file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+              name: "MTV_001_SIGNED_LoginAccess_List.pdf",
+              date: "26/09/2015",
+              url: "http://www.this-is-great.com"
             }, {
               icon: "pdf",
-              file_title: "MTV_aug_SIGNED_LoginAccess_List.pdf"
+              name: "MTV_aug_SIGNED_LoginAccess_List.pdf",
+              date: "26/09/2015",
+              url: "http://www.this-is-great.com"
             }, {
               icon: "pdf",
-              file_title: "MTV_sep_SIGNED_LoginAccess_List.pdf"
+              name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
+              date: "26/09/2015",
+              url: "http://www.this-is-great.com"
             }]
           }, {
             date: "20/09/2015",
             title: "My new request",
             past_requests_files: [{
               icon: "pdf",
-              file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+              name: "MTV_001_SIGNED_LoginAccess_List.pdf",
+              date: "26/09/2015",
+              url: "http://www.this-is-great.com"
             }, {
               icon: "pdf",
-              file_title: "MTV_aug_SIGNED_LoginAccess_List.pdf"
+              name: "MTV_aug_SIGNED_LoginAccess_List.pdf",
+              date: "26/09/2015",
+              url: "http://www.this-is-great.com"
             }, {
               icon: "pdf",
-              file_title: "MTV_sep_SIGNED_LoginAccess_List.pdf"
+              name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
+              date: "26/09/2015",
+              url: "http://www.this-is-great.com"
             }]
           }, {
             date: "10/09/2015",
             title: "My new request",
             past_requests_files: [{
               icon: "pdf",
-              file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+              name: "MTV_001_SIGNED_LoginAccess_List.pdf",
+              date: "26/09/2015",
+              url: "http://www.this-is-great.com"
             }, {
               icon: "pdf",
-              file_title: "MTV_aug_SIGNED_LoginAccess_List.pdf"
+              name: "MTV_aug_SIGNED_LoginAccess_List.pdf",
+              date: "26/09/2015",
+              url: "http://www.this-is-great.com"
             }, {
               icon: "pdf",
-              file_title: "MTV_sep_SIGNED_LoginAccess_List.pdf"
+              name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
+              date: "26/09/2015",
+              url: "http://www.this-is-great.com"
             }]
           }],
           children: [{
