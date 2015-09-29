@@ -72,9 +72,6 @@
         new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
       }
     },
-    "{files} add": function () {
-      console.log("FILES ADDED", arguments);
-    },
     ".js-trigger-reuse click": function (el, ev) {
       var view = this.options.view,
           checked = _.reduce(view.past_requests, function (val, memo) {
