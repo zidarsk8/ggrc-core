@@ -23,6 +23,7 @@ from ggrc.models.mixins import (
 from ggrc.models.reflection import PublishOnly
 from ggrc_gdrive_integration.models.object_folder import Folderable
 from ggrc_workflows.models.cycle import Cycle
+from ggrc_workflows.models.workflow_person import WorkflowPerson
 from ggrc_basic_permissions.models import UserRole
 
 
@@ -145,7 +146,6 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
 
   @classmethod
   def _filter_by_no_access(cls, predicate):
-    from ggrc_workflows.models import WorkflowPerson
     is_no_access = not_(UserRole.query.filter(
         (UserRole.person_id == Person.id) &
         (UserRole.context_id == cls.context_id)
