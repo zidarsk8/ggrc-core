@@ -279,7 +279,7 @@
         }],
         past_requests: [{
           date: "26/09/2015",
-          title: "My new request",
+          title: "My new request lorem ipsum dolor sit amet consectetur adipiscing elit morbi et turpis et arcu viverra posuere in et sapien",
           past_requests_files: [{
             icon: "pdf",
             file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"
@@ -580,7 +580,7 @@
           }],
           past_requests: [{
             date: "26/09/2015",
-            title: "My new request",
+            title: "My new request lorem ipsum dolor sit amet consectetur adipiscing elit morbi et turpis et arcu viverra posuere in et sapien",
             past_requests_files: [{
               icon: "pdf",
               file_title: "MTV_001_SIGNED_LoginAccess_List.pdf"

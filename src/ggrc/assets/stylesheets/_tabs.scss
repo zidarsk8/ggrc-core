@@ -107,19 +107,20 @@
 			border-bottom: none;
 		}
 	}
-	.goto-link {
-		float: right;
-	}
 	.small-col {
-		float: left;
+		@extend %tab-col-general;
 		width: 10%;
 	}
 	.medium-col {
-		float: left;
+		@extend %tab-col-general;
 		width: 35%;
 	}
+	.xmedium-col {
+		@extend %tab-col-general;
+		width: 30%;
+	}
 	.large-col {
-		float: left;
+		@extend %tab-col-general;
 		width: 55%;
 	}
 }
@@ -129,6 +130,6 @@
 	label {
 		display: inline-block;
 		@extend %oneline;
-		width: 71%;
+		width: 62%;
 	}
 }

@@ -7,47 +7,86 @@
 
 <section class="info sticky-info-panel" style="height: 242px !important;">
 
-  <div class="sticky-pane-header">
-    {{> /static/mustache/base_objects/dropdown_menu.mustache}}
-    <a href="javascript://" class="btn btn-small btn-primary right-button">Complete</a>
+  <div class="details-wrap pin">
+    <ul class="pin-action">
+      <li>
+        <a href="javascript://" data-size="deselect" class="close-pane"><i class="grcicon-x-grey" rel="tooltip" data-placement="left" title="Close info pane"></i></a>
+      </li>
+      <li>
+        <a href="javascript://" data-size="max" class="max"><i class="grcicon-maximize" rel="tooltip" data-placement="left" title="Maximize height"></i></a>
+      </li>
+      <li>
+        <a href="javascript://" data-size="normal" class="normal"><i class="grcicon-default" style="opacity:1.0" rel="tooltip" data-placement="left" title="Default height"></i></a>
+      </li>
+      <li>
+        <a href="javascript://" data-size="min" class="min"><i class="grcicon-minimize" rel="tooltip" data-placement="left" title="Minimize height"></i></a>
+      </li>
+    </ul><!-- pin-action end -->
+  </div><!-- details-wrap pin end -->
 
-    <div class="clearfix">
-      <div class="details-wrap pin">
-        <ul class="pin-action">
-          <li>
-            <a href="javascript://" data-size="deselect" class="close-pane"><i class="grcicon-x-grey" rel="tooltip" data-placement="left" title="Close info pane"></i></a>
-          </li>
-          <li>
-            <a href="javascript://" data-size="max" class="max"><i class="grcicon-maximize" rel="tooltip" data-placement="left" title="Maximize height"></i></a>
-          </li>
-          <li>
-            <a href="javascript://" data-size="normal" class="normal"><i class="grcicon-default" style="opacity:1.0" rel="tooltip" data-placement="left" title="Default height"></i></a>
-          </li>
-          <li>
-            <a href="javascript://" data-size="min" class="min"><i class="grcicon-minimize" rel="tooltip" data-placement="left" title="Minimize height"></i></a>
-          </li>
-        </ul><!-- pin-action end -->
-      </div><!-- details-wrap pin end -->
+  <div class="pane-header">
+    <div class="row-fluid wrap-row">
+      <div class="span8">
+        <h6>Title</h6>
+        <h3>{{info_title}}</h3>
+      </div>
+      <div class="span4">
+        <div class="info-pane-utility">
 
-      <div class="tier-content">
-        <div class="row-fluid wrap-row">
-          <div class="span6">
-            <h6>Title</h6>
-            <h3>{{info_title}}</h3>
+          <div class="details-wrap">
+            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+              {{#is_allowed 'update' instance context='for'}}
+                {{> /static/mustache/base_objects/edit_object_link.mustache}}
+              {{/is_allowed}}
+              <li>
+                <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+              </li>
+
+              {{#is_info_pin}}
+                {{#is_allowed_to_map page_instance instance}}
+                  {{^options.is_in_selector}}
+                    {{> /static/mustache/base_objects/unmap.mustache}}
+
+                  {{/options}}
+                {{/is_allowed_to_map}}
+                {{#if instance.viewLink}}
+                  {{#is_allowed "view_object_page" instance}}
+                    <li>
+                      <a href="{{instance.viewLink}}">
+                        <i class="grcicon-goto"></i>
+                        View {{instance.class.title_singular}}
+                      </a>
+                    </li>
+                  {{/is_allowed}}
+                {{/if}}
+              {{/is_info_pin}}
+
+              {{#is_allowed 'delete' instance}}
+                <li>
+                  <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                    <i class="grcicon-deleted"></i>
+                    Delete
+                  </a>
+                </li>
+              {{/is_allowed}}
+
+            </ul>
           </div>
-          <div class="span6">
-            <h6>State</h6>
-            <span class="state-value state-{{state}}">{{state}}</span>
-          </div>
+
+          <a href="javascript://" class="btn btn-small btn-primary pull-right">Complete</a>
         </div>
       </div>
     </div>
-
   </div>
 
-  <div class="tier-content bottom-content">
+  <div class="tier-content">
     <div class="row-fluid">
-      <div class="span9">
+      <div class="span8">
 
         <div class="row-fluid wrap-row">
           <div class="span12">
@@ -67,8 +106,10 @@
                   <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                   <span class="date">{{date}}</span>
                   {{name}}
-                  <a target="_blank" href="{{url}}"><i class="grcicon-external"></i></a>
-                  <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                  <span class="file-controls">
+                    <a target="_blank" href="{{url}}"><i class="grcicon-external"></i></a>
+                    <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                  </span>
                 </li>
               {{/files}}
             </ul>
@@ -78,7 +119,7 @@
         </div>
 
       </div>
-      <div class="span3">
+      <div class="span4">
 
         <div class="row-fluid wrap-row">
           <div class="span12">
@@ -221,12 +262,12 @@
                         </div>
                       </div>
                     </span>
-                    <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                    <a class="delete-mapped-object" href="javascript://"><i class="grcicon-deleted"></i></a>
                   </li>
                 {{/mapped_objects}}
               </ul>
-              <a class="btn btn-primary btn-small" href="javascript://">
-                Map objects to this Request
+              <a class="btn btn-draft btn-small" href="javascript://">
+                Map objects
               </a>
             </div>
           </div>
@@ -252,7 +293,7 @@
         <div class="tab-pane fade in active" id="tab1">
           <ul class="entry-list">
             <li class="tree-footer tree-item-add inner-tree-footer non-stick">
-              <a href="javascript://" class="btn btn-primary btn-mini section-create">
+              <a href="javascript://" class="btn btn-draft btn-mini section-create">
                 Add Comment
               </a>
             </li>
@@ -344,11 +385,11 @@
               <div class="medium-col">
                 <h6>Request title</h6>
               </div>
-              <div class="medium-col">
+              <div class="xmedium-col">
                 <h6>Evidence</h6>
               </div>
               <div class="small-col">
-                <a href="javascript://" class="btn btn-small btn-full btn-primary">Reuse</a>
+                <a href="javascript://" class="btn btn-small btn-full btn-draft">Reuse</a>
               </div>
               <div class="small-col">&nbsp;</div>
             </li>
@@ -358,7 +399,9 @@
                   {{date}}
                 </div>
                 <div class="medium-col">
-                  {{title}}
+                  <a target="_blank" href="javascript://">
+                    {{title}}
+                  </a>
                 </div>
                 <div class="large-col">
                   <ul class="past-file-list">
@@ -368,10 +411,7 @@
                           <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                           {{file_title}}
                         </label>
-
                         <input type="checkbox">
-
-                        <a class="goto-link" href="javascript://"><i class="grcicon-goto"></i></a>
                       </li>
                     {{/past_requests_files}}
                   </ul>
