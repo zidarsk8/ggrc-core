@@ -16,7 +16,8 @@
   can.Control("CMS.Controllers.MockupHelper", {
     defaults: {
       title_view: GGRC.mustache_path + "/title.mustache",
-      object_views: {}
+      object_views: {},
+      cached: null
     }
   }, {
     init: function (el, opts) {
@@ -36,7 +37,10 @@
         var isActive = view.title === tab;
         view.attr("active", isActive);
         if (isActive) {
-          new CMS.Controllers.MockupView(this.element.find(".inner-content"), {
+          if (this.cached) {
+            this.cached.destroy();
+          }
+          this.cached = new CMS.Controllers.MockupView(this.element.find(".inner-content"), {
             view: view
           });
         }
@@ -172,7 +176,7 @@
 
       el.find("i").css("opacity", 1).closest("li").siblings().find("i").css("opacity", 0.25);
       this.element
-        .show()
+        .show().height(0)
         .animate({
           height: heights[size]
         }, {
@@ -185,6 +189,9 @@
             }
           }.bind(this)
         });
+    },
+    "{can.route} tab": function (router, ev, tab) {
+      this.element.hide();
     },
     "{can.route} item": function (router, ev, item) {
       // TODO: Simplify this
