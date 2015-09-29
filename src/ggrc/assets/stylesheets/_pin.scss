@@ -19,7 +19,7 @@
   .info {
     @include box-shadow(none);
     padding: 15px 20px 20px 20px;
-    &.temp-class-to-manipulate-with {
+    &.sticky-info-panel {
       margin-top: -15px;
     }
     .small-info {
