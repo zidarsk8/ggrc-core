@@ -26,15 +26,12 @@
 
   <div class="pane-header">
     <div class="row-fluid wrap-row">
-      <div class="span5">
+      <div class="span9">
         <h6>Title</h6>
         <h3>{{info_title}}</h3>
-      </div>
-      <div class="span3">
-        <h6>State</h6>
         <span class="state-value state-inprogress">{{state}}</span>
       </div>
-      <div class="span4">
+      <div class="span3">
         <div class="info-pane-utility">
 
           <div class="details-wrap">
@@ -140,8 +137,10 @@
                   <ul>
                     {{#people_assignee}}
                       <li>
-                        <a href="javascript://"><i class="grcicon-edit"></i></a>
-                        <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                        <span class="file-controls">
+                          <a href="javascript://"><i class="grcicon-edit"></i></a>
+                          <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                        </span>
                         <a href="javascript://">{{name}}</a>
                       </li>
                     {{/people_assignee}}
@@ -155,8 +154,10 @@
                   <ul>
                     {{#people_requester}}
                       <li>
-                        <a href="javascript://"><i class="grcicon-edit"></i></a>
-                        <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                        <span class="file-controls">
+                          <a href="javascript://"><i class="grcicon-edit"></i></a>
+                          <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                        </span>
                         <a href="javascript://">{{name}}</a>
                       </li>
                     {{/people_requester}}
@@ -170,8 +171,10 @@
                   <ul>
                     {{#people_verifier}}
                       <li>
-                        <a href="javascript://"><i class="grcicon-edit"></i></a>
-                        <a class="disabled" href="javascript://"><i class="grcicon-deleted"></i></a>
+                        <span class="file-controls">
+                          <a href="javascript://"><i class="grcicon-edit"></i></a>
+                          <a class="disabled" href="javascript://"><i class="grcicon-deleted"></i></a>
+                        </span>
                         <a href="javascript://">{{name}}</a>
                       </li>
                     {{/people_verifier}}
@@ -194,7 +197,9 @@
                   {{created_on}}
                 </li>
                 <li>
-                  <a href="javascript://"><i class="grcicon-edit"></i></a>
+                  <span class="file-controls">
+                    <a href="javascript://"><i class="grcicon-edit"></i></a>
+                  </span>
                   <label>
                     Due on
                   </label>
@@ -212,7 +217,9 @@
               <ul class="mapped-list">
                 {{#mapped_objects}}
                   <li>
-                    <a class="delete-mapped-object" href="javascript://"><i class="grcicon-deleted"></i></a>
+                    <span class="file-controls">
+                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                    </span>
                     <i class="grcicon-{{icon}}-color"></i>
                     <span class="person-holder">
                       <a href='mailto:{{email}}' target="_blank">
@@ -440,7 +447,7 @@
                   </ul>
                 </div>
                 <div class="large-col">
-                  <ul class="past-file-list">
+                  <ul class="file-list">
                     {{#past_requests_files}}
                       <li>
                         <label>

@@ -128,16 +128,3 @@
 		width: 45%;
 	}
 }
-
-.past-file-list {
-	@extend %reset-list;
-	width: 92%;
-	label {
-		display: inline-block;
-		@extend %oneline;
-		width: 88%;
-	}
-	input[type="checkbox"] {
-		float: right;
-	}
-}

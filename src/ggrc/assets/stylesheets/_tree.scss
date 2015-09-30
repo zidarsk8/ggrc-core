@@ -1274,14 +1274,6 @@ ul.new-tree {
 }
 
 .tier-content {
-  overflow: hidden;
-  zoom: 1;
-  .pin-content & {
-    margin-right: 105px;
-  }
-  &.pin {
-    margin-right: 0;
-  }
   .sticky-info-panel & {
     margin-top: 77px;
   }
