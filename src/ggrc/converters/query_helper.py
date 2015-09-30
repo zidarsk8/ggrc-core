@@ -7,7 +7,6 @@ import datetime
 from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
-import datetime
 
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.reflection import AttributeInfo
@@ -205,7 +204,10 @@ class QueryHelper(object):
         return value
       key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
       # handle dates
-      if key in ["start_date", "end_date"]:
+      if ("date" in key and "relative" not in key) or \
+         key in ["due_on", "requested_on"]:
+        if isinstance(value, datetime.date):
+          return value
         try:
           month, day, year = map(int, value.split("/"))
           return datetime.date(year, month, day)
