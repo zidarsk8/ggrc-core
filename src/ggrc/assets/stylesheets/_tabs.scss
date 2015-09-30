@@ -107,9 +107,13 @@
 			border-bottom: none;
 		}
 	}
-	.small-col {
+	.mini-col {
 		@extend %tab-col-general;
 		width: 10%;
+	}
+	.small-col {
+		@extend %tab-col-general;
+		width: 20%;
 	}
 	.medium-col {
 		@extend %tab-col-general;
@@ -117,21 +121,21 @@
 	}
 	.xmedium-col {
 		@extend %tab-col-general;
-		width: 30%;
+		width: 25%;
 	}
 	.large-col {
 		@extend %tab-col-general;
-		width: 55%;
+		width: 45%;
 	}
 }
 
 .past-file-list {
 	@extend %reset-list;
-	width: 65%;
+	width: 92%;
 	label {
 		display: inline-block;
 		@extend %oneline;
-		width: 85%;
+		width: 88%;
 	}
 	input[type="checkbox"] {
 		float: right;

@@ -28,9 +28,23 @@
         info_title: "My new request",
         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae ante dapibus lacus dictum vestibulum. Nullam finibus semper convallis. Ut libero mauris, viverra nec augue eget, congue viverra felis. Aenean ut arcu vel tortor rhoncus dictum id vel urna. Sed a enim laoreet diam lacinia euismod.",
         state: "In Progress",
-        people_assignee: "Martin L.K.",
-        people_requester: "Josh Smith",
-        people_verifier: "Prasanna V.",
+        people_assignee: [{
+          name: "Gisele Bundchen"
+        }, {
+          name: "Cara Delevingne"
+        }, {
+          name: "Adriana Lima"
+        }],
+        people_requester: [{
+          name: "Doutzen Kroes"
+        }, {
+          name: "Natalia Vodianova"
+        }, {
+          name: "Miranda Kerr"
+        }],
+        people_verifier: [{
+          name: "Prasanna V."
+        }],
         created_on: "12/03/14",
         due_on: "12/31/15",
         type_a: "assignee",
@@ -388,9 +402,23 @@
             name: "MTV_001_SIGNED_LoginAccess_List.pdf",
             url: "http://google.com/"
           }],
-          people_assignee: "Martin L.K.",
-          people_requester: "Josh Smith",
-          people_verifier: "Prasanna V.",
+          people_assignee: [{
+            name: "Gisele Bundchen"
+          }, {
+            name: "Cara Delevingne"
+          }, {
+            name: "Adriana Lima"
+          }],
+          people_requester: [{
+            name: "Doutzen Kroes"
+          }, {
+            name: "Natalia Vodianova"
+          }, {
+            name: "Miranda Kerr"
+          }],
+          people_verifier: [{
+            name: "Prasanna V."
+          }],
           created_on: "12/03/14",
           due_on: "12/31/15",
           type_a: "assignee",
@@ -614,6 +642,22 @@
               name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
               date: "26/09/2015",
               url: "http://www.this-is-great.com"
+            }],
+            mapped_objects: [{
+              icon: "objective",
+              title: "090.7068 objective 1",
+              state: "Draft",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
+            }, {
+              icon: "control",
+              title: "Access to the Private Network with expired Key v0906984",
+              state: "In Progress",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
+            }, {
+              icon: "regulation",
+              title: "a regulation object",
+              state: "In Progress",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
             }]
           }, {
             date: "20/09/2015",
@@ -633,6 +677,22 @@
               name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
               date: "26/09/2015",
               url: "http://www.this-is-great.com"
+            }],
+            mapped_objects: [{
+              icon: "objective",
+              title: "090.7068 objective 1",
+              state: "Draft",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
+            }, {
+              icon: "control",
+              title: "Access to the Private Network with expired Key v0906984",
+              state: "In Progress",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
+            }, {
+              icon: "regulation",
+              title: "a regulation object",
+              state: "In Progress",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
             }]
           }, {
             date: "10/09/2015",
@@ -652,6 +712,22 @@
               name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
               date: "26/09/2015",
               url: "http://www.this-is-great.com"
+            }],
+            mapped_objects: [{
+              icon: "objective",
+              title: "090.7068 objective 1",
+              state: "Draft",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
+            }, {
+              icon: "control",
+              title: "Access to the Private Network with expired Key v0906984",
+              state: "In Progress",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
+            }, {
+              icon: "regulation",
+              title: "a regulation object",
+              state: "In Progress",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
             }]
           }],
           children: [{
