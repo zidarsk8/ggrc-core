@@ -25,7 +25,7 @@
           {{{firstnonempty description '<i>No description</i>'}}}
         </p>
       </div>
-      
+
       {{^if_null url}}
         <a class="url oneline" href="{{schemed_url url}}" target="_blank">
           {{url}}
@@ -34,7 +34,7 @@
       {{#if_null url}}
         <span class="no-url">No URL</span>
       {{/if_null}}
-  	  
+
     </div>
   </div>
 
@@ -64,14 +64,10 @@
               </span>
             {{else}}
               {{#is_allowed_to_map page_instance instance join=true}}
-              {{#if_helpers '\
-                ^if_instance_of' page_instance 'Directive' '\
-                or ^if_instance_of' instance 'Section'}}
               <a class="primary map-to-page-object" href="javascript://" data-follow="true" {{#instance}}{{data 'instance'}}{{/instance}}>
                 <i class="grcicon-reg-map"></i>
                 Map to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
               </a>
-              {{/if_helpers}}
               {{/is_allowed_to_map}}
             {{/if}}
           {{/with_direct_mappings_as}}
