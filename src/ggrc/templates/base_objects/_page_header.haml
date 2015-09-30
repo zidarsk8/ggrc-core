@@ -82,11 +82,7 @@
         %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
           %i.grcicon-logout-black
           Logout
-  %li
-    %a.nav-trigger.active{'href': 'javascript://'}
-      %i.grcicon-nav-trigger{'rel': 'tooltip', 'data-placement': 'left', 'data-original-title': 'Menu'}
-      %span
-        Menu
+
   -if self.page_help
     %li
       %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
