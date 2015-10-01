@@ -124,14 +124,14 @@ class QueryHelper(object):
     self.clean_filters(expression.get("right"))
 
   def expression_keys(self, exp):
-      op = exp["op"]["name"]
-      if op in ["AND", "OR"]:
-        return expression_keys(exp["left"]) | expression_keys(exp["right"])
-      left = exp.get("left", None)
-      if left is None:
-        return set()
-      else:
-        return set([left])
+    op = exp["op"]["name"]
+    if op in ["AND", "OR"]:
+      return expression_keys(exp["left"]) | expression_keys(exp["right"])
+    left = exp.get("left", None)
+    if left is None:
+      return set()
+    else:
+      return set([left])
 
   def macro_expand_object_query(self, object_query):
     def expand_task_dates(exp):
