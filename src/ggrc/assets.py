@@ -77,6 +77,7 @@ _per_module_load_suffixes = [
     'assets/stylesheets',
     'assets/vendor/stylesheets',
     'assets/js_specs',
+    'assets/mockups',
 ]
 
 for module_load_base in module_load_paths:
@@ -131,6 +132,13 @@ environment.register("dashboard-js-templates", webassets.Bundle(
   *asset_paths['dashboard-js-template-files'],
   filters=MustacheFilter,
   output='dashboard-templates' + version_suffix + '.js',
+  # Always keep `debug` False here, since raw mustache is not valid JS
+  debug=False))
+
+environment.register("mockup-js-templates", webassets.Bundle(
+  *asset_paths['mockup-js-template-files'],
+  filters=MustacheFilter,
+  output='mockup-templates' + version_suffix + '.js',
   # Always keep `debug` False here, since raw mustache is not valid JS
   debug=False))
 
