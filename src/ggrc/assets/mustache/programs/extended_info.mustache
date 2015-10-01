@@ -3,18 +3,15 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: brad@reciprocitylabs.com
     Maintained By: predrag@reciprocitylabs.com
-    
+
     Template: extended info applicable to program object
-    
+
 }}
 
 {{#instance}}
   <div class="row-fluid">
     <div class="span12">
       <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
-        {{#is_private}}
-          <i class="grcicon-private" rel="tooltip" title="Private"></i>
-        {{/is_private}}
         {{title}}
       </a>
     </div>
@@ -22,7 +19,7 @@
   <div class="row-fluid">
     <div class="span12">
       <h6>Description</h6>
-      <div class="rtf">      
+      <div class="rtf">
         {{{firstnonempty description '<em>No description</em>'}}}
       </div>
     </div>
