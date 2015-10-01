@@ -22,10 +22,11 @@ from nose.plugins.skip import SkipTest
 class ServicesTestMockModel(Base, ggrc.db.Model):
   __tablename__ = 'test_model'
   foo = db.Column(db.String)
+  code = db.Column(db.String, unique=True)
 
   # REST properties
-  _publish_attrs = ['modified_by_id', 'foo']
-  _update_attrs = ['foo']
+  _publish_attrs = ['modified_by_id', 'foo', 'code']
+  _update_attrs = ['foo', 'code']
 
 URL_MOCK_COLLECTION = '/api/mock_resources'
 URL_MOCK_RESOURCE = '/api/mock_resources/{0}'
@@ -218,6 +219,78 @@ class TestResource(TestCase):
         1, len(response.json['test_model_collection']['test_model']))
     self.assertEqual(
         'bar', response.json['test_model_collection']['test_model'][0]['foo'])
+
+  def test_collection_post_successful_single_array(self):
+    data = json.dumps(
+        [{'services_test_mock_model': {'foo': 'bar', 'context': None}}])
+    response = self.client.post(
+        URL_MOCK_COLLECTION,
+        content_type='application/json',
+        data=data,
+        headers=self.headers(),
+    )
+    self.assert200(response)
+    self.assertEqual(type(response.json), list)
+    self.assertEqual(len(response.json), 1)
+
+    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
+    self.assert200(response)
+    self.assertEqual(
+        1, len(response.json['test_model_collection']['test_model']))
+    self.assertEqual(
+        'bar', response.json['test_model_collection']['test_model'][0]['foo'])
+
+  def test_collection_post_successful_multiple(self):
+    data = json.dumps([
+      {'services_test_mock_model': {'foo': 'bar1', 'context': None}},
+      {'services_test_mock_model': {'foo': 'bar2', 'context': None}},
+    ])
+    response = self.client.post(
+        URL_MOCK_COLLECTION,
+        content_type='application/json',
+        data=data,
+        headers=self.headers(),
+    )
+    self.assert200(response)
+    self.assertEqual(type(response.json), list)
+    self.assertEqual(len(response.json), 2)
+    self.assertEqual(
+        'bar1', response.json[0][1]['services_test_mock_model']['foo'])
+    self.assertEqual(
+        'bar2', response.json[1][1]['services_test_mock_model']['foo'])
+    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
+    self.assert200(response)
+    self.assertEqual(
+        2, len(response.json['test_model_collection']['test_model']))
+
+  def test_collection_post_successful_multiple_with_errors(self):
+    data = json.dumps([
+      {'services_test_mock_model':
+        {'foo': 'bar1', 'code': 'f1', 'context': None}},
+      {'services_test_mock_model':
+        {'foo': 'bar1', 'code': 'f1', 'context': None}},
+      {'services_test_mock_model':
+        {'foo': 'bar2', 'code': 'f2', 'context': None}},
+      {'services_test_mock_model':
+        {'foo': 'bar2', 'code': 'f2', 'context': None}},
+    ])
+    response = self.client.post(
+        URL_MOCK_COLLECTION,
+        content_type='application/json',
+        data=data,
+        headers=self.headers(),
+    )
+
+    self.assertEqual(500, response.status_code)
+    self.assertEqual([201, 500, 201, 500], [i[0] for i in response.json])
+    self.assertEqual(
+        'bar1', response.json[0][1]['services_test_mock_model']['foo'])
+    self.assertEqual(
+        'bar2', response.json[2][1]['services_test_mock_model']['foo'])
+    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
+    self.assert200(response)
+    self.assertEqual(
+        2, len(response.json['test_model_collection']['test_model']))
 
   def test_collection_post_bad_request(self):
     response = self.client.post(
