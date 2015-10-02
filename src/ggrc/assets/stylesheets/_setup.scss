@@ -231,6 +231,12 @@ $fontTitle: "Helvetica Neue", Helvetica, Arial, sans-serif;
   list-style:none;
 }
 
+%tab-col-general {
+  float: left;
+  padding-right: 20px;
+  box-sizing: border-box;
+}
+
 // Temporary adding sticky until resolve if we are using it or not
 %sticky {
   position: -webkit-sticky;

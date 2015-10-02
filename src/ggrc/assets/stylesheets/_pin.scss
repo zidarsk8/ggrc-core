@@ -125,11 +125,29 @@
   &.dates {
     > li {
       margin-bottom: 0;
+      position: relative;
+      &:hover {
+        .file-controls {
+          @include opacity(1);
+          left: -51px;
+        }
+      }
+    }
+  }
+  i {
+    @include opacity(.6);
+    @include transition(opacity .2s ease);
+  }
+  a {
+    &:hover {
+      i {
+        @include opacity(1);
+      }
     }
   }
   label {
     float: left;
-    width: 40%;
+    width: 27%;
     text-transform: uppercase;
     font-size: 10px;
     line-height: 16px;
@@ -152,13 +170,42 @@
     width: 60%;
     li {
       margin-bottom: 3px;
+      position: relative;
+      &:hover {
+        .file-controls {
+          @include opacity(1);
+          left: -51px;
+        }
+      }
     }
   }
 }
 
-.right-button {
-  float: right;
-  margin-top: -4px;
+.file-controls {
+  @include border-radius(11px 0 0 11px);
+  @include box-shadow(-1px 0 1px rgba(0,0,0, .2));
+  @include opacity(0);
+  @include transition(opacity .2s ease, left .2s ease);
+  position: absolute;
+  top: -2px;
+  left: 0;
+  z-index: 9999;
+  background: $white;
+  padding-left: 5px;
+  height: 20px;
+  padding-top: 2px;
+  min-width: 45px;
+  i {
+    @include opacity(.6);
+    @include transition(opacity .2s ease);
+  }
+  a {
+    &:hover {
+      i {
+        @include opacity(1);
+      }
+    }
+  }
 }
 
 .file-list-wrap {
@@ -167,7 +214,6 @@
 
 .file-list {
   @extend %reset-list;
-  font-size: 16px;
   .date {
     color: $gray;
     font-size: 11px;
@@ -179,8 +225,29 @@
   }
   li {
     margin-bottom: 10px;
+    position: relative;
     .entry-list & {
       @extend %oneline;
+    }
+    &:hover {
+      .file-controls {
+        @include opacity(1);
+        left: -50px;
+      }
+    }
+  }
+  .past-items-list & {
+    li {
+      margin-bottom: 0;
+    }
+    width: 92%;
+    label {
+      display: inline-block;
+      @extend %oneline;
+      width: 88%;
+    }
+    input[type="checkbox"] {
+      float: right;
     }
   }
 }
@@ -189,10 +256,48 @@
   @extend %reset-list;
   li {
     margin-bottom: 5px;
+    position: relative;
     .person-holder {
       @extend %oneline;
       width: 77%;
       display: inline-block;
+      .past-items-list & {
+        width: 85%;
+      }
     }
+    &:hover {
+      .file-controls {
+        @include opacity(1);
+        left: -51px;
+      }
+    }
+  }
+}
+
+.pane-header {
+  h3 {
+    overflow: hidden !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 80%;
+    float: left;
+    margin-right: 10px;
+  }
+}
+
+.sticky-info-panel {
+  &.info {
+    margin-top: -15px;
+  }
+  .pane-header {
+    position: fixed;
+    left: 52px;
+    right: 52px;
+    height: 52px;
+    background: $white;
+    border-bottom: 1px solid $lightGray;
+    padding-top: 15px;
+    margin-bottom: 10px;
+    z-index: 9999;
   }
 }
