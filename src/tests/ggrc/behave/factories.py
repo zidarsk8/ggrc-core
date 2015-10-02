@@ -251,6 +251,11 @@ class DataAssetFactory(ModelFactory):
   status = FuzzyChoice(MODEL.VALID_STATES)
 
 
+class AccessGroupFactory(ModelFactory):
+  MODEL = models.AccessGroup
+  status = FuzzyChoice(MODEL.VALID_STATES)
+
+
 class FacilityFactory(ModelFactory):
   MODEL = models.Facility
   status = FuzzyChoice(MODEL.VALID_STATES)
