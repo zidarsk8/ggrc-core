@@ -132,7 +132,7 @@ class Types(object):
   directives = {'Regulation', 'Policy', 'Standard', 'Contract'}
   assets_business = {'System', 'Process', 'DataAsset', 'Product', 'Project',
                      'Facility', 'Market'}
-  people_groups = {'Person', 'OrgGroup', 'Vendor'}
+  people_groups = {'AccessGroup', 'Person', 'OrgGroup', 'Vendor'}
 
 
 rules = RuleSet(count_limit=10000, rule_list=[

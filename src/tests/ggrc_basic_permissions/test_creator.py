@@ -48,7 +48,7 @@ class TestCreator(TestCase):
         "Control", "ControlAssessment", "DataAsset", "Contract",
         "Policy", "Regulation", "Standard", "Document", "Facility",
         "Market", "Objective", "OrgGroup", "Vendor", "Product",
-        "Clause", "System", "Process", "Issue", "Project"
+        "Clause", "System", "Process", "Issue", "Project", "AccessGroup"
     ])
     for model_singular in base_models:
       try:

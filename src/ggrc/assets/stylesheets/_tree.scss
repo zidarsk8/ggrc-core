@@ -265,6 +265,7 @@ ul.new-tree {
             &.facility,
             &.product,
             &.dataasset,
+            &.accessgroup,
             &.market {
               color:$business;
             }
@@ -356,6 +357,7 @@ ul.new-tree {
               &.facility,
               &.product,
               &.dataasset,
+              &.accessgroup,
               &.market {
                 color:$business;
               }
@@ -672,6 +674,7 @@ ul.new-tree {
     &.facility,
     &.product,
     &.dataasset,
+    &.accessgroup,
     &.market
     {
       .item-data {
