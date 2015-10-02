@@ -21,6 +21,7 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.computed_property import computed_property
 
+from ggrc.utils import underscore_from_camelcase
 
 """Mixins to add common attributes and relationships. Note, all model classes
 must also inherit from ``db.Model``. For example:
@@ -625,7 +626,8 @@ class CustomAttributable(object):
   @declared_attr
   def custom_attribute_definitions(cls):
     # FIXME definitions should be class scoped, not instance scoped.
-    from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+    from ggrc.models.custom_attribute_definition import \
+      CustomAttributeDefinition
     definition_type = foreign(CustomAttributeDefinition.definition_type)
     join_function = lambda: or_(
         definition_type == cls.__name__,
@@ -641,9 +643,11 @@ class CustomAttributable(object):
 
   @classmethod
   def get_custom_attribute_definitions(cls):
-    from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+    from ggrc.models.custom_attribute_definition import \
+      CustomAttributeDefinition
     return CustomAttributeDefinition.query.filter(
-        CustomAttributeDefinition.definition_type == cls.__name__).all()
+        CustomAttributeDefinition.definition_type ==
+        underscore_from_camelcase(cls.__name__)).all()
 
 
 class TestPlanned(object):
