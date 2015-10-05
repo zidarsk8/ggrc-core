@@ -630,7 +630,7 @@ class CustomAttributable(object):
       CustomAttributeDefinition
     definition_type = foreign(CustomAttributeDefinition.definition_type)
     join_function = lambda: or_(
-        definition_type == cls.__name__,
+        definition_type == underscore_from_camelcase(cls.__name__),
         # The bottom statement always evaluates to False, and is here just to
         # satisfy sqlalchemys need for use of foreing keys while defining a
         # relationship.
