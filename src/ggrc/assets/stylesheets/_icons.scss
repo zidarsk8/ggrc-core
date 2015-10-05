@@ -280,8 +280,6 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-not-done { background-position: -54px -416px; }
 .grcicon-done-black { background-position: -78px -416px; }
 .grcicon-not-done-black { background-position: -102px -416px; }
-.grcicon-nav-trigger { background-position: -318px -416px; }
-.grcicon-nav-trigger-active { background-position: -342px -416px; }
 .grcicon-child-node { background-position: -222px -416px; }
 .grcicon-all-object { background-position: -366px -8px; }
 .grcicon-all-object-white { background-position: -366px -32px; }
@@ -303,8 +301,6 @@ a.remove_filter i[class^="grcicon-"] {
 .grciconlarge-dashboard-white { background-position:-8px -40px; }
 .grciconlarge-arrow-left { background-position: -40px -8px; }
 
-.grciconlarge-nav-trigger { background-position: -72px -8px; }
-.grciconlarge-nav-trigger-active { background-position: -72px -40px; }
 .grciconlarge-dashboard-new { background-position: -104px -8px; }
 
 .grcicon-maximize { background-position: -318px -200px; }
@@ -340,6 +336,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grciconlarge-control_assessment { background-position: -168px -200px; }
 .grciconlarge-risk { background-position: -232px -200px; }
 .grciconlarge-threat_actor { background-position: -264px -200px; }
+.grciconlarge-access_group, .grciconlarge-access-group, .grciconlarge-accessgroup { background-position: -296px -200px; }
 .grciconlarge-market { background-position: -328px -200px; }
 
 .showhide {
@@ -472,6 +469,9 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-dataasset, .grcicon-data_asset { background-position:-174px -248px; }
 .grcicon-dataasset-black, .grcicon-data_asset-black { background-position:-174px -224px; }
 .grcicon-dataasset-color, .grcicon-data_asset-color { background-position:-54px -320px; }
+.grcicon-accessgroup, .grcicon-access_group { background-position: -366px -80px; }
+.grcicon-accessgroup-black, .grcicon-access_group-black { background-position: -366px -80px; }
+.grcicon-accessgroup-color, .grcicon-access_group-color { background-position: -366px -80px; }
 //compliance
 
 .grcicon-object-black { background-position:-6px -344px; }
@@ -512,6 +512,9 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-company_controls-black { background-position:-150px -224px; }
 .grcicon-company_controls-color { background-position:-30px -320px; }
 .grcicon-control_assessment-color { background-position: -150px -416px; }
+.grcicon-auto_control_assessment-color { background-position: -366px -416px; }
+.grcicon-auto_control_assessment-black { background-position: -366px -392px; }
+.grcicon-auto_control_assessment-white { background-position: -342px -200px; }
 // risk
 .grcicon-risk { background-position:-198px -248px }
 .grcicon-risk-black { background-position:-198px -224px; }

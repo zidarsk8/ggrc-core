@@ -80,6 +80,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
+    , "AccessGroup" : {}
     , "Market" : {}
     }
   , init : function() {
@@ -153,6 +154,7 @@ can.Model.Cacheable("CMS.Models.Project", {
     , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
+    , "AccessGroup" : {}
     , "Market" : {}
     }
   , init : function() {
@@ -239,6 +241,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
+    , "AccessGroup" : {}
     , "Market" : {}
     }
   , init : function() {
@@ -328,7 +331,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
-    , "Product" : {}
+    , "AccessGroup" : {}
     , "Market" : {}
     }
   , init : function() {
@@ -417,6 +420,95 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
+    , "AccessGroup" : {}
+    , "Market" : {}
+    }
+  , init : function() {
+    var that = this;
+    this._super && this._super.apply(this, arguments);
+    $(function(){
+      that.tree_view_options.child_options[0].model = CMS.Models.Process;
+    });
+    this.tree_view_options.child_options[1].model = this;
+
+    this.validateNonBlank("title");
+  }
+}, {});
+
+can.Model.Cacheable("CMS.Models.AccessGroup", {
+  root_object : "access_group"
+  , root_collection : "access_groups"
+  , category : "entities"
+  , findAll : "GET /api/access_groups"
+  , findOne : "GET /api/access_groups/{id}"
+  , create : "POST /api/access_groups"
+  , update : "PUT /api/access_groups/{id}"
+  , destroy : "DELETE /api/access_groups/{id}"
+  , mixins : ["ownable", "contactable", "unique_title"]
+  , is_custom_attributable: true
+  , attributes : {
+      context : "CMS.Models.Context.stub"
+    , owners : "CMS.Models.Person.stubs"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , sections : "CMS.Models.get_stubs"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
+  }
+  , tree_view_options : {
+    show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+    , attr_list : can.Model.Cacheable.attr_list.concat([
+      {attr_title: 'URL', attr_name: 'url'},
+      {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
+      {attr_title: 'Stop Date', attr_name: 'end_date'}
+    ])
+    , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
+    , child_options : [{
+      model : null
+      , find_params : {
+        "destination_type" : "Process"
+        , "source_type" : "AccessGroup"
+        , relationship_type_id : "access_group_has_process"
+      }
+      , parent_find_param : "source_id"
+      , draw_children : true
+      , find_function : "findRelated"
+      , related_side : "source"
+      , create_link : true
+    }, {
+      model : null
+      , find_params : {
+        "destination_type" : "AccessGroup"
+        , "source_type" : "AccessGroup"
+        , relationship_type_id: "access_group_relies_upon_access_group"
+      }
+      , parent_find_param : "destination_id"
+      , draw_children : true
+      , start_expanded : false
+      , find_function : "findRelatedSource"
+      , related_side : "destination"
+      , single_object : false
+      , create_link : true
+    }]}
+  , links_to : {
+    "System" : {}
+    , "Process" : {}
+    , "Program" : {}
+    , "Product" : {}
+    , "Facility" : {}
+    , "OrgGroup" : {}
+    , "Vendor" : {}
+    , "Project" : {}
+    , "DataAsset" : {}
+    , "AccessGroup" : {}
     , "Market" : {}
     }
   , init : function() {
@@ -490,6 +582,7 @@ can.Model.Cacheable("CMS.Models.Market", {
     , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
+    , "AccessGroup" : {}
     , "Market" : {}
     }
   , init : function() {
@@ -576,6 +669,7 @@ can.Model.Cacheable("CMS.Models.Vendor", {
     , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
+    , "AccessGroup" : {}
     , "Market" : {}
     }
   , init : function() {

@@ -107,28 +107,31 @@
 			border-bottom: none;
 		}
 	}
-	.goto-link {
-		float: right;
-	}
-	.small-col {
-		float: left;
+	.mini-col {
+		@extend %tab-col-general;
 		width: 10%;
 	}
+	.small-col {
+		@extend %tab-col-general;
+		width: 20%;
+	}
 	.medium-col {
-		float: left;
+		@extend %tab-col-general;
 		width: 35%;
 	}
+	.xmedium-col {
+		@extend %tab-col-general;
+		width: 25%;
+	}
 	.large-col {
-		float: left;
-		width: 55%;
+		@extend %tab-col-general;
+		width: 45%;
 	}
 }
 
-.past-file-list {
-	@extend %reset-list;
-	label {
-		display: inline-block;
-		@extend %oneline;
-		width: 71%;
+.add-comment {
+	margin: 10px 0 20px;
+	.controls {
+		display: none;
 	}
 }

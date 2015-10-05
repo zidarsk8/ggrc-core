@@ -9,8 +9,7 @@
   var WorkflowExtension = {},
       _workflow_object_types = Array.prototype.concat.call([],
         'Program Regulation Policy Standard Contract Clause Section'.split(' '),
-        'Control Objective'.split(' '),
-        'OrgGroup Vendor'.split(' '),
+        'Control Objective OrgGroup Vendor AccessGroup'.split(' '),
         'System Process DataAsset Product Project Facility Market Issue ControlAssessment'.split(' '),
         'Risk ThreatActor'.split(' ')
       ),

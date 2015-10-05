@@ -265,6 +265,7 @@ ul.new-tree {
             &.facility,
             &.product,
             &.dataasset,
+            &.accessgroup,
             &.market {
               color:$business;
             }
@@ -356,6 +357,7 @@ ul.new-tree {
               &.facility,
               &.product,
               &.dataasset,
+              &.accessgroup,
               &.market {
                 color:$business;
               }
@@ -672,6 +674,7 @@ ul.new-tree {
     &.facility,
     &.product,
     &.dataasset,
+    &.accessgroup,
     &.market
     {
       .item-data {
@@ -1274,14 +1277,15 @@ ul.new-tree {
 }
 
 .tier-content {
-  overflow: hidden;
-  zoom: 1;
-  .pin-content & {
-    margin-right: 105px;
+  .sticky-info-panel & {
+    margin-top: 77px;
   }
-  &.pin {
-    margin-right: 0;
-  }
+}
+
+.info-pane-utility {
+  @include clearfix();
+  margin-top: 6px;
+  float: right;
 }
 
 .details-wrap {
@@ -1290,6 +1294,9 @@ ul.new-tree {
   width: 60px;
   margin-top: -4px;
   position: relative;
+  .info-pane-utility & {
+    margin-top: 0;
+  }
   .pin-content & {
     margin-top: -54px;
   }
@@ -1305,6 +1312,26 @@ ul.new-tree {
     margin-top: -18px;
     position: fixed;
     right: 8px;
+    .sticky-info-panel & {
+      margin-top: -3px;
+    }
+  }
+  .dropdown-toggle {
+    @include clearfix();
+    height: 8px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+  .bubble {
+    float: left;
+    margin-right: 4px;
+    background: $darkGray;
+    @include border-radius(50%);
+    width: 8px;
+    height: 8px;
+    &:last-child {
+      margin-right: 0;
+    }
   }
   .dropdown-menu {
     @extend %reset-list;

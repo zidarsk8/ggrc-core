@@ -19,7 +19,7 @@
       "Objective", "Control", "Section", "Clause",
       "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project",
-      "MultitypeSearch", "Issue", "ControlAssessment"
+      "MultitypeSearch", "Issue", "ControlAssessment", "AccessGroup"
     ],
     related_object_descriptors = {},
     threat_actor_descriptor, risk_descriptor;
@@ -65,6 +65,7 @@
         },
         related_programs: TypeFilter("related_objects", "Program"),
         related_data_assets: TypeFilter("related_objects", "DataAsset"),
+        related_access_groups: TypeFilter("related_objects", "AccessGroup"),
         related_facilities: TypeFilter("related_objects", "Facility"),
         related_markets: TypeFilter("related_objects", "Market"),
         related_processes: TypeFilter("related_objects", "Process"),

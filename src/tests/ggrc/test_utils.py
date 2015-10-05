@@ -19,7 +19,7 @@ class TestUtilsDictFunctions(TestCase):
     # Special cases in mappings as defined in utils.py:
     audit_mappings = ["Control", "DataAsset", "Facility", "Market", "OrgGroup",
                       "Process", "Product", "Program", "Project", "System",
-                      "Vendor"]
+                      "Vendor", "AccessGroup"]
 
     for object_name, object_mappings in mappings.items():
       for mapping in object_mappings:
