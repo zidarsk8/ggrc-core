@@ -1046,7 +1046,7 @@ class Resource(ModelView):
         object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
         return (201, object_for_json)
-    except IntegrityError as e:
+    except (IntegrityError, ValidationError) as e:
       msg = e.orig.args[1]
       if obj.type == "Relationship" and \
           msg.startswith("Duplicate entry") and \
@@ -1065,7 +1065,9 @@ class Resource(ModelView):
         ).first()
         object_for_json = self.object_for_json(obj)
         return (200, object_for_json)
-      raise e
+      message = translate_message(e)
+      current_app.logger.warn(message)
+      return (403, message)
 
   def collection_post(self):
     if self.request.mimetype != 'application/json':
@@ -1079,12 +1081,16 @@ class Resource(ModelView):
     for src in body:
       try:
         src_res = self.collection_post_step(UnicodeSafeJsonWrapper(src))
-        db.session.commit()
+        db.session.flush()
       except Exception as e:
         src_res = (getattr(e, "code", 500), e.message)
+      try:
+        db.session.commit()
+      except:
         db.session.rollback()
       res.append(src_res)
     headers = {"Content-Type": "application/json"}
+    errors = []
     if wrap:
       status, res = res[0]
       if type(res) == dict and len(res) == 1:
@@ -1092,11 +1098,14 @@ class Resource(ModelView):
         if "id" in value:
           headers['Location'] = self.url_for(id=value["id"])
     else:
-      status = 200
-      for res_status, _ in res:
+      for res_status, body in res:
         if not (200 <= res_status < 300):
-          status = res_status
-          break
+          errors.append((res_status, body))
+      if len(errors) > 0:
+        status = errors[0][0]
+        headers["X-Flash-Error"] = '\n'.join((error for _, error in errors))
+      else:
+        status = 200
     return current_app.make_response(
         (self.as_json(res), status, headers))
 

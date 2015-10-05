@@ -20,17 +20,80 @@
     DELAY: 100, // Number of ms to wait before the first batch is fired
     BATCH: GGRC.config.MAX_INSTANCES || 3, // Maximum number of POST/PUT requests at any given time
     _queue: [],
+    _buckets: {},
     _timeout: null,
 
-    enqueue: function (obj, args) {
-     this._queue.push({o: obj, a: args});
-     if (typeof this._timeout === "number") {
-       clearTimeout(this._timeout);
-     }
-     this._timeout = setTimeout(function () {
-       new GGRC.SaveQueue(this._queue.splice(0, this._queue.length));
-     }.bind(this), this.DELAY);
+    _enqueue_bucket: function (bucket) {
+      var that = this;
+      var objs = bucket.objs;
+      bucket.objs = [];
+      return function () {
+        var body = _.map(objs, function (obj) {
+          var o = {};
+          o[bucket.type] = obj.serialize();
+          return o;
+        });
+        return $.ajax({
+          type: "POST",
+          url: "/api/" + bucket.plural,
+          data: body
+        }).always(function(data, type) {
+          if (type === "error") {
+            data = data.responseJSON;
+          }
+          var cb = function(single) {
+            return function () {
+              this.created(single[1][bucket.type]);
+              return new $.Deferred().resolve();
+            };
+          };
+          for (var i = 0; i < objs.length; i++) {
+            var single = data[i];
+            if (single[0] >= 200 && single[0] < 300) {
+              var obj = objs[i];
+              obj._save(cb(single));
+            }
+          }
+        }).always(function() {
+          if (bucket.objs.length > 0) {
+            that._step(that._enqueue_bucket(bucket));
+          } else {
+            bucket.in_flight = false;
+          }
+        });
+      };
     },
+
+    _step: function (elem) {
+      this._queue.push(elem);
+      if (typeof this._timeout === "number") {
+        clearTimeout(this._timeout);
+      }
+      this._timeout = setTimeout(function () {
+        new GGRC.SaveQueue(this._queue.splice(0, this._queue.length));
+      }.bind(this), this.DELAY);
+    },
+
+    enqueue: function (obj, args) {
+      var elem = function () {
+          return obj._save.apply(obj, args);
+      };
+      if (obj.isNew()) {
+        var type = obj.constructor.table_singular;
+        var bucket = this._buckets[type];
+        if (bucket === undefined) {
+          var plural = obj.constructor.table_plural;
+          bucket = {objs: [], type: type, plural: plural};
+          this._buckets[type] = bucket;
+        }
+        bucket.objs.push(obj);
+        if (!bucket.in_flight) {
+          elem = this._enqueue_bucket(bucket);
+          bucket.in_flight = true;
+        }
+      }
+      this._step(elem);
+     },
   }, {
     init: function (queue) {
       this._queue = queue;
@@ -41,10 +104,10 @@
         // Finished
         return;
       }
-      var ret, objs = this._queue.splice(0, this.constructor.BATCH);
-      $.when.apply($, objs.map(function (obj) {
-        return obj.o._save.apply(obj.o, obj.a);
-      })).always(this._resolve.bind(this)); // Move on to the next one
+      var objs = this._queue.splice(0, this.constructor.BATCH);
+      $.when.apply($, objs.map(function (f) {
+        return f.apply(this);
+      }.bind(this.constructor))).always(this._resolve.bind(this)); // Move on to the next one
     }
   });
 
