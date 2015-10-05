@@ -56,6 +56,7 @@
         "facility": CMS.Models.Facility,
         "product": CMS.Models.Product,
         "data_asset": CMS.Models.DataAsset,
+        "access_group": CMS.Models.AccessGroup,
         "market": CMS.Models.Market,
         "system_or_process": {
           _discriminator: function(data) {

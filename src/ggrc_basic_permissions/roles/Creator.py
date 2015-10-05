@@ -46,6 +46,14 @@ owner_base = [
         "condition": "contains"
     },
     {
+        "type": "AccessGroup",
+        "terms": {
+            "list_property": "owners",
+            "value": "$current_user"
+        },
+        "condition": "contains"
+    },
+    {
         "type": "Directive",
         "terms": {
             "list_property": "owners",
@@ -250,6 +258,7 @@ permissions = {
         "ControlAssessment",
         "Issue",
         "DataAsset",
+        "AccessGroup",
         "Directive",
         "Contract",
         "Policy",

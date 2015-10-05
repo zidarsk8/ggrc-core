@@ -1173,6 +1173,10 @@ p {
   .tree-title-area & {
     font-weight: normal;
   }
+  .pane-header & {
+    display: inline-block;
+    margin-top: 4px;
+  }
 }
 
 @each $state_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
