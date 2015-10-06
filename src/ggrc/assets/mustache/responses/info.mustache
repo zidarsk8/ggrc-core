@@ -7,19 +7,7 @@
 
 {{#instance}}
   <section class="info">
-    {{#is_info_pin}}
-    <div class="clearfix">
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content pin">
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Response</h6>
-            {{{firstnonempty instance.description 'Response'}}}
-          </div>
-        </div>
-      </div>
-    </div>
-    {{/is_info_pin}}
+
     {{#if options.allow_mapping_or_creating}}
     {{! NB: Creating and editing responses have the same rules. }}
     {{#if_can_create_response options.parent_instance}}
@@ -47,6 +35,21 @@
     </div>
     {{/if_can_create_response}}
     {{/if}}
+
+    {{#is_info_pin}}
+    <div class="clearfix">
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      <div class="tier-content pin">
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Response</h6>
+            {{{firstnonempty instance.description 'Response'}}}
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/is_info_pin}}
+
     <div class="tier-content">
 
       {{! The parent is Audit on My Work/Profile pages }}

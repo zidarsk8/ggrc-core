@@ -8,25 +8,8 @@
 {{#instance}}
   {{#using object=instance.object}}
     <section class="info">
-      {{#is_info_pin}}
-      <div class="clearfix">
-        {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-        <div class="tier-content pin">
-          {{#if object.title}}
-            {{{render '/static/mustache/base_objects/general_info.mustache' instance=object}}}
-          {{else}}
-            <div class="row-fluid wrap-row">
-              <div class="span6">
-                <h6>Title</h6>
-                <h3>{{title}} <span class="gray">Sorry, you do not have access</span> </h3>
-              </div>
-            </div>
-          {{/if}}
-        </div>
-      </div>
-      {{/is_info_pin}}
 
-      <div class="details-wrap no-top">
+      <div class="details-wrap">
         {{#if object.title}}
           <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
           <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
@@ -63,6 +46,24 @@
           </ul>
         {{/if}}
       </div>
+
+      {{#is_info_pin}}
+      <div class="clearfix">
+        {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+        <div class="tier-content pin">
+          {{#if object.title}}
+            {{{render '/static/mustache/base_objects/general_info.mustache' instance=object}}}
+          {{else}}
+            <div class="row-fluid wrap-row">
+              <div class="span6">
+                <h6>Title</h6>
+                <h3>{{title}} <span class="gray">Sorry, you do not have access</span> </h3>
+              </div>
+            </div>
+          {{/if}}
+        </div>
+      </div>
+      {{/is_info_pin}}
 
       <div class="tier-content">
         {{#if_helpers '\
