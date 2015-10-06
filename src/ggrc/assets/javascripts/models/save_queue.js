@@ -40,6 +40,9 @@
         }).always(function(data, type) {
           if (type === "error") {
             data = data.responseJSON;
+            if (data === undefined) {
+              return;
+            }
           }
           var cb = function(single) {
             return function () {
