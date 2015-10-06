@@ -70,6 +70,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , "Vendor" : {}
       , "Project" : {}
       , "DataAsset" : {}
+      , "AccessGroup" : {}
       , "Program" : {}
       , "Market" : {}
       , "Regulation" : {}

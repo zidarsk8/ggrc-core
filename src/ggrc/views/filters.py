@@ -61,7 +61,7 @@ def init_filter_views():
         'Project', 'Facility', 'Product', 'DataAsset', 'Market',
         'System', 'Process'):
       return 'business'
-    elif obj in ('OrgGroup', 'Person'):
+    elif obj in ('OrgGroup', 'Person', 'AccessGroup'):
       return 'entities'
     elif obj in ('Risk', 'RiskyAttribute'):
       return 'risk'

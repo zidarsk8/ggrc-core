@@ -79,6 +79,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
+    , "AccessGroup" : {}
     , "Product" : {}
     , "Market" : {}
   }

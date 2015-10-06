@@ -1,12 +1,13 @@
 /*
  * Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: brad@reciprocitylabs.com
- * Maintained By: brad@reciprocitylabs.com
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
  */
 
 // Pin content
-.pin-content {
+.pin-content,
+.info-pin {
   @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   position: fixed;
   bottom: 40px;
@@ -107,5 +108,195 @@
     &:last-child {
       margin-right: 0;
     }
+  }
+}
+
+.side-content {
+  margin-left: 20px;
+}
+
+.label-list {
+  @extend %reset-list;
+  > li {
+    margin-bottom: 10px;
+    @include clearfix();
+  }
+  &.dates {
+    > li {
+      margin-bottom: 0;
+      position: relative;
+      &:hover {
+        .file-controls {
+          @include opacity(1);
+          left: -51px;
+        }
+      }
+    }
+  }
+  i {
+    @include opacity(.6);
+    @include transition(opacity .2s ease);
+  }
+  a {
+    &:hover {
+      i {
+        @include opacity(1);
+      }
+    }
+  }
+  label {
+    float: left;
+    width: 27%;
+    text-transform: uppercase;
+    font-size: 10px;
+    line-height: 16px;
+    margin-top: 1px;
+    .person-label {
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+      line-height: 16px;
+      font-size: 10px;
+    }
+  }
+  .disabled {
+    cursor: default;
+    @include opacity(.3);
+  }
+  ul {
+    @extend %reset-list;
+    float: left;
+    width: 60%;
+    li {
+      margin-bottom: 3px;
+      position: relative;
+      &:hover {
+        .file-controls {
+          @include opacity(1);
+          left: -51px;
+        }
+      }
+    }
+  }
+}
+
+.file-controls {
+  @include border-radius(11px 0 0 11px);
+  @include box-shadow(-1px 0 1px rgba(0,0,0, .2));
+  @include opacity(0);
+  @include transition(opacity .2s ease, left .2s ease);
+  position: absolute;
+  top: -2px;
+  left: 0;
+  z-index: 9999;
+  background: $white;
+  padding-left: 5px;
+  height: 20px;
+  padding-top: 2px;
+  min-width: 45px;
+  i {
+    @include opacity(.6);
+    @include transition(opacity .2s ease);
+  }
+  a {
+    &:hover {
+      i {
+        @include opacity(1);
+      }
+    }
+  }
+}
+
+.file-list-wrap {
+  margin: 5px 0 0 12px;
+}
+
+.file-list {
+  @extend %reset-list;
+  .date {
+    color: $gray;
+    font-size: 11px;
+    font-style: italic;
+    display: inline-block;
+    margin-right: 4px;
+    line-height: 18px;
+    vertical-align: top;
+  }
+  li {
+    margin-bottom: 10px;
+    position: relative;
+    .entry-list & {
+      @extend %oneline;
+    }
+    &:hover {
+      .file-controls {
+        @include opacity(1);
+        left: -50px;
+      }
+    }
+  }
+  .past-items-list & {
+    li {
+      margin-bottom: 0;
+    }
+    width: 92%;
+    label {
+      display: inline-block;
+      @extend %oneline;
+      width: 88%;
+    }
+    input[type="checkbox"] {
+      float: right;
+    }
+  }
+}
+
+.mapped-list {
+  @extend %reset-list;
+  li {
+    margin-bottom: 5px;
+    position: relative;
+    .person-holder {
+      @extend %oneline;
+      width: 77%;
+      display: inline-block;
+      .past-items-list & {
+        width: 85%;
+      }
+    }
+    &:hover {
+      .file-controls {
+        @include opacity(1);
+        left: -51px;
+      }
+    }
+  }
+}
+
+.pane-header {
+  h3 {
+    overflow: hidden !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 80%;
+    float: left;
+    margin-right: 10px;
+  }
+}
+
+.sticky-info-panel {
+  &.info {
+    margin-top: -15px;
+  }
+  .pane-header {
+    position: fixed;
+    left: 52px;
+    right: 52px;
+    height: 52px;
+    background: $white;
+    border-bottom: 1px solid $lightGray;
+    padding-top: 15px;
+    margin-bottom: 10px;
+    z-index: 9999;
   }
 }

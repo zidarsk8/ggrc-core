@@ -19,7 +19,7 @@
       "Objective", "Control", "Section", "Clause",
       "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project",
-      "MultitypeSearch", "Issue", "ControlAssessment"
+      "MultitypeSearch", "Issue", "ControlAssessment", "AccessGroup"
     ],
     related_object_descriptors = {},
     threat_actor_descriptor, risk_descriptor;
@@ -65,6 +65,7 @@
         },
         related_programs: TypeFilter("related_objects", "Program"),
         related_data_assets: TypeFilter("related_objects", "DataAsset"),
+        related_access_groups: TypeFilter("related_objects", "AccessGroup"),
         related_facilities: TypeFilter("related_objects", "Facility"),
         related_markets: TypeFilter("related_objects", "Market"),
         related_processes: TypeFilter("related_objects", "Process"),
@@ -73,7 +74,6 @@
         related_systems: TypeFilter("related_objects", "System"),
         related_controls: TypeFilter("related_objects", "Control"),
         related_clauses: TypeFilter("related_objects", "Clause"),
-        related_objectives: TypeFilter("related_objects", "Objecitve"),
         related_sections: TypeFilter("related_objects", "Section"),
         related_regulations: TypeFilter("related_objects", "Regulation"),
         related_contracts: TypeFilter("related_objects", "Contract"),
@@ -127,10 +127,14 @@
         is_my_work = function is_my_work() {
           return page_instance.type === "Person";
         },
-        related_or_owned = is_my_work() ? 'owned_' : 'related_';
+        related_or_owned = is_my_work() ? 'owned_' : 'related_',
+        sorted_widget_types = _.sortBy(_risk_object_types, function(type) {
+          var model = CMS.Models[type] || {};
+          return model.title_plural || type;
+        });
 
     // Init widget descriptors:
-    can.each(_risk_object_types, function (model_name) {
+    can.each(sorted_widget_types, function (model_name) {
 
       if (model_name === 'MultitypeSearch') {
         return;
@@ -155,7 +159,7 @@
           model: model,
           mapping: "related_" + model.table_plural,
         }
-      }
+      };
     });
     threat_actor_descriptor = {
       content_controller: CMS.Controllers.TreeView,
@@ -254,7 +258,7 @@
 
 
 
-  GGRC.register_hook("LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_risks");
+  GGRC.register_hook("LHN.Sections_risk", GGRC.mustache_path + "/dashboard/lhn_risks");
 
   RisksExtension.init_mappings();
 

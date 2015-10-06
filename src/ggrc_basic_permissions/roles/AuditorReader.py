@@ -20,6 +20,7 @@ permissions = {
         "Issue",
         "ControlControl",
         "DataAsset",
+        "AccessGroup",
         "Directive",
         "Contract",
         "Policy",
