@@ -16,15 +16,15 @@ from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
-from ggrc.models.reflection import AttributeInfo
 from ggrc.models.track_object_state import track_state_for_class
 from ggrc.models.track_object_state import HasObjectState
 
 
-class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
-              WithContact, Titled, Slugged, Stateful, db.Model,
-              CustomAttributable, Documentable, Personable,
-              Ownable, Relatable):
+class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
+             WithContact, Titled, Slugged, Stateful,
+             db.Model, CustomAttributable, Documentable,
+             Personable, Ownable, Timeboxed, Relatable):
+
   VALID_STATES = [
       'Draft',
       'Final',
@@ -36,22 +36,19 @@ class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
       'Not in Scope',
       'Deprecated',
   ]
-  __tablename__ = 'sections'
-  _table_plural = 'sections'
+  __tablename__ = 'clauses'
+  _table_plural = 'clauses'
   _title_uniqueness = False
   _aliases = {
-    "url": "Section URL",
-    "description": "Text of Section",
-    "directive": {
-      "display_name": "Policy / Regulation / Standard / Contract",
-      "type": AttributeInfo.Type.MAPPING
-    }
+      "url": "Clause URL",
+      "description": "Text of Clause",
+      "directive": None,
   }
 
 
   na = deferred(db.Column(db.Boolean, default=False, nullable=False),
-                'Section')
-  notes = deferred(db.Column(db.Text), 'Section')
+                'Clause')
+  notes = deferred(db.Column(db.Text), 'Clause')
 
   _publish_attrs = [
       'na',
@@ -60,4 +57,4 @@ class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   _sanitize_html = ['notes']
   _include_links = []
 
-track_state_for_class(Section)
+track_state_for_class(Clause)

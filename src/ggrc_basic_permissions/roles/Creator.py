@@ -162,14 +162,6 @@ owner_base = [
     },
     "RelationshipType",
     {
-        "type": "SectionBase",
-        "terms": {
-            "list_property": "owners",
-            "value": "$current_user"
-        },
-        "condition": "contains"
-    },
-    {
         "type": "Section",
         "terms": {
             "list_property": "owners",
@@ -294,7 +286,6 @@ permissions = {
             "condition": "relationship",
         },
         "RelationshipType",
-        "SectionBase",
         "Section",
         "Clause",
         "SystemOrProcess",

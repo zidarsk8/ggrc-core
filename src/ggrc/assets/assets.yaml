@@ -257,7 +257,6 @@ dashboard-js-template-files:
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
   - roles/object_list.mustache
-  - sections/info.mustache
   - sections/modal_content.mustache
   - sections/tree.mustache
   - sections/dropdown_menu.mustache
