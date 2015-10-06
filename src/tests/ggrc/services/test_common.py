@@ -122,7 +122,7 @@ class TestResource(TestCase):
   def headers(self, *args, **kwargs):
     ret = list(args)
     ret.append(('X-Requested-By', 'Unit Tests'))
-    ret.extend([(k, v) for k, v in kwargs.items()])
+    ret.extend(kwargs.items())
     return ret
 
   def test_X_Requested_By_required(self):
