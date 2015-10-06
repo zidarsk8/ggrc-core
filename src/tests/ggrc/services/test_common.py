@@ -281,8 +281,8 @@ class TestResource(TestCase):
         headers=self.headers(),
     )
 
-    self.assertEqual(500, response.status_code)
-    self.assertEqual([201, 500, 201, 500], [i[0] for i in response.json])
+    self.assertEqual(403, response.status_code)
+    self.assertEqual([201, 403, 201, 403], [i[0] for i in response.json])
     self.assertEqual(
         'bar1', response.json[0][1]['services_test_mock_model']['foo'])
     self.assertEqual(
