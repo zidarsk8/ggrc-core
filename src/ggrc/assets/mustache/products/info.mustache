@@ -7,6 +7,9 @@
 
 {{#instance}}
   <section class="info">
+
+    {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+
     {{#is_info_pin}}
     <div class="clearfix">
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
@@ -15,8 +18,6 @@
       </div>
     </div>
     {{/is_info_pin}}
-
-    {{> /static/mustache/base_objects/dropdown_menu.mustache}}
 
     <div class="tier-content">
       {{^is_info_pin}}
