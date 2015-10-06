@@ -132,4 +132,21 @@
 .add-comment {
 	display: none;
 	margin: 10px 0 20px;
+	.controls {
+		// display: none;
+		margin-top: 15px;
+	}
+	textarea {
+		margin-bottom: 0;
+	}
+}
+
+.attachments-preview {
+	ul {
+		@extend %reset-list;
+	}
+	li {
+		display: inline-block;
+		margin: 4px 3px 0 0;
+	}
 }
