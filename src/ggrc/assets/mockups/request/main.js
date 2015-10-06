@@ -105,12 +105,26 @@
         comments: [{
           type: "assignee",
           author: "Albert Chan",
-          date: "09/20/2015 07:31:02am PDT",
-          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus.",
+          date: "09/28/2015 07:31:02am PDT",
+          text: "",
           attachments: [{
+            icon: "text",
             url: "http://google.com/",
             title: "canjs-observe-bug.txt"
+          }, {
+            icon: "pdf",
+            url: "http://google.com/",
+            title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+          }, {
+            icon: "zip",
+            url: "http://google.com/Compressed_files.zip",
+            title: "Compressed_files.zip"
           }]
+        }, {
+          type: "assignee",
+          author: "Albert Chan",
+          date: "09/20/2015 07:31:02am PDT",
+          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus."
         }, {
           type: "verifier",
           author: "Prasanna V.",
@@ -465,12 +479,26 @@
           comments: [{
             type: "assignee",
             author: "Albert Chan",
-            date: "09/20/2015 07:31:02am PDT",
-            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus.",
+            date: "09/28/2015 07:31:02am PDT",
+            text: "",
             attachments: [{
+              icon: "text",
               url: "http://google.com/",
               title: "canjs-observe-bug.txt"
+            }, {
+              icon: "pdf",
+              url: "http://google.com/",
+              title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+            }, {
+              icon: "zip",
+              url: "http://google.com/Compressed_files.zip",
+              title: "Compressed_files.zip"
             }]
+          }, {
+            type: "assignee",
+            author: "Albert Chan",
+            date: "09/20/2015 07:31:02am PDT",
+            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus."
           }, {
             type: "verifier",
             author: "Prasanna V.",

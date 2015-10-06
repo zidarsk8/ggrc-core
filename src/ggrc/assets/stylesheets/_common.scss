@@ -1281,3 +1281,9 @@ label.disabled {
     }
   }
 }
+
+.label-light {
+  background-color: lighten($blue, 55%);
+  color: $black;
+  font-weight: normal;
+}

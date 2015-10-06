@@ -316,9 +316,21 @@
                     <div class="wysiwyg-area">
                       <textarea rows="7" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment"></textarea>
                     </div>
+                    <div class="attachments-preview">
+                      <ul>
+                        <li class="label label-light">canjs-observe-bug</li>
+                        <li class="label label-light">MTV_001_SIGNED_LoginAccess_List</li>
+                        <li class="label label-light">Compressed_files</li>
+                        <li class="label label-light">Compressed_files_2</li>
+                        <li class="label label-light">Compressed_files_abc</li>
+                        <li class="label label-light">Compressed_files_xyz</li>
+                      </ul>
+                    </div>
                     <div class="controls">
                       <a href="javascript://" class="btn btn-success btn-small">Add</a>
                       <a href="javascript://" class="btn btn-draft btn-small">Cancel</a>
+                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Add evidence</a>
+                        <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Add URL</a>
                     </div>
                   </div>
                 </div>
@@ -337,12 +349,8 @@
                     <ul class="attachment-list">
                       <li>
                         <a href="{{url}}" target="_blank">
-                          <i class="grcicon-attach"></i>
+                          <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                           <span>{{title}}</span>
-                        </a>
-                        <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-                          <span class="result"></span>
-                          <i class="grcicon-deleted"></i>
                         </a>
                       </li>
                     </ul>
