@@ -83,7 +83,12 @@
         var bucket = this._buckets[type];
         if (bucket === undefined) {
           var plural = obj.constructor.table_plural;
-          bucket = {objs: [], type: type, plural: plural};
+          bucket = {
+            objs: [],
+            type: type,
+            plural: plural,
+            in_flight: false // is there a "thread" running for this bucket
+          };
           this._buckets[type] = bucket;
         }
         bucket.objs.push(obj);
