@@ -1296,15 +1296,18 @@ ul.new-tree {
   position: relative;
   .info-pane-utility & {
     margin-top: 0;
+    .dropdown-toggle {
+      @include clearfix();
+      height: 8px;
+      padding-top: 9px;
+      padding-bottom: 9px;
+    }
   }
   .pin-content & {
-    margin-top: -54px;
+    margin-top: 4px;
   }
   a {
     display: block;
-  }
-  &.no-top {
-    margin-top: -4px;
   }
   &.pin {
     margin-left: 0;
@@ -1315,12 +1318,6 @@ ul.new-tree {
     .sticky-info-panel & {
       margin-top: -3px;
     }
-  }
-  .dropdown-toggle {
-    @include clearfix();
-    height: 8px;
-    padding-top: 9px;
-    padding-bottom: 9px;
   }
   .bubble {
     float: left;

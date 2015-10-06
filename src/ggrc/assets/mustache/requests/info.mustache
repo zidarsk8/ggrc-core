@@ -7,29 +7,8 @@
 
 {{#instance}}
   <section class="info">
-    {{#is_info_pin}}
-    <div class="clearfix">
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content pin">
-        {{#instance}}
-          <div class="row-fluid wrap-row">
-            <div class="span6">
-              <h6>Request</h6>
-              <div class="rtf-block">
-                {{{firstnonempty instance.description '<i>State your request here...</i>'}}}
-              </div>
-            </div>
-            <div class="span6">
-              <h6>State</h6>
-              <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
-            </div>
-          </div>
-        {{/instance}}
-      </div>
-    </div>
-    {{/is_info_pin}}
 
-    <div class="details-wrap no-top">
+    <div class="details-wrap">
       {{#if_can_edit_request instance}}
       <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
       <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
@@ -53,6 +32,28 @@
       </ul>
       {{/if_can_edit_request}}
     </div>
+
+    {{#is_info_pin}}
+    <div class="clearfix">
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      <div class="tier-content pin">
+        {{#instance}}
+          <div class="row-fluid wrap-row">
+            <div class="span6">
+              <h6>Request</h6>
+              <div class="rtf-block">
+                {{{firstnonempty instance.description '<i>State your request here...</i>'}}}
+              </div>
+            </div>
+            <div class="span6">
+              <h6>State</h6>
+              <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+            </div>
+          </div>
+        {{/instance}}
+      </div>
+    </div>
+    {{/is_info_pin}}
 
     <div class="tier-content">
       <div class="row-fluid wrap-row">
