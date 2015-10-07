@@ -223,11 +223,9 @@
     vertical-align: top;
   }
   li {
+    @extend %oneline;
     margin-bottom: 10px;
     position: relative;
-    .entry-list & {
-      @extend %oneline;
-    }
     &:hover {
       .file-controls {
         @include opacity(1);

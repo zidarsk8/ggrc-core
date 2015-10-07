@@ -364,10 +364,17 @@ dashboard-js-spec-helpers:
   - spec_helpers.js
 
 mockup-js-files:
-  # 3rd party
-  # 3rd party end
+  # Request
+  - request/pages/info.js
+  - request/pages/requests.js
+  - request/pages/objectives.js
+  - request/pages/regulations.js
+  - request/pages/controls.js
+
+  # Bootstrap files shouold be above
   - mockuphelper_controller.js
   - request/main.js
+
 
 mockup-js-template-files:
   - title.mustache

@@ -1281,3 +1281,21 @@ label.disabled {
     }
   }
 }
+
+.label-light {
+  background-color: lighten($blue, 55%);
+  span,
+  a {
+    color: $black;
+    text-shadow: none;
+    font-weight: normal;
+  }
+  a {
+    font-weight: bold;
+    text-decoration: none;
+    padding: 0 2px;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}

@@ -5,7 +5,7 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-<section class="info sticky-info-panel" style="height: 242px !important;">
+<section class="info sticky-info-panel" style="height: 311px !important;">
 
   <div class="details-wrap pin">
     <ul class="pin-action">
@@ -99,25 +99,47 @@
         </div>
 
         <div class="row-fluid wrap-row">
-          <h6>URL / Evidence</h6>
-          <div class="file-list-wrap">
-            <ul class="file-list">
-              {{#files}}
-                <li>
-                  <span class="file-controls">
-                    <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                  </span>
-                  <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                  <span class="date">{{date}}</span>
-                  <a target="_blank" href="{{url}}">
-                    {{name}}
-                  </a>
-                </li>
-              {{/files}}
-            </ul>
+          <div class="span6">
+            <h6>Evidence</h6>
+            <div class="file-list-wrap">
+              <ul class="file-list">
+                {{#files}}
+                  <li>
+                    <span class="file-controls">
+                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                    </span>
+                    <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                    <span class="date">{{date}}</span>
+                    <a target="_blank" href="{{url}}">
+                      {{name}}
+                    </a>
+                  </li>
+                {{/files}}
+              </ul>
 
-            <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Add evidence</a>
-            <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Add URL</a>
+              <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Add evidence</a>
+            </div>
+          </div>
+          <div class="span6">
+            <h6>URL</h6>
+            <div class="file-list-wrap">
+              <ul class="file-list">
+                {{#urls}}
+                  <li>
+                    <span class="file-controls">
+                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                    </span>
+                    <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                    <span class="date">{{date}}</span>
+                    <a target="_blank" href="{{url}}">
+                      {{name}}
+                    </a>
+                  </li>
+                {{/urls}}
+              </ul>
+
+              <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Add URL</a>
+            </div>
           </div>
         </div>
 
@@ -274,7 +296,7 @@
     <div class="tabs-wrap">
       <ul class="nav nav-tabs">
         <li class="active"><a href="#tab1" data-toggle="tab">
-          Comments and Responses (4)
+          Comments and Responses (6)
         </a></li>
         <li><a href="#tab2" data-toggle="tab">
           Request log
@@ -288,15 +310,50 @@
         <div class="tab-pane fade in active" id="tab1">
           <ul class="entry-list">
             <li class="tree-item-add">
+              <a data-show=".add-comment" class="btn btn-draft btn-small js-trigger-addcomment" href="javascript://">
+                Add response
+              </a>
               <div class="add-comment">
                 <div class="row-fluid">
                   <div class="span8">
+                    <div class="controls top">
+                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
+                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
+                    </div>
                     <div class="wysiwyg-area">
-                      <textarea rows="7" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment"></textarea>
+                      <textarea rows="4" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment (optional)"></textarea>
+                    </div>
+                    <div class="attachments-preview">
+                      <ul>
+                        <li class="label label-light">
+                          <span>canjs-observe-bug</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                        <li class="label label-light">
+                          <span>MTV_001_SIGNED_LoginAccess_List</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                        <li class="label label-light">
+                          <span>Compressed_files</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                        <li class="label label-light">
+                          <span>Compressed_files_2</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                        <li class="label label-light">
+                          <span>Compressed_files_abc</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                        <li class="label label-light">
+                          <span>Compressed_files_xyz</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                      </ul>
                     </div>
                     <div class="controls">
                       <a href="javascript://" class="btn btn-success btn-small">Add</a>
-                      <a href="javascript://" class="btn btn-draft btn-small">Cancel</a>
+                      <a href="javascript://" class="btn btn-draft btn-small js-trigger-cancel">Cancel</a>
                     </div>
                   </div>
                 </div>
@@ -308,19 +365,15 @@
                 <div class="w-status">
                   <span class="entry-author">
                     <a href="javascript://">{{author}}</a>
-                    added a comment - {{date}}
+                    {{author_description}} - {{date}}
                   </span>
                   {{text}}
                   {{#attachments}}
                     <ul class="attachment-list">
                       <li>
                         <a href="{{url}}" target="_blank">
-                          <i class="grcicon-attach"></i>
+                          <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                           <span>{{title}}</span>
-                        </a>
-                        <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-                          <span class="result"></span>
-                          <i class="grcicon-deleted"></i>
                         </a>
                       </li>
                     </ul>
