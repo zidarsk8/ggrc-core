@@ -370,6 +370,7 @@ mockup-js-files:
   - request/pages/objectives.js
   - request/pages/regulations.js
   - request/pages/controls.js
+  - request/pages/assessments.js
 
   # Bootstrap files shouold be above
   - mockuphelper_controller.js

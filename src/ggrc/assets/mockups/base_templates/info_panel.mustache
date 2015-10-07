@@ -29,7 +29,7 @@
       <div class="span9">
         <h6>Title</h6>
         <h3>{{info_title}}</h3>
-        <span class="state-value state-inprogress">{{state}}</span>
+        <span class="state-value state-{{state_color}}">{{state}}</span>
       </div>
       <div class="span3">
         <div class="info-pane-utility">
@@ -177,7 +177,7 @@
                     {{#people_requester}}
                       <li>
                         <span class="file-controls">
-                          <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                          <a class="disabled" href="javascript://"><i class="grcicon-deleted"></i></a>
                           <a href="javascript://"><i class="grcicon-edit"></i></a>
                         </span>
                         <a href="javascript://">{{name}}</a>
@@ -194,7 +194,7 @@
                     {{#people_verifier}}
                       <li>
                         <span class="file-controls">
-                          <a class="disabled" href="javascript://"><i class="grcicon-deleted"></i></a>
+                          <a href="javascript://"><i class="grcicon-deleted"></i></a>
                           <a href="javascript://"><i class="grcicon-edit"></i></a>
                         </span>
                         <a href="javascript://">{{name}}</a>

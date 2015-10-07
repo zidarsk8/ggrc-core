@@ -9,6 +9,7 @@
     info_title: "My new request",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae ante dapibus lacus dictum vestibulum. Nullam finibus semper convallis. Ut libero mauris, viverra nec augue eget, congue viverra felis. Aenean ut arcu vel tortor rhoncus dictum id vel urna. Sed a enim laoreet diam lacinia euismod.",
     state: "In Progress",
+    state_color: "inprogress",
     people_assignee: [{
       name: "Gisele Bundchen"
     }, {
