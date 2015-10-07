@@ -72,16 +72,18 @@
         name: "Cara Delevingne"
       }, {
         name: "Adriana Lima"
+      }, {
+        name: "Albert Chan"
       }],
       people_requester: [{
         name: "Doutzen Kroes"
+      }],
+      people_verifier: [{
+        name: "Prasanna V."
       }, {
         name: "Natalia Vodianova"
       }, {
         name: "Miranda Kerr"
-      }],
-      people_verifier: [{
-        name: "Prasanna V."
       }],
       created_on: "12/03/14",
       due_on: "12/31/15",
@@ -107,8 +109,26 @@
       comments: [{
         type: "assignee",
         author: "Albert Chan",
-        date: "09/20/2015 07:31:02am PDT",
-        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus.",
+        author_description: "attached URL",
+        date: "09/29/2015 07:31:02am PDT",
+        attachments: [{
+          icon: "url",
+          url: "https://github.com/",
+          title: "https://github.com/"
+        }, {
+          icon: "url",
+          url: "https://www.google.com/?gws_rd=ssl#q=how+to+cook+salmon",
+          title: "https://www.google.com/?gws_rd=ssl#q=how+to+cook+salmon"
+        }, {
+          icon: "url",
+          url: "https://www.youtube.com/watch?v=Vr9r81O5vN8",
+          title: "https://www.youtube.com/watch?v=Vr9r81O5vN8"
+        }]
+      }, {
+        type: "assignee",
+        author: "Albert Chan",
+        author_description: "attached respond",
+        date: "09/25/2015 07:31:02am PDT",
         attachments: [{
           icon: "text",
           url: "http://google.com/",
@@ -123,18 +143,32 @@
           title: "Compressed_files.zip"
         }]
       }, {
+        type: "assignee",
+        author: "Albert Chan",
+        author_description: "added a comment",
+        date: "09/20/2015 07:31:02am PDT",
+        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus.",
+        attachments: [{
+          icon: "text",
+          url: "http://google.com/",
+          title: "canjs-observe-bug.txt"
+        }]
+      }, {
         type: "verifier",
         author: "Prasanna V.",
+        author_description: "added a comment",
         date: "08/30/2015 05:31:02am PDT",
         text: "Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus."
       }, {
         type: "requester",
         author: "Jost Novljan",
+        author_description: "added a comment",
         date: "07/21/2015 01:31:02pm PDT",
         text: "See usecase here: https://docs.google.com/document/d/1kU6DgyJBOxbPX5eDhphq97dcMhg-b-LpzTJT27XlHYk/edit#heading=h.9wrhlxa3ye2d."
       }, {
         type: "assignee",
         author: "Albert Chan",
+        author_description: "added a comment",
         date: "07/18/2015 03:16:02pm PDT",
         text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus."
       }],

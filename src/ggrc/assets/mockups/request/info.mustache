@@ -298,7 +298,7 @@
       <div class="tabs-wrap">
         <ul class="nav nav-tabs">
           <li class="active"><a href="#tab1" data-toggle="tab">
-            Comments and Responses (4)
+            Comments and Responses (6)
           </a></li>
           <li><a href="#tab2" data-toggle="tab">
             Request log
@@ -318,8 +318,12 @@
                 <div class="add-comment">
                   <div class="row-fluid">
                     <div class="span8">
+                      <div class="controls top">
+                        <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
+                        <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
+                      </div>
                       <div class="wysiwyg-area">
-                        <textarea rows="7" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment"></textarea>
+                        <textarea rows="4" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment (optional)"></textarea>
                       </div>
                       <div class="attachments-preview">
                         <ul>
@@ -351,8 +355,6 @@
                       </div>
                       <div class="controls">
                         <a href="javascript://" class="btn btn-success btn-small">Add</a>
-                        <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
-                        <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
                         <a href="javascript://" class="btn btn-draft btn-small js-trigger-cancel">Cancel</a>
                       </div>
                     </div>
@@ -365,7 +367,7 @@
                   <div class="w-status">
                     <span class="entry-author">
                       <a href="javascript://">{{author}}</a>
-                      added a comment - {{date}}
+                      {{author_description}} - {{date}}
                     </span>
                     {{text}}
                     {{#attachments}}
