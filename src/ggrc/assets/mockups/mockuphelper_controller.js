@@ -76,6 +76,29 @@
         new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
       }
     },
+    ".add-comment .btn-small click": function (el, ev) {
+      var elem = $(ev.target);
+      elem.find("textarea").val("");
+      elem.find(".add-comment").removeClass("active");
+    },
+    ".add-comment .btn-success click": function (el, ev) {
+      var text = $(ev.target).val();
+
+      // this.options.view.comments.push({
+      //   type: "assignee",
+      //   author: "Albert Chan",
+      //   date: moment().format('MM/D/YYYY h:mm:ss a'),
+      //   text: text
+      // })
+    },
+    ".js-trigger-addcomment click": function (el, ev) {
+      this.element.find(el.data("show")).show();
+      el.hide();
+    },
+    ".js-trigger-cancel click": function (el, ev) {
+      this.element.find(".add-comment").hide();
+      this.element.find(".js-trigger-addcomment").show();
+    },
     ".js-trigger-reuse click": function (el, ev) {
       var view = this.options.view,
           checked = _.reduce(view.past_requests, function (val, memo) {

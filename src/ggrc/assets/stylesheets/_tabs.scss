@@ -130,6 +130,7 @@
 }
 
 .add-comment {
+	display: none;
 	margin: 10px 0 20px;
 	.controls {
 		// display: none;
@@ -141,12 +142,10 @@
 }
 
 .attachments-preview {
-	// display: none;
 	ul {
 		@extend %reset-list;
 	}
 	li {
 		display: inline-block;
-		margin: 4px 3px 0 0;
 	}
 }
