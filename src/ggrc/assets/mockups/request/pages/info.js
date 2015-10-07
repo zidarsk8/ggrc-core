@@ -37,11 +37,6 @@
       name: "Compressed_files.zip",
       url: "https://github.com/Compressed_files.zip"
     }, {
-      icon: "url",
-      date: "09/23/2015",
-      name: "https://github.com/",
-      url: "https://github.com/"
-    }, {
       icon: "",
       date: "09/22/2015",
       name: "simple_file.reg",
@@ -72,14 +67,39 @@
       name: "MTV_001_SIGNED_LoginAccess_List.pdf",
       url: "http://google.com/"
     }],
+    urls: [{
+      icon: "url",
+      date: "09/23/2015",
+      name: "https://github.com/",
+      url: "https://github.com/"
+    }, {
+      icon: "url",
+      date: "09/22/2015",
+      name: "https://www.google.com/?gws_rd=ssl#q=how+to+cook+salmon",
+      url: "https://www.google.com/?gws_rd=ssl#q=how+to+cook+salmon"
+    }, {
+      icon: "url",
+      date: "09/21/2015",
+      name: "https://www.youtube.com/watch?v=Vr9r81O5vN8",
+      url: "https://www.youtube.com/watch?v=Vr9r81O5vN8"
+    }],
     comments: [{
       type: "assignee",
       author: "Albert Chan",
       date: "09/20/2015 07:31:02am PDT",
       text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus.",
       attachments: [{
+        icon: "text",
         url: "http://google.com/",
         title: "canjs-observe-bug.txt"
+      }, {
+        icon: "pdf",
+        url: "http://google.com/",
+        title: "MTV_001_SIGNED_LoginAccess_List.pdf"
+      }, {
+        icon: "zip",
+        url: "http://google.com/Compressed_files.zip",
+        title: "Compressed_files.zip"
       }]
     }, {
       type: "verifier",

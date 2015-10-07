@@ -310,6 +310,9 @@
         <div class="tab-pane fade in active" id="tab1">
           <ul class="entry-list">
             <li class="tree-item-add">
+              <a data-show=".add-comment" class="btn btn-draft btn-small js-trigger-addcomment" href="javascript://">
+                Add response
+              </a>
               <div class="add-comment">
                 <div class="row-fluid">
                   <div class="span8">
@@ -318,19 +321,37 @@
                     </div>
                     <div class="attachments-preview">
                       <ul>
-                        <li class="label label-light">canjs-observe-bug</li>
-                        <li class="label label-light">MTV_001_SIGNED_LoginAccess_List</li>
-                        <li class="label label-light">Compressed_files</li>
-                        <li class="label label-light">Compressed_files_2</li>
-                        <li class="label label-light">Compressed_files_abc</li>
-                        <li class="label label-light">Compressed_files_xyz</li>
+                        <li class="label label-light">
+                          <span>canjs-observe-bug</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                        <li class="label label-light">
+                          <span>MTV_001_SIGNED_LoginAccess_List</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                        <li class="label label-light">
+                          <span>Compressed_files</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                        <li class="label label-light">
+                          <span>Compressed_files_2</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                        <li class="label label-light">
+                          <span>Compressed_files_abc</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                        <li class="label label-light">
+                          <span>Compressed_files_xyz</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
                       </ul>
                     </div>
                     <div class="controls">
                       <a href="javascript://" class="btn btn-success btn-small">Add</a>
-                      <a href="javascript://" class="btn btn-draft btn-small">Cancel</a>
-                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Add evidence</a>
-                        <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Add URL</a>
+                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
+                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
+                      <a href="javascript://" class="btn btn-draft btn-small js-trigger-cancel">Cancel</a>
                     </div>
                   </div>
                 </div>
