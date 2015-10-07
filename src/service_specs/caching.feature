@@ -80,7 +80,6 @@ Feature: Resource caching
       | Program            | programs             | description | desc1    | desc2    |
       | ProgramDirective   | program_directives   | status      | Draft    | Final    |
       | Relationship       | relationships        | status      | Draft    | Final    |
-      #| SectionBase        | section_bases        | description | desc1    | desc2    |
       | Section            | sections             | description | desc1    | desc2    |
       | Clause             | clauses              | description | desc1    | desc2    |
       #| SystemOrProcess    | systems_or_processes | description | desc1    | desc2    |

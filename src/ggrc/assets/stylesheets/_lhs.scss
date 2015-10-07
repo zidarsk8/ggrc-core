@@ -330,7 +330,7 @@ h4.search-title {
           @extend %oneline;
           display:block;
           width: auto !important;
-          margin-right: 60px;
+          margin-right: 30px;
           &.lhs-item-long {
             margin-right: 10px;
           }
@@ -342,12 +342,6 @@ h4.search-title {
         &:hover {
           background: $lightGray;
           text-decoration: none;
-        }
-        .lhs-private {
-          margin-right: 17px;
-          position: absolute;
-          top: 0px;
-          right: 20px;
         }
         .lhs-people {
           margin-right: 17px;

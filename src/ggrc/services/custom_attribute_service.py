@@ -5,6 +5,8 @@
 
 from ggrc import db
 from ggrc.models import CustomAttributeDefinition
+from ggrc.utils import underscore_from_camelcase
+
 
 class CustomAttributeService(object):
 
@@ -12,8 +14,9 @@ class CustomAttributeService(object):
 
   """
   @staticmethod
-  def attribute_definitions_for_type(type):
+  def attribute_definitions_for_type(ttype):
     return db.session.query(CustomAttributeDefinition)\
-      .filter(CustomAttributeDefinition.definition_type == type)\
+      .filter(CustomAttributeDefinition.definition_type ==
+              underscore_from_camelcase(ttype))\
       .order_by(CustomAttributeDefinition.title)\
       .all()

@@ -18,6 +18,7 @@ from ggrc.login import get_current_user
 from ggrc.models import Audit
 from ggrc.models import AuditObject
 from ggrc.models import CategoryBase
+from ggrc.models import Contract
 from ggrc.models import CustomAttributeDefinition
 from ggrc.models import CustomAttributeValue
 from ggrc.models import ObjectPerson
@@ -593,7 +594,7 @@ class ProgramColumnHandler(ParentColumnHandler):
     super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
 
 
-class SectionDirectiveColumnHandler(ColumnHandler):
+class SectionDirectiveColumnHandler(MappingColumnHandler):
 
   def get_directive_from_slug(self, directive_class, slug):
     if slug in self.new_objects[directive_class]:
@@ -601,22 +602,22 @@ class SectionDirectiveColumnHandler(ColumnHandler):
     return directive_class.query.filter_by(slug=slug).first()
 
   def parse_item(self):
-    """ get a program from slugs """
-    allowed_directives = [Policy, Regulation, Standard]
+    """ get a directive from slug """
+    allowed_directives = [Policy, Regulation, Standard, Contract]
     if self.raw_value == "":
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
       return None
     slug = self.raw_value
     for directive_class in allowed_directives:
       directive = self.get_directive_from_slug(directive_class, slug)
       if directive is not None:
-        return directive
+        return [directive]
     self.add_error(errors.UNKNOWN_OBJECT, object_type="Program", slug=slug)
     return None
 
   def get_value(self):
-    directive = getattr(self.row_converter.obj, self.key, False)
-    return directive.slug
+    # Legacy field. With the new mapping system it is not possible to determine
+    # which was the primary directive that has been mapped
+    return ""
 
 
 class ControlColumnHandler(MappingColumnHandler):

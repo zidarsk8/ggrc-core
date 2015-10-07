@@ -145,7 +145,7 @@ rules = RuleSet(count_limit=10000, rule_list=[
 
     Rule(
         'mapping to sections and clauses',
-        Attr('directive'),
+        Types.directives,
         {'Section', 'Clause'},
         {'Objective', 'Control'},
     ),

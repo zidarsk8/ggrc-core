@@ -25,16 +25,6 @@
       {{/if_null}}
       {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
     </div>
-    <div data-id="privacy_hidden" class="span6 hidable">
-      <label>
-      Privacy
-        <i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>
-        <a data-id="hide_privacy_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      </label>
-      <div class="checkbox-area">
-        <input data-id="privacy_chkbx" tabindex="2" name="private" value="private" type="checkbox" {{#if private}}checked="checked"{{/if}}> Private Program
-      </div>
-    </div>
   </div>
 
   <!-- Description & owner/contact block  -->

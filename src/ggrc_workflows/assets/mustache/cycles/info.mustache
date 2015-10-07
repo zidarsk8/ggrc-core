@@ -6,14 +6,6 @@
 }}
 
 <section class="info">
-  {{#is_info_pin}}
-    <div class="clearfix">
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content pin">
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-      </div>
-    </div>
-  {{/is_info_pin}}
 
   {{#using instance=instance.workflow}}
   <!-- This should have only view link, shouldn't edit cycle instance of workflow while active -->
@@ -46,6 +38,14 @@
     </div>
   {{/using}}
 
+  {{#is_info_pin}}
+    <div class="clearfix">
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      <div class="tier-content pin">
+        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      </div>
+    </div>
+  {{/is_info_pin}}
 
   <div class="tier-content">
     <div class="row-fluid wrap-row">

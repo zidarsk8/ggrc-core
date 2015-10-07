@@ -35,3 +35,9 @@ class SqlIndexer(Indexer):
     db.session.query(self.record_type).delete()
     if commit:
       db.session.commit()
+
+  def delete_records_by_type(self, type, commit=True):
+    db.session.query(self.record_type).filter(
+      self.record_type.type == type).delete()
+    if commit:
+      db.session.commit()

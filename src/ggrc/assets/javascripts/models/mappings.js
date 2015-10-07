@@ -401,12 +401,8 @@
       _mixins: [
         "related_object", "personable", "ownable"
       ],
-      _canonical: {
-        "sections": "Section"
-      },
-      sections: Direct("Section", "directive", "sections"),
       orphaned_objects: Multi([
-        "sections", "people", "controls", "objectives", "related_objects"
+        "people", "controls", "objectives", "related_objects"
       ])
     },
 
