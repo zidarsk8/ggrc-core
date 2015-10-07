@@ -66,19 +66,6 @@
       {{/is_info_pin}}
 
       <div class="tier-content">
-        {{#if_helpers '\
-          #if_equals' object.type "Program" '\
-          and #if' object.private}}
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>Private Program</h6>
-              <span class="private">
-                <i class="grcicon-private"></i>
-              </span>
-            </div>
-          </div>
-        {{/if_helpers}}
-
         {{{render '/static/mustache/base_objects/description.mustache' instance=object}}}
         {{{render '/static/mustache/base_objects/notes.mustache' instance=object}}}
         {{#if_equals object.class.title_singular 'Program'}}

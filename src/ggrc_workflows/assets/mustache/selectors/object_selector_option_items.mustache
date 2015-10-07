@@ -15,13 +15,6 @@
             <div class="row-fluid">
               <div class="span11">
                 <div class="tree-title-area">
-                  {{#if_helpers '\
-                    #if_equals' instance.type "Program" '\
-                    and #if' instance.private}}
-                    <span class="private">
-                      <i class="grcicon-private"></i>
-                    </span>
-                  {{/if_helpers}}
                   {{firstexist instance.name instance.title instance.link instance.description}}
                   <span class="url-link">
                     {{firstexist instance.email instance.link}}
