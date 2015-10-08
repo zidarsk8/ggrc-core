@@ -387,28 +387,28 @@
                         <p class="instruction">Original value</p>
                         {{#original_value}}
                           {{text}}
-                          {{#file_list}}
-                            <ul class="file-list">
-                              <li>
-                                <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                                {{file_name}}
-                              </li>
-                            </ul>
-                          {{/file_list}}
+                          <ul class="file-list">
+                            {{#file_list}}
+                            <li>
+                              <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                              {{name}}
+                            </li>
+                            {{/file_list}}
+                          </ul>
                         {{/original_value}}
                       </div>
                       <div class="third-col">
                         <p class="instruction">New value</p>
                         {{#new_value}}
                           {{text}}
-                          {{#file_list}}
-                            <ul class="file-list">
-                              <li>
-                                <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                                {{file_name}}
-                              </li>
-                            </ul>
-                          {{/file_list}}
+                          <ul class="file-list">
+                            {{#file_list}}
+                            <li>
+                              <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                              {{name}}
+                            </li>
+                            {{/file_list}}
+                          </ul>
                         {{/new_value}}
                       </div>
                     </div>

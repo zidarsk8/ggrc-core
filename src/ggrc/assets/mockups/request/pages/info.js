@@ -9,16 +9,16 @@
     info_title: "My new request",
     description: Generator.paragraph(7),
     state: "In Progress",
-    people_assignee: Generator.users(5),
-    people_requester: Generator.users(),
-    people_verifier: Generator.users(3),
+    people_assignee: Generator.get("user", 5),
+    people_requester: Generator.get("user"),
+    people_verifier: Generator.get("user", 3),
     created_on: "12/03/14",
     due_on: "12/31/15",
     type_a: "assignee",
     type_r: "requester",
     type_v: "verifier",
-    files: Generator.files(8, {sort: "date"}),
-    comments: Generator.comments(3, {sort: "date"}),
+    files: Generator.get("file", 8, {sort: "date"}),
+    comments: Generator.get("comment", 3, {sort: "date"}),
     logs: [{
       type: "requester",
       author: "Jost Novljan",
@@ -87,11 +87,11 @@
       field: "Evidence",
       original_value: [{
         text: "",
-        file_list: Generator.files(2)
+        file_list: Generator.get("file", "random")
       }],
       new_value: [{
         text: "",
-        file_list: Generator.files(5)
+        file_list: Generator.get("file", "random")
       }]
     }, {
       type: "assignee",
@@ -170,6 +170,6 @@
       state: "In Progress",
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
     }],
-    past_requests: Generator.requests(5)
+    past_requests: Generator.get("request", 5)
   };
 })(GGRC || {}, GGRC.Mockup.Generator);

@@ -18,9 +18,6 @@
       name: g.get_random(FIRST_NAMES) + " " + g.get_random(LAST_NAMES)
     };
   };
-  g.users = function (count) {
-    return _.times(count || 1, g.user);
-  };
   g.get_random = function (arr) {
     return arr[_.random(0, arr.length - 1)];
   };
@@ -46,7 +43,7 @@
     }
     return _.trim(_.times(count || 1, g.sentence).join(" "));
   };
-  g.file = function () {
+  g.file = function (options) {
     var types = "pdf txt xls doc img zip url ".split(" "),
         name = g.get_words(_.random(3, 7), "_"),
         extension = g.get_random(types);
@@ -67,49 +64,44 @@
     // TODO: Moment knows how to handle invalid dates, so I don't care
     return moment(data.month + "-" + data.day + "-" + data.year).format(data.format || "MM/DD/YYYY");
   };
-  g.files = function (count, options) {
-    if (count === 0) {
-      return [];
-    }
-    options = options || {};
-    var files = _.times(count || 1, g.file);
-    if (options.sort === "date") {
-      return g._sort_by_date(files);
-    }
-    return files;
-  };
-  g.comment = function () {
+  g.comment = function (options) {
     var types = "assignee requester verifier".split(" ");
     return {
-      type: g.get_random(types),
+      type: options.type || g.get_random(types),
       author: g.user(),
       date: g.get_date({year: 2015}),
       comment: g.paragraph(_.random(0, 10)),
-      attachments: g.files(_.random(0, 3))
+      attachments: g.get("file", _.random(0, 3))
     };
-  },
-  g.comments = function (count, options) {
-    options = options || {};
-    var comments = _.times(count || 1, g.comment);
-    if (options.sort === "date") {
-      return g._sort_by_date(comments);
-    }
-    return comments;
   };
   g.request = function () {
     return {
       date: g.get_date({year: 2015}),
       title: g.title(),
-      files: g.files(_.random(1, 5))
+      files: g.get("file", _.random(1, 5))
     };
   };
-  g.requests = function (count) {
-    return _.times(count || 1, g.request);
-  }
   g._sort_by_date = function (arr) {
     return _.sortBy(arr, function (item) {
       return moment(item.date).unix();
     }).reverse();
+  };
+g.get = function (type, count, options) {
+    var fn = g[type] || g[type.slice(0, -1)];
+    if (!type || !fn) {
+      return;
+    }
+    options = options || {};
+    if (count === "random") {
+      count = _.random(0, 5);
+    }
+    if (count === 0) {
+      return [];
+    }
+    var values = _.times(count || 1, _.partial(fn, options));
+    if (options.sort === "date") {
+      return g._sort_by_date(values);
+    }
   };
   GGRC.Mockup = GGRC.Mockup || {};
   GGRC.Mockup.Generator = GGRC.Mockup.Generator || g;
