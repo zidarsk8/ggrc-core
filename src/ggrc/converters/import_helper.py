@@ -13,7 +13,8 @@ from ggrc.converters import handlers
 
 _mapping_handlers = {
   "__mapping__:person": handlers.PersonMappingColumnHandler,
-  "__unmapping__:person": handlers.PersonUnmappingColumnHandler
+  "__unmapping__:person": handlers.PersonUnmappingColumnHandler,
+  "directive": handlers.SectionDirectiveColumnHandler
 }
 
 def get_object_column_definitions(object_class):

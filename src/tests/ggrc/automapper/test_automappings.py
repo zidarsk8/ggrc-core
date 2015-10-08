@@ -133,18 +133,19 @@ class TestAutomappings(TestCase):
     })
     section = self.create_object(Section, {
         'title': next('Test section'),
-        'directive': {'id': regulation.id},
     })
     objective = self.create_object(Objective, {'title': next('Objective')})
     self.assert_mapping_implication(
-        to_create=(objective, section),
+        to_create=[(regulation, section), (objective, section)],
         implied=(objective, regulation),
 
     )
     program = self.create_object(Program, {'title': next('Program')})
     self.assert_mapping_implication(
         to_create=[(objective, program)],
-        implied=[(objective, section), (objective, regulation)],
+        implied=[(regulation, section),
+                 (objective, section),
+                 (objective, regulation)],
         relevant=[regulation, section, objective]
     )
 
@@ -171,7 +172,9 @@ class TestAutomappings(TestCase):
     control = self.create_object(Control, {'title': next('Test control')})
     objective = self.create_object(Objective, {'title': next('Test control')})
     self.assert_mapping_implication(
-        to_create=[(section, objective), (objective, control)],
+        to_create=[(regulation, section),
+                   (section, objective),
+                   (objective, control)],
         implied=[
             (regulation, objective),
             (section, control),
@@ -183,6 +186,7 @@ class TestAutomappings(TestCase):
     self.assert_mapping_implication(
         to_create=[(control, program)],
         implied=[
+            (regulation, section),
             (section, objective),
             (objective, control),
             (regulation, objective),
@@ -207,7 +211,9 @@ class TestAutomappings(TestCase):
         'title': next('Test Objective')
     })
     self.assert_mapping_implication(
-        to_create=[(section, objective1), (objective1, objective2)],
+        to_create=[(regulation, section),
+                   (section, objective1),
+                   (objective1, objective2)],
         implied=[
             (section, objective2),
             (regulation, objective1),

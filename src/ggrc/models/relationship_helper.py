@@ -21,21 +21,6 @@ from ggrc.models import all_models
 class RelationshipHelper(object):
 
   @classmethod
-  def section_directive(cls, object_type, related_type, related_ids):
-    directives = {"Policy", "Regulation", "Standard"}
-    if not related_ids:
-      return None
-
-    if object_type == "Section" and related_type in directives:
-      return db.session.query(Section.id).filter(
-          Section.directive_id.in_(related_ids))
-    elif related_type == "Section" and object_type in directives:
-      return db.session.query(Section.directive_id).filter(
-          Section.id.in_(related_ids))
-
-    return None
-
-  @classmethod
   def program_audit(cls, object_type, related_type, related_ids):
     if {object_type, related_type} != {"Program", "Audit"} or not related_ids:
       return None
@@ -183,7 +168,6 @@ class RelationshipHelper(object):
         cls.request_assignee(object_type, related_type, related_ids),
         cls.request_audit_object(object_type, related_type, related_ids),
         cls.request_response(object_type, related_type, related_ids),
-        cls.section_directive(object_type, related_type, related_ids),
         cls.task_group_object(object_type, related_type, related_ids),
     ]
 

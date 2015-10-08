@@ -8,25 +8,8 @@
 {{#instance}}
   {{#using object=instance.object}}
     <section class="info">
-      {{#is_info_pin}}
-      <div class="clearfix">
-        {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-        <div class="tier-content pin">
-          {{#if object.title}}
-            {{{render '/static/mustache/base_objects/general_info.mustache' instance=object}}}
-          {{else}}
-            <div class="row-fluid wrap-row">
-              <div class="span6">
-                <h6>Title</h6>
-                <h3>{{title}} <span class="gray">Sorry, you do not have access</span> </h3>
-              </div>
-            </div>
-          {{/if}}
-        </div>
-      </div>
-      {{/is_info_pin}}
 
-      <div class="details-wrap no-top">
+      <div class="details-wrap">
         {{#if object.title}}
           <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
           <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
@@ -64,20 +47,25 @@
         {{/if}}
       </div>
 
-      <div class="tier-content">
-        {{#if_helpers '\
-          #if_equals' object.type "Program" '\
-          and #if' object.private}}
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>Private Program</h6>
-              <span class="private">
-                <i class="grcicon-private"></i>
-              </span>
+      {{#is_info_pin}}
+      <div class="clearfix">
+        {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+        <div class="tier-content pin">
+          {{#if object.title}}
+            {{{render '/static/mustache/base_objects/general_info.mustache' instance=object}}}
+          {{else}}
+            <div class="row-fluid wrap-row">
+              <div class="span6">
+                <h6>Title</h6>
+                <h3>{{title}} <span class="gray">Sorry, you do not have access</span> </h3>
+              </div>
             </div>
-          </div>
-        {{/if_helpers}}
+          {{/if}}
+        </div>
+      </div>
+      {{/is_info_pin}}
 
+      <div class="tier-content">
         {{{render '/static/mustache/base_objects/description.mustache' instance=object}}}
         {{{render '/static/mustache/base_objects/notes.mustache' instance=object}}}
         {{#if_equals object.class.title_singular 'Program'}}

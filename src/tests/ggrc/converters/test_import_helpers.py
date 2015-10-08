@@ -515,7 +515,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Text of Section",
         "Notes",
-        "Policy / Regulation / Standard",
+        "Policy / Regulation / Standard / Contract",
         "Owner",
         "Primary Contact",
         "Secondary Contact",
