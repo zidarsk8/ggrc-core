@@ -311,14 +311,18 @@
         <div class="tab-content">
           <div class="tab-pane fade in active" id="tab1">
             <div class="tree-item-add">
-              <a data-show=".add-comment" class="btn btn-draft btn-small js-trigger-addcomment" href="javascript://">
+              <a data-show=".add-comment" class="btn btn-draft btn-small bottom-spacing js-trigger-addcomment" href="javascript://">
                 Add response
               </a>
               <div class="add-comment">
                 <div class="row-fluid">
                   <div class="span8">
+                    <div class="controls top">
+                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
+                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
+                    </div>
                     <div class="wysiwyg-area">
-                      <textarea rows="7" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment"></textarea>
+                      <textarea rows="4" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment (optional)"></textarea>
                     </div>
                     <div class="attachments-preview">
                       <ul>
@@ -332,8 +336,6 @@
                     </div>
                     <div class="controls">
                       <a href="javascript://" class="btn btn-success btn-small">Add</a>
-                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
-                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
                       <a href="javascript://" class="btn btn-draft btn-small js-trigger-cancel">Cancel</a>
                     </div>
                   </div>
