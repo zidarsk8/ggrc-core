@@ -364,6 +364,8 @@ dashboard-js-spec-helpers:
   - spec_helpers.js
 
 mockup-js-files:
+  - mockup_generator.js
+
   # Request
   - request/pages/info.js
   - request/pages/requests.js

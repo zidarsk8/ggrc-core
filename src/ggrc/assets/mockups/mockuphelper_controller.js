@@ -6,7 +6,7 @@
 */
 
 
-(function (can, $) {
+(function (can, $, Generator) {
   can.route(":tab", {tab: "Info"});
   can.route(":tab/:item");
 
@@ -82,14 +82,11 @@
       elem.find(".add-comment").removeClass("active");
     },
     ".add-comment .btn-success click": function (el, ev) {
-      var text = $(ev.target).val();
+      var $textarea = this.element.find(".add-comment textarea"),
+          text = $.trim($textarea.val());
 
-      // this.options.view.comments.push({
-      //   type: "assignee",
-      //   author: "Albert Chan",
-      //   date: moment().format('MM/D/YYYY h:mm:ss a'),
-      //   text: text
-      // })
+
+      this.options.view.comments.unshift(Generator.comment());
     },
     ".js-trigger-addcomment click": function (el, ev) {
       this.element.find(el.data("show")).show();
@@ -241,4 +238,4 @@
       this.element.show();
     }
   });
-})(this.can, this.can.$);
+})(this.can, this.can.$, GGRC.Mockup.Generator);
