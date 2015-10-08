@@ -12,13 +12,25 @@
     people_assignee: Generator.get("user", 5),
     people_requester: Generator.get("user"),
     people_verifier: Generator.get("user", 3),
-    created_on: "12/03/14",
-    due_on: "12/31/15",
-    type_a: "assignee",
-    type_r: "requester",
-    type_v: "verifier",
+    state_color: "inprogress",
     files: Generator.get("file", 8, {sort: "date"}),
     comments: Generator.get("comment", 3, {sort: "date"}),
+    urls: [{
+      icon: "url",
+      date: "09/23/2015",
+      name: "https://github.com/",
+      url: "https://github.com/"
+    }, {
+      icon: "url",
+      date: "09/22/2015",
+      name: "https://www.google.com/?gws_rd=ssl#q=how+to+cook+salmon",
+      url: "https://www.google.com/?gws_rd=ssl#q=how+to+cook+salmon"
+    }, {
+      icon: "url",
+      date: "09/21/2015",
+      name: "https://www.youtube.com/watch?v=Vr9r81O5vN8",
+      url: "https://www.youtube.com/watch?v=Vr9r81O5vN8"
+    }],
     logs: [{
       type: "requester",
       author: "Jost Novljan",

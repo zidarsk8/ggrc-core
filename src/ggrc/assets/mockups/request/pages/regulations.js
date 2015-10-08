@@ -7,12 +7,13 @@
     icon: "grcicon-regulation-color",
     template: "/request/audit.mustache",
     children: [{
-      title: "My new request",
-      info_title: "My new request",
+      title: "My new regulation",
+      info_title: "My new regulation",
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae ante dapibus lacus dictum vestibulum. Nullam finibus semper convallis. Ut libero mauris, viverra nec augue eget, congue viverra felis. Aenean ut arcu vel tortor rhoncus dictum id vel urna. Sed a enim laoreet diam lacinia euismod.",
-      state: "In Progress",
-      type: "audit",
-      status: "In Progress",
+      state: "Draft",
+      state_color: "draft",
+      type: "regulation",
+      status: "Draft",
       id: "2",
       files: [{
         icon: "zip",
@@ -397,14 +398,14 @@
         id: "12"
       }]
     }, {
-      title: "Simple Request for Programs",
-      type: "issue",
+      title: "Severe Rusty Creek",
+      type: "regulation",
       id: "3",
       status: "Draft",
       children: []
     }, {
-      title: "Request made for Sections inspection",
-      type: "audit",
+      title: "Early Furious Flannel",
+      type: "regulation",
       id: "5",
       status: "Draft",
       children: [{

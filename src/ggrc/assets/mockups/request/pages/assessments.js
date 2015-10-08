@@ -2,24 +2,29 @@
   GGRC.Bootstrap.Mockups = GGRC.Bootstrap.Mockups || {};
   GGRC.Bootstrap.Mockups.Request = GGRC.Bootstrap.Mockups.Request || {};
 
-  GGRC.Bootstrap.Mockups.Request.Requests = {
-    title: "Requests",
-    icon: "grcicon-request-color",
+  GGRC.Bootstrap.Mockups.Request.Assessments = {
+    title: "Assessments",
+    icon: "grcicon-assessment-color",
     template: "/request/audit.mustache",
     children: [{
-      title: "My new request",
-      info_title: "My new request",
+      title: "Very first assessment for this Request",
+      info_title: "Very first assessment for this Request",
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae ante dapibus lacus dictum vestibulum. Nullam finibus semper convallis. Ut libero mauris, viverra nec augue eget, congue viverra felis. Aenean ut arcu vel tortor rhoncus dictum id vel urna. Sed a enim laoreet diam lacinia euismod.",
-      state: "In Progress",
-      state_color: "inprogress",
-      type: "audit",
-      status: "In Progress",
+      state: "Draft",
+      state_color: "draft",
+      type: "assessment",
+      status: "Draft",
       id: "2",
       files: [{
         icon: "zip",
         date: "09/24/2015",
         name: "Compressed_files.zip",
         url: "https://github.com/Compressed_files.zip"
+      }, {
+        icon: "url",
+        date: "09/23/2015",
+        name: "https://github.com/",
+        url: "https://github.com/"
       }, {
         icon: "",
         date: "09/22/2015",
@@ -51,40 +56,22 @@
         name: "MTV_001_SIGNED_LoginAccess_List.pdf",
         url: "http://google.com/"
       }],
-      urls: [{
-        icon: "url",
-        date: "09/23/2015",
-        name: "https://github.com/",
-        url: "https://github.com/"
-      }, {
-        icon: "url",
-        date: "09/22/2015",
-        name: "https://www.google.com/?gws_rd=ssl#q=how+to+cook+salmon",
-        url: "https://www.google.com/?gws_rd=ssl#q=how+to+cook+salmon"
-      }, {
-        icon: "url",
-        date: "09/21/2015",
-        name: "https://www.youtube.com/watch?v=Vr9r81O5vN8",
-        url: "https://www.youtube.com/watch?v=Vr9r81O5vN8"
-      }],
       people_assignee: [{
         name: "Gisele Bundchen"
       }, {
         name: "Cara Delevingne"
       }, {
         name: "Adriana Lima"
-      }, {
-        name: "Albert Chan"
       }],
       people_requester: [{
         name: "Doutzen Kroes"
-      }],
-      people_verifier: [{
-        name: "Prasanna V."
       }, {
         name: "Natalia Vodianova"
       }, {
         name: "Miranda Kerr"
+      }],
+      people_verifier: [{
+        name: "Prasanna V."
       }],
       created_on: "12/03/14",
       due_on: "12/31/15",
@@ -110,66 +97,25 @@
       comments: [{
         type: "assignee",
         author: "Albert Chan",
-        author_description: "attached URL",
-        date: "09/29/2015 07:31:02am PDT",
-        attachments: [{
-          icon: "url",
-          url: "https://github.com/",
-          title: "https://github.com/"
-        }, {
-          icon: "url",
-          url: "https://www.google.com/?gws_rd=ssl#q=how+to+cook+salmon",
-          title: "https://www.google.com/?gws_rd=ssl#q=how+to+cook+salmon"
-        }, {
-          icon: "url",
-          url: "https://www.youtube.com/watch?v=Vr9r81O5vN8",
-          title: "https://www.youtube.com/watch?v=Vr9r81O5vN8"
-        }]
-      }, {
-        type: "assignee",
-        author: "Albert Chan",
-        author_description: "attached respond",
-        date: "09/25/2015 07:31:02am PDT",
-        attachments: [{
-          icon: "text",
-          url: "http://google.com/",
-          title: "canjs-observe-bug.txt"
-        }, {
-          icon: "pdf",
-          url: "http://google.com/",
-          title: "MTV_001_SIGNED_LoginAccess_List.pdf"
-        }, {
-          icon: "zip",
-          url: "http://google.com/Compressed_files.zip",
-          title: "Compressed_files.zip"
-        }]
-      }, {
-        type: "assignee",
-        author: "Albert Chan",
-        author_description: "added a comment",
         date: "09/20/2015 07:31:02am PDT",
         text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus.",
         attachments: [{
-          icon: "text",
           url: "http://google.com/",
           title: "canjs-observe-bug.txt"
         }]
       }, {
         type: "verifier",
         author: "Prasanna V.",
-        author_description: "added a comment",
         date: "08/30/2015 05:31:02am PDT",
         text: "Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus."
       }, {
         type: "requester",
         author: "Jost Novljan",
-        author_description: "added a comment",
         date: "07/21/2015 01:31:02pm PDT",
         text: "See usecase here: https://docs.google.com/document/d/1kU6DgyJBOxbPX5eDhphq97dcMhg-b-LpzTJT27XlHYk/edit#heading=h.9wrhlxa3ye2d."
       }, {
         type: "assignee",
         author: "Albert Chan",
-        author_description: "added a comment",
         date: "07/18/2015 03:16:02pm PDT",
         text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non mauris euismod, suscipit velit eu, imperdiet ex. Curabitur nisl diam, blandit in luctus ac, eleifend quis libero. Morbi in lobortis risus. Vestibulum congue dictum finibus."
       }],
@@ -452,14 +398,14 @@
         id: "12"
       }]
     }, {
-      title: "Simple Request for Programs",
-      type: "issue",
+      title: "Brutal Pure Firecracker",
+      type: "assessment",
       id: "3",
       status: "Draft",
       children: []
     }, {
-      title: "Request made for Sections inspection",
-      type: "audit",
+      title: "Sleepy Vital Notorious",
+      type: "assessment",
       id: "5",
       status: "Draft",
       children: [{
