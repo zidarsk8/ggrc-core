@@ -310,70 +310,54 @@
 
         <div class="tab-content">
           <div class="tab-pane fade in active" id="tab1">
-            <ul class="entry-list">
-              <li class="tree-item-add">
-                <a data-show=".add-comment" class="btn btn-draft btn-small js-trigger-addcomment" href="javascript://">
-                  Add response
-                </a>
-                <div class="add-comment">
-                  <div class="row-fluid">
-                    <div class="span8">
-                      <div class="wysiwyg-area">
-                        <textarea rows="7" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment"></textarea>
-                      </div>
-                      <div class="attachments-preview">
-                        <ul>
-                          <li class="label label-light">
-                            <span>canjs-observe-bug</span>
-                            <a href="#" class="js-trigger-removeattachment">&times;</a>
-                          </li>
-                          <li class="label label-light">
-                            <span>MTV_001_SIGNED_LoginAccess_List</span>
-                            <a href="#" class="js-trigger-removeattachment">&times;</a>
-                          </li>
-                          <li class="label label-light">
-                            <span>Compressed_files</span>
-                            <a href="#" class="js-trigger-removeattachment">&times;</a>
-                          </li>
-                          <li class="label label-light">
-                            <span>Compressed_files_2</span>
-                            <a href="#" class="js-trigger-removeattachment">&times;</a>
-                          </li>
-                          <li class="label label-light">
-                            <span>Compressed_files_abc</span>
-                            <a href="#" class="js-trigger-removeattachment">&times;</a>
-                          </li>
-                          <li class="label label-light">
-                            <span>Compressed_files_xyz</span>
-                            <a href="#" class="js-trigger-removeattachment">&times;</a>
-                          </li>
-                        </ul>
-                      </div>
-                      <div class="controls">
-                        <a href="javascript://" class="btn btn-success btn-small">Add</a>
-                        <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
-                        <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
-                        <a href="javascript://" class="btn btn-draft btn-small js-trigger-cancel">Cancel</a>
-                      </div>
+            <div class="tree-item-add">
+              <a data-show=".add-comment" class="btn btn-draft btn-small js-trigger-addcomment" href="javascript://">
+                Add response
+              </a>
+              <div class="add-comment">
+                <div class="row-fluid">
+                  <div class="span8">
+                    <div class="wysiwyg-area">
+                      <textarea rows="7" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment"></textarea>
+                    </div>
+                    <div class="attachments-preview">
+                      <ul>
+                      {{#attachment}}
+                        <li class="label label-light">
+                          <span>{{name}}</span>
+                          <a href="#" class="js-trigger-removeattachment">&times;</a>
+                        </li>
+                      {{/attachment}}
+                      </ul>
+                    </div>
+                    <div class="controls">
+                      <a href="javascript://" class="btn btn-success btn-small">Add</a>
+                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
+                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
+                      <a href="javascript://" class="btn btn-draft btn-small js-trigger-cancel">Cancel</a>
                     </div>
                   </div>
                 </div>
-              </li>
+              </div>
+            </div>
+            <ul class="entry-list">
               {{#comments}}
                 <li>
                   <span class="person-label {{type}}"></span>
                   <div class="w-status">
                     <span class="entry-author">
-                      <a href="javascript://">{{author}}</a>
+                      {{#author}}
+                        <a href="javascript://">{{name}}</a>
+                      {{/author}}
                       added a comment - {{date}}
                     </span>
-                    {{text}}
+                    {{comment}}
                     {{#attachments}}
                       <ul class="attachment-list">
                         <li>
                           <a href="{{url}}" target="_blank">
                             <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                            <span>{{title}}</span>
+                            <span>{{name}}</span>
                           </a>
                         </li>
                       </ul>
