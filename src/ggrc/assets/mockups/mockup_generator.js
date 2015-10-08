@@ -54,6 +54,7 @@
     return _.trim(_.times(count || 1, g.sentence).join(" "));
   };
   g.file = function (options) {
+    options = options || {};
     var types = "pdf txt xls doc img zip url ".split(" "),
         name = g.get_words(_.random(3, 7), "_"),
         extension = g.get_random(types);
@@ -75,6 +76,7 @@
     return moment(data.month + "-" + data.day + "-" + data.year).format(data.format || "MM/DD/YYYY");
   };
   g.comment = function (options) {
+    options = options || {};
     var types = "assignee requester verifier".split(" ");
     return {
       type: options.type || g.get_random(types),
