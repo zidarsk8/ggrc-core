@@ -32,6 +32,9 @@
       return arr[num];
     }).join(join);
   };
+  g.title = function (len) {
+    return _.startCase(g.get_words(_.random(3, 7)));
+  };
   g.sentence = function (len) {
     var punctuation = ".",
         sentence = g.get_words(_.random(3, len || 15));
@@ -90,6 +93,16 @@
     }
     return comments;
   };
+  g.request = function () {
+    return {
+      date: g.get_date({year: 2015}),
+      title: g.title(),
+      files: g.files(_.random(1, 5))
+    };
+  };
+  g.requests = function (count) {
+    return _.times(count || 1, g.request);
+  }
   g._sort_by_date = function (arr) {
     return _.sortBy(arr, function (item) {
       return moment(item.date).unix();

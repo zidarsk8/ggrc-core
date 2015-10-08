@@ -170,63 +170,6 @@
       state: "In Progress",
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
     }],
-    past_requests: [{
-      date: "26/09/2015",
-      title: "My new request lorem ipsum dolor sit amet consectetur adipiscing elit morbi et turpis et arcu viverra posuere in et sapien",
-      past_requests_files: [{
-        icon: "pdf",
-        name: "MTV_001_SIGNED_LoginAccess_List.pdf",
-        date: "10/09/2015",
-        url: "http://www.happy-day.com"
-      }, {
-        icon: "pdf",
-        name: "MTV_aug_SIGNED_LoginAccess_List.pdf",
-        date: "10/09/2015",
-        url: "http://www.happy-day.com"
-      }, {
-        icon: "pdf",
-        name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
-        date: "10/09/2015",
-        url: "http://www.happy-day.com"
-      }]
-    }, {
-      date: "20/09/2015",
-      title: "My new request",
-      past_requests_files: [{
-        icon: "pdf",
-        name: "MTV_001_SIGNED_LoginAccess_List.pdf",
-        date: "10/09/2015",
-        url: "http://www.happy-day.com"
-      }, {
-        icon: "pdf",
-        name: "MTV_aug_SIGNED_LoginAccess_List.pdf",
-        date: "10/09/2015",
-        url: "http://www.happy-day.com"
-      }, {
-        icon: "pdf",
-        name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
-        date: "10/09/2015",
-        url: "http://www.happy-day.com"
-      }]
-    }, {
-      date: "10/09/2015",
-      title: "My new request",
-      past_requests_files: [{
-        icon: "pdf",
-        name: "MTV_001_SIGNED_LoginAccess_List.pdf",
-        date: "10/09/2015",
-        url: "http://www.happy-day.com"
-      }, {
-        icon: "pdf",
-        name: "MTV_aug_SIGNED_LoginAccess_List.pdf",
-        date: "10/09/2015",
-        url: "http://www.happy-day.com"
-      }, {
-        icon: "pdf",
-        name: "MTV_sep_SIGNED_LoginAccess_List.pdf",
-        date: "10/09/2015",
-        url: "http://www.happy-day.com"
-      }]
-    }]
+    past_requests: Generator.requests(5)
   };
 })(GGRC || {}, GGRC.Mockup.Generator);
