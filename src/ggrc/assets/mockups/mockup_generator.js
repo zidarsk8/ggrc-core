@@ -41,6 +41,9 @@
     return _.capitalize(sentence) + punctuation;
   };
   g.paragraph = function (count) {
+    if (count === 0) {
+      return "";
+    }
     return _.trim(_.times(count || 1, g.sentence).join(" "));
   };
   g.file = function () {
@@ -81,7 +84,7 @@
       type: g.get_random(types),
       author: g.user(),
       date: g.get_date({year: 2015}),
-      comment: g.paragraph(10),
+      comment: g.paragraph(_.random(0, 10)),
       attachments: g.files(_.random(0, 3))
     };
   },
