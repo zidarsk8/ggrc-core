@@ -104,7 +104,7 @@
             <div class="span6">
               <h6>Evidence</h6>
               <div class="file-list-wrap">
-                <ul class="file-list">
+                <ul class="attachment-list">
                   {{#files}}
                     <li>
                       <span class="file-controls">
@@ -125,7 +125,7 @@
             <div class="span6">
               <h6>URL</h6>
               <div class="file-list-wrap">
-                <ul class="file-list">
+                <ul class="attachment-list">
                   {{#urls}}
                     <li>
                       <span class="file-controls">
@@ -354,16 +354,16 @@
                       added a response - {{date}}
                     </span>
                     {{comment}}
-                    {{#attachments}}
-                      <ul class="attachment-list">
+                    <ul class="attachment-list">
+                      {{#attachments}}
                         <li>
+                          <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                           <a href="{{url}}" target="_blank">
-                            <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                            <span>{{name}}</span>
+                            {{name}}
                           </a>
                         </li>
-                      </ul>
-                    {{/attachments}}
+                      {{/attachments}}
+                    </ul>
                   </div>
                 </li>
               {{/comments}}
@@ -495,7 +495,7 @@
                     </ul>
                   </div>
                   <div class="large-col">
-                    <ul class="file-list">
+                    <ul class="attachment-list">
                       {{#files}}
                         <li>
                           <label>

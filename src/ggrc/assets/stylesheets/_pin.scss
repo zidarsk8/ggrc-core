@@ -211,7 +211,7 @@
   margin: 5px 0 0 12px;
 }
 
-.file-list {
+.attachment-list {
   @extend %reset-list;
   .date {
     color: $gray;
@@ -245,10 +245,35 @@
     label {
       display: inline-block;
       @extend %oneline;
-      width: 88%;
+      width: 95%;
     }
     input[type="checkbox"] {
       float: right;
+    }
+  }
+  .entry-list & {
+    padding: 4px 0 0 0;
+    li {
+      margin-left: -4px;
+      .info-action {
+        @include opacity(1);
+        i {
+          margin-top: 0;
+        }
+      }
+      a {
+        width: auto;
+        display: inline;
+        &:hover {
+          text-decoration: underline;
+          span {
+            text-decoration: underline;
+          }
+        }
+      }
+      [class^="grcicon-"] {
+        margin-top: 1px;
+      }
     }
   }
 }
