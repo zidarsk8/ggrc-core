@@ -237,6 +237,7 @@
         });
     },
     "{can.route} tab": function (router, ev, tab) {
+      this.activePanel = _.findWhere(this.options.views, {title: tab});
       this.element.hide();
     },
     "{can.route} item": function (router, ev, item) {
@@ -255,7 +256,7 @@
       item = item.split("-");
       var view = _.compact(_.flattenDeep(_.map(this.options.views, recursiveFind)))[0];
       this.active = view;
-      this.element.html(can.view(this.options.view, view));
+      this.element.html(can.view(this.activePanel.infopane_template || this.options.view, view));
       this.element.show();
     }
   });
