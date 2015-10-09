@@ -590,7 +590,6 @@
             fetch_post_process: sort_sections,
             show_view: GGRC.mustache_path + "/directives/tree.mustache",
             footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/business_objects/tree_add_item.mustache"
           },
           Policy: {
             mapping: "policies",
