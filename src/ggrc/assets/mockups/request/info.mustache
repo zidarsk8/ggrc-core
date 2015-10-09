@@ -43,6 +43,12 @@
                 <span class="bubble"></span>
               </a>
               <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+                <li>
+                  <a href="javascript://">
+                    <i class="grcicon-add-black"></i>
+                    Define Assessment template
+                  </a>
+                </li>
                 {{#is_allowed 'update' instance context='for'}}
                   {{> /static/mustache/base_objects/edit_object_link.mustache}}
                 {{/is_allowed}}
