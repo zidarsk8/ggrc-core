@@ -75,6 +75,18 @@
 			content: "V";
 		}
 	}
+	&.lead {
+		background: $orange;
+		&:after {
+			content: "L";
+		}
+	}
+	&.auditor {
+		background: $olive;
+		&:after {
+			content: "A";
+		}
+	}
 }
 
 .third-col {

@@ -4,33 +4,6 @@
  * Created By: brad@reciprocitylabs.com
  * Maintained By: brad@reciprocitylabs.com
  */
-
-.attachment-list {
-  @extend %reset-list;
-  padding: 4px 0 0 0;
-  li {
-    margin-left: -6px;
-    margin-bottom: 6px !important;
-    .info-action {
-      @include opacity(1);
-      i {
-        margin-top: 0;
-      }
-    }
-    a {
-      &:hover {
-        text-decoration: underline;
-        span {
-          text-decoration: underline;
-        }
-      }
-    }
-    [class^="grcicon-"] {
-      margin-top: 1px;
-    }
-  }
-}
-
 .mockup-tree {
   .tree-item {
     .tree-title-area {
