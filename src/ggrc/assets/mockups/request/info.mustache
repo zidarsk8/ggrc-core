@@ -111,7 +111,7 @@
                         <a href="javascript://"><i class="grcicon-deleted"></i></a>
                       </span>
                       <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                      <span class="date">{{date}}</span>
+                      <span class="date">{{timestamp}}</span>
                       <a target="_blank" href="{{url}}">
                         {{name}}
                       </a>
@@ -132,7 +132,7 @@
                         <a href="javascript://"><i class="grcicon-deleted"></i></a>
                       </span>
                       <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                      <span class="date">{{date}}</span>
+                      <span class="date">{{timestamp}}</span>
                       <a target="_blank" href="{{url}}">
                         {{name}}
                       </a>
@@ -322,18 +322,18 @@
                     </div>
                     <div class="attachments-preview">
                       <ul>
-                      {{#attachment}}
+                      {{#comment_attachments}}
                         <li class="label label-light">
                           <span>{{name}}</span>
                           <a href="#" class="js-trigger-removeattachment">&times;</a>
                         </li>
-                      {{/attachment}}
+                      {{/comment_attachments}}
                       </ul>
                     </div>
                     <div class="controls">
                       <a href="javascript://" class="btn btn-success btn-small">Add</a>
-                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
-                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
+                      <a href="javascript://" class="btn btn-draft btn-small js-trigger-attachdata" data-type="file"><i class="grcicon-attach"></i> Attach evidence</a>
+                      <a href="javascript://" class="btn btn-draft btn-small js-trigger-attachdata" data-type="url"><i class="grcicon-link"></i> Attach URL</a>
                       <a href="javascript://" class="btn btn-draft btn-small js-trigger-cancel">Cancel</a>
                     </div>
                   </div>
@@ -343,14 +343,13 @@
             <ul class="entry-list">
               {{#comments}}
                 <li>
-                  <span class="person-label {{type}}"></span>
-                  <div class="w-status">
-                    <span class="entry-author">
-                      {{#author}}
-                        <a href="javascript://">{{name}}</a>
-                      {{/author}}
-                      added a response - {{date}}
-                    </span>
+                  {{#author}}
+                    <span class="person-label {{type}}"></span>
+                    <div class="w-status">
+                      <span class="entry-author">
+                          <a href="javascript://">{{name}}</a>
+                        added a response - {{timestamp}}
+                      </span>
                     {{comment}}
                     {{#attachments}}
                       <ul class="attachment-list">
@@ -362,7 +361,8 @@
                         </li>
                       </ul>
                     {{/attachments}}
-                  </div>
+                    </div>
+                  {{/author}}
                 </li>
               {{/comments}}
             </ul>
@@ -375,7 +375,7 @@
                   <div class="w-status">
                     <span class="entry-author">
                       <a href="javascript://">{{author}}</a>
-                      {{log_status}} - {{date}}
+                      {{log_status}} - {{timestamp}}
                     </span>
                     <div class="clearfix">
                       <div class="third-col">
@@ -439,7 +439,7 @@
               {{#past_requests}}
                 <li class="clearfix">
                   <div class="mini-col">
-                    {{date}}
+                    {{timestamp}}
                   </div>
                   <div class="xmedium-col">
                     <a target="_blank" href="javascript://">

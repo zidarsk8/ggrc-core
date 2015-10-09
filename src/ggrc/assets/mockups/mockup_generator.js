@@ -11,12 +11,17 @@
       WORDS = "all undertaken by government market network over family tribe formal informal organization territory through laws norms power language relates processes interaction decision-making among actors involved collective problem that lead creation reinforcement reproduction social norms institutions distinguish term governance from government government formal body invested with authority make decisions given political system this case governance process which includes all actors involved influencing decision-making process such as lobbies parties medias centered on relevant governing body whether organization geopolitical entity nation-state corporation business organization incorporated as legal entity socio-political entity chiefdom tribe family etc an informal one its governance way rules norms actions are produced sustained regulated held accountable degree formality depends on internal rules given organization absence actors administer affecting aimed already also among analysed analytical any apply applying approaches are article articulated as associated assure at authority authors banks based be becht beginning being best between board boards bolton both business by called can century citizens clear coherent collective community complex concept connections consists contrast control corporate corporation corporation creating customers customs deals decisions defined denote describe describes differences direct directioncorporate directors documented edit eells empirical employees environment environmental equals especially established example exercise exist explicit fiduciary finance first five focus focuses for form formal found framework free from functioning gaf generate global goal goals governance governancecorporate governanceglobal governanceinformation governanceinternet governanceit governance government group has have however in include includes independent industry informal information institutions inter- interact interchangeable interdependent interests international internet investigating investment involved is issues it itself james large laws lenders like logically main make management manner many markets meaning mechanisms mediated methodology mission mitigate need needs nodal non-governmental non-normative non-profit norms obligations observed of often older on or organization organizations other over overarching people perspective pg plane players points policies policy political polity postulated practical primarily principal problems processes project projects proposes public regarding regular regulation regulators reinforcing relations relationship relationships research respect responsibility richard right risks rules sector serves set shareholders social society some sometimes stakeholders states structure successful suppliers system technology term terms textbooks their these those through thus tool traditional trust trustees understood units unlike up use used value various was way where wherever which whom with word".split(" "),
       SITES = "Google.com Facebook.com Amazon.com Youtube.com Yahoo.com Wikipedia.org Ebay.com Twitter.com Go.com Craigslist.org Reddit.com Netflix.com Linkedin.com Live.com Bing.com Espn.go.com Pinterest.com Imgur.com Tumblr.com Chase.com Cnn.com Apple.com Paypal.com Blogspot.com Instagram.com".split(" ");
 
-  function g() {
+  var g = function() {
+    this.u = g.user();
+    this.d = g.get_date({today: true});
     return this;
-  }
-  g.user = function () {
+  };
+  g.user = function (options) {
+    options = options || {};
+    var types = "assignee requester verifier".split(" ");
     return {
-      name: g.get_random(FIRST_NAMES) + " " + g.get_random(LAST_NAMES)
+      name: g.get_random(FIRST_NAMES) + " " + g.get_random(LAST_NAMES),
+      type: options.type || g.get_random(types)
     };
   };
   g.url = function () {
@@ -62,12 +67,15 @@
     return {
       name: name + (extension ? "." + extension : ""),
       icon: extension || "",
-      date: g.get_date(),
+      timestamp: g.get_date(),
       url: "http:/google.com"
     };
   };
   g.get_date = function (data) {
     data = data || {};
+    if (data.today) {
+      return moment().format(data.format || "MM/DD/YYYY");
+    }
     data.month = data.month || _.random(1, 12);
     data.day = data.day || _.random(1, 31);
     data.year = data.year || _.random(2003, 2015);
@@ -77,18 +85,16 @@
   };
   g.comment = function (options) {
     options = options || {};
-    var types = "assignee requester verifier".split(" ");
     return {
-      type: options.type || g.get_random(types),
       author: g.user(),
-      date: g.get_date({year: 2015}),
+      timestamp: g.get_date({year: 2015}),
       comment: g.paragraph(_.random(0, 10)),
       attachments: g.get("file", _.random(0, 3))
     };
   };
   g.request = function () {
     return {
-      date: g.get_date({year: 2015}),
+      timestamp: g.get_date({year: 2015}),
       title: g.title(),
       files: g.get("file", _.random(1, 5))
     };
@@ -98,7 +104,7 @@
       return moment(item.date).unix();
     }).reverse();
   };
-g.get = function (type, count, options) {
+  g.get = function (type, count, options) {
     var fn = g[type] || g[type.slice(0, -1)];
     if (!type || !fn) {
       return;
@@ -116,6 +122,8 @@ g.get = function (type, count, options) {
     }
     return values;
   };
+
   GGRC.Mockup = GGRC.Mockup || {};
   GGRC.Mockup.Generator = GGRC.Mockup.Generator || g;
+  GGRC.Mockup.Generator.current = GGRC.Mockup.Generator.current || new g();
 })(this.GGRC, this._);
