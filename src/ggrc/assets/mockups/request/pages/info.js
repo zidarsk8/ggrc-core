@@ -6,7 +6,7 @@
     title: "Info",
     icon: "grcicon-info",
     template: "/request/info.mustache",
-    info_title: "My new request",
+    info_title: "My new audit",
     description: Generator.paragraph(7),
     state: "In Progress",
     people_assignee: Generator.get("user", 5),
