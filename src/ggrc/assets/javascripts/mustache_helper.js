@@ -2993,7 +2993,7 @@ Mustache.registerHelper("if_less", function (a, b, options) {
   }
 });
 
-Mustache.registerHelper("assign_tab_index", function(index, increment, options) {
+Mustache.registerHelper("add_index", function(index, increment, options) {
   index = Mustache.resolve(index);
   increment = Mustache.resolve(increment);
 

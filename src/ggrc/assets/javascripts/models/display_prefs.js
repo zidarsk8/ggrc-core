@@ -212,27 +212,27 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   }
 
   , setModalState : function (model_name, display_state) {
-    var path = null, hdr = this.getObject(path, MODAL_STATE), obj = {};
+    var path = null, modal_state = this.getObject(path, MODAL_STATE), obj = {};
 
-    if (!hdr) {
-      hdr = this.makeObject(path, MODAL_STATE);
+    if (!modal_state) {
+      modal_state = this.makeObject(path, MODAL_STATE);
     }
 
     obj.display_state = display_state;
-    hdr.attr(model_name, obj);
+    modal_state.attr(model_name, obj);
 
     this.autoupdate && this.save();
     return this;
   }
 
   , getModalState : function (model_name) {
-    var value = this.getObject(null, MODAL_STATE);
+    var modal_state = this.getObject(null, MODAL_STATE);
 
-    if (!value || !value[model_name]) {
+    if (!modal_state || !modal_state[model_name]) {
       return null;
     }
 
-    return value[model_name].display_state;
+    return modal_state[model_name].display_state;
   }
 
   , setChildTreeDisplayList : function (model_name, display_list) {

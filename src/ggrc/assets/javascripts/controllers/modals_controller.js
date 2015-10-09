@@ -536,16 +536,19 @@ can.Control("GGRC.Controllers.Modals", {
     this.options.reset_visible = true;
 
     $hidables.addClass("hidden");
-    $(this.element).find(".inner-hide").addClass("inner-hidable");
+    this.element.find(".inner-hide").addClass("inner-hidable");
 
     //Set up the hidden elements index to 1
     for (i = 0; i < hidden_elements.length; i++) {
-      var tab_value = $(hidden_elements[i]).attr("tabindex");
+      var $hidden_element = $(hidden_elements[i]),
+          tab_value = $hidden_element.attr("tabindex");
       //The UI array index start from 0, and tab-index/io-index is from 1
       if(tab_value > 0){
         this.options.ui_array[tab_value-1] = 1;
-        $(hidden_elements[i]).attr("tabindex", "-1");
-        $(hidden_elements[i]).attr("uiindex", tab_value);
+        $hidden_element.attr({
+          tabindex: "-1",
+          uiindex: tab_value
+        });
       }
     }
 
@@ -577,8 +580,8 @@ can.Control("GGRC.Controllers.Modals", {
     }
 
     this.options.reset_visible = false;
-    $(this.element).find(".hidden").removeClass("hidden");
-    $(this.element).find(".inner-hide").removeClass("inner-hidable");
+    this.element.find(".hidden").removeClass("hidden");
+    this.element.find(".inner-hide").removeClass("inner-hidable");
     el.hide();
     $hideButton.show();
     return false
@@ -633,8 +636,10 @@ can.Control("GGRC.Controllers.Modals", {
 
           if ($selected) {
             $selected.closest(".hidable").addClass("hidden");
-            $selected.attr("uiindex", tabindex);
-            $selected.attr("tabindex", "-1");
+            $selected.attr({
+              uiindex: tabindex,
+              tabindex: "-1"
+            });
           }
         }
       }
