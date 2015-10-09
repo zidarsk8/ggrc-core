@@ -102,7 +102,7 @@
           <div class="span6">
             <h6>Evidence</h6>
             <div class="file-list-wrap">
-              <ul class="file-list">
+              <ul class="attachment-list">
                 {{#files}}
                   <li>
                     <span class="file-controls">
@@ -123,7 +123,7 @@
           <div class="span6">
             <h6>URL</h6>
             <div class="file-list-wrap">
-              <ul class="file-list">
+              <ul class="attachment-list">
                 {{#urls}}
                   <li>
                     <span class="file-controls">
@@ -308,82 +308,65 @@
 
       <div class="tab-content">
         <div class="tab-pane fade in active" id="tab1">
-          <ul class="entry-list">
-            <li class="tree-item-add">
-              <a data-show=".add-comment" class="btn btn-draft btn-small js-trigger-addcomment" href="javascript://">
-                Add response
-              </a>
-              <div class="add-comment">
-                <div class="row-fluid">
-                  <div class="span8">
-                    <div class="controls top">
-                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
-                      <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
-                    </div>
-                    <div class="wysiwyg-area">
-                      <textarea rows="4" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment (optional)"></textarea>
-                    </div>
-                    <div class="attachments-preview">
-                      <ul>
-                        <li class="label label-light">
-                          <span>canjs-observe-bug</span>
-                          <a href="#" class="js-trigger-removeattachment">&times;</a>
-                        </li>
-                        <li class="label label-light">
-                          <span>MTV_001_SIGNED_LoginAccess_List</span>
-                          <a href="#" class="js-trigger-removeattachment">&times;</a>
-                        </li>
-                        <li class="label label-light">
-                          <span>Compressed_files</span>
-                          <a href="#" class="js-trigger-removeattachment">&times;</a>
-                        </li>
-                        <li class="label label-light">
-                          <span>Compressed_files_2</span>
-                          <a href="#" class="js-trigger-removeattachment">&times;</a>
-                        </li>
-                        <li class="label label-light">
-                          <span>Compressed_files_abc</span>
-                          <a href="#" class="js-trigger-removeattachment">&times;</a>
-                        </li>
-                        <li class="label label-light">
-                          <span>Compressed_files_xyz</span>
-                          <a href="#" class="js-trigger-removeattachment">&times;</a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="controls">
-                      <a href="javascript://" class="btn btn-success btn-small">Add</a>
-                      <a href="javascript://" class="btn btn-draft btn-small js-trigger-cancel">Cancel</a>
-                    </div>
+          <div class="tree-item-add">
+            <a data-show=".add-comment" class="btn btn-draft btn-small bottom-spacing js-trigger-addcomment" href="javascript://">
+              Add response
+            </a>
+            <div class="add-comment">
+              <div class="row-fluid">
+                <div class="span8">
+                  <div class="controls top">
+                    <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
+                    <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
+                  </div>
+                  <div class="wysiwyg-area">
+                    <textarea rows="4" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment (optional)"></textarea>
+                  </div>
+                  <div class="attachments-preview">
+                    <ul>
+                    {{#attachment}}
+                      <li class="label label-light">
+                        <span>{{name}}</span>
+                        <a href="#" class="js-trigger-removeattachment">&times;</a>
+                      </li>
+                    {{/attachment}}
+                    </ul>
+                  </div>
+                  <div class="controls">
+                    <a href="javascript://" class="btn btn-success btn-small">Add</a>
+                    <a href="javascript://" class="btn btn-draft btn-small js-trigger-cancel">Cancel</a>
                   </div>
                 </div>
               </div>
-            </li>
+            </div>
+          </div>
+          <ul class="entry-list">
             {{#comments}}
               <li>
                 <span class="person-label {{type}}"></span>
                 <div class="w-status">
                   <span class="entry-author">
-                    <a href="javascript://">{{author}}</a>
-                    {{author_description}} - {{date}}
+                    {{#author}}
+                      <a href="javascript://">{{name}}</a>
+                    {{/author}}
+                    added a response - {{date}}
                   </span>
-                  {{text}}
-                  {{#attachments}}
-                    <ul class="attachment-list">
+                  {{comment}}
+                  <ul class="attachment-list">
+                    {{#attachments}}
                       <li>
+                        <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                         <a href="{{url}}" target="_blank">
-                          <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                          <span>{{title}}</span>
+                          {{name}}
                         </a>
                       </li>
-                    </ul>
-                  {{/attachments}}
+                    {{/attachments}}
+                  </ul>
                 </div>
               </li>
             {{/comments}}
           </ul>
         </div>
-
         <div class="tab-pane fade" id="tab2">
           <ul class="entry-list">
             {{#logs}}
@@ -403,28 +386,28 @@
                       <p class="instruction">Original value</p>
                       {{#original_value}}
                         {{text}}
-                        {{#file_list}}
-                          <ul class="file-list">
-                            <li>
-                              <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                              {{file_name}}
-                            </li>
-                          </ul>
-                        {{/file_list}}
+                        <ul class="attachment-list">
+                          {{#file_list}}
+                          <li class="oneline">
+                            <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                            {{name}}
+                          </li>
+                          {{/file_list}}
+                        </ul>
                       {{/original_value}}
                     </div>
                     <div class="third-col">
                       <p class="instruction">New value</p>
                       {{#new_value}}
                         {{text}}
-                        {{#file_list}}
-                          <ul class="file-list">
-                            <li>
-                              <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                              {{file_name}}
-                            </li>
-                          </ul>
-                        {{/file_list}}
+                        <ul class="attachment-list">
+                          {{#file_list}}
+                          <li class="oneline">
+                            <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                            {{name}}
+                          </li>
+                          {{/file_list}}
+                        </ul>
                       {{/new_value}}
                     </div>
                   </div>
@@ -510,8 +493,8 @@
                   </ul>
                 </div>
                 <div class="large-col">
-                  <ul class="file-list">
-                    {{#past_requests_files}}
+                  <ul class="attachment-list">
+                    {{#files}}
                       <li>
                         <label>
                           <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
@@ -519,7 +502,7 @@
                         </label>
                         <input type="checkbox" class="js-trigger-pastfile" {{{data "item"}}}>
                       </li>
-                    {{/past_requests_files}}
+                    {{/files}}
                   </ul>
                 </div>
               </li>

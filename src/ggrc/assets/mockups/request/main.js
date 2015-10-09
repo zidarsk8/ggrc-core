@@ -18,7 +18,7 @@
     // Object:
     object: {
       icon: "grciconlarge-audit",
-      title: "My new request",
+      title: "My new audit",
     },
     // Views:
     views: _.values(GGRC.Bootstrap.Mockups.Request)
