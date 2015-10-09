@@ -122,6 +122,36 @@
     }
     return values;
   };
+  g._create_single = function (data, options) {
+    var alias = {
+          "date": "get_date",
+          "timestamp": "get_date",
+          "text": "paragraph",
+          "user": "user",
+          "files": "file"
+        },
+        rGenerator = /^\%\S+$/i,
+        result = {};
+
+     _.each(data, function (val, prop) {
+      if (options.randomize === prop) {
+        result[prop] = g._create_single(g.get_random(val), options);
+        return;
+      }
+      if (rGenerator.test(val)) {
+        result[prop] = g[alias[val.substr(1)]]();
+      } else if (_.isObject(val) && !_.isEmpty(val)) {
+        result[prop] = g._create_single(val, options);
+      } else if (!_.isNumber(prop)) {
+        result[prop] = val;
+      }
+     });
+     return result;
+  };
+  g.create = function (data, options) {
+    options = options || {};
+    return _.times(options.count || 1, _.partial(this._create_single, data, options));
+  };
 
   GGRC.Mockup = GGRC.Mockup || {};
   GGRC.Mockup.Generator = GGRC.Mockup.Generator || g;
