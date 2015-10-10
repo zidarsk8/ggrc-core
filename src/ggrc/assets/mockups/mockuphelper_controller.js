@@ -134,6 +134,48 @@
           isChecked = el.prop("checked");
 
       data.attr("checked", isChecked);
+    },
+
+    // TO-DO: Please check this and optimize if needed
+    ".show-hidden-fields click": function (el, ev) {
+      if($(".hidden-fields-area").hasClass("active")) {
+        $(".hidden-fields-area").removeClass("active");
+        $(".hidden-fields-area").css("display", "none");
+      } else {
+        $(".hidden-fields-area").addClass("active");
+        $(".hidden-fields-area").css("display", "block");
+      }
+    },
+
+    // TO-DO: This is not working, but you can see idea what needs to happened. Please make it work
+    "#assessorDefault change":function (el, ev) {
+      $(this).find("option:selected").each(function() {
+        var $value = $(this).val(),
+            $input = $(this).closest(".choose-from-select").find(".choose-input");
+
+        if($value === "other") {
+          $input.prop("disabled", false);
+        } else {
+          $input.prop("disabled", true);
+        }
+      });
+    },
+
+    // TO-DO: This is not working, but you can see idea what needs to happened. Please make it work
+    "#underAssessment change":function (el, ev) {
+      $(this).find("option:selected").each(function() {
+        var $value = $(this).val(),
+            $label = $(this).closest(".choose-object").find(".inline-check"),
+            $input = $label.find('input');
+
+        if($value === "Control") {
+          $input.prop("disabled", false);
+          $label.removeClass("disabled");
+        } else {
+          $input.prop("disabled", true);
+          $label.addClass("disabled");
+        }
+      });
     }
   });
 
