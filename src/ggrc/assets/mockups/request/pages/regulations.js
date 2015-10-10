@@ -6,6 +6,7 @@
     title: "Regulations",
     icon: "grcicon-regulation-color",
     template: "/request/audit.mustache",
+    infopane_template: "/static/mockups/base_templates/info_panel.mustache",
     children: [{
       title: "My new regulation",
       info_title: "My new regulation",
