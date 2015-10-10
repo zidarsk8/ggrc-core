@@ -6,6 +6,7 @@
     title: "Objectives",
     icon: "grcicon-objective-color",
     template: "/request/audit.mustache",
+    infopane_template: "/static/mockups/base_templates/info_panel_objective.mustache",
     children: [{
       title: "Hidden Bitter Mustard",
       info_title: "Hidden Bitter Mustard",

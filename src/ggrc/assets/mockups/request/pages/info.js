@@ -9,6 +9,8 @@
     info_title: "My new audit",
     description: Generator.paragraph(7),
     state: "In Progress",
+    type_lead: "lead",
+    type_auditor: "auditor",
     people_assignee: Generator.get("user", 5),
     people_requester: Generator.get("user"),
     people_verifier: Generator.get("user", 3),
