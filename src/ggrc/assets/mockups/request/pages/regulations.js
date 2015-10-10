@@ -1,4 +1,4 @@
-(function (GGRC) {
+(function (GGRC, Generator) {
   GGRC.Bootstrap.Mockups = GGRC.Bootstrap.Mockups || {};
   GGRC.Bootstrap.Mockups.Request = GGRC.Bootstrap.Mockups.Request || {};
 
@@ -57,23 +57,9 @@
         name: "MTV_001_SIGNED_LoginAccess_List.pdf",
         url: "http://google.com/"
       }],
-      people_assignee: [{
-        name: "Gisele Bundchen"
-      }, {
-        name: "Cara Delevingne"
-      }, {
-        name: "Adriana Lima"
-      }],
-      people_requester: [{
-        name: "Doutzen Kroes"
-      }, {
-        name: "Natalia Vodianova"
-      }, {
-        name: "Miranda Kerr"
-      }],
-      people_verifier: [{
-        name: "Prasanna V."
-      }],
+      people_assignee: Generator.get("user", 3),
+      people_requester: Generator.get("user"),
+      people_secondary: Generator.get("user"),
       created_on: "12/03/14",
       due_on: "12/31/15",
       type_a: "assignee",
@@ -436,4 +422,4 @@
       }]
     }]
   };
-})(GGRC || {});
+})(GGRC || {}, GGRC.Mockup.Generator);
