@@ -63,6 +63,12 @@
 			content: "A";
 		}
 	}
+	&.assessor {
+		background: $purple;
+		&:after {
+			content: "S";
+		}
+	}
 	&.requester {
 		background: $purple;
 		&:after {

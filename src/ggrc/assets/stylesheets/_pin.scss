@@ -327,3 +327,24 @@
     z-index: 9999;
   }
 }
+
+.inline-radio-list {
+  @extend %reset-list;
+  @include clearfix();
+  li {
+    float: left;
+    margin-right: 20px;
+    &:last-child {
+      margin-right: 0;
+    }
+    input {
+      margin: -3px 0 0 0;
+    }
+  }
+  &.full-width {
+    li {
+      width: 20%;
+      margin-right: 0;
+    }
+  }
+}
