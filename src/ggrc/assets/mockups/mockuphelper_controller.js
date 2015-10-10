@@ -65,7 +65,8 @@
 
   can.Control("CMS.Controllers.MockupView", {
     defaults: {
-      title_view: GGRC.mustache_path + "/title.mustache"
+      title_view: GGRC.mustache_path + "/title.mustache",
+      comment_attachments: new can.List
     }
   }, {
     init: function (el, options) {
@@ -76,17 +77,37 @@
         new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
       }
     },
-    ".add-comment .btn-small click": function (el, ev) {
-      var elem = $(ev.target);
-      elem.find("textarea").val("");
-      elem.find(".add-comment").removeClass("active");
+    ".add-comment .js-trigger-cancel click": "cleanComments",
+    "{view.comments} add": "cleanComments",
+    ".add-comment .js-trigger-attachdata click": function (el, ev) {
+      var type = el.data("type"),
+          typeFn = Generator[type];
+
+      if (!typeFn) {
+        return;
+      };
+      this.options.comment_attachments.push(typeFn());
+    },
+    "cleanComments": function () {
+      this.element.find(".add-comment textarea").val("");
+      this.options.comment_attachments.replace([]);
     },
     ".add-comment .btn-success click": function (el, ev) {
       var $textarea = this.element.find(".add-comment textarea"),
-          text = $.trim($textarea.val());
+          text = $.trim($textarea.val()),
+          attachments = this.options.comment_attachments;
 
-
-      this.options.view.comments.unshift(Generator.comment());
+      if (!text.length && !attachments.length) {
+        return;
+      }
+      this.options.view.comments.unshift({
+        author: Generator.current.u,
+        timestamp: Generator.current.d,
+        comment: text,
+        attachments: _.map(attachments, function (attachment) {
+          return attachment;
+        })
+      });
     },
     ".js-trigger-addcomment click": function (el, ev) {
       this.element.find(el.data("show")).show();
@@ -216,6 +237,7 @@
         });
     },
     "{can.route} tab": function (router, ev, tab) {
+      this.activePanel = _.findWhere(this.options.views, {title: tab});
       this.element.hide();
     },
     "{can.route} item": function (router, ev, item) {
@@ -234,7 +256,7 @@
       item = item.split("-");
       var view = _.compact(_.flattenDeep(_.map(this.options.views, recursiveFind)))[0];
       this.active = view;
-      this.element.html(can.view(this.options.view, view));
+      this.element.html(can.view(this.activePanel.infopane_template || this.options.view, view));
       this.element.show();
     }
   });
