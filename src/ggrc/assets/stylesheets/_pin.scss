@@ -227,8 +227,9 @@
     position: relative;
     &:hover {
       .file-controls {
+        min-width: 25px;
         @include opacity(1);
-        left: -50px;
+        left: -30px;
       }
     }
     a {
