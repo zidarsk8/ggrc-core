@@ -227,8 +227,8 @@
     position: relative;
     &:hover {
       .file-controls {
-        min-width: 25px;
         @include opacity(1);
+        min-width: 25px;
         left: -30px;
       }
     }
@@ -295,7 +295,8 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        left: -51px;
+        min-width: 25px;
+        left: -30px;
       }
     }
   }
