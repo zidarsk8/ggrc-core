@@ -10,6 +10,7 @@ from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters.handlers import UserColumnHandler
 from ggrc.login import get_current_user
+from ggrc.models import Context
 from ggrc.models import Person
 from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
@@ -127,9 +128,13 @@ class UserRoleColumnHandler(UserColumnHandler):
     if self.dry_run or not self.value:
       return
     self.remove_current_roles()
+    context = None
+    if self.value.name == "gGRC Admin":
+      context = Context.query.filter_by(name="System Administration").first()
     user_role = UserRole(
         role=self.value,
-        person=self.row_converter.obj
+        person=self.row_converter.obj,
+        context=context,
     )
     db.session.add(user_role)
     self.dry_run = True

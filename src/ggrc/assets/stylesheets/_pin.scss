@@ -228,12 +228,13 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        left: -50px;
+        min-width: 25px;
+        left: -30px;
       }
     }
     a {
       @extend %oneline;
-      width: 75%;
+      width: 68%;
       display: inline-block;
     }
   }
@@ -294,7 +295,8 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        left: -51px;
+        min-width: 25px;
+        left: -30px;
       }
     }
   }

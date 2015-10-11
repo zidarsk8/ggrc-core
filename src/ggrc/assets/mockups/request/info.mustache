@@ -222,64 +222,6 @@
             </div>
           </div>
 
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>Mapped objects</h6>
-              <div class="side-content">
-                <ul class="mapped-list">
-                  {{#mapped_objects}}
-                    <li>
-                      <span class="file-controls">
-                        <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                      </span>
-                      <i class="grcicon-{{icon}}-color"></i>
-                      <span class="person-holder">
-                        <a href='mailto:{{email}}' target="_blank">
-                          <span class="person-tooltip-trigger" data-placement="top">
-                            {{title}}
-                          </span>
-                        </a>
-
-                        <div class="custom-popover-content">
-                          <div class="preview-container person-preview">
-                            <div class="row-fluid">
-                              <div class="span12">
-                                <div class="profile-info">
-                                  <div class="row-fluid wrap-row">
-                                    <div class="span8">
-                                      <h6>Title</h6>
-                                      <h5 class="oneline"><i class="grcicon-{{icon}}-color"></i> {{title}}</h5>
-                                    </div>
-                                    <div class="span4">
-                                      <h6>Status</h6>
-                                      {{state}}
-                                    </div>
-                                  </div>
-                                  <div class="row-fluid wrap-row">
-                                    <div class="span12">
-                                      <h6>Description</h6>
-                                      {{description}}
-                                    </div>
-                                  </div>
-
-                                  {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </span>
-                    </li>
-                  {{/mapped_objects}}
-                </ul>
-                <a class="btn btn-draft btn-small" href="javascript://">
-                  Map objects
-                </a>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
 
