@@ -103,7 +103,7 @@ dashboard-js-files:
   - apps/dashboard.js
   - apps/custom_attributes.js
   - dashboard.js
-  # - jquery.iframe-transport.js
+  - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   - components/link_to_clipboard.js
   - components/relevant_filters.js
