@@ -107,6 +107,7 @@
                   <li>
                     <span class="file-controls">
                       <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                      <a href="javascript://"><i class="grcicon-edit"></i></a>
                     </span>
                     <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                     <span class="date">{{date}}</span>
@@ -355,6 +356,10 @@
                   <ul class="attachment-list">
                     {{#attachments}}
                       <li>
+                        <span class="file-controls">
+                          <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                          <a href="javascript://"><i class="grcicon-edit"></i></a>
+                        </span>
                         <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                         <a href="{{url}}" target="_blank">
                           {{name}}

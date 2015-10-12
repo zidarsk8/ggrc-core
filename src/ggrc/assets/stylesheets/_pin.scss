@@ -228,8 +228,10 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        min-width: 25px;
-        left: -30px;
+        left: -50px;
+        a {
+          width: auto;
+        }
       }
     }
     a {
