@@ -100,46 +100,10 @@
 
         <div class="row-fluid wrap-row">
           <div class="span6">
-            <h6>Evidence</h6>
-            <div class="file-list-wrap">
-              <ul class="attachment-list">
-                {{#files}}
-                  <li>
-                    <span class="file-controls">
-                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                    </span>
-                    <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                    <span class="date">{{date}}</span>
-                    <a target="_blank" href="{{url}}">
-                      {{name}}
-                    </a>
-                  </li>
-                {{/files}}
-              </ul>
-
-              <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Add evidence</a>
-            </div>
+            <attachment-list title="Evidence" data="comments" types="!url"></attachment-list>
           </div>
           <div class="span6">
-            <h6>URL</h6>
-            <div class="file-list-wrap">
-              <ul class="attachment-list">
-                {{#urls}}
-                  <li>
-                    <span class="file-controls">
-                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                    </span>
-                    <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                    <span class="date">{{date}}</span>
-                    <a target="_blank" href="{{url}}">
-                      {{name}}
-                    </a>
-                  </li>
-                {{/urls}}
-              </ul>
-
-              <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Add URL</a>
-            </div>
+            <attachment-list title="URL" data="comments" types="url"></attachment-list>
           </div>
         </div>
 
@@ -349,7 +313,7 @@
                     {{#author}}
                       <a href="javascript://">{{name}}</a>
                     {{/author}}
-                    added a response - {{date}}
+                    added a response - {{timestamp}}
                   </span>
                   {{comment}}
                   <ul class="attachment-list">
@@ -375,7 +339,7 @@
                 <div class="w-status">
                   <span class="entry-author">
                     <a href="javascript://">{{author}}</a>
-                    {{log_status}} - {{date}}
+                    {{log_status}} - {{timestamp}}
                   </span>
                   <div class="clearfix">
                     <div class="third-col">
@@ -439,7 +403,7 @@
             {{#past_requests}}
               <li class="clearfix">
                 <div class="mini-col">
-                  {{date}}
+                  {{timestamp}}
                 </div>
                 <div class="xmedium-col">
                   <a target="_blank" href="javascript://">
@@ -494,7 +458,7 @@
                 </div>
                 <div class="large-col">
                   <ul class="attachment-list">
-                    {{#files}}
+                    {{#each files}}
                       <li>
                         <label>
                           <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>

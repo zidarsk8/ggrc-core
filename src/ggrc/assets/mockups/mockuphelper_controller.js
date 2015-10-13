@@ -299,4 +299,32 @@
       this.element.show();
     }
   });
+
+  can.Component.extend({
+    tag: "attachment-list",
+    template: can.view("/static/mockups/base_templates/attachment_list.mustache"),
+    scope: {
+      title: "@",
+      types: "@",
+      files: can.compute(function () {
+        var types = this.attr("types"),
+            isNegation = types.charAt(0) === "!";
+        if (isNegation) {
+          types = types.slice(1);
+        }
+        return _.reduce(this.attr("data"), function (memo, comment) {
+          var attachments = _.filter(comment.attachments, function (attachment) {
+            if (isNegation) {
+              return attachment.extension !== types;
+            }
+            return attachment.extension === types;
+          });
+          if (attachments.length) {
+            return memo.concat(attachments);
+          }
+          return memo;
+        }, []);
+      })
+    }
+  });
 })(this.can, this.can.$, GGRC.Mockup.Generator);

@@ -28,7 +28,8 @@
     var site = g.get_random(SITES);
     return {
       icon: "url",
-      date: g.get_date({year: 2015}),
+      extension: "url",
+      timestamp: g.get_date({year: 2015}),
       name: site,
       url: "http://" + site.toLowerCase() + "/"
     };
@@ -63,9 +64,12 @@
     var types = "pdf txt xls doc img zip url ".split(" "),
         name = g.get_words(_.random(3, 7), "_"),
         extension = g.get_random(types);
-
+    if (extension === "url") {
+      return g.url();
+    }
     return {
       name: name + (extension ? "." + extension : ""),
+      extension: extension || "",
       icon: extension || "",
       timestamp: g.get_date(),
       url: "http:/google.com"
