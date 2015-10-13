@@ -153,7 +153,7 @@
       data.attr("checked", isChecked);
     },
     ".show-hidden-fields click": function (el, ev) {
-      this.element.find(".hidden-fields-area").toggleClass("active");
+      $(".hidden-fields-area").toggleClass("active");
     }
   });
 
