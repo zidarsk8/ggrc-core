@@ -199,6 +199,7 @@
     @include transition(opacity .2s ease);
   }
   a {
+    width: auto !important;
     &:hover {
       i {
         @include opacity(1);
@@ -228,8 +229,7 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        min-width: 25px;
-        left: -30px;
+        left: -50px;
       }
     }
     a {

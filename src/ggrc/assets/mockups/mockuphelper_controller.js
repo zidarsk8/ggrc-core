@@ -29,6 +29,8 @@
           };
       new CMS.Controllers.MockupNav(this.element.find(".internav"), options);
       new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), options);
+      new CMS.Controllers.MockupModalView(this.element);
+
       this.element.find(".title-content").html(can.view(this.options.title_view, opts.object));
       this.options.views = views;
     },
@@ -65,18 +67,33 @@
 
   can.Control("CMS.Controllers.MockupView", {
     defaults: {
-      title_view: GGRC.mustache_path + "/title.mustache",
-      comment_attachments: new can.List
+      title_view: GGRC.mustache_path + "/title.mustache"
     }
   }, {
-    init: function (el, options) {
-      this.element.html(can.view(GGRC.mustache_path + options.view.template, _.extend(this.options, {
-        instance: options.view
-      })));
-      if (options.view.children) {
-        new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
+      init: function (el, options) {
+        this.element.html(can.view(GGRC.mustache_path + options.view.template, _.extend(this.options, {
+          instance: options.view
+        })));
+        if (options.view.children) {
+          new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
+        }
+        if (options.view.title === "Info") {
+          this.cached = new CMS.Controllers.MockupInfoView(this.element);
+        }
+      },
+      destroy: function () {
+        if (this.cached) {
+          this.cached.destroy();
+        }
+        can.Control.prototype.destroy.call(this);
       }
-    },
+  });
+
+  can.Control("CMS.Controllers.MockupInfoView", {
+    defaults: {
+      comment_attachments: new can.List()
+    }
+  }, {
     ".add-comment .js-trigger-cancel click": "cleanComments",
     "{view.comments} add": "cleanComments",
     ".add-comment .js-trigger-attachdata click": function (el, ev) {
@@ -135,47 +152,20 @@
 
       data.attr("checked", isChecked);
     },
-
-    // TO-DO: Please check this and optimize if needed
     ".show-hidden-fields click": function (el, ev) {
-      if($(".hidden-fields-area").hasClass("active")) {
-        $(".hidden-fields-area").removeClass("active");
-        $(".hidden-fields-area").css("display", "none");
-      } else {
-        $(".hidden-fields-area").addClass("active");
-        $(".hidden-fields-area").css("display", "block");
-      }
+      $(".hidden-fields-area").toggleClass("active");
+    }
+  });
+
+  can.Control("CMS.Controllers.MockupModalView", {
+  }, {
+    ".modal #assessorDefault change": function (el, ev) {
+      this.element.find(".js-toggle-chooseperson").prop("disabled", el.val() !== "other");
     },
-
-    // TO-DO: This is not working, but you can see idea what needs to happened. Please make it work
-    "#assessorDefault change":function (el, ev) {
-      $(this).find("option:selected").each(function() {
-        var $value = $(this).val(),
-            $input = $(this).closest(".choose-from-select").find(".choose-input");
-
-        if($value === "other") {
-          $input.prop("disabled", false);
-        } else {
-          $input.prop("disabled", true);
-        }
-      });
-    },
-
-    // TO-DO: This is not working, but you can see idea what needs to happened. Please make it work
-    "#underAssessment change":function (el, ev) {
-      $(this).find("option:selected").each(function() {
-        var $value = $(this).val(),
-            $label = $(this).closest(".choose-object").find(".inline-check"),
-            $input = $label.find('input');
-
-        if($value === "Control") {
-          $input.prop("disabled", false);
-          $label.removeClass("disabled");
-        } else {
-          $input.prop("disabled", true);
-          $label.addClass("disabled");
-        }
-      });
+    ".modal #underAssessment change": function (el, ev) {
+      var isEnabled = el.val() === "Control";
+      this.element.find(".js-toggle-controlplans").prop("disabled", !isEnabled)
+          .closest("label").toggleClass("disabled", !isEnabled);
     }
   });
 
@@ -299,6 +289,10 @@
       var view = _.compact(_.flattenDeep(_.map(this.options.views, recursiveFind)))[0];
       this.active = view;
       this.element.html(can.view(this.activePanel.infopane_template || this.options.view, view));
+      if (this.cached) {
+        this.cached.destroy();
+      }
+      this.cached = new CMS.Controllers.MockupInfoView(this.element.find(".tier-content"));
       this.element.show();
     }
   });

@@ -99,51 +99,6 @@
         </div>
 
         <div class="row-fluid wrap-row">
-          <div class="span6">
-            <h6>Evidence</h6>
-            <div class="file-list-wrap">
-              <ul class="attachment-list">
-                {{#files}}
-                  <li>
-                    <span class="file-controls">
-                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                    </span>
-                    <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                    <span class="date">{{date}}</span>
-                    <a target="_blank" href="{{url}}">
-                      {{name}}
-                    </a>
-                  </li>
-                {{/files}}
-              </ul>
-
-              <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Add evidence</a>
-            </div>
-          </div>
-          <div class="span6">
-            <h6>URL</h6>
-            <div class="file-list-wrap">
-              <ul class="attachment-list">
-                {{#urls}}
-                  <li>
-                    <span class="file-controls">
-                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                    </span>
-                    <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                    <span class="date">{{date}}</span>
-                    <a target="_blank" href="{{url}}">
-                      {{name}}
-                    </a>
-                  </li>
-                {{/urls}}
-              </ul>
-
-              <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Add URL</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="row-fluid wrap-row">
           <div class="span12">
             <h6>Conclusion: Effectiveness</h6>
             <ul class="inline-radio-list full-width">
@@ -373,15 +328,18 @@
           Comments (6)
         </a></li>
         <li><a href="#tab2" data-toggle="tab">
-          Assessment log
+          Attachments
         </a></li>
         <li><a href="#tab3" data-toggle="tab">
-          Related assessments
+          Assessment log
         </a></li>
         <li><a href="#tab4" data-toggle="tab">
-          Requests
+          Related assessments
         </a></li>
         <li><a href="#tab5" data-toggle="tab">
+          Requests
+        </a></li>
+        <li><a href="#tab6" data-toggle="tab">
           Issues
         </a></li>
       </ul>
@@ -435,6 +393,10 @@
                   <ul class="attachment-list">
                     {{#attachments}}
                       <li>
+                        <span class="file-controls">
+                          <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                          <a href="javascript://"><i class="grcicon-edit"></i></a>
+                        </span>
                         <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                         <a href="{{url}}" target="_blank">
                           {{name}}
@@ -448,6 +410,53 @@
           </ul>
         </div>
         <div class="tab-pane fade" id="tab2">
+          <div class="row-fluid wrap-row">
+            <div class="span6">
+              <h6>Evidence</h6>
+              <div class="file-list-wrap">
+                <ul class="attachment-list">
+                  {{#files}}
+                    <li>
+                      <span class="file-controls">
+                        <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                        <a href="javascript://"><i class="grcicon-edit"></i></a>
+                      </span>
+                      <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                      <span class="date">{{date}}</span>
+                      <a target="_blank" href="{{url}}">
+                        {{name}}
+                      </a>
+                    </li>
+                  {{/files}}
+                </ul>
+
+                <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Add evidence</a>
+              </div>
+            </div>
+            <div class="span6">
+              <h6>URL</h6>
+              <div class="file-list-wrap">
+                <ul class="attachment-list">
+                  {{#urls}}
+                    <li>
+                      <span class="file-controls">
+                        <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                      </span>
+                      <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                      <span class="date">{{date}}</span>
+                      <a target="_blank" href="{{url}}">
+                        {{name}}
+                      </a>
+                    </li>
+                  {{/urls}}
+                </ul>
+
+                <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Add URL</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="tab3">
           <ul class="entry-list">
             {{#logs}}
               <li>
@@ -497,7 +506,7 @@
           </ul>
         </div>
 
-        <div class="tab-pane fade" id="tab3">
+        <div class="tab-pane fade" id="tab4">
           <ul class="past-items-list">
             <li class="clearfix list-title">
               <div class="mini-col">
@@ -590,7 +599,7 @@
           </ul>
         </div>
 
-        <div class="tab-pane fade bottom-spacing" id="tab4">
+        <div class="tab-pane fade bottom-spacing" id="tab5">
           <ul class="mapped-list">
             {{#mapped_objects_requests}}
               <li>
@@ -641,7 +650,7 @@
           <a href="#" class="btn btn-small btn-primary">Request information</a>
         </div>
 
-        <div class="tab-pane fade bottom-spacing" id="tab5">
+        <div class="tab-pane fade bottom-spacing" id="tab6">
           <ul class="mapped-list">
             {{#mapped_objects_issues}}
               <li>
