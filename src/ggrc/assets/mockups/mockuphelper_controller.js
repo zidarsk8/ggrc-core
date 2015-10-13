@@ -292,6 +292,9 @@
       if (this.cached) {
         this.cached.destroy();
       }
+      if (!+this.element.height()) {
+        this.element.height("auto");
+      }
       this.cached = new CMS.Controllers.MockupInfoView(this.element.find(".tier-content"));
       this.element.show();
     }
