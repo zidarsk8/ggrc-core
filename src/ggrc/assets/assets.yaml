@@ -373,17 +373,21 @@ mockup-js-files:
   - request/pages/regulations.js
   - request/pages/controls.js
   - request/pages/assessments.js
+  - assessor/pages/assessments.js
 
   # Bootstrap files shouold be above
   - mockuphelper_controller.js
   - request/main.js
+  - assessor/main.js
 
 
 mockup-js-template-files:
   - title.mustache
   - request/info.mustache
   - request/audit.mustache
+  - assessor/audit.mustache
   - base_templates/tree.mustache
+  - base_templates/tree-assessor.mustache
   - base_templates/tree_item.mustache
   - base_templates/info_panel.mustache
   - base_templates/filter.mustache
