@@ -104,31 +104,31 @@
             <ul class="inline-radio-list full-width">
               <li>
                 <label>
-                  <input type="radio">
+                  <input type="radio" name="conclusion">
                   Yes
                 </label>
               </li>
               <li>
                 <label>
-                  <input type="radio">
+                  <input type="radio" name="conclusion">
                   No
                 </label>
               </li>
               <li>
                 <label>
-                  <input type="radio">
+                  <input type="radio" name="conclusion">
                   At Risk
                 </label>
               </li>
               <li>
                 <label>
-                  <input type="radio">
+                  <input type="radio" name="conclusion">
                   Unclear
                 </label>
               </li>
               <li>
                 <label>
-                  <input type="radio">
+                  <input type="radio" name="conclusion">
                   In Remediation
                 </label>
               </li>
@@ -136,6 +136,7 @@
           </div>
         </div>
 
+        <!-- TEMPORARILY HIDDEN. WILL BE SHOWN AGAIN AFTER FRIDAY 16TH OF OCTOBER 2015
         <div class="row-fluid wrap-row">
           <div class="span3">
             <h6>Contract Length</h6>
@@ -169,6 +170,55 @@
               <option value="">1</option>
               <option value="">2</option>
             </select>
+          </div>
+        </div>
+        -->
+
+        <div class="row-fluid wrap-row">
+          <div class="span3">
+            <h6>Bug Number</h6>
+            <input type="text" class="input-block-level">
+          </div>
+        </div>
+
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Mapped objects</h6>
+            <ul class="mapped-list">
+              {{#mapped_objects}}
+                <li>
+                  <div class="custom-attr-wrap mapped">
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <div class="info-expand">
+                          <a class="show-hidden-fields info-show-hide" href="javascript://">
+                            <span class="out">
+                              <i class="grcicon-arrow-right"></i>
+                            </span>
+                            <span class="in">
+                              <i class="grcicon-arrow-bottom"></i>
+                            </span>
+                            <i class="grcicon-{{icon}}-color"></i>
+                            {{title}}
+                          </a>
+                        </div>
+                      </div>
+                    </div><!-- row-fluid end -->
+                    <div class="hidden-fields-area" style="display:none;">
+                      <div class="row-fluid wrap-row">
+                        <div class="span12">
+                          <h6>Description</h6>
+                          {{description}}
+                        </div>
+                      </div><!-- row-fluid end -->
+                    </div><!-- hidden-fields-area end -->
+                  </div>
+                </li>
+              {{/mapped_objects}}
+            </ul>
+            <a class="btn btn-draft btn-small" href="javascript://">
+              Map objects
+            </a>
           </div>
         </div>
 
@@ -261,64 +311,6 @@
           </div>
         </div>
 
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Mapped objects</h6>
-            <div class="side-content">
-              <ul class="mapped-list">
-                {{#mapped_objects}}
-                  <li>
-                    <span class="file-controls">
-                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                    </span>
-                    <i class="grcicon-{{icon}}-color"></i>
-                    <span class="person-holder">
-                      <a href='mailto:{{email}}' target="_blank">
-                        <span class="person-tooltip-trigger" data-placement="top">
-                          {{title}}
-                        </span>
-                      </a>
-
-                      <div class="custom-popover-content">
-                        <div class="preview-container person-preview">
-                          <div class="row-fluid">
-                            <div class="span12">
-                              <div class="profile-info">
-                                <div class="row-fluid wrap-row">
-                                  <div class="span8">
-                                    <h6>Title</h6>
-                                    <h5 class="oneline"><i class="grcicon-{{icon}}-color"></i> {{title}}</h5>
-                                  </div>
-                                  <div class="span4">
-                                    <h6>Status</h6>
-                                    {{state}}
-                                  </div>
-                                </div>
-                                <div class="row-fluid wrap-row">
-                                  <div class="span12">
-                                    <h6>Description</h6>
-                                    {{description}}
-                                  </div>
-                                </div>
-
-                                {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </span>
-                  </li>
-                {{/mapped_objects}}
-              </ul>
-              <a class="btn btn-draft btn-small" href="javascript://">
-                Map objects
-              </a>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
 
@@ -347,9 +339,6 @@
       <div class="tab-content">
         <div class="tab-pane fade in active" id="tab1">
           <div class="tree-item-add">
-            <a data-show=".add-comment" class="btn btn-draft btn-small bottom-spacing js-trigger-addcomment" href="javascript://">
-              Add response
-            </a>
             <div class="add-comment">
               <div class="row-fluid">
                 <div class="span8">
@@ -358,7 +347,7 @@
                     <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
                   </div>
                   <div class="wysiwyg-area">
-                    <textarea rows="4" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment (optional)"></textarea>
+                    <textarea rows="3" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment (optional)"></textarea>
                   </div>
                   <div class="attachments-preview">
                     <ul>
@@ -372,7 +361,6 @@
                   </div>
                   <div class="controls">
                     <a href="javascript://" class="btn btn-success btn-small">Add</a>
-                    <a href="javascript://" class="btn btn-draft btn-small js-trigger-cancel">Cancel</a>
                   </div>
                 </div>
               </div>
