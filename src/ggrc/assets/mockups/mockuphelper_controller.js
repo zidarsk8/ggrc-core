@@ -94,7 +94,6 @@
       comment_attachments: new can.List()
     }
   }, {
-    ".add-comment .js-trigger-cancel click": "cleanComments",
     "{view.comments} add": "cleanComments",
     ".add-comment .js-trigger-attachdata click": function (el, ev) {
       var type = el.data("type"),
@@ -125,14 +124,6 @@
           return attachment;
         })
       });
-    },
-    ".js-trigger-addcomment click": function (el, ev) {
-      this.element.find(el.data("show")).show();
-      el.hide();
-    },
-    ".js-trigger-cancel click": function (el, ev) {
-      this.element.find(".add-comment").hide();
-      this.element.find(".js-trigger-addcomment").show();
     },
     ".js-trigger-reuse click": function (el, ev) {
       var view = this.options.view,
