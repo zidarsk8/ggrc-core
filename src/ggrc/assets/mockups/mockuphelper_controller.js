@@ -313,7 +313,7 @@
         this.scope.attachments.replace([]);
         this.element.find("textarea").val("");
       },
-      "{scope.isOpen} change": "cleanPanel",
+      "{scope} isOpen": "cleanPanel",
       "a[data-toggle-prop] click": function (el, ev) {
         var prop = el.data("toggle-prop"),
             val = this.scope.attr(prop);
