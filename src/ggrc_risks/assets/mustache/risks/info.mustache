@@ -11,12 +11,13 @@
 {{#instance}}
   <section class="info">
 
-    {{> /static/mustache/base_objects/dropdown_menu.mustache}}
-
     {{#is_info_pin}}
     <div class="clearfix">
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content">
+      <div class="tier-content pin">
+        <div class="info-pane-utility">
+          {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+          {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+        </div>
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       </div>
     </div>
@@ -24,6 +25,9 @@
 
     <div class="tier-content">
       {{^is_info_pin}}
+        <div class="info-pane-utility">
+          {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+        </div>
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       {{/is_info_pin}}
       {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
