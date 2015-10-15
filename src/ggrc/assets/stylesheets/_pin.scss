@@ -55,10 +55,15 @@
 }
 
 .pin-action {
+  @include clearfix();
   @extend %reset-list;
+  float: right;
   li {
-    display: block;
-    margin-bottom: 2px;
+    float: left;
+    margin-left: 5px;
+    &:first-child {
+      margin-left: 0;
+    }
     a {
       i {
         @include opacity(.25);
@@ -120,6 +125,9 @@
   > li {
     margin-bottom: 10px;
     @include clearfix();
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
   &.dates {
     > li {
@@ -170,6 +178,9 @@
     li {
       margin-bottom: 3px;
       position: relative;
+      &:last-child {
+        margin-bottom: 0;
+      }
       &:hover {
         .file-controls {
           @include opacity(1);
@@ -199,6 +210,7 @@
     @include transition(opacity .2s ease);
   }
   a {
+    width: auto !important;
     &:hover {
       i {
         @include opacity(1);
@@ -228,8 +240,7 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        min-width: 25px;
-        left: -30px;
+        left: -50px;
       }
     }
     a {
@@ -290,6 +301,15 @@
       display: inline-block;
       .past-items-list & {
         width: 85%;
+      }
+    }
+    &:last-child {
+      .custom-attr-wrap {
+        &.mapped {
+          .info-expand {
+            border-bottom: none;
+          }
+        }
       }
     }
     &:hover {

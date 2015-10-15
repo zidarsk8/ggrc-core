@@ -7,23 +7,6 @@
 
 <section class="info sticky-info-panel" style="height: 311px !important;">
 
-  <div class="details-wrap pin">
-    <ul class="pin-action">
-      <li>
-        <a href="javascript://" data-size="deselect" class="close-pane"><i class="grcicon-x-grey" rel="tooltip" data-placement="left" title="Close info pane"></i></a>
-      </li>
-      <li>
-        <a href="javascript://" data-size="max" class="max"><i class="grcicon-maximize" rel="tooltip" data-placement="left" title="Maximize height"></i></a>
-      </li>
-      <li>
-        <a href="javascript://" data-size="normal" class="normal"><i class="grcicon-default" style="opacity:1.0" rel="tooltip" data-placement="left" title="Default height"></i></a>
-      </li>
-      <li>
-        <a href="javascript://" data-size="min" class="min"><i class="grcicon-minimize" rel="tooltip" data-placement="left" title="Minimize height"></i></a>
-      </li>
-    </ul><!-- pin-action end -->
-  </div><!-- details-wrap pin end -->
-
   <div class="pane-header">
     <div class="row-fluid wrap-row">
       <div class="span9">
@@ -33,6 +16,23 @@
       </div>
       <div class="span3">
         <div class="info-pane-utility">
+
+          <div class="details-wrap pin">
+            <ul class="pin-action">
+              <li>
+                <a href="javascript://" data-size="min" class="min"><i class="grcicon-minimize" rel="tooltip" data-placement="left" title="Minimize height"></i></a>
+              </li>
+              <li>
+                <a href="javascript://" data-size="normal" class="normal"><i class="grcicon-default" style="opacity:1.0" rel="tooltip" data-placement="left" title="Default height"></i></a>
+              </li>
+              <li>
+                <a href="javascript://" data-size="max" class="max"><i class="grcicon-maximize" rel="tooltip" data-placement="left" title="Maximize height"></i></a>
+              </li>
+              <li>
+                <a href="javascript://" data-size="deselect" class="close-pane"><i class="grcicon-x-grey" rel="tooltip" data-placement="left" title="Close info pane"></i></a>
+              </li>
+            </ul><!-- pin-action end -->
+          </div><!-- details-wrap pin end -->
 
           <div class="details-wrap">
             <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
@@ -79,7 +79,7 @@
             </ul>
           </div>
 
-          <a href="javascript://" class="btn btn-small btn-primary pull-right">Complete</a>
+          <a href="javascript://" class="btn-complete btn btn-small btn-primary pull-right">Complete</a>
         </div>
       </div>
     </div>
@@ -104,6 +104,47 @@
           </div>
           <div class="span6">
             <attachment-list title="URL" data="comments" types="url"></attachment-list>
+          </div>
+        </div>
+
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Mapped objects</h6>
+            <ul class="mapped-list">
+              {{#mapped_objects}}
+                <li>
+                  <div class="custom-attr-wrap mapped">
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <div class="info-expand">
+                          <a class="show-hidden-fields info-show-hide" href="javascript://">
+                            <span class="out">
+                              <i class="grcicon-arrow-right"></i>
+                            </span>
+                            <span class="in">
+                              <i class="grcicon-arrow-bottom"></i>
+                            </span>
+                            <i class="grcicon-{{icon}}-color"></i>
+                            {{title}}
+                          </a>
+                        </div>
+                      </div>
+                    </div><!-- row-fluid end -->
+                    <div class="hidden-fields-area" style="display:none;">
+                      <div class="row-fluid wrap-row">
+                        <div class="span12">
+                          <h6>Description</h6>
+                          {{description}}
+                        </div>
+                      </div><!-- row-fluid end -->
+                    </div><!-- hidden-fields-area end -->
+                  </div>
+                </li>
+              {{/mapped_objects}}
+            </ul>
+            <a class="btn btn-draft btn-small" href="javascript://">
+              Map objects
+            </a>
           </div>
         </div>
 
@@ -196,64 +237,6 @@
           </div>
         </div>
 
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Mapped objects</h6>
-            <div class="side-content">
-              <ul class="mapped-list">
-                {{#mapped_objects}}
-                  <li>
-                    <span class="file-controls">
-                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                    </span>
-                    <i class="grcicon-{{icon}}-color"></i>
-                    <span class="person-holder">
-                      <a href='mailto:{{email}}' target="_blank">
-                        <span class="person-tooltip-trigger" data-placement="top">
-                          {{title}}
-                        </span>
-                      </a>
-
-                      <div class="custom-popover-content">
-                        <div class="preview-container person-preview">
-                          <div class="row-fluid">
-                            <div class="span12">
-                              <div class="profile-info">
-                                <div class="row-fluid wrap-row">
-                                  <div class="span8">
-                                    <h6>Title</h6>
-                                    <h5 class="oneline"><i class="grcicon-{{icon}}-color"></i> {{title}}</h5>
-                                  </div>
-                                  <div class="span4">
-                                    <h6>Status</h6>
-                                    {{state}}
-                                  </div>
-                                </div>
-                                <div class="row-fluid wrap-row">
-                                  <div class="span12">
-                                    <h6>Description</h6>
-                                    {{description}}
-                                  </div>
-                                </div>
-
-                                {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </span>
-                  </li>
-                {{/mapped_objects}}
-              </ul>
-              <a class="btn btn-draft btn-small" href="javascript://">
-                Map objects
-              </a>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
 
@@ -290,6 +273,10 @@
                   <ul class="attachment-list">
                     {{#attachments}}
                       <li>
+                        <span class="file-controls">
+                          <a href="javascript://"><i class="grcicon-deleted"></i></a>
+                          <a href="javascript://"><i class="grcicon-edit"></i></a>
+                        </span>
                         <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                         <a href="{{url}}" target="_blank">
                           {{name}}
