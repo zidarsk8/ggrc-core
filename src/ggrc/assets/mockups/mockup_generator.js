@@ -61,12 +61,10 @@
   };
   g.file = function (options) {
     options = options || {};
-    var types = "pdf txt xls doc img zip url ".split(" "),
+    var types = "pdf txt xls doc img zip ".split(" "),
         name = g.get_words(_.random(3, 7), "_"),
         extension = g.get_random(types);
-    if (extension === "url") {
-      return g.url();
-    }
+
     return {
       name: name + (extension ? "." + extension : ""),
       extension: extension || "",
@@ -93,7 +91,7 @@
       author: g.user(),
       timestamp: g.get_date({year: 2015}),
       comment: g.paragraph(_.random(0, 10)),
-      attachments: g.get("file", _.random(0, 3))
+      attachments: g.get("file|url", _.random(0, 3))
     };
   };
   g.request = function () {
@@ -108,11 +106,15 @@
       return moment(item.date).unix();
     }).reverse();
   };
-  g.get = function (type, count, options) {
-    var fn = g[type] || g[type.slice(0, -1)];
-    if (!type || !fn) {
-      return;
+  g.get = function (types, count, options) {
+    function get_type_fn(type) {
+      var fn = g[type] || g[type.slice(0, -1)];
+      if (!type || !fn) {
+        return;
+      }
+      return fn;
     }
+    types = _.map(types.split("|"), get_type_fn);
     options = options || {};
     if (count === "random") {
       count = _.random(0, 5);
@@ -120,7 +122,7 @@
     if (count === 0) {
       return [];
     }
-    var values = _.times(count || 1, _.partial(fn, options));
+    var values = _.times(count || 1, _.partial(g.get_random(types), options));
     if (options.sort === "date") {
       return g._sort_by_date(values);
     }
