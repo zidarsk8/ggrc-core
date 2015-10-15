@@ -1282,6 +1282,17 @@ ul.new-tree {
   }
 }
 
+.sticky-info-panel {
+  .pane-header {
+    .details-wrap {
+      margin-top: 10px !important;
+      &.pin {
+        margin-top: -10px !important;
+      }
+    }
+  }
+}
+
 .info-pane-utility {
   @include clearfix();
   float: right;
@@ -1298,6 +1309,9 @@ ul.new-tree {
   position: relative;
   .info-pane-utility & {
     margin-top: 10px;
+    .pane-header & {
+      margin-top: 0;
+    }
     .dropdown-toggle {
       @include clearfix();
       height: 8px;
@@ -1315,7 +1329,6 @@ ul.new-tree {
     @include clearfix();
     width: auto;
     margin-left: 5px;
-    margin-top: -10px;
     float: none;
     clear: both;
   }
