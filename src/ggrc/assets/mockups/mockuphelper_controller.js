@@ -94,62 +94,26 @@
       comment_attachments: new can.List()
     }
   }, {
-    ".add-comment .js-trigger-cancel click": "cleanComments",
-    "{view.comments} add": "cleanComments",
-    ".add-comment .js-trigger-attachdata click": function (el, ev) {
-      var type = el.data("type"),
-          typeFn = Generator[type];
-
-      if (!typeFn) {
-        return;
-      };
-      this.options.comment_attachments.push(typeFn());
-    },
-    "cleanComments": function () {
-      this.element.find(".add-comment textarea").val("");
-      this.options.comment_attachments.replace([]);
-    },
-    ".add-comment .btn-success click": function (el, ev) {
-      var $textarea = this.element.find(".add-comment textarea"),
-          text = $.trim($textarea.val()),
-          attachments = this.options.comment_attachments;
-
-      if (!text.length && !attachments.length) {
-        return;
-      }
-      this.options.view.comments.unshift({
-        author: Generator.current.u,
-        timestamp: Generator.current.d,
-        comment: text,
-        attachments: _.map(attachments, function (attachment) {
-          return attachment;
-        })
-      });
-    },
-    ".js-trigger-addcomment click": function (el, ev) {
-      this.element.find(el.data("show")).show();
-      el.hide();
-    },
-    ".js-trigger-cancel click": function (el, ev) {
-      this.element.find(".add-comment").hide();
-      this.element.find(".js-trigger-addcomment").show();
-    },
     ".js-trigger-reuse click": function (el, ev) {
       var view = this.options.view,
-          checked = _.reduce(view.past_requests, function (val, memo) {
-            return val.concat(_.filter(memo.past_requests_files, function (file) {
+          checked = _.reduce(this.options.view.past_requests, function (val, memo) {
+            return val.concat(_.filter(memo.files, function (file) {
               var status = file.checked;
               file.attr("checked", false);
               return status;
             }));
           }, []);
       this.element.find(".past-items-list .js-trigger-pastfile").prop("checked", false);
-      view.files.push.apply(view.files, checked);
+      view.comments.push({
+        author: Generator.current.u,
+        timestamp: Generator.current.d,
+        attachments: checked,
+        comment: ""
+      });
     },
     ".js-trigger-pastfile change": function (el, ev) {
       var data = el.data("item"),
           isChecked = el.prop("checked");
-
       data.attr("checked", isChecked);
     },
     ".show-hidden-fields click": function (el, ev) {
@@ -295,7 +259,9 @@
       if (!+this.element.height()) {
         this.element.height("auto");
       }
-      this.cached = new CMS.Controllers.MockupInfoView(this.element.find(".tier-content"));
+      this.cached = new CMS.Controllers.MockupInfoView(this.element.find(".tier-content"), {
+        view: view
+      });
       this.element.show();
     }
   });
@@ -306,13 +272,20 @@
     scope: {
       title: "@",
       types: "@",
-      files: can.compute(function () {
-        var types = this.attr("types"),
-            isNegation = types.charAt(0) === "!";
+      files: new can.List()
+    },
+    events: {
+      "inserted": "updateFiles",
+      "{scope.data} add": "updateFiles",
+      "{scope.data} remove": "updateFiles",
+      "updateFiles": function () {
+        var types = this.scope.attr("types"),
+            isNegation = types.charAt(0) === "!",
+            result;
         if (isNegation) {
           types = types.slice(1);
         }
-        return _.reduce(this.attr("data"), function (memo, comment) {
+        result = _.reduce(this.scope.attr("data"), function (memo, comment) {
           var attachments = _.filter(comment.attachments, function (attachment) {
             if (isNegation) {
               return attachment.extension !== types;
@@ -324,7 +297,54 @@
           }
           return memo;
         }, []);
-      })
+        this.scope.attr("files", result);
+      }
+    }
+  });
+  can.Component.extend({
+    tag: "add-comment",
+    template: can.view("/static/mockups/base_templates/add_comment.mustache"),
+    scope: {
+      attachments: new can.List(),
+      isOpen: false
+    },
+    events: {
+      "cleanPanel": function () {
+        this.scope.attachments.replace([]);
+        this.element.find("textarea").val("");
+      },
+      "{scope.isOpen} change": "cleanPanel",
+      "a[data-toggle-prop] click": function (el, ev) {
+        var prop = el.data("toggle-prop"),
+            val = this.scope.attr(prop);
+        this.scope.attr(prop, !val);
+      },
+      ".js-trigger-attachdata click": function (el, ev) {
+        var type = el.data("type"),
+            typeFn = Generator[type];
+        if (!typeFn) {
+          return;
+        };
+        this.scope.attachments.push(typeFn());
+      },
+      ".btn-success click": function (el, ev) {
+        var $textarea = this.element.find(".add-comment textarea"),
+            text = $.trim($textarea.val()),
+            attachments = this.scope.attachments;
+
+        if (!text.length && !attachments.length) {
+          return;
+        }
+        this.scope.data.unshift({
+          author: Generator.current.u,
+          timestamp: Generator.current.d,
+          comment: text,
+          attachments: _.map(attachments, function (attachment) {
+            return attachment;
+          })
+        });
+        this.cleanPanel();
+      }
     }
   });
 })(this.can, this.can.$, GGRC.Mockup.Generator);
