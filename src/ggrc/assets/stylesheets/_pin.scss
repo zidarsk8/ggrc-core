@@ -55,10 +55,15 @@
 }
 
 .pin-action {
+  @include clearfix();
   @extend %reset-list;
+  float: right;
   li {
-    display: block;
-    margin-bottom: 2px;
+    float: left;
+    margin-left: 5px;
+    &:first-child {
+      margin-left: 0;
+    }
     a {
       i {
         @include opacity(.25);
