@@ -1124,6 +1124,17 @@ p.modal-value {
   }
 }
 
+#AssessmentDefineTemplate {
+  .hidden-fields-area {
+    padding-left: 0;
+  }
+  .custom-attr-table {
+    select {
+      width: 120px;
+    }
+  }
+}
+
 // Mockups Workflow V1.1
 .gdrive-select {
   margin-left: 10px;
