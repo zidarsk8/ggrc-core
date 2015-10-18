@@ -336,7 +336,7 @@ class MappingColumnHandler(ColumnHandler):
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
     class_ = self.mapping_object
-    lines = self.raw_value.splitlines()
+    lines = set(self.raw_value.splitlines())
     slugs = filter(unicode.strip, lines)  # noqa
     objects = []
     for slug in slugs:
