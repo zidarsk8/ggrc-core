@@ -96,23 +96,14 @@ class TestBasicCsvImport(converters.TestCase):
     for policy in policies:
       test_owners(policy)
 
-  def test_facilities_intermappings_dry_run(self):
+  def test_intermappings(self):
     self.generate_people(["miha", "predrag", "vladan", "ivan"])
 
-    filename = "facilities_intermappings.csv"
-    response_json = self.import_file(filename, dry_run=True)
-
-    self.assertEqual(4, response_json[0]["created"])
-
-    response_warnings = response_json[0]["row_warnings"]
-    self.assertEqual(set(), set(response_warnings))
-    self.assertEqual(0, models.Relationship.query.count())
-
-  def test_facilities_intermappings(self):
-    self.generate_people(["miha", "predrag", "vladan", "ivan"])
-
-    filename = "facilities_intermappings.csv"
+    filename = "intermappings.csv"
+    response_json_dry = self.import_file(filename, dry_run=True)
     response_json = self.import_file(filename)
+
+    self.assertEqual(response_json_dry, response_json)
 
     self.assertEqual(4, response_json[0]["created"])
 
