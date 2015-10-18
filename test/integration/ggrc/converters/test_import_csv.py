@@ -109,7 +109,12 @@ class TestBasicCsvImport(converters.TestCase):
 
     response_warnings = response_json[0]["row_warnings"]
     self.assertEqual(set(), set(response_warnings))
-    self.assertEqual(4, models.Relationship.query.count())
+    self.assertEqual(13, models.Relationship.query.count())
+
+    obj2 = models.Objective.query.filter_by(slug="O2").first()
+    obj3 = models.Objective.query.filter_by(slug="O3").first()
+    self.assertNotEqual(None, models.Relationship.find_related(obj2, obj2))
+    self.assertEqual(None, models.Relationship.find_related(obj3, obj3))
 
   def test_control_assessments_import_update(self):
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
