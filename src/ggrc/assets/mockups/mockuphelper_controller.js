@@ -305,19 +305,12 @@
     tag: "add-comment",
     template: can.view("/static/mockups/base_templates/add_comment.mustache"),
     scope: {
-      attachments: new can.List(),
-      isOpen: false
+      attachments: new can.List()
     },
     events: {
       "cleanPanel": function () {
         this.scope.attachments.replace([]);
         this.element.find("textarea").val("");
-      },
-      "{scope} isOpen": "cleanPanel",
-      "a[data-toggle-prop] click": function (el, ev) {
-        var prop = el.data("toggle-prop"),
-            val = this.scope.attr(prop);
-        this.scope.attr(prop, !val);
       },
       ".js-trigger-attachdata click": function (el, ev) {
         var type = el.data("type"),
