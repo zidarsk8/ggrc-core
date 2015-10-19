@@ -1,0 +1,47 @@
+<ul class="entry-list">
+  {{#logs}}
+    <li>
+      <span class="person-label {{type}}"></span>
+      <div class="w-status">
+        <span class="entry-author">
+          <a href="javascript://">{{author}}</a>
+          {{log_status}} - {{timestamp}}
+        </span>
+        <div class="clearfix">
+          <div class="third-col">
+            <p class="instruction">Field</p>
+            {{field}}
+          </div>
+          <div class="third-col">
+            <p class="instruction">Original value</p>
+            {{#original_value}}
+              {{text}}
+              <ul class="attachment-list">
+                {{#file_list}}
+                <li class="oneline">
+                  <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                  {{name}}
+                </li>
+                {{/file_list}}
+              </ul>
+            {{/original_value}}
+          </div>
+          <div class="third-col">
+            <p class="instruction">New value</p>
+            {{#new_value}}
+              {{text}}
+              <ul class="attachment-list">
+                {{#file_list}}
+                <li class="oneline">
+                  <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+                  {{name}}
+                </li>
+                {{/file_list}}
+              </ul>
+            {{/new_value}}
+          </div>
+        </div>
+      </div>
+    </li>
+  {{/logs}}
+</ul>
