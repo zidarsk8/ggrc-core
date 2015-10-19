@@ -1130,7 +1130,13 @@ p.modal-value {
   }
   .custom-attr-table {
     select {
-      width: 120px;
+      width: 100px;
+    }
+    input[type="text"] {
+      width: 150px;
+    }
+    h6 {
+      font-size: 9px;
     }
   }
 }
