@@ -115,9 +115,6 @@
       var data = el.data("item"),
           isChecked = el.prop("checked");
       data.attr("checked", isChecked);
-    },
-    ".show-hidden-fields click": function (el, ev) {
-      $(".hidden-fields-area").toggleClass("active");
     }
   });
 
