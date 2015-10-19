@@ -10,9 +10,12 @@
     <li>
       <span class="person-label {{type}}"></span>
       <div class="w-status">
+        {{#data}}
         <span class="entry-author">
-          <a href="javascript://">{{author}}</a>
-          {{log_status}} - {{timestamp}}
+          {{#author}}
+            <a href="javascript://">{{name}}</a>
+          {{/author}}
+          {{status}} - {{timestamp}}
         </span>
         <div class="clearfix">
           <div class="third-col">
@@ -21,34 +24,38 @@
           </div>
           <div class="third-col">
             <p class="instruction">Original value</p>
-            {{#original_value}}
+            {{#original}}
               {{text}}
               <ul class="attachment-list">
-                {{#file_list}}
+                {{#files}}
                 <li class="oneline">
                   <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                   {{name}}
                 </li>
-                {{/file_list}}
+                {{/files}}
               </ul>
-            {{/original_value}}
+            {{/original}}
           </div>
           <div class="third-col">
             <p class="instruction">New value</p>
-            {{#new_value}}
+            {{#changed}}
+              {{#author}}
+                {{name}}
+              {{/author}}
               {{text}}
               <ul class="attachment-list">
-                {{#file_list}}
+                {{#files}}
                 <li class="oneline">
                   <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
                   {{name}}
                 </li>
-                {{/file_list}}
+                {{/files}}
               </ul>
-            {{/new_value}}
+            {{/changed}}
           </div>
         </div>
       </div>
+      {{/data}}
     </li>
   {{/logs}}
 </ul>
