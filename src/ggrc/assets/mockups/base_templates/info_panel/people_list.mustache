@@ -1,0 +1,63 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+<h6>People</h6>
+<div class="side-content">
+  <ul class="label-list">
+    <li>
+      <label>
+        <span class="person-label {{type_a}}"></span>
+        Assignee
+      </label>
+      <ul>
+        {{#people_assignee}}
+          <li>
+            <span class="file-controls">
+              <a href="javascript://"><i class="grcicon-deleted"></i></a>
+              <a href="javascript://"><i class="grcicon-edit"></i></a>
+            </span>
+            <a href="javascript://">{{name}}</a>
+          </li>
+        {{/people_assignee}}
+      </ul>
+    </li>
+    <li>
+      <label>
+        <span class="person-label {{type_r}}"></span>
+        Requester
+      </label>
+      <ul>
+        {{#people_requester}}
+          <li>
+            <span class="file-controls">
+              <a class="disabled" href="javascript://"><i class="grcicon-deleted"></i></a>
+              <a href="javascript://"><i class="grcicon-edit"></i></a>
+            </span>
+            <a href="javascript://">{{name}}</a>
+          </li>
+        {{/people_requester}}
+      </ul>
+    </li>
+    <li>
+      <label>
+        <span class="person-label {{type_v}}"></span>
+        Verifier
+      </label>
+      <ul>
+        {{#people_verifier}}
+          <li>
+            <span class="file-controls">
+              <a href="javascript://"><i class="grcicon-deleted"></i></a>
+              <a href="javascript://"><i class="grcicon-edit"></i></a>
+            </span>
+            <a href="javascript://">{{name}}</a>
+          </li>
+        {{/people_verifier}}
+      </ul>
+    </li>
+  </ul>
+</div>

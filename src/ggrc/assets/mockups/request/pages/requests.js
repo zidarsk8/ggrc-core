@@ -6,6 +6,7 @@
     title: "Requests",
     icon: "grcicon-request-color",
     template: "/request/audit.mustache",
+    infopane_template: "/static/mockups/base_templates/info_panel.mustache",
     children: [{
       title: "My new request",
       info_title: "My new request",
