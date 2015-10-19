@@ -1301,6 +1301,12 @@ ul.new-tree {
       &.pin {
         margin-top: -10px !important;
       }
+      .dropdown-toggle {
+        @include clearfix();
+        height: 8px;
+        padding-top: 9px;
+        padding-bottom: 9px;
+      }
     }
   }
 }
