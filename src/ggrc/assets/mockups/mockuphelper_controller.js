@@ -218,7 +218,6 @@
         return increment[size] * height;
       }
       var height = get_height(Math.floor($(".content").height()/3), size || "min");
-      console.log("HEIGHT", height);
       this.element
         .show()
         .removeClass("hidden")
@@ -259,7 +258,7 @@
       item = item.split("-");
       var view = _.compact(_.flattenDeep(_.map(this.options.views, recursiveFind)))[0];
       this.active = view;
-      this.element.html(can.view(this.activePanel.infopane_template || this.options.view, view));
+      this.element.html(can.view(this.options.view, view));
       if (this.cached) {
         this.cached.destroy();
       }

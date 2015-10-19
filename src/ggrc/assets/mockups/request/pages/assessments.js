@@ -6,7 +6,6 @@
     title: "Assessments",
     icon: "grcicon-assessment-color",
     template: "/request/audit.mustache",
-    infopane_template: "/static/mockups/base_templates/info_panel_assessments.mustache",
     children: [{
       title: "Very first assessment",
       info_title: "Very first assessment",

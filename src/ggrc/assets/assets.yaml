@@ -412,7 +412,3 @@ mockup-js-template-files:
   - base_templates/nav_item.mustache
   - base_templates/attachment_list.mustache
   - base_templates/add_comment.mustache
-  - base_templates/info_panel_regulation.mustache
-  - base_templates/info_panel_objective.mustache
-  - base_templates/info_panel_control.mustache
-  - base_templates/info_panel_assessments.mustache

@@ -6,7 +6,6 @@
     title: "Controls",
     icon: "grcicon-control-color",
     template: "/request/audit.mustache",
-    infopane_template: "/static/mockups/base_templates/info_panel_control.mustache",
     children: [{
       title: "Yellow Dead Dog Control",
       info_title: "Yellow Dead Dog Control",
