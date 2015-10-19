@@ -621,7 +621,7 @@
       objectives: TypeFilter("objects", "Objective"),
       objectives_via_program: Cross("_program", "objectives"),
       responses_via_requests: Cross("requests", "responses"),
-      related_objects: Multi(['requests', 'responses_via_requests']),
+      related_objects_via_requests: Multi(['requests', 'responses_via_requests']),
       context: Direct("Context", "related_object", "context"),
       authorizations: Cross("context", "user_roles"),
       authorized_program_people: Cross("_program", 'authorized_people'),
@@ -633,7 +633,7 @@
         });
       }),
       auditors: Cross("auditor_authorizations", "person"),
-      related_owned_objects: CustomFilter("related_objects", function (result) {
+      related_owned_objects: CustomFilter("related_objects_via_requests", function (result) {
         var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();
         return !person || (result.instance.attr("contact") && result.instance.contact.id === person.id) || (result.instance.attr("assignee") && result.instance.assignee.id === person.id) || (result.instance.attr("requestor") && result.instance.requestor.id === person.id);
       }),
@@ -642,7 +642,7 @@
       related_owned_interview_responses: TypeFilter("related_owned_objects", "InterviewResponse"),
       related_owned_population_sample_responses: TypeFilter("related_owned_objects", "PopulationSampleResponse"),
       related_owned_responses: Multi(["related_owned_documentation_responses", "related_owned_interview_responses", "related_owned_population_sample_responses"]),
-      related_mapped_objects: CustomFilter("related_objects", function (result) {
+      related_mapped_objects: CustomFilter("related_objects_via_requests", function (result) {
         var page_instance = GGRC.page_instance(),
           instance = result.instance,
           is_mapped = function (responses) {
@@ -680,9 +680,9 @@
         null, "destination", "Relationship", "source", "related_destinations"),
       related_objects_as_destination: Proxy(
         null, "source", "Relationship", "destination", "related_sources"),
-      related_objects_via_relationship: Multi(["related_objects_as_source", "related_objects_as_destination"]),
-      related_control_assessments: TypeFilter("related_objects_via_relationship", "ControlAssessment"),
-      related_issues: TypeFilter("related_objects_via_relationship", "Issue")
+      related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
+      related_control_assessments: TypeFilter("related_objects", "ControlAssessment"),
+      related_issues: TypeFilter("related_objects", "Issue")
     },
     ControlAssessment: {
       _mixins: [
