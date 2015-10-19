@@ -326,7 +326,11 @@ CMS.Models.get_stub = function (object) {
 };
 
 CMS.Models.get_stubs = function (objects) {
-  return new can.Stub.List(can.map(CMS.Models.get_instances(objects), function(o) {
+  return new can.Stub.List(can.map(CMS.Models.get_instances(objects), function (o) {
+    if (!o || !o.stub) {
+      console.warn("`Models.get_stubs` instance has no stubs ", arguments);
+      return;
+    }
     return o.stub();
   }));
 };

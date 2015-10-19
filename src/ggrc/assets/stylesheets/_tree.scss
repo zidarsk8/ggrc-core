@@ -1,4 +1,4 @@
-/*
+F/*
  * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  * Created By: brad@reciprocitylabs.com
@@ -1280,6 +1280,18 @@ ul.new-tree {
   .sticky-info-panel & {
     margin-top: 77px;
   }
+  &.pin {
+    .info-pane-utility {
+      .details-wrap {
+        margin-top: 10px;
+      }
+    }
+  }
+  .info-pane-utility {
+    .details-wrap {
+      margin-top: 0;
+    }
+  }
 }
 
 .sticky-info-panel {
@@ -1305,17 +1317,11 @@ ul.new-tree {
   float: right;
   margin-left: 20px;
   width: 60px;
-  margin-top: -4px;
   position: relative;
   .info-pane-utility & {
-    margin-top: 10px;
-    .pane-header & {
-      margin-top: 0;
-    }
     .dropdown-toggle {
       @include clearfix();
-      height: 8px;
-      padding-top: 9px;
+      height: 12px;
       padding-bottom: 9px;
     }
   }
@@ -1329,8 +1335,12 @@ ul.new-tree {
     @include clearfix();
     width: auto;
     margin-left: 5px;
+    margin-top: -10px !important;
     float: none;
     clear: both;
+    .sticky-info-panel & {
+      margin-top: -3px;
+    }
   }
   .bubble {
     float: left;
