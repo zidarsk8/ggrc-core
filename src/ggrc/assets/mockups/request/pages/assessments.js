@@ -18,14 +18,13 @@
       files: Generator.get("file", 8, {sort: "date"}),
       comments: Generator.get("comment", 3, {sort: "date"}),
       urls: Generator.get("url", 3),
-      people_assignee: Generator.get("user", 5),
-      people_assessor: Generator.get("user"),
-      people_verifier: Generator.get("user", 3),
+      people: {
+        "assignee": Generator.get("user", 5),
+        "assessor": Generator.get("user"),
+        "verifier": Generator.get("user", 3)
+      },
       created_on: "12/03/14",
       due_on: "12/31/15",
-      type_a: "assignee",
-      type_s: "assessor",
-      type_v: "verifier",
       mapped_objects: [{
         icon: "objective",
         title: "090.7068 objective 1",

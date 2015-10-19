@@ -149,13 +149,14 @@
               <h6>People</h6>
               <div class="side-content">
                 <ul class="label-list">
+                  {{#each people}}
                   <li>
                     <label>
-                      <span class="person-label {{type_lead}}"></span>
-                      Audit Lead
+                      <span class="person-label {{@key}}"></span>
+                      {{@key}}
                     </label>
                     <ul>
-                      {{#people_assignee}}
+                      {{#each .}}
                         <li>
                           <span class="file-controls">
                             <a href="javascript://"><i class="grcicon-deleted"></i></a>
@@ -163,26 +164,10 @@
                           </span>
                           <a href="javascript://">{{name}}</a>
                         </li>
-                      {{/people_assignee}}
+                      {{/each}}
                     </ul>
                   </li>
-                  <li>
-                    <label>
-                      <span class="person-label {{type_auditor}}"></span>
-                      Auditor
-                    </label>
-                    <ul>
-                      {{#people_verifier}}
-                        <li>
-                          <span class="file-controls">
-                            <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                            <a href="javascript://"><i class="grcicon-edit"></i></a>
-                          </span>
-                          <a href="javascript://">{{name}}</a>
-                        </li>
-                      {{/people_verifier}}
-                    </ul>
-                  </li>
+                  {{/each}}
                 </ul>
               </div>
             </div>
