@@ -996,25 +996,19 @@ class Resource(ModelView):
     """Do NOTHING by default"""
     pass
 
-  def collection_post(self):
+  def collection_post_step(self, src):
     try:
-      if self.request.mimetype != 'application/json':
-        return current_app.make_response((
-            'Content-Type must be application/json', 415, []))
       obj = self.model()
-      src = UnicodeSafeJsonWrapper(self.request.json)
       root_attribute = self.model._inflector.table_singular
       try:
         src = src[root_attribute]
       except KeyError, e:
-        return current_app.make_response((
-            'Required attribute "{0}" not found'.format(
-                root_attribute), 400, []))
+        raise BadRequest('Required attribute "{0}" not found'.format(
+                root_attribute))
       with benchmark("Query create permissions"):
         if not permissions.is_allowed_create(self.model.__name__, None,
                                              self.get_context_id_from_json(src)):
           raise Forbidden()
-
       if src.get('private') == True and src.get('context') is not None \
           and src['context'].get('id') is not None:
         raise BadRequest(
@@ -1051,8 +1045,7 @@ class Resource(ModelView):
       with benchmark("Serialize object"):
         object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
-        return self.json_success_response(
-            object_for_json, self.modified_at(obj), id=obj.id, status=201)
+        return (201, object_for_json)
     except IntegrityError as e:
       msg = e.orig.args[1]
       if obj.type == "Relationship" and \
@@ -1071,10 +1064,41 @@ class Resource(ModelView):
             (R.destination_id==obj.source_id))
         ).first()
         object_for_json = self.object_for_json(obj)
-        return self.json_success_response(object_for_json,
-                                          self.modified_at(obj),
-                                          id=obj.id, status=200)
+        return (200, object_for_json)
       raise e
+
+  def collection_post(self):
+    if self.request.mimetype != 'application/json':
+      return current_app.make_response((
+          'Content-Type must be application/json', 415, []))
+    body = self.request.json
+    wrap = type(body) == dict
+    if wrap:
+      body = [body]
+    res = []
+    for src in body:
+      try:
+        src_res = self.collection_post_step(UnicodeSafeJsonWrapper(src))
+        db.session.commit()
+      except Exception as e:
+        src_res = (getattr(e, "code", 500), e.message)
+        db.session.rollback()
+      res.append(src_res)
+    headers = {"Content-Type": "application/json"}
+    if wrap:
+      status, res = res[0]
+      if type(res) == dict and len(res) == 1:
+        value = res.values()[0]
+        if "id" in value:
+          headers['Location'] = self.url_for(id=value["id"])
+    else:
+      status = 200
+      for res_status, _ in res:
+        if not (200 <= res_status < 300):
+          status = res_status
+          break
+    return current_app.make_response(
+        (self.as_json(res), status, headers))
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
