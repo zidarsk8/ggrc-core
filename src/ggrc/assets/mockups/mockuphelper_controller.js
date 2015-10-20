@@ -293,11 +293,28 @@
             return attachment.extension === types;
           });
           if (attachments.length) {
-            return memo.concat(attachments);
+            return memo.concat(_.filter(attachments, function (attachment) {
+              return !attachment.attr("deleted");
+            }));
           }
           return memo;
         }, []);
         this.scope.attr("files", result);
+      },
+      ".js-trigger--delete click": function (el, ev) {
+        var file = el.data("file");
+        file.attr("deleted", true);
+        this.updateFiles();
+      },
+      ".btn-draft click": function (el, ev) {
+        if (this.scope.attr("types") !== "url") {
+          return this.scope.attr("data").unshift({
+            author: Generator.current.u,
+            timestamp: Generator.current.d,
+            attachments: Generator.get("file"),
+            comment: ""
+          });
+        }
       }
     }
   });

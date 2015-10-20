@@ -8,10 +8,10 @@
 <h6>{{title}}</h6>
 <div class="file-list-wrap">
   <ul class="attachment-list">
-    {{#files}}
+    {{#each files}}
       <li>
         <span class="file-controls">
-          <a href="javascript://"><i class="grcicon-deleted"></i></a>
+          <a {{data "file"}} data-index="{{@index}}" class="js-trigger--delete" href="javascript://"><i class="grcicon-deleted"></i></a>
           <a href="javascript://"><i class="grcicon-edit"></i></a>
         </span>
         <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
@@ -20,7 +20,7 @@
           {{name}}
         </a>
       </li>
-    {{/files}}
+    {{/each}}
   </ul>
 
   <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Add {{title}}</a>
