@@ -13,6 +13,12 @@
    *  multiple requests to the server at once. It makes sure the requests
    *  are grouped together (inside _queue) and then resolved in batches.
    *
+   *  It will also try to group POST request and use the custom collection post
+   *  API and then redistribute responses in order to trace in latency for
+   *  throughput. This is done by a "thread" (of timeouts) per object type (per
+   *  bucket) that enqueues as a regular request but then greedily dispatches
+   *  requests that arrived while it was in the queue.
+   *
    *  enqueue(obj: CMS.Models.Cacheable, save_args) -> null
    */
   can.Construct("GGRC.SaveQueue", {
