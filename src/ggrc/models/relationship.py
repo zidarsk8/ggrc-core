@@ -43,7 +43,8 @@ class Relationship(Mapping, db.Model):
   relationship_attrs = db.relationship(
       lambda: RelationshipAttr,
       collection_class=attribute_mapped_collection("attr_name"),
-      lazy='joined'  # eager loading
+      lazy='joined',  # eager loading
+      cascade='all, delete-orphan'
   )
   attrs = association_proxy(
       "relationship_attrs", "attr_value",
@@ -109,7 +110,9 @@ class Relationship(Mapping, db.Model):
       'source',
       'destination',
       'relationship_type_id',
+      'attrs',
   ]
+  attrs.publish_raw = True
 
   def _display_name(self):
     return self.source.display_name + '<->' + self.destination.display_name
@@ -177,7 +180,7 @@ class RelationshipAttr(Identifiable, db.Model):
   __tablename__ = 'relationship_attrs'
   relationship_id = db.Column(
       db.Integer,
-      db.ForeignKey('relationships.id', ondelete='SET NULL'),
+      db.ForeignKey('relationships.id'),
       primary_key=True
   )
   attr_name = db.Column(db.String, nullable=False)
