@@ -13,6 +13,7 @@ from ggrc.models.object_person import Personable
 from ggrc.models.context import HasOwnContext
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.program import Program
+from ggrc.models.person import Person
 
 
 class Audit(
@@ -67,10 +68,13 @@ class Audit(
 
   _aliases = {
       "program": {
-        "display_name": "Program",
-        "filter_by": "_filter_by_program",
+          "display_name": "Program",
+          "filter_by": "_filter_by_program",
       },
-      "user_role:Auditor": "Auditors",
+      "user_role:Auditor": {
+          "display_name": "Auditors",
+          "filter_by": "_filter_by_auditor",
+      },
       "status": "Status",
       "start_date": "Planned Start Date",
       "end_date": "Planned End Date",
@@ -92,6 +96,15 @@ class Audit(
     return Program.query.filter(
         (Program.id == Audit.program_id) &
         (predicate(Program.slug) | predicate(Program.title))
+    ).exists()
+
+  @classmethod
+  def _filter_by_auditor(cls, predicate):
+    from ggrc_basic_permissions.models import Role, UserRole
+    return UserRole.query.join(Role, Person).filter(
+        (Role.name == "Auditor") &
+        (UserRole.context_id == cls.context_id) &
+        (predicate(Person.name) | predicate(Person.email))
     ).exists()
 
   @classmethod
