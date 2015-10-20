@@ -298,6 +298,16 @@
           return memo;
         }, []);
         this.scope.attr("files", result);
+      },
+      ".btn-draft click": function (el, ev) {
+        if (this.scope.attr("types") !== "url") {
+          return this.scope.attr("data").unshift({
+            author: Generator.current.u,
+            timestamp: Generator.current.d,
+            attachments: Generator.get("file"),
+            comment: ""
+          });
+        }
       }
     }
   });
