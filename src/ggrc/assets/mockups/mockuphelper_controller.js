@@ -115,9 +115,6 @@
       var data = el.data("item"),
           isChecked = el.prop("checked");
       data.attr("checked", isChecked);
-    },
-    ".show-hidden-fields click": function (el, ev) {
-      $(".hidden-fields-area").toggleClass("active");
     }
   });
 
@@ -203,24 +200,26 @@
   can.Control("CMS.Controllers.MockupInfoPanel", {
     defaults: {
       view: "/static/mockups/base_templates/info_panel.mustache",
-      slide: 240
+      slide: 240,
+      minHeight: 240
     }
   }, {
-    ".pin-action a click": function (el, ev) {
-      var size = el.data("size"),
-          height = Math.round($(window).height() / 3),
-          heights = {
-            deselect: 0,
-            min: height,
-            normal: height*2,
-            max: height*3
-          };
-
-      el.find("i").css("opacity", 1).closest("li").siblings().find("i").css("opacity", 0.25);
+    "setSize": function (size) {
+      function get_height(height, size) {
+         var increment = {
+          deselect: 0,
+          min: 1,
+          normal: 2,
+          max: 3
+        };
+        return increment[size] * height;
+      }
+      var height = get_height(Math.floor($(".content").height()/3), size || "min");
       this.element
-        .show().height(0)
+        .show()
+        .removeClass("hidden")
         .animate({
-          height: heights[size]
+          height: height
         }, {
           duration: this.options.slide,
           complete: function () {
@@ -231,6 +230,10 @@
             }
           }.bind(this)
         });
+    },
+    ".pin-action a click": function (el, ev) {
+      el.find("i").css("opacity", 1).closest("li").siblings().find("i").css("opacity", 0.25);
+      this.setSize(el.data("size"));
     },
     "{can.route} tab": function (router, ev, tab) {
       this.activePanel = _.findWhere(this.options.views, {title: tab});
@@ -252,17 +255,14 @@
       item = item.split("-");
       var view = _.compact(_.flattenDeep(_.map(this.options.views, recursiveFind)))[0];
       this.active = view;
-      this.element.html(can.view(this.activePanel.infopane_template || this.options.view, view));
+      this.element.html(can.view(this.options.view, view));
       if (this.cached) {
         this.cached.destroy();
-      }
-      if (!+this.element.height()) {
-        this.element.height("auto");
       }
       this.cached = new CMS.Controllers.MockupInfoView(this.element.find(".tier-content"), {
         view: view
       });
-      this.element.show();
+      this.setSize();
     }
   });
 
@@ -305,19 +305,12 @@
     tag: "add-comment",
     template: can.view("/static/mockups/base_templates/add_comment.mustache"),
     scope: {
-      attachments: new can.List(),
-      isOpen: false
+      attachments: new can.List()
     },
     events: {
       "cleanPanel": function () {
         this.scope.attachments.replace([]);
         this.element.find("textarea").val("");
-      },
-      "{scope} isOpen": "cleanPanel",
-      "a[data-toggle-prop] click": function (el, ev) {
-        var prop = el.data("toggle-prop"),
-            val = this.scope.attr(prop);
-        this.scope.attr(prop, !val);
       },
       ".js-trigger-attachdata click": function (el, ev) {
         var type = el.data("type"),

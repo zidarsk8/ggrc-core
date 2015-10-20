@@ -11,10 +11,10 @@
   @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
   position: fixed;
   bottom: 40px;
-  left: 32px;
-  right: 32px;
+  left: 27px;
+  right: 27px;
   background: $white;
-  z-index: 0;
+  z-index: 1000;
   overflow: auto;
   .info {
     @include box-shadow(none);
@@ -331,6 +331,13 @@
     float: left;
     margin-right: 10px;
   }
+  .details-wrap {
+    .dropdown-toggle {
+      height: 8px;
+      padding-top: 9px;
+      padding-bottom: 9px;
+    }
+  }
 }
 
 .sticky-info-panel {
@@ -339,8 +346,8 @@
   }
   .pane-header {
     position: fixed;
-    left: 52px;
-    right: 52px;
+    left: 47px;
+    right: 47px;
     height: 52px;
     background: $white;
     border-bottom: 1px solid $lightGray;

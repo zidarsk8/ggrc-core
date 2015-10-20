@@ -31,7 +31,9 @@
         <div class="span9">
           <h6>Title</h6>
           <h3>{{info_title}}</h3>
-          <span class="state-value state-{{state_color}}">{{state}}</span>
+          {{#state}}
+            <span class="state-value state-{{class_name}}">{{title}}</span>
+          {{/state}}
         </div>
         <div class="span3">
           <div class="info-pane-utility">
@@ -149,13 +151,14 @@
               <h6>People</h6>
               <div class="side-content">
                 <ul class="label-list">
+                  {{#each people}}
                   <li>
                     <label>
-                      <span class="person-label {{type_lead}}"></span>
-                      Audit Lead
+                      <span class="person-label {{@key}}"></span>
+                      {{@key}}
                     </label>
                     <ul>
-                      {{#people_assignee}}
+                      {{#each .}}
                         <li>
                           <span class="file-controls">
                             <a href="javascript://"><i class="grcicon-deleted"></i></a>
@@ -163,26 +166,10 @@
                           </span>
                           <a href="javascript://">{{name}}</a>
                         </li>
-                      {{/people_assignee}}
+                      {{/each}}
                     </ul>
                   </li>
-                  <li>
-                    <label>
-                      <span class="person-label {{type_auditor}}"></span>
-                      Auditor
-                    </label>
-                    <ul>
-                      {{#people_verifier}}
-                        <li>
-                          <span class="file-controls">
-                            <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                            <a href="javascript://"><i class="grcicon-edit"></i></a>
-                          </span>
-                          <a href="javascript://">{{name}}</a>
-                        </li>
-                      {{/people_verifier}}
-                    </ul>
-                  </li>
+                  {{/each}}
                 </ul>
               </div>
             </div>
@@ -262,7 +249,7 @@
           <label>
             Audit
           </label>
-          <strong>2014 Imagine all the people</strong>
+          <strong>My new audit</strong>
         </div>
       </div>
       <br>
@@ -365,6 +352,12 @@
               </label>
               <input type="text" class="input-block-level" placeholder="Choose person">
             </div>
+            <div class="span6 bottom-spacing">
+              <label>
+                Bug number
+              </label>
+              <input type="text" class="input-block-level" placeholder="Bug number">
+            </div>
           </div>
         </div>
       </div>
@@ -388,55 +381,63 @@
         </div><!-- row-fluid end -->
         <div class="hidden-fields-area" style="display:none;">
           <div class="row-fluid wrap-row">
-            <div class="span12">
-              <div class="custom-attr-table">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Attribute Title</th>
-                      <th>Attribute type</th>
-                      <th>Attribute values</th>
-                      <th class="centered">Mandatory</th>
-                      <th>&nbsp;</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Contract length</td>
-                      <td>Dropdown</td>
-                      <td>0-1 year, 2 years, 3 or more</td>
-                      <td class="centered checkbox-wrap"><input type="checkbox" checked></td>
-                      <td>
-                        <div class="pull-right">
-                          <a href="#"><i class="grcicon-edit"></i></a>
-                          <a href="#"><i class="grcicon-deleted"></i></a>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><input type="text"></td>
-                      <td>
-                        <select>
-                          <option>Dropdown</option>
-                          <option>Checkbox</option>
-                          <option>Text</option>
-                        </select>
-                      </td>
-                      <td>
-                        <input type="text" placeholder="Type values separated by comma">
-                      </td>
-                      <td class="centered checkbox-wrap">
-                        <input type="checkbox">
-                      </td>
-                      <td>
-                        <div class="pull-right">
-                          <a class="btn btn-small btn-info" href="#">Add field</a>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+            <div class="custom-attr-table span12">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th><h6>Attribute Title</h6></th>
+                    <th><h6>Attribute type</h6></th>
+                    <th><h6>Attribute values</h6></th>
+                    <th class="centered"><h6>Attachment required</h6></th>
+                    <th class="centered"><h6>Comment required</h6></th>
+                    <th class="centered"><h6>Mandatory</h6></th>
+                    <th>&nbsp;</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Contract length</td>
+                    <td>Dropdown</td>
+                    <td>0-1 year, 2 years, 3 or more</td>
+                    <td class="centered checkbox-wrap"><input type="checkbox" checked></td>
+                    <td class="centered checkbox-wrap"><input type="checkbox" checked></td>
+                    <td class="centered checkbox-wrap"><input type="checkbox" checked></td>
+                    <td>
+                      <div class="pull-right">
+                        <a href="#"><i class="grcicon-edit"></i></a>
+                        <a href="#"><i class="grcicon-deleted"></i></a>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><input type="text"></td>
+                    <td>
+                      <select>
+                        <option>Dropdown</option>
+                        <option>Checkbox</option>
+                        <option>Text</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input type="text" placeholder="Type values separated by comma">
+                    </td>
+                    <td class="centered checkbox-wrap">
+                      <input type="checkbox">
+                    </td>
+                    <td class="centered checkbox-wrap">
+                      <input type="checkbox">
+                    </td>
+                    <td class="centered checkbox-wrap">
+                      <input type="checkbox">
+                    </td>
+                    <td>
+                      <div class="pull-right">
+                        <a class="btn btn-small btn-info" href="#">Add field</a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
