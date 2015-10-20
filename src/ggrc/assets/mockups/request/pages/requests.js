@@ -10,36 +10,51 @@
       title: "My new request",
       info_title: "My new request",
       description: Generator.paragraph(7),
-      state: "In Progress",
+      state: {
+        title: "In Progress",
+        class_name: "inprogress"
+      },
       state_color: "inprogress",
       type: "audit",
       status: "In Progress",
       id: "2",
       comments: Generator.get("comment", 10, {sort: "date"}),
-      people_assignee: Generator.get("user", 5),
-      people_requester: Generator.get("user"),
-      people_verifier: Generator.get("user", 3),
+      people: {
+        "assignee": Generator.get("user", 5),
+        "requester": Generator.get("user"),
+        "verifier": Generator.get("user", 3)
+      },
       created_on: "12/03/14",
       due_on: "12/31/15",
-      type_a: "assignee",
-      type_r: "requester",
-      type_v: "verifier",
-      mapped_objects: [{
-        icon: "objective",
-        title: "090.7068 objective 1",
-        state: "Draft",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }, {
-        icon: "control",
-        title: "Access to the Private Network with expired Key v0906984",
-        state: "In Progress",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }, {
-        icon: "regulation",
-        title: "a regulation object",
-        state: "In Progress",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }],
+      mapped: {
+        "objects": Generator.create({
+            icon: ["objective", "control", "regulation"],
+            title: "%title",
+            description: "%text",
+            state: ["In Progress", "Draft"]
+          }, {
+            count: 5,
+            randomize: ["state", "icon"]
+          }),
+        "requests": Generator.create({
+            icon: "requests",
+            title: "%title",
+            description: "%text",
+            state: ["In Progress", "Draft"]
+          }, {
+            count: 5,
+            randomize: "state"
+          }),
+        "issues": Generator.create({
+            icon: "issue",
+            title: "%title",
+            description: "%text",
+            state: ["In Progress", "Draft"]
+          }, {
+            count: 5,
+            randomize: "state"
+          })
+      },
       logs: Generator.create({
         author: "%user",
         timestamp: "%date",

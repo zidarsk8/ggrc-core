@@ -35,7 +35,7 @@
       </div>
       <div class="small-col">
         <ul class="mapped-list">
-          {{#mapped_objects}}
+          {{#each mapped.objects}}
             <li>
               <i class="grcicon-{{icon}}-color"></i>
               <span class="person-holder">
@@ -76,7 +76,7 @@
                 </div>
               </span>
             </li>
-          {{/mapped_objects}}
+          {{/each}}
         </ul>
       </div>
       <div class="large-col">
