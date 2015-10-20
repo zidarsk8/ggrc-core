@@ -10,20 +10,22 @@
       title: "My new request",
       info_title: "My new request",
       description: Generator.paragraph(7),
-      state: "In Progress",
+      state: {
+        title: "In Progress",
+        class_name: "inprogress"
+      },
       state_color: "inprogress",
       type: "audit",
       status: "In Progress",
       id: "2",
       comments: Generator.get("comment", 10, {sort: "date"}),
-      people_assignee: Generator.get("user", 5),
-      people_requester: Generator.get("user"),
-      people_verifier: Generator.get("user", 3),
+      people: {
+        "assignee": Generator.get("user", 5),
+        "requester": Generator.get("user"),
+        "verifier": Generator.get("user", 3)
+      },
       created_on: "12/03/14",
       due_on: "12/31/15",
-      type_a: "assignee",
-      type_r: "requester",
-      type_v: "verifier",
       mapped: {
         "objects": Generator.create({
             icon: ["objective", "control", "regulation"],

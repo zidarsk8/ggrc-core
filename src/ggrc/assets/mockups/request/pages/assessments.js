@@ -15,6 +15,8 @@
         title: "In Progress",
         class_name: "inprogress"
       },
+      state_color: "inprogress",
+      status: "In Progress",
       id: "2",
       files: Generator.get("file", 8, {sort: "date"}),
       comments: Generator.get("comment", 3, {sort: "date"}),
