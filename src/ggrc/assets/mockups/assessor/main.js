@@ -21,6 +21,6 @@
       title: "My Assessments",
     },
     // Views:
-    views: _.values(GGRC.Bootstrap.Mockups.Request)
+    views: _.values(GGRC.Bootstrap.Mockups.Assessor)
   });
 })(this.can, this.can.$);
