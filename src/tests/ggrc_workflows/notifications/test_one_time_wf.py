@@ -3,23 +3,21 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
-from tests.ggrc import TestCase
+from datetime import date
+from datetime import datetime
 from freezegun import freeze_time
-from datetime import date, datetime
+from mock import patch
 
-import os
 from ggrc import db
-from ggrc.models import Notification, Person
 from ggrc import notification
+from ggrc.models import Notification
+from ggrc.models import Person
 from ggrc_workflows.models import Cycle
-from tests.ggrc_workflows.generator import WorkflowsGenerator
+from ggrc_workflows.views import send_todays_digest_notifications
+from tests.ggrc import TestCase
 from tests.ggrc.api_helper import Api
 from tests.ggrc.generator import ObjectGenerator
-
-
-if os.environ.get('TRAVIS', False):
-  random.seed(1)  # so we can reproduce the tests if needed
+from tests.ggrc_workflows.generator import WorkflowsGenerator
 
 
 class TestOneTimeWorkflowNotification(TestCase):
@@ -82,12 +80,13 @@ class TestOneTimeWorkflowNotification(TestCase):
       _, notif_data = notification.get_todays_notifications()
       self.assertEqual(len(notif_data[person_1.email]["due_today"]), 2)
 
-  def test_one_time_wf_activate_single_person(self):
+  @patch("ggrc.notification.email.send_email")
+  def test_one_time_wf_activate_single_person(self, mock_mail):
 
     with freeze_time("2015-04-10"):
       user = "user@example.com"
       _, wf = self.wf_generator.generate_workflow(
-        self.one_time_workflow_single_person)
+          self.one_time_workflow_single_person)
 
       _, cycle = self.wf_generator.generate_cycle(wf)
       self.wf_generator.activate_workflow(wf)
@@ -98,7 +97,8 @@ class TestOneTimeWorkflowNotification(TestCase):
       self.assertIn(cycle.id, notif_data[user]["cycle_started"])
       self.assertIn("my_tasks", notif_data[user]["cycle_started"][cycle.id])
       self.assertIn("cycle_tasks", notif_data[user]["cycle_started"][cycle.id])
-      self.assertIn("my_task_groups", notif_data[user]["cycle_started"][cycle.id])
+      self.assertIn(
+          "my_task_groups", notif_data[user]["cycle_started"][cycle.id])
       self.assertIn("cycle_url", notif_data[user]["cycle_started"][cycle.id])
 
       cycle = Cycle.query.get(cycle.id)
@@ -123,6 +123,9 @@ class TestOneTimeWorkflowNotification(TestCase):
     with freeze_time("2015-05-05"):  # due date
       _, notif_data = notification.get_todays_notifications()
       self.assertEqual(len(notif_data[user]["due_today"]), 3)
+
+      send_todays_digest_notifications()
+      self.assertEquals(mock_mail.call_count, 1)
 
   def create_test_cases(self):
     def person_dict(person_id):
@@ -185,8 +188,8 @@ class TestOneTimeWorkflowNotification(TestCase):
             "title": "one time task group",
             "contact": person_dict(user),
             "task_group_tasks": [{
-                "title": "task 1",
-                "description": "some task",
+                "title": u"task 1 \u2062 WITH AN UMBRELLA ELLA ELLA. \u2062",
+                "description": "some task. ",
                 "contact": person_dict(user),
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
@@ -202,7 +205,7 @@ class TestOneTimeWorkflowNotification(TestCase):
             "title": "another one time task group",
             "contact": person_dict(user),
             "task_group_tasks": [{
-                "title": "task 1 in tg 2",
+                "title": u"task 1 \u2062 WITH AN UMBRELLA ELLA ELLA. \u2062",
                 "description": "some task",
                 "contact": person_dict(user),
                 "start_date": date(2015, 5, 8),  # friday

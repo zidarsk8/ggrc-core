@@ -322,7 +322,7 @@ def get_cycle_task_dict(cycle_task):
     if cycle_task.cycle_task_group_object.object:
       object_title = cycle_task.cycle_task_group_object.object.title
     else:
-      object_title = "{} [deleted]".format(
+      object_title = u"{} [deleted]".format(
           cycle_task.cycle_task_group_object.title)
 
   return {
