@@ -28,7 +28,7 @@
             views: views
           };
       new CMS.Controllers.MockupNav(this.element.find(".internav"), options);
-      new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), options);
+      new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), _.extend(options, {infopin: opts.infopin || "min"}));
       new CMS.Controllers.MockupModalView(this.element);
 
       this.element.find(".title-content").html(can.view(this.options.title_view, opts.object));
@@ -266,7 +266,7 @@
       this.cached = new CMS.Controllers.MockupInfoView(this.element.find(".tier-content"), {
         view: view
       });
-      this.setSize();
+      _.defer(this.setSize.bind(this));
     }
   });
 
