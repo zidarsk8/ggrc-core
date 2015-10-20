@@ -1282,10 +1282,23 @@ ul.new-tree {
   }
 }
 
+.sticky-info-panel {
+  .pane-header {
+    .details-wrap {
+      margin-top: 10px !important;
+      &.pin {
+        margin-top: -10px !important;
+      }
+    }
+  }
+}
+
 .info-pane-utility {
   @include clearfix();
-  margin-top: 6px;
   float: right;
+  .btn-complete {
+    margin-top: 10px;
+  }
 }
 
 .details-wrap {
@@ -1295,7 +1308,10 @@ ul.new-tree {
   margin-top: -4px;
   position: relative;
   .info-pane-utility & {
-    margin-top: 0;
+    margin-top: 10px;
+    .pane-header & {
+      margin-top: 0;
+    }
     .dropdown-toggle {
       @include clearfix();
       height: 8px;
@@ -1310,14 +1326,11 @@ ul.new-tree {
     display: block;
   }
   &.pin {
-    margin-left: 0;
-    width: 20px;
-    margin-top: -18px;
-    position: fixed;
-    right: 8px;
-    .sticky-info-panel & {
-      margin-top: -3px;
-    }
+    @include clearfix();
+    width: auto;
+    margin-left: 5px;
+    float: none;
+    clear: both;
   }
   .bubble {
     float: left;

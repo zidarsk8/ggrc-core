@@ -15,9 +15,7 @@
     people_requester: Generator.get("user"),
     people_verifier: Generator.get("user", 3),
     state_color: "inprogress",
-    files: Generator.get("file", 8, {sort: "date"}),
-    comments: Generator.get("comment", 3, {sort: "date"}),
-    urls: Generator.get("url", 3),
+    comments: can.Map(Generator.get("comment", 10, {sort: "date"})),
     logs: Generator.create({
       author: "%user",
       timestamp: "%date",

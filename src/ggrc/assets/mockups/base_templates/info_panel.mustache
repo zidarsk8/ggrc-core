@@ -7,23 +7,6 @@
 
 <section class="info sticky-info-panel" style="height: 311px !important;">
 
-  <div class="details-wrap pin">
-    <ul class="pin-action">
-      <li>
-        <a href="javascript://" data-size="deselect" class="close-pane"><i class="grcicon-x-grey" rel="tooltip" data-placement="left" title="Close info pane"></i></a>
-      </li>
-      <li>
-        <a href="javascript://" data-size="max" class="max"><i class="grcicon-maximize" rel="tooltip" data-placement="left" title="Maximize height"></i></a>
-      </li>
-      <li>
-        <a href="javascript://" data-size="normal" class="normal"><i class="grcicon-default" style="opacity:1.0" rel="tooltip" data-placement="left" title="Default height"></i></a>
-      </li>
-      <li>
-        <a href="javascript://" data-size="min" class="min"><i class="grcicon-minimize" rel="tooltip" data-placement="left" title="Minimize height"></i></a>
-      </li>
-    </ul><!-- pin-action end -->
-  </div><!-- details-wrap pin end -->
-
   <div class="pane-header">
     <div class="row-fluid wrap-row">
       <div class="span9">
@@ -33,6 +16,23 @@
       </div>
       <div class="span3">
         <div class="info-pane-utility">
+
+          <div class="details-wrap pin">
+            <ul class="pin-action">
+              <li>
+                <a href="javascript://" data-size="min" class="min"><i class="grcicon-minimize" rel="tooltip" data-placement="left" title="Minimize height"></i></a>
+              </li>
+              <li>
+                <a href="javascript://" data-size="normal" class="normal"><i class="grcicon-default" style="opacity:1.0" rel="tooltip" data-placement="left" title="Default height"></i></a>
+              </li>
+              <li>
+                <a href="javascript://" data-size="max" class="max"><i class="grcicon-maximize" rel="tooltip" data-placement="left" title="Maximize height"></i></a>
+              </li>
+              <li>
+                <a href="javascript://" data-size="deselect" class="close-pane"><i class="grcicon-x-grey" rel="tooltip" data-placement="left" title="Close info pane"></i></a>
+              </li>
+            </ul><!-- pin-action end -->
+          </div><!-- details-wrap pin end -->
 
           <div class="details-wrap">
             <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
@@ -79,7 +79,7 @@
             </ul>
           </div>
 
-          <a href="javascript://" class="btn btn-small btn-primary pull-right">Complete</a>
+          <a href="javascript://" class="btn-complete btn btn-small btn-primary pull-right">Complete</a>
         </div>
       </div>
     </div>
@@ -100,47 +100,10 @@
 
         <div class="row-fluid wrap-row">
           <div class="span6">
-            <h6>Evidence</h6>
-            <div class="file-list-wrap">
-              <ul class="attachment-list">
-                {{#files}}
-                  <li>
-                    <span class="file-controls">
-                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                      <a href="javascript://"><i class="grcicon-edit"></i></a>
-                    </span>
-                    <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                    <span class="date">{{date}}</span>
-                    <a target="_blank" href="{{url}}">
-                      {{name}}
-                    </a>
-                  </li>
-                {{/files}}
-              </ul>
-
-              <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Add evidence</a>
-            </div>
+            <attachment-list title="Evidence" data="comments" types="!url"></attachment-list>
           </div>
           <div class="span6">
-            <h6>URL</h6>
-            <div class="file-list-wrap">
-              <ul class="attachment-list">
-                {{#urls}}
-                  <li>
-                    <span class="file-controls">
-                      <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                    </span>
-                    <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-                    <span class="date">{{date}}</span>
-                    <a target="_blank" href="{{url}}">
-                      {{name}}
-                    </a>
-                  </li>
-                {{/urls}}
-              </ul>
-
-              <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Add URL</a>
-            </div>
+            <attachment-list title="URL" data="comments" types="url"></attachment-list>
           </div>
         </div>
 
@@ -280,7 +243,7 @@
     <div class="tabs-wrap">
       <ul class="nav nav-tabs">
         <li class="active"><a href="#tab1" data-toggle="tab">
-          Comments and Responses (6)
+          Comments and Responses ({{comments.length}})
         </a></li>
         <li><a href="#tab2" data-toggle="tab">
           Request log
@@ -293,32 +256,7 @@
       <div class="tab-content">
         <div class="tab-pane fade in active" id="tab1">
           <div class="tree-item-add">
-            <div class="add-comment">
-              <div class="row-fluid">
-                <div class="span8">
-                  <div class="controls top">
-                    <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-attach"></i> Attach evidence</a>
-                    <a href="javascript://" class="btn btn-draft btn-small"><i class="grcicon-link"></i> Attach URL</a>
-                  </div>
-                  <div class="wysiwyg-area">
-                    <textarea rows="3" class="span12 triple wysihtml5" name="" id="" placeholder="Enter comment (optional)"></textarea>
-                  </div>
-                  <div class="attachments-preview">
-                    <ul>
-                    {{#attachment}}
-                      <li class="label label-light">
-                        <span>{{name}}</span>
-                        <a href="#" class="js-trigger-removeattachment">&times;</a>
-                      </li>
-                    {{/attachment}}
-                    </ul>
-                  </div>
-                  <div class="controls">
-                    <a href="javascript://" class="btn btn-success btn-small">Add</a>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <add-comment data="comments"></add-comment>
           </div>
           <ul class="entry-list">
             {{#comments}}
@@ -329,7 +267,7 @@
                     {{#author}}
                       <a href="javascript://">{{name}}</a>
                     {{/author}}
-                    added a response - {{date}}
+                    added a response - {{timestamp}}
                   </span>
                   {{comment}}
                   <ul class="attachment-list">
@@ -359,7 +297,7 @@
                 <div class="w-status">
                   <span class="entry-author">
                     <a href="javascript://">{{author}}</a>
-                    {{log_status}} - {{date}}
+                    {{log_status}} - {{timestamp}}
                   </span>
                   <div class="clearfix">
                     <div class="third-col">
@@ -423,7 +361,7 @@
             {{#past_requests}}
               <li class="clearfix">
                 <div class="mini-col">
-                  {{date}}
+                  {{timestamp}}
                 </div>
                 <div class="xmedium-col">
                   <a target="_blank" href="javascript://">
@@ -478,7 +416,7 @@
                 </div>
                 <div class="large-col">
                   <ul class="attachment-list">
-                    {{#files}}
+                    {{#each files}}
                       <li>
                         <label>
                           <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
