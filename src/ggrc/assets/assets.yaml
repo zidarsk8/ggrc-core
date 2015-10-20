@@ -385,7 +385,7 @@ mockup-js-template-files:
   # Request
   - title.mustache
   - request/info.mustache
-  - request/audit.mustache
+  - request/widget.mustache
   - request/assessment_modal.mustache
   - assessor/assessments.mustache
 

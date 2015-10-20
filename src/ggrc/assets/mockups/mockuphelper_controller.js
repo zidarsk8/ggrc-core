@@ -71,7 +71,8 @@
 
   can.Control("CMS.Controllers.MockupView", {
     defaults: {
-      title_view: GGRC.mustache_path + "/title.mustache"
+      title_view: GGRC.mustache_path + "/title.mustache",
+      slide_speed: 240
     }
   }, {
       init: function (el, options) {
@@ -90,6 +91,9 @@
           this.cached.destroy();
         }
         can.Control.prototype.destroy.call(this);
+      },
+      ".filter-trigger click": function (el, ev) {
+        this.element.find(".filter-holder").slideToggle(this.options.slide_speed);
       }
   });
 
@@ -266,7 +270,7 @@
       this.cached = new CMS.Controllers.MockupInfoView(this.element.find(".tier-content"), {
         view: view
       });
-      _.defer(this.setSize.bind(this));
+      this.setSize();
     }
   });
 

@@ -5,7 +5,7 @@
   GGRC.Bootstrap.Mockups.Request.Regulations = {
     title: "Regulations",
     icon: "grcicon-regulation-color",
-    template: "/request/audit.mustache",
+    template: "/request/widget.mustache",
     children: [{
       title: "My new regulation",
       info_title: "My new regulation",

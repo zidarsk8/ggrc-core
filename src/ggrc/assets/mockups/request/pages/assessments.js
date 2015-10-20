@@ -5,7 +5,7 @@
   GGRC.Bootstrap.Mockups.Request.Assessments = {
     title: "Assessments",
     icon: "grcicon-assessment-color",
-    template: "/request/audit.mustache",
+    template: "/request/widget.mustache",
     children: [{
       title: "Very first assessment",
       info_title: "Very first assessment",

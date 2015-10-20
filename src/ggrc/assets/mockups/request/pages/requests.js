@@ -5,7 +5,7 @@
   GGRC.Bootstrap.Mockups.Request.Requests = {
     title: "Requests",
     icon: "grcicon-request-color",
-    template: "/request/audit.mustache",
+    template: "/request/widget.mustache",
     children: [{
       title: "My new request",
       info_title: "My new request",

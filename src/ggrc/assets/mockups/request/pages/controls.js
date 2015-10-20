@@ -5,7 +5,7 @@
   GGRC.Bootstrap.Mockups.Request.Controls = {
     title: "Controls",
     icon: "grcicon-control-color",
-    template: "/request/audit.mustache",
+    template: "/request/widget.mustache",
     children: [{
       title: "Yellow Dead Dog Control",
       info_title: "Yellow Dead Dog Control",

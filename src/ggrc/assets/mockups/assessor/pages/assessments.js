@@ -6,6 +6,7 @@
     title: "Assessments",
     icon: "grcicon-assessment-color",
     template: "/assessor/assessments.mustache",
+    hide_filter: true,
     children: [{
       title: "Very first assessment",
       info_title: "Very first assessment",
