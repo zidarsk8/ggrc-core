@@ -4,9 +4,15 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import deferred, Base, Described, Mapping
-from sqlalchemy.ext.declarative import declared_attr
+from ggrc.models.mixins import Base
+from ggrc.models.mixins import deferred
+from ggrc.models.mixins import Described
+from ggrc.models.mixins import Identifiable
+from ggrc.models.mixins import Mapping
 from sqlalchemy import or_, and_
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm.collections import attribute_mapped_collection
 
 
 class Relationship(Mapping, db.Model):
@@ -33,6 +39,15 @@ class Relationship(Mapping, db.Model):
   automapping = db.relationship(
       lambda: Relationship,
       remote_side=lambda: Relationship.id
+  )
+  relationship_attrs = db.relationship(
+      lambda: RelationshipAttr,
+      collection_class=attribute_mapped_collection("attr_name"),
+      lazy='joined'  # eager loading
+  )
+  attrs = association_proxy(
+      "relationship_attrs", "attr_value",
+      creator=lambda k, v: RelationshipAttr(attr_name=k, attr_value=v)
   )
 
   @property
@@ -156,3 +171,14 @@ class Relatable(object):
     return cls.eager_inclusions(query, Relatable._include_links).options(
         orm.subqueryload('related_sources'),
         orm.subqueryload('related_destinations'))
+
+
+class RelationshipAttr(Identifiable, db.Model):
+  __tablename__ = 'relationship_attrs'
+  relationship_id = db.Column(
+      db.Integer,
+      db.ForeignKey('relationships.id', ondelete='SET NULL'),
+      primary_key=True
+  )
+  attr_name = db.Column(db.String, nullable=False)
+  attr_value = db.Column(db.String, nullable=False)
