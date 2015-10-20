@@ -28,13 +28,17 @@
             views: views
           };
       new CMS.Controllers.MockupNav(this.element.find(".internav"), options);
-      new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), options);
+      new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), _.extend(options, {infopin: opts.infopin || "min"}));
       new CMS.Controllers.MockupModalView(this.element);
 
       this.element.find(".title-content").html(can.view(this.options.title_view, opts.object));
       this.options.views = views;
     },
     "{can.route} tab": function (router, ev, tab) {
+      var exists = _.findWhere(this.options.views, {title: tab});
+      if (!exists) {
+        return can.route.attr("tab", _.first(this.options.views).title);
+      }
       this.options.views.each(function (view) {
         var isActive = view.title === tab;
         view.attr("active", isActive);
@@ -262,7 +266,7 @@
       this.cached = new CMS.Controllers.MockupInfoView(this.element.find(".tier-content"), {
         view: view
       });
-      this.setSize();
+      _.defer(this.setSize.bind(this));
     }
   });
 

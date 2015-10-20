@@ -1,12 +1,11 @@
 (function (GGRC, Generator) {
   GGRC.Bootstrap.Mockups = GGRC.Bootstrap.Mockups || {};
-  GGRC.Bootstrap.Mockups.Request = GGRC.Bootstrap.Mockups.Request || {};
+  GGRC.Bootstrap.Mockups.Assessor = GGRC.Bootstrap.Mockups.Assessor || {};
 
-  GGRC.Bootstrap.Mockups.Request.Assessments = {
+  GGRC.Bootstrap.Mockups.Assessor.Assessments = {
     title: "Assessments",
     icon: "grcicon-assessment-color",
-    template: "/assessor/audit.mustache",
-    infopane_template: "/static/mockups/base_templates/info_panel_assessments.mustache",
+    template: "/assessor/assessments.mustache",
     children: [{
       title: "Very first assessment",
       info_title: "Very first assessment",

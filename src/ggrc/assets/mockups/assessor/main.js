@@ -20,7 +20,8 @@
       icon: "grciconlarge-assessment",
       title: "My Assessments",
     },
+    infopin: "normal",
     // Views:
-    views: _.values(GGRC.Bootstrap.Mockups.Request)
+    views: _.values(GGRC.Bootstrap.Mockups.Assessor)
   });
 })(this.can, this.can.$);
