@@ -35,6 +35,10 @@
       this.options.views = views;
     },
     "{can.route} tab": function (router, ev, tab) {
+      var exists = _.findWhere(this.options.views, {title: tab});
+      if (!exists) {
+        return can.route.attr("tab", _.first(this.options.views).title);
+      }
       this.options.views.each(function (view) {
         var isActive = view.title === tab;
         view.attr("active", isActive);
