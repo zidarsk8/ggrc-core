@@ -1805,6 +1805,10 @@ ul.attr-list, ul.model-list {
   @extend .info-expand;
 }
 
+.info-expand-mapped {
+  @extend .info-expand;
+}
+
 .expand-link {
   a.show-hidden-fields {
     display:block;

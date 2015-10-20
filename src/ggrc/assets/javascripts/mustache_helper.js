@@ -2992,6 +2992,13 @@ Mustache.registerHelper("if_less", function (a, b, options) {
   }
 });
 
+Mustache.registerHelper("add_index", function(index, increment, options) {
+  index = Mustache.resolve(index);
+  increment = Mustache.resolve(increment);
+
+  return (index + increment);
+});
+
 function get_proper_url (url) {
   var domain, max_label, url_split;
 

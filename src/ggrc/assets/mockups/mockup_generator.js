@@ -131,6 +131,7 @@
   g._create_single = function (data, options) {
     var alias = {
           "date": "get_date",
+          "title": "title",
           "timestamp": "get_date",
           "text": "paragraph",
           "user": "user",
@@ -140,7 +141,12 @@
         result = {};
 
      _.each(data, function (val, prop) {
-      if (options.randomize === prop) {
+      if (_.isArray(options.randomize) ? _.indexOf(options.randomize, prop) !== -1
+                                       : options.randomize === prop) {
+        if (_.every(val, _.isString)) {
+          result[prop] = g.get_random(val);
+          return;
+        }
         result[prop] = g._create_single(g.get_random(val), options);
         return;
       }

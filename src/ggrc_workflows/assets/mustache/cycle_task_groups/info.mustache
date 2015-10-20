@@ -10,8 +10,10 @@
   <section class="info">
     {{#is_info_pin}}
     <div class="clearfix">
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
       <div class="tier-content pin">
+        <div class="info-pane-utility">
+          {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+        </div>
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       </div>
     </div>

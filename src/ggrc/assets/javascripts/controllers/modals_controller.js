@@ -74,18 +74,23 @@ can.Control("GGRC.Controllers.Modals", {
     if (content) {
       this.element.html(content);
     }
-    this.options.attr("$header", this.element.find(".modal-header"));
-    this.options.attr("$content", this.element.find(".modal-body"));
-    this.options.attr("$footer", this.element.find(".modal-footer"));
-    this.on();
-    this.fetch_all()
-      .then(this.proxy("apply_object_params"))
-      .then(this.proxy("serialize_form"))
-      .then(function() {
-        // If the modal is closed early, the element no longer exists
-        that.element && that.element.trigger('preload');
-      })
-      .then(this.proxy("autocomplete"));
+    CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
+      this.display_prefs = display_prefs;
+
+      this.options.attr("$header", this.element.find(".modal-header"));
+      this.options.attr("$content", this.element.find(".modal-body"));
+      this.options.attr("$footer", this.element.find(".modal-footer"));
+      this.on();
+      this.fetch_all()
+        .then(this.proxy("apply_object_params"))
+        .then(this.proxy("serialize_form"))
+        .then(function() {
+          // If the modal is closed early, the element no longer exists
+          that.element && that.element.trigger('preload');
+        })
+        .then(this.proxy("autocomplete"));
+      this.restore_ui_status_from_storage();
+    }.bind(this));
   }
 
   , apply_object_params: function () {
@@ -286,7 +291,7 @@ can.Control("GGRC.Controllers.Modals", {
         hidable_tabs++;
     }
     //ui_array index is used as the tab_order, Add extra space for skipped numbers
-    var storable_ui = hidable_tabs + 10;
+    var storable_ui = hidable_tabs + 20;
     for (var i = 0; i < storable_ui; i++) {
       //When we start, all the ui elements are visible
       this.options.ui_array.push(0);
@@ -519,26 +524,31 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "{$content} #formHide click" : function(el, ev) {
-    var ui_arr_length = this.options.ui_array.length;
-    for(var i = 0; i < ui_arr_length; i++) {
+    var i, ui_arr_length = this.options.ui_array.length,
+        $showButton = this.element.find("#formRestore"),
+        $hidables = this.element.find(".hidable"),
+        hidden_elements = $hidables.find("[tabindex]");
+
+    for (i = 0; i < ui_arr_length; i++) {
       this.options.ui_array[i] = 0;
     }
-    var $showButton = $(this.element).find('#formRestore');
+
     this.options.reset_visible = true;
 
-    var $hidables = $(this.element).find(".hidable");
     $hidables.addClass("hidden");
-    $(this.element).find('.inner-hide').addClass('inner-hidable');
+    this.element.find(".inner-hide").addClass("inner-hidable");
 
     //Set up the hidden elements index to 1
-    var hidden_elements = $hidables.find('[tabindex]');
-    for(var i = 0; i < hidden_elements.length; i++) {
-      var tab_value = $(hidden_elements[i]).attr('tabindex');
+    for (i = 0; i < hidden_elements.length; i++) {
+      var $hidden_element = $(hidden_elements[i]),
+          tab_value = $hidden_element.attr("tabindex");
       //The UI array index start from 0, and tab-index/io-index is from 1
       if(tab_value > 0){
         this.options.ui_array[tab_value-1] = 1;
-        $(hidden_elements[i]).attr('tabindex', '-1');
-        $(hidden_elements[i]).attr('uiindex', tab_value);
+        $hidden_element.attr({
+          tabindex: "-1",
+          uiindex: tab_value
+        });
       }
     }
 
@@ -549,60 +559,94 @@ can.Control("GGRC.Controllers.Modals", {
 
   , "{$content} #formRestore click" : function(el, ev) {
     //Update UI status array to initial state
-    var ui_arr_length = this.options.ui_array.length;
-    for(var i = 0; i < ui_arr_length; i++) {
+    var i, ui_arr_length = this.options.ui_array.length,
+        $form = this.element.find("form"),
+        $body = $form.closest(".modal-body"),
+        uiElements = $body.find("[uiindex]")
+        $hideButton = this.element.find("#formHide");
+
+    for (i = 0; i < ui_arr_length; i++) {
       this.options.ui_array[i] = 0;
     }
 
     //Set up the correct tab index for tabbing
     //Get all the ui elements with 'uiindex' set to original tabindex
     //Restore the original tab index
-    var $form = $(this.element).find('form');
-    var uiElements = $form.find('[uiindex]');
-    for (var i = 0; i < uiElements.length; i++) {
+
+    for (i = 0; i < uiElements.length; i++) {
       var $el = $(uiElements[i]);
-      var tab_val = $el.attr('uiindex');
-      $el.attr('tabindex', tab_val);
+      var tab_val = $el.attr("uiindex");
+      $el.attr("tabindex", tab_val);
     }
 
-    var $hideButton = $(this.element).find('#formHide');
     this.options.reset_visible = false;
-    $(this.element).find(".hidden").removeClass("hidden");
-    $(this.element).find('.inner-hide').removeClass('inner-hidable');
+    this.element.find(".hidden").removeClass("hidden");
+    this.element.find(".inner-hide").removeClass("inner-hidable");
     el.hide();
     $hideButton.show();
     return false
   }
 
-  , save_ui_status : function(){}
+  , save_ui_status : function(){
+    var model_name = this.options.model.model_singular,
+        reset_visible = this.options.reset_visible ? this.options.reset_visible : false,
+        ui_array = this.options.ui_array ? this.options.ui_array : [],
+        display_state = {
+          reset_visible : reset_visible,
+          ui_array : ui_array
+        };
 
-  , restore_ui_status : function(){
+    this.display_prefs.setModalState(model_name, display_state);
+    this.display_prefs.save();
+
+  }
+
+  , restore_ui_status_from_storage : function() {
+    var model_name = this.options.model.model_singular,
+        display_state = this.display_prefs.getModalState(model_name);
+
+    //set up reset_visible and ui_array
+    if (display_state !== null) {
+      if (display_state.reset_visible) {
+        this.options.reset_visible = display_state.reset_visible;
+      }
+      if (display_state.ui_array) {
+        this.options.ui_array = display_state.ui_array;
+      }
+    }
+    this.restore_ui_status();
+  }
+
+  , restore_ui_status : function() {
     //walk through the ui_array, for the one values,
     //select the element with tab index and hide it
 
-    if(this.options.reset_visible){//some elements are hidden
-      var $selected,
-          str,
-          tabindex,
-          $form = $(this.element).find('form');
-      for (var i = 0; i < this.options.ui_array.length; i++){
-        if(this.options.ui_array[i] == 1){
-          tabindex = i+1;
-          str = '[tabindex=' + tabindex + ']';
-          $selected = $form.find(str);
-          $selected.closest('.hidable').addClass('hidden');
-          $selected.attr('uiindex', tabindex);
-          $selected.attr('tabindex', '-1');
+    if (this.options.reset_visible) {//some elements are hidden
+      var $selected, str, tabindex, i,
+          $form = this.element.find("form"),
+          $body = $form.closest(".modal-body"),
+          $hideButton = $form.find("#formHide"),
+          $showButton = $form.find("#formRestore");
+
+      for (i = 0; i < this.options.ui_array.length; i++) {
+        if (this.options.ui_array[i] == 1) {
+          tabindex = i + 1;
+          str = "[tabindex=" + tabindex + "]";
+          $selected = $body.find(str);
+
+          if ($selected) {
+            $selected.closest(".hidable").addClass("hidden");
+            $selected.attr({
+              uiindex: tabindex,
+              tabindex: "-1"
+            });
+          }
         }
       }
 
-      if($selected){
-        var $hideButton = $selected.closest('.modal-body').find('#formHide'),
-          $showButton = $selected.closest('.modal-body').find('#formRestore');
+      $hideButton.hide();
+      $showButton.show();
 
-        $hideButton.hide();
-        $showButton.show();
-      }
       return false;
     }
 
@@ -806,6 +850,7 @@ can.Control("GGRC.Controllers.Modals", {
         }
         delete that.disable_hide;
       });
+      this.save_ui_status();
       return ajd;
   }
 

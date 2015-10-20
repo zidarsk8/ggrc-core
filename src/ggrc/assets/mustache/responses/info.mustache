@@ -8,40 +8,43 @@
 {{#instance}}
   <section class="info">
 
-    {{#if options.allow_mapping_or_creating}}
-    {{! NB: Creating and editing responses have the same rules. }}
-    {{#if_can_create_response options.parent_instance}}
-    <div class="details-wrap no-top">
-      <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-      <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-        <li>
-          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Response" data-object-plural="responses" data-object-id="{{instance.id}}">
-            <i class="grcicon-edit"></i>
-            Edit Response
-          </a>
-        </li>
-        <li>
-          <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-        </li>
-        {{#is_allowed 'delete' instance}}
-          <li>
-            <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-              <i class="grcicon-deleted"></i>
-              Delete
-            </a>
-          </li>
-        {{/is_allowed}}
-      </ul>
-    </div>
-    {{/if_can_create_response}}
-    {{/if}}
-
     {{#is_info_pin}}
     <div class="clearfix">
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
       <div class="tier-content pin">
+
+        <div class="info-pane-utility">
+          {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+          {{#if options.allow_mapping_or_creating}}
+          {{! NB: Creating and editing responses have the same rules. }}
+          {{#if_can_create_response options.parent_instance}}
+          <div class="details-wrap no-top">
+            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+            <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+              <li>
+                <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Response" data-object-plural="responses" data-object-id="{{instance.id}}">
+                  <i class="grcicon-edit"></i>
+                  Edit Response
+                </a>
+              </li>
+              <li>
+                <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+              </li>
+              {{#is_allowed 'delete' instance}}
+                <li>
+                  <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                    <i class="grcicon-deleted"></i>
+                    Delete
+                  </a>
+                </li>
+              {{/is_allowed}}
+            </ul>
+          </div>
+          {{/if_can_create_response}}
+          {{/if}}
+        </div>
+
         <div class="row-fluid wrap-row">
-          <div class="span12">
+          <div class="span9">
             <h6>Response</h6>
             {{{firstnonempty instance.description 'Response'}}}
           </div>
