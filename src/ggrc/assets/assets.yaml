@@ -380,9 +380,14 @@ mockup-js-files:
 
 
 mockup-js-template-files:
+  # Request
   - title.mustache
   - request/info.mustache
   - request/audit.mustache
+  - request/assessment_modal.mustache
+
+  # Base templates
+  - base_templates/modal_base.mustache
 
   # Info panel partials
   - base_templates/info_panel/base.mustache
