@@ -31,7 +31,9 @@
         <div class="span9">
           <h6>Title</h6>
           <h3>{{info_title}}</h3>
-          <span class="state-value state-{{state_color}}">{{state}}</span>
+          {{#state}}
+            <span class="state-value state-{{class_name}}">{{title}}</span>
+          {{/state}}
         </div>
         <div class="span3">
           <div class="info-pane-utility">

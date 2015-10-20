@@ -10,10 +10,11 @@
       title: "Very first assessment",
       info_title: "Very first assessment",
       description: Generator.paragraph(7),
-      state: "In Progress",
-      state_color: "inprogress",
       type: "assessment",
-      status: "In Progress",
+      state: {
+        title: "In Progress",
+        class_name: "inprogress"
+      },
       id: "2",
       files: Generator.get("file", 8, {sort: "date"}),
       comments: Generator.get("comment", 3, {sort: "date"}),
@@ -25,54 +26,35 @@
       },
       created_on: "12/03/14",
       due_on: "12/31/15",
-      mapped_objects: [{
-        icon: "objective",
-        title: "090.7068 objective 1",
-        state: "Draft",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }, {
-        icon: "control",
-        title: "Access to the Private Network with expired Key v0906984",
-        state: "In Progress",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }, {
-        icon: "regulation",
-        title: "a regulation object",
-        state: "In Progress",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }],
-      mapped_objects_requests: [{
-        icon: "request",
-        title: "My new request",
-        state: "In Progress",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }, {
-        icon: "request",
-        title: "Simple Request for Programs",
-        state: "Draft",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }, {
-        icon: "request",
-        title: "Request made for Sections inspection",
-        state: "Draft",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }],
-      mapped_objects_issues: [{
-        icon: "issue",
-        title: "090.7068 issue 1",
-        state: "Draft",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }, {
-        icon: "issue",
-        title: "Access to the Private Network with expired Key v0906984",
-        state: "In Progress",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }, {
-        icon: "issue",
-        title: "a object under issue",
-        state: "In Progress",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-      }],
+      mapped: {
+        "objects": Generator.create({
+            icon: ["objective", "control", "regulation"],
+            title: "%title",
+            description: "%text",
+            state: ["In Progress", "Draft"]
+          }, {
+            count: 5,
+            randomize: ["state", "icon"]
+          }),
+        "requests": Generator.create({
+            icon: "requests",
+            title: "%title",
+            description: "%text",
+            state: ["In Progress", "Draft"]
+          }, {
+            count: 5,
+            randomize: "state"
+          }),
+        "issues": Generator.create({
+            icon: "issue",
+            title: "%title",
+            description: "%text",
+            state: ["In Progress", "Draft"]
+          }, {
+            count: 5,
+            randomize: "state"
+          })
+      },
       logs: Generator.create({
         author: "%user",
         timestamp: "%date",

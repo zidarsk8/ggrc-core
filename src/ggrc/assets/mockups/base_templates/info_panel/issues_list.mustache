@@ -6,7 +6,7 @@
 }}
 
 <ul class="mapped-list">
-  {{#mapped_objects_issues}}
+  {{#each mapped.issues}}
     <li>
       <span class="file-controls">
         <a href="javascript://"><i class="grcicon-deleted"></i></a>
@@ -50,6 +50,6 @@
         </div>
       </span>
     </li>
-  {{/mapped_objects_issues}}
+  {{/each}}
 </ul>
 <a href="#" class="btn btn-small btn-danger">Raise an issue</a>

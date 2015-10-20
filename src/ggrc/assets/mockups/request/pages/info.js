@@ -8,12 +8,14 @@
     template: "/request/info.mustache",
     info_title: "My new audit",
     description: Generator.paragraph(7),
-    state: "In Progress",
+    state: {
+      title: "In Progress",
+      class_name: "inprogress"
+    },
     people: {
       "audit lead": Generator.get("user", 5),
       "auditor": Generator.get("user", 3)
     },
-    state_color: "inprogress",
     comments: can.Map(Generator.get("comment", 10, {sort: "date"})),
     logs: Generator.create({
       author: "%user",

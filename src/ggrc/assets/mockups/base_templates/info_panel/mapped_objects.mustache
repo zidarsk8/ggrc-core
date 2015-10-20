@@ -7,7 +7,7 @@
 
 <h6>Mapped objects</h6>
 <ul class="mapped-list">
-  {{#mapped_objects}}
+  {{#each mapped.objects}}
     <li>
       <div class="custom-attr-wrap mapped">
         <div class="row-fluid">
@@ -36,7 +36,7 @@
         </div><!-- hidden-fields-area end -->
       </div>
     </li>
-  {{/mapped_objects}}
+  {{/each}}
 </ul>
 <a class="btn btn-draft btn-small" href="javascript://">
   Map objects
