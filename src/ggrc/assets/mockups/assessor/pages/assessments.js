@@ -10,21 +10,24 @@
       title: "Very first assessment",
       info_title: "Very first assessment",
       description: Generator.paragraph(7),
-      state: "In Progress",
-      state_color: "inprogress",
       type: "assessment",
+      state: {
+        title: "In Progress",
+        class_name: "inprogress"
+      },
+      state_color: "inprogress",
       status: "In Progress",
       id: "2",
       files: Generator.get("file", 8, {sort: "date"}),
       comments: Generator.get("comment", 3, {sort: "date"}),
       urls: Generator.get("url", 3),
-      created_on: "12/03/14",
-      due_on: "12/31/15",
       people: {
         "assignee": Generator.get("user", 5),
         "assessor": Generator.get("user"),
         "verifier": Generator.get("user", 3)
       },
+      created_on: "12/03/14",
+      due_on: "12/31/15",
       mapped: {
         "objects": Generator.create({
             icon: ["objective", "control", "regulation"],
@@ -118,7 +121,57 @@
       }, {
         count: 5,
         randomize: "data"
-      })
+      }),
+      past_requests: Generator.get("request", 5),
+      children: [{
+        title: "Other title",
+        type: "process",
+        id: "23"
+      }, {
+        title: "YOLO",
+        type: "issue",
+        id: "24"
+      }, {
+        title: "R U Talking to me",
+        type: "system",
+        id: "12"
+      }]
+    }, {
+      title: "Simple Request for Programs",
+      type: "issue",
+      id: "3",
+      status: "Draft",
+      children: []
+    }, {
+      title: "Request made for Sections inspection",
+      type: "audit",
+      id: "5",
+      status: "Draft",
+      children: [{
+        title: "Other title",
+        type: "process",
+        id: "63"
+      }, {
+        title: "YOLO",
+        type: "issue",
+        id: "344"
+      }, {
+        title: "R U Talking to me",
+        type: "system",
+        id: "342"
+      }, {
+        title: "Other title",
+        type: "process",
+        id: "33"
+      }, {
+        title: "YOLO",
+        type: "issue",
+        id: "54"
+      }, {
+        title: "R U Talking to me",
+        type: "system",
+        id: "62"
+      }]
     }]
   };
 })(GGRC || {}, GGRC.Mockup.Generator);
