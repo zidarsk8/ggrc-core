@@ -128,8 +128,11 @@
 
   can.Control("CMS.Controllers.MockupModalView", {
   }, {
-    ".modal #assessorDefault change": function (el, ev) {
-      this.element.find(".js-toggle-chooseperson").prop("disabled", el.val() !== "other");
+    ".modal .js-toggle-field change": function (el, ev) {
+      var target = this.element.find(el.data("target")),
+          val = el.data("value");
+
+      target.prop("disabled", el.val() !== val);
     },
     ".modal #underAssessment change": function (el, ev) {
       var isEnabled = el.val() === "Control";
