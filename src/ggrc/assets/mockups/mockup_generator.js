@@ -9,7 +9,112 @@
   var FIRST_NAMES = "James Christopher Ronald Mary Lisa Michelle John Daniel Anthony Patricia Nancy Laura Robert Paul Kevin Linda Karen Sarah Michael Mark Jason Barbara Betty Kimberly William Donald Jeff Elizabeth Helen Deborah David George Jennifer Sandra Richard Kenneth Maria Donna Charles Steven Susan Carol Joseph Edward Margaret Ruth Thomas Brian Dorothy Sharon".split(" "),
       LAST_NAMES = "Smith Anderson Clark Wright Mitchell Johnson Thomas Rodriguez Lopez Perez Williams Jackson Lewis Hill Roberts Jones White Lee Scott Turner Brown Harris Walker Green Phillips Davis Martin Hall Adams Campbell Miller Thompson Allen Baker Parker Wilson Garcia Young Gonzalez Evans Moore Martinez Hernandez Nelson Edwards Taylor Robinson King Carter Collins".split(" "),
       WORDS = "all undertaken by government market network over family tribe formal informal organization territory through laws norms power language relates processes interaction decision-making among actors involved collective problem that lead creation reinforcement reproduction social norms institutions distinguish term governance from government government formal body invested with authority make decisions given political system this case governance process which includes all actors involved influencing decision-making process such as lobbies parties medias centered on relevant governing body whether organization geopolitical entity nation-state corporation business organization incorporated as legal entity socio-political entity chiefdom tribe family etc an informal one its governance way rules norms actions are produced sustained regulated held accountable degree formality depends on internal rules given organization absence actors administer affecting aimed already also among analysed analytical any apply applying approaches are article articulated as associated assure at authority authors banks based be becht beginning being best between board boards bolton both business by called can century citizens clear coherent collective community complex concept connections consists contrast control corporate corporation corporation creating customers customs deals decisions defined denote describe describes differences direct directioncorporate directors documented edit eells empirical employees environment environmental equals especially established example exercise exist explicit fiduciary finance first five focus focuses for form formal found framework free from functioning gaf generate global goal goals governance governancecorporate governanceglobal governanceinformation governanceinternet governanceit governance government group has have however in include includes independent industry informal information institutions inter- interact interchangeable interdependent interests international internet investigating investment involved is issues it itself james large laws lenders like logically main make management manner many markets meaning mechanisms mediated methodology mission mitigate need needs nodal non-governmental non-normative non-profit norms obligations observed of often older on or organization organizations other over overarching people perspective pg plane players points policies policy political polity postulated practical primarily principal problems processes project projects proposes public regarding regular regulation regulators reinforcing relations relationship relationships research respect responsibility richard right risks rules sector serves set shareholders social society some sometimes stakeholders states structure successful suppliers system technology term terms textbooks their these those through thus tool traditional trust trustees understood units unlike up use used value various was way where wherever which whom with word".split(" "),
-      SITES = "Google.com Facebook.com Amazon.com Youtube.com Yahoo.com Wikipedia.org Ebay.com Twitter.com Go.com Craigslist.org Reddit.com Netflix.com Linkedin.com Live.com Bing.com Espn.go.com Pinterest.com Imgur.com Tumblr.com Chase.com Cnn.com Apple.com Paypal.com Blogspot.com Instagram.com".split(" ");
+      SITES = [{
+        "title": "AdMob",
+        "domain": "admob.com"
+      }, {
+        "title": "AdSense",
+        "domain": "adsense.com"
+      }, {
+        "title": "AdWords",
+        "domain": "adwords.com"
+      }, {
+        "title": "Android",
+        "domain": "android.com"
+      }, {
+        "title": "Blogger",
+        "domain": "blogger.com"
+      }, {
+        "title": "Chromium",
+        "domain": "chromium.org"
+      }, {
+        "title": "Google Chrome",
+        "domain": "chrome.com"
+      }, {
+        "title": "Chromebook",
+        "domain": "chromebook.com"
+      }, {
+        "title": "Google Member",
+        "domain": "googlemember.com"
+      }, {
+        "title": "Google Members",
+        "domain": "googlemembers.com"
+      }, {
+        "title": "elgooG",
+        "domain": "com.google"
+      }, {
+        "title": "FeedBurner",
+        "domain": "feedburner.com"
+      }, {
+        "title": "DoubleClick",
+        "domain": "doubleclick.com"
+      }, {
+        "title": "iGoogle",
+        "domain": "igoogle.com"
+      }, {
+        "title": "Froogle",
+        "domain": "froogle.com"
+      }, {
+        "title": "Google Analytics",
+        "domain": "googleanalytics.com"
+      }, {
+        "title": "Google Code",
+        "domain": "googlecode.com"
+      }, {
+        "title": "Google Developer Source",
+        "domain": "googlesource.com"
+      }, {
+        "title": "Google Drive",
+        "domain": "googledrive.com"
+      }, {
+        "title": "Google Earth",
+        "domain": "googlearth.com"
+      }, {
+        "title": "Google Maps",
+        "domain": "googlemaps.com"
+      }, {
+        "title": "Google Page Creator",
+        "domain": "googlepagecreator.com"
+      }, {
+        "title": "Google Scholar",
+        "domain": "googlescholar.com"
+      }, {
+        "title": "Gmail",
+        "domain": "gmail.com"
+      }, {
+        "title": "Keyhole",
+        "domain": "keyhole.com"
+      }, {
+        "title": "Made with Code",
+        "domain": "madewithcode.com"
+      }, {
+        "title": "Panoramio",
+        "domain": "panoramio.com"
+      }, {
+        "title": "Picasa",
+        "domain": "picasa.com"
+      }, {
+        "title": "SketchUp",
+        "domain": "sketchup.com"
+      }, {
+        "title": "Google Analytics",
+        "domain": "urchin.com"
+      }, {
+        "title": "Waze",
+        "domain": "waze.com"
+      }, {
+        "title": "YouTube",
+        "domain": "youtube.com"
+      }, {
+        "title": "Google.org",
+        "domain": "google.org"
+      }, {
+        "title": "Google",
+        "domain": "goolge.com"
+      }, {
+        "title": "Google URL Shortener",
+        "domain": "goo.gl"
+      }];
 
   var g = function() {
     this.u = g.user();
@@ -18,10 +123,10 @@
   };
   g.user = function (options) {
     options = options || {};
-    var types = "assignee requester verifier".split(" ");
+    var types = "assignee requester verifier assessor".split(" ");
     return {
       name: g.get_random(FIRST_NAMES) + " " + g.get_random(LAST_NAMES),
-      type: options.type || g.get_random(types)
+      type: options.type || g.get_random(options.types || types)
     };
   };
   g.url = function () {
@@ -30,8 +135,8 @@
       icon: "url",
       extension: "url",
       timestamp: g.get_date({year: 2015}),
-      name: site,
-      url: "http://" + site.toLowerCase() + "/"
+      name: site.title,
+      url: "http://" + site.domain
     };
   };
   g.get_random = function (arr) {
@@ -88,7 +193,7 @@
   g.comment = function (options) {
     options = options || {};
     return {
-      author: g.user(),
+      author: g.user(options.type || options.types),
       timestamp: g.get_date({year: 2015}),
       comment: g.paragraph(_.random(0, 10)),
       attachments: g.get("file|url", _.random(0, 3))
@@ -122,7 +227,12 @@
     if (count === 0) {
       return [];
     }
+    if (options.types) {
+      options.types = options.types.split("|");
+    }
     var values = _.times(count || 1, _.partial(g.get_random(types), options));
+    if (options.types) {
+    }
     if (options.sort === "date") {
       return g._sort_by_date(values);
     }
