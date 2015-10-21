@@ -227,9 +227,6 @@
     if (count === 0) {
       return [];
     }
-    if (options.types) {
-      options.types = options.types.split("|");
-    }
     var values = _.times(count || 1, _.partial(g.get_random(types), options));
     if (options.types) {
     }
