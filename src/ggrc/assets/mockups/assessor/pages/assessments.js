@@ -123,20 +123,7 @@
         count: 5,
         randomize: "data"
       }),
-      past_requests: Generator.get("request", 5),
-      children: [{
-        title: "Other title",
-        type: "process",
-        id: "23"
-      }, {
-        title: "YOLO",
-        type: "issue",
-        id: "24"
-      }, {
-        title: "R U Talking to me",
-        type: "system",
-        id: "12"
-      }]
+      past_requests: Generator.get("request", 5)
     }, {
       title: "Simple Request for Programs",
       type: "issue",
