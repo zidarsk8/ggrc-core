@@ -1277,9 +1277,6 @@ ul.new-tree {
 }
 
 .tier-content {
-  .sticky-info-panel & {
-    margin-top: 77px;
-  }
   &.pin {
     .info-pane-utility {
       .details-wrap {
@@ -1297,10 +1294,7 @@ ul.new-tree {
 .sticky-info-panel {
   .pane-header {
     .details-wrap {
-      margin-top: 10px !important;
-      &.pin {
-        margin-top: -10px !important;
-      }
+      margin-top: 18px !important;
     }
   }
 }
@@ -1309,7 +1303,24 @@ ul.new-tree {
   @include clearfix();
   float: right;
   .btn-complete {
-    margin-top: 10px;
+    margin-top: 18px;
+  }
+}
+
+.cms_controllers_mockup_helper {
+  .details-wrap {
+    &.pin {
+      position: fixed;
+      right: 47px;
+      z-index: 9999;
+      width: 100px;
+      background: $white;
+      margin-top: -15px !important;
+      padding-top: 5px;
+    }
+  }
+  .tier-content {
+    margin-top: 77px;
   }
 }
 
