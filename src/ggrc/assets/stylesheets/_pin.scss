@@ -350,9 +350,6 @@
 }
 
 .sticky-info-panel {
-  &.info {
-    margin-top: -15px;
-  }
   .pane-header {
     position: fixed;
     left: 47px;
@@ -360,9 +357,10 @@
     height: 52px;
     background: $white;
     border-bottom: 1px solid $lightGray;
-    padding-top: 15px;
     margin-bottom: 10px;
-    z-index: 9999;
+    z-index: 9000;
+    margin-top: -92px;
+    padding-top: 20px;
   }
 }
 
