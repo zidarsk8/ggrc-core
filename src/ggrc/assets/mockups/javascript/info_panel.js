@@ -94,6 +94,9 @@
     }
   }, {
     "init": function () {
+      if (!this.options.view || !this.options.view.type) {
+        return;
+      }
       var template = this.options.templates[this.options.view.type] || this.options.templates["default"];
       this.element.html(can.view(template, this.options.view));
     },
