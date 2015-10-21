@@ -213,7 +213,7 @@
   };
   g.get = function (types, count, options) {
     function get_type_fn(type) {
-      var fn = g[type] || g[type.slice(0, -1)];
+      var fn = g[type] || g[type.slice(0, -1)] || g["get_" + type];
       if (!type || !fn) {
         return;
       }
@@ -228,8 +228,6 @@
       return [];
     }
     var values = _.times(count || 1, _.partial(g.get_random(types), options));
-    if (options.types) {
-    }
     if (options.sort === "date") {
       return g._sort_by_date(values);
     }

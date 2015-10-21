@@ -365,6 +365,7 @@ dashboard-js-spec-helpers:
 
 mockup-js-files:
   - mockup_generator.js
+  - javascript/generators/assessment.js
 
   # Request
   - request/pages/info.js
