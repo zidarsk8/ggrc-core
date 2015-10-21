@@ -57,7 +57,7 @@
 <div class="tabs-wrap">
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tab1" data-toggle="tab">
-      Comments (6)
+      Comments {{#if comments}}({{comments.length}}){{/if}}
     </a></li>
     <li><a href="#tab2" data-toggle="tab">
       Attachments
@@ -86,7 +86,9 @@
     <div class="tab-pane fade" id="tab2">
       <div class="row-fluid wrap-row">
         <div class="span6">
-          <attachment-list title="Evidence" data="comments" types="!url"></attachment-list>
+          <div class="left-spacing">
+            <attachment-list title="Evidence" data="comments" types="!url"></attachment-list>
+          </div>
         </div>
         <div class="span6">
           <attachment-list title="URL" data="comments" types="url"></attachment-list>

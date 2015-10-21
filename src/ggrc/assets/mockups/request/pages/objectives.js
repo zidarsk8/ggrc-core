@@ -5,7 +5,7 @@
   GGRC.Bootstrap.Mockups.Request.Objectives = {
     title: "Objectives",
     icon: "grcicon-objective-color",
-    template: "/request/audit.mustache",
+    template: "/request/widget.mustache",
     children: [{
       title: "Hidden Bitter Mustard",
       info_title: "Hidden Bitter Mustard",

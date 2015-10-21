@@ -16,20 +16,27 @@
     </div>
     <div class="span3">
       <div class="info-pane-utility">
-
         <div class="details-wrap pin">
           <ul class="pin-action">
             <li>
-              <a href="javascript://" data-size="min" class="min"><i class="grcicon-minimize" rel="tooltip" data-placement="left" title="Minimize height"></i></a>
+              <a href="javascript://" data-size="min" class="min">
+                <i class="grcicon-minimize {{#if_equals active_pin "min" }}active{{/if}}" rel="tooltip" data-placement="left" title="Minimize height"></i>
+              </a>
             </li>
             <li>
-              <a href="javascript://" data-size="normal" class="normal"><i class="grcicon-default" style="opacity:1.0" rel="tooltip" data-placement="left" title="Default height"></i></a>
+              <a href="javascript://" data-size="normal" class="normal">
+                <i class="grcicon-default {{#if_equals active_pin "normal" }}active{{/if}}" rel="tooltip" data-placement="left" title="Default height"></i>
+              </a>
             </li>
             <li>
-              <a href="javascript://" data-size="max" class="max"><i class="grcicon-maximize" rel="tooltip" data-placement="left" title="Maximize height"></i></a>
+              <a href="javascript://" data-size="max" class="max">
+                <i class="grcicon-maximize {{#if_equals active_pin "max" }}active{{/if}}" rel="tooltip" data-placement="left" title="Maximize height"></i>
+              </a>
             </li>
             <li>
-              <a href="javascript://" data-size="deselect" class="close-pane"><i class="grcicon-x-grey" rel="tooltip" data-placement="left" title="Close info pane"></i></a>
+              <a href="javascript://" data-size="deselect" class="close-pane">
+                <i class="grcicon-x-grey" rel="tooltip" data-placement="left" title="Close info pane"></i>
+              </a>
             </li>
           </ul><!-- pin-action end -->
         </div><!-- details-wrap pin end -->

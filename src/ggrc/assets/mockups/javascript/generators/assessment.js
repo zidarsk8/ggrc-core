@@ -1,14 +1,16 @@
-(function (GGRC, Generator) {
-  GGRC.Bootstrap.Mockups = GGRC.Bootstrap.Mockups || {};
-  GGRC.Bootstrap.Mockups.Request = GGRC.Bootstrap.Mockups.Request || {};
+/*!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE- 0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+*/
 
-  GGRC.Bootstrap.Mockups.Request.Assessments = {
-    title: "Assessments",
-    icon: "grcicon-assessment-color",
-    template: "/request/widget.mustache",
-    children: [{
-      title: "Very first assessment",
-      info_title: "Very first assessment",
+
+(function (GGRC, _, Generator) {
+  Generator.assessment = function () {
+    return {
+      title: Generator.title(),
+      info_title: Generator.title(),
       description: Generator.paragraph(7),
       type: "assessment",
       state: {
@@ -18,16 +20,15 @@
       state_color: "inprogress",
       status: "In Progress",
       id: "2",
-      files: Generator.get("file", 8, {sort: "date"}),
-      comments: Generator.get("comment", 3, {sort: "date"}),
+      comments: Generator.get("comment", 10, {sort: "date", types: ["assignee", "assessor", "verifier"]}),
       urls: Generator.get("url", 3),
-      created_on: "12/03/14",
-      due_on: "12/31/15",
       people: {
         "assignee": Generator.get("user", 5),
         "assessor": Generator.get("user"),
         "verifier": Generator.get("user", 3)
       },
+      created_on: Generator.get_date({year: 2015}),
+      due_on: Generator.get_date({year: 2015}),
       mapped: {
         "objects": Generator.create({
             icon: ["objective", "control", "regulation"],
@@ -39,7 +40,7 @@
             randomize: ["state", "icon"]
           }),
         "requests": Generator.create({
-            icon: "request",
+            icon: "requests",
             title: "%title",
             description: "%text",
             state: ["In Progress", "Draft"]
@@ -122,56 +123,7 @@
         count: 5,
         randomize: "data"
       }),
-      past_requests: Generator.get("request", 5),
-      children: [{
-        title: "Other title",
-        type: "process",
-        id: "23"
-      }, {
-        title: "YOLO",
-        type: "issue",
-        id: "24"
-      }, {
-        title: "R U Talking to me",
-        type: "system",
-        id: "12"
-      }]
-    }, {
-      title: "Simple Request for Programs",
-      type: "issue",
-      id: "3",
-      status: "Draft",
-      children: []
-    }, {
-      title: "Request made for Sections inspection",
-      type: "audit",
-      id: "5",
-      status: "Draft",
-      children: [{
-        title: "Other title",
-        type: "process",
-        id: "63"
-      }, {
-        title: "YOLO",
-        type: "issue",
-        id: "344"
-      }, {
-        title: "R U Talking to me",
-        type: "system",
-        id: "342"
-      }, {
-        title: "Other title",
-        type: "process",
-        id: "33"
-      }, {
-        title: "YOLO",
-        type: "issue",
-        id: "54"
-      }, {
-        title: "R U Talking to me",
-        type: "system",
-        id: "62"
-      }]
-    }]
+      past_requests: Generator.get("request", 5)
+    };
   };
-})(GGRC || {}, GGRC.Mockup.Generator);
+})(this.GGRC, this._, GGRC.Mockup.Generator);

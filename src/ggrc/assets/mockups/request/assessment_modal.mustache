@@ -91,33 +91,38 @@
               Default Assessors
               <span class="required">*</span>
             </label>
-            <select class="input-block-level" id="assessorDefault">
-              <option>Object Owner</option>
+            <select class="input-block-level js-toggle-field" data-target=".choose-assessor" data-value="other">
+              <option>Object Owners</option>
               <option>Audit Lead</option>
               <option>Object contact</option>
               <option>Primary assessor</option>
               <option>Secondary assessors</option>
-              <option value="other">Other...</option>
+              <option value="other">Others...</option>
             </select>
           </div>
           <div class="span6">
             <label>&nbsp;</label>
-            <input type="text" class="input-block-level choose-input js-toggle-chooseperson" placeholder="Choose person" disabled>
+            <input type="text" class="input-block-level choose-input choose-assessor" placeholder="Add person 1, Add person 2..." disabled>
           </div>
         </div>
-        <div class="row-fluid">
+        <div class="row-fluid choose-from-select">
           <div class="span6 bottom-spacing">
             <label>
-              Default verifier
+              Default Verifier
               <span class="required">*</span>
             </label>
-            <input type="text" class="input-block-level" placeholder="Choose person">
+            <select class="input-block-level js-toggle-field" data-target=".choose-verifier" data-value="other">
+              <option>Object Owners</option>
+              <option>Audit Lead</option>
+              <option>Object contact</option>
+              <option>Primary assessor</option>
+              <option>Secondary assessors</option>
+              <option value="other">Others...</option>
+            </select>
           </div>
-          <div class="span6 bottom-spacing">
-            <label>
-              Bug number
-            </label>
-            <input type="text" class="input-block-level" placeholder="Bug number">
+          <div class="span6">
+            <label>&nbsp;</label>
+            <input type="text" class="input-block-level choose-input choose-verifier" placeholder="Add person 1, Add person 2..." disabled>
           </div>
         </div>
       </div>
@@ -157,12 +162,26 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>Contract length</td>
-                  <td>Dropdown</td>
-                  <td>0-1 year, 2 years, 3 or more</td>
+                  <td>Assessment results</td>
+                  <td>Radio</td>
+                  <td>Yes, No, At Risk, Unclear, In Remediation</td>
                   <td class="centered checkbox-wrap"><input type="checkbox" checked></td>
                   <td class="centered checkbox-wrap"><input type="checkbox" checked></td>
                   <td class="centered checkbox-wrap"><input type="checkbox" checked></td>
+                  <td>
+                    <div class="pull-right">
+                      <a href="#"><i class="grcicon-edit"></i></a>
+                      <a href="#"><i class="grcicon-deleted"></i></a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Bug number</td>
+                  <td>Text</td>
+                  <td></td>
+                  <td class="centered checkbox-wrap"><input type="checkbox"></td>
+                  <td class="centered checkbox-wrap"><input type="checkbox"></td>
+                  <td class="centered checkbox-wrap"><input type="checkbox"></td>
                   <td>
                     <div class="pull-right">
                       <a href="#"><i class="grcicon-edit"></i></a>
@@ -176,6 +195,7 @@
                     <select>
                       <option>Dropdown</option>
                       <option>Checkbox</option>
+                      <option>Radio</option>
                       <option>Text</option>
                     </select>
                   </td>

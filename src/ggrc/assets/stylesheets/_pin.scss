@@ -67,6 +67,9 @@
     a {
       i {
         @include opacity(.25);
+        &.active {
+          @include opacity(1);
+        }
       }
       &:hover {
         i {
@@ -290,8 +293,15 @@
   }
 }
 
+.left-spacing {
+  margin-left: 30px;
+}
+
 .mapped-list {
   @extend %reset-list;
+  &.left-spacing {
+    margin-left: 20px;
+  }
   li {
     margin-bottom: 5px;
     position: relative;
@@ -315,8 +325,7 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        min-width: 25px;
-        left: -30px;
+        left: -50px;
       }
     }
   }

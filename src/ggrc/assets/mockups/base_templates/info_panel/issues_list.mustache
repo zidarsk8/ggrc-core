@@ -5,15 +5,16 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-<ul class="mapped-list">
+<ul class="mapped-list left-spacing">
   {{#each mapped.issues}}
     <li>
       <span class="file-controls">
-        <a href="javascript://"><i class="grcicon-deleted"></i></a>
+        <a href="javascript://"><i class="grcicon-unmapped"></i></a>
+        <a href="javascript://"><i class="grcicon-edit"></i></a>
       </span>
       <i class="grcicon-{{icon}}-color"></i>
       <span class="person-holder">
-        <a href='mailto:{{email}}' target="_blank">
+        <a href='{{url}}' target="_blank">
           <span class="person-tooltip-trigger" data-placement="top">
             {{title}}
           </span>
