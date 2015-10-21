@@ -63,7 +63,8 @@
 			content: "A";
 		}
 	}
-	&.assessor {
+	&.assessor,
+	&.assessors {
 		background: $purple;
 		&:after {
 			content: "S";
@@ -75,7 +76,15 @@
 			content: "R";
 		}
 	}
-	&.verifier {
+	&.creator,
+	&.creators {
+		background: $orange;
+		&:after {
+			content: "C";
+		}
+	}
+	&.verifier,
+	&.verifiers {
 		background: $orange;
 		&:after {
 			content: "V";

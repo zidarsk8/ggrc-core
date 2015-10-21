@@ -20,7 +20,7 @@
       state_color: "inprogress",
       status: "In Progress",
       id: "2",
-      comments: Generator.get("comment", 10, {sort: "date", types: ["assignee", "assessor", "verifier"]}),
+      comments: Generator.get("comment", 10, {sort: "date", types: ["assessor", "creator", "verifier"]}),
       urls: Generator.get("url", 3),
       people: {
         "assessors": Generator.get("user", 5),
