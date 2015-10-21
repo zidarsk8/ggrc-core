@@ -150,6 +150,9 @@ a.remove_filter i[class^="grcicon-"] {
   .active & {
     background-position:-30px -80px;
   }
+  .file-controls & {
+    background-position:-30px -56px;
+  }
   .tree-structure .active & {
     background-position:-30px -56px;
   }
