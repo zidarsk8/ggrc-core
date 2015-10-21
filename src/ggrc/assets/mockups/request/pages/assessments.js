@@ -39,7 +39,7 @@
             randomize: ["state", "icon"]
           }),
         "requests": Generator.create({
-            icon: "requests",
+            icon: "request",
             title: "%title",
             description: "%text",
             state: ["In Progress", "Draft"]
