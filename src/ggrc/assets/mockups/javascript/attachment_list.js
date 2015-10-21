@@ -47,14 +47,13 @@
         this.updateFiles();
       },
       ".btn-draft click": function (el, ev) {
-        if (this.scope.attr("types") !== "url") {
-          return this.scope.attr("data").unshift({
-            author: Generator.current.u,
-            timestamp: Generator.current.d,
-            attachments: Generator.get("file"),
-            comment: ""
-          });
-        }
+        var attachments = Generator.get(this.scope.attr("types") === "url" ? "url" : "file");
+        return this.scope.attr("data").unshift({
+          author: Generator.current.u,
+          timestamp: Generator.current.d,
+          attachments: attachments,
+          comment: ""
+        });
       }
     }
   });
