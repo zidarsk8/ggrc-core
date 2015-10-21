@@ -367,6 +367,9 @@ mockup-js-files:
   - mockup_generator.js
   - javascript/generators/assessment.js
 
+  # Assessor
+  - assessor/pages/assessments.js
+
   # Request
   - request/pages/info.js
   - request/pages/requests.js
@@ -374,7 +377,6 @@ mockup-js-files:
   - request/pages/regulations.js
   - request/pages/controls.js
   - request/pages/assessments.js
-  - assessor/pages/assessments.js
 
   # Bootstrap files shouold be above
   - javascript/add_comment.js
@@ -382,9 +384,8 @@ mockup-js-files:
   - javascript/info_panel.js
   - javascript/tree_view.js
   - mockuphelper_controller.js
-  - request/main.js
   - assessor/main.js
-
+  - request/main.js
 
 mockup-js-template-files:
   # Request
