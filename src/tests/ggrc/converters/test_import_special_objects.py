@@ -43,7 +43,7 @@ class TestSpecialObjects(TestCase):
     self.assertEquals(2, Program.query.count())
     program = Program.query.filter(Program.slug == "prog-1").first()
     p1_roles = UserRole.query.filter_by(context_id=program.context_id).all()
-    self.assertEquals(4, len(p1_roles))
+    self.assertEquals(5, len(p1_roles))
     owner_ids = [r.person_id for r in p1_roles if r.role_id == 1]
     editor_ids = [r.person_id for r in p1_roles if r.role_id == 2]
     reader_ids = [r.person_id for r in p1_roles if r.role_id == 3]
@@ -55,7 +55,7 @@ class TestSpecialObjects(TestCase):
                      Person.query.filter(Person.id.in_(reader_ids)).all()]
     expected_owners = set(["user1@example.com", "user11@example.com"])
     expected_editors = set(["user11@example.com"])
-    expected_readers = set(["user12@example.com"])
+    expected_readers = set(["user12@example.com", "user2@example.com"])
     self.assertEqual(set(owner_emails), expected_owners)
     self.assertEqual(set(editor_emails), expected_editors)
     self.assertEqual(set(reader_emails), expected_readers)

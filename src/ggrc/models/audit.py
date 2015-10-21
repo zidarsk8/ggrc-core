@@ -11,6 +11,7 @@ from .mixins import (
 from ggrc.models.relationship import Relatable
 from ggrc.models.object_person import Personable
 from ggrc.models.context import HasOwnContext
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.program import Program
 from ggrc.models.person import Person
@@ -73,6 +74,7 @@ class Audit(
       },
       "user_role:Auditor": {
           "display_name": "Auditors",
+          "type": AttributeInfo.Type.USER_ROLE,
           "filter_by": "_filter_by_auditor",
       },
       "status": "Status",

@@ -4,13 +4,11 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from collections import defaultdict
-from flask import current_app
 from itertools import chain
 from itertools import product
 
 from ggrc import settings
 from ggrc.cache.memcache import MemCache
-from ggrc.converters import errors
 from ggrc.converters import get_exportables
 from ggrc.converters.base_block import BlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
@@ -25,6 +23,8 @@ class Converter(object):
       "Program",
       "Risk Assessment",
       "Audit",
+      "Request",
+      "Response",
       "Policy",
       "Regulation",
       "Standard",
@@ -168,4 +168,3 @@ class Converter(object):
       return
     memcache = MemCache()
     memcache.clean()
-

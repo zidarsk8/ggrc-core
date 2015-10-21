@@ -9,11 +9,12 @@ from ggrc.models.mixins import (
 )
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
 from ggrc.models.request import Request
 
 
-class Response(Noted, Described, Hyperlinked, WithContact,
+class Response(Noted, Described, Documentable, Hyperlinked, WithContact,
                Titled, Slugged, db.Model):
   __tablename__ = 'responses'
   __mapper_args__ = {
@@ -79,18 +80,26 @@ class Response(Noted, Described, Hyperlinked, WithContact,
   _aliases = {
       "description": "Response",
       "request": {
-        "display_name": "Request",
-        "mandatory": True,
-        "filter_by": "_filter_by_request",
+          "display_name": "Request",
+          "mandatory": True,
+          "filter_by": "_filter_by_request",
       },
       "response_type": {
-        "display_name": "Response Type",
-        "mandatory": True,
+          "display_name": "Response Type",
+          "mandatory": True,
       },
       "status": "Status",
       "title": None,
       "secondary_contact": None,
       "notes": None,
+      "documents": {
+          "display_name": "Documents",
+          "type": AttributeInfo.Type.SPECIAL_MAPPING,
+      },
+      "mapped_objects": {
+          "display_name": "Mapped Objects",
+          "type": AttributeInfo.Type.SPECIAL_MAPPING,
+      }
 
   }
 
@@ -114,7 +123,7 @@ class Response(Noted, Described, Hyperlinked, WithContact,
         orm.joinedload('request'))
 
 
-class DocumentationResponse(Relatable, Documentable, Personable, Response):
+class DocumentationResponse(Relatable, Personable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'documentation'
@@ -125,7 +134,7 @@ class DocumentationResponse(Relatable, Documentable, Personable, Response):
   _sanitize_html = []
 
 
-class InterviewResponse(Relatable, Documentable, Personable, Response):
+class InterviewResponse(Relatable, Personable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'interview'
@@ -151,7 +160,7 @@ class InterviewResponse(Relatable, Documentable, Personable, Response):
         orm.subqueryload('meetings'))
 
 
-class PopulationSampleResponse(Relatable, Documentable, Personable, Response):
+class PopulationSampleResponse(Relatable, Personable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'population sample'

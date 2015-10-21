@@ -12,13 +12,14 @@ import traceback
 
 from ggrc import db
 from ggrc.automapper import AutomapperGenerator
-from ggrc.converters import get_importables
 from ggrc.converters import errors
+from ggrc.converters import get_importables
 from ggrc.login import get_current_user
 from ggrc.models import Audit
 from ggrc.models import AuditObject
 from ggrc.models import CategoryBase
 from ggrc.models import Contract
+from ggrc.models import ControlAssessment
 from ggrc.models import CustomAttributeDefinition
 from ggrc.models import CustomAttributeValue
 from ggrc.models import ObjectPerson
@@ -31,11 +32,11 @@ from ggrc.models import Relationship
 from ggrc.models import Request
 from ggrc.models import Response
 from ggrc.models import Standard
-from ggrc.models import ControlAssessment
 from ggrc.models import all_models
+from ggrc.models import response
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.rbac import permissions
-from ggrc.models.reflection import AttributeInfo
 
 
 MAPPING_PREFIX = "__mapping__:"
@@ -143,20 +144,26 @@ class StatusColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
-    valid_states = row_converter.object_class.VALID_STATES
-    self.state_mappings = {str(s).lower(): s for s in valid_states}
+    self.valid_states = row_converter.object_class.VALID_STATES
+    self.state_mappings = {str(s).lower(): s for s in self.valid_states}
     super(StatusColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
-    # TODO: check if mandatory and replace with default if it's wrong
     value = self.raw_value.lower()
     status = self.state_mappings.get(value)
     if status is None:
-      status = self.get_default()
-      if value:
-        self.add_warning(errors.WRONG_REQUIRED_VALUE,
-                         value=value[:20],
+      if self.mandatory:
+        if len(self.valid_states) > 0:
+          self.add_warning(errors.WRONG_REQUIRED_VALUE,
+                           value=value[:20],
+                           column_name=self.display_name)
+          status = self.valid_states[0]
+        else:
+          self.add_error(errors.MISSING_VALUE_ERROR,
                          column_name=self.display_name)
+          return
+      elif value != "":
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
     return status
 
 
@@ -186,8 +193,11 @@ class UserColumnHandler(ColumnHandler):
   def parse_item(self):
     email = self.raw_value.lower()
     person = self.get_person(email)
-    if not person and email != "":
-      self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+    if not person:
+      if email != "":
+        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+      elif self.mandatory:
+        self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.key)
     return person
 
   def get_value(self):
@@ -827,7 +837,7 @@ class RequestColumnHandler(ParentColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.parent = Request
-    super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
+    super(RequestColumnHandler, self).__init__(row_converter, key, **options)
 
 
 class ResponseTypeColumnHandler(ColumnHandler):
@@ -839,3 +849,121 @@ class ResponseTypeColumnHandler(ColumnHandler):
                      column_name=self.display_name,
                      value=value)
     return value
+
+
+class ResponseMappedObjectsColumnHandler(ColumnHandler):
+
+  res_types = {v.__mapper_args__.get("polymorphic_identity", None): v.__name__
+               for v in response.__dict__.values()
+               if isinstance(v, type) and issubclass(v, response.Response)}
+
+  def __init__(self, row_converter, key, **options):
+    self.mappable = get_importables()
+    self.new_slugs = row_converter.block_converter.converter.new_objects
+    super(ResponseMappedObjectsColumnHandler, self) \
+        .__init__(row_converter, key, **options)
+
+  def parse_item(self):
+    lines = [line.split(":", 1) for line in self.raw_value.splitlines()]
+    objects = []
+    for line in lines:
+      if len(line) != 2:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+        continue
+      object_class, slug = line
+      slug = slug.strip()
+      class_ = self.mappable.get(object_class.strip().lower())
+      if class_ is None:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+        continue
+      new_object_slugs = self.new_slugs[class_]
+      obj = class_.query.filter(class_.slug == slug).first()
+      if obj:
+        objects.append(obj)
+      elif not (slug in new_object_slugs and self.dry_run):
+        self.add_warning(errors.UNKNOWN_OBJECT,
+                         object_type=class_._inflector.human_singular.title(),
+                         slug=slug)
+    return objects
+
+  def _mapped_objects(self):
+    obj = self.row_converter.obj
+    rels = Relationship.query.filter(
+        ((Relationship.source_type == obj.type) &
+         Relationship.source_id == obj.id) |
+        ((Relationship.destination_type == obj.type) &
+         Relationship.destination_id == obj.id)).all()
+    return [r.source if r.source != obj else r.destination for r in rels]
+
+  def get_value(self):
+    lines = ["{}: {}".format(o._inflector.title_singular.title(), o.slug)
+             for o in self._mapped_objects()]
+    return "\n".join(lines)
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    obj = self.row_converter.obj
+    obj_type = self.res_types[obj.response_type]
+    existing = set((o.type, o.id) for o in self._mapped_objects())
+    desired = set((o.type, o.id) for o in self.value)
+    to_delete = existing - desired
+    if len(to_delete) > 0:
+      Relationship.query.filter(
+          or_(*[(((Relationship.source_type == obj_type) &
+                  (Relationship.source_id == obj.id) &
+                  (Relationship.destination_type == o_type) &
+                  (Relationship.destination_id == o_id)) |
+                 ((Relationship.destination_type == obj_type) &
+                  (Relationship.destination_id == obj.id) &
+                  (Relationship.source_type == o_type) &
+                  (Relationship.source_id == o_id)))
+                for o_type, o_id in to_delete])
+      ).delete()
+
+    new_relationships = []
+    for relevant_type, relevant_id in desired - existing:
+      rel = Relationship(
+          source_type=obj_type,
+          source_id=obj.id,
+          destination_type=relevant_type,
+          destination_id=relevant_id
+      )
+      new_relationships.append(rel)
+      db.session.add(rel)
+    db.session.flush()
+    for rel in new_relationships:
+      AutomapperGenerator(rel, False).generate_automappings()
+    self.dry_run = True
+
+  def set_obj_attr(self):
+    pass
+
+
+class DocumentsColumnHandler(ColumnHandler):
+
+  def get_value(self):
+    lines = ["{} {}".format(d.title, d.link)
+             for d in self.row_converter.obj.documents]
+    return "\n".join(lines)
+
+  def parse_item(self):
+    lines = [line.rsplit(" ", 1) for line in self.raw_value.splitlines()]
+    documents = []
+    for line in lines:
+      if len(line) != 2:
+        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+        continue
+      title, link = line
+      documents.append(
+          all_models.Document(title=title.strip(), link=link.strip()))
+    return documents
+
+  def set_obj_attr(self):
+    pass
+
+  def insert_object(self):
+    if self.dry_run or not self.value:
+      return
+    self.row_converter.obj.documents = self.value
+    self.dry_run = True
