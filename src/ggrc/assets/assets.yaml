@@ -376,6 +376,10 @@ mockup-js-files:
   - assessor/pages/assessments.js
 
   # Bootstrap files shouold be above
+  - javascript/add_comment.js
+  - javascript/attachment_list.js
+  - javascript/info_panel.js
+  - javascript/tree_view.js
   - mockuphelper_controller.js
   - request/main.js
   - assessor/main.js

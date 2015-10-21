@@ -67,6 +67,9 @@
     a {
       i {
         @include opacity(.25);
+        &.active {
+          @include opacity(1);
+        }
       }
       &:hover {
         i {
