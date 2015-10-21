@@ -400,6 +400,7 @@ mockup-js-template-files:
 
   # Info panel partials
   - base_templates/info_panel/base.mustache
+  - base_templates/info_panel/pin_actions.mustache
   - base_templates/info_panel/header.mustache
   - base_templates/info_panel/description.mustache
   - base_templates/info_panel/mapped_objects.mustache
