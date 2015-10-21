@@ -4,10 +4,16 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from ggrc.models.mixins import (
-    deferred, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
-)
+from ggrc.models.document import Document
+from ggrc.models.mixins import Described
+from ggrc.models.mixins import Hyperlinked
+from ggrc.models.mixins import Noted
+from ggrc.models.mixins import Slugged
+from ggrc.models.mixins import Titled
+from ggrc.models.mixins import WithContact
+from ggrc.models.mixins import deferred
 from ggrc.models.object_document import Documentable
+from ggrc.models.object_document import ObjectDocument
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
@@ -95,6 +101,7 @@ class Response(Noted, Described, Documentable, Hyperlinked, WithContact,
       "documents": {
           "display_name": "Documents",
           "type": AttributeInfo.Type.SPECIAL_MAPPING,
+          "filter_by": "_filter_by_documents"
       },
       "mapped_objects": {
           "display_name": "Mapped Objects",
@@ -106,6 +113,17 @@ class Response(Noted, Described, Documentable, Hyperlinked, WithContact,
   def _display_name(self):
     return u'Response with id={0} for Audit "{1}"'.format(
         self.id, self.request.audit.display_name)
+
+  @classmethod
+  def _filter_by_documents(cls, predicate):
+    types = ["Response", "DocumentationResponse", "InterviewResponse",
+             "PopulationSampleResponse"]
+    return ObjectDocument.query.filter(
+        (ObjectDocument.documentable_type.in_(types)) &
+        (ObjectDocument.documentable_id == cls.id)
+    ).join(Document).filter(
+        predicate(Document.title)
+    ).exists()
 
   @classmethod
   def _filter_by_request(cls, predicate):
