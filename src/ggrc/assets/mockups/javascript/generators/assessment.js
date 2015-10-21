@@ -23,9 +23,9 @@
       comments: Generator.get("comment", 10, {sort: "date", types: ["assignee", "assessor", "verifier"]}),
       urls: Generator.get("url", 3),
       people: {
-        "assignee": Generator.get("user", 5),
-        "assessor": Generator.get("user"),
-        "verifier": Generator.get("user", 3)
+        "assessors": Generator.get("user", 5),
+        "creator": Generator.get("user"),
+        "verifiers": Generator.get("user", 3)
       },
       created_on: Generator.get_date({year: 2015}),
       due_on: Generator.get_date({year: 2015}),
