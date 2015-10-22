@@ -30,7 +30,7 @@ function _display_tree_subpath(el, path, attempt_counter) {
   var rest = path.split("/")
     , type = rest.shift()
     , id = rest.shift()
-    , selector = "[data-object-type=" + type + "][data-object-id=" + id + "]"
+    , selector = "[data-object-type='" + type + "'][data-object-id=" + id + "]"
     , $node
     , $next_node
     , node_controller
