@@ -19,7 +19,6 @@
             mappings;
 
         if (showAll) {
-          console.log(GGRC.tree_view.base_widgets_by_type[type]);
           return _.sortBy(_.compact(_.map(GGRC.tree_view.base_widgets_by_type[type], function (mapping) {
             return CMS.Models[mapping];
           })), "model_singular");
