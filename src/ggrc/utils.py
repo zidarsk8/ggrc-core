@@ -160,29 +160,29 @@ def get_mapping_rules():
   # these rules are copy pasted from
   # src/ggrc/assets/javascripts/apps/business_objects.js line: 276
   business_object_rules = {
-    "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Audit",  # noqa # removed Person because Programs have a "Mapped" attribute for people mappings
-    "Audit": "Issue ControlAssessment Request history Person program program_controls",  # noqa
-    "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Issue",  # noqa
-    "ControlAssessment": "Issue Objective Program Regulation Contract Policy Standard Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "Regulation": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person",  # noqa
-    "Policy": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person",  # noqa
-    "Standard": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person",  # noqa
-    "Contract": "Program Issue ControlAssessment Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Section",  # noqa
-    "Clause": "Contract Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Section Policy Regulation Standard",  # noqa
-    "Section": "Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Policy Regulation Standard Contract Clause",  # noqa
-    "Objective" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person",  # noqa
-    "Control" : "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "Person" : "Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Audit",  # noqa
-    "OrgGroup" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "Vendor" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "System" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "Process" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "DataAsset" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "AccessGroup" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "Product" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "Project" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "Facility" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit",  # noqa
-    "Market" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit"  # noqa
+    "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Audit Request",  # noqa # removed Person because Programs have a "Mapped" attribute for people mappings
+    "Audit": "Issue ControlAssessment Request history Person program program_controls Request",  # noqa
+    "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Issue Request",  # noqa
+    "ControlAssessment": "Issue Objective Program Regulation Contract Policy Standard Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "Regulation": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Request",  # noqa
+    "Policy": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Request",  # noqa
+    "Standard": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Request",  # noqa
+    "Contract": "Program Issue ControlAssessment Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Section Request",  # noqa
+    "Clause": "Contract Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Section Policy Regulation Standard Request",  # noqa
+    "Section": "Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Policy Regulation Standard Contract Clause Request",  # noqa
+    "Objective" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Request",  # noqa
+    "Control" : "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "Person" : "Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Audit Request",  # noqa
+    "OrgGroup" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "Vendor" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "System" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "Process" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "DataAsset" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "AccessGroup" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "Product" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "Project" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "Facility" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request",  # noqa
+    "Market" : "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Request"  # noqa
   }
   split_rules = {k: v.split() for k, v in business_object_rules.items()}
   filtered_rules = {k: filter(v) for k, v in split_rules.items()}

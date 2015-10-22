@@ -70,6 +70,7 @@
         "process": CMS.Models.Process,
         "control": CMS.Models.Control,
         "control_assessment": CMS.Models.ControlAssessment,
+        "request": CMS.Models.Request,
         "issue" : CMS.Models.Issue,
         "objective": CMS.Models.Objective,
         "section": CMS.Models.Section,

@@ -246,29 +246,30 @@
       object = GGRC.page_instance();
 
     var base_widgets_by_type = {
-      "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Clause Section",
+      "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Clause Section Request",
       "Audit": "Issue ControlAssessment Request history Person Program Control",
-      "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue AccessGroup Clause Section",
-      "ControlAssessment": "Issue Objective Program Clause Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit Request AccessGroup Section",
-      "Regulation": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup",
-      "Policy": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup",
-      "Standard": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup",
-      "Contract": "Program Issue ControlAssessment Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Section",
-      "Clause": "Contract Objective ControlAssessment Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Section Policy Regulation Standard Program Audit",
-      "Section": "Objective Control ControlAssessment System Process DataAsset Product Project Facility Market OrgGroup Vendor AccessGroup Person Policy Regulation Standard Contract Clause Program Audit",
-      "Objective": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup",
-      "Control": "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup",
-      "Person": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit Request AccessGroup",
-      "OrgGroup": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup",
-      "Vendor": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup",
-      "System": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup",
-      "Process": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup",
-      "DataAsset": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup",
-      "AccessGroup": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit",
-      "Product": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup",
-      "Project": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup",
-      "Facility": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup",
-      "Market": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup"
+      "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue AccessGroup Clause Section Request",
+      "ControlAssessment": "Issue Objective Program Clause Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit Request AccessGroup Section Request",
+      "Request": "Issue Objective Program Clause Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit Request AccessGroup Section",
+      "Regulation": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Request",
+      "Policy": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Request",
+      "Standard": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Request",
+      "Contract": "Program Issue ControlAssessment Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Section Request",
+      "Clause": "Contract Objective ControlAssessment Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Section Policy Regulation Standard Program Audit Request",
+      "Section": "Objective Control ControlAssessment System Process DataAsset Product Project Facility Market OrgGroup Vendor AccessGroup Person Policy Regulation Standard Contract Clause Program Audit Request",
+      "Objective": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Request",
+      "Control": "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
+      "Person": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit Request AccessGroup Request",
+      "OrgGroup": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
+      "Vendor": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
+      "System": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
+      "Process": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
+      "DataAsset": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
+      "AccessGroup": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit Request",
+      "Product": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
+      "Project": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
+      "Facility": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
+      "Market": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request"
     };
     base_widgets_by_type = _.mapValues(base_widgets_by_type,
       function (conf) {
@@ -297,6 +298,7 @@
       'processes': GGRC.mustache_path + "/processes/info.mustache",
       'products': GGRC.mustache_path + "/products/info.mustache",
       'control_assessments': GGRC.mustache_path + "/control_assessments/info.mustache",
+      'requests': GGRC.mustache_path + "/requests/info.mustache",
       'issues': GGRC.mustache_path + "/issues/info.mustache",
     };
     widget_list.add_widget(object.constructor.shortName, "info", {
@@ -438,13 +440,13 @@
         Control: {
           Request: {
             widget_id: "Request",
-            widget_name: "Audit Requests"
+            widget_name: "Requests"
           }
         },
         Person: {
           Request: {
             widget_id: "Request",
-            widget_name: "Audit Requests"
+            widget_name: "Requests"
           }
         }
       },
@@ -549,6 +551,11 @@
           },
           ControlAssessment: {
             mapping: "related_control_assessments",
+            child_options: [related_objects_child_options],
+            draw_children: true
+          },
+          Request: {
+            mapping: "related_requests",
             child_options: [related_objects_child_options],
             draw_children: true
           },
@@ -746,16 +753,6 @@
             footer_view: null
           },
         },
-        open_requests: {
-          Request: {
-            mapping: "open_requests",
-            allow_mapping: false,
-            allow_creating: false,
-            draw_children: true,
-            show_view: GGRC.mustache_path + "/requests/tree.mustache",
-            footer_view: null
-          }
-        },
         Clause: {
           _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
@@ -766,7 +763,10 @@
           _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         Control: {
-          _mixins: ["governance_objects", "business_objects", "extended_audits", "open_requests", "issues"],
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"],
+        },
+        Request: {
+          _mixins: ["governance_objects", "business_objects", "issues"],
         },
         ControlAssessment: {
           _mixins: ["governance_objects", "business_objects", "issues"],

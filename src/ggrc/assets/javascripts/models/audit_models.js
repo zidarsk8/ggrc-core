@@ -276,34 +276,32 @@ can.Model.Mixin("requestorable", {
 
 can.Model.Cacheable("CMS.Models.Request", {
   root_object : "request",
-  filter_keys : ["assignee", "code", "company", "control",
+  filter_keys : ["assignee", "audit", "code", "company", "control",
                  "due date", "due", "name", "notes", "request",
                  "requested on", "status", "test", "title", "request_type",
-                 "type", "request type", "due_on", "request_object", "request object", "request title"
+                 "type", "request type", "due_on", "request_object",
+                 "request object", "request title"
   ],
   filter_mappings: {
     "type": "request_type",
+    "request title": "title",
+    "request description": "description",
     "request type": "request_type",
-    "request title": "description",
-    "request object": "request_object"
   },
   root_collection : "requests"
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
-  , mixins : ["unique_title", "requestorable"]
+  , mixins : ["unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , audit : "CMS.Models.Audit.stub"
-    , responses : "CMS.Models.Response.stubs"
     , assignee : "CMS.Models.Person.stub"
-    , requestor : "CMS.Models.Person.stub"
-    , audit_object : "CMS.Models.AuditObject.stub"
     , requested_on : "date"
     , due_on : "date"
+    , audit : "CMS.Models.Audit.stub"
   }
   , defaults : {
-    status : "Draft"
+    status : "Unstarted"
     , requested_on : new Date()
     , due_on : null
   }
@@ -313,8 +311,8 @@ can.Model.Cacheable("CMS.Models.Request", {
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
     , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
     , attr_list : [
-      {attr_title: 'Title', attr_name: 'description'},
-      {attr_title: 'Request Object', attr_name: 'audit_object'},
+      {attr_title: 'Title', attr_name: 'title'},
+      {attr_title: 'Description', attr_name: 'description'},
       {attr_title: 'Assignee', attr_name: 'assignee'},
       {attr_title: 'Status', attr_name: 'status'},
       {attr_title: 'Last Updated', attr_name: 'updated_at'},
@@ -322,22 +320,20 @@ can.Model.Cacheable("CMS.Models.Request", {
       {attr_title: 'Due Date', attr_name: 'due_on', attr_sort_field: 'due_on'},
       {attr_title: 'Request Type', attr_name: 'request_type'},
       {attr_title: 'Code', attr_name: 'slug'},
-      {attr_title: 'Responses', attr_name: 'mapped_responses'}
+      {attr_title: 'Audit', attr_name: 'audit'},
     ]
-    , display_attr_names : ['description', 'audit_object', 'assignee', 'due_on', 'status']
-    , mandatory_attr_names : ['description']
+    , display_attr_names : ['description','assignee', 'due_on', 'status']
+    , mandatory_attr_names : ['title', 'description']
     , draw_children : true
-    , child_options : [{
-      model : "Response"
-      , mapping : "responses"
-      , allow_creating : true
-    }]
   }
   , init : function() {
     this._super.apply(this, arguments);
+    this.validateNonBlank("title");
     this.validateNonBlank("description");
     this.validateNonBlank("due_on");
+    this.validateNonBlank("requested_on");
     this.validatePresenceOf("assignee");
+    this.validatePresenceOf("audit");
     if(this === CMS.Models.Request) {
       this.bind("created", function(ev, instance) {
         if(instance.constructor === CMS.Models.Request) {
@@ -349,24 +345,6 @@ can.Model.Cacheable("CMS.Models.Request", {
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
-    function setFieldsFromAudit() {
-      if(!this.selfLink && this.audit) {
-        var audit = this.audit.reify();
-        if (!this.assignee) {
-          this.attr("assignee", audit.contact || {id : null});
-        }
-        if (!this.due_on) {
-          this.attr("due_on", audit.end_date || "");
-        }
-      }
-    }
-    setFieldsFromAudit.call(this);
-    this.bind("audit", setFieldsFromAudit);
-    this.attr("response_model_class", can.compute(function() {
-      return can.capitalize(this.attr("request_type")
-          .replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); }))
-        + "Response";
-    }, this));
   }
 
   , display_name : function() {
@@ -402,39 +380,13 @@ can.Model.Cacheable("CMS.Models.Request", {
     ).then(update_program_authorizations);
     GGRC.delay_leaving_page_until(dfd);
   }
-  , before_save: function(notifier) {
-    // this.control_assessment is the control assessment passed in by clicking
-    // "Open Request" on the control assessment page
-    var obj = this.audit_object_object || this.control_assessment,
-        audit = this.audit.reify(),
-        audit_object;
-
-    // We fetch all audit_objets, because we need to check if this audit_object
-    // is already mapped to a request
-    notifier.queue(audit.refresh_all("audit_objects").then(function(objects) {
-      audit_object = _.reduce(objects, function(previous, audit_object) {
-        var auditable = audit_object.auditable || {};
-        if (obj && auditable.id === obj.id && auditable.type === obj.type) {
-          return audit_object;
-        }
-        return previous;
-      }, null);
-
-      if (obj && !audit_object) {
-        return new CMS.Models.AuditObject({
-          audit: this.audit,
-          auditable: obj,
-          context: this.audit.reify().context
-        }).save();
-      }
-      return $.when(audit_object);
-    }.bind(this)).then(function(audit_object) {
-      this.attr("audit_object", audit_object);
-    }.bind(this)));
-  }
   , form_preload : function(new_object_form) {
     var audit, that = this;
     if(new_object_form) {
+      if (GGRC.page_model.type == "Audit") {
+        this.attr("audit", { id: GGRC.page_model.id, type: "Audit" });
+      }
+
       if(!this.assignee && this.audit) {
         audit = this.audit.reify();
         (audit.selfLink ? $.when(audit) : audit.refresh())
@@ -447,11 +399,11 @@ can.Model.Cacheable("CMS.Models.Request", {
   , get_filter_vals: function () {
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
         mappings = $.extend({}, this.class.filter_mappings, {
-          "title": "description",
+          "title": "title",
+          "description": "description",
           "state": "status",
           "due date": "due_on",
-          "due": "due_on",
-          "request object": "request_object"
+          "due": "due_on"
         }),
         keys, vals;
 
@@ -463,8 +415,6 @@ can.Model.Cacheable("CMS.Models.Request", {
       if (this.assignee) {
         vals["assignee"] = filter_vals.apply(this.assignee.reify(), []);
       }
-      vals["control"] = this.audit_object ? this.audit_object.reify().auditable.reify().title : "None";
-      vals["request_object"] = vals["request object"] = vals["control"];
     } catch (e) {}
 
     return vals;
