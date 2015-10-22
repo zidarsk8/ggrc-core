@@ -106,6 +106,7 @@ class Response(Noted, Described, Documentable, Hyperlinked, WithContact,
       "mapped_objects": {
           "display_name": "Mapped Objects",
           "type": AttributeInfo.Type.SPECIAL_MAPPING,
+          "filter_by": "_filter_by_mapped_objects",
       }
 
   }
@@ -124,6 +125,11 @@ class Response(Noted, Described, Documentable, Hyperlinked, WithContact,
     ).join(Document).filter(
         predicate(Document.title)
     ).exists()
+
+  @classmethod
+  def _filter_by_mapped_objects(cls, predicate):
+    # ignore this since response is going away soon
+    return True
 
   @classmethod
   def _filter_by_request(cls, predicate):
