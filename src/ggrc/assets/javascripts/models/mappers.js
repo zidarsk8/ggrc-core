@@ -805,7 +805,7 @@
                 new_result.compute = can.compute(function() {
                   return self.filter_fn(result);
                 }).bind("change", $.proxy(self, "process_result", binding, result, new_result));
-                self.process_result(binding, result, new_result, new_result.compute());
+                self.process_result(binding, result, new_result, new_result.compute);
               });
             });
           });
@@ -832,7 +832,7 @@
                 new_result.compute = can.compute(function() {
                   return self.filter_fn(result);
                 }).bind("change", $.proxy(self, "process_result", binding, result, new_result));
-                self.process_result(binding, result, new_result, new_result.compute());
+                self.process_result(binding, result, new_result, new_result.compute);
               });
             });
           });
