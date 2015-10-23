@@ -17,6 +17,8 @@ describe("can.Model.Cacheable", function() {
       // The string update key has to be here to make the update conflict tests work.
       //  See can.Model.Cacheable.init for details on how the software
       //  under test is broken. --BM
+      findOne: 'GET /api/dummy_models/{id}',
+      findAll: 'GET /api/dummy_models/',
       update: "PUT /api/dummy_models/{id}",
       mixins: ["dummyable"],
       attributes: { dummy_attribute: "dummy_convert" },
