@@ -189,7 +189,7 @@ describe("can.Model.Cacheable", function() {
         var obj = _obj;
         obj.attr("foo", "bar");
         obj.backup();
-        expect(obj._backupStore).toEqual(jasmine.objectContaining({ id: obj.id, foo: "bar" }));
+        expect(obj._backupStore()).toEqual(jasmine.objectContaining({ id: obj.id, foo: "bar" }));
         obj.attr("foo", "plonk");
         spyOn($.fn, "trigger").and.callThrough();
         spyOn(obj, "save").and.callFake(function() {
@@ -242,7 +242,7 @@ describe("can.Model.Cacheable", function() {
         var obj = _obj;
         obj.attr("foo", "bar");
         obj.backup();
-        expect(obj._backupStore).toEqual(jasmine.objectContaining({ id: obj.id, foo: "bar" }));
+        expect(obj._backupStore()).toEqual(jasmine.objectContaining({ id: obj.id, foo: "bar" }));
         obj.attr("foo", "plonk");
         spyOn(obj, "save").and.returnValue($.when(obj));
         spyOn(obj, "refresh").and.callFake(function() {
