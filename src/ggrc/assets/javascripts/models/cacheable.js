@@ -1128,7 +1128,7 @@ can.Model("can.Model.Cacheable", {
     if (!this.custom_attributes) {
       this.setup_custom_attributes();
     }
-    this.custom_attribute_values.each(function (custom_attr) {
+    can.each(this.custom_attribute_values, function (custom_attr) {
       custom_attr = custom_attr.reify();
       custom_attrs[custom_attr_ids[custom_attr.custom_attribute_id]] =
         custom_attr.attribute_value;
