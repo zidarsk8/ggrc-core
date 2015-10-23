@@ -661,3 +661,25 @@ class TestPlanned(object):
   _fulltext_attrs = ['test_plan']
   _sanitize_html = ['test_plan']
   _aliases = {"test_plan": "Test Plan"}
+
+
+class Assignable(object):
+
+  ASSIGNEE_TYPES = set(["Assignee"])
+
+  @property
+  def assignees(self):
+    assignees = [(r.source, r.attrs["AssigneeType"])
+                 for r in self.related_sources
+                 if "AssigneeType" in r.attrs]
+    assignees += [(r.destination, r.attrs["AssigneeType"])
+                  for r in self.related_destinations
+                  if "AssigneeType" in r.attrs]
+    return set(assignees)
+
+  @staticmethod
+  def _validate_relationship_attr(cls, source, dest, attr_name, attr_value):
+    types_ok = set([source.type, dest.type]) == set([cls.__name__, "Person"])
+    attr_name_ok = attr_name == "AssigneeType"
+    attr_value_ok = attr_value in cls.ASSIGNEE_TYPES
+    return types_ok and attr_name_ok and attr_value_ok
