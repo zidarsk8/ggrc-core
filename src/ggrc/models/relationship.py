@@ -12,7 +12,9 @@ from ggrc.models.mixins import Mapping
 from sqlalchemy import or_, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import validates
 from sqlalchemy.orm.collections import attribute_mapped_collection
+from werkzeug.exceptions import BadRequest
 
 
 class Relationship(Mapping, db.Model):
@@ -79,6 +81,11 @@ class Relationship(Mapping, db.Model):
     self.destination_type = value.__class__.__name__ if value is not None \
         else None
     return setattr(self, self.destination_attr, value)
+
+  @validates('relationship_attrs')
+  def _validate_attr(self, key, attr):
+    RelationshipAttr.validate_attr(self.source, self.destination, attr)
+    return attr
 
   @classmethod
   def find_related(cls, object1, object2):
@@ -185,3 +192,37 @@ class RelationshipAttr(Identifiable, db.Model):
   )
   attr_name = db.Column(db.String, nullable=False)
   attr_value = db.Column(db.String, nullable=False)
+
+  _validators = {}
+
+  @classmethod
+  def validate_attr(cls, source, destination, attr):
+    attr_name = attr.attr_name
+    attr_value = attr.attr_value
+    validators = cls._get_validators(source) + cls._get_validators(destination)
+    for validator in validators:
+      if validator(source, destination, attr_name, attr_value):
+        return
+    raise BadRequest("Invalid attribute {}: {}".format(attr_name, attr_value))
+
+  @classmethod
+  def _get_validators(cls, obj):
+    target_class = type(obj)
+    if target_class not in cls._validators:
+      cls._validators[target_class] = cls._gather_validators(target_class)
+    return cls._validators[target_class]
+
+  @staticmethod
+  def _gather_validators(target_class):
+    queue = set([target_class])
+    done = set()
+    validators = set()
+    while queue:
+      cls = queue.pop()
+      for b in cls.__bases__:
+        if b not in done:
+          queue.add(b)
+      validator = getattr(cls, "_validate_relationship_attr", None)
+      if validator is not None:
+        validators.add(validator)
+    return [lambda *args: v(target_class, *args) for v in validators]
