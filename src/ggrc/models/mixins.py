@@ -18,7 +18,6 @@ from sqlalchemy.orm.session import Session
 from ggrc import db
 from ggrc.models.inflector import ModelInflectorDescriptor
 from ggrc.models.reflection import AttributeInfo
-from ggrc.models.reflection import PublishOnly
 from ggrc.models.computed_property import computed_property
 
 from ggrc.utils import underscore_from_camelcase
@@ -415,8 +414,9 @@ class Slugged(Base):
   _aliases = {
       "slug": {
           "display_name": "Code",
-          "description": ("Must be unique. Can be left empty for autogeneration."
-                          " If updating or deleting, code is required"),
+          "description": ("Must be unique. Can be left empty for"
+                          "autogeneration. If updating or deleting,"
+                          "code is required"),
       }
   }
 
@@ -509,12 +509,12 @@ class WithContact(object):
   _publish_attrs = ['contact', 'secondary_contact']
   _aliases = {
       "contact": {
-        "display_name": "Primary Contact",
-        "filter_by": "_filter_by_contact",
+          "display_name": "Primary Contact",
+          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": {
-        "display_name": "Secondary Contact",
-        "filter_by": "_filter_by_secondary_contact",
+          "display_name": "Secondary Contact",
+          "filter_by": "_filter_by_secondary_contact",
       },
   }
 
@@ -627,7 +627,7 @@ class CustomAttributable(object):
   def custom_attribute_definitions(cls):
     # FIXME definitions should be class scoped, not instance scoped.
     from ggrc.models.custom_attribute_definition import \
-      CustomAttributeDefinition
+        CustomAttributeDefinition
     definition_type = foreign(CustomAttributeDefinition.definition_type)
     join_function = lambda: or_(
         definition_type == underscore_from_camelcase(cls.__name__),
@@ -644,7 +644,7 @@ class CustomAttributable(object):
   @classmethod
   def get_custom_attribute_definitions(cls):
     from ggrc.models.custom_attribute_definition import \
-      CustomAttributeDefinition
+        CustomAttributeDefinition
     return CustomAttributeDefinition.query.filter(
         CustomAttributeDefinition.definition_type ==
         underscore_from_camelcase(cls.__name__)).all()
