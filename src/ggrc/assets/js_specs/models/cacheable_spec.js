@@ -38,7 +38,7 @@ describe("can.Model.Cacheable", function() {
   describe("::setup", function() {
 
     it("prefers pre-set static names over root object & collection", function() {
-      var Model = can.Model.Cacheable.extend({
+      var Model = can.Model.Cacheable.extend("CSM.Models.Dummy", {
         root_object: "wrong_name",
         root_collection: "wrong_names",
         model_singular: "RightName",
@@ -77,7 +77,7 @@ describe("can.Model.Cacheable", function() {
 
     it("sets findAll to default based on root_collection if not set", function() {
       spyOn(can.Model, "setup");
-      var Model = can.Model.Cacheable.extend({ root_collection: "foos" }, {});
+      var Model = can.Model.Cacheable.extend("CMS.Models.DummyFind", { root_collection: "foos" }, {});
       expect(Model.findAll).toBe("GET /api/foos");
     });
 
