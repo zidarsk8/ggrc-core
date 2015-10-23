@@ -34,7 +34,6 @@
 
   // Register `workflows` extension with GGRC
   GGRC.extensions.push(WorkflowExtension);
-
   WorkflowExtension.name = "workflows";
 
   // Register Workflow models for use with `infer_object_type`
@@ -45,7 +44,6 @@
       'cycle_task_group': CMS.Models.CycleTaskGroup,
       'cycle_task_group_object': CMS.Models.CycleTaskGroupObject,
       'cycle_task_group_object_task': CMS.Models.CycleTaskGroupObjectTask,
-
       'task_group': CMS.Models.TaskGroup,
       'workflow': CMS.Models.Workflow
     };
@@ -248,6 +246,9 @@
 
     // Insert `workflows` mappings to all business object types
     can.each(_workflow_object_types, function (type) {
+      var tree_widgets = GGRC.tree_view.base_widgets_by_type;
+      tree_widgets[type] = tree_widgets[type].concat(["TaskGroup", "Workflow", "CycleTaskEntry", "CycleTaskGroupObjectTask", "CycleTaskGroupObject", "CycleTaskGroup"]);
+
       CMS.Models[type].attributes.cycle_objects = 'CMS.Models.CycleTaskGroupObject.stubs';
       mappings[type] = {
         task_groups: new GGRC.ListLoaders.ProxyListLoader('TaskGroupObject', 'object', 'task_group', 'task_group_objects', null),
