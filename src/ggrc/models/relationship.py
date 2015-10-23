@@ -84,6 +84,10 @@ class Relationship(Mapping, db.Model):
 
   @validates('relationship_attrs')
   def _validate_attr(self, key, attr):
+    """
+      Only white-listed attributes can be stored, so users don't use this
+      for storing arbitrary data.
+    """
     RelationshipAttr.validate_attr(self.source, self.destination, attr)
     return attr
 
@@ -184,6 +188,12 @@ class Relatable(object):
 
 
 class RelationshipAttr(Identifiable, db.Model):
+  """
+    Extended attributes for relationships. Used to store relations meta-data
+    so the Relationship table can be used in place of join-tables that carry
+    extra information
+  """
+
   __tablename__ = 'relationship_attrs'
   relationship_id = db.Column(
       db.Integer,
@@ -197,6 +207,10 @@ class RelationshipAttr(Identifiable, db.Model):
 
   @classmethod
   def validate_attr(cls, source, destination, attr):
+    """
+      Checks both source and destination type (with mixins) for
+      defined validators _validate_relationship_attr
+    """
     attr_name = attr.attr_name
     attr_value = attr.attr_value
     validators = cls._get_validators(source) + cls._get_validators(destination)
