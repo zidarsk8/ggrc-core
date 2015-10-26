@@ -5,16 +5,17 @@
 
 from ggrc import db
 from ggrc.models.mixins import Base
-from ggrc.models.mixins import deferred
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Identifiable
 from ggrc.models.mixins import Mapping
+from ggrc.models.mixins import deferred
 from sqlalchemy import or_, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from werkzeug.exceptions import BadRequest
+import functools
 
 
 class Relationship(Mapping, db.Model):
@@ -239,4 +240,4 @@ class RelationshipAttr(Identifiable, db.Model):
       validator = getattr(cls, "_validate_relationship_attr", None)
       if validator is not None:
         validators.add(validator)
-    return [lambda *args: v(target_class, *args) for v in validators]
+    return [functools.partial(v, target_class) for v in validators]
