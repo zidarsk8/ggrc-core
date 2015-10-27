@@ -681,7 +681,8 @@ class Resource(ModelView):
       return current_app.make_response((
           'application/json', 406, [('Content-Type', 'text/plain')]))
     with benchmark("Query read permissions"):
-      if not permissions.is_allowed_read(self.model.__name__, obj.id, obj.context_id):
+      if not permissions.is_allowed_read(self.model.__name__, obj.id, obj.context_id)\
+         and not has_conditions('read', self.model.__name__):
         raise Forbidden()
       if not permissions.is_allowed_read_for(obj):
         raise Forbidden()
@@ -728,13 +729,15 @@ class Resource(ModelView):
       return self.not_found_response()
     src = UnicodeSafeJsonWrapper(self.request.json)
     with benchmark("Query update permissions"):
-      if not permissions.is_allowed_update(self.model.__name__, obj.id, obj.context_id):
+      if not permissions.is_allowed_update(self.model.__name__, obj.id, obj.context_id)\
+         and not has_conditions('update', self.model.__name__):
         raise Forbidden()
       if not permissions.is_allowed_update_for(obj):
         raise Forbidden()
       new_context = self.get_context_id_from_json(src)
       if new_context != obj.context_id \
-          and not permissions.is_allowed_update(self.model.__name__, obj.id, new_context):
+         and not permissions.is_allowed_update(self.model.__name__, obj.id, new_context)\
+         and not has_conditions('update', self.model.__name__):
         raise Forbidden()
     if self.request.mimetype != 'application/json':
       return current_app.make_response(
@@ -790,7 +793,8 @@ class Resource(ModelView):
       if obj is None:
         return self.not_found_response()
       with benchmark("Query delete permissions"):
-        if not permissions.is_allowed_delete(self.model.__name__, obj.id, obj.context_id):
+        if not permissions.is_allowed_delete(self.model.__name__, obj.id, obj.context_id)\
+           and not has_conditions("delete", self.model.__name__):
           raise Forbidden()
         if not permissions.is_allowed_delete_for(obj):
           raise Forbidden()
@@ -1012,11 +1016,12 @@ class Resource(ModelView):
                 root_attribute), 400, []))
       with benchmark("Query create permissions"):
         if not permissions.is_allowed_create(self.model.__name__, None,
-                                             self.get_context_id_from_json(src)):
+                                             self.get_context_id_from_json(src))\
+           and not has_conditions('create', self.model.__name__):
           raise Forbidden()
 
       if src.get('private') == True and src.get('context') is not None \
-          and src['context'].get('id') is not None:
+         and src['context'].get('id') is not None:
         raise BadRequest(
             'context MUST be "null" when creating a private resource.')
       elif 'context' not in src:
@@ -1222,6 +1227,17 @@ class ReadOnlyResource(Resource):
       return super(ReadOnlyResource, self).dispatch_request(*args, **kwargs)
     else:
       raise NotImplementedError()
+
+
+def has_conditions(action, resource):
+  """
+  Checks if the resource has a condition that needs to be checked with
+  is_allowed_for
+  """
+  _permissions = permissions.permissions_for(get_current_user())._permissions()
+  return bool(_permissions.get(action, {})
+              .get(resource, {})
+              .get('conditions', {}))
 
 
 def filter_resource(resource, depth=0, user_permissions=None):
