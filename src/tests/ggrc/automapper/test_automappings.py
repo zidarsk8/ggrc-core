@@ -244,19 +244,22 @@ class TestAutomappings(TestCase):
     _, admin = self.gen.generate_person(user_role="gGRC Admin")
 
     program = self.create_object(Program, {'title': next('Program')})
-
-    owners = [{"id": creator.id}]
-    self.api.set_user(creator)
     regulation = self.create_object(Regulation, {
       'title': next('Regulation'),
-      'owners': owners,
+      'owners': [{"id": admin.id}],
     })
+    owners = [{"id": creator.id}]
+    self.api.set_user(creator)
     section = self.create_object(Section, {
       'title': next('Section'),
       'owners': owners,
     })
     objective = self.create_object(Objective, {
       'title': next('Objective'),
+      'owners': owners,
+    })
+    control = self.create_object(Control, {
+      'title': next('Control'),
       'owners': owners,
     })
 
@@ -268,9 +271,10 @@ class TestAutomappings(TestCase):
 
     self.api.set_user(creator)
     self.assert_mapping_implication(
-        to_create=[(section, objective)],
+        to_create=[(section, objective),
+                   (control, objective)],
         implied=[(program, regulation),
                  (program, section),
                  (section, regulation),
-                 (objective, regulation)],
+                 (control, section)],
     )
