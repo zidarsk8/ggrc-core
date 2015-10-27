@@ -3,17 +3,20 @@
 # Created By: andraz@reciprocitylabs.com
 # Maintained By: andraz@reciprocitylabs.com
 
-import os
-import random
-import itertools
-
-from tests.ggrc import TestCase
-from tests.ggrc.generator import ObjectGenerator
-
-from ggrc.models import (Regulation, Section, Relationship,
-                         Program, Control, Objective)
 from ggrc import db
 from ggrc.automapper.rules import rules
+from ggrc.models import Control
+from ggrc.models import Objective
+from ggrc.models import Program
+from ggrc.models import Regulation
+from ggrc.models import Relationship
+from ggrc.models import Section
+from tests.ggrc import TestCase
+from tests.ggrc.api_helper import Api
+from tests.ggrc.generator import ObjectGenerator
+import itertools
+import os
+import random
 
 
 if os.environ.get('TRAVIS', False):
@@ -46,6 +49,7 @@ class TestAutomappings(TestCase):
   def setUp(self):
     TestCase.setUp(self)
     self.gen = ObjectGenerator()
+    self.api = self.gen.api
 
   def tearDown(self):
     TestCase.tearDown(self)
@@ -233,4 +237,40 @@ class TestAutomappings(TestCase):
                    (controlP, control1),
                    (controlP, control2)],
         implied=[(objective, control1), (objective, control2)]
+    )
+
+  def test_automapping_permissions_check(self):
+    _, creator = self.gen.generate_person(user_role="Creator")
+    _, admin = self.gen.generate_person(user_role="gGRC Admin")
+
+    program = self.create_object(Program, {'title': next('Program')})
+
+    owners = [{"id": creator.id}]
+    self.api.set_user(creator)
+    regulation = self.create_object(Regulation, {
+      'title': next('Regulation'),
+      'owners': owners,
+    })
+    section = self.create_object(Section, {
+      'title': next('Section'),
+      'owners': owners,
+    })
+    objective = self.create_object(Objective, {
+      'title': next('Objective'),
+      'owners': owners,
+    })
+
+    self.api.set_user(admin)
+    self.assert_mapping_implication(
+        to_create=[(program, regulation), (regulation, section)],
+        implied=[(program, section)]
+    )
+
+    self.api.set_user(creator)
+    self.assert_mapping_implication(
+        to_create=[(section, objective)],
+        implied=[(program, regulation),
+                 (program, section),
+                 (section, regulation),
+                 (objective, regulation)],
     )
