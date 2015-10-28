@@ -4,14 +4,12 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from collections import defaultdict
-from flask import current_app
 from itertools import chain
 from itertools import product
 
 from ggrc import settings
 from ggrc.cache.memcache import MemCache
-from ggrc.converters import errors
-from ggrc.converters import get_importables
+from ggrc.converters import get_exportables
 from ggrc.converters.base_block import BlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import split_array
@@ -52,7 +50,7 @@ class Converter(object):
     self.new_objects = defaultdict(dict)
     self.shared_state = {}
     self.response_data = []
-    self.importable = get_importables()
+    self.exportable = get_exportables()
     self.indexer = get_indexer()
 
   def to_array(self, data_grid=False):
@@ -120,7 +118,7 @@ class Converter(object):
 
     Generate block converters from a list of tuples with an object name and ids
     """
-    object_map = {o.__name__: o for o in self.importable.values()}
+    object_map = {o.__name__: o for o in self.exportable.values()}
     for object_data in self.ids_by_type:
       class_name = object_data["object_name"]
       object_class = object_map[class_name]
@@ -136,7 +134,7 @@ class Converter(object):
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
       class_name = data[1][0].strip().lower()
-      object_class = self.importable.get(class_name)
+      object_class = self.exportable.get(class_name)
       raw_headers, rows = extract_relevant_data(data)
       block_converter = BlockConverter(self, object_class=object_class,
                                        rows=rows, raw_headers=raw_headers,
@@ -170,4 +168,3 @@ class Converter(object):
       return
     memcache = MemCache()
     memcache.clean()
-

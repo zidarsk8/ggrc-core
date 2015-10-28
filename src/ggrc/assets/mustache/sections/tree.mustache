@@ -94,16 +94,12 @@
                     </li>
                   {{/infer_roles}}
                   {{#with_page_object_as 'page_instance'}}
-                  {{#if_helpers '\
-                    ^if_instance_of' page_instance 'Directive' '\
-                    or ^if_instance_of' instance 'Section'}}
                     <li>
                       {{#child_options}}
                         {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance multiple_mapping_case=true}}}
                       {{/child_options}}
                       {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
                     </li>
-                  {{/if_helpers}}
                   {{/with_page_object_as}}
 
                   {{#with_mapping_count instance 'related_objects'}}

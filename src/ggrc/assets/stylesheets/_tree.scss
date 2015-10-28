@@ -265,6 +265,7 @@ ul.new-tree {
             &.facility,
             &.product,
             &.dataasset,
+            &.accessgroup,
             &.market {
               color:$business;
             }
@@ -356,6 +357,7 @@ ul.new-tree {
               &.facility,
               &.product,
               &.dataasset,
+              &.accessgroup,
               &.market {
                 color:$business;
               }
@@ -672,6 +674,7 @@ ul.new-tree {
     &.facility,
     &.product,
     &.dataasset,
+    &.accessgroup,
     &.market
     {
       .item-data {
@@ -1014,6 +1017,13 @@ ul.new-tree {
   padding:9px 0;
 }
 
+.bottom-space {
+  padding-bottom: 25px;
+  p {
+    margin-bottom: 0;
+  }
+}
+
 .show-description {
   position:relative;
   padding-top:16px;
@@ -1267,35 +1277,67 @@ ul.new-tree {
 }
 
 .tier-content {
-  overflow: hidden;
-  zoom: 1;
-  .pin-content & {
-    margin-right: 105px;
+  .sticky-info-panel & {
+    margin-top: 77px;
   }
   &.pin {
-    margin-right: 0;
+    .info-pane-utility {
+      .details-wrap {
+        margin-top: 10px;
+      }
+    }
   }
+  .info-pane-utility {
+    .details-wrap {
+      margin-top: 0;
+    }
+  }
+}
+
+.info-pane-utility {
+  @include clearfix();
+  float: right;
 }
 
 .details-wrap {
   float: right;
   margin-left: 20px;
   width: 60px;
-  margin-top: -4px;
-  .pin-content & {
-    margin-top: -54px;
-  }
   position: relative;
+  .info-pane-utility & {
+    .dropdown-toggle {
+      @include clearfix();
+      height: 12px;
+      padding-bottom: 9px;
+    }
+  }
+  .pin-content & {
+    margin-top: 4px;
+  }
   a {
     display: block;
   }
-  &.no-top {
-    margin-top: -4px;
-  }
   &.pin {
-    margin-left: 10px;
-    width: 95px;
-    margin-top: 5px;
+    @include clearfix();
+    width: auto;
+    margin-left: 5px;
+    margin-top: -10px !important;
+    float: none;
+    clear: both;
+    .sticky-info-panel & {
+      margin-top: -3px;
+    }
+  }
+  .bubble {
+    float: left;
+    margin-right: 4px;
+    background: $darkGray;
+    @include border-radius(50%);
+    width: 8px;
+    height: 8px;
+    &:last-child {
+      margin-right: 0;
+    }
   }
   .dropdown-menu {
     @extend %reset-list;

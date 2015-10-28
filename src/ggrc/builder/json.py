@@ -250,6 +250,8 @@ class UpdateAttrHandler(object):
   @classmethod
   def AssociationProxy(cls, obj, json_obj, attr_name, class_attr):
     """Translate the JSON value for an ``AssociationProxy``."""
+    if getattr(class_attr, "publish_raw", False):
+      return json_obj.get(attr_name, {})
     rel_class = class_attr.remote_attr.property.mapper.class_
     return cls.query_for(rel_class, json_obj, attr_name, True)
 
@@ -618,8 +620,11 @@ class Builder(AttributeInfo):
       self, obj, attr_name, inclusions, include, inclusion_filter):
     class_attr = getattr(obj.__class__, attr_name)
     if isinstance(class_attr, AssociationProxy):
-      return self.publish_association_proxy(
-          obj, attr_name, class_attr, inclusions, include, inclusion_filter)
+      if getattr(class_attr, 'publish_raw', False):
+        return getattr(obj, attr_name).copy()
+      else:
+        return self.publish_association_proxy(
+            obj, attr_name, class_attr, inclusions, include, inclusion_filter)
     elif isinstance(class_attr, InstrumentedAttribute) and \
          isinstance(class_attr.property, RelationshipProperty):
       return self.publish_relationship(

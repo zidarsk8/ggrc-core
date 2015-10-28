@@ -21,8 +21,8 @@ $.ajaxPrefilter(function ( options, originalOptions, jqXHR ) {
 
 function get_template_path(url) {
   var match;
-  match = url.match(/\/static\/mustache\/(.*)\.mustache/);
-  return match && match[1];
+  match = url.match(/\/static\/(mustache|mockups)\/(.*)\.mustache/);
+  return match && match[2];
 }
 
 // Check if the template is available in "GGRC.Templates", and if so,
@@ -31,7 +31,6 @@ function get_template_path(url) {
 $.ajaxTransport("text", function (options, _originalOptions, _jqXHR) {
   var template_path = get_template_path(options.url),
       template = template_path && GGRC.Templates[template_path];
-
   if (template) {
     return {
       send: function (headers, completeCallback) {
@@ -764,6 +763,29 @@ Mustache.registerHelper("get_permalink", function () {
   return window.location.href;
 });
 
+Mustache.registerHelper("get_view_link", function (instance, options) {
+  function finish(link) {
+    return "<a href=" + link.viewLink + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
+  }
+  instance = resolve_computed(instance);
+  var props = {
+      "Request": "audit",
+      "TaskGroupTask": "task_group:workflow",
+      "TaskGroup": "workflow",
+      "CycleTaskGroupObjectTask": "cycle:workflow",
+      "InterviewResponse": "request:audit",
+      "DocumentationResponse": "request:audit"
+    },
+    hasProp = _.has(props, instance.type);
+
+  if (!instance.viewLink && !hasProp) {
+    return "";
+  }
+  if (instance && !hasProp) {
+    return finish(instance);
+  }
+  return defer_render("a", finish, instance.refresh_all.apply(instance, props[instance.type].split(":")));
+});
 
 Mustache.registerHelper("schemed_url", function (url) {
   var domain, max_label, url_split;
@@ -1703,7 +1725,7 @@ Mustache.registerHelper("global_count", function (model_type, options) {
         , "Section", "Objective", "Control"
         , "System", "Process"
         , "DataAsset", "Product", "Project", "Facility", "OrgGroup"
-        , "Audit"
+        , "Audit", "AccessGroup"
         ];
       GGRC._search_cache_deferred = GGRC.Models.Search.counts_for_types(null, models);
     }
@@ -2744,7 +2766,6 @@ Mustache.registerHelper("find_template", function (base_name, instance, options)
     //binding result case
     instance = instance.instance;
   }
-
   if (GGRC.Templates[instance.constructor.table_plural + "/" + base_name]) {
     tmpl = "/static/mustache/" + instance.constructor.table_plural + "/" + base_name + ".mustache";
   } else if (GGRC.Templates["base_objects/" + base_name]) {
@@ -2969,6 +2990,13 @@ Mustache.registerHelper("if_less", function (a, b, options) {
   } else {
     return options.inverse(options.contexts);
   }
+});
+
+Mustache.registerHelper("add_index", function(index, increment, options) {
+  index = Mustache.resolve(index);
+  increment = Mustache.resolve(increment);
+
+  return (index + increment);
 });
 
 function get_proper_url (url) {

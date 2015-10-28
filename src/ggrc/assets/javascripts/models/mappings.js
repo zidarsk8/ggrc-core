@@ -322,7 +322,7 @@
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
           "Program", "Issue", "Control", "Section", "Clause", "Objective",
-          "Audit", "ControlAssessment"
+          "Audit", "ControlAssessment", "AccessGroup"
         ]
       },
       related_objects_as_source: Proxy(
@@ -330,6 +330,7 @@
       related_objects_as_destination: Proxy(
         null, "source", "Relationship", "destination", "related_sources"),
       related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
+      related_access_groups: TypeFilter("related_objects", "AccessGroup"),
       related_data_assets: TypeFilter("related_objects", "DataAsset"),
       related_facilities: TypeFilter("related_objects", "Facility"),
       related_markets: TypeFilter("related_objects", "Market"),
@@ -400,12 +401,8 @@
       _mixins: [
         "related_object", "personable", "ownable"
       ],
-      _canonical: {
-        "sections": "Section"
-      },
-      sections: Direct("Section", "directive", "sections"),
       orphaned_objects: Multi([
-        "sections", "people", "controls", "objectives", "related_objects"
+        "people", "controls", "objectives", "related_objects"
       ])
     },
 
@@ -432,6 +429,9 @@
       orphaned_objects: Multi([
         "related_objects", "people", "controls", "objectives", "sections", "clauses"
       ])
+    },
+    AccessGroup: {
+      _mixins: ["business_object"]
     },
     DataAsset: {
       _mixins: ["business_object"]
@@ -463,7 +463,7 @@
     Person: {
       _canonical: {
         "related_objects": [
-          "Program", "Regulation", "Contract", "Policy", "Standard",
+          "Program", "Regulation", "Contract", "Policy", "Standard", "AccessGroup",
           "Objective", "Control", "Section", "Clause", "DataAsset", "Facility", "Market",
           "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue", "ControlAssessment"
         ],
@@ -478,6 +478,7 @@
       owned_controls: Indirect("Control", "contact"),
       owned_sections: Indirect("Section", "contact"),
       owned_clauses: Indirect("Clause", "contact"),
+      owned_access_groups: Indirect("AccessGroup", "contact"),
       owned_data_assets: Indirect("DataAsset", "contact"),
       owned_facilities: Indirect("Facility", "contact"),
       owned_markets: Indirect("Market", "contact"),
@@ -498,6 +499,7 @@
       related_controls: TypeFilter("related_objects", "Control"),
       related_sections: TypeFilter("related_objects", "Section"),
       related_clauses: TypeFilter("related_objects", "Clause"),
+      related_access_groups: TypeFilter("related_objects", "AccessGroup"),
       related_data_assets: TypeFilter("related_objects", "DataAsset"),
       related_facilities: TypeFilter("related_objects", "Facility"),
       related_markets: TypeFilter("related_objects", "Market"),
@@ -530,7 +532,7 @@
       related_objects_via_search: Search(function (binding) {
         var types = [
           "Program", "Regulation", "Contract", "Policy", "Standard",
-          "Section", "Clause", "Objective", "Control",
+          "Section", "Clause", "Objective", "Control", "AccessGroup",
           "System", "Process", "DataAsset", "Product", "Project", "Facility",
           "Market", "OrgGroup", "Vendor", "Audit", "Issue", "ControlAssessment" //, "Request", "Response"
         ];
@@ -548,7 +550,7 @@
           }).pipe(function (mappings) {
             return mappings.entries;
           });
-      }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,ControlAssessment"),
+      }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,AccessGroup,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,ControlAssessment"),
       extended_related_programs_via_search: TypeFilter("related_objects_via_search", "Program"),
       extended_related_regulations_via_search: TypeFilter("related_objects_via_search", "Regulation"),
       extended_related_contracts_via_search: TypeFilter("related_objects_via_search", "Contract"),
@@ -558,6 +560,7 @@
       extended_related_controls_via_search: TypeFilter("related_objects_via_search", "Control"),
       extended_related_sections_via_search: TypeFilter("related_objects_via_search", "Section"),
       extended_related_clauses_via_search: TypeFilter("related_objects_via_search", "Clause"),
+      extended_related_access_groups_via_search: TypeFilter("related_objects_via_search", "AccessGroup"),
       extended_related_data_assets_via_search: TypeFilter("related_objects_via_search", "DataAsset"),
       extended_related_facilities_via_search: TypeFilter("related_objects_via_search", "Facility"),
       extended_related_markets_via_search: TypeFilter("related_objects_via_search", "Market"),
@@ -692,6 +695,7 @@
         "control": "Control",
       },
       control: Direct("Control", "controls", "control_assessment"),
+      requests: Cross("related_audits", "requests")
     },
     Issue: {
       _mixins: [

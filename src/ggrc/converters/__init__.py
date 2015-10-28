@@ -6,12 +6,31 @@
 """ This module is used for import and export of data with csv files """
 
 from ggrc.extensions import get_extension_modules
-from ggrc.models import (
-    Audit, Control, ControlAssessment, DataAsset, Contract,
-    Policy, Regulation, Standard, Facility, Market, Objective, Option,
-    OrgGroup, Vendor, Person, Product, Program, Project, Request, Response,
-    Section, Clause, System, Process, Issue,
-)
+from ggrc.models import AccessGroup
+from ggrc.models import Audit
+from ggrc.models import Control
+from ggrc.models import ControlAssessment
+from ggrc.models import DataAsset
+from ggrc.models import Contract
+from ggrc.models import Policy
+from ggrc.models import Regulation
+from ggrc.models import Standard
+from ggrc.models import Facility
+from ggrc.models import Market
+from ggrc.models import Objective
+from ggrc.models import OrgGroup
+from ggrc.models import Vendor
+from ggrc.models import Person
+from ggrc.models import Product
+from ggrc.models import Program
+from ggrc.models import Project
+from ggrc.models import Request
+from ggrc.models import Response
+from ggrc.models import Section
+from ggrc.models import Clause
+from ggrc.models import System
+from ggrc.models import Process
+from ggrc.models import Issue
 
 
 def get_shared_unique_rules():
@@ -34,6 +53,9 @@ def get_shared_unique_rules():
 
 
 GGRC_IMPORTABLE = {
+    "access group": AccessGroup,
+    "access_group": AccessGroup,
+    "accessgroup": AccessGroup,
     "audit": Audit,
     "control": Control,
     "control assessment": ControlAssessment,
@@ -66,15 +88,30 @@ GGRC_IMPORTABLE = {
     "issue": Issue,
 }
 
+GGRC_EXPORTABLE = {}
+
+
+def _get_types(attr):
+  res = {}
+  for extension_module in get_extension_modules():
+    contributed = getattr(extension_module, attr, None)
+    if callable(contributed):
+      res.update(contributed())
+    elif isinstance(contributed, dict):
+      res.update(contributed)
+  return res
+
 
 def get_importables():
   """ Get a dict of all importable objects from all modules """
   importable = GGRC_IMPORTABLE
-  for extension_module in get_extension_modules():
-    contributed_importables = getattr(
-        extension_module, "contributed_importables", None)
-    if callable(contributed_importables):
-      importable.update(contributed_importables())
-    elif isinstance(contributed_importables, dict):
-      importable.update(contributed_importables)
+  importable.update(_get_types("contributed_importables"))
   return importable
+
+
+def get_exportables():
+  """ Get a dict of all exportable objects from all modules """
+  exportable = GGRC_EXPORTABLE
+  exportable.update(get_importables())
+  exportable.update(_get_types("contributed_exportables"))
+  return exportable

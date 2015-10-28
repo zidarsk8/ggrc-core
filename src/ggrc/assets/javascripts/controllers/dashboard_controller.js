@@ -103,24 +103,11 @@ can.Control("CMS.Controllers.Dashboard", {
               dashboard_controller: this
           });
       }
-
-      if (this.display_prefs.getTopNavHidden()) {
-        // page needs time to render
-        setTimeout(this.close_nav.bind(this), 500);
-      }
     }
 
   , init_info_pin: function() {
     this.info_pin = new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
   }
-
-  , ".nav-trigger click": function(el, ev) {
-      if(el.hasClass("active")) {
-        this.close_nav(el);
-      } else {
-        this.open_nav(el);
-      }
-    }
 
   , '.user-dropdown click': function (el, ev) {
     var email_now = el.find('input[value="Email_Now"]'),
@@ -136,48 +123,6 @@ can.Control("CMS.Controllers.Dashboard", {
     , ".nav-logout click": function (el, ev) {
       can.Model.LocalStorage.clearAll();
     }
-
-  , open_nav: function (el) {
-    el || (el = $(".nav-trigger"));
-    var options = {
-        duration: 800,
-        easing: 'easeOutExpo'
-    },
-        $nav = el.closest("body").find(".top-inner-nav"),
-        $lhn_nav = el.closest("body").find(".lhs-holder"),
-        $lhn_type = el.closest("body").find(".lhn-type"),
-        $content = el.closest("body").find(".object-area");
-
-    el.addClass("active");
-    $nav.animate({top: "48"}, options);
-    $lhn_type.animate({top: "94"}, options);
-    $lhn_nav.animate({top: "128"}, options);
-    $content.animate({top: "78"}, options);
-
-    this.display_prefs.setTopNavHidden("", false);
-    $(window).trigger("resize");
-  }
-
-  , close_nav: function (el) {
-    el || (el = $(".nav-trigger"));
-    var options = {
-        duration: 800,
-        easing: 'easeOutExpo'
-    },
-        $nav = el.closest("body").find(".top-inner-nav"),
-        $lhn_nav = el.closest("body").find(".lhs-holder"),
-        $lhn_type = el.closest("body").find(".lhn-type"),
-        $content = el.closest("body").find(".object-area");
-
-    el.removeClass("active");
-    $nav.animate({top: "18"}, options);
-    $lhn_type.animate({top: "65"}, options);
-    $lhn_nav.animate({top: "99"}, options);
-    $content.animate({top: "49"}, options);
-
-    this.display_prefs.setTopNavHidden("", true);
-    $(window).trigger("resize");
-  }
 
   , init_widget_descriptors: function() {
       var that = this;
@@ -221,7 +166,7 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , get_active_widget_elements: function() {
-      return this.element.find("section.widget[id]:not([id=])").toArray();
+      return this.element.find("section.widget[id]:not([id=''])").toArray();
     }
 
   , add_widget_from_descriptor: function() {

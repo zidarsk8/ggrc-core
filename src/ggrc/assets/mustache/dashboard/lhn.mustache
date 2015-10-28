@@ -86,6 +86,7 @@
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Person" li_class="entities" template_view='/static/mustache/people/search_result.mustache'}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="OrgGroup" li_class="entities"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Vendor" li_class="entities"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="AccessGroup" li_class="entities"}}}
               </ul>
             </div>
           </li>
@@ -107,6 +108,8 @@
               </ul>
             </div>
           </li>
+
+          {{{render_hooks 'LHN.Sections_risk'}}}
         </ul>
 
         {{{render_hooks 'LHN.Sections'}}}

@@ -3,9 +3,11 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from ggrc.models import Product
 from tests.ggrc.converters import TestCase
 from tests.ggrc.generator import ObjectGenerator
+
+from ggrc.models import AccessGroup
+from ggrc.models import Product
 
 
 class TestImportWithCustomAttributes(TestCase):
@@ -35,6 +37,9 @@ class TestImportWithCustomAttributes(TestCase):
     gen("product", attribute_type="Dropdown", title="man select",
         options="e,f,g", mandatory=True)
 
+    gen("access_group", attribute_type="Text",
+        title="access group test custom", mandatory=True)
+
   def create_people(self):
     emails = [
         "user1@ggrc.com",
@@ -51,7 +56,7 @@ class TestImportWithCustomAttributes(TestCase):
   def test_product_with_all_custom_attributes(self):
     filename = "product_with_all_custom_attributes.csv"
     response = self.import_file(filename)[0]
-    expected_warnings = set([
+    expected_warnings = {
         "Line 6: man CH contains invalid data. The value will be ignored.",
         "Line 8: normal select contains invalid data. The value will be"
         " ignored.",
@@ -74,9 +79,9 @@ class TestImportWithCustomAttributes(TestCase):
         " user will be ignored.",
         "Line 27: Owner field does not contain a valid owner. You will be"
         " assigned as object owner."
-    ])
+    }
 
-    expected_errors = set([
+    expected_errors = {
         "Line 6: Field man CH is required. The line will be ignored.",
         "Line 9: Field man select is required. The line will be ignored.",
         "Line 10: Field man select is required. The line will be ignored.",
@@ -85,10 +90,30 @@ class TestImportWithCustomAttributes(TestCase):
         "Line 18: Field man RT is required. The line will be ignored.",
         "Line 20: Field man text is required. The line will be ignored.",
         "Line 28: Field Title is required. The line will be ignored."
-    ])
+    }
 
     self.assertEqual(expected_warnings, set(response["row_warnings"]))
     self.assertEqual(expected_errors, set(response["row_errors"]))
     self.assertEqual(18, response["created"])
     self.assertEqual(8, response["ignored"])
     self.assertEqual(18, Product.query.count())
+
+  def test_multi_word_object_with_custom_attributes(self):
+    """Test multi-word (e.g. Access Group, Data Asset) object import"""
+    filename = "multi_word_object_custom_attribute_test.csv"
+    response = self.import_file(filename)[0]
+    self.assertEqual([], response["row_warnings"])
+    self.assertEqual([], response["row_errors"])
+    self.assertEqual(10, response["created"])
+    self.assertEqual(0, response["ignored"])
+    self.assertEqual(0, response["updated"])
+    self.assertEqual(10, AccessGroup.query.count())
+
+    for x in range(1, 11):
+      ag = AccessGroup.query.filter(
+        AccessGroup.slug == "ag-{}".format(x)).first()
+      self.assertEqual(
+        len(filter(lambda v: v.attribute_value == "some text {}".format(x),
+                   ag.custom_attribute_values)),
+        1
+      )

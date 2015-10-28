@@ -788,7 +788,11 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
     "operational": "operationally"
   },
   tree_view_options : {
-    add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
+    add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
+    attr_list : can.Model.Cacheable.attr_list.concat([
+        {attr_title: 'Conclusion: Design', attr_name: 'design'},
+        {attr_title: 'Conclusion: Operation', attr_name: 'operationally'}
+    ])
   },
   init : function() {
     this._super && this._super.apply(this, arguments);

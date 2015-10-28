@@ -61,6 +61,16 @@
                                   {{network_zone.title}}
                                 {{/using}}
                               {{/case}}
+                              {{#case 'design'}}
+                                {{#using design=instance.design}}
+                                  {{design}}
+                                {{/using}}
+                              {{/case}}
+                              {{#case 'operationally'}}
+                                {{#using operationally=instance.operationally}}
+                                  {{operationally}}
+                                {{/using}}
+                              {{/case}}
 
                               {{#default}}
                                 {{#if_helpers '\

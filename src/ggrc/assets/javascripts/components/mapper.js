@@ -44,16 +44,24 @@
       get_forbidden: function (type) {
         var forbidden = {
           "Program": ["Audit"],
-          "Audit": ["Request", "ControlAssessment"],
-          "ControlAssessment": ["Audit", "Control"]
+          "Audit": ["Request"],
+          "ControlAssessment": ["Control"]
         };
         return forbidden[type] ? forbidden[type] : [];
+      },
+      get_whitelist: function () {
+        var whitelisted = ["Request", "ControlAssessment",
+            "TaskGroupTask", "TaskGroup", "CycleTaskGroupObjectTask",
+            "InterviewResponse", "DocumentationResponse"
+          ];
+        return this.attr("search_only") ? whitelisted : [];
       },
       types: can.compute(function () {
         var selector_list,
             canonical = GGRC.Mappings.get_canonical_mappings_for(this.object),
             list = GGRC.tree_view.base_widgets_by_type[this.object],
             forbidden = this.get_forbidden(this.object),
+            whitelist = this.get_whitelist(),
             groups = {
               "all_objects": {
                 name: "All Objects",
@@ -77,7 +85,8 @@
               }
             };
 
-        selector_list = _.intersection(_.keys(canonical), list);
+        selector_list = _.intersection.apply(_, _.compact([_.keys(canonical), list]));
+        selector_list = _.union(selector_list, whitelist);
         can.each(selector_list, function (model_name) {
           if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name)) {
             return;
@@ -195,22 +204,22 @@
         this.scope.attr("mapper.is_saving", true);
         que.enqueue(instance).trigger().done(function (inst) {
           data["context"] = instance.context || null;
-          _.each(this.scope.attr("mapper.selected"), function (desination) {
+          _.each(this.scope.attr("mapper.selected"), function (destination) {
             var modelInstance,
-                isMapped = GGRC.Utils.is_mapped(instance, desination),
-                isAllowed = GGRC.Utils.allowed_to_map(instance, desination);
+                isMapped = GGRC.Utils.is_mapped(instance, destination),
+                isAllowed = GGRC.Utils.allowed_to_map(instance, destination);
 
             if (isMapped || !isAllowed) {
               return;
             }
-            mapping = GGRC.Mappings.get_canonical_mapping(object, isAllObject ? desination.type : type);
+            mapping = GGRC.Mappings.get_canonical_mapping(object, isAllObject ? destination.type : type);
             Model = CMS.Models[mapping.model_name];
             data[mapping.object_attr] = {
               href: instance.href,
               type: instance.type,
               id: instance.id
             };
-            data[mapping.option_attr] = desination;
+            data[mapping.option_attr] = destination;
             modelInstance = new Model(data);
             defer.push(modelInstance.save());
           }, this);
@@ -223,6 +232,7 @@
               this.scope.attr("mapper.is_saving", false);
               // TODO: Find proper way to dismiss the modal
               this.element.find(".modal-dismiss").trigger("click");
+
               // there is some kind of a race condition when filling the treview with new elements
               // so many don't get rendered. To solve it, at the end of the loading
               // we refresh the whole tree view. Other solutions could be to batch add the objects.

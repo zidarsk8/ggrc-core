@@ -8,31 +8,26 @@
 
 {{#instance}}
   <section class="info">
+
     {{#is_info_pin}}
     <div class="clearfix">
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
       <div class="tier-content pin">
+        <div class="info-pane-utility">
+          {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+          {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+        </div>
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       </div>
     </div>
     {{/is_info_pin}}
 
-    {{> /static/mustache/base_objects/dropdown_menu.mustache}}
-
     <div class="tier-content">
       {{^is_info_pin}}
+        <div class="info-pane-utility">
+          {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+        </div>
         {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       {{/is_info_pin}}
-      {{#if instance.private}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Private Program</h6>
-            <span class="private">
-              <i class="grcicon-private"></i>
-            </span>
-          </div>
-        </div>
-      {{/if}}
       {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/contacts.mustache' is_program=true instance=instance}}}

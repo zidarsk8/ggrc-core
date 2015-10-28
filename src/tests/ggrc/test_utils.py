@@ -19,8 +19,7 @@ class TestUtilsDictFunctions(TestCase):
     # Special cases in mappings as defined in utils.py:
     audit_mappings = ["Control", "DataAsset", "Facility", "Market", "OrgGroup",
                       "Process", "Product", "Program", "Project", "System",
-                      "Vendor"]
-    section_mappings = ["Policy", "Regulation", "Standard"]
+                      "Vendor", "AccessGroup"]
 
     for object_name, object_mappings in mappings.items():
       for mapping in object_mappings:
@@ -28,11 +27,6 @@ class TestUtilsDictFunctions(TestCase):
           if mapping == "Request":
             self.assertNotIn(mapping, mappings)
           elif mapping == "Audit" and object_name in audit_mappings:
-            self.assertNotIn(
-                object_name, mappings[mapping],
-                "{} found in {} mappings".format(object_name, mapping)
-            )
-          elif mapping == "Section" and object_name in section_mappings:
             self.assertNotIn(
                 object_name, mappings[mapping],
                 "{} found in {} mappings".format(object_name, mapping)
