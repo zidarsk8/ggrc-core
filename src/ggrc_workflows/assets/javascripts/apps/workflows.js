@@ -301,8 +301,10 @@
     var page_instance = GGRC.page_instance(),
         tree_widgets = GGRC.tree_view.base_widgets_by_type;
 
-    // Add Workflow to tree base
-    tree_widgets[type] = tree_widgets[type].concat(["TaskGroup", "Workflow", "CycleTaskEntry", "CycleTaskGroupObjectTask", "CycleTaskGroupObject", "CycleTaskGroup"]);
+    _.each(_workflow_object_types, function (type) {
+      tree_widgets[type] = tree_widgets[type].concat(["TaskGroup", "Workflow", "CycleTaskEntry", "CycleTaskGroupObjectTask", "CycleTaskGroupObject", "CycleTaskGroup"]);
+    });
+
     if (page_instance instanceof CMS.Models.Workflow) {
       WorkflowExtension.init_widgets_for_workflow_page();
     } else if (page_instance instanceof CMS.Models.Person) {
