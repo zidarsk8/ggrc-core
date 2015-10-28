@@ -10,6 +10,7 @@
 from access_group import AccessGroup
 from ggrc.models.audit import Audit
 from ggrc.models.audit_object import AuditObject
+from ggrc.models.comment import Comment
 from ggrc.models.categorization import Categorization
 from ggrc.models.category import CategoryBase
 from ggrc.models.context import Context
@@ -67,6 +68,7 @@ all_models = [
     Context,
     Control,
     ControlAssessment,
+    Comment,
     CustomAttributeDefinition,
     CustomAttributeValue,
     DataAsset,
