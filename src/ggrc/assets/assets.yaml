@@ -39,6 +39,7 @@ dashboard-js-files:
   - plugins/persistent_notifier.js
   - ggrc_base.js
   - plugins/ggrc_utils.js
+  - plugins/can_control.js
   - plugins/wysiwyg.js
   - plugins/autocomplete.js
   - plugins/ajax_extensions.js
