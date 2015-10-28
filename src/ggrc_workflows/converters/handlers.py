@@ -238,6 +238,8 @@ class TaskTypeColumnHandler(ColumnHandler):
   def parse_item(self):
     """ parse task type column value """
     if self.raw_value == "":
+      self.add_warning(errors.MISSING_VALUE_ERROR,
+                       column_name=self.display_name)
       return None
     value = self.type_map.get(self.raw_value.lower())
     if value is None:
@@ -322,7 +324,7 @@ class ObjectsColumnHandler(ColumnHandler):
         task_group_id=self.row_converter.obj.id).all()
     lines = ["{}: {}".format(t.object._inflector.title_singular.title(),
                              t.object.slug)
-             for t in task_group_objects]
+             for t in task_group_objects if t.object is not None]
     return "\n".join(lines)
 
   def insert_object(self):

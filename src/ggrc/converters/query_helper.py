@@ -124,7 +124,7 @@ class QueryHelper(object):
     self.clean_filters(expression.get("right"))
 
   def expression_keys(self, exp):
-    op = exp["op"]["name"]
+    op = exp.get("op", {}).get("name", None)
     if op in ["AND", "OR"]:
       return expression_keys(exp["left"]) | expression_keys(exp["right"])
     left = exp.get("left", None)
