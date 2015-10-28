@@ -13,7 +13,6 @@
 //= require pbc/system
 
 (function(namespace, $) {
-
   var sort_by_name_email = function(list) {
     return new list.constructor(can.makeArray(list).sort(function(a,b) {
       a = a.person || a;
@@ -24,6 +23,12 @@
       if (a < b) return -1;
       return 0;
     }));
+  };
+  var init_widgets = function () {
+    // Ensure each extension has had a chance to initialize widgets
+    _.each(GGRC.extensions, function (extension) {
+      extension.init_widgets && extension.init_widgets();
+    });
   };
   var admin_list_descriptors = {
     "people" : {
@@ -129,8 +134,9 @@
         }
       }
   });
-  var $area = $('.area').first(), instance, model_name,
-      extra_page_options, defaults, object_browser;
+  var $area = $('.area').first(),
+      location = window.location.pathname,
+      instance, model_name, extra_page_options, defaults, object_browser;
 
   extra_page_options = {
       Program: {
@@ -152,18 +158,12 @@
       }
   };
 
-  object_browser = /^\/objectBrowser\/?$/.test(window.location.pathname);
-  if (/^\/\w+\/\d+($|\?|\#)/.test(window.location.pathname) || /^\/dashboard/.test(window.location.pathname)
+  object_browser = /^\/objectBrowser\/?$/.test(location);
+  if (/^\/\w+\/\d+($|\?|\#)/.test(location) || /^\/dashboard/.test(location)
       || object_browser) {
-  //if (/\w+\/\d+($|\?|\#)/.test(window.location) || /dashboard/.test(window.location)) {
     instance = GGRC.page_instance();
     model_name = instance.constructor.shortName;
-
-    // Ensure each extension has had a chance to initialize widgets
-    can.each(GGRC.extensions, function(extension) {
-      if (extension.init_widgets)
-        extension.init_widgets();
-    });
+    init_widgets();
     defaults = Object.keys(GGRC.WidgetList.get_widget_list_for(model_name));
 
     //Remove info and task tabs from object-browser list of tabs
@@ -186,20 +186,15 @@
         }
       , current_user: GGRC.current_user
       }, extra_page_options[model_name]));
-  } else if (/^\/admin\/?$/.test(window.location.pathname)) {
-
+  } else if (/^\/admin\/?$/.test(location)) {
     $area.cms_controllers_dashboard({
         widget_descriptors: GGRC.WidgetList.get_widget_list_for("admin")
       , menu_tree_spec: GGRC.admin_menu_spec
       , default_widgets : ["people", "roles", "events", "custom_attributes"]
     });
-
-    // Ensure each extension has had a chance to initialize admin widgets
-    can.each(GGRC.extensions, function(extension) {
-      if (extension.init_admin_widgets)
-        extension.init_admin_widgets();
-    });
-
+    init_widgets();
+  } else if (/^\/import|export/i.test(location)) {
+    init_widgets();
   } else {
     $area.cms_controllers_dashboard({
       widget_descriptors: GGRC.widget_descriptors,

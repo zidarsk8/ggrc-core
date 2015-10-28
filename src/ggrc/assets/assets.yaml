@@ -100,10 +100,8 @@ dashboard-js-files:
   - models/custom_attributes.js
   - apps/quick_search.js
   - apps/business_objects.js
-  - apps/dashboard.js
   - apps/custom_attributes.js
-  - dashboard.js
-  - jquery.iframe-transport.js
+  # - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   - components/link_to_clipboard.js
   - components/relevant_filters.js
@@ -112,6 +110,10 @@ dashboard-js-files:
   - components/mapper.js
   #- d3.v2.js
   #- related_graph.js
+
+app-init-files:
+  - apps/dashboard.js
+  - dashboard.js
 
 dashboard-js-template-files:
   - add_widget_menu.mustache

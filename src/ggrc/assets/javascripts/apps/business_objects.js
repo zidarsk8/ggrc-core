@@ -9,10 +9,12 @@
 
 (function (can, $) {
 
-  if (!GGRC.widget_descriptors)
+  if (!GGRC.widget_descriptors) {
     GGRC.widget_descriptors = {};
-  if (!GGRC.default_widgets)
+  }
+  if (!GGRC.default_widgets) {
     GGRC.default_widgets = [];
+  }
 
 
   //A widget descriptor has the minimum five properties:
